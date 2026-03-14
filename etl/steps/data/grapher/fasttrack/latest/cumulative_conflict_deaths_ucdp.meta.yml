@@ -69,6 +69,9 @@ tables:
           The best estimate of the number of deaths of combatants and civilians due to fighting in armed conflicts that were ongoing between 1989 and 2024.
 
           An armed conflict is a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year.
+        presentation:
+          topic_tags:
+            - War & Peace
       onesided_rate:
         title: Cumulative death rate from one-sided violence
         unit: deaths per 100,000 people
@@ -129,6 +132,9 @@ tables:
           An armed conflict is a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year.
 
           The rate is the deaths divided by the 1989 population, and expressed per 100,000 people.
+        presentation:
+          topic_tags:
+            - War & Peace
     dimensions:
       - name: country
         slug: country

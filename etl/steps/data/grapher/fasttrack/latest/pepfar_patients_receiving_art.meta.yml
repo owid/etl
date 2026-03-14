@@ -19,3 +19,7 @@ tables:
           numDecimalPlaces: 0
         description: |-
           The number of patients receiving antiretroviral therapy (ART) through the President's Emergency Plan for AIDS Relief, by year.
+        presentation:
+          topic_tags:
+            - Foreign Aid
+            - HIV/AIDS

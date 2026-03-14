@@ -41,6 +41,8 @@ tables:
                 customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100, 200]
                 baseColorScheme: Reds
       # Tests per case, cumulative
+          topic_tags:
+            - COVID-19
       cumulative_tests_per_case:
         title: Total COVID-19 tests per confirmed case
         description_short: |-
@@ -48,6 +50,9 @@ tables:
         unit: "tests per confirmed case"
 
       # Positivity rate, 7d average
+        presentation:
+          topic_tags:
+            - COVID-19
       short_term_positivity_rate:
         title: COVID-19 positivity rate
         description_short: |-
@@ -71,6 +76,8 @@ tables:
                 customNumericValues: [0, 1, 2, 5, 10, 20, 50]
                 baseColorScheme: Reds
       # Positivity rate, 7d avg
+          topic_tags:
+            - COVID-19
       cumulative_positivity_rate:
         title: COVID-19 positivity rate (cumulative)
         description_short: |-
@@ -80,6 +87,9 @@ tables:
         short_unit: "%"
 
       # Specific threshold indicator
+        presentation:
+          topic_tags:
+            - COVID-19
       has_population_5m_and_100_cases_and_testing_data:
         title: "Has population ≥ 5M AND had ≥100 cases ≥21 days ago AND has testing data"
         description_short: |-

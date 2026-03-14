@@ -14,6 +14,9 @@ tables:
         title: Cumulative lives saved by measles vaccination
         unit: lives saved
         description: The cumulative number of lives saved from measles since 1974 as a result of vaccination efforts
+        presentation:
+          topic_tags:
+            - Vaccination
     dimensions:
       - name: country
         slug: country

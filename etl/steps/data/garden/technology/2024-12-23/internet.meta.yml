@@ -19,6 +19,10 @@ tables:
         display:
           name: Number of Internet users
 
+        presentation:
+          topic_tags:
+            - Internet
+            - Technological Change
       share_internet_users:
         title: Share of Internet users
         short_unit: "%"

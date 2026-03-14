@@ -74,3 +74,471 @@ tables:
         unit: vehicles per 1,000 people
         display:
           numDecimalPlaces: 0
+  general_availability_of_statins_in_the_public_health_sector:
+    variables:
+      general_availability_of_statins_in_the_public_health_sector:
+        presentation:
+          topic_tags:
+            - Cardiovascular Diseases
+  alcohol_attributable_fractions__all_cause_deaths__pct:
+    variables:
+      alcohol_attributable_fractions__all_cause_deaths__pct__sex_both_sexes__age_group_total__all_ages:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  alcohol__tourist_consumption__in_litres_of_pure_alcohol:
+    variables:
+      alcohol__tourist_consumption__in_litres_of_pure_alcohol:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  _15_19_years_old_total_alcohol_consumption_in_litres_of_pure_alcohol:
+    variables:
+      _15_19_years_old_total_alcohol_consumption_in_litres_of_pure_alcohol__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  alcohol_expenditure_as_a_per_cent_of_total_household_expenditure:
+    variables:
+      alcohol_expenditure_as_a_per_cent_of_total_household_expenditure:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  alcohol_related_crimes__pct_of_all_crimes:
+    variables:
+      alcohol_related_crimes__pct_of_all_crimes:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  mean_non_hdl_cholesterol__age_standardized:
+    variables:
+      mean_non_hdl_cholesterol__age_standardized__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Cardiovascular Diseases
+  alcohol__consumption_of_pure_alcohol_by_type_of_beverage__pct:
+    variables:
+      alcohol__consumption_of_pure_alcohol_by_type_of_beverage__pct__beverage_types_beer:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+      alcohol__consumption_of_pure_alcohol_by_type_of_beverage__pct__beverage_types_spirits:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+      alcohol__consumption_of_pure_alcohol_by_type_of_beverage__pct__beverage_types_wine:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  alcohol__recorded_per_capita__15plus__consumption__in_litres_of_pure_alcohol:
+    variables:
+      alcohol__recorded_per_capita__15plus__consumption__in_litres_of_pure_alcohol__beverage_types_beer:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+      alcohol__recorded_per_capita__15plus__consumption__in_litres_of_pure_alcohol__beverage_types_spirits:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+      alcohol__recorded_per_capita__15plus__consumption__in_litres_of_pure_alcohol__beverage_types_wine:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  completeness_of_cause_of_death_data__pct:
+    variables:
+      completeness_of_cause_of_death_data__pct:
+        presentation:
+          topic_tags:
+            - Causes of Death
+  ? prevalence_of_overweight_among_children_and_adolescents__bmi__gt__plus1_standard_deviations_above_the_median__crude_estimate__pct
+  : variables:
+      ? prevalence_of_overweight_among_children_and_adolescents__bmi__gt__plus1_standard_deviations_above_the_median__crude_estimate__pct__sex_both_sexes__age_group_5_19__years_of_age
+      : presentation:
+          topic_tags:
+            - Obesity
+  overweight_prevalence_among_children_under_5_years_of_age__pct_weight_for_height__gt_plus2_sd__model_based_estimates:
+    variables:
+      ? overweight_prevalence_among_children_under_5_years_of_age__pct_weight_for_height__gt_plus2_sd__model_based_estimates__sex_both_sexes
+      : presentation:
+          topic_tags:
+            - Obesity
+  existence_of_national_screening_program_for_cervical_cancer:
+    variables:
+      existence_of_national_screening_program_for_cervical_cancer:
+        presentation:
+          topic_tags:
+            - Cancer
+  estimated_malaria_mortality_rate__per_100_000_population:
+    variables:
+      estimated_malaria_mortality_rate__per_100_000_population:
+        presentation:
+          topic_tags:
+            - Malaria
+  raised_fasting_blood_glucose__gt__7_0_mmol_l__age_standardized_estimate:
+    variables:
+      raised_fasting_blood_glucose__gt__7_0_mmol_l__age_standardized_estimate__sex_both_sexes__age_group_18plus__years_of_age:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Cardiovascular Diseases
+            - Causes of Death
+  alcohol__heavy_episodic_drinking__15plus__drinkers_only__past_30_days__pct:
+    variables:
+      alcohol__heavy_episodic_drinking__15plus__drinkers_only__past_30_days__pct__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  mean_hdl_cholesterol__age_standardized:
+    variables:
+      mean_hdl_cholesterol__age_standardized__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Cardiovascular Diseases
+  domestic_general_government_health_expenditure__gghe_d__as_percentage_of_general_government_expenditure__gge__pct:
+    variables:
+      domestic_general_government_health_expenditure__gghe_d__as_percentage_of_general_government_expenditure__gge__pct:
+        presentation:
+          topic_tags:
+            - Government Spending
+            - Healthcare Spending
+  healthy_life_expectancy__hale__at_birth__years:
+    variables:
+      healthy_life_expectancy__hale__at_birth__years__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Life Expectancy
+  prevalence_of_hypertension_among_adults_aged_30_79_years__age_standardized:
+    variables:
+      prevalence_of_hypertension_among_adults_aged_30_79_years__age_standardized__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Cardiovascular Diseases
+            - Causes of Death
+      prevalence_of_hypertension_among_adults_aged_30_79_years__age_standardized__sex_male:
+        presentation:
+          topic_tags:
+            - Cardiovascular Diseases
+            - Obesity
+      prevalence_of_hypertension_among_adults_aged_30_79_years__age_standardized__sex_female:
+        presentation:
+          topic_tags:
+            - Cardiovascular Diseases
+            - Obesity
+  reported_number_of_people_requiring_interventions_against_ntds:
+    variables:
+      reported_number_of_people_requiring_interventions_against_ntds:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Eradication of Diseases
+            - Neglected Tropical Diseases
+  life_expectancy_at_birth__years:
+    variables:
+      life_expectancy_at_birth__years__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Life Expectancy
+  maternal_mortality_ratio__per_100_000_live_births:
+    variables:
+      maternal_mortality_ratio__per_100_000_live_births:
+        presentation:
+          topic_tags:
+            - Maternal Mortality
+  mean_bmi__kg_m2__age_standardized_estimate:
+    variables:
+      mean_bmi__kg_m2__age_standardized_estimate__sex_male__age_group_18plus__years_of_age:
+        presentation:
+          topic_tags:
+            - Obesity
+      mean_bmi__kg_m2__age_standardized_estimate__sex_female__age_group_18plus__years_of_age:
+        presentation:
+          topic_tags:
+            - Obesity
+  mental_health_units_in_general_hospitals__per_100_000_population:
+    variables:
+      mental_health_units_in_general_hospitals__per_100_000_population:
+        presentation:
+          topic_tags:
+            - Mental Health
+  neonatal_mortality_rate__0_to_27_days__per_1000_live_births__sdg_3_2_2:
+    variables:
+      neonatal_mortality_rate__0_to_27_days__per_1000_live_births__sdg_3_2_2__sex_both_sexes__age_group_0_27_days:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Child & Infant Mortality
+  total_tetanus__number_of_reported_cases:
+    variables:
+      total_tetanus__number_of_reported_cases:
+        presentation:
+          topic_tags:
+            - Tetanus
+  stunting_numbers_among_children_under_5_years_of_age__millions__model_based_estimates:
+    variables:
+      stunting_numbers_among_children_under_5_years_of_age__millions__model_based_estimates__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Hunger & Undernourishment
+            - Micronutrient Deficiency
+  wasting_numbers_among_children_under_5_years_of_age__millions__model_based_estimates:
+    variables:
+      wasting_numbers_among_children_under_5_years_of_age__millions__model_based_estimates:
+        presentation:
+          topic_tags:
+            - Hunger & Undernourishment
+  estimated_number_of_malaria_deaths:
+    variables:
+      estimated_number_of_malaria_deaths:
+        presentation:
+          topic_tags:
+            - Malaria
+  number_of_infant_deaths__between_birth_and_11_months:
+    variables:
+      number_of_infant_deaths__between_birth_and_11_months__sex_both_sexes__age_group_0_to_11_months:
+        presentation:
+          topic_tags:
+            - Causes of Death
+            - Child & Infant Mortality
+  number_of_maternal_deaths:
+    variables:
+      number_of_maternal_deaths:
+        presentation:
+          topic_tags:
+            - Maternal Mortality
+  number_of_new_hiv_infections:
+    variables:
+      number_of_new_hiv_infections:
+        presentation:
+          topic_tags:
+            - HIV/AIDS
+  number_of_cases_of_yaws_reported:
+    variables:
+      number_of_cases_of_yaws_reported:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Eradication of Diseases
+            - Neglected Tropical Diseases
+  prevalence_of_obesity_among_adults__bmi__gt__30__age_standardized_estimate__pct:
+    variables:
+      ? prevalence_of_obesity_among_adults__bmi__gt__30__age_standardized_estimate__pct__sex_both_sexes__age_group_18plus__years_of_age
+      : presentation:
+          topic_tags:
+            - Cardiovascular Diseases
+            - Causes of Death
+            - Obesity
+      ? prevalence_of_obesity_among_adults__bmi__gt__30__age_standardized_estimate__pct__sex_female__age_group_18plus__years_of_age
+      : presentation:
+          topic_tags:
+            - Obesity
+      prevalence_of_obesity_among_adults__bmi__gt__30__age_standardized_estimate__pct__sex_male__age_group_18plus__years_of_age:
+        presentation:
+          topic_tags:
+            - Obesity
+  reported_number_of_individuals_treated_for_onchocerciasis:
+    variables:
+      reported_number_of_individuals_treated_for_onchocerciasis:
+        presentation:
+          topic_tags:
+            - Neglected Tropical Diseases
+  concentrations_of_fine_particulate_matter__pm2_5:
+    variables:
+      concentrations_of_fine_particulate_matter__pm2_5__residence_area_type_total:
+        presentation:
+          topic_tags:
+            - Air Pollution
+            - Outdoor Air Pollution
+  children_aged__lt__5_years_with_pneumonia_symptoms_taken_to_a_health_facility__pct:
+    variables:
+      children_aged__lt__5_years_with_pneumonia_symptoms_taken_to_a_health_facility__pct__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality
+            - Pneumonia
+  estimated_number_of_individuals_in_the_country_requiring_preventive_chemotherapy_for_onchocerciasis:
+    variables:
+      estimated_number_of_individuals_in_the_country_requiring_preventive_chemotherapy_for_onchocerciasis:
+        presentation:
+          topic_tags:
+            - Neglected Tropical Diseases
+  number_of_new_reported_cases_of_human_african_trypanosomiasis__t_b__rhodesiense:
+    variables:
+      number_of_new_reported_cases_of_human_african_trypanosomiasis__t_b__rhodesiense:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Neglected Tropical Diseases
+  number_of_new_reported_cases_of_human_african_trypanosomiasis__t_b__gambiense:
+    variables:
+      number_of_new_reported_cases_of_human_african_trypanosomiasis__t_b__gambiense:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Neglected Tropical Diseases
+  number_of_new_leprosy_cases:
+    variables:
+      number_of_new_leprosy_cases:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Neglected Tropical Diseases
+  measles__number_of_reported_cases:
+    variables:
+      measles__number_of_reported_cases:
+        presentation:
+          topic_tags:
+            - Vaccination
+  reported_number_of_human_rabies_deaths:
+    variables:
+      reported_number_of_human_rabies_deaths:
+        presentation:
+          topic_tags:
+            - Causes of Death
+            - Neglected Tropical Diseases
+  attribution_of_road_traffic_deaths_to_alcohol__pct:
+    variables:
+      attribution_of_road_traffic_deaths_to_alcohol__pct:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  prevalence_of_obesity_among_adults__bmi__gt__30__crude_estimate__pct:
+    variables:
+      prevalence_of_obesity_among_adults__bmi__gt__30__crude_estimate__pct__sex_both_sexes__age_group_18plus__years_of_age:
+        presentation:
+          topic_tags:
+            - Obesity
+  prevalence_of_overweight_among_adults__bmi__gt__25__age_standardized_estimate__pct:
+    variables:
+      ? prevalence_of_overweight_among_adults__bmi__gt__25__age_standardized_estimate__pct__sex_both_sexes__age_group_18plus__years_of_age
+      : presentation:
+          topic_tags:
+            - Obesity
+      ? prevalence_of_overweight_among_adults__bmi__gt__25__age_standardized_estimate__pct__sex_female__age_group_18plus__years_of_age
+      : presentation:
+          topic_tags:
+            - Obesity
+      ? prevalence_of_overweight_among_adults__bmi__gt__25__age_standardized_estimate__pct__sex_male__age_group_18plus__years_of_age
+      : presentation:
+          topic_tags:
+            - Obesity
+  alcohol__consumers_past_12_months__pct:
+    variables:
+      alcohol__consumers_past_12_months__pct__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates:
+    variables:
+      ? stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates__sex_both_sexes
+      : presentation:
+          topic_tags:
+            - Hunger & Undernourishment
+  antenatal_care_coverage__at_least_four_visits__pct:
+    variables:
+      antenatal_care_coverage__at_least_four_visits__pct:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Maternal Mortality
+  alcohol__abstainers_lifetime__pct:
+    variables:
+      alcohol__abstainers_lifetime__pct__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  alcohol__abstainers_past_12_months__pct:
+    variables:
+      alcohol__abstainers_past_12_months__pct__sex_both_sexes:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  persons_with_alcohol_use_disorders_receiving_treatment__pct:
+    variables:
+      persons_with_alcohol_use_disorders_receiving_treatment__pct:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  stand_alone_policy_or_plan_for_mental_health:
+    variables:
+      stand_alone_policy_or_plan_for_mental_health:
+        presentation:
+          topic_tags:
+            - Mental Health
+  standard_drink_measures__in_grams_per_unit:
+    variables:
+      standard_drink_measures__in_grams_per_unit:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  status_of_endemicity_of_buruli_ulcer:
+    variables:
+      status_of_endemicity_of_buruli_ulcer:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Neglected Tropical Diseases
+  status_of_endemicity_of_cutaneous_leishmaniasis:
+    variables:
+      status_of_endemicity_of_cutaneous_leishmaniasis:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Neglected Tropical Diseases
+  status_of_endemicity_of_onchocerciasis:
+    variables:
+      status_of_endemicity_of_onchocerciasis:
+        presentation:
+          topic_tags:
+            - Eradication of Diseases
+            - Global Health
+            - Neglected Tropical Diseases
+  status_of_endemicity_of_visceral_leishmaniasis:
+    variables:
+      status_of_endemicity_of_visceral_leishmaniasis:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Neglected Tropical Diseases
+  status_of_elimination_of_trachoma_as_a_public_health_problem:
+    variables:
+      status_of_elimination_of_trachoma_as_a_public_health_problem:
+        presentation:
+          topic_tags:
+            - Burden of Disease
+            - Neglected Tropical Diseases
+  status_of_yaws_endemicity:
+    variables:
+      status_of_yaws_endemicity:
+        presentation:
+          topic_tags:
+            - Eradication of Diseases
+            - Global Health
+            - Neglected Tropical Diseases
+  neonates_protected_at_birth_against_neonatal_tetanus__pab__pct:
+    variables:
+      neonates_protected_at_birth_against_neonatal_tetanus__pab__pct:
+        presentation:
+          topic_tags:
+            - Tetanus
+  current_health_expenditure__che__as_percentage_of_gross_domestic_product__gdp__pct:
+    variables:
+      current_health_expenditure__che__as_percentage_of_gross_domestic_product__gdp__pct:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Healthcare Spending
+  deaths_due_to_tuberculosis_among_hiv_negative_people__per_100_000_population:
+    variables:
+      deaths_due_to_tuberculosis_among_hiv_negative_people__per_100_000_population:
+        presentation:
+          topic_tags:
+            - Tuberculosis
+  uhc_service_coverage_index__sdg_3_8_1:
+    variables:
+      uhc_service_coverage_index__sdg_3_8_1:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Healthcare Spending

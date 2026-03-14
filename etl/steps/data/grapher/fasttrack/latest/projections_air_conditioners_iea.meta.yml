@@ -13,3 +13,8 @@ tables:
         display:
           conversionFactor: 1000000
         description: Projected number of air conditioning units.
+        presentation:
+          topic_tags:
+            - Climate Change
+            - Natural Disasters
+            - Technological Change

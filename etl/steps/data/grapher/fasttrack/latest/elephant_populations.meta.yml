@@ -11,6 +11,9 @@ tables:
         unit: ''
         description: |-
           The estimated number of African elephants. This is based on definitive population counts. Historical estimates come with significant uncertainty.
+        presentation:
+          topic_tags:
+            - Biodiversity
       african_elephant_population_probable:
         title: Number of African elephants, including probable estimates
         unit: ''
@@ -21,10 +24,16 @@ tables:
         unit: ''
         description: |-
           Carcass ratio is the number of dead elephants observed during survey counts as a percentage of the total population. Carcass ratios greater than 8% are considered to be a strong indication of a declining population.
+        presentation:
+          topic_tags:
+            - Biodiversity
       asian_elephant_population:
         title: Number of Asian elephants
         unit: ''
         description: The estimated number of Asian elephants.
+        presentation:
+          topic_tags:
+            - Biodiversity
     dimensions:
       - name: country
         slug: country

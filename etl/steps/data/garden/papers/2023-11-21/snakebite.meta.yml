@@ -17,6 +17,11 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Causes of Death
+            - Global Health
+            - Neglected Tropical Diseases
       age_standardized_death_rate_per_100000:
         title: Age-standardized death rate from snakebite envenoming
         description_short: Age-standardized death rate per 100,000 people from snakebite envenoming.
@@ -24,6 +29,11 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Causes of Death
+            - Global Health
+            - Neglected Tropical Diseases
       percent_change_in_deaths_from_1990_to_2019:
         title: Percent change in deaths from snakebite envenoming between 1990 and 2019
         unit: "%"

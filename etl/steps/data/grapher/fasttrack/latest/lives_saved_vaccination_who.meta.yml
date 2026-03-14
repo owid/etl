@@ -13,9 +13,7 @@ tables:
       influenza_b:
         title: Haemophilus influenzae type B
         unit: lives saved
-        description:
-          The number of lives saved from Haemophilus influenzae type B over the last 50 years as a result of vaccination
-          efforts.
+        description: The number of lives saved from Haemophilus influenzae type B over the last 50 years as a result of vaccination efforts.
       hepatitus_b:
         title: Hepatitis B
         unit: lives saved
@@ -23,9 +21,7 @@ tables:
       japanese_encephalitis:
         title: Japanese encephalitis
         unit: lives saved
-        description:
-          The number of lives saved from Japanese encephalitis over the last 50 years as a result of vaccination
-          efforts.
+        description: The number of lives saved from Japanese encephalitis over the last 50 years as a result of vaccination efforts.
       measles:
         title: Measles
         unit: lives saved
@@ -33,9 +29,7 @@ tables:
       meningitis_a:
         title: Neisseria meningitidis A
         unit: lives saved
-        description:
-          The number of lives saved from Neisseria meningitidis A over the last 50 years as a result of vaccination
-          efforts.
+        description: The number of lives saved from Neisseria meningitidis A over the last 50 years as a result of vaccination efforts.
       pertussis:
         title: Whooping cough (Pertussis)
         unit: lives saved
@@ -55,9 +49,7 @@ tables:
       streptococcus_pneumoniae:
         title: Streptococcus pneumoniae
         unit: lives saved
-        description:
-          The number of lives saved from Streptococcus pneumoniae over the last 50 years as a result of vaccination
-          efforts.
+        description: The number of lives saved from Streptococcus pneumoniae over the last 50 years as a result of vaccination efforts.
       tetanus:
         title: Tetanus
         unit: lives saved
@@ -74,3 +66,6 @@ tables:
         title: Total
         unit: lives saved
         description: The number of lives saved over the last 50 years as a result of vaccination efforts.
+        presentation:
+          topic_tags:
+            - Vaccination

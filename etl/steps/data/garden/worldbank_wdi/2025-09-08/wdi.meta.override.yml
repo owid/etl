@@ -39,15 +39,11 @@ definitions:
 
     We have also obtained [Our World in Data regional aggregations](https://ourworldindata.org/world-region-map-definitions) of these indicators by calculating a population-weighted average by region. You can see more information about the population data in [this dedicated article about sources](https://ourworldindata.org/population-sources).
 
-  map_brackets_gdp: &map_brackets_gdp
-    [0, 10000000000, 30000000000, 100000000000, 300000000000, 1000000000000, 3000000000000, 10000000000000, 1]
-  map_brackets_gdp_per_capita: &map_brackets_gdp_per_capita
-    [0, 1000, 2000, 5000, 10000, 20000, 50000, 1]
+  map_brackets_gdp: &map_brackets_gdp [0, 10000000000, 30000000000, 100000000000, 300000000000, 1000000000000, 3000000000000, 10000000000000, 1]
+  map_brackets_gdp_per_capita: &map_brackets_gdp_per_capita [0, 1000, 2000, 5000, 10000, 20000, 50000, 1]
 
-  selected_entity_names_gdp: &selected_entity_names_gdp
-    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
-  selected_entity_names_gdp_per_capita: &selected_entity_names_gdp_per_capita
-    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
+  selected_entity_names_gdp: &selected_entity_names_gdp [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
+  selected_entity_names_gdp_per_capita: &selected_entity_names_gdp_per_capita [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
 
   ####################################################################################
   # ILOSTAT definitions
@@ -150,7 +146,7 @@ definitions:
       timeTolerance: 10
       colorScale:
         binningStrategy: manual
-        customNumericValues: [0, 10, 20,30,40,50,60,70,80,90,100]
+        customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         baseColorScheme: Blues
 
   # Gross enrolment ratio configuration
@@ -175,13 +171,13 @@ definitions:
     - The data comes from administrative records such as school enrollment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
 
   desc_key_trained_teachers: &desc_key_trained_teachers
-   - Not all teachers receive the same level of preparation before entering the classroom. This indicator measures the percentage of teachers at each education level who have completed at least the minimum organized pedagogical training required for teaching at that level in their country.
-   - It captures the share of teachers who are pedagogically trained, expressed as a percentage of all teachers at that level. For example, if there are 1,000 primary teachers and 850 have completed the required training, the indicator shows 85%.
-   - The "minimum training" refers to whatever organized pedagogical preparation each country requires — pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
-   - Values below 100% suggest some teachers are working without the pedagogical training their own country considers necessary. However, cross-country comparisons can be misleading since training requirements vary significantly between nations.
-   - This indicator does not account for differences in teachers' experience, professional status, teaching methods, materials, or classroom conditions — all of which affect the quality of teaching and learning. Some teachers without formal training may also acquire equivalent skills through professional experience.
-   - The reference years reflect the school year. In countries where the school year spans two calendar years (e.g. September 2010 to June 2011), the reference year is the year in which the school year ended (2011 in this example).
-   - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
+    - Not all teachers receive the same level of preparation before entering the classroom. This indicator measures the percentage of teachers at each education level who have completed at least the minimum organized pedagogical training required for teaching at that level in their country.
+    - It captures the share of teachers who are pedagogically trained, expressed as a percentage of all teachers at that level. For example, if there are 1,000 primary teachers and 850 have completed the required training, the indicator shows 85%.
+    - The "minimum training" refers to whatever organized pedagogical preparation each country requires — pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
+    - Values below 100% suggest some teachers are working without the pedagogical training their own country considers necessary. However, cross-country comparisons can be misleading since training requirements vary significantly between nations.
+    - This indicator does not account for differences in teachers' experience, professional status, teaching methods, materials, or classroom conditions — all of which affect the quality of teaching and learning. Some teachers without formal training may also acquire equivalent skills through professional experience.
+    - The reference years reflect the school year. In countries where the school year spans two calendar years (e.g. September 2010 to June 2011), the reference year is the year in which the school year ended (2011 in this example).
+    - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
 
   ####################################################################################
   # Energy definitions
@@ -704,8 +700,8 @@ tables:
                   - ''
                   - ''
                 customNumericColors:
-                  - null
-                  - null
+                  - 
+                  - 
                 legendDescription: Prevalence of stunting (% of children under 5)
             selectedEntityNames:
               - China
@@ -793,8 +789,8 @@ tables:
                   - ''
                   - ''
                 customNumericColors:
-                  - null
-                  - null
+                  - 
+                  - 
                 legendDescription: Prevalence of stunting (% of children under 5)
             selectedEntityNames:
               - China
@@ -881,7 +877,7 @@ tables:
           - Exports of goods and services represent the value of all goods and other market services provided to the rest of the world. Imports represent the value of all goods and other market services received from the rest of the world. In both cases, they include the value of merchandise, freight, insurance, transport, travel, royalties, license fees, and other services, such as communication, construction, financial, information, business, personal, and government services.
 
       eg_elc_accs_zs_without:
-        title:  Access to electricity (% of population with no access)
+        title: Access to electricity (% of population with no access)
         unit: '% of population'
         short_unit: '%'
         description_short: *description_short_electricity
@@ -1012,7 +1008,7 @@ tables:
         title: Gross enrollment in pre-primary education
         short_unit: '%'
         unit: '%'
-        description_short:  Number of children of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of the official pre-primary school age.
+        description_short: Number of children of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of the official pre-primary school age.
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrollment in pre-primary education
@@ -1037,7 +1033,7 @@ tables:
           name: Girls
 
       se_pre_enrr_ma:
-        title:  Gross enrollment in pre-primary education among boys
+        title: Gross enrollment in pre-primary education among boys
         short_unit: '%'
         unit: '%'
         description_short: Number of boys of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of boys of the official pre-primary school age.
@@ -2389,3 +2385,7 @@ tables:
           name: Number of people out of the labor force
           numDecimalPlaces: 0
           tolerance: 0
+      nv_agr_empl_kd:
+        presentation:
+          topic_tags:
+            - Employment in Agriculture

@@ -10,6 +10,9 @@ tables:
         title: DHS is only data source
         unit: ''
         description: Whether the only source of maternal mortality data is the Demographic and Health Surveys
+        presentation:
+          topic_tags:
+            - Global Health
     dimensions:
       - name: country
         slug: country

@@ -8,3 +8,60 @@ definitions:
       topic_tags:
         - Agricultural Production
       attribution_short: UN FAO
+tables:
+  faostat_fbsc_flat:
+    variables:
+      fruit__00002919__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        presentation:
+          topic_tags:
+            - Diet Compositions
+      vegetables__00002918__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        presentation:
+          topic_tags:
+            - Diet Compositions
+      cocoa_beans__00002633__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        presentation:
+          topic_tags:
+            - Diet Compositions
+            - Food Supply
+      meat__total__00002943__food_available_for_consumption__0645pe__grams_per_day_per_capita:
+        presentation:
+          topic_tags:
+            - Food Supply
+            - Meat & Dairy Production
+      total__00002901__food_available_for_consumption__0684pc__grams_of_fat_per_day_per_capita:
+        presentation:
+          topic_tags:
+            - Food Supply
+      total__00002901__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        presentation:
+          topic_tags:
+            - Food Supply
+      fish_and_seafood__00002960__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        presentation:
+          topic_tags:
+            - Meat & Dairy Production
+      fish_and_seafood__00002960__production__005511__tonnes:
+        presentation:
+          topic_tags:
+            - Biodiversity
+            - Fish & Overfishing
+            - Meat & Dairy Production
+      meat__total__00002943__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        presentation:
+          topic_tags:
+            - Food Supply
+            - Meat & Dairy Production
+      palm_oil__00002577__imports__005611__tonnes:
+        presentation:
+          topic_tags:
+            - Agricultural Production
+            - Food Supply
+      eggs__00002949__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        presentation:
+          topic_tags:
+            - Meat & Dairy Production
+      milk__excluding_butter__00002848__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        presentation:
+          topic_tags:
+            - Meat & Dairy Production

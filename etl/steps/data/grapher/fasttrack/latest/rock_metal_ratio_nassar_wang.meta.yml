@@ -11,3 +11,6 @@ tables:
         unit: ''
         description: |-
           The amount of rock that has to be mined to produce one unit of metal. For example, a ratio of 10 means 10 kilograms of rock has to be mined to get 1 kilogram of metal.
+        presentation:
+          topic_tags:
+            - Metals & Minerals

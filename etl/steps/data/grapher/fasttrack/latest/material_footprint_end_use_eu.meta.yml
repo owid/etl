@@ -23,6 +23,9 @@ tables:
           name: Share of total material consumption
         description: |-
           Each end use's share of the total material consumption of the economy. The raw material consumption is the mass of any resources used directly or indirectly in the production of these products. This adjusts for trade so it includes all resource extraction, including those overseas.
+        presentation:
+          topic_tags:
+            - Metals & Minerals
     dimensions:
       - name: country
         slug: country

@@ -21,3 +21,7 @@ tables:
         unit: '%'
         short_unit: '%'
         description: Global CO2 emissions from aviation as a share of emissions from all fossil sources and land use.
+        presentation:
+          topic_tags:
+            - CO2 & Greenhouse Gas Emissions
+            - Transport

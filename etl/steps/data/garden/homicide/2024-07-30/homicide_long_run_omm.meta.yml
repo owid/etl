@@ -67,3 +67,6 @@ tables:
             url_main: Eisner (2014) - https://www.jstor.org/stable/10.1086/677662?read-now=1&seq=16#page_scan_tab_contents; WHO Mortality Database (2024) - https://platform.who.int/mortality/themes/theme-details/topics/indicator-groups/indicator-group-details/MDB/violence
         display:
           numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - Homicides

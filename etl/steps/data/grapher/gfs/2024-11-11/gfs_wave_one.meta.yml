@@ -258,6 +258,8 @@ tables:
           grapher_config:
             note: |-
               The full question text is "Is there any one special person you know that you feel very close to? For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes."
+          topic_tags:
+            - Loneliness & Social Connections
       close_to_na_share:
         title: Share of respondents who did not answer the question about feeling close to someone
         description_key:
@@ -307,7 +309,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-         Average number of days per week people reported doing at least 30 minutes of exercise in the last week."
+          Average number of days per week people reported doing at least 30 minutes of exercise in the last week."
         presentation:
           grapher_config:
             note: "{definitions.survey_text.exercise}"
@@ -406,7 +408,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-         Average score people gave when asked "How often do you feel discriminated against because of any group you are part of?", where 1 is "always" and 4 is "never".
+          Average score people gave when asked "How often do you feel discriminated against because of any group you are part of?", where 1 is "always" and 4 is "never".
       discriminated_often_share:
         title: Share of people who feel discriminated against often or always
         description_short: |-
@@ -426,21 +428,24 @@ tables:
       discriminated_ans_4_share:
         title: Share of people who never feel discriminated against
         description_short: |-
-         Share of people who answered "never" when asked "How often do you feel discriminated against because of any group you are part of?"
+          Share of people who answered "never" when asked "How often do you feel discriminated against because of any group you are part of?"
       discriminated_na_share:
         title: Share of respondents who did not answer the question about discrimination
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of respondents who did not answer the question "How often do you feel discriminated against because of any group you are part of?"
+          Share of respondents who did not answer the question "How often do you feel discriminated against because of any group you are part of?"
       donated_no_share:
         title: Share of people who did not recently donate to charity
         description_short: |-
-         Share of respondents who said "no" when asked whether they had donated to a charity or non-profit in the last month.
+          Share of respondents who said "no" when asked whether they had donated to a charity or non-profit in the last month.
       donated_yes_share:
         title: Share of people who recently donated to charity
         description_short: |-
-         Share of respondents who said "yes" when asked whether they had donated to a charity or non-profit in the last month.
+          Share of respondents who said "yes" when asked whether they had donated to a charity or non-profit in the last month.
+        presentation:
+          topic_tags:
+            - Loneliness & Social Connections
       donated_na_share:
         title: Share of respondents who did not answer the question about donating to charity
         description_key:
@@ -488,41 +493,44 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-         Average score people gave when asked "In the last two weeks, how often have you felt nervous, anxious or on edge?", where 1 is "nearly every day" and 4 is "not at all".
+          Average score people gave when asked "In the last two weeks, how often have you felt nervous, anxious or on edge?", where 1 is "nearly every day" and 4 is "not at all".
       feel_anxious_ans_1_share:
         title: Share of people who felt anxious nearly every day in the last two weeks
         description_short: |-
-         Share of people who reported feeling nervous nearly every day in the last two weeks."
+          Share of people who reported feeling nervous nearly every day in the last two weeks."
       feel_anxious_ans_2_share:
         title: Share of people who felt anxious more than half of the days in the last two weeks
         description_short: |-
-         Share of people who reported feeling nervous or anxious more than half of the days in the last two weeks."
+          Share of people who reported feeling nervous or anxious more than half of the days in the last two weeks."
       feel_anxious_ans_3_share:
         title: Share of people who felt anxious several days in the last two weeks
         description_short: |-
-         Share of people who reported feeling nervous several days in the last two weeks."
+          Share of people who reported feeling nervous several days in the last two weeks."
       feel_anxious_ans_4_share:
         title: Share of people who did not feel anxious in the last two weeks
         description_short: |-
-         Share of people who reported not feeling nervous, anxious or on edge in the last two weeks."
+          Share of people who reported not feeling nervous, anxious or on edge in the last two weeks."
       feel_anxious_na_share:
         title: Share of respondents who did not answer the question about anxiety
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of respondents who did not answer the question "In the last two weeks, how often have you felt nervous, anxious or on edge?"
+          Share of respondents who did not answer the question "In the last two weeks, how often have you felt nervous, anxious or on edge?"
       freedom_mean:
         title: Self-reported freedom
         unit: ""
         short_unit: ""
         description_short: |-
-         Average of responses of how much the respondent agreed with the statement that they have the freedom to pursue the things that are important to them, ranging from 0 ("strongly disagree") to 10 ("strongly agree").
+          Average of responses of how much the respondent agreed with the statement that they have the freedom to pursue the things that are important to them, ranging from 0 ("strongly disagree") to 10 ("strongly agree").
+        presentation:
+          topic_tags:
+            - Human Rights
       freedom_na_share:
         title: Share of respondents who did not answer the question about freedom to make life choices
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of respondents who did not answer the question "I have the freedom in my life to pursue the things that are most important to me."
+          Share of respondents who did not answer the question "I have the freedom in my life to pursue the things that are most important to me."
       freedom_ans_0_share:
         <<: *freedom
       freedom_ans_1_share:
@@ -551,12 +559,15 @@ tables:
         short_unit: ""
         description_short: |-
           Average of responses of how much the respondent agreed with the statement that, despite challenges, they always remain hopeful about the future, ranging from 0 ("strongly disagree") to 10 ("strongly agree").
+        presentation:
+          topic_tags:
+            - Mental Health
       hope_future_na_share:
         title: Share of respondents who did not answer the question about hopefulness
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of respondents who did not answer the question "Despite challenges, I always remain hopeful about the future."
+          Share of respondents who did not answer the question "Despite challenges, I always remain hopeful about the future."
       hope_future_ans_0_share:
         <<: *hope_future
       hope_future_ans_1_share:
@@ -584,11 +595,11 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-         Average of responses to the question of how the respondent would rate their overall mental health, ranging from 0 ("poor") to 10 ("excellent").
+          Average of responses to the question of how the respondent would rate their overall mental health, ranging from 0 ("poor") to 10 ("excellent").
       mental_health_na_share:
         title: Share of respondents who did not answer the question about mental health
         description_short: |-
-         Share of respondents who did not answer the question "How would you rate your overall mental health?"
+          Share of respondents who did not answer the question "How would you rate your overall mental health?"
       mental_health_ans_0_share:
         <<: *mental_health
       mental_health_ans_1_share:
@@ -624,7 +635,7 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of respondents who did not answer the question "How often do you feel lonely?"
+          Share of respondents who did not answer the question "How often do you feel lonely?"
       lonely_ans_0_share:
         <<: *lonely
       lonely_ans_1_share:
@@ -652,11 +663,11 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-         Average of responses to the question of how the respondent would rate their overall physical health, ranging from 0 ("poor") to 10 ("excellent").
+          Average of responses to the question of how the respondent would rate their overall physical health, ranging from 0 ("poor") to 10 ("excellent").
       physical_hlth_na_share:
         title: Share of respondents who did not answer the question about physical health
         description_short: |-
-         Share of respondents who did not answer the question "How would you rate your overall physical health?"
+          Share of respondents who did not answer the question "How would you rate your overall physical health?"
       physical_hlth_ans_0_share:
         <<: *physical_hlth
       physical_hlth_ans_1_share:
@@ -682,105 +693,108 @@ tables:
       rel8_ans_1_share:
         title: Share of people who feel identify as spiritual
         description_short: |-
-         Share of people who answered "spiritual" when asked "Would you say you are religious, spiritual, neither, or both?"
+          Share of people who answered "spiritual" when asked "Would you say you are religious, spiritual, neither, or both?"
       rel8_ans_2_share:
         title: Share of people who feel identify as religious
         description_short: |-
-         Share of people who answered "religious" when asked "Would you say you are religious, spiritual, neither, or both?"
+          Share of people who answered "religious" when asked "Would you say you are religious, spiritual, neither, or both?"
       rel8_ans_3_share:
         title: Share of people who feel identify as both religious and spiritual
         description_short: |-
-         Share of people who answered "both" when asked "Would you say you are religious, spiritual, neither, or both?"
+          Share of people who answered "both" when asked "Would you say you are religious, spiritual, neither, or both?"
       rel8_ans_4_share:
         title: Share of people who feel identify as neither religious nor spiritual
         description_short: |-
-         Share of people who answered "neither" when asked "Would you say you are religious, spiritual, neither, or both?"
+          Share of people who answered "neither" when asked "Would you say you are religious, spiritual, neither, or both?"
       rel8_na_share:
         title: Share of respondents who did not answer the question about religion and spirituality
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of respondents who did not answer the question "Would you say you are religious, spiritual, neither, or both?"
+          Share of respondents who did not answer the question "Would you say you are religious, spiritual, neither, or both?"
       say_in_govt_ans_1_share:
         title: Share of people who feel they have a say in government
         description_short: |-
-         Share of people who agree with the statement "People like me have a say in what the government does."
+          Share of people who agree with the statement "People like me have a say in what the government does."
       say_in_govt_ans_2_share:
         title: Share of people who feel they do not have a say in government
         description_short: |-
-         Share of people who disagree with the statement "People like me have a say in what the government does."
+          Share of people who disagree with the statement "People like me have a say in what the government does."
       say_in_govt_ans_3_share:
         title: Share of people who feel unsure about having a say in government
         description_short: |-
-         Share of people who are unsure about whether "People like me have a say in what the government does."
+          Share of people who are unsure about whether "People like me have a say in what the government does."
       say_in_govt_na_share:
         title: Share of respondents who did not answer the question about having a say in government
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of respondents who did not answer the question "People like me have a say in what the government does."
+          Share of respondents who did not answer the question "People like me have a say in what the government does."
       trust_people_mean:
         title: Perceived trust in people
         unit: ""
         short_unit: ""
         description_short: |-
-         Average score people gave when asked "How many people in this country trust each other?", where 1 is "all people" and 5 is "none".
+          Average score people gave when asked "How many people in this country trust each other?", where 1 is "all people" and 5 is "none".
       trust_people_most_share:
         title: Share of people who think most or all people trust each other
         description_short: |-
-         Share of people who answered "most" or "all" when asked "How many people in this country trust each other?"
+          Share of people who answered "most" or "all" when asked "How many people in this country trust each other?"
       trust_people_ans_1_share:
         title: Share of people who think all people trust each other
         description_short: |-
-         Share of people who answered "all" when asked "How many people in this country trust each other?"
+          Share of people who answered "all" when asked "How many people in this country trust each other?"
       trust_people_ans_2_share:
         title: Share of people who think most people trust each other
         description_short: |-
-         Share of people who answered "most" when asked "How many people in this country trust each other?"
+          Share of people who answered "most" when asked "How many people in this country trust each other?"
       trust_people_ans_3_share:
         title: Share of people who think only some people trust each other
         description_short: |-
-         Share of people who answered "some" when asked "How many people in this country trust each other?"
+          Share of people who answered "some" when asked "How many people in this country trust each other?"
       trust_people_ans_4_share:
         title: Share of people who think not very many people trust each other
         description_short: |-
-         Share of people who answered "not very many" when asked "How many people in this country trust each other?"
+          Share of people who answered "not very many" when asked "How many people in this country trust each other?"
       trust_people_ans_5_share:
         title: Share of people who think no people trust each other
         description_short: |-
-         Share of people who answered "none" when asked "How many people in this country trust each other?"
+          Share of people who answered "none" when asked "How many people in this country trust each other?"
       trust_people_na_share:
         title: Share of respondents who did not answer the question about trust in people
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of respondents who did not answer the question "How many people in this country trust each other?"
+          Share of respondents who did not answer the question "How many people in this country trust each other?"
       volunteered_no_share:
         title: Share of people who did not recently volunteer
         description_short: |-
-         Share of respondents who said "no" when asked whether they had volunteered for an organization in the last month.
+          Share of respondents who said "no" when asked whether they had volunteered for an organization in the last month.
       volunteered_yes_share:
         title: Share of people who recently volunteered
         description_short: |-
           Share of respondents who said "yes" when asked whether they had volunteered for an organization in the last month.
+        presentation:
+          topic_tags:
+            - Loneliness & Social Connections
       volunteered_na_share:
         title: Share of respondents who did not answer the question about volunteering
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of respondents who did not answer the question "In the last month, have you volunteered your time to an organization?"
+          Share of respondents who did not answer the question "In the last month, have you volunteered your time to an organization?"
       wb_today_mean:
         title: Self-reported life evaluation score
         unit: ""
         short_unit: ""
         description_short: |-
-         Average score people gave when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+          Average score people gave when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
       wb_today_na_share:
         title: Share of respondents who did not answer the life evaluation question
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of respondents who did not answer the question "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+          Share of respondents who did not answer the question "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
       wb_today_ans_0_share:
         <<: *wb_today
       wb_today_ans_1_share:

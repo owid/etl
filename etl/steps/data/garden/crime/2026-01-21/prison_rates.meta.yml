@@ -25,6 +25,7 @@ tables:
         unit: prisoners per 100,000 people
         display:
           numDecimalPlaces: 0
+
       pretrial_detainees_pct:
         title: Share of prisoners that are pre-trial detainees
         description_short: Pre-trial detainees and remand prisoners as a percentage of the total prison population.

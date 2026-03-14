@@ -1,0 +1,7 @@
+tables:
+  natural_disasters_global_by_deaths:
+    variables:
+      n_events:
+        presentation:
+          topic_tags:
+            - Natural Disasters

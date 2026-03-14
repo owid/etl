@@ -11,8 +11,10 @@ tables:
         unit: ''
         display:
           numDecimalPlaces: 1.0
-        description: Estimated total fertility rate required to retain the same population size, after accounting for early
-          life mortality.
+        description: Estimated total fertility rate required to retain the same population size, after accounting for early life mortality.
+        presentation:
+          topic_tags:
+            - Fertility Rate
       replacement_fertility_rate_projection:
         title: Replacement fertility rate (projection)
         unit: ''

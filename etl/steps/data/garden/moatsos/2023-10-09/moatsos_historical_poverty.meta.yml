@@ -21,16 +21,22 @@ tables:
           title_public: Number of people living in extreme poverty
           title_variant: Long-run estimates
 
+          topic_tags:
+            - Poverty
       headcount_ratio_190_smooth:
         presentation:
           title_public: Share of population living in extreme poverty
           title_variant: Long-run estimates
 
+          topic_tags:
+            - Poverty
       headcount_cbn:
         presentation:
           title_public: Number of people living in extreme poverty
           title_variant: Long-run estimates - Cost of basic needs
 
+          topic_tags:
+            - Poverty
       headcount_ratio_cbn:
         presentation:
           title_public: Share of population living in extreme poverty
@@ -38,3 +44,5 @@ tables:
 
 
 
+          topic_tags:
+            - Poverty

@@ -11,3 +11,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description: Share of households with air conditioning.
+        presentation:
+          topic_tags:
+            - Climate Change
+            - Natural Disasters
+            - Technological Change

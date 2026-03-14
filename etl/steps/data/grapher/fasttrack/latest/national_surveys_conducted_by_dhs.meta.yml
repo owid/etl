@@ -1,7 +1,6 @@
 dataset:
   title: Number of national surveys in Demographic and Health Surveys
-  description: The cumulative number of surveys conducted per country in the Demographic and Health surveys since it began
-    in 1984.
+  description: The cumulative number of surveys conducted per country in the Demographic and Health surveys since it began in 1984.
   licenses:
     - {}
 tables:
@@ -11,6 +10,9 @@ tables:
         title: Total number of national DHS surveys conducted
         unit: ''
         description: Cumulative number of national Demographic and Health Surveys conducted in a country since 1984.
+        presentation:
+          topic_tags:
+            - Global Health
     dimensions:
       - name: country
         slug: country

@@ -11,6 +11,10 @@ tables:
           numDecimalPlaces: 0
           conversionFactor: 1
 
+        presentation:
+          topic_tags:
+            - Influenza
+            - Pandemics
   avian_influenza_ah5n1_year:
     variables:
       avian_cases_year:

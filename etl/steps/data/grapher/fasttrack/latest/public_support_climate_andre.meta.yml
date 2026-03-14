@@ -12,11 +12,18 @@ tables:
         unit: '%'
         short_unit: '%'
         description: Share that think people in their country should act to fight global warming.
+        presentation:
+          topic_tags:
+            - Climate Change
+            - CO2 & Greenhouse Gas Emissions
       demand_political_action_climate:
         title: Government action on climate
         unit: '%'
         short_unit: '%'
         description: Share that want to see their national government should do more to tackle climate change.
+        presentation:
+          topic_tags:
+            - Climate Change
       willingness_contribute_1pct_climate_others:
         title: Perception willing to give 1% of income
         unit: '%'

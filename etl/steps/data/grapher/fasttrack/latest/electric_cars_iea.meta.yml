@@ -11,11 +11,19 @@ tables:
         unit: '%'
         short_unit: '%'
         description: The share of new cars sold that are electric. This includes plug-in hybrids and battery-electric cars.
+        presentation:
+          topic_tags:
+            - Energy
+            - Transport
       ev_stock_share:
         title: Share of car stocks that are electric
         unit: '%'
         short_unit: '%'
         description: The share of car stocks that are electric. This includes plug-in hybrids and battery-electric cars.
+        presentation:
+          topic_tags:
+            - Energy
+            - Transport
       bev_sales:
         title: Battery-electric cars sold
         unit: cars
@@ -41,11 +49,19 @@ tables:
         unit: cars
         short_unit: cars
         description: The number of new electric cars sold. This includes plug-in hybrids and battery-electric cars.
+        presentation:
+          topic_tags:
+            - Energy
+            - Transport
       bev_share_ev_cars:
         title: Battery-electric as a share of electric cars sold
         unit: '%'
         short_unit: '%'
         description: The share of electric car stocks that are fully battery-electric.
+        presentation:
+          topic_tags:
+            - Energy
+            - Transport
       phev_share_ev_cars:
         title: Plug-in hybrid as a share of electric cars sold
         unit: '%'
@@ -66,6 +82,10 @@ tables:
         unit: cars
         short_unit: cars
         description: The number of electric car stocks. This includes plug-in hybrids and battery-electric cars.
+        presentation:
+          topic_tags:
+            - Energy
+            - Transport
       total_cars_sold:
         title: Total new car sales
         unit: cars

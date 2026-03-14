@@ -106,6 +106,15 @@ tables:
       #     grapher_config:
       #       subtitle: *pop2_description_short
 
+      population__sex_all__age_all__variant_estimates:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Population Growth
+      population__sex_all__age_0_4__variant_medium:
+        presentation:
+          topic_tags:
+            - Population Growth
   growth_rate:
     variables:
       growth_rate:
@@ -164,6 +173,10 @@ tables:
               The total fertility rate is the number of children that would be born to a woman if she were to live to the end of her child-bearing years and give birth to children at the current age-specific fertility rates.
               <%- endif %>
 
+      fertility_rate__sex_all__age_all__variant_estimates:
+        presentation:
+          topic_tags:
+            - Fertility Rate
   fertility_single:
     variables:
       fertility_rate:
@@ -224,6 +237,29 @@ tables:
           grapher_config:
             subtitle: The number of deaths occurring during the year, per 1,000 people. {definitions.global.projections}
 
+      deaths__sex_all__age_all__variant_estimates:
+        presentation:
+          topic_tags:
+            - Causes of Death
+            - Global Health
+      deaths__sex_all__age_0_4__variant_estimates:
+        presentation:
+          topic_tags:
+            - Population Growth
+      death_rate__sex_all__age_all__variant_estimates:
+        presentation:
+          topic_tags:
+            - Causes of Death
+            - Global Health
+      deaths__sex_all__age_0__variant_estimates:
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality
+      deaths__sex_all__age_0__variant_medium:
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality
+            - Fertility Rate
   births:
     variables:
       births:
@@ -252,6 +288,15 @@ tables:
           grapher_config:
             subtitle: The number of live births occurring during the year, per 1,000 people. {definitions.global.projections}
 
+      births__sex_all__age_all__variant_estimates:
+        presentation:
+          topic_tags:
+            - Fertility Rate
+            - Population Growth
+      birth_rate__sex_all__age_all__variant_estimates:
+        presentation:
+          topic_tags:
+            - Fertility Rate
   median_age:
     variables:
       median_age:
@@ -317,6 +362,22 @@ tables:
               Shown is the 'period life expectancy'<< sex_name >> at age << age >>. This is the expected age at death, if age-specific mortality rates in the current year were to stay the same throughout its life.
               <%- endif %>
 
+      life_expectancy__sex_all__age_0__variant_medium:
+        presentation:
+          topic_tags:
+            - Life Expectancy
+      life_expectancy__sex_all__age_0__variant_estimates:
+        presentation:
+          topic_tags:
+            - Life Expectancy
+      life_expectancy__sex_male__age_0__variant_estimates:
+        presentation:
+          topic_tags:
+            - Life Expectancy
+      life_expectancy__sex_female__age_0__variant_estimates:
+        presentation:
+          topic_tags:
+            - Life Expectancy
   sex_ratio:
     variables:
       sex_ratio:
@@ -343,6 +404,19 @@ tables:
               The number of male individuals per 100 female individuals, at age << age >>.
               <%- endif %> {definitions.global.projections}
 
+      sex_ratio__sex_all__age_0__variant_estimates:
+        presentation:
+          topic_tags:
+            - Gender Ratio
+            - Women's Rights
+      sex_ratio__sex_all__age_5__variant_estimates:
+        presentation:
+          topic_tags:
+            - Gender Ratio
+      sex_ratio__sex_all__age_60__variant_estimates:
+        presentation:
+          topic_tags:
+            - Gender Ratio
   dependency_ratio:
     variables:
       dependency_ratio:
@@ -378,6 +452,18 @@ tables:
             Old-age dependency ratio
             <%- endif %>, {definitions.global.dimensions.title}
 
+      dependency_ratio__sex_all__age_total__variant_estimates:
+        presentation:
+          topic_tags:
+            - Age Structure
+      dependency_ratio__sex_all__age_old__variant_estimates:
+        presentation:
+          topic_tags:
+            - Age Structure
+      dependency_ratio__sex_all__age_youth__variant_estimates:
+        presentation:
+          topic_tags:
+            - Age Structure
   mortality_rate:
     variables:
       mortality_rate:
@@ -420,3 +506,11 @@ tables:
               <%- else %>
               This is the probability of a child born in a specific year or period dying before reaching the age of 5, if subject to age-specific mortality rates of that period. This is given as the share of live births.
               <%- endif %> {definitions.global.projections}
+      mortality_rate__sex_all__age_0_4__variant_estimates:
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality
+      mortality_rate__sex_all__age_0__variant_estimates:
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality

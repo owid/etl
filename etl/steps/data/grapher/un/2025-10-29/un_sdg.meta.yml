@@ -163,11 +163,11 @@ tables:
                 baseColorScheme: Greens
                 binningStrategy: manual
                 customNumericColors:
-                  -
-                  -
-                  -
-                  -
-                  -
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
                 customNumericValues:
                   - 0
                   - 10
@@ -223,11 +223,11 @@ tables:
                 baseColorScheme: PuBu
                 binningStrategy: manual
                 customNumericColors:
-                  -
-                  -
-                  -
-                  -
-                  -
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
                 customNumericValues:
                   - 0
                   - 10
@@ -261,13 +261,13 @@ tables:
         description_short: |-
           Share of respondents who reported having contact with a public official in the past 12 months and paying or being asked to pay a [bribe](#dod:bribery).
         description_key:
-        - This indicator measures how common bribery is in people’s everyday interactions with public officials. It shows the share of individuals who, in the past year, either paid a bribe or were asked to pay one during contact with a public official.
-        - Bribes can take the form of money, gifts, or favors given in exchange for special treatment. The focus is on petty or administrative bribery — the kind people may face when accessing basic services, such as dealing with the police, schools, or healthcare.
-        - “Public officials” refers to anyone holding a legislative, executive, administrative, or judicial role — including police officers, customs agents, judges, teachers, and doctors. The data does not cover high-level political corruption, trading of influence, or abuse of office.
-        - Data comes primarily from national surveys, where respondents report their own direct experiences. Reports involving intermediaries (e.g. a bribe paid through someone else) are included, but second-hand accounts from other household members are excluded.
-        - When national data is unavailable or insufficient, estimates may draw on [Global Corruption Barometer (GCB)](https://www.transparency.org/en/gcb) data, provided it aligns closely with UNODC definitions. These estimates are reviewed and validated by national authorities, usually through national statistics offices.
-        - In some cases — such as Peru and Panama — UNODC estimates differ significantly from the GCB's figures. These differences may arise from variations in survey scope (e.g. UNODC's surveys inquire about any contact with public officials, while GCB asks about contact concerning a few core services), sample size, how people without recent contact with officials are handled, or how surveys are conducted (e.g. phone vs. in-person).
-        - Earlier surveys often excluded people who were asked for a bribe but refused to pay. This likely led to underestimates of the prevalence of bribery. The UNODC aims to correct this by applying standardised methods across countries.
+          - This indicator measures how common bribery is in people’s everyday interactions with public officials. It shows the share of individuals who, in the past year, either paid a bribe or were asked to pay one during contact with a public official.
+          - Bribes can take the form of money, gifts, or favors given in exchange for special treatment. The focus is on petty or administrative bribery — the kind people may face when accessing basic services, such as dealing with the police, schools, or healthcare.
+          - “Public officials” refers to anyone holding a legislative, executive, administrative, or judicial role — including police officers, customs agents, judges, teachers, and doctors. The data does not cover high-level political corruption, trading of influence, or abuse of office.
+          - Data comes primarily from national surveys, where respondents report their own direct experiences. Reports involving intermediaries (e.g. a bribe paid through someone else) are included, but second-hand accounts from other household members are excluded.
+          - When national data is unavailable or insufficient, estimates may draw on [Global Corruption Barometer (GCB)](https://www.transparency.org/en/gcb) data, provided it aligns closely with UNODC definitions. These estimates are reviewed and validated by national authorities, usually through national statistics offices.
+          - In some cases — such as Peru and Panama — UNODC estimates differ significantly from the GCB's figures. These differences may arise from variations in survey scope (e.g. UNODC's surveys inquire about any contact with public officials, while GCB asks about contact concerning a few core services), sample size, how people without recent contact with officials are handled, or how surveys are conducted (e.g. phone vs. in-person).
+          - Earlier surveys often excluded people who were asked for a bribe but refused to pay. This likely led to underestimates of the prevalence of bribery. The UNODC aims to correct this by applying standardised methods across countries.
         description_from_producer: |-
           This indicator is defined as the percentage of persons who paid at least one bribe (gave a public official money, a gift or counter favour) to a public official, or were asked for a bribe by these public officials, in the last 12 months, as a percentage of persons who had at least one contact with a public official in the same period.
 
@@ -366,6 +366,10 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+        presentation:
+          topic_tags:
+            - Government Spending
+            - Healthcare Spending
   _1_3_1__si_cov_chld__both_sexes:
     variables:
       _1_3_1__si_cov_chld__both_sexes:
@@ -456,6 +460,10 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+        presentation:
+          topic_tags:
+            - Economic Inequality by Gender
+            - Women's Rights
   _8_2_1__sl_emp_pcap:
     variables:
       _8_2_1__sl_emp_pcap:
@@ -463,6 +471,9 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+        presentation:
+          topic_tags:
+            - Economic Growth
   _8_3_1__sl_isv_ifem__no_breakdown__both_sexes:
     variables:
       _8_3_1__sl_isv_ifem__no_breakdown__both_sexes:
@@ -510,6 +521,8 @@ tables:
             note: |-
               {definitions.note_icls_13}
             variantName: "{definitions.variant_name_national_estimates}"
+          topic_tags:
+            - Women's Employment
         display:
           name: Share of female workers in informal employment
           numDecimalPlaces: 1
@@ -591,6 +604,9 @@ tables:
           numDecimalPlaces: 1
           tolerance: 10
 
+        presentation:
+          topic_tags:
+            - Employment in Agriculture
   _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
     variables:
       _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
@@ -712,6 +728,10 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+        presentation:
+          topic_tags:
+            - Child Labor
+            - Violence Against Children & Children's Rights
   _8_7_1__sl_tlf_chldea__5_to_17_years_old__female:
     variables:
       _8_7_1__sl_tlf_chldea__5_to_17_years_old__female:
@@ -768,6 +788,9 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+        presentation:
+          topic_tags:
+            - Causes of Death
   _8_8_1__sl_emp_ftlinjur__no_breakdown__female:
     variables:
       _8_8_1__sl_emp_ftlinjur__no_breakdown__female:
@@ -830,6 +853,10 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+        presentation:
+          topic_tags:
+            - Child Labor
+            - Human Rights
   _8_b_1__sl_cpa_yemp:
     variables:
       _8_b_1__sl_cpa_yemp:
@@ -840,6 +867,9 @@ tables:
           numDecimalPlaces: 0
           tolerance: 5
 
+        presentation:
+          topic_tags:
+            - Economic Growth
   _9_2_2__sl_tlf_manf:
     variables:
       _9_2_2__sl_tlf_manf:
@@ -849,6 +879,9 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+        presentation:
+          topic_tags:
+            - Trade & Globalization
   _10_4_1__sl_emp_gtotl:
     variables:
       _10_4_1__sl_emp_gtotl:
@@ -857,3 +890,1208 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
+  _15_2_1__ag_lnd_frstbiopha:
+    variables:
+      _15_2_1__ag_lnd_frstbiopha:
+        presentation:
+          topic_tags:
+            - Forests & Deforestation
+  _5_6_2__sh_lgr_acsrhe:
+    variables:
+      _5_6_2__sh_lgr_acsrhe:
+        presentation:
+          topic_tags:
+            - Fertility Rate
+            - Global Health
+  _3_7_2__sp_dyn_adkl__15_to_19_years_old:
+    variables:
+      _3_7_2__sp_dyn_adkl__15_to_19_years_old:
+        presentation:
+          topic_tags:
+            - Age Structure
+            - Fertility Rate
+  _3_7_2__sp_dyn_adkl__10_to_14_years_old:
+    variables:
+      _3_7_2__sp_dyn_adkl__10_to_14_years_old:
+        presentation:
+          topic_tags:
+            - Age Structure
+            - Fertility Rate
+  _2_b_1__ag_prd_xsubdy:
+    variables:
+      _2_b_1__ag_prd_xsubdy:
+        presentation:
+          topic_tags:
+            - Agricultural Production
+            - Trade & Globalization
+  _9_1_2__is_rdp_pfvol__air_transport:
+    variables:
+      _9_1_2__is_rdp_pfvol__air_transport:
+        presentation:
+          topic_tags:
+            - Transport
+  _17_13_1__fm_lbl_bmny_zg:
+    variables:
+      _17_13_1__fm_lbl_bmny_zg:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Government Spending
+  _17_13_1__ny_gdp_mktp_kd_zg:
+    variables:
+      _17_13_1__ny_gdp_mktp_kd_zg:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Trade & Globalization
+  _17_13_1__ne_exp_gnfs_kd_zg:
+    variables:
+      _17_13_1__ne_exp_gnfs_kd_zg:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Trade & Globalization
+  _17_13_1__ne_con_govt_kd_zg:
+    variables:
+      _17_13_1__ne_con_govt_kd_zg:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Government Spending
+  _17_13_1__ne_imp_gnfs_kd_zg:
+    variables:
+      _17_13_1__ne_imp_gnfs_kd_zg:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Trade & Globalization
+  _17_13_1__ne_gdi_totl_kd_zg:
+    variables:
+      _17_13_1__ne_gdi_totl_kd_zg:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Government Spending
+  _17_13_1__fb_bnk_capa_zs:
+    variables:
+      _17_13_1__fb_bnk_capa_zs:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Healthcare Spending
+  _17_13_1__fm_lbl_bmny_ir_zs:
+    variables:
+      _17_13_1__fm_lbl_bmny_ir_zs:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Government Spending
+  _15_8_1__er_ias_natbud:
+    variables:
+      _15_8_1__er_ias_natbud:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _6_6_1__en_wbe_mangc:
+    variables:
+      _6_6_1__en_wbe_mangc:
+        presentation:
+          topic_tags:
+            - Biodiversity
+            - Forests & Deforestation
+  _14_1_1__en_mar_chldev:
+    variables:
+      _14_1_1__en_mar_chldev:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _12_6_1__en_scp_frmn__no_breakdown:
+    variables:
+      _12_6_1__en_scp_frmn__no_breakdown:
+        presentation:
+          topic_tags:
+            - CO2 & Greenhouse Gas Emissions
+            - Trade & Globalization
+  _16_10_2__sg_inf_accss:
+    variables:
+      _16_10_2__sg_inf_accss:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Trust
+  _15_6_1__er_cbd_nagoya:
+    variables:
+      _15_6_1__er_cbd_nagoya:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _15_6_1__er_cbd_absclrhs:
+    variables:
+      _15_6_1__er_cbd_absclrhs:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _15_6_1__er_cbd_ptypgrfa:
+    variables:
+      _15_6_1__er_cbd_ptypgrfa:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _14_2_1__en_scp_ecsyba__no_breakdown__no_breakdown:
+    variables:
+      _14_2_1__en_scp_ecsyba__no_breakdown__no_breakdown:
+        presentation:
+          topic_tags:
+            - Fish & Overfishing
+  _15_9_1__er_bdy_seea__no_breakdown:
+    variables:
+      _15_9_1__er_bdy_seea__no_breakdown:
+        presentation:
+          topic_tags:
+            - CO2 & Greenhouse Gas Emissions
+            - Economic Growth
+  _16_a_1__sg_nhr_cmplnc:
+    variables:
+      _16_a_1__sg_nhr_cmplnc:
+        presentation:
+          topic_tags:
+            - Human Rights
+  _11_b_1__sg_dsr_lgrgsr:
+    variables:
+      _11_b_1__sg_dsr_lgrgsr:
+        presentation:
+          topic_tags:
+            - Natural Disasters
+  _13_b_1__en_naa_plan_dv:
+    variables:
+      _13_b_1__en_naa_plan_dv:
+        presentation:
+          topic_tags:
+            - Climate Change
+  _12_1_1__sg_scp_cntry:
+    variables:
+      _12_1_1__sg_scp_cntry:
+        presentation:
+          topic_tags:
+            - Energy
+  _15_4_1__er_ptd_mtn:
+    variables:
+      _15_4_1__er_ptd_mtn:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _6_6_1__en_wbe_wtlp:
+    variables:
+      _6_6_1__en_wbe_wtlp:
+        presentation:
+          topic_tags:
+            - Land Use
+  _17_13_1__bn_cab_xoka_gd_zs:
+    variables:
+      _17_13_1__bn_cab_xoka_gd_zs:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Government Spending
+  _3_9_1__sh_aap_asmort:
+    variables:
+      _3_9_1__sh_aap_asmort:
+        presentation:
+          topic_tags:
+            - Air Pollution
+            - Burden of Disease
+  _3_9_3__sh_sta_poisn__both_sexes:
+    variables:
+      _3_9_3__sh_sta_poisn__both_sexes:
+        presentation:
+          topic_tags:
+            - Causes of Death
+  _3_9_1__sh_hap_asmort:
+    variables:
+      _3_9_1__sh_hap_asmort:
+        presentation:
+          topic_tags:
+            - Air Pollution
+            - Causes of Death
+  _3_9_1__sh_sta_asairp:
+    variables:
+      _3_9_1__sh_sta_asairp:
+        presentation:
+          topic_tags:
+            - Air Pollution
+            - Causes of Death
+  _10_7_3__sm_dth_migr:
+    variables:
+      _10_7_3__sm_dth_migr:
+        presentation:
+          topic_tags:
+            - Migration
+  _13_1_1__vc_dsr_mtmp:
+    variables:
+      _13_1_1__vc_dsr_mtmp:
+        presentation:
+          topic_tags:
+            - Natural Disasters
+  _17_4_1__dt_tds_dect:
+    variables:
+      _17_4_1__dt_tds_dect:
+        presentation:
+          topic_tags:
+            - Government Spending
+            - Trade & Globalization
+  _5_a_2__sg_lgl_lndfemod:
+    variables:
+      _5_a_2__sg_lgl_lndfemod:
+        presentation:
+          topic_tags:
+            - Economic Inequality by Gender
+            - Women's Rights
+  _3_c_1__sh_med_den__dentists:
+    variables:
+      _3_c_1__sh_med_den__dentists:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Healthcare Spending
+  _11_5_2__vc_dsr_gdpls:
+    variables:
+      _11_5_2__vc_dsr_gdpls:
+        presentation:
+          topic_tags:
+            - Natural Disasters
+  _11_5_2__vc_dsr_lsgp:
+    variables:
+      _11_5_2__vc_dsr_lsgp:
+        presentation:
+          topic_tags:
+            - Natural Disasters
+  _1_5_2__vc_dsr_gdpls:
+    variables:
+      _1_5_2__vc_dsr_gdpls:
+        presentation:
+          topic_tags:
+            - Natural Disasters
+  _12_2_2__en_mat_domcmpc__total_or_no_breakdown:
+    variables:
+      _12_2_2__en_mat_domcmpc__total_or_no_breakdown:
+        presentation:
+          topic_tags:
+            - Economic Growth
+  _12_2_2__en_mat_domcmpg__total_or_no_breakdown:
+    variables:
+      _12_2_2__en_mat_domcmpg__total_or_no_breakdown:
+        presentation:
+          topic_tags:
+            - Economic Growth
+  _1_a_1__dc_oda_povdlg:
+    variables:
+      _1_a_1__dc_oda_povdlg:
+        presentation:
+          topic_tags:
+            - Foreign Aid
+            - Poverty
+  _12_5_1__en_ewt_rcyr:
+    variables:
+      _12_5_1__en_ewt_rcyr:
+        presentation:
+          topic_tags:
+            - Waste Management
+  _11_4_1__gb_xpd_culnat_pbpv:
+    variables:
+      _11_4_1__gb_xpd_culnat_pbpv:
+        presentation:
+          topic_tags:
+            - Government Spending
+            - Healthcare Spending
+  _17_7_1__dc_envtech_exp:
+    variables:
+      _17_7_1__dc_envtech_exp:
+        presentation:
+          topic_tags:
+            - CO2 & Greenhouse Gas Emissions
+            - Technological Change
+  _17_13_1__dt_dod_dect_gn_zs:
+    variables:
+      _17_13_1__dt_dod_dect_gn_zs:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Government Spending
+  _10_7_2__sg_cpa_migrs__all_domains:
+    variables:
+      _10_7_2__sg_cpa_migrs__all_domains:
+        presentation:
+          topic_tags:
+            - Migration
+  _2_c_1__ag_fpa_cfpi:
+    variables:
+      _2_c_1__ag_fpa_cfpi:
+        presentation:
+          topic_tags:
+            - Food Prices
+  _17_2_1__dc_oda_ldcg:
+    variables:
+      _17_2_1__dc_oda_ldcg:
+        presentation:
+          topic_tags:
+            - Foreign Aid
+  _15_2_1__ag_lnd_frstchg:
+    variables:
+      _15_2_1__ag_lnd_frstchg:
+        presentation:
+          topic_tags:
+            - Forests & Deforestation
+  _12_c_1__er_ffs_cmpt_cd:
+    variables:
+      _12_c_1__er_ffs_cmpt_cd:
+        presentation:
+          topic_tags:
+            - Fossil Fuels
+  _6_4_2__er_h2o_stress__no_breakdown:
+    variables:
+      _6_4_2__er_h2o_stress__no_breakdown:
+        presentation:
+          topic_tags:
+            - Water Use & Stress
+  _12_3_1__ag_fls_index__total_or_no_breakdown:
+    variables:
+      _12_3_1__ag_fls_index__total_or_no_breakdown:
+        presentation:
+          topic_tags:
+            - Environmental Impacts of Food Production
+            - Food Supply
+  _16_6_1__gf_xpd_gbpc:
+    variables:
+      _16_6_1__gf_xpd_gbpc:
+        presentation:
+          topic_tags:
+            - Government Spending
+            - Healthcare Spending
+  _13_a_1__dc_fin_tot:
+    variables:
+      _13_a_1__dc_fin_tot:
+        presentation:
+          topic_tags:
+            - Climate Change
+  _17_13_1__dp_dod_dld2_cr_cg_z1:
+    variables:
+      _17_13_1__dp_dod_dld2_cr_cg_z1:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Government Spending
+  _12_4_2__en_haz_pcap:
+    variables:
+      _12_4_2__en_haz_pcap:
+        presentation:
+          topic_tags:
+            - Waste Management
+  _16_2_2__vc_htf_detv__under_18_years_old__female:
+    variables:
+      _16_2_2__vc_htf_detv__under_18_years_old__female:
+        presentation:
+          topic_tags:
+            - Migration
+  _6_5_1__er_h2o_iwrmd:
+    variables:
+      _6_5_1__er_h2o_iwrmd:
+        presentation:
+          topic_tags:
+            - Clean Water & Sanitation
+            - Water Use & Stress
+  _14_c_1__er_unclos_imple:
+    variables:
+      _14_c_1__er_unclos_imple:
+        presentation:
+          topic_tags:
+            - Democracy
+            - Water Use & Stress
+  _17_7_1__dc_envtech_imp:
+    variables:
+      _17_7_1__dc_envtech_imp:
+        presentation:
+          topic_tags:
+            - CO2 & Greenhouse Gas Emissions
+            - Technological Change
+  _2_3_2__si_agr_lsfp__both_sexes:
+    variables:
+      _2_3_2__si_agr_lsfp__both_sexes:
+        presentation:
+          topic_tags:
+            - Employment in Agriculture
+            - Food Prices
+  _2_3_2__si_agr_ssfp__both_sexes:
+    variables:
+      _2_3_2__si_agr_ssfp__both_sexes:
+        presentation:
+          topic_tags:
+            - Employment in Agriculture
+            - Food Prices
+  _7_a_1__eg_iff_randn__all_renewables:
+    variables:
+      _7_a_1__eg_iff_randn__all_renewables:
+        presentation:
+          topic_tags:
+            - Renewable Energy
+            - Research & Development
+  _3_8_2__sh_xpd_earn25:
+    variables:
+      _3_8_2__sh_xpd_earn25:
+        presentation:
+          topic_tags:
+            - Healthcare Spending
+  _5_1_1__sg_lgl_geneqemp:
+    variables:
+      _5_1_1__sg_lgl_geneqemp:
+        presentation:
+          topic_tags:
+            - Economic Inequality by Gender
+  _5_1_1__sg_lgl_geneqmar:
+    variables:
+      _5_1_1__sg_lgl_geneqmar:
+        presentation:
+          topic_tags:
+            - Human Rights
+            - Women's Rights
+  _5_1_1__sg_lgl_geneqvaw:
+    variables:
+      _5_1_1__sg_lgl_geneqvaw:
+        presentation:
+          topic_tags:
+            - Human Rights
+            - Women's Rights
+  _1_4_2__sp_lgl_lnddoc__both_sexes:
+    variables:
+      _1_4_2__sp_lgl_lnddoc__both_sexes:
+        presentation:
+          topic_tags:
+            - Human Rights
+            - Land Use
+  _1_5_3__sg_dsr_lgrgsr:
+    variables:
+      _1_5_3__sg_dsr_lgrgsr:
+        presentation:
+          topic_tags:
+            - Natural Disasters
+  _13_1_3__sg_dsr_sils:
+    variables:
+      _13_1_3__sg_dsr_sils:
+        presentation:
+          topic_tags:
+            - Natural Disasters
+  _17_14_1__sg_cpa_sdevp:
+    variables:
+      _17_14_1__sg_cpa_sdevp:
+        presentation:
+          topic_tags:
+            - CO2 & Greenhouse Gas Emissions
+            - Economic Growth
+  _12_7_1__sg_scp_procn:
+    variables:
+      _12_7_1__sg_scp_procn:
+        presentation:
+          topic_tags:
+            - CO2 & Greenhouse Gas Emissions
+            - Research & Development
+  _16_2_3__vc_vaw_sxvln__18_to_29_years_old__male:
+    variables:
+      _16_2_3__vc_vaw_sxvln__18_to_29_years_old__male:
+        presentation:
+          topic_tags:
+            - Violence Against Children & Children's Rights
+  _10_7_1__sl_emp_rcost_mo__both_sexes:
+    variables:
+      _10_7_1__sl_emp_rcost_mo__both_sexes:
+        presentation:
+          topic_tags:
+            - Migration
+  _17_17_1__gf_com_pppi_kd:
+    variables:
+      _17_17_1__gf_com_pppi_kd:
+        presentation:
+          topic_tags:
+            - Government Spending
+            - Healthcare Spending
+  _3_9_2__sh_sta_washari:
+    variables:
+      _3_9_2__sh_sta_washari:
+        presentation:
+          topic_tags:
+            - Clean Water & Sanitation
+            - Sanitation
+  _15_4_2__er_mtn_grncvi__total__mountain_green_cover_index__mgci:
+    variables:
+      _15_4_2__er_mtn_grncvi__total__mountain_green_cover_index__mgci:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _12_5_1__en_mwt_rcyv:
+    variables:
+      _12_5_1__en_mwt_rcyv:
+        presentation:
+          topic_tags:
+            - Waste Management
+  _15_8_1__er_ias_nbsap:
+    variables:
+      _15_8_1__er_ias_nbsap:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _15_9_1__er_bdy_abt2np:
+    variables:
+      _15_9_1__er_bdy_abt2np:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _3_b_2__dc_tof_hlthnt:
+    variables:
+      _3_b_2__dc_tof_hlthnt:
+        presentation:
+          topic_tags:
+            - Foreign Aid
+            - Healthcare Spending
+  _17_13_1__bn_klt_ptxl_cd:
+    variables:
+      _17_13_1__bn_klt_ptxl_cd:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Trade & Globalization
+  _2_5_1__er_grf_plntstor:
+    variables:
+      _2_5_1__er_grf_plntstor:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _2_5_1__er_grf_animrcntn_trb:
+    variables:
+      _2_5_1__er_grf_animrcntn_trb:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _4_6_1__se_adt_funs__male__numeracy:
+    variables:
+      _4_6_1__se_adt_funs__male__numeracy:
+        presentation:
+          topic_tags:
+            - Global Education
+  _4_6_1__se_adt_funs__female__numeracy:
+    variables:
+      _4_6_1__se_adt_funs__female__numeracy:
+        presentation:
+          topic_tags:
+            - Global Education
+  _14_a_1__er_rde_osex:
+    variables:
+      _14_a_1__er_rde_osex:
+        presentation:
+          topic_tags:
+            - Research & Development
+  _4_b_1__dc_tof_schipsl:
+    variables:
+      _4_b_1__dc_tof_schipsl:
+        presentation:
+          topic_tags:
+            - Education Spending
+            - Foreign Aid
+  _17_2_1__dc_oda_ldcs:
+    variables:
+      _17_2_1__dc_oda_ldcs:
+        presentation:
+          topic_tags:
+            - Foreign Aid
+  _5_1_1__sg_lgl_geneqlfp:
+    variables:
+      _5_1_1__sg_lgl_geneqlfp:
+        presentation:
+          topic_tags:
+            - Human Rights
+            - Women's Rights
+  _4_3_1__se_adt_eductrn__15_to_64_years_old__both_sexes:
+    variables:
+      _4_3_1__se_adt_eductrn__15_to_64_years_old__both_sexes:
+        presentation:
+          topic_tags:
+            - Global Education
+  _3_c_1__sh_med_den__pharmacists:
+    variables:
+      _3_c_1__sh_med_den__pharmacists:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Healthcare Spending
+  _3_5_1__sh_sud_alcol__both_sexes:
+    variables:
+      _3_5_1__sh_sud_alcol__both_sexes:
+        presentation:
+          topic_tags:
+            - Alcohol Consumption
+  _3_3_4__sh_hap_hbsag:
+    variables:
+      _3_3_4__sh_hap_hbsag:
+        presentation:
+          topic_tags:
+            - Child & Infant Mortality
+            - Eradication of Diseases
+  _3_a_1__sh_prv_smok__both_sexes:
+    variables:
+      _3_a_1__sh_prv_smok__both_sexes:
+        presentation:
+          topic_tags:
+            - Smoking
+  _4_a_1__se_acs_intnt__primary:
+    variables:
+      _4_a_1__se_acs_intnt__primary:
+        presentation:
+          topic_tags:
+            - Global Education
+            - Internet
+  _2_3_1__pd_agr_ssfp__both_sexes:
+    variables:
+      _2_3_1__pd_agr_ssfp__both_sexes:
+        presentation:
+          topic_tags:
+            - Agricultural Production
+  _2_4_1__ag_lnd_sust_prxts:
+    variables:
+      _2_4_1__ag_lnd_sust_prxts:
+        presentation:
+          topic_tags:
+            - Agricultural Production
+            - Environmental Impacts of Food Production
+  _10_7_2__sg_cpa_migrp__all_domains:
+    variables:
+      _10_7_2__sg_cpa_migrp__all_domains:
+        presentation:
+          topic_tags:
+            - Migration
+  _2_5_1__er_grf_animrcntn:
+    variables:
+      _2_5_1__er_grf_animrcntn:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _4_2_1__se_dev_ontrk__36_to_59_months_old__both_sexes:
+    variables:
+      _4_2_1__se_dev_ontrk__36_to_59_months_old__both_sexes:
+        presentation:
+          topic_tags:
+            - Global Education
+  _15_2_1__ag_lnd_frstcert:
+    variables:
+      _15_2_1__ag_lnd_frstcert:
+        presentation:
+          topic_tags:
+            - Forests & Deforestation
+  _15_2_1__ag_lnd_frstmgt:
+    variables:
+      _15_2_1__ag_lnd_frstmgt:
+        presentation:
+          topic_tags:
+            - Forests & Deforestation
+  _15_2_1__ag_lnd_frstprct:
+    variables:
+      _15_2_1__ag_lnd_frstprct:
+        presentation:
+          topic_tags:
+            - Biodiversity
+            - Forests & Deforestation
+  _15_1_2__er_ptd_frhwtr:
+    variables:
+      _15_1_2__er_ptd_frhwtr:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _2_5_2__er_rsk_lbreds:
+    variables:
+      _2_5_2__er_rsk_lbreds:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _11_6_1__en_ref_wascol:
+    variables:
+      _11_6_1__en_ref_wascol:
+        presentation:
+          topic_tags:
+            - Waste Management
+  _5_2_1__vc_vaw_marr__15_to_49_years_old:
+    variables:
+      _5_2_1__vc_vaw_marr__15_to_49_years_old:
+        presentation:
+          topic_tags:
+            - Women's Rights
+  _10_a_1__tm_trf_zero__total_or_no_breakdown:
+    variables:
+      _10_a_1__tm_trf_zero__total_or_no_breakdown:
+        presentation:
+          topic_tags:
+            - Trade & Globalization
+  ? _4_4_1__se_adt_acts__25_to_74_years_old__all_areas__both_sexes__creating_electronic_presentations_with_presentation_software
+  : variables:
+      ? _4_4_1__se_adt_acts__25_to_74_years_old__all_areas__both_sexes__creating_electronic_presentations_with_presentation_software
+      : presentation:
+          topic_tags:
+            - Technological Change
+  _14_5_1__er_mrn_mpa:
+    variables:
+      _14_5_1__er_mrn_mpa:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _15_1_2__er_ptd_terr:
+    variables:
+      _15_1_2__er_ptd_terr:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _14_b_1__er_reg_ssfrar:
+    variables:
+      _14_b_1__er_reg_ssfrar:
+        presentation:
+          topic_tags:
+            - Fish & Overfishing
+  _14_c_1__er_unclos_ratacc:
+    variables:
+      _14_c_1__er_unclos_ratacc:
+        presentation:
+          topic_tags:
+            - Clean Water & Sanitation
+            - Water Use & Stress
+  _1_a_1__dc_oda_povlg:
+    variables:
+      _1_a_1__dc_oda_povlg:
+        presentation:
+          topic_tags:
+            - Foreign Aid
+            - Poverty
+  _15_5_1__er_rsk_lst:
+    variables:
+      _15_5_1__er_rsk_lst:
+        presentation:
+          topic_tags:
+            - Biodiversity
+  _14_6_1__er_reg_unfcim:
+    variables:
+      _14_6_1__er_reg_unfcim:
+        presentation:
+          topic_tags:
+            - Fish & Overfishing
+  _7_b_1__eg_egy_rnew__all_renewables:
+    variables:
+      _7_b_1__eg_egy_rnew__all_renewables:
+        presentation:
+          topic_tags:
+            - Renewable Energy
+  _16_7_1__sg_dmk_parlmp_lc:
+    variables:
+      _16_7_1__sg_dmk_parlmp_lc:
+        presentation:
+          topic_tags:
+            - Women's Rights
+  _16_7_1__sg_dmk_jdc__all_age_ranges_or_no_breaks_by_age__no_breakdown_by_disability__total__female__judges:
+    variables:
+      _16_7_1__sg_dmk_jdc__all_age_ranges_or_no_breaks_by_age__no_breakdown_by_disability__total__female__judges:
+        presentation:
+          topic_tags:
+            - Gender Ratio
+            - Women's Rights
+  _16_7_1__sg_dmk_parlmp_uc:
+    variables:
+      _16_7_1__sg_dmk_parlmp_uc:
+        presentation:
+          topic_tags:
+            - Women's Rights
+  _16_1_4__vc_sns_waln_drk__both_sexes:
+    variables:
+      _16_1_4__vc_sns_waln_drk__both_sexes:
+        presentation:
+          topic_tags:
+            - Happiness & Life Satisfaction
+            - Trust
+  _16_a_1__sg_nhr_impl:
+    variables:
+      _16_a_1__sg_nhr_impl:
+        presentation:
+          topic_tags:
+            - Human Rights
+  _15_3_1__ag_lnd_dgrd:
+    variables:
+      _15_3_1__ag_lnd_dgrd:
+        presentation:
+          topic_tags:
+            - Forests & Deforestation
+            - Land Use
+  _1_4_2__sp_lgl_lndsec__both_sexes:
+    variables:
+      _1_4_2__sp_lgl_lndsec__both_sexes:
+        presentation:
+          topic_tags:
+            - Human Rights
+            - Land Use
+  _2_4_1__ag_lnd_sust:
+    variables:
+      _2_4_1__ag_lnd_sust:
+        presentation:
+          topic_tags:
+            - Agricultural Production
+  _5_a_1__sp_gnp_wnowns:
+    variables:
+      _5_a_1__sp_gnp_wnowns:
+        presentation:
+          topic_tags:
+            - Agricultural Production
+            - Economic Inequality by Gender
+  _2_2_2__sn_sta_ovwgt__both_sexes:
+    variables:
+      _2_2_2__sn_sta_ovwgt__both_sexes:
+        presentation:
+          topic_tags:
+            - Obesity
+  _16_2_1__vc_vaw_phypyv__1_to_14_years_old:
+    variables:
+      _16_2_1__vc_vaw_phypyv__1_to_14_years_old:
+        presentation:
+          topic_tags:
+            - Violence Against Children & Children's Rights
+  _6_b_1__er_wat_proced:
+    variables:
+      _6_b_1__er_wat_proced:
+        presentation:
+          topic_tags:
+            - Water Use & Stress
+  _5_4_1__sl_dom_tspd__15_years_old_and_over__all_areas__female:
+    variables:
+      _5_4_1__sl_dom_tspd__15_years_old_and_over__all_areas__female:
+        presentation:
+          topic_tags:
+            - Women's Employment
+  _3_d_2__sh_bld_ecoli:
+    variables:
+      _3_d_2__sh_bld_ecoli:
+        presentation:
+          topic_tags:
+            - Antibiotics & Antibiotic Resistance
+            - Diarrheal Diseases
+  _7_2_1__eg_fec_rnew:
+    variables:
+      _7_2_1__eg_fec_rnew:
+        presentation:
+          topic_tags:
+            - Energy
+            - Renewable Energy
+  _14_4_1__er_h2o_fwtl:
+    variables:
+      _14_4_1__er_h2o_fwtl:
+        presentation:
+          topic_tags:
+            - Fish & Overfishing
+  _17_11_1__tx_exp_gbmrch:
+    variables:
+      _17_11_1__tx_exp_gbmrch:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Trade & Globalization
+  _17_11_1__tx_exp_gbsvr:
+    variables:
+      _17_11_1__tx_exp_gbsvr:
+        presentation:
+          topic_tags:
+            - Tourism
+            - Trade & Globalization
+  _3_b_3__sh_hlf_emed:
+    variables:
+      _3_b_3__sh_hlf_emed:
+        presentation:
+          topic_tags:
+            - Global Health
+            - Healthcare Spending
+  _6_6_1__en_lkrv_pwap:
+    variables:
+      _6_6_1__en_lkrv_pwap:
+        presentation:
+          topic_tags:
+            - Land Use
+            - Water Use & Stress
+  _3_7_1__sh_fpl_mtmm:
+    variables:
+      _3_7_1__sh_fpl_mtmm:
+        presentation:
+          topic_tags:
+            - Fertility Rate
+  _15_4_2__er_mtn_dgrdp__total:
+    variables:
+      _15_4_2__er_mtn_dgrdp__total:
+        presentation:
+          topic_tags:
+            - Land Use
+  ? _16_7_2__iu_dmk_icrs__all_age_ranges_or_no_breaks_by_age__no_breakdown_by_disability__total_or_not_breakdown__all_areas__total__both_sexes
+  : variables:
+      ? _16_7_2__iu_dmk_icrs__all_age_ranges_or_no_breaks_by_age__no_breakdown_by_disability__total_or_not_breakdown__all_areas__total__both_sexes
+      : presentation:
+          topic_tags:
+            - Democracy
+            - Trust
+  _16_3_3__sp_disp_resol__no_breakdown_by_disability__both_sexes:
+    variables:
+      _16_3_3__sp_disp_resol__no_breakdown_by_disability__both_sexes:
+        presentation:
+          topic_tags:
+            - Human Rights
+  _16_6_2__sp_psr_osatis_gov__all_age_ranges_or_no_breaks_by_age__no_breakdown_by_disability__all_areas__total__both_sexes:
+    variables:
+      _16_6_2__sp_psr_osatis_gov__all_age_ranges_or_no_breaks_by_age__no_breakdown_by_disability__all_areas__total__both_sexes:
+        presentation:
+          topic_tags:
+            - Government Spending
+            - Trust
+  _3_8_2__sh_xpd_earn10:
+    variables:
+      _3_8_2__sh_xpd_earn10:
+        presentation:
+          topic_tags:
+            - Healthcare Spending
+  _9_1_1__sp_rod_r2km:
+    variables:
+      _9_1_1__sp_rod_r2km:
+        presentation:
+          topic_tags:
+            - Urbanization
+  _3_d_2__sh_bld_mrsa:
+    variables:
+      _3_d_2__sh_bld_mrsa:
+        presentation:
+          topic_tags:
+            - Antibiotics & Antibiotic Resistance
+            - Diarrheal Diseases
+  _16_4_2__vc_arm_sztrace:
+    variables:
+      _16_4_2__vc_arm_sztrace:
+        presentation:
+          topic_tags:
+            - Illicit Drug Use
+            - War & Peace
+  _4_1_1__se_tot_prfl__lower_secondary__both_sexes__skill__minimum_proficiency_in_mathematics:
+    variables:
+      _4_1_1__se_tot_prfl__lower_secondary__both_sexes__skill__minimum_proficiency_in_mathematics:
+        presentation:
+          topic_tags:
+            - Global Education
+  _4_1_1__se_tot_prfl__primary__both_sexes__skill__minimum_proficiency_in_mathematics:
+    variables:
+      _4_1_1__se_tot_prfl__primary__both_sexes__skill__minimum_proficiency_in_mathematics:
+        presentation:
+          topic_tags:
+            - Global Education
+  _11_7_2__vc_voh_sxph__both_sexes:
+    variables:
+      _11_7_2__vc_voh_sxph__both_sexes:
+        presentation:
+          topic_tags:
+            - Human Rights
+  _11_1_1__en_lnd_indqthsng__all_areas_or_breakdown_by_cities_not_available__all_areas:
+    variables:
+      _11_1_1__en_lnd_indqthsng__all_areas_or_breakdown_by_cities_not_available__all_areas:
+        presentation:
+          topic_tags:
+            - Urbanization
+  _11_1_1__en_lnd_slum:
+    variables:
+      _11_1_1__en_lnd_slum:
+        presentation:
+          topic_tags:
+            - Urbanization
+  _11_7_1__en_acs_urb_opensp__all_areas_or_breakdown_by_cities_not_available:
+    variables:
+      _11_7_1__en_acs_urb_opensp__all_areas_or_breakdown_by_cities_not_available:
+        presentation:
+          topic_tags:
+            - Happiness & Life Satisfaction
+            - Urbanization
+  _5_5_1__sg_gen_locgels:
+    variables:
+      _5_5_1__sg_gen_locgels:
+        presentation:
+          topic_tags:
+            - Women's Rights
+  _5_2_1__vc_vaw_marr__15_years_old_and_over:
+    variables:
+      _5_2_1__vc_vaw_marr__15_years_old_and_over:
+        presentation:
+          topic_tags:
+            - Women's Rights
+  _1_2_2__sd_mdp_muhc__all_age_ranges_or_no_breaks_by_age__all_areas__both_sexes:
+    variables:
+      _1_2_2__sd_mdp_muhc__all_age_ranges_or_no_breaks_by_age__all_areas__both_sexes:
+        presentation:
+          topic_tags:
+            - Poverty
+  _5_b_1__it_mob_own__both_sexes:
+    variables:
+      _5_b_1__it_mob_own__both_sexes:
+        presentation:
+          topic_tags:
+            - Internet
+            - Technological Change
+  _9_c_1__it_mob_4gntwk:
+    variables:
+      _9_c_1__it_mob_4gntwk:
+        presentation:
+          topic_tags:
+            - Technological Change
+  _9_3_1__nv_ind_ssis__manufacturing:
+    variables:
+      _9_3_1__nv_ind_ssis__manufacturing:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Employment in Agriculture
+  _9_3_2__fc_acc_ssid:
+    variables:
+      _9_3_2__fc_acc_ssid:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Healthcare Spending
+  _14_7_1__en_scp_fshgdp:
+    variables:
+      _14_7_1__en_scp_fshgdp:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Fish & Overfishing
+  _5_c_1__sg_gen_eqpwn:
+    variables:
+      _5_c_1__sg_gen_eqpwn:
+        presentation:
+          topic_tags:
+            - Economic Inequality by Gender
+            - Government Spending
+  _17_13_1__gc_tax_totl_gd_zs:
+    variables:
+      _17_13_1__gc_tax_totl_gd_zs:
+        presentation:
+          topic_tags:
+            - Taxation
+  _2_a_2__dc_tof_agrl:
+    variables:
+      _2_a_2__dc_tof_agrl:
+        presentation:
+          topic_tags:
+            - Foreign Aid
+  _16_4_1__di_ill_in__drug_trafficking:
+    variables:
+      _16_4_1__di_ill_in__drug_trafficking:
+        presentation:
+          topic_tags:
+            - Illicit Drug Use
+            - Trade & Globalization
+  _9_b_1__nv_ind_tech__manufacturing:
+    variables:
+      _9_b_1__nv_ind_tech__manufacturing:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Technological Change
+  _8_a_1__dc_tof_trdcmdl:
+    variables:
+      _8_a_1__dc_tof_trdcmdl:
+        presentation:
+          topic_tags:
+            - Foreign Aid
+            - Trade & Globalization
+  _8_a_1__dc_tof_trdcml:
+    variables:
+      _8_a_1__dc_tof_trdcml:
+        presentation:
+          topic_tags:
+            - Foreign Aid
+            - Trade & Globalization
+  _15_a_1__dc_oda_bdvdl:
+    variables:
+      _15_a_1__dc_oda_bdvdl:
+        presentation:
+          topic_tags:
+            - Biodiversity
+            - Foreign Aid
+  _15_a_1__dc_oda_bdvl:
+    variables:
+      _15_a_1__dc_oda_bdvl:
+        presentation:
+          topic_tags:
+            - Biodiversity
+            - Foreign Aid
+  _9_a_1__dc_tof_infral:
+    variables:
+      _9_a_1__dc_tof_infral:
+        presentation:
+          topic_tags:
+            - Foreign Aid
+  _6_a_1__dc_tof_washl:
+    variables:
+      _6_a_1__dc_tof_washl:
+        presentation:
+          topic_tags:
+            - Clean Water & Sanitation
+            - Foreign Aid
+            - Sanitation
+  _17_9_1__dc_fta_total:
+    variables:
+      _17_9_1__dc_fta_total:
+        presentation:
+          topic_tags:
+            - Foreign Aid
+  _16_4_1__di_ill_out__drug_trafficking:
+    variables:
+      _16_4_1__di_ill_out__drug_trafficking:
+        presentation:
+          topic_tags:
+            - Illicit Drug Use
+            - Trade & Globalization
+  _17_13_1__fi_res_totl_mo:
+    variables:
+      _17_13_1__fi_res_totl_mo:
+        presentation:
+          topic_tags:
+            - Economic Growth
+            - Food Supply
+  _16_3_2__vc_prs_unsnt__both_sexes:
+    variables:
+      _16_3_2__vc_prs_unsnt__both_sexes:
+        presentation:
+          topic_tags:
+            - Homicides
+            - Human Rights
+  _11_a_1__sd_cpa_uprdp:
+    variables:
+      _11_a_1__sd_cpa_uprdp:
+        presentation:
+          topic_tags:
+            - Urbanization
+  _6_3_1__en_wwt_wwds:
+    variables:
+      _6_3_1__en_wwt_wwds:
+        presentation:
+          topic_tags:
+            - Water Use & Stress
+  _5_6_1__sh_fpl_infm:
+    variables:
+      _5_6_1__sh_fpl_infm:
+        presentation:
+          topic_tags:
+            - Human Rights
+            - Women's Rights
+  _5_3_1__sp_dyn_mrbf15:
+    variables:
+      _5_3_1__sp_dyn_mrbf15:
+        presentation:
+          topic_tags:
+            - Marriages & Divorces
+            - Violence Against Children & Children's Rights
+  _16_2_3__vc_vaw_sxvln__18_to_29_years_old__female:
+    variables:
+      _16_2_3__vc_vaw_sxvln__18_to_29_years_old__female:
+        presentation:
+          topic_tags:
+            - Violence Against Children & Children's Rights
+            - Women's Rights

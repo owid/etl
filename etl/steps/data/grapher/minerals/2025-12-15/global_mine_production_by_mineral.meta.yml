@@ -1,0 +1,7 @@
+tables:
+  global_mine_production_by_mineral:
+    variables:
+      mine_production:
+        presentation:
+          topic_tags:
+            - Metals & Minerals

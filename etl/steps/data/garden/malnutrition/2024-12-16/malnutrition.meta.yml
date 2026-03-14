@@ -23,6 +23,9 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: Number of underweight children
+          topic_tags:
+            - Child & Infant Mortality
+            - Hunger & Undernourishment
       number_of_wasted_children:
         title: Number of wasted children
         description_short: Prevalence of wasting is the proportion of children under age 5 whose weight for height is more than two standard deviations below the median for the international reference population ages 0-59.

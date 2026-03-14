@@ -19,5 +19,7 @@ tables:
         presentation:
           grapher_config:
             note: "Example machines that are not classified as robots: software (e.g., voice assistants), remote-controlled drones, self-driving cars, “smart” washing machines."
+          topic_tags:
+            - Technological Change
         display:
           numDecimalPlaces: 0
