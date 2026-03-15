@@ -1,0 +1,32 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 31
+
+
+tables:
+  mmlu:
+    variables:
+      em:
+        title: Best MMLU score by country of origin
+        unit: "%"
+        short_unit: "%"
+        description_short: Best score achieved on the MMLU benchmark by any AI model from a given country or region, per year. France, the United Kingdom, and Germany are grouped as Europe.
+        description_key:
+          - This indicator shows the highest score on the MMLU benchmark achieved by any AI model originating from a given country or region in a given year.
+          - MMLU (Massive Multitask Language Understanding) evaluates AI models across 57 academic subjects, including STEM, humanities, and social sciences. Scores reflect accuracy across this wide range of tasks.
+          - Models are assigned to countries based on the country of origin of the organization that developed them. Where models were developed by organizations spanning multiple countries, they are assigned to the United States if the US is one of the countries; otherwise to China, and then to Europe (France, UK, Germany).
+          - France, the United Kingdom, and Germany are grouped into a single "Europe" category.
+          - Scores are shown as percentages (0–100). Most evaluations use a 5-shot prompt format.
+        description_from_producer: |-
+          MMLU (Massive Multitask Language Understanding) is a benchmark that covers 57 different subjects across STEM, humanities, social sciences, and more. It is designed to test the breadth of an AI model's knowledge and reasoning ability across diverse academic domains.
+        display:
+          numDecimalPlaces: 1
