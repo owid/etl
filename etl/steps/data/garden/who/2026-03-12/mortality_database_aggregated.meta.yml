@@ -1,0 +1,29 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Causes of Death
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+  title: WHO Mortality Database - Aggregated from Raw Data
+  description: |
+    Aggregated WHO mortality database calculated directly from raw WHO data files.
+
+    Coverage: 2021-2024, 108 countries with ICD-10 coded mortality data
+
+tables:
+  mortality_database_aggregated:
+    variables:
+      deaths:
+        title: Deaths from << cause_category.lower() >> in << sex.lower() >> aged << age_group.lower() >>
+        description_short: Reported total deaths from << cause_category.lower() >> in << sex.lower() >> aged << age_group.lower() >>.
+        unit: deaths
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            note: |-
+              All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
