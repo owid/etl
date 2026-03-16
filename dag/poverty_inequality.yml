@@ -67,27 +67,27 @@ steps:
   #
   # Luxembourg Income Study
   #
-  data://meadow/lis/2025-12-12/luxembourg_income_study:
-    - snapshot://lis/2025-12-12/lis_incomes.csv
-    - snapshot://lis/2025-12-12/lis_absolute_poverty.csv
-    - snapshot://lis/2025-12-12/lis_inequality.csv
-    - snapshot://lis/2025-12-12/lis_relative_poverty.csv
-  data://garden/lis/2025-12-12/luxembourg_income_study:
-    - data://meadow/lis/2025-12-12/luxembourg_income_study
-  data://grapher/lis/2025-12-12/luxembourg_income_study:
-    - data://garden/lis/2025-12-12/luxembourg_income_study
+  data://meadow/lis/2026-03-16/luxembourg_income_study:
+    - snapshot://lis/2026-03-16/lis_absolute_poverty.csv
+    - snapshot://lis/2026-03-16/lis_inequality.csv
+    - snapshot://lis/2026-03-16/lis_incomes.csv
+    - snapshot://lis/2026-03-16/lis_relative_poverty.csv
+  data://garden/lis/2026-03-16/luxembourg_income_study:
+    - data://meadow/lis/2026-03-16/luxembourg_income_study
+  data://grapher/lis/2026-03-16/luxembourg_income_study:
+    - data://garden/lis/2026-03-16/luxembourg_income_study
   export://explorers/lis/latest/poverty_lis:
-    - data://grapher/lis/2025-12-12/luxembourg_income_study
+    - data://grapher/lis/2026-03-16/luxembourg_income_study
   export://explorers/lis/latest/inequality_lis:
-    - data://grapher/lis/2025-12-12/luxembourg_income_study
+    - data://grapher/lis/2026-03-16/luxembourg_income_study
   export://explorers/lis/latest/incomes_lis:
-    - data://grapher/lis/2025-12-12/luxembourg_income_study
+    - data://grapher/lis/2026-03-16/luxembourg_income_study
   export://multidim/lis/latest/gini_lis:
-    - data://grapher/lis/2025-12-12/luxembourg_income_study
+    - data://grapher/lis/2026-03-16/luxembourg_income_study
   export://multidim/lis/latest/relative_poverty_lis:
-    - data://grapher/lis/2025-12-12/luxembourg_income_study
+    - data://grapher/lis/2026-03-16/luxembourg_income_study
   export://multidim/lis/latest/incomes_lis:
-    - data://grapher/lis/2025-12-12/luxembourg_income_study
+    - data://grapher/lis/2026-03-16/luxembourg_income_study
 
   # Poverty and inequality file for inequality comparisons at OWID
   data://garden/poverty_inequality/2025-01-22/poverty_inequality_file:
