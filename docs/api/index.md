@@ -6,7 +6,7 @@ icon: material/api
 
 # APIs
 
-!!! tip "For convenience, we provide a Python library that wraps all our APIs: [owid-data](../libraries/catalog/api/)."
+!!! tip "For convenience, we provide a Python library that wraps all our APIs: [owid-catalog](../libraries/catalog/api/)."
 
 
 Our World in Data offers a curated collection of charts on our website, datasets and indicators via our ETL catalog, etc. To this end, we are working to consolidate our different data APIs and provide clear documentation for each of them.
