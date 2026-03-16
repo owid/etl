@@ -280,3 +280,7 @@ steps:
     - data://meadow/lis/2025-12-12/luxembourg_income_study
   data://grapher/lis/2025-12-12/luxembourg_income_study:
     - data://garden/lis/2025-12-12/luxembourg_income_study
+
+  # SEDLAC Grapher step
+    data://grapher/cedlas/2025-04-01/sedlac:
+    - data://garden/cedlas/2025-04-01/sedlac
