@@ -17,7 +17,6 @@ def run() -> None:
     snap = paths.load_snapshot()
     tb = snap.read()
 
-
     ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
     ds_population = paths.load_dataset("population")
@@ -25,7 +24,14 @@ def run() -> None:
     # drop unused columns
     tb = tb[["Year", "Rank", "Country name", "Life evaluation (3-year average)"]]
     # rename columns
-    tb = tb.rename(columns={"Year": "year", "Rank": "rank", "Country name": "country", "Life evaluation (3-year average)": "ladder_score"})
+    tb = tb.rename(
+        columns={
+            "Year": "year",
+            "Rank": "rank",
+            "Country name": "country",
+            "Life evaluation (3-year average)": "ladder_score",
+        }
+    )
 
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
