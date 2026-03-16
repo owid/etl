@@ -28,8 +28,10 @@ def run() -> None:
     # Drop rows with missing key columns.
     tb = tb.dropna(subset=["Model version", "Release date", "Country"])
 
-    # Deduplicate by taking max EM per (model_version, release_date, country).
-    tb = tb.sort_values("EM", ascending=False).drop_duplicates(subset=["Model version", "Release date", "Country"])
+    # Deduplicate by (model_version, release_date), keeping row with max EM.
+    # Where the same model version has multiple entries (different sources / names),
+    # keep the one with the highest reported score; also keep its Name.
+    tb = tb.sort_values("EM", ascending=False).drop_duplicates(subset=["Model version", "Release date"])
 
     tb = tb.format(["release_date", "model_version"], short_name="mmlu")
 

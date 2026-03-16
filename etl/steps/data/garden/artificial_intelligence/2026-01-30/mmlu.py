@@ -51,7 +51,7 @@ def assign_region(country_str: str) -> str:
 
 
 def run() -> None:
-    """Process MMLU benchmark data, computing best score per country per year."""
+    """Process MMLU benchmark data, keeping only models that set a new record per country."""
     #
     # Load inputs.
     #
@@ -62,25 +62,41 @@ def run() -> None:
     # Process data.
     #
     # Convert EM score to percentage.
-    tb["em"] = tb["em"] * 100
+    tb["em"] = (tb["em"] * 100).round(1)
 
     # Assign each model to a region.
     tb["country"] = tb["country"].apply(assign_region)
 
-    # Ensure release_date is datetime, then parse year.
+    # Ensure release_date is datetime.
     tb["release_date"] = tb["release_date"].astype("datetime64[ns]")
 
-    # Parse year from release date.
-    tb["year"] = tb["release_date"].dt.year
+    # Drop rows with missing scores.
+    tb = tb.dropna(subset=["em"])
 
-    # Keep best score per country per year (the frontier model for each region each year).
-    tb = tb.groupby(["year", "country"], as_index=False)["em"].max()
-    tb["em"] = tb["em"].round(1)
+    # For each (country, release_date), keep only the best-scoring model and its name.
+    idx = tb.groupby(["country", "release_date"])["em"].idxmax()
+    tb = tb.loc[idx].reset_index(drop=True)
 
-    tb = tb.format(["year", "country"])
+    # For each country, keep only models that strictly improve on all previous scores
+    # (i.e. the frontier/record-setting models over time).
+    tb = tb.sort_values(["country", "release_date"]).reset_index(drop=True)
+    tb["cummax"] = tb.groupby("country")["em"].cummax()
+    tb["prev_cummax"] = tb.groupby("country")["cummax"].shift(1).fillna(0)
+    tb = tb[tb["em"] > tb["prev_cummax"]].drop(columns=["cummax", "prev_cummax"])
+
+    # Table 1: indexed by (release_date, model_name) — model name as the grapher entity.
+    tb_models = tb.rename(columns={"country": "country_name", "name": "country"})
+    tb_models = tb_models[["release_date", "country", "em", "country_name"]].reset_index(drop=True)
+    tb_models = tb_models.format(["release_date", "country"], short_name="mmlu_by_model")
+
+    # Table 2: indexed by (release_date, country) — region as the grapher entity, no model name.
+    tb_country = tb[["release_date", "country", "em"]].reset_index(drop=True)
+    tb_country = tb_country.format(["release_date", "country"], short_name="mmlu_by_country")
 
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb_models, tb_country], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
     ds_garden.save()

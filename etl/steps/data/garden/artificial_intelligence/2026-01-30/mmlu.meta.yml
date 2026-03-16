@@ -1,11 +1,22 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    description_short: Highest MMLU score achieved by a model from a given country or region, shown whenever a new record was set. MMLU is a multitask benchmark made up of exam-style questions across dozens of academic and professional subjects, used to assess breadth of knowledge and problem-solving.
+    description_key:
+      - This indicator shows the highest MMLU score achieved so far by a model from a given country or region.
+      - MMLU (Massive Multitask Language Understanding) is a benchmark that tests AI models across 57 subjects, from school-level science and mathematics to professional fields such as law and medicine.
+      - Scores show the share of multiple-choice questions a model answered correctly. Some models are tested with example questions before answering new questions, while others are not.
+      - Models are grouped by country or region using information on where the developer is based.
+      - France, the United Kingdom, and Germany are grouped into a single "Europe" category.
+      - Data are compiled by Epoch AI from published papers, official leaderboards, and other primary sources.
     processing_level: major
+    description_from_producer: |-
+      MMLU consists of four-choice questions spanning humanities, STEM, social sciences, and professional domains. Many questions require recall of domain facts, application of definitions, or light reasoning under time constraints—skills analogous to standardized testing. Due to its breadth and stability, MMLU is frequently used as a headline indicator of general knowledge in model reports. Sub-scores by discipline can reveal strengths and weaknesses across subject areas.
+    display:
+      numDecimalPlaces: 1
     presentation:
       topic_tags:
         - Artificial Intelligence
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -13,20 +24,24 @@ dataset:
 
 
 tables:
-  mmlu:
+  mmlu_by_model:
+    variables:
+      em:
+        title: MMLU score by AI model
+        unit: "%"
+        short_unit: "%"
+
+      country_name:
+        title: Country or region of origin
+        unit: ""
+        description_short: Country or region of origin of the AI model (France, UK, and Germany are grouped as Europe).
+
+  mmlu_by_country:
     variables:
       em:
         title: Best MMLU score by country of origin
         unit: "%"
         short_unit: "%"
-        description_short: Best score achieved on the MMLU benchmark by any AI model from a given country or region, per year. France, the United Kingdom, and Germany are grouped as Europe.
-        description_key:
-          - This indicator shows the highest score on the MMLU benchmark achieved by any AI model originating from a given country or region in a given year.
-          - MMLU (Massive Multitask Language Understanding) evaluates AI models across 57 academic subjects, including STEM, humanities, and social sciences. Scores reflect accuracy across this wide range of tasks.
-          - Models are assigned to countries based on the country of origin of the organization that developed them. Where models were developed by organizations spanning multiple countries, they are assigned to the United States if the US is one of the countries; otherwise to China, and then to Europe (France, UK, Germany).
-          - France, the United Kingdom, and Germany are grouped into a single "Europe" category.
-          - Scores are shown as percentages (0–100). Most evaluations use a 5-shot prompt format.
-        description_from_producer: |-
-          MMLU (Massive Multitask Language Understanding) is a benchmark that covers 57 different subjects across STEM, humanities, social sciences, and more. It is designed to test the breadth of an AI model's knowledge and reasoning ability across diverse academic domains.
-        display:
-          numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            note: France, the United Kingdom, and Germany are grouped as Europe.
