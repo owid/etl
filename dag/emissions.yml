@@ -128,12 +128,6 @@ steps:
     - data://garden/energy/2025-06-27/primary_energy_consumption
     - data://meadow/gcp/2025-11-13/global_carbon_budget
   #
-  # Decoupling of GDP and CO2.
-  #
-  data://garden/emissions/2025-11-13/gdp_and_co2_decoupling:
-    - data://garden/worldbank_wdi/2025-09-08/wdi
-    - data://garden/gcp/2025-11-13/global_carbon_budget
-  #
   # GCP - Global Carbon Budget.
   #
   data://grapher/gcp/2025-11-13/global_carbon_budget:
@@ -190,6 +184,23 @@ steps:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population
   #
+  # Decoupling of GDP and CO2.
+  #
+  data://garden/emissions/2026-03-05/gdp_and_co2_decoupling:
+    - data://garden/worldbank_wdi/2026-02-27/wdi
+    - data://garden/gcp/2025-11-13/global_carbon_budget
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Decoupling of GDP and CO2.
+  #
+  data://grapher/emissions/2026-03-05/gdp_and_co2_decoupling:
+    - data://garden/emissions/2026-03-05/gdp_and_co2_decoupling
+  #
+  # Decoupling of GDP and CO2.
+  #
+  data://external/emissions/2026-03-05/gdp_and_co2_decoupling:
+    - data://garden/emissions/2026-03-05/gdp_and_co2_decoupling
+  #
   # Climate Watch - Greenhouse gas emissions by sector.
   #
   data://meadow/climate_watch/2026-02-10/emissions_by_sector:
@@ -207,3 +218,25 @@ steps:
   #
   data://grapher/climate_watch/2026-02-10/emissions_by_sector:
     - data://garden/climate_watch/2026-02-10/emissions_by_sector
+  #
+  # Emissions - Greenhouse gas emissions by custom sector.
+  #
+  data://garden/emissions/2026-02-11/emissions_by_custom_sector:
+    - data://garden/climate_watch/2026-02-10/emissions_by_sector
+    - data://garden/ember/2026-01-26/yearly_electricity
+  #
+  # Emissions - Greenhouse gas emissions by custom sector.
+  #
+  data://grapher/emissions/2026-02-11/emissions_by_custom_sector:
+    - data://garden/emissions/2026-02-11/emissions_by_custom_sector
+  #
+  # Emissions - Greenhouse gas emissions by custom sector (alternative version).
+  #
+  data://garden/emissions/2026-03-04/emissions_by_custom_sector:
+    - data://garden/climate_watch/2026-02-10/emissions_by_sector
+    - data://garden/un/2026-02-11/energy_statistics_database
+  #
+  # Emissions - Greenhouse gas emissions by custom sector (alternative version).
+  #
+  data://grapher/emissions/2026-03-04/emissions_by_custom_sector:
+    - data://garden/emissions/2026-03-04/emissions_by_custom_sector

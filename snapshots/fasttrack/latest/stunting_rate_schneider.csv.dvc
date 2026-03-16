@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: |-
+      Erich Schneider et al. (2026). The decline of child stunting in 122 countries: a systematic review of child growth studies since the 19th century.
+    title: stunting_rate_schneider
+    citation_full: |-
+      Erich Schneider et al. (2026). The decline of child stunting in 122 countries: a systematic review of child growth studies since the 19th century.
+    url_main: https://gh.bmj.com/content/11/2/e018607
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTHEIREOumtGUfVaELSuFyP0OoD224EJwaeoguJUklKo3YnVTIoBX2g5jwhGu1iTaCBvTUxrjnXAWcP/pub?output=csv
+    date_accessed: '2026-03-11'
+  name: Long-run stunting rates (Schneider et al. 2026)
+  description: Long-run estimates of childhood stunting rates
+  license: {}
+outs:
+  - md5: f165100ca378c5409c192e2194d809d1
+    size: 12418
+    path: stunting_rate_schneider.csv

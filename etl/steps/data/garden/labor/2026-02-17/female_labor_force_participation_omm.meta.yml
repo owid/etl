@@ -1,0 +1,51 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Women's Employment
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Female labor force participation rate (OMM)
+  update_period_days: 365
+
+
+tables:
+  female_labor_force_participation_omm:
+    variables:
+      female_labor_force_participation:
+        title: Female labor force participation rate
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the female working-age population who are economically active (employed or unemployed).
+        description_key:
+          - The labor force participation rate shows the share of working-age people who are either employed (working for pay or profit) or unemployed (not working, but actively looking for work and available to start). This indicator shows the share of the population that is economically active.
+          - People who are not seeking work or are not available, such as students, retired people, or unpaid caregivers, are excluded as they are considered to be outside the labor force.
+          - We construct this indicator by combining two sources covering different periods. We combined long-run data from [Killingsworth and Heckman (1986)](https://eml.berkeley.edu/~saez/course/Heckman%20and%20Killingsworth_Handbook.pdf) (covering the period up to 1950 for most countries and 1981 for Germany) with more recent estimates from the International Labour Organization (ILO) accessed via the World Bank’s World Development Indicators.
+          - We used the [ILO's national estimates](#dod:ilo-national-estimates) instead of the [modeled data](#dod:ilo-modelled-estimates) to have the longest series possible, and to be consistent with the earlier estimates.
+          - The data by Killingsworth and Heckman (1986) combines earlier data from [Long (1958)](https://econpapers.repec.org/bookchap/nbrnberbk/long58-1.htm) with official statistics from each country, and the International Labour Organization's Yearbook of Labour Statistics.
+          - For several observations before 1960, the working-age population is age 14 or older, instead of 15 or older. In Great Britain, it is age 12 or older in the year 1921.
+          - Up until 1951, data for the United Kingdom represents Great Britain (excludes Northern Ireland). Germany is represented by their post-WWI borders until 1925, and by West Germany (without Berlin) from 1939 until reunification.
+        processing_level: major
+        description_processing: |-
+          We combined long-run data from Killingsworth and Heckman (1986) with ILOSTAT data from the World Bank’s World Development Indicators (national estimates). If there is data for both years, we keep the ILOSTAT data to be consistent with most recent years.
+
+          The latest year in the series coming from Killingsworth and Heckman (1986) depends on the country:
+          - For Canada, it is 1951.
+          - For Germany, it is 1981.
+          - For the United Kingdom, it is 1951.
+          - For the United States, it is 1950.
+
+          In the Killingsworth and Heckman (1986), the data for Germany had two values for 1939, one with post WWI borders and one with West Germany borders (without Berlin). We kept the latter, which follows the convention of the rest of the dataset.
+        description_from_producer: ""
+        presentation:
+          grapher_config:
+            subtitle: ""
+            note: ""
+        display:
+          name: Female labor force participation rate
+          numDecimalPlaces: 1
+

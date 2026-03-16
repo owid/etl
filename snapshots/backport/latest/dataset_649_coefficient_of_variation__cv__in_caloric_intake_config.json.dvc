@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/649
-    date_accessed: 2023-08-10 07:52:11.384603
+    url: https://admin.owid.io/admin/datasets/649
+    date_accessed: 2026-03-05 11:03:34.744283+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_649_coefficient_of_variation__cv__in_caloric_intake
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 692b65db507988adbe680e740016e2ca
-  size: 2338
-  path: dataset_649_coefficient_of_variation__cv__in_caloric_intake_config.json
+  - md5: b2eebb41f05fcc5ccf61bb4dd7f46ada
+    size: 2468
+    path: dataset_649_coefficient_of_variation__cv__in_caloric_intake_config.json

@@ -18,6 +18,7 @@ from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
 from apps.housekeeper.utils import (
+    CONFIG,
     MODEL_DEFAULT_PRETTY,
     TODAY,
     get_chart_summary,
@@ -30,10 +31,9 @@ from etl.slack_helpers import send_slack_message
 
 log = get_logger()
 
-# Default reviewers for daily chart reviews
-# Users are identified by UserIDs. To get the ID for a user, check slackId column in MySQL table `users`.
-DAILY_CHART_REVIEWER_DEFAULT = "U07437LD7JR"  # Tuna
-DAILY_DRAFT_CHART_REVIEWER_DEFAULT = "U07437LD7JR"  # Tuna - alt: Fiona (U01T5MG8DTM)
+# Default reviewer for daily chart reviews (from config.yaml)
+DEFAULT_SLACK_ID = CONFIG["charts"]["default_slack_id"]
+REVIEWER_OVERRIDES = CONFIG["charts"].get("reviewer_overrides", {})
 
 
 ####################################
@@ -43,6 +43,7 @@ def send_slack_chart_reviews(
     channel_name: str,
     include_published: bool = True,
     include_draft: bool = True,
+    dev: bool = False,
 ):
     """Send daily chart reviews to Slack (both published and draft).
 
@@ -52,20 +53,23 @@ def send_slack_chart_reviews(
         channel_name: Name of the Slack channel to send the message to.
         include_published: Whether to send a published chart review.
         include_draft: Whether to send a draft chart review.
+        dev: If True, replace Slack mentions with code-formatted names (no pings).
     """
     log.info("Getting all charts to review")
     df_published, df_draft = get_all_charts_to_review()
 
     # Get user data (slack usernames)
     slack_users = get_usernames()
-    # Replace Max for Hannah (https://owid.slack.com/archives/C087DMCTYM9/p1768236870922109)
-    HANNAH_ID = "U4U46QBJ5"
-    MAX_ID = "U3E5PRWNN"
-    slack_users = {k: (HANNAH_ID if v == MAX_ID else v) for k, v in slack_users.items()}
 
-    # Uncomment below if you want to test the workflow without tagging people
-    # slack_users = {k: "U011L616WE5" for k, v in slack_users.items()}
-    # slack_users = {k: f"_{v}" for k, v in slack_users.items()}
+    if dev:
+        # Dev mode: use code-formatted names instead of Slack mentions
+        slack_users = {k: f"`{k}`" for k in slack_users}
+        default_mention = "`Default Reviewer`"
+    else:
+        # Production: apply reviewer overrides and format as Slack mentions
+        slack_users = {k: REVIEWER_OVERRIDES.get(v, v) for k, v in slack_users.items()}
+        slack_users = {k: f"<@{v}>" for k, v in slack_users.items()}
+        default_mention = f"<@{DEFAULT_SLACK_ID}>"
 
     if include_published and not df_published.empty:
         _send_published_chart_review(
@@ -74,6 +78,7 @@ def send_slack_chart_reviews(
             slack_username="Daily chart",
             icon_emoji="sus-blue",
             slack_users=slack_users,
+            default_mention=default_mention,
         )
     elif include_published:
         log.info("No published charts to review")
@@ -85,6 +90,7 @@ def send_slack_chart_reviews(
             slack_username="Daily draft chart",
             icon_emoji="sus-white",
             slack_users=slack_users,
+            default_mention=default_mention,
         )
     elif include_draft:
         log.info("No draft charts to review")
@@ -139,6 +145,7 @@ def _send_published_chart_review(
     slack_username: str,
     icon_emoji: str,
     slack_users: dict[str, str],
+    default_mention: str,
 ):
     """Send a published chart review to Slack.
 
@@ -147,6 +154,7 @@ def _send_published_chart_review(
         channel_name: Name of the Slack channel.
         slack_username: Username to use when sending the message.
         icon_emoji: Emoji to use as icon.
+        default_mention: Pre-formatted mention for the default reviewer.
     """
     log.info(f"Selected published chart: {chart['chart_id']}, {chart['slug']}")
 
@@ -154,7 +162,7 @@ def _send_published_chart_review(
     refs = get_references(chart["chart_id"])
 
     # Prepare message
-    message = build_published_message(chart, refs)
+    message = build_published_message(chart, refs, default_mention=default_mention)
 
     # Send message
     if SLACK_API_TOKEN:
@@ -181,12 +189,14 @@ def _send_published_chart_review(
         owidb_submit_review_id(object_type="chart", object_id=chart["chart_id"])
 
 
-def build_published_message(chart, refs):
+def build_published_message(chart, refs, default_mention: str | None = None):
     """Build message for published chart review."""
+    if default_mention is None:
+        default_mention = f"<@{DEFAULT_SLACK_ID}>"
     message_usage = _get_published_message_usage(chart, refs)
     date_str = TODAY.strftime("%d %b, %Y")
     message = (
-        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online* <@{DAILY_CHART_REVIEWER_DEFAULT}>\n"
+        f"[{date_str}] *Decide whether to keep <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this chart> online* {default_mention}\n"
         f"_{message_usage}_\n"
     )
     return message
@@ -258,6 +268,7 @@ def _send_draft_chart_review(
     slack_username: str,
     icon_emoji: str,
     slack_users: dict[str, str],
+    default_mention: str,
 ):
     """Send a draft chart review to Slack.
 
@@ -266,11 +277,12 @@ def _send_draft_chart_review(
         channel_name: Name of the Slack channel.
         slack_username: Username to use when sending the message.
         icon_emoji: Emoji to use as icon.
+        default_mention: Pre-formatted mention for the default reviewer.
     """
     log.info(f"Selected draft chart: {chart['chart_id']}, {chart['slug']}")
 
     # Find responsible user (creator, editor, or default)
-    slack_tag, reason, _ = _find_responsible_user(chart, slack_users)
+    slack_tag, reason, _ = _find_responsible_user(chart, slack_users, default_mention=default_mention)
 
     # Build message with responsible user tag
     message = build_draft_message(chart, slack_tag=slack_tag)
@@ -327,8 +339,8 @@ def build_draft_message(chart, slack_tag: str | None = None):
 
     date_str = last_edited.strftime("%d %b %Y")
 
-    # Format the tag part of the message
-    tag_part = f" <@{slack_tag}>" if slack_tag else ""
+    # Format the tag part of the message (slack_tag is already pre-formatted)
+    tag_part = f" {slack_tag}" if slack_tag else ""
 
     message = (
         f"[{today_str}] *Delete <{OWID_ENV.chart_admin_site(chart['chart_id'])}|this draft> if it's no longer needed*{tag_part}\n"
@@ -350,42 +362,9 @@ def get_references(chart_id: int):
 
 def get_usernames():
     df = read_metabase(
-        "select * from users",
+        "select fullName, slackId from users where slackId is not null",
         database_id=5,
     )
-
-    if "slackId" not in df.columns:
-        SLACK_NAMES = {
-            "Angela Wenham": "U06U7HMGJSU",
-            "Antoinette Finnegan": "U0550KX9ZG9",
-            "Bastian Herre": "U01Q41A9PJS",
-            "Bertha Rohenkohl": "U07TQ8APT1T",
-            "Bobbie Macdonald": "U0117V5H16U",
-            "Charlie Giattino": "U01310BHF4J",
-            "Daniel Bachler": "U01TSHGPXRV",
-            "Edouard Mathieu": "U01129F6DQQ",
-            "Esteban Ortiz Ospina": "U3E8LTA3X",
-            "Fiona Spooner": "U01T5MG8DTM",
-            "Hannah Ritchie": "U4U46QBJ5",
-            "Ike Saunders": "U036Q593X54",
-            "Joe Hasell": "U3GSPFCV6",
-            "Lucas Rodés-Guirao": "U01THNNPDCG",
-            "Marcel Gerber": "U011L616WE5",
-            "Martin Račák": "U06S4C4KGJZ",
-            "Marwa Boukarim": "U03DTUH6T7S",
-            "Matthieu Bergel": "ULG7KK63Z",
-            "Max Roser": "U3E5PRWNN",
-            "Mojmir Vinkler": "U02US02AWA1",
-            "Natalie Reynolds-Garcia": "U03QPP629GW",
-            "Pablo Arriagada": "U03DR3BKE5R",
-            "Pablo Rosado": "U02UVHS46AZ",
-            "Sophia Mersmann": "U04QE4CFUKC",
-            "Tuna Acisu": "U07437LD7JR",
-            "Valerie Muigai": "U027C4D5B7F",
-            "Veronika Samborska": "U053NDCFT7C",
-        }
-        df["slackId"] = df["fullName"].map(SLACK_NAMES)
-
     df = df[["fullName", "slackId"]].dropna()
     dix = df.set_index("fullName")["slackId"].to_dict()
     return dix
@@ -417,24 +396,28 @@ def _format_date(date_value) -> str:
     return str(date_value)
 
 
-def _find_responsible_user(chart, users) -> tuple[str, str, str | None]:
+def _find_responsible_user(chart, users, default_mention: str | None = None) -> tuple[str, str, str | None]:
     """Find the responsible user for a draft chart.
 
     Logic:
-    1. Check created_by - if in SLACK_NAMES, use them
-    2. Check revisions chronologically - find first editor in SLACK_NAMES
-    3. Fall back to DAILY_DRAFT_CHART_REVIEWER_DEFAULT
+    1. Check created_by - if in users, use them
+    2. Check revisions chronologically - find first editor in users
+    3. Fall back to default_mention
 
     Args:
         chart: Chart row (pandas Series) with created_by and revisions fields.
-        users: Dictionary with available users on Slack
+        users: Dictionary mapping full names to pre-formatted Slack mentions.
+        default_mention: Pre-formatted fallback mention. Defaults to Slack mention of DEFAULT_SLACK_ID.
 
     Returns:
         Tuple of (slack_tag, reason, date_str) where:
-        - slack_tag: Username to tag on Slack
+        - slack_tag: Pre-formatted mention string
         - reason: Why this person was tagged (for thread message)
         - date_str: Relevant date (creation or edit date), or None for default
     """
+    if default_mention is None:
+        default_mention = f"<@{DEFAULT_SLACK_ID}>"
+
     # 1. Check creator
     creator = chart.get("created_by")
     if creator and creator in users:
@@ -454,8 +437,7 @@ def _find_responsible_user(chart, users) -> tuple[str, str, str | None]:
             return slack_tag, f"You edited this chart on {date_str}.", date_str
 
     # 3. Fall back to default
-    slack_tag = DAILY_DRAFT_CHART_REVIEWER_DEFAULT
-    return slack_tag, "You are the default reviewer for draft charts.", None
+    return default_mention, "You are the default reviewer for draft charts.", None
 
 
 def _build_refs_message(refs):

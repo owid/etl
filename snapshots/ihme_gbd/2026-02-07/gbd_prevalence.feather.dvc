@@ -15,9 +15,13 @@ meta:
     attribution_short: "IHME-GBD"
     # Files
     url_main: https://vizhub.healthdata.org/gbd-results/
-    date_accessed: 2026-02-07
+    date_accessed: '2026-02-07'
 
     # License
     license:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+outs:
+  - md5: f5907ec13f4955d601fbd6512dd36571
+    size: 1045240434
+    path: gbd_prevalence.feather

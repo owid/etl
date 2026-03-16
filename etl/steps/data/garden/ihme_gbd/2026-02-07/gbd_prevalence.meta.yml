@@ -1,0 +1,113 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+    processing_level: major
+
+macros: |-
+  <% macro title(metric, age, cause, unit) %>
+    <% if metric == "Number" %>
+        <% if age != 'Age-standardized' and age != 'All ages' %>
+            << unit | capitalize >> of << cause >>, among individuals aged << age >>
+        <% elif age == 'Age-standardized' %>
+            Age-standardized << unit >> of << cause >>
+        <% elif age == 'All ages' %>
+            Total number of << unit >> of << cause >>
+        <% endif %>
+    <% elif metric == "Rate" %>
+        <% if age != 'Age-standardized' and age != 'All ages' %>
+            << unit | capitalize >> of << cause >>, among individuals aged << age >> per 100,000 people
+        <% elif age == 'Age-standardized' %>
+            Age-standardized << unit >> of << cause >> per 100,000 people
+        <% elif age == 'All ages' %>
+            << unit | capitalize >> of << cause >> per 100,000 people
+        <% endif %>
+    <% elif metric == "Share" %>
+        <% if age != 'Age-standardized' and age != 'All ages' %>
+            << unit | capitalize >> of << cause >>, among individuals aged << age >> per 100 people
+        <% elif age == 'Age-standardized' %>
+            Age-standardized << unit >> of << cause >> per 100 people
+        <% elif age == 'All ages' %>
+            << unit | capitalize >> of << cause >> per 100 people
+        <% endif %>
+    <% endif %>
+  <% endmacro %>
+
+  <% macro description_short(metric, age, cause, unit) %>
+    <% if metric == "Number" %>
+        <% if age != 'Age-standardized' and age != 'All ages' %>
+            The estimated number of << unit >> of << cause >> in those aged << age >>.
+        <% elif age == 'Age-standardized' %>
+            The estimated number of age-standardized << unit >> of << cause >>.
+        <% elif age == 'All ages' %>
+            The estimated number of << unit >> of << cause >>.
+        <% endif %>
+    <% elif metric == "Rate" %>
+        <% if age != 'Age-standardized' and age != 'All ages' %>
+            The estimated number of << unit >> of << cause >> in those aged << age >>, per 100,000 people.
+        <% elif age == 'Age-standardized' %>
+            The estimated number of age-standardized << unit >> of << cause >>, per 100,000 people.
+        <% elif age == 'All ages' %>
+            The estimated number of << unit >> of << cause >>, per 100,000 people.
+        <% endif %>
+    <% elif metric == "Share" %>
+        <% if age != 'Age-standardized' and age != 'All ages' %>
+            The estimated number of << unit >> of << cause >> in those aged << age >>, per 100 people.
+        <% elif age == 'Age-standardized' %>
+            The estimated number of age-standardized << unit >> of << cause >>, per 100 people.
+        <% elif age == 'All ages' %>
+            The estimated number of << unit >> of << cause >>, per 100 people.
+        <% endif %>
+    <% endif %>
+  <% endmacro %>
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 1460
+  non_redistributable: true
+tables:
+  gbd_prevalence:
+    variables:
+      value:
+        title: |-
+          {macros}
+          << title(metric, age, format_cause(cause), 'current cases') >>
+        unit: |-
+          {macros}
+          << format_unit(metric, 'cases') >>
+        short_unit: |-
+          {definitions.short_unit}
+        description_short: |-
+          {macros}
+          << description_short(metric, age, format_cause(cause), 'current cases') >>
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
+  gbd_incidence:
+    variables:
+      value:
+        title: |-
+          {macros}
+          << title(metric, age, format_cause(cause), 'new cases') >>
+        unit: |-
+          {macros}
+          << format_unit(metric, 'new cases') >>
+        short_unit: |-
+          {definitions.short_unit}
+        description_short: |-
+          {macros}
+          << description_short(metric, age, format_cause(cause), 'new cases') >>
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>

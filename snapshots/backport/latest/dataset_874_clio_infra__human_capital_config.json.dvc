@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/874
-    date_accessed: 2023-08-10 10:26:41.288426
+    url: https://admin.owid.io/admin/datasets/874
+    date_accessed: 2026-03-10 08:02:21.996163+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_874_clio_infra__human_capital
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8ae8ccee49c997fe508401d90dd5efda
-  size: 9209
-  path: dataset_874_clio_infra__human_capital_config.json
+  - md5: b8a78d3baa7d399a27d0eb8a3e9398d8
+    size: 9804
+    path: dataset_874_clio_infra__human_capital_config.json

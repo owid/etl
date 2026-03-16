@@ -1,0 +1,21 @@
+dataset:
+  title: Laws on child marriage - Gender, Institutions and Development Database (GID-DB, 2019)
+tables:
+  laws_on_child_marriage__gender__institutions_and_development_database__gid_db__2019:
+    variables:
+      laws_on_child_marriage__gid_db__2019:
+        title: Laws on child marriage (GID-DB, 2019)
+        unit: ''
+        display:
+          name: Laws on child marriage
+        description: |-
+          This child marriage indicator provides a five-point indicator as to whether women and men have the same legal minimum age of marriage. Please see the source description below for a detailed description of each of the five category scores.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

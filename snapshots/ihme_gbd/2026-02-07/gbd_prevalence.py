@@ -6,7 +6,7 @@ Important - You need and account to access the data.
 
 * Go to: https://vizhub.healthdata.org/gbd-results/
 * In 'GBD Estimate' select 'Cause of death or injury'
-* In Measure select 'Prevalence'
+* In Measure select 'Prevalence' & 'Incidence'
 * In Metric select 'Number' and 'Rate'
 * In Cause select 'Select all causes'
 * In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions'
@@ -34,8 +34,8 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
-BASE_URL = ""
-NUMBER_OF_FILES = 127
+BASE_URL = "https://dl.healthdata.org/gbd-api-2023-collaborator/feab1bd7a15b87e8d19ebf604f60aaf7_files/IHME-GBD_2023_DATA-feab1bd7-"
+NUMBER_OF_FILES = 138
 
 
 @click.command()
@@ -56,7 +56,3 @@ def main(upload: bool) -> None:
 
     log.info("Uploading final file", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
     snap.create_snapshot(upload=upload, data=df)
-
-
-if __name__ == "__main__":
-    main()

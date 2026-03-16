@@ -18,7 +18,7 @@ Custom VS Code extensions enhance your ETL development workflow by automating re
 To install all custom extensions:
 
 ```bash
-make install-vscode-extensions
+make vsce-sync
 ```
 
 This installs both marketplace extensions (Ruff, YAML) and our custom extensions from `vscode_extensions/*/install/*.vsix`.
@@ -133,6 +133,47 @@ Catch outdated code patterns as you type with configurable warnings.
     - Hover for suggested alternatives
     - Extensible: add new patterns in `src/extension.ts`
 
+### Chart Preview
+
+!!! tip "**Shortcut**: ++cmd+alt+p++"
+
+Preview ETL datasets and charts directly in VS Code without leaving your editor.
+
+**Use case**: You're working on a garden step and want to quickly check the indicators it produces — their sparklines, value ranges, null rates, and data quality flags — without running the full pipeline or opening a browser.
+
+Works for:
+
+- **Garden / meadow `.py` steps** → opens a dataset preview panel with indicator cards
+- **`.chart.yml` files and multidim steps** → embeds the staging chart viewer
+
+#### Dataset preview
+
+Opens a live panel showing:
+
+- Indicator cards sorted by popularity (most-viewed indicators first)
+- Sparkline charts per entity, entity selector, and shuffle button
+- Stats: year range, entity count, min/max values, null rate
+- Data quality flags: missing title, unit, description, or origins
+- Popularity score (`★`) sourced from the `analytics_popularity` table
+
+The panel **auto-rebuilds** when you save the step file (uses `etlr --watch` in the background).
+
+!!! note "How it works"
+
+    1. Open any garden/meadow `.py` step (the dataset must have been built at least once)
+    2. Press ++cmd+alt+p++
+    3. The dataset preview panel opens — save the file to trigger a rebuild
+
+#### Chart preview
+
+Embeds the staging admin chart viewer for `.chart.yml` and multidim export steps.
+
+!!! note "How it works"
+
+    1. Open a `.chart.yml` or multidim `.py` step
+    2. Press ++cmd+alt+p++
+    3. The chart is loaded from the staging server in a side panel
+
 ## Developing extensions
 
 Improving existing extensions or creating a new ones is simple. Below, we outline the basic workflow for extension development.
@@ -173,7 +214,7 @@ Reload VS Code: cmd+shift+p → "Developer: Reload Window"
 
 ### Extension not working after update
 
-**Problem**: Ran `make install-vscode-extensions` but extension didn't update.
+**Problem**: Ran `make vsce-sync` but extension didn't update.
 
 **Cause**: This command skips already-installed extensions.
 

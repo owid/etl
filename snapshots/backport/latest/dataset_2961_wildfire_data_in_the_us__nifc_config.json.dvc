@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2961
-    date_accessed: 2023-08-10 09:06:05.978018
+    url: https://admin.owid.io/admin/datasets/2961
+    date_accessed: 2026-03-05 12:29:09.447080+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2961_wildfire_data_in_the_us__nifc
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 630a4706a245003c5b3268da9c367ece
-  size: 6313
-  path: dataset_2961_wildfire_data_in_the_us__nifc_config.json
+  - md5: 54d1b44068440fb64c297a11a4f3f0ee
+    size: 6908
+    path: dataset_2961_wildfire_data_in_the_us__nifc_config.json

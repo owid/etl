@@ -29,7 +29,7 @@ CONFIG_BASE = {
     },
     "hideTotalValueLabel": False,
     "hideTimeline": False,
-    "hideLegend": False,
+    "hideSeriesLabels": False,
     "tab": "chart",
     "logo": "owid",
     "$schema": DEFAULT_GRAPHER_SCHEMA,

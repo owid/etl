@@ -11,7 +11,8 @@ config:
   wpBlockId: 57755
   isPublished: true
   originUrl: https://ourworldindata.org/economic-inequality
-  # pickerColumnSlugs:
+  pickerColumnSlugs:
+    - asdf
 
 dimensions:
   - name: Indicator

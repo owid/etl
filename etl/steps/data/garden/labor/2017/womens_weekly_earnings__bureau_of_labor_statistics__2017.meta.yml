@@ -1,0 +1,19 @@
+dataset:
+  title: Women's weekly earnings as a percentage of men's - Bureau of Labor Statistics (2017)
+tables:
+  womens_weekly_earnings__bureau_of_labor_statistics__2017:
+    variables:
+      womens_weekly_earnings_as_a_percentage_of_mens_by_age__bureau_of_labor_statistics__2017:
+        title: Women's weekly earnings as a percentage of men's by age (Bureau of Labor Statistics (2017))
+        unit: '%'
+        description: |-
+          Women's weekly earnings as a share of men's, by age group. Earnings ratios are the weekly median earnings of full time workers.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

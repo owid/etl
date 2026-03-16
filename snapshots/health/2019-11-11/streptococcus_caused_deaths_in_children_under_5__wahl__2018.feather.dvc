@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Wahl (2018)
+    description: |-
+      Deaths and mortality rates from diseases caused by Streptococcus pneumoniae bacteria in children under-5.
+
+      Wahl, B., O'Brien, K. L., Greenbaum, A., Majumder, A., Liu, L., Chu, Y., ... & Rudan, I. (2018). Burden of Streptococcus pneumoniae and Haemophilus influenzae type b disease in children in the era of conjugate vaccines: global, regional, and national estimates for 2000–15. The Lancet Global Health, 6(7), e744-e757.
+    url: https://www.thelancet.com/journals/langlo/article/PIIS2214-109X(18)30247-X
+    date_accessed: 2019-11-11
+    published_by: |-
+      Wahl, B., O'Brien, K. L., Greenbaum, A., Majumder, A., Liu, L., Chu, Y., ... & Rudan, I. (2018). Burden of Streptococcus pneumoniae and Haemophilus influenzae type b disease in children in the era of conjugate vaccines: global, regional, and national estimates for 2000–15. The Lancet Global Health, 6(7), e744-e757.
+  name: Streptococcus-caused deaths in children under-5, Wahl (2018)
+  description: ''
+  is_public: false
+outs:
+  - md5: af9f5944171786fbecd34abd0ecb03bb
+    size: 64706
+    path: streptococcus_caused_deaths_in_children_under_5__wahl__2018.feather

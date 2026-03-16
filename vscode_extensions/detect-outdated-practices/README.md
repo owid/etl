@@ -166,7 +166,7 @@ npx @vscode/vsce package
 
 ## Installation
 
-This extension is installed automatically via `make install-vscode-extensions` from the project root.
+This extension is installed automatically via `make vsce-sync` from the project root.
 
 To manually install:
 ```bash

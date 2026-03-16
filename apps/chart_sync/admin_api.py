@@ -64,9 +64,10 @@ class AdminAPI(object):
         return js
 
     def create_chart(self, chart_config: dict, user_id: Optional[int] = None) -> dict:
-        # Extract isInheritanceEnabled from config and prepare request params
+        # Extract chart-table fields; keep them out of chart_configs.full payload.
         config = chart_config.copy()
         is_inheritance_enabled = config.pop("isInheritanceEnabled", None)
+        config.pop("forceDatapage", None)
 
         # Build request parameters
         params = {}
@@ -86,9 +87,10 @@ class AdminAPI(object):
         return js
 
     def update_chart(self, chart_id: int, chart_config: dict, user_id: Optional[int] = None) -> dict:
-        # Extract isInheritanceEnabled from config and prepare request params
+        # Extract chart-table fields; keep them out of chart_configs.full payload.
         config = chart_config.copy()
         is_inheritance_enabled = config.pop("isInheritanceEnabled", None)
+        config.pop("forceDatapage", None)
 
         # Build request parameters
         params = {}

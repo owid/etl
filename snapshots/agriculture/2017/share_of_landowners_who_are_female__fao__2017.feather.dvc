@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: Share of landowners who are female (%)
+    description: |-
+      Data on agricultural land ownership by gender is available and reported by the FAO across 102 countries. Currently this data is not available as a time-series, and is limited to measurement in a single census year. Note that this census year is not consistent across all countries. Data for most European and North American countries is based on 2010-11 datasets, whereas other countries can extend from 1993-2011. For graphing consistency, this has been shown as a single year (e.g. assuming these figures are representative of 2011). The actual years of measurement for each country can be found in the referenced FAO report and database.
+
+      The FAO's publication on its Gender and Land Rights Database notes the following definition:
+      "The agricultural landowner is defined as the legal owner of the agricultural land; however, definitions of ownership may vary across countries and surveys. The indicator may not necessarily reflect documented ownership certified by a legal document. Especially in places where much of the land is not formally titled or documented, surveys often simply ask whether someone in the household owns the land, and if so, who owns it. In addition to officially titled ownership, it may also include proxies, such as the right to use, sell or bequeath the land, or the right to use it as collateral. This enables the indicator to capture different aspects of the “bundle of rights” related to land, rather than land ownership in the strictest sense of the term. The current indicator in the GLRD uses different definitions of ownership; they are specified for each country in the data notes. As data for more countries become available, it will be useful to calculate these measures using more than one definition of ownership.
+
+      An individual is defined as a landowner whether they own land solely (they are the only owner of a plot of land) or jointly with someone inside or outside the household. Thus, households may have multiple landowners. In addition, households may own multiple plots of land with different owners identified for each plot."
+
+      References:
+      FAO (2015). Gender and Land Statistics Recent developments in FAO’s Gender and Land Rights Database. Rome. Available at: http://www.fao.org/3/a-i4862e.pdf [accessed 29/05/2017]
+    url: http://www.fao.org/gender-landrights-database/en/
+    date_accessed: 2017-05-29
+    published_by: United Nations Food and Agricultural Organisation (FAO) Gender and Land Rights Database
+  name: Share of landowners who are female - FAO (2017)
+  description: |-
+    Share of agricultural landowners who are female (%).
+
+    I thought the data came from the FAOSTAT WCAD dataset. But from what I've read [here](https://www.fao.org/3/i4862e/i4862e.pdf), WCAD informs about land management and not landownership. So we can't update this dataset with FAOSTAT data. I think the data comes from [this page](https://www.fao.org/gender-landrights-database/data-map/statistics/en/), where they claim "The data is shown in the interactive map and are also available in graph and table formats." but I haven't found any way to access the data but to copy or scrape the page. In any case the data has not changed. Last time I checked (2023-04-11) the data doesn't seem to have changed with respect to this dataset, so there's no need to update it.
+outs:
+  - md5: 981921ffb79cc424fb22ec1421427d2d
+    size: 5050
+    path: share_of_landowners_who_are_female__fao__2017.feather

@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/276
-    date_accessed: 2023-08-10 07:44:03.370316
+    url: https://admin.owid.io/admin/datasets/276
+    date_accessed: 2026-03-05 13:25:39.321881+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_276_trust__eurostat
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e23099df7c5d46808619a4b1e9797767
-  size: 2952
-  path: dataset_276_trust__eurostat_config.json
+  - md5: 18c865d9873bfcd33e66275b53b2873f
+    size: 3175
+    path: dataset_276_trust__eurostat_config.json

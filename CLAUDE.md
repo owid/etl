@@ -37,7 +37,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
 
 **Important:**
-- Never use `--force` alone - always pair with `--only`
+- **Avoid `--force`** — `etlr` has built-in change detection and only re-runs steps whose code or data changed. Use `--force` only when you need to re-run a step despite no code changes (e.g., after fixing external data). Never use `--force` alone — always pair with `--only`.
 - For `grapher://` steps, always add `--grapher` flag
 
 ## Git Workflow
@@ -72,17 +72,25 @@ Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 
 ## Code Patterns
 
+### Preserving metadata/origins in steps
+
+- **No `np.where`** — strips origins. Use `tb["col"] = tb["b"]; tb.loc[mask, "col"] = tb.loc[mask, "a"]`
+- **No `index.map()`** to pull columns from another table — loses origins. Use `tb.join(other[["col"]], how="left")`
+- **`snap.read_csv/json/excel/feather/...`** — prefer over manual file reading + `pd.DataFrame`
+- **`paths.regions.harmonize_names(tb, country_col=..., countries_file=...)`** — current harmonization API (replaces `geo.harmonize_countries`)
+- **`Table.format()`** needs both `country` and `year`. For year-less tables: `set_index("country")` + set `tb.metadata.short_name`
+- **`*.meta.yml`**: omit `dataset:` block — inherited from origin. Only define `tables:` → `variables:`
+
 ### Standard Garden Step
 ```python
 from etl.helpers import PathFinder
-from etl.data_helpers import geo
 
 paths = PathFinder(__file__)
 
 def run() -> None:
     ds_input = paths.load_dataset("input_dataset")
     tb = ds_input["table_name"].reset_index()
-    tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
     tb = tb.format(short_name=paths.short_name)
     ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()
@@ -146,6 +154,19 @@ Use `uv` (not pip):
 uv add package_name
 uv remove package_name
 ```
+
+## VSCode Extensions
+
+Extensions live in `vscode_extensions/<name>/`. After **every** code change, you must compile, package, and install — just compiling is NOT enough:
+
+```bash
+cd vscode_extensions/<name>
+npm run compile
+npx @vscode/vsce package --out install/<name>-<version>.vsix
+code --install-extension install/<name>-<version>.vsix --force
+```
+
+Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
 
 ## Extended Documentation
 

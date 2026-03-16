@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2794
-    date_accessed: 2023-08-10 09:25:00.033209
+    url: https://admin.owid.io/admin/datasets/2794
+    date_accessed: 2026-03-05 14:30:44.584328+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3b927e41ff663bfa02c49b63e5933abf
-  size: 8077
-  path: dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys_config.json
+  - md5: 1e0bceca832d68a81cd9fb424e38df6a
+    size: 8393
+    path: dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys_config.json

@@ -1,0 +1,26 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  animals_food_and_technology:
+    variables:
+      {}
+
+  animals_food_and_technology_responses:
+    variables:
+      share:
+        title: Share of respondents
+        unit: "%"
+        short_unit: "%"
+        description_short: Weighted share of survey respondents selecting a response.

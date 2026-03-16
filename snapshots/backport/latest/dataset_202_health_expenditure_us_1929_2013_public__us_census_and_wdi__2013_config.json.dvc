@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/202
-    date_accessed: 2023-08-10 08:33:54.078675
+    url: https://admin.owid.io/admin/datasets/202
+    date_accessed: 2026-03-10 09:21:33.783115+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_202_health_expenditure_us_1929_2013_public__us_census_and_wdi__2013
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f9551cdcabb40c7a1c3b39973f54c3d5
-  size: 2070
-  path: 
-    dataset_202_health_expenditure_us_1929_2013_public__us_census_and_wdi__2013_config.json
+  - md5: 5e271122c5604f324da0744f8111c379
+    size: 2200
+    path: dataset_202_health_expenditure_us_1929_2013_public__us_census_and_wdi__2013_config.json

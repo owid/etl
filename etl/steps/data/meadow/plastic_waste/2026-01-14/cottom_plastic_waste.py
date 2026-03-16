@@ -10,6 +10,7 @@ paths = PathFinder(__file__)
 
 # Define the variables we want to extract
 VARIABLES = [
+    "Population_2020",
     "wg",
     "wg_per_cap",
     "pwg",

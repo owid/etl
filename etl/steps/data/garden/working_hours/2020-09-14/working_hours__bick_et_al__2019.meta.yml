@@ -1,0 +1,165 @@
+dataset:
+  title: Working Hours – Bick et al (2019)
+tables:
+  working_hours__bick_et_al__2019:
+    variables:
+      average_annual_hours_worked_per_employed_person__bick_et_al_2019:
+        title: Average annual hours worked per employed person (Bick et al 2019)
+        unit: ''
+      annual_hrs_worked_employed_15_24:
+        title: annual_hrs_worked_employed_15_24
+        unit: ''
+      annual_hrs_worked_employed_25_54:
+        title: annual_hrs_worked_employed_25_54
+        unit: ''
+      annual_hrs_worked_employed_55_64:
+        title: annual_hrs_worked_employed_55_64
+        unit: ''
+      annual_hrs_worked_employed_agri:
+        title: annual_hrs_worked_employed_agri
+        unit: ''
+      annual_hrs_worked_employed_edu_enrolled:
+        title: annual_hrs_worked_employed_edu_enrolled
+        unit: ''
+      annual_hrs_worked_employed_edu_high:
+        title: annual_hrs_worked_employed_edu_high
+        unit: ''
+      annual_hrs_worked_employed_edu_low:
+        title: annual_hrs_worked_employed_edu_low
+        unit: ''
+      annual_hrs_worked_employed_edu_med:
+        title: annual_hrs_worked_employed_edu_med
+        unit: ''
+      annual_hrs_worked_employed_manuf:
+        title: annual_hrs_worked_employed_manuf
+        unit: ''
+      annual_hrs_worked_employed_men:
+        title: annual_hrs_worked_employed_men
+        unit: ''
+      annual_hrs_worked_employed_serv:
+        title: annual_hrs_worked_employed_serv
+        unit: ''
+      annual_hrs_worked_employed_women:
+        title: annual_hrs_worked_employed_women
+        unit: ''
+      annual_hrs_worked_person:
+        title: annual_hrs_worked_person
+        unit: ''
+      annual_hrs_worked_person_15_24:
+        title: annual_hrs_worked_person_15_24
+        unit: ''
+      annual_hrs_worked_person_25_54:
+        title: annual_hrs_worked_person_25_54
+        unit: ''
+      annual_hrs_worked_person_55_64:
+        title: annual_hrs_worked_person_55_64
+        unit: ''
+      annual_hrs_worked_person_edu_enrolled:
+        title: annual_hrs_worked_person_edu_enrolled
+        unit: ''
+      annual_hrs_worked_person_edu_high:
+        title: annual_hrs_worked_person_edu_high
+        unit: ''
+      annual_hrs_worked_person_edu_low:
+        title: annual_hrs_worked_person_edu_low
+        unit: ''
+      annual_hrs_worked_person_edu_med:
+        title: annual_hrs_worked_person_edu_med
+        unit: ''
+      annual_hrs_worked_person_men:
+        title: annual_hrs_worked_person_men
+        unit: ''
+      annual_hrs_worked_person_women:
+        title: annual_hrs_worked_person_women
+        unit: ''
+      annual_leave:
+        title: annual_leave
+        unit: ''
+        description: |-
+          The data is from the Bick et al (2019) Online Appendix section A.2: Public Holidays and Days of Annual Leave. It is originally presented as number of days; we convert days to 5-day workweeks by dividing by 5.
+      employment_rate:
+        title: employment_rate
+        unit: ''
+      employment_rate_15_24:
+        title: employment_rate_15_24
+        unit: ''
+      employment_rate_25_54:
+        title: employment_rate_25_54
+        unit: ''
+      employment_rate_55_64:
+        title: employment_rate_55_64
+        unit: ''
+      employment_rate_edu_enrolled:
+        title: employment_rate_edu_enrolled
+        unit: ''
+      employment_rate_edu_high:
+        title: employment_rate_edu_high
+        unit: ''
+      employment_rate_edu_low:
+        title: employment_rate_edu_low
+        unit: ''
+      employment_rate_edu_med:
+        title: employment_rate_edu_med
+        unit: ''
+      employment_rate_men:
+        title: employment_rate_men
+        unit: ''
+      employment_rate_women:
+        title: employment_rate_women
+        unit: ''
+      public_holidays:
+        title: public_holidays
+        unit: ''
+        description: |-
+          The data is from the Bick et al (2019) Online Appendix section A.2: Public Holidays and Days of Annual Leave. It is originally presented as number of days; we convert days to 5-day workweeks by dividing by 5.
+      weekly_hrs_worked_15_24:
+        title: weekly_hrs_worked_15_24
+        unit: ''
+      weekly_hrs_worked_25_54:
+        title: weekly_hrs_worked_25_54
+        unit: ''
+      weekly_hrs_worked_55_64:
+        title: weekly_hrs_worked_55_64
+        unit: ''
+      weekly_hrs_worked_agri:
+        title: weekly_hrs_worked_agri
+        unit: ''
+      weekly_hrs_worked_edu_enrolled:
+        title: weekly_hrs_worked_edu_enrolled
+        unit: ''
+      weekly_hrs_worked_edu_high:
+        title: weekly_hrs_worked_edu_high
+        unit: ''
+      weekly_hrs_worked_edu_low:
+        title: weekly_hrs_worked_edu_low
+        unit: ''
+      weekly_hrs_worked_edu_med:
+        title: weekly_hrs_worked_edu_med
+        unit: ''
+      weekly_hrs_worked_employed:
+        title: weekly_hrs_worked_employed
+        unit: ''
+      weekly_hrs_worked_employed_men:
+        title: weekly_hrs_worked_employed_men
+        unit: ''
+      weekly_hrs_worked_employed_women:
+        title: weekly_hrs_worked_employed_women
+        unit: ''
+      weekly_hrs_worked_manuf:
+        title: weekly_hrs_worked_manuf
+        unit: ''
+      weekly_hrs_worked_serv:
+        title: weekly_hrs_worked_serv
+        unit: ''
+      weeks_worked:
+        title: weeks_worked
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

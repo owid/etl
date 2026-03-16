@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Hill, Thomas, Dimsdale (2016), A Millennium of UK Data (2016), Bank of England
+    description: Uses GDP at factor cost.  Great Britain growth rates prior to 1855.
+    url: https://www.bankofengland.co.uk/statistics/research-datasets#
+    date_accessed: 2018-02-22
+    published_by: |-
+      Hill, S, Thomas, R and Dimsdale, N (2017) "A Millennium of UK Data", Bank of England OBRA dataset, https://www.bankofengland.co.uk/statistics/research-datasets
+  name: Labor productivity per hour (Hill, Thomas, Dimsdale (2016), Bank of England)
+  description: ''
+outs:
+  - md5: 2d60a6b2c58eede598de52c6a6afba2d
+    size: 6090
+    path: labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england.feather

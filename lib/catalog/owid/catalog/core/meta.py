@@ -151,7 +151,7 @@ class MetaBase(DataClassJsonMixin):
             if value is not None:
                 setattr(self, key, value)
 
-    def copy(self, deep=True) -> Self:
+    def copy(self, deep: bool = True) -> Self:
         """Create a copy of the metadata object.
 
         Args:
@@ -565,7 +565,7 @@ class VariableMeta(MetaBase):
 
         return meta
 
-    def copy(self, deep=True) -> Self:
+    def copy(self, deep: bool = True) -> Self:
         m = super().copy(deep)
         m._name = getattr(self, "_name", None)  # type: ignore
         return m  # type: ignore
@@ -758,7 +758,7 @@ def is_year_or_date(s: str) -> bool:
         return False
 
 
-def _deepcopy_dataclass(dc) -> Any:
+def _deepcopy_dataclass(dc: Any) -> Any:
     """Create a deep copy of a dataclass. This is much faster than running copy.deepcopy."""
     dc = dataclasses.replace(dc)
     for k, v in dc.__dict__.items():

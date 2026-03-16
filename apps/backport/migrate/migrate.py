@@ -1,4 +1,6 @@
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 from typing import Optional, cast
 
@@ -7,6 +9,7 @@ import structlog
 from owid.catalog.utils import underscore
 from rich import print
 from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
 
 from apps.backport.backport import PotentialBackport
 from apps.utils.files import add_to_dag, generate_step
@@ -76,6 +79,12 @@ DAG_MIGRATED_PATH = DAG_DIR / "migrated.yml"
     type=bool,
     help="Upload dataset to S3 as snapshot",
 )
+@click.option(
+    "--run/--no-run",
+    default=False,
+    type=bool,
+    help="Run snapshot, ETL+grapher, and indicator upgrade after generating files",
+)
 def cli(
     dataset_id: int,
     namespace: str,
@@ -85,6 +94,7 @@ def cli(
     force: bool = False,
     dry_run: bool = False,
     upload: bool = True,
+    run: bool = False,
 ) -> None:
     """Migrate existing dataset from MySQL into ETL.
 
@@ -93,10 +103,14 @@ def cli(
     - Garden step with YAML metadata
     - Grapher step
 
+    With `--run`, it also executes the full pipeline: snapshot, ETL+grapher,
+    and indicator upgrade (match + upgrade).
+
     **Example:**
 
     ```
     ENV=.env.live etl b migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
+    etl b migrate --dataset-id 2660 --namespace trade --run
     ```
     """
     return migrate(
@@ -108,6 +122,7 @@ def cli(
         force=force,
         dry_run=dry_run,
         upload=upload,
+        run=run,
     )
 
 
@@ -121,6 +136,7 @@ def migrate(
     dry_run: bool = False,
     upload: bool = True,
     engine: Optional[Engine] = None,
+    run: bool = False,
 ) -> None:
     lg = log.bind(dataset_id=dataset_id)
 
@@ -136,9 +152,16 @@ def migrate(
 
     if backport:
         lg.info("migrate.backport_dataset")
-        # backport to refresh snapshots in S3
-        if force or pb.needs_update():
-            pb.upload(upload, dry_run, engine)
+        # always force backport during migration to ensure config.json is fresh
+        # (stale/empty configs from previous backports cause JSONDecodeError)
+        pb.upload(upload, dry_run, engine)
+
+    if dry_run:
+        lg.info("migrate.dry_run", namespace=namespace, version=version, short_name=short_name)
+        print(
+            f"\n[bold yellow]Dry run:[/bold yellow] Would create ETL steps for [bold]{namespace}/{version}/{short_name}[/bold]"
+        )
+        return
 
     # load both snapshots and recreate Dataset from it
     _generate_metadata_yaml(namespace, version, short_name, pb.short_name)
@@ -147,27 +170,81 @@ def migrate(
     _generate_step_files(namespace, version, short_name, pb.short_name)
 
     # add steps to DAG
-    _add_to_migrated_dag(namespace, version, short_name)
+    _add_to_migrated_dag(namespace, version, short_name, is_public=pb.public)
 
-    # Print instructions
-    print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
-    print("[green]1.[/green] Create a PR")
-    print(f"[green]2.[/green] Execute snapshot with [bold]`etls {namespace}/{version}/{short_name}`[/bold]")
-    print(f"[green]3.[/green] Run dataset with [bold]`etlr {namespace}/{version}/{short_name} --grapher`[/bold]")
-    print("[green]4.[/green] Run indicator upgrader in [bold]`make wizard`[/bold]")
-    print("[green]5.[/green] Merge your PR, then [bold]delete[/bold] or archive the old dataset")
+    if run:
+        _run_full_pipeline(dataset_id, namespace, version, short_name, engine)
+    else:
+        # Print instructions for manual execution
+        print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
+        print("[green]1.[/green] Create a PR")
+        print(f"[green]2.[/green] Execute snapshot with [bold]`etls {namespace}/{version}/{short_name}`[/bold]")
+        print(f"[green]3.[/green] Run dataset with [bold]`etlr {namespace}/{version}/{short_name} --grapher`[/bold]")
+        print("[green]4.[/green] Run indicator upgrader in [bold]`make wizard`[/bold]")
+        print("[green]5.[/green] Merge your PR, then [bold]delete[/bold] or archive the old dataset")
 
 
-def _add_to_migrated_dag(namespace: str, version: str, short_name: str):
+def _run_full_pipeline(old_dataset_id: int, namespace: str, version: str, short_name: str, engine: Engine) -> None:
+    """Run the full migration pipeline: snapshot, ETL+grapher, and indicator upgrade."""
+    from apps.indicator_upgrade.match import main as match_main
+    from apps.indicator_upgrade.upgrade import cli_upgrade_indicators
+    from etl.grapher.model import Dataset as GrapherDataset
+
+    dataset_path = f"{namespace}/{version}/{short_name}"
+    etls = str(Path(sys.executable).parent / "etls")
+    etlr = str(Path(sys.executable).parent / "etlr")
+
+    # 1. Run snapshot
+    log.info("migrate.run_snapshot", dataset_path=dataset_path)
+    subprocess.run([etls, dataset_path], check=True)
+
+    # 2. Run ETL + grapher
+    log.info("migrate.run_etl_grapher", dataset_path=dataset_path)
+    subprocess.run([etlr, dataset_path, "--grapher", "--private"], check=True)
+
+    # 3. Look up the new dataset ID
+    catalog_path = f"{namespace}/{version}/{short_name}"
+    with Session(engine) as session:
+        ds = session.query(GrapherDataset).filter(GrapherDataset.catalogPath == catalog_path).one()
+        new_dataset_id = ds.id
+
+    log.info("migrate.new_dataset_created", old_id=old_dataset_id, new_id=new_dataset_id)
+
+    # 4. Match indicators (non-interactive, perfect matches only)
+    log.info("migrate.match_indicators", old_id=old_dataset_id, new_id=new_dataset_id)
+    match_main(
+        old_dataset_id=old_dataset_id,
+        new_dataset_id=new_dataset_id,
+        dry_run=False,
+        match_identical=True,
+        no_interactive=True,
+        auto_threshold=100.0,
+        quiet=True,
+    )
+
+    # 5. Upgrade indicators
+    log.info("migrate.upgrade_indicators")
+    cli_upgrade_indicators(dry_run=False)
+
+    print(f"\n[bold green]Migration complete![/bold green] Dataset {old_dataset_id} → {new_dataset_id}")
+    print("[green]Charts have been updated to use the new variables.[/green]")
+
+
+def _add_to_migrated_dag(namespace: str, version: str, short_name: str, is_public: bool = True):
+    private_suffix = "" if is_public else "-private"
     add_to_dag(
-        {f"data://grapher/{namespace}/{version}/{short_name}": {f"data://garden/{namespace}/{version}/{short_name}"}},
+        {
+            f"data{private_suffix}://grapher/{namespace}/{version}/{short_name}": [
+                f"data{private_suffix}://garden/{namespace}/{version}/{short_name}"
+            ]
+        },
         dag_path=DAG_MIGRATED_PATH,
     )
     add_to_dag(
         {
-            f"data://garden/{namespace}/{version}/{short_name}": {
-                f"snapshot://{namespace}/{version}/{short_name}.feather"
-            }
+            f"data{private_suffix}://garden/{namespace}/{version}/{short_name}": [
+                f"snapshot{private_suffix}://{namespace}/{version}/{short_name}.feather"
+            ]
         },
         dag_path=DAG_MIGRATED_PATH,
     )
@@ -196,11 +273,11 @@ def _generate_metadata_yaml(namespace: str, version: str, short_name: str, backp
     ds.metadata.version = version
     ds.metadata.short_name = short_name
 
-    meta = metadata_export(ds)
+    meta = metadata_export(ds, keep_title=True)
 
     # remove source and description which is already in snapshot
-    meta["dataset"].pop("sources")
-    meta["dataset"].pop("description")
+    meta["dataset"].pop("sources", None)
+    meta["dataset"].pop("description", None)
 
     yml_path = STEP_DIR / f"data/{ds.metadata.uri}.meta.yml"
 

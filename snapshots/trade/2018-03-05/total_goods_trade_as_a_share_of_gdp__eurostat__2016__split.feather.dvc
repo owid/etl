@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Eurostat (2016)
+    description: |-
+      Eurostat data reports goods exports in millions of euros to the rest of the world. To calculate the total value of goods exports to the world, we convert the total value of exports into USD using the average yearly USD/euro exchange rate produced by the European Central Bank available at: http://sdw.ecb.europa.eu/browseSelection.do?removeItem=&mergeFilter=&ec=&rc=&EXR_SUFFIX.18=A&oc=&df=true&DATASET=0&dc=&CURRENCY.18=USD&node=9691296&showHide=&pb=&removedItemList=&activeTab=&FREQ.18=A&legendRef=reference
+
+      Then, the total export value in US$ is divided by the country's GDP to give total exports as a share of GDP. The World Bank's GDP data series (in current US$) is used.
+    url: http://ec.europa.eu/eurostat/web/international-trade-in-goods/data/database
+    date_accessed: 2018-03-05
+    published_by: Eurostat Comext
+  name: Total goods trade as a share of GDP (Eurostat (2016)) (split)
+  description: ''
+  is_public: false
+outs:
+  - md5: ff29264d082f77844a4b989866dce38e
+    size: 6818
+    path: total_goods_trade_as_a_share_of_gdp__eurostat__2016__split.feather

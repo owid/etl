@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Fouquin and Hugot (CEPII 2016)
+    description: |-
+      'Non-rich' countries are all countries in the world except: Australia, Austria, Belgium, Canada, Cyprus, Denmark, Finland, France, Germany, Greece, Iceland,Ireland, Israel, Italy, Japan, Luxembourg, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland, United Kingdom, United States.
+
+      Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+    url: http://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=32
+    date_accessed: 2018-03-19
+    published_by: |-
+      Michel Fouquin & Jules Hugot , 2016. "Two Centuries of Bilateral Trade and Gravity Data: 1827-2014," CEPII Working Paper 2016- 14 , May 2016 , CEPII
+  name: Share of world merchandise trade by type of trade - Fouquin and Hugot (CEPII 2016, Dyadic data)
+  description: This dataset uses Fouquin and Hugot (CEPII 2016) dyadic trade data.
+outs:
+  - md5: 44094ba8bb15aa9cf16e494b26b53102
+    size: 21522
+    path: share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data.feather

@@ -1,0 +1,18 @@
+dataset:
+  title: Coal production - The SHIFT Project
+tables:
+  coal_production__the_shift_project:
+    variables:
+      coal_production__the_shift_project:
+        title: Coal production (The SHIFT Project)
+        unit: terrawatt-hours
+        short_unit: TWh
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

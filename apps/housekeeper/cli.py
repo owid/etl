@@ -14,7 +14,6 @@ REVIEW_TYPES = [
 
 # Config
 CHANNEL_NAME = "#chart-reviews"
-# CHANNEL_NAME = "#lucas-playground"
 
 
 @click.command("housekeeper", help=__doc__)
@@ -28,13 +27,23 @@ CHANNEL_NAME = "#chart-reviews"
     "--channel",
     "-c",
     type=str,
-    help=f"Name of the slack channel to send the message two. If None, {CHANNEL_NAME} will be used",
+    help=f"Name of the slack channel to send the message to. If None, {CHANNEL_NAME} will be used",
 )
-def main(review_type: str, channel: Optional[str] = None):
+@click.option(
+    "--dev",
+    is_flag=True,
+    default=False,
+    help="Dev mode: replaces Slack mentions with code-formatted names so nobody gets pinged. Requires --channel.",
+)
+def main(review_type: str, channel: Optional[str] = None, dev: bool = False):
+    if dev and channel is None:
+        raise click.UsageError("--dev requires --channel to avoid posting to the main channel")
+
     channel_name = CHANNEL_NAME if channel is None else channel
     # Review charts
     if review_type == "chart":
         send_slack_chart_reviews(
             channel_name=channel_name,
             include_draft=True,
+            dev=dev,
         )

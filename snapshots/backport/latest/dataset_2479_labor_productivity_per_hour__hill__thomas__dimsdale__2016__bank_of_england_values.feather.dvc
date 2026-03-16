@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2479
-    date_accessed: 2023-08-10 09:11:04.816518
+    url: https://admin.owid.io/admin/datasets/2479
+    date_accessed: 2026-03-05 13:14:26.209359+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Labor productivity per hour (Hill, Thomas, Dimsdale (2016), Bank of England)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 13dc77984fdb07e4cafe541d0950099f
-  size: 9322
-  path: 
-    dataset_2479_labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england_values.feather
+  - md5: f2efdfb7ab62af9e11a9eef6913aaca6
+    size: 9354
+    path: dataset_2479_labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england_values.feather

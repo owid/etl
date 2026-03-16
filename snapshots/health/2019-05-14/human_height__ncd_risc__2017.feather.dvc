@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: NCD RisC, Human Height (2017)
+    description: Mean heights of men and women aged 18 or older by birth year, extending from 1896 to 1996.
+    url: http://www.ncdrisc.org/data-downloads-height.html
+    date_accessed: 2019-05-14
+    published_by: NCD RisC
+  name: Human Height - NCD RisC (2017)
+  description: ''
+outs:
+  - md5: 5d88b0e9b0fb3bdc7db1e395bab9464a
+    size: 812530
+    path: human_height__ncd_risc__2017.feather

@@ -1,0 +1,19 @@
+dataset:
+  title: Percentage of adults living alone in the US and Canada- US Census Bureau & Statistics Canada
+tables:
+  percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada:
+    variables:
+      percentage_of_adults_living_alone:
+        title: Percentage of adults living alone
+        unit: '%'
+        short_unit: '%'
+        description: The percentage of adults living alone.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

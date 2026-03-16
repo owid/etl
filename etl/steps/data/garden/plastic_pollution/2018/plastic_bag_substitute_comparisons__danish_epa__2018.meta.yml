@@ -1,0 +1,44 @@
+dataset:
+  title: Plastic bag substitute comparisons (Danish EPA, 2018)
+tables:
+  plastic_bag_substitute_comparisons__danish_epa__2018:
+    variables:
+      all_environmental_indicators:
+        title: All environmental indicators
+        unit: ''
+      all_environmental_indicators__max:
+        title: All environmental indicators (max)
+        unit: ''
+      freshwater_eutrophication:
+        title: Freshwater eutrophication
+        unit: ''
+      greenhouse_gas_emissions:
+        title: Greenhouse gas emissions
+        unit: ''
+      ozone_depletion:
+        title: Ozone depletion
+        unit: ''
+      ozone_formation:
+        title: Ozone formation
+        unit: ''
+      particulate_matter:
+        title: Particulate matter
+        unit: ''
+      terrestrial_acidification:
+        title: Terrestrial acidification
+        unit: ''
+      terrestrial_eutrophication:
+        title: Terrestrial eutrophication
+        unit: ''
+      water_use:
+        title: Water use
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

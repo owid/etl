@@ -60,11 +60,6 @@ LIMIT_NOFILE = 4096
     help="Run private steps.",
 )
 @click.option(
-    "--instant",
-    is_flag=True,
-    help="Only apply YAML metadata in the garden step.",
-)
-@click.option(
     "--grapher/--no-grapher",
     "-g/-ng",
     default=False,
@@ -160,7 +155,6 @@ def main_cli(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
-    instant: bool = False,
     grapher: bool = False,
     export: bool = False,
     ipdb: bool = False,
@@ -205,6 +199,10 @@ def main_cli(
 
     config.enable_sentry()
 
+    # in watch mode, run steps in-process (no subprocess) so exceptions propagate and the loop continues
+    if watch:
+        config.DEBUG = True
+
     # make everything single threaded, useful for debugging
     if not use_threads:
         config.GRAPHER_INSERT_WORKERS = 1
@@ -214,10 +212,6 @@ def main_cli(
     # GRAPHER_INSERT_WORKERS should be split among workers
     if workers > 1:
         config.GRAPHER_INSERT_WORKERS = config.GRAPHER_INSERT_WORKERS // workers
-
-    # Set INSTANT mode from CLI flag
-    if instant:
-        config.INSTANT = instant
 
     # Set CONTINUE_ON_FAILURE from CLI flag
     if continue_on_failure:
@@ -255,7 +249,13 @@ def main_cli(
     else:
         runs = [None]
 
-    for _ in runs:
+    for changed_file in runs:
+        if watch and changed_file is not None:
+            is_yaml = str(changed_file).endswith((".yml", ".yaml"))
+            config.INSTANT = is_yaml
+            mode_label = "instant (metadata only)" if is_yaml else "full"
+            print(f"--- File changed: {changed_file.name} [{mode_label}]", flush=True)
+
         if ipdb:
             from ipdb import launch_ipdb_on_exception
 
@@ -266,7 +266,18 @@ def main_cli(
             with launch_ipdb_on_exception():
                 main(**kwargs)  # type: ignore
         else:
-            main(**kwargs)  # type: ignore
+            try:
+                main(**kwargs)  # type: ignore
+            except Exception:
+                if not watch:
+                    raise
+                import traceback
+
+                traceback.print_exc()
+                print("--- step_failed", flush=True)
+                continue
+            if watch:
+                print("--- Dataset rebuild complete", flush=True)
 
 
 def _find_closest_matches(includes_str: str, dag: DAG) -> None:

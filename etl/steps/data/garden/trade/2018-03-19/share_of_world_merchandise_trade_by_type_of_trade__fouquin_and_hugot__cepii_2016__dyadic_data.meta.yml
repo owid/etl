@@ -1,0 +1,70 @@
+dataset:
+  title: Share of world merchandise trade by type of trade - Fouquin and Hugot (CEPII 2016, Dyadic data)
+tables:
+  share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data:
+    variables:
+      share_of_world_merchandise_trade__non_rich_to_non_rich__fouquin_and_hugot__cepii_2016__dyadic_data:
+        title: Share of world merchandise trade - non-rich to non-rich (Fouquin and Hugot; CEPII 2016, Dyadic data)
+        unit: '%'
+        description: |-
+          The non-rich to non-rich trade series shows the proportion of merchandise exports that are exported from non-rich countries to other non-rich countries as a share of total world exports. Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+
+          'Non-rich' countries are all countries in the world except: Australia, Austria, Belgium, Canada, Cyprus, Denmark, Finland, France, Germany, Greece, Iceland,Ireland, Israel, Italy, Japan, Luxembourg, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland, United Kingdom, United States.
+      share_of_world_merchandise_trade__non_rich_to_rich__fouquin_and_hugot__cepii_2016__dyadic_data:
+        title: Share of world merchandise trade - non-rich to rich (Fouquin and Hugot; CEPII 2016, Dyadic data)
+        unit: '%'
+        description: |-
+          The non-rich to rich trade series shows the proportion of merchandise exports that are exported from non-rich countries to rich countries as a share of total world exports. Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+
+          'Non-rich' countries are all countries in the world except: Australia, Austria, Belgium, Canada, Cyprus, Denmark, Finland, France, Germany, Greece, Iceland,Ireland, Israel, Italy, Japan, Luxembourg, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland, United Kingdom, United States.
+      share_of_world_merchandise_trade__rich_to_non_rich__fouquin_and_hugot__cepii_2016__dyadic_data:
+        title: Share of world merchandise trade - rich to non-rich (Fouquin and Hugot; CEPII 2016, Dyadic data)
+        unit: '%'
+        description: |-
+          The rich to non-rich trade series shows the proportion of merchandise exports that are exported from rich countries to non-rich countries as a share of total world exports. Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+
+          'Non-rich' countries are all countries in the world except: Australia, Austria, Belgium, Canada, Cyprus, Denmark, Finland, France, Germany, Greece, Iceland,Ireland, Israel, Italy, Japan, Luxembourg, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland, United Kingdom, United States.
+      share_of_world_merchandise_trade__rich_to_rich__fouquin_and_hugot__cepii_2016__dyadic_data:
+        title: Share of world merchandise trade - rich to rich (Fouquin and Hugot; CEPII 2016, Dyadic data)
+        unit: '%'
+        description: |-
+          The rich to rich trade series shows the proportion of merchandise exports that are exported from rich countries to other rich countries as a share of total world exports. Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+
+          'Non-rich' countries are all countries in the world except: Australia, Austria, Belgium, Canada, Cyprus, Denmark, Finland, France, Germany, Greece, Iceland,Ireland, Israel, Italy, Japan, Luxembourg, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland, United Kingdom, United States.
+      value_of_world_merchandise_trade__non_rich_to_non_rich__fouquin_and_hugot__cepii_2016__dyadic_data:
+        title: Value of world merchandise trade - non-rich to non-rich (Fouquin and Hugot; CEPII 2016, Dyadic data)
+        unit: £
+        description: |-
+          The value of world merchandise trade exports from non-rich to non-rich countries. Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+
+          'Non-rich' countries are all countries in the world except: Australia, Austria, Belgium, Canada, Cyprus, Denmark, Finland, France, Germany, Greece, Iceland,Ireland, Israel, Italy, Japan, Luxembourg, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland, United Kingdom, United States.
+      value_of_world_merchandise_trade__non_rich_to_rich__fouquin_and_hugot__cepii_2016__dyadic_data:
+        title: Value of world merchandise trade - non-rich to rich (Fouquin and Hugot; CEPII 2016, Dyadic data)
+        unit: £
+        description: |-
+          The value of world merchandise trade exports from non-rich to rich countries. Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+
+          'Non-rich' countries are all countries in the world except: Australia, Austria, Belgium, Canada, Cyprus, Denmark, Finland, France, Germany, Greece, Iceland,Ireland, Israel, Italy, Japan, Luxembourg, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland, United Kingdom, United States.
+      value_of_world_merchandise_trade__rich_to_non_rich__fouquin_and_hugot__cepii_2016__dyadic_data:
+        title: Value of world merchandise trade - rich to non-rich (Fouquin and Hugot; CEPII 2016, Dyadic data)
+        unit: £
+        description: |-
+          The value of world merchandise trade exports from rich to non-rich countries. Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+
+          'Non-rich' countries are all countries in the world except: Australia, Austria, Belgium, Canada, Cyprus, Denmark, Finland, France, Germany, Greece, Iceland,Ireland, Israel, Italy, Japan, Luxembourg, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland, United Kingdom, United States.
+      value_of_world_merchandise_trade__rich_to_rich__fouquin_and_hugot__cepii_2016__dyadic_data:
+        title: Value of world merchandise trade - rich to rich (Fouquin and Hugot; CEPII 2016, Dyadic data)
+        unit: £
+        description: |-
+          The value of world merchandise trade exports from rich to rich countries. Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+
+          'Non-rich' countries are all countries in the world except: Australia, Austria, Belgium, Canada, Cyprus, Denmark, Finland, France, Germany, Greece, Iceland,Ireland, Israel, Italy, Japan, Luxembourg, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland, United Kingdom, United States.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

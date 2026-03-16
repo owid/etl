@@ -1,0 +1,23 @@
+meta:
+  source:
+    name: European Commission and IIASA, 2020
+    description: |-
+      These population projections come from a joint project between the European Commission and the International Institute for Applied Systems Analysis (IIASA). The results, first published as the "<a href="https://ec.europa.eu/jrc/en/facts4eufuture/eu-demographic-scenarios">Demographic Scenarios for the EU</a>" flagship report, were since updated and published by the Proceedings of the National Academy of Sciences of the United States of America (PNAS). Information on the detailed methodology and updated microsimulation results can be found <a href="https://www.pnas.org/content/117/14/7690.abstract">here</a>.
+
+      Full reference:
+      Marois, G., Bélanger, A., & Lutz, W. (2020). Population aging, migration, and productivity in Europe. Proceedings of the National Academy of Sciences, 117(14), 7690-7695.
+
+      -------
+      Background on the labour force assumptions for the 'LFDR - Constant Participation' and 'LFDR - High Participation' scenarios:
+      Future labour force participation rates are calculated from statistical modelling based on the 2014 and 2015 Labour Force Survey, assuming constant entry and exit rates in the labour force by age, sex, education, and country. The 'high participation (Swedish) scenario' assumes a convergence in labour participation rates by 2050 to what was observed in Sweden during 2014-2015.
+    url: https://www.pnas.org/content/117/14/7690.abstract
+    date_accessed: 2026-03-06
+    published_by: |-
+      Marois, G., Bélanger, A., & Lutz, W. (2020). Population aging, migration, and productivity in Europe. Proceedings of the National Academy of Sciences, 117(14), 7690-7695.
+  name: Labour Force Dependency Ratio (IIASC)
+  description: ''
+  is_public: false
+outs:
+  - md5: 59264a536aa9398ddcf6ccf44726fdcf
+    size: 10706
+    path: labour_force_dependency_ratio__iiasc.feather

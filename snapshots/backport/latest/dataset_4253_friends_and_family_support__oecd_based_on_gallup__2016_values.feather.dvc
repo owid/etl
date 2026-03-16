@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4253
-    date_accessed: 2023-08-10 09:04:29.570843
+    url: https://admin.owid.io/admin/datasets/4253
+    date_accessed: 2026-03-10 09:14:31.169212+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Friends and family support – OECD based on Gallup (2016)
   description: The OECD average is population-weighted.
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 25abfabe53e1e4944c0d35f1be943940
-  size: 7514
-  path: 
-    dataset_4253_friends_and_family_support__oecd_based_on_gallup__2016_values.feather
+  - md5: 5ab1b825a9b1c444ddaa6f5169006db3
+    size: 7554
+    path: dataset_4253_friends_and_family_support__oecd_based_on_gallup__2016_values.feather

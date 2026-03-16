@@ -22,16 +22,16 @@ class ResponseSet(BaseModel, Generic[T]):
     for backwards compatibility.
 
     Attributes:
-        results: List of result objects.
+        items: List of result objects.
         query: The query that produced these results.
-        total_count: Total number of results available (may be more than len(results)).
+        total_count: Total number of results available (may be more than len(items)).
     """
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
     )
 
-    results: list[T]
+    items: list[T]
     query: str = ""
     total_count: int = 0
     base_url: str = Field(frozen=True)
@@ -41,25 +41,25 @@ class ResponseSet(BaseModel, Generic[T]):
 
     def _get_type_display(self) -> str:
         """Get display name for ResponseSet with generic type."""
-        if not self.results:
+        if not self.items:
             return "ResponseSet"
 
         # Get the type of the first result
-        first_result = self.results[0]
+        first_result = self.items[0]
         type_name = type(first_result).__name__
         return f"ResponseSet[{type_name}]"
 
     def model_post_init(self, __context: Any) -> None:
         """Set total_count to length of results if not provided."""
         if self.total_count == 0:
-            self.total_count = len(self.results)
+            self.total_count = len(self.items)
 
     def __iter__(self) -> Iterator[T]:  # type: ignore[override]
         """Iterate over results, not model fields."""
-        return iter(self.results)
+        return iter(self.items)
 
     def __len__(self) -> int:
-        return len(self.results)
+        return len(self.items)
 
     @overload
     def __getitem__(self, index: int) -> T: ...
@@ -70,13 +70,13 @@ class ResponseSet(BaseModel, Generic[T]):
     def __getitem__(self, index: int | slice) -> "T | ResponseSet[T]":
         if isinstance(index, slice):
             return ResponseSet(
-                results=self.results[index],
+                items=self.items[index],
                 query=self.query,
-                total_count=len(self.results[index]),
+                total_count=len(self.items[index]),
                 base_url=self.base_url,
                 _ui_advanced=self._ui_advanced,
             )
-        return self.results[index]
+        return self.items[index]
 
     # Display settings
     _MAX_DISPLAY_ROWS: int = 60
@@ -122,13 +122,13 @@ class ResponseSet(BaseModel, Generic[T]):
         """Display results as a formatted table for better readability."""
         type_display = self._get_type_display()
 
-        if not self.results:
-            return f"{type_display}(query={self.query!r}, total_count=0, results=[])"
+        if not self.items:
+            return f"{type_display}(query={self.query!r}, total_count=0, items=[])"
 
         df, truncated = self._get_display_frame()
 
         if len(df) == 0:
-            return f"{type_display}(query={self.query!r}, total_count={self.total_count}, results=[])"
+            return f"{type_display}(query={self.query!r}, total_count={self.total_count}, items=[])"
 
         df_str = str(df)
 
@@ -147,10 +147,10 @@ class ResponseSet(BaseModel, Generic[T]):
         df_lines = df_str.split("\n")
         indented_df = "\n    ".join(df_lines)
 
-        header = f"{type_display}\n.query={self.query!r}\n.total_count={self.total_count}\n.results:\n    {indented_df}"
+        header = f"{type_display}\n.query={self.query!r}\n.total_count={self.total_count}\n.items:\n    {indented_df}"
 
         # Add helper tip at the end
-        tip = "\n\nTip: Use .to_frame() for pandas operations, or .latest(by='field') to get most recent"
+        tip = "\n\nTip: Use .to_frame() for pandas, .to_dict() for plain dicts, or .latest(by='field') for most recent"
         return header + tip
 
     def __str__(self) -> str:
@@ -161,17 +161,23 @@ class ResponseSet(BaseModel, Generic[T]):
         """Display as HTML table in Jupyter notebooks."""
         type_display = self._get_type_display()
 
-        if not self.results:
-            return f"<p>{type_display}(query={self.query!r}, limit=0, results=[])</p>"
+        if not self.items:
+            return f"<p>{type_display}(query={self.query!r}, limit=0, items=[])</p>"
 
         df, truncated = self._get_display_frame()
 
         # For ChartResult, add thumbnail column and make URL clickable
-        if self.results and type(self.results[0]).__name__ == "ChartResult" and "url" in df.columns:
-            df = df.copy()
+        if self.items and type(self.items[0]).__name__ == "ChartResult" and "url" in df.columns:
+            df = df.copy()  # Get display labels from results (slug + query_params for explorers/multidim)
 
-            # Get slugs from results (order matches df rows)
-            slugs = [getattr(r, "slug", "") for r in self.results]
+            def _slug_label(r: Any) -> str:
+                slug = getattr(r, "slug", "")
+                query_params = getattr(r, "query_params", "")
+                if query_params:
+                    return f"{slug}{query_params}"
+                return slug
+
+            slugs = [_slug_label(r) for r in self.items]
             # Handle truncated display (head + tail)
             if truncated:
                 slugs = slugs[: self._HEAD_ROWS] + slugs[-self._TAIL_ROWS :]
@@ -220,7 +226,7 @@ class ResponseSet(BaseModel, Generic[T]):
   <ul style="list-style-type: none; padding-left: 1em;">
     <li><strong>.query</strong>: {self.query!r}</li>
     <li><strong>.total_count</strong>: {self.total_count}</li>
-    <li><strong>.results</strong>:
+    <li><strong>.items</strong>:
       <div style="margin-left: 1.5em; margin-top: 0.5em;">
         {df_html}
       </div>
@@ -256,42 +262,50 @@ class ResponseSet(BaseModel, Generic[T]):
             >>> latest_chart = chart_results.latest()
             ```
         """
-        if not self.results:
+        if not self.items:
             raise ValueError("No results available to get latest from")
 
         # Auto-detect sort key based on result type
         if by is None:
-            return max(self.results, key=self._get_version_string)
+            return max(self.items, key=self._get_version_string)
 
         # Explicit attribute name
-        if not hasattr(self.results[0], by):
+        if not hasattr(self.items[0], by):
             # Get available attributes (exclude private ones)
             available = [
-                k for k in dir(self.results[0]) if not k.startswith("_") and not callable(getattr(self.results[0], k))
+                k for k in dir(self.items[0]) if not k.startswith("_") and not callable(getattr(self.items[0], k))
             ]
             raise AttributeError(
                 f"Results don't have '{by}' attribute. " f"Available attributes: {', '.join(sorted(available))}"
             )
 
-        return max(self.results, key=lambda item: getattr(item, by))
+        return max(self.items, key=lambda item: getattr(item, by))
 
-    def to_frame(self) -> pd.DataFrame:
+    def to_frame(self, all_fields: bool | None = None) -> pd.DataFrame:
         """Convert results to a DataFrame.
+
+        Args:
+            all_fields: If True, show all fields. If False, show only key fields.
+                If None (default), use the instance's _ui_advanced setting.
 
         Returns:
             DataFrame with one row per result.
         """
-        if not self.results:
+        if not self.items:
             return pd.DataFrame()
+
+        # Resolve effective flag: explicit arg > instance setting
+        is_advanced = all_fields if all_fields is not None else self._ui_advanced
 
         # Convert Pydantic models to dicts
         rows = []
-        for r in self.results:
+        for r in self.items:
             if isinstance(r, BaseModel):
                 # For ChartResult, exclude large dict fields for better display
                 # Use type name check to avoid circular imports
                 if type(r).__name__ == "ChartResult":
                     row = {
+                        "type": getattr(r, "type", ""),
                         "slug": getattr(r, "slug", ""),
                         "title": getattr(r, "title", ""),
                         "description": getattr(r, "description", ""),
@@ -304,9 +318,8 @@ class ResponseSet(BaseModel, Generic[T]):
                     }
 
                     # Simplify if not advanced UI
-                    if not self._ui_advanced:
+                    if not is_advanced:
                         row = {
-                            # "slug": row["slug"],
                             "title": row["title"],
                             "description": row["description"],
                             "last_updated": row["last_updated"],
@@ -320,7 +333,7 @@ class ResponseSet(BaseModel, Generic[T]):
                     row.pop("base_url", None)
 
                     # Simplify if not advanced UI
-                    if not self._ui_advanced:
+                    if not is_advanced:
                         row = {
                             "title": row.get("title") or "",
                             "description": row.get("description") or "",
@@ -332,6 +345,30 @@ class ResponseSet(BaseModel, Generic[T]):
                 rows.append(r)
 
         return pd.DataFrame(rows)
+
+    def to_dict(self) -> list[dict[str, Any]]:
+        """Convert results to a list of plain dictionaries.
+
+        Useful for serializing results for AI/LLM context windows
+        or any scenario where you need simple dict representations.
+
+        Returns:
+            List of dictionaries, one per result item.
+
+        Example:
+            ```py
+            >>> results = client.charts.search("gdp")
+            >>> results.to_dict()
+            [{'slug': 'gdp-per-capita', 'title': 'GDP per capita', ...}, ...]
+            ```
+        """
+        if not self.items:
+            return []
+
+        if isinstance(self.items[0], BaseModel):
+            return [item.model_dump() for item in self.items]  # type: ignore[union-attr]
+
+        return list(self.items)  # type: ignore[arg-type]
 
     def filter(self, predicate: Callable[[T], bool]) -> "ResponseSet[T]":
         """Filter results by predicate function.
@@ -357,9 +394,9 @@ class ResponseSet(BaseModel, Generic[T]):
             >>> results.filter(lambda r: r.version > '2024').filter(lambda r: r.namespace == "un")
             ```
         """
-        filtered_results = [item for item in self.results if predicate(item)]
+        filtered_results = [item for item in self.items if predicate(item)]
         return ResponseSet(
-            results=filtered_results,
+            items=filtered_results,
             query=self.query,
             total_count=len(filtered_results),
             base_url=self.base_url,
@@ -395,18 +432,46 @@ class ResponseSet(BaseModel, Generic[T]):
         """
         if isinstance(key, str):
             # Sort by attribute name
-            sorted_results = sorted(self.results, key=lambda item: getattr(item, key), reverse=reverse)
+            sorted_results = sorted(self.items, key=lambda item: getattr(item, key), reverse=reverse)
         else:
             # Sort by key function
-            sorted_results = sorted(self.results, key=key, reverse=reverse)
+            sorted_results = sorted(self.items, key=key, reverse=reverse)
 
         return ResponseSet(
-            results=sorted_results,
+            items=sorted_results,
             query=self.query,
             total_count=self.total_count,
             base_url=self.base_url,
             _ui_advanced=self._ui_advanced,
         )
+
+    def set_ui_advanced(self) -> "ResponseSet[T]":
+        """Switch to advanced display showing all fields (type, slug, popularity, etc.).
+
+        Returns:
+            Self (for chaining).
+
+        Example:
+            ```py
+            >>> results.set_ui_advanced()
+            ```
+        """
+        self._ui_advanced = True
+        return self
+
+    def set_ui_basic(self) -> "ResponseSet[T]":
+        """Switch to basic display showing only key fields (title, description, url).
+
+        Returns:
+            Self (for chaining).
+
+        Example:
+            ```py
+            >>> results.set_ui_basic()
+            ```
+        """
+        self._ui_advanced = False
+        return self
 
     def _get_version_string(self, item: T) -> str:
         """Get a sortable version string for any result type.

@@ -1,0 +1,29 @@
+dataset:
+  title: Global meat projections to 2050 - FAO
+tables:
+  global_meat_projections_to_2050__fao:
+    variables:
+      beef_and_buffalo:
+        title: Beef and Buffalo
+        unit: tonnes
+      eggs:
+        title: Eggs
+        unit: tonnes
+      pigmeat:
+        title: Pigmeat
+        unit: tonnes
+      poultry:
+        title: Poultry
+        unit: tonnes
+      sheep_and_goat:
+        title: Sheep and goat
+        unit: tonnes
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

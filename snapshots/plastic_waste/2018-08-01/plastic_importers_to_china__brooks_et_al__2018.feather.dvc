@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Plastic importers to China - Brooks et al. (2018)
+    description: |-
+      Quantity of plastic exports to China by the top 10 exporting countries in 2016. This is given in tonnes of plastic waste imported by China.
+
+      Data is based on the UN Comtrade Database.
+    url: http://advances.sciencemag.org/content/4/6/eaat0131
+    date_accessed: 2026-03-05
+    published_by: |-
+      Brooks, A. L., Wang, S., & Jambeck, J. R. (2018). The Chinese import ban and its impact on global plastic waste trade. Science Advances, 4(6), eaat0131.
+  name: Plastic importers to China - Brooks et al. (2018)
+  description: ''
+outs:
+  - md5: a7348fd45c668de078074be8f95b9296
+    size: 3858
+    path: plastic_importers_to_china__brooks_et_al__2018.feather

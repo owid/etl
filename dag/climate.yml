@@ -10,9 +10,9 @@ steps:
   # Copernicus Climate Change Service - Surface temperature.
   #
   data://meadow/climate/2025-01-07/surface_temperature:
-  - snapshot://climate/2025-04-07/surface_temperature.zip
-  - snapshot://countries/2023-12-27/world_bank.zip
-  - snapshot://countries/2025-03-22/continents_oceans.zip
+    - snapshot://climate/2025-04-07/surface_temperature.zip
+    - snapshot://countries/2023-12-27/world_bank.zip
+    - snapshot://countries/2025-03-22/continents_oceans.zip
   data://garden/climate/2025-01-07/surface_temperature:
     - data://meadow/climate/2025-01-07/surface_temperature
   data://grapher/climate/2025-01-07/surface_temperature_anomalies:
@@ -31,8 +31,8 @@ steps:
   # Copernicus Climate Change Service - Precipitation.
   #
   data://meadow/climate/2026-01-16/total_precipitation:
-  - snapshot://climate/2026-01-16/total_precipitation.zip
-  - snapshot://countries/2023-12-27/world_bank.zip
+    - snapshot://climate/2026-01-16/total_precipitation.zip
+    - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2026-01-16/total_precipitation:
     - data://meadow/climate/2026-01-16/total_precipitation
   data://grapher/climate/2026-01-16/total_precipitation_annual:
@@ -57,7 +57,7 @@ steps:
   data://garden/climate/latest/weekly_wildfires:
     - data://meadow/climate/latest/weekly_wildfires
     - data://garden/regions/2023-01-01/regions
-    - data://garden/faostat/2025-03-17/faostat_rl
+    - data://garden/faostat/2026-02-25/faostat_rl
   data://grapher/climate/latest/weekly_wildfires:
     - data://garden/climate/latest/weekly_wildfires
   data://grapher/climate/latest/wildfires_by_year:
@@ -106,6 +106,16 @@ steps:
     - data://grapher/climate/2026-01-14/climate_change_impacts_annual
     - data://grapher/climate/2026-01-14/climate_change_impacts_monthly
 
+  #
+  # NASA Ozone Watch - Ozone hole area and concentration.
+  #
+  data://meadow/climate/2026-03-02/nasa_ozone_hole:
+    - snapshot://climate/2026-03-02/nasa_ozone_hole_p2.txt
+    - snapshot://climate/2026-03-02/nasa_ozone_hole_p1.txt
+  data://garden/climate/2026-03-02/nasa_ozone_hole:
+    - data://meadow/climate/2026-03-02/nasa_ozone_hole
+  data://grapher/climate/2026-03-02/nasa_ozone_hole:
+    - data://garden/climate/2026-03-02/nasa_ozone_hole
   #
   # IPCC scenarios
   #
