@@ -36,6 +36,9 @@ class SearchOptions:
     agent_search: str = "keyword"
     agent_type: str = "all"  # all, chart, explorer, or mdim
 
+    # Typesense options
+    typesense_alpha: float = 0.3
+
 
 AGENT_MODELS = [
     "gemini",
@@ -154,13 +157,13 @@ def fetch_algolia_search(query: str, hits_per_page: int, api_base: str) -> tuple
         return {"error": str(e), "hits": []}, time.time() - start
 
 
-def fetch_typesense_search(query: str, hits_per_page: int, api_base: str) -> tuple[dict, float]:
+def fetch_typesense_search(query: str, hits_per_page: int, api_base: str, alpha: float = 0.3) -> tuple[dict, float]:
     """Fetch results from Typesense hybrid search API."""
     start = time.time()
     try:
         response = requests.get(
             f"{api_base}/api/search",
-            params={"q": query, "hitsPerPage": hits_per_page, "alpha": 0.5, "dedup": "api"},
+            params={"q": query, "hitsPerPage": hits_per_page, "alpha": alpha, "dedup": "api"},
             timeout=30,
         )
         response.raise_for_status()
@@ -386,6 +389,17 @@ def render_source_options(side: str, source: str) -> SearchOptions:
                 options=["all", "chart", "explorer", "mdim"],
                 help="Filter results by type",
             )
+    elif source == SearchSource.TYPESENSE:
+        with st_horizontal():
+            options.typesense_alpha = url_persist(st.number_input)(
+                key=f"{side}_typesense_alpha",
+                label="Alpha",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.3,
+                step=0.1,
+                help="Balance between keyword (0) and semantic (1) search",
+            )
     # Algolia has no options
 
     return options
@@ -402,7 +416,7 @@ def fetch_for_source(
     if source == SearchSource.ALGOLIA:
         return fetch_algolia_search(query, hits_per_page, api_base)
     elif source == SearchSource.TYPESENSE:
-        return fetch_typesense_search(query, hits_per_page, api_base)
+        return fetch_typesense_search(query, hits_per_page, api_base, options.typesense_alpha)
     elif source == SearchSource.SEMANTIC:
         return fetch_semantic_search(
             query,

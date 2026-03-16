@@ -161,8 +161,6 @@ steps:
     - snapshot://cedlas/2025-04-01/sedlac_inequality.xlsx
   data://garden/cedlas/2025-04-01/sedlac:
     - data://meadow/cedlas/2025-04-01/sedlac
-  data://grapher/cedlas/2025-04-01/sedlac:
-    - data://garden/cedlas/2025-04-01/sedlac
 
   # OECD Affordable Housing Database - Homelessness
   data://meadow/oecd/2024-04-30/affordable_housing_database:
