@@ -129,6 +129,10 @@ def na_to_zero(tb):
     tb.loc[tb["year"] >= 2009, C_N_D_R] = tb.loc[tb["year"] >= 2009, C_N_D_R].fillna(0)
     tb.loc[tb["year"] >= 2019, D_T_D_R] = tb.loc[tb["year"] >= 2019, D_T_D_R].fillna(0)
 
+    # print statistics on how many NaN values there are in each column after filling existing NaNs
+    print("NaN values after filling existing NaNs:")
+    print(tb[[D_N_D_R, C_T_D_R, C_N_D_R, D_T_D_R]].isna().sum())
+
     # then, create rows for country-year combinations that are missing
     new_rows = []
     for country, year in all_combinations:
@@ -138,31 +142,48 @@ def na_to_zero(tb):
                 new_row = {
                     "country": country,
                     "year": year,
-                    "disaster_new_displacement_rounded": 0,
+                    D_N_D: 0,
+                    D_N_D_R: 0,
                 }
             # 2009-2018 has both conflict and disaster displacements and conflict IDPs
             elif year >= 2009 and year < 2019:
                 new_row = {
                     "country": country,
                     "year": year,
-                    "conflict_total_displacement_rounded": 0,
-                    "conflict_new_displacement_rounded": 0,
-                    "disaster_new_displacement_rounded": 0,
+                    C_T_D: 0,
+                    C_N_D: 0,
+                    D_N_D: 0,
+                    C_T_D_R: 0,
+                    C_N_D_R: 0,
+                    D_N_D_R: 0,
                 }
             # 2019 and onwards has all data
             elif year >= 2019:
                 new_row = {
                     "country": country,
                     "year": year,
-                    "conflict_total_displacement_rounded": 0,
-                    "conflict_new_displacement_rounded": 0,
-                    "disaster_total_displacement_rounded": 0,
-                    "disaster_new_displacement_rounded": 0,
+                    C_T_D: 0,
+                    C_N_D: 0,
+                    D_T_D: 0,
+                    D_N_D: 0,
+                    C_T_D_R: 0,
+                    C_N_D_R: 0,
+                    D_T_D_R: 0,
+                    D_N_D_R: 0,
                 }
             else:
                 raise ValueError(f"Year {year} is before 2008, which is not expected in the dataset.")
             new_rows.append(new_row)
+
+    # print statistics on how many new rows are being added
+    print(f"Number of new rows being added: {len(new_rows)}")
+    print(new_rows[:5])  # print the first 5 new rows as a sample
+
     if new_rows:
         tb_new = Table(pd.DataFrame(new_rows)).copy_metadata(tb)
         tb = pr.concat([tb, tb_new], ignore_index=True)
+
+    # print statistics on how many NaN values there are in each column after adding new rows
+    print("NaN values after adding new rows:")
+    print(tb[[D_N_D_R, C_T_D_R, C_N_D_R, D_T_D_R]].isna().sum())
     return tb
