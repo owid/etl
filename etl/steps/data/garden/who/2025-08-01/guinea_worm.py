@@ -19,7 +19,6 @@ CURRENT_YEAR = 2024
 
 
 def run() -> None:
-
     # Load inputs.
     snap = paths.load_snapshot("guinea_worm_cases.csv")
 
