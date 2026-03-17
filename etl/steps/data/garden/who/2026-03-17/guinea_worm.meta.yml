@@ -9,6 +9,7 @@ definitions:
 
 dataset:
   update_period_days: 365
+  title: Guinea Worm Disease (Dracunculiasis) cases and certification status (WHO/ Carter Center)
 
 
 tables:
