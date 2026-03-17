@@ -7,6 +7,7 @@ TODO: Add sorting mechanism to the chart diff list.
 - At which stage should we get the analytics / anomalist scores? In ChartDiff.from_charts_df! (look for "TODO")
 """
 
+import os
 import re
 from pathlib import Path
 
@@ -114,9 +115,13 @@ if WARN_MSG:
 def get_chart_diffs():
     """Get chart diffs."""
     # Get actual charts
+    # Skip analytics (Metabase/Datasette/anomalist) during testing to avoid slow external API calls
+    skip_analytics = os.environ.get("SKIP_CHART_DIFF_ANALYTICS") == "1"
     if st.session_state.chart_diffs == {}:
         with st.spinner("Getting charts from database...", show_time=True):
-            st.session_state.chart_diffs = get_chart_diffs_from_grapher(SOURCE_ENGINE, TARGET_ENGINE)
+            st.session_state.chart_diffs = get_chart_diffs_from_grapher(
+                SOURCE_ENGINE, TARGET_ENGINE, skip_analytics=skip_analytics
+            )
 
     # Sort charts
     st.session_state.chart_diffs = dict(
