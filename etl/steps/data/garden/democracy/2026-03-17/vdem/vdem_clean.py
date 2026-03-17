@@ -558,7 +558,7 @@ def compare_with_row_coding(tb: Table) -> Table:
     # 4 Observations are coded differently because v2x_polyarchy in V-Dem's input dataset is barely above 0.5, whereas in the released dataset it is rounded to 0.5 and therefore is not above the coding threshold (conversation with Marcus Tannenberg and Johannes von Römer).
     assert (
         tb.loc[(tb["regime_row_owid"] == 1) & (tb["v2x_regime"] == 2), ["country", "year", "v2x_polyarchy"]].shape[0]
-        == 8  # NOTE: went from 4 (2024) to 8 (2025)
+        == 4  # NOTE: went from 4 (2024) to 8 (2025) to 4 (2026)
     )
     tb.loc[(tb["regime_row_owid"] == 1) & (tb["v2x_regime"] == 2), "regime_row_owid"] = 2
 
@@ -591,8 +591,8 @@ def compare_with_row_coding(tb: Table) -> Table:
 
     # 137 bservations own classification identifies as closed autocracies, whereas RoW identifies them as electoral autocracies
     assert (
-        tb.loc[(tb["regime_row_owid"] == 0) & (tb["v2x_regime"] == 1), ["country", "year"]].shape[0] == 137
-    )  # NOTE: went from 141 (2024) to 137 (2025)
+        tb.loc[(tb["regime_row_owid"] == 0) & (tb["v2x_regime"] == 1), ["country", "year"]].shape[0] == 139
+    )  # NOTE: went from 141 (2024) to 137 (2025) to 139 (2026)
 
     # Belgium in 1919 is hard-recoded in RoW code, though Marcus Tannenberg does not know why that happens even if the errors in a previous version of the V-Dem dataset should by now be remedied; it only continues to make a difference for Belgium in 1919; I keep the recode.
     # replace regime_row_owid = 1 if country_name == "Belgium" & year == 1919
@@ -607,7 +607,7 @@ def compare_with_row_coding(tb: Table) -> Table:
             & (tb["v2ex_hosw"] > 0.5),
             ["country", "year", "v2exnamhos"],
         ].shape[0]
-        == 105  # NOTE: went from 111 (2024) to 105 (2025)
+        == 106  # NOTE: went from 111 (2024) to 105 (2025) to 106 (2026)
     )
     # Examples include many prominent heads of state which came to office in coup d'etats or rebellions, such as Boumedienne (Algeria 1965), Anez (Bolivia 2019), Buyoya (Burundi 1987), Batista (Cuba 1952), Ankrah (Ghana 1966), Khomeini (Iran 1980), Buhari (Nigeria 1983), Jammeh (The Gambia 1994), and Eyadema (1967 Togo)
 
@@ -634,7 +634,7 @@ def compare_with_row_coding(tb: Table) -> Table:
             & (tb["v2ex_hosw"] <= 0.5),
             ["country", "year", "v2expathhg", "v2ex_legconhog", "v2exaphogp"],
         ].shape[0]
-        == 23  # NOTE: went from 21 (2024) to 23 (2025)
+        == 24  # NOTE: went from 21 (2024) to 23 (2025) to 24 (2026)
     )
     tb.loc[
         (tb["regime_row_owid"] == 0)
@@ -661,7 +661,7 @@ def compare_with_row_coding(tb: Table) -> Table:
             (tb["regime_row_owid"] == 1) & (tb["v2x_regime"] == 0) & (tb["v2ex_hosw"] <= 0.5),
             ["v2elmulpar_osp_leg", "v2elmulpar_osp_hoe", "v2elmulpar_osp", "v2xlg_elecreg"],
         ].shape[0]
-        == 82  # NOTE: went from 90 (2024) to 82 (2025)
+        == 81  # NOTE: went from 90 (2024) to 82 (2025) to 81 (2026)
     )
 
     # 43 observations which RoW identifies as electoral autocracies, but which own classification identifies as missing:
