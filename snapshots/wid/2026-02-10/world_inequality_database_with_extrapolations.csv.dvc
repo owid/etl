@@ -14,6 +14,6 @@ meta:
       name: CC BY 4.0
       url: https://wid.world/
 outs:
-  - md5: 2855be3c92218906be816ea2346e838b
-    size: 29080629
+  - md5: 29ba927fe2d65d41118409945a9e9b12
+    size: 29096701
     path: world_inequality_database_with_extrapolations.csv

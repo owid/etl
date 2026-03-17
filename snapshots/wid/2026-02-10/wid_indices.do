@@ -12,14 +12,15 @@ When needed, values are converted to PPP (2011 vintage) adjusted to prices of th
 
 HOW TO EXECUTE:
 
-1. Open this do-file in a local installation of Stata (execution time: ~40 minutes)
+1. Open this do-file in a local installation of Stata (it takes several hours to execute)
 2. It generates four files, which exclude and include extrapolations. They need to be imported as snapshots in the ETL, as
 	etls wid/2026-02-10/world_inequality_database --path-to-file snapshots/wid/2026-02-10/wid_indices_992j_exclude.csv
 	etls wid/2026-02-10/world_inequality_database_with_extrapolations --path-to-file snapshots/wid/2026-02-10/wid_indices_992j_include.csv
 	etls wid/2026-02-10/world_inequality_database_distribution --path-to-file snapshots/wid/2026-02-10/wid_distribution_992j_exclude.csv
 	etls wid/2026-02-10/world_inequality_database_distribution_with_extrapolations --path-to-file snapshots/wid/2026-02-10/wid_distribution_992j_include.csv
 	etls wid/2026-02-10/world_inequality_database_fiscal --path-to-file snapshots/wid/2026-02-10/wid_indices_fiscal_992ijt_exclude.csv
-3. After the execution above ends, delete the csv files created by this do-file.
+5. Delete the csv files by running
+    rm snapshots/wid/2026-02-10/*.csv
 
 	(Change the date for future updates)
 
