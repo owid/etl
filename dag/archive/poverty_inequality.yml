@@ -284,3 +284,20 @@ steps:
   # SEDLAC Grapher step
   data://grapher/cedlas/2025-04-01/sedlac:
     - data://garden/cedlas/2025-04-01/sedlac
+
+
+  # WID
+  data://meadow/wid/2026-01-02/world_inequality_database:
+    - snapshot://wid/2026-01-02/world_inequality_database_with_extrapolations.csv
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://wid/2026-01-02/world_inequality_database_fiscal.csv
+    - snapshot://wid/2026-01-02/world_inequality_database.csv
+    - snapshot://wid/2026-01-02/world_inequality_database_distribution.csv
+    - snapshot://wid/2026-01-02/world_inequality_database_distribution_with_extrapolations.csv
+  data://garden/wid/2026-01-12/world_inequality_database:
+    - data://meadow/wid/2026-01-02/world_inequality_database
+  data://grapher/wid/2026-01-12/world_inequality_database:
+    - data://garden/wid/2026-01-12/world_inequality_database
+
+  data://garden/wid/2026-01-02/world_inequality_database_legacy:
+    - data://meadow/wid/2026-01-02/world_inequality_database
