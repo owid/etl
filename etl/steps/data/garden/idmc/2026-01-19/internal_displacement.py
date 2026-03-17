@@ -124,14 +124,19 @@ def na_to_zero(tb):
     all_combinations = [(country, year) for country in tb_countries for year in tb_years]
 
     # first, fill existing NaN values with 0 for years where data is expected to exist
+    # 2008 and onwards has natural disaster displacements
     tb.loc[tb["year"] >= 2008, D_N_D_R] = tb.loc[tb["year"] >= 2008, D_N_D_R].fillna(0)
-    tb.loc[tb["year"] >= 2009, C_T_D_R] = tb.loc[tb["year"] >= 2009, C_T_D_R].fillna(0)
-    tb.loc[tb["year"] >= 2009, C_N_D_R] = tb.loc[tb["year"] >= 2009, C_N_D_R].fillna(0)
-    tb.loc[tb["year"] >= 2019, D_T_D_R] = tb.loc[tb["year"] >= 2019, D_T_D_R].fillna(0)
+    tb.loc[tb["year"] >= 2008, D_N_D] = tb.loc[tb["year"] >= 2008, D_N_D].fillna(0)
 
-    # print statistics on how many NaN values there are in each column after filling existing NaNs
-    print("NaN values after filling existing NaNs:")
-    print(tb[[D_N_D_R, C_T_D_R, C_N_D_R, D_T_D_R]].isna().sum())
+    # 2009 and onwards has conflict displacements and conflict IDPs
+    tb.loc[tb["year"] >= 2009, C_T_D_R] = tb.loc[tb["year"] >= 2009, C_T_D_R].fillna(0)
+    tb.loc[tb["year"] >= 2009, C_T_D] = tb.loc[tb["year"] >= 2009, C_T_D].fillna(0)
+    tb.loc[tb["year"] >= 2009, C_N_D_R] = tb.loc[tb["year"] >= 2009, C_N_D_R].fillna(0)
+    tb.loc[tb["year"] >= 2009, C_N_D] = tb.loc[tb["year"] >= 2009, C_N_D].fillna(0)
+
+    # 2019 and onwards has disaster IDPs
+    tb.loc[tb["year"] >= 2019, D_T_D_R] = tb.loc[tb["year"] >= 2019, D_T_D_R].fillna(0)
+    tb.loc[tb["year"] >= 2019, D_T_D] = tb.loc[tb["year"] >= 2019, D_T_D].fillna(0)
 
     # then, create rows for country-year combinations that are missing
     new_rows = []
@@ -175,15 +180,7 @@ def na_to_zero(tb):
                 raise ValueError(f"Year {year} is before 2008, which is not expected in the dataset.")
             new_rows.append(new_row)
 
-    # print statistics on how many new rows are being added
-    print(f"Number of new rows being added: {len(new_rows)}")
-    print(new_rows[:5])  # print the first 5 new rows as a sample
-
     if new_rows:
         tb_new = Table(pd.DataFrame(new_rows)).copy_metadata(tb)
         tb = pr.concat([tb, tb_new], ignore_index=True)
-
-    # print statistics on how many NaN values there are in each column after adding new rows
-    print("NaN values after adding new rows:")
-    print(tb[[D_N_D_R, C_T_D_R, C_N_D_R, D_T_D_R]].isna().sum())
     return tb
