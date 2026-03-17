@@ -77,12 +77,7 @@ def _pick_toggle_by_label(at: AppTest, label: str) -> Toggle:
 @pytest.mark.usefixtures("set_config")
 def test_app_chart_diff():
     """Ensure that chart-diff doesn't raise any errors on start."""
-    # Skip analytics (Metabase/Datasette/anomalist) to avoid slow external API calls in CI
-    os.environ["SKIP_CHART_DIFF_ANALYTICS"] = "1"
-    try:
-        at = AppTest.from_file(str(WIZARD_DIR / "app_pages/chart_diff/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
-    finally:
-        os.environ.pop("SKIP_CHART_DIFF_ANALYTICS", None)
+    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/chart_diff/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
     # allowed exceptions from migration of chart configs
     if at.exception:
         msg = at.exception[0].message

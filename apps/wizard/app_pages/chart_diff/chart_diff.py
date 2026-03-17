@@ -13,6 +13,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
+from apps.anomalist.anomalist_api import get_anomalies_for_chart_ids
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS
 from apps.wizard.utils import get_staging_creation_time
 from apps.wizard.utils.components import st_cache_data
@@ -1151,7 +1152,7 @@ def modified_charts_on_staging(
 
 
 def get_chart_diffs_from_grapher(
-    source_engine: Engine, target_engine: Engine, max_workers: int = 10, skip_analytics: bool = False
+    source_engine: Engine, target_engine: Engine, max_workers: int = 10
 ) -> dict[int, ChartDiff]:
     """Get chart diffs from Grapher.
 
@@ -1167,7 +1168,6 @@ def get_chart_diffs_from_grapher(
         metadata=True,
         data=True,
         tags=True,
-        skip_analytics=skip_analytics,
     )
 
     chart_diffs = {chart.chart_id: chart for chart in chart_diffs}
@@ -1238,9 +1238,6 @@ def get_chart_views_cached(chart_ids: List[int]) -> Dict[int, float]:
 
 @st_cache_data(custom_text="Retrieving anomalies in indicators used in charts to review...", show_time=True)
 def get_chart_anomalies_cached(chart_ids: List[int]) -> Dict[int, float]:
-    # Lazy import to avoid pulling in sklearn/matplotlib (~3-4s) at module load time
-    from apps.anomalist.anomalist_api import get_anomalies_for_chart_ids
-
     # Anomalies
     df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("upgrade_change",))
     return df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()  # type: ignore
