@@ -19,7 +19,7 @@ HOW TO EXECUTE:
 	etls wid/2026-02-10/world_inequality_database_distribution --path-to-file snapshots/wid/2026-02-10/wid_distribution_992j_exclude.csv
 	etls wid/2026-02-10/world_inequality_database_distribution_with_extrapolations --path-to-file snapshots/wid/2026-02-10/wid_distribution_992j_include.csv
 	etls wid/2026-02-10/world_inequality_database_fiscal --path-to-file snapshots/wid/2026-02-10/wid_indices_fiscal_992ijt_exclude.csv
-5. Delete the csv files by running
+3. Delete the csv files by running
     rm snapshots/wid/2026-02-10/*.csv
 
 	(Change the date for future updates)
