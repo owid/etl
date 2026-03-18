@@ -602,6 +602,9 @@ class ChartDiffShow:
 
         for nc in narrative_charts:
             with st.container(border=True):
+                source_admin_url = f"{SOURCE.admin_site}/narrative-charts/{nc.id}/edit"
+                target_admin_url = f"{TARGET.admin_site}/narrative-charts/{nc.id}/edit"
+
                 # Get full configs from both environments via API
                 source_nc = source_api.get_narrative_chart(nc.id)
                 source_config = source_nc.get("configFull", {})
@@ -616,14 +619,14 @@ class ChartDiffShow:
                 col1, col2 = st.columns(2)
 
                 with col1:
-                    st.markdown("Production")
+                    st.markdown(f"[Production]({target_admin_url})")
                     if target_config:
                         grapher_chart(chart_config=target_config, owid_env=TARGET)
                     else:
                         st.info("Not available in production")
 
                 with col2:
-                    st.markdown("Staging")
+                    st.markdown(f"[Staging]({source_admin_url})")
                     if source_config:
                         grapher_chart(chart_config=source_config, owid_env=SOURCE)
                     else:
