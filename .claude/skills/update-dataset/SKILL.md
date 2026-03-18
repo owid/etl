@@ -119,7 +119,7 @@ Filter out the old dataset's own DAG entries (snapshot → meadow → garden →
 
 If downstream dependents exist:
 - **Tell the user** which datasets depend on the old version and need updating in a follow-up PR
-- **Add a PR comment** listing the downstream dependencies with a note that they should be updated to point to the new version
+- **Add a "Downstream dependencies" section to the PR description** (not collapsed — this is important) listing the dependent datasets with a note that they should be updated to point to the new version in a follow-up PR
 
 ## Guardrails and tips
 
