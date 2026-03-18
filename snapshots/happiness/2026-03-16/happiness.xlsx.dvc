@@ -26,7 +26,6 @@ meta:
     license:
       name: World Happiness Report - Data sharing policy
       url: https://worldhappiness.report/data-sharing/
-  is_public: false
 
 
 outs:
