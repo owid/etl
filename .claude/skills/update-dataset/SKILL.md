@@ -31,6 +31,7 @@ Assumptions:
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
+- [ ] Pick 1–3 chart views for the public announcement
 - [ ] Draft Slack announcement, add to PR description, and notify user to post it to #data-updates-comms
 
 Persistence:
@@ -88,11 +89,41 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Skip diff
 
 7) Indicator upgrade (optional, staging only)
-   - Use indicator-upgrader subagent with `<short_name> <branch>`
-   - **CRITICAL**: After the upgrader finishes, always verify it actually worked by querying staging: `make query SQL="SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"`. If the count is 0, the upgrade did not run — re-run it.
+   - First upload the new grapher dataset to the staging DB (required before the upgrader can detect it):
+     ```bash
+     STAGING=<branch> .venv/bin/etlr data://grapher/<namespace>/<new_version>/<short_name> --grapher --private
+     ```
+   - Then run the automatic upgrader:
+     ```bash
+     STAGING=<branch> .venv/bin/etl indicator-upgrade auto
+     ```
+   - **CRITICAL**: After the upgrader finishes, always verify it actually worked by querying staging:
+     ```bash
+     mysql -h "staging-site-<branch>" -u owid --port 3306 -D owid -e "SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"
+     ```
+     If the count is 0, the upgrade did not run — re-run it.
 
-8) Slack announcement & PR update
+8) Pick chart views for the public announcement
+   - Query the staging DB for all charts using the new dataset:
+     ```sql
+     SELECT c.id, cc.slug, cc.full->>'$.title' as title, cc.full->>'$.type' as type, cc.full->>'$.hasMapTab' as hasMapTab
+     FROM charts c
+     JOIN chart_configs cc ON cc.id = c.configId
+     JOIN chart_dimensions cd ON cd.chartId = c.id
+     JOIN variables v ON cd.variableId = v.id
+     WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'
+     GROUP BY c.id
+     ```
+   - Pick 1–3 views using these criteria (in order of preference):
+     - **Map views** — immediately visual, readers can find their own country
+     - **Charts with punchy, standalone headlines** — titles that make a clear claim work best for social sharing
+     - **Global trend charts** (StackedArea / World) — show the big picture over time
+     - **Skip**: population-weighted variants (harder to read quickly), within-regime breakdowns (too niche), country-specific views
+   - Add the selected charts with brief rationale to the Slack announcement draft
+
+9) Slack announcement & PR update
    - Fill out the template at `.claude/skills/update-dataset/slack-announcement-template.md` using facts gathered during the update (coverage, chart count, key changes, etc.)
+   - Include the 1–3 selected chart views from step 8
    - Ask user if unsure about any details
    - Save the draft to `workbench/<short_name>/slack-announcement.md`
    - **Add the announcement to the PR description** as a collapsed section titled "Slack Announcement"
