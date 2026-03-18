@@ -107,6 +107,20 @@ At the end of the workflow, update the PR description with:
 - Collapsed sections for each pipeline step (Snapshot, Meadow, Garden, Grapher)
 - A collapsed section for the Slack announcement
 
+## Downstream dependency check
+
+After completing the update, check if any other datasets depend on the **old** version of the updated dataset:
+
+```bash
+rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"
+```
+
+Filter out the old dataset's own DAG entries (snapshot → meadow → garden → grapher chain). Any remaining references are **downstream dependents** that still point to the old version.
+
+If downstream dependents exist:
+- **Tell the user** which datasets depend on the old version and need updating in a follow-up PR
+- **Add a PR comment** listing the downstream dependencies with a note that they should be updated to point to the new version
+
 ## Guardrails and tips
 
 - **DAG consistency**: After `etl update`, always verify that all new steps in `dag/main.yml` reference each other with the new version. A common bug is garden depending on old meadow or old snapshot — this silently loads stale data.
