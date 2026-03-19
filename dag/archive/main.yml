@@ -696,6 +696,20 @@ steps:
   data://garden/oecd/2024-08-19/ppp_exchange_rates:
     - data://meadow/oecd/2024-08-19/ppp_exchange_rates
 
+
+  # World Happiness report (2025)
+  data://meadow/happiness/2025-03-28/happiness:
+    - snapshot://happiness/2025-03-28/happiness.xlsx
+
+  data://garden/happiness/2025-03-28/happiness:
+    - data://meadow/happiness/2025-03-28/happiness
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+
+  data://grapher/happiness/2025-03-28/happiness:
+    - data://garden/happiness/2025-03-28/happiness
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

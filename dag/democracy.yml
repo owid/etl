@@ -91,3 +91,21 @@ steps:
     - data://meadow/democracy/2024-05-22/claassen_satisfaction
   data://grapher/democracy/2024-05-22/claassen_satisfaction:
     - data://garden/democracy/2024-03-07/claassen_satisfaction
+  data://garden/democracy/2026-03-17/vdem:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/democracy/2026-03-17/vdem
+    - data://garden/demography/2024-07-15/population
+  data://grapher/democracy/2026-03-17/vdem:
+    - data://garden/democracy/2026-03-17/vdem
+  # Varieties of Democracy (2025)
+  data://meadow/democracy/2026-03-17/vdem:
+    - snapshot://democracy/2026-03-17/vdem.zip
+  # Episodes of Regime Transition (2025)
+  data://meadow/democracy/2026-03-18/ert:
+    - snapshot://democracy/2026-03-18/ert.csv
+  data://garden/democracy/2026-03-18/ert:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/democracy/2026-03-18/ert
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/democracy/2026-03-18/ert:
+    - data://garden/democracy/2026-03-18/ert
