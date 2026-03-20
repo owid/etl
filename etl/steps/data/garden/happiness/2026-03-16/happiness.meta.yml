@@ -21,7 +21,7 @@ tables:
         description_processing: We calculated the average of regions by taking a population-weighted average over all countries within that region.
         description_key:
           - The Cantril ladder asks respondents to think of a ladder, with the best possible life for them being a 10 and the worst possible life being a 0. They are then asked to rate their own current lives on that 0 to 10 scale.
-          - The rankings are calculated by the World Happiness report based on nationally representative samples collected by the Gallup World Poll.
+          - The rankings are calculated by the World Happiness Report based on nationally representative samples collected by the Gallup World Poll.
           - The score is the average of the three-year survey period, i.e. the year 2025 shows the average of the 2023-2025 survey data.
           - The number of people and countries surveyed varies year to year, but typically more than 100,000 people in over 140 countries participate in the Gallup World Poll each year.
           - The rankings are based entirely on the survey scores, which are weighted by Gallup to make the estimates representative.
