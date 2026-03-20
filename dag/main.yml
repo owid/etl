@@ -104,18 +104,6 @@ steps:
   data://grapher/technology/2023-03-16/hcctad:
     - data://garden/technology/2023-03-16/hcctad
 
-  # World Happiness report (2025)
-  data://meadow/happiness/2025-03-28/happiness:
-    - snapshot://happiness/2025-03-28/happiness.xlsx
-
-  data://garden/happiness/2025-03-28/happiness:
-    - data://meadow/happiness/2025-03-28/happiness
-    - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2025-07-01/income_groups
-    - data://garden/regions/2023-01-01/regions
-
-  data://grapher/happiness/2025-03-28/happiness:
-    - data://garden/happiness/2025-03-28/happiness
 
   # U.S. patent activity since 1790 (USPTO)
   data://meadow/research_development/2023-05-24/us_patents:
@@ -837,6 +825,17 @@ steps:
 
   data://grapher/bls/2026-03-20/us_consumer_prices:
     - data://garden/bls/2026-03-20/us_consumer_prices
+
+  #
+  # World Happiness Report (2026)
+  #
+  data://garden/happiness/2026-03-16/happiness:
+    - snapshot://happiness/2026-03-16/happiness.xlsx
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/happiness/2026-03-16/happiness:
+    - data://garden/happiness/2026-03-16/happiness
 
 include:
   - dag/open_numbers.yml

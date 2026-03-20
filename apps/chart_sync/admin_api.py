@@ -210,6 +210,7 @@ class AdminAPI(object):
         resp = requests.get(
             f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}.config.json",
             headers=self._headers(),
+            timeout=1,
         )
         js = self._json_from_response(resp)
         return js

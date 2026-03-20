@@ -124,10 +124,19 @@ def na_to_zero(tb):
     all_combinations = [(country, year) for country in tb_countries for year in tb_years]
 
     # first, fill existing NaN values with 0 for years where data is expected to exist
+    # 2008 and onwards has natural disaster displacements
     tb.loc[tb["year"] >= 2008, D_N_D_R] = tb.loc[tb["year"] >= 2008, D_N_D_R].fillna(0)
+    tb.loc[tb["year"] >= 2008, D_N_D] = tb.loc[tb["year"] >= 2008, D_N_D].fillna(0)
+
+    # 2009 and onwards has conflict displacements and conflict IDPs
     tb.loc[tb["year"] >= 2009, C_T_D_R] = tb.loc[tb["year"] >= 2009, C_T_D_R].fillna(0)
+    tb.loc[tb["year"] >= 2009, C_T_D] = tb.loc[tb["year"] >= 2009, C_T_D].fillna(0)
     tb.loc[tb["year"] >= 2009, C_N_D_R] = tb.loc[tb["year"] >= 2009, C_N_D_R].fillna(0)
+    tb.loc[tb["year"] >= 2009, C_N_D] = tb.loc[tb["year"] >= 2009, C_N_D].fillna(0)
+
+    # 2019 and onwards has disaster IDPs
     tb.loc[tb["year"] >= 2019, D_T_D_R] = tb.loc[tb["year"] >= 2019, D_T_D_R].fillna(0)
+    tb.loc[tb["year"] >= 2019, D_T_D] = tb.loc[tb["year"] >= 2019, D_T_D].fillna(0)
 
     # then, create rows for country-year combinations that are missing
     new_rows = []
@@ -138,30 +147,39 @@ def na_to_zero(tb):
                 new_row = {
                     "country": country,
                     "year": year,
-                    "disaster_new_displacement_rounded": 0,
+                    D_N_D: 0,
+                    D_N_D_R: 0,
                 }
             # 2009-2018 has both conflict and disaster displacements and conflict IDPs
             elif year >= 2009 and year < 2019:
                 new_row = {
                     "country": country,
                     "year": year,
-                    "conflict_total_displacement_rounded": 0,
-                    "conflict_new_displacement_rounded": 0,
-                    "disaster_new_displacement_rounded": 0,
+                    C_T_D: 0,
+                    C_N_D: 0,
+                    D_N_D: 0,
+                    C_T_D_R: 0,
+                    C_N_D_R: 0,
+                    D_N_D_R: 0,
                 }
             # 2019 and onwards has all data
             elif year >= 2019:
                 new_row = {
                     "country": country,
                     "year": year,
-                    "conflict_total_displacement_rounded": 0,
-                    "conflict_new_displacement_rounded": 0,
-                    "disaster_total_displacement_rounded": 0,
-                    "disaster_new_displacement_rounded": 0,
+                    C_T_D: 0,
+                    C_N_D: 0,
+                    D_T_D: 0,
+                    D_N_D: 0,
+                    C_T_D_R: 0,
+                    C_N_D_R: 0,
+                    D_T_D_R: 0,
+                    D_N_D_R: 0,
                 }
             else:
                 raise ValueError(f"Year {year} is before 2008, which is not expected in the dataset.")
             new_rows.append(new_row)
+
     if new_rows:
         tb_new = Table(pd.DataFrame(new_rows)).copy_metadata(tb)
         tb = pr.concat([tb, tb_new], ignore_index=True)
