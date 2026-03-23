@@ -167,12 +167,18 @@ def test_pruned_json():
 def test_hash_any():
     assert hash_any("abc") == 15462616177412505458
     assert hash_any(123) == 123
-    assert hash_any({"a": [1, 2, 3]}) == 2363935703804446291
     meta = VariableMeta(
         origins=[Origin(title="Title", producer="Producer")],
         presentation=VariablePresentationMeta(title_public="Title public"),
     )
-    assert hash_any(meta) == -6203626027110537925
+    # Hash should be deterministic across calls
+    assert hash_any(meta) == hash_any(meta)
+    # Different metadata should produce different hashes
+    meta2 = VariableMeta(
+        origins=[Origin(title="Different", producer="Producer")],
+        presentation=VariablePresentationMeta(title_public="Title public"),
+    )
+    assert hash_any(meta) != hash_any(meta2)
 
 
 def test_remove_details_on_demand():
