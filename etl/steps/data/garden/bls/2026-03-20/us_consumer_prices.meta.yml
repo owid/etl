@@ -26,7 +26,7 @@ tables:
         description_from_producer: "College tuition and fees in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SEEB01)"
         description_key:
           - *cpi_desc
-          - This CPI item falls under “Tuition, other school fees, and childcare,” a subcategory of the broader Education index, and tracks out-of-pocket costs for tuition, school fees, and childcare.          - It's a subcategory of the broader "Tuition, other school fees, and childcare" which is part of the "Education" category.
+          - This CPI item falls under “Tuition, other school fees, and childcare,” a subcategory of the broader Education index, and tracks out-of-pocket costs for tuition, school fees, and childcare.
           - It subtracts scholarships and grants, so the reported cost reflects what people really pay after financial aid.
           - Only degree-granting programs are included, such as associate’s, bachelor’s, master’s, and doctoral degrees.
           - Changes in the quality of education — like more instruction time — are difficult to measure, so most tuition increases are treated as simple price increases unless the reason for the change is very clear.
@@ -114,10 +114,10 @@ tables:
         description_from_producer: "Housing in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAH)"
         description_key:
           - *cpi_desc
-          - The CPI’s housing category encompasses out-of-pocket expenses related to shelter and household operations, including rent, owners’ equivalent rent, utilities, and household furnishings.​
-          - It reflects the prices consumers actually pay, excluding mortgage interest, home purchase prices, or housing subsidies.​
-          - While adjustments are made for changes in housing quality (e.g., renovations or added amenities), most price changes are treated as direct inflation.​
-          - This category is a major driver of core inflation and provides insights into long-term cost-of-living trends.​
+          - The CPI’s housing category encompasses out-of-pocket expenses related to shelter and household operations, including rent, owners’ equivalent rent, utilities, and household furnishings.
+          - It reflects the prices consumers actually pay, excluding mortgage interest, home purchase prices, or housing subsidies.
+          - While adjustments are made for changes in housing quality (e.g., renovations or added amenities), most price changes are treated as direct inflation.
+          - This category is a major driver of core inflation and provides insights into long-term cost-of-living trends.
           - *cpi_base_1982_84
         unit: ""
         presentation:
@@ -240,7 +240,7 @@ tables:
           - It encompasses categories such as food, housing, apparel, transportation, medical care, recreation, education, and communication.
           - Prices are collected monthly from a wide array of retail and service establishments across the U.S.
           - The index serves as a key indicator of inflation, reflecting the overall cost of living for consumers.
-          - It is widely used for economic analysis, policy-making, and adjusting income payments for inflation.​
+          - It is widely used for economic analysis, policy-making, and adjusting income payments for inflation.
           - *cpi_base_1982_84
         unit: ""
         presentation:
