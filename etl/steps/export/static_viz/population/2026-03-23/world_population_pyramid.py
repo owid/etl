@@ -360,7 +360,9 @@ def run() -> None:
     median_ages = load_median_ages(ds_wpp, display_years)
     source_text = build_source_citation(ds_wpp)
 
-    fig = create_visualization(tb, median_ages, source_text, display_years, year_colors, label_year_ages, latest_historical_year)
+    fig = create_visualization(
+        tb, median_ages, source_text, display_years, year_colors, label_year_ages, latest_historical_year
+    )
 
     paths.export_fig(
         fig,
