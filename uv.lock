@@ -5438,7 +5438,7 @@ requires-dist = [
     { name = "mistune", specifier = ">=3.0.1" },
     { name = "owid-datautils", editable = "lib/datautils" },
     { name = "owid-repack", editable = "lib/repack" },
-    { name = "pandas", specifier = ">=2.2.3" },
+    { name = "pandas", specifier = ">=2.2.3,<3" },
     { name = "platformdirs", specifier = ">=4.0.0" },
     { name = "pyarrow", specifier = ">=10.0.1" },
     { name = "pydantic", specifier = ">=2.0.0" },
@@ -5502,7 +5502,7 @@ requires-dist = [
     { name = "gdown", specifier = ">=4.5.2" },
     { name = "gsheets", specifier = ">=0.6.1" },
     { name = "jinja2", specifier = ">=3.1.6" },
-    { name = "pandas", specifier = ">=2.2.3" },
+    { name = "pandas", specifier = ">=2.2.3,<3" },
     { name = "protobuf", specifier = ">=6.33.4" },
     { name = "py7zr", specifier = ">=0.22.0" },
     { name = "pyarrow", specifier = ">=18.0.0" },
@@ -5546,7 +5546,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "numpy", specifier = ">=1.24.0" },
-    { name = "pandas", specifier = ">=2.2.3" },
+    { name = "pandas", specifier = ">=2.2.3,<3" },
     { name = "pyarrow", specifier = ">=18.0.0" },
 ]
 
