@@ -10,7 +10,7 @@ from jsonschema.exceptions import ValidationError
 from yaml.loader import SafeLoader
 
 from etl.files import read_json_schema
-from etl.paths import SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
+from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
 
 log = structlog.get_logger()
 
@@ -85,10 +85,21 @@ def _get_changed_files_vs_master(pattern: str) -> set[str] | None:
 
 
 def _should_validate(file_path: Path, changed_files: set[str] | None) -> bool:
-    """Check if a file should be validated based on the changed files set."""
+    """Check if a file should be validated based on the changed files set.
+
+    `changed_files` contains repo-relative paths as returned by git (e.g.
+    ``etl/steps/data/garden/foo/2024-01-01/foo.meta.yml``), so we must
+    convert the absolute ``file_path`` to a repo-relative path before
+    checking membership.
+    """
     if changed_files is None:
         return True
-    return str(file_path) in changed_files
+    try:
+        rel = str(file_path.relative_to(BASE_DIR))
+    except ValueError:
+        # file_path is outside the repo — fall back to str comparison
+        rel = str(file_path)
+    return rel in changed_files
 
 
 def test_dataset_schemas():
