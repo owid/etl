@@ -1,13 +1,4 @@
 steps:
-  # Varieties of Democracy (2025)
-  data://meadow/democracy/2025-03-17/vdem:
-    - snapshot://democracy/2025-03-17/vdem.zip
-  data://garden/democracy/2025-03-17/vdem:
-    - data://meadow/democracy/2025-03-17/vdem
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/democracy/2025-03-17/vdem:
-    - data://garden/democracy/2025-03-17/vdem
 
   # Episodes of Regime Transition (2025)
   data://meadow/democracy/2025-05-05/ert:
