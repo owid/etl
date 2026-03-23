@@ -22,8 +22,24 @@ def run() -> None:
     tb = ds_meadow.read("yougov_job_automation")
 
     # Remove specific groups from the group column (likely small sample sizes for some of these resulting in strange values sometimes)
-    groups_to_remove = ["Middle Eastern", "Native American", "Other", "Asian", "Black", "Hispanic", "Two or more races"]
+    groups_to_remove = ["Middle Eastern", "Native American", "Other", "Asian", "Black", "Hispanic", "Two or more races", "White"]
     tb = tb[~tb["group"].isin(groups_to_remove)]
+
+    # Rename groups to be cleaner and more descriptive
+    group_rename = {
+        "US Adults in work": "All working adults",
+        "18-29": "Ages 18-29",
+        "30-44": "Ages 30-44",
+        "45-64": "Ages 45-64",
+        "65+": "Ages 65+",
+        "No HS": "No high school diploma",
+        "High school graduate": "High school graduate",
+        "Some college": "Some college",
+        "2-year": "2-year college degree",
+        "4-year": "4-year college degree",
+        "Post-grad": "Postgraduate degree",
+    }
+    tb["group"] = tb["group"].map(lambda x: group_rename.get(x, x))
 
     #
     # Process data.
