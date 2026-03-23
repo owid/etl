@@ -2,8 +2,6 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
-from owid.catalog.core import processing_log as pl
-
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
 
@@ -52,7 +50,6 @@ def extract_capacity_from_sheet(excel_object: pr.ExcelFile, sheet_name: str) -> 
     return tb
 
 
-@pl.wrap("extract_capacity_from_sheets")
 def _extract_data_sheet_by_sheet(excel_object: pr.ExcelFile, sheet_names: list[str], snap: Snapshot) -> Table:
     # Extract data sheet by sheet.
     all_data = Table(metadata=snap.to_table_metadata())

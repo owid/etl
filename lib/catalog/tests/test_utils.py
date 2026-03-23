@@ -172,7 +172,7 @@ def test_hash_any():
         origins=[Origin(title="Title", producer="Producer")],
         presentation=VariablePresentationMeta(title_public="Title public"),
     )
-    assert hash_any(meta) == 6982634015113220894
+    assert hash_any(meta) == -6203626027110537925
 
 
 def test_remove_details_on_demand():

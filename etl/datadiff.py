@@ -815,7 +815,7 @@ def _column_metadata_dict(meta: VariableMeta) -> dict[str, Any]:
     d.pop("origins", None)
 
     # remove noise
-    d.pop("processing_log", None)
+
     for source in d.get("sources", []):
         source.pop("date_accessed", None)
         source.pop("publication_date", None)

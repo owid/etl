@@ -30,7 +30,6 @@ from owid.catalog.core.meta import (
     VariableMeta,
     VariablePresentationMeta,
 )
-from owid.catalog.core.processing_log import ProcessingLog, enabled
 from owid.catalog.core.properties import metadata_property
 
 log = structlog.get_logger()
@@ -415,52 +414,7 @@ class Indicator(pd.Series):
         variable: str | None = None,
         comment: str | None = None,
     ) -> Indicator:
-        """Add an entry to the indicator's processing log.
-
-        Records data transformation operations for data provenance tracking.
-
-        Args:
-            operation: Name of the operation performed (e.g., "merge", "aggregate").
-            parents: List of parent indicators that contributed to this operation.
-                If None, uses the indicator itself as the only parent.
-            variable: Name of the variable for the log entry. If None, uses the
-                indicator's name or UNNAMED_INDICATOR.
-            comment: Optional comment describing the operation in detail.
-
-        Returns:
-            The indicator itself (for method chaining).
-
-        Example:
-            ```python
-            # Log a custom transformation
-            ind.update_log(
-                operation="normalize",
-                comment="Normalized to 2015 baseline"
-            )
-
-            # Log a merge operation
-            result.update_log(
-                operation="merge",
-                parents=[ind1, ind2],
-                comment="Combined GDP and population data"
-            )
-            ```
-        """
-        if variable is None:
-            # If a variable name is not specified, take it from the indicator, or otherwise use UNNAMED_INDICATOR.
-            variable = self.name or UNNAMED_INDICATOR
-
-        if parents is None:
-            # If parents are not specified, take the indicator itself as the only parent.
-            parents = [self]
-
-        # Add new entry to the indicator's processing log.
-        self.metadata.processing_log.add_entry(
-            variable=variable,
-            parents=parents,
-            operation=operation,
-            comment=comment,
-        )
+        """No-op kept for backwards compatibility. Processing log has been removed."""
         return self
 
     def rolling(self, *args: Any, **kwargs: Any) -> IndicatorRolling:
@@ -764,47 +718,6 @@ def get_unique_description_key_points_from_indicators(indicators: list[Indicator
     return description_key_points
 
 
-def combine_indicators_processing_logs(
-    indicators: list[Indicator] | None = None,
-    *,
-    variables: list[Indicator] | None = None,
-) -> ProcessingLog:
-    """Combine processing logs from multiple indicators.
-
-    Merges all processing log entries from the provided indicators into a single
-    ProcessingLog object, maintaining chronological order.
-
-    Args:
-        indicators: List of Indicator objects whose processing logs should be combined.
-        variables: Deprecated alias for indicators parameter (for backwards compatibility).
-
-    Returns:
-        ProcessingLog object containing all entries from all indicators.
-
-    Example:
-        ```python
-        combined_log = combine_indicators_processing_logs([ind1, ind2, ind3])
-        print(f"Combined log has {len(combined_log)} entries")
-        ```
-    """
-    # Support both parameter names for backwards compatibility
-    if indicators is None and variables is not None:
-        indicators = variables
-    elif indicators is None:
-        indicators = []
-
-    # Make a list with all entries in the processing log of all indicators.
-    processing_log = sum(
-        [
-            indicator.metadata.processing_log if indicator.metadata.processing_log is not None else []
-            for indicator in indicators
-        ],
-        [],
-    )
-
-    return ProcessingLog(processing_log)  # ty: ignore
-
-
 def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:
     # The argument list_of_objects can contain dictionaries or None, or be empty.
     # If a list contains one dictionary (possibly repeated multiple times with identical content), return that
@@ -980,15 +893,6 @@ def combine_indicators_metadata(
     metadata.dimensions = _get_metadata_value_from_indicators_if_all_identical(
         indicators=indicators_only, field="dimensions", operation=operation, warn_if_different=True
     )
-
-    if enabled():
-        metadata.processing_log = combine_indicators_processing_logs(indicators=indicators_only)
-        if operation:
-            metadata.processing_log.add_entry(
-                variable=name,
-                parents=indicators,
-                operation=operation,
-            )
 
     return metadata
 

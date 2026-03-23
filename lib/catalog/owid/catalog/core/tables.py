@@ -31,7 +31,6 @@ from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # ty: ignore
 from pandas.core.series import Series
 
 from owid.catalog.core import indicators, utils, warnings
-from owid.catalog.core import processing_log as pl
 from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, Source, TableMeta, VariableMeta
 
 log = structlog.get_logger()
@@ -200,9 +199,6 @@ class Table(pd.DataFrame):
             table.to("data.parquet", repack=False)  # Skip optimization
             ```
         """
-        # Add entry in the processing log about operation "save".
-        self = update_processing_logs_when_saving_table(table=self, path=path)
-
         if isinstance(path, Path):
             path = path.as_posix()
 
@@ -264,9 +260,6 @@ class Table(pd.DataFrame):
 
         else:
             raise ValueError(f"could not detect a suitable format to read from: {path}")
-
-        # Add processing log to the metadata of each variable in the table.
-        table = update_processing_logs_when_loading_or_creating_table(table=table)
 
         # Fill dimensions from additional_info for compatibility
         for col in table.columns:
@@ -846,13 +839,8 @@ class Table(pd.DataFrame):
                     value.name = key
                 if value.name == indicators.UNNAMED_INDICATOR:
                     # Update the variable name, if it had the unnamed variable tag.
-                    # Replace all instances of unnamed variables in the processing log by the actual name of the new
-                    # variable.
-                    # WARNING: This process assumes that all instances of unnamed variable tag correspond to the new
-                    #  variable.
                     value.name = key
                 self._fields[key] = value.metadata
-                value.update_log(operation="rename", variable=key)
             # assign Table with a single column should work
             elif isinstance(value, Table) and value.shape[1] == 1:
                 self._fields[key] = value.iloc[:, 0].metadata
@@ -945,15 +933,6 @@ class Table(pd.DataFrame):
                 fields[new_col] = self._fields[old_col].copy()
 
             new_table._fields = defaultdict(VariableMeta, fields)
-
-        for old_col, new_col in zip(old_cols, new_table.all_columns):
-            # Update processing log.
-            if old_col != new_col:
-                new_table._fields[new_col].processing_log.add_entry(
-                    variable=new_col,
-                    parents=[self._fields[old_col]],
-                    operation="rename",
-                )
 
         if inplace:
             return None
@@ -1685,15 +1664,7 @@ class Table(pd.DataFrame):
         # inplace returns None
         if tb is None:
             return None
-        tb = tb.copy()
-        for column in list(tb.all_columns):
-            tb._fields[column].processing_log.add_entry(
-                variable=column,
-                parents=[tb.get_column_or_index(column)],
-                operation="dropna",
-            )
-
-        return cast(Table, tb)
+        return cast(Table, tb.copy())
 
     def drop(self, *args: Any, **kwargs: Any) -> Table:
         """Drop specified labels from rows or columns.
@@ -1769,20 +1740,7 @@ class Table(pd.DataFrame):
         variable_names: list[str] | None = None,
         comment: str | None = None,
     ) -> Table:
-        # Append a new entry to the processing log of the required indicators.
-        if variable_names is None:
-            # If no variable is specified, assume all (including index columns).
-            variable_names = list(self.all_columns)
-        for column in variable_names:
-            # If parents is not defined, assume the parents are simply the current variable.
-            _parents = parents or [column]
-            # Update (in place) the processing log of current variable.
-            self._fields[column].processing_log.add_entry(
-                variable=column,
-                parents=_parents,
-                operation=operation,
-                comment=comment,
-            )
+        """No-op kept for backwards compatibility. Processing log has been removed."""
         return self
 
     def amend_log(
@@ -1791,32 +1749,11 @@ class Table(pd.DataFrame):
         comment: str | None = None,
         operation: str | None = None,
     ) -> Table:
-        """Amend operation or comment of the latest processing log entry."""
-        # Append a new entry to the processing log of the required indicators.
-        if variable_names is None:
-            # If no variable is specified, assume all (including index columns).
-            variable_names = list(self.all_columns)
-        for column in variable_names:
-            # Update (in place) the processing log of current variable.
-            self._fields[column].processing_log.amend_entry(
-                operation=operation,
-                comment=comment,
-            )
+        """No-op kept for backwards compatibility. Processing log has been removed."""
         return self
 
     def sort_values(self, by: str | list[str], *args: Any, **kwargs: Any) -> Table:
-        tb = super().sort_values(by=by, *args, **kwargs).copy()
-        for column in list(tb.all_columns):
-            if isinstance(by, str):
-                parents = [by, column]
-            else:
-                parents = by + [column]
-
-            parent_variables = [tb.get_column_or_index(parent) for parent in parents]
-
-            tb._fields[column].processing_log.add_entry(variable=column, parents=parent_variables, operation="sort")
-
-        return cast(Table, tb)
+        return cast(Table, super().sort_values(by=by, *args, **kwargs).copy())
 
     def sum(self, *args: Any, **kwargs: Any) -> indicators.Indicator:
         variable_name = indicators.UNNAMED_INDICATOR
@@ -1842,70 +1779,44 @@ class Table(pd.DataFrame):
     def reorder_levels(self, *args: Any, **kwargs: Any) -> Table:
         return super().reorder_levels(*args, **kwargs)  # ty: ignore
 
-    @staticmethod
-    def _update_log(tb: Table, other: Scalar | Series | indicators.Indicator | Table, operation: str) -> None:  # ty: ignore
-        # The following would have a parents only the scalar, not the scalar and the corresponding variable.
-        # tb = update_log(table=tb, operation="+", parents=[other], variable_names=tb.columns)
-        # Instead, update the processing log of each variable in the table.
-        for column in tb.columns:
-            if isinstance(other, pd.DataFrame):
-                parents = [tb[column], other[column]]
-            else:
-                parents = [tb[column], other]
-            tb[column].update_log(parents=parents, operation=operation)
-
     def __add__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
-        self._update_log(tb, other, "+")
-        return tb
+        return cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
 
     def __iadd__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__add__(other)
 
     def __sub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        tb = cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
-        self._update_log(tb, other, "-")
-        return tb
+        return cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
 
     def __isub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__sub__(other)
 
     def __mul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        tb = cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
-        self._update_log(tb, other, "*")
-        return tb
+        return cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
 
     def __imul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__mul__(other)
 
     def __truediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        tb = cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
-        self._update_log(tb, other, "/")
-        return tb
+        return cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
 
     def __itruediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__truediv__(other)
 
     def __floordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        tb = cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
-        self._update_log(tb, other, "//")
-        return tb
+        return cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
 
     def __ifloordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__floordiv__(other)
 
     def __mod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        tb = cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
-        self._update_log(tb, other, "%")
-        return tb
+        return cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
 
     def __imod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__mod__(other)
 
     def __pow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        tb = cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
-        self._update_log(tb, other, "**")
-        return tb
+        return cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
 
     def __ipow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__pow__(other)
@@ -2001,16 +1912,7 @@ class TableGroupBy:
                     # output is series, e.g. `size` function
                     return df
                 else:
-                    tb = _create_table(df, self.metadata, self._fields)
-                    if pl.enabled():
-                        for col in tb.columns:
-                            # parents are grouping columns and grouped one
-                            index_parents = [tb.get_column_or_index(n) for n in tb.index.names]
-                            tb[col].update_log(
-                                operation=f"groupby_{name}",
-                                parents=[tb[col]] + index_parents,
-                            )
-                    return tb
+                    return _create_table(df, self.metadata, self._fields)
 
             self.__annotations__[name] = Callable[..., Table]
             return func
@@ -2042,15 +1944,6 @@ class TableGroupBy:
         # kwargs rename fields
         for new_col, (col, _) in kwargs.items():
             tb._fields[new_col] = self._fields[col]
-
-        if pl.enabled():
-            for col in tb.columns:
-                # parents are grouping columns and grouped one
-                index_parents = [tb.get_column_or_index("b") for n in tb.index.names]
-                tb[col].update_log(
-                    operation=f"agg_{func}",
-                    parents=[tb[col]] + index_parents,
-                )
 
         return tb
 
@@ -2552,8 +2445,6 @@ def _add_table_and_variables_metadata_to_table(
             else:
                 table._fields[column].sources = metadata.dataset.sources  # ty: ignore
             table._fields[column].licenses = metadata.dataset.licenses  # ty: ignore
-    table = update_processing_logs_when_loading_or_creating_table(table=table)
-
     return table
 
 
@@ -2892,53 +2783,6 @@ class ExcelFile(pd.ExcelFile):
         if metadata is not None:
             table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
         return table
-
-
-def update_processing_logs_when_loading_or_creating_table(table: Table) -> Table:
-    # Add entry to processing log, specifying that each variable was loaded from this table.
-    try:
-        # If the table comes from an ETL dataset, generate a URI for the table.
-        table_uri = f"{table.metadata.dataset.uri}/{table.metadata.short_name}"  # ty: ignore
-        parents = [table_uri]
-        operation = "load"
-    except (AssertionError, AttributeError):
-        # The table doesn't have an uri, which means it was probably created from scratch.
-        parents = []
-        operation = "create"
-
-    # Add log entries to all columns
-    for column in list(table.all_columns):
-        pl = table._fields[column].processing_log
-
-        # Clear processing log, we're not keeping log from previous channels. It can always be reconstructed
-        # by concatenating processing log of indicators accross channels.
-        pl.clear()
-        pl.add_entry(
-            variable=column,
-            parents=parents,
-            operation=operation,
-        )
-
-    return table
-
-
-def update_processing_logs_when_saving_table(table: Table, path: str | Path) -> Table:
-    # Infer the ETL uri from the path where the table will be saved.
-    # Note: If the path does not fit the expected format, the result will be an arbitrary path, but it will not raise an
-    # error, as long as path is a Path.
-    path = Path(path)
-    uri = "/".join(path.absolute().parts[-5:-1] + tuple([path.stem]))
-
-    # Add a processing log entry to each column, including index columns.
-    for column in list(table.all_columns):
-        table._fields[column].processing_log.add_entry(
-            target=uri,
-            parents=[table._fields[column]],
-            operation="save",
-            variable=column,
-        )
-
-    return table
 
 
 def copy_metadata(from_table: Table, to_table: Table, deep: bool = False) -> Table:
