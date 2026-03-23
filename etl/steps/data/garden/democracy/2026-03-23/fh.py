@@ -48,6 +48,7 @@ REGIONS = {
         "additional_members": [
             "Crimea",
             "Eastern Donbas",
+            "Russian-Occupied Territories of Ukraine",
             "Northern Ireland",
         ]
     },
