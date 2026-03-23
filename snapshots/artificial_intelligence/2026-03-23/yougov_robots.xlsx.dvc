@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: YouGov
+    title: Robot intelligence survey
+    description: |-
+      Biannual tracker of Americans' concerns regarding robotic intelligence. The provided results are weighted to ensure they are representative of the United States population across various demographic factors. The weighting is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This weighting process helps to account for the diversity within the population and ensures that the results reflect a broader representation of the United States as a whole. Each wave comprises responses from 1001 - 1085 US Adults.
+    title_snapshot: Robot intelligence survey - Biannual tracker
+    citation_full: Robot intelligence. YouGov (2025)
+    url_main: https://today.yougov.com/topics/politics/trackers/robot-intelligence
+    url_download: https://today.yougov.com/_pubapis/v5/us/trackers/robot-intelligence/download
+    date_accessed: '2026-03-23'
+    date_published: '2025-07-10'
+    license:
+      name: Copyright © 2024 YouGov PLC
+      url: https://today.yougov.com/about/terms

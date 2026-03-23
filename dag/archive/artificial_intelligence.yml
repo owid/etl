@@ -559,6 +559,20 @@ steps:
   data://grapher/artificial_intelligence/2024-07-23/yougov_job_automation:
     - data://garden/artificial_intelligence/2024-07-23/yougov_job_automation
 
+  data://meadow/artificial_intelligence/2025-02-17/yougov_robots:
+    - snapshot://artificial_intelligence/2025-02-17/yougov_robots.xlsx
+  data://garden/artificial_intelligence/2025-02-17/yougov_robots:
+    - data://meadow/artificial_intelligence/2025-02-17/yougov_robots
+  data://grapher/artificial_intelligence/2025-02-17/yougov_robots:
+    - data://garden/artificial_intelligence/2025-02-17/yougov_robots
+
+  data://meadow/artificial_intelligence/2025-02-17/yougov_job_automation:
+    - snapshot://artificial_intelligence/2025-02-17/yougov_job_automation.xlsx
+  data://garden/artificial_intelligence/2025-02-17/yougov_job_automation:
+    - data://meadow/artificial_intelligence/2025-02-17/yougov_job_automation
+  data://grapher/artificial_intelligence/2025-02-17/yougov_job_automation:
+    - data://garden/artificial_intelligence/2025-02-17/yougov_job_automation
+
 
   ########################
   # AI Index report
