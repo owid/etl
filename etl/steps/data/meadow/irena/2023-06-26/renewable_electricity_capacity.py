@@ -2,6 +2,7 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
+
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
 
