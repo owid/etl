@@ -32,7 +32,8 @@ Assumptions:
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Pick 1–3 chart views for the public announcement
-- [ ] Draft Slack announcement, add to PR description, and notify user to post it to #data-updates-comms
+- [ ] Draft Slack announcement, add to PR description with `@codex review`, and notify user to post it to #data-updates-comms
+- [ ] Address Codex review comments (fix valid ones + resolve all threads)
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
@@ -127,7 +128,29 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Ask user if unsure about any details
    - Save the draft to `workbench/<short_name>/slack-announcement.md`
    - **Add the announcement to the PR description** as a collapsed section titled "Slack Announcement"
+   - **Append `@codex review` as the very last line of the PR description** (outside all collapsed sections) to trigger an automated code review
    - Tell the user: "Slack announcement drafted at `workbench/<short_name>/slack-announcement.md` and added to the PR description. Please review and post it to **#data-updates-comms**."
+
+10) Codex review: address comments and resolve threads
+   - Wait ~60 seconds after posting `@codex review`, then poll for inline review comments:
+     ```bash
+     gh api repos/owid/etl/pulls/<pr_number>/comments | python3 -m json.tool
+     ```
+   - Fetch open review thread IDs via GraphQL:
+     ```bash
+     gh api graphql -f query='{ repository(owner:"owid", name:"etl") { pullRequest(number:<pr_number>) { reviewThreads(first:20) { nodes { id isResolved comments(first:1) { nodes { body } } } } } } }'
+     ```
+   - For each unresolved Codex comment:
+     - **If valid**: apply the fix, commit, push, then resolve the thread:
+       ```bash
+       gh api graphql -f query='mutation { resolveReviewThread(input:{threadId:"<thread_id>"}) { thread { id isResolved } } }'
+       ```
+     - **If not valid / not applicable**: reply explaining why, then resolve the thread:
+       ```bash
+       gh api repos/owid/etl/pulls/<pr_number>/comments/<comment_id>/replies -f body="<explanation>"
+       gh api graphql -f query='mutation { resolveReviewThread(input:{threadId:"<thread_id>"}) { thread { id isResolved } } }'
+       ```
+   - If Codex hasn't posted yet after 60 s, wait another 60 s and retry (up to ~5 min total).
 
 ## Committing and pushing
 
