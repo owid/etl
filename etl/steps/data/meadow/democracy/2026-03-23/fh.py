@@ -154,12 +154,7 @@ def reshape_ratings_from_scores_file(tb: Table, min_year: int) -> Table:
     # Apply same dtype conversions as _set_dtypes_indicators_ratings
     tb["civlibs"] = tb["civlibs"].astype("string").astype("Int64")
     tb["polrights"] = tb["polrights"].astype("string").astype("Int64")
-    tb["regime"] = (
-        tb["regime"]
-        .astype("string")
-        .replace({"NF": "0", "PF": "1", "F": "2"})
-        .astype("Int64")
-    )
+    tb["regime"] = tb["regime"].astype("string").replace({"NF": "0", "PF": "1", "F": "2"}).astype("Int64")
     tb["country_flag"] = tb["country_flag"].astype("Int64")
     tb["country"] = tb["country"].astype("string")
     tb["year"] = tb["year"].astype(int)
