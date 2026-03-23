@@ -23,7 +23,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "pandas>=2.2.3",
+    "pandas>=2.2.3,<3",
     "jsonschema>=3.2.0",
     "pyarrow>=10.0.1",
     "ipdb>=0.13.9",

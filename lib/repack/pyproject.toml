@@ -9,7 +9,7 @@ license = "MIT"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.24.0",
-    "pandas>=2.2.3",
+    "pandas>=2.2.3,<3",
     # there are problems with installing 18.0.0, but we should undo this once it's fixed
     "pyarrow>=18.0.0",
 ]

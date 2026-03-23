@@ -14,7 +14,7 @@ keywords = [
 license = "MIT"
 requires-python = ">=3.10, <4.0"
 dependencies = [
-    "pandas>=2.2.3",
+    "pandas>=2.2.3,<3",
     "boto3>=1.38.23",
     "structlog>=21.5.0",
     "colorama>=0.4.4",
