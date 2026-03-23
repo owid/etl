@@ -1733,25 +1733,6 @@ class Table(pd.DataFrame):
         """
         return super().filter(*args, **kwargs)  # ty: ignore
 
-    def update_log(
-        self,
-        operation: str,
-        parents: list[Any] | None = None,
-        variable_names: list[str] | None = None,
-        comment: str | None = None,
-    ) -> Table:
-        """No-op kept for backwards compatibility. Processing log has been removed."""
-        return self
-
-    def amend_log(
-        self,
-        variable_names: list[str] | None = None,
-        comment: str | None = None,
-        operation: str | None = None,
-    ) -> Table:
-        """No-op kept for backwards compatibility. Processing log has been removed."""
-        return self
-
     def sort_values(self, by: str | list[str], *args: Any, **kwargs: Any) -> Table:
         return cast(Table, super().sort_values(by=by, *args, **kwargs).copy())
 

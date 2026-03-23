@@ -1137,10 +1137,6 @@ Example:
     print(table.all_columns)  # ["country", "year", "gdp", "population"]
     ```
 
-#### `amend_log(self, variable_names: 'list[str] | None' = None, comment: 'str | None' = None, operation: 'str | None' = None) -> 'Table'`
-
-Amend operation or comment of the latest processing log entry.
-
 #### `astype(self, *args: 'Any', **kwargs: 'Any') -> 'Table'`
 
 Cast table columns to specified dtype(s).
@@ -1954,8 +1950,6 @@ Example:
     table.underscore(inplace=True)
     ```
 
-#### `update_log(self, operation: 'str', parents: 'list[Any] | None' = None, variable_names: 'list[str] | None' = None, comment: 'str | None' = None) -> 'Table'`
-
 #### `update_metadata(self, **kwargs: 'Any') -> 'Table'`
 
 Update table-level metadata fields.
@@ -2275,7 +2269,6 @@ Example:
 
 #### `Indicator.processing_level` (property)
 
-#### `Indicator.processing_log` (property)
 
 #### `rolling(self, *args: 'Any', **kwargs: 'Any') -> 'IndicatorRolling'`
 
@@ -2318,40 +2311,6 @@ Convert Indicator to a Table (single-column table).
 #### `Indicator.type` (property)
 
 #### `Indicator.unit` (property)
-
-#### `update_log(self, operation: 'str', parents: 'list[Any] | None' = None, variable: 'str | None' = None, comment: 'str | None' = None) -> 'Indicator'`
-
-Add an entry to the indicator's processing log.
-
-Records data transformation operations for data provenance tracking.
-
-Args:
-    operation: Name of the operation performed (e.g., "merge", "aggregate").
-    parents: List of parent indicators that contributed to this operation.
-        If None, uses the indicator itself as the only parent.
-    variable: Name of the variable for the log entry. If None, uses the
-        indicator's name or UNNAMED_INDICATOR.
-    comment: Optional comment describing the operation in detail.
-
-Returns:
-    The indicator itself (for method chaining).
-
-Example:
-    ```python
-    # Log a custom transformation
-    ind.update_log(
-        operation="normalize",
-        comment="Normalized to 2015 baseline"
-    )
-
-    # Log a merge operation
-    result.update_log(
-        operation="merge",
-        parents=[ind1, ind2],
-        comment="Combined GDP and population data"
-    )
-    ```
-
 
 ### Indicator
 
@@ -2485,7 +2444,6 @@ Example:
 
 #### `Indicator.processing_level` (property)
 
-#### `Indicator.processing_log` (property)
 
 #### `rolling(self, *args: 'Any', **kwargs: 'Any') -> 'IndicatorRolling'`
 
@@ -2528,40 +2486,6 @@ Convert Indicator to a Table (single-column table).
 #### `Indicator.type` (property)
 
 #### `Indicator.unit` (property)
-
-#### `update_log(self, operation: 'str', parents: 'list[Any] | None' = None, variable: 'str | None' = None, comment: 'str | None' = None) -> 'Indicator'`
-
-Add an entry to the indicator's processing log.
-
-Records data transformation operations for data provenance tracking.
-
-Args:
-    operation: Name of the operation performed (e.g., "merge", "aggregate").
-    parents: List of parent indicators that contributed to this operation.
-        If None, uses the indicator itself as the only parent.
-    variable: Name of the variable for the log entry. If None, uses the
-        indicator's name or UNNAMED_INDICATOR.
-    comment: Optional comment describing the operation in detail.
-
-Returns:
-    The indicator itself (for method chaining).
-
-Example:
-    ```python
-    # Log a custom transformation
-    ind.update_log(
-        operation="normalize",
-        comment="Normalized to 2015 baseline"
-    )
-
-    # Log a merge operation
-    result.update_log(
-        operation="merge",
-        parents=[ind1, ind2],
-        comment="Combined GDP and population data"
-    )
-    ```
-
 
 ### `copy_metadata(from_variable: 'Indicator', to_variable: 'Indicator', inplace: 'bool' = False) -> 'Indicator | None'`
 

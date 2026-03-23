@@ -407,16 +407,6 @@ class Indicator(pd.Series):
     def set_categories(self, *args: Any, **kwargs: Any) -> Indicator:
         return Indicator(self.cat.set_categories(*args, **kwargs), name=self.name, metadata=self.metadata.copy())
 
-    def update_log(
-        self,
-        operation: str,
-        parents: list[Any] | None = None,
-        variable: str | None = None,
-        comment: str | None = None,
-    ) -> Indicator:
-        """No-op kept for backwards compatibility. Processing log has been removed."""
-        return self
-
     def rolling(self, *args: Any, **kwargs: Any) -> IndicatorRolling:
         """Create a rolling window operation that preserves metadata.
 
