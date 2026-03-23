@@ -202,7 +202,8 @@ wizard: .venv
 
 # Sync VS Code extensions: installs missing ones and upgrades outdated ones (version-aware)
 vsce-sync:
-	@if command -v code > /dev/null; then \
+	@unset NODE_OPTIONS; \
+	if command -v code > /dev/null; then \
 		INSTALLED=$$(code --list-extensions --show-versions); \
 		EXTENSIONS="ms-toolsai.jupyter"; \
 		for EXT in $$EXTENSIONS; do \

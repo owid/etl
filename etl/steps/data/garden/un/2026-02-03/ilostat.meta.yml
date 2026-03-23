@@ -147,7 +147,7 @@ definitions:
     <%- elif classif1 == "Age (child labour): 15-17" %>
     Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
     <%- elif classif1 == "Age (child labour): 5-17" %>
-    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity; for children aged 12-14, it includes those who did at least 14 hours of economic activity; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
     <%- endif %>
   description_key_low_pay_earners: |-
     Workers are considered _low pay_ if their hourly earnings at all jobs are less than two-thirds of median hourly earnings.

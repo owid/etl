@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 import pandas as pd
 import streamlit as st
 from sqlalchemy.orm import Session
+from structlog import get_logger
 
 import etl.grapher.model as gm
 from apps.backport.datasync.data_metadata import (
@@ -26,6 +27,8 @@ from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS, SOURCE, T
 from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
 from etl.grapher.io import variable_metadata_df_from_s3
+
+log = get_logger()
 
 # GPT model default
 MODEL_DEFAULT = "gpt-5"
@@ -602,28 +605,36 @@ class ChartDiffShow:
 
         for nc in narrative_charts:
             with st.container(border=True):
+                source_admin_url = f"{SOURCE.admin_site}/narrative-charts/{nc.id}/edit"
+                target_admin_url = f"{TARGET.admin_site}/narrative-charts/{nc.id}/edit"
+
                 # Get full configs from both environments via API
-                source_nc = source_api.get_narrative_chart(nc.id)
-                source_config = source_nc.get("configFull", {})
+                try:
+                    source_nc = source_api.get_narrative_chart(nc.id)
+                    source_config = source_nc.get("configFull", {})
+                except Exception as e:
+                    log.warning(f"_show_narrative_charts: source failed nc.id={nc.id}: {e}")
+                    source_config = None
 
                 try:
                     target_nc = target_api.get_narrative_chart(nc.id)
                     target_config = target_nc.get("configFull", {})
-                except Exception:
+                except Exception as e:
+                    log.warning(f"_show_narrative_charts: target failed nc.id={nc.id}: {e}")
                     target_config = None
 
                 # Show side-by-side comparison
                 col1, col2 = st.columns(2)
 
                 with col1:
-                    st.markdown("Production")
+                    st.markdown(f"[Production]({target_admin_url})")
                     if target_config:
                         grapher_chart(chart_config=target_config, owid_env=TARGET)
                     else:
                         st.info("Not available in production")
 
                 with col2:
-                    st.markdown("Staging")
+                    st.markdown(f"[Staging]({source_admin_url})")
                     if source_config:
                         grapher_chart(chart_config=source_config, owid_env=SOURCE)
                     else:
