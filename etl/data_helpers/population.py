@@ -7,8 +7,6 @@ from owid.catalog import Dataset
 from owid.datautils.dataframes import map_series
 from structlog import get_logger
 
-from etl.paths import DATA_DIR
-
 # Initialize logger.
 log = get_logger()
 
@@ -73,10 +71,10 @@ def add_population(
         assert df[age_col].notnull().all(), f"Column {age_col} contains missing values!"
 
     if ds_un_wpp is None:
-        ds_un_wpp_path = DATA_DIR / "garden/un/2022-07-11/un_wpp"
-        log.warning(f"Dataset {ds_un_wpp_path} is silently being loaded.")
-        # Load granular population dataset
-        ds_un_wpp = Dataset(ds_un_wpp_path)
+        raise ValueError(
+            "ds_un_wpp must be provided. Load it explicitly with paths.load_dataset('un_wpp') and ensure "
+            "data://garden/un/2022-07-11/un_wpp is in the step's DAG dependencies."
+        )
     pop = ds_un_wpp.read("population_granular", safe_types=False)  # type: ignore
     # Keep only variant='medium'
     pop = pop[pop["variant"] == "medium"].drop(columns=["variant"])
