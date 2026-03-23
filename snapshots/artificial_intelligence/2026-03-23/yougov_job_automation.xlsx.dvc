@@ -12,3 +12,7 @@ meta:
     license:
       name: Copyright © 2024 YouGov PLC
       url: https://today.yougov.com/about/terms
+outs:
+  - md5: fdf35048e21e8bb74982e893ca5ea349
+    size: 29178
+    path: yougov_job_automation.xlsx

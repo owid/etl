@@ -13,3 +13,7 @@ meta:
     license:
       name: Copyright © 2024 YouGov PLC
       url: https://today.yougov.com/about/terms
+outs:
+  - md5: 2028d88fdc3507526745685001cc7686
+    size: 30703
+    path: yougov_robots.xlsx
