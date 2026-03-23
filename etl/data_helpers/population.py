@@ -11,6 +11,58 @@ from structlog import get_logger
 log = get_logger()
 
 
+def _parse_age_str(age_str: str) -> tuple[int, float]:
+    """Parse an age bucket string into an inclusive (min, max) range.
+
+    Open-ended buckets (e.g. '100+', 'all') get max=inf.
+    """
+    s = str(age_str).strip()
+    if s == "all":
+        return (0, float("inf"))
+    elif s.endswith("+"):
+        return (int(s[:-1]), float("inf"))
+    elif "-" in s:
+        lo, hi = s.split("-", 1)
+        return (int(lo), int(hi))
+    else:
+        v = int(s)
+        return (v, v)
+
+
+def _select_age_buckets(available_ages: list[str], req_min: int, req_max: float) -> list[str]:
+    """Select the minimal non-overlapping age buckets that cover [req_min, req_max].
+
+    Strategy:
+    1. Try an exact-match bucket first (handles 'all', '15+', '18+', '65+', '0-4', etc.)
+    2. Otherwise collect every bucket whose range falls entirely within the request, then
+       keep only "atomic" ones — buckets that contain no smaller candidate inside them.
+    """
+    parsed: dict[str, tuple[int, float]] = {}
+    for a in available_ages:
+        try:
+            parsed[a] = _parse_age_str(a)
+        except (ValueError, AttributeError):
+            pass
+
+    # 1. Exact match
+    for age_str, (b_min, b_max) in parsed.items():
+        if b_min == req_min and b_max == req_max:
+            return [age_str]
+
+    # 2. Atomic sub-buckets
+    candidates = {a: r for a, r in parsed.items() if r[0] >= req_min and r[1] <= req_max}
+
+    atomic = []
+    for age_str, (b_min, b_max) in candidates.items():
+        has_sub = any(
+            other != age_str and other_r[0] >= b_min and other_r[1] <= b_max for other, other_r in candidates.items()
+        )
+        if not has_sub:
+            atomic.append(age_str)
+
+    return atomic
+
+
 def add_population(
     df: pd.DataFrame,
     country_col: str,
@@ -23,9 +75,7 @@ def add_population(
     age_col: str | None = None,
     age_group_mapping: dict[str, Any | None] | None = None,
 ) -> pd.DataFrame:
-    """Add population to dataframe.
-
-    Currently uses population from UN WPP 2022, as this dataset contains dissagregated data by age and sex groups.
+    """Add population to dataframe using UN WPP 2024 (data://garden/un/2024-07-12/un_wpp).
 
     This function can be used to add population to a dataframe with the following dimensions: sex, age.
 
@@ -37,9 +87,9 @@ def add_population(
         Name of column with country names.
     year_col : str
         Name of column with years.
-    ds_un_wpp : Dataset, optional
-        Population dataset from UN WPP. It should always be provided. But, for compatibility with old steps, if not
-        provided, it will be silently loaded.
+    ds_un_wpp : Dataset
+        Population dataset from UN WPP (data://garden/un/2024-07-12/un_wpp).
+        Must be provided explicitly; ensure it is listed in the step's DAG dependencies.
     sex_col: str, optional
         Name of the column with sex group dimension.
     sex_group_all: str, optional
@@ -47,18 +97,16 @@ def add_population(
     sex_group_female: str, optional
         Value in `sex_col` for "female" sex group.
     sex_group_male: str, optional
-        value in `sex_col` for "male" sex group.
+        Value in `sex_col` for "male" sex group.
     age_col: str, optional
         Name of the column with age group dimension.
     age_group_mapping: Dict[str, Optional[List[Optional[int]]]], optional
-        Mapping from age group names to age ranges. The format of this argument is:
+        Mapping from age group names to age ranges:
         {
             "age_group_name_in_input_dataframe": [min_age, max_age],
             ...
         }
-
-        Population within the range [min_age, max_age] will be assigned to the age group `age_group_name_in_input_dataframe`.
-        To get single-year values, use max_age = min_age + 1.
+        max_age=None means open-ended (no upper bound).
 
     Returns
     -------
@@ -73,21 +121,24 @@ def add_population(
     if ds_un_wpp is None:
         raise ValueError(
             "ds_un_wpp must be provided. Load it explicitly with paths.load_dataset('un_wpp') and ensure "
-            "data://garden/un/2022-07-11/un_wpp is in the step's DAG dependencies."
+            "data://garden/un/2024-07-12/un_wpp is in the step's DAG dependencies."
         )
-    pop = ds_un_wpp.read("population_granular", safe_types=False)  # ty: ignore
-    # Keep only variant='medium'
-    pop = pop[pop["variant"] == "medium"].drop(columns=["variant"])
-    # Keep only metric='population'
-    pop = pop[pop["metric"] == "population"].drop(columns=["metric"]).rename(columns={"value": "population"})
 
-    # Main index columns
+    # Read population table from the 2024 dataset.
+    # Use 'estimates' for historical years (1950-2023) and 'medium' for projections (2024+).
+    pop = ds_un_wpp.read("population", safe_types=False)  # type: ignore
+    pop = pop[pop["variant"].isin(["estimates", "medium"])].drop(columns=["variant"])
+    # Keep only the population count; drop density/change columns.
+    pop = pop.drop(columns=["population_change", "population_density"], errors="ignore")
+    # Rename 'country' → 'location' to keep the rest of the logic uniform.
+    pop = pop.rename(columns={"country": "location"})
+
+    # Main merge columns
     columns_merge_df = [country_col, year_col]
     columns_merge_pop = ["location", "year"]
 
     # SEX GROUP
     if sex_col:
-        # Rename sex groups
         sex_group_mapping = {}
         if sex_group_all:
             sex_group_mapping["all"] = sex_group_all
@@ -96,11 +147,10 @@ def add_population(
         if sex_group_male:
             sex_group_mapping["male"] = sex_group_male
         if not sex_group_mapping:
-            raise ValueError("Need to specify at least of argument of `sex_group_*`!")
+            raise ValueError("Need to specify at least one argument of `sex_group_*`!")
         pop["sex"] = map_series(pop["sex"], sex_group_mapping)
         pop = pop.dropna(subset=["sex"])
 
-        # Add additional index columns
         columns_merge_df.append(sex_col)
         columns_merge_pop.append("sex")
     else:
@@ -110,32 +160,38 @@ def add_population(
     if age_col:
         if not age_group_mapping:
             raise ValueError("Must specify a value for `age_group_mapping`!")
-        # Add additional index columns
+
         columns_merge_df.append(age_col)
         columns_merge_pop.append("age")
 
-        # Build age groups
-        # NOTE: this must be done in a loop because age ranges could be overlapping
+        available_ages = pop["age"].unique().tolist()
+
+        # Build each requested age group by selecting the appropriate atomic buckets.
+        # NOTE: done in a loop because ranges can overlap across groups.
         df_pop = []
-        pop["age"] = pop["age"].astype(str).replace({"100+": 100}).astype("uint")
         for age_group_name, age_ranges in age_group_mapping.items():
             if not age_ranges:
                 age_ranges = [None, None]
-            # Define min and max age range in group
-            age_min = age_ranges[0] if age_ranges[0] is not None else -1
-            age_max = age_ranges[1] if age_ranges[1] is not None else 1000
-            # Keep ages in group - allows for selection of single years in group
-            pop_g = pop.loc[
-                (pop["age"] >= age_min) & (pop["age"] <= age_max)
-            ]  # Group by dimensions, replace age group name
+            req_min = age_ranges[0] if age_ranges[0] is not None else 0
+            req_max = float("inf") if age_ranges[1] is None else age_ranges[1]
+
+            buckets = _select_age_buckets(available_ages, req_min, req_max)
+            if not buckets:
+                log.warning(
+                    f"No population age buckets found for range [{req_min}, {req_max}] "
+                    f"(age group '{age_group_name}'). Population will be NaN for this group."
+                )
+                continue
+
             pop_g = (
-                pop_g.drop(columns=["age"])
+                pop[pop["age"].isin(buckets)]
+                .drop(columns=["age"])
                 .groupby(["location", "year", "sex"], as_index=False, observed=True)
                 .sum()
                 .assign(age=age_group_name)
             )
-            # Add dataframe to list
             df_pop.append(pop_g)
+
         df_pop = pd.concat(df_pop, ignore_index=True).astype({"age": "category"})
     else:
         df_pop = pop.groupby(["location", "year", "sex"], as_index=False).sum().drop(columns=["age"], errors="ignore")
