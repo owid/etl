@@ -51,7 +51,8 @@ dimensions:
     name: Pollution type
     choices:
       - slug: all
-        name: Total (indoor and outdoor)
+        name: Total
+        description: Includes both indoor and outdoor air pollution.
       - slug: outdoor
         name: Outdoor
       - slug: indoor
@@ -62,10 +63,13 @@ dimensions:
     choices:
       - slug: number
         name: Number of deaths
+        description: Total number of premature deaths attributed to air pollution.
       - slug: rate
         name: Death rate
+        description: Number of premature deaths per 100,000 people.
       - slug: share
         name: Share of deaths
+        description: Share of total deaths which are attributed to air pollution.
 
 views:
   # All air pollution
