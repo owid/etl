@@ -22,7 +22,16 @@ def run() -> None:
     tb = ds_meadow.read("yougov_job_automation")
 
     # Remove specific groups from the group column (likely small sample sizes for some of these resulting in strange values sometimes)
-    groups_to_remove = ["Middle Eastern", "Native American", "Other", "Asian", "Black", "Hispanic", "Two or more races", "White"]
+    groups_to_remove = [
+        "Middle Eastern",
+        "Native American",
+        "Other",
+        "Asian",
+        "Black",
+        "Hispanic",
+        "Two or more races",
+        "White",
+    ]
     tb = tb[~tb["group"].isin(groups_to_remove)]
 
     # Rename groups to be cleaner and more descriptive
