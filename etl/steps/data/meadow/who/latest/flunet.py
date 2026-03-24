@@ -28,9 +28,8 @@ def run(dest_dir: str) -> None:
     # Create a new table and ensure all columns are snake-case.
     tb = tb.rename(columns={"country_area_territory": "country"})
 
-    # Convert messy columns to string.
-    # for col in ("aother_subtype_details", "parainfluenza", "otherrespvirus"):
-    for col in ("aother_subtype_details", "other_respvirus_details"):
+    # Convert all remaining object-dtype columns to str so repack_frame can handle them.
+    for col in tb.columns[tb.dtypes == "object"]:
         ix = tb[col].notnull()
         tb.loc[ix, col] = tb.loc[ix, col].astype("str")
 
