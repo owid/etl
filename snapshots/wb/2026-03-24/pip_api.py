@@ -1,4 +1,3 @@
-# NOTE: Check all the TODO comments in the code, to modify data related to the new 2021 prices
 # TODO: Extract data in arrow files, for faster processing.
 """
 DATA EXTRACTION FOR THE WORLD BANK POVERTY AND INEQUALITY PLATFORM (PIP) API
