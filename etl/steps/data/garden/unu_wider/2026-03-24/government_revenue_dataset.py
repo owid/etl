@@ -11,7 +11,6 @@ from owid.catalog import Table
 from structlog import get_logger
 from tabulate import tabulate
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 log = get_logger()
@@ -41,10 +40,7 @@ def run() -> None:
 
     #
     # Process data.
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-    )
+    tb = paths.regions.harmonize_names(tb=tb)
     tb = drop_flagged_rows_and_unnecessary_columns(tb)
 
     tb = tb.set_index(["country", "year"], verify_integrity=True)
