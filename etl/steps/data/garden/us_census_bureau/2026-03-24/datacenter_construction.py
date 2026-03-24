@@ -41,7 +41,9 @@ def run() -> None:
 
     # Adjust for inflation using PPI (base year January 2021=100)
     tb["datacenter_construction_spending_real"] = tb["datacenter_construction_spending"] * (100 / tb["ppi_rebased"])
-    tb["general_office_construction_spending_real"] = tb["general_office_construction_spending"] * (100 / tb["ppi_rebased"])
+    tb["general_office_construction_spending_real"] = tb["general_office_construction_spending"] * (
+        100 / tb["ppi_rebased"]
+    )
 
     # Drop the PPI columns as they're not needed in output
     tb = tb.drop(columns=["ppi_new_office_construction", "ppi_rebased"])

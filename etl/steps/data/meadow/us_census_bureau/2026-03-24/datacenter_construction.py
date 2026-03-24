@@ -28,7 +28,9 @@ def run() -> None:
     tb = tb[["Date", "Data center", "General"]].copy()
 
     # Rename columns
-    tb = tb.rename(columns={"Data center": "datacenter_construction_spending", "General": "general_office_construction_spending"})
+    tb = tb.rename(
+        columns={"Data center": "datacenter_construction_spending", "General": "general_office_construction_spending"}
+    )
 
     # Remove rows where datacenter_construction_spending is NaN first
     tb = tb.dropna(subset=["datacenter_construction_spending", "general_office_construction_spending"])
