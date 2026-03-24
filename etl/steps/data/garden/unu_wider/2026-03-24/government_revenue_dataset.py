@@ -2,18 +2,16 @@
 Load a meadow dataset and create a garden dataset.
 
 NOTE: To extract the log of the process (to review sanity checks, for example), follow these steps:
-    1. Define LONG_FORMAT as True.
-    2. Run the following command in the terminal:
-        nohup uv run etl run government_revenue_dataset > government_revenue_dataset.log 2>&1 &
+    1. Define DEBUG as True.
+    2. (optional) Define LONG_FORMAT as True to see the full tables in the log.
+    3. Run the following command in the terminal:
+        nohup .venv/bin/etlr government_revenue_dataset > government_revenue_dataset.log 2>&1 &
 """
 
 from owid.catalog import Table
-from structlog import get_logger
 from tabulate import tabulate
 
 from etl.helpers import PathFinder
-
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -21,7 +19,10 @@ paths = PathFinder(__file__)
 # Set table format when printing
 TABLEFMT = "pretty"
 
-# Define if I show the full table or just the first 5 rows for assertions
+# Define if sanity checks should run (set to True to see sanity check output)
+DEBUG = False
+
+# Define if I show the full table or just the first 5 rows for assertions (only applies when DEBUG=True)
 LONG_FORMAT = False
 
 
@@ -122,11 +123,12 @@ def sanity_checks(tb: Table) -> None:
     Perform sanity checks on the data.
     """
 
+    if not DEBUG:
+        return
+
     tb = tb.copy()
 
-    tb = check_negative_values(tb)
-
-    return tb
+    check_negative_values(tb)
 
 
 def check_negative_values(tb: Table):
