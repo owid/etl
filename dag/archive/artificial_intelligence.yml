@@ -792,3 +792,7 @@ steps:
     - data://garden/bls/2025-12-24/us_ppi_construction
   data://grapher/us_census_bureau/2025-11-17/datacenter_construction:
     - data://garden/us_census_bureau/2025-11-17/datacenter_construction
+
+  # USA PPI New Office Construction (US Bureau of Labor Statistics) - superseded by 2026-03-24
+  data://garden/bls/2025-12-24/us_ppi_construction:
+    - snapshot://bls/2025-12-24/us_ppi_construction.csv
