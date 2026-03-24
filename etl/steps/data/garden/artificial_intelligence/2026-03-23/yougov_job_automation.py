@@ -31,6 +31,12 @@ def run() -> None:
         "Hispanic",
         "Two or more races",
         "White",
+        "No HS",
+        "High school graduate",
+        "Some college",
+        "2-year",
+        "4-year",
+        "Post-grad",
     ]
     tb = tb[~tb["group"].isin(groups_to_remove)]
 
@@ -41,12 +47,8 @@ def run() -> None:
         "30-44": "Ages 30-44",
         "45-64": "Ages 45-64",
         "65+": "Ages 65+",
-        "No HS": "No high school diploma",
-        "High school graduate": "High school graduate",
-        "Some college": "Some college",
-        "2-year": "2-year college degree",
-        "4-year": "4-year college degree",
-        "Post-grad": "Postgraduate degree",
+        "Male": "Men",
+        "Female": "Women",
     }
     tb["group"] = tb["group"].map(lambda x: group_rename.get(x, x))
 
