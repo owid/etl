@@ -36,7 +36,9 @@ def run(dest_dir: str) -> None:
     KNOWN_STRAY_STRINGS = {"RSV", "ES"}
     for col in tb.columns[tb.dtypes == "object"]:
         if tb[col].dropna().apply(lambda x: isinstance(x, (int, float))).any():
-            stray = {v for v in tb[col] if isinstance(v, str) and pd.isna(pd.to_numeric(v, errors="coerce"))} - KNOWN_STRAY_STRINGS
+            stray = {
+                v for v in tb[col] if isinstance(v, str) and pd.isna(pd.to_numeric(v, errors="coerce"))
+            } - KNOWN_STRAY_STRINGS
             if stray:
                 raise ValueError(f"Column '{col}' contains unexpected non-numeric strings: {stray}")
             tb[col] = pd.to_numeric(tb[col], errors="coerce")
