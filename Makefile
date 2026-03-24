@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate vsce-exclude-archived owid_mcp vsce-compile vsce-sync
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate vsce-exclude-archived owid_mcp vsce-compile vsce-sync install-hooks
 
 include default.mk
 
@@ -32,6 +32,7 @@ help:
 	@echo '  make fasttrack 	Start Fast-track on port 8082'
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make query SQL="..." Run SQL query on staging MySQL for current branch'
+	@echo '  make install-hooks	Install git hooks (runs make check before commit)'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make vsce-exclude-archived  Exclude archived steps from VSCode user settings'
@@ -222,6 +223,13 @@ vsce-sync:
 	else \
 		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension sync."; \
 	fi
+
+# Backward-compatible alias
+install-hooks:
+	@echo '==> Installing git hooks'
+	cp scripts/hooks/pre-commit .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
+	@echo '==> Done. pre-commit hook will run make check before each commit.'
 
 # Backward-compatible alias
 install-vscode-extensions: vsce-sync
