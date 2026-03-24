@@ -24,14 +24,14 @@ def run() -> None:
     # Clean column names - remove line breaks and extra whitespace
     tb.columns = tb.columns.str.replace("\n_x000D_", " ").str.strip()
 
-    # Keep only Date and Data center columns
-    tb = tb[["Date", "Data center"]].copy()
+    # Keep only Date, Data center, and General office columns
+    tb = tb[["Date", "Data center", "General"]].copy()
 
     # Rename columns
-    tb = tb.rename(columns={"Data center": "datacenter_construction_spending"})
+    tb = tb.rename(columns={"Data center": "datacenter_construction_spending", "General": "general_office_construction_spending"})
 
     # Remove rows where datacenter_construction_spending is NaN first
-    tb = tb.dropna(subset=["datacenter_construction_spending"])
+    tb = tb.dropna(subset=["datacenter_construction_spending", "general_office_construction_spending"])
 
     # Parse the date column
     # Format is like "Jul-25p" (July 2025 preliminary) or "Jun-25r" (June 2025 revised)

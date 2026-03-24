@@ -30,6 +30,7 @@ def run() -> None:
 
     # Convert spending from millions to actual dollars for consistency
     tb["datacenter_construction_spending"] = tb["datacenter_construction_spending"] * 1_000_000
+    tb["general_office_construction_spending"] = tb["general_office_construction_spending"] * 1_000_000
 
     # Merge with PPI data using pr.merge to preserve metadata
     tb = pr.merge(tb, tb_ppi[["date", "ppi_new_office_construction"]], on=["date"], how="left")
@@ -40,6 +41,7 @@ def run() -> None:
 
     # Adjust for inflation using PPI (base year January 2021=100)
     tb["datacenter_construction_spending_real"] = tb["datacenter_construction_spending"] * (100 / tb["ppi_rebased"])
+    tb["general_office_construction_spending_real"] = tb["general_office_construction_spending"] * (100 / tb["ppi_rebased"])
 
     # Drop the PPI columns as they're not needed in output
     tb = tb.drop(columns=["ppi_new_office_construction", "ppi_rebased"])
