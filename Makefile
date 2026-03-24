@@ -2,11 +2,11 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vsce-exclude-archived owid_mcp vsce-compile vsce-sync
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate vsce-exclude-archived owid_mcp vsce-compile vsce-sync
 
 include default.mk
 
-SRC = etl snapshots apps api api_search tests docs owid_mcp
+SRC = etl snapshots apps api_search tests docs owid_mcp
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/*
 
@@ -28,7 +28,6 @@ help:
 	@echo '  make sync.catalog  Sync catalog from R2 into local data/ folder'
 	@echo '  make lab       	Start a Jupyter Lab server'
 	@echo '  make publish   	Publish the generated catalog to S3'
-	@echo '  make api   		Start the ETL API on port 8081'
 	@echo '  make api-search   	Start the Search API on port 8084'
 	@echo '  make fasttrack 	Start Fast-track on port 8082'
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
@@ -183,10 +182,6 @@ query:
 	NORMALIZED=$$(echo "$$BRANCH" | sed 's/[\/\._]/-/g' | sed 's/^staging-site-//' | cut -c1-28 | sed 's/-*$$//'); \
 	HOST="staging-site-$$NORMALIZED"; \
 	mysql -h "$$HOST" -u owid --port 3306 -D owid -e "$(SQL)"
-
-api: .venv
-	@echo '==> Starting ETL API on http://localhost:8081/api/v1/indicators'
-	.venv/bin/uvicorn api.main:app --reload --port 8081 --host 0.0.0.0 --reload-exclude '.cache/*'
 
 api-search: .venv
 	@echo '==> Starting Search API on http://localhost:8084/indicators'
