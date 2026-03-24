@@ -33,8 +33,12 @@ def run(dest_dir: str) -> None:
     # numeric in some CSV chunks but encountered stray strings like 'RSV' or 'ES' in others.
     # Detect these by checking for actual float/int objects inside an object-dtype column,
     # then coerce the stray strings to NaN. Pure text columns are left as str.
+    KNOWN_STRAY_STRINGS = {"RSV", "ES"}
     for col in tb.columns[tb.dtypes == "object"]:
         if tb[col].dropna().apply(lambda x: isinstance(x, (int, float))).any():
+            stray = {v for v in tb[col] if isinstance(v, str) and pd.isna(pd.to_numeric(v, errors="coerce"))} - KNOWN_STRAY_STRINGS
+            if stray:
+                raise ValueError(f"Column '{col}' contains unexpected non-numeric strings: {stray}")
             tb[col] = pd.to_numeric(tb[col], errors="coerce")
         else:
             ix = tb[col].notnull()
