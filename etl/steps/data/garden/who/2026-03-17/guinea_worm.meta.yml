@@ -6,6 +6,8 @@ definitions:
         - Neglected Tropical Diseases
         - Global Health
         - Eradication of Diseases
+      attribution: World Health Organization (2026)
+      attribution_short: WHO
 
 dataset:
   update_period_days: 365
