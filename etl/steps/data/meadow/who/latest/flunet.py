@@ -1,5 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
+import pandas as pd
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -28,10 +29,17 @@ def run(dest_dir: str) -> None:
     # Create a new table and ensure all columns are snake-case.
     tb = tb.rename(columns={"country_area_territory": "country"})
 
-    # Convert all remaining object-dtype columns to str so repack_frame can handle them.
+    # Fix object-dtype columns caused by pandas mixed-type chunking or dirty data.
+    # Columns that are mostly numeric (e.g. ah5 with stray 'RSV' strings) → to_numeric with coerce.
+    # Genuinely text columns (country names, comments, etc.) → str.
     for col in tb.columns[tb.dtypes == "object"]:
-        ix = tb[col].notnull()
-        tb.loc[ix, col] = tb.loc[ix, col].astype("str")
+        numeric = pd.to_numeric(tb[col], errors="coerce")
+        total_nonnull = tb[col].notna().sum()
+        if total_nonnull > 0 and numeric.notna().sum() / total_nonnull >= 0.5:
+            tb[col] = numeric
+        else:
+            ix = tb[col].notnull()
+            tb.loc[ix, col] = tb.loc[ix, col].astype("str")
 
     #
     # Save outputs.
