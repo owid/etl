@@ -24,12 +24,30 @@ definitions:
     unit: "% of GDP"
     short_unit: "%"
 
+  description_key_revenue: |-
+    Government revenue is all the money a government receives, including taxes, social contributions, grants, and income from other sources.
+  description_key_revenue_excluding_sc: |-
+    Government revenue excluding social contributions is all the money a government receives, including taxes, grants, and income from other sources, but excluding social contributions.
+  description_key_revenue_excluding_gr_inc_sc: |-
+    Government revenue excluding grants and including social contributions is all the money a government receives, including taxes, social contributions, and income from other sources, but excluding grants.
+  description_key_revenue_excluding_gr_sc: |-
+    Government revenue excluding grants and excluding social contributions is all the money a government receives, including taxes and income from other sources, but excluding grants and social contributions.
   description_key_tax: |-
-    Taxes are defined as compulsory, unrequited payments to the government, following IMF and OECD definitions.
+    Taxes are mandatory payments to the government that are not made in exchange for a specific good or service.
+  description_key_social_contributions: |-
+    Social contributions are payments –compulsory or voluntary– made by workers and employers into social insurance systems, such as pensions, unemployment insurance, or health insurance.
+  description_key_grants: |-
+    Grants are transfers received by a government from foreign governments or international organizations, given without a direct exchange of goods or services.
+  description_key_non_tax_revenue: |-
+    Non-tax revenue is money the government earns that is not from taxes, social contributions, or grants—usually because the government is selling something, charging for a service, or receiving income from assets it owns.
   description_key_resource_taxes_not_captured: |-
     Resource taxes (mostly related to oil and mining) are not systematically defined or captured in the data.
-  description_key_social_contributions: |-
-    Social contributions include both compulsory and voluntary social insurance contributions from employers, employees, and the self-employed.
+
+  description_key_tipcg: |-
+    Taxes on income, profits, and capital gains (TIPCG) are taxes imposed on the income of individuals and corporations, including wages, business profits, and capital gains from the sale of assets.
+
+  description_key_taxes_goods_services: |-
+    Taxes on goods and services are taxes on the production, sale, transfer, or use of goods and services. They include value-added taxes (VAT), sales taxes, excise duties (e.g. on fuel, alcohol and tobacco), and other taxes on goods and services.
 
   taxes_def: >-
     The variable Taxes captures tax collected regardless of sources (i.e., unless otherwise defined, this
@@ -171,6 +189,12 @@ tables:
       rev_inc_sc:
         title: Revenue including social contributions (as a share of GDP)
         description_short: Includes taxes, non-tax revenue, social contributions, and grants.
+        description_key:
+          - "{definitions.description_key_revenue}"
+          - "{definitions.description_key_tax}"
+          - "{definitions.description_key_social_contributions}"
+          - "{definitions.description_key_grants}"
+          - "{definitions.description_key_non_tax_revenue}"
         description_from_producer: "{definitions.revenue}"
         display:
           name: Revenue including social contributions
@@ -179,6 +203,11 @@ tables:
       rev_ex_sc:
         title: Revenue excluding social contributions (as a share of GDP)
         description_short: Includes taxes, non-tax revenue, and grants.
+        description_key:
+          - "{definitions.description_key_revenue_excluding_sc}"
+          - "{definitions.description_key_tax}"
+          - "{definitions.description_key_grants}"
+          - "{definitions.description_key_non_tax_revenue}"
         description_from_producer: "{definitions.revenue}"
         display:
           name: Revenue excluding social contributions
@@ -187,6 +216,11 @@ tables:
       rev_ex_gr_inc_sc:
         title: Revenue excluding grants and including social contributions (as a share of GDP)
         description_short: Includes taxes, non-tax revenue, and social contributions.
+        description_key:
+          - "{definitions.description_key_revenue_excluding_gr_inc_sc}"
+          - "{definitions.description_key_tax}"
+          - "{definitions.description_key_social_contributions}"
+          - "{definitions.description_key_non_tax_revenue}"
         description_from_producer: "{definitions.revenue}"
         display:
           name: Revenue excluding grants and including social contributions
@@ -195,6 +229,10 @@ tables:
       rev_ex_gr_ex_sc:
         title: Revenue excluding grants and excluding social contributions (as a share of GDP)
         description_short: Includes taxes and non-tax revenue.
+        description_key:
+          - "{definitions.description_key_revenue_excluding_gr_sc}"
+          - "{definitions.description_key_tax}"
+          - "{definitions.description_key_non_tax_revenue}"
         description_from_producer: "{definitions.revenue}"
         display:
           name: Revenue excluding grants and excluding social contributions
@@ -270,6 +308,9 @@ tables:
 
       tax_ex_sc:
         title: Taxes excluding social contributions (as a share of GDP)
+        description_key:
+          - "{definitions.description_key_tax}"
+          - "{definitions.description_key_resource_taxes_not_captured}"
         description_from_producer: |-
           {definitions.taxes_def}
 
@@ -280,6 +321,8 @@ tables:
 
       resourcetaxes:
         title: Resource taxes (as a share of GDP)
+        description_key:
+          - "{definitions.description_key_tax}"
         description_short: Refers mostly to corporate taxation of resource extraction.
         description_from_producer: |-
           {definitions.taxes_def}
@@ -371,6 +414,9 @@ tables:
         title: Taxes on income, profits and capital gains (TIPCG) (as a share of GDP)
         unit: "%"
         short_unit: "%"
+        description_key:
+          - "{definitions.description_key_tax}"
+          - "{definitions.description_key_tipcg}"
         description_from_producer: |-
           {definitions.taxes_def}
 
@@ -519,6 +565,9 @@ tables:
 
       tax_g_s:
         title: Taxes on goods and services (as a share of GDP)
+        description_key:
+          - "{definitions.description_key_tax}"
+          - "{definitions.description_key_taxes_goods_services}"
         description_from_producer: |-
           {definitions.taxes_def}
 
