@@ -19,12 +19,12 @@ steps:
     - data://garden/oecd/2025-06-30/government_at_a_glance
 
   # UNU-WIDER Government Revenue Dataset
-  data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
-    - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
-  data://garden/unu_wider/2023-11-01/government_revenue_dataset:
-    - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
-  data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
-    - data://garden/unu_wider/2023-11-01/government_revenue_dataset
+  data://meadow/unu_wider/2026-03-24/government_revenue_dataset:
+    - snapshot://unu_wider/2026-03-24/government_revenue_dataset.dta
+  data://garden/unu_wider/2026-03-24/government_revenue_dataset:
+    - data://meadow/unu_wider/2026-03-24/government_revenue_dataset
+  data://grapher/unu_wider/2026-03-24/government_revenue_dataset:
+    - data://garden/unu_wider/2026-03-24/government_revenue_dataset
 
   # Public Finances in Modern History dataset (IMF)
   data://meadow/imf/2025-04-02/public_finances_modern_history:
@@ -139,11 +139,3 @@ steps:
     - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/cow/2024-07-26/national_material_capabilities:
     - data://garden/cow/2024-07-26/national_material_capabilities
-
-  # UNU-WIDER Government Revenue Dataset
-  data://meadow/unu_wider/2026-03-24/government_revenue_dataset:
-    - snapshot://unu_wider/2026-03-24/government_revenue_dataset.dta
-  data://garden/unu_wider/2026-03-24/government_revenue_dataset:
-    - data://meadow/unu_wider/2026-03-24/government_revenue_dataset
-  data://grapher/unu_wider/2026-03-24/government_revenue_dataset:
-    - data://garden/unu_wider/2026-03-24/government_revenue_dataset
