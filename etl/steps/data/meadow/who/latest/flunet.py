@@ -29,14 +29,13 @@ def run(dest_dir: str) -> None:
     # Create a new table and ensure all columns are snake-case.
     tb = tb.rename(columns={"country_area_territory": "country"})
 
-    # Fix object-dtype columns caused by pandas mixed-type chunking or dirty data.
-    # Columns that are mostly numeric (e.g. ah5 with stray 'RSV' strings) → to_numeric with coerce.
-    # Genuinely text columns (country names, comments, etc.) → str.
+    # Some columns (e.g. ah5, anotsubtypable) have mixed types because pandas parsed them as
+    # numeric in some CSV chunks but encountered stray strings like 'RSV' or 'ES' in others.
+    # Detect these by checking for actual float/int objects inside an object-dtype column,
+    # then coerce the stray strings to NaN. Pure text columns are left as str.
     for col in tb.columns[tb.dtypes == "object"]:
-        numeric = pd.to_numeric(tb[col], errors="coerce")
-        total_nonnull = tb[col].notna().sum()
-        if total_nonnull > 0 and numeric.notna().sum() / total_nonnull >= 0.5:
-            tb[col] = numeric
+        if tb[col].dropna().apply(lambda x: isinstance(x, (int, float))).any():
+            tb[col] = pd.to_numeric(tb[col], errors="coerce")
         else:
             ix = tb[col].notnull()
             tb.loc[ix, col] = tb.loc[ix, col].astype("str")
