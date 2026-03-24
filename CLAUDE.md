@@ -54,6 +54,9 @@ git commit -m "🔨🤖 Description"
 
 # 3. Push
 git push
+
+# 4. Add PR description
+gh pr edit <number> --body "..."
 ```
 
 ### Commit Message Emojis
