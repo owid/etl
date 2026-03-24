@@ -100,7 +100,7 @@ def drop_flagged_rows_and_unnecessary_columns(tb: Table) -> Table:
             "id",
             "reg",
             "inc",
-            "historicalinc",
+            "gdp",
             "generalnotes",
             "cautionnotes",
             "resourcerevenuenotes",
