@@ -19,7 +19,7 @@ definitions:
 
     display: &common-display
       numDecimalPlaces: 1
-      tolerance: 5
+      tolerance: 10
 
     unit: "% of GDP"
     short_unit: "%"
@@ -254,7 +254,6 @@ tables:
               - United States
               - France
               - United Kingdom
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       tax_ex_sc:
         title: Taxes excluding social contributions (as a share of GDP)
         description_from_producer: |-
