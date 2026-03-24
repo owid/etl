@@ -4,7 +4,7 @@ meta:
     title: Government Revenue Dataset (GRD)
     description: |-
       The GRD aims to present a complete picture of government revenue and tax trends over time and allows for analysis at the country, regional or cross-country level. Where possible, figures are expressed both inclusive and exclusive of natural resource revenues, which helps to overcome a major obstacle to cross-country comparisons in existing data sources.
-    citation_full: UNU-WIDER Government Revenue Dataset. Version 2025. https://doi.org/10.35188/UNU-WIDER/GRD-2025
+    citation_full: "UNU-WIDER (2025). UNU-WIDER Government Revenue Dataset. Version 2025. Helsinki: UNU-WIDER. https://doi.org/10.35188/UNU-WIDER/GRD-2025"
     attribution: UNU-WIDER Government Revenue Dataset (2025)
     attribution_short: UNU-WIDER
     version_producer: '2025'
