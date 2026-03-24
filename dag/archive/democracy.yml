@@ -49,6 +49,18 @@ steps:
   data://grapher/democracy/2025-05-29/lexical_index:
     - data://garden/democracy/2025-05-29/lexical_index
 
+  # Freedom House (2025)
+  data://meadow/democracy/2025-06-02/fh:
+    - snapshot://democracy/2025-06-02/fh_ratings.xlsx
+    - snapshot://democracy/2024-05-16/fh_scores.xlsx
+    - snapshot://democracy/2025-06-02/fh.xlsx
+  data://garden/democracy/2025-06-02/fh:
+    - data://meadow/democracy/2025-06-02/fh
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/democracy/2025-06-02/fh:
+    - data://garden/democracy/2025-06-02/fh
+
   # Freedom House (2024)
   data://meadow/democracy/2024-05-16/fh:
     - snapshot://democracy/2024-05-16/fh_scores.xlsx
