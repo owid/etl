@@ -78,6 +78,10 @@ FILL_GAPS = "false"
 MAX_WORKERS = 2
 TOLERANCE_PERCENTILES = 1
 
+# Set to False to skip percentile extraction (e.g. when percentile source links haven't been updated yet).
+# When False, the script will still generate key indicators, relative poverty, and filled data,
+# but will skip: percentile construction, median patching, and decile threshold merging.
+EXTRACT_COUNTRY_PERCENTILES = False
 
 # Select live (1) or internal (0) API
 LIVE_API = 1
@@ -744,17 +748,22 @@ def generate_percentiles_raw(wb_api: WB_API):
     versions = pip_versions(wb_api)
 
     # Run the main function
-    missing_countries, list_missing_countries = get_list_of_missing_countries()
-    log.info(
-        f"These countries are available in a common query but not in the percentile file: {list_missing_countries}"
-    )
+    if EXTRACT_COUNTRY_PERCENTILES:
+        missing_countries, list_missing_countries = get_list_of_missing_countries()
+        log.info(
+            f"These countries are available in a common query but not in the percentile file: {list_missing_countries}"
+        )
 
-    # Only run the function if there are missing countries
-    if list_missing_countries:
-        concurrent_percentiles_function(country_code=missing_countries)
-        log.info("Country files downloaded")
+        # Only run the function if there are missing countries
+        if list_missing_countries:
+            concurrent_percentiles_function(country_code=missing_countries)
+            log.info("Country files downloaded")
+        else:
+            log.info("All countries are in the percentile file. No need to extract them.")
     else:
-        log.info("All countries are in the percentile file. No need to extract them.")
+        log.warning("Skipping country percentile extraction (EXTRACT_COUNTRY_PERCENTILES is False)")
+        list_missing_countries = []
+        missing_countries = ""
 
     concurrent_percentiles_region_function()
     log.info("Region files downloaded")
@@ -951,13 +960,16 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
         df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # type: ignore
 
         # Add official percentiles from the World Bank Databank
-        df_percentiles_published_ppp_old = format_official_percentiles(PPP_VERSIONS[0], wb_api)
-        df_percentiles_published_ppp_current = format_official_percentiles(PPP_VERSIONS[1], wb_api)
+        if EXTRACT_COUNTRY_PERCENTILES:
+            df_percentiles_published_ppp_old = format_official_percentiles(PPP_VERSIONS[0], wb_api)
+            df_percentiles_published_ppp_current = format_official_percentiles(PPP_VERSIONS[1], wb_api)
 
-        df_percentiles = pd.concat(
-            [df_percentiles, df_percentiles_published_ppp_old, df_percentiles_published_ppp_current],
-            ignore_index=True,
-        )
+            df_percentiles = pd.concat(
+                [df_percentiles, df_percentiles_published_ppp_old, df_percentiles_published_ppp_current],
+                ignore_index=True,
+            )
+        else:
+            log.warning("Skipping official country percentiles (EXTRACT_COUNTRY_PERCENTILES is False)")
 
         # Drop duplicates. Keep the second one (the official one)
         df_percentiles = df_percentiles.drop_duplicates(
