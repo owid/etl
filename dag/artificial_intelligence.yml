@@ -8,6 +8,14 @@ steps:
   data://grapher/artificial_intelligence/2026-01-30/frontiermath:
     - data://garden/artificial_intelligence/2026-01-30/frontiermath
 
+  # MMLU Benchmark by country of origin (EPOCH)
+  data://meadow/artificial_intelligence/2026-01-30/mmlu:
+    - snapshot://artificial_intelligence/2026-01-30/epoch_benchmark_data.zip
+  data://garden/artificial_intelligence/2026-01-30/mmlu:
+    - data://meadow/artificial_intelligence/2026-01-30/mmlu
+  data://grapher/artificial_intelligence/2026-01-30/mmlu:
+    - data://garden/artificial_intelligence/2026-01-30/mmlu
+
   # Stack Overflow Developer Survey – AI tool usage
   data://meadow/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
     - snapshot://artificial_intelligence/2026-02-05/stackoverflow_ai_usage.csv
