@@ -152,6 +152,16 @@ If downstream dependents exist:
 - **Tell the user** which datasets depend on the old version and need updating in a follow-up PR
 - **Add a "Downstream dependencies" section to the PR description** (not collapsed — this is important) listing the dependent datasets with a note that they should be updated to point to the new version in a follow-up PR
 
+## DAG archiving
+
+After the ETL update, the old version's DAG entries (snapshot → meadow → garden → grapher) remain in the main DAG file but are no longer referenced by any active step. **Ask the user** if they want to move the old entries to the corresponding archive DAG file (e.g., `dag/archive/poverty_inequality.yml`).
+
+If the user agrees:
+1. Find the old version's entries in the main DAG file (e.g., `dag/poverty_inequality.yml`)
+2. Move them to the **bottom** of the corresponding archive file (`dag/archive/<same_file>.yml`)
+3. Include the original section comment (e.g., `# 1000 Binned Global Distribution (World Bank PIP)`) above the archived entries
+4. Verify no references to the old version remain in the main DAG (excluding the archive)
+
 ## Guardrails and tips
 
 - **DAG consistency**: After `etl update`, always verify that all new steps in `dag/main.yml` reference each other with the new version. A common bug is garden depending on old meadow or old snapshot — this silently loads stale data.
