@@ -27,6 +27,12 @@ Accept any of:
 - A glob: `etl/steps/data/garden/wb/2026-03-25/*.py`
 - `all` — scan all non-archived steps (slow)
 
+## Fix guidance
+
+When applying fixes, keep these notes in mind:
+
+- **`paths.regions.harmonize_names(tb)`**: `country_col` and `countries_file` are inferred by default — it assumes the column is `"country"` and uses the step's `.countries.json` file. Only pass these arguments if you need to override the defaults. Preserve extra kwargs like `warn_on_unused_countries`.
+
 ## Workflow
 
 1. Read `vscode_extensions/detect-outdated-practices/src/extension.ts` to get the current pattern list
