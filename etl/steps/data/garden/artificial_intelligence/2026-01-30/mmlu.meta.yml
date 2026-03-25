@@ -1,7 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    description_short: Highest MMLU score achieved by a model from a given country or region, shown whenever a new record was set. MMLU is a multitask benchmark made up of exam-style questions across dozens of academic and professional subjects, used to assess breadth of knowledge and problem-solving.
+    description_short: Highest MMLU score achieved by a model from a given country or region, shown whenever a new record was set. MMLU is a multitask benchmark made up of exam-style questions across dozens of academic and professional subjects.
     description_key:
       - This indicator shows the highest MMLU score achieved so far by a model from a given country or region.
       - MMLU (Massive Multitask Language Understanding) is a benchmark that tests AI models across 57 subjects, from school-level science and mathematics to professional fields such as law and medicine.
