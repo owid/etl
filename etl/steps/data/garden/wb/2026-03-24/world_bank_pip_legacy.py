@@ -16,7 +16,6 @@ from shared import add_metadata_vars, add_metadata_vars_percentiles
 from structlog import get_logger
 from tabulate import tabulate
 
-
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
