@@ -190,12 +190,12 @@ steps:
   #
   # Poverty projections in 2021 prices up to 2050
   #
-  data://meadow/wb/2025-11-10/poverty_projections:
-    - snapshot://wb/2025-11-10/poverty_projections.dta
-  data://garden/wb/2025-11-10/poverty_projections:
-    - data://meadow/wb/2025-11-10/poverty_projections
-  data://grapher/wb/2025-11-10/poverty_projections:
-    - data://garden/wb/2025-11-10/poverty_projections
+  data://meadow/wb/2026-03-25/poverty_projections:
+    - snapshot://wb/2026-03-25/poverty_projections.dta
+  data://garden/wb/2026-03-25/poverty_projections:
+    - data://meadow/wb/2026-03-25/poverty_projections
+  data://grapher/wb/2026-03-25/poverty_projections:
+    - data://garden/wb/2026-03-25/poverty_projections
 
   #
   # Historical inequality estimates from van Zanden et al. (2014)
