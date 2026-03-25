@@ -42,7 +42,8 @@ tables:
         unit: terawatt-hours
         description_short: *description_short_twh
         description_processing: |-
-          {definitions.description_processing_sources}{definitions.description_processing_ej_twh}
+          {definitions.description_processing_sources}
+          {definitions.description_processing_ej_twh}
         display:
           name: Coal
         presentation:
@@ -64,7 +65,8 @@ tables:
         unit: terawatt-hours
         description_short: *description_short_twh
         description_processing: |-
-          {definitions.description_processing_sources}{definitions.description_processing_ej_twh}
+          {definitions.description_processing_sources}
+          {definitions.description_processing_ej_twh}
         display:
           name: Gas
         presentation:
@@ -86,7 +88,8 @@ tables:
         unit: terawatt-hours
         description_short: *description_short_twh
         description_processing: |-
-          {definitions.description_processing_sources}{definitions.description_processing_oil_twh}
+          {definitions.description_processing_sources}
+          {definitions.description_processing_oil_twh}
         display:
           name: Oil
         presentation:
@@ -97,7 +100,8 @@ tables:
         unit: terawatt-hours
         description_short: *description_short_twh
         description_processing: |-
-          {definitions.description_processing_sources}{definitions.description_processing_ej_twh}
+          {definitions.description_processing_sources}
+          {definitions.description_processing_ej_twh}
         display:
           name: Coal
           numDecimalPlaces: 0
@@ -109,7 +113,9 @@ tables:
         unit: kilowatt-hours
         description_short: *description_short_per_capita
         description_processing: |-
-          {definitions.description_processing_sources}{definitions.description_processing_ej_twh}{definitions.description_processing_per_capita}
+          {definitions.description_processing_sources}
+          {definitions.description_processing_ej_twh}
+          {definitions.description_processing_per_capita}
         display:
           name: Coal
           numDecimalPlaces: 0
@@ -121,7 +127,8 @@ tables:
         unit: terawatt-hours
         description_short: *description_short_twh
         description_processing: |-
-          {definitions.description_processing_sources}{definitions.description_processing_ej_twh}
+          {definitions.description_processing_sources}
+          {definitions.description_processing_ej_twh}
         display:
           name: Gas
           numDecimalPlaces: 0
@@ -133,7 +140,9 @@ tables:
         unit: kilowatt-hours
         description_short: *description_short_per_capita
         description_processing: |-
-          {definitions.description_processing_sources}{definitions.description_processing_ej_twh}{definitions.description_processing_per_capita}
+          {definitions.description_processing_sources}
+          {definitions.description_processing_ej_twh}
+          {definitions.description_processing_per_capita}
         display:
           name: Gas
           numDecimalPlaces: 0
@@ -145,7 +154,8 @@ tables:
         unit: terawatt-hours
         description_short: *description_short_twh
         description_processing: |-
-          {definitions.description_processing_sources}{definitions.description_processing_oil_twh}
+          {definitions.description_processing_sources}
+          {definitions.description_processing_oil_twh}
         display:
           name: Oil
           numDecimalPlaces: 0
@@ -157,7 +167,9 @@ tables:
         unit: kilowatt-hours
         description_short: *description_short_per_capita
         description_processing: |-
-          {definitions.description_processing_sources}{definitions.description_processing_oil_twh}{definitions.description_processing_per_capita}
+          {definitions.description_processing_sources}
+          {definitions.description_processing_oil_twh}
+          {definitions.description_processing_per_capita}
         display:
           name: Oil
           numDecimalPlaces: 0
