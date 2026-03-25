@@ -27,6 +27,7 @@ definitions:
           - SlopeChart
         yAxis:
           min: 0
+      metadata:
         description_key:
           - Air pollution is one of the leading risk factors for early death worldwide.
           - Air pollution — particularly very small particles called particulate matter — can infiltrate the lungs, airways and respitatory system, increasing the risk of several of the most common health conditions, including heart disease, stroke, lower respiratory infections, lung cancer, diabetes, and chronic obstructive pulmonary disease (COPD).
