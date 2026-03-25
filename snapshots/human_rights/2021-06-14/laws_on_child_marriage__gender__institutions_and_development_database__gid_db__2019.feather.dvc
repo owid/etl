@@ -1,0 +1,27 @@
+meta:
+  source:
+    name: Gender, Institutions and Development Database (GID-DB) 2019
+    description: |-
+      The Gender, Institutions and Development Database (GID-DB) compiles data on the laws on child marriage, specifically whether women and men have the same legal minimum age of marriage. The child marriage indicator has five categories listed below:
+
+      0: The law guarantees the same minimum age of marriage above 18 years to women and men, without legal exceptions regarding either consent or some groups of women. Customary, religious and traditional laws or practices do not encourage girl child marriage.
+
+      0.25: The minimum age of marriage might be different for men and women, but it is above 18 years, without legal exceptions regarding either consent or some groups of women. However, some customary, religious and traditional laws or practices encourage girl child marriage.
+
+      0.5: The minimum age of marriage might be different for men and women, but it is above 18 years. However, legal exceptions exist regarding consent and/or some groups of women.
+
+      0.75: The law allows child marriage for both women and men or there is no legal age of marriage for women nor men.
+
+      1: The law allows child marriage for women but not for men.
+
+      For further information see the <a href="https://www.genderindex.org/methodology/">SIGI methodology page</a>.
+    url: https://stats.oecd.org/Index.aspx?DataSetCode=GIDDB2019#
+    date_accessed: 2021-06-14
+    published_by: OECD.Stat
+  name: Laws on child marriage - Gender, Institutions and Development Database (GID-DB, 2019)
+  description: ''
+  is_public: false
+outs:
+  - md5: 1a44ec088d854fa2dde75010118aacf1
+    size: 5738
+    path: laws_on_child_marriage__gender__institutions_and_development_database__gid_db__2019.feather

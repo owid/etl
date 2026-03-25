@@ -1,0 +1,32 @@
+dataset:
+  title: Plastic imports by China & impact of ban - Brooks et al. (2018)
+tables:
+  plastic_imports_by_china__and__impact_of_ban__brooks_et_al__2018:
+    variables:
+      displaced_plastic_waste__100pct_ban__tonnes:
+        title: Displaced plastic waste - 100% ban (tonnes)
+        unit: tonnes
+      displaced_plastic_waste__50pct_ban__tonnes:
+        title: Displaced plastic waste - 50% ban (tonnes)
+        unit: tonnes
+      displaced_plastic_waste__75pct_ban__tonnes:
+        title: Displaced plastic waste - 75% ban (tonnes)
+        unit: tonnes
+      domestic_plastic_waste_generated__tonnes:
+        title: Domestic plastic waste generated (tonnes)
+        unit: tonnes
+      imported_recycled_waste__tonnes:
+        title: Imported recycled waste (tonnes)
+        unit: tonnes
+      share_of_plastic_waste_imported__pct:
+        title: Share of plastic waste imported (%)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

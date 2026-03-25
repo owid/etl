@@ -1,0 +1,28 @@
+dataset:
+  title: Indonesian deforestation drivers (Austin et al. (2019)
+tables:
+  indonesian_deforestation_drivers__austin_et_al__2019:
+    variables:
+      deforestation_hectares:
+        title: deforestation_hectares
+        unit: hectares
+        short_unit: ha
+        display:
+          name: Drivers of deforestation in Indonesia
+          numDecimalPlaces: 0
+      share_deforestation:
+        title: share_deforestation
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of deforestation in Indonesia
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

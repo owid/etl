@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: OECD, Gender Wage Gap (2017)
+    description: ''
+    url: https://data.oecd.org/earnwage/gender-wage-gap.htm#indicator-chart
+    date_accessed: 2017-10-17
+    published_by: OECD
+  name: Gender Wage Gap – OECD (2017)
+  description: The difference between male and female median wages divided by the male median wages.
+outs:
+  - md5: 784ae7e658efc2f33ba0cf206342ebe2
+    size: 6458
+    path: gender_wage_gap__oecd__2017.feather

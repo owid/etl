@@ -1,0 +1,29 @@
+dataset:
+  title: 'Agri-Environmental Indicators: Energy - FAO (2017)'
+tables:
+  agri_environmental_indicators__energy__fao__2017:
+    variables:
+      energy__bioenergy_production__bioenergy_production_as_a_pct_of_total_renewable_energy_production__fao__2017:
+        title: 'Energy: Bioenergy production - Bioenergy production as a % of total renewable energy production (FAO (2017))'
+        unit: '%'
+        description: |-
+          ENERGY USE:  Agriculture consumes energy directly for crop and livestock production (machinery, etc) but also indirectly through fertilizers and pesticides. Agriculture also produces energy as biofuels and biomass production. As an energy user, Agriculture contributes to global warming (mainly through CO2 emissions, but also CH4 and N2O emissions), air pollution (mainly through NOx and SO2 emissions) and to the depletion of fossil energy resources. Important energy users are glasshouse horticulture, floriculture and dairy production. Agriculture can make a contribution to the mitigation of climate change and air pollution effects through more efficient energy use and through the production of renewable energy (bio-energy production). Indicator: Agriculture and forestry energy used as a % of total energy use, measured as Agr.Energy use/Total Energy Use)*100.
+          BIOENERGY: Bioenergy refers to energy derived from the biological carbon fixation of plants or from biological tissues. Examples are biodiesel, derived from vegetable oils and animal fats, and bioethanol, produced by the fermentation of carbohydrates of crops like corn.  The production of biomass for energy production has important effects on rural development, international policy and economy, and on the environment: it supports the rural economy creating jobs and gives farmers a source of income complementary to food production. Biofuels have also an impact on economy and trade, since they reduce the dependence on oil-producing countries. Being derived from plants, their production contributes to carbon sequestration.  Biofuels production presents also some issues, such as the increased pressure on water resources, deforestation (to clear land to cultivate fuel crops), and the change in use of land originally intended for food production. Indicator: Bioenergy production as a % of total energy production. Methodology: Sum of different bioenergy (e.g. biodiesel, biogases). Share of bioenergy on renewable energy prod. = (Biofuels prod/Total renewable production)*100.
+      ? |-
+        energy__energy_used_in_agriculture_and_forestry__agriculture_and_forestry_energy_use_as_a_pct_of_total_energy_use__fao__2017
+      : title: |-
+          Energy: Energy used in agriculture and forestry - Agriculture and forestry energy use as a % of total energy use (FAO (2017))
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          ENERGY USE:  Agriculture consumes energy directly for crop and livestock production (machinery, etc) but also indirectly through fertilizers and pesticides. Agriculture also produces energy as biofuels and biomass production. As an energy user, Agriculture contributes to global warming (mainly through CO2 emissions, but also CH4 and N2O emissions), air pollution (mainly through NOx and SO2 emissions) and to the depletion of fossil energy resources. Important energy users are glasshouse horticulture, floriculture and dairy production. Agriculture can make a contribution to the mitigation of climate change and air pollution effects through more efficient energy use and through the production of renewable energy (bio-energy production). Indicator: Agriculture and forestry energy used as a % of total energy use, measured as Agr.Energy use/Total Energy Use)*100.
+          BIOENERGY: Bioenergy refers to energy derived from the biological carbon fixation of plants or from biological tissues. Examples are biodiesel, derived from vegetable oils and animal fats, and bioethanol, produced by the fermentation of carbohydrates of crops like corn.  The production of biomass for energy production has important effects on rural development, international policy and economy, and on the environment: it supports the rural economy creating jobs and gives farmers a source of income complementary to food production. Biofuels have also an impact on economy and trade, since they reduce the dependence on oil-producing countries. Being derived from plants, their production contributes to carbon sequestration.  Biofuels production presents also some issues, such as the increased pressure on water resources, deforestation (to clear land to cultivate fuel crops), and the change in use of land originally intended for food production. Indicator: Bioenergy production as a % of total energy production. Methodology: Sum of different bioenergy (e.g. biodiesel, biogases). Share of bioenergy on renewable energy prod. = (Biofuels prod/Total renewable production)*100.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

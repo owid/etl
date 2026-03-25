@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2731
-    date_accessed: 2023-08-10 08:26:20.976740
+    url: https://admin.owid.io/admin/datasets/2731
+    date_accessed: 2026-03-05 13:17:04.731125+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2731_parties_to_montreal_protocol__unep__2023
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f0eb734b2910f2e27e75cca1b4eb66f8
-  size: 3163
-  path: dataset_2731_parties_to_montreal_protocol__unep__2023_config.json
+  - md5: 7fcd1aa872f080720b3d6ec88badd18a
+    size: 3386
+    path: dataset_2731_parties_to_montreal_protocol__unep__2023_config.json

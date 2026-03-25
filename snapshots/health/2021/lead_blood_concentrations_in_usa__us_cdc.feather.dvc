@@ -1,0 +1,21 @@
+meta:
+  source:
+    name: |-
+      Centers for Disease Control and Prevention; National Center for Health Statistics and National Center for Environmental Health; National Health and Nutrition Examination Survey
+    description: |-
+      This measures the median and 95th percentile of lead blood concentrations in 1-5 year olds in the United States from the 1970s onwards.
+
+      - Data is obtained from an ongoing continuous survey conducted by the National Center for Health Statistics.
+      - Survey data are representative of the U.S. general population.
+      - Lead is measured in blood samples obtained from individual survey participants.
+    url: https://www.epa.gov/americaschildrenenvironment/ace-biomonitoring-lead
+    date_accessed: 2026-03-05
+    published_by: |-
+      Centers for Disease Control and Prevention; National Center for Health Statistics and National Center for Environmental Health; National Health and Nutrition Examination Survey
+  name: Lead blood concentrations in USA (US CDC)
+  description: ''
+  is_public: false
+outs:
+  - md5: 41e5d17e91142451315f84486d6b1be0
+    size: 3226
+    path: lead_blood_concentrations_in_usa__us_cdc.feather

@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4130
-    date_accessed: 2023-08-10 08:49:36.410445
+    url: https://admin.owid.io/admin/datasets/4130
+    date_accessed: 2026-03-05 12:31:43.160722+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4130_corporate_tax_revenue__ictd_unu_wider_grd__2019
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2f327e78d8deb05a847ae129c5b15102
-  size: 3745
-  path: dataset_4130_corporate_tax_revenue__ictd_unu_wider_grd__2019_config.json
+  - md5: 232e8c68cd62c8686fe5d1bed02299d4
+    size: 3968
+    path: dataset_4130_corporate_tax_revenue__ictd_unu_wider_grd__2019_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Global Malaria Programme, World Health Organization
+    description: |-
+      Values for estimated malaria deaths are the point values taken from the World Malaria Report 2021. The regional values are found in the following tables: Africa (Table 3.2), South-East Asia (Table 3.3), Eastern Mediterranean (Table 3.4), Western Pacific (Table 3.5), Americas (Table 3.6) and Europe (Section 3.7).
+    url: https://apps.who.int/iris/rest/bitstreams/1398397/retrieve
+    date_accessed: 2022-02-21
+    published_by: 'World malaria report 2021. Geneva: World Health Organization; 2021. Licence: CC BY-NC-SA 3.0 IGO.'
+  name: Estimated Malaria Deaths
+  description: |-
+    There is some rounding of the figures for each of the regions, so that the sum doesn't quite add up to the values in the global estimates, which is also rounded. For example their estimate of global malaria deaths is 627000, but the regions sum to 626909.
+  is_public: false
+outs:
+  - md5: 2c34ceb29a2a27631a573ffaee087c25
+    size: 3666
+    path: estimated_malaria_deaths.feather

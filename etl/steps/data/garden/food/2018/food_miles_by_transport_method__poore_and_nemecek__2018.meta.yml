@@ -1,0 +1,35 @@
+dataset:
+  title: Food miles by transport method (Poore & Nemecek, 2018)
+tables:
+  food_miles_by_transport_method__poore_and_nemecek__2018:
+    variables:
+      emissions_factor_for_ambient_transport__kg_co2eq_per_tonne_kilometer:
+        title: Emissions factor for ambient transport (kg CO2eq per tonne-kilometer)
+        unit: ''
+      emissions_factor_for_temperature_controlled_transport__kg_co2eq_per_tonne_kilometer:
+        title: Emissions factor for temperature-controlled transport (kg CO2eq per tonne-kilometer)
+        unit: ''
+      food_miles__million_tonne_kilometers__poore__and__nemecek__2018:
+        title: Food miles (million tonne kilometers) (Poore & Nemecek, 2018)
+        unit: tonne kilometers
+        short_unit: tkm
+        display:
+          conversionFactor: 1000000
+          name: Food miles by transport method
+        description: Food miles by transport method are measured in tonne kilometers.
+      share_of_food_miles__poore__and__nemecek__2018:
+        title: Share of food miles (Poore & Nemecek, 2018)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of food miles by transport method
+        description: Each transport method's share of total food miles (as measured in tonne kilometers).
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

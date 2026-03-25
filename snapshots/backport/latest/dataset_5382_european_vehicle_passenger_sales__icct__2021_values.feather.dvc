@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5382
-    date_accessed: 2023-08-10 09:43:02.371133
+    url: https://admin.owid.io/admin/datasets/5382
+    date_accessed: 2026-03-10 08:07:55.631421+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: European vehicle passenger sales (ICCT, 2021)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3e10e6d5920298807cab728762adecc0
-  size: 49834
-  path: dataset_5382_european_vehicle_passenger_sales__icct__2021_values.feather
+  - md5: 6441b0bd54ee2392325526e1817aeeb2
+    size: 50210
+    path: dataset_5382_european_vehicle_passenger_sales__icct__2021_values.feather

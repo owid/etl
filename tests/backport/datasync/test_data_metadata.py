@@ -202,10 +202,10 @@ def test_variable_data_df_from_s3():
             "entityCode": ["GBR"],
         }
     )
-    s3_data = pd.DataFrame({"entities": [1, 1], "values": ["a", 2], "years": [2000, 2001]})
+    fetched_data = pd.DataFrame({"entityId": [1, 1], "value": ["a", 2], "year": [2000, 2001], "variableId": [123, 123]})
 
     with mock.patch("etl.grapher.io._fetch_entities", return_value=entities):
-        with mock.patch("pandas.read_json", return_value=s3_data):
+        with mock.patch("etl.grapher.io._fetch_data_df_from_s3", return_value=fetched_data):
             df = variable_data_df_from_s3(engine, [123])
 
     assert df.to_dict(orient="records") == [

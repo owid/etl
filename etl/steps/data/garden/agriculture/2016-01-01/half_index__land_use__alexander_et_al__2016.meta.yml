@@ -1,0 +1,25 @@
+dataset:
+  title: HALF Index (Land Use) - Alexander et al. (2016)
+tables:
+  half_index__land_use__alexander_et_al__2016:
+    variables:
+      half_index__habitable_land_area__alexander_et_al__2016:
+        title: HALF Index (habitable land area) (Alexander et al. (2016))
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Measures the percentage of habitable land area we would need for the global population to consume the average diet of any given country.
+      half_index__total_land_area__alexander_et_al__2016:
+        title: HALF Index (total land area) (Alexander et al. (2016))
+        unit: '%'
+        description: |-
+          Measures the percentage of total land area we would need for the global population to consume the average diet of any given country.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

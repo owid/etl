@@ -1,0 +1,53 @@
+dataset:
+  title: Child Labor (World ILO) - ILO (2017)
+tables:
+  child_labor__world_ilo__ilo__2017:
+    variables:
+      child_labor__all__world__ilo_ipec:
+        title: Child Labor (All, World, ILO-IPEC)
+        unit: '% children ages 5-17'
+        short_unit: '%'
+        display:
+          unit: people
+        description: |-
+          Share of children ages 5-17 involved in economic activity for at least one hour in the reference week of the corresponding survey (irrespective of school attendance)
+      child_labor__boys__world__2000_2012__ilo:
+        title: Child Labor (Boys, World, 2000-2012) (ILO)
+        unit: '% boys ages 5-17'
+        short_unit: '%'
+        description: Percentage of boys aged between 5-17 active in the labor force.
+      child_labor__girls__world__2000_2012__ilo:
+        title: Child Labor (Girls, World, 2000-2012) (ILO)
+        unit: '% girls ages 5-17'
+        short_unit: '%'
+        display:
+          unit: '% of world population'
+        description: Percentage of girls aged between 5-17 in the labor force.
+      child_labor__incidence__ilo:
+        title: Child labor (incidence) (ILO)
+        unit: '%'
+        short_unit: '%'
+        display:
+          unit: Percent
+        description: Percentage of incidences involving children in employment.
+      children__5_14_years__in_employment__ilo:
+        title: Children (5-14 years) in employment (ILO)
+        unit: Children
+        display:
+          unit: Percent
+        description: The number of children in employment aged between 5-14 years.
+      children__5_14_years__not_in_employment__ilo:
+        title: Children (5-14 years) not in employment (ILO)
+        unit: Children
+        display:
+          unit: Percent
+        description: Children aged 5-14 years not in employment.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,22 @@
+dataset:
+  title: Randomized controlled trials published in high-impact medical journals
+tables:
+  randomized_controlled_trials_published_in_high_impact_medical_journals:
+    variables:
+      total_number_of_rcts_published_in_high_impact_medical_journals:
+        title: Total number of RCTs published in high impact medical journals
+        unit: ''
+        display:
+          name: Total number of RCTs published in high ranked medical journals
+          numDecimalPlaces: 0
+        description: |-
+          This shows all randomized controlled trials (RCTs) published in high-impact medical journals (with an impact factor above 10 in 2017; this totaled 40 journals). This includes primary analyses, secondary analyses and methods papers of RCTs.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

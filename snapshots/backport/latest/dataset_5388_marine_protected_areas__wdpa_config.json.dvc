@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5388
-    date_accessed: 2023-08-10 09:40:28.340661
+    url: https://admin.owid.io/admin/datasets/5388
+    date_accessed: 2026-03-10 08:08:09.893422+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5388_marine_protected_areas__wdpa
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4a073b9c94b6fa7c112fa283994e90bf
-  size: 5317
-  path: dataset_5388_marine_protected_areas__wdpa_config.json
+  - md5: 237e10e29e0c0496c104e3088ce57cec
+    size: 5819
+    path: dataset_5388_marine_protected_areas__wdpa_config.json

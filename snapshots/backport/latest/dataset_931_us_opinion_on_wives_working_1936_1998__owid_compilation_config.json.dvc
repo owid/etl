@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/931
-    date_accessed: 2023-08-10 08:59:49.395221
+    url: https://admin.owid.io/admin/datasets/931
+    date_accessed: 2026-03-05 13:33:40.603694+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_931_us_opinion_on_wives_working_1936_1998__owid_compilation
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 48c56607ce09f8ff1c3f7b68687f57f3
-  size: 2244
-  path: dataset_931_us_opinion_on_wives_working_1936_1998__owid_compilation_config.json
+  - md5: 5e5449fb9a6e9266779560db5c61edcf
+    size: 2374
+    path: dataset_931_us_opinion_on_wives_working_1936_1998__owid_compilation_config.json

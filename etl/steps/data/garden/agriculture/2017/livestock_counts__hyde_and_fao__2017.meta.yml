@@ -1,0 +1,58 @@
+dataset:
+  title: Livestock counts - HYDE & FAO (2017)
+tables:
+  livestock_counts__hyde_and_fao__2017:
+    variables:
+      asses__hyde__and__fao__2017:
+        title: Asses (HYDE & FAO (2017))
+        unit: animals
+        description: Number of asses, measured as the total number within a given year.
+      buffalo__hyde__and__fao__2017:
+        title: Buffalo (HYDE & FAO (2017))
+        unit: ''
+        description: Number of buffalo, measured as the total number within a given year.
+      cattle__hyde__and__fao__2017:
+        title: Cattle (HYDE & FAO (2017))
+        unit: animals
+        description: Number of cattle, measured as the total number within a given year.
+      chickens__hyde__and__fao__2017:
+        title: Chickens (HYDE & FAO (2017))
+        unit: thousand animals
+        description: Number of chickens, measured as the total number within a given year.
+      goats__hyde__and__fao__2017:
+        title: Goats (HYDE & FAO (2017))
+        unit: animals
+        description: Number of goats, measured as the total number within a given year.
+      horses__hyde__and__fao__2017:
+        title: Horses (HYDE & FAO (2017))
+        unit: animals
+        description: Number of horses, measured as the total number within a given year.
+      mules__hyde__and__fao__2017:
+        title: Mules (HYDE & FAO (2017))
+        unit: animals
+        description: Number of mules, measured as the total number within a given year.
+      pigs__hyde__and__fao__2017:
+        title: Pigs (HYDE & FAO (2017))
+        unit: animals
+        description: Number of pigs, measured as the total number within a given year.
+      poultry__hyde__and__fao__2017:
+        title: Poultry (HYDE & FAO (2017))
+        unit: thousand animals
+        description: Number of poultry, measured as the total number within a given year.
+      sheep__hyde__and__fao__2017:
+        title: Sheep (HYDE & FAO (2017))
+        unit: animals
+        description: Number of sheep, measured as the total number within a given year.
+      turkeys__hyde__and__fao__2017:
+        title: Turkeys (HYDE & FAO (2017))
+        unit: thousand animals
+        description: Number of turkeys, measured as the total number within a given year.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

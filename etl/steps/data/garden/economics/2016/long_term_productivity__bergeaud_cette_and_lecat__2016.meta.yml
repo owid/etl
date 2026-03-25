@@ -1,0 +1,37 @@
+dataset:
+  title: Long term productivity - Bergeaud, Cette, and Lecat (2016)
+tables:
+  long_term_productivity__bergeaud_cette_and_lecat__2016:
+    variables:
+      age_of_capital_stock__bergeaud__cette__and_lecat__2016:
+        title: Age of capital stock (Bergeaud, Cette, and Lecat (2016))
+        unit: ''
+        description: Average age of equipment capital stock measured in years.
+      capital_intensity__bergeaud__cette__and_lecat__2016:
+        title: Capital Intensity (Bergeaud, Cette, and Lecat (2016))
+        unit: ''
+        description: |-
+          Capital intensity is defined as the ratio of total capital stock over total hours worked. Unit of measurement in $US 2010 ppp per hour.
+      gdp_per_capita__bergeaud__cette__and_lecat__2016:
+        title: GDP per capita (Bergeaud, Cette, and Lecat (2016))
+        unit: ''
+        description: Gross Domestic Product per capita. Units of measurement $US 2010 ppp per person.
+      labor_productivity__bergeaud__cette__and_lecat__2016:
+        title: Labor productivity (Bergeaud, Cette, and Lecat (2016))
+        unit: ''
+        description: Labor productivity is defined as the ratio of GDP over total hours worked. Unit of measurement in $US
+          2010 ppp per hour.
+      total_factor_productivity__tfp__bergeaud__cette__and_lecat__2016:
+        title: Total Factor Productivity (TFP) (Bergeaud, Cette, and Lecat (2016))
+        unit: ''
+        description: |-
+          Solow residual from a constant return to scale Cobb-Douglas production function with capital stock and hours worked as input. Units of measurement $US 2010 ppp based.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

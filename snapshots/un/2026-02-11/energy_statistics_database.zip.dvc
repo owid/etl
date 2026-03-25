@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Energy Statistics Database"
+    description: |-
+      The Energy Statistics Database, available at UNdata, contains comprehensive energy statistics on the production, trade, conversion and final consumption of primary and secondary; conventional and non-conventional; and new and renewable sources of energy.
+
+      - [Data prior to 1990](http://unstats.un.org/unsd/energy/edbase.htm).
+      - [Details on how the energy statistics are compiled](https://unstats.un.org/unsd/energystats/questionnaire/documents/Energy-Questionnaire-Guidelines.pdf).
+      - [Country notes](http://data.un.org/_Docs/Energy_Statistics_Database_notes_UNdata.pdf).
+    date_published: "2025-12-15"
+
+    # Citation
+    producer: United Nations Statistics Division
+    citation_full: |-
+      Energy Statistics Database, United Nations Statistics Division via UNdata (2025).
+
+    # Files
+    url_main: https://data.un.org/Data.aspx?d=EDATA&f=cmID%3aEL%3btrID%3a12#EDATA
+    date_accessed: '2026-02-11'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://data.un.org/Host.aspx?Content=UNdataUse
+outs:
+  - md5: 9ad98f44c826e8d62871ab3117611443
+    size: 10483921
+    path: energy_statistics_database.zip

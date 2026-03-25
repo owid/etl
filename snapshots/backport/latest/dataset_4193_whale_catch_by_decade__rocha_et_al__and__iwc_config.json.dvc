@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4193
-    date_accessed: 2023-08-10 08:50:04.452724
+    url: https://admin.owid.io/admin/datasets/4193
+    date_accessed: 2026-03-10 09:11:43.462135+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4193_whale_catch_by_decade__rocha_et_al__and__iwc
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 17d83fb8d35566f45ba1d6426837d0bb
-  size: 12988
-  path: dataset_4193_whale_catch_by_decade__rocha_et_al__and__iwc_config.json
+  - md5: 9df731700b9b53486b7c003a731e2955
+    size: 14141
+    path: dataset_4193_whale_catch_by_decade__rocha_et_al__and__iwc_config.json

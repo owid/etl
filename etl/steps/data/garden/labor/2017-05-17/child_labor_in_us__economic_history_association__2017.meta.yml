@@ -1,0 +1,30 @@
+dataset:
+  title: Child Labor in US - Economic History Association (2017)
+tables:
+  child_labor_in_us__economic_history_association__2017:
+    variables:
+      child_labor__all__pct__economic_history_association__2017:
+        title: Child Labor- All (%) (Economic History Association (2017))
+        unit: '%'
+        display:
+          unit: 2010 USD PPP
+        description: Share of children in employment.
+      child_labor__boys__pct__economic_history_association__2017:
+        title: Child Labor- Boys (%) (Economic History Association (2017))
+        unit: '%'
+        display:
+          unit: tonnes
+        description: Share of boys in employment.
+      child_labor__girls__pct__economic_history_association__2017:
+        title: Child Labor- Girls (%) (Economic History Association (2017))
+        unit: '%'
+        description: Share of girls in employment.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

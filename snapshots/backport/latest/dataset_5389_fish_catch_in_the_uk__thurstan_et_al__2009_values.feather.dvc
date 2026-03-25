@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5389
-    date_accessed: 2023-08-10 08:44:36.789289
+    url: https://admin.owid.io/admin/datasets/5389
+    date_accessed: 2026-03-10 08:08:31.164882+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Fish catch in the UK (Thurstan et al. 2009)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a7b7c1bae7e7ca3f534e8ffffbdeb5db
-  size: 12906
-  path: dataset_5389_fish_catch_in_the_uk__thurstan_et_al__2009_values.feather
+  - md5: ff6d045aff96dd0ce0b07962793b044b
+    size: 13498
+    path: dataset_5389_fish_catch_in_the_uk__thurstan_et_al__2009_values.feather

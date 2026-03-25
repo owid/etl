@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -59,12 +59,14 @@ def run() -> None:
     ds_regions = paths.load_dataset("regions")
     # Load income groups dataset.
     ds_income_groups = paths.load_dataset("income_groups")
+    # Load UN WPP population dataset.
+    ds_un_wpp = paths.load_dataset("un_wpp")
     #
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.drop(columns=["measure", "unit"])
-    tb = add_population_column(tb)
+    tb = add_population_column(tb, ds_un_wpp)
     tb = combining_sexes_for_all_age_groups(tb)
     tb = geo.add_regions_to_table(
         tb,
@@ -112,7 +114,7 @@ def combining_sexes_for_all_age_groups(tb: Table) -> Table:
     return tb
 
 
-def add_population_column(tb: Table) -> Table:
+def add_population_column(tb: Table, ds_un_wpp: Dataset) -> Table:
     """
     Adding the population for each age-group, in rows where the risk factor is "all".
     """
@@ -128,6 +130,7 @@ def add_population_column(tb: Table) -> Table:
         sex_group_male="m",
         age_col="age_group",
         age_group_mapping=AGE_GROUPS_RANGES,
+        ds_un_wpp=ds_un_wpp,
     )
     tb_no_pop["population"] = np.nan
     tb = pr.concat([tb_pop, tb_no_pop], axis=0, ignore_index=True, short_name=paths.short_name)

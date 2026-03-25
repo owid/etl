@@ -267,3 +267,37 @@ steps:
     # - data://meadow/wb/2025-10-09/world_bank_pip
   data://grapher/wb/2025-10-09/world_bank_pip:
     - data://garden/wb/2025-10-09/world_bank_pip
+
+  #
+  # Luxembourg Income Study
+  #
+  data://meadow/lis/2025-12-12/luxembourg_income_study:
+    - snapshot://lis/2025-12-12/lis_incomes.csv
+    - snapshot://lis/2025-12-12/lis_absolute_poverty.csv
+    - snapshot://lis/2025-12-12/lis_inequality.csv
+    - snapshot://lis/2025-12-12/lis_relative_poverty.csv
+  data://garden/lis/2025-12-12/luxembourg_income_study:
+    - data://meadow/lis/2025-12-12/luxembourg_income_study
+  data://grapher/lis/2025-12-12/luxembourg_income_study:
+    - data://garden/lis/2025-12-12/luxembourg_income_study
+
+  # SEDLAC Grapher step
+  data://grapher/cedlas/2025-04-01/sedlac:
+    - data://garden/cedlas/2025-04-01/sedlac
+
+
+  # WID
+  data://meadow/wid/2026-01-02/world_inequality_database:
+    - snapshot://wid/2026-01-02/world_inequality_database_with_extrapolations.csv
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://wid/2026-01-02/world_inequality_database_fiscal.csv
+    - snapshot://wid/2026-01-02/world_inequality_database.csv
+    - snapshot://wid/2026-01-02/world_inequality_database_distribution.csv
+    - snapshot://wid/2026-01-02/world_inequality_database_distribution_with_extrapolations.csv
+  data://garden/wid/2026-01-12/world_inequality_database:
+    - data://meadow/wid/2026-01-02/world_inequality_database
+  data://grapher/wid/2026-01-12/world_inequality_database:
+    - data://garden/wid/2026-01-12/world_inequality_database
+
+  data://garden/wid/2026-01-02/world_inequality_database_legacy:
+    - data://meadow/wid/2026-01-02/world_inequality_database

@@ -1,0 +1,17 @@
+dataset:
+  title: Total merchandise trade as a share of GDP (OECD (2016)) (split)
+tables:
+  total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split:
+    variables:
+      total_merchandise_trade_as_a_share_of_gdp__oecd__2016:
+        title: Total merchandise trade as a share of GDP (OECD (2016))
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

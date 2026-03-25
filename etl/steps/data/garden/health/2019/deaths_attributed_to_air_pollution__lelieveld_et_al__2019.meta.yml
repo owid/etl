@@ -1,0 +1,84 @@
+dataset:
+  title: Deaths attributed to air pollution (Lelieveld et al. 2019)
+tables:
+  deaths_attributed_to_air_pollution__lelieveld_et_al__2019:
+    variables:
+      death_rates_from_air_pollution_from_fossil_fuels__per_100_000:
+        title: Death rates from air pollution from fossil fuels (per 100,000)
+        unit: deaths per 100,000
+        display:
+          name: Death rates from air pollution from fossil fuels
+      death_rates_from_all_air_pollution__per_100_000:
+        title: Death rates from all air pollution (per 100,000)
+        unit: deaths per 100,000
+        display:
+          name: Death rates from air pollution from all sources
+      death_rates_from_all_anthropogenic_air_pollution__per_100_000:
+        title: Death rates from all anthropogenic air pollution (per 100,000)
+        unit: deaths per 100,000
+        display:
+          name: Death rates from air pollution from anthropogenic sources
+      deaths_from_anthropogenic_pollution_as_a_share_of_total_air_pollution_deaths:
+        title: Deaths from anthropogenic pollution as a share of total air pollution deaths
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of anthropogenic air pollution deaths attributed to fossil fuels
+      deaths_from_fossil_pollution_as_a_share_of_total_air_pollution_deaths:
+        title: Deaths from fossil pollution as a share of total air pollution deaths
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of total air pollution deaths attributed to fossil fuels
+      deaths_from_fossil_pollution_as_a_share_of_total_anthropogenic_air_pollution_deaths:
+        title: Deaths from fossil pollution as a share of total anthropogenic air pollution deaths
+        unit: ''
+        display:
+          name: Share of total air pollution deaths attributed to anthropogenic pollution
+      excess_mortality_from_air_pollution__all_sources:
+        title: Excess mortality from air pollution (all sources)
+        unit: deaths
+        short_unit: deaths
+        display:
+          name: Annual deaths attributed to air pollution from all sources
+          numDecimalPlaces: 0
+      excess_mortality_from_all_anthropogenic_pollution:
+        title: Excess mortality from all anthropogenic pollution
+        unit: deaths
+        display:
+          name: Annual deaths from air pollution from anthropogenic sources
+          numDecimalPlaces: 0
+      excess_mortality_from_fossil_fuels:
+        title: Excess mortality from fossil fuels
+        unit: deaths
+        short_unit: deaths
+        display:
+          name: Annual deaths attributed air pollution from fossil fuels
+          numDecimalPlaces: 0
+      total_years_life_lost_from_air_pollution__all_sources:
+        title: Total Years Life Lost from air pollution (all sources)
+        unit: ''
+      total_years_life_lost_from_all_anthropogenic_pollution:
+        title: Total Years Life Lost from all anthropogenic pollution
+        unit: ''
+      total_years_life_lost_from_fossil_fuels:
+        title: Total Years Life Lost from fossil fuels
+        unit: ''
+      yll_rates_from_air_pollution_from_fossil_fuels__per_100_000:
+        title: YLL rates from air pollution from fossil fuels (per 100,000)
+        unit: ''
+      yll_rates_from_all_air_pollution__per_100_000:
+        title: YLL rates from all air pollution (per 100,000)
+        unit: ''
+      yll_rates_from_anthropogenic_air_pollution__per_100_000:
+        title: YLL rates from anthropogenic air pollution (per 100,000)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

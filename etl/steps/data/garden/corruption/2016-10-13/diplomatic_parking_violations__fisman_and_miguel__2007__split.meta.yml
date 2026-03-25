@@ -1,0 +1,19 @@
+dataset:
+  title: Diplomatic parking violations (Fisman and Miguel (2007)) (split)
+tables:
+  diplomatic_parking_violations__fisman_and_miguel__2007__split:
+    variables:
+      diplomatic_parking_violations__fisman_and_miguel__2007:
+        title: Diplomatic parking violations (Fisman and Miguel (2007))
+        unit: Scofflaws per diplomat
+        description: Average unpaid annual New York city diplomatic parking violations per diplomat, November 1997 to November
+          2002
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

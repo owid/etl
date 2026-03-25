@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/951
-    date_accessed: 2023-08-10 08:28:39.519485
+    url: https://admin.owid.io/admin/datasets/951
+    date_accessed: 2026-03-05 11:00:51.442163+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Coal output and employment in UK - BEIS (2020)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4899029648b5f73cd4cad7047f67fb1e
-  size: 14802
-  path: dataset_951_coal_output_and_employment_in_uk__beis__2020_values.feather
+  - md5: b8f8ad7e50203c0f5e674c413714fdbd
+    size: 14842
+    path: dataset_951_coal_output_and_employment_in_uk__beis__2020_values.feather

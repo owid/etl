@@ -1,0 +1,68 @@
+dataset:
+  title: eat-lancet-diet-composition (grams per capita per day)
+tables:
+  eat_lancet_diet_composition__grams_per_capita_per_day:
+    variables:
+      animal_fats:
+        title: animal_fats
+        unit: ''
+      beef:
+        title: beef
+        unit: ''
+      cereals:
+        title: cereals
+        unit: ''
+      eggs:
+        title: eggs
+        unit: ''
+      fruits:
+        title: fruits
+        unit: ''
+      lamb:
+        title: lamb
+        unit: ''
+      legumes:
+        title: legumes
+        unit: ''
+      milk_equivalents:
+        title: milk_equivalents
+        unit: ''
+      nuts:
+        title: nuts
+        unit: ''
+      oils:
+        title: oils
+        unit: ''
+      pigmeat:
+        title: pigmeat
+        unit: ''
+      poultry:
+        title: poultry
+        unit: ''
+      red_meat:
+        title: red_meat
+        unit: ''
+      roots_tubers:
+        title: roots_tubers
+        unit: ''
+      seafood:
+        title: seafood
+        unit: ''
+      sugar:
+        title: sugar
+        unit: ''
+      vegetable_oils:
+        title: vegetable_oils
+        unit: ''
+      vegetables:
+        title: vegetables
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

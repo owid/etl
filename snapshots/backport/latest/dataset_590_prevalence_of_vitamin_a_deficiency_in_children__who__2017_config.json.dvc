@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/590
-    date_accessed: 2023-08-10 08:57:23.238073
+    url: https://admin.owid.io/admin/datasets/590
+    date_accessed: 2026-03-05 12:23:41.937876+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_590_prevalence_of_vitamin_a_deficiency_in_children__who__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bfc7780d3d04e8080fd105d3d350a063
-  size: 4833
-  path: 
-    dataset_590_prevalence_of_vitamin_a_deficiency_in_children__who__2017_config.json
+  - md5: 80950208e0ee7ea350f60a1b56afc798
+    size: 5056
+    path: dataset_590_prevalence_of_vitamin_a_deficiency_in_children__who__2017_config.json

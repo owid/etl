@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2952
-    date_accessed: 2023-08-10 09:21:53.727345
+    url: https://admin.owid.io/admin/datasets/2952
+    date_accessed: 2026-03-06 07:49:46.090689+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Extreme Poverty Share to 2030 - Crespo-Cuaresma (2018)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b7230bf963fcf617614736e76c47183d
-  size: 48010
-  path: dataset_2952_extreme_poverty_share_to_2030__crespo_cuaresma__2018_values.feather
+  - md5: 6d2d6d5c1ca9fa7456db9f4a77fa0f05
+    size: 51306
+    path: dataset_2952_extreme_poverty_share_to_2030__crespo_cuaresma__2018_values.feather

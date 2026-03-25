@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: International Pollutants Elimination Network (IPEN)
+    description: |-
+      The International Pollutants Elimination Network (IPEN) have collated studies on the concentration of lead in paint sold across low and middle-income countries. More than 100 studies have been conducted across 59 countries, involving the testing of more than 4,000 solvent-based paints.
+
+      These studies report the share of paints that have a lead concentration great than 90 parts per million (ppm); 600ppm and 10,000ppm of the dry weight of paint.
+
+      Lead paint is thought to be a significant contributor to lead poisoning; many countries have therefore implemented a regulatory limit of 90ppm or 600ppm for sold paints.
+    url: http://www.ipen.org
+    date_accessed: 2026-03-05
+    published_by: International Pollutants Elimination Network (IPEN)
+  name: Lead concentrations in paint (IPEN, 2021)
+  description: ''
+  is_public: false
+outs:
+  - md5: d53291d7fd8da8d6b85622c859b48e48
+    size: 5618
+    path: lead_concentrations_in_paint__ipen__2021.feather

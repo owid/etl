@@ -1,0 +1,48 @@
+dataset:
+  title: Clio-Infra - Biological Standards of Living - Baten and Blum (2015)
+tables:
+  clio_infra__biological_standards_of_living__baten_and_blum__2015:
+    variables:
+      height__baten_and_blum_2015:
+        title: Height (Baten and Blum 2015)
+        unit: cm
+        short_unit: cm
+        description: Heights by birth decade and country, both before and after 1800.
+        sources:
+          - name: Height (Baten and Blum 2015)
+            description: |-
+              Additional information: Methodologies used for data collection and processing. Reconstruction of heights by birth decade using a variety of different sources. Please see link for the complete list.
+            url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/IAEKLA
+            date_accessed: 2017-09-09
+            published_by: |-
+              For the post-1800 period: Baten, Joerg and Matthias Blum, “Growing Taller, but Unequal: Biological Well-Being in World Regions and Its Determinants, 1810-1989.” Economic History of Developing Regions (2012)
+
+              For the pre-1800 period: Koepke, Nikola and Baten, Joerg "The Biological Standard of Living in Europe During the Last Two Millennia," in European Review of Economic History 9-1 (2005)
+      height_gini__baten_and_blum_2015:
+        title: Height Gini (Baten and Blum 2015)
+        unit: Gini
+        short_unit: Gini
+        description: |-
+          Proxy for inequality of human health and welfare. The higher a country's gini coefficient, the greater the degree of inequality.
+        sources:
+          - name: Height Gini (Baten and Blum 2015)
+            description: |-
+              Additional information: Methodologies used for data collection and processing. Reconstruction of height ginis by birth decade using a variety of different sources. The height gini is a transformation of the coefficient of height inequality, based on Moradi and Baten’s formula: g htgini=-33.5 + 20.5*cv.
+
+              Data quality: As good as possible, but counter-checking and improvement welcome. Interpretations on individual country level should be done with careful checking.  An important caveat is many individual countries cannot be measured without a substantial amount of measurement error. The tendencies of anthropometric inequality by world region (in which country-specific measurement error tends to average out) is probably informative.
+
+
+              Publisher source: Data collated from a host of academic papers. Please refer to the link for the complete list.
+            url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/HKZPR9
+            date_accessed: 2017-09-09
+            published_by: |-
+              Jörg Baten and Matthias Blum, “Anthropometric within-country Inequality and the Estimation of Skill Premia with Anthropometric Indicators”, Review of Economics -- Jahrbuch fuer Wirtschaftswissenschaften (2011)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

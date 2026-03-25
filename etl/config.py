@@ -141,6 +141,10 @@ def load_STAGING() -> Optional[str]:
     # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
 
+    # Treat empty string and "0" as disabled
+    if STAGING in (None, "", "0"):
+        return None
+
     # Check if we're running via etl d run-python-step (suppress warnings)
     is_run_python_step = len(sys.argv) >= 3 and sys.argv[1:3] == ["d", "run-python-step"]
 
@@ -247,9 +251,6 @@ ETL_EPOCH = 5
 STRICT_AFTER = "2023-06-25"
 
 SLACK_API_TOKEN = env.get("SLACK_API_TOKEN")
-
-# if True, commit and push updates to YAML files coming from admin
-ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
 
 # if True, commit and push updates from fasttrack
 FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")

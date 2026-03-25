@@ -1,0 +1,20 @@
+dataset:
+  title: Parties to Montreal Protocol (UNEP, 2023)
+tables:
+  parties_to_montreal_protocol__unep__2023:
+    variables:
+      vienna_convention_and_montreal_protocol__cumulative_parties:
+        title: Vienna Convention and Montreal Protocol (Cumulative Parties)
+        unit: total parties in Montreal Protocol
+      vienna_convention_and_montreal_protocol__parties_subscribing_each_year:
+        title: Vienna Convention and Montreal Protocol (Parties Subscribing each Year)
+        unit: parties subscribed to Montreal Protocol
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,160 @@
+dataset:
+  title: Waste Production and Management
+tables:
+  waste_production_and_management:
+    variables:
+      amounts_of_municipal_waste__total:
+        title: Amounts of Municipal Waste - Total
+        unit: Thousand Tons
+        sources:
+          - name: Amounts of Municipal Waste - Total
+            description: |-
+              Publication year: 2007
+              Unit: Thousand Tons
+              Abstract
+              Waste collected and treated by or for municipalities. It covers waste from households, including bulky waste, similar waste from commerce and trade, office buildings, institutions and small businesses, yard and garden waste, street sweepings, the contents of litter containers, and market cleansing waste. The definition excludes waste from municipal sewage networks and treatment, as well as municipal construction and demolition waste
+              Point of contact
+              Role: Originator
+              Person: Organization for Economic Co-Operation and Development (OECD)
+              Organization: ----
+              Email: env.contact@oecd.org
+
+              Temporal extent
+              Covered time: 1980 - 2005
+              Geographic extent
+              Coverage: World
+            url: http://ede.grid.unep.ch/
+            date_accessed: 2018-02-15
+            published_by: United Nations Environment Programme
+      municipal_waste_collection:
+        title: Municipal Waste Collection
+        unit: Thousand Tons
+        sources:
+          - name: Municipal Waste Collection
+            description: |-
+              Publication year: 2009-08-01
+              Unit: Thousand Tons
+              Abstract
+              Municipal waste includes waste originating from: households, commerce and trade, small businesses, office buildings and institutions (schools, hospitals, government buildings).  It also includes bulky waste (e.g. white goods, old furniture, mattresses) and waste  from selected municipal services, e.g. waste from park and garden maintenance, waste from street cleaning services (street sweepings, the content of litter containers, market cleansing waste), if managed as waste.  The definition excludes waste from municipal sewage network and treatment, municipal construction and demolition waste.
+
+              Municipal waste collected refers to waste collected by or on behalf of municipalities, as well as municipal waste collected by the private sector. It includes mixed waste, and fractions collected separately for recovery operations (through door-to-door collection  and/or through voluntary deposits).
+              Percentage of total population served by municipal waste collection refers to the percentage proportion of the total population covered by regular municipal waste removal service in relation to the total population of the country.
+              Point of contact
+              Role: Originator
+              Person: United Nations Statistics Division (UNSD)
+              Organization: Director
+              Email: statistics@un.org
+
+              Temporal extent
+              Covered time: 1990 - 2007
+              Geographic extent
+              Coverage: World
+            url: http://ede.grid.unep.ch/
+            date_accessed: 2018-02-15
+            published_by: United Nations Environment Programme
+      participation_in_treaties__basel_convention:
+        title: Participation in Treaties - Basel Convention
+        unit: Number of Parties Subscribing each Year
+        sources:
+          - name: Participation in Treaties - Basel Convention
+            description: |-
+              Publication year: 2013-12-01
+              Unit: Number of Parties Subscribing each Year
+              Abstract
+              The Basel Convention on the Control of Tranboundary Movements of Hazardous Wastes and their Disposal was adopted in 1989 and entered into force on 5 May 1992.
+              Point of contact
+              Role: Originator
+              Person: United Nations Office of Legal Affairs (OLA)
+              Organization: ----
+              Email: ----
+
+              Temporal extent
+              Covered time: 1989 - 2013-12-01
+              Geographic extent
+              Coverage: World
+            url: http://ede.grid.unep.ch/
+            date_accessed: 2018-02-15
+            published_by: United Nations Environment Programme
+      participation_in_treaties__rotterdam_convention:
+        title: Participation in Treaties - Rotterdam Convention
+        unit: Number of Parties Subscribing each Year
+        sources:
+          - name: Participation in Treaties - Rotterdam Convention
+            description: |-
+              Publication year: 2013-12-01
+              Unit: Number of Parties Subscribing each Year
+              Abstract
+              The Convention establishes the principle that export of a chemical covered by the Convention can only take place with the prior informed consent of the importing party.  The Convention establishes a "Prior Informed Consent procedure," a means for formally obtaining and disseminating the decisions of importing countries as to whether they wish to receive future shipments of specified chemicals and for ensuring compliance with these decisions by exporting countries.
+              The Convention initially covers 22 pesticides (including five severely hazardous pesticide formulations) and 5 industrial chemicals, but many more are expected to be added in the future.  The Conference of the Parties will decide on the inclusion of chemicals.
+              Point of contact
+              Role: Originator
+              Person: United Nations Office of Legal Affairs (OLA)
+              Organization: ----
+              Email: ----
+
+              Temporal extent
+              Covered time: 1999 - 2013-12-01
+              Geographic extent
+              Coverage: World
+            url: http://ede.grid.unep.ch/
+            date_accessed: 2018-02-15
+            published_by: United Nations Environment Programme
+      waste_recycling_rates__glass:
+        title: Waste Recycling Rates - Glass
+        unit: Percent of Apparent Consumption
+        sources:
+          - name: Waste Recycling Rates - Glass
+            description: |-
+              Publication year: 2007
+              Unit: Percent of Apparent Consumption
+              Abstract
+              Recycling is defined as reuse of material in a production process that diverts it from the waste stream, except for recycling within industrial plants and the reuse of material as fuel.
+              "Recycling rates" are the ratios of the quantity collected for recycling to the apparent consumption (economic notion of domestic production of the respective material + imports - exports).
+              It should, however, be noted that definitions may vary from one country to another. In particular, total amounts of waste produced, rather than apparent consumption, may be used in some areas to derive recycling rates.
+              Point of contact
+              Role: Originator
+              Person: Organization for Economic Co-Operation and Development (OECD)
+              Organization: ----
+              Email: env.contact@oecd.org
+
+              Temporal extent
+              Covered time: 1980 - 2005
+              Geographic extent
+              Coverage: World
+            url: http://ede.grid.unep.ch/
+            date_accessed: 2018-02-15
+            published_by: United Nations Environment Programme
+      waste_recycling_rates__paper_and_cardboard:
+        title: Waste Recycling Rates - Paper and Cardboard
+        unit: Percent of Apparent Consumption
+        sources:
+          - name: Waste Recycling Rates - Paper and Cardboard
+            description: |-
+              Publication year: 2007
+              Unit: Percent of Apparent Consumption
+              Abstract
+              Recycling is defined as reuse of material in a production process that diverts it from the waste stream, except for recycling within industrial plants and the reuse of material as fuel.
+              "Recycling rates" are the ratios of the quantity collected for recycling to the apparent consumption (economic notion of domestic production of the respective material + imports - exports).
+              It should, however, be noted that definitions may vary from one country to another. In particular, total amounts of waste produced, rather than apparent consumption, may be used in some areas to derive recycling rates.
+              Point of contact
+              Role: Originator
+              Person: Organization for Economic Co-Operation and Development (OECD)
+              Organization: ----
+              Email: env.contact@oecd.org
+
+              Temporal extent
+              Covered time: 1980 - 2005
+              Geographic extent
+              Coverage: World
+            url: http://ede.grid.unep.ch/
+            date_accessed: 2018-02-15
+            published_by: United Nations Environment Programme
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

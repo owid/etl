@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/466
-    date_accessed: 2023-08-10 09:38:15.716430
+    url: https://admin.owid.io/admin/datasets/466
+    date_accessed: 2026-03-05 09:56:32.584729+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_466_renewable_investment_as_pct_of_gdp__bnep_and_world_bank
   description: Renewable Investment as % of GDP in 2015 - BNEP and World Bank
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 91313858d1d77c2e82b40126e12ba485
-  size: 2517
-  path: dataset_466_renewable_investment_as_pct_of_gdp__bnep_and_world_bank_config.json
+  - md5: 8cf2c55e044d9050a6a02ca5eaad12ca
+    size: 2647
+    path: dataset_466_renewable_investment_as_pct_of_gdp__bnep_and_world_bank_config.json

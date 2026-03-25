@@ -1,16 +1,15 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5314
-    date_accessed: 2023-08-10 08:33:29.597347
+    url: https://admin.owid.io/admin/datasets/5314
+    date_accessed: 2026-03-10 09:30:07.017797+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Gallup World Poll - Someone to help you
-  description: (Max, 22 Feb 2023) This cannot be shared publicly! It is not publicly
-    licensed. But I want to keep it internally.
+  description: (Max, 22 Feb 2023) This cannot be shared publicly! It is not publicly licensed. But I want to keep it internally.
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b61ae820b1ceb7b36709ef4737498ab0
-  size: 32066
-  path: dataset_5314_gallup_world_poll__someone_to_help_you_values.feather
+  - md5: 154cbab7b4c6afafcea93e1b6ad82dd5
+    size: 32890
+    path: dataset_5314_gallup_world_poll__someone_to_help_you_values.feather

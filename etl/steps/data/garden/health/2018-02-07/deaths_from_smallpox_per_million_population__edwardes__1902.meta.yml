@@ -1,0 +1,17 @@
+dataset:
+  title: Deaths from smallpox per million population (Edwardes, 1902)
+tables:
+  deaths_from_smallpox_per_million_population__edwardes__1902:
+    variables:
+      number_of_deaths_from_smallpox_per_1_000_population__edwardes_1902:
+        title: Number of deaths from smallpox per 1,000 population (Edwardes 1902)
+        unit: Deaths per 1,000 people
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

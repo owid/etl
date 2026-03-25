@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3021
-    date_accessed: 2023-08-10 09:02:33.255928
+    url: https://admin.owid.io/admin/datasets/3021
+    date_accessed: 2026-03-10 09:15:45.118428+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Total merchandise trade as a share of GDP (OECD (2016)) (split)
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 221774cd4da007b3ee21f3fc3bdf1b24
-  size: 12274
-  path: 
-    dataset_3021_total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split_values.feather
+  - md5: 9f506c80b49b5e8f96fcd21691668580
+    size: 11618
+    path: dataset_3021_total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split_values.feather

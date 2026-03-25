@@ -1,0 +1,19 @@
+dataset:
+  title: Year of smallpox eradication by country - WHO (1988)
+tables:
+  year_of_smallpox_eradication_by_country__who__1988:
+    variables:
+      year_of_smallpox_eradication__who__1988:
+        title: Year of smallpox eradication (WHO (1988))
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

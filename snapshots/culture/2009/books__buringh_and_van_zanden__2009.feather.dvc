@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: Buringh and Van Zanden (2009)
+    description: |-
+      The unit of analysis for the estimates of manuscripts is the number of individual manuscripts. The unit of analysis for the estimates of printed books is (new) ‘title’ or ‘edition’. The authors corrected the numbers to account for the underrepresentation of estimates for different geographical regions and different times. The authors consider their estimates to be conservative and note that the “figures should be interpreted as low estimates”.
+
+      Titles are either books (which have by definition more than 49 pages) or pamphlets (less than 50 pages). The authors define a title as ‘a printed publication which forms a separate whole, whether issued in one or several volumes. Different language versions of the same title published in a particular country should be considered as individual titles’; this includes first editions and reeditions. The authors give the following example: ‘The first printing of Gutenberg’s Bible is one title, and new editions of the Bible will again be counted, but a reprint of exactly the same manuscript would not be included.’
+
+      Buringh and Van Zanden note that the aggregation of the data to country levels obscures inequalities within countries – ‘if we could isolate data on, for example, northern Italy or the north of France (including Paris), these regions rank much higher in output per capita’.
+    url: https://www.jstor.org/stable/40263962
+    date_accessed: 2026-03-05
+    published_by: |-
+      Eltjo Buringh and Jan Luiten Van Zanden (2009) – Charting the “Rise of the West”: Manuscripts and Printed Books in Europe, a Long-Term Perspective from the Sixth through Eighteenth Centuries. In The Journal of Economic History The Journal of Economic History Vol. 69, No. 2 (Jun., 2009), pp. 409-445.
+  name: Books - Buringh and Van Zanden (2009)
+  description: ''
+outs:
+  - md5: 0cba3ce5ff6d3bb2464a320fbdcc2c3f
+    size: 6538
+    path: books__buringh_and_van_zanden__2009.feather

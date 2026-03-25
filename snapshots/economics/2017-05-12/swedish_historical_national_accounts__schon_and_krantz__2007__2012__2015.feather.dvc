@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Schön and Krantz (2007, 2012, 2015)
+    description: |-
+      The source notes: "One should note that present time levels of GDP and sector value added in these series differ from data in contemporary official national accounts. It is natural that a number of shifts and redefinitions are performed in contemporary statistics in relation to structural and technological changes, but it is also reasonable that levels in the short contemporary series are adjusted to the long historical series rather than the other way around. "
+    url: |-
+      https://www.lusem.lu.se/organisation/department-economic-history/research-department-economic-history/databases-department-economic-history/economic-history-data/swedish-historical-national-accounts-1300-2020
+    date_accessed: 2017-05-12
+    published_by: |-
+      (i) Schön, L. & Krantz, O. (2015), "New Swedish Historical National Accounts since the 16th Century in Constant and Current Prices." Lund Papers in Economic History 140, Lund University. (ii) Schön, L. & Krantz, O. (2012), “Swedish Historical National Accounts 1560–2010.” Lund Papers in Economic History 123, Lund University. (iii) Krantz, O. & Schön, L. (2007), Swedish Historical National Accounts 1800–2000, Lund Studies in Economic History 41, Lund.
+  name: Swedish Historical National Accounts - Schön and Krantz (2007, 2012, 2015)
+  description: ''
+outs:
+  - md5: 5a826905256d346efda8443e3374927d
+    size: 22922
+    path: swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015.feather

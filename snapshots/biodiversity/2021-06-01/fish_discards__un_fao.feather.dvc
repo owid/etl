@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Pérez Roda, M.A. et al. (2019).  A third assessment of global marine fisheries discards. FAO Fisheries and Aquaculture.
+    description: |-
+      Discards are animals thrown back (alive or dead) into the sea after being caught during fishing activities.
+
+      This is one subset of 'bycatch': animals that are not the target species but are caught during fishing activities. Some bycatch is still used as human food, or animal feed. The proportion that is not used, and is instead, thrown back into the sea is called 'discards'.
+    url: http://www.fao.org/3/CA2905EN/ca2905en.pdf
+    date_accessed: 2026-03-06
+    published_by: |-
+      Pérez Roda, M.A. (ed.), Gilman, E., Huntington, T., Kennelly, S.J., Suuronen, P., Chaloupka, M. and Medley, P. 2019. A third assessment of global marine fisheries discards. FAO Fisheries and Aquaculture Technical Paper No. 633. Rome, FAO. 78 pp.
+  name: Fish discards (UN FAO)
+  description: ''
+  is_public: false
+outs:
+  - md5: 47818ed174936d2ac9cfdb89ed82eb42
+    size: 5698
+    path: fish_discards__un_fao.feather

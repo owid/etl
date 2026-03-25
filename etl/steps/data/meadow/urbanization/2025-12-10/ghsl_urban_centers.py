@@ -170,10 +170,25 @@ def run() -> None:
     # Format the table.
     tb = tb.format(["country", "year"])
 
+    #
+    # Create a raw city-level table for matching purposes.
+    #
+    tb_cities_raw = tb_raw[["country", "urban_center_name", "year", "urban_pop"]].copy()
+    tb_cities_raw = tb_cities_raw.dropna(subset=["urban_center_name", "urban_pop"])
+    tb_cities_raw = tb_cities_raw[tb_cities_raw["urban_pop"] > 0]
+
+    # Handle duplicate city names by keeping the first occurrence
+    # (some cities appear multiple times with same name in different regions)
+    tb_cities_raw = tb_cities_raw.drop_duplicates(subset=["country", "urban_center_name", "year"], keep="first")
+
+    tb_cities_raw = tb_cities_raw.format(["country", "urban_center_name", "year"], short_name="ghsl_urban_centers_raw")
+
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(
+        tables=[tb, tb_cities_raw], check_variables_metadata=True, default_metadata=snap.metadata
+    )
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()

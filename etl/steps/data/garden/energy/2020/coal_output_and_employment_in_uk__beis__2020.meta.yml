@@ -1,0 +1,132 @@
+dataset:
+  title: Coal output and employment in UK - BEIS (2020)
+tables:
+  coal_output_and_employment_in_uk__beis__2020:
+    variables:
+      coal_output__beis__2020:
+        title: Coal Output (BEIS (2020))
+        unit: million tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Coal Output
+          unit: tonnes
+      coal_by_end_use__coke_ovens__and__solid_fuels:
+        title: Coal by end use (Coke ovens & solid fuels)
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Coke ovens & solid fuels
+        description: The quantity of coal production allocated to coke ovens & solid fuel use in the UK.
+      coal_by_end_use__collieries:
+        title: Coal by end use (Collieries)
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Collieries
+        description: The quantity of coal production allocated to energy use in UK collieries.
+      coal_by_end_use__domestic:
+        title: Coal by end use (Domestic)
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Domestic
+        description: The quantity of coal production used domestically in the UK.
+      coal_by_end_use__electricity:
+        title: Coal by end use (Electricity)
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Electricity
+        description: The quantity of coal production allocated to electricity production in the UK.
+      coal_by_end_use__gas:
+        title: Coal by end use (Gas)
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Gas
+          numDecimalPlaces: 0
+          tableDisplay:
+            hideAbsoluteChange: false
+            hideRelativeChange: false
+        description: The quantity of coal production allocated to gas production in the UK.
+      coal_by_end_use__industry:
+        title: Coal by end use (Industry)
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Industry
+        description: The quantity of coal production used in industry in the UK.
+      coal_by_end_use__miscellaneous:
+        title: Coal by end use (Miscellaneous)
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Miscellaneous
+        description: The quantity of coal production used for miscellaneous purposes in the UK.
+      coal_by_end_use__railways:
+        title: Coal by end use (Railways)
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Railways
+        description: The quantity of coal production allocated to railways in the UK.
+      coal_imports__beis__2020:
+        title: Coal imports (BEIS (2020))
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Coal imports
+      coal_production_per_worker__beis__2020:
+        title: Coal production per worker (BEIS (2020))
+        unit: tonnes per worker
+        short_unit: t
+        display:
+          name: Coal production per worker
+          unit: tonnes
+      deepmined_coal_output__beis__2020:
+        title: Deepmined coal output (BEIS (2020))
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Deepmined coal output
+      employment_in_coal_industry__beis__2020:
+        title: Employment in coal industry (BEIS (2020))
+        unit: thousands
+        display:
+          conversionFactor: 1000
+          name: Employment in coal industry
+          unit: employed
+      opencast_coal_output__beis__2020:
+        title: Opencast coal output (BEIS (2020))
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Opencast coal output
+      percentage_of_workforce_in_coal_industry__beis__2020:
+        title: Percentage of workforce in coal industry (BEIS (2020))
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Percentage of workforce in coal industry
+          unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,20 @@
+meta:
+  source:
+    name: Bachmann and Baumgarten (2013)
+    description: |-
+      The EU-LFS survey question(s) asked to determine the job search methods used by respondents vary country to country. For exact question(s) asked by country, see the <a href="https://ec.europa.eu/eurostat/statistics-explained/index.php/EU_labour_force_survey_-_methodology#Core_questionnaires">EU-LFS core questionnaires documentation</a>.
+
+      The authors note the "annual dataset [...] consists of yearly cross-sections. This means it is not possible to follow individuals over time."
+
+      Note: The method “Test, interview, or examination” is not surveyed in the UK, therefore it is not strictly comparable across countries.
+    url: https://link.springer.com/content/pdf/10.1186%2F2193-9012-2-22.pdf (Table 5)
+    date_accessed: 2019-10-30
+    published_by: |-
+      Bachmann and Baumgarten: How do the unemployed search for a job? – Evidence from the EU Labour Force Survey. IZA Journal of European Labor Studies 2013, 2:22
+  name: Proportion of unemployed using specific search methods - Bachmann and Baumgarten (2013)
+  description: ''
+  is_public: false
+outs:
+  - md5: f8ead8109ba38548a748092560ef5e33
+    size: 8938
+    path: proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013.feather

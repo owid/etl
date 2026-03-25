@@ -1,0 +1,20 @@
+dataset:
+  title: Female labor force participation rate - OWID (2017)
+tables:
+  female_labor_force_participation_rate__owid__2017:
+    variables:
+      female_labor_force_participation_rate__owid_based_on_oecd_2017_and_others:
+        title: Female labor force participation rate (OWID based on OECD 2017 and others)
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Proportion of the female population ages 15 and over that is economically active. Estimates combine various sources. For some observations before 1960, the participation rate is taken with respect to the female population 14 and over. (See complete source for more details). Data is available for OECD member countries, as well as for non-member countries publishing statistics in OECD.stats.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

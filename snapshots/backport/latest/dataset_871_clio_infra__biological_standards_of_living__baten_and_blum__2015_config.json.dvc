@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/871
-    date_accessed: 2023-08-10 08:08:41.272655
+    url: https://admin.owid.io/admin/datasets/871
+    date_accessed: 2026-03-10 08:02:06.559483+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_871_clio_infra__biological_standards_of_living__baten_and_blum__2015
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 73bdb6eee5c881d74f21cd8b6b6fa336
-  size: 4725
-  path: 
-    dataset_871_clio_infra__biological_standards_of_living__baten_and_blum__2015_config.json
+  - md5: 9de84ac2f67ba19a7097fb64001836ce
+    size: 4948
+    path: dataset_871_clio_infra__biological_standards_of_living__baten_and_blum__2015_config.json

@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2826
-    date_accessed: 2023-08-10 07:46:02.414305
+    url: https://admin.owid.io/admin/datasets/2826
+    date_accessed: 2026-03-10 09:27:24.967284+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Time spent, participation time, and participation rates - Eurostat
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2306d82e49b6913facadefc2a6eb70fd
-  size: 11482
-  path: 
-    dataset_2826_time_spent__participation_time__and_participation_rates__eurostat_values.feather
+  - md5: b9a7a80798791cb55d4962f9e46f2e13
+    size: 11194
+    path: dataset_2826_time_spent__participation_time__and_participation_rates__eurostat_values.feather

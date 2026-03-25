@@ -1,0 +1,21 @@
+dataset:
+  title: Renewable Investment as % of GDP - BNEP and World Bank
+tables:
+  renewable_investment_as_pct_of_gdp__bnep_and_world_bank:
+    variables:
+      renewable_investment__pct_of_gdp__bnep_and_world_bank:
+        title: Renewable Investment (% of GDP) (BNEP and World Bank)
+        unit: '% of GDP'
+        short_unit: '%'
+        display:
+          unit: Rate
+        description: Renewable Investment as % of GDP in 2015 - BNEP and World Bank
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

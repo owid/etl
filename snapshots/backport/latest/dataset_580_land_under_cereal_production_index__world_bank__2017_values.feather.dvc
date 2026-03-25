@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/580
-    date_accessed: 2023-08-10 09:01:54.366584
+    url: https://admin.owid.io/admin/datasets/580
+    date_accessed: 2026-03-06 07:46:36.830205+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Land under cereal production index - World Bank (2017)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0022e59384704b74b11394154af7a478
-  size: 44370
-  path: dataset_580_land_under_cereal_production_index__world_bank__2017_values.feather
+  - md5: ba4cc96c5b4f02ba427cf81a3a130a23
+    size: 45546
+    path: dataset_580_land_under_cereal_production_index__world_bank__2017_values.feather

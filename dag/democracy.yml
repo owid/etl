@@ -1,13 +1,4 @@
 steps:
-  # Varieties of Democracy (2025)
-  data://meadow/democracy/2025-03-17/vdem:
-    - snapshot://democracy/2025-03-17/vdem.zip
-  data://garden/democracy/2025-03-17/vdem:
-    - data://meadow/democracy/2025-03-17/vdem
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/democracy/2025-03-17/vdem:
-    - data://garden/democracy/2025-03-17/vdem
 
   # Episodes of Regime Transition (2025)
   data://meadow/democracy/2025-05-05/ert:
@@ -30,17 +21,6 @@ steps:
     - data://garden/democracy/2025-06-26/lexical_index
 
 
-  # Freedom House (2025)
-  data://meadow/democracy/2025-06-02/fh:
-    - snapshot://democracy/2025-06-02/fh_ratings.xlsx
-    - snapshot://democracy/2024-05-16/fh_scores.xlsx
-    - snapshot://democracy/2025-06-02/fh.xlsx
-  data://garden/democracy/2025-06-02/fh:
-    - data://meadow/democracy/2025-06-02/fh
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/democracy/2025-06-02/fh:
-    - data://garden/democracy/2025-06-02/fh
 
   # EIU (2025)
   data://meadow/democracy/2025-03-05/eiu:
@@ -91,3 +71,32 @@ steps:
     - data://meadow/democracy/2024-05-22/claassen_satisfaction
   data://grapher/democracy/2024-05-22/claassen_satisfaction:
     - data://garden/democracy/2024-03-07/claassen_satisfaction
+  data://garden/democracy/2026-03-17/vdem:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/democracy/2026-03-17/vdem
+    - data://garden/demography/2024-07-15/population
+  data://grapher/democracy/2026-03-17/vdem:
+    - data://garden/democracy/2026-03-17/vdem
+  # Varieties of Democracy (2025)
+  data://meadow/democracy/2026-03-17/vdem:
+    - snapshot://democracy/2026-03-17/vdem.zip
+  # Episodes of Regime Transition (2025)
+  data://meadow/democracy/2026-03-18/ert:
+    - snapshot://democracy/2026-03-18/ert.csv
+  data://garden/democracy/2026-03-18/ert:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/democracy/2026-03-18/ert
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/democracy/2026-03-18/ert:
+    - data://garden/democracy/2026-03-18/ert
+  # Freedom House (2025)
+  data://meadow/democracy/2026-03-23/fh:
+    - snapshot://democracy/2026-03-23/fh_ratings.xlsx
+    - snapshot://democracy/2024-05-16/fh_scores.xlsx
+    - snapshot://democracy/2026-03-23/fh.xlsx
+  data://garden/democracy/2026-03-23/fh:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/democracy/2026-03-23/fh
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/democracy/2026-03-23/fh:
+    - data://garden/democracy/2026-03-23/fh

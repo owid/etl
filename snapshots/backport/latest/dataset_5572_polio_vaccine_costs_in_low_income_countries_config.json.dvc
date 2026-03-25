@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5572
-    date_accessed: 2023-08-10 07:41:07.443091
+    url: https://admin.owid.io/admin/datasets/5572
+    date_accessed: 2026-03-05 13:38:43.049794+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5572_polio_vaccine_costs_in_low_income_countries
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a5851735c494597597fef479742859dd
-  size: 4955
-  path: dataset_5572_polio_vaccine_costs_in_low_income_countries_config.json
+  - md5: f25767aac21f99b23b0cd7b0a1767e8d
+    size: 5364
+    path: dataset_5572_polio_vaccine_costs_in_low_income_countries_config.json

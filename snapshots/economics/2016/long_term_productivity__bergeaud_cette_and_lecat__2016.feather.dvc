@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Bergeaud, A., Cette, G. and Lecat, R. (2016)
+    description: |-
+      The Long-Term Productivity database was created as a project at the Bank of France in 2013 by Antonin Bergeaud, Gilbert Cette and Remy Lecat. This database covers productivity relevant statistics, at least for the period 1890 to present, and includes 17 countries in the latest version (2016).
+
+      The starting database used was built by Cette, Kocoglu and Mairesse (2009) on the United States, Japan, France and the United Kingdom over the 1890-2006 period.
+    url: http://www.longtermproductivity.com/download.html
+    date_accessed: 2018-04-03
+    published_by: |-
+      Bergeaud, A., Cette, G. and Lecat, R. (2016): "Productivity Trends in Advanced Countries between 1890 and 2012," Review of Income and Wealth, vol. 62(3), pages 420–444.
+  name: Long term productivity - Bergeaud, Cette, and Lecat (2016)
+  description: |-
+    The Long-Term Productivity database was created as a project at the Bank of France in 2013 by Antonin Bergeaud, Gilbert Cette and Remy Lecat. This database covers productivity relevant statistics, at least for the period 1890 to present, and includes 17 countries in the latest version (2016).
+outs:
+  - md5: 8011f301668331a2b216d01d24307584
+    size: 74690
+    path: long_term_productivity__bergeaud_cette_and_lecat__2016.feather

@@ -1,0 +1,28 @@
+meta:
+  origin:
+    producer: Freedom House
+    title: Freedom in the World
+    description: |-
+      The Freedom in the World report is composed of numerical ratings and supporting descriptive texts for 195 countries and 15 territories. External analysts assess 210 countries and territories, using a combination of on-the-ground research, consultations with local contacts, and information from news articles, nongovernmental organizations, governments, and a variety of other sources. Expert advisers and regional specialists then vet the analysts' conclusions. The final product represents the consensus of the analysts, advisers, and Freedom House staff.
+
+      For each country and territory, Freedom in the World analyzes the electoral process, political pluralism and participation, the functioning of the government, freedom of expression and of belief, associational and organizational rights, the rule of law, and personal autonomy and individual rights.
+    title_snapshot: Freedom in the World - Aggregate Category and Subcategory Scores, 2013-2026
+    description_snapshot: |-
+      The same indicators were present from FIW2013 through FIW2018.
+
+      In FIW2018, Add A (Additional Discretionary Question A) was eliminated, and Add B (Additional Discretionary Question B) was renamed Add Q.
+
+      For data-analysis purposes, Freedom in the World divides countries and territories into six world regions: Africa, the Americas, Asia-Pacific, Eurasia, Europe, and the Middle East. Prior to the 2022 edition, the countries of North Africa were grouped with the Middle East rather than the rest of Africa.
+    citation_full: |-
+      Freedom House. Freedom in the World 2026. Washington, DC: Freedom House, 2026. Online: https://freedomhouse.org/report/freedom-world
+    url_main: https://freedomhouse.org/report/freedom-world
+    url_download: https://freedomhouse.org/report/freedom-world
+    date_accessed: '2026-03-23'
+    date_published: '2026-03-01'
+    license:
+      name: Freedom House 2026
+      url: https://freedomhouse.org/about-us/content-permissions
+outs:
+  - md5: a4d38f0264c17eb214829b2bb2679969
+    size: 541873
+    path: fh.xlsx

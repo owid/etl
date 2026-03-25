@@ -1,0 +1,32 @@
+dataset:
+  title: Share of women in top income groups – Atkinson, Casarico & Voitchovsky (2018)
+tables:
+  share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018:
+    variables:
+      share_of_women_in_top_0_1pct:
+        title: Share of women in top 0.1%
+        unit: ''
+      share_of_women_in_top_0_25pct:
+        title: Share of women in top 0.25%
+        unit: ''
+      share_of_women_in_top_0_5pct:
+        title: Share of women in top 0.5%
+        unit: ''
+      share_of_women_in_top_1pct:
+        title: Share of women in top 1%
+        unit: ''
+      share_of_women_in_top_10pct:
+        title: Share of women in top 10%
+        unit: ''
+      share_of_women_in_top_5pct:
+        title: Share of women in top 5%
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

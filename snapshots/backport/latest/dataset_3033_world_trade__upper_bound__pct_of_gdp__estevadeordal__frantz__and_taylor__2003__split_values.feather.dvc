@@ -1,17 +1,15 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3033
-    date_accessed: 2023-08-10 07:49:20.888240
+    url: https://admin.owid.io/admin/datasets/3033
+    date_accessed: 2026-03-10 07:47:45.603709+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: World trade - upper bound (% of GDP) (Estevadeordal, Frantz, and Taylor (2003))
-    (split)
+  name: World trade - upper bound (% of GDP) (Estevadeordal, Frantz, and Taylor (2003)) (split)
   description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4a18538d55b458803d612859290cbcbb
-  size: 6306
-  path: 
-    dataset_3033_world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split_values.feather
+  - md5: 29da5f2f93872c5b9956d8f3b15e78b1
+    size: 6346
+    path: dataset_3033_world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split_values.feather

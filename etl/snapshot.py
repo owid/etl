@@ -36,6 +36,20 @@ from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump, yaml_l
 log = structlog.get_logger()
 
 
+class SnapshotNotFoundException(Exception):
+    """Raised when a snapshot file is not found on the remote server.
+
+    This is a plain Exception subclass (no unpicklable attributes) so it can
+    safely travel across process boundaries in ProcessPoolExecutor workers.
+    """
+
+    def __init__(self, uri: str, md5: str) -> None:
+        super().__init__(
+            f"Snapshot file not found on the remote server: {uri} (md5: {md5}). "
+            f"Have you run `etls {uri} --upload` to upload it?"
+        )
+
+
 class SnapshotArchive:
     """Context manager for reading files from snapshot archives.
 
@@ -196,6 +210,20 @@ class Snapshot:
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def _snapshot_exists_on_remote(self, md5: str) -> bool:
+        """Check if snapshot file exists on R2 without downloading it."""
+        if self.metadata.is_public:
+            url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
+            try:
+                resp = requests.head(url, timeout=10)
+                return resp.status_code == 200
+            except requests.RequestException:
+                return False
+        else:
+            # For private snapshots, assume it exists if md5 matches — we can't
+            # easily do a HEAD request on S3 without more setup
+            return True
+
     def _download_dvc_file(self, md5: str) -> None:
         """Download file from remote to self.path."""
         self.path.parent.mkdir(exist_ok=True, parents=True)
@@ -203,7 +231,12 @@ class Snapshot:
             # TODO: temporarily download files from R2 instead of public link to prevent
             # issues with cached snapshots. Remove this when convenient
             download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
-            download_helpers.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
+            try:
+                download_helpers.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
+            except requests.exceptions.HTTPError as e:
+                if e.response is not None and e.response.status_code == 404:
+                    raise SnapshotNotFoundException(self.uri, md5) from None
+                raise
         else:
             download_url = f"s3://{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
             s3_utils.download(download_url, str(self.path))
@@ -317,10 +350,13 @@ class Snapshot:
         with open(self.metadata_path, "r") as f:
             meta = ruamel_load(f)
 
-        # If the file already exists with the same md5, skip the upload
+        # If the file already exists with the same md5, verify it's actually on R2 before skipping
         if meta.get("outs") and meta["outs"][0]["md5"] == md5:
-            log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
-            return
+            if self._snapshot_exists_on_remote(md5):
+                log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
+                return
+            else:
+                log.warning("File md5 matches .dvc metadata but is missing from R2, re-uploading", snapshot=self.uri)
 
         # Upload to S3
         bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
@@ -855,7 +891,9 @@ class SnapshotMeta(MetaBase):
             js = json.load(f)
 
         # NOTE: this is similar to `convert_grapher_source`, DRY it when possible
-        assert len(js["sources"]) == 1
+        assert len(js["sources"]) >= 1
+        # Use only the first source for snapshot metadata; the garden step
+        # handles per-variable sources from the backport config separately.
         s = js["sources"][0]
         self.name = js["dataset"]["name"]
         self.source = Source(

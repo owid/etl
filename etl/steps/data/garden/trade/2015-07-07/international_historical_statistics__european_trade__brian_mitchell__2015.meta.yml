@@ -1,0 +1,21 @@
+dataset:
+  title: 'International Historical Statistics: European trade - Brian Mitchell (2015)'
+tables:
+  international_historical_statistics__european_trade__brian_mitchell__2015:
+    variables:
+      historical_european_trade__brian_mitchell__2015:
+        title: Historical European trade (Brian Mitchell (2015))
+        unit: '%'
+        short_unit: '%'
+        display:
+          shortUnit: '%'
+          unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

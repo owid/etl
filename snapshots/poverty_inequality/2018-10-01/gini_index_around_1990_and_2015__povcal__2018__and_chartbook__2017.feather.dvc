@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Povcal (2018), The Chartbook of Economic Inequality (2017), Kanbur et al (2017) Table 1.B
+    url: http://iresearch.worldbank.org/PovcalNet/povOnDemand.aspx ; https://www.chartbookofeconomicinequality.com
+    date_accessed: 2018-10-01
+    published_by: |-
+      Povcal (2018); Atkinson, Hasell, Morelli, and Roser (2017), “The Chartbook of Economic Inequality”; Kanbur, R., & Wang, Y. 2017. The great Chinese inequality turnaround. ECINEQ Working Paper Series WP 2017 – 433
+  name: Gini Index around 1990 and 2015 – Povcal (2018) and Chartbook (2017)
+  description: ''
+  is_public: false
+outs:
+  - md5: 639225fb05a38cf1b3142bc3fa77b747
+    size: 7970
+    path: gini_index_around_1990_and_2015__povcal__2018__and_chartbook__2017.feather

@@ -1,0 +1,18 @@
+dataset:
+  title: US Maternal Mortality and FLFP Index - OWID (2017)
+tables:
+  us_maternal_mortality_and_flfp_index__owid__2017:
+    variables:
+      maternal_mortality_index__owid__2017:
+        title: Maternal Mortality Index (OWID (2017))
+        unit: ''
+        description: Measures maternal mortality as an index to 1900.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/1020
-    date_accessed: 2023-08-10 08:08:00.258928
+    url: https://admin.owid.io/admin/datasets/1020
+    date_accessed: 2026-03-05 10:55:44.143867+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Global freshwater use since 1900 - IGB
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cd6238ac7eddc93d8c2c9ebccba6d65a
-  size: 10202
-  path: dataset_1020_global_freshwater_use_since_1900__igb_values.feather
+  - md5: fc8227387cd4f40408af58e50975d967
+    size: 10674
+    path: dataset_1020_global_freshwater_use_since_1900__igb_values.feather

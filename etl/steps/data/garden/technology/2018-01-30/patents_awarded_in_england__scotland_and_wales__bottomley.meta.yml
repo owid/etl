@@ -1,0 +1,17 @@
+dataset:
+  title: Patents awarded in England, Scotland and Wales - Bottomley
+tables:
+  patents_awarded_in_england__scotland_and_wales__bottomley:
+    variables:
+      number_of_patents_awarded:
+        title: Number of patents awarded
+        unit: patents awarded per year
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: FishStat via Pauly, Zeller, and Palomares from Sea Around Us Concepts, Design and Data.
+    description: |-
+      This data is sourced from the Sea Around Us database published by Pauly, Zeller and Palomares, available at: http://www.seaaroundus.org/.
+
+      This project relies on multiple sources but primarily the FishStat database published by the Food and Agriculture Organization of the United Nations. This is available here: http://www.fao.org/fishery/statistics/software/fishstatj/en.
+    url: http://www.seaaroundus.org/
+    date_accessed: 2026-03-05
+    published_by: Pauly D., Zeller D., Palomares M.L.D. (Editors), 2020. Sea Around Us Concepts, Design and Data (seaaroundus.org).
+  name: Global fish catch by end use (FishStat via SeaAroundUs)
+  description: ''
+outs:
+  - md5: 91f21e02ffb19d69f7f79c06038f91b5
+    size: 1595026
+    path: global_fish_catch_by_end_use__fishstat_via_seaaroundus.feather

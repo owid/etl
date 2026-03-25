@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5222
-    date_accessed: 2023-08-10 09:21:22.855929
+    url: https://admin.owid.io/admin/datasets/5222
+    date_accessed: 2026-03-05 09:54:20.218579+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5222_deaths_attributed_to_air_pollution__lelieveld_et_al__2019
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 523a48c5b230dd97d3b4c8bd0eb00718
-  size: 15138
-  path: 
-    dataset_5222_deaths_attributed_to_air_pollution__lelieveld_et_al__2019_config.json
+  - md5: dfe28e3dc00c0ec1dd699781cf7eba45
+    size: 16570
+    path: dataset_5222_deaths_attributed_to_air_pollution__lelieveld_et_al__2019_config.json

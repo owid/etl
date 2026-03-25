@@ -1,0 +1,203 @@
+dataset:
+  title: |-
+    Biological and chemical weapons proliferation – OWID based on Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008) and the UN (2022)
+tables:
+  ? |-
+    biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022
+  : variables:
+      bioweapons_convention:
+        title: bioweapons_convention
+        unit: ''
+        description: |-
+          The variable identifies whether a country ratified the Biological Weapons Convention, signed it, or neither signed nor ratified it, using data from the United Nations (2022).
+      bioweapons_convention_num:
+        title: bioweapons_convention_num
+        unit: ''
+        description: |-
+          The variable identifies whether a country ratified the Biological Weapons Convention (score of 2), signed it (score of 1), or neither signed nor ratified it (score of 0), using data from the United Nations (2022).
+      bioweapons_status_current:
+        title: bioweapons_status_current
+        unit: ''
+        description: |-
+          The variable identifies whether a country pursues, possesses, or has recently used biological weapons, using information from Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008) and the UN (2022).
+
+          A country is coded as pursuing biological weapons if it is increasing its capabilities or has a dedicated program. A country is coded as possessing biological weapons if it has weapons which it can deliver.
+
+          The variable also identifies when a country was alleged by another country of pursuing, possessing, or using biological weapons, but these allegations have not been confirmed by the country itself or impartial observers.
+      bioweapons_status_current_num:
+        title: bioweapons_status_current_num
+        unit: ''
+        description: |-
+          The variable identifies whether a country pursues, possesses, or has recently used biological weapons, using information from Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008) and the UN (2022).
+
+          A country is coded as pursuing biological weapons if it is increasing its capabilities or has a dedicated program. A country is coded as possessing biological weapons if it has weapons which it can deliver.
+
+          The variable also identifies when a country was alleged by another country of pursuing, possessing, or using biological weapons, but these allegations have not been confirmed by the country itself or impartial observers.
+
+          A country receives a score of 0 if it neither pursues nor possesses biological weapons, and a score of 1 if it allegedly pursues them.
+      bioweapons_status_hist:
+        title: bioweapons_status_hist
+        unit: ''
+        description: |-
+          The variable identifies whether a country ever pursued, possessed, or used biological weapons, using information from Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008) and the UN (2022).
+
+          A country is coded as having pursued biological weapons if it increased its capabilities or had a dedicated program. A country is coded as having possessed biological weapons if it had weapons which it could have delivered.
+
+          The closest a country got to using biological weapons ever is recorded.
+
+          The variable also identifies when a country was alleged by another country of pursuing, possessing, or using biological weapons, but these allegations have not been confirmed by the country itself or impartial observers.
+      bioweapons_status_hist_num:
+        title: bioweapons_status_hist_num
+        unit: ''
+        description: |-
+          The variable identifies whether a country ever pursued, possessed, or used biological weapons, using information from Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008) and the UN (2022).
+
+          A country is coded as having pursued biological weapons if it increased its capabilities or had a dedicated program. A country is coded as having possessed biological weapons if it had weapons which it could have delivered.
+
+          The closest a country got to using biological weapons ever is recorded.
+
+          The variable also identifies when a country was alleged by another country of pursuing, possessing, or using biological weapons, but these allegations have not been confirmed by the country itself or impartial observers.
+
+          A country receives a score of 0 if it neither pursued nor possessed biological weapons, a score of 1 if it allegedly pursued them, a score of 2 if it pursued them, a score of 3 if it allegedly possessed them, a score of 4 if it possessed them, and a score of 5 if it used biological weapons.
+      chemweapons_convention:
+        title: chemweapons_convention
+        unit: ''
+        description: |-
+          The variable identifies whether a country ratified the Chemical Weapons Convention, signed it, or neither signed nor ratified it, using data from the United Nations (2022).
+      chemweapons_convention_num:
+        title: chemweapons_convention_num
+        unit: ''
+        description: |-
+          The variable identifies whether a country ratified the Chemical Weapons Convention (score of 2), signed it (score of 1), or neither signed nor ratified it (score of 0), using data from the United Nations (2022).
+      chemweapons_status_current:
+        title: chemweapons_status_current
+        unit: ''
+        description: |-
+          The variable identifies whether a country pursues, possesses, or has recently used chemical weapons, using information from Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008) and the UN (2022).
+
+          A country is coded as having recently used chemical weapons if it did so in the previous ten years. A country is coded as pursuing chemical weapons if it is increasing its capabilities or has a dedicated program. A country is coded as possessing chemical weapons if it has weapons which it can deliver. 'Recent' means the country used or allegedly used them within the last decade.
+
+          The variable also identifies when a country was alleged by another country of pursuing, possessing, or using chemical weapons, but these allegations have not been confirmed by the country itself or impartial observers.
+      chemweapons_status_current_num:
+        title: chemweapons_status_current_num
+        unit: ''
+        description: |-
+          The variable identifies whether a country pursues, possesses, or has recently used chemical weapons, using information from Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008) and the UN (2022).
+
+          A country is coded as having recently used chemical weapons if it did so in the previous ten years. A country is coded as pursuing chemical weapons if it is increasing its capabilities or has a dedicated program. A country is coded as possessing chemical weapons if it has weapons which it can deliver. 'Recent' means the country used or allegedly used them within the last decade.
+
+          The variable also identifies when a country was alleged by another country of pursuing, possessing, or using chemical weapons, but these allegations have not been confirmed by the country itself or impartial observers.
+
+          A country receives a score of 0 if it neither pursues nor possesses chemical weapons, a score of 1 if it allegedly pursues them, score of 2 if it possesses them, a score of 3 if it allegedly recently used them, and a score of 4 if it recently used them.
+      chemweapons_status_hist:
+        title: chemweapons_status_hist
+        unit: ''
+        description: |-
+          The variable identifies whether a country ever pursued, possessed, or used chemical weapons, using information from Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008) and the UN (2022).
+
+          A country is coded as having pursued chemical weapons if it was increasing its capabilities or had a dedicated program. A country is coded as having possessed chemical weapons if it has weapons which it can deliver.
+
+          The closest a country got to using biological weapons ever is recorded.
+
+          The variable also identifies when a country was alleged by another country of pursuing, possessing, or using chemical weapons, but these allegations have not been confirmed by the country itself or impartial observers.
+      chemweapons_status_hist_num:
+        title: chemweapons_status_hist_num
+        unit: ''
+        description: |-
+          The variable identifies whether a country ever pursued, possessed, or used chemical weapons, using information from Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008) and the UN (2022).
+
+          A country is coded as having pursued chemical weapons if it was increasing its capabilities or had a dedicated program. A country is coded as having possessed chemical weapons if it has weapons which it can deliver.
+
+          The closest a country got to using chemical weapons ever is recorded.
+
+          The variable also identifies when a country was alleged by another country of pursuing, possessing, or using chemical weapons, but these allegations have not been confirmed by the country itself or impartial observers.
+
+          A country receives a score of 0 if it neither pursued nor possessed chemical weapons, a score of 1 if it pursued them, score of 2 if it allegedly possessed them, a score of 3 if it possessed them, a score of 4 if it allegedly used them, and a score of 5 if it used chemical weapons.
+      num_bioweapons_curr_allepur:
+        title: num_bioweapons_curr_allepur
+        unit: ''
+        description: The variable identifies the number of countries that currently allegedly pursue biological weapons.
+      num_bioweapons_curr_neither:
+        title: num_bioweapons_curr_neither
+        unit: ''
+        description: The variable identifies the number of countries that currently neither pursue nor possess biological
+          weapons.
+      num_bioweapons_hist_alleposs:
+        title: num_bioweapons_hist_alleposs
+        unit: ''
+        description: The variable identifies the number of countries that allegedly possessed biological weapons.
+      num_bioweapons_hist_allepur:
+        title: num_bioweapons_hist_allepur
+        unit: ''
+        description: The variable identifies the number of countries that allegedly pursued biological weapons.
+      num_bioweapons_hist_neither:
+        title: num_bioweapons_hist_neither
+        unit: ''
+        description: The variable identifies the number of countries that neither pursued nor possessed biological weapons.
+      num_bioweapons_hist_poss:
+        title: num_bioweapons_hist_poss
+        unit: ''
+        description: The variable identifies the number of countries that possessed biological weapons.
+      num_bioweapons_hist_pur:
+        title: num_bioweapons_hist_pur
+        unit: ''
+        description: The variable identifies the number of countries that pursued biological weapons.
+      num_bioweapons_hist_use:
+        title: num_bioweapons_hist_use
+        unit: ''
+        description: The variable identifies the number of countries that used biological weapons.
+      num_chemweapons_curr_allepur:
+        title: num_chemweapons_curr_allepur
+        unit: ''
+        description: The variable identifies the number of countries that currently allegedly pursue chemical weapons.
+      num_chemweapons_curr_alleuse:
+        title: num_chemweapons_curr_alleuse
+        unit: ''
+        description: |-
+          The variable identifies the number of countries that recently allegedly used chemical weapons. 'Recent' means in the previous ten years.
+      num_chemweapons_curr_neither:
+        title: num_chemweapons_curr_neither
+        unit: ''
+        description: The variable identifies the number of countries that currently neither pursue nor possess chemical weapons.
+      num_chemweapons_curr_poss:
+        title: num_chemweapons_curr_poss
+        unit: ''
+        description: The variable identifies the number of countries that currently allegedly possess chemical weapons.
+      num_chemweapons_curr_use:
+        title: num_chemweapons_curr_use
+        unit: ''
+        description: |-
+          The variable identifies the number of countries that recently used chemical weapons.  'Recent' means in the previous ten years.
+      num_chemweapons_hist_alleposs:
+        title: num_chemweapons_hist_alleposs
+        unit: ''
+        description: The variable identifies the number of countries that allegedly possessed chemical weapons.
+      num_chemweapons_hist_alleuse:
+        title: num_chemweapons_hist_alleuse
+        unit: ''
+        description: The variable identifies the number of countries that allegedly used chemical weapons.
+      num_chemweapons_hist_neither:
+        title: num_chemweapons_hist_neither
+        unit: ''
+        description: The variable identifies the number of countries that neither pursued nor possessed chemical weapons.
+      num_chemweapons_hist_poss:
+        title: num_chemweapons_hist_poss
+        unit: ''
+        description: The variable identifies the number of countries that possessed chemical weapons.
+      num_chemweapons_hist_pur:
+        title: num_chemweapons_hist_pur
+        unit: ''
+        description: The variable identifies the number of countries that pursued chemical weapons.
+      num_chemweapons_hist_use:
+        title: num_chemweapons_hist_use
+        unit: ''
+        description: The variable identifies the number of countries that used chemical weapons.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,77 @@
+dataset:
+  title: Global wildlife trade (Harfoot et al. 2018)
+tables:
+  global_wildlife_trade__harfoot_et_al__2018:
+    variables:
+      captive_exported_organisms:
+        title: Captive exported organisms
+        unit: whole organism equivalents (WOE)
+        display:
+          name: Wildlife exports of captive species
+        description: |-
+          Wildlife trade is quantified in terms of whole organism equivalents (WOE). For example, five skulls represent five WOEs, whereas it's assumed that four ears are sourced from two animals and so represent two WOEs.
+      captive_imported_organisms:
+        title: Captive imported organisms
+        unit: whole organism equivalents (WOE)
+        display:
+          name: Wildlife imports of species in captivity
+        description: |-
+          Wildlife trade is quantified in terms of whole organism equivalents (WOE). For example, five skulls represent five WOEs, whereas it's assumed that four ears are sourced from two animals and so represent two WOEs.
+      exported_organisms:
+        title: Exported organisms
+        unit: whole organism equivalents
+        display:
+          name: Wildlife exports
+        description: |-
+          Wildlife trade is quantified in terms of whole organism equivalents (WOE). For example, five skulls represent five WOEs, whereas it's assumed that four ears are sourced from two animals and so represent two WOEs.
+      exported_taxa:
+        title: Exported taxa
+        unit: ''
+      exporting_states:
+        title: Exporting states
+        unit: ''
+      imported_organisms:
+        title: Imported organisms
+        unit: whole organism equivalents (WOE)
+        display:
+          name: Wildlife imports
+        description: |-
+          Wildlife trade is quantified in terms of whole organism equivalents (WOE). For example, five skulls represent five WOEs, whereas it's assumed that four ears are sourced from two animals and so represent two WOEs.
+      imported_taxa:
+        title: Imported taxa
+        unit: ''
+      importing_states:
+        title: Importing states
+        unit: ''
+      ratio_of_wild_to_captive_exports:
+        title: Ratio of wild-to-captive exports
+        unit: ''
+      share_of_exports_from_captive_organisms:
+        title: Share of exports from captive organisms
+        unit: ''
+      share_of_exports_from_wild_organisms:
+        title: Share of exports from wild organisms
+        unit: ''
+      wild_exported_organisms:
+        title: Wild exported organisms
+        unit: whole organism equivalents (WOE)
+        display:
+          name: Wildlife exports of wild species
+        description: |-
+          Wildlife trade is quantified in terms of whole organism equivalents (WOE). For example, five skulls represent five WOEs, whereas it's assumed that four ears are sourced from two animals and so represent two WOEs.
+      wild_imported_organisms:
+        title: Wild imported organisms
+        unit: whole organism equivalents (WOE)
+        display:
+          name: Wildlife imports of wild species
+        description: |-
+          Wildlife trade is quantified in terms of whole organism equivalents (WOE). For example, five skulls represent five WOEs, whereas it's assumed that four ears are sourced from two animals and so represent two WOEs.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

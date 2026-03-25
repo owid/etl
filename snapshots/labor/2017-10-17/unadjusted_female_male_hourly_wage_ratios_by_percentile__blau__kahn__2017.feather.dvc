@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Blau, Kahn (2017)
+    url: http://pubs.aeaweb.org/doi/pdfplus/10.1257/jel.20160995
+    date_accessed: 2017-10-17
+    published_by: |-
+      Blau, Francine D., and Lawrence M. Kahn (2017). "The Gender Wage Gap: Extent, Trends, and Explanations." Journal of Economic Literature, 55(3): 789-865.
+  name: Unadjusted female-male hourly wage ratios by percentile – Blau, Kahn (2017)
+  description: ''
+outs:
+  - md5: 54f3cf4b0dbcdb32193bfd238ad94c48
+    size: 4226
+    path: unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017.feather

@@ -1,0 +1,23 @@
+dataset:
+  title: Country programmable aid (CPA) from 2000-2019 (OECD, 2018)
+tables:
+  country_programmable_aid__cpa__from_2000_2019__oecd__2018:
+    variables:
+      cpa_from_all_donors__oecd__2018:
+        title: CPA from all donors (OECD, 2018)
+        unit: USD
+        short_unit: $
+        display:
+          conversionFactor: 1000000
+          name: Country Programmable Aid (CPA) recieved
+        description: |-
+          Country Programmable Aid (CPA) is the portion of aid that donors programme at country or regional level. CPA for bilateral donors is defined through exclusions, by subtracting from total gross bilateral official development assistance (ODA), all activities that: (i) are inherently unpredictable by nature (humanitarian aid and debt relief); or (ii) entail no cross-border flows (administrative costs, imputed student costs, promotion of development awareness, and costs related to research and refugees in donor countries); or (iii) do not form part of co-operation agreements between governments (food aid, aid from local governments, core funding to NGOs, ODA equity investments, aid through secondary agencies, and aid which is not allocable by country or region). CPA from multilateral agencies is derived by subtracting from total multilateral outflows the non-CPA elements that are applicable to multilateral agencies. CPA is measured in gross disbursement terms and does not net out loan repayments since these are not usually factored into country aid decisions. CPA tracks the proportion of ODA over which recipient countries have, or could have, significant say. As such, CPA is closer to capturing actual aid flows to countries than the concept of official development assistance, and has been proven a good proxy for aid recorded at the country level. CPA is derived from the standard OECD Development Assistance Committee (DAC) and Creditor Reporting System (CRS). This indicator is measured in USD constant prices, using 2016 as the base year.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

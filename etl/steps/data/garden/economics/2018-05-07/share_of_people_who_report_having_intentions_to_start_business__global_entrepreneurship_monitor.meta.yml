@@ -1,0 +1,19 @@
+dataset:
+  title: Share of people who report having intentions to start business - Global Entrepreneurship Monitor
+tables:
+  share_of_people_who_report_having_intentions_to_start_business__global_entrepreneurship_monitor:
+    variables:
+      share_of_people_who_report_having_intentions_to_start_business__global_entrepreneurship_monitor:
+        title: Share of people who report having intentions to start business (Global Entrepreneurship Monitor)
+        unit: ''
+        description: |-
+          Percentage of 18-64 population who intend to start a business within three years (individuals already involved in any stage of entrepreneurial activity excluded)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

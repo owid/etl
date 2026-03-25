@@ -134,7 +134,7 @@ with st_horizontal(vertical_alignment="flex-end", justify_content="space-between
     - **Existing Google sheet**: Update from a Google sheet (already imported in the database).
     - **Local CSV**: Import from a local CSV.
     """,
-        default=[IMPORT_GSHEET],
+        default=IMPORT_GSHEET,
     )
 
     # Show brief guidelines for each import method

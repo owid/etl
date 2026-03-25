@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Broadberry, S., Campbell, B. M., Klein, A., Overton, M., & Van Leeuwen, B. (2015)
+    description: |-
+      This dataset is produced using 'A5. Service Sector 1270-1870' sheet in BoE dataset. For each variables, output figures are indexed those in year 1700 (i.e. 1700 = 100), and they are measured on a log scale.
+    url: http://www.bankofengland.co.uk/research/Pages/datasets/default.aspx#threecenturies
+    date_accessed: 2017-08-25
+    published_by: Bank of England (BoE) 2017
+  name: Output of key services sectors in England - using Bank of England (2017)
+  description: This data consists the measures of output in key services sectors in England (1270-1870).
+outs:
+  - md5: 16f2e6807198d4a5247a89abce641914
+    size: 30210
+    path: output_of_key_services_sectors_in_england__using_bank_of_england__2017.feather

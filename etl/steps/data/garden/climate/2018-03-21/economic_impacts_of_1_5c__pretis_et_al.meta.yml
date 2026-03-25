@@ -1,0 +1,29 @@
+dataset:
+  title: Economic impacts of 1.5C - Pretis et al.
+tables:
+  economic_impacts_of_1_5c__pretis_et_al:
+    variables:
+      _17th_percentile:
+        title: 17th percentile
+        unit: '%'
+      _2_5th_percentile:
+        title: 2.5th percentile
+        unit: '%'
+      _83rd_percentile:
+        title: 83rd percentile
+        unit: '%'
+      _97_5th_percentile:
+        title: 97.5th percentile
+        unit: '%'
+      median:
+        title: Median
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -259,6 +259,12 @@ steps:
   data://grapher/emissions/2023-10-24/emission_factors:
     - data://garden/emissions/2023-10-24/emission_factors
   #
+  # Decoupling of GDP and CO2.
+  #
+  data://garden/emissions/2025-11-13/gdp_and_co2_decoupling:
+    - data://garden/worldbank_wdi/2025-09-08/wdi
+    - data://garden/gcp/2025-11-13/global_carbon_budget
+  #
   # Climate Watch - Greenhouse gas emissions by sector.
   #
   data://meadow/climate_watch/2025-09-19/emissions_by_sector:
@@ -276,3 +282,10 @@ steps:
   #
   data://grapher/climate_watch/2025-09-19/emissions_by_sector:
     - data://garden/climate_watch/2025-09-19/emissions_by_sector
+  #
+  # Decoupling of GDP and CO2.
+  #
+  data://external/emissions/2026-02-04/gdp_and_co2_decoupling:
+    - data://garden/worldbank_wdi/2026-02-27/wdi
+    - data://garden/gcp/2025-11-13/global_carbon_budget
+    - data://garden/regions/2023-01-01/regions

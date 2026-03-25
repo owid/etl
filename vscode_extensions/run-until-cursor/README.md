@@ -10,7 +10,7 @@ This extension allows you to **execute all lines inside `run()` up to the line w
 
 ## Installation
 
-You don't have to install it manually if you are on a working ETL environment. Just running `make install-vscode-extensions` should install the latest version of this extension.
+You don't have to install it manually if you are on a working ETL environment. Just running `make vsce-sync` should install the latest version of this extension.
 
 However, if you want to manually install this extension, you can:
 - Press `cmd+shift+p` and select "Extensions: Install from VSIX".

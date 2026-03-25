@@ -1,0 +1,50 @@
+dataset:
+  title: Depression prevalence by education - OECD
+tables:
+  depression_prevalence_by_education__oecd:
+    variables:
+      all_levels_of_education__active:
+        title: All levels of education (active)
+        unit: '%'
+      all_levels_of_education__employed:
+        title: All levels of education (employed)
+        unit: '%'
+      all_levels_of_education__total:
+        title: All levels of education (total)
+        unit: '%'
+      below_upper_secondary_education__active:
+        title: Below upper secondary education (active)
+        unit: '%'
+      below_upper_secondary_education__employed:
+        title: Below upper secondary education (employed)
+        unit: '%'
+      below_upper_secondary_education__total:
+        title: Below upper secondary education (total)
+        unit: '%'
+      tertiary_education__active:
+        title: Tertiary education (active)
+        unit: '%'
+      tertiary_education__employed:
+        title: Tertiary education (employed)
+        unit: '%'
+      tertiary_education__total:
+        title: Tertiary education (total)
+        unit: '%'
+      upper_secondary_and_post_secondary_non_tertiary_education__active:
+        title: Upper secondary and post-secondary non-tertiary education (active)
+        unit: '%'
+      upper_secondary_and_post_secondary_non_tertiary_education__employed:
+        title: Upper secondary and post-secondary non-tertiary education (employed)
+        unit: '%'
+      upper_secondary_and_post_secondary_non_tertiary_education__total:
+        title: Upper secondary and post-secondary non-tertiary education (total)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

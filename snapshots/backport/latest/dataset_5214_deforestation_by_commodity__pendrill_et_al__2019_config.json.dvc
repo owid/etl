@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5214
-    date_accessed: 2023-08-10 07:50:16.448399
+    url: https://admin.owid.io/admin/datasets/5214
+    date_accessed: 2026-03-10 08:06:07.686180+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5214_deforestation_by_commodity__pendrill_et_al__2019
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2a6a568040b76d366ebbf734bcd476bc
-  size: 8854
-  path: dataset_5214_deforestation_by_commodity__pendrill_et_al__2019_config.json
+  - md5: fe82d9a0eb1a919fd5cf0097c86226eb
+    size: 9635
+    path: dataset_5214_deforestation_by_commodity__pendrill_et_al__2019_config.json

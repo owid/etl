@@ -828,22 +828,20 @@ class Dataset(Base):
         if not dataset_ids:
             return []
 
-        query = text("""
-            SELECT d.*
-            FROM datasets d
-            WHERE d.id IN :dataset_ids
-            AND d.isArchived = 0
-            AND NOT EXISTS (
-                SELECT 1
-                FROM variables v
-                JOIN chart_dimensions cd ON cd.variableId = v.id
-                WHERE v.datasetId = d.id
+        query = (
+            select(cls)
+            .where(
+                cls.id.in_(dataset_ids),
+                cls.isArchived == 0,
+                ~select(Variable.id)
+                .where(Variable.datasetId == cls.id)
+                .join(ChartDimensions, ChartDimensions.variableId == Variable.id)
+                .exists(),
             )
-            ORDER BY d.id
-        """)
+            .order_by(cls.id)
+        )
 
-        result = session.execute(select(cls).from_statement(query).params(dataset_ids=tuple(dataset_ids)))
-        return list(result.scalars().all())
+        return list(session.scalars(query).all())
 
 
 class SourceDescription(TypedDict, total=False):
@@ -2105,9 +2103,10 @@ class ExplorerView(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     explorerSlug: Mapped[str] = mapped_column(String(255, "utf8mb4_0900_as_cs"))
-    explorerView: Mapped[dict] = mapped_column(JSON)
+    dimensions: Mapped[dict] = mapped_column(JSON)
     chartConfigId: Mapped[Optional[str]] = mapped_column(CHAR(36, "utf8mb4_0900_as_cs"))
     error: Mapped[Optional[str]] = mapped_column(TEXT(collation="utf8mb4_0900_as_cs"))
+    viewId: Mapped[str] = mapped_column(String(512, "utf8mb4_0900_as_cs"))
 
     chart_config: Mapped[Optional["ChartConfig"]] = relationship("ChartConfig", back_populates="explorer_viewss")
     explorer: Mapped["Explorer"] = relationship("Explorer", back_populates="explorer_viewss")
@@ -2221,17 +2220,23 @@ class NarrativeChart(Base):
         for source_var_id in source_var_ids:
             source_var = source_session.get(Variable, source_var_id)
             if not source_var:
-                log.warning(f"Variable {source_var_id} not found in source for narrative chart {self.id}")
+                log.warning(
+                    f"Variable {source_var_id} not found in source for narrative chart {self.id}, keeping original ID"
+                )
+                remap_ids[source_var_id] = source_var_id
                 continue
 
+            matched = False
             if source_var.catalogPath:
                 try:
                     target_var = Variable.from_catalog_path(target_session, source_var.catalogPath)
                     remap_ids[source_var_id] = target_var.id
+                    matched = True
                 except NoResultFound:
                     log.warning(f"Variable catalogPath not found in target: {source_var.catalogPath}")
-            else:
-                # Old style variable, match on name and datasetId
+
+            if not matched:
+                # Try matching by name and datasetId
                 try:
                     target_var = target_session.scalars(
                         select(Variable).where(
@@ -2239,10 +2244,21 @@ class NarrativeChart(Base):
                         )
                     ).one()
                     remap_ids[source_var_id] = target_var.id
+                    matched = True
                 except NoResultFound:
+                    pass
+
+            if not matched:
+                # Variable might exist in target with the same ID (e.g. from a dataset
+                # that wasn't changed). Use the same ID as a fallback.
+                target_var = target_session.get(Variable, source_var_id)
+                if target_var:
+                    remap_ids[source_var_id] = source_var_id
+                else:
                     log.warning(
-                        f"Variable with name `{source_var.name}` and datasetId `{source_var.datasetId}` not found in target"
+                        f"Variable {source_var_id} ({source_var.name}) not found in target for narrative chart {self.id}, keeping original ID"
                     )
+                    remap_ids[source_var_id] = source_var_id
 
         if not remap_ids:
             return merged_config

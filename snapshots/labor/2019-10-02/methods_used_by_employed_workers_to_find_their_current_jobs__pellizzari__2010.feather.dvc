@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Methods used by employed workers to find their current jobs - Pellizzari (2010)
+    description: |-
+      Employed workers in the ECHP are asked to indicate how they have found their current job. The exact phrasing of the question reads: ”By what means were you first informed about your current job?”. Six possible answers are offered, and respondents can choose only one. The sample includes individuals aged 16-64 in 14 European countries over the period 1994-1999.
+    url: http://eprints.lse.ac.uk/19980/1/Do_Friends_and_Relatives_Really_Help_in_Getting_a_Good_Job.pdf
+    date_accessed: 2019-10-02
+    published_by: Pellizzari, M. (2010). Do friends and relatives really help in getting a good job?. ILR Review, 63(3), 494-510.
+  name: Methods used by employed workers to find their current jobs - Pellizzari (2010)
+  description: ''
+  is_public: false
+outs:
+  - md5: 49b59d6c213b2a46ae101130e5d53599
+    size: 7026
+    path: methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010.feather

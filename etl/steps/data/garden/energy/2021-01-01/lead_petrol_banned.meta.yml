@@ -1,0 +1,23 @@
+dataset:
+  title: lead_petrol_banned
+tables:
+  lead_petrol_banned:
+    variables:
+      lead_petrol_banned:
+        title: lead_petrol_banned
+        unit: ''
+        display:
+          name: Which countries have banned the use of leaded petrol in road vehicles?
+        description: |-
+          This dataset reports the year for which leaded petrol (Tetraethyllead) was banned for use in road vehicles.
+
+          Algeria was the final country to ban leaded petrol in road vehicles in 2021. The specific date of phase-out could not be found for some countries (although all countries have banned the use of leaded petrol in road vehicles).
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

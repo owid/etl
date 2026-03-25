@@ -1,0 +1,126 @@
+dataset:
+  title: GHG emissions from food by life-cycle stage (Crippa et al. 2021)
+tables:
+  ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021:
+    variables:
+      agricultural_production_emissions:
+        title: Agricultural production emissions
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000000000
+          name: Agricultural production
+          numDecimalPlaces: 0
+        description: |-
+          Emissions from agricultural production include enteric fermentation from livestock; methane emissions from rice; emissions from manure and synthetic fertilizer application, in addition to upstream emissions from energy production for agricultural inputs including fertilizers and fuel use in machinery.
+      aviation_transport_share_of_food_emissions:
+        title: Aviation transport share of food emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Aviation
+        description: Share of food system emissions that come from air transport.
+      end_of_life_food_emissions:
+        title: End-of-Life food emissions
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000000000
+          name: Consumer waste
+          numDecimalPlaces: 0
+        description: |-
+          Greenhouse gas emissions from end-of-life food processing. This includes consumer waste and management of the end-of-life waste from input materials.
+      food_consumption_emissions:
+        title: Food consumption emissions
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000000000
+          name: Consumer energy (e.g. cooking)
+          numDecimalPlaces: 0
+        description: Greenhouse gas emissions from food consumption. This includes energy use such as cooking and refrigeration.
+      food_packaging_emissions:
+        title: Food packaging emissions
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000000000
+          name: Food packaging
+          numDecimalPlaces: 0
+        description: Greenhouse gas emissions from food packaging.
+      food_processing_emissions:
+        title: Food processing emissions
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000000000
+          name: Food processing
+          numDecimalPlaces: 0
+        description: Greenhouse gas emissions from food processing.
+      food_retail_emissions:
+        title: Food retail emissions
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000000000
+          name: Retail
+          numDecimalPlaces: 0
+        description: |-
+          Greenhouse gas emissions from food retailers. This includes energy production from refrigeration, freezing etc. in retail operations.
+      food_transport_emissions:
+        title: Food transport emissions
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000000000
+          name: Transport
+          numDecimalPlaces: 0
+        description: |-
+          Greenhouse gas emissions from food transport emissions. This includes local, regional and international transport from road, rail, shipping and aviation.
+      land_use_change_emissions:
+        title: Land use change emissions
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000000000
+          name: Land use
+          numDecimalPlaces: 0
+        description: Greenhouse gas emissions from land use, and land use change from food production.
+      rail_transport_share_of_food_emissions:
+        title: Rail transport share of food emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Rail
+        description: Share of food system emissions that come from rail transport.
+      road_transport_share_of_food_emissions:
+        title: Road transport share of food emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Road
+        description: Share of food system emissions that come from road transport.
+      shipping_transport_share_of_food_emissions:
+        title: Shipping transport share of food emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Shipping
+        description: Share of food system emissions that come from international shipping.
+      total_emissions_from_food:
+        title: Total emissions from food
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000000000
+          name: Total
+          numDecimalPlaces: 0
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

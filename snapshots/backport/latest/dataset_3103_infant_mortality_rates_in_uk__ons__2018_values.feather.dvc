@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3103
-    date_accessed: 2023-08-10 08:38:18.786590
+    url: https://admin.owid.io/admin/datasets/3103
+    date_accessed: 2026-03-05 14:32:00.559080+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Infant Mortality Rates in UK (ONS, 2018)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d066a49756c20ecc7e7baa28a5e2c15a
-  size: 6730
-  path: dataset_3103_infant_mortality_rates_in_uk__ons__2018_values.feather
+  - md5: 7c33510881a06077914e8660e42a056a
+    size: 6770
+    path: dataset_3103_infant_mortality_rates_in_uk__ons__2018_values.feather

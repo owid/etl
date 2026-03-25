@@ -1,0 +1,23 @@
+dataset:
+  title: Male-to-female ratio high school courses in USA - Goldin et al.
+tables:
+  male_to_female_ratio_high_school_courses_in_usa__goldin_et_al:
+    variables:
+      chemistry:
+        title: Chemistry
+        unit: ''
+      maths:
+        title: Maths
+        unit: ''
+      science:
+        title: Science
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

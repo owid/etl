@@ -1,0 +1,18 @@
+dataset:
+  title: Influenza vaccination rates in over 65s (OECD)
+tables:
+  influenza_vaccination_rates_in_over_65s__oecd:
+    variables:
+      influenza_vaccination_rate__ages_65plus:
+        title: Influenza vaccination rate (ages 65+)
+        unit: '%'
+        short_unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

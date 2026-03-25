@@ -1,0 +1,17 @@
+dataset:
+  title: ocean_waste_global_top10
+tables:
+  ocean_waste_global_top10:
+    variables:
+      share_of_aquatic_waste:
+        title: Share of aquatic waste
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

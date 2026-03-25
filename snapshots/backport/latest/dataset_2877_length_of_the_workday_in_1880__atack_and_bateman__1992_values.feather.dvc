@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2877
-    date_accessed: 2023-08-10 08:02:26.540856
+    url: https://admin.owid.io/admin/datasets/2877
+    date_accessed: 2026-03-05 14:30:52.048806+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Length of the workday in 1880 - Atack and Bateman (1992)
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 02e204c56b0d8edb1e88f4c0acb26f65
-  size: 7394
-  path: 
-    dataset_2877_length_of_the_workday_in_1880__atack_and_bateman__1992_values.feather
+  - md5: e8806cca0076ef7128efedbc5744bc73
+    size: 7434
+    path: dataset_2877_length_of_the_workday_in_1880__atack_and_bateman__1992_values.feather

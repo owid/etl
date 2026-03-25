@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3096
-    date_accessed: 2023-08-10 07:45:49.431677
+    url: https://admin.owid.io/admin/datasets/3096
+    date_accessed: 2026-03-10 08:53:46.022393+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3096_biomass_and_taxa_abundance__bar_on_et_al__2018
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c213c64c847ae8c33dfe404560d95972
-  size: 2924
-  path: dataset_3096_biomass_and_taxa_abundance__bar_on_et_al__2018_config.json
+  - md5: 8fd89463d3c33651b2ed9b610237da99
+    size: 3147
+    path: dataset_3096_biomass_and_taxa_abundance__bar_on_et_al__2018_config.json

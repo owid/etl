@@ -1,0 +1,26 @@
+dataset:
+  title: Crude Birth and Death Rates (per 1,000), England and Wales 1541-2015 - Wrigley and Schofield, Mitchell, UK ONS
+tables:
+  crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons:
+    variables:
+      crude_birth_rate__owid_based_on_wrigley_and_schofield__1981__mitchell__2010__and_uk_ons__2016:
+        title: Crude Birth Rate (OWID based on Wrigley and Schofield (1981), Mitchell (2010), and UK ONS (2016))
+        unit: per 1,000
+        display:
+          unit: Percent
+        description: Birth rate per 1,000 people
+      crude_death_rate__owid_based_on_wrigley_and_schofield__1981__mitchell__2010__and_uk_ons__2016:
+        title: Crude Death Rate (OWID based on Wrigley and Schofield (1981), Mitchell (2010), and UK ONS (2016))
+        unit: per 1,000
+        display:
+          unit: Index
+        description: Death rate per 1,000 people
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

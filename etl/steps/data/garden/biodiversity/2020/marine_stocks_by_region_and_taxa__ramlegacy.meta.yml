@@ -1,0 +1,68 @@
+dataset:
+  title: Marine stocks by region and taxa (ramlegacy)
+tables:
+  marine_stocks_by_region_and_taxa__ramlegacy:
+    variables:
+      biomass_mean_region:
+        title: biomass_mean_region
+        unit: ''
+      biomass_mean_taxa:
+        title: biomass_mean_taxa
+        unit: ''
+      biomass_q25_region:
+        title: biomass_q25_region
+        unit: ''
+      biomass_q25_taxa:
+        title: biomass_q25_taxa
+        unit: ''
+      biomass_q75_region:
+        title: biomass_q75_region
+        unit: ''
+      biomass_q75_taxa:
+        title: biomass_q75_taxa
+        unit: ''
+      catch_mean_region:
+        title: catch_mean_region
+        unit: ''
+      catch_mean_taxa:
+        title: catch_mean_taxa
+        unit: ''
+      catch_q25_region:
+        title: catch_q25_region
+        unit: ''
+      catch_q25_taxa:
+        title: catch_q25_taxa
+        unit: ''
+      catch_q75_region:
+        title: catch_q75_region
+        unit: ''
+      catch_q75_taxa:
+        title: catch_q75_taxa
+        unit: ''
+      fishing_pressure_mean_region:
+        title: fishing_pressure_mean_region
+        unit: ''
+      fishing_pressure_mean_taxa:
+        title: fishing_pressure_mean_taxa
+        unit: ''
+      fishing_pressure_q25_region:
+        title: fishing_pressure_q25_region
+        unit: ''
+      fishing_pressure_q25_taxa:
+        title: fishing_pressure_q25_taxa
+        unit: ''
+      fishing_pressure_q75_region:
+        title: fishing_pressure_q75_region
+        unit: ''
+      fishing_pressure_q75_taxa:
+        title: fishing_pressure_q75_taxa
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

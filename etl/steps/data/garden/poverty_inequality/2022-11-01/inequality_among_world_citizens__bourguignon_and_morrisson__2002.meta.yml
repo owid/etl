@@ -1,0 +1,29 @@
+dataset:
+  title: Inequality Among World Citizens - Bourguignon and Morrisson (2002)
+tables:
+  inequality_among_world_citizens__bourguignon_and_morrisson__2002:
+    variables:
+      inequality_between_country_groups:
+        title: Inequality between country groups
+        unit: ''
+        description: |-
+          The between-country component refers to the inequality that would be observed if incomes were
+          identical within each country.
+      inequality_within_country_groups:
+        title: Inequality within country groups
+        unit: ''
+        description: |-
+          The within-country component of inequality is obtained by difference and corresponds to average country inequality weighted by total income for the Theil index or total population for the mean logarithmic deviation
+          (see Bourguignon, 1979; Shorrocks, 1980)
+      total_inequality:
+        title: Total inequality
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
