@@ -7,6 +7,10 @@ description: Check ETL step files for outdated coding patterns and offer to fix 
 
 Scan ETL step files for outdated coding patterns and offer to fix them.
 
+## Source of truth
+
+The canonical list of outdated patterns is defined in the VSCode extension at `vscode_extensions/detect-outdated-practices/src/extension.ts`. **Always read this file first** to get the current patterns, their scopes, and messages. Do not hardcode patterns — the extension is the single source of truth and may be updated independently.
+
 ## Scope
 
 By default, check the files involved in the **current task** (e.g., the steps being updated). If the user provides explicit paths or asks for a broader scan, use those instead.
@@ -17,28 +21,11 @@ Accept any of:
 - A glob: `etl/steps/data/garden/wb/2026-03-25/*.py`
 - `all` — scan all non-archived steps (slow)
 
-## Outdated patterns to check
+## Modern replacements
 
-### 1. Snapshot scripts: `if __name__ == "__main__"` + click decorators
+When fixing detected patterns, apply these replacements:
 
-**Outdated:**
-```python
-from pathlib import Path
-import click
-from etl.snapshot import Snapshot
-
-SNAPSHOT_VERSION = Path(__file__).parent.name
-
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--path-to-file", "-f", prompt=True, type=str, help="Path to local data file.")
-def run(path_to_file: str, upload: bool) -> None:
-    snap = Snapshot(f"namespace/{SNAPSHOT_VERSION}/file.ext")
-    snap.create_snapshot(filename=path_to_file, upload=upload)
-
-if __name__ == "__main__":
-    run()
-```
+### Snapshot scripts: `if __name__ == "__main__"` + click decorators → PathFinder
 
 **Modern:**
 ```python
@@ -57,48 +44,26 @@ Key changes:
 - Remove `click` decorators and `if __name__ == "__main__"` block
 - Function signature: `run(upload: bool = True, path_to_file: str | None = None)`
 
-### 2. Snapshot scripts: `snap.dvc_add()` instead of `snap.create_snapshot()`
+### `snap.dvc_add()` → `snap.create_snapshot()`
 
-**Outdated:**
-```python
-snap.dvc_add(upload=upload)
-```
+### `geo.harmonize_countries()` → `paths.regions.harmonize_names(tb)`
 
-**Modern:**
-```python
-snap.create_snapshot(filename=path_to_file, upload=upload)
-# or for URL-based snapshots:
-snap.create_snapshot(upload=upload)
-```
+`country_col` and `countries_file` are inferred by default — only pass them if you need to override. Preserve extra kwargs like `warn_on_unused_countries`.
 
-### 3. Garden steps: `geo.harmonize_countries()` instead of `paths.regions.harmonize_names()`
+### `paths.load_dependency()` → `paths.load_dataset()` or `paths.load_snapshot()`
 
-**Outdated:**
-```python
-from etl.data_helpers import geo
-tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-```
-
-**Modern:**
-```python
-tb = paths.regions.harmonize_names(tb)
-```
-
-Note: `country_col` and `countries_file` are inferred by default — only pass them if you need to override.
-
-### 4. Meadow/Garden steps: `if __name__ == "__main__"` block
-
-Step files (meadow, garden, grapher) should only define a `run()` function. They should not have `if __name__ == "__main__"` blocks — the ETL runner calls `run()` directly.
+### `dest_dir` → remove (use `paths.create_dataset` which doesn't need it)
 
 ## Workflow
 
-1. Identify the files to scan based on the scope
-2. For each file, check for all outdated patterns listed above
-3. Report findings as a summary table:
+1. Read `vscode_extensions/detect-outdated-practices/src/extension.ts` to get the current pattern list
+2. Identify the files to scan based on the scope, respecting each pattern's `scope` field
+3. Grep for each pattern in the scoped files
+4. Report findings as a summary table:
    ```
    | File | Issue | Line |
    |------|-------|------|
-   | snapshots/wb/2026-03-25/poverty_projections.py | `if __name__` + click pattern | 29 |
+   | snapshots/wb/2026-03-25/poverty_projections.py | `if __name__` block in snapshot | 29 |
    ```
-4. Ask the user: "Found N outdated patterns. Fix them?"
-5. If yes, apply fixes and show a summary of changes
+5. Ask the user: "Found N outdated patterns. Fix them?"
+6. If yes, apply fixes and show a summary of changes
