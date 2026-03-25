@@ -61,8 +61,8 @@ def run() -> None:
     #
     # Process data.
     #
-    # Convert EM score to percentage.
-    tb["em"] = (tb["em"] * 100).round(1)
+    # Convert EM score to percentage (full precision — rounding happens at output only).
+    tb["em"] = tb["em"] * 100
 
     # Assign each model to a region.
     tb["country"] = tb["country"].apply(assign_region)
@@ -83,6 +83,9 @@ def run() -> None:
     tb["cummax"] = tb.groupby("country")["em"].cummax()
     tb["prev_cummax"] = tb.groupby("country")["cummax"].shift(1).fillna(0)
     tb = tb[tb["em"] > tb["prev_cummax"]].drop(columns=["cummax", "prev_cummax"])
+
+    # Round for presentation only, after all record-selection logic is complete.
+    tb["em"] = tb["em"].round(1)
 
     # Table 1: indexed by (release_date, model_name) — model name as the grapher entity.
     tb_models = tb.rename(columns={"country": "country_name", "name": "country"})
