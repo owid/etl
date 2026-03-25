@@ -32,6 +32,7 @@ Accept any of:
 When applying fixes, keep these notes in mind:
 
 - **`paths.regions.harmonize_names(tb)`**: `country_col` and `countries_file` are inferred by default — it assumes the column is `"country"` and uses the step's `.countries.json` file. Only pass these arguments if you need to override the defaults. Preserve extra kwargs like `warn_on_unused_countries`.
+- **Linting**: After fixing patterns, always run `make check` (or let the code-quality-fixer agent handle it). In particular, don't leave extra blank lines between imports — follow the project's import style (no blank lines within import groups, one blank line between standard library and third-party groups).
 
 ## Workflow
 
