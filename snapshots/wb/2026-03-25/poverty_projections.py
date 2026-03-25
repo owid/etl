@@ -6,26 +6,14 @@ The file used here was provided by Nishant Yonzan via email on November 7, 2025,
 
 """
 
-from pathlib import Path
+from etl.helpers import PathFinder
 
-import click
-
-from etl.snapshot import Snapshot
-
-# Version for current snapshot dataset.
-SNAPSHOT_VERSION = Path(__file__).parent.name
+paths = PathFinder(__file__)
 
 
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--path-to-file", "-f", prompt=True, type=str, help="Path to local data file.")
-def run(path_to_file: str, upload: bool) -> None:
+def run(upload: bool = True, path_to_file: str | None = None) -> None:
     # Initialize a new snapshot.
-    snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/poverty_projections.dta")
+    snap = paths.init_snapshot()
 
-    # Save snapshots.
+    # Save snapshot.
     snap.create_snapshot(filename=path_to_file, upload=upload)
-
-
-if __name__ == "__main__":
-    run()

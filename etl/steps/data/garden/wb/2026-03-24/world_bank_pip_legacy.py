@@ -16,7 +16,7 @@ from shared import add_metadata_vars, add_metadata_vars_percentiles
 from structlog import get_logger
 from tabulate import tabulate
 
-from etl.data_helpers import geo
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -130,10 +130,8 @@ def run() -> None:
     tb = calculate_inequality(tb)
 
     # Harmonize country names
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, warn_on_unused_countries=False)
-    tb_percentiles = geo.harmonize_countries(
-        df=tb_percentiles, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
-    )
+    tb = paths.regions.harmonize_names(tb, warn_on_unused_countries=False)
+    tb_percentiles = paths.regions.harmonize_names(tb_percentiles, warn_on_unused_countries=False)
 
     # Make share a percentage in tb_percentiles
     tb_percentiles["share"] *= 100

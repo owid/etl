@@ -2,7 +2,7 @@
 
 import owid.catalog.processing as pr
 
-from etl.data_helpers import geo
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -33,10 +33,7 @@ def run() -> None:
     tb["povertyline"] = tb["povertyline"].replace({"3.00": "300", "4.20": "420", "8.30": "830"})
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-    )
+    tb = paths.regions.harmonize_names(tb)
 
     # Improve table format.
     tb = tb.format(["country", "year", "povertyline"])
