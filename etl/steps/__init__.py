@@ -37,6 +37,7 @@ from owid.catalog.api.utils import DEFAULT_CATALOG_URL
 from owid.catalog.core.datasets import DEFAULT_FORMATS
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
+from tqdm import tqdm
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl import config, files, git_helpers, paths
@@ -931,7 +932,7 @@ class GrapherStep(Step):
             # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
             # is fetching the whole dataset from data-api as they would receive all tables merged in a single
             # table. This won't be a problem after we introduce the concept of "tables"
-            for table in dataset:
+            for table in tqdm(dataset):
                 assert not table.empty, f"table {table.metadata.short_name} is empty"
 
                 # if SUBSET is set, only upsert matching variables
