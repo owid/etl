@@ -547,6 +547,7 @@ class Table(pd.DataFrame):
             if time.time() - t > 5:
                 log.warning(
                     "repacking took a long time, consider adding create_dataset(..., repack=False)",
+                    path=path,
                     time=time.time() - t,
                 )
 
