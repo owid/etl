@@ -70,6 +70,11 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Perform help check, dry run, approval, then real execution; capture summary for later PR notes
    - After running, **always verify `dag/main.yml`**: grep for the old version and confirm all internal references between the new steps point to the new version (e.g., garden depends on new meadow, not old meadow).
 
+1b) Check for outdated practices (check-outdated-practices skill)
+   - After `etl update` creates new step files, run the `/check-outdated-practices` skill on the newly created files
+   - This catches patterns like `if __name__ == "__main__"`, `geo.harmonize_countries()`, `dest_dir`, `paths.load_dependency()`, etc. that were copied from old versions
+   - Fix any findings before proceeding — this avoids propagating legacy patterns into new versions
+
 2) Create PR and integrate update via subagent (etl-pr)
    - Inputs: `<namespace>/<old_version>/<short_name>`
    - Create or reuse draft PR, set up work branch, and incorporate the ETL update outputs
