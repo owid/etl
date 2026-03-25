@@ -7,7 +7,6 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.tables import concat
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 from etl.steps.data.garden.democracy.shared import (
     add_imputes,
@@ -72,14 +71,8 @@ def run() -> None:
     #
     # Process data.
     #
-    tb_ratings = geo.harmonize_countries(
-        df=tb_ratings,
-        countries_file=paths.country_mapping_path,
-    )
-    tb_scores = geo.harmonize_countries(
-        df=tb_scores,
-        countries_file=paths.country_mapping_path,
-    )
+    tb_ratings = paths.regions.harmonize_names(tb_ratings)
+    tb_scores = paths.regions.harmonize_names(tb_scores)
 
     # Create indicator for electoral democracy
     tb_scores = add_electdem(tb_scores)
