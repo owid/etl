@@ -85,10 +85,6 @@ steps:
   data://grapher/wvs/2023-06-25/longitudinal_wvs:
     - data://garden/wvs/2023-06-25/longitudinal_wvs
 
-  # USA PPI New Office Construction (US Bureau of Labor Statistics)
-  data://garden/bls/2025-12-24/us_ppi_construction:
-    - snapshot://bls/2025-12-24/us_ppi_construction.csv
-
   # Historical Cross Country Technology Adoption Dataset (Comin & Hobijn, 2004)
   data://meadow/technology/2023-03-16/hcctad:
     - snapshot://technology/2023-03-16/hcctad.txt
@@ -829,6 +825,10 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/happiness/2026-03-16/happiness:
     - data://garden/happiness/2026-03-16/happiness
+
+  # USA PPI New Office Construction (US Bureau of Labor Statistics)
+  data://garden/bls/2026-03-24/us_ppi_construction:
+    - snapshot://bls/2026-03-24/us_ppi_construction.csv
 
 include:
   - dag/open_numbers.yml

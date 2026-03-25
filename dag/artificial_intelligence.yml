@@ -232,13 +232,13 @@ steps:
     - data://garden/artificial_intelligence/2025-11-11/nvidia_revenue
 
   # Datacenter construction spending (U.S. Census Bureau)
-  data://meadow/us_census_bureau/2025-11-17/datacenter_construction:
-    - snapshot://us_census_bureau/2025-11-17/datacenter_construction.xlsx
-  data://garden/us_census_bureau/2025-11-17/datacenter_construction:
-    - data://meadow/us_census_bureau/2025-11-17/datacenter_construction
-    - data://garden/bls/2025-12-24/us_ppi_construction
-  data://grapher/us_census_bureau/2025-11-17/datacenter_construction:
-    - data://garden/us_census_bureau/2025-11-17/datacenter_construction
+  data://meadow/us_census_bureau/2026-03-24/datacenter_construction:
+    - snapshot://us_census_bureau/2026-03-24/datacenter_construction.xlsx
+  data://garden/us_census_bureau/2026-03-24/datacenter_construction:
+    - data://garden/bls/2026-03-24/us_ppi_construction
+    - data://meadow/us_census_bureau/2026-03-24/datacenter_construction
+  data://grapher/us_census_bureau/2026-03-24/datacenter_construction:
+    - data://garden/us_census_bureau/2026-03-24/datacenter_construction
 
   # IEA Energy and AI dataset
   data://meadow/artificial_intelligence/2025-11-07/energy_ai:
