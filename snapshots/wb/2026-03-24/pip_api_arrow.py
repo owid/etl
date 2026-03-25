@@ -296,15 +296,15 @@ class WB_API:
     def get_table(self, table):
         return pd.read_csv(f"{self.api_address}/aux?table={table}&long_format=false&format=csv")
 
-    def fetch_csv(self, url):
-        return _fetch_csv(f"{self.api_address}{url}")
+    def fetch_arrow(self, url):
+        return _fetch_arrow(f"{self.api_address}{url}")
 
 
 @retry(wait=wait_random_exponential(multiplier=1), stop=stop_after_attempt(MAX_REPEATS))
 def _get_request(url: str) -> requests.Response:
     response = requests.get(url, timeout=TIMEOUT)
     if response.status_code != 200:
-        log.info("fetch_csv.retry", url=url)
+        log.info("fetch_arrow.retry", url=url)
         raise Exception("API timed out")
 
     if b"Server Error" in response.content:
@@ -314,28 +314,28 @@ def _get_request(url: str) -> requests.Response:
 
 
 @memory.cache
-def _fetch_csv(url: str) -> pd.DataFrame:
+def _fetch_arrow(url: str) -> pd.DataFrame:
     r2 = connect_r2_cached()
     r2_bucket = "owid-private"
-    r2_key = "cache/pip_api/" + checksum_str(url)
+    r2_key = "cache/pip_api_arrow/" + checksum_str(url)
 
     # try to get it from cache
     try:
         obj = r2.get_object(Bucket=r2_bucket, Key=r2_key)  # type: ignore[reportAttributeAccessIssue]
-        s = obj["Body"].read().decode("utf-8")
-        # we might have cached invalid responses, in that case fetch it again
-        if "Server Error" not in s:
-            df = pd.read_csv(io.StringIO(s))
-            log.info("fetch_csv.cache_hit", url=url)
+        data = obj["Body"].read()
+        # Arrow responses are binary, check for server errors in first bytes
+        if b"Server Error" not in data[:200]:
+            df = pd.read_feather(io.BytesIO(data))
+            log.info("fetch_arrow.cache_hit", url=url)
             return df
         else:
-            log.info("fetch_csv.cache_with_error", url=url)
+            log.info("fetch_arrow.cache_with_error", url=url)
     except ClientError:
         pass
 
-    log.info("fetch_csv.start", url=url)
+    log.info("fetch_arrow.start", url=url)
     response = _get_request(url)
-    log.info("fetch_csv.success", url=url, t=response.elapsed.total_seconds())
+    log.info("fetch_arrow.success", url=url, t=response.elapsed.total_seconds())
 
     # save the result to R2 cache
     r2.put_object(  # type: ignore[reportAttributeAccessIssue]
@@ -344,7 +344,7 @@ def _fetch_csv(url: str) -> pd.DataFrame:
         Key=r2_key,
     )
 
-    df = pd.read_csv(io.StringIO(response.content.decode("utf-8")))
+    df = pd.read_feather(io.BytesIO(response.content))
     return df
 
 
@@ -483,13 +483,13 @@ def pip_query_country(
     # NOTE: There is a bug for China: when querying specific poverty lines (as for relative poverty), the API doesn't respond
     # One hacky way to fix it is to call a more generalized query first (with no welfare_type, reporting_level nor release version)
     if country_code == "CHN":
-        wb_api.fetch_csv(
-            f"/pip?country={country_code}&year={year}&{popshare_or_povline}={value}&ppp_version={ppp_version}&fill_gaps={fill_gaps}&format=csv"
+        wb_api.fetch_arrow(
+            f"/pip?country={country_code}&year={year}&{popshare_or_povline}={value}&ppp_version={ppp_version}&fill_gaps={fill_gaps}&format=arrow"
         )
 
     # Build query
-    df = wb_api.fetch_csv(
-        f"/pip?{popshare_or_povline}={value}&country={country_code}&year={year}&fill_gaps={fill_gaps}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
+    df = wb_api.fetch_arrow(
+        f"/pip?{popshare_or_povline}={value}&country={country_code}&year={year}&fill_gaps={fill_gaps}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=arrow"
     )
 
     # Add PPP version as column
@@ -548,8 +548,8 @@ def pip_query_region(
     release_version = versions[ppp_version]["release_version"]
 
     # Build query
-    df = wb_api.fetch_csv(
-        f"/pip-grp?group_by=wb&{popshare_or_povline}={value}&country={country_code}&year={year}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
+    df = wb_api.fetch_arrow(
+        f"/pip-grp?group_by=wb&{popshare_or_povline}={value}&country={country_code}&year={year}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=arrow"
     )
 
     # Add PPP version as column
