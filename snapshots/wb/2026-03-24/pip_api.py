@@ -81,7 +81,7 @@ TOLERANCE_PERCENTILES = 1
 # Set to False to skip percentile extraction (e.g. when percentile source links haven't been updated yet).
 # When False, the script will still generate key indicators, relative poverty, and filled data,
 # but will skip: percentile construction, median patching, and decile threshold merging.
-EXTRACT_COUNTRY_PERCENTILES = False
+EXTRACT_COUNTRY_PERCENTILES = True
 
 # Select live (1) or internal (0) API
 LIVE_API = 1
@@ -348,9 +348,9 @@ def _fetch_csv(url: str) -> pd.DataFrame:
 def _fetch_percentiles(version: int) -> pd.DataFrame:
     # These URLs were copied from https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
     if version == PPP_VERSIONS[0]:
-        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090251/world_100bin.csv"
+        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090251/world_100bin_revised.csv"
     elif version == PPP_VERSIONS[1]:
-        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090357/world_100bin.csv"
+        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090357/world_100bin_revised.csv"
     else:
         raise ValueError(f"Version {version} is not supported")
 
