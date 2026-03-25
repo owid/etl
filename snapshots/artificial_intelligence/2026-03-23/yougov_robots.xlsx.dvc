@@ -9,9 +9,9 @@ meta:
     url_main: https://today.yougov.com/topics/politics/trackers/robot-intelligence
     url_download: https://today.yougov.com/_pubapis/v5/us/trackers/robot-intelligence/download
     date_accessed: '2026-03-23'
-    date_published: '2025-07-10'
+    date_published: '2025-12-01'
     license:
-      name: Copyright © 2024 YouGov PLC
+      name: YouGov terms & conditions of use
       url: https://today.yougov.com/about/terms
 outs:
   - md5: 2028d88fdc3507526745685001cc7686

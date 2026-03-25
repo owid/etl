@@ -6,7 +6,7 @@ definitions:
       topic_tags:
         - Artificial Intelligence
       grapher_config:
-        note: Number of respondents ranges between n = 460 and n = 533 US working adults per survey wave.
+        note: Number of respondents ranges between n = 460 and n = 568 US working adults per survey wave.
 
     description_key:
       - Respondents were asked, "How worried, if it all, are you that your type of work could be automated within your lifetime?".

@@ -42,18 +42,6 @@ def run() -> None:
     ]
     tb = tb[~tb["group"].isin(groups_to_remove)]
 
-    # Rename groups to be cleaner and more descriptive
-    group_rename = {
-        "All adults": "All adults",
-        "18-29": "Ages 18-29",
-        "30-44": "Ages 30-44",
-        "45-64": "Ages 45-64",
-        "65+": "Ages 65+",
-        "Male": "Men",
-        "Female": "Women",
-    }
-    tb["group"] = tb["group"].map(lambda x: group_rename.get(x, x))
-
     tb = sh.preprocess_data(
         tb,
         index_columns=["group", "date"],

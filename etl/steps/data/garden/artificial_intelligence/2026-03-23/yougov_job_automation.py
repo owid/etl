@@ -40,17 +40,8 @@ def run() -> None:
     ]
     tb = tb[~tb["group"].isin(groups_to_remove)]
 
-    # Rename groups to be cleaner and more descriptive
-    group_rename = {
-        "US Adults in work": "All working adults",
-        "18-29": "Ages 18-29",
-        "30-44": "Ages 30-44",
-        "45-64": "Ages 45-64",
-        "65+": "Ages 65+",
-        "Male": "Men",
-        "Female": "Women",
-    }
-    tb["group"] = tb["group"].map(lambda x: group_rename.get(x, x))
+    # Rename the "all" group to be more descriptive
+    tb["group"] = tb["group"].replace({"US Adults in work": "All working adults"})
 
     #
     # Process data.
