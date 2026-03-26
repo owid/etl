@@ -135,7 +135,9 @@ def run(dest_dir: str) -> None:
         # tb_population_doubling,
     ]
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True, repack=False)
+    # repack=True converts low-cardinality strings to categoricals and shrinks numeric types,
+    # drastically reducing feather file size and read time (e.g. population: 406 MB -> 132 MB on disk).
+    ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
@@ -510,3 +512,5 @@ def clean_table_standard_xlsx(
         tb = tb.format(COLUMNS_INDEX_FORMAT, short_name=new_name)
 
     return tb
+
+

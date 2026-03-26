@@ -1,3 +1,4 @@
+import os
 from typing import Dict, List, Optional, Tuple, cast
 
 import numpy as np
@@ -14,6 +15,10 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Use this to process a subset of data. Set a comma-separated list of countries. For example:
+# SUBSET='France,Germany' etlr un/2024-07-12/un_wpp --private
+SUBSET = os.environ.get("SUBSET")
 
 YEAR_SPLIT = 2024
 COLUMNS_INDEX = ["country", "year", "sex", "age", "variant"]
@@ -37,23 +42,44 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("un_wpp")
 
-    # Load tables
-    tb_population = ds_meadow.read("population")
-    tb_population_density = ds_meadow.read("population_density")
-    tb_growth_rate = ds_meadow.read("growth_rate")
-    tb_nat_change = ds_meadow.read("natural_change_rate")
-    tb_fertility = ds_meadow.read("fertility_rate")
-    tb_fertility_births_single = ds_meadow.read("fertility_births_single")
-    tb_migration = ds_meadow.read("net_migration")
-    tb_migration_rate = ds_meadow.read("net_migration_rate")
-    tb_deaths = ds_meadow.read("deaths")
-    tb_death_rate = ds_meadow.read("death_rate")
-    tb_births = ds_meadow.read("births")
-    tb_birth_rate = ds_meadow.read("birth_rate")
-    tb_median_age = ds_meadow.read("median_age")
-    tb_le = ds_meadow.read("life_expectancy")
-    tb_mortality = ds_meadow.read("mortality_rate")
-    tb_childbearing_age = ds_meadow.read("mean_age_childbearing")
+    # Load tables (safe_types=False preserves categoricals from meadow, much faster for large tables)
+    tb_population = ds_meadow.read("population", safe_types=False)
+    tb_population_density = ds_meadow.read("population_density", safe_types=False)
+    tb_growth_rate = ds_meadow.read("growth_rate", safe_types=False)
+    tb_nat_change = ds_meadow.read("natural_change_rate", safe_types=False)
+    tb_fertility = ds_meadow.read("fertility_rate", safe_types=False)
+    tb_fertility_births_single = ds_meadow.read("fertility_births_single", safe_types=False)
+    tb_migration = ds_meadow.read("net_migration", safe_types=False)
+    tb_migration_rate = ds_meadow.read("net_migration_rate", safe_types=False)
+    tb_deaths = ds_meadow.read("deaths", safe_types=False)
+    tb_death_rate = ds_meadow.read("death_rate", safe_types=False)
+    tb_births = ds_meadow.read("births", safe_types=False)
+    tb_birth_rate = ds_meadow.read("birth_rate", safe_types=False)
+    tb_median_age = ds_meadow.read("median_age", safe_types=False)
+    tb_le = ds_meadow.read("life_expectancy", safe_types=False)
+    tb_mortality = ds_meadow.read("mortality_rate", safe_types=False)
+    tb_childbearing_age = ds_meadow.read("mean_age_childbearing", safe_types=False)
+
+    # Filter to subset of countries if SUBSET is set (for faster development runs).
+    if SUBSET:
+        subset_countries = [c.strip() for c in SUBSET.split(",")]
+        paths.log.info(f"Running on subset of countries: {subset_countries}")
+        tb_population = tb_population[tb_population["country"].isin(subset_countries)]
+        tb_population_density = tb_population_density[tb_population_density["country"].isin(subset_countries)]
+        tb_growth_rate = tb_growth_rate[tb_growth_rate["country"].isin(subset_countries)]
+        tb_nat_change = tb_nat_change[tb_nat_change["country"].isin(subset_countries)]
+        tb_fertility = tb_fertility[tb_fertility["country"].isin(subset_countries)]
+        tb_fertility_births_single = tb_fertility_births_single[tb_fertility_births_single["country"].isin(subset_countries)]
+        tb_migration = tb_migration[tb_migration["country"].isin(subset_countries)]
+        tb_migration_rate = tb_migration_rate[tb_migration_rate["country"].isin(subset_countries)]
+        tb_deaths = tb_deaths[tb_deaths["country"].isin(subset_countries)]
+        tb_death_rate = tb_death_rate[tb_death_rate["country"].isin(subset_countries)]
+        tb_births = tb_births[tb_births["country"].isin(subset_countries)]
+        tb_birth_rate = tb_birth_rate[tb_birth_rate["country"].isin(subset_countries)]
+        tb_median_age = tb_median_age[tb_median_age["country"].isin(subset_countries)]
+        tb_le = tb_le[tb_le["country"].isin(subset_countries)]
+        tb_mortality = tb_mortality[tb_mortality["country"].isin(subset_countries)]
+        tb_childbearing_age = tb_childbearing_age[tb_childbearing_age["country"].isin(subset_countries)]
 
     #
     # Process data.
