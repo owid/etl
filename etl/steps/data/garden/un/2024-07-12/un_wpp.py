@@ -592,8 +592,7 @@ def process_mortality(tb: Table) -> Table:
 
 
 def process_standard(tb: Table, allowed_nans: Optional[Dict[str, int]] = None) -> Table:
-    """Process the population table."""
-    paths.log.info("Processing population variables...")
+    """Standard processing: sanity checks, harmonize country names and dimensions."""
 
     # Sanity check
     if allowed_nans:
@@ -811,8 +810,15 @@ def harmonize_dimension(tb: Table, column_name: str, mapping: Dict[str, str], st
         # Assert column_name does not contain any other column but those in mapping
         assert set(tb[column_name].unique()) == set(mapping.keys())
 
-    # Replace values in column_name
-    tb[column_name] = tb[column_name].replace(mapping)
+    # Use cat.rename_categories for categorical columns (avoids FutureWarning from .replace())
+    col = tb[column_name]
+    if hasattr(col, "cat"):
+        # Only rename categories that are in the mapping
+        cat_mapping = {k: v for k, v in mapping.items() if k in col.cat.categories}
+        if cat_mapping:
+            tb[column_name] = col.cat.rename_categories(cat_mapping)
+    else:
+        tb[column_name] = col.replace(mapping)
 
     return tb
 
@@ -822,6 +828,8 @@ def harmonize_country_names(tb: Table):
         tb,
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
+        warn_on_unused_countries=False,
+        warn_on_unknown_excluded_countries=False,
     )
     return tb
 
