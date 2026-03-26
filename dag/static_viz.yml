@@ -14,3 +14,7 @@ steps:
   export://static_viz/population/2026-02-02/world_population_long_run:
     - data://grapher/demography/2024-07-15/population
     - data://grapher/demography/2025-10-22/life_expectancy
+
+  # Life expectancy by age in the United Kingdom
+  export://static_viz/life_expectancy/2026-03-26/life_expectancy_by_age:
+    - data://garden/demography/2025-10-22/life_expectancy

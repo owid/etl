@@ -85,7 +85,7 @@ def run() -> None:
     ## Check values
     paths.log.info("final checks")
     _check_column_values(tb, "sex", {"total", "male", "female"})
-    _check_column_values(tb, "age", {0, 10, 15, 25, 45, 65, 80})
+    _check_column_values(tb, "age", {0, 1, 5, 10, 15, 25, 45, 65, 80})
 
     # Create three tables: (i) only historical values, (ii) only future values, (iii) all values
     columns_index = ["country", "year", "sex", "age"]
@@ -156,7 +156,7 @@ def process_lt(tb: Table) -> Table:
     Desired format is with columns country, year, sex, age | life_expectancy.
     """
     tb = tb.loc[
-        (tb["age"].isin(["0", "10", "15", "25", "45", "65", "80"])) & (tb["type"] == "period"),
+        (tb["age"].isin(["0", "1", "5", "10", "15", "25", "45", "65", "80"])) & (tb["type"] == "period"),
         ["country", "year", "sex", "age", "life_expectancy", "source"],
     ]
 
@@ -175,7 +175,7 @@ def process_lt(tb: Table) -> Table:
     ## sex
     _check_column_values(tb, "sex", {"total", "female", "male"})
     ## age
-    _check_column_values(tb, "age", {0, 10, 15, 25, 45, 65, 80})
+    _check_column_values(tb, "age", {0, 1, 5, 10, 15, 25, 45, 65, 80})
 
     return tb
 
