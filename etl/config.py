@@ -8,6 +8,7 @@ only important for OWID staff.
 """
 
 import asyncio
+import logging
 import os
 import pwd
 import re
@@ -75,6 +76,19 @@ def get_container_name(branch_name):
 
 
 load_env()
+
+# Log level for structlog filtering (applied in enable_structlog_filtering below).
+# By default, only INFO and above are shown. Set DEBUG=1 in .env to see DEBUG messages.
+STRUCTLOG_LOG_LEVEL = logging.DEBUG if env.get("DEBUG") in ("True", "true", "1") else logging.INFO
+
+
+def enable_structlog_filtering() -> None:
+    """Configure structlog log-level filtering.
+
+    Called from the ETL CLI entry point, not at import time, to avoid
+    interfering with other tools (e.g. Streamlit apps) that import etl.config.
+    """
+    structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(STRUCTLOG_LOG_LEVEL))
 
 
 pd.set_option("future.no_silent_downcasting", True)
