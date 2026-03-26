@@ -137,7 +137,7 @@ def run(dest_dir: str) -> None:
     # Create a new meadow dataset with the same metadata as the snapshot.
     # repack=True converts low-cardinality strings to categoricals and shrinks numeric types,
     # drastically reducing feather file size and read time (e.g. population: 406 MB -> 132 MB on disk).
-    ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True)
+    ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True, repack=False)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
