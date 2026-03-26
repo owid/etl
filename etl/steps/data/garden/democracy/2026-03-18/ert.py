@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 from etl.steps.data.garden.democracy.shared import (
     add_population_in_dummies,
@@ -77,10 +76,8 @@ def run() -> None:
     )
 
     # Harmonize country names
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-    )
+    tb = paths.regions.harmonize_names(tb)
+
     # Corrections: Germany -> West Germany, Yemen -> Yemen Arab Republic, Vietnam -> Democratic Republic of Vietnam
     tb = correct_country_names(tb)
 

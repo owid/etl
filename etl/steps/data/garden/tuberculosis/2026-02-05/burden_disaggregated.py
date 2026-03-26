@@ -64,7 +64,7 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb)
     tb = tb.drop(columns=["measure", "unit"])
     tb = add_population_column(tb, ds_un_wpp)
     tb = combining_sexes_for_all_age_groups(tb)
