@@ -107,7 +107,7 @@ def create_visualization(tb, source_text: str) -> plt.Figure:
 
     # Collect first and last points per age for labels
     first_points = {}  # age -> (year, y_value)
-    last_points = {}   # age -> (year, y_value)
+    last_points = {}  # age -> (year, y_value)
 
     # Plot one line per age group
     for age in AGES:
@@ -172,8 +172,7 @@ def create_visualization(tb, source_text: str) -> plt.Figure:
         x_end, y_raw = last_points[age]
         y = adj_right[age]
         if abs(y - y_raw) > 1.0:
-            ax.plot([x_end, label_x_right - 0.5], [y_raw, y],
-                    color=AGE_COLORS[age], linewidth=0.6, alpha=0.4, zorder=4)
+            ax.plot([x_end, label_x_right - 0.5], [y_raw, y], color=AGE_COLORS[age], linewidth=0.6, alpha=0.4, zorder=4)
         le_val = round(y_raw, 1)
         ax.text(label_x_right, y, f"{le_val:.0f}", color=AGE_COLORS[age], fontsize=10, va="center", ha="left")
 
@@ -312,14 +311,14 @@ def _build_source_citation(tb_birth, tb_le) -> str:
                 unique_origins[key] = origin
 
         source_parts = []
-        for (producer, title, date_pub), origin in sorted(
-            unique_origins.items(), key=lambda x: x[0][0] or ""
-        ):
+        for (producer, title, date_pub), origin in sorted(unique_origins.items(), key=lambda x: x[0][0] or ""):
             year = date_pub.split("-")[0] if date_pub else ""
             if producer:
                 source_parts.append(f"{producer} ({year})" if year else producer)
 
-        return "Data sources: " + "; ".join(source_parts) if source_parts else "Data sources: HMD; UN WPP; Zijdeman et al."
+        return (
+            "Data sources: " + "; ".join(source_parts) if source_parts else "Data sources: HMD; UN WPP; Zijdeman et al."
+        )
     except Exception:
         return "Data sources: HMD; UN WPP; Zijdeman et al."
 
