@@ -880,6 +880,13 @@ def add_patents_articles_per_million_people(tb: Table) -> Table:
     return tb
 
 
+def _last_year_with_substantial_coverage(tb: Table, indicator: str, threshold: float = 0.5) -> int:
+    """Return the last year where `indicator` has at least `threshold` × median annual country count."""
+    counts = tb.loc[tb[indicator].notna()].groupby("year")["country"].nunique()
+    median_count = counts.median()
+    return int(counts[counts >= median_count * threshold].index.max())
+
+
 def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
     """
     Add ILO modeling comparison indicators to the table.
@@ -928,12 +935,14 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
             f"{indicator}_ilo_modeling_comparison_absolute"
         ].copy_metadata(tb[f"{indicator}_absolute_difference"])
 
-        # Calculate the maximum year with data for each indicator
-        max_year_modeled = tb.loc[tb[ind_modeled].notna(), "year"].max()
-        max_year_national = tb.loc[tb[ind_national].notna(), "year"].max()
+        # Find the last year with substantial coverage for both indicators.
+        # Use at least 50% of the median annual country count as the threshold,
+        # so stray data points in a new year don't extend the comparison.
+        max_year_modeled = _last_year_with_substantial_coverage(tb, ind_modeled)
+        max_year_national = _last_year_with_substantial_coverage(tb, ind_national)
         max_year_for_comparison = min(max_year_modeled, max_year_national)
 
-        # Make ilo_modeling_comparison NaN for years greater than the maximum year with data
+        # Make ilo_modeling_comparison NaN for years greater than the maximum year with substantial data
         tb.loc[tb["year"] > max_year_for_comparison, f"{indicator}_ilo_modeling_comparison_absolute"] = pd.NA
 
         # # Drop columns no longer needed
