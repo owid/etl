@@ -39,6 +39,7 @@ Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run)
 **Important:**
 - **Avoid `--force`** — `etlr` has built-in change detection and only re-runs steps whose code or data changed. Use `--force` only when you need to re-run a step despite no code changes (e.g., after fixing external data). Never use `--force` alone — always pair with `--only`.
 - For `grapher://` steps, always add `--grapher` flag
+- Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset --private`
 
 ## Git Workflow
 
@@ -83,6 +84,12 @@ Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 - **`paths.regions.harmonize_names(tb, country_col=..., countries_file=...)`** — current harmonization API (replaces `geo.harmonize_countries`)
 - **`Table.format()`** needs both `country` and `year`. For year-less tables: `set_index("country")` + set `tb.metadata.short_name`
 - **`*.meta.yml`**: omit `dataset:` block — inherited from origin. Only define `tables:` → `variables:`
+
+### Performance
+
+- **Meadow: use categoricals** — low-cardinality string columns (`country`, `variant`, `sex`, `age`) should be `.astype("category")` before `.format()`. Dramatically reduces feather size and read time.
+- **Garden: `safe_types=False`** — for large tables (>1M rows), use `ds.read("table", safe_types=False)` to preserve categoricals and avoid expensive type conversions.
+- **Inspect feather schema** — use `pyarrow.feather.read_table(path).schema` to check if columns are `large_string` (bad) vs `dictionary` (good).
 
 ### Standard Garden Step
 ```python
@@ -175,7 +182,6 @@ Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
 
 See `.claude/docs/` for:
 - `debugging.md` - Data quality debugging approach
-- `performance.md` - Profiling and optimization
 - `pipeline-stages.md` - Pipeline architecture details
 
 ## Individual Preferences
