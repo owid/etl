@@ -1727,6 +1727,12 @@ tables:
             subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp}"
             chartTypes: *chart_types
+            matchingEntitiesOnly: true
+            dimensions:
+              - property: x
+                variableId: 953903
+              - property: color
+                variableId: 900801
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
@@ -1778,6 +1784,12 @@ tables:
             subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp}"
             chartTypes: *chart_types
+            matchingEntitiesOnly: true
+            dimensions:
+              - property: x
+                variableId: 953903
+              - property: color
+                variableId: 900801
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
@@ -1837,6 +1849,12 @@ tables:
               The mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
             note: "{definitions.note_ppp}"
             chartTypes: *chart_types
+            matchingEntitiesOnly: true
+            dimensions:
+              - property: x
+                variableId: 953903
+              - property: color
+                variableId: 900801
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
@@ -1896,6 +1914,12 @@ tables:
               The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).{definitions.spells_subtitle}
             note: "{definitions.note_without_ppp}"
             chartTypes: *chart_types
+            matchingEntitiesOnly: true
+            dimensions:
+              - property: x
+                variableId: 953903
+              - property: color
+                variableId: 900801
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             yAxis:
@@ -1948,6 +1972,12 @@ tables:
             subtitle: The level of <<welfare_type>> per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
             note: "{definitions.note_ppp}"
             chartTypes: *chart_types
+            matchingEntitiesOnly: true
+            dimensions:
+              - property: x
+                variableId: 953903
+              - property: color
+                variableId: 900801
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
