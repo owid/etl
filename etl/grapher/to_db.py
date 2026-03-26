@@ -260,7 +260,7 @@ def upsert_table(
     # Both checksums match
     if checksums.get("dataChecksum") == checksum_data and checksums.get("metadataChecksum") == checksum_metadata:
         if verbose:
-            log.info("upsert_table.skipped_no_changes", size=len(df), catalog_path=catalog_path)
+            log.debug("upsert_table.skipped_no_changes", size=len(df), catalog_path=catalog_path)
         return
 
     with Session(engine) as session:

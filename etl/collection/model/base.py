@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import TypeVar, Union
 
-from owid.catalog.meta import MetaBase
+from owid.catalog.core.meta import MetaBase
 
 T = TypeVar("T")
 
