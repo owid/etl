@@ -513,6 +513,11 @@ definitions:
   note_total_shortfall: |-
     {definitions.ppp_adjustment_note} This shortfall does not take into account costs and inefficiencies from making the necessary transfers.
 
+  chart_types: &chart_types
+    - LineChart
+    - DiscreteBar
+    - Marimekko
+
   hasmaptab: |-
     <% if survey_comparability is not defined or survey_comparability == "No spells" %>
     true
@@ -1721,6 +1726,7 @@ tables:
             title: Mean <<welfare_type>> {definitions.per_period}
             subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp}"
+            chartTypes: *chart_types
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
@@ -1771,6 +1777,7 @@ tables:
             title: Median <<welfare_type>> {definitions.per_period}
             subtitle: "{definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}"
             note: "{definitions.note_ppp}"
+            chartTypes: *chart_types
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
@@ -1829,6 +1836,7 @@ tables:
               {macros}
               The mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
             note: "{definitions.note_ppp}"
+            chartTypes: *chart_types
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
@@ -1887,6 +1895,7 @@ tables:
               {macros}
               The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).{definitions.spells_subtitle}
             note: "{definitions.note_without_ppp}"
+            chartTypes: *chart_types
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             yAxis:
@@ -1938,6 +1947,7 @@ tables:
             title: "{definitions.threshold_title}"
             subtitle: The level of <<welfare_type>> per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
             note: "{definitions.note_ppp}"
+            chartTypes: *chart_types
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             hideRelativeToggle: false
