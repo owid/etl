@@ -175,7 +175,6 @@ Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
 
 See `.claude/docs/` for:
 - `debugging.md` - Data quality debugging approach
-- `performance.md` - Profiling and optimization
 - `pipeline-stages.md` - Pipeline architecture details
 
 ## Individual Preferences
