@@ -20,11 +20,18 @@ description: Profile and optimize ETL step performance — CPU time, memory usag
 
 ## Workflow
 
-1. **Profile first** — never guess, always measure
-2. **Identify the bottleneck** — read the `%` column, focus on the top 3 lines
-3. **Diagnose** — is it I/O, dtype waste, or algorithmic?
-4. **Fix one thing** — apply the smallest targeted fix
-5. **Re-profile** — verify improvement, repeat
+1. **Check feather schemas first** — before profiling, inspect the on-disk types of large tables:
+   ```python
+   import pyarrow.feather as pf
+   for field in pf.read_table("data/meadow/.../table.feather").schema:
+       print(f"{field.name}: {field.type}")
+   # large_string → should be dictionary (categorical)
+   ```
+2. **Profile** — measure, never guess
+3. **Identify the bottleneck** — read the `%` column, focus on the top 3 lines
+4. **Diagnose** — is it I/O, dtype waste, or algorithmic?
+5. **Fix one thing** — apply the smallest targeted fix
+6. **Re-profile** — verify improvement, repeat
 
 ## Reading Profile Output
 
