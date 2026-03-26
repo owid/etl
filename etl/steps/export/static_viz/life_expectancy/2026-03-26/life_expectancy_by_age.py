@@ -60,9 +60,9 @@ def run() -> None:
     """
     ds = paths.load_dataset("life_expectancy")
 
-    # --- Age 0 from long-run at_birth table ---
+    # --- Age 0 from long-run at_birth table (start ~1700 for cleaner historical range) ---
     tb_birth = ds.read("life_expectancy_at_birth")
-    tb_birth = tb_birth[(tb_birth["country"] == COUNTRY)].copy()
+    tb_birth = tb_birth[(tb_birth["country"] == COUNTRY) & (tb_birth["year"] >= 1700)].copy()
     tb_birth = tb_birth[["country", "year", "life_expectancy_0"]].rename(
         columns={"life_expectancy_0": "life_expectancy"}
     )
@@ -82,7 +82,7 @@ def run() -> None:
 
     fig = create_visualization(tb, source_text)
 
-    paths.export_fig(fig, "life_expectancy_by_age_uk", ["svg", "png"], dpi=300, bbox_inches="tight")
+    paths.export_fig(fig, "life_expectancy_by_age_uk", ["svg", "png"], dpi=300, bbox_inches="tight", transparent=True)
     paths.log.info("Saved SVG and PNG")
 
     plt.close(fig)
@@ -98,12 +98,16 @@ def create_visualization(tb, source_text: str) -> plt.Figure:
 
     fig, ax = plt.subplots(figsize=(16, 13))
 
+    fig.patch.set_visible(False)
+    ax.set_facecolor("none")
+
     ax.set_axisbelow(True)
     ax.grid(axis="y", color=grid_color, linewidth=1)
     ax.grid(axis="x", visible=False)
 
-    # Collect last-point y values for label placement
-    last_points = {}  # age -> (year, y_value)
+    # Collect first and last points per age for labels
+    first_points = {}  # age -> (year, y_value)
+    last_points = {}   # age -> (year, y_value)
 
     # Plot one line per age group
     for age in AGES:
@@ -120,61 +124,64 @@ def create_visualization(tb, source_text: str) -> plt.Figure:
             zorder=5,
         )
 
+        first = tb_age.iloc[0]
         last = tb_age.iloc[-1]
+        first_points[age] = (int(first["year"]), float(first["life_expectancy"]))
         last_points[age] = (int(last["year"]), float(last["life_expectancy"]))
 
-    # Place labels with bidirectional spreading to avoid overlap
-    MIN_SPACING = 2.8
-    sorted_ages = sorted(last_points.keys(), key=lambda a: last_points[a][1])
-    adjusted_y = [last_points[age][1] for age in sorted_ages]
+    def spread_labels(points_dict, min_spacing=2.8):
+        """Bidirectionally spread label y positions to avoid overlap."""
+        sorted_ages = sorted(points_dict.keys(), key=lambda a: points_dict[a][1])
+        ys = [points_dict[age][1] for age in sorted_ages]
+        for _ in range(200):
+            moved = False
+            for i in range(1, len(ys)):
+                if ys[i] - ys[i - 1] < min_spacing:
+                    push = (min_spacing - (ys[i] - ys[i - 1])) / 2
+                    ys[i - 1] -= push
+                    ys[i] += push
+                    moved = True
+            if not moved:
+                break
+        return {age: y for age, y in zip(sorted_ages, ys)}
 
-    # Iteratively push labels apart (both directions) until no overlaps remain
-    for _ in range(100):
-        moved = False
-        for i in range(1, len(adjusted_y)):
-            gap = adjusted_y[i] - adjusted_y[i - 1]
-            if gap < MIN_SPACING:
-                push = (MIN_SPACING - gap) / 2
-                adjusted_y[i - 1] -= push
-                adjusted_y[i] += push
-                moved = True
-        if not moved:
-            break
+    # --- LEFT labels: age name at start of each line ---
+    # "At birth" starts at 1703; other ages start at 1922 — label those separately
+    birth_first = {0: first_points[0]} if 0 in first_points else {}
+    other_first = {age: first_points[age] for age in AGES if age != 0 and age in first_points}
 
-    adjusted_y_map = {age: y for age, y in zip(sorted_ages, adjusted_y)}
+    adj_other_left = spread_labels(other_first, min_spacing=2.8)
 
-    label_x = max(v[0] for v in last_points.values()) + 2
+    for age, (x, y_raw) in other_first.items():
+        y = adj_other_left[age]
+        if abs(y - y_raw) > 1.0:
+            ax.plot([x, x - 0.5], [y_raw, y], color=AGE_COLORS[age], linewidth=0.6, alpha=0.4, zorder=4)
+        ax.text(x - 2, y, AGE_LABELS[age], color=AGE_COLORS[age], fontsize=10, va="center", ha="right")
+
+    if 0 in birth_first:
+        x0, y0 = birth_first[0]
+        ax.text(x0 - 2, y0, AGE_LABELS[0], color=AGE_COLORS[0], fontsize=10, va="center", ha="right")
+
+    # --- RIGHT labels: numeric life expectancy value at end of each line ---
+    adj_right = spread_labels(last_points, min_spacing=2.8)
+    label_x_right = max(v[0] for v in last_points.values()) + 2
+
     for age in AGES:
         if age not in last_points:
             continue
-        # Draw a faint connector line from label to line end when they diverge
-        line_end_y = last_points[age][1]
-        label_y = adjusted_y_map[age]
-        line_end_x = last_points[age][0]
-        if abs(label_y - line_end_y) > 1.0:
-            ax.plot(
-                [line_end_x, label_x - 0.5],
-                [line_end_y, label_y],
-                color=AGE_COLORS[age],
-                linewidth=0.6,
-                alpha=0.5,
-                zorder=4,
-            )
-        ax.text(
-            label_x,
-            label_y,
-            AGE_LABELS[age],
-            color=AGE_COLORS[age],
-            fontsize=10,
-            va="center",
-            ha="left",
-        )
+        x_end, y_raw = last_points[age]
+        y = adj_right[age]
+        if abs(y - y_raw) > 1.0:
+            ax.plot([x_end, label_x_right - 0.5], [y_raw, y],
+                    color=AGE_COLORS[age], linewidth=0.6, alpha=0.4, zorder=4)
+        le_val = round(y_raw, 1)
+        ax.text(label_x_right, y, f"{le_val:.0f}", color=AGE_COLORS[age], fontsize=10, va="center", ha="left")
 
     # Axis limits
     year_min = int(tb["year"].min())
     year_max = int(tb["year"].max())
-    ax.set_xlim(year_min - 10, year_max + 30)
-    ax.set_ylim(15, 100)
+    ax.set_xlim(year_min - 55, year_max + 25)
+    ax.set_ylim(15, 92)
 
     # X-axis ticks
     tick_start = int(np.ceil(year_min / 50) * 50)
@@ -187,8 +194,8 @@ def create_visualization(tb, source_text: str) -> plt.Figure:
     ax.set_xticks(x_ticks)
     ax.tick_params(axis="x", colors=grey_text, labelsize=11, length=0)
 
-    ax.set_yticks(range(20, 101, 10))
-    ax.set_yticklabels([str(y) for y in range(20, 101, 10)], fontsize=11, color=grey_text)
+    ax.set_yticks(range(20, 91, 10))
+    ax.set_yticklabels([str(y) for y in range(20, 91, 10)], fontsize=11, color=grey_text)
     ax.tick_params(axis="y", length=0, left=False)
 
     # Spines
@@ -230,15 +237,15 @@ def create_visualization(tb, source_text: str) -> plt.Figure:
             arrowprops=dict(arrowstyle="->", color=grey_text, lw=1.2, connectionstyle="arc3,rad=-0.2"),
         )
 
-    # Note explaining conditional life expectancy lines start later — top left, below subtitle area
+    # Note explaining conditional life expectancy lines start later
     ax.text(
-        year_min + 5,
-        95,
-        "Data for ages 1+ available from 1922 onwards.",
+        1922 + 3,
+        22,
+        "Data for ages 1+ available\nfrom 1922 onwards.",
         fontsize=9,
         color=grey_text,
         ha="left",
-        va="top",
+        va="bottom",
         style="italic",
     )
 
