@@ -69,7 +69,9 @@ def run() -> None:
         tb_growth_rate = tb_growth_rate[tb_growth_rate["country"].isin(subset_countries)]
         tb_nat_change = tb_nat_change[tb_nat_change["country"].isin(subset_countries)]
         tb_fertility = tb_fertility[tb_fertility["country"].isin(subset_countries)]
-        tb_fertility_births_single = tb_fertility_births_single[tb_fertility_births_single["country"].isin(subset_countries)]
+        tb_fertility_births_single = tb_fertility_births_single[
+            tb_fertility_births_single["country"].isin(subset_countries)
+        ]
         tb_migration = tb_migration[tb_migration["country"].isin(subset_countries)]
         tb_migration_rate = tb_migration_rate[tb_migration_rate["country"].isin(subset_countries)]
         tb_deaths = tb_deaths[tb_deaths["country"].isin(subset_countries)]

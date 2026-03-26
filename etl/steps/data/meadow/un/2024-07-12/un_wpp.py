@@ -512,5 +512,3 @@ def clean_table_standard_xlsx(
         tb = tb.format(COLUMNS_INDEX_FORMAT, short_name=new_name)
 
     return tb
-
-
