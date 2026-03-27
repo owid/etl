@@ -11,12 +11,13 @@ from owid.catalog.core.utils import dynamic_yaml_load, dynamic_yaml_to_dict
 
 
 @lru_cache(maxsize=None)
-def _load_annot(resolved_path: str, frozen_params: tuple[tuple[str, Any], ...]) -> dict[str, Any]:
+def _load_annot(resolved_path: str, frozen_params: tuple[tuple[str, Any], ...], _mtime: tuple[float, float] = (0.0, 0.0)) -> dict[str, Any]:
     """Load and cache the parsed YAML annotation dict.
 
     ``dynamic_yaml_to_dict`` is expensive (~0.7 s for large files).  Within a
     single ETL step the same .meta.yml is parsed once per table, so caching the
-    result keyed on (resolved path, frozen params) eliminates redundant work.
+    result keyed on (resolved path, frozen params, mtime) eliminates redundant
+    work while still picking up file changes.
     """
     path_or_io = merge_with_shared_meta(Path(resolved_path))
     return dynamic_yaml_to_dict(dynamic_yaml_load(path_or_io, dict(frozen_params)))
@@ -50,7 +51,12 @@ def update_metadata_from_yaml(
 
     # load YAML file as dictionary (cached — parsing is expensive)
     # TODO: tb.metadata.dataset reference shouldn't exist
-    annot = _load_annot(str(Path(path).resolve()), tuple(sorted(params.items())))
+    resolved = str(Path(path).resolve())
+    # Include mtime of the file (and shared.meta.yml if present) so the cache
+    # is invalidated when the file is modified on disk.
+    shared_path = Path(path).parent / "shared.meta.yml"
+    mtime = (Path(resolved).stat().st_mtime, shared_path.stat().st_mtime if shared_path.exists() else 0.0)
+    annot = _load_annot(resolved, tuple(sorted(params.items())), mtime)
 
     tb.metadata.short_name = table_name
 
