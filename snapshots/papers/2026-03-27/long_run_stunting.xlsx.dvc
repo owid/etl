@@ -11,13 +11,12 @@ meta:
     date_published: "2026-02-18"
 
     # Citation
-    producer: Schneider, EB et al.
+    producer: Schneider et al.
     citation_full: |-
       Schneider EB, Jaramillo Echeverri J, Purcell M, A'Hearn B, Arthi V, Blum M, et al.
       The decline of child stunting in 122 countries: a systematic review of child growth studies
       since the 19th century. BMJ Global Health. 2026;11:e018607.
       https://doi.org/10.1136/bmjgh-2024-018607, Data available at https://zenodo.org/records/18262234
-    attribution_short: Schneider et al. (2026)
 
     # Files
     url_main: https://zenodo.org/records/18262234
