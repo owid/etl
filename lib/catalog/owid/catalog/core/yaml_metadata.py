@@ -11,7 +11,9 @@ from owid.catalog.core.utils import dynamic_yaml_load, dynamic_yaml_to_dict
 
 
 @lru_cache(maxsize=None)
-def _load_annot(resolved_path: str, frozen_params: tuple[tuple[str, Any], ...], _mtime: tuple[float, float] = (0.0, 0.0)) -> dict[str, Any]:
+def _load_annot(
+    resolved_path: str, frozen_params: tuple[tuple[str, Any], ...], _mtime: tuple[float, float] = (0.0, 0.0)
+) -> dict[str, Any]:
     """Load and cache the parsed YAML annotation dict.
 
     ``dynamic_yaml_to_dict`` is expensive (~0.7 s for large files).  Within a
