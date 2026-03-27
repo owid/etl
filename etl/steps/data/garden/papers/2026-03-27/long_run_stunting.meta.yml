@@ -1,0 +1,34 @@
+# NOTE: To learn more about the fields, hover over their names.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Child & Infant Mortality
+        - Hunger & Undernourishment
+
+
+
+dataset:
+  update_period_days: 0 # Data comes from a paper and is not expected to be updated.
+
+tables:
+  long_run_stunting:
+    variables:
+      stunting_rate:
+        title: Child stunting rate
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of children between 2 and 10 years old who are stunted, so shorter than would be expected for their age. Stunting is a sign of long-term malnutrition or poor health in early childhood.
+        description_key:
+          - Stunting rates are an important indicator of child health and nutrition in a country. High stunting rates can mean widespread malnutrition and poor health conditions during early childhood.
+          - Children are considered stunted if their height-for-age is more than two standard deviations below the median of the World Health Organization (WHO) [child growth standards](https://www.who.int/tools/child-growth-standards/standards).
+          - This data comes from [an article by Scheider et al. (2026)](https://gh.bmj.com/content/11/2/e018607) that compiles historical studies and the UN Joint Malnutrition Estimates (JME) database to provide a long-term perspective on child stunting rates.
+          - This chart includes only data points from high-quality studies e.g. studies that are nationally representative and have larger sample sizes. The full dataset includes additional data points and is available via the original paper [here](https://doi.org/10.5281/zenodo.18262234)
+          - The year is the midpoint of the decade in which the children were born, so the 1955 data point includes children born between 1950 and 1959.
+        display:
+          roundingMode: "significantFigures"
+          numSignificantFigures: 2
+          tolerance: 10
