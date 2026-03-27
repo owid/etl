@@ -129,11 +129,21 @@ tb.loc[tb["a"] > 0, "result"] = tb.loc[tb["a"] > 0, "a"]
 - Ensure groupby columns are categorical (much faster hashing)
 - Use `observed=True` to skip unused category combinations
 - Use `as_index=False` to avoid expensive multi-index creation
+- **Never mix lambdas with string aggregations** in `.agg()` — a single callable forces pandas off its fast C path, causing ~10× slowdown on ALL aggregations (including the string ones like `"sum"`). Split into two separate groupby calls instead.
 
 ```python
 # Good
 tb.groupby(["country", "year", "sex"], as_index=False, observed=True)["value"].sum()
+
+# Bad — lambda poisons the entire agg call
+tb.groupby(cols).agg({"value": "sum", "country": lambda x: check(x)})
+
+# Good — separate the fast and slow aggregations
+result = tb.groupby(cols).agg({"value": "sum"})
+checks = tb.groupby(cols)["country"].apply(lambda x: check(x))
 ```
+
+**Known issue**: `geo.add_region_aggregates()` (deprecated) injects a per-group lambda to check `countries_that_must_have_data`. When that list is empty (common case), the lambda is a no-op but still causes the slowdown. This was fixed in 2026-03 to skip the lambda when no checks are needed. The newer `paths.regions.add_aggregates()` API doesn't have this issue.
 
 ### 5. Unnecessary Full-Table Reads
 
@@ -182,6 +192,13 @@ Look for:
 print(f"Memory: {tb.memory_usage(deep=True).sum() / 1e6:.0f} MB")
 print(tb.dtypes)  # object dtype = memory hog
 ```
+
+## Iteration Tips
+
+- **Always use SUBSET** for profiling iterations. Never run full data until you've confirmed the fix works.
+- **Use `etl d profile`** for measuring, not `etlr` — the latter has overhead from change detection, dependency resolution, and dataset saving that drowns out the signal.
+- **Small SUBSET for correctness** (2-3 values), **medium SUBSET for timing** (10-15 values). Only go bigger if the bottleneck doesn't show up at small scale.
+- **`-f function_name`** to drill into specific functions. Only works for functions defined in the step's main module, not imported ones.
 
 ## Checklist Before Optimizing
 

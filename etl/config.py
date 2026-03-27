@@ -88,7 +88,19 @@ def enable_structlog_filtering() -> None:
     Called from the ETL CLI entry point, not at import time, to avoid
     interfering with other tools (e.g. Streamlit apps) that import etl.config.
     """
-    structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(STRUCTLOG_LOG_LEVEL))
+    kwargs: dict = dict(wrapper_class=structlog.make_filtering_bound_logger(STRUCTLOG_LOG_LEVEL))
+
+    # Allow disabling timestamps via ETL_LOG_TIMESTAMPS=0
+    if env.get("ETL_LOG_TIMESTAMPS", "0") == "0":
+        kwargs["processors"] = [
+            structlog.contextvars.merge_contextvars,
+            structlog.processors.add_log_level,
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.dev.ConsoleRenderer(),
+        ]
+
+    structlog.configure(**kwargs)
 
 
 pd.set_option("future.no_silent_downcasting", True)
