@@ -1115,24 +1115,26 @@ function renderValueDist(valueCounts) {
 }
 
 function renderSparkline(data) {
-    if (!data || data.length < 2) return '<div class="sparkline-placeholder">No sparkline data</div>';
+    // Compact format: {years: [...], values: [...]}
+    if (!data || !data.years || data.years.length < 2) return '<div class="sparkline-placeholder">No sparkline data</div>';
     var W = 280, H = 40, PAD = 2;
-    var values = data.map(function(d) { return d.value; });
+    var years = data.years, values = data.values, n = years.length;
     var min = Math.min.apply(null, values);
     var max = Math.max.apply(null, values);
     var range = max - min || 1;
-    var points = data.map(function(d, i) {
-        var x = PAD + (i / (data.length - 1)) * (W - 2 * PAD);
-        var y = H - PAD - ((d.value - min) / range) * (H - 2 * PAD);
-        return x.toFixed(1) + ',' + y.toFixed(1);
-    });
+    var points = [];
+    for (var i = 0; i < n; i++) {
+        var x = PAD + (i / (n - 1)) * (W - 2 * PAD);
+        var y = H - PAD - ((values[i] - min) / range) * (H - 2 * PAD);
+        points.push(x.toFixed(1) + ',' + y.toFixed(1));
+    }
     var linePoints = points.join(' ');
     var areaPoints = PAD + ',' + H + ' ' + linePoints + ' ' + (W - PAD) + ',' + H;
     return '<svg width="100%" viewBox="0 0 ' + W + ' ' + (H + 12) + '" preserveAspectRatio="none">' +
         '<polygon points="' + areaPoints + '" fill="#3794ff" fill-opacity="0.06"/>' +
         '<polyline points="' + linePoints + '" fill="none" stroke="#3794ff" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>' +
-        '<text x="' + PAD + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace">' + data[0].year + '</text>' +
-        '<text x="' + (W - PAD) + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace" text-anchor="end">' + data[data.length - 1].year + '</text>' +
+        '<text x="' + PAD + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace">' + years[0] + '</text>' +
+        '<text x="' + (W - PAD) + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace" text-anchor="end">' + years[n - 1] + '</text>' +
         '<text x="' + PAD + '" y="8" font-size="8" fill="#555" font-family="monospace">' + formatNum(max) + '</text>' +
         '<text x="' + (W - PAD) + '" y="' + (H - 2) + '" font-size="8" fill="#555" font-family="monospace" text-anchor="end">' + formatNum(min) + '</text>' +
         '</svg>';
