@@ -831,6 +831,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
         else:
             raise AssertionError("Table must have columns country and year or date.")
 
+        cols_missing_title_public = []
         for col in tab:
             if col in ("year", "country"):
                 continue
@@ -857,10 +858,13 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             display_name = (tab[col].m.display or {}).get("name")
             title_public = getattr(tab[col].m.presentation, "title_public", None)
             if warn_title_public and display_name and not title_public:
-                warnings.warn(
-                    f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
-                    warnings.DisplayNameWarning,
-                )
+                cols_missing_title_public.append(col)
+
+        if cols_missing_title_public:
+            warnings.warn(
+                f"{len(cols_missing_title_public)} column(s) use display.name but no presentation.title_public (e.g. {', '.join(cols_missing_title_public[:3])}). Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
+                warnings.DisplayNameWarning,
+            )
 
 
 def _validate_grapher_config(tab: Table, col: str) -> None:

@@ -77,7 +77,7 @@ def run() -> None:
             log.warning("un_sdg.skip", table_name=var)
             continue
 
-        log.info("un_sdg.process", table_name=var)
+        log.debug("un_sdg.process", table_name=var)
 
         tb = ds_garden.read(var, safe_types=False)
 
