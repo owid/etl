@@ -19,13 +19,16 @@ tables:
     variables:
       pm:
         title: PM2.5 air pollution
-        description_short: Annual average concentration of fine particulate matter (PM2.5) in micrograms per cubic meter.
+        description_short: Annual average concentration of fine [particulate matter (PM2.5)](#dod:particulate_matter_pollution) in micrograms per cubic meter.
         description_key:
-          - Outdoor air pollution, specifically PM2.5, is a major environmental risk factor for health issues such as respiratory and cardiovascular diseases.
-          - The data for the annual average concentrations of PM2.5 comes from a satellite-derived particulate pollution concentration dataset constructed by [Donkelaar et al. (2021)](https://sites.wustl.edu/acag/datasets/surface-pm2-5/).
+          - Outdoor air pollution, specifically PM2.5, is a major environmental risk factor for health issues such as respiratory and cardiovascular diseases. It is estimated to contribute to millions of premature deaths globally each year.
+        description_from_producer: The data for the annual average concentrations of PM2.5 comes from a satellite-derived particulate pollution concentration dataset constructed by [Donkelaar et al. (2021)](https://sites.wustl.edu/acag/datasets/surface-pm2-5/). More information can be found in the [AQLI methodology and research design document](https://aqli.epic.uchicago.edu/about/methodology/).
         display:
           roundingMode: significantFigures
           numSignificantFigures: 2
+        presentation:
+          grapher_config:
+            note: The [WHO's Air Quality Guidelines](#dod:who-air-quality-guidelines) suggest annual average PM2.5 exposure should be less than 5 µg/m³ in order to minimize the impacts of PM2.5 on human health.
       whostandard:
         title: WHO PM2.5 guideline
         description_short: The WHO annual PM2.5 guideline value (5 µg/m³ as of the 2021 guidelines).
@@ -38,6 +41,9 @@ tables:
         display:
           roundingMode: significantFigures
           numSignificantFigures: 2
+        presentation:
+          grapher_config:
+            note: The [WHO's Air Quality Guidelines](#dod:who-air-quality-guidelines) suggest annual average PM2.5 exposure should be less than 5 µg/m³ in order to minimize the impacts of PM2.5 on human health.
       llpp_who:
         title: Life expectancy gain if WHO guideline met
         unit: years
