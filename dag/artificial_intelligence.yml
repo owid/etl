@@ -288,3 +288,12 @@ steps:
     - data://meadow/ifr/2026-01-14/robot_density
   data://grapher/ifr/2026-01-14/robot_density:
     - data://garden/ifr/2026-01-14/robot_density
+  #
+  # Robotaxis dataset
+  #
+  data://meadow/artificial_intelligence/2026-03-30/robotaxis:
+    - snapshot://artificial_intelligence/2026-03-30/robotaxis.csv
+  data://garden/artificial_intelligence/2026-03-30/robotaxis:
+    - data://meadow/artificial_intelligence/2026-03-30/robotaxis
+  data://grapher/artificial_intelligence/2026-03-30/robotaxis:
+    - data://garden/artificial_intelligence/2026-03-30/robotaxis
