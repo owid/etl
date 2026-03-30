@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import pymysql
 import structlog
-from jsonschema import validate
 from owid import catalog
 from owid.catalog.core import Table, jinja, warnings
 from owid.catalog.core.utils import dynamic_yaml_load, dynamic_yaml_to_dict, underscore
@@ -877,6 +876,8 @@ def _validate_grapher_config(tab: Table, col: str) -> None:
         schema = get_schema_from_url(grapher_config["$schema"])
         # schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version", "title")]
         schema["required"] = []
+
+        from jsonschema import validate
 
         validate(grapher_config, schema)
 
