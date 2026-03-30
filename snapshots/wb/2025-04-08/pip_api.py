@@ -452,7 +452,7 @@ def pip_query_country(
         Path(f"{CACHE_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
         # Save to csv
         df.to_csv(
-            f"{CACHE_DIR}/pip_country_data/pip_country_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value*100))}_welfare_{welfare_type}_rep_{reporting_level}_fillgaps_{fill_gaps}_ppp_{ppp_version}.csv",
+            f"{CACHE_DIR}/pip_country_data/pip_country_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value * 100))}_welfare_{welfare_type}_rep_{reporting_level}_fillgaps_{fill_gaps}_ppp_{ppp_version}.csv",
             index=False,
         )
 
@@ -512,7 +512,7 @@ def pip_query_region(
         Path(f"{CACHE_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
         # Save to csv
         df.to_csv(
-            f"{CACHE_DIR}/pip_region_data/pip_region_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value*100))}_ppp_{ppp_version}.csv",
+            f"{CACHE_DIR}/pip_region_data/pip_region_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value * 100))}_ppp_{ppp_version}.csv",
             index=False,
         )
 
@@ -893,9 +893,7 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
         log.info("Percentiles calculated and consolidated")
 
         # Rename headcount to estimated_percentile and poverty_line to thr
-        df_percentiles = df_percentiles.rename(
-            columns={"headcount": "estimated_percentile", "poverty_line": "thr"}
-        )  # ty: ignore
+        df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # ty: ignore
 
         # Add official percentiles from the World Bank Databank
         df_percentiles_published_ppp_old = format_official_percentiles(PPP_VERSIONS[0], wb_api)
@@ -1237,7 +1235,7 @@ def generate_relative_poverty(wb_api: WB_API):
         """
         if ~np.isnan(df_row["median"]):
             if Path(
-                f"{CACHE_DIR}/pip_region_data/pip_region_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median']*pct))}_ppp_{PPP_VERSIONS[1]}.csv"
+                f"{CACHE_DIR}/pip_region_data/pip_region_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median'] * pct))}_ppp_{PPP_VERSIONS[1]}.csv"
             ).is_file():
                 return
             else:
@@ -1278,7 +1276,7 @@ def generate_relative_poverty(wb_api: WB_API):
                 if ~np.isnan(df["median"].iloc[i]):
                     if country_or_region == "country":
                         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
-                        file_path = f"{CACHE_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_{PPP_VERSIONS[1]}.csv"
+                        file_path = f"{CACHE_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median'] * pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_{PPP_VERSIONS[1]}.csv"
                         if Path(file_path).is_file():
                             results = pd.read_csv(file_path)
                         else:
@@ -1288,7 +1286,7 @@ def generate_relative_poverty(wb_api: WB_API):
 
                     elif country_or_region == "region":
                         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
-                        file_path = f"{CACHE_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_ppp_{PPP_VERSIONS[1]}.csv"
+                        file_path = f"{CACHE_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median'] * pct))}_ppp_{PPP_VERSIONS[1]}.csv"
                         if Path(file_path).is_file():
                             results = pd.read_csv(file_path)
                         else:

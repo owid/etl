@@ -281,9 +281,7 @@ def create_long_dataset(df_current, df_historical):
     )
 
     # Show rows with duplicated index
-    df_duplicated = df_long[
-        df_long.duplicated(subset=["country", "year", "issue", "date_modified"], keep=False)
-    ].copy()  # ty: ignore
+    df_duplicated = df_long[df_long.duplicated(subset=["country", "year", "issue", "date_modified"], keep=False)].copy()  # ty: ignore
 
     df_duplicated.to_csv(PARENT_DIR / "duplicated.csv", index=True)
 

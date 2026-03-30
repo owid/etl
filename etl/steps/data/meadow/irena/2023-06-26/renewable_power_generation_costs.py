@@ -101,9 +101,7 @@ def extract_global_cost_for_all_sources_from_excel_file(excel_object: pr.ExcelFi
 
     # Solar photovoltaic.
     solar_pv = (
-        excel_object.parse("Fig 3.1", skiprows=22)
-        .dropna(how="all", axis=1)
-        .rename(columns={"Unnamed: 1": "temp"})  # ty: ignore
+        excel_object.parse("Fig 3.1", skiprows=22).dropna(how="all", axis=1).rename(columns={"Unnamed: 1": "temp"})  # ty: ignore
     )
     solar_pv = solar_pv[solar_pv["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
@@ -111,9 +109,7 @@ def extract_global_cost_for_all_sources_from_excel_file(excel_object: pr.ExcelFi
     solar_pv["technology"] = "Solar photovoltaic"
 
     # Onshore wind.
-    onshore_wind = excel_object.parse(
-        "Fig 2.12", skiprows=3, usecols=lambda column: "Unnamed" not in column
-    ).rename(  # ty: ignore
+    onshore_wind = excel_object.parse("Fig 2.12", skiprows=3, usecols=lambda column: "Unnamed" not in column).rename(  # ty: ignore
         columns={"Year": "year", "Weighted average": "cost"}
     )
     onshore_wind["technology"] = "Onshore wind"
@@ -134,18 +130,14 @@ def extract_global_cost_for_all_sources_from_excel_file(excel_object: pr.ExcelFi
     offshore_wind["technology"] = "Offshore wind"
 
     # Geothermal.
-    geothermal = excel_object.parse("Fig 7.4", skiprows=5).rename(
-        columns={"Year": "year", "Weighted average": "cost"}
-    )[  # ty: ignore
+    geothermal = excel_object.parse("Fig 7.4", skiprows=5).rename(columns={"Year": "year", "Weighted average": "cost"})[  # ty: ignore
         ["year", "cost"]
     ]
     geothermal["technology"] = "Geothermal"
 
     # Bioenergy.
     bioenergy = (
-        excel_object.parse("Fig 8.1", skiprows=20)
-        .dropna(axis=1, how="all")
-        .rename(columns={"Unnamed: 1": "temp"})  # ty: ignore
+        excel_object.parse("Fig 8.1", skiprows=20).dropna(axis=1, how="all").rename(columns={"Unnamed: 1": "temp"})  # ty: ignore
     )
     bioenergy = bioenergy[bioenergy["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
@@ -154,9 +146,7 @@ def extract_global_cost_for_all_sources_from_excel_file(excel_object: pr.ExcelFi
 
     # Hydropower.
     hydropower = (
-        excel_object.parse("Fig 6.1", skiprows=20)
-        .dropna(how="all", axis=1)
-        .rename(columns={"Unnamed: 1": "temp"})  # ty: ignore
+        excel_object.parse("Fig 6.1", skiprows=20).dropna(how="all", axis=1).rename(columns={"Unnamed: 1": "temp"})  # ty: ignore
     )
     hydropower = hydropower[hydropower["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
@@ -191,9 +181,7 @@ def extract_country_cost_from_excel_file(excel_object: pr.ExcelFile) -> Table:
 
     # Solar photovoltaic.
     solar_pv = (
-        excel_object.parse("Fig 3.8", skiprows=5)
-        .dropna(how="all", axis=1)
-        .rename(columns={"2021 USD/kWh": "country"})  # ty: ignore
+        excel_object.parse("Fig 3.8", skiprows=5).dropna(how="all", axis=1).rename(columns={"2021 USD/kWh": "country"})  # ty: ignore
     )
 
     # Last column is the difference between the cost in the last two years. Remove that column.
@@ -201,9 +189,7 @@ def extract_country_cost_from_excel_file(excel_object: pr.ExcelFile) -> Table:
 
     # Onshore wind.
     onshore_wind = (
-        excel_object.parse("Fig 2.13", skiprows=6)
-        .dropna(how="all", axis=1)
-        .rename(columns={"Country": "country"})  # ty: ignore
+        excel_object.parse("Fig 2.13", skiprows=6).dropna(how="all", axis=1).rename(columns={"Country": "country"})  # ty: ignore
     )
 
     # Country column is repeated. Drop it, and drop column of percentage decrease.

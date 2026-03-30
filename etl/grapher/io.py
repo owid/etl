@@ -955,9 +955,7 @@ def get_variables_data(
 
     # Add parsed catalog_path column if catalogPath exists
     if "catalogPath" in df.columns and len(df) > 0:
-        df["catalog_path"] = [
-            CatalogPath.from_str(p) if p else None for p in df["catalogPath"]
-        ]  # ty: ignore[invalid-assignment]
+        df["catalog_path"] = [CatalogPath.from_str(p) if p else None for p in df["catalogPath"]]  # ty: ignore[invalid-assignment]
 
     return df
 

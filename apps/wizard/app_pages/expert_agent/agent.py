@@ -636,7 +636,7 @@ async def generate_plot(
             # Build prompt with error feedback from previous attempts
             if error_history:
                 error_feedback = "\n\nPREVIOUS ATTEMPT ERRORS:\n" + "\n".join(
-                    f"Attempt {i+1} error: {err}" for i, err in enumerate(error_history)
+                    f"Attempt {i + 1} error: {err}" for i, err in enumerate(error_history)
                 )
                 prompt = context_info + error_feedback + "\n\nPlease fix the code to avoid these errors."
             else:
@@ -687,7 +687,7 @@ async def generate_plot(
 
             # If this was the last retry, raise the error
             if attempt == max_retries - 1:
-                full_error = "\n".join(f"Attempt {i+1}: {err}" for i, err in enumerate(error_history))
+                full_error = "\n".join(f"Attempt {i + 1}: {err}" for i, err in enumerate(error_history))
                 log.error(f"All {max_retries} attempts failed for question {question_id}:\n{full_error}")
                 raise ValueError(f"Failed to generate plot after {max_retries} attempts. Errors:\n{full_error}")
 

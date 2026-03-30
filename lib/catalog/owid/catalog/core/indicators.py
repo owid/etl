@@ -534,6 +534,7 @@ class Indicator(pd.Series):
             new_var._fields = defaultdict(VariableMeta, {k: self._fields[k].copy(deep=deep) for k in field_names})
         return new_var  # ty: ignore[invalid-return-type]
 
+
 # Backwards-compatible alias
 Variable = Indicator
 

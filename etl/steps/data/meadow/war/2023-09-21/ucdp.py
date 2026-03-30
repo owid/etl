@@ -59,9 +59,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir, tables=tables, default_metadata=snap.metadata, check_variables_metadata=True
-    )  # ty: ignore
+    ds_meadow = create_dataset(dest_dir, tables=tables, default_metadata=snap.metadata, check_variables_metadata=True)  # ty: ignore
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

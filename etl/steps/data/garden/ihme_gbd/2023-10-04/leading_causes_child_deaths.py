@@ -197,7 +197,7 @@ def add_owid_hierarchy(tb_hierarchy: Table) -> Table:
         "Tuberculosis",
         "HIV/AIDS",
         "Drowning",
-        "Malaria" "Syphilis",
+        "MalariaSyphilis",
     ]
     msk_all_ages = tb_hierarchy["cause_name"].isin(all_ages)
     tb_hierarchy_all_ages = tb_hierarchy[msk_all_ages]

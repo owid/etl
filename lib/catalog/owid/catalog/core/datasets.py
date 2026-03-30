@@ -18,12 +18,12 @@ from typing import Any, Literal, cast
 import numpy as np
 import pandas as pd
 import yaml
+from owid.repack import to_safe_types
 
 from owid.catalog.core import tables, utils
 from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
 from owid.catalog.core.processing_log import disable_processing_log
 from owid.catalog.core.properties import metadata_property
-from owid.repack import to_safe_types
 
 FileFormat = Literal["csv", "feather", "parquet", "json"]
 
@@ -185,9 +185,9 @@ class Dataset:
             if dtype in NULLABLE_DTYPES:
                 # pandas nullable types like Float64 have their own pd.NA instead of np.nan
                 # make sure we don't use wrong nan, otherwise dropna and other methods won't work
-                assert (
-                    np.isnan(table[col]).sum() == 0
-                ), f"Column `{col}` is using np.nan, but it should be using pd.NA because it has type {table[col].dtype}"
+                assert np.isnan(table[col]).sum() == 0, (
+                    f"Column `{col}` is using np.nan, but it should be using pd.NA because it has type {table[col].dtype}"
+                )
 
         # copy dataset metadata to the table
         table.metadata.dataset = self.metadata

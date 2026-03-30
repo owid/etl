@@ -161,8 +161,8 @@ def cli() -> None:
         f"{len(changes)} grapher dataset pairs need to be mapped.\n"
     )
     for change in changes:
-        print(f'[{change["old"]["id"]}] {change["old"]["name"]}')
-        print(f'    Step: {change["old"]["step"]}')
-        print(f'[{change["new"]["id"]}] {change["new"]["name"]}')
-        print(f'    Step: {change["new"]["step"]}')
+        print(f"[{change['old']['id']}] {change['old']['name']}")
+        print(f"    Step: {change['old']['step']}")
+        print(f"[{change['new']['id']}] {change['new']['name']}")
+        print(f"    Step: {change['new']['step']}")
         print()

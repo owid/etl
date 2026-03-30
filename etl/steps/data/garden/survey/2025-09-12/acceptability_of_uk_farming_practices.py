@@ -30,7 +30,7 @@ def inspect_demographics(tb):
     # Create age groups.
     assert tb["age"].min() >= 18, "Unexpected age range."
     bins = [17, 24, 34, 44, 54, 64, 100]
-    labels = [f"{bins[i]+1}-{bins[i+1]}" for i in range(len(bins) - 2)] + [f"{bins[-2]+1}+"]
+    labels = [f"{bins[i] + 1}-{bins[i + 1]}" for i in range(len(bins) - 2)] + [f"{bins[-2] + 1}+"]
     tb["age_group"] = pd.cut(tb["age"], bins=bins, labels=labels, include_lowest=True)
     demographics_found = {
         indicator: tb.groupby(indicator).agg({"user": lambda x: 100 * len(x) / len(tb)})

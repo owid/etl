@@ -722,12 +722,12 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
         Multidimensional: Democracy score with confidence intervals (low/best/high)
     """
     # 0/ Sanity check on regions
-    assert set(tb_countries_avg["country"].unique()) == REGIONS.keys() | {
-        "World"
-    }, "Countries in tb_countries_avg do not match defined regions!"
-    assert set(tb_population_avg["country"].unique()) == REGIONS.keys() | {
-        "World"
-    }, "Countries in tb_countries_avg do not match defined regions!"
+    assert set(tb_countries_avg["country"].unique()) == REGIONS.keys() | {"World"}, (
+        "Countries in tb_countries_avg do not match defined regions!"
+    )
+    assert set(tb_population_avg["country"].unique()) == REGIONS.keys() | {"World"}, (
+        "Countries in tb_countries_avg do not match defined regions!"
+    )
 
     # 1/ Get uni- and multi-dimensional indicator tables
     ## It puts indicators that have '_low' in the name in the multi-dimensional table. It also formats it into "long format", so to have a new column `estimate`.
@@ -746,9 +746,9 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
         indicator_category_callback=lambda x: "low" if "_low" in x else "high" if "_high" in x else "best",
         column_dimension_name="estimate",
     )
-    assert set(tb_population_avg) == set(
-        tb_countries_avg
-    ), "Columns in tb_population_avg and tb_countries_avg do not match!"
+    assert set(tb_population_avg) == set(tb_countries_avg), (
+        "Columns in tb_population_avg and tb_countries_avg do not match!"
+    )
 
     # 3/ Get columns of indicators with region data, based on whether they have estimates (dimension estimate) or not
     columns_uni = [
@@ -1120,9 +1120,9 @@ def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
             # Assert that there are actually NaNs
             assert tb_[indicator["name"]].isna().any(), f"No NA found for indicator {indicator['name']}!"
             # If NA, we should not have category '-1', otherwise these would get merged!
-            assert "-1" not in set(
-                tb_[indicator["name"]].unique()
-            ), f"Error for indicator `{indicator['name']}`. Found -1, which is not allowed when `has_na=True`!"
+            assert "-1" not in set(tb_[indicator["name"]].unique()), (
+                f"Error for indicator `{indicator['name']}`. Found -1, which is not allowed when `has_na=True`!"
+            )
             tb_[indicator["name"]] = tb_[indicator["name"]].fillna("-1")
             # Add '-1' as a possible category
             if isinstance(values_expected, dict):
@@ -1133,9 +1133,9 @@ def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
             assert not tb_[indicator["name"]].isna().any(), f"NA found for {indicator['name']}!"
 
         values_found = set(tb_[indicator["name"]].unique())
-        assert values_found == set(
-            values_expected
-        ), f"Error for indicator `{indicator['name']}`. Expected {set(values_expected)} but found {values_found}"
+        assert values_found == set(values_expected), (
+            f"Error for indicator `{indicator['name']}`. Expected {set(values_expected)} but found {values_found}"
+        )
 
         # Rename dimension values
         if isinstance(values_expected, dict):

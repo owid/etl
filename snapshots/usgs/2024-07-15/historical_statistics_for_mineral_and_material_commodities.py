@@ -122,15 +122,13 @@ def download_all_files(df: pd.DataFrame, snapshot_path: Path) -> None:
             if row["supply_demand_url"] != "NA":
                 download_file_from_url(
                     url=row["supply_demand_url"],
-                    local_path=supply_demand_dir
-                    / f"{underscore(row['commodity'])}.xlsx",  # ty: ignore[invalid-argument-type]
+                    local_path=supply_demand_dir / f"{underscore(row['commodity'])}.xlsx",  # ty: ignore[invalid-argument-type]
                 )
 
             if row["end_use_url"] != "NA":
                 download_file_from_url(
                     url=row["end_use_url"],
-                    local_path=end_use_dir
-                    / f"{underscore(row['commodity'])}.xlsx",  # ty: ignore[invalid-argument-type]
+                    local_path=end_use_dir / f"{underscore(row['commodity'])}.xlsx",  # ty: ignore[invalid-argument-type]
                 )
 
         # Create the zip file at the snapshot path.

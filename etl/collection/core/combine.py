@@ -87,9 +87,9 @@ def combine_config_dimensions(
                     dim_overwrite["choices"],
                     "slug",
                 )
-                assert (
-                    "choices" in dim
-                ), f"Choices not found in dimension: {dim}! This is rare, please report this issue!"
+                assert "choices" in dim, (
+                    f"Choices not found in dimension: {dim}! This is rare, please report this issue!"
+                )
                 for choice in dim["choices"]:
                     slug_choice = choice["slug"]
                     if slug_choice in choices_overwrite:
@@ -265,9 +265,9 @@ def combine_collections(
         if collection_dims is None:
             collection_dims = dimensions_flatten
         else:
-            assert (
-                collection_dims == dimensions_flatten
-            ), "Dimensions are not the same across collections. Please review that dimensions are listed in the same order, have the same slugs, names, description, etc."
+            assert collection_dims == dimensions_flatten, (
+                "Dimensions are not the same across collections. Please review that dimensions are listed in the same order, have the same slugs, names, description, etc."
+            )
 
     # Check for checkbox dimensions in the first collection
     # TODO: Implement support for checkboxes when merging
@@ -297,9 +297,9 @@ def combine_collections(
     if has_duplicate_views or force_collection_dimension:
         for i, collection in enumerate(collections):
             if collection_choices_names is not None:
-                assert len(collection_choices_names) == len(
-                    collections
-                ), "Length of collection_choices_names must match the number of collections"
+                assert len(collection_choices_names) == len(collections), (
+                    "Length of collection_choices_names must match the number of collections"
+                )
                 choice_name = collection_choices_names[i]
             else:
                 choice_name = collection.title.get("title", collection.short_name)
@@ -341,9 +341,9 @@ def combine_collections(
 
     # Create catalog path
     if isinstance(catalog_path, str):
-        assert (
-            "#" in catalog_path
-        ), "Catalog path must contain a '#' to separate the base path from the collection name."
+        assert "#" in catalog_path, (
+            "Catalog path must contain a '#' to separate the base path from the collection name."
+        )
         catalog_path_new = catalog_path
         collection_name_new = catalog_path_new.split("#")[-1]
     else:
@@ -441,9 +441,9 @@ def _combine_dimensions(
             df_choices["dimension_slug"] == dimension.slug, cols_choices + ["slug"]
         ].drop_duplicates()
 
-        assert (
-            len(df_dim_choices) == df_dim_choices["slug"].nunique()
-        ), f"Duplicate slugs in dimension {dimension.slug} choices."
+        assert len(df_dim_choices) == df_dim_choices["slug"].nunique(), (
+            f"Duplicate slugs in dimension {dimension.slug} choices."
+        )
 
         # Raw choices
         choices = df_dim_choices.to_dict("records")

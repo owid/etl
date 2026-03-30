@@ -258,9 +258,9 @@ def add_conflict_type(tb: Table) -> Table:
         "Vietnam, 1964-75",
     ]
     mask_custom = tb["name"].isin(wars_interstate)
-    assert (
-        mask_custom.sum() == len(wars_interstate)
-    ), "Some corrections can't be made, because some war names specified in `wars_interstate` are not found in the data!"
+    assert mask_custom.sum() == len(wars_interstate), (
+        "Some corrections can't be made, because some war names specified in `wars_interstate` are not found in the data!"
+    )
     ## Build final mask
     mask = name_wo_year.str.contains("-") | mask_custom
 
@@ -382,9 +382,7 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_world_all_conf["conflict_type"] = "all"
 
     ## Combine
-    tb_new = pr.concat(
-        [tb_new, tb_new_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True
-    ).sort_values(  # ty: ignore
+    tb_new = pr.concat([tb_new, tb_new_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True).sort_values(  # ty: ignore
         by=["startyear", "region", "conflict_type"]
     )
 

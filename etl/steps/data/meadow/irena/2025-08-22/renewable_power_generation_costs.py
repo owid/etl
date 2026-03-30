@@ -301,9 +301,9 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
     error = "The file format for onshore wind LCOE has changed."
     assert "onshore wind" in data.parse(sheet_name_onshore_wind_top_markets).columns[0], error
     assert "top markets" in data.parse(sheet_name_onshore_wind_top_markets).columns[0], error
-    assert (
-        data.parse(sheet_name_onshore_wind_top_markets, skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})"
-    ), error
+    assert data.parse(sheet_name_onshore_wind_top_markets, skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", (
+        error
+    )
     # NOTE: Column "Country" appears twice, so drop one of them.
     onshore_wind = (
         data.parse(sheet_name_onshore_wind_top_markets, skiprows=6)

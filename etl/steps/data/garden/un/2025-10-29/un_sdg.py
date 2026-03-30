@@ -83,9 +83,9 @@ def labor_share_to_hours(tb: pd.DataFrame):
     tb_dl = tb[(tb["indicator"] == "5.4.1")]
 
     # assert all entries have series code in the set of the three series codes mentioned above
-    assert (
-        tb_dl["seriescode"].isin(["SL_DOM_TSPD", "SL_DOM_TSPDCW", "SL_DOM_TSPDDC"]).all()
-    ), "Unexpected series codes found for indicator 5.4.1: {}".format(tb_dl["seriescode"].unique())
+    assert tb_dl["seriescode"].isin(["SL_DOM_TSPD", "SL_DOM_TSPDCW", "SL_DOM_TSPDDC"]).all(), (
+        "Unexpected series codes found for indicator 5.4.1: {}".format(tb_dl["seriescode"].unique())
+    )
 
     # assert all entries have units and short_unit %
     assert (tb_dl["long_unit"] == "%").all(), "Unexpected long units found for indicator 5.4.1: {}".format(

@@ -55,9 +55,7 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = paths.create_dataset(
-        tables=tables, check_variables_metadata=True, default_metadata=snap.metadata
-    )  # ty: ignore
+    ds_meadow = paths.create_dataset(tables=tables, check_variables_metadata=True, default_metadata=snap.metadata)  # ty: ignore
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()

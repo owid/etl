@@ -140,14 +140,14 @@ def add_eu28(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_europe(df: pd.DataFrame) -> pd.DataFrame:
-    assert (
-        "European Union (28)" in df.country.unique()
-    ), "Check data! It looks like `European Union (28)` is not present."
+    assert "European Union (28)" in df.country.unique(), (
+        "Check data! It looks like `European Union (28)` is not present."
+    )
     # EU states
     europe_members = list_countries_in_region("Europe") + ["European Union (28)"]
-    assert (
-        len(set(df.country).intersection(europe_members)) == 18
-    ), "Check data! It might be that individual EU 28 member states are still present."
+    assert len(set(df.country).intersection(europe_members)) == 18, (
+        "Check data! It might be that individual EU 28 member states are still present."
+    )
     # Add EU data
     df = _add_region(df, europe_members, "Europe", remove_members=False)
     return df

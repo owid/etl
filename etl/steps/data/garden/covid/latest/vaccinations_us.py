@@ -28,9 +28,7 @@ def run(dest_dir: str) -> None:
     # Add total boosters
     tb = add_total_boosters(tb)
     # Something else
-    tb = (
-        tb.groupby("state", observed=True).apply(make_monotonic, max_removed_rows=None).reset_index(drop=True)
-    )  # ty: ignore
+    tb = tb.groupby("state", observed=True).apply(make_monotonic, max_removed_rows=None).reset_index(drop=True)  # ty: ignore
     # Add per-capita
     tb = add_per_capita(tb)
     # Add smoothed indicators

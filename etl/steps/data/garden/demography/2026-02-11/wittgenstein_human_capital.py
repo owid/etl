@@ -245,9 +245,9 @@ def _compute_regional_tfr(tables_raw: dict[str, Table]) -> dict:
 
 def sanity_checks(tb_proj, tb_hist):
     # Short name sanity check
-    assert (
-        tb_proj.m.short_name == tb_hist.m.short_name
-    ), f"Mismatch in short_name of historical ({tb_hist.m.short_name}) and projection ({tb_proj.m.short_name})"
+    assert tb_proj.m.short_name == tb_hist.m.short_name, (
+        f"Mismatch in short_name of historical ({tb_hist.m.short_name}) and projection ({tb_proj.m.short_name})"
+    )
     key = tb_proj.m.short_name
 
     # Look for differences
@@ -276,6 +276,6 @@ def sanity_checks(tb_proj, tb_hist):
     if key in TABLES_MERGE_FROM_HIST:
         extra_cols = TABLES_MERGE_FROM_HIST[key]
         for col in extra_cols:
-            assert (
-                col in tb_hist.columns
-            ), f"Table {key}: Expected column '{col}' in historical for merge, but not found"
+            assert col in tb_hist.columns, (
+                f"Table {key}: Expected column '{col}' in historical for merge, but not found"
+            )

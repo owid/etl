@@ -49,7 +49,7 @@ dev = [
     "openpyxl>=3.0.10",
     "lxml>=4.9.1",
     "ty==0.0.26",
-    "ruff==0.8.6"
+    "ruff==0.15.8"
 ]
 
 [tool.ruff]
@@ -63,6 +63,7 @@ call-top-callable = "ignore"
 unsupported-operator = "ignore"
 redundant-cast = "ignore"
 no-matching-overload = "ignore"
+too-many-positional-arguments = "ignore"
 
 [build-system]
 requires = ["hatchling"]

@@ -287,15 +287,15 @@ def parse_table(data_raw: str, snap):
 def _check_nas(tb, missing_row_max, missing_countries_max):
     """Check missing values & countries in data."""
     row_nans = tb.isna().any(axis=1)
-    assert (
-        row_nans.sum() / len(tb) < missing_row_max
-    ), f"Too many missing values in life tables: {row_nans.sum()/len(tb)}"
+    assert row_nans.sum() / len(tb) < missing_row_max, (
+        f"Too many missing values in life tables: {row_nans.sum() / len(tb)}"
+    )
 
     # Countries missing
     countries_missing_data = tb.loc[row_nans, "PopName"].unique()
-    assert (
-        len(countries_missing_data) / len(tb) < missing_countries_max
-    ), f"Too many missing values in life tables: {len(countries_missing_data)}"
+    assert len(countries_missing_data) / len(tb) < missing_countries_max, (
+        f"Too many missing values in life tables: {len(countries_missing_data)}"
+    )
 
 
 def _clean_population_type(tb):
@@ -312,9 +312,9 @@ def _clean_population_type(tb):
     tb["year"] = tb["year"].astype(int)
 
     # Ensure raw year is as expected
-    assert (
-        tb.groupby(["PopName", "year", "Age", "sex", "format"]).Year.nunique().max() == 2
-    ), "Unexpected number of years (+/-)"
+    assert tb.groupby(["PopName", "year", "Age", "sex", "format"]).Year.nunique().max() == 2, (
+        "Unexpected number of years (+/-)"
+    )
 
     # Drop duplicate years, keeping YYYY+.
     tb["Year"] = tb["Year"].astype("string")

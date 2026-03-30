@@ -209,16 +209,16 @@ def make_table_long_and_separate(tb: Table) -> Tuple[Table, Table]:
     )
 
     # Assert that all indicators have a welfare type assigned
-    assert (
-        tb_long["welfare_type"].isnull().sum() == 0
-    ), f"Some indicators do not have a welfare type assigned: {tb_long[tb_long['welfare_type'].isnull()]['indicator'].unique()}"
+    assert tb_long["welfare_type"].isnull().sum() == 0, (
+        f"Some indicators do not have a welfare type assigned: {tb_long[tb_long['welfare_type'].isnull()]['indicator'].unique()}"
+    )
 
     # Assert that all inequality indicators are in the INEQUALITY_INDICATORS keys
     indicators_available = set(tb_long["indicator"].unique())
     indicators_expected = set(INEQUALITY_INDICATORS.keys())
-    assert indicators_expected.issubset(
-        indicators_available
-    ), f"Some inequality indicators are missing: {indicators_expected - indicators_available}"
+    assert indicators_expected.issubset(indicators_available), (
+        f"Some inequality indicators are missing: {indicators_expected - indicators_available}"
+    )
 
     # Separate the tables between indicators not needing quantiles nor period adjustments (inequality indicators) and those needing them (share, thr, avg, median, mean)
     tb_inequality = tb_long[tb_long["indicator"].isin(INEQUALITY_INDICATORS.keys())].copy()
@@ -327,9 +327,9 @@ def format_percentiles_table(tb: Table) -> Table:
     # Assert that all welfare types are in WELFARE_TYPES keys
     welfare_types_available = set(tb["welfare_type"].unique())
     welfare_types_expected = set(WELFARE_TYPES.keys())
-    assert welfare_types_expected.issubset(
-        welfare_types_available
-    ), f"Some welfare types are missing: {welfare_types_expected - welfare_types_available}"
+    assert welfare_types_expected.issubset(welfare_types_available), (
+        f"Some welfare types are missing: {welfare_types_expected - welfare_types_available}"
+    )
 
     # Replace welfare types
     tb["welfare_type"] = tb["welfare_type"].replace(WELFARE_TYPES)

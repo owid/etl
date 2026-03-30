@@ -269,7 +269,7 @@ Check out these good examples. Make sure these examples are followed closely.
     for i in range(0, len(missing_sources), MAX_BATCH_SIZE):
         batch_missing_sources = missing_sources[i : i + MAX_BATCH_SIZE]
         console.print(
-            f"[bold]Processing batch {i//MAX_BATCH_SIZE + 1}: {len(batch_missing_sources)} sources (total: {len(missing_sources)})[/bold]"
+            f"[bold]Processing batch {i // MAX_BATCH_SIZE + 1}: {len(batch_missing_sources)} sources (total: {len(missing_sources)})[/bold]"
         )
 
         # Create input data for this batch
@@ -297,9 +297,9 @@ Check out these good examples. Make sure these examples are followed closely.
 
         r = json.loads(response.choices[0].message.content)
 
-        assert len(r["sources"]) == len(
-            batch_missing_sources
-        ), f"Expected {len(batch_missing_sources)} sources, got {len(r['sources'])}"
+        assert len(r["sources"]) == len(batch_missing_sources), (
+            f"Expected {len(batch_missing_sources)} sources, got {len(r['sources'])}"
+        )
 
         all_new_sources.extend(r["sources"])
 

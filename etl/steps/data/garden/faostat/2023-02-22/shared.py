@@ -285,7 +285,7 @@ FLAGS_RANKING = (
 
 # Additional explanation to append to element description for variables that were originally given per capita.
 WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = (
-    "Originally given per-capita, and converted into total figures by " "multiplying by population (given by FAO)."
+    "Originally given per-capita, and converted into total figures by multiplying by population (given by FAO)."
 )
 # Additional explanation to append to element description for created per-capita variables.
 NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = (
@@ -582,7 +582,7 @@ def remove_rows_with_nan_value(data: pd.DataFrame, verbose: bool = False) -> pd.
     if n_rows_with_nan_value > 0:
         frac_nan_rows = n_rows_with_nan_value / len(data)
         if verbose:
-            log.info(f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) " f"with nan in column 'value'.")
+            log.info(f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) with nan in column 'value'.")
         if frac_nan_rows > 0.15:
             log.warning(f"{frac_nan_rows: .0%} rows of nan values removed.")
         data = data.dropna(subset="value").reset_index(drop=True)
@@ -1387,8 +1387,7 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
 
         # Add per capita values to all other regions that are not FAO regions.
         per_capita_data.loc[owid_regions_mask, "value"] = (
-            per_capita_data[owid_regions_mask]["value"]
-            / per_capita_data[owid_regions_mask]["population_with_data"]  # ty: ignore
+            per_capita_data[owid_regions_mask]["value"] / per_capita_data[owid_regions_mask]["population_with_data"]  # ty: ignore
         )
 
         # Remove nans (which may have been created because of missing FAO population).
@@ -1685,11 +1684,9 @@ def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
     # (which would cause issues when uploading to grapher).
     data["variable_name"] = dataframes.apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
-        lambda item,
-        item_code,
-        element,
-        element_code,
-        unit: f"{item} | {item_code} || {element} | {element_code} || {unit}",
+        lambda item, item_code, element, element_code, unit: (
+            f"{item} | {item_code} || {element} | {element_code} || {unit}"
+        ),
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).

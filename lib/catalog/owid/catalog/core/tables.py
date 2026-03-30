@@ -25,14 +25,14 @@ import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
 import structlog
+from owid.datautils import dataframes
+from owid.repack import repack_frame
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # ty: ignore
 from pandas.core.series import Series
 
 from owid.catalog.core import indicators, utils, warnings
 from owid.catalog.core import processing_log as pl
 from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, Source, TableMeta, VariableMeta
-from owid.datautils import dataframes
-from owid.repack import repack_frame
 
 log = structlog.get_logger()
 
@@ -140,9 +140,9 @@ class Table(pd.DataFrame):
 
         # use supplied short_name
         if short_name:
-            assert self.metadata.short_name is None or (
-                self.metadata.short_name == short_name
-            ), "short_name is different from the one in metadata"
+            assert self.metadata.short_name is None or (self.metadata.short_name == short_name), (
+                "short_name is different from the one in metadata"
+            )
             self.metadata.short_name = short_name
 
         # all columns have empty metadata by default
@@ -2292,7 +2292,9 @@ def merge(
             new_column = f"{column}{suffixes[0]}"
         else:
             new_column = column
-        tb[new_column].metadata = indicators.combine_indicators_metadata([left[column]], operation="merge", name=column)  # ty: ignore[invalid-assignment]
+        tb[new_column].metadata = indicators.combine_indicators_metadata(  # ty: ignore[invalid-assignment]
+            [left[column]], operation="merge", name=column
+        )
 
     for column in columns_from_right:
         if column in overlapping_columns:

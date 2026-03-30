@@ -273,8 +273,7 @@ class CatalogMixin:
         if channel:
             if channel not in self.channels:
                 raise ValueError(
-                    f"You need to add `{channel}` to channels in Catalog init "
-                    f"(only `{self.channels}` are loaded now)"
+                    f"You need to add `{channel}` to channels in Catalog init (only `{self.channels}` are loaded now)"
                 )
             criteria &= self.frame.channel == channel
 

@@ -316,9 +316,7 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_world_alltypes["hostility_level"] = "all"
 
     # Combine
-    tb_new = pr.concat(
-        [tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True
-    ).sort_values(  # ty: ignore
+    tb_new = pr.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # ty: ignore
         by=["styear", "region", "hostility_level"]
     )
 

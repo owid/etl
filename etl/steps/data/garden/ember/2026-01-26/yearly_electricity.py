@@ -406,9 +406,7 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
         )
 
     # Merge all tables into one, with an appropriate short name.
-    tb_combined = pr.multi_merge(
-        list(tables.values()), on=index_columns, how="outer", short_name=paths.short_name
-    )  # ty: ignore
+    tb_combined = pr.multi_merge(list(tables.values()), on=index_columns, how="outer", short_name=paths.short_name)  # ty: ignore
 
     # Rename certain columns for consistency.
     tb_combined = tb_combined.rename(

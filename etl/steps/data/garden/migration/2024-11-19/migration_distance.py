@@ -135,8 +135,6 @@ def calculate_distance_matrix(world):
                 point1, point2 = nearest_points(row1.geometry, row2.geometry)  # ty: ignore
 
                 # Calculate geodesic distance between the nearest points
-                distance_matrix.iloc[i, j] = geodesic(
-                    (point1.y, point1.x), (point2.y, point2.x)
-                ).kilometers  # ty: ignore
+                distance_matrix.iloc[i, j] = geodesic((point1.y, point1.x), (point2.y, point2.x)).kilometers  # ty: ignore
 
     return distance_matrix

@@ -80,7 +80,9 @@ def update_snapshot_metadata(snap: Snapshot) -> None:
     # Update the access date.
     snap.metadata.origin.date_accessed = dt.datetime.now().strftime("%Y-%m-%d")
     # Update the full citation.
-    snap.metadata.origin.citation_full = f"World Development Indicators (WDI), The World Bank ({snap.metadata.origin.date_published.split('-')[0]})."  # ty: ignore
+    snap.metadata.origin.citation_full = (
+        f"World Development Indicators (WDI), The World Bank ({snap.metadata.origin.date_published.split('-')[0]})."  # ty: ignore
+    )
 
     # Sanity checks.
     error = "Citation has changed. Review the new citation and adjust the code."

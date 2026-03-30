@@ -78,7 +78,7 @@ def add_age_groups(df: Table) -> Table:
         .assign(age="1-4")
     )
     # Basic 5-year age groups
-    age_map = {str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)}
+    age_map = {str(i): f"{i - i % 5}-{i + 4 - i % 5}" for i in range(0, 100)}
     df_5 = df.assign(age=df.age.map(age_map)).copy()
     df_5 = df_5.groupby(
         ["location", "year", "metric", "sex", "age", "variant"],
@@ -86,7 +86,7 @@ def add_age_groups(df: Table) -> Table:
         observed=True,
     ).sum()
     # Basic 10-year age groups
-    age_map = {str(i): f"{i - i%10}-{i + 9 - i%10}" for i in range(0, 100)}
+    age_map = {str(i): f"{i - i % 10}-{i + 9 - i % 10}" for i in range(0, 100)}
     df_10 = df.assign(age=df.age.map(age_map)).copy()
     df_10 = df_10.groupby(
         ["location", "year", "metric", "sex", "age", "variant"],

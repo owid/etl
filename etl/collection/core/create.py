@@ -152,8 +152,7 @@ def _bake_listable(fct_single, obj, obj_name, num_tables):
         return obj
     else:
         raise TypeError(
-            f"Parameter '{obj_name}' must be a list of lists or a single value, "
-            f"but got {type(obj)} with value {obj}"
+            f"Parameter '{obj_name}' must be a list of lists or a single value, but got {type(obj)} with value {obj}"
         )
 
 

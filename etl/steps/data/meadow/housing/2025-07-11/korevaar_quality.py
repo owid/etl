@@ -83,9 +83,9 @@ def run() -> None:
                     # if so, multiply by 100
                     tb[col] = tb[col] * 100
                 # assert that all entries are between 0 and 100
-                assert (tb[col].min() >= 0) and (
-                    tb[col].max() <= 100
-                ), f"Column {col} has values outside of [0, 100] range."
+                assert (tb[col].min() >= 0) and (tb[col].max() <= 100), (
+                    f"Column {col} has values outside of [0, 100] range."
+                )
 
     tb_all = pr.concat([tb_ams, tb_par, tb_lon, tb_bel], ignore_index=True)  # ty: ignore
 

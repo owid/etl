@@ -276,7 +276,7 @@ class ResponseSet(BaseModel, Generic[T]):
                 k for k in dir(self.items[0]) if not k.startswith("_") and not callable(getattr(self.items[0], k))
             ]
             raise AttributeError(
-                f"Results don't have '{by}' attribute. " f"Available attributes: {', '.join(sorted(available))}"
+                f"Results don't have '{by}' attribute. Available attributes: {', '.join(sorted(available))}"
             )
 
         return max(self.items, key=lambda item: getattr(item, by))

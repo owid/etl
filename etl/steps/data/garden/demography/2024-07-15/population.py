@@ -240,18 +240,18 @@ def format_wpp(tb: Table, column_indicator: str, indicator_dtype: str) -> Table:
     ]
 
     # Sanity checks IN
-    assert (
-        tb.loc[tb["variant"] == "estimates", "year"].min() == YEAR_START_WPP
-    ), f"Unexpected start year for WPP estimates. Should be {YEAR_START_WPP}!"
-    assert (
-        tb.loc[tb["variant"] == "estimates", "year"].max() == YEAR_START_WPP_PROJ - 1
-    ), f"Unexpected end year for WPP estimates. Should be {YEAR_START_WPP_PROJ-1}!"
-    assert (
-        tb.loc[tb["variant"] == "medium", "year"].min() == YEAR_START_WPP_PROJ
-    ), f"Unexpected start year for WPP projections. Should be {YEAR_START_WPP_PROJ}!"
-    assert (
-        tb.loc[tb["variant"] == "medium", "year"].max() == YEAR_END_WPP
-    ), f"Unexpected end year for WPP projections. Should be {YEAR_END_WPP}!"
+    assert tb.loc[tb["variant"] == "estimates", "year"].min() == YEAR_START_WPP, (
+        f"Unexpected start year for WPP estimates. Should be {YEAR_START_WPP}!"
+    )
+    assert tb.loc[tb["variant"] == "estimates", "year"].max() == YEAR_START_WPP_PROJ - 1, (
+        f"Unexpected end year for WPP estimates. Should be {YEAR_START_WPP_PROJ - 1}!"
+    )
+    assert tb.loc[tb["variant"] == "medium", "year"].min() == YEAR_START_WPP_PROJ, (
+        f"Unexpected start year for WPP projections. Should be {YEAR_START_WPP_PROJ}!"
+    )
+    assert tb.loc[tb["variant"] == "medium", "year"].max() == YEAR_END_WPP, (
+        f"Unexpected end year for WPP projections. Should be {YEAR_END_WPP}!"
+    )
 
     # Rename columns, sort rows
     tb = (
@@ -503,9 +503,9 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
         (tb_agg["year"] >= YEAR_START_GAPMINDER) & (tb_agg["year"] < YEAR_START_WPP) & tb_agg["source"].isna(), "source"
     ] = SOURCES_NAMES["gapminder"]
     tb_agg.loc[(tb_agg["year"] >= YEAR_START_WPP) & tb_agg["source"].isna(), "source"] = SOURCES_NAMES["unwpp"]
-    assert (
-        tb_agg.notna().all().all()
-    ), f"Some rows still have missing values! Columns without NaN? {tb_agg.notna().all()}"
+    assert tb_agg.notna().all().all(), (
+        f"Some rows still have missing values! Columns without NaN? {tb_agg.notna().all()}"
+    )
     # re-estimate region aggregates
     tb_agg = _aggregate(
         tb=tb_agg,
@@ -518,9 +518,9 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
     # Ensure all rows have source
     assert tb["source"].notna().all(), "Some rows do not have a source!"
     vals = tb.loc[tb["country"].isin(continents) & (tb["year"] < YEAR_START_GAPMINDER), "source"].unique()
-    assert (
-        len(vals) == 1 and vals[0] == SOURCES_NAMES["hyde"]
-    ), f"Unexpected sources for continents before {YEAR_START_GAPMINDER}!"
+    assert len(vals) == 1 and vals[0] == SOURCES_NAMES["hyde"], (
+        f"Unexpected sources for continents before {YEAR_START_GAPMINDER}!"
+    )
     return tb
 
 
@@ -604,9 +604,9 @@ def add_historical_regions(tb: Table, tb_gm: Table, tb_regions: Table) -> Table:
         former_country_name = tb_regions.loc[code, "name"]
         end_year = tb_regions.loc[code, "end_year"]
         # Sanity check: former country not already in table! remember that we are creating it now
-        assert former_country_name not in set(
-            tb["country"]
-        ), f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
+        assert former_country_name not in set(tb["country"]), (
+            f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
+        )
         # Get list of country successors (equivalent of former state with nowadays' countries) and end year (dissolution of former state)
         codes_successors = json.loads(tb_regions.loc[code, "successors"])
         countries_successors = tb_regions.loc[codes_successors, "name"].tolist()

@@ -72,6 +72,6 @@ def _sanity_checks(tb: Table) -> None:
     tb_ = geo.add_population_to_table(tb_, paths.load_dataset("population"))
     for col in columns_absolute:
         x = tb_.dropna(subset=[col])
-        assert all(
-            x[col] < 0.2 * x["population"]
-        ), f"{col} contains values that might be too large (compared to population values)!"
+        assert all(x[col] < 0.2 * x["population"]), (
+            f"{col} contains values that might be too large (compared to population values)!"
+        )

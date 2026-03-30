@@ -153,7 +153,7 @@ def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any]) ->
                     verify_integrity=True,
                     inplace=True,
                 )
-                table_short_name = f'{NAMESPACE}_{domain.lower()}_{category_structure[category]["short_name"]}'
+                table_short_name = f"{NAMESPACE}_{domain.lower()}_{category_structure[category]['short_name']}"
 
                 # there might be duplicates coming from `itemsgroup` and `itemgroup`
                 if table_short_name in used_short_names:

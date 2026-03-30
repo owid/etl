@@ -355,9 +355,7 @@ class AppState:
             # Default value for selectbox (and other widgets with selectbox-like behavior)
             if "options" in kwargs:
                 options = cast(List[str], kwargs["options"])
-                index = (
-                    options.index(default_value) if default_value in options else index_if_value_is_none
-                )  # ty: ignore
+                index = options.index(default_value) if default_value in options else index_if_value_is_none  # ty: ignore
                 kwargs["index"] = index
             # Default value for other widgets (if none is given)
             elif (
@@ -573,9 +571,9 @@ def _get_staging_creation_time(session: Session):
       AND table_name IN ('charts', 'variables', 'datasets', 'chart_dimensions')
     """
     df = read_sql(query_ts, session)
-    assert (
-        len(df) == 1 and df["min_create_time"].notna().all()
-    ), "Failed to get staging server creation time. Make sure the staging server was properly set up."
+    assert len(df) == 1 and df["min_create_time"].notna().all(), (
+        "Failed to get staging server creation time. Make sure the staging server was properly set up."
+    )
     create_time = df["min_create_time"].item()
     return create_time
 

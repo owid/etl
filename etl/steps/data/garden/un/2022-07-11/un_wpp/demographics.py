@@ -34,7 +34,7 @@ COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
         "name": "births",
         "sex": "all",
         "age": "all",
-        "operation": lambda x: (x * 1000),
+        "operation": lambda x: x * 1000,
     },
     "cbr": {
         "name": "birth_rate",
@@ -157,7 +157,7 @@ COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
         "name": "net_migration",
         "sex": "all",
         "age": "all",
-        "operation": lambda x: (x * 1000),
+        "operation": lambda x: x * 1000,
     },
     "cnmr": {
         "name": "net_migration_rate",
@@ -168,13 +168,13 @@ COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
         "name": "infant_mortality_rate",
         "sex": "all",
         "age": "0",
-        "operation": lambda x: (x / 10),
+        "operation": lambda x: x / 10,
     },
     "q5": {
         "name": "child_mortality_rate",
         "sex": "all",
         "age": "0-4",
-        "operation": lambda x: (x / 10),
+        "operation": lambda x: x / 10,
     },
 }
 COLUMNS_ORDER = ["location", "year", "metric", "sex", "age", "variant", "value"]

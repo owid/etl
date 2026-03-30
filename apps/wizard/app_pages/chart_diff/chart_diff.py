@@ -381,9 +381,7 @@ class ChartDiff:
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
 
         # Get all slugs from target
-        slugs_in_target = cls._get_chart_slugs(
-            target_session, slugs={c.slug for c in source_charts.values()}
-        )  # ty: ignore
+        slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # ty: ignore
 
         # Get chart views, anomalies, and articles (skip if not needed for performance)
         if skip_analytics:

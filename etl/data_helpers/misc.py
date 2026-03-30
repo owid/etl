@@ -116,9 +116,7 @@ def interpolate_table(
     # Interpolate
     df = (  # ty: ignore[invalid-assignment]
         df.groupby(entity_col)
-        .transform(
-            lambda x: x.interpolate(method=method, limit_direction=limit_direction, limit_area=limit_area)
-        )  # ty: ignore
+        .transform(lambda x: x.interpolate(method=method, limit_direction=limit_direction, limit_area=limit_area))  # ty: ignore
         .reset_index()
     )
 

@@ -22,7 +22,7 @@ COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
     "births": {
         "name": "births",
         "sex": "all",
-        "operation": lambda x: (x * 1000),
+        "operation": lambda x: x * 1000,
     },
 }
 COLUMNS_ORDER: List[str] = [

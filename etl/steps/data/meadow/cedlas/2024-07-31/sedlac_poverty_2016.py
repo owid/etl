@@ -145,14 +145,14 @@ def format_long_tables(
 
         actual_countries_with_null = t[t["index"] == "nan"]["country"].unique().tolist()
 
-        assert (
-            actual_countries_with_null == countries_with_null
-        ), f"Null values in index are not only for {countries_with_null}. In this case, we have {actual_countries_with_null}."
+        assert actual_countries_with_null == countries_with_null, (
+            f"Null values in index are not only for {countries_with_null}. In this case, we have {actual_countries_with_null}."
+        )
 
         # Assert that the null values are only two
-        assert (
-            len(t[t["index"] == "nan"]) == len(countries_with_null)
-        ), f"There are more than {len(countries_with_null)} null values in index. There are {len(t[t['index'] == 'nan'])}."
+        assert len(t[t["index"] == "nan"]) == len(countries_with_null), (
+            f"There are more than {len(countries_with_null)} null values in index. There are {len(t[t['index'] == 'nan'])}."
+        )
 
         # Replace empty index values for country = Chile and Argentina and delete for Brazil and Mexico
         # t.loc[(t["country"] == "El Salvador") & (t["index"] == "nan"), "index"] = "Single series"
@@ -176,11 +176,9 @@ def format_long_tables(
         t.columns = t.columns.str.strip()
 
         # Assert if columns in table are contained in columns dict + country + year + survey
-        assert set(
-            t.columns
-        ).issubset(
-            set(list(columns.keys()) + ["country", "year", "survey"])
-        ), f"Columns not found in the table: {set(t.columns) - set(list(columns.keys()) + ['country', 'year', 'survey'])}."
+        assert set(t.columns).issubset(set(list(columns.keys()) + ["country", "year", "survey"])), (
+            f"Columns not found in the table: {set(t.columns) - set(list(columns.keys()) + ['country', 'year', 'survey'])}."
+        )
 
         # Rename columns with columns dict
         t = t.rename(columns=columns)

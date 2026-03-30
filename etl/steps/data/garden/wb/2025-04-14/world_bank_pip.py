@@ -505,8 +505,8 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
             # If it's the last value calculate the people between this value and the previous
             # and also the people over this poverty line (and percentages)
             else:
-                varname_n = ("headcount_between", ppp_year, f"{povlines[i-1]} and {povlines[i]}")
-                varname_pct = ("headcount_ratio_between", ppp_year, f"{povlines[i-1]} and {povlines[i]}")
+                varname_n = ("headcount_between", ppp_year, f"{povlines[i - 1]} and {povlines[i]}")
+                varname_pct = ("headcount_ratio_between", ppp_year, f"{povlines[i - 1]} and {povlines[i]}")
                 tb_pivot[varname_n] = (
                     tb_pivot[("headcount", ppp_year, povlines[i])] - tb_pivot[("headcount", ppp_year, povlines[i - 1])]
                 )
@@ -651,7 +651,7 @@ def sanity_checks(
         if not tb_error.empty:
             log.fatal(
                 f"""There are {len(tb_error)} observations with negative values! In:
-                {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT)}"""
+                {tabulate(tb_error[index], headers="keys", tablefmt=TABLEFMT)}"""
             )
             # NOTE: Check if we want to delete these observations
             # tb_pivot = tb_pivot[~mask].reset_index(drop=True)
@@ -672,8 +672,8 @@ def sanity_checks(
             # If it's the last value calculate the people between this value and the previous
             # and also the people over this poverty line (and percentages)
             else:
-                varname_n = ("headcount_between", ppp_year, f"{povlines[i-1]} and {povlines[i]}")
-                varname_pct = ("headcount_ratio_between", ppp_year, f"{povlines[i-1]} and {povlines[i]}")
+                varname_n = ("headcount_between", ppp_year, f"{povlines[i - 1]} and {povlines[i]}")
+                varname_pct = ("headcount_ratio_between", ppp_year, f"{povlines[i - 1]} and {povlines[i]}")
                 col_stacked_n_all.append(varname_n)
                 col_stacked_pct_all.append(varname_pct)
 
@@ -717,7 +717,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""{len(tb_error)} observations of all stacked values are not adding up to 100% and will be deleted:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {tabulate(tb_error[index + ["sum_pct"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                 )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -730,7 +730,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""{len(tb_error)} observations of the reduced set of stacked values are not adding up to 100% and will be deleted:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {tabulate(tb_error[index + ["sum_pct"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                 )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -746,7 +746,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
-                    {tabulate(tb_error[(index + ["headcount_ratio"])], headers = 'keys', tablefmt = TABLEFMT)}"""
+                    {tabulate(tb_error[(index + ["headcount_ratio"])], headers="keys", tablefmt=TABLEFMT)}"""
                 )
 
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
@@ -769,7 +769,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
-                    {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT, floatfmt="0.0f")}"""
+                    {tabulate(tb_error[index], headers="keys", tablefmt=TABLEFMT, floatfmt="0.0f")}"""
                 )
             tb_pivot = tb_pivot[tb_pivot["check_total"]].reset_index(drop=True)
 
@@ -794,7 +794,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
-                    {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT)}"""
+                    {tabulate(tb_error[index], headers="keys", tablefmt=TABLEFMT)}"""
                 )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -818,7 +818,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
-                    {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {tabulate(tb_error[index], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                 )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -838,7 +838,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {tabulate(tb_error[index + ["sum_pct"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                 )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -860,7 +860,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""{len(tb_error)} observations of shares (with top 1%) are not adding up to 100% and will be converted to null:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {tabulate(tb_error[index + ["sum_pct"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                 )
             # Make columns None if mask is True
             tb_pivot.loc[mask, [("top90_99_share", ppp_year, povlines[1]), ("top1_share", ppp_year, povlines[1])]] = (
@@ -1141,7 +1141,7 @@ def check_jumps_in_grapher_dataset(tb: Table) -> None:
         if not tb_error.empty:
             log.fatal(
                 f"""There are {len(tb_error)} observations with abnormal jumps for {col}:
-                {tabulate(tb_error[['ppp_version', 'country', 'year', col, 'check_diff_column', 'check_diff_year']].sort_values('year').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                {tabulate(tb_error[["ppp_version", "country", "year", col, "check_diff_column", "check_diff_year"]].sort_values("year").reset_index(drop=True), headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
             )
             # tb = tb[~mask].reset_index(drop=True)
 

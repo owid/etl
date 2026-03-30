@@ -202,7 +202,7 @@ def check_table(table: Table) -> None:
 
 def _check_upserted_variable(variable: Variable) -> None:
     assert variable.notnull().all(), (
-        "Tables to be upserted must have no null values. Instead they" f" have:\n{variable.loc[variable.isnull()]}"
+        f"Tables to be upserted must have no null values. Instead they have:\n{variable.loc[variable.isnull()]}"
     )
     assert not gh.contains_inf(variable), f"Column `{variable.name}` has inf values"
 
@@ -212,9 +212,7 @@ def load_dataset_variables(dataset_id: int, engine: Engine) -> Dict[int | str, A
     select catalogPath, id, dataChecksum, metadataChecksum from variables where datasetId = %(dataset_id)s
     """
     return (
-        read_sql(q, engine=engine, params={"dataset_id": dataset_id})
-        .set_index("catalogPath")
-        .to_dict(orient="index")  # ty: ignore[invalid-return-type]
+        read_sql(q, engine=engine, params={"dataset_id": dataset_id}).set_index("catalogPath").to_dict(orient="index")  # ty: ignore[invalid-return-type]
     )
 
 

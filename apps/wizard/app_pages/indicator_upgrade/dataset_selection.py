@@ -278,8 +278,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
                     )
                 else:
                     st.success(
-                        "🎉 All indicators have been automatically mapped! "
-                        "You can proceed directly to the final step."
+                        "🎉 All indicators have been automatically mapped! You can proceed directly to the final step."
                     )
 
             else:

@@ -568,7 +568,7 @@ def load_views(
     if post_count > 0:
         breakdown += f" + {post_count} posts"
 
-    rprint(f"[cyan]Aggregated to {len(views)} unique objects to inspect " f"({breakdown})...[/cyan]\n")
+    rprint(f"[cyan]Aggregated to {len(views)} unique objects to inspect ({breakdown})...[/cyan]\n")
 
     return views
 

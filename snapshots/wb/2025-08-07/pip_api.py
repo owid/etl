@@ -905,9 +905,7 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
         log.info("Percentiles calculated and consolidated")
 
         # Rename headcount to estimated_percentile and poverty_line to thr
-        df_percentiles = df_percentiles.rename(
-            columns={"headcount": "estimated_percentile", "poverty_line": "thr"}
-        )  # ty: ignore
+        df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # ty: ignore
 
         # Add official percentiles from the World Bank Databank
         df_percentiles_published_ppp_old = format_official_percentiles(PPP_VERSIONS[0], wb_api)

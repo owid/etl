@@ -220,7 +220,7 @@ def generate_event_section(event_name: str, params_interface: str, properties: L
             required = "✓" if not prop["optional"] else ""
             prop_type = prop["type"].replace("|", "\\|")  # Escape pipe in type unions
             description = prop["description"] or "—"
-            md += f'| `{prop["name"]}` | `{prop_type}` | {required} | {description} |\n'
+            md += f"| `{prop['name']}` | `{prop_type}` | {required} | {description} |\n"
 
         md += "\n"
 

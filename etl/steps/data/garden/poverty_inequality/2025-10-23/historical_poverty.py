@@ -706,7 +706,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
         if len(extreme_growth) > 0:
             log.warning(
                 f"prepare_gdp_data: Found {len(extreme_growth)} instances of extreme growth "
-                f"(<-{round((1- EXTREME_GROWTH_FACTOR_THRESHOLDS[0]) * 100, 1)}% or >+{round((EXTREME_GROWTH_FACTOR_THRESHOLDS[1]-1) * 100, 1)}% or  in a single year)"
+                f"(<-{round((1 - EXTREME_GROWTH_FACTOR_THRESHOLDS[0]) * 100, 1)}% or >+{round((EXTREME_GROWTH_FACTOR_THRESHOLDS[1] - 1) * 100, 1)}% or  in a single year)"
             )
             # Filter extreme_growth to only include country-years where growth_factor_origin is historical_entity or region
             extreme_growth_introduced = extreme_growth[
@@ -833,9 +833,9 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, tb_population_
 
         # Verify that all missing data is from expected countries
         set_countries_missing_pop = set(missing_pop_rows["country"])
-        assert (
-            set_countries_missing_pop == set(COUNTRIES_WITHOUT_POPULATION)
-        ), f"Unexpected countries missing population data: {set_countries_missing_pop - set(COUNTRIES_WITHOUT_POPULATION)}"
+        assert set_countries_missing_pop == set(COUNTRIES_WITHOUT_POPULATION), (
+            f"Unexpected countries missing population data: {set_countries_missing_pop - set(COUNTRIES_WITHOUT_POPULATION)}"
+        )
 
     # Drop cumulative_growth_factor column, as it's no longer needed
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["cumulative_growth_factor"])
@@ -1127,18 +1127,18 @@ def create_stacked_variables(tb: Table) -> Table:
         # If it's the last value calculate the people between this value and the previous
         # and also the people over this poverty line (and percentages)
         else:
-            varname_n = ("headcount_between", f"{POVERTY_LINES[i-1]} and {POVERTY_LINES[i]}")
-            varname_pct = ("headcount_ratio_between", f"{POVERTY_LINES[i-1]} and {POVERTY_LINES[i]}")
+            varname_n = ("headcount_between", f"{POVERTY_LINES[i - 1]} and {POVERTY_LINES[i]}")
+            varname_pct = ("headcount_ratio_between", f"{POVERTY_LINES[i - 1]} and {POVERTY_LINES[i]}")
             tb_pivot[varname_n] = (
                 tb_pivot[("headcount", POVERTY_LINES[i])] - tb_pivot[("headcount", POVERTY_LINES[i - 1])]
             )
             tb_pivot[varname_pct] = 100 * (tb_pivot[varname_n] / tb_pivot[("population", POVERTY_LINES[i])])
 
             # Add benchmark between variables
-            varname_n_benchmark = ("headcount_between_benchmark", f"{POVERTY_LINES[i-1]} and {POVERTY_LINES[i]}")
+            varname_n_benchmark = ("headcount_between_benchmark", f"{POVERTY_LINES[i - 1]} and {POVERTY_LINES[i]}")
             varname_pct_benchmark = (
                 "headcount_ratio_between_benchmark",
-                f"{POVERTY_LINES[i-1]} and {POVERTY_LINES[i]}",
+                f"{POVERTY_LINES[i - 1]} and {POVERTY_LINES[i]}",
             )
             tb_pivot[varname_n_benchmark] = (
                 tb_pivot[("headcount_benchmark", POVERTY_LINES[i])]
@@ -1149,10 +1149,10 @@ def create_stacked_variables(tb: Table) -> Table:
             )
 
             # Add rolling average between variables
-            varname_n_rolling = ("headcount_between_rolling_avg", f"{POVERTY_LINES[i-1]} and {POVERTY_LINES[i]}")
+            varname_n_rolling = ("headcount_between_rolling_avg", f"{POVERTY_LINES[i - 1]} and {POVERTY_LINES[i]}")
             varname_pct_rolling = (
                 "headcount_ratio_between_rolling_avg",
-                f"{POVERTY_LINES[i-1]} and {POVERTY_LINES[i]}",
+                f"{POVERTY_LINES[i - 1]} and {POVERTY_LINES[i]}",
             )
             tb_pivot[varname_n_rolling] = (
                 tb_pivot[("headcount_rolling_avg", POVERTY_LINES[i])]
@@ -1396,9 +1396,9 @@ def create_ginis_from_thousand_bins_distribution(tb_thousand_bins: Table, tb_pip
 
     # Sanity check: Gini should be between 0 and 1
     invalid_gini = gini_calc[(gini_calc["gini"] < 0) | (gini_calc["gini"] > 1)]
-    assert (
-        len(invalid_gini) == 0
-    ), f"create_ginis_from_thousand_bins_distribution: Found {len(invalid_gini)} country-years with invalid Gini coefficients (outside [0,1] range):\n{invalid_gini}"
+    assert len(invalid_gini) == 0, (
+        f"create_ginis_from_thousand_bins_distribution: Found {len(invalid_gini)} country-years with invalid Gini coefficients (outside [0,1] range):\n{invalid_gini}"
+    )
 
     # Merge with PIP data
     tb_pip = pr.merge(
@@ -1909,9 +1909,9 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
         )
         tb_gini_mean = tb_gini_mean[tb_gini_mean["mean"].notna() & tb_gini_mean["gini"].notna()].reset_index(drop=True)
     else:
-        assert (
-            len(remaining_nans) == 0
-        ), f"prepare_mean_gini_data: There are {len(remaining_nans)} remaining NaN values in mean or gini after interpolation and extrapolation. {remaining_nans[['country', 'year', 'mean', 'gini']]}"
+        assert len(remaining_nans) == 0, (
+            f"prepare_mean_gini_data: There are {len(remaining_nans)} remaining NaN values in mean or gini after interpolation and extrapolation. {remaining_nans[['country', 'year', 'mean', 'gini']]}"
+        )
 
     # Copy origins only
     tb_gini_mean["mean"].m.origins = (tb["mean_filled"] + tb["mean_survey"] + tb_gdp["growth_factor"]).m.origins
@@ -2134,15 +2134,15 @@ def expand_means_and_ginis_to_thousand_bins(
     tb_expanded["avg"].m.origins = (tb_gini_mean[mean_column] + tb_gini_mean[gini_column]).m.origins
 
     # Assert that categorical dtypes are preserved after merge (critical for memory efficiency)
-    assert isinstance(
-        tb_expanded["country"].dtype, pd.CategoricalDtype
-    ), f"country must be categorical after merge, got {tb_expanded['country'].dtype}"
-    assert isinstance(
-        tb_expanded["region"].dtype, pd.CategoricalDtype
-    ), f"region must be categorical after merge, got {tb_expanded['region'].dtype}"
-    assert isinstance(
-        tb_expanded["region_old"].dtype, pd.CategoricalDtype
-    ), f"region_old must be categorical after merge, got {tb_expanded['region_old'].dtype}"
+    assert isinstance(tb_expanded["country"].dtype, pd.CategoricalDtype), (
+        f"country must be categorical after merge, got {tb_expanded['country'].dtype}"
+    )
+    assert isinstance(tb_expanded["region"].dtype, pd.CategoricalDtype), (
+        f"region must be categorical after merge, got {tb_expanded['region'].dtype}"
+    )
+    assert isinstance(tb_expanded["region_old"].dtype, pd.CategoricalDtype), (
+        f"region_old must be categorical after merge, got {tb_expanded['region_old'].dtype}"
+    )
 
     # OPTIMIZATION: Sort tb_expanded before concatenating to avoid sorting the entire concatenated table
     # This is much faster because we sort a smaller table, then concat is cheap with sort=False

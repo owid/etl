@@ -727,9 +727,7 @@ def interpolate_table(
             return group
 
         # Apply the reindexing to each group
-        df = (
-            df.groupby(country_col).apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])
-        )  # ty: ignore
+        df = df.groupby(country_col).apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])  # ty: ignore
     else:
         # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
         # Optionally fill missing years linearly.
@@ -742,9 +740,7 @@ def interpolate_table(
         # Reindex
         df = (  # ty: ignore[invalid-assignment]
             df.set_index([country_col, time_col])
-            .reindex(
-                pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col])
-            )  # ty: ignore
+            .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col]))  # ty: ignore
             .sort_index()
         )
 
@@ -1525,9 +1521,9 @@ def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: s
     # Check countries that went missing
     if missing_countries is not None:
         countries_missing = countries_start - countries_end
-        assert (
-            countries_missing == missing_countries
-        ), f"Missing countries don't match the expected! {countries_missing}"
+        assert countries_missing == missing_countries, (
+            f"Missing countries don't match the expected! {countries_missing}"
+        )
 
     return tb
 
@@ -2607,8 +2603,9 @@ class RegionAggregator:
                         .groupby(other_index_columns, as_index=False)
                         .agg(
                             {
-                                self.country_col: lambda x: set(required_countries)
-                                <= set(x[self.tb_coverage.loc[x.index, column]])  # ty: ignore
+                                self.country_col: lambda x: (
+                                    set(required_countries) <= set(x[self.tb_coverage.loc[x.index, column]])  # ty: ignore[unresolved-attribute]
+                                )  # ty: ignore
                             }
                         )  # ty: ignore
                     )

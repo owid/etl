@@ -94,31 +94,19 @@ def bake_chart_config(
     # Tweak config
     chart_config_any = chart_config
     if isinstance(variable_id, (int, np.integer)):
-        chart_config_any["dimensions"] = [
-            {"property": "y", "variableId": variable_id}
-        ]  # ty: ignore[invalid-assignment]
+        chart_config_any["dimensions"] = [{"property": "y", "variableId": variable_id}]  # ty: ignore[invalid-assignment]
     elif isinstance(variable_id, list):
-        chart_config_any["dimensions"] = [
-            {"property": "y", "variableId": v} for v in variable_id
-        ]  # ty: ignore[invalid-assignment]
+        chart_config_any["dimensions"] = [{"property": "y", "variableId": v} for v in variable_id]  # ty: ignore[invalid-assignment]
     elif isinstance(catalog_path, str):
         variable = ensure_load_variable(catalog_path=catalog_path, owid_env=owid_env)
-        chart_config_any["dimensions"] = [
-            {"property": "y", "variableId": variable.id}
-        ]  # ty: ignore[invalid-assignment]
+        chart_config_any["dimensions"] = [{"property": "y", "variableId": variable.id}]  # ty: ignore[invalid-assignment]
     elif isinstance(variable, Variable):
-        chart_config_any["dimensions"] = [
-            {"property": "y", "variableId": variable.id}
-        ]  # ty: ignore[invalid-assignment]
+        chart_config_any["dimensions"] = [{"property": "y", "variableId": variable.id}]  # ty: ignore[invalid-assignment]
     elif isinstance(variable, list):
-        chart_config_any["dimensions"] = [
-            {"property": "y", "variableId": v.id} for v in variable
-        ]  # ty: ignore[invalid-assignment]
+        chart_config_any["dimensions"] = [{"property": "y", "variableId": v.id} for v in variable]  # ty: ignore[invalid-assignment]
     else:
         variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
-        chart_config_any["dimensions"] = [
-            {"property": "y", "variableId": variable.id}
-        ]  # ty: ignore[invalid-assignment]
+        chart_config_any["dimensions"] = [{"property": "y", "variableId": variable.id}]  # ty: ignore[invalid-assignment]
 
     if display is not None:
         assert len(display) == len(chart_config_any["dimensions"])  # ty: ignore[invalid-assignment]
