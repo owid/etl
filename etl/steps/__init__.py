@@ -654,13 +654,14 @@ class DataStep(Step):
         """
         Import the Python module for this step and call run() on it.
 
-        Uses os.fork() on Linux to avoid the ~3-5s overhead of spawning a new
-        Python process via subprocess for every step. The forked child inherits
-        all already-imported modules, runs the step, and exits — so any memory
+        Uses os.fork() to avoid the ~3-5s overhead of spawning a new Python
+        process via subprocess for every step. The forked child inherits all
+        already-imported modules, runs the step, and exits — so any memory
         leaked by feather serialisation dies with the child process.
 
-        Falls back to subprocess on non-Linux platforms (macOS, Windows) where
-        fork() is unavailable or unsafe.
+        Works on both Linux and macOS (both provide os.fork()). Falls back to
+        subprocess only on platforms where fork() is unavailable (Windows) or
+        when IPDB debugging is enabled (debugger needs a proper subprocess).
         """
         if hasattr(os, "fork") and not config.IPDB_ENABLED:
             self._run_py_fork()
