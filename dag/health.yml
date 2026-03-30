@@ -1,4 +1,12 @@
 steps:
+  # Air Quality Life Index (AQLI)
+  data://meadow/aqli/2026-03-30/air_quality_life_index:
+    - snapshot://aqli/2026-03-30/air_quality_life_index.zip
+  data://garden/aqli/2026-03-30/air_quality_life_index:
+    - data://meadow/aqli/2026-03-30/air_quality_life_index
+  data://grapher/aqli/2026-03-30/air_quality_life_index:
+    - data://garden/aqli/2026-03-30/air_quality_life_index
+
   # Health
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv

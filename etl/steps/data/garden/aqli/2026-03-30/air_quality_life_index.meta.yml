@@ -1,0 +1,56 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Outdoor Air Pollution
+    unit: micrograms per cubic meter
+    short_unit: µg/m³
+    processing_level: minor
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  air_quality_life_index:
+    variables:
+      pm:
+        title: PM2.5 air pollution
+        description_short: Annual average concentration of fine particulate matter (PM2.5) in micrograms per cubic meter.
+        description_key:
+          - Outdoor air pollution, specifically PM2.5, is a major environmental risk factor for health issues such as respiratory and cardiovascular diseases.
+          - The data for the annual average concentrations of PM2.5 comes from a satellite-derived particulate pollution concentration dataset constructed by [Donkelaar et al. (2021)](https://sites.wustl.edu/acag/datasets/surface-pm2-5/).
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 2
+      whostandard:
+        title: WHO PM2.5 guideline
+        description_short: The WHO annual PM2.5 guideline value (5 µg/m³ as of the 2021 guidelines).
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 2
+      natstandard:
+        title: National PM2.5 standard
+        description_short: The national limit for PM2.5 pollution levels, as set by each country's regulatory authority.
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 2
+      llpp_who:
+        title: Life expectancy gain if WHO guideline met
+        unit: years
+        short_unit: years
+        description_short: Potential gain in life expectancy (in years) if PM2.5 pollution were reduced to meet the WHO annual guideline of 5 µg/m³.
+        display:
+          roundingMode: decimalPlaces
+          numDecimalPlaces: 1
+      llpp_nat:
+        title: Life expectancy gain if national standard met
+        unit: years
+        short_unit: years
+        description_short: Potential gain in life expectancy (in years) if PM2.5 pollution were reduced to meet the country's national air quality standard.
+        display:
+          roundingMode: decimalPlaces
+          numDecimalPlaces: 1
