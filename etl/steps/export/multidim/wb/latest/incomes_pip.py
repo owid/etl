@@ -201,6 +201,25 @@ def run() -> None:
                 if name:
                     ind.display = {"name": name}
 
+    # Add Marimekko as an additional chart type for mean and median views.
+    # Set x (population) and color (region) indicators needed by the Marimekko tab.
+    POPULATION_PATH = "grapher/demography/2024-07-15/population/population#population"
+    REGION_PATH = "grapher/regions/2023-01-01/regions/regions#owid_region"
+    c.dependencies.update(
+        {
+            "grapher/demography/2024-07-15/population",
+            "grapher/regions/2023-01-01/regions",
+        }
+    )
+    for view in c.views:
+        if view.matches(indicator=["mean", "median"], decile="nan"):
+            view.config = view.config or {}
+            view.config["chartTypes"] = ["LineChart", "Marimekko"]
+            view.indicators.set_indicator(
+                x=POPULATION_PATH,
+                color=REGION_PATH,
+            )
+
     #
     # Save garden dataset.
     #
