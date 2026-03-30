@@ -465,9 +465,11 @@ def add_region_aggregates(
         # For now, simply warn that the original data for the region for those columns was deleted.
         columns_without_aggregate = set(df.drop(columns=index_columns).columns) - set(aggregations)
         if (len(columns_without_aggregate) > 0) and (len(df[df[country_col] == region]) > 0):
+            cols_preview = sorted(columns_without_aggregate)[:5]
+            n = len(columns_without_aggregate)
             log.warning(
-                f"Region {region} already has data for columns that do not have a defined aggregation method: "
-                f"({columns_without_aggregate}). That data will become nan."
+                f"Region {region} already has data for {n} column(s) without a defined aggregation method "
+                f"(e.g. {', '.join(cols_preview)}). That data will become nan."
             )
 
     # Sort conveniently.
