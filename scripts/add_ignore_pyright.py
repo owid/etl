@@ -4,6 +4,10 @@ import sys
 """Usage:
 
 uv run pyright owid tests --outputjson | python ../../scripts/add_ignore_pyright.py
+
+Note: This script is a pyright-specific helper. It intentionally inserts
+# type: ignore[rule] comments (recognised by pyright/mypy) rather than
+# ty: ignore[rule] (recognised by ty). Do not use it to suppress ty errors.
 """
 
 
@@ -14,7 +18,7 @@ def add_type_ignore_to_lines(file_path, line_number, rule):
 
     # We need to insert # type: ignore[rule] at the end of the line
     target_line = lines[line_number - 1].rstrip()  # Pyright uses 1-based indexing for lines
-    if "# type: ignore" not in target_line:
+    if "# type: ignore" not in target_line and "# ty: ignore" not in target_line:
         lines[line_number - 1] = f"{target_line}  # type: ignore[{rule}]\n"
 
     with open(file_path, "w") as file:
