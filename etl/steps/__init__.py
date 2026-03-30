@@ -675,7 +675,9 @@ class DataStep(Step):
         # Apply the same virtual-memory limit that prlimit would enforce
         if sys.platform == "linux":
             try:
-                resource.setrlimit(resource.RLIMIT_AS, (config.MAX_VIRTUAL_MEMORY_LINUX, config.MAX_VIRTUAL_MEMORY_LINUX))
+                resource.setrlimit(
+                    resource.RLIMIT_AS, (config.MAX_VIRTUAL_MEMORY_LINUX, config.MAX_VIRTUAL_MEMORY_LINUX)
+                )
             except ValueError:
                 pass  # not all systems support RLIMIT_AS
 
