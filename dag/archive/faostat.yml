@@ -633,3 +633,72 @@ steps:
   #
   data://grapher/faostat/2025-03-17/additional_variables:
     - data://garden/faostat/2025-03-17/additional_variables
+  data://garden/faostat/2025-03-17/faostat_qcl:
+    - data://garden/faostat/2025-03-17/faostat_metadata
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+    - data://meadow/faostat/2025-03-17/faostat_qcl
+  data://garden/faostat/2025-03-17/faostat_lc:
+    - data://garden/faostat/2025-03-17/faostat_metadata
+    - data://meadow/faostat/2025-03-17/faostat_lc
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://garden/faostat/2025-03-17/faostat_qi:
+    - data://garden/faostat/2025-03-17/faostat_metadata
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/faostat/2025-03-17/faostat_qi
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://garden/faostat/2025-03-17/faostat_sdgb:
+    - data://garden/faostat/2025-03-17/faostat_metadata
+    - data://meadow/faostat/2025-03-17/faostat_sdgb
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://garden/faostat/2025-03-17/faostat_rp:
+    - data://garden/faostat/2025-03-17/faostat_metadata
+    - data://meadow/faostat/2025-03-17/faostat_rp
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://garden/faostat/2025-03-17/faostat_rfn:
+    - data://garden/faostat/2025-03-17/faostat_metadata
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+    - data://meadow/faostat/2025-03-17/faostat_rfn
+  #
+  # FAOSTAT garden steps for version 2025-03-17
+  #
+  data://garden/faostat/2025-03-17/faostat_cisp:
+    - data://garden/faostat/2025-03-17/faostat_metadata
+    - data://meadow/faostat/2025-03-17/faostat_cisp
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://garden/faostat/2025-03-17/faostat_qv:
+    - data://garden/faostat/2025-03-17/faostat_metadata
+    - data://meadow/faostat/2025-03-17/faostat_qv
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/faostat/2025-03-17/faostat_qcl:
+    - data://garden/faostat/2025-03-17/faostat_qcl
+  data://grapher/faostat/2025-03-17/faostat_lc:
+    - data://garden/faostat/2025-03-17/faostat_lc
+  data://grapher/faostat/2025-03-17/faostat_sdgb:
+    - data://garden/faostat/2025-03-17/faostat_sdgb
+  data://grapher/faostat/2025-03-17/faostat_rp:
+    - data://garden/faostat/2025-03-17/faostat_rp
+  data://grapher/faostat/2025-03-17/faostat_rfn:
+    - data://garden/faostat/2025-03-17/faostat_rfn
+  #
+  # FAOSTAT grapher steps for version 2025-03-17
+  #
+  data://grapher/faostat/2025-03-17/faostat_cisp:
+    - data://garden/faostat/2025-03-17/faostat_cisp
+  data://grapher/faostat/2025-03-17/faostat_qv:
+    - data://garden/faostat/2025-03-17/faostat_qv
+

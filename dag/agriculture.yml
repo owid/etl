@@ -89,16 +89,6 @@ steps:
   data://grapher/wb/2025-08-04/food_prices_for_nutrition:
     - data://garden/wb/2025-08-04/food_prices_for_nutrition
   #
-  # Decoupling of agricultural production and land use
-  #
-  data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use:
-    - data://garden/faostat/2025-03-17/faostat_fbsc
-    - data://garden/faostat/2025-03-17/faostat_rl
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/agriculture/2025-08-06/decoupling_food_production_and_land_use:
-    - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use
-  #
   # Lobell Lab: Crop productivity in southern Africa
   # NOTE: Not updateable.
   #
@@ -225,6 +215,16 @@ steps:
   #
   data://grapher/agriculture/2026-03-02/attainable_yields:
     - data://garden/agriculture/2026-03-02/attainable_yields
+  #
+  # Decoupling food production and land use.
+  #
+  data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use:
+    - data://garden/faostat/2025-03-17/faostat_fbsc
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2025-03-17/faostat_rl
+  data://grapher/agriculture/2025-08-06/decoupling_food_production_and_land_use:
+    - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use
   #
   # Crop yields explorer.
   #

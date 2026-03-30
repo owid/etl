@@ -282,3 +282,7 @@ steps:
   #
   data://grapher/agriculture/2025-10-16/corn_yields:
     - data://garden/agriculture/2025-10-16/corn_yields
+  #
+  # Decoupling of agricultural production and land use
+  #
+
