@@ -53,9 +53,9 @@ def main(upload: bool, path_to_file: Optional[str] = None) -> None:
 def modify_metadata(snap: Snapshot) -> Snapshot:
     """Modify metadata"""
     # Get access date
-    snap.metadata.origin.date_accessed = date.today()  # type: ignore
+    snap.metadata.origin.date_accessed = date.today()  # ty: ignore
     # Set publication date
-    snap.metadata.origin.date_published = str(date.today().year)  # type: ignore
+    snap.metadata.origin.date_published = str(date.today().year)  # ty: ignore
     # Save
     snap.metadata.save()
     return snap

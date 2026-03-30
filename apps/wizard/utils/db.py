@@ -94,7 +94,7 @@ class WizardDB:
                 "url_patch",
                 "url_html",
             )
-            query = _prepare_query_insert(TB_PR, fields)  # type: ignore
+            query = _prepare_query_insert(TB_PR, fields)  # ty: ignore
             # Get IDs to update
             ids = tuple(str(data["id"]) for data in data_values)
             # Insert in table
@@ -126,7 +126,7 @@ class WizardDB:
         """Add GPT summary entry."""
         if DB_IS_SET_UP:
             fields = ("id", "date", "cost", "summary", "window_type")
-            query = _prepare_query_insert(TB_NS, fields)  # type: ignore
+            query = _prepare_query_insert(TB_NS, fields)  # ty: ignore
             code = hashlib.sha1(window_type.encode()).hexdigest()[:5]
             query_params = {
                 "id": f"{round(time.time())}{code}",

@@ -122,7 +122,7 @@ def _split_long_title(text: str) -> str:
 
 
 class SpinachAreaHarvestedAnomaly(DataAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "The area harvested of spinach for China (which refers to mainland) in 1984 is missing. "
         "This causes that other regions that are aggregates which include China mainland have a spurious reduction in "
         "area harvested of spinach in that year, and a spurious increase in yield. "
@@ -199,7 +199,7 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
 
 
 class CocoaBeansFoodAvailableAnomaly(DataAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Food available for consumption for cocoa beans from 2010 onwards presents many zeros for different countries. "
         "These zeros are likely to correspond to missing data. "
         "This issue may be caused by a change in FAO methodology precisely on 2010. "
@@ -305,7 +305,7 @@ class CocoaBeansFoodAvailableAnomaly(DataAnomaly):
 
 
 class EggYieldNorthernEuropeAnomaly(DataAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "The amount of eggs produced per bird for Northern Europe (FAO) is unreasonably high before 1973, with values "
         "between 50kg and 115kg, while from 1973 on it has more reasonable values, below 20kg. "
         "Therefore, we remove all values for Northern Europe (FAO) between 1961 and 1972."
@@ -383,7 +383,7 @@ class EggYieldNorthernEuropeAnomaly(DataAnomaly):
 
 
 class TeaProductionAnomaly(DataAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Tea production in FAO data increased dramatically from 1990 to 1991 for many different countries (including "
         "some of the main producers, like China and India). However, data from 1991 was flagged as 'Estimated value' "
         "(while data prior to 1991 is flagged as 'Official figure'). This potentially anomalous increase was not "
@@ -490,7 +490,7 @@ class TeaProductionAnomaly(DataAnomaly):
 
 
 class HighYieldAnomaly(DataAnomaly):
-    description = ()  # type: ignore
+    description = ()  # ty: ignore
 
     affected_item_codes = []
     affected_element_codes = []
@@ -542,7 +542,7 @@ class HighYieldAnomaly(DataAnomaly):
 
 
 class FruitYieldAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "For example, the yield of item 'Fruit Primary' in Denmark prior to 1985 is larger than 6000 tonnes/ha. "
         "Similar issues happen to Antigua and Barbuda and Burkina Faso. "
@@ -592,7 +592,7 @@ class FruitYieldAnomaly(HighYieldAnomaly):
 
 
 class FruitYieldNetherlandsAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "This happens to item 'Fruit Primary' in Netherlands prior to 1984. "
         "Therefore, we remove these possibly spurious values."
@@ -637,7 +637,7 @@ class FruitYieldNetherlandsAnomaly(HighYieldAnomaly):
 
 
 class LocustBeansYieldAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "This happens to item 'Locust beans (carobs)' for region 'Net Food Importing Developing Countries (FAO)'. "
         "Therefore, we remove these possibly spurious values."
@@ -683,7 +683,7 @@ class LocustBeansYieldAnomaly(HighYieldAnomaly):
 
 
 class WalnutsYieldAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "This happens to item 'Walnuts, in shell' for region 'Eastern Asia (FAO)'. "
         "Therefore, we remove these possibly spurious values."
@@ -729,7 +729,7 @@ class WalnutsYieldAnomaly(HighYieldAnomaly):
 
 
 class OtherTropicalFruitYieldNorthernAfricaAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "This happens to item 'Other tropical fruits, n.e.c.' for region 'Northern Africa (FAO)'. "
         "Therefore, we remove these possibly spurious values."
@@ -767,7 +767,7 @@ class OtherTropicalFruitYieldNorthernAfricaAnomaly(HighYieldAnomaly):
 
 
 class OtherTropicalFruitYieldSouthAmericaAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "This happens to item 'Other tropical fruits, n.e.c.' for South America. "
         "Therefore, we remove these possibly spurious values."

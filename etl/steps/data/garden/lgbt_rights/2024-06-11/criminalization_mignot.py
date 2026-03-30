@@ -264,7 +264,7 @@ def fill_countries_to_start_year(tb: Table) -> Table:
     # Create start_year column
     tb_["start_year"] = START_YEAR
 
-    tb_ = expand_table(tb=tb_, start_col="start_year", end_col="year", status=pd.NA)  # type: ignore
+    tb_ = expand_table(tb=tb_, start_col="start_year", end_col="year", status=pd.NA)  # ty: ignore
 
     # Concatenate the two tables
     tb = pr.concat([tb, tb_], ignore_index=True)

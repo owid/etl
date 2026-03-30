@@ -63,7 +63,7 @@ def get_chart_views(min_date: str, max_date: str) -> pd.DataFrame:
 
     # Merge all data frames.
     df = pr.multi_merge(
-        dfs,  # type: ignore
+        dfs,  # ty: ignore
         on="grapher",
         how="outer",
     )

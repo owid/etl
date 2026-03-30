@@ -178,7 +178,7 @@ class Indicator(pd.Series):
         if metadata:
             assert not _fields, "cannot pass both metadata and _fields"
             assert name or self.name, "cannot pass metadata without a name"
-            _fields = {(name or self.name): metadata}  # type: ignore
+            _fields = {(name or self.name): metadata}  # ty: ignore
 
         self._fields = _fields or defaultdict(VariableMeta)
 
@@ -188,7 +188,7 @@ class Indicator(pd.Series):
 
         # DeprecationWarning: Passing a SingleBlockManager to Indicator is deprecated and will raise in a future version. Use public APIs instead.
         with warnings.ignore_warnings([DeprecationWarning]):
-            super().__init__(data=data, index=index, name=name, **kwargs)
+            super().__init__(data=data, index=index, name=name, **kwargs)  # ty: ignore[unknown-argument]
 
     @property
     def m(self) -> VariableMeta:
@@ -253,7 +253,7 @@ class Indicator(pd.Series):
         vm = self._fields[self.checked_name]
 
         # pass this as a hidden attribute to the metadata object for display only
-        vm._name = self.name  # type: ignore
+        vm._name = self.name  # ty: ignore
 
         return vm
 
@@ -275,73 +275,73 @@ class Indicator(pd.Series):
              <pre>{}</pre>
         """.format(self.name, html)
 
-    def __add__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __add__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         indicator_name = self.name or UNNAMED_INDICATOR
         indicator = Indicator(super().__add__(other), name=indicator_name)
         indicator.metadata = combine_indicators_metadata(indicators=[self, other], operation="+", name=indicator_name)
         return indicator
 
-    def __iadd__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __iadd__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         return self.__add__(other)
 
-    def __sub__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __sub__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         indicator_name = self.name or UNNAMED_INDICATOR
         indicator = Indicator(super().__sub__(other), name=indicator_name)
         indicator.metadata = combine_indicators_metadata(indicators=[self, other], operation="-", name=indicator_name)
         return indicator
 
-    def __isub__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __isub__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         return self.__sub__(other)
 
-    def __mul__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __mul__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         indicator_name = self.name or UNNAMED_INDICATOR
         indicator = Indicator(super().__mul__(other), name=indicator_name)
         indicator.metadata = combine_indicators_metadata(indicators=[self, other], operation="*", name=indicator_name)
         return indicator
 
-    def __imul__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __imul__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         return self.__mul__(other)
 
-    def __truediv__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __truediv__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         if is_nullable_series(self) or is_nullable_series(other):
             # 0/0 should return pd.NA, not np.nan
             zero_div_zero = (other == 0) & (self == 0)
             if zero_div_zero.any():
-                other = other.replace({0: pd.NA})  # type: ignore
+                other = other.replace({0: pd.NA})  # ty: ignore
 
         indicator_name = self.name or UNNAMED_INDICATOR
         indicator = Indicator(super().__truediv__(other), name=indicator_name)
         indicator.metadata = combine_indicators_metadata(indicators=[self, other], operation="/", name=indicator_name)
         return indicator
 
-    def __itruediv__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __itruediv__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         return self.__truediv__(other)
 
-    def __floordiv__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __floordiv__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         indicator_name = self.name or UNNAMED_INDICATOR
         indicator = Indicator(super().__floordiv__(other), name=indicator_name)
         indicator.metadata = combine_indicators_metadata(indicators=[self, other], operation="//", name=indicator_name)
         return indicator
 
-    def __ifloordiv__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __ifloordiv__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         return self.__floordiv__(other)
 
-    def __mod__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __mod__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         indicator_name = self.name or UNNAMED_INDICATOR
         indicator = Indicator(super().__mod__(other), name=indicator_name)
         indicator.metadata = combine_indicators_metadata(indicators=[self, other], operation="%", name=indicator_name)
         return indicator
 
-    def __imod__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __imod__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         return self.__mod__(other)
 
-    def __pow__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __pow__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         indicator_name = self.name or UNNAMED_INDICATOR
         indicator = Indicator(super().__pow__(other), name=indicator_name)
         indicator.metadata = combine_indicators_metadata(indicators=[self, other], operation="**", name=indicator_name)
         return indicator
 
-    def __ipow__(self, other: Scalar | Series | Indicator) -> Indicator:  # type: ignore
+    def __ipow__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         return self.__pow__(other)
 
     def fillna(self, value: Any = None, *args: Any, **kwargs: Any) -> Indicator:
@@ -374,27 +374,27 @@ class Indicator(pd.Series):
         )
         return indicator
 
-    def add(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # type: ignore
+    def add(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # ty: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__add__(other=other)
 
-    def sub(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # type: ignore
+    def sub(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # ty: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__sub__(other=other)
 
-    def mul(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # type: ignore
+    def mul(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # ty: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__mul__(other=other)
 
-    def truediv(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # type: ignore
+    def truediv(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # ty: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__truediv__(other=other)
 
-    def div(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # type: ignore
+    def div(self, other: Scalar | Series | Indicator, *args: Any, **kwargs: Any) -> Indicator:  # ty: ignore
         return self.truediv(other=other, *args, **kwargs)
 
     def pct_change(self, *args: Any, **kwargs: Any) -> Indicator:
@@ -486,7 +486,7 @@ class Indicator(pd.Series):
             assert rolling_avg.metadata.title == ind.metadata.title
             ```
         """
-        return IndicatorRolling(super().rolling(*args, **kwargs), self.metadata.copy(), self.name)  # type: ignore
+        return IndicatorRolling(super().rolling(*args, **kwargs), self.metadata.copy(), self.name)  # ty: ignore
 
     def to_frame(self, name: str | None = None) -> Table:
         """Convert Indicator to a Table (single-column table).
@@ -497,12 +497,12 @@ class Indicator(pd.Series):
         # The parent to_frame() already returns a Table via _constructor_expanddim
         # Don't pass name=None explicitly, as that would make pandas use None as column name
         if name is None:
-            return super().to_frame()  # type: ignore[return-value]
+            return super().to_frame()  # ty: ignore[invalid-return-type]
         else:
-            tb = super().to_frame(name=name)  # type: ignore[return-value]
+            tb = super().to_frame(name=name)  # ty: ignore[invalid-return-type]
             if self.name is not None:
                 tb[name].metadata = self.metadata.copy()
-            return tb  # type: ignore
+            return tb  # ty: ignore
 
     def copy_metadata(self, from_variable: Indicator, inplace: bool = False) -> Indicator | None:
         """Copy metadata from another indicator.
@@ -525,15 +525,14 @@ class Indicator(pd.Series):
             ind1.copy_metadata(from_variable=ind2, inplace=True)
             ```
         """
-        return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)  # type: ignore
+        return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)  # ty: ignore
 
     def copy(self, deep: bool = True) -> Indicator:
         new_var = super().copy(deep=deep)
         if deep:
             field_names = [n for n in self.index.names + [self.name] if n is not None]
             new_var._fields = defaultdict(VariableMeta, {k: self._fields[k].copy(deep=deep) for k in field_names})
-        return new_var
-
+        return new_var  # ty: ignore[invalid-return-type]
 
 # Backwards-compatible alias
 Variable = Indicator
@@ -802,7 +801,7 @@ def combine_indicators_processing_logs(
         [],
     )
 
-    return ProcessingLog(processing_log)  # type: ignore
+    return ProcessingLog(processing_log)  # ty: ignore
 
 
 def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:
@@ -841,7 +840,7 @@ def combine_indicators_presentation(
     indicators: list[Indicator], operation: OPERATION | None
 ) -> VariablePresentationMeta | None:
     # Apply the same logic as for displays.
-    return combine_indicators_display(indicators=indicators, operation=operation, _field_name="presentation")  # type: ignore
+    return combine_indicators_display(indicators=indicators, operation=operation, _field_name="presentation")  # ty: ignore
 
 
 def combine_indicators_processing_level(indicators: list[Indicator]) -> PROCESSING_LEVELS | None:

@@ -54,7 +54,7 @@ class ResponseSet(BaseModel, Generic[T]):
         if self.total_count == 0:
             self.total_count = len(self.items)
 
-    def __iter__(self) -> Iterator[T]:  # type: ignore[override]
+    def __iter__(self) -> Iterator[T]:  # ty: ignore[invalid-method-override]
         """Iterate over results, not model fields."""
         return iter(self.items)
 
@@ -366,9 +366,9 @@ class ResponseSet(BaseModel, Generic[T]):
             return []
 
         if isinstance(self.items[0], BaseModel):
-            return [item.model_dump() for item in self.items]  # type: ignore[union-attr]
+            return [item.model_dump() for item in self.items]  # ty: ignore[unresolved-attribute]
 
-        return list(self.items)  # type: ignore[arg-type]
+        return list(self.items)  # ty: ignore[invalid-argument-type, invalid-return-type]
 
     def filter(self, predicate: Callable[[T], bool]) -> "ResponseSet[T]":
         """Filter results by predicate function.

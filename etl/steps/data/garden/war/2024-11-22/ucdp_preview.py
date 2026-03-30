@@ -544,7 +544,7 @@ def _get_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world["region"] = "World"
 
     # Combine
-    tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(  # type: ignore
+    tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(  # ty: ignore
         by=["year", "region", "conflict_type"]
     )
 
@@ -585,7 +585,7 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new_world["region"] = "World"
 
     # Combine
-    tb_new = pr.concat([tb_new, tb_new_world], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pr.concat([tb_new, tb_new_world], ignore_index=True).sort_values(  # ty: ignore
         by=["year", "region", "conflict_type"]
     )
 

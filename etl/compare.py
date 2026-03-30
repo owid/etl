@@ -146,7 +146,7 @@ def etl_catalog(
             namespace=namespace,
             dataset=dataset,
             channels=[channel],
-            version=version,  # type: ignore[reportArgumentType]
+            version=version,  # ty: ignore[invalid-argument-type]
         )
     except Exception as e:
         if debug:
@@ -163,7 +163,7 @@ def etl_catalog(
                 namespace=namespace,
                 dataset=dataset,
                 channel=channel,
-                version=version,  # type: ignore[reportArgumentType]
+                version=version,  # ty: ignore[invalid-argument-type]
             )
         except ValueError as e:
             # try again after reindexing
@@ -174,7 +174,7 @@ def etl_catalog(
                     namespace=namespace,
                     dataset=dataset,
                     channel=channel,
-                    version=version,  # type: ignore[reportArgumentType]
+                    version=version,  # ty: ignore[invalid-argument-type]
                 )
             else:
                 raise e

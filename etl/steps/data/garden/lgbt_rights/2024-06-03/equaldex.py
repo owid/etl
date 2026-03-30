@@ -437,7 +437,7 @@ def add_metadata_for_aggregated_columns(col: str, status: str, count_or_pop: str
     else:
         paths.log.error(f"count_or_pop must be either 'count' or 'pop'. Got {count_or_pop}.")
 
-    return meta  # type: ignore
+    return meta  # ty: ignore
 
 
 def select_only_sovereign_countries(tb: Table, tb_sovereign_countries: Table) -> Table:

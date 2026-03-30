@@ -288,7 +288,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
         # Ask GPT (stream)
         stream = client.chat.completions.create(
             model=MODEL_DEFAULT,
-            messages=messages,  # type: ignore
+            messages=messages,  # ty: ignore
             max_completion_tokens=3000,
             stream=True,
         )
@@ -503,7 +503,7 @@ def _change_chart_selection(df, key_table, key_selection):
     st.session_state[key_selection] = df.iloc[rows]["entity_name"].tolist()
 
 
-def _score_table(df: pd.DataFrame) -> pd.DataFrame:
+def _score_table(df: pd.DataFrame) -> "pd.io.formats.style.Styler":  # ty: ignore[invalid-return-type]
     """Return a table of scores and other useful columns for a given indicator. Return styled dataframe."""
     # Filter df_all for the indicator and anomaly type currently displayed.
     df_show = df.copy()
@@ -607,7 +607,7 @@ with st.form(key="dataset_search"):
         format_func=lambda x: DATASETS_ALL[x],
     )
 
-    st.query_params["anomalist_datasets_selected"] = st.session_state.anomalist_datasets_selected  # type: ignore
+    st.query_params["anomalist_datasets_selected"] = st.session_state.anomalist_datasets_selected  # ty: ignore
 
     st.form_submit_button(
         "Detect anomalies",

@@ -165,15 +165,15 @@ class CountryRegionMapper:
         aliases = {}
         valid_names = set()
         for row in rc_df.itertuples():
-            name = row.name  # type: ignore
-            code = row.Index  # type: ignore
+            name = row.name  # ty: ignore
+            code = row.Index  # ty: ignore
             valid_names.add(name)
-            aliases[name.lower()] = name
+            aliases[name.lower()] = name  # ty: ignore[unresolved-attribute]
             if code in aliases_s.index:
                 for alias in aliases_s.loc[[code]]:
                     aliases[alias.lower()] = name
             # Include the region code itself as another alias.
-            aliases[code.lower()] = name
+            aliases[code.lower()] = name  # ty: ignore[unresolved-attribute]
 
         self.aliases = aliases
         self.valid_names = valid_names

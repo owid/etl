@@ -718,7 +718,7 @@ class GithubApiRepo:
             head_sha=head_sha,
             status="completed",
             conclusion=conclusion,
-            output=output,  # type: ignore
+            output=output,  # ty: ignore
         )
 
         return check_run

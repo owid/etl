@@ -69,7 +69,7 @@ class EmbeddingsModel(Generic[TDoc]):
         if model_name is None:
             # NOTE: this is a bit of a hack, it's better to pass it explicitly
             # TODO: fix it when we update to the latest version
-            model_name = model.tokenizer.name_or_path.split("/")[-1]  # type: ignore
+            model_name = model.tokenizer.name_or_path.split("/")[-1]  # ty: ignore
 
         self.model = model
         self.model_name = model_name
@@ -94,7 +94,7 @@ class EmbeddingsModel(Generic[TDoc]):
             with open(self.cache_file_keys, "rb") as f:
                 keys = pickle.load(f)
 
-        return keys, embeddings  # type: ignore
+        return keys, embeddings  # ty: ignore
 
     def _save(self, keys: list[str], embeddings: torch.Tensor) -> None:
         """Save embeddings and keys to cache files."""
@@ -180,7 +180,7 @@ class EmbeddingsModel(Generic[TDoc]):
 
         # Get requested embeddings in order
         indices = [key_to_index[text] for text in texts]
-        req_embeddings = embeddings[indices]  # type: ignore
+        req_embeddings = embeddings[indices]  # ty: ignore
 
         self.docs = docs
         self.embeddings = req_embeddings
@@ -202,7 +202,7 @@ class EmbeddingsModel(Generic[TDoc]):
                 score = (score + 1) / 2
             elif typ == "euclidean":
                 # distance = torch.cdist(embeddings, input_embedding)
-                score = util.euclidean_sim(embeddings, input_embedding)  # type: ignore
+                score = util.euclidean_sim(embeddings, input_embedding)  # ty: ignore
                 score = 1 / (1 - score)  # Normalize to [0, 1]
             else:
                 raise ValueError(f"Invalid similarity type: {typ}")
@@ -228,7 +228,7 @@ class EmbeddingsModel(Generic[TDoc]):
             doc.similarity = similarities[i]
 
         # Sort the documents by descending similarity score.
-        sorted_documents = sorted(_docs, key=lambda x: x.similarity, reverse=True)  # type: ignore
+        sorted_documents = sorted(_docs, key=lambda x: x.similarity, reverse=True)  # ty: ignore
 
         log.info("get_sorted_documents_by_similarity.end", t=time.time() - t)
 

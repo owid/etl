@@ -81,7 +81,7 @@ class MetaBase(DataClassJsonMixin):
         """
         return hash_any(self)
 
-    def __eq__(self, other: Self) -> bool:  # type: ignore
+    def __eq__(self, other: Self) -> bool:  # ty: ignore
         """Check equality based on hash values.
 
         Args:
@@ -94,7 +94,7 @@ class MetaBase(DataClassJsonMixin):
             return False
         return self.__hash__() == other.__hash__()
 
-    def to_dict(self, encode_json: bool = False) -> dict[str, Any]:  # type: ignore
+    def to_dict(self, encode_json: bool = False) -> dict[str, Any]:  # ty: ignore
         """Convert metadata object to dictionary.
 
         Args:
@@ -113,7 +113,7 @@ class MetaBase(DataClassJsonMixin):
         return super().to_dict(encode_json=encode_json)
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> T:  # type: ignore
+    def from_dict(cls, d: dict[str, Any]) -> T:  # ty: ignore
         """Create metadata object from dictionary.
 
         Args:
@@ -133,7 +133,7 @@ class MetaBase(DataClassJsonMixin):
             the default dataclasses_json method.
         """
         # NOTE: this is much faster than using dataclasses_json
-        return dataclass_from_dict(cls, d)  # type: ignore
+        return dataclass_from_dict(cls, d)  # ty: ignore
 
     def update(self, **kwargs: dict[str, Any]) -> None:
         """Update metadata fields with new values.
@@ -169,7 +169,7 @@ class MetaBase(DataClassJsonMixin):
             ```
         """
         if not deep:
-            return dataclasses.replace(self)  # type: ignore
+            return dataclasses.replace(self)  # ty: ignore
         else:
             return _deepcopy_dataclass(self)
 
@@ -567,8 +567,8 @@ class VariableMeta(MetaBase):
 
     def copy(self, deep: bool = True) -> Self:
         m = super().copy(deep)
-        m._name = getattr(self, "_name", None)  # type: ignore
-        return m  # type: ignore
+        m._name = getattr(self, "_name", None)  # ty: ignore
+        return m  # ty: ignore
 
 
 @pruned_json
@@ -744,7 +744,7 @@ def to_html(record: Any) -> str | None:
         return '<ul style="text-align: left; margin-top: 0em; margin-bottom: 0em">{}</ul>'.format("".join(rows))
 
     else:
-        return mistune.html(str(record))  # type: ignore
+        return mistune.html(str(record))  # ty: ignore
 
 
 def is_year_or_date(s: str) -> bool:

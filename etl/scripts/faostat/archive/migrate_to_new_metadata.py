@@ -45,7 +45,7 @@ def main():
             )
             continue
         try:
-            dataset_id = get_dataset_id(dataset_name=dataset_name, version=VERSION)  # type: ignore[reportArgumentType]
+            dataset_id = get_dataset_id(dataset_name=dataset_name, version=VERSION)  # ty: ignore[invalid-argument-type]
         except AssertionError:
             log.error(
                 f"Grapher dataset for {domain} could not be found in the database. "
@@ -84,7 +84,7 @@ def main():
     for domain, metadata in metadata_dict.items():
         metadata_file = STEP_DIR / f"data/garden/faostat/{VERSION}/{domain}.meta.yml"
         yaml_text = yaml_dump(metadata)
-        metadata_file.write_text(yaml_text)  # type: ignore
+        metadata_file.write_text(yaml_text)  # ty: ignore
 
 
 if __name__ == "__main__":

@@ -12,30 +12,30 @@ Note: This script is a pyright-specific helper. It intentionally inserts
 
 
 def add_type_ignore_to_lines(file_path, line_number, rule):
-    """Reads a file, adds # type: ignore to the specified line, and writes it back."""
+    """Reads a file, adds # ty: ignore to the specified line, and writes it back."""
     with open(file_path, "r") as file:
         lines = file.readlines()
 
-    # We need to insert # type: ignore[rule] at the end of the line
+    # We need to insert # ty: ignore at the end of the line
     target_line = lines[line_number - 1].rstrip()  # Pyright uses 1-based indexing for lines
-    if "# type: ignore" not in target_line and "# ty: ignore" not in target_line:
-        lines[line_number - 1] = f"{target_line}  # type: ignore[{rule}]\n"
+    if  "# ty: ignore" not in target_line and "# ty: ignore" not in target_line:
+        lines[line_number - 1] = f"{target_line}  # ty: ignore\n"
 
     with open(file_path, "w") as file:
         file.writelines(lines)
 
 
 def process_pyright_json_from_pipe():
-    """Reads JSON input from stdin (pipe) and adds # type: ignore for errors."""
+    """Reads JSON input from stdin (pipe) and adds # ty: ignore for errors."""
     data = json.load(sys.stdin)  # Reading from stdin
 
     for diagnostic in data.get("generalDiagnostics", []):
         file_path = diagnostic["file"]
         line_number = diagnostic["range"]["start"]["line"] + 1  # Pyright uses 0-based index
         rule = diagnostic["rule"]
-        print(f"Adding # type: ignore[{rule}] to {file_path} on line {line_number}")
+        print(f"Adding # ty: ignore to {file_path} on line {line_number}")
 
-        # Add the # type: ignore comment to the corresponding file and line
+        # Add the # ty: ignore comment to the corresponding file and line
         add_type_ignore_to_lines(file_path, line_number, rule)
 
 

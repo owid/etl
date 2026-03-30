@@ -291,7 +291,7 @@ class CatalogMixin:
 
     def find_one(self, *args: str | None, **kwargs: str | None) -> Table:
         """Find and load a single table matching search criteria."""
-        return self.find(*args, **kwargs).load()  # type: ignore
+        return self.find(*args, **kwargs).load()  # ty: ignore
 
     def find_latest(
         self,
@@ -299,7 +299,7 @@ class CatalogMixin:
         **kwargs: str | None,
     ) -> Table:
         """Find and load the latest version of a table."""
-        frame = self.find(*args, **kwargs)  # type: ignore
+        frame = self.find(*args, **kwargs)  # ty: ignore
         if frame.empty:
             raise ValueError("No matching table found")
         else:
@@ -422,7 +422,7 @@ class LocalCatalog(CatalogMixin):
         keys = ["table", "dataset", "version", "namespace", "channel", "is_public", "title", "description"]
         columns = keys + [c for c in df.columns if c not in keys]
 
-        df.sort_values(keys, inplace=True)  # type: ignore
+        df.sort_values(keys, inplace=True)  # ty: ignore
         df = df.loc[:, columns]
 
         return CatalogFrame(df)
@@ -493,7 +493,7 @@ class CatalogFrame(pd.DataFrame):
 
     def load(self) -> Table:
         if len(self) == 1:
-            return self.iloc[0].load()  # type: ignore
+            return self.iloc[0].load()  # ty: ignore
         elif len(self) == 0:
             raise ValueError("no tables found")
         else:

@@ -141,7 +141,7 @@ def _get_params_cached(
         missing_old=missing_old,
         missing_new=missing_new,
         similarity_name=similarity_function_name,
-    )  # type: ignore
+    )  # ty: ignore
 
     iu = []
     if indicator_mapping_auto or suggestions:
@@ -392,7 +392,7 @@ class IndicatorUpgradeShow:
                     indicator_id_to_display=indicator_id_to_display,
                     df=df_data,
                     # enable_bulk_explore,
-                )  # type: ignore
+                )  # ty: ignore
 
             return indicator_chosen
 
@@ -468,7 +468,7 @@ class IndicatorUpgradeShow:
             on_change=_set_states_checkbox,
         )
 
-    @st.dialog("Explore changes in the new indicator", width="large")  # type: ignore
+    @st.dialog("Explore changes in the new indicator", width="large")  # ty: ignore
     def _st_explore_indicator_modal(self, indicator_old, indicator_new, indicator_id_to_display, df=None) -> None:
         """Same as st_explore_indicator but framed in a dialog.
 
@@ -533,7 +533,7 @@ def convert_year_to_date(df: pd.DataFrame, indicator_ids: List[int]) -> pd.DataF
 
     ix = df.yearIsDay == "true"
     if ix.any():
-        df.year = df.year.astype(object)
+        df.year = df.year.astype(object)  # ty: ignore[unresolved-attribute]
         df.loc[ix, "year"] = pd.to_datetime(df.loc[ix, "zeroDay"]).dt.date + np.array(
             [pd.Timedelta(days=y) for y in df.loc[ix, "year"]]
         )

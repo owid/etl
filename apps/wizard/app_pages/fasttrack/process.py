@@ -299,7 +299,7 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
 
         # there is an alias for this country
         elif country in alias_to_country.index:
-            df.country = df.country.replace({country: alias_to_country[country]})
+            df.country = df.country.replace({country: alias_to_country[country]})  # ty: ignore[unresolved-attribute]
             st.warning(f"Country `{country}` harmonized to `{alias_to_country.loc[country]}`")
 
         # unknown country

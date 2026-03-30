@@ -206,4 +206,4 @@ def add_metadata_for_aggregated_columns(
     else:
         paths.log.error(f"count_or_pop must be either 'count' or 'pop'. Got {count_or_pop}.")
 
-    return meta  # type: ignore
+    return meta  # ty: ignore

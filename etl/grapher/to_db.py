@@ -212,7 +212,9 @@ def load_dataset_variables(dataset_id: int, engine: Engine) -> Dict[int | str, A
     select catalogPath, id, dataChecksum, metadataChecksum from variables where datasetId = %(dataset_id)s
     """
     return (
-        read_sql(q, engine=engine, params={"dataset_id": dataset_id}).set_index("catalogPath").to_dict(orient="index")
+        read_sql(q, engine=engine, params={"dataset_id": dataset_id})
+        .set_index("catalogPath")
+        .to_dict(orient="index")  # ty: ignore[invalid-return-type]
     )
 
 
@@ -426,7 +428,7 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
     with Session(get_engine()) as session:
         q = (
             update(gm.Dataset)
-            .where(gm.Dataset.id == dataset_id)  # type: ignore
+            .where(gm.Dataset.id == dataset_id)  # ty: ignore
             .values(
                 sourceChecksum=checksum,
                 dataEditedAt=datetime.datetime.now(datetime.timezone.utc),

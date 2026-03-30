@@ -650,7 +650,7 @@ def _sync_dods(
                 )
                 _notify_slack_dod_conflict(
                     source_dod.name,
-                    str(source_session.bind.url).split("@")[-1],  # type: ignore
+                    str(source_session.bind.url).split("@")[-1],  # ty: ignore
                     source_dod.updatedAt,
                     target_dod.updatedAt,
                     server_creation_time,

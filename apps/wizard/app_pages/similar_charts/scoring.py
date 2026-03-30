@@ -85,14 +85,14 @@ class ScoringModel:
         # w = w / w.sum()
 
         # Calculate total score
-        return scores.sum(axis=1).to_dict()
+        return scores.sum(axis=1).to_dict()  # ty: ignore[invalid-return-type]
 
     def similar_chart_by_title(self, title: str) -> int:
         title_scores = self.emb_title.calculate_similarity(title)
         d = dict(zip([c.chart_id for c in self.charts], title_scores))
 
         # Return chart_id with the highest score
-        return max(d, key=d.get)  # type: ignore
+        return max(d, key=d.get)  # ty: ignore
 
     def similarity_components(self, chart: Chart) -> pd.DataFrame:
         log.info("similarity_components.start", n_docs=len(self.charts))
@@ -192,6 +192,6 @@ def gpt_diverse_charts(
     assert response
     log.info("add_gpt_diversity.end", cost=response.cost, t=time.time() - t)
 
-    js = json.loads(response.choices[0].message.content.replace("```json", "").replace("```", ""))  # type: ignore
+    js = json.loads(response.choices[0].message.content.replace("```json", "").replace("```", ""))  # ty: ignore
 
     return js

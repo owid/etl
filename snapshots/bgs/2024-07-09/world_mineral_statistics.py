@@ -86,14 +86,14 @@ def main(upload: bool) -> None:
     soup = BeautifulSoup(page_map.text, "html.parser")
 
     # Map mineral names (commodities) to ids.
-    soup_commodity = soup.find("select", id="commodity").find_all("option")  # type: ignore
+    soup_commodity = soup.find("select", id="commodity").find_all("option")  # ty: ignore
     commodity_to_id = {option.text.strip(): int(option["value"]) for option in soup_commodity if option["value"]}
 
     # Data type options are simply "Imports", "Exports" and "Production".
     data_types = ["Imports", "Exports", "Production"]
 
     # Get the list of available years.
-    soup_years = soup.find("select", id="dateFrom").find_all("option")  # type: ignore
+    soup_years = soup.find("select", id="dateFrom").find_all("option")  # ty: ignore
     years = [int(option.text.strip()) for option in soup_years if option["value"]]
 
     # First fetch all necessary data, without processing it.

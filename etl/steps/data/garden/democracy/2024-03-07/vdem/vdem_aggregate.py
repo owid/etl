@@ -177,8 +177,8 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
         ds_regions=ds_regions,
-        aggregations={k: "mean" for k in INDICATORS_REGION_AVERAGES},  # type: ignore
-        aggregations_world={k: np.mean for k in INDICATORS_REGION_AVERAGES},  # type: ignore
+        aggregations={k: "mean" for k in INDICATORS_REGION_AVERAGES},  # ty: ignore
+        aggregations_world={k: np.mean for k in INDICATORS_REGION_AVERAGES},  # ty: ignore
     )
 
     # Sanity check on output shape
@@ -329,7 +329,7 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
         ds_regions=ds_regions,
-        aggregations={k: "sum" for k in INDICATORS_REGION_AVERAGES} | {"population": "sum"},  # type: ignore
+        aggregations={k: "sum" for k in INDICATORS_REGION_AVERAGES} | {"population": "sum"},  # ty: ignore
         min_num_values_per_year=1,
     )
 

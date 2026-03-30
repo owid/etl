@@ -178,14 +178,14 @@ class IntegerNumberWithWords:
     def numeric_words_list(cls) -> Set[str]:
         """Return list of all numeric words (flattened)."""
         words = set(word for value in cls.numeric_words.values() for word in value["words"] if word != "")
-        return words  # type: ignore
+        return words  # ty: ignore
 
     def _match_numeric_words(self) -> Dict[str, Union[str, int]]:
         """Match number with words."""
         match = re.search(self.regex_number_verbose(), self.number)
         if match:
             numbers = match.groupdict(default=0)
-            return numbers  # type: ignore
+            return numbers  # ty: ignore
         else:
             raise ValueError("Number may not contain numeric words. Please review!")
 

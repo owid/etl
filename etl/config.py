@@ -146,7 +146,7 @@ DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
 # Special ENV file with access to production DB (read-only), used by chart-diff
 if "ENV_FILE_PROD" in env:
-    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # type: ignore
+    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # ty: ignore
 else:
     ENV_FILE_PROD = None
 
@@ -384,7 +384,7 @@ class Config:
                 if field.name not in env_dict:
                     raise KeyError(f"Field {field.name} not found in env file {env_file}!")
                 config_dict[field.name] = env_dict[field.name]
-        return cls(**config_dict)  # type: ignore
+        return cls(**config_dict)  # ty: ignore
 
 
 class UnknownOWIDEnv(Exception):

@@ -1703,7 +1703,7 @@ def separate_rest_of_tables(tb: Table) -> Tuple[Table, Table, Table, Table]:
         columns=INDICATORS_INEQUALITY + INDICATORS_CPI + INDICATORS_REST_PPP + INDICATORS_NOT_USED, errors="raise"
     )
 
-    return tb, tb_inequality, tb_cpi, tb_rest  # type: ignore
+    return tb, tb_inequality, tb_cpi, tb_rest  # ty: ignore
 
 
 def separate_filled_and_unfilled_data(tb: Table) -> Tuple[Table, Table]:

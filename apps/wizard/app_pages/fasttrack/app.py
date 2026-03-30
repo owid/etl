@@ -207,7 +207,7 @@ else:
             with placeholder_for_existing_google_sheet:
                 existing_google_sheet = st.selectbox(
                     label="Existing Google Sheets",
-                    options=options,  # type: ignore
+                    options=options,  # ty: ignore
                     format_func=lambda x: x["label"],
                     help="Selected sheet will be used if you don't specify Google Sheets URL.",
                     key="existing_sheet",

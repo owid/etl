@@ -123,7 +123,7 @@ agent = Agent(
     instructions=SYSTEM_PROMPT,
     retries=2,
     model_settings=settings,
-    toolsets=get_toolsets(),  # type: ignore
+    toolsets=get_toolsets(),  # ty: ignore
 )
 
 # Agent for recommending follow-up questions

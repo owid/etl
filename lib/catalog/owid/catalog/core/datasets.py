@@ -32,7 +32,7 @@ FileFormat = Literal["csv", "feather", "parquet", "json"]
 SUPPORTED_FORMATS: list[FileFormat] = ["feather", "parquet", "csv", "json"]
 
 # the formats we generate by default
-DEFAULT_FORMATS: list[FileFormat] = environ.get("DEFAULT_FORMATS", "feather").split(",")  # type: ignore
+DEFAULT_FORMATS: list[FileFormat] = environ.get("DEFAULT_FORMATS", "feather").split(",")  # ty: ignore
 
 # the format we use by default if we only need one
 PREFERRED_FORMAT: FileFormat = "feather"
@@ -301,7 +301,7 @@ class Dataset:
         parts = str(self.path).split("/")
         if len(parts) >= 4:
             channel, _, _, _ = parts[-4:]
-            if channel in CHANNEL.__args__:  # type: ignore
+            if channel in CHANNEL.__args__:  # ty: ignore
                 self.metadata.channel = channel
 
         self.metadata.save(self._index_file)
@@ -436,7 +436,7 @@ class Dataset:
             row["path"] = relative_path.as_posix()
             row["channel"] = relative_path.parts[0]
 
-            row["formats"] = [f for f in SUPPORTED_FORMATS if table_path.with_suffix(f".{f}").exists()]  # type: ignore
+            row["formats"] = [f for f in SUPPORTED_FORMATS if table_path.with_suffix(f".{f}").exists()]  # ty: ignore
 
             rows.append(row)
 

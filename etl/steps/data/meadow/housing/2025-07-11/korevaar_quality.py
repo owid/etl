@@ -87,7 +87,7 @@ def run() -> None:
                     tb[col].max() <= 100
                 ), f"Column {col} has values outside of [0, 100] range."
 
-    tb_all = pr.concat([tb_ams, tb_par, tb_lon, tb_bel], ignore_index=True)  # type: ignore
+    tb_all = pr.concat([tb_ams, tb_par, tb_lon, tb_bel], ignore_index=True)  # ty: ignore
 
     #
     # Process data.

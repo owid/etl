@@ -21,7 +21,7 @@ from typing import Dict, List, Union, cast
 import numpy as np
 import pandas as pd
 import structlog
-from owid import catalog, repack  # type: ignore
+from owid import catalog, repack  # ty: ignore
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
@@ -1449,11 +1449,12 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
 
         # Add per capita values to all other regions that are not FAO regions.
         per_capita_data.loc[owid_regions_mask, "value"] = (
-            per_capita_data[owid_regions_mask]["value"] / per_capita_data[owid_regions_mask]["population_with_data"]  # type: ignore
+            per_capita_data[owid_regions_mask]["value"]
+            / per_capita_data[owid_regions_mask]["population_with_data"]  # ty: ignore
         )
 
         # Remove nans (which may have been created because of missing FAO population).
-        per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)  # type: ignore
+        per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)  # ty: ignore
 
         # Add "per capita" to all units.
         per_capita_data["unit"] = per_capita_data["unit"].cat.rename_categories(lambda c: f"{c} per capita")
@@ -1828,7 +1829,7 @@ def _variable_name_map(data: pd.DataFrame, column: str) -> Dict[str, str]:
     does not map to two distinct values)."""
     pivot = data.dropna(subset=[column]).groupby(["variable_name"], observed=True)[column].apply(set)
     assert all(pivot.map(len) == 1)
-    return pivot.map(lambda x: list(x)[0]).to_dict()  # type: ignore
+    return pivot.map(lambda x: list(x)[0]).to_dict()  # ty: ignore
 
 
 def run(dest_dir: str) -> None:

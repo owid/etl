@@ -100,7 +100,7 @@ def find_mapping_suggestions_cached(missing_old, missing_new, similarity_name):
             missing_old=missing_old,
             missing_new=missing_new,
             similarity_name=similarity_name,
-        )  # type: ignore
+        )  # ty: ignore
     # Sort by max similarity: First suggestion is that one that has the highest similarity score with any of its suggested new vars.
     suggestions = sorted(suggestions, key=lambda x: x["new"]["similarity"].max(), reverse=True)
     return suggestions

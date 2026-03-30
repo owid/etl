@@ -35,10 +35,10 @@ def validate_chart_config_and_set_defaults(
     """
     log.info("schema: validating schema and adding defaults")
 
-    def _extend_with_set_default(validator_class):  # type: ignore
+    def _extend_with_set_default(validator_class):  # ty: ignore
         validate_properties = validator_class.VALIDATORS["properties"]
 
-        def _set_defaults(validator, properties, instance, schema):  # type: ignore
+        def _set_defaults(validator, properties, instance, schema):  # ty: ignore
             for property, subschema in properties.items():
                 if "default" in subschema:
                     instance.setdefault(property, subschema["default"])
@@ -121,10 +121,10 @@ def validate_chart_config_and_remove_defaults(
     """
     log.info("schema: validating schema and removing defaults")
 
-    def _extend_with_remove_default(validator_class):  # type: ignore
+    def _extend_with_remove_default(validator_class):  # ty: ignore
         validate_properties = validator_class.VALIDATORS["properties"]
 
-        def _set_defaults(validator, properties, instance, schema):  # type: ignore
+        def _set_defaults(validator, properties, instance, schema):  # ty: ignore
             for property, subschema in properties.items():
                 is_required = property in (schema or {}).get("required", [])
                 if "default" in subschema:

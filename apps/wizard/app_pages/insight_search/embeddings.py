@@ -56,7 +56,7 @@ def get_embeddings(
     if model_name is None:
         # NOTE: this is a bit of a hack
         # TODO: fix it when we update to the latest version
-        model_name = model.tokenizer.name_or_path.split("/")[-1]  # type: ignore
+        model_name = model.tokenizer.name_or_path.split("/")[-1]  # ty: ignore
 
     cache_file_keys = CACHE_DIR / f"embeddings_{model_name}.keys.pkl"
     cache_file_tensor = CACHE_DIR / f"embeddings_{model_name}.pt"
@@ -86,7 +86,7 @@ def get_embeddings(
             # Start the multiprocessing pool
             pool = model.start_multi_process_pool(target_devices=workers * [DEVICE])
             # Encode sentences using multiprocessing
-            batch_embeddings = model.encode_multi_process(  # type: ignore
+            batch_embeddings = model.encode_multi_process(  # ty: ignore
                 missing_texts,
                 pool,
                 batch_size=batch_size,
@@ -128,7 +128,7 @@ def get_embeddings(
 
     # Get requested embeddings in order
     indices = [key_to_index[text] for text in texts]
-    req_embeddings = embeddings[indices]  # type: ignore
+    req_embeddings = embeddings[indices]  # ty: ignore
 
     log.info("get_embeddings.end", t=time.time() - t)
 
@@ -145,7 +145,7 @@ def get_insights_embeddings(_model, insights: list[Dict[str, Any]]) -> list:
             insight["title"] + " " + insight["raw_text"] + " " + " ".join(insight["authors"]) for insight in insights
         ]
 
-        return get_embeddings(_model, insights_texts)  # type: ignore
+        return get_embeddings(_model, insights_texts)  # ty: ignore
 
 
 def get_sorted_documents_by_similarity(
@@ -170,7 +170,7 @@ def get_sorted_documents_by_similarity(
 
     # Attach the similarity scores to the documents.
     for i, doc in enumerate(_docs):
-        doc["similarity"] = similarities[i]  # type: ignore
+        doc["similarity"] = similarities[i]  # ty: ignore
 
     # Sort the documents by descending similarity score.
     sorted_documents = sorted(_docs, key=lambda x: x["similarity"], reverse=True)

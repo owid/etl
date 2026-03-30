@@ -34,7 +34,7 @@ class StepForm(BaseModel):
     errors: Dict[str, Any] = {}
     step_name: str
 
-    def __init__(self: Self, **kwargs: str | int) -> None:  # type: ignore[reportInvalidTypeVarUse]
+    def __init__(self: Self, **kwargs: str | int) -> None:  # ty: ignore
         """Construct parent class."""
         super().__init__(**kwargs)
         self.validate()
@@ -51,7 +51,7 @@ class StepForm(BaseModel):
         data = cls.filter_relevant_fields(step_name=st.session_state["step_name"], data=session_state)
         return cls(**data)
 
-    def validate(self: Self) -> None:  # type: ignore[reportIncompatibleMethodOverride]
+    def validate(self: Self) -> None:  # ty: ignore[invalid-method-override]
         """Validate form fields."""
         raise NotImplementedError("Needs to be implemented in the child class!")
 
@@ -183,7 +183,7 @@ class DataForm(StepForm):
     # Extra steps
     dependencies_extra: Dict[str, Any]
 
-    def __init__(self: Self, **data: Any) -> None:  # type: ignore[reportInvalidTypeVarUse]
+    def __init__(self: Self, **data: Any) -> None:  # ty: ignore
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
 
@@ -203,7 +203,7 @@ class DataForm(StepForm):
             "grapher": data.get("dependencies_extra_grapher"),
         }
         # st.write(data)
-        super().__init__(**data)  # type: ignore
+        super().__init__(**data)  # ty: ignore
 
     def validate(self: Self) -> None:
         """Check that fields in form are valid.
@@ -434,7 +434,7 @@ class SnapshotForm(StepForm):
     license_url: str
     license_name: str
 
-    def __init__(self: Self, **data: str | int) -> None:  # type: ignore[reportInvalidTypeVarUse]
+    def __init__(self: Self, **data: str | int) -> None:  # ty: ignore
         """Construct form."""
         # Change name for certain fields (and remove old ones)
         data["license_url"] = data["origin.license.url"]
@@ -500,7 +500,7 @@ class SnapshotForm(StepForm):
             raise ValueError("attribution must be present!")
 
     @property
-    def metadata(self: Self) -> Dict[str, Any]:  # type: ignore[reportIncompatibleMethodOverride]
+    def metadata(self: Self) -> Dict[str, Any]:  # ty: ignore[invalid-method-override]
         """Define metadata for easy YAML-export."""
         license_field = {
             "name": self.license_name,
@@ -543,12 +543,12 @@ class CollectionForm(StepForm):
     add_to_dag: bool
     dag_file: str
 
-    def __init__(self: Self, **data: Any) -> None:  # type: ignore[reportInvalidTypeVarUse]
+    def __init__(self: Self, **data: Any) -> None:  # ty: ignore
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
 
         # st.write(data)
-        super().__init__(**data)  # type: ignore
+        super().__init__(**data)  # ty: ignore
 
     def create_files(self) -> List[Dict[str, Any]]:
         # Generate files

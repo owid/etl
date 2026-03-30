@@ -4,8 +4,8 @@ from typing import Any, Callable, Generator, Iterable, List, Optional, cast
 import numpy as np
 import pandas as pd
 from pandas.api.types import (
-    is_datetime64_any_dtype,  # type: ignore
-    is_numeric_dtype,  # type: ignore
+    is_datetime64_any_dtype,  # ty: ignore
+    is_numeric_dtype,  # ty: ignore
     union_categoricals,
 )
 
@@ -261,8 +261,12 @@ class HighLevelDiff:
         self.index_values_missing_in_df1 = self.df2.index.difference(self.df1.index)
         self.index_values_missing_in_df2 = self.df1.index.difference(self.df2.index)
         self.index_values_shared = self.df2.index.intersection(self.df1.index)
-        self.duplicate_index_values_in_df1 = self.df1[self.df1.index.duplicated()].index.values
-        self.duplicate_index_values_in_df2 = self.df2[self.df2.index.duplicated()].index.values
+        self.duplicate_index_values_in_df1 = (  # ty: ignore[invalid-assignment]
+            self.df1[self.df1.index.duplicated()].index.values
+        )
+        self.duplicate_index_values_in_df2 = (  # ty: ignore[invalid-assignment]
+            self.df2[self.df2.index.duplicated()].index.values
+        )
 
         # Now we calculate the value differences in the intersection of the two dataframes.
         if self.columns_shared and not self.index_values_shared.empty:

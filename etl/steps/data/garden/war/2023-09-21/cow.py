@@ -82,7 +82,7 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
-from pandas.api.types import is_integer_dtype  # type: ignore
+from pandas.api.types import is_integer_dtype  # ty: ignore
 from shared import (
     add_indicators_extra,
     add_region_from_code,
@@ -930,12 +930,12 @@ def _get_ongoing_metrics(tb: Table) -> Table:
             tb_ongoing_world_intra,
         ],
         ignore_index=True,
-    ).sort_values(  # type: ignore
+    ).sort_values(  # ty: ignore
         by=["year", "region", "conflict_type"]
     )
 
     ## Rename columns
-    tb_ongoing = tb_ongoing.rename(  # type: ignore
+    tb_ongoing = tb_ongoing.rename(  # ty: ignore
         columns={
             "warnum": "number_ongoing_conflicts",
         }
@@ -986,12 +986,12 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new = pr.concat(
         [tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes, tb_new_intra, tb_new_world_intra],
         ignore_index=True,
-    ).sort_values(  # type: ignore
+    ).sort_values(  # ty: ignore
         by=["year_start", "region", "conflict_type"]
     )
 
     ## Rename columns
-    tb_new = tb_new.rename(  # type: ignore
+    tb_new = tb_new.rename(  # ty: ignore
         columns={
             "year_start": "year",
             "warnum": "number_new_conflicts",

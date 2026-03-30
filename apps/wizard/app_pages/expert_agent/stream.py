@@ -258,7 +258,7 @@ async def agent_stream_with_updates(
     # Run agent with text output (original behavior)
     async with agent.run_stream(
         prompt,
-        model=model,  # type: ignore
+        model=model,  # ty: ignore
         message_history=message_history,
         deps=deps,
         event_stream_handler=event_stream_handler,
@@ -385,7 +385,7 @@ async def agent_stream_with_updates_structured(
     # Run agent with structured output
     async with agent.run_stream(
         prompt,
-        model=model,  # type: ignore
+        model=model,  # ty: ignore
         message_history=message_history,
         output_type=list[AnswerChunk],
         deps=deps,
@@ -476,7 +476,7 @@ async def agent_stream(agent, prompt: str, model_name: str, message_history) -> 
 
         async with agent.run_stream(
             prompt,
-            model=model,  # type: ignore
+            model=model,  # ty: ignore
             message_history=message_history,
             # toolsets=toolsets,
         ) as result:

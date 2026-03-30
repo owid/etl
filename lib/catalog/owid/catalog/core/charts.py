@@ -27,7 +27,7 @@ class ChartTableMeta(TableMeta):
     """
 
     # Charts don't have a dataset reference
-    dataset: None = field(default=None, compare=False)  # type: ignore[assignment]
+    dataset: None = field(default=None, compare=False)  # ty: ignore[invalid-assignment]
 
     # Store chart configuration in metadata
     chart_config: dict[str, Any] = field(default_factory=dict)

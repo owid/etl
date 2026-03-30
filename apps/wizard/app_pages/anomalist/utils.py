@@ -72,15 +72,19 @@ def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], D
     variable_mapping = load_variable_mapping(datasets_new_ids, dataset_new_and_old)
 
     # For convenience, create a dataset name "[id] Name".
-    df_datasets["id_name"] = "[" + df_datasets["id"].astype(str) + "] " + df_datasets["name"]
+    df_datasets["id_name"] = (
+        "[" + df_datasets["id"].astype(str) + "] " + df_datasets["name"]  # ty: ignore[unsupported-operator]
+    )
     # List all grapher datasets.
-    datasets_all = df_datasets[["id", "id_name"]].set_index("id").squeeze().to_dict()
+    datasets_all = (
+        df_datasets[["id", "id_name"]].set_index("id").squeeze().to_dict()  # ty: ignore[unresolved-attribute]
+    )
     # List new datasets.
     datasets_new = {k: v for k, v in datasets_all.items() if k in datasets_new_ids}
 
     log.info("get_datasets_and_mapping_inputs", t=time.time() - t)
 
-    return datasets_all, datasets_new, variable_mapping  # type: ignore
+    return datasets_all, datasets_new, variable_mapping  # ty: ignore
 
 
 def load_variable_mapping(
@@ -113,7 +117,7 @@ def load_variable_mapping(
         # No mapping available.
         variable_mapping = dict()
 
-    return variable_mapping  # type: ignore
+    return variable_mapping  # ty: ignore
 
 
 def create_tables(_owid_env: OWIDEnv = OWID_ENV):

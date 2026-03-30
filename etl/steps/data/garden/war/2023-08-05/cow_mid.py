@@ -285,7 +285,7 @@ def expand_observations(tb: Table) -> Table:
     YEAR_MAX = tb["endyear"].max()
     tb_all_years = pd.DataFrame(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
     df = pd.DataFrame(tb)  # to prevent error "AttributeError: 'DataFrame' object has no attribute 'all_columns'"
-    df = df.merge(tb_all_years, how="cross")  # type: ignore
+    df = df.merge(tb_all_years, how="cross")  # ty: ignore
     tb = Table(df, metadata=tb.metadata)
     # Filter only entries that actually existed
     tb = tb[(tb["year"] >= tb["styear"]) & (tb["year"] <= tb["endyear"])]

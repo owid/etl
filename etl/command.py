@@ -260,15 +260,15 @@ def main_cli(
         if ipdb:
             from ipdb import launch_ipdb_on_exception
 
-            config.IPDB_ENABLED = True  # type: ignore[assignment]
+            config.IPDB_ENABLED = True  # ty: ignore[invalid-assignment][invalid-assignment]
             config.GRAPHER_INSERT_WORKERS = 1
             config.DIRTY_STEPS_WORKERS = 1
             kwargs["workers"] = 1
             with launch_ipdb_on_exception():
-                main(**kwargs)  # type: ignore
+                main(**kwargs)  # ty: ignore
         else:
             try:
-                main(**kwargs)  # type: ignore
+                main(**kwargs)  # ty: ignore
             except Exception:
                 if not watch:
                     raise
@@ -852,10 +852,10 @@ def _set_dependencies_to_nondirty(step: "Step") -> None:
 
     if isinstance(step, DataStep):
         for step_dep in step.dependencies:
-            step_dep.is_dirty = _always_clean  # type: ignore[method-assign]
+            step_dep.is_dirty = _always_clean  # ty: ignore[invalid-assignment]
     if isinstance(step, GrapherStep):
         for step_dep in step.data_step.dependencies:
-            step.data_step.is_dirty = _always_clean  # type: ignore[method-assign]
+            step.data_step.is_dirty = _always_clean  # ty: ignore[invalid-assignment]
 
 
 def _check_public_private_steps(dag: DAG) -> None:

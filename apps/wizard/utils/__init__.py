@@ -152,8 +152,8 @@ def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
 class classproperty(property):
     """Decorator."""
 
-    def __get__(self, owner_self: Self, owner_cls: Self):  # type: ignore[reportIncompatibleMethodOverride]
-        return self.fget(owner_cls)  # type: ignore
+    def __get__(self, owner_self: Self, owner_cls: Self):  # ty: ignore[invalid-method-override]
+        return self.fget(owner_cls)  # ty: ignore
 
 
 class AppState:
@@ -345,7 +345,7 @@ class AppState:
                 if dataset_field_name:
                     default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
                 else:
-                    default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # type: ignore
+                    default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # ty: ignore
             else:
                 default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
@@ -355,7 +355,9 @@ class AppState:
             # Default value for selectbox (and other widgets with selectbox-like behavior)
             if "options" in kwargs:
                 options = cast(List[str], kwargs["options"])
-                index = options.index(default_value) if default_value in options else index_if_value_is_none  # type: ignore
+                index = (
+                    options.index(default_value) if default_value in options else index_if_value_is_none
+                )  # ty: ignore
                 kwargs["index"] = index
             # Default value for other widgets (if none is given)
             elif (
@@ -554,7 +556,7 @@ def enable_sentry_for_streamlit():
 
     for module_name in modules_to_patch:
         module = sys.modules[module_name]
-        module.handle_uncaught_app_exception = sentry_handler  # type: ignore
+        module.handle_uncaught_app_exception = sentry_handler  # ty: ignore
 
 
 def _get_staging_creation_time(session: Session):

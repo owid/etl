@@ -20,7 +20,7 @@ import owid.catalog.core.processing as pr
 import pandas as pd
 import structlog
 from detected_anomalies import handle_anomalies
-from owid import repack  # type: ignore
+from owid import repack  # ty: ignore
 from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta
 from owid.catalog.core import utils, warnings
 from owid.datautils import dataframes
@@ -1410,7 +1410,7 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
         ]["population_with_data"].astype(float)
 
         # Remove nans (which may have been created because of missing FAO population).
-        per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)  # type: ignore
+        per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)  # ty: ignore
 
         # Add "per capita" to all units.
         per_capita_data["unit"] = per_capita_data["unit"].cat.rename_categories(lambda c: f"{c} per capita")
@@ -1917,9 +1917,9 @@ def _variable_name_map(data: Table, column: str, enforce_unique: bool = True) ->
     pivot = data.dropna(subset=[column]).groupby(["variable_name"], observed=True)[column].apply(set)
     if enforce_unique:
         assert all(pivot.map(len) == 1)
-        return pivot.map(lambda x: list(x)[0]).to_dict()  # type: ignore
+        return pivot.map(lambda x: list(x)[0]).to_dict()  # ty: ignore
     else:
-        return pivot.map(lambda x: "".join(dict.fromkeys(x))).to_dict()  # type: ignore
+        return pivot.map(lambda x: "".join(dict.fromkeys(x))).to_dict()  # ty: ignore
 
 
 def parse_amendments_table(amendments: Table, dataset_short_name: str):

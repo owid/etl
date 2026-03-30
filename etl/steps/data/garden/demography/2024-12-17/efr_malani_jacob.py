@@ -24,7 +24,7 @@ origin = Origin(
     producer="Malani and Jacob",
     title="A New Measure of Surviving Children that Sheds Light on Long-term Trends in Fertility",
     citation_full="Malani, A., & Jacob, A. (2024). A New Measure of Surviving Children that Sheds Light on Long-term Trends in Fertility. https://doi.org/10.3386/w33175",
-    date_published="2024-11-01",  # type: ignore
+    date_published="2024-11-01",  # ty: ignore
     description="""
 The world has experienced a dramatic decline in total fertility rate (TFR) since the Industrial Revolution. Yet the consequences of this decline flow not merely from a reduction in births, but from a reduction in the number of surviving children. Authors propose a new measure of the number of surviving children per female, which authors call the effective fertility rate (EFR). EFR can be approximated as the product of TFR and the probability of survival. Moreover, TFR changes can be decomposed into changes that preserve EFR and those that change EFR. Authors specialized EFR to measure the number of daughters that survive to reproduce (reproductive EFR) and the number children that survive to become workers (labor EFR).
 

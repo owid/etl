@@ -159,7 +159,7 @@ def add_region_aggregates_education(
         else:
             variable_agg = aggregations[variable]
 
-        aggs[variable] = variable_agg  # type: ignore
+        aggs[variable] = variable_agg  # ty: ignore
 
     df_region = groupby_agg(
         df=df_countries,

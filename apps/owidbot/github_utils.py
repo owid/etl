@@ -158,7 +158,7 @@ def commit_file_to_github(
         contents = repo.get_contents(file_path, ref=branch)
 
         # Compare the existing content with the new content
-        if contents.sha == new_content_checksum:  # type: ignore
+        if contents.sha == new_content_checksum:  # ty: ignore
             log.info(
                 f"File {file_path} is identical to the current version in {repo_name} on branch {branch}. No commit will be made."
             )
@@ -166,7 +166,7 @@ def commit_file_to_github(
 
         # Update the file
         if not dry_run:
-            repo.update_file(contents.path, commit_message, content, contents.sha, branch=branch)  # type: ignore
+            repo.update_file(contents.path, commit_message, content, contents.sha, branch=branch)  # ty: ignore
     except Exception as e:
         # If the file doesn't exist, create a new file
         if "404" in str(e):

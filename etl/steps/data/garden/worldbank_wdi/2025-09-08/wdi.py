@@ -86,11 +86,11 @@ def run() -> None:
         df=tb_meadow,
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
-    ).set_index(["country", "year"], verify_integrity=True)  # type: ignore
+    ).set_index(["country", "year"], verify_integrity=True)  # ty: ignore
 
     tb_cust = mk_custom_entities(tb)
     assert all([col in tb.columns for col in tb_cust.columns])
-    tb = pd.concat([tb, tb_cust], axis=0).copy_metadata(tb)  # type: ignore
+    tb = pd.concat([tb, tb_cust], axis=0).copy_metadata(tb)  # ty: ignore
 
     tb_garden = tb
 

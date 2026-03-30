@@ -18,7 +18,7 @@ SOURCE_NAME = "unwpp"
 def load_unwpp() -> Table:
     # load wpp data
     ds = paths.load_dependency(short_name="un_wpp", namespace="un")
-    df = ds["population"]  # type: ignore
+    df = ds["population"]  # ty: ignore
 
     # Filter
     df = df.reset_index()

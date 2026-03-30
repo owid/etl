@@ -195,7 +195,7 @@ def parse_coal_reserves(data: pr.ExcelFile) -> Table:
 
     # The year of the data is written in the header of the sheet.
     # Extract it using a regular expression.
-    _year = re.findall(r"\d{4}", tb.columns[0])  # type: ignore
+    _year = re.findall(r"\d{4}", tb.columns[0])  # ty: ignore
     assert len(_year) == 1, f"Year could not be extracted from the header of the sheet {sheet_name}."
     year = int(_year[0])
 

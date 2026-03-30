@@ -361,7 +361,7 @@ def detect_overlapping_data_for_regions_and_members(
                         _known_overlaps = [
                             {key for key in overlap if key != "entity_to_make_nan"} for overlap in known_overlaps
                         ]
-                        if new_overlap not in _known_overlaps:  # type: ignore
+                        if new_overlap not in _known_overlaps:  # ty: ignore
                             log.warning(
                                 f"Data for '{region}' overlaps with '{member}' on '{variable}' "
                                 f"and years: {overlapping_years}"
@@ -421,7 +421,7 @@ def remove_overlapping_data_for_regions_and_members(
                     log.warning(f"Given overlap number {i} is not found in the data; redefine this list.")
                 # Make nan data points for either the region or the member (which is specified by "entity to make nan").
                 indexes_to_make_nan = duplicated_rows[
-                    duplicated_rows["country"] == overlap[overlap["entity_to_make_nan"]]  # type: ignore
+                    duplicated_rows["country"] == overlap[overlap["entity_to_make_nan"]]  # ty: ignore
                 ].index.tolist()
                 df.loc[indexes_to_make_nan, overlap["variable"]] = np.nan
 

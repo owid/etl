@@ -188,7 +188,7 @@ def run_updates(
 
     # If MD5 has changed, create a PR.
     if create_pr and not any(identical for identical in identicals):
-        create_autoupdate_pr(update_name=update.name, files=files_to_update)  # type: ignore
+        create_autoupdate_pr(update_name=update.name, files=files_to_update)  # ty: ignore
 
     # Restore the DVC files to their original state after processing
     if not dry_run:

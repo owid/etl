@@ -5,7 +5,7 @@ from datetime import date
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog.utils import underscore
-from shared import harmonize_countries  # type: ignore
+from shared import harmonize_countries  # ty: ignore
 from structlog import get_logger
 
 from etl.data_helpers.misc import check_values_in_column

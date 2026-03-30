@@ -203,7 +203,7 @@ def _get_random_dataset():
             .first()
         )
 
-    dataset_id = ds.id  # type: ignore
+    dataset_id = ds.id  # ty: ignore
 
     return dataset_id
 

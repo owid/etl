@@ -106,15 +106,15 @@ def _fetch_mdims(mdim_catalog_path: str) -> tuple[gm.MultiDimDataPage, gm.MultiD
 
     def load_mdim_config(engine) -> gm.MultiDimDataPage:
         with Session(engine) as session:
-            return gm.MultiDimDataPage.load_mdim(session, catalogPath=mdim_catalog_path)  # type: ignore
+            return gm.MultiDimDataPage.load_mdim(session, catalogPath=mdim_catalog_path)  # ty: ignore
 
     source_mdim = load_mdim_config(SOURCE_ENGINE)
     target_mdim = load_mdim_config(TARGET_ENGINE)
 
     if source_mdim.slug is None:
-        source_mdim.slug = source_mdim.catalogPath.split("/")[-1]  # type: ignore
+        source_mdim.slug = source_mdim.catalogPath.split("/")[-1]  # ty: ignore
     if target_mdim is not None and target_mdim.slug is None:
-        target_mdim.slug = target_mdim.catalogPath.split("/")[-1]  # type: ignore
+        target_mdim.slug = target_mdim.catalogPath.split("/")[-1]  # ty: ignore
 
     return source_mdim, target_mdim
 
@@ -248,7 +248,7 @@ def main():
 
     _show_options()
 
-    hide_unchanged_mdims: bool = st.session_state.get("hide_unchanged_mdims")  # type: ignore
+    hide_unchanged_mdims: bool = st.session_state.get("hide_unchanged_mdims")  # ty: ignore
 
     # Step 1: Display MDIM selection UI
     mdim_catalog_path = _display_mdim_selection(hide_unchanged_mdims)

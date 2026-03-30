@@ -241,7 +241,7 @@ def _calculate_days_since_commit(commit_series: pd.Series) -> pd.Series:
         diff = now - dt
         return max(0, diff.days)  # Ensure we don't get negative days
 
-    return commit_series.apply(calc_days)  # type: ignore
+    return commit_series.apply(calc_days)  # ty: ignore
 
 
 def get_server_summary_stats(df: pd.DataFrame, host_memory_stats: Optional[Dict] = None) -> Dict[str, Any]:

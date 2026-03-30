@@ -4,7 +4,7 @@ import zipfile
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog.utils import underscore
-from pandas.api.types import is_numeric_dtype  # type: ignore
+from pandas.api.types import is_numeric_dtype  # ty: ignore
 from structlog import get_logger
 
 from etl.helpers import PathFinder

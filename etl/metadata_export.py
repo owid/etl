@@ -79,7 +79,11 @@ def main(
 ) -> str:
     """Read docstring of `cli`."""
     ds = Dataset(path=path)
-    meta_dict = metadata_export(ds, prune=True, decimals=int(decimals) if decimals.isnumeric() else decimals)  # type: ignore
+    meta_dict = metadata_export(
+        ds,
+        prune=True,
+        decimals=int(decimals) if decimals.isnumeric() else decimals,  # ty: ignore[unresolved-attribute]
+    )  # ty: ignore
 
     output_path = Path(output) if output else paths.STEP_DIR / "data" / f"{ds.metadata.uri}.meta.yml"
 
@@ -96,7 +100,7 @@ def main(
     else:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
-            f.write(yaml_str)  # type: ignore
+            f.write(yaml_str)  # ty: ignore
 
     return str(output_path)
 
@@ -151,7 +155,7 @@ def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path, delete_em
 
         return ruamel_dump(doc)
     else:
-        return yaml_dump(meta_dict, replace_confusing_ascii=True)  # type: ignore
+        return yaml_dump(meta_dict, replace_confusing_ascii=True)  # ty: ignore
 
 
 def metadata_export(

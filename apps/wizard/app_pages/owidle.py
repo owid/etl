@@ -299,7 +299,7 @@ def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame]:
     ].drop_duplicates()
     # df_geo = df_geo.to_crs(3310)
 
-    return tb_indicator, df_geo  # type: ignore[reportReturnType]
+    return tb_indicator, df_geo  # ty: ignore[invalid-return-type]
 
 
 @st.cache_data
@@ -469,7 +469,7 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     # More details:
     # - https://geographiclib.sourceforge.io/Python/doc/examples.html#initializing
     if USE_WGS84:
-        geod = Geodesic.WGS84  # type: ignore
+        geod = Geodesic.WGS84  # ty: ignore
         # geod.Inverse returns a Geodesic dictionary (https://geographiclib.sourceforge.io/Python/doc/interface.html#dict)
         print("----------------")
         print(guess.y, guess.x, solution.y, solution.x)
@@ -828,16 +828,16 @@ def plot_chart_gdp_pc(countries_guessed: List[str], years_guessed: List[str], so
             countries_guessed,
             years_guessed=years_guessed,
             solution=solution,
-            column_indicator=GDP_INDICATOR,  # type: ignore[reportArgumentType]
-            title=gdp_indicator_titles[GDP_INDICATOR],  # type: ignore[reportArgumentType]
+            column_indicator=GDP_INDICATOR,  # ty: ignore[invalid-argument-type]
+            title=gdp_indicator_titles[GDP_INDICATOR],  # ty: ignore[invalid-argument-type]
             column_country="location",
         )
     else:
         _plot_chart(
             countries_guessed,
             solution=solution,
-            column_indicator=GDP_INDICATOR,  # type: ignore[reportArgumentType]
-            title=gdp_indicator_titles[GDP_INDICATOR],  # type: ignore[reportArgumentType]
+            column_indicator=GDP_INDICATOR,  # ty: ignore[invalid-argument-type]
+            title=gdp_indicator_titles[GDP_INDICATOR],  # ty: ignore[invalid-argument-type]
             column_country="location",
         )
 

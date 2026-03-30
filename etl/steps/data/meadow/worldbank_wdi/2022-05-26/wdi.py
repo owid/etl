@@ -5,7 +5,7 @@ import pandas as pd
 from owid.catalog import Dataset, DatasetMeta, Table, TableMeta
 from owid.catalog.utils import underscore
 from owid.walden import Catalog
-from pandas.api.types import is_numeric_dtype  # type: ignore
+from pandas.api.types import is_numeric_dtype  # ty: ignore
 
 
 def run(dest_dir: str) -> None:

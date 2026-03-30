@@ -277,7 +277,7 @@ def render_fields_from_schema(
                 render_fields_from_schema(
                     props["properties"],
                     prop_uri,
-                    container=containers[cat],  # type: ignore
+                    container=containers[cat],  # ty: ignore
                 )
             else:
                 render_fields_from_schema(props["properties"], prop_uri)
@@ -334,12 +334,12 @@ def render_fields_from_schema(
             # Render field in corresponding container
             if categories:
                 with containers[props["category"]]:
-                    APP_STATE.st_widget(**kwargs)  # type: ignore
+                    APP_STATE.st_widget(**kwargs)  # ty: ignore
             elif container:
                 with container:
-                    APP_STATE.st_widget(**kwargs)  # type: ignore
+                    APP_STATE.st_widget(**kwargs)  # ty: ignore
             else:
-                APP_STATE.st_widget(**kwargs)  # type: ignore
+                APP_STATE.st_widget(**kwargs)  # ty: ignore
 
 
 def update_state() -> None:
@@ -461,7 +461,7 @@ if submitted:
                 s_file = st.text_input(
                     label="Select local file to import", placeholder="path/to/file.csv", key="snapshot_file"
                 )
-            st.button("Run snapshot step", key="run_snapshot_step", on_click=run_snap_step)  # type: ignore
+            st.button("Run snapshot step", key="run_snapshot_step", on_click=run_snap_step)  # ty: ignore
 
             st.markdown(
                 f"""

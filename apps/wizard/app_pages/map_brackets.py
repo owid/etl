@@ -279,7 +279,7 @@ class MapBracketer:
         self.brackets_selected = self.brackets_all[self.bracket_type].tolist()
         # Define the grapher version of the selected brackets, which needs a minimum value and a list of brackets.
         self.brackets_selected_grapher_min_value = None
-        self.brackets_selected_grapher_values = self.brackets_selected.copy()  # type: ignore
+        self.brackets_selected_grapher_values = self.brackets_selected.copy()  # ty: ignore
 
     @property
     def brackets(self):
@@ -387,7 +387,7 @@ class MapBracketer:
         shifts = [1, 2, 5]
         for shift in shifts:
             # Round the smallest increment up to the closest shifted power of 10.
-            increment = round_to_shifted_power_of_ten(smallest_increment, shifts=[shift], floor=False)  # type: ignore
+            increment = round_to_shifted_power_of_ten(smallest_increment, shifts=[shift], floor=False)  # ty: ignore
             # Find the largest bracket that would fully cover the minimum data value.
             bracket_min = increment * np.floor(self.min_value / increment).astype(int)
             # Find the smallest bracket that would fully cover the maximum data value.
@@ -579,7 +579,7 @@ class MapBracketer:
         self._update_grapher_brackets()
 
     def _update_grapher_brackets(self):
-        self.brackets_selected_grapher_values = self.brackets_selected.copy()  # type: ignore
+        self.brackets_selected_grapher_values = self.brackets_selected.copy()  # ty: ignore
         if self.lower_bracket_open:
             # To ensure the lower bracket is open, use a large value of "customNumericMinValue".
             self.brackets_selected_grapher_min_value = self.max_value
@@ -618,7 +618,7 @@ class MapBracketer:
 def map_bracketer_interactive(mb: MapBracketer) -> None:
     # Add a dropdown for color scheme.
     color_schemes = load_color_schemes()
-    mb.color_scheme = st.selectbox(  # type: ignore
+    mb.color_scheme = st.selectbox(  # ty: ignore
         label="Color scheme",
         options=color_schemes,
         index=[i for i, color in enumerate(color_schemes) if color == "BuGn"][0],
@@ -706,7 +706,7 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
         # horizontal=True,
         help="We usually use either linear or log-like brackets. And we usually prefer certain increments for linear brackets (e.g. 100, or 20, or 5000) rather than arbitrary increments (e.g. 700, 42, or 3.14). Similarly, we usually prefer certain factors for log-like brackets, namely 2 (and 2.5), 3 (and 3.33), and 10. Here you can choose among those options. Alternatively, you can manually enter custom values.",
     )
-    mb.bracket_type = bracket_type_labels[bracket_type]  # type: ignore
+    mb.bracket_type = bracket_type_labels[bracket_type]  # ty: ignore
     if mb.bracket_type == BRACKET_LABELS["custom"]["custom"]:
         # Create an input text box for custom brackets.
         try:
@@ -727,7 +727,7 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
         if len(mb.brackets_positive) <= 1:
             st.error("No brackets possible.")
             st.stop()
-        min_selected, max_selected = st.select_slider(  # type: ignore
+        min_selected, max_selected = st.select_slider(  # ty: ignore
             "Full range of valid positive brackets",
             options=mb.brackets_positive,
             value=(
@@ -740,7 +740,7 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
         mb.update_brackets_selected(min_selected=min_selected, max_selected=max_selected)
     elif mb.bracket_type in list(BRACKET_LABELS["linear"].values()):
         # Create a slider for all values.
-        min_selected, max_selected = st.select_slider(  # type: ignore
+        min_selected, max_selected = st.select_slider(  # ty: ignore
             "Full range of values",
             options=mb.brackets,
             value=(
@@ -935,7 +935,7 @@ elif use_type == USE_TYPE_EXPLORERS:
             explorer_names = [explorer.slug for explorer in explorers]
 
         # Select an explorer name from a dropdown menu.
-        explorer_name: str = st.selectbox(  # type: ignore
+        explorer_name: str = st.selectbox(  # ty: ignore
             label="Name of explorer",
             options=explorer_names,
             index=[i for i, name in enumerate(explorer_names) if name == EXPLORER_NAME_DEFAULT][0],
@@ -979,7 +979,7 @@ elif use_type == USE_TYPE_EXPLORERS:
 
         # Select a variable id from a dropdown menu.
         variable_id: str = str(
-            st.selectbox(  # type: ignore
+            st.selectbox(  # ty: ignore
                 label=f"Indicator id ({len(variable_ids)} variables available)",
                 options=variable_ids,
                 index=0,
@@ -1004,7 +1004,7 @@ elif use_type == USE_TYPE_EXPLORERS:
     else:
         additional_config = explorer.get_variable_config_from_catalog_path(catalog_path=variable_id)
 
-    mb = MapBracketer(variable_id_or_path=variable_id)  # type: ignore
+    mb = MapBracketer(variable_id_or_path=variable_id)  # ty: ignore
 
     edit_brackets = True
     if len(additional_config) > 0:

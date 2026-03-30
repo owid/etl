@@ -283,7 +283,10 @@ def get_similarity_score(
         assert (column_old is not None) and (
             column_new is not None
         ), "Need to provide column names for categorical values."
-        score["rel_diff_error"] = (100 * ((df.loc[:, column_old] != df.loc[:, column_new]).astype(int).mean())).round(2)
+        score["rel_diff_error"] = (
+            100
+            * ((df.loc[:, column_old] != df.loc[:, column_new]).astype(int).mean())  # ty: ignore[unresolved-attribute]
+        ).round(2)  # ty: ignore[unresolved-attribute]
         # num_diff = (df.loc[:, column_old] != df.loc[:, column_new]).sum()
         # score["num_diff"] = num_diff
         # score["num_totla"] = len(df)
@@ -434,7 +437,7 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
 
     # Sort by error
     if COLUMN_ABS_RELATIVE_ERROR in df_show.columns:
-        df_show = df_show.sort_values(COLUMN_ABS_RELATIVE_ERROR, ascending=False)  # type: ignore
+        df_show = df_show.sort_values(COLUMN_ABS_RELATIVE_ERROR, ascending=False)  # ty: ignore
 
     # Change column names
     df_show = cast(pd.DataFrame, df_show)

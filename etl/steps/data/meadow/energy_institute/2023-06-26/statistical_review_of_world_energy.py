@@ -35,7 +35,7 @@ def parse_coal_reserves(data: pr.ExcelFile) -> Table:
 
     # The year of the data is written in the header of the sheet.
     # Extract it using a regular expression.
-    _year = re.findall(r"\d{4}", tb.columns[0])  # type: ignore
+    _year = re.findall(r"\d{4}", tb.columns[0])  # ty: ignore
     assert len(_year) == 1, f"Year could not be extracted from the header of the sheet {sheet_name}."
     year = int(_year[0])
 
@@ -472,7 +472,7 @@ def run(dest_dir: str) -> None:
 
     # Adapt source and license for prices data, which is based on S&P Global Platts.
     prices_data_license = copy.deepcopy(snap.metadata.license)
-    prices_data_license.name = "© S&P Global Inc. 2023"  # type: ignore
+    prices_data_license.name = "© S&P Global Inc. 2023"  # ty: ignore
     assert snap.metadata.source
     prices_data_source = copy.deepcopy(snap.metadata.source)
     prices_data_source.name = "Energy Institute Statistical Review of World Energy based on S&P Global Platts (2023)"

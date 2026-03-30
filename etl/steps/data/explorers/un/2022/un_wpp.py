@@ -73,7 +73,7 @@ def _organize_variants(df: pd.DataFrame) -> pd.DataFrame:
             df.loc[df.year < YEAR_SPLIT].assign(variant="high").astype({"variant": "category"}),
             df.loc[df.year >= YEAR_SPLIT],
         ]
-    ).astype({"variant": "category"})  # type: ignore
+    ).astype({"variant": "category"})  # ty: ignore
     return df
 
 
@@ -103,7 +103,7 @@ def _extract_dimension_values(
     groups_all = []
     regex = r"(.*)__(.*)__(.*)__(.*)"
     for col in df.columns:
-        groups = list(re.search(regex, col).groups())  # type: ignore
+        groups = list(re.search(regex, col).groups())  # ty: ignore
         if not by_metric:
             groups[0] = no_dim_keyword
         if not by_sex:

@@ -113,7 +113,9 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
             t[col] = np.nan
 
         assert variable["sourceId"]
-        t[col].metadata = convert_grapher_variable(variable, variable_source_dict[variable["sourceId"]])
+        t[col].metadata = convert_grapher_variable(  # ty: ignore[unresolved-attribute]
+            variable, variable_source_dict[variable["sourceId"]]
+        )
 
     # NOTE: collision happens for dataset 5629 with column names
     # Indicator:On-premise sales restrictions to intoxicated persons (archived) - Beverage Types:Spirits

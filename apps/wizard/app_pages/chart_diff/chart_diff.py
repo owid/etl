@@ -381,7 +381,9 @@ class ChartDiff:
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
 
         # Get all slugs from target
-        slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
+        slugs_in_target = cls._get_chart_slugs(
+            target_session, slugs={c.slug for c in source_charts.values()}
+        )  # ty: ignore
 
         # Get chart views, anomalies, and articles (skip if not needed for performance)
         if skip_analytics:
@@ -535,8 +537,8 @@ class ChartDiff:
             approval = gm.ChartDiffApprovals(
                 chartId=self.chart_id,
                 sourceUpdatedAt=self.source_chart.updatedAt,
-                targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # type: ignore
-                status=status,  # type: ignore
+                targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # ty: ignore
+                status=status,  # ty: ignore
             )
             session.add(approval)
             session.commit()
@@ -554,7 +556,7 @@ class ChartDiff:
             assert self.target_chart
         conflict = gm.ChartDiffConflicts(
             chartId=self.chart_id,
-            targetUpdatedAt=self.target_chart.updatedAt,  # type: ignore
+            targetUpdatedAt=self.target_chart.updatedAt,  # ty: ignore
             conflict="resolved",
         )
         session.add(conflict)
@@ -646,7 +648,7 @@ class ChartDiff:
             target_updated_ats = []
             for chart_id in chart_ids:
                 if target_charts.get(chart_id) is not None:
-                    target_updated_ats.append(target_charts[chart_id].updatedAt)  # type: ignore
+                    target_updated_ats.append(target_charts[chart_id].updatedAt)  # ty: ignore
                 else:
                     target_updated_ats.append(None)
 
@@ -665,7 +667,7 @@ class ChartDiff:
         target_updated_ats = []
         for chart_id in chart_ids:
             if target_charts.get(chart_id) is not None:
-                target_updated_ats.append(target_charts[chart_id].updatedAt)  # type: ignore
+                target_updated_ats.append(target_charts[chart_id].updatedAt)  # ty: ignore
             else:
                 target_updated_ats.append(None)
         conflicts = gm.ChartDiffConflicts.get_conflict_batch(
@@ -732,10 +734,10 @@ class ChartDiffsLoader:
     ) -> pd.DataFrame:
         """DataFrame with charts details."""
         return self.df[
-            (self.df.configEdited & config)
-            | (self.df.dataEdited & data)
-            | (self.df.metadataEdited & metadata)
-            | (self.df.tagsEdited & tags)
+            (self.df.configEdited & config)  # ty: ignore[unsupported-operator]
+            | (self.df.dataEdited & data)  # ty: ignore[unsupported-operator]
+            | (self.df.metadataEdited & metadata)  # ty: ignore[unsupported-operator]
+            | (self.df.tagsEdited & tags)  # ty: ignore[unsupported-operator]
         ]
 
     def get_diffs(
@@ -1233,14 +1235,14 @@ def tags_are_equal(tags_1: List[Dict[str, Any]], tags_2: List[Dict[str, Any]], v
 def get_chart_views_cached(chart_ids: List[int]) -> Dict[int, float]:
     # Get chart views
     df_analytics = get_chart_views_last_n_days(chart_ids, ANALYTICS_NUM_DAYS)
-    return df_analytics.set_index("chart_id")["views_daily"].to_dict()  # type: ignore
+    return df_analytics.set_index("chart_id")["views_daily"].to_dict()  # ty: ignore
 
 
 @st_cache_data(custom_text="Retrieving anomalies in indicators used in charts to review...", show_time=True)
 def get_chart_anomalies_cached(chart_ids: List[int]) -> Dict[int, float]:
     # Anomalies
     df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("upgrade_change",))
-    return df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()  # type: ignore
+    return df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()  # ty: ignore
 
 
 @st_cache_data(custom_text="Retrieving analytics on article references...")

@@ -434,19 +434,19 @@ def extract_metadata_from_xml(file_path):
     if title_element is not None:
         title_text = title_element.text
         # Extract commodity name from the title.
-        if " - " in title_text:  # type: ignore
-            commodity_name = title_text.split(" - ")[1].replace(" Data Release", "").strip()  # type: ignore
+        if " - " in title_text:  # ty: ignore
+            commodity_name = title_text.split(" - ")[1].replace(" Data Release", "").strip()  # ty: ignore
             world_data["Commodity"] = commodity_name
 
     # Navigate to the world data section.
     for detailed in root.findall(".//detailed"):
         enttypl = detailed.find("enttyp/enttypl")
-        if enttypl is not None and "world" in enttypl.text.lower():  # type: ignore
+        if enttypl is not None and "world" in enttypl.text.lower():  # ty: ignore
             for attr in detailed.findall("attr"):
                 attr_label = attr.find("attrlabl")
                 attr_def = attr.find("attrdef")
                 if attr_label is not None and attr_def is not None:
-                    world_data[attr_label.text] = attr_def.text.strip()  # type: ignore
+                    world_data[attr_label.text] = attr_def.text.strip()  # ty: ignore
 
     return world_data
 
@@ -660,7 +660,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional
         elif unit_reserves in ["Mt", "mt"]:
             d[f"Reserves_{unit_reserves}"] *= 1e6
             d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
-        elif (unit_reserves == "mcm") & (d["Mineral"].unique().item() == "Helium"):  # type: ignore
+        elif (unit_reserves == "mcm") & (d["Mineral"].unique().item() == "Helium"):  # ty: ignore
             d["Reserves_mcm"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
             d = d.rename(columns={"Reserves_mcm": "Reserves_t"}, errors="raise")
         elif unit_reserves == "kg":
@@ -674,7 +674,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional
 
         # While production is usually given for an explicit year (actually, usually two years), reserves
         # does not have a year. I will assume that the reserves correspond to the latest informed year.
-        year_reserves = int(d["Source"].unique().item()[-4:]) - 1  # type: ignore
+        year_reserves = int(d["Source"].unique().item()[-4:]) - 1  # ty: ignore
         df_reserves = d[columns].assign(**{"Year": year_reserves})
 
         # Remove rows without data.
@@ -732,7 +732,7 @@ def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Option
         if unit_production == "Sponge_t":
             unit_production = "t"
             # A footnote will be added to mention that it refers to sponge (see FOOTNOTES).
-        if d["Mineral"].unique().item() == "Soda ash":  # type: ignore
+        if d["Mineral"].unique().item() == "Soda ash":  # ty: ignore
             # For consistency with different years, rename one of the sub-commodities (this happens at least in 2024).
             d["Type"] = d["Type"].replace({"Soda ash, Synthetic": "Soda ash, synthetic"})
 
@@ -762,7 +762,7 @@ def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Option
             df_production["Production_t"] *= 1e3
         elif unit_production in ["Mt", "mmt"]:
             df_production["Production_t"] *= 1e6
-        elif (unit_production == "mcm") and (d["Mineral"].unique().item() == "Helium"):  # type: ignore
+        elif (unit_production == "mcm") and (d["Mineral"].unique().item() == "Helium"):  # ty: ignore
             df_production["Production_t"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
         elif unit_production == "kct":
             df_production["Production_t"] *= THOUSAND_CARATS_TO_TONNES
@@ -1061,7 +1061,7 @@ def run(dest_dir: str) -> None:
     df = gather_and_process_data(data=data)
 
     # Create a table with metadata.
-    tb = pr.read_from_df(df, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)  # type: ignore
+    tb = pr.read_from_df(df, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)  # ty: ignore
 
     # For convenience (and for consistency with other similar datasets) rename columns.
     tb = tb.rename(

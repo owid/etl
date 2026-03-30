@@ -81,7 +81,7 @@ def _yield_wide_table(
         table_to_yield = table_to_yield[[c for c in table_to_yield.columns if c not in dim_names]]
 
         # Filter NaN values from dimensions and return dictionary
-        dim_dict = _create_dim_dict(dim_names, dim_values)  # type: ignore
+        dim_dict = _create_dim_dict(dim_names, dim_values)  # ty: ignore
 
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
@@ -116,7 +116,9 @@ def _yield_wide_table(
             tab.metadata.short_name = short_name
             tab.rename(columns={column: short_name}, inplace=True)
 
-            tab[short_name].metadata = _metadata_for_dimensions(tab[short_name].metadata, dim_dict, column)
+            tab[short_name].metadata = _metadata_for_dimensions(  # ty: ignore[unresolved-attribute]
+                tab[short_name].metadata, dim_dict, column
+            )
 
             yield tab
 
@@ -167,7 +169,7 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
     dim_names = [k for k in long_tb.primary_key if k not in ("year", "country", "date")]
 
     # Unstack dimensions to a wide format
-    wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))  # type: ignore
+    wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))  # ty: ignore
 
     # Drop columns with all NaNs
     wide_tb = wide_tb.dropna(axis=1, how="all")
@@ -393,11 +395,15 @@ def country_to_entity_id(
         assert by == "name", "create_entities works only with `by='name'`"
         ix = entity_id.isnull()
         # cast to float to fix issues with categories
-        entity_id[ix] = (  # type: ignore[reportCallIssue]
-            country[ix].map(_get_and_create_entities_in_db(set(country[ix].unique()), engine=engine)).astype(float)  # type: ignore[reportCallIssue]
+        entity_id[ix] = (  # ty: ignore[call-non-callable]
+            country[ix]
+            .map(_get_and_create_entities_in_db(set(country[ix].unique()), engine=engine))
+            .astype(float)  # ty: ignore[call-non-callable]
         )
 
-    assert not entity_id.isnull().any(), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"  # type: ignore[reportCallIssue]
+    assert (
+        not entity_id.isnull().any()
+    ), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"  # ty: ignore[call-non-callable]
 
     return cast(pd.Series, entity_id.astype(int))
 
@@ -459,7 +465,7 @@ def combine_metadata_sources(sources: List[catalog.Source]) -> catalog.Source:
 
         # Instead of leaving an empty string, make any empty field None.
         if combined_value == "":
-            combined_value = None  # type: ignore
+            combined_value = None  # ty: ignore
 
         setattr(default_source, attribute, combined_value)
 
@@ -550,7 +556,7 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
 
     # Add entity code and name
     with Session(engine) as session:
-        table = add_entity_code_and_name(session, table).copy_metadata(table)
+        table = add_entity_code_and_name(session, table).copy_metadata(table)  # ty: ignore[call-non-callable]
 
     table = table.set_index(["entityId", "entityCode", "entityName", "year"] + dim_names)
 
@@ -610,12 +616,12 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
 
 @dataclass
 class IntRange:
-    min: int  # type: ignore
+    min: int  # ty: ignore
     _min: int = field(init=False, repr=False)
-    max: int  # type: ignore
+    max: int  # ty: ignore
     _max: int = field(init=False, repr=False)
 
-    @property  # type: ignore
+    @property  # ty: ignore
     def min(self) -> int:
         return self._min
 
@@ -623,7 +629,7 @@ class IntRange:
     def min(self, x: int) -> None:
         self._min = int(x)
 
-    @property  # type: ignore
+    @property  # ty: ignore
     def max(self) -> int:
         return self._max
 
@@ -633,7 +639,7 @@ class IntRange:
 
     @staticmethod
     def from_values(xs: List[int]) -> "IntRange":
-        return IntRange(min(xs), max(xs))  # type: ignore[unknown-argument]
+        return IntRange(min=min(xs), max=max(xs))  # ty: ignore[unknown-argument]
 
     def to_values(self) -> list[int]:
         return [self.min, self.max]
@@ -641,7 +647,7 @@ class IntRange:
 
 def contains_inf(s: pd.Series) -> bool:
     """Check if a series contains infinity."""
-    return pd.api.types.is_numeric_dtype(s.dtype) and np.isinf(s).any()  # type: ignore
+    return pd.api.types.is_numeric_dtype(s.dtype) and np.isinf(s).any()  # ty: ignore
 
 
 def sanitize_numpy(obj: Any) -> Any:

@@ -216,7 +216,7 @@ def ensure_category(category: Optional[str]):
     """Get category if not provided."""
     if category is None:
         # show suggestions
-        choices = [questionary.Choice(**choice) for choice in PR_CATEGORIES_CHOICES]  # type: ignore
+        choices = [questionary.Choice(**choice) for choice in PR_CATEGORIES_CHOICES]  # ty: ignore
         category = questionary.select(
             message="Please choose a PR category",
             choices=choices,

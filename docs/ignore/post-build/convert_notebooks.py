@@ -635,7 +635,7 @@ def _expand_nav_for_page(template: str, page_path: str, relative_root: str) -> s
             if not isinstance(link, Tag):
                 continue
             href = link.get("href", "")
-            if href.endswith(page_filename):
+            if href.endswith(page_filename):  # ty: ignore[unresolved-attribute]
                 nav_link = link
                 break
 

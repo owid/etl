@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
 
     # harmonize country names
     world = geo.harmonize_countries(
-        df=world,  # type: ignore
+        df=world,  # ty: ignore
         country_col="name",
         countries_file=paths.country_mapping_path,
     )
@@ -132,9 +132,11 @@ def calculate_distance_matrix(world):
                 distance_matrix.iloc[i, j] = distance_matrix.iloc[j, i]  # Distance is symmetric
             else:
                 # Get the nearest points between two geometries
-                point1, point2 = nearest_points(row1.geometry, row2.geometry)  # type: ignore
+                point1, point2 = nearest_points(row1.geometry, row2.geometry)  # ty: ignore
 
                 # Calculate geodesic distance between the nearest points
-                distance_matrix.iloc[i, j] = geodesic((point1.y, point1.x), (point2.y, point2.x)).kilometers  # type: ignore
+                distance_matrix.iloc[i, j] = geodesic(
+                    (point1.y, point1.x), (point2.y, point2.x)
+                ).kilometers  # ty: ignore
 
     return distance_matrix

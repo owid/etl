@@ -176,9 +176,9 @@ def ask_gpt(df) -> Tuple[str, float, int]:
     )
     response = api.query_gpt(query=query, model=MODEL_DEFAULT)
 
-    summary = response.message_content  # type: ignore
+    summary = response.message_content  # ty: ignore
     cost, num_tokens = get_cost_and_tokens(SYSTEM_PROMPT + USER_PROMPT, summary, MODEL_DEFAULT)
-    return summary, cost, num_tokens  # type: ignore
+    return summary, cost, num_tokens  # ty: ignore
 
 
 def add_news_data_to_db() -> None:

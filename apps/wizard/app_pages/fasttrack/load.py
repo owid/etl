@@ -75,7 +75,7 @@ def load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
         )
 
     # sort them by date accessed
-    existing_sheets.sort(key=lambda m: m["date_accessed"], reverse=True)  # type: ignore
+    existing_sheets.sort(key=lambda m: m["date_accessed"], reverse=True)  # ty: ignore
 
     return existing_sheets
 
@@ -86,7 +86,7 @@ def load_data_from_csv(uploaded_file):
     # Read CSV file as a dataframe
     st.write("Importing CSV...")
     # sep=None autodetects separators
-    csv_df = pd.read_csv(uploaded_file, sep=None)  # type: ignore
+    csv_df = pd.read_csv(uploaded_file, sep=None)  # ty: ignore
 
     try:
         # Parse dataframe
@@ -211,10 +211,10 @@ def parse_metadata_from_csv(
         version_producer="Local CSV",
         url_main="https://unknown.com",
         date_accessed=str(dt.date.today()),
-        date_published=str(dt.date.today()),  # type: ignore
+        date_published=str(dt.date.today()),  # ty: ignore
     )
 
-    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, origin  # type: ignore
+    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, origin  # ty: ignore
 
 
 ###################################
@@ -284,7 +284,7 @@ def _is_valid_date(series: pd.Series) -> bool:
     # Try converting the series to datetime
     converted = pd.to_datetime(series, errors="coerce")
     # Check if there are any NaT (invalid dates)
-    return converted.notna().all()
+    return bool(converted.notna().all())
 
 
 def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
@@ -310,7 +310,7 @@ def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
     # short_name is not used anymore
     source.pop("short_name", None)
 
-    return Source(**source)  # type: ignore[reportCallIssue]
+    return Source(**source)  # ty: ignore[call-non-callable]
 
 
 def _parse_origins(origins_meta_df: pd.DataFrame) -> Optional[Origin]:
@@ -325,7 +325,7 @@ def _parse_origins(origins_meta_df: pd.DataFrame) -> Optional[Origin]:
     assert len(origins) == 1, "Only one source is supported for now"
     origin = origins[0]
 
-    origin = _prune_empty(origin)  # type: ignore
+    origin = _prune_empty(origin)  # ty: ignore
 
     # parse license fields
     if origin.get("license.name") or origin.get("license.url"):
@@ -335,7 +335,7 @@ def _parse_origins(origins_meta_df: pd.DataFrame) -> Optional[Origin]:
 
 
 def _parse_dataset(dataset_meta_df: pd.DataFrame) -> DatasetMeta:
-    dataset_dict = _prune_empty(dataset_meta_df.set_index(0)[1].to_dict())  # type: ignore
+    dataset_dict = _prune_empty(dataset_meta_df.set_index(0)[1].to_dict())  # ty: ignore
     dataset_dict["namespace"] = "fasttrack"  # or should it be owid? or institution specific?
     dataset_dict.pop("updated")
     dataset_dict.pop("external_csv", None)
@@ -366,7 +366,7 @@ def _parse_dataset(dataset_meta_df: pd.DataFrame) -> DatasetMeta:
 def _parse_variables(variables_meta_df: pd.DataFrame) -> Dict[str, VariableMeta]:
     variables_meta_df = variables_meta_df.dropna(subset=["short_name"])
 
-    variables_list = [_prune_empty(v) for v in variables_meta_df.to_dict(orient="records")]  # type: ignore
+    variables_list = [_prune_empty(v) for v in variables_meta_df.to_dict(orient="records")]  # ty: ignore
 
     # default variable values
     for variable in variables_list:

@@ -23,7 +23,7 @@ def estimate_bard_epsilon(series: pd.Series) -> float:
     # Instead of just taking maximum and minimum, take 95th percentile and 5th percentile.
     eps = (real_values.quantile(0.95) - real_values.quantile(0.05)) / 10
 
-    return eps  # type: ignore
+    return eps  # ty: ignore
 
 
 def get_long_format_score_df(df_score: pd.DataFrame, df_scale: pd.DataFrame) -> pd.DataFrame:
@@ -218,7 +218,7 @@ class AnomalyIsolationForest(AnomalyDetector):
                 series_scaled = scaler.fit_transform(series_imputed)
 
                 # Initialize the Isolation Forest model.
-                isolation_forest = IsolationForest(contamination=0.05, random_state=1)  # type: ignore
+                isolation_forest = IsolationForest(contamination=0.05, random_state=1)  # ty: ignore
 
                 # Fit the model and calculate anomaly scores.
                 isolation_forest.fit(series_scaled)

@@ -52,4 +52,4 @@ def _get_data_indicators_from_db() -> list[Indicator]:
     """
     df = read_sql(query)
     indicators = df.to_dict(orient="records")
-    return [Indicator(**indicator) for indicator in indicators]  # type: ignore
+    return [Indicator(**indicator) for indicator in indicators]  # ty: ignore

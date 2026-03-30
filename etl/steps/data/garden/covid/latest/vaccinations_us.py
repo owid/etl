@@ -28,7 +28,9 @@ def run(dest_dir: str) -> None:
     # Add total boosters
     tb = add_total_boosters(tb)
     # Something else
-    tb = tb.groupby("state", observed=True).apply(make_monotonic, max_removed_rows=None).reset_index(drop=True)  # type: ignore
+    tb = (
+        tb.groupby("state", observed=True).apply(make_monotonic, max_removed_rows=None).reset_index(drop=True)
+    )  # ty: ignore
     # Add per-capita
     tb = add_per_capita(tb)
     # Add smoothed indicators
@@ -94,7 +96,7 @@ def add_total_boosters(tb: Table) -> Table:
         return tb
 
     # Apply the function to each group
-    tb = tb.groupby("state").apply(_calculate_total_boosters).reset_index(drop=True)  # type: ignore
+    tb = tb.groupby("state").apply(_calculate_total_boosters).reset_index(drop=True)  # ty: ignore
 
     tb.loc[tb["date"] < "2021-08-27", "total_boosters"] = pd.NA
     tb.loc[tb["total_boosters"] < 0, "total_boosters"] = pd.NA
@@ -127,7 +129,7 @@ def add_smoothed(tb: Table) -> Table:
     """Add smoothed indicators."""
     tb = tb.sort_values(["date", "state"])
     tb["date"] = pd.to_datetime(tb["date"])
-    tb = tb.groupby("state", as_index=False).apply(_smooth_state)  # type: ignore
+    tb = tb.groupby("state", as_index=False).apply(_smooth_state)  # ty: ignore
 
     # Add metadata
     cols = [
@@ -145,7 +147,7 @@ def _smooth_state(tb: Table) -> Table:
     tb[["state", "census_2019"]] = tb[["state", "census_2019"]].ffill()
     interpolated_totals = tb["total_vaccinations"].interpolate("linear")
     tb["daily_vaccinations"] = (
-        (interpolated_totals - interpolated_totals.shift(1)).rolling(7, min_periods=1).mean().round()  # type: ignore
+        (interpolated_totals - interpolated_totals.shift(1)).rolling(7, min_periods=1).mean().round()  # ty: ignore
     )
     tb["daily_vaccinations_raw"] = (tb["total_vaccinations"] - tb["total_vaccinations"].shift(1)).copy_metadata(
         tb["total_vaccinations"]

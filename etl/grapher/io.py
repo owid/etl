@@ -435,7 +435,7 @@ def variable_metadata_df_from_s3(
     env: OWIDEnv | None = None,
 ) -> List[Dict[str, Any]]:
     """Fetch data from S3 and add entity code and name from DB."""
-    args = [variable_ids]
+    args: list = [variable_ids]
     if env:
         args += [[env for _ in range(len(variable_ids))]]
 
@@ -445,7 +445,7 @@ def variable_metadata_df_from_s3(
     if not (isinstance(results, list) and all(isinstance(res, dict) for res in results)):
         raise TypeError(f"results must be a list of dictionaries, got {type(results)}")
 
-    return results  # type: ignore
+    return results  # ty: ignore
 
 
 def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dict[str, Any]:
@@ -515,10 +515,10 @@ def variable_data_table_from_catalog(
                 name = trim_long_variable_name(col)
                 matches = [variable for variable in variables if name == variable.shortName]
                 if matches:
-                    col_mapping[col] = matches[0].id  # type: ignore
+                    col_mapping[col] = matches[0].id  # ty: ignore
 
             tb = tb[col_mapping.keys()]
-            tb.columns = col_mapping.values()
+            tb.columns = col_mapping.values()  # ty: ignore[invalid-assignment]
             tbs.append(tb.set_index(["country", year_or_date]))
 
         # Dimensional case
@@ -547,7 +547,7 @@ def variable_data_table_from_catalog(
                                 label.append(f["value"])
                                 break
                         else:
-                            label.append(None)  # type: ignore
+                            label.append(None)  # ty: ignore
                 labels.append(label)
 
             tb = tb_pivoted.loc[:, labels]
@@ -556,7 +556,7 @@ def variable_data_table_from_catalog(
             tbs.append(tb)
 
     # NOTE: this can be pretty slow for datasets with a lot of tables
-    return pd.concat(tbs, axis=1).reset_index()  # type: ignore
+    return pd.concat(tbs, axis=1).reset_index()  # ty: ignore
 
 
 #######################################################################################################
@@ -955,7 +955,9 @@ def get_variables_data(
 
     # Add parsed catalog_path column if catalogPath exists
     if "catalogPath" in df.columns and len(df) > 0:
-        df["catalog_path"] = [CatalogPath.from_str(p) if p else None for p in df["catalogPath"]]
+        df["catalog_path"] = [
+            CatalogPath.from_str(p) if p else None for p in df["catalogPath"]
+        ]  # ty: ignore[invalid-assignment]
 
     return df
 

@@ -202,7 +202,7 @@ def _interp_ffill_fillna(tb: Table, columns: List[str], entity_col: str = "count
         time_mode="none",
     )
 
-    tb.loc[:, columns] = tb.groupby("country")[columns].ffill().fillna(0)  # type: ignore
+    tb.loc[:, columns] = tb.groupby("country")[columns].ffill().fillna(0)  # ty: ignore
 
     return tb
 
@@ -359,7 +359,7 @@ def add_rolling_indicators(tb: Table) -> Table:
             tb.groupby("country")["new_vaccinations_interpolated"]
             .rolling(f"{n_days}D", min_periods=1)
             .sum()
-            .reset_index(0, drop=True)  # type: ignore
+            .reset_index(0, drop=True)  # ty: ignore
         )
         # Per capita
         tb[f"rolling_vaccinations_{n_months}m_per_hundred"] = (

@@ -207,12 +207,12 @@ def load_dag_file_for_each_step() -> Dict[str, str]:
     """
     dag_file_steps = load_steps_for_each_dag_file()
     # Reverse active dictionary of dag files.
-    active_dag_files = reverse_graph(dag_file_steps["active"])  # type: ignore
+    active_dag_files = reverse_graph(dag_file_steps["active"])  # ty: ignore
     dag_file_steps_reverse = {
         step: list(active_dag_files[step])[0] for step in active_dag_files if len(active_dag_files[step]) > 0
     }
     # Add the reverse of the archive dictionary of dag files.
-    archive_dag_files = reverse_graph(dag_file_steps["archive"])  # type: ignore
+    archive_dag_files = reverse_graph(dag_file_steps["archive"])  # ty: ignore
     dag_file_steps_reverse.update(
         {step: list(archive_dag_files[step])[0] for step in archive_dag_files if len(archive_dag_files[step]) > 0}
     )
@@ -489,11 +489,11 @@ class VersionTracker:
         # But steps that are in the archive dag can be either in the active or the archive directory.
         path_to_script = None
         if step_type == "export":
-            path_to_script = paths.STEP_DIR / "export" / channel / namespace / version / name  # type: ignore
+            path_to_script = paths.STEP_DIR / "export" / channel / namespace / version / name  # ty: ignore
         elif channel == "snapshot":
-            path_to_script = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
+            path_to_script = paths.SNAPSHOTS_DIR / namespace / version / name  # ty: ignore
         elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
-            path_to_script = paths.STEP_DIR / "data" / channel / namespace / version / name  # type: ignore
+            path_to_script = paths.STEP_DIR / "data" / channel / namespace / version / name  # ty: ignore
         elif channel in ["backport", "etag"]:
             # Ignore these channels, for which there is never a script.
             return None
@@ -505,10 +505,10 @@ class VersionTracker:
         # In the case of snapshots, there may or may not be a .py file, but there definitely needs to be a dvc file.
         # In that case, the corresponding script is not trivial to find, but at least we can return the dvc file.
         for path_to_script_candidate in [
-            path_to_script.with_suffix(".py"),  # type: ignore
-            path_to_script.with_suffix(".ipynb"),  # type: ignore
-            path_to_script / "__init__.py",  # type: ignore
-            path_to_script.with_name(path_to_script.name + ".dvc"),  # type: ignore
+            path_to_script.with_suffix(".py"),  # ty: ignore
+            path_to_script.with_suffix(".ipynb"),  # ty: ignore
+            path_to_script / "__init__.py",  # ty: ignore
+            path_to_script.with_name(path_to_script.name + ".dvc"),  # ty: ignore
         ]:
             if path_to_script_candidate.exists():
                 path_to_script_detected = path_to_script_candidate
@@ -808,13 +808,17 @@ class VersionTracker:
         # To achieve that, for each step, sum the list of chart ids from all its usages to the list of chart ids of
         # the step itself. Then create a sorted list of the set of all those chart ids.
         steps_df["all_chart_ids"] = [
-            sorted(set(sum([step_to_chart_ids[usage] for usage in row["all_usages"]], step_to_chart_ids[row["step"]])))  # type: ignore
+            sorted(
+                set(sum([step_to_chart_ids[usage] for usage in row["all_usages"]], step_to_chart_ids[row["step"]]))
+            )  # ty: ignore
             for _, row in steps_df.iterrows()
         ]
         # Create a column with charts slugs, i.e. for each step, [(123, "some_chart"), (456, "some_other_chart"), ...].
         steps_df["all_chart_slugs"] = [
             sorted(
-                set(sum([step_to_chart_slugs[usage] for usage in row["all_usages"]], step_to_chart_slugs[row["step"]]))  # type: ignore
+                set(
+                    sum([step_to_chart_slugs[usage] for usage in row["all_usages"]], step_to_chart_slugs[row["step"]])
+                )  # ty: ignore
             )
             for _, row in steps_df.iterrows()
         ]
@@ -827,7 +831,7 @@ class VersionTracker:
                 sorted(
                     set(
                         sum(
-                            [step_to_chart_views[metric][usage] for usage in row["all_usages"]],  # type: ignore
+                            [step_to_chart_views[metric][usage] for usage in row["all_usages"]],  # ty: ignore
                             step_to_chart_views[metric][row["step"]],
                         )
                     )
@@ -886,12 +890,12 @@ class VersionTracker:
         steps_df = self._add_columns_with_different_step_versions(steps_df=steps_df)
 
         # For convenience, add full local path to dag files to steps dataframe.
-        steps_df["dag_file_path"] = [
+        steps_df["dag_file_path"] = [  # ty: ignore[invalid-assignment]
             (paths.DAG_DIR / dag_file_name).with_suffix(".yml") if dag_file_name else None
             for dag_file_name in steps_df["dag_file_name"].fillna("")
         ]
         # For convenience, add full local path to script files.
-        steps_df["full_path_to_script"] = [
+        steps_df["full_path_to_script"] = [  # ty: ignore[invalid-assignment]
             paths.BASE_DIR / script_file_name if script_file_name else None
             for script_file_name in steps_df["path_to_script"].fillna("")
         ]
@@ -922,7 +926,9 @@ class VersionTracker:
         steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
         steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
         steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
-        steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
+        steps_df["path_to_script"] = [
+            self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps
+        ]  # ty: ignore[invalid-assignment]
 
         # Add column for the total number of all dependencies and usges.
         steps_df["n_all_dependencies"] = [len(dependencies) for dependencies in steps_df["all_dependencies"]]
@@ -949,7 +955,9 @@ class VersionTracker:
         steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
         steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
         steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
-        steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
+        steps_df["path_to_script"] = [
+            self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps
+        ]  # ty: ignore[invalid-assignment]
 
         # Add column for the total number of all dependencies and usges.
         steps_df["n_all_dependencies"] = [len(dependencies) for dependencies in steps_df["all_dependencies"]]

@@ -28,7 +28,7 @@ def _create_raw_dataframe_from_soup(soup: BeautifulSoup) -> pd.DataFrame:
     # Extract headers with multi-level structure.
     headers = []
     sub_headers = []
-    for th in table.find_all("th"):  # type: ignore
+    for th in table.find_all("th"):  # ty: ignore
         colspan = th.get("colspan")
         if colspan:
             headers.extend([th.text.strip()] * int(colspan))
@@ -39,7 +39,7 @@ def _create_raw_dataframe_from_soup(soup: BeautifulSoup) -> pd.DataFrame:
 
     # Extract rows (skipping the header row).
     rows = []
-    for tr in table.find_all("tr")[1:]:  # type: ignore
+    for tr in table.find_all("tr")[1:]:  # ty: ignore
         row = []
         for td in tr.find_all("td"):
             row.append(td.text.strip())
@@ -70,17 +70,17 @@ def _extract_notes_and_footnotes_from_soup(soup: BeautifulSoup) -> Tuple[List[st
         notes_heading = notes_section.find_next("h3", string="Table notes")
         if notes_heading:
             for sibling in notes_heading.find_next_siblings():
-                if sibling.name == "h3" and sibling.text == "Footnotes":  # type: ignore
+                if sibling.name == "h3" and sibling.text == "Footnotes":  # ty: ignore
                     break
-                if sibling.name == "p":  # type: ignore
+                if sibling.name == "p":  # ty: ignore
                     notes.append(sibling.text.strip())
 
         footnotes_heading = notes_section.find_next("h3", string="Footnotes")
         if footnotes_heading:
             for sibling in footnotes_heading.find_next_siblings():
-                if sibling.name == "h2" and sibling.text == "Export data":  # type: ignore
+                if sibling.name == "h2" and sibling.text == "Export data":  # ty: ignore
                     break
-                if sibling.name == "p":  # type: ignore
+                if sibling.name == "p":  # ty: ignore
                     footnotes.append(sibling.text.strip())
 
     # Convert footnotes into a dictionary, mapping the mark of the footnote to its corresponding text.

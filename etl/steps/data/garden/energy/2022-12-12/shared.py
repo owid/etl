@@ -469,7 +469,7 @@ def detect_overlapping_regions(
             )
             # Concatenate both selections of data, and select duplicated rows.
             combined = pd.concat([region_values, member_values])
-            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
+            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # ty: ignore
             if len(overlaps) > 0:
                 # Add the overlap found to the dictionary of all overlaps.
                 all_overlaps.update({year: set(overlaps[country_col]) for year in overlaps[year_col].unique()})

@@ -88,7 +88,7 @@ def main(path_to_file: str, output_dir: str, overwrite: bool, model: str) -> Non
 class MetadataGPTUpdater:
     """Update metadata file using Chat GPT."""
 
-    def __init__(self: Self, path_to_file: str, model: str) -> None:  # type: ignore[reportInvalidTypeVarUse]
+    def __init__(self: Self, path_to_file: str, model: str) -> None:  # ty: ignore
         """Initialize the metadata updater."""
         # Name of the model
         self.model: str = model
@@ -169,7 +169,7 @@ class MetadataGPTUpdater:
     def save_updated_metadata(self: Self, output_file: str) -> None:
         """Save the metadata file and returns its content."""
         with open(output_file, "w") as file:
-            yaml_dump(self.metadata_new_str, file, width=float("inf"))  # type: ignore
+            yaml_dump(self.metadata_new_str, file, width=float("inf"))  # ty: ignore
         log.info(f"Metadata file saved to {output_file}")
 
     def run(self: Self, lazy: bool = False) -> float | None:
@@ -192,10 +192,10 @@ class MetadataGPTUpdater:
         """Run main code for snapshot."""
         # Create system prompt
         query = create_query_snapshot(self.metadata_old_str)
-        response = self.client.query_gpt(query=query, model=self.model)  # type: ignore
+        response = self.client.query_gpt(query=query, model=self.model)  # ty: ignore
 
         if isinstance(response, GPTResponse):
-            self.__metadata_new = response.message_content_as_dict  # type: ignore
+            self.__metadata_new = response.message_content_as_dict  # ty: ignore
             return response.cost
 
     def run_data_step(self: Self, lazy: bool = False) -> float:
@@ -234,10 +234,10 @@ class MetadataGPTUpdater:
                     )
                     # Query GPT (or just estimate cost if lazy mode is on)
                     if lazy:
-                        est_cost = query.estimated_cost(self.model)  # type: ignore
+                        est_cost = query.estimated_cost(self.model)  # ty: ignore
                         cost += len(original_yaml_content["tables"].items()) * est_cost
                     else:
-                        result = self.client.query_gpt(query=query, model=self.model)  # type: ignore
+                        result = self.client.query_gpt(query=query, model=self.model)  # ty: ignore
                         # Act based on reply (only if valid)
                         if result:
                             cost += cast(int, result.cost)
@@ -247,7 +247,7 @@ class MetadataGPTUpdater:
                     indicator_metadata_dict = convert_list_to_dict(indicator_metadata)
 
                     # Format description_key to be bullet points
-                    indicator_metadata_dict["description_key"] = [  # type: ignore
+                    indicator_metadata_dict["description_key"] = [  # ty: ignore
                         f"{item}" for item in indicator_metadata_dict["description_key"].split(". ")
                     ]
 
@@ -257,7 +257,7 @@ class MetadataGPTUpdater:
         # Update metadata (when lazy mode is OFF)
         if not lazy:
             # Update metadata
-            self.__metadata_new = original_yaml_content  # type: ignore
+            self.__metadata_new = original_yaml_content  # ty: ignore
         return cost
 
 

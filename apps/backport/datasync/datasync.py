@@ -38,7 +38,7 @@ def upload_gzip_string(s: str, s3_path: str, private: bool = False) -> None:
         retry=retry_if_exception_type((EndpointConnectionError, SSLError)),
     ):
         with attempt:
-            client.put_object(  # type: ignore[reportAttributeAccessIssue]
+            client.put_object(  # ty: ignore[unresolved-attribute]
                 Bucket=bucket,
                 Body=body_gzip,
                 Key=key,

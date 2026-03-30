@@ -44,7 +44,7 @@ def get_charts() -> list[data.Chart]:
     ret = []
     for c in charts:
         c["tags"] = c["tags"].split(";") if c["tags"] else []
-        ret.append(data.Chart(**c))  # type: ignore
+        ret.append(data.Chart(**c))  # ty: ignore
 
     return ret
 
@@ -63,7 +63,9 @@ def st_chart_info(chart: data.Chart) -> None:
 
 def st_chart_scores(chart: data.Chart, sim_components: pd.DataFrame) -> None:
     st.markdown(f"#### Similarity: {chart.similarity:.0%}")
-    st.table(sim_components.loc[chart.chart_id].to_frame("score").style.format("{:.0%}"))
+    st.table(
+        sim_components.loc[chart.chart_id].to_frame("score").style.format("{:.0%}")  # ty: ignore[call-non-callable]
+    )
     if chart.gpt_reason:
         st.markdown(f"**GPT Diversity Reason**:\n{chart.gpt_reason}")
 
@@ -222,7 +224,7 @@ sim_components = scoring_model.similarity_components(chosen_chart)
 for chart in charts:
     chart.similarity = sim_dict[chart.chart_id]
 
-sorted_charts = sorted(charts, key=lambda x: x.similarity, reverse=True)  # type: ignore
+sorted_charts = sorted(charts, key=lambda x: x.similarity, reverse=True)  # ty: ignore
 
 # Postprocess charts with GPT and prioritize diversity
 if diversity_gpt:

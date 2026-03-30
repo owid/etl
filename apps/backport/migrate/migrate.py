@@ -284,7 +284,7 @@ def _generate_metadata_yaml(namespace: str, version: str, short_name: str, backp
     yml_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(yml_path, "w") as f:
-        f.write(yaml_dump(meta))  # type: ignore
+        f.write(yaml_dump(meta))  # ty: ignore
 
 
 if __name__ == "__main__":

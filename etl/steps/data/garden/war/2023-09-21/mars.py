@@ -433,7 +433,7 @@ def _create_metrics_new(tb: Table) -> Table:
     tb_new = pr.concat(
         [tb_new_regions, tb_new_regions_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True
     )
-    tb_new = tb_new.rename(columns={"yrstart": "year"})  # type: ignore
+    tb_new = tb_new.rename(columns={"yrstart": "year"})  # ty: ignore
 
     return tb_new
 

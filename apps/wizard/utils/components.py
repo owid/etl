@@ -147,7 +147,7 @@ def grapher_chart_from_url(chart_url: str, height=600):
             style="width: 100%; height: 600px; border: 0px none;"
             allow="web-share; clipboard-write"></iframe>
     """
-    return components.html(chart_animation_iframe_html, height=height, width=1.6 * height)  # type: ignore
+    return components.html(chart_animation_iframe_html, height=height, width=1.6 * height)  # ty: ignore
 
 
 def explorer_chart(
@@ -177,7 +177,7 @@ def explorer_chart(
     """
 
     # Render the HTML
-    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # type: ignore
+    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # ty: ignore
 
 
 def mdim_chart(url: str, view: dict, height: int = 600, default_display: Optional[str] = None):
@@ -198,7 +198,7 @@ def mdim_chart(url: str, view: dict, height: int = 600, default_display: Optiona
     """
 
     # Render the HTML
-    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # type: ignore
+    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # ty: ignore
 
 
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):

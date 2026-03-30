@@ -358,7 +358,7 @@ def _rename_choices(coll: Collection, choice_renames: dict[str, dict[str, str] |
                 for choice in dim.choices:
                     if isinstance(renames, dict):
                         if choice.slug in renames:
-                            choice.name = renames[choice.slug]
+                            choice.name = renames[choice.slug]  # ty: ignore[invalid-assignment]
                     elif inspect.isfunction(renames):
                         rename = renames(choice.slug)
                         if rename:

@@ -109,7 +109,7 @@ def run() -> None:
     index_cols = ["country", "year", "quintile", "tenure_type"]
 
     # get all combinations of country, year, quintile, and tenure type
-    full_index = tb_b_full[index_cols].drop_duplicates()  # type:ignore
+    full_index = tb_b_full[index_cols].drop_duplicates()  # ty: ignore
     only_hc_burden = tb_b_full[tb_b_full["hc_burden"].notna()][index_cols + ["hc_burden"]]
     only_hc_overburden = tb_b_full[tb_b_full["hc_overburden"].notna()][index_cols + ["hc_overburden"]]
 

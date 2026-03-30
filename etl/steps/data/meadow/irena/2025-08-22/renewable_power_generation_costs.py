@@ -213,7 +213,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     assert data.parse(sheet_name_geothermal, skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     geothermal = data.parse(sheet_name_geothermal, skiprows=5).rename(
         columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
-    )[["year", "cost"]]  # type: ignore
+    )[["year", "cost"]]  # ty: ignore
     geothermal["technology"] = "Geothermal"
 
     # Bioenergy.
@@ -224,7 +224,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     bioenergy = (
         data.parse(sheet_name_bioenergy, skiprows=20)
         .dropna(axis=1, how="all")
-        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # ty: ignore
     )
     bioenergy = bioenergy[bioenergy["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
@@ -243,7 +243,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     hydropower = (
         data.parse(sheet_name_hydropower, skiprows=20)
         .dropna(how="all", axis=1)
-        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # ty: ignore
     )
     hydropower = hydropower[hydropower["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"

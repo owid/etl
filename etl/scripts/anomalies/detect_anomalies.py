@@ -86,7 +86,7 @@ def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Var
     #     log.info(f"Loading data from local ETL file: {etl_file}")
     #     ds_etl = catalog.Dataset(etl_file)
     #     if ds_etl.table_names == [ds.shortName]:
-    #         df = pd.DataFrame(ds_etl.read(ds.shortName))  # type: ignore
+    #         df = pd.DataFrame(ds_etl.read(ds.shortName))  # ty: ignore
     #     # Change column names to variable ids.
     #     df = df.rename(columns={column: ds_variable_ids[column] for column in df.columns if column in ds_variable_ids}, errors="raise").rename(columns={"country": "entity_name"}, errors="raise")
 
@@ -98,10 +98,10 @@ def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Var
         # Load data for all variables from S3.
         df_long = io.variable_data_df_from_s3(
             engine=engine,
-            variable_ids=ds_variable_ids.values(),  # type: ignore
+            variable_ids=ds_variable_ids.values(),  # ty: ignore
             workers=None,
-            value_as_str=False,  # type: ignore
-        )  # type: ignore
+            value_as_str=False,  # ty: ignore
+        )  # ty: ignore
 
         # Switch from long to wide format dataframe.
         df = (

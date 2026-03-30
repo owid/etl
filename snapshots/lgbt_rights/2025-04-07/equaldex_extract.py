@@ -40,7 +40,7 @@ API_KEY = os.getenv("EQUALDEX_KEY")
 GET_DATA_FROM_API = True
 
 # Define regex pattern to find years in the data
-REGEX_PATTERN = r"(\d{4})"  # type: ignore
+REGEX_PATTERN = r"(\d{4})"  # ty: ignore
 
 # Define current year
 CURRENT_YEAR = datetime.datetime.now().year
@@ -97,7 +97,7 @@ def extract_from_api(country_list: List[str]) -> Tuple[pd.DataFrame, pd.DataFram
                 log.error(f"{country}: Status {status}")
 
         # Create a dictionary with the output
-        response_dict = json.loads(content)  # type: ignore
+        response_dict = json.loads(content)  # ty: ignore
 
         # Get the country name from the response
         try:
@@ -282,7 +282,9 @@ def create_long_dataset(df_current, df_historical):
     )
 
     # Show rows with duplicated index
-    df_duplicated = df_long[df_long.duplicated(subset=["country", "year", "issue", "date_modified"], keep=False)].copy()  # type: ignore
+    df_duplicated = df_long[
+        df_long.duplicated(subset=["country", "year", "issue", "date_modified"], keep=False)
+    ].copy()  # ty: ignore
 
     df_duplicated.to_csv(PARENT_DIR / "duplicated.csv", index=True)
 

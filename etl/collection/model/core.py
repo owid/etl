@@ -181,7 +181,7 @@ class Collection(MDIMBase):
         log.info(f"Exporting collection config to {self.local_config_path}")
         self.save_file(self.local_config_path, force_create=True)
 
-    def save(  # type: ignore[override]
+    def save(  # ty: ignore[invalid-method-override]
         self,
         owid_env: OWIDEnv | None = None,
         tolerate_extra_indicators: bool = False,
@@ -339,7 +339,7 @@ class Collection(MDIMBase):
             # Update dimensions
             view.dimensions = view_dimensions
 
-    def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> dict[str, Any]:  # type: ignore
+    def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> dict[str, Any]:  # ty: ignore
         dix = super().to_dict(encode_json=encode_json)
         if drop_definitions:
             dix = {k: v for k, v in dix.items() if k not in {"_definitions", "definitions"}}
@@ -413,9 +413,9 @@ class Collection(MDIMBase):
         )
 
         try:
-            validator(self.to_dict())  # type: ignore
+            validator(self.to_dict())  # ty: ignore
         except fastjsonschema.JsonSchemaException as e:
-            raise ValueError(f"Config validation error: {e.message}")  # type: ignore
+            raise ValueError(f"Config validation error: {e.message}")  # ty: ignore
 
     def indicators_in_use(self, tolerate_extra_indicators: bool = False):
         # Get all indicators used in all views
@@ -1157,7 +1157,7 @@ def sanity_check_grouped_view(view: View) -> None:
     metadata_dict = (
         view.metadata
         if isinstance(view.metadata, dict)
-        else view.metadata.to_dict()  # type: ignore[union-attr]
+        else view.metadata.to_dict()  # ty: ignore[unresolved-attribute, call-non-callable]
         if hasattr(view.metadata, "to_dict")
         else {}
     )

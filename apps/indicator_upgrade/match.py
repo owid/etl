@@ -669,7 +669,7 @@ def find_mapping_suggestions_optim(
     suggestions = []
     for idx, old_row in missing_old.iterrows():
         # Retrieve the similarity scores for the current old_name
-        scores = similarity_scores[idx]  # type: ignore
+        scores = similarity_scores[idx]  # ty: ignore
 
         # Sort missing_new based on these scores
         sorted_indices = np.argsort(-scores)  # Negative for descending sort
@@ -706,7 +706,7 @@ def consolidate_mapping_suggestions_with_user(
         name_old = suggestion["old"]["name_old"]
         id_old = suggestion["old"]["id_old"]
         missing_new = suggestion["new"]
-        missing_new = missing_new[~missing_new["id_new"].isin(ids_new_ignore)]  # type: ignore[reportCallIssue]
+        missing_new = missing_new[~missing_new["id_new"].isin(ids_new_ignore)]  # ty: ignore[call-non-callable]
         new_indexes = missing_new.index.tolist()
 
         # display comparison to user

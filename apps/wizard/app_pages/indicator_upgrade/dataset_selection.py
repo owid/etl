@@ -77,7 +77,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         column_display = "name"
 
     # Create a column to display the dataset by its dataset id followed by its title.
-    df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]
+    df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]  # ty: ignore[unsupported-operator]
     version = df["step"].str.split("/").str[-2]
     is_archived = df["isArchived"].replace({0: "", 1: " (ARCHIVED) "}).fillna("")
     df["display_name"] = is_archived + df["display_name"] + " [" + version.fillna("unknown version") + "]"

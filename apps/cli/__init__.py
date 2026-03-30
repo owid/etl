@@ -21,7 +21,7 @@ if not os.getenv("GENERATING_DOCS"):
 class LazyGroup(click.RichGroup):
     """Ref: https://click.palletsprojects.com/en/8.1.x/complex/#lazily-loading-subcommands"""
 
-    def __init__(self, *args, lazy_subcommands=None, **kwargs):  # type: ignore[no-untyped-def]
+    def __init__(self, *args, lazy_subcommands=None, **kwargs):  # ty: ignore
         super().__init__(*args, **kwargs)
         # lazy_subcommands is a map of the form:
         #
@@ -48,7 +48,7 @@ class LazyGroup(click.RichGroup):
         # get the Command object from that module
         cmd_object = getattr(mod, cmd_object_name)
         # check the result to make debugging easier
-        if not isinstance(cmd_object, click.BaseCommand):  # type: ignore
+        if not isinstance(cmd_object, click.BaseCommand):  # ty: ignore
             raise ValueError(f"Lazy loading of {import_path} failed by returning " "a non-command object")
         return cmd_object
 
@@ -404,12 +404,12 @@ commands_subgroups = {
     f"etl {alias}": [
         {
             "name": "Commands",
-            "commands": list(subgroup["commands"].keys()),
+            "commands": list(subgroup["commands"].keys()),  # ty: ignore[unresolved-attribute]
         }
     ]
     for alias, subgroup in SUBGROUPS.items()
 }
-click.rich_click.COMMAND_GROUPS = {  # type: ignore[assignment]
+click.rich_click.COMMAND_GROUPS = {  # ty: ignore[invalid-assignment]
     "etl": GROUPS,
     **commands_subgroups,
 }

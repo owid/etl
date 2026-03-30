@@ -65,7 +65,7 @@ from sqlalchemy.dialects.mysql import (
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import NoResultFound, ProgrammingError
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import (  # type: ignore
+from sqlalchemy.orm import (  # ty: ignore
     DeclarativeBase,
     Mapped,
     MappedAsDataclass,
@@ -119,14 +119,14 @@ class Base(MappedAsDataclass, DeclarativeBase):
     def create_table(cls, engine: Engine, if_exists: Literal["fail", "replace", "skip"] = "fail") -> None:
         if if_exists == "replace":
             # Drop the table if it exists and create a new one
-            cls.__table__.drop(engine, checkfirst=True)  # type: ignore
-            cls.__table__.create(engine, checkfirst=False)  # type: ignore
+            cls.__table__.drop(engine, checkfirst=True)  # ty: ignore
+            cls.__table__.create(engine, checkfirst=False)  # ty: ignore
         elif if_exists == "skip":
             # Create the table only if it doesn't already exist
-            cls.__table__.create(engine, checkfirst=True)  # type: ignore
+            cls.__table__.create(engine, checkfirst=True)  # ty: ignore
         elif if_exists == "fail":
             # Attempt to create the table; fail if it already exists
-            cls.__table__.create(engine, checkfirst=False)  # type: ignore
+            cls.__table__.create(engine, checkfirst=False)  # ty: ignore
         else:
             raise ValueError(f"Unrecognized value for if_exists: {if_exists}")
 
@@ -436,7 +436,7 @@ class Chart(Base):
     chart_config: Mapped["ChartConfig"] = relationship("ChartConfig", back_populates="chartss", lazy="joined")
 
     @hybrid_property
-    def updatedAt(self) -> datetime:  # type: ignore
+    def updatedAt(self) -> datetime:  # ty: ignore
         # updatedAt is None if the chart is new, it only gets populated once we save it
         return self._updatedAt or self.createdAt
 
@@ -445,7 +445,7 @@ class Chart(Base):
         self._updatedAt = value
 
     @hybrid_property
-    def config(self) -> dict[str, Any]:  # type: ignore
+    def config(self) -> dict[str, Any]:  # ty: ignore
         config = self.chart_config.full.copy()
         # Include chart-level flags in config so they're part of comparison/diff logic.
         config["isInheritanceEnabled"] = bool(self.isInheritanceEnabled)
@@ -457,7 +457,7 @@ class Chart(Base):
         return select(ChartConfig.full).where(ChartConfig.id == cls.configId).scalar_subquery()
 
     @hybrid_property
-    def slug(self) -> Optional[str]:  # type: ignore
+    def slug(self) -> Optional[str]:  # ty: ignore
         return self.chart_config.slug
 
     @slug.expression
@@ -963,7 +963,7 @@ class Source(Base):
                 "sourceIds": source_ids or [-1],
             },
         )
-        sources.description = sources.description.map(json.loads)
+        sources.description = sources.description.map(json.loads)  # ty: ignore[unresolved-attribute]
 
         # sources are rarely missing datasetId (that is most likely a bug)
         if sources.datasetId.isnull().any():
@@ -971,9 +971,9 @@ class Source(Base):
                 "load_sources.sources_missing_datasetId",
                 source_ids=sources.id[sources.datasetId.isnull()].tolist(),
             )
-            sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)
+            sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)  # ty: ignore[unresolved-attribute]
 
-        return [cls.from_dict(d) for d in sources.to_dict(orient="records")]  # type: ignore
+        return [cls.from_dict(d) for d in sources.to_dict(orient="records")]  # ty: ignore
 
 
 class DimensionFilter(TypedDict):
@@ -1297,7 +1297,7 @@ class Variable(Base):
         assert metadata.unit is not None
 
         if metadata.presentation:
-            presentation_dict = metadata.presentation.to_dict()  # type: ignore
+            presentation_dict = metadata.presentation.to_dict()  # ty: ignore
             # convert all fields from snake_case to camelCase
             presentation_dict = humps.camelize(presentation_dict)
         else:
@@ -1372,7 +1372,7 @@ class Variable(Base):
     @classmethod
     @deprecated("Use from_id_or_path instead")
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
-        return session.scalars(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
+        return session.scalars(select(cls).where(cls.id.in_(variables_id))).all()  # ty: ignore
 
     @overload
     @classmethod
@@ -1392,7 +1392,7 @@ class Variable(Base):
         session: Session,
         id_or_path: int | str | List[str | int],
         columns: Optional[List[str]] = None,
-    ) -> "Variable" | List["Variable"]:
+    ) -> Union["Variable", List["Variable"]]:
         """Load a variable from the database by its catalog path or variable ID."""
         # Single id
         if isinstance(id_or_path, int):
@@ -1441,7 +1441,7 @@ class Variable(Base):
     @classmethod
     def from_catalog_path(
         cls, session: Session, catalog_path: str | List[str], columns: Optional[List[str]] = None
-    ) -> "Variable" | List["Variable"]:
+    ) -> Union["Variable", List["Variable"]]:
         """Load a variable from the DB by its catalog path."""
         if isinstance(catalog_path, str):
             assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
@@ -1451,9 +1451,9 @@ class Variable(Base):
         # Return Variable if columns is None and return Row object if columns is provided
         execute = session.execute if columns else session.scalars
         if isinstance(catalog_path, str):
-            return execute(_select_columns(cls, columns).where(cls.catalogPath == catalog_path)).one()  # type: ignore
+            return execute(_select_columns(cls, columns).where(cls.catalogPath == catalog_path)).one()  # ty: ignore
         elif isinstance(catalog_path, list):
-            return execute(_select_columns(cls, columns).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
+            return execute(_select_columns(cls, columns).where(cls.catalogPath.in_(catalog_path))).all()  # ty: ignore
 
     @overload
     @classmethod
@@ -1468,21 +1468,21 @@ class Variable(Base):
     @classmethod
     def from_id(
         cls, session: Session, variable_id: int | List[int], columns: Optional[List[str]] = None
-    ) -> "Variable" | List["Variable"]:
+    ) -> Union["Variable", List["Variable"]]:
         """Load a variable (or list of variables) from the DB by its ID path."""
         # Return Variable if columns is None and return Row object if columns is provided
         execute = session.execute if columns else session.scalars
 
         if isinstance(variable_id, int):
-            return execute(_select_columns(cls, columns).where(cls.id == variable_id)).one()  # type: ignore
+            return execute(_select_columns(cls, columns).where(cls.id == variable_id)).one()  # ty: ignore
         elif isinstance(variable_id, list):
-            return execute(_select_columns(cls, columns).where(cls.id.in_(variable_id))).all()  # type: ignore
+            return execute(_select_columns(cls, columns).where(cls.id.in_(variable_id))).all()  # ty: ignore
 
     @classmethod
     def catalog_paths_to_variable_ids(cls, session: Session, catalog_paths: List[str]) -> Dict[str, int]:
         """Return a mapping from catalog paths to variable IDs."""
         query = select(Variable).where(Variable.catalogPath.in_(catalog_paths))
-        return {var.catalogPath: var.id for var in session.scalars(query).all()}  # type: ignore
+        return {var.catalogPath: var.id for var in session.scalars(query).all()}  # ty: ignore
 
     @classmethod
     def infer_type(cls, values: pd.Series) -> VARIABLE_TYPE:
@@ -1672,7 +1672,7 @@ class Origin(Base):
             descriptionSnapshot=origin.description_snapshot,
             description=origin.description,
             datePublished=origin.date_published,
-            dateAccessed=origin.date_accessed,  # type: ignore
+            dateAccessed=origin.date_accessed,  # ty: ignore
         )
 
     @property
@@ -1922,14 +1922,14 @@ class MultiDimDataPage(Base):
     ) -> Optional["MultiDimDataPage"]:
         cond = cls.catalogPath == catalogPath
         if columns:
-            return session.execute(_select_columns(cls, columns).where(cond)).one()  # type: ignore
+            return session.execute(_select_columns(cls, columns).where(cond)).one()  # ty: ignore
         else:
             return session.scalars(select(cls).where(cond)).first()
 
     @classmethod
     def load_mdims(cls, session: Session, columns: Optional[List[str]] = None) -> List["MultiDimDataPage"]:
         execute = session.execute if columns else session.scalars
-        return execute(_select_columns(cls, columns)).all()  # type: ignore
+        return execute(_select_columns(cls, columns)).all()  # ty: ignore
 
 
 class Anomaly(Base):
@@ -1968,7 +1968,7 @@ class Anomaly(Base):
         return session.scalars(select(cls).where(cls.datasetId == dataset_id, cls.anomalyType == anomaly_type)).one()
 
     @hybrid_property
-    def dfScore(self) -> Optional[pd.DataFrame]:  # type: ignore
+    def dfScore(self) -> Optional[pd.DataFrame]:  # ty: ignore
         if self._dfScore is None:
             return None
         buffer = io.BytesIO(self._dfScore)
@@ -1985,7 +1985,7 @@ class Anomaly(Base):
             self._dfScore = buffer.read()
 
     @hybrid_property
-    def dfReduced(self) -> Optional[pd.DataFrame]:  # type: ignore
+    def dfReduced(self) -> Optional[pd.DataFrame]:  # ty: ignore
         if self._dfReduced is None:
             return None
         buffer = io.BytesIO(self._dfReduced)
@@ -2004,7 +2004,7 @@ class Anomaly(Base):
     @classmethod
     def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
         try:
-            return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+            return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # ty: ignore
         except ProgrammingError as e:
             # anomalies table does not exist (error code 1146), it gets created dynamically
             # when the first anomaly is created
@@ -2074,14 +2074,14 @@ class Explorer(Base):
     ) -> Optional["Explorer"]:
         cond = cls.slug == slug
         if columns:
-            return session.execute(_select_columns(cls, columns).where(cond)).one()  # type: ignore
+            return session.execute(_select_columns(cls, columns).where(cond)).one()  # ty: ignore
         else:
             return session.scalars(select(cls).where(cond)).first()
 
     @classmethod
     def load_explorers(cls, session: Session, columns: Optional[List[str]] = None) -> List["Explorer"]:
         execute = session.execute if columns else session.scalars
-        return execute(_select_columns(cls, columns)).all()  # type: ignore
+        return execute(_select_columns(cls, columns)).all()  # ty: ignore
 
 
 class ExplorerView(Base):

@@ -103,7 +103,7 @@ def interpolate_table(
 
     if time_mode != "none":
         # Expand time
-        df = expand_time_column(  # type: ignore[assignment]
+        df = expand_time_column(  # ty: ignore[invalid-assignment]
             df,
             dimension_col=entity_col,
             time_col=time_col,
@@ -114,9 +114,11 @@ def interpolate_table(
     df = cast(TableOrDataFrame, df.set_index(index).sort_index())
 
     # Interpolate
-    df = (  # type: ignore[assignment]
+    df = (  # ty: ignore[invalid-assignment]
         df.groupby(entity_col)
-        .transform(lambda x: x.interpolate(method=method, limit_direction=limit_direction, limit_area=limit_area))  # type: ignore
+        .transform(
+            lambda x: x.interpolate(method=method, limit_direction=limit_direction, limit_area=limit_area)
+        )  # ty: ignore
         .reset_index()
     )
 
@@ -211,7 +213,7 @@ def expand_time_column(
         if single_dimension:
             # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
             # Optionally fill missing years linearly.
-            entities_in_data = df[dimension_col].unique()
+            entities_in_data = df[dimension_col].unique()  # ty: ignore[call-non-callable]
             iterables = [entities_in_data, date_values]
             names = [dimension_col, time_col]
         else:
@@ -237,7 +239,7 @@ def expand_time_column(
             group[dimension_col] = group[dimension_col].ffill().bfill()  # Fill NaNs in 'country'
             return group
 
-        df = df.groupby(dimension_col).apply(_reindex_dates).reset_index(drop=True).set_index(index)  # type: ignore
+        df = df.groupby(dimension_col).apply(_reindex_dates).reset_index(drop=True).set_index(index)  # ty: ignore
         df = cast(TableOrDataFrame, df.reset_index())
     # Either full range or all observations.
     elif method in {"full_range", "observed"}:
@@ -255,9 +257,9 @@ def expand_time_column(
         )
 
         # Reindex
-        df = (  # type: ignore[assignment]
+        df = (  # ty: ignore[invalid-assignment]
             df.set_index(index)
-            .reindex(pd.MultiIndex.from_product(iterables, names=names))  # type: ignore
+            .reindex(pd.MultiIndex.from_product(iterables, names=names))  # ty: ignore
             .sort_index()
         )
 
@@ -283,7 +285,7 @@ def expand_time_column(
         if isinstance(start, datetime):
             date_values = pd.date_range(start=start, end=end)
         else:
-            date_values = range(start, end + 1)  # type: ignore
+            date_values = range(start, end + 1)  # ty: ignore
 
         # Build ranges to add (preliminary)
         iterables, names = _get_iter_and_names(
@@ -306,9 +308,9 @@ def expand_time_column(
 
         # Extend the dataframe
         if isinstance(df, Table):
-            df = pr.concat([df, Table(df_range)])  #  type: ignore
+            df = pr.concat([df, Table(df_range)])  # ty: ignore
         elif isinstance(df, pd.DataFrame):
-            df = pd.concat([df, df_range])  # type: ignore
+            df = pd.concat([df, df_range])  # ty: ignore
 
     df = df.sort_values(index)
 
@@ -352,7 +354,7 @@ def expand_time_column(
     # Output dataframe in same order as input
     df = df.loc[:, columns_order]
 
-    if not DID_INTERPOLATE:  # type: ignore
+    if not DID_INTERPOLATE:  # ty: ignore
         try:
             df = df.astype(dtypes)
         except pd.errors.IntCastingNaNError:
@@ -610,9 +612,9 @@ def compare_tables(
                     elif metric == "bard_max":
                         condition = max(bard(a=_old, b=_new, eps=bard_eps)) < bard_max
                     else:
-                        condition = metric(_old, _new)  # type: ignore
+                        condition = metric(_old, _new)  # ty: ignore
 
-                    if condition:  # type: ignore
+                    if condition:  # ty: ignore
                         # If the old and new tables are equal for this country-column, skip this column.
                         continue
 
@@ -954,7 +956,7 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
             continue
 
         # Get display name
-        display_name = GSHEET_EXPORT_CONFIG["FIELD_DISPLAY_NAMES"].get(key, key)
+        display_name = GSHEET_EXPORT_CONFIG["FIELD_DISPLAY_NAMES"].get(key, key)  # ty: ignore[unresolved-attribute]
 
         if isinstance(value, list):
             # Handle special case for origins - extract attributes for each

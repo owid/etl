@@ -444,7 +444,7 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
         tb_agg = geo.add_regions_to_table(
             tb=tb,
             regions=regions_,
-            aggregations={"population": "sum", "source": lambda x: "; ".join(sorted(set(x)))},  # type: ignore
+            aggregations={"population": "sum", "source": lambda x: "; ".join(sorted(set(x)))},  # ty: ignore
             ds_regions=ds_regions,
             ds_income_groups=ds_income_groups,
             num_allowed_nans_per_year=None,

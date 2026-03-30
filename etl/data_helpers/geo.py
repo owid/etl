@@ -142,7 +142,7 @@ def list_countries_in_region(
 
     if income_groups is None:
         income_groups = _load_income_groups().reset_index()
-    income_groups_names = income_groups["income_group"].dropna().unique().tolist()  # type: ignore
+    income_groups_names = income_groups["income_group"].dropna().unique().tolist()  # ty: ignore
 
     if region in countries_regions["name"].tolist():
         # Find codes of member countries in this region.
@@ -154,7 +154,7 @@ def list_countries_in_region(
         # Get harmonized names of these countries.
         members = countries_regions.loc[member_codes]["name"].tolist()  # type: list[str]
     elif region in income_groups_names:
-        members = income_groups[income_groups["income_group"] == region]["country"].unique().tolist()  # type: ignore
+        members = income_groups[income_groups["income_group"] == region]["country"].unique().tolist()  # ty: ignore
     else:
         raise RegionNotFound
 
@@ -227,7 +227,7 @@ def list_countries_in_region_that_must_have_data(
 
     # Select population data for reference year for all countries in the region.
     reference = (
-        population[(population["country"].isin(members)) & (population["year"] == reference_year)]  # type: ignore
+        population[(population["country"].isin(members)) & (population["year"] == reference_year)]  # ty: ignore
         .dropna(subset="population")
         .sort_values("population", ascending=False)
         .reset_index(drop=True)
@@ -473,7 +473,7 @@ def add_region_aggregates(
             )
 
     # Sort conveniently.
-    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)  # type: ignore
+    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)  # ty: ignore
 
     # Convert country to categorical if the original was
     if df[country_col].dtype.name == "category":
@@ -483,7 +483,7 @@ def add_region_aggregates(
     if isinstance(df, Table):
         return Table(df_updated).copy_metadata(df)
     else:
-        return df_updated  # type: ignore
+        return df_updated  # ty: ignore
 
 
 def harmonize_countries(
@@ -580,7 +580,7 @@ def harmonize_countries(
 
     df_harmonized[country_col] = country_harmonized
 
-    return df_harmonized  # type: ignore
+    return df_harmonized  # ty: ignore
 
 
 def _add_population_to_dataframe(
@@ -668,7 +668,7 @@ def _add_population_to_dataframe(
             pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, year_col])
         )
 
-        population = population.groupby(country_col).transform(
+        population = population.groupby(country_col).transform(  # ty: ignore[call-non-callable]
             lambda x: x.interpolate(method="linear", limit_direction="both")
         )
 
@@ -727,7 +727,9 @@ def interpolate_table(
             return group
 
         # Apply the reindexing to each group
-        df = df.groupby(country_col).apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])  # type: ignore
+        df = (
+            df.groupby(country_col).apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])
+        )  # ty: ignore
     else:
         # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
         # Optionally fill missing years linearly.
@@ -738,16 +740,18 @@ def interpolate_table(
         else:
             years_in_data = df[time_col].unique()
         # Reindex
-        df = (  # type: ignore[assignment]
+        df = (  # ty: ignore[invalid-assignment]
             df.set_index([country_col, time_col])
-            .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col]))  # type: ignore
+            .reindex(
+                pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col])
+            )  # ty: ignore
             .sort_index()
         )
 
     # Interpolate
-    df = (  # type: ignore[assignment]
+    df = (  # ty: ignore[invalid-assignment]
         df.groupby(country_col)
-        .transform(lambda x: x.interpolate(method="linear", limit_direction="both"))  # type: ignore
+        .transform(lambda x: x.interpolate(method="linear", limit_direction="both"))  # ty: ignore
         .reset_index()
     )
 
@@ -1054,7 +1058,7 @@ def list_members_of_region(
 
         # Create a dataframe of countries in each income group.
         tb_countries_in_income_group = (
-            tb_income.rename(columns={"classification": "region", "country": "members"})  # type: ignore
+            tb_income.rename(columns={"classification": "region", "country": "members"})  # ty: ignore
             .groupby("region", as_index=True, observed=True)
             .agg({"members": list})
         )
@@ -1150,7 +1154,7 @@ def detect_overlapping_regions(
     # List all variables in data (ignoring index columns).
     variables = [column for column in df.columns if column not in index_columns]
     # List all country names found in data.
-    countries_in_data = set(df[country_col].unique().tolist())  # type: ignore
+    countries_in_data = set(df[country_col].unique().tolist())  # ty: ignore
     # List all regions found in data.
     # TODO: Possible overlaps in custom regions are not considered here. I think it would be simple enough to include
     #   here custom regions and check for overlaps.
@@ -1176,7 +1180,7 @@ def detect_overlapping_regions(
             # Concatenate both selections of data, and select duplicated rows.
             combined = pd.concat([region_values, member_values])
             # Option 1: Check if there is an overlap on the same year (even if not on the same variable).
-            # overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
+            # overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # ty: ignore
             # Option 2: Check if there is an overlap on the same year and on the same variable.
             # Count how many non-nan values are present for each year, among the two countries considered.
             counts = combined.drop(columns=country_col).groupby(year_col, as_index=True, observed=True).count()
@@ -1461,7 +1465,7 @@ def add_regions_to_table(
         # TODO: Add entry to processing log.
         return Table(df_with_regions).copy_metadata(tb)
     else:
-        return df_with_regions  # type: ignore
+        return df_with_regions  # ty: ignore
 
 
 def fill_date_gaps(tb: Table) -> Table:
@@ -1492,7 +1496,9 @@ def make_table_population_daily(ds_population: Dataset, year_min: int, year_max:
     # Filter only years of interest
     population = population[(population["year"] >= year_min) & (population["year"] <= year_max)]
     # Create date column
-    population["date"] = pd.to_datetime(population["year"].astype("string") + "-07-01")
+    population["date"] = pd.to_datetime(
+        population["year"].astype("string") + "-07-01"  # ty: ignore[unsupported-operator]
+    )
     # Keep relevant columns
     population = population.loc[:, ["date", "country", "population"]]
     # Add missing dates
@@ -1739,21 +1745,21 @@ class Regions:
     def tb_income_groups(self) -> Table:
         """Table of the income groups dataset that contains income groups classification over the years (not just the latest classification)."""
         if self._tb_income_groups is None:
-            self._tb_income_groups = self.ds_income_groups.read("income_groups")  # type: ignore
+            self._tb_income_groups = self.ds_income_groups.read("income_groups")  # ty: ignore
         return self._tb_income_groups
 
     @property
     def tb_income_groups_latest(self) -> Table:
         """Table of the income groups dataset that contains the latest income groups classification."""
         if self._tb_income_groups_latest is None:
-            self._tb_income_groups_latest = self.ds_income_groups.read("income_groups_latest")  # type: ignore
+            self._tb_income_groups_latest = self.ds_income_groups.read("income_groups_latest")  # ty: ignore
         return self._tb_income_groups_latest
 
     @property
     def tb_population(self) -> Table:
         """Main table from the population dataset."""
         if self._tb_population is None:
-            self._tb_population = self.ds_population.read("population")  # type: ignore
+            self._tb_population = self.ds_population.read("population")  # ty: ignore
         return self._tb_population
 
     def get_region(self, name: str, **kwargs) -> dict:
@@ -1776,7 +1782,7 @@ class Regions:
                 region_dict = {column: None for column in self.tb_regions.columns}
                 # Fill with some information.
                 region_dict.update(
-                    {  # type: ignore
+                    {  # ty: ignore
                         "code": INCOME_GROUPS_ENTITY_CODES[name],
                         "name": name,
                         "region_type": "income_group",
@@ -1795,7 +1801,7 @@ class Regions:
             # For now, use the existing function to extract members (as well as successors, for historical regions, and related countries like overseas territories), which has some additional logic.
             subregion_types: list[SubregionType] = ["members", "successors", "related"]
             for subregion_type in subregion_types:
-                region_dict[subregion_type] = list_members_of_region(  # type: ignore
+                region_dict[subregion_type] = list_members_of_region(  # ty: ignore
                     region=name,
                     ds_regions=self.ds_regions,
                     # Load income groups only if necessary (and raise an error if not among dependencies).
@@ -1806,7 +1812,7 @@ class Regions:
                     **kwargs,
                 )
 
-            self._region_cache[name] = region_dict
+            self._region_cache[name] = region_dict  # ty: ignore[invalid-assignment]
         return self._region_cache[name]
 
     def get_regions(
@@ -1962,7 +1968,7 @@ class Regions:
         """
         tb_with_population = add_population_to_table(
             tb=tb,
-            ds_population=self.ds_population,  # type: ignore
+            ds_population=self.ds_population,  # ty: ignore
             country_col=country_col,
             year_col=year_col,
             population_col=population_col,
@@ -2308,7 +2314,7 @@ class RegionAggregator:
         self._ds_regions = ds_regions
         self._ds_income_groups = ds_income_groups
         self._ds_population = ds_population
-        self.aggregations = aggregations  # type: ignore
+        self.aggregations = aggregations  # ty: ignore
         self.country_col = country_col
         self.year_col = year_col
         self.population_col = population_col
@@ -2597,14 +2603,14 @@ class RegionAggregator:
                     # Within each group check if all required countries have data for this column.
                     # This ensures all groupings appear in the result, even if no country has data.
                     df_covered = (
-                        self.tb_coverage[self.index_columns]  # type: ignore
+                        self.tb_coverage[self.index_columns]  # ty: ignore
                         .groupby(other_index_columns, as_index=False)
                         .agg(
                             {
                                 self.country_col: lambda x: set(required_countries)
-                                <= set(x[self.tb_coverage.loc[x.index, column]])  # type: ignore
+                                <= set(x[self.tb_coverage.loc[x.index, column]])  # ty: ignore
                             }
-                        )  # type: ignore
+                        )  # ty: ignore
                     )
                     groupings_to_nan = df_covered[~df_covered[self.country_col]][other_index_columns]
                     # Set region aggregate to NaN for those groupings.
@@ -2635,8 +2641,8 @@ class RegionAggregator:
                         continue
 
                     # Get coverage data for this region.
-                    region_coverage = self.tb_coverage[  # type: ignore
-                        self.tb_coverage[self.country_col].isin(self.regions_members[region])  # type: ignore
+                    region_coverage = self.tb_coverage[  # ty: ignore
+                        self.tb_coverage[self.country_col].isin(self.regions_members[region])  # ty: ignore
                     ]
 
                     if region_coverage.empty:
@@ -2823,7 +2829,7 @@ class RegionAggregator:
                 if weight_col == self.population_col and weight_col not in tb.columns:
                     tb = add_population_to_table(
                         tb=tb,
-                        ds_population=self.ds_population,  # type: ignore
+                        ds_population=self.ds_population,  # ty: ignore
                         country_col=self.country_col,
                         year_col=self.year_col,
                         population_col=self.population_col,
@@ -2884,7 +2890,7 @@ class RegionAggregator:
         df_no_regions = tb[~_select_regions]
 
         # Combine the table with only regions and the table with no regions.
-        df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # type: ignore
+        df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # ty: ignore
 
         # Final sort and column ordering.
         df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)[tb.columns]
@@ -2966,7 +2972,7 @@ class RegionAggregator:
         if not was_population_in_table:
             tb_result = add_population_to_table(
                 tb=tb,
-                ds_population=self.ds_population,  # type: ignore
+                ds_population=self.ds_population,  # ty: ignore
                 country_col=self.country_col,
                 year_col=self.year_col,
                 population_col=self.population_col,
@@ -2983,7 +2989,7 @@ class RegionAggregator:
             if self.tb_coverage is None:
                 self._create_coverage_table(tb=tb_result)
             # Create an auxiliary table of informed population. For a given column, each row contains the population of the corresponding region on the corresponding year, or a zero, if that column-row was originally nan.
-            tb_population_informed = self.tb_coverage[self.index_columns + columns].copy()  # type: ignore
+            tb_population_informed = self.tb_coverage[self.index_columns + columns].copy()  # ty: ignore
             tb_population_informed[columns] = tb_population_informed[columns].multiply(
                 tb_result[self.population_col], axis=0
             )

@@ -163,7 +163,7 @@ def create_dataset(
             if dim_names:
                 # First pass to update metadata from YAML
                 if meta_path.exists():
-                    table.update_metadata_from_yaml(meta_path, table.m.short_name)  # type: ignore
+                    table.update_metadata_from_yaml(meta_path, table.m.short_name)  # ty: ignore
                 log.info("long_to_wide.start", shape=table.shape, short_name=table.m.short_name, dim_names=dim_names)
                 t = time.time()
                 table = gh.long_to_wide(table)
@@ -218,7 +218,7 @@ def render_yaml_metadata(ds: catalog.Dataset) -> None:
     for table_name in ds.table_names:
         table = ds[table_name]
         for col in table.columns:
-            table[col].metadata = table[col].metadata.render({})
+            table[col].metadata = table[col].metadata.render({})  # ty: ignore[unresolved-attribute]
         table._save_metadata(os.path.join(ds.path, table.metadata.checked_name + ".meta.json"))
 
 
@@ -310,8 +310,8 @@ class PathFinder:
     @property
     def channel(self) -> CHANNEL:
         if self._is_snapshot_file:
-            return "snapshot"  # type: ignore
-        return self.f.parent.parent.parent.name  # type: ignore
+            return "snapshot"  # ty: ignore
+        return self.f.parent.parent.parent.name  # ty: ignore
 
     @property
     def namespace(self) -> str:
@@ -401,7 +401,7 @@ class PathFinder:
         """Return step name."""
         return self.create_step_name(
             short_name=self.short_name,
-            channel=self.channel,  # type: ignore
+            channel=self.channel,  # ty: ignore
             namespace=self.namespace,
             version=self.version,
             step_type=self.step_type,
@@ -606,7 +606,7 @@ class PathFinder:
             )
             dataset = catalog.Dataset(dataset_path)
 
-        return dataset  # type: ignore[reportReturnType]
+        return dataset  # ty: ignore[invalid-return-type]
 
     def load_snapshot(self, short_name: str | None = None, **kwargs) -> Snapshot:
         """Load snapshot dependency. short_name defaults to the current step's short_name."""

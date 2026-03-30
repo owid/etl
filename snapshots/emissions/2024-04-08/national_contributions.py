@@ -56,7 +56,7 @@ def main(upload: bool) -> None:
 def extract_metadata_from_main_page(snap: Snapshot) -> Dict[str, str]:
     """Extract the publication date."""
     # Get the full HTML content of the main page.
-    response = requests.get(snap.metadata.origin.url_main)  # type: ignore
+    response = requests.get(snap.metadata.origin.url_main)  # ty: ignore
 
     # The "latest" url redirects to the new record (which we need to extract other fields).
     response_final = response.url
@@ -78,7 +78,7 @@ def extract_metadata_from_main_page(snap: Snapshot) -> Dict[str, str]:
     ]
 
     # The download links have the years hardcoded in the url, so we need to update them.
-    file_name = snap.metadata.origin.url_download.split("/")[-1]  # type: ignore
+    file_name = snap.metadata.origin.url_download.split("/")[-1]  # ty: ignore
     # Assume that the latest informed year in the data is 2 years before the current version.
     file_name_new = file_name.split("-")[0] + "-" + str(int(version_producer.split(".")[0]) - 2) + ".csv"
     # Create the new download url (using the new token for the latest version, and the latest year in the file name).

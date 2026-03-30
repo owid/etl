@@ -68,7 +68,7 @@ class StepUpdater:
         # Get info for step to be updated.
         step_info = self.steps_df[self.steps_df["step"] == step].iloc[0].to_dict()
 
-        return step_info
+        return step_info  # ty: ignore[invalid-return-type]
 
     def _update_snapshot_step(
         self,
@@ -124,7 +124,7 @@ class StepUpdater:
             step_py_file = steps_sorted[choice]
 
         # Define the new step.
-        step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
+        step_new = step.replace(step_info["version"], step_version_new)  # ty: ignore
 
         # Define a header for the new step in the dag file.
         if step_header is None:
@@ -141,9 +141,9 @@ class StepUpdater:
             # Load metadata from last step.
             metadata = SnapshotMeta.load_from_yaml(step_dvc_file)
             # Update version and date accessed.
-            metadata.version = step_version_new  # type: ignore
+            metadata.version = step_version_new  # ty: ignore
             if metadata.origin:
-                metadata.origin.date_accessed = step_version_new  # type: ignore
+                metadata.origin.date_accessed = step_version_new  # ty: ignore
             # Write metadata to new file.
             step_dvc_file_new.write_text(metadata.to_yaml())
 
@@ -207,7 +207,7 @@ class StepUpdater:
             # If the step has version "latest", the new step will also have version "latest".
             step_new = step
         else:
-            step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
+            step_new = step.replace(step_info["version"], step_version_new)  # ty: ignore
 
         # Find the latest version of each of the step's dependencies.
         step_dependencies = set(self.steps_df[self.steps_df["step"] == step].iloc[0]["direct_dependencies"])
@@ -234,7 +234,7 @@ class StepUpdater:
                 # Copy files to new folder.
                 for step_file in step_files:
                     # Define the path to the new version of this file.
-                    step_file_new = Path(str(step_file).replace(step_info["version"], step_version_new))  # type: ignore
+                    step_file_new = Path(str(step_file).replace(step_info["version"], step_version_new))  # ty: ignore
 
                     # Check that the new file does not exist.
                     if step_file_new.exists():

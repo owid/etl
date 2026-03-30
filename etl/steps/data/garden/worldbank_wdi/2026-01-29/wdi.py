@@ -86,7 +86,7 @@ def run() -> None:
 
     tb_cust = mk_custom_entities(tb)
     assert all([col in tb.columns for col in tb_cust.columns])
-    tb = pd.concat([tb, tb_cust], axis=0).copy_metadata(tb)  # type: ignore
+    tb = pd.concat([tb, tb_cust], axis=0).copy_metadata(tb)  # ty: ignore
 
     tb_garden = tb
 

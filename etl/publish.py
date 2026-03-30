@@ -348,7 +348,7 @@ def get_published_checksums(bucket: str, channel: CHANNEL) -> Dict[str, str]:
         existing["path"] = existing["path"].apply(lambda p: p.rsplit("/", 1)[0])
         existing = existing[["path", "checksum"]].drop_duplicates().set_index("path").checksum.to_dict()
     except HTTPError:
-        existing = {}  # type: ignore
+        existing = {}  # ty: ignore
     except IncompleteRead as e:
         print(f"ERROR: error when reading {uri}: {e}", file=sys.stderr)
         raise e
@@ -372,7 +372,7 @@ def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:
     return Path(f"catalog-{channel}.{format}")
 
 
-def read_frame(uri: str, max_retries: int = 3) -> pd.DataFrame:  # type: ignore
+def read_frame(uri: str, max_retries: int = 3) -> pd.DataFrame:  # ty: ignore
     retries = 0
     while retries <= max_retries:
         try:

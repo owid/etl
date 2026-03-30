@@ -2042,8 +2042,8 @@ def expand_means_and_ginis_to_thousand_bins(
         pd.DataFrame(
             {
                 # Use .array to preserve categorical dtype, saves ~800MB per call
-                "country": np.repeat(tb_new["country"].array, n_quantiles),  # type: ignore
-                "year": np.repeat(tb_new["year"].array, n_quantiles),  # type: ignore
+                "country": np.repeat(tb_new["country"].array, n_quantiles),  # ty: ignore
+                "year": np.repeat(tb_new["year"].array, n_quantiles),  # ty: ignore
                 "quantile": np.tile(quantiles, n_rows),  # uint16 quantiles
                 "avg": compute_incomes(),  # float32 incomes, computed and freed immediately
             }

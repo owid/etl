@@ -135,13 +135,13 @@ def compare(
         else:
             # For numeric data, consider them equal within certain absolute and relative tolerances.
             compared_row = np.isclose(
-                df1[col].values,  # type: ignore
-                df2[col].values,  # type: ignore
+                df1[col].values,  # ty: ignore
+                df2[col].values,  # ty: ignore
                 atol=absolute_tolerance,
                 rtol=relative_tolerance,
             )
         # Treat nans as equal.
-        compared_row[pd.isnull(df1[col].values) & pd.isnull(df2[col].values)] = True  # type: ignore
+        compared_row[pd.isnull(df1[col].values) & pd.isnull(df2[col].values)] = True  # ty: ignore
         compared[col] = compared_row
 
     return compared
@@ -256,7 +256,7 @@ def are_equal(
             absolute_tolerance=absolute_tolerance,
             relative_tolerance=relative_tolerance,
         )
-        all_values_equal = compared.all().all()  # type: ignore
+        all_values_equal = compared.all().all()  # ty: ignore
         if not all_values_equal:
             summary += "\n* Values differ by more than the given absolute and relative" " tolerances."
 
@@ -273,7 +273,7 @@ def are_equal(
         # Optionally print the summary of the comparison.
         print(summary)
 
-    return equal, compared
+    return equal, compared  # ty: ignore[invalid-return-type]
 
 
 def _calculate_weighted_mean(
@@ -423,7 +423,7 @@ def groupby_agg(
 
         # Handle regular aggregations first (if any)
         if regular_aggregations:
-            grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(regular_aggregations)  # type: ignore
+            grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(regular_aggregations)  # ty: ignore
         else:
             # Create empty DataFrame with proper groupby index for weighted-only case
             grouped = (
@@ -445,10 +445,10 @@ def groupby_agg(
                 ),
                 include_groups=False,
             )
-            grouped[col] = weighted_results  # type: ignore
+            grouped[col] = weighted_results  # ty: ignore
     else:
         # No weighted aggregations; use standard grouping logic
-        grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(aggregations)  # type: ignore
+        grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(aggregations)  # ty: ignore
 
     # Calculate a few necessary parameters related to the number of nans and valid elements.
     if (num_allowed_nans is not None) or (frac_allowed_nans is not None) or (min_num_values is not None):
@@ -456,16 +456,16 @@ def groupby_agg(
         num_nans_detected = count_missing_in_groups(df, groupby_columns, **groupby_kwargs)
     if (frac_allowed_nans is not None) or (min_num_values is not None):
         # Count number of total elements in each group (counting both nans and non-nan values).
-        num_elements = df.groupby(groupby_columns, **groupby_kwargs).size()  # type: ignore
+        num_elements = df.groupby(groupby_columns, **groupby_kwargs).size()  # ty: ignore
 
     # Apply conditions sequentially.
     if num_allowed_nans is not None:
         # Make nan any aggregation where there were too many missing values.
-        grouped = grouped[num_nans_detected <= num_allowed_nans]  # type: ignore
+        grouped = grouped[num_nans_detected <= num_allowed_nans]  # ty: ignore
 
     if frac_allowed_nans is not None:
         # Make nan any aggregation where there were too many missing values.
-        grouped = grouped[num_nans_detected.divide(num_elements, axis="index") <= frac_allowed_nans]  # type: ignore
+        grouped = grouped[num_nans_detected.divide(num_elements, axis="index") <= frac_allowed_nans]  # ty: ignore
 
     if min_num_values is not None:
         # Make nan any aggregation where there were too few valid (non-nan) values.
@@ -477,7 +477,7 @@ def groupby_agg(
         # Therefore, we impose that either the number of valid values is >= min_num_values, or that there are no nans
         # (and hence all values are valid).
         grouped = grouped[
-            (-num_nans_detected.subtract(num_elements, axis="index") >= min_num_values) | (num_nans_detected == 0)  # type: ignore
+            (-num_nans_detected.subtract(num_elements, axis="index") >= min_num_values) | (num_nans_detected == 0)  # ty: ignore
         ]
 
     return cast(pd.DataFrame, grouped)
@@ -535,7 +535,7 @@ def multi_merge(dfs: List[pd.DataFrame], on: Union[List[str], str], how: str = "
     """
     merged = dfs[0].copy()
     for df in dfs[1:]:
-        merged = pd.merge(merged, df, how=how, on=on)  # type: ignore
+        merged = pd.merge(merged, df, how=how, on=on)  # ty: ignore
 
     return merged
 
@@ -644,7 +644,7 @@ def map_series(
         missing = series_mapped.isnull() & (~series.isin(values_mapped_to_nan))
         if missing.any():
             # Replace those nans by their original values.
-            series_mapped.loc[missing] = series[missing]  # type: ignore[reportCallIssue]
+            series_mapped.loc[missing] = series[missing]  # ty: ignore[call-non-callable]
 
     if warn_on_missing_mappings:
         unmapped = set(series) - set(mapping)
@@ -770,7 +770,7 @@ def apply_on_categoricals(cat_series: List[pd.Series], func: Callable[..., str])
         # use existing category
         codes.append(seen[cat_codes])
 
-    return cast(pd.Series, pd.Categorical.from_codes(codes, categories=categories))
+    return cast(pd.Series, pd.Categorical.from_codes(codes, categories=pd.Index(categories)))
 
 
 def combine_two_overlapping_dataframes(

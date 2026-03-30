@@ -21,7 +21,7 @@ def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
     )
     data = data_df[["values", "years", "entities"]].to_dict(orient="list")
     data["values"] = _convert_strings_to_numeric(data["values"])
-    return data  # type: ignore
+    return data  # ty: ignore
 
 
 def _load_variable(session: Session, variable_id: int) -> Dict[str, Any]:

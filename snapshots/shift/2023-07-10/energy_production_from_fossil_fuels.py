@@ -331,11 +331,11 @@ def fetch_data_for_energy_source_and_a_list_of_countries(energy_source: str, cou
         soup.find(
             "script",
             {"type": "application/json", "id": re.compile(r"^((?!tb-djs).)*$")},
-        ).string  # type: ignore
+        ).string  # ty: ignore
     )
 
     fields = data["props"]["apolloState"]
-    elements = {}  # type: ignore
+    elements = {}  # ty: ignore
     years = []
     for key in list(fields):
         if (ENERGY_UNIT in key) and ("name" in fields[key]) and ("data" in fields[key]):
@@ -379,7 +379,7 @@ def fetch_all_data_for_energy_source(energy_source: str) -> pd.DataFrame:
         # Fetch data for current chunk of countries and specified energy source.
         df = fetch_data_for_energy_source_and_a_list_of_countries(
             energy_source=energy_source,
-            countries=countries_chunk,  # type: ignore
+            countries=countries_chunk,  # ty: ignore
         )
         # Wait between consecutive requests.
         sleep(TIME_BETWEEN_QUERIES)

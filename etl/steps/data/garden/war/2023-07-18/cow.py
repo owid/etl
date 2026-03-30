@@ -79,7 +79,7 @@ from typing import List, Set, Tuple
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from pandas.api.types import is_integer_dtype  # type: ignore
+from pandas.api.types import is_integer_dtype  # ty: ignore
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -272,7 +272,7 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
 
     # Add yearly observations (scale values)
     log.info("war.cow: expand observations")
-    tb = expand_observations(tb, column_metrics=["number_deaths_ongoing_conflicts"])  # type: ignore
+    tb = expand_observations(tb, column_metrics=["number_deaths_ongoing_conflicts"])  # ty: ignore
 
     # Estimate metrics (do the aggregations)
     log.info("war.cow: estimate metrics")
@@ -758,7 +758,7 @@ def expand_observations(tb: Table, column_metrics: List[int]) -> Table:
     YEAR_MIN = tb["year_start"].min()
     YEAR_MAX = tb["year_end"].max()
     tb_all_years = pd.DataFrame(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
-    tb = tb_all_years.merge(tb, how="cross")  # type: ignore
+    tb = tb_all_years.merge(tb, how="cross")  # ty: ignore
     ## Filter only entries that actually existed
     tb = tb[(tb["year"] >= tb["year_start"]) & (tb["year"] <= tb["year_end"])]
 
@@ -849,12 +849,12 @@ def _get_ongoing_metrics(tb: Table) -> Table:
             tb_ongoing_world_intra,
         ],
         ignore_index=True,
-    ).sort_values(  # type: ignore
+    ).sort_values(  # ty: ignore
         by=["year", "region", "conflict_type"]
     )
 
     ## Rename columns
-    tb_ongoing = tb_ongoing.rename(  # type: ignore
+    tb_ongoing = tb_ongoing.rename(  # ty: ignore
         columns={
             "warnum": "number_ongoing_conflicts",
         }
@@ -905,12 +905,12 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new = pd.concat(
         [tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes, tb_new_intra, tb_new_world_intra],
         ignore_index=True,
-    ).sort_values(  # type: ignore
+    ).sort_values(  # ty: ignore
         by=["year_start", "region", "conflict_type"]
     )
 
     ## Rename columns
-    tb_new = tb_new.rename(  # type: ignore
+    tb_new = tb_new.rename(  # ty: ignore
         columns={
             "year_start": "year",
             "warnum": "number_new_conflicts",

@@ -326,7 +326,7 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
             regions = set(vc[vc > 1].index.get_level_values(0))
             table = table[~table.index.get_level_values("country").isin(regions)]
 
-            table.reset_index(level=["level_status"], inplace=True)  # type: ignore
+            table.reset_index(level=["level_status"], inplace=True)  # ty: ignore
             table["value"] = table["level_status"]
             table.drop(columns=["level_status"], inplace=True)
         new_tabs.append(table)

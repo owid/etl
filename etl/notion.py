@@ -219,7 +219,7 @@ def get_impact_highlights(
 
     # Fetch impact highlights from Notion.
     df = get_table_from_notion_url(
-        notion_url=NOTION_IMPACT_HIGHLIGHTS_TABLE_URL,  # type: ignore
+        notion_url=NOTION_IMPACT_HIGHLIGHTS_TABLE_URL,  # ty: ignore
         include_row_urls=True,
         max_rows=max_rows,
     )
@@ -243,7 +243,7 @@ def get_impact_highlights(
 
 def get_data_producer_contacts(producers: Optional[List[str]] = None) -> pd.DataFrame:
     # Fetch data providers contacts table from Notion.
-    df = get_table_from_notion_url(notion_url=NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL)  # type: ignore
+    df = get_table_from_notion_url(notion_url=NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL)  # ty: ignore
 
     if producers is not None:
         # Select relevant producers.

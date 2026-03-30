@@ -68,22 +68,22 @@ class FasttrackImport:
 
         The data of the dataset consists of its one and only table.
         """
-        return self.dataset[self.meta.short_name]  # type: ignore
+        return self.dataset[self.meta.short_name]  # ty: ignore
 
     @property
     def dataset_dir(self) -> Path:
         """Directory of the dataset."""
-        return STEP_DIR / "data" / "grapher" / self.meta.namespace / str(self.meta.version)  # type: ignore
+        return STEP_DIR / "data" / "grapher" / self.meta.namespace / str(self.meta.version)  # ty: ignore
 
     @property
     def step_path(self) -> Path:
         """Path to the step python script."""
-        return self.dataset_dir / (self.meta.short_name + ".py")  # type: ignore
+        return self.dataset_dir / (self.meta.short_name + ".py")  # ty: ignore
 
     @property
     def metadata_path(self) -> Path:
         """Path to the step's metadata YAML file."""
-        return self.dataset_dir / (self.meta.short_name + ".meta.yml")  # type: ignore
+        return self.dataset_dir / (self.meta.short_name + ".meta.yml")  # ty: ignore
 
     # Snapshot-level properties
     @property
@@ -121,12 +121,12 @@ class FasttrackImport:
             raise ValueError("Dataset must have either one source or one origin")
 
         return SnapshotMeta(
-            namespace=self.meta.namespace,  # type: ignore
-            short_name=self.meta.short_name,  # type: ignore
-            name=self.meta.title,  # type: ignore
+            namespace=self.meta.namespace,  # ty: ignore
+            short_name=self.meta.short_name,  # ty: ignore
+            name=self.meta.title,  # ty: ignore
             version=str(self.meta.version),
             file_extension="csv",
-            description=self.meta.description,  # type: ignore
+            description=self.meta.description,  # ty: ignore
             source=source,
             origin=origin,
             license=license,
@@ -154,7 +154,7 @@ class FasttrackImport:
         yml = metadata_export(self.dataset)
         # source is already in the snapshot and is propagated
         yml["dataset"].pop("sources", None)
-        return yaml_dump(yml)  # type: ignore
+        return yaml_dump(yml)  # ty: ignore
 
     def save_metadata(self) -> None:
         """Save dataset YAML metadata file as `self.metadata_path`."""
@@ -290,7 +290,7 @@ class FasttrackImport:
                 session,
                 namespace=str(self.dataset.metadata.namespace),
                 short_name=str(self.dataset.metadata.short_name),
-                version=str(self.dataset.metadata.version),  # type: ignore
+                version=str(self.dataset.metadata.version),  # ty: ignore
             )
             assert ds.id, "No ID found in dataset object!"
             return ds.id

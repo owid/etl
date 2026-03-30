@@ -456,7 +456,7 @@ class TeaProductionAnomaly(DataAnomaly):
 
 
 class HighYieldAnomaly(DataAnomaly):
-    description = ()  # type: ignore
+    description = ()  # ty: ignore
 
     affected_item_codes = []
     affected_element_codes = []

@@ -113,7 +113,7 @@ def from_file(
     read_function = input_methods[extension]
 
     # Load file using the chosen read function and the appropriate arguments.
-    df: pd.DataFrame = read_function(file_path, **kwargs)  # type: ignore
+    df: pd.DataFrame = read_function(file_path, **kwargs)  # ty: ignore
     return df
 
 

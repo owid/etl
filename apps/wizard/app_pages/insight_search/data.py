@@ -52,7 +52,7 @@ def get_raw_images() -> Dict[Any, Any]:
     query = "select filename, cloudflareId from images;"
     df = read_sql(query).dropna()
 
-    return df.set_index("filename").squeeze().to_dict()
+    return df.set_index("filename").squeeze().to_dict()  # ty: ignore[unresolved-attribute]
 
 
 def extract_text_from_raw_data_insight(content: Dict[str, Any]) -> str:

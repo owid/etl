@@ -72,10 +72,10 @@ def _stream_to_file(
         md5.update(chunk)
         bytes_downloaded += len(chunk)
         if display_progress:
-            progress.update(task_id, advance=len(chunk))  # type: ignore
+            progress.update(task_id, advance=len(chunk))  # ty: ignore
 
     if display_progress:
-        progress.stop()  # type: ignore
+        progress.stop()  # ty: ignore
 
     # Verify content length if provided by server and content is not compressed
     # When content is gzipped, requests decompresses it automatically, so bytes_downloaded

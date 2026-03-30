@@ -24,7 +24,7 @@ def raise_helper(msg: str) -> None:
     raise Exception(msg)
 
 
-jinja_env.globals["raise"] = raise_helper
+jinja_env.globals["raise"] = raise_helper  # ty: ignore[invalid-assignment]
 
 
 def _uses_jinja(text: str | None):

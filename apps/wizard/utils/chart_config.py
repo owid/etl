@@ -92,25 +92,38 @@ def bake_chart_config(
     chart_config = deepcopy(CONFIG_BASE)
 
     # Tweak config
+    chart_config_any = chart_config
     if isinstance(variable_id, (int, np.integer)):
-        chart_config["dimensions"] = [{"property": "y", "variableId": variable_id}]
+        chart_config_any["dimensions"] = [
+            {"property": "y", "variableId": variable_id}
+        ]  # ty: ignore[invalid-assignment]
     elif isinstance(variable_id, list):
-        chart_config["dimensions"] = [{"property": "y", "variableId": v} for v in variable_id]
+        chart_config_any["dimensions"] = [
+            {"property": "y", "variableId": v} for v in variable_id
+        ]  # ty: ignore[invalid-assignment]
     elif isinstance(catalog_path, str):
         variable = ensure_load_variable(catalog_path=catalog_path, owid_env=owid_env)
-        chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
+        chart_config_any["dimensions"] = [
+            {"property": "y", "variableId": variable.id}
+        ]  # ty: ignore[invalid-assignment]
     elif isinstance(variable, Variable):
-        chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
+        chart_config_any["dimensions"] = [
+            {"property": "y", "variableId": variable.id}
+        ]  # ty: ignore[invalid-assignment]
     elif isinstance(variable, list):
-        chart_config["dimensions"] = [{"property": "y", "variableId": v.id} for v in variable]
+        chart_config_any["dimensions"] = [
+            {"property": "y", "variableId": v.id} for v in variable
+        ]  # ty: ignore[invalid-assignment]
     else:
         variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
-        chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
+        chart_config_any["dimensions"] = [
+            {"property": "y", "variableId": variable.id}
+        ]  # ty: ignore[invalid-assignment]
 
     if display is not None:
-        assert len(display) == len(chart_config["dimensions"])
+        assert len(display) == len(chart_config_any["dimensions"])  # ty: ignore[invalid-assignment]
         for i, d in enumerate(display):
-            chart_config["dimensions"][i]["display"] = d
+            chart_config_any["dimensions"][i]["display"] = d  # ty: ignore[invalid-assignment, not-subscriptable]
 
     ## Selected entities?
     if selected_entities is not None:

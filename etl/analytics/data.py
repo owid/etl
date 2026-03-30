@@ -91,7 +91,7 @@ def get_number_of_days(
     if isinstance(date_start, pd.Series) or isinstance(date_end, pd.Series):
         # Add a column with the number of days that the views are referring to.
         # Add 1 to include the end date in the count.
-        n_days = (date_end - date_start).dt.days + 1
+        n_days = (date_end - date_start).dt.days + 1  # ty: ignore[unresolved-attribute]
         # Set to 0 for cases where date_start > date_end.
         n_days = n_days.where(date_end >= date_start, 0)
     else:

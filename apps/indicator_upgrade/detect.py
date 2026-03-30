@@ -136,10 +136,10 @@ def get_datasets_with_migrations(archived: bool = True) -> pd.DataFrame:
         # Sort by mappability and number of charts
         # Prefer datasets with old counterparts and fewer charts (likely unmapped)
         new_dataset_charts = get_dataset_charts(dataset_ids=dataset_ids)
-        new_dataset_charts["n_new_charts"] = new_dataset_charts["chart_ids"].apply(len)  # type: ignore
+        new_dataset_charts["n_new_charts"] = new_dataset_charts["chart_ids"].apply(len)  # ty: ignore
         steps_df_grapher = (
             steps_df_grapher.merge(
-                new_dataset_charts[["dataset_id", "n_new_charts"]].rename(columns={"dataset_id": "id"}),  # type: ignore
+                new_dataset_charts[["dataset_id", "n_new_charts"]].rename(columns={"dataset_id": "id"}),  # ty: ignore
                 on="id",
                 how="left",
             )

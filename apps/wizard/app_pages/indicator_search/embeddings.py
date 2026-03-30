@@ -12,4 +12,4 @@ def get_indicators_embeddings(_model, indicators: list[Dict[str, Any]]) -> list:
         # Combine the name and description into a single string
         indicators_texts = [indicator["name"] + " " + indicator["description"] for indicator in indicators]
 
-        return emb.get_embeddings(_model, indicators_texts)  # type: ignore
+        return emb.get_embeddings(_model, indicators_texts)  # ty: ignore

@@ -119,4 +119,4 @@ class GoogleApi:
         request = f"'{parent_id}' in parents and trashed=false"
         # Get list of files
         files = self.drive.ListFile({"q": request}).GetList()
-        return files  # type: ignore[reportReturnType]
+        return files  # ty: ignore[invalid-return-type]

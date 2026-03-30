@@ -135,7 +135,7 @@ def load_metadata_urls() -> Dict[str, str]:
 
     meta_links = {}
 
-    for a_href in soup.find_all("a", href=lambda href: href and "gho/data" in href):  # type: ignore
+    for a_href in soup.find_all("a", href=lambda href: href and "gho/data" in href):  # ty: ignore
         link = a_href.attrs["href"]
         # relative link
         if link.startswith("/data/gho"):
@@ -155,7 +155,7 @@ def load_metadata_urls_from_registry() -> Dict[str, str]:
 
     meta_links = {}
 
-    for a_href in soup.find_all("a", href=lambda href: href and "data/gho" in href):  # type: ignore
+    for a_href in soup.find_all("a", href=lambda href: href and "data/gho" in href):  # ty: ignore
         link = a_href.attrs["href"]
         # relative link
         if link.startswith("/data/gho"):

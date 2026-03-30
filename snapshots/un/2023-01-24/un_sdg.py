@@ -62,7 +62,7 @@ def main(upload: bool) -> None:
             json.dump(dim_desc, fp)
 
         log.info("Adding dimension descriptions to catalog...")
-        add_snapshot("un/2023-01-24/un_sdg_dimension.json", filename=dim_file, upload=upload)  # type: ignore
+        add_snapshot("un/2023-01-24/un_sdg_dimension.json", filename=dim_file, upload=upload)  # ty: ignore
 
         # fetch the file locally
         assert metadata.source

@@ -95,7 +95,7 @@ def gather_producer_analytics(producers: List[str], min_date: str, max_date: str
         df_charts.loc[
             df_charts["chart_id"].isin(sorted(set(df_posts[homepage_mask]["chart_id"]))), "featured_on_homepage"
         ] = True
-        df_posts = df_posts.drop(homepage_mask[homepage_mask].index).reset_index(drop=True)  # type: ignore
+        df_posts = df_posts.drop(homepage_mask[homepage_mask].index).reset_index(drop=True)  # ty: ignore
     # Keep only the information about posts.
     df_posts = (
         df_posts.drop_duplicates(subset=["post_url"])
@@ -415,7 +415,7 @@ class Report:
         # Add data providers emails with commenter permissions.
         if self.emails is not None:
             GoogleDrive().set_file_permissions(
-                file_id=self.pdf_id,  # type: ignore
+                file_id=self.pdf_id,  # ty: ignore
                 role="commenter",
                 emails=self.emails,
                 send_notification_email=False,

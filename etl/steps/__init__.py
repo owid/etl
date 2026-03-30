@@ -1172,9 +1172,9 @@ class ExportStep(DataStep):
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
             if config.DEBUG:
-                DataStep._run_py_isolated(self)  # type: ignore
+                DataStep._run_py_isolated(self)  # ty: ignore
             else:
-                DataStep._run_py(self)  # type: ignore
+                DataStep._run_py(self)  # ty: ignore
 
         # save checksum (only update index.json, don't call ds.save() which iterates
         # table_names and would pick up custom JSON files written by the export script)
@@ -1265,7 +1265,7 @@ class ETagStep(Step):
 class PrivateMixin:
     def after_run(self) -> None:
         """Make dataset private"""
-        ds = catalog.Dataset(self._dest_dir.as_posix())  # type: ignore
+        ds = catalog.Dataset(self._dest_dir.as_posix())  # ty: ignore
         ds.metadata.is_public = False
         ds.save()
 
@@ -1287,7 +1287,7 @@ def select_dirty_steps(steps: List[Step], workers: int = 1) -> List[Step]:
         _add_is_dirty_cached(s, cache_is_dirty)
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
-        steps_dirty = executor.map(_step_is_dirty, steps)  # type: ignore
+        steps_dirty = executor.map(_step_is_dirty, steps)  # ty: ignore
         steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
 
     cache_is_dirty.clear()
@@ -1303,16 +1303,16 @@ def _cached_is_dirty(step: Step, cache: files.RuntimeCache) -> bool:
     key = str(step)
     if key not in cache:
         # _is_dirty is a dynamically added copy of the original is_dirty method (see _add_is_dirty_cached)
-        cache.add(key, step._is_dirty())  # type: ignore[attr-defined]
-    return cache[key]  # type: ignore[return-value]
+        cache.add(key, step._is_dirty())  # ty: ignore[unresolved-attribute]
+    return cache[key]  # ty: ignore[invalid-return-type]
 
 
 def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     """Save copy of a method to _is_dirty and replace it with a cached version."""
     # Intentional monkey-patching: save original method and replace with cached version
-    s._is_dirty = s.is_dirty  # type: ignore[attr-defined]
-    s._cache = cache  # type: ignore[attr-defined]
-    s.is_dirty = partial(_cached_is_dirty, s, cache)  # type: ignore[method-assign]
+    s._is_dirty = s.is_dirty  # ty: ignore[unresolved-attribute]
+    s._cache = cache  # ty: ignore[unresolved-attribute]
+    s.is_dirty = partial(_cached_is_dirty, s, cache)  # ty: ignore[invalid-assignment]
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
 

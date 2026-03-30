@@ -41,7 +41,7 @@ class Explorer(Collection):
             raise ValueError("Missing 'config' key in the dictionary.")
 
         # Now that data is in the expected shape, let the parent class handle the rest
-        return super().from_dict(data)  # type: ignore[return-value]
+        return super().from_dict(data)  # ty: ignore[invalid-return-type]
 
     def __post_init__(self):
         """We set it here because of simplicity.
@@ -240,7 +240,7 @@ def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: OWIDEnv | None =
     else:
         engine = owid_env.engine
     with Session(engine) as session:
-        db_indicators = gm.Variable.from_id_or_path(session, catalog_paths)  # type: ignore
+        db_indicators = gm.Variable.from_id_or_path(session, catalog_paths)  # ty: ignore
         # scores = dict(zip(catalog_paths, range(len(catalog_paths))))
         # db_indicators.sort(key=lambda x: scores[x.catalogPath], reverse=True)
         return {indicator.catalogPath: indicator.id for indicator in db_indicators}

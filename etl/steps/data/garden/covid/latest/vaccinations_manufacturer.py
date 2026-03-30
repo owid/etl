@@ -110,6 +110,6 @@ def _interp_ffill_fillna(
         time_mode="none",
     )
 
-    tb.loc[:, columns] = tb.groupby(entity_col)[columns].ffill().fillna(0)  # type: ignore
+    tb.loc[:, columns] = tb.groupby(entity_col)[columns].ffill().fillna(0)  # ty: ignore
 
     return tb

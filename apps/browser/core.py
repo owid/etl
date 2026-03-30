@@ -749,7 +749,7 @@ def browse_items(
                         state.matches = []
 
                         def reload_for_mode_switch() -> None:
-                            state.all_items = state.items_loader()  # type: ignore[misc]
+                            state.all_items = state.items_loader()  # ty: ignore
                             state.filter_options = extract_filter_options(state.all_items)
                             state.loading = False
                             if state.on_items_loaded is not None:
@@ -773,7 +773,7 @@ def browse_items(
                     state.matches = []
 
                     def reload_items() -> None:
-                        state.all_items = state.items_loader()  # type: ignore[misc]
+                        state.all_items = state.items_loader()  # ty: ignore
                         state.loading = False
                         if state.on_items_loaded is not None:
                             state.on_items_loaded(state.all_items)

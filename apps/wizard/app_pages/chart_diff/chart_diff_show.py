@@ -162,7 +162,9 @@ class ChartDiffShow:
 
     def _refresh_chart_diff(self):
         """Get latest chart version from database."""
-        diff_new = ChartDiffsLoader(self.source_session.get_bind(), self.target_session.get_bind()).get_diffs(  # type: ignore
+        diff_new = ChartDiffsLoader(
+            self.source_session.get_bind(), self.target_session.get_bind()
+        ).get_diffs(  # ty: ignore
             sync=True, chart_ids=[self.diff.chart_id]
         )[0]
         st.session_state.chart_diffs[self.diff.chart_id] = diff_new
@@ -271,7 +273,7 @@ class ChartDiffShow:
                     options=self.status_names_binary,
                     horizontal=True,
                     format_func=lambda x: f":{DISPLAY_STATE_OPTIONS_BINARY[x]['color']}-background[{DISPLAY_STATE_OPTIONS_BINARY[x]['label']}]",
-                    index=self.status_names_binary.index(self.diff.approval_status),  # type: ignore
+                    index=self.status_names_binary.index(self.diff.approval_status),  # ty: ignore
                     on_change=self._push_status_binary,
                     help="Note that the changes in the chart come from ETL changes (metadata/data) and therefore there is no way to reject them at this stage. If you are not happy with the changes, please look at the ETL steps involved. We present them to you here as a sanity check, and ask you to review them for correctness.",
                 )
@@ -295,7 +297,7 @@ class ChartDiffShow:
                     key=f"status-ctrl-{self.diff.chart_id}",
                     options=self.status_names,
                     format_func=lambda x: _format_status(x),
-                    default=self.diff.approval_status,  # type: ignore
+                    default=self.diff.approval_status,  # ty: ignore
                     on_change=self._push_status,
                     disabled=self.diff.in_conflict,
                     help=help_text,
@@ -369,7 +371,7 @@ class ChartDiffShow:
                 badges = " ".join([f":gray-badge[{tag['name']}]" for tag in tags])
                 st.markdown(badges)
 
-    @st.dialog("Metadata differences", width="large")  # type: ignore
+    @st.dialog("Metadata differences", width="large")  # ty: ignore
     def _show_metadata_diff_modal(self) -> None:
         """Show metadata diff in a modal page."""
         # Sanity checks
@@ -439,7 +441,7 @@ class ChartDiffShow:
                 ]
                 stream = api.chat.completions.create(
                     model=MODEL_DEFAULT,
-                    messages=messages,  # type: ignore
+                    messages=messages,  # ty: ignore
                     max_completion_tokens=1000,
                     stream=True,
                 )

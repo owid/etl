@@ -37,10 +37,10 @@ def prune_dict(d: dict) -> dict:
 
 # explorer.core, model.core, model.dimensions, model.view
 def pruned_json(cls: T) -> T:
-    orig = cls.to_dict  # type: ignore
+    orig = cls.to_dict  # ty: ignore
 
     # only keep non-null public variables
     # calling original to_dict returns dictionaries, not objects
-    cls.to_dict = lambda self, **kwargs: prune_dict(orig(self, **kwargs))  # type: ignore
+    cls.to_dict = lambda self, **kwargs: prune_dict(orig(self, **kwargs))  # ty: ignore
 
     return cls

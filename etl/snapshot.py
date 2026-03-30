@@ -758,7 +758,7 @@ class SnapshotMeta(MetaBase):
             del d["short_name"]
             del d["file_extension"]
 
-        return yaml_dump({"meta": d})  # type: ignore
+        return yaml_dump({"meta": d})  # ty: ignore
 
     def _update_metadata_file(self, d: dict[str, Any]) -> None:
         """Update metadata YAML file with given dictionary."""
@@ -782,7 +782,7 @@ class SnapshotMeta(MetaBase):
         with open(self.path, "w") as f:
             f.write(ruamel_dump(meta))
 
-    def save(self) -> None:  # type: ignore
+    def save(self) -> None:  # ty: ignore
         """Save metadata to YAML file. This is useful if you're dynamically changing
         metadata (like dates) from the script and need to save them into YAML. This
         function doesn't upload the file to S3, use `create_snapshot` instead.
@@ -911,15 +911,15 @@ class SnapshotMeta(MetaBase):
             table_meta = TableMeta.from_dict(
                 {
                     "short_name": self.short_name,
-                    "title": self.origin.title,  # type: ignore
-                    "description": self.origin.description,  # type: ignore
+                    "title": self.origin.title,  # ty: ignore
+                    "description": self.origin.description,  # ty: ignore
                     "dataset": DatasetMeta.from_dict(
                         {
                             "channel": "snapshots",
                             "namespace": self.namespace,
                             "short_name": self.short_name,
-                            "title": self.origin.title,  # type: ignore
-                            "description": self.origin.description,  # type: ignore
+                            "title": self.origin.title,  # ty: ignore
+                            "description": self.origin.description,  # ty: ignore
                             "licenses": [self.license] if self.license else [],
                             "is_public": self.is_public,
                             "version": self.version,

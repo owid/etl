@@ -96,5 +96,5 @@ def add_age_groups(df: Table) -> Table:
     # 100+ age group
     df_100 = df[df.age == "100+"].copy()
     # Merge all age groups
-    df = pd.concat([df_0, df_1_4, df_5, df_10, df_100], ignore_index=True)  # type: ignore
+    df = pd.concat([df_0, df_1_4, df_5, df_10, df_100], ignore_index=True)  # ty: ignore
     return df

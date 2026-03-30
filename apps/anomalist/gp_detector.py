@@ -59,7 +59,7 @@ def _processing_queue(items: list[tuple[str, int]]) -> List[tuple]:
         probs = np.full_like(probs, 0.5)
     else:
         # Otherwise, fill any missing values with the mean probability.
-        probs = np.nan_to_num(probs, nan=np.nanmean(probs))  # type: ignore
+        probs = np.nan_to_num(probs, nan=np.nanmean(probs))  # ty: ignore
 
     # Randomly shuffle the items based on their probabilities
     items_index = np.random.choice(
@@ -70,7 +70,7 @@ def _processing_queue(items: list[tuple[str, int]]) -> List[tuple]:
     )
 
     # Return the shuffled list of items
-    return np.array(items, dtype=object)[items_index]  # type: ignore
+    return np.array(items, dtype=object)[items_index]  # ty: ignore
 
 
 class AnomalyGaussianProcessOutlier(AnomalyDetector):
@@ -187,7 +187,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
     def get_Xy(self, series: pd.Series) -> tuple[np.ndarray, np.ndarray]:
         X = series.index.values.reshape(-1, 1)
         y = series.values
-        return X, y  # type: ignore
+        return X, y  # ty: ignore
 
     def fit_predict_z(self, X, y) -> np.ndarray:
         # t = time.time()
@@ -238,11 +238,11 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         # log.info(f"Optimized Kernel: {gp.kernel_}")
 
         # Make predictions with confidence intervals
-        mean_pred, std_pred = gp.predict(X_normalized, return_std=True)  # type: ignore
+        mean_pred, std_pred = gp.predict(X_normalized, return_std=True)  # ty: ignore
 
         # Denormalize
-        mean_pred = mean_pred * y_std + y_mean  # type: ignore
-        std_pred = std_pred * y_std  # type: ignore
+        mean_pred = mean_pred * y_std + y_mean  # ty: ignore
+        std_pred = std_pred * y_std  # ty: ignore
 
         return mean_pred, std_pred
 

@@ -114,7 +114,7 @@ def _read_catalog_index(uri: str, *, timeout: int = 30) -> pd.DataFrame:
 
 
 def _match_score(
-    series: pd.Series,  # type: ignore[type-arg]
+    series: pd.Series,  # ty: ignore
     query: str,
     mode: Literal["exact", "contains", "regex", "fuzzy"],
     case: bool,

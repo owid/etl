@@ -269,7 +269,7 @@ def calculate_yearly_impacts(tb: Table) -> Table:
                 # Fraction of days affected this year.
                 days_fraction = days_affected_in_year / days_total
                 # Impacts this years.
-                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
+                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # ty: ignore
                 # Start a series that counts the impacts accumulated over the years.
                 cumulative_impacts = impacts
                 # Normalize data by the number of days affected in this year.
@@ -281,9 +281,9 @@ def calculate_yearly_impacts(tb: Table) -> Table:
                 # Note: Ignore leap years.
                 days_fraction = 365 / days_total
                 # Impacts this year.
-                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
+                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # ty: ignore
                 # Add impacts to the cumulative impacts series.
-                cumulative_impacts += impacts  # type: ignore
+                cumulative_impacts += impacts  # ty: ignore
                 # Normalize data by the number of days affected in this year.
                 new_event[IMPACT_COLUMNS] = impacts
                 # Correct dates.
@@ -291,14 +291,14 @@ def calculate_yearly_impacts(tb: Table) -> Table:
                 new_event["end_date"] = pd.Timestamp(year=year, month=12, day=31)
             else:
                 # Assign all remaining impacts to the last year.
-                impacts = row[IMPACT_COLUMNS] - cumulative_impacts  # type: ignore
+                impacts = row[IMPACT_COLUMNS] - cumulative_impacts  # ty: ignore
                 new_event[IMPACT_COLUMNS] = impacts
                 # Correct dates.
                 new_event["start_date"] = pd.Timestamp(year=year, month=1, day=1)
             added_events = pr.concat([added_events, new_event], ignore_index=True)
 
     # Remove multi-year rows from main dataframe, and add those rows after separating events year by year.
-    tb_yearly = pr.concat([tb[~(multi_year_rows_mask)], added_events], ignore_index=True)  # type: ignore
+    tb_yearly = pr.concat([tb[~(multi_year_rows_mask)], added_events], ignore_index=True)  # ty: ignore
 
     # Sort conveniently.
     tb_yearly = tb_yearly.sort_values(["country", "year", "type"]).reset_index(drop=True)

@@ -61,10 +61,10 @@ def read_gbq(*args, **kwargs) -> pd.DataFrame:
     if GOOGLE_APPLICATION_CREDENTIALS:
         # Use service account
         credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
-        return pandas_gbq.read_gbq(*args, **kwargs, credentials=credentials)  # type: ignore
+        return pandas_gbq.read_gbq(*args, **kwargs, credentials=credentials)  # ty: ignore
     else:
         # Use browser authentication.
-        return pandas_gbq.read_gbq(*args, **kwargs)  # type: ignore
+        return pandas_gbq.read_gbq(*args, **kwargs)  # ty: ignore
 
 
 class GoogleDrive:

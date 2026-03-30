@@ -97,7 +97,7 @@ def find_date_published(snap: Snapshot) -> Optional[str]:
         #   Next to the file name (Sea_Ice_Index_Monthly_Data_by_Year_G02135_v3.0.xlsx).
 
         # Extract all the text in the web page.
-        url = "/".join(snap.metadata.origin.url_download.split("/")[:-1])  # type: ignore
+        url = "/".join(snap.metadata.origin.url_download.split("/")[:-1])  # ty: ignore
         response = requests.get(url)
         # Parse HTML content.
         soup = BeautifulSoup(response.text, "html.parser")
@@ -118,7 +118,7 @@ def find_date_published(snap: Snapshot) -> Optional[str]:
         #   https://www.metoffice.gov.uk/hadobs/hadsst4/data/download.html
 
         # Extract all the text in the web page.
-        url = snap.metadata.origin.url_download.split("/data/")[0] + "/data/download.html"  # type: ignore
+        url = snap.metadata.origin.url_download.split("/data/")[0] + "/data/download.html"  # ty: ignore
         response = requests.get(url)
         # Parse HTML content.
         soup = BeautifulSoup(response.text, "html.parser")
@@ -139,8 +139,8 @@ def find_date_published(snap: Snapshot) -> Optional[str]:
         #   https://hahana.soest.hawaii.edu/hot/hotco2/HOT_surface_CO2.txt
 
         # Extract text from data file.
-        url = snap.metadata.origin.url_download  # type: ignore
-        response = requests.get(url)  # type: ignore[reportArgumentType]
+        url = snap.metadata.origin.url_download  # ty: ignore
+        response = requests.get(url)  # ty: ignore[invalid-argument-type]
         for line in response.text.split("\n"):
             # At the top of the file, there is a line like "Last updated 11 December 2023 by J.E. Dore".
             if "Last updated" in line:
@@ -158,8 +158,8 @@ def find_date_published(snap: Snapshot) -> Optional[str]:
         # The date is in a line like "# File Creation: Fri Jan  5 03:55:24 2024".
 
         # Extract text from data file.
-        url = snap.metadata.origin.url_download  # type: ignore
-        response = requests.get(url)  # type: ignore[reportArgumentType]
+        url = snap.metadata.origin.url_download  # ty: ignore
+        response = requests.get(url)  # ty: ignore[invalid-argument-type]
         for line in response.text.split("\n"):
             # At the top of the file, there is a line like "Last updated 11 December 2023 by J.E. Dore".
             if "File Creation" in line:
@@ -173,7 +173,7 @@ def find_date_published(snap: Snapshot) -> Optional[str]:
                     log.warn(f"Failed to extract date_published for: {snap.path.name}")
 
     # In all other cases, assume date_published is the same as date_accessed.
-    return snap.metadata.origin.date_accessed  # type: ignore
+    return snap.metadata.origin.date_accessed  # ty: ignore
 
 
 @click.command()
@@ -184,17 +184,17 @@ def main(upload: bool) -> None:
         snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/{file_name}")
 
         # To ease the recurrent task update, fetch the access date from the version, and write it to the dvc files.
-        snap.metadata.origin.date_accessed = SNAPSHOT_VERSION  # type: ignore
+        snap.metadata.origin.date_accessed = SNAPSHOT_VERSION  # ty: ignore
 
         # Extract publication date, if possible, and otherwise assume it is the same as the access date.
-        snap.metadata.origin.date_published = find_date_published(snap=snap)  # type: ignore
+        snap.metadata.origin.date_published = find_date_published(snap=snap)  # ty: ignore
 
         # Extract publication year from date_published (which will be used in the custom attribution).
-        year_published = snap.metadata.origin.date_published.split("-")[0]  # type: ignore
+        year_published = snap.metadata.origin.date_published.split("-")[0]  # ty: ignore
 
         # Assign a custom attribution.
-        snap.metadata.origin.attribution = (  # type: ignore
-            f"{snap.metadata.origin.producer} - {snap.metadata.origin.title} ({year_published})"  # type: ignore
+        snap.metadata.origin.attribution = (  # ty: ignore
+            f"{snap.metadata.origin.producer} - {snap.metadata.origin.title} ({year_published})"  # ty: ignore
         )
 
         # Rewrite metadata to dvc file.

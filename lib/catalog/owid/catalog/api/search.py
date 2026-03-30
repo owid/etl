@@ -207,7 +207,7 @@ class SiteSearchAPI:
             chart = ChartResult(
                 slug=slug,
                 title=hit.get("title", ""),
-                type=chart_type,  # type: ignore[arg-type]
+                type=chart_type,  # ty: ignore[invalid-argument-type]
                 query_params=query_params,
                 subtitle=hit.get("subtitle", ""),
                 available_entities=hit.get("availableEntities", []),

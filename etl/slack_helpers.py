@@ -29,7 +29,7 @@ def send_slack_message(
     # If no Slack token is configured, just print the message
     if config.SLACK_API_TOKEN is None:
         print(f"[SLACK {channel}] {message}")
-        return None  # type: ignore
+        return None  # ty: ignore
 
     # Send message + image
     if image_url or image_path:

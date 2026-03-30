@@ -145,9 +145,11 @@ def update_file_based_explorer(explorer: str) -> Optional[str]:
     # Create an informative log message.
     message = "URLs to be replaced in explorer file:\n"
     for url_old, url_new in url_mapping.items():
-        assert url_new.split("/")[-2] > url_old.split("/")[-2], "New version should be greater than old version."  # type: ignore
+        assert (
+            url_new.split("/")[-2] > url_old.split("/")[-2]  # ty: ignore[unresolved-attribute]
+        ), "New version should be greater than old version."  # ty: ignore
         message += f"{url_old} ->\n{url_new})\n"
-        explorer_new = explorer_new.replace(url_old, url_new)  # type: ignore
+        explorer_new = explorer_new.replace(url_old, url_new)  # ty: ignore
     log.info(message)
 
     return explorer_new

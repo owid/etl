@@ -184,7 +184,7 @@ def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> List[str]:
     # List all relevant snapshots.
     snapshots = [snapshot for snapshot in snapshot_catalog(match=namespace) if snapshot.metadata.namespace == namespace]
 
-    snapshots_latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # type: ignore
+    snapshots_latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # ty: ignore
 
     # Find latest version in current channel for the considered namespace.
     latest_version_in_channel = find_latest_version_for_namespace_in_channel(channel=channel)
@@ -285,7 +285,7 @@ def find_latest_version_for_step(channel: str, step_name: str, namespace: str = 
                 snapshot for snapshot in snapshot_catalog(match=step_name) if snapshot.metadata.namespace == namespace
             ]
             # Find latest version for current step.
-            latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # type: ignore
+            latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # ty: ignore
         except IndexError:
             log.warning(warning_message)
 

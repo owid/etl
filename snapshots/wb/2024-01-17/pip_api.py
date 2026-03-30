@@ -40,7 +40,7 @@ import pandas as pd
 import requests
 from botocore.exceptions import ClientError
 from joblib import Memory
-from owid.catalog import connect_r2_cached  # type: ignore[reportAttributeAccessIssue]
+from owid.catalog import connect_r2_cached  # ty: ignore[unresolved-attribute]
 from structlog import get_logger
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
@@ -833,7 +833,9 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
         log.info("Percentiles calculated and consolidated")
 
         # Rename headcount to estimated_percentile and poverty_line to thr
-        df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # type: ignore
+        df_percentiles = df_percentiles.rename(
+            columns={"headcount": "estimated_percentile", "poverty_line": "thr"}
+        )  # ty: ignore
 
         # Add official percentiles from the World Bank Databank
         df_percentiles_published_2011 = format_official_percentiles(2011, wb_api)
@@ -1425,7 +1427,7 @@ def generate_key_indicators(wb_api: WB_API):
     df = pd.concat([results, results_region], ignore_index=True)
 
     # Sort ppp_version, country, year and poverty_line
-    df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])  # type: ignore
+    df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])  # ty: ignore
 
     # Save to csv
     df.to_csv(f"{CACHE_DIR}/pip_raw.csv", index=False)

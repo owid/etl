@@ -382,8 +382,8 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
         ds_regions=ds_regions,
-        aggregations={k: "mean" for k in cols_indicators},  # type: ignore
-        aggregations_world={k: "mean" for k in cols_indicators},  # type: ignore
+        aggregations={k: "mean" for k in cols_indicators},  # ty: ignore
+        aggregations_world={k: "mean" for k in cols_indicators},  # ty: ignore
         countries_must_have_data=countries_must_have_data,
         frac_must_have_data=frac_must_have_data,
     )

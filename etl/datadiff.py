@@ -256,7 +256,7 @@ tb = {_snippet_dataset(ds_b, table_name)}
                         changed.append("changed [u]metadata[/u]")
                     if new_index.any():
                         changed.append("new [u]data[/u]")
-                    if (~eq_data[~new_index]).any():  # type: ignore[reportCallIssue]
+                    if (~eq_data[~new_index]).any():  # ty: ignore[call-non-callable]
                         changed.append("changed [u]data[/u]")
 
                     if changed:
@@ -577,7 +577,7 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, co
     meta_a = yaml_dump(dict_a, **kwargs)
     meta_b = yaml_dump(dict_b, **kwargs)
 
-    lines = difflib.ndiff(meta_a.splitlines(keepends=True), meta_b.splitlines(keepends=True))  # type: ignore
+    lines = difflib.ndiff(meta_a.splitlines(keepends=True), meta_b.splitlines(keepends=True))  # ty: ignore
     # do not print lines that are identical
     lines = [line for line in lines if not line.startswith("  ")]
 
@@ -602,7 +602,7 @@ def _df_to_str(df: pd.DataFrame, limit: int = 5) -> list[str]:
     else:
         df_samp = df
 
-    for line in df_samp.to_string(index=False).split("\n"):  # type: ignore
+    for line in df_samp.to_string(index=False).split("\n"):  # ty: ignore
         lines.append("  " + line)
     return lines
 
@@ -701,7 +701,7 @@ def _data_diff(
 
 def _is_datetime(dtype: Any) -> bool:
     try:
-        return np.issubdtype(dtype, np.datetime64)  # type: ignore
+        return np.issubdtype(dtype, np.datetime64)  # ty: ignore
     except Exception:
         return False
 
@@ -741,7 +741,7 @@ def _sort_index(df: Table) -> Table:
     for level_name in df.index.names:
         level = df.index.get_level_values(level_name)
         if level.dtype == "category":
-            level = level.reorder_categories(sorted(level.categories))
+            level = level.reorder_categories(sorted(level.categories))  # ty: ignore[unresolved-attribute]
         new_levels.append(level)
 
     df.index = pd.MultiIndex.from_arrays(new_levels)
@@ -855,7 +855,7 @@ def _local_catalog_datasets(
         channel_datasets = list(lc_a.iter_datasets(chan, include=include))
         # TODO: channel should be in DatasetMeta by default
         for ds in channel_datasets:
-            ds.metadata.channel = chan  # type: ignore
+            ds.metadata.channel = chan  # ty: ignore
 
         datasets += channel_datasets
 
@@ -879,7 +879,7 @@ def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
     js.pop("origins", None)
     ds_meta = DatasetMeta(**js)
     # TODO: channel should be in DatasetMeta by default
-    ds_meta.channel = path.split("/")[0]  # type: ignore
+    ds_meta.channel = path.split("/")[0]  # ty: ignore
     table_names = frame.loc[frame["ds_paths"] == path, "table"].tolist()
     return RemoteDataset(ds_meta, table_names)
 
@@ -915,7 +915,7 @@ def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude:
 
     mapping = {path: result for path, result in zip(ds_paths, results)}
 
-    return mapping  # type: ignore
+    return mapping  # ty: ignore
 
 
 @retry(
@@ -930,7 +930,7 @@ def get_table_with_retry(ds: Dataset, table_name: str) -> Table:
 def dataset_uri(ds: Dataset) -> str:
     # TODO: coule be method in DatasetMeta (after we add channel)
     assert hasattr(ds.metadata, "channel"), "Dataset metadata should have channel attribute"
-    return f"{ds.metadata.channel}/{ds.metadata.namespace}/{ds.metadata.version}/{ds.metadata.short_name}"  # type: ignore
+    return f"{ds.metadata.channel}/{ds.metadata.namespace}/{ds.metadata.version}/{ds.metadata.short_name}"  # ty: ignore
 
 
 if __name__ == "__main__":

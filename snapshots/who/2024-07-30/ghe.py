@@ -63,7 +63,7 @@ def get_cause_data(url) -> pd.DataFrame:
     return repack_frame(data_df)
 
 
-def get_cause_data_with_retry(url) -> pd.DataFrame:  # type: ignore
+def get_cause_data_with_retry(url) -> pd.DataFrame:  # ty: ignore
     for attempt in Retrying(
         wait=wait_fixed(5),
         stop=stop_after_attempt(10),
@@ -112,7 +112,7 @@ def download_cause_data(causes) -> pd.DataFrame:
     all_df = pd.concat(all_data)
     all_df = all_df.reset_index()
 
-    return repack_frame(all_df)  # type: ignore[reportArgumentType]
+    return repack_frame(all_df)  # ty: ignore[invalid-argument-type]
 
 
 if __name__ == "__main__":

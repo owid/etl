@@ -156,7 +156,7 @@ Please write a data insight for the given chart. Use simple language and short p
             # Ask GPT (stream)
             stream = api.chat.completions.create(
                 model=MODEL_DEFAULT,
-                messages=messages,  # type: ignore
+                messages=messages,  # ty: ignore
                 max_completion_tokens=3000,
                 stream=True,
             )
@@ -200,7 +200,7 @@ Explain the core insights present in this data, in plain, educational language.
         # Opena AI (do first to catch possible errors in ENV)
         api = OpenAIWrapper()
 
-        prompt_with_data, _ = get_trajectory_prompt(conn, prompt, slug)  # type: ignore
+        prompt_with_data, _ = get_trajectory_prompt(conn, prompt, slug)  # ty: ignore
 
         # Prepare messages for Insighter
         messages = [
@@ -216,7 +216,7 @@ Explain the core insights present in this data, in plain, educational language.
             # Ask GPT (stream)
             stream = api.chat.completions.create(
                 model=MODEL_DEFAULT,
-                messages=messages,  # type: ignore
+                messages=messages,  # ty: ignore
                 max_completion_tokens=3000,
                 stream=True,
             )
@@ -265,7 +265,7 @@ If making a point about a country, include its peers, region, income group or "W
         # Opena AI (do first to catch possible errors in ENV)
         api = OpenAIWrapper()
 
-        prompt_with_data, df = get_trajectory_prompt(conn, prompt, slug, codes=True)  # type: ignore
+        prompt_with_data, df = get_trajectory_prompt(conn, prompt, slug, codes=True)  # ty: ignore
 
         if df.attrs["config"].get("tab") == "map":
             base_url = f"https://ourworldindata.org/grapher/{slug}?tab=chart&time=2000..latest&"
@@ -290,7 +290,7 @@ If making a point about a country, include its peers, region, income group or "W
             # Ask GPT (stream)
             stream = api.chat.completions.create(
                 model=MODEL_DEFAULT,
-                messages=messages,  # type: ignore
+                messages=messages,  # ty: ignore
                 max_completion_tokens=3000,
                 stream=True,
             )

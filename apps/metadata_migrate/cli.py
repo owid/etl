@@ -244,9 +244,9 @@ def cli(
     }
 
     if origins:
-        dataset["sources"] = []  # type: ignore
-        definitions["common"]["sources"] = []
-        definitions["common"]["origins"] = [origin.to_dict() for origin in origins]
+        dataset["sources"] = []  # ty: ignore
+        definitions["common"]["sources"] = []  # ty: ignore[invalid-assignment]
+        definitions["common"]["origins"] = [origin.to_dict() for origin in origins]  # ty: ignore[invalid-assignment]
 
     meta_dict = {"dataset": dataset, "definitions": definitions, "tables": {table_name: {"variables": vars}}}
 
@@ -260,7 +260,7 @@ def cli(
     else:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
-            f.write(yaml_str)  # type: ignore
+            f.write(yaml_str)  # ty: ignore
 
         if run_etl:
             log.info(f"Running ETL for {uri}")
@@ -327,22 +327,22 @@ def _create_origin_from_source(ds: Dataset, source: Source, license: Optional[Li
         description += source.description
 
     origin = Origin(
-        title=ds.metadata.title,  # type: ignore[reportArgumentType]
-        producer=source.name,  # type: ignore[reportArgumentType]
+        title=ds.metadata.title,  # ty: ignore[invalid-argument-type]
+        producer=source.name,  # ty: ignore[invalid-argument-type]
         citation_full=source.published_by,
         license=license,
         description=description,
         url_main=source.url,
         url_download=source.source_data_url,
         date_accessed=source.date_accessed,
-        date_published=source.publication_date or source.publication_year,  # type: ignore[reportArgumentType]
+        date_published=source.publication_date or source.publication_year,  # ty: ignore[invalid-argument-type]
     )
 
     if not origin.date_published:
         log.warning(
             f"missing publication_date and publication_year in source, using date_accessed: {origin.date_accessed}"
         )
-        origin.date_published = origin.date_accessed  # type: ignore
+        origin.date_published = origin.date_accessed  # ty: ignore
     return origin
 
 

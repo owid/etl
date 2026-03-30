@@ -49,7 +49,7 @@ ANOMALY_DETECTORS = {
 
 def load_detector(anomaly_type: ANOMALY_TYPE) -> AnomalyDetector:
     """Load detector."""
-    return ANOMALY_DETECTORS[anomaly_type]  # type: ignore[return-value]
+    return ANOMALY_DETECTORS[anomaly_type]  # ty: ignore[invalid-return-type]
 
 
 def get_variables_views_in_charts(
@@ -109,7 +109,7 @@ def renormalize_score(
     # Clip population between the minimum and maximum defined above.
     score_clipped = score.clip(lower=min_value, upper=max_value)
     # Renormalize score.
-    score_renormalized = factor * np.log(score_clipped) + constant  # type: ignore
+    score_renormalized = factor * np.log(score_clipped) + constant  # ty: ignore
     # Sanity checks.
     if len(score_renormalized[score_renormalized.notnull()]) > 0:
         # NOTE: Sometimes the input score may be empty (e.g. because indicators don't have analytics data, or are not used in charts) or nan (e.g. when renormalizing the population score on an array of entities with no population data, like "Northern Hemisphere").
@@ -804,7 +804,7 @@ def get_anomalies_for_chart_ids(
         anomalies = [
             anomaly
             for anomaly in gm.Anomaly.load_anomalies(session=session, dataset_id=sorted(set(df["dataset_id"])))
-            if anomaly.anomalyType in anomaly_types  # type: ignore
+            if anomaly.anomalyType in anomaly_types  # ty: ignore
         ]
 
     # Simplify the original dataframe to only contain the charts and datasets for which there are anomalies calculated.
@@ -813,7 +813,7 @@ def get_anomalies_for_chart_ids(
 
     # Gather anomalies for all variables, datasets, and anomaly types.
     df_anomalies_all = [
-        anomaly.dfReduced.assign(**{"dataset_id": anomaly.datasetId, "anomaly_type": anomaly.anomalyType})  # type: ignore
+        anomaly.dfReduced.assign(**{"dataset_id": anomaly.datasetId, "anomaly_type": anomaly.anomalyType})  # ty: ignore
         for anomaly in anomalies
     ]
     if len(df_anomalies_all) == 0:
@@ -822,7 +822,7 @@ def get_anomalies_for_chart_ids(
     df_anomalies = pd.concat(
         df_anomalies_all,
         ignore_index=True,
-    ).rename(columns={"anomaly_score": "score_anomaly"})  # type: ignore
+    ).rename(columns={"anomaly_score": "score_anomaly"})  # ty: ignore
 
     # Add the population score.
     df_anomalies = add_population_score(df_reduced=df_anomalies)

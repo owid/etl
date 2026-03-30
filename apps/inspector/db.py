@@ -277,7 +277,7 @@ def fetch_posts(post_slugs: list[str] | None = None) -> list[dict[str, Any]]:
     if df.empty:
         return []
 
-    result: list[dict[str, Any]] = df.to_dict("records")  # type: ignore
+    result: list[dict[str, Any]] = df.to_dict("records")  # ty: ignore
     return result
 
 
@@ -353,7 +353,7 @@ def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, 
         df.groupby(["id", "config_id", "slug", "view_type", "chart_config"], dropna=False).agg(agg_dict).reset_index()
     )
 
-    result: list[dict[str, Any]] = agg_df.to_dict("records")  # type: ignore
+    result: list[dict[str, Any]] = agg_df.to_dict("records")  # ty: ignore
     log.info(f"Aggregated to {len(result)} chart configs")
     return result
 
@@ -499,7 +499,7 @@ def load_views(
     if not agg_df.empty:
         agg_df = agg_df.sort_values("explorerSlug").reset_index(drop=True)
 
-    views: list[dict[str, Any]] = agg_df.to_dict("records")  # type: ignore
+    views: list[dict[str, Any]] = agg_df.to_dict("records")  # ty: ignore
 
     # Add chart configs as views (charts are treated as single "views" without collections)
     views.extend(chart_configs)

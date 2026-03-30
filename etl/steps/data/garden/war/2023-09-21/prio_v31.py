@@ -241,10 +241,10 @@ def _add_ongoing_metrics(tb: Table) -> Table:
         ],
         ignore_index=True,
     )
-    tb_ongoing = tb_ongoing.sort_values(["year", "region", "conflict_type"])  # type: ignore
+    tb_ongoing = tb_ongoing.sort_values(["year", "region", "conflict_type"])  # ty: ignore
 
     ## Rename
-    tb_ongoing = tb_ongoing.rename(  # type: ignore
+    tb_ongoing = tb_ongoing.rename(  # ty: ignore
         columns={
             "id": "number_ongoing_conflicts",
             "bdeadlow": "number_deaths_ongoing_conflicts_battle_low",
@@ -287,7 +287,7 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new = pr.concat([tb_new, tb_new_world], ignore_index=True)
 
     # Rename
-    tb_new = tb_new.rename(columns={"id": "number_new_conflicts"})  # type: ignore
+    tb_new = tb_new.rename(columns={"id": "number_new_conflicts"})  # ty: ignore
 
     return tb_new
 
