@@ -209,17 +209,6 @@ steps:
     - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
 
 
-  #
-  # Robotaxis dataset
-  #
-  data://meadow/artificial_intelligence/2025-12-09/robotaxis:
-    - snapshot://artificial_intelligence/2025-12-09/robotaxis.csv
-  data://garden/artificial_intelligence/2025-12-09/robotaxis:
-    - data://meadow/artificial_intelligence/2025-12-09/robotaxis
-  data://grapher/artificial_intelligence/2025-12-09/robotaxis:
-    - data://garden/artificial_intelligence/2025-12-09/robotaxis
-
-  #
   # Ireland Data Centers Metered Electricity Consumption
   #
   data://meadow/artificial_intelligence/2025-11-10/ireland_metered_consumption:
