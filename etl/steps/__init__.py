@@ -653,9 +653,84 @@ class DataStep(Step):
     def _run_py(self) -> None:
         """
         Import the Python module for this step and call run() on it.
+
+        Uses os.fork() to avoid the ~3-5s overhead of spawning a new Python
+        process via subprocess for every step. The forked child inherits all
+        already-imported modules, runs the step, and exits — so any memory
+        leaked by feather serialisation dies with the child process.
+
+        Works on both Linux and macOS (both provide os.fork()). Falls back to
+        subprocess only on platforms where fork() is unavailable (Windows) or
+        when IPDB debugging is enabled (debugger needs a proper subprocess).
         """
-        # use a subprocess to isolate each step from the others, and avoid state bleeding
-        # between them
+        if hasattr(os, "fork") and not config.IPDB_ENABLED:
+            self._run_py_fork()
+        else:
+            self._run_py_subprocess()
+
+    def _run_py_fork(self) -> None:
+        """Run the step in a forked child process (Linux only)."""
+        import resource
+        import traceback
+
+        # Apply the same virtual-memory limit that prlimit would enforce
+        if sys.platform == "linux":
+            try:
+                resource.setrlimit(
+                    resource.RLIMIT_AS, (config.MAX_VIRTUAL_MEMORY_LINUX, config.MAX_VIRTUAL_MEMORY_LINUX)
+                )
+            except ValueError:
+                pass  # not all systems support RLIMIT_AS
+
+        # Flush before forking to prevent the child from inheriting (and
+        # potentially re-flushing) buffered output from the parent, which
+        # causes duplicate "--- Starting / Finished" lines in CI logs.
+        sys.stdout.flush()
+        sys.stderr.flush()
+
+        pid = os.fork()
+        if pid == 0:
+            # ---------- child process ----------
+            try:
+                # Close all inherited file descriptors except stdin/stdout/stderr.
+                # The forked child inherits FDs for the multiprocessing Manager
+                # proxy, ProcessPoolExecutor pipes, DB connections, etc.  When
+                # os._exit() later closes them implicitly it can confuse the
+                # Manager server and cause the parent worker to hang.
+                import resource as _resource
+
+                _max_fd = _resource.getrlimit(_resource.RLIMIT_NOFILE)[0]
+                os.closerange(3, _max_fd)
+
+                config.enable_structlog_filtering()
+                step_type, path = str(self).split("://", 1)
+                step_type = step_type.replace("-private", "")
+                step_path = paths.STEP_DIR / step_type / path
+                module_dir = step_path if step_path.is_dir() else step_path.parent
+                if module_dir.as_posix() not in sys.path:
+                    sys.path.append(module_dir.as_posix())
+
+                module_path = path.replace("/", ".")
+                import_path = f"{paths.BASE_PACKAGE}.steps.{step_type}.{module_path}"
+                step_module = import_module(import_path)
+                run_module_run(step_module, self._dest_dir.as_posix())
+                os._exit(0)
+            except BaseException:
+                traceback.print_exc()
+                os._exit(1)
+        else:
+            # ---------- parent process ----------
+            _, status = os.waitpid(pid, 0)
+            if os.WIFEXITED(status):
+                exit_code = os.WEXITSTATUS(status)
+                if exit_code != 0:
+                    sys.exit(exit_code)
+            elif os.WIFSIGNALED(status):
+                sig = os.WTERMSIG(status)
+                raise Exception(f"Step {self} was killed by signal {sig}")
+
+    def _run_py_subprocess(self) -> None:
+        """Run the step in a new subprocess (fallback for non-Linux or debug mode)."""
         args = []
 
         if sys.platform == "linux":

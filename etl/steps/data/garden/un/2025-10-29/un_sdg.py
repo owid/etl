@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
     for table in all_tables:
-        log.info(
+        log.debug(
             "un_sdg.create_garden_table",
             indicator=table.index[0][4],
             series_code=table.index[0][5],
@@ -301,7 +301,7 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
     output_tables = []
     len_dimensions = []
     for group_name, df_group in all_series:
-        log.info(
+        log.debug(
             "un_sdg.create_dataframe.group",
             indicator=group_name[0],
             series=group_name[1],
