@@ -102,7 +102,12 @@ def run() -> None:
     # ── Harmonize country names ────────────────────────────────────────────────
     # Reuse the mapping file from the parent step (same source data, same countries).
     countries_file = paths.directory / "ghsl_urban_centers.countries.json"
-    tb_raw = paths.regions.harmonize_names(tb_raw, countries_file=countries_file)
+    excluded_countries_file = paths.directory / "ghsl_urban_centers.excluded_countries.json"
+    tb_raw = paths.regions.harmonize_names(
+        tb_raw,
+        countries_file=countries_file,
+        excluded_countries_file=excluded_countries_file,
+    )
 
     # ── Assign bins ────────────────────────────────────────────────────────────
     tb_raw["bin_x"] = assign_bin_vectorized(tb_raw["urban_pop"].to_numpy(dtype=float))
