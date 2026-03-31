@@ -49,7 +49,7 @@ tables:
         title: Monthly distance traveled by robotaxi passengers
         unit: kilometers
         short_unit: km
-        description_short: The total distance that passengers travel each month in California's paid driverless taxi services, calculated by summing, across all trips, the number of passengers multiplied by the kilometers each one travels.
+        description_short: Monthly passenger kilometers traveled in California’s paid driverless taxis, summing the kilometers actually traveled by individual passengers across all trips.
         description_processing: |-
           We summed values across all approved robotaxi carriers operating in California to produce monthly totals. Both Cruise and Waymo reported actual trip data through November 2023. After that, only Waymo data is included, as Cruise suspended its robotaxi service following a safety incident in October 2023. Cruise continued to file regulatory reports with zero trips through at least mid-2024.
 
