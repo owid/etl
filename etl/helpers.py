@@ -749,6 +749,7 @@ class PathFinder:
         indicator_as_dimension: bool = False,
         choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
         catalog_path_full: bool = False,
+        additional_indicators: Listable[dict[str, str] | None] = None,
         *,  # Force keyword-only arguments after this
         explorer: Literal[True],
     ) -> Explorer: ...
@@ -766,6 +767,7 @@ class PathFinder:
         indicator_as_dimension: bool = False,
         choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
         catalog_path_full: bool = False,
+        additional_indicators: Listable[dict[str, str] | None] = None,
         *,  # Force keyword-only arguments after this
         explorer: Literal[False] = False,
     ) -> Collection: ...
@@ -782,6 +784,7 @@ class PathFinder:
         indicator_as_dimension: bool = False,
         choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
         catalog_path_full: bool = False,
+        additional_indicators: Listable[dict[str, str] | None] = None,
         explorer: bool = False,
     ) -> Explorer | Collection:
         """Create a collection with the given configuration and data.
@@ -843,6 +846,12 @@ class PathFinder:
         catalog_path_full : bool, default False
             If True, it uses full catalog path. If False, uses shorter version (e.g., `table#indicator` or `dataset/table#indicator`).
 
+        additional_indicators : Listable[dict[str, str] | None], default None
+            Additional indicators for non-y axes ("x", "size", "color") added to every expanded view.
+            Keys are axis names, values are indicator paths (short or full). Short paths like
+            `table#indicator` are expanded using the same logic as y indicators.
+            For multiple tables: can be a list matching `tb` length.
+
         explorer : bool, default False
             Use this flag to create an explorer (True).
 
@@ -868,6 +877,7 @@ class PathFinder:
             choice_renames=choice_renames,
             catalog_path_full=catalog_path_full,
             explorer=explorer,
+            additional_indicators=additional_indicators,
         )
 
     @deprecated.deprecated(
