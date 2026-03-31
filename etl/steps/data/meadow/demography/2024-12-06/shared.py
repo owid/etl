@@ -254,7 +254,19 @@ def _get_index_columns(tb):
 
 def _to_categories(tb):
     """Convert dimension columns to categoricals. Called once per file at read time."""
+    # year must be string before converting to category — some files have int years
+    # (1950, 1955...) and others have string ranges ("2020-2025"). Mixing types in a
+    # single categorical causes pyarrow serialization failures.
+    if "year" in tb.columns and tb["year"].dtype != "category":
+        import pandas as pd
+
+        if pd.api.types.is_float_dtype(tb["year"]):
+            tb["year"] = tb["year"].astype(int).astype(str).astype("category")
+        else:
+            tb["year"] = tb["year"].astype(str).astype("category")
     for col in DIM_COLS:
+        if col == "year":
+            continue
         if col in tb.columns and tb[col].dtype != "category":
             tb[col] = tb[col].astype("category")
     return tb
