@@ -1,0 +1,26 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+
+  desc_key_common: &desc_key_common
+    - The [GHSL Urban Centre Database (GHS-UCDB R2024A)](https://human-settlement.emergency.copernicus.eu/ghs_ucdb2024.php) tracks population and land use for 11,422 [cities](#dod:cities-degurba) around the world. Cities are identified using the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php), based on population density and settlement size rather than administrative boundaries. To qualify as a city, an area must have at least 1,500 people per square kilometre and a total population of at least 50,000.
+    - City boundaries are fixed at their 2025 extent and held constant across all years.
+    - The underlying population figures have been rescaled to match UN World Population Prospects 2022 national totals.
+
+  desc_bins: &desc_bins |-
+    Cities are grouped into size bins following the 1-2-3-5 rule on a log scale: 50k–100k, 100k–200k, 200k–300k, 300k–500k, 500k–1M, 1M–2M, 2M–3M, 3M–5M, 5M–10M, 10M–20M, 20M–30M, 30M–50M, and 50M+. Each x-axis value is the upper bound of its bin. This binning gives approximately equal spacing on a logarithmic scale, with step ratios of roughly 1.5–2×.
+
+tables:
+  ghsl_urban_centers_distribution:
+    title: Population distribution across city sizes
+    description_short: |-
+      Share of urban-centre population living in cities of each size category,
+      for all countries and regional aggregates. Designed for a bespoke Grapher
+      chart where the x-axis is the city-size bin and each year is a separate indicator.
+    variables:
+      # Variables are generated programmatically (pop_share_YYYY_estimates / projections).
+      # Metadata for all generated variables is defined via common above.

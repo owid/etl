@@ -93,6 +93,14 @@ steps:
   data://grapher/urbanization/2025-12-10/ghsl_urban_centers:
     - data://garden/urbanization/2025-12-10/ghsl_urban_centers
 
+  # City-size distribution (bespoke viz: bin upper-bound on x-axis, years as indicators)
+  data://garden/urbanization/2025-12-10/ghsl_urban_centers_distribution:
+    - data://meadow/urbanization/2025-12-10/ghsl_urban_centers
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/urbanization/2025-12-10/ghsl_urban_centers_distribution:
+    - data://garden/urbanization/2025-12-10/ghsl_urban_centers_distribution
+
   #
   # UN WUP National Definitions
   #
