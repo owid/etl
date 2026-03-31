@@ -118,13 +118,24 @@ YEAR_ESTIMATES_END = 2023  # Year up to which the estimates go (inclusive). Proj
 
 
 def _load_interim_csvs() -> Dict[str, Table]:
-    """Load all interim update ZIPs and return a dict mapping CSV filename to Table."""
+    """Load all interim update ZIPs and return a dict mapping CSV filename to Table.
+
+    Verifies that all loaded CSVs only contain the 'Medium' variant.
+    """
     result: Dict[str, Table] = {}
     for snap_name in INTERIM_SNAPSHOTS:
         snap = paths.load_snapshot(snap_name)
         with snap.extracted() as archive:
             for name in archive.glob("*.csv"):
-                result[name] = archive.read(name)
+                tb = archive.read(name)
+                # Sanity check: interim data should only contain the Medium variant
+                if "Variant" in tb.columns:
+                    variants = set(tb["Variant"].unique())
+                    assert variants == {"Medium"}, (
+                        f"Interim CSV '{name}' from '{snap_name}' contains unexpected variants: "
+                        f"{variants - {'Medium'}}. Expected only 'Medium'."
+                    )
+                result[name] = tb
     return result
 
 
@@ -132,6 +143,7 @@ def _apply_interim_csv(tb: Table, interim_csvs: Dict[str, Table], short_name: st
     """Replace rows for interim-updated countries in a CSV-based table.
 
     Drops rows from `tb` that match interim country+variant, then appends the interim rows.
+    Only Togo / Medium variant interim data is expected; year range is clipped to match `tb`.
     """
     interim_filename = INTERIM_CSV_MAP.get(short_name)
     if interim_filename is None or interim_filename not in interim_csvs:
@@ -139,15 +151,21 @@ def _apply_interim_csv(tb: Table, interim_csvs: Dict[str, Table], short_name: st
 
     tb_interim = interim_csvs[interim_filename].copy()
 
-    # Get the set of (Location, Variant) pairs in the interim data
-    interim_countries = set(tb_interim["Location"].unique())
-    interim_variants = set(tb_interim["Variant"].unique())
+    # Keep only Togo + Medium variant from interim data
+    tb_interim = tb_interim.loc[(tb_interim["Location"] == "Togo") & (tb_interim["Variant"] == "Medium")]
+    if tb_interim.empty:
+        return tb
 
-    # Drop matching rows from the original table
-    mask = tb["Location"].isin(interim_countries) & tb["Variant"].isin(interim_variants)
-    # Also drop "Estimates" variant for the same countries, since interim covers the full 1950-2100 range as "Medium"
-    mask_estimates = tb["Location"].isin(interim_countries) & (tb["Variant"] == "Estimates")
-    tb = tb.loc[~(mask | mask_estimates)]
+    # Clip interim years to match the year range present in the original table
+    year_min = int(tb["Time"].min())
+    year_max = int(tb["Time"].max())
+    tb_interim = tb_interim.loc[(tb_interim["Time"] >= year_min) & (tb_interim["Time"] <= year_max)]
+    if tb_interim.empty:
+        return tb
+
+    # Drop matching rows from the original table (both Medium and Estimates for Togo)
+    mask = (tb["Location"] == "Togo") & (tb["Variant"].isin({"Medium", "Estimates"}))
+    tb = tb.loc[~mask]
 
     # Append interim data
     tb = concat([tb, tb_interim], ignore_index=True)
@@ -159,6 +177,7 @@ def _apply_interim_xlsx(tb: Table, interim_csvs: Dict[str, Table]) -> Table:
 
     The interim CSV uses short column names (TFR, LEx, etc.) while the XLSX uses long names.
     We rename the interim columns, drop matching rows from the original, and append.
+    Only Togo / Medium variant interim data is expected; year range is clipped to match `tb`.
     """
     interim_filename = "WPP2024_Demographic_Indicators_Medium_Update.csv"
     if interim_filename not in interim_csvs:
@@ -166,21 +185,32 @@ def _apply_interim_xlsx(tb: Table, interim_csvs: Dict[str, Table]) -> Table:
 
     tb_interim = interim_csvs[interim_filename].copy()
 
+    # Keep only Togo + Medium variant from interim data
+    tb_interim = tb_interim.loc[(tb_interim["Location"] == "Togo") & (tb_interim["Variant"] == "Medium")]
+    if tb_interim.empty:
+        return tb
+
     # Get interim countries (use the already-renamed "country" column if present, else "Location")
     country_col = "country" if "country" in tb.columns else "Region, subregion, country or area *"
     variant_col = "variant" if "variant" in tb.columns else "Variant"
+    year_col = "year" if "year" in tb.columns else "Year"
+
+    # Clip interim years to match the year range present in the original table
+    year_min = int(tb[year_col].min())
+    year_max = int(tb[year_col].max())
+    tb_interim = tb_interim.loc[(tb_interim["Time"] >= year_min) & (tb_interim["Time"] <= year_max)]
+    if tb_interim.empty:
+        return tb
 
     # Rename interim columns to match XLSX column names
     rename_map = {
         "Location": country_col,
-        "Time": "year" if "year" in tb.columns else "Year",
+        "Time": year_col,
         "Variant": variant_col,
         "LocTypeName": "Type" if "Type" in tb.columns else "LocTypeName",
     }
     rename_map.update(INTERIM_DEMO_INDICATORS_RENAME)
     tb_interim = tb_interim.rename(columns=rename_map)
-
-    year_col = "year" if "year" in tb.columns else "Year"
 
     # Keep only columns that exist in the original table
     common_cols = [c for c in tb_interim.columns if c in tb.columns]
@@ -189,13 +219,9 @@ def _apply_interim_xlsx(tb: Table, interim_csvs: Dict[str, Table]) -> Table:
     # Ensure year types match
     tb_interim[year_col] = tb_interim[year_col].astype(tb[year_col].dtype)
 
-    interim_countries = set(tb_interim[country_col].unique())
-    interim_variants = set(tb_interim[variant_col].unique())
-
-    # Drop matching rows + estimates for the same countries
-    mask = tb[country_col].isin(interim_countries) & tb[variant_col].isin(interim_variants)
-    mask_estimates = tb[country_col].isin(interim_countries) & (tb[variant_col] == "Estimates")
-    tb = tb.loc[~(mask | mask_estimates)]
+    # Drop matching rows from the original table (both Medium and Estimates for Togo)
+    mask = (tb[country_col] == "Togo") & (tb[variant_col].isin({"Medium", "Estimates"}))
+    tb = tb.loc[~mask]
 
     tb = concat([tb, tb_interim], ignore_index=True)
     return tb
