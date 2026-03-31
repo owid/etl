@@ -308,6 +308,9 @@ def _read_single_file(file_path, filename, scenario):
         raise ValueError(f"Unexpected file format: {filename}!")
 
     tb = tb.rename(columns=COLUMNS_RENAME)
+    # TODO: If the snapshot stored dimension columns as categoricals (e.g. parquet/feather
+    #  with dictionary encoding), we could skip this conversion entirely and save ~7s on
+    #  155 files. Consider switching snapshot format from RDS/CSV to feather/parquet.
     tb = _to_categories(tb)
     return (scenario, short_name, tb)
 
