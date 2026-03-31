@@ -14,6 +14,7 @@ import owid.catalog.processing as pr
 import pyreadr
 from owid.catalog import Table
 from owid.catalog.core.tables import _add_table_and_variables_metadata_to_table
+from owid.datautils.dataframes import rename_categories
 
 from etl.helpers import PathFinder
 
@@ -26,13 +27,16 @@ COLUMNS_RENAME = {
     "period": "year",
 }
 
-# Harmonization of the dimension values
+# Harmonization of the dimension values (applied on categories, not row-by-row)
 REPLACE_AGE = {
     "all": "total",
 }
 REPLACE_SEX = {
     "both": "total",
 }
+
+# Dimension columns that should always be categorical
+DIM_COLS = ["country", "year", "age", "sex", "education"]
 
 
 def make_scenario_tables(tbs_scenario, tables_combine_edu, tables_concat, tables_drop, tables_composition):
@@ -236,7 +240,7 @@ def consolidate_table_all(tables, scenario_num, tables_composition):
         tb = merge_tables_seq(tbs_, on=cols_index, how="outer")
         # Add scenario information
         tb["scenario"] = scenario_num
-        tb["scenario"] = tb["scenario"].astype("string")
+        tb["scenario"] = tb["scenario"].astype("category")
         # Add consolidated table in main dictionary
         tables_new[tname_new] = tb
     return tables_new
@@ -248,28 +252,38 @@ def _get_index_columns(tb):
     return cols_index
 
 
+def _to_categories(tb):
+    """Convert dimension columns to categoricals. Called once per file at read time."""
+    for col in DIM_COLS:
+        if col in tb.columns and tb[col].dtype != "category":
+            tb[col] = tb[col].astype("category")
+    return tb
+
+
 def harmonize_tb(tb):
-    """Harmonizes tables.
+    """Harmonize dimension values using category-level operations.
 
-    - Dimensions are named differently in different tables. This function ensures that they are consistent.
-    - Makes sure DTypes are set correctly.
+    Operates on the small set of unique category values instead of
+    millions of rows. Idempotent: safe to call on already-harmonized data.
+    Ensures all dimension columns are categorical on exit.
     """
-    if "age" in tb.columns:
-        tb["age"] = (
-            tb["age"]
-            .str.lower()
-            .replace(REPLACE_AGE)
-            .str.replace("––", "-", regex=False)
-            .str.replace("--", "-", regex=False)
-        ).astype("category")
-    if "sex" in tb.columns:
-        tb["sex"] = tb["sex"].str.lower().replace(REPLACE_SEX).astype("category")
-    if "education" in tb.columns:
-        tb["education"] = tb["education"].str.lower().str.replace(" ", "_").astype("category")
+    # Ensure all dimension columns are categorical first
+    # (some operations like .assign() may produce object-dtype columns)
+    tb = _to_categories(tb)
 
-    # Set dtype — use category for low-cardinality dimension columns
-    tb["country"] = tb["country"].astype("category")
-    tb["year"] = tb["year"].astype("category")
+    if "age" in tb.columns:
+        age_mapping = {}
+        for cat in tb["age"].cat.categories:
+            new = str(cat).lower().replace("––", "-").replace("--", "-")
+            new = REPLACE_AGE.get(new, new)
+            age_mapping[cat] = new
+        tb["age"] = rename_categories(tb["age"], age_mapping)
+    if "sex" in tb.columns:
+        sex_mapping = {cat: REPLACE_SEX.get(str(cat).lower(), str(cat).lower()) for cat in tb["sex"].cat.categories}
+        tb["sex"] = rename_categories(tb["sex"], sex_mapping)
+    if "education" in tb.columns:
+        edu_mapping = {cat: str(cat).lower().replace(" ", "_") for cat in tb["education"].cat.categories}
+        tb["education"] = rename_categories(tb["education"], edu_mapping)
     return tb
 
 
@@ -279,7 +293,7 @@ def merge_tables_seq(tables, **kwargs):
 
 
 def _read_single_file(file_path, filename, scenario):
-    """Read a single file from the archive."""
+    """Read a single file from the archive and convert to categoricals immediately."""
     if filename.endswith(".rds"):
         data = pyreadr.read_r(file_path)
         assert set(data.keys()) == {None}, "Unexpected keys in RDS file!"
@@ -294,6 +308,7 @@ def _read_single_file(file_path, filename, scenario):
         raise ValueError(f"Unexpected file format: {filename}!")
 
     tb = tb.rename(columns=COLUMNS_RENAME)
+    tb = _to_categories(tb)
     return (scenario, short_name, tb)
 
 
