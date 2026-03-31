@@ -5,7 +5,7 @@ Data model
 Index : (country, year)
     country  – harmonised country name or region/income-group aggregate
     year     – bin upper-bound integer (the x-axis in Grapher)
-               1-2-5 log scale: 100_000, 200_000, 500_000, 1_000_000, …, 100_000_000
+               25 log-uniform bins from 50k to 50M (ratio ≈ 1.33×); sentinel 100_000_000 for 50M+
 
 Variables (one per 5-year time step)
     pop_share_YYYY_estimates   – % of urban-centre population in this bin (historical)
@@ -49,29 +49,18 @@ REGIONS = [
     "World",
 ]
 
-# 1-2-3-5 log-spaced bin edges (population lower bounds).
-# Adds a "3" step between each decade for finer resolution (~1.5–2× ratios vs 2.5× for 1-2-5).
-# Each bin's x-axis value is its upper bound.
+# Log-uniform bins: 25 steps from 50k to 50M (ratio ≈ 1.33× per step).
+# Each bin's x-axis value is its upper bound (integer).
 # Last bin (50M+) uses 100_000_000 as a sentinel integer x-value.
-_EDGES = [
-    50_000,
-    100_000,
-    200_000,
-    300_000,
-    500_000,
-    1_000_000,
-    2_000_000,
-    3_000_000,
-    5_000_000,
-    10_000_000,
-    20_000_000,
-    30_000_000,
-    50_000_000,
-]
+_N_BINS = 25
+_POP_MIN = 50_000
+_POP_MAX = 50_000_000
+_EDGES = np.geomspace(_POP_MIN, _POP_MAX, _N_BINS + 1).round().astype(int).tolist()
 BINS = []
-for _i, _lo in enumerate(_EDGES):
-    _hi = _EDGES[_i + 1] if _i + 1 < len(_EDGES) else float("inf")
-    _x = _EDGES[_i + 1] if _i + 1 < len(_EDGES) else 100_000_000
+for _i in range(_N_BINS):
+    _lo = _EDGES[_i]
+    _hi = _EDGES[_i + 1] if _i < _N_BINS - 1 else float("inf")
+    _x = _EDGES[_i + 1] if _i < _N_BINS - 1 else 100_000_000
     BINS.append({"lo": _lo, "hi": _hi, "x": _x})
 
 BIN_X_VALUES = [b["x"] for b in BINS]
