@@ -1943,7 +1943,7 @@ class Anomaly(Base):
     )
     datasetId: Mapped[int] = mapped_column(Integer)
     datasetSourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
-    anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
+    anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default="")
     path_file: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LONGBLOB, default=None)
     _dfReduced: Mapped[Optional[bytes]] = mapped_column("dfReduced", LONGBLOB, default=None)

@@ -8,6 +8,14 @@ steps:
   data://grapher/artificial_intelligence/2026-01-30/frontiermath:
     - data://garden/artificial_intelligence/2026-01-30/frontiermath
 
+  # MMLU Benchmark by country of origin (EPOCH)
+  data://meadow/artificial_intelligence/2026-01-30/mmlu:
+    - snapshot://artificial_intelligence/2026-01-30/epoch_benchmark_data.zip
+  data://garden/artificial_intelligence/2026-01-30/mmlu:
+    - data://meadow/artificial_intelligence/2026-01-30/mmlu
+  data://grapher/artificial_intelligence/2026-01-30/mmlu:
+    - data://garden/artificial_intelligence/2026-01-30/mmlu
+
   # Stack Overflow Developer Survey – AI tool usage
   data://meadow/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
     - snapshot://artificial_intelligence/2026-02-05/stackoverflow_ai_usage.csv
@@ -116,19 +124,19 @@ steps:
     - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped
 
   # YouGov AI surveys
-  data://meadow/artificial_intelligence/2025-02-17/yougov_robots:
-    - snapshot://artificial_intelligence/2025-02-17/yougov_robots.xlsx
-  data://garden/artificial_intelligence/2025-02-17/yougov_robots:
-    - data://meadow/artificial_intelligence/2025-02-17/yougov_robots
-  data://grapher/artificial_intelligence/2025-02-17/yougov_robots:
-    - data://garden/artificial_intelligence/2025-02-17/yougov_robots
+  data://meadow/artificial_intelligence/2026-03-23/yougov_robots:
+    - snapshot://artificial_intelligence/2026-03-23/yougov_robots.xlsx
+  data://garden/artificial_intelligence/2026-03-23/yougov_robots:
+    - data://meadow/artificial_intelligence/2026-03-23/yougov_robots
+  data://grapher/artificial_intelligence/2026-03-23/yougov_robots:
+    - data://garden/artificial_intelligence/2026-03-23/yougov_robots
 
-  data://meadow/artificial_intelligence/2025-02-17/yougov_job_automation:
-    - snapshot://artificial_intelligence/2025-02-17/yougov_job_automation.xlsx
-  data://garden/artificial_intelligence/2025-02-17/yougov_job_automation:
-    - data://meadow/artificial_intelligence/2025-02-17/yougov_job_automation
-  data://grapher/artificial_intelligence/2025-02-17/yougov_job_automation:
-    - data://garden/artificial_intelligence/2025-02-17/yougov_job_automation
+  data://meadow/artificial_intelligence/2026-03-23/yougov_job_automation:
+    - snapshot://artificial_intelligence/2026-03-23/yougov_job_automation.xlsx
+  data://garden/artificial_intelligence/2026-03-23/yougov_job_automation:
+    - data://meadow/artificial_intelligence/2026-03-23/yougov_job_automation
+  data://grapher/artificial_intelligence/2026-03-23/yougov_job_automation:
+    - data://garden/artificial_intelligence/2026-03-23/yougov_job_automation
 
   ########################
   # AI Index report
@@ -232,13 +240,13 @@ steps:
     - data://garden/artificial_intelligence/2025-11-11/nvidia_revenue
 
   # Datacenter construction spending (U.S. Census Bureau)
-  data://meadow/us_census_bureau/2025-11-17/datacenter_construction:
-    - snapshot://us_census_bureau/2025-11-17/datacenter_construction.xlsx
-  data://garden/us_census_bureau/2025-11-17/datacenter_construction:
-    - data://meadow/us_census_bureau/2025-11-17/datacenter_construction
-    - data://garden/bls/2025-12-24/us_ppi_construction
-  data://grapher/us_census_bureau/2025-11-17/datacenter_construction:
-    - data://garden/us_census_bureau/2025-11-17/datacenter_construction
+  data://meadow/us_census_bureau/2026-03-24/datacenter_construction:
+    - snapshot://us_census_bureau/2026-03-24/datacenter_construction.xlsx
+  data://garden/us_census_bureau/2026-03-24/datacenter_construction:
+    - data://garden/bls/2026-03-24/us_ppi_construction
+    - data://meadow/us_census_bureau/2026-03-24/datacenter_construction
+  data://grapher/us_census_bureau/2026-03-24/datacenter_construction:
+    - data://garden/us_census_bureau/2026-03-24/datacenter_construction
 
   # IEA Energy and AI dataset
   data://meadow/artificial_intelligence/2025-11-07/energy_ai:

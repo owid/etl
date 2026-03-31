@@ -66,8 +66,9 @@ def run() -> None:
 
     # Loop over tables in meadow dataset.
     tables = []
+    log.info("gho.run.start", n_indicators=len(ds_meadow.table_names))
     for label in ds_meadow.table_names:
-        log.info("gho.run", label=label)
+        log.debug("gho.run", label=label)
 
         # Read table from meadow dataset.
         tb = ds_meadow.read(label, safe_types=False)
@@ -145,6 +146,8 @@ def run() -> None:
             tb = process_statins_indicator(tb)
 
         tables.append(tb)
+
+    log.info("gho.run.end", n_tables=len(tables), n_indicators=len(ds_meadow.table_names))
 
     # Merge identical tables
     tables = merge_identical_tables(tables)

@@ -85,10 +85,6 @@ steps:
   data://grapher/wvs/2023-06-25/longitudinal_wvs:
     - data://garden/wvs/2023-06-25/longitudinal_wvs
 
-  # USA PPI New Office Construction (US Bureau of Labor Statistics)
-  data://garden/bls/2025-12-24/us_ppi_construction:
-    - snapshot://bls/2025-12-24/us_ppi_construction.csv
-
   # Historical Cross Country Technology Adoption Dataset (Comin & Hobijn, 2004)
   data://meadow/technology/2023-03-16/hcctad:
     - snapshot://technology/2023-03-16/hcctad.txt
@@ -415,7 +411,7 @@ steps:
 
   data://garden/wpf/2025-01-17/famines_by_regime_gdp_population:
     - data://garden/wpf/2025-01-17/famines
-    - data://garden/democracy/2025-03-17/vdem
+    - data://garden/democracy/2026-03-17/vdem
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population
   data://grapher/wpf/2025-01-17/famines_by_regime_gdp_population:
@@ -830,6 +826,7 @@ steps:
   data://grapher/happiness/2026-03-16/happiness:
     - data://garden/happiness/2026-03-16/happiness
 
+<<<<<<< atus-update
 
   #
   # TODO: add step name (just something recognizable)
@@ -843,6 +840,11 @@ steps:
     - data://meadow/atus/2026-03-10/atus_time_spent_with
   data://grapher/atus/2026-03-10/atus_time_spent_with:
     - data://garden/atus/2026-03-10/atus_time_spent_with
+=======
+  # USA PPI New Office Construction (US Bureau of Labor Statistics)
+  data://garden/bls/2026-03-24/us_ppi_construction:
+    - snapshot://bls/2026-03-24/us_ppi_construction.csv
+>>>>>>> master
 
 include:
   - dag/open_numbers.yml

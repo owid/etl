@@ -34,7 +34,8 @@ def warn_on_list_of_entities(
         show_list: True to print a list of affected entities.
 
     """
-    warnings.warn(warning_message)
     if show_list:
-        print(warning_message)
-        print("\n".join(["* " + str(entity) for entity in list_of_entities]))
+        entity_list = "\n".join(["* " + str(entity) for entity in list_of_entities])
+        warnings.warn(f"{warning_message}\n{entity_list}")
+    else:
+        warnings.warn(warning_message)

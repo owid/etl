@@ -1,6 +1,5 @@
 """Load snapshot and create a garden dataset."""
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -14,9 +13,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("endemic_invertebrates")
     tb = ds_meadow.read("endemic_invertebrates")
     # tb = pr.concat([tb, tb_fish], ignore_index=True, axis=0)
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = paths.regions.harmonize_names(tb)
 
     tb = tb.format(["country", "year"])
 

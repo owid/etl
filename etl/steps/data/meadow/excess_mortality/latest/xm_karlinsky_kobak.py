@@ -79,7 +79,7 @@ def run(dest_dir: str) -> None:
 
 def load_dataframe(path: Union[Path, str], column_names: List[str]) -> pd.DataFrame:
     """Load the data from the latest version of the dataset."""
-    df = pd.read_csv(path, names=column_names)
+    df = pd.read_csv(path, names=column_names, encoding="latin-1")
     # Check columns
     assert (
         df.reset_index().shape[1] == len(column_names) + 1

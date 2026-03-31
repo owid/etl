@@ -12,6 +12,7 @@ import requests
 from owid.catalog import License, Origin, Table, VariableMeta
 from owid.catalog.utils import underscore
 from structlog import getLogger
+from tqdm import tqdm
 
 from etl.files import yaml_load
 from etl.grapher import helpers as gh
@@ -20,6 +21,12 @@ from etl.helpers import PathFinder
 log = getLogger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+PROCESSING_NOTES = {
+    "SL_DOM_TSPD": "Originally reported as a share of the day (%). Converted to hours per day by multiplying by 24.",
+    "SL_DOM_TSPDCW": "Originally reported as a share of the day (%). Converted to hours per day by multiplying by 24.",
+    "SL_DOM_TSPDDC": "Originally reported as a share of the day (%). Converted to hours per day by multiplying by 24.",
+}
 
 # only include tables containing SUBSET string, this is useful for debugging
 SUBSET = os.environ.get("SUBSET")
@@ -65,12 +72,12 @@ def run() -> None:
     source_desc = load_source_description()
     short_source_mapping = load_short_source_mapping()
 
-    for var in ds_garden.table_names:
+    for var in tqdm(ds_garden.table_names):
         if SUBSET and not re.search(SUBSET, var):
             log.warning("un_sdg.skip", table_name=var)
             continue
 
-        log.info("un_sdg.process", table_name=var)
+        log.debug("un_sdg.process", table_name=var)
 
         tb = ds_garden.read(var, safe_types=False)
 
@@ -225,6 +232,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, source_desc: dict, date_acce
     indicator = tb["variable_name"].iloc[0].split("-")[0].strip()
     series_code = tb["seriescode"].iloc[0].upper()
     series_description = tb["seriesdescription"].iloc[0]
+    processing_note = PROCESSING_NOTES.get(series_code, None)
     source_desc = create_metadata_desc(
         indicator=indicator, series_code=series_code, source_desc=source_desc, series_description=series_description
     )
@@ -253,6 +261,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, source_desc: dict, date_acce
     tb["meta"] = VariableMeta(
         title=tb["variable_name_meta"].iloc[0],
         description_short=series_description,
+        description_processing=processing_note,
         description_from_producer=str(source_desc),
         origins=[origin],
         unit=tb["long_unit"].iloc[0].lower(),

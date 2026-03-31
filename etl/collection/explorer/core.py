@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
-from owid.catalog.utils import underscore
+from owid.catalog.core.utils import underscore
 from sqlalchemy.orm import Session
 from typing_extensions import Self
 
