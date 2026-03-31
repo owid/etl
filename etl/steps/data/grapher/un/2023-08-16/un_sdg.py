@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
             log.warning("un_sdg.skip", table_name=var)
             continue
 
-        log.info("un_sdg.process", table_name=var)
+        log.debug("un_sdg.process", table_name=var)
 
         var_df = create_dataframe_with_variable_name(ds_garden, var)
         var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
