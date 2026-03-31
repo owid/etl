@@ -716,7 +716,7 @@ steps:
   data://grapher/bls/2025-04-12/us_consumer_prices:
     - data://garden/bls/2025-04-12/us_consumer_prices
 
-      # ATUS - American Time Use Survey
+  # ATUS - American Time Use Survey
   data://meadow/atus/2024-12-10/atus_0323:
     - snapshot://atus/2024-12-10/atus_who.zip
     - snapshot://atus/2024-12-10/atus_activities.zip

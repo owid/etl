@@ -7,7 +7,7 @@ meta:
     description: |-
       The American Time Use Survey (ATUS) measures the amount of time people spend doing various activities, such as paid work, childcare, volunteering, and socializing. It provides nationally representative estimates of how, where, and with whom Americans spend their time, and is the only federal survey providing data on the full range of nonmarket activities, from childcare to volunteering.
     date_published: "2025-06-26"
-    version_producer: ATUS 2024
+    version_producer: 03-24
     title_snapshot: American Time Use Survey - Activity file
     description_snapshot: |-
       The Activity file contains information about how ATUS respondents spent their diary day. It includes information such as activity codes, activity start and stop times, and locations for the ATUS 2003-2024.
@@ -17,7 +17,7 @@ meta:
     # Citation
     producer: U.S. Bureau of Labor Statistics
     citation_full: |-
-      American Time Use Survey, U.S. Bureau of Labor Statistics, https://www.bls.gov/tus/, 2025
+      American Time Use Survey, U.S. Bureau of Labor Statistics, https://www.bls.gov/tus/, 2025.
     attribution_short: BLS
 
     # Files

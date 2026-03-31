@@ -7,7 +7,7 @@ definitions:
         - Time Use
       grapher_config:
         note: |-
-          Activities such as sleeping, grooming, and personal care are not included in the data. Relationships used to categorize people are not exhaustive and time spent with multiple people counts towards all (e.g., attending a party with friends and partner counts toward both "friends" and "partner").'
+          Activities such as sleeping, grooming, and personal care are not included in the data. Relationships used to categorize people are not exhaustive and time spent with multiple people counts towards all (e.g., attending a party with friends and partner counts toward both "friends" and "partner").
         originUrl: https://ourworldindata.org/time-use
     display:
       numSignificantFigures: 2
@@ -34,11 +34,11 @@ tables:
     variables:
       t:
         title: Time spent with other people throughout life - <<who_category>>
-        unit: "Hours"
+        unit: hours
         short_unit: "h"
         description_short: |-
           <% if who_category in ["Children", "Partner", "Family"] %>
-          Time spent with <<who_category.lower()>>, by gender and age. This data is measured in hours per day and based on averages from surveys in the United States between 2010 and 2024
+          Time spent with <<who_category.lower()>>, by gender and age. This data is measured in hours per day and based on averages from surveys in the United States between 2010 and 2024.
           <% elif who_category in ["Friend", "Co-worker"] %>
           Time spent with <<who_category.lower()>>s, by gender and age. This data is measured in hours per day and based on averages from surveys in the United States between 2010 and 2024.
           <% elif who_category == "Alone" %>
