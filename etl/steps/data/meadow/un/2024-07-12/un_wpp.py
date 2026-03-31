@@ -8,7 +8,6 @@ What do we do here?
 - Set indices and verify integrity
 """
 
-from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -16,7 +15,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.catalog.tables import concat
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__=__file__)
@@ -117,18 +116,13 @@ INTERIM_SNAPSHOTS = [
 
 
 def _load_interim_csvs() -> Dict[str, Table]:
-    """Load all interim update ZIPs and return a dict mapping CSV filename to Table (concatenated across all ZIPs)."""
-    all_csvs: Dict[str, List[Table]] = defaultdict(list)
+    """Load all interim update ZIPs and return a dict mapping CSV filename to Table."""
+    result: Dict[str, Table] = {}
     for snap_name in INTERIM_SNAPSHOTS:
         snap = paths.load_snapshot(snap_name)
         with snap.extracted() as archive:
             for name in archive.glob("*.csv"):
-                tb = archive.read(name)
-                all_csvs[name].append(tb)
-    # Concat tables from multiple ZIPs if present
-    result = {}
-    for name, tbs in all_csvs.items():
-        result[name] = concat(tbs, ignore_index=True) if len(tbs) > 1 else tbs[0]
+                result[name] = archive.read(name)
     return result
 
 
@@ -205,7 +199,7 @@ def _apply_interim_xlsx(tb: Table, interim_csvs: Dict[str, Table]) -> Table:
     return tb
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -280,7 +274,7 @@ def run(dest_dir: str) -> None:
     tables = [_categorize_index(tb) for tb in tables]
 
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True, repack=False)
+    ds_meadow = paths.create_dataset(tables=tables, check_variables_metadata=True, repack=False)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
