@@ -23,6 +23,9 @@ def run() -> None:
     numeric_cols = ["totaltrips", "totalpassengerscarried", "totalpmt"]
     tb = tb.groupby("date")[numeric_cols].sum().reset_index()
 
+    # Convert passenger miles traveled to kilometers
+    tb["totalpmt"] = tb["totalpmt"] * 1.60934
+
     tb["country"] = "California"
 
     # Improve table format.
