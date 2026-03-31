@@ -199,7 +199,5 @@ def st_show_home():
                         )
 
 
-
-
 # Show the home page
 st_show_home()
