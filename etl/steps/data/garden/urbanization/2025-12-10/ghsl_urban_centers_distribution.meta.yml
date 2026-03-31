@@ -12,14 +12,23 @@ definitions:
     - The underlying population figures have been rescaled to match UN World Population Prospects 2022 national totals, so country-level numbers are consistent with UN estimates.
     - Cities are grouped into size bins following the 1-2-3-5 rule on a log scale. Each x-axis value is the upper bound of its bin (e.g. x = 100,000 captures cities with 50,000–100,000 people). Bin boundaries are 100k, 200k, 300k, 500k, 1M, 2M, 3M, 5M, 10M, 20M, 30M, 50M, and 100M (sentinel for 50M+).
 
-  desc_short_estimates: &desc_short_estimates |-
+  desc_short_share_estimates: &desc_short_share_estimates |-
     Share of urban-centre population living in cities of each size category (historical estimates). The x-axis position is the upper-population limit of the bin.
 
-  desc_short_projections: &desc_short_projections |-
+  desc_short_share_projections: &desc_short_share_projections |-
     Share of urban-centre population living in cities of each size category (projections). The x-axis position is the upper-population limit of the bin.
 
-  desc_processing: &desc_processing |-
+  desc_short_pop_estimates: &desc_short_pop_estimates |-
+    Total number of people living in urban centres of each size category (historical estimates). The x-axis position is the upper-population limit of the bin.
+
+  desc_short_pop_projections: &desc_short_pop_projections |-
+    Total number of people living in urban centres of each size category (projections). The x-axis position is the upper-population limit of the bin.
+
+  desc_processing_share: &desc_processing_share |-
     For each country and year, cities are assigned to a size bin based on their population. The population in each bin is summed and divided by the total urban-centre population to give the share. Regional aggregates are computed as the sum of city populations across all countries in the region.
+
+  desc_processing_pop: &desc_processing_pop |-
+    For each country and year, cities are assigned to a size bin based on their population. The population in each bin is summed. Regional aggregates are computed as the sum of city populations across all countries in the region.
 
 tables:
   ghsl_urban_centers_distribution:
@@ -29,9 +38,9 @@ tables:
         title: Share of urban-centre population by city size (1950)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -39,9 +48,9 @@ tables:
         title: Share of urban-centre population by city size (1955)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -49,9 +58,9 @@ tables:
         title: Share of urban-centre population by city size (1960)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -59,9 +68,9 @@ tables:
         title: Share of urban-centre population by city size (1965)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -69,9 +78,9 @@ tables:
         title: Share of urban-centre population by city size (1970)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -79,9 +88,9 @@ tables:
         title: Share of urban-centre population by city size (1975)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -89,9 +98,9 @@ tables:
         title: Share of urban-centre population by city size (1980)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -99,9 +108,9 @@ tables:
         title: Share of urban-centre population by city size (1985)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -109,9 +118,9 @@ tables:
         title: Share of urban-centre population by city size (1990)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -119,9 +128,9 @@ tables:
         title: Share of urban-centre population by city size (1995)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -129,9 +138,9 @@ tables:
         title: Share of urban-centre population by city size (2000)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -139,9 +148,9 @@ tables:
         title: Share of urban-centre population by city size (2005)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -149,9 +158,9 @@ tables:
         title: Share of urban-centre population by city size (2010)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -159,9 +168,9 @@ tables:
         title: Share of urban-centre population by city size (2015)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -169,9 +178,9 @@ tables:
         title: Share of urban-centre population by city size (2020)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_estimates
+        description_short: *desc_short_share_estimates
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
 
@@ -180,9 +189,9 @@ tables:
         title: Share of urban-centre population by city size (2020, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -191,9 +200,9 @@ tables:
         title: Share of urban-centre population by city size (2025, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -202,9 +211,9 @@ tables:
         title: Share of urban-centre population by city size (2030, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -213,9 +222,9 @@ tables:
         title: Share of urban-centre population by city size (2035, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -224,9 +233,9 @@ tables:
         title: Share of urban-centre population by city size (2040, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -235,9 +244,9 @@ tables:
         title: Share of urban-centre population by city size (2045, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -246,9 +255,9 @@ tables:
         title: Share of urban-centre population by city size (2050, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -257,9 +266,9 @@ tables:
         title: Share of urban-centre population by city size (2055, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -268,9 +277,9 @@ tables:
         title: Share of urban-centre population by city size (2060, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -279,9 +288,9 @@ tables:
         title: Share of urban-centre population by city size (2065, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -290,9 +299,9 @@ tables:
         title: Share of urban-centre population by city size (2070, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -301,9 +310,9 @@ tables:
         title: Share of urban-centre population by city size (2075, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -312,9 +321,9 @@ tables:
         title: Share of urban-centre population by city size (2080, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -323,9 +332,9 @@ tables:
         title: Share of urban-centre population by city size (2085, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -334,9 +343,9 @@ tables:
         title: Share of urban-centre population by city size (2090, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -345,9 +354,9 @@ tables:
         title: Share of urban-centre population by city size (2095, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -356,9 +365,348 @@ tables:
         title: Share of urban-centre population by city size (2100, projected)
         unit: "%"
         short_unit: "%"
-        description_short: *desc_short_projections
+        description_short: *desc_short_share_projections
         description_key: *desc_key
-        description_processing: *desc_processing
+        description_processing: *desc_processing_share
         display:
           numDecimalPlaces: 1
+          isProjection: true
+
+      # ── RAW POPULATION — ESTIMATES (1950–2020) ─────────────────────────────────
+      pop_1950_estimates:
+        title: Population living in urban centres by city size (1950)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_1955_estimates:
+        title: Population living in urban centres by city size (1955)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_1960_estimates:
+        title: Population living in urban centres by city size (1960)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_1965_estimates:
+        title: Population living in urban centres by city size (1965)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_1970_estimates:
+        title: Population living in urban centres by city size (1970)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_1975_estimates:
+        title: Population living in urban centres by city size (1975)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_1980_estimates:
+        title: Population living in urban centres by city size (1980)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_1985_estimates:
+        title: Population living in urban centres by city size (1985)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_1990_estimates:
+        title: Population living in urban centres by city size (1990)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_1995_estimates:
+        title: Population living in urban centres by city size (1995)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_2000_estimates:
+        title: Population living in urban centres by city size (2000)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_2005_estimates:
+        title: Population living in urban centres by city size (2005)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_2010_estimates:
+        title: Population living in urban centres by city size (2010)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_2015_estimates:
+        title: Population living in urban centres by city size (2015)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      pop_2020_estimates:
+        title: Population living in urban centres by city size (2020)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+
+      # ── RAW POPULATION — PROJECTIONS (2020–2100) ───────────────────────────────
+      pop_2020_projections:
+        title: Population living in urban centres by city size (2020, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2025_projections:
+        title: Population living in urban centres by city size (2025, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2030_projections:
+        title: Population living in urban centres by city size (2030, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2035_projections:
+        title: Population living in urban centres by city size (2035, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2040_projections:
+        title: Population living in urban centres by city size (2040, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2045_projections:
+        title: Population living in urban centres by city size (2045, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2050_projections:
+        title: Population living in urban centres by city size (2050, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2055_projections:
+        title: Population living in urban centres by city size (2055, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2060_projections:
+        title: Population living in urban centres by city size (2060, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2065_projections:
+        title: Population living in urban centres by city size (2065, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2070_projections:
+        title: Population living in urban centres by city size (2070, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2075_projections:
+        title: Population living in urban centres by city size (2075, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2080_projections:
+        title: Population living in urban centres by city size (2080, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2085_projections:
+        title: Population living in urban centres by city size (2085, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2090_projections:
+        title: Population living in urban centres by city size (2090, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2095_projections:
+        title: Population living in urban centres by city size (2095, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      pop_2100_projections:
+        title: Population living in urban centres by city size (2100, projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_short_pop_projections
+        description_key: *desc_key
+        description_processing: *desc_processing_pop
+        display:
+          numDecimalPlaces: 0
           isProjection: true

@@ -137,32 +137,47 @@ def run() -> None:
         min_num_values_per_year=1,
     )
 
-    # ── Convert to shares (% of urban-centre population in each bin) ──────────
+    # ── Convert to shares; keep raw population too ────────────────────────────
     tb_wide["_total"] = tb_wide[bin_cols].sum(axis=1)
     for col in bin_cols:
         x = int(col.split("_", 1)[1])
         tb_wide[f"share_{x}"] = (tb_wide[col] / tb_wide["_total"]) * 100
+        tb_wide[f"pop_{x}"] = tb_wide[col]  # raw population (people)
     tb_wide = tb_wide.drop(columns=bin_cols + ["_total"])
     share_cols = [f"share_{x}" for x in BIN_X_VALUES]
+    pop_cols = [f"pop_{x}" for x in BIN_X_VALUES]
 
-    # ── Melt back to long: (country, year, bin_x, pop_share) ─────────────────
-    tb_long = tb_wide.melt(
+    # ── Melt both metrics to long format ──────────────────────────────────────
+    tb_long_share = tb_wide.melt(
         id_vars=["country", "year"],
         value_vars=share_cols,
         var_name="bin_col",
         value_name="pop_share",
     )
-    tb_long["bin_x"] = tb_long["bin_col"].str.removeprefix("share_").astype(int)
-    tb_long = tb_long.drop(columns=["bin_col"])
+    tb_long_share["bin_x"] = tb_long_share["bin_col"].str.removeprefix("share_").astype(int)
+    tb_long_share = tb_long_share.drop(columns=["bin_col"])
+
+    tb_long_pop = tb_wide.melt(
+        id_vars=["country", "year"],
+        value_vars=pop_cols,
+        var_name="bin_col",
+        value_name="pop",
+    )
+    tb_long_pop["bin_x"] = tb_long_pop["bin_col"].str.removeprefix("pop_").astype(int)
+    tb_long_pop = tb_long_pop.drop(columns=["bin_col"])
+
+    tb_long = pr.merge(tb_long_share, tb_long_pop, on=["country", "year", "bin_x"], how="outer")
 
     # ── Split into estimates / projections ────────────────────────────────────
     past = tb_long[tb_long["year"] < START_OF_PROJECTIONS].copy()
     future = tb_long[tb_long["year"] >= START_OF_PROJECTIONS - 5].copy()
 
     def pivot_years(df, suffix):
-        pt = df.pivot_table(index=["country", "bin_x"], columns="year", values="pop_share")
-        pt.columns = [f"pop_share_{y}_{suffix}" for y in pt.columns]
-        return pt.reset_index()
+        pt_share = df.pivot_table(index=["country", "bin_x"], columns="year", values="pop_share")
+        pt_share.columns = [f"pop_share_{y}_{suffix}" for y in pt_share.columns]
+        pt_pop = df.pivot_table(index=["country", "bin_x"], columns="year", values="pop")
+        pt_pop.columns = [f"pop_{y}_{suffix}" for y in pt_pop.columns]
+        return pr.merge(pt_share.reset_index(), pt_pop.reset_index(), on=["country", "bin_x"], how="outer")
 
     tb_est = pivot_years(past, "estimates")
     tb_proj = pivot_years(future, "projections")
@@ -173,18 +188,24 @@ def run() -> None:
     origins = _origins
     for col in tb.columns:
         if col.startswith("pop_share_"):
-            # col format: pop_share_YYYY_estimates / pop_share_YYYY_projections
             parts = col.split("_")
-            year = parts[2]
-            suffix = parts[3]  # "estimates" or "projections"
+            year, suffix = parts[2], parts[3]
             tb[col].metadata.origins = origins
             tb[col].metadata.unit = "%"
             tb[col].metadata.short_unit = "%"
             tb[col].metadata.title = f"Share of urban-centre population by city size ({year}, {suffix})"
-            tb[
-                col
-            ].metadata.description_short = (
+            tb[col].metadata.description_short = (
                 f"Share of urban-centre population living in cities of each size category, {year} ({suffix})."
+            )
+        elif col.startswith("pop_") and not col.startswith("pop_share"):
+            parts = col.split("_")
+            year, suffix = parts[1], parts[2]
+            tb[col].metadata.origins = origins
+            tb[col].metadata.unit = "people"
+            tb[col].metadata.short_unit = ""
+            tb[col].metadata.title = f"Population living in urban centres by city size ({year}, {suffix})"
+            tb[col].metadata.description_short = (
+                f"Total population living in urban centres of each size category, {year} ({suffix})."
             )
 
     # ── Format: bin_x becomes 'year' (the Grapher x-axis) ────────────────────
