@@ -114,6 +114,8 @@ INTERIM_SNAPSHOTS = [
     "un_wpp_interim_20260119_togo.zip",
 ]
 
+YEAR_ESTIMATES_END = 2023  # Year up to which the estimates go (inclusive). Projections start in 2024.
+
 
 def _load_interim_csvs() -> Dict[str, Table]:
     """Load all interim update ZIPs and return a dict mapping CSV filename to Table."""
@@ -282,19 +284,26 @@ def run() -> None:
 
 def make_tb_population(interim_csvs: Dict[str, Table]) -> Table:
     """Make population table."""
+    # Get estimates (1950-2023) data
     tb_population = read_from_csv("un_wpp_population_estimates.csv", interim_csvs)
     tb_population["month"] = "July"
+    tb_population = tb_population.loc[tb_population["Time"] <= YEAR_ESTIMATES_END]
     tb_population_jan = read_from_csv("un_wpp_population_jan_estimates.csv", interim_csvs)
     tb_population_jan["month"] = "January"
+    tb_population_jan = tb_population_jan.loc[tb_population_jan["Time"] <= YEAR_ESTIMATES_END]
+
+    # Get projections (2024-2100) data
     tb_population_jan_medium = read_from_csv("un_wpp_population_jan_medium.csv", interim_csvs)
     tb_population_jan_medium["month"] = "January"
-    tb_population_l = read_from_csv("un_wpp_population_low.csv", interim_csvs)
+    tb_population_jan_medium = tb_population_jan_medium.loc[tb_population_jan_medium["Time"] > YEAR_ESTIMATES_END]
+    tb_population_l = read_from_csv("un_wpp_population_low.csv")
     tb_population_l["month"] = "July"
     tb_population_m = read_from_csv("un_wpp_population_medium.csv", interim_csvs)
     tb_population_m["month"] = "July"
-    tb_population_h = read_from_csv("un_wpp_population_high.csv", interim_csvs)
+    tb_population_m = tb_population_m.loc[tb_population_m["Time"] > YEAR_ESTIMATES_END]
+    tb_population_h = read_from_csv("un_wpp_population_high.csv")
     tb_population_h["month"] = "July"
-    tb_population_c = read_from_csv("un_wpp_population_constant_fertility.csv", interim_csvs)
+    tb_population_c = read_from_csv("un_wpp_population_constant_fertility.csv")
     tb_population_c["month"] = "July"
     tb_population = combine_population(
         [
