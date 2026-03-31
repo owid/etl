@@ -7,6 +7,24 @@ definitions:
     unit: micrograms per cubic meter
     short_unit: µg/m³
     processing_level: minor
+  description_aqli: &description_aqli |-
+    The data for the annual average concentrations of PM2.5 comes from a satellite-derived particulate pollution concentration dataset constructed by [Donkelaar et al. (2021)](https://sites.wustl.edu/acag/datasets/surface-pm2-5/).
+
+    Users may find that the AQLI’s satellite-derived pollution data differs from what their governments or local air quality monitors report. Some of the discrepancies are by design, reflecting differences in the operational definition of particulate pollution level:
+
+    ### Dust and sea salt
+    Whereas monitors pick up all kinds of particulates, the AQLI intentionally uses raw PM₂.₅ data from which the shares of mineral dust and sea salt have been removed in order to target human-caused pollution. This decreases the AQLI’s reported pollution, especially in arid regions such as North Africa, the Middle East, Sub-Saharan African, and northwestern China.
+
+    ### Area average vs. point estimates
+    The satellite-derived data measures the average air pollution within a block of a grid. In contrast, air pollution monitors measure the air pollution level at their specific point locations—downwind of the brick kiln or in a tree in the park. If one were to average monitor readings in a region, the average could be higher or lower than one specific point measure.
+
+    ### Population-weighting
+    We use population weighting to calculate average exposures in a region. Population weighting is done by multiplying the air pollution level (PM₂.₅) in each cell by the population in that grid. These values are then added up for all grids within a region, and the total is divided by the sum of the populations of all grids.
+
+    ### Resolution
+    While the 0.01 x 0.01-degree grid provides a fine resolution for a global air pollution dataset, it may misrepresent pollution levels in areas with sharp changes in pollution and population density at smaller scales. This issue arises in areas with significant pollution and population variation, such as cities near large mountains. An extreme example is Ulaanbaatar, Mongolia. The city’s elongated shape and location in the Tuul River Valley mean each grid cell used to calculate its average pollution level includes both the highly polluted urban area and the cleaner surrounding mountains. This lowers the grid’s average pollution levels, and population-weighting does not sufficiently reduce the influence of the less-polluted mountain areas. As a result, AQLI estimates much lower PM₂.₅ levels (19 μg/m³ in 2016) compared to monitor data (92 μg/m³), with the latter better reflecting the air residents breathe.
+
+    More information can be found in the [AQLI methodology and research design document](https://aqli.epic.uchicago.edu/about/methodology/).
 
 
 # Learn more about the available fields:
@@ -18,11 +36,15 @@ tables:
   air_quality_life_index:
     variables:
       pm:
-        title: PM2.5 air pollution
-        description_short: Annual average concentration of fine [particulate matter (PM2.5)](#dod:particulate_matter_pollution) in micrograms per cubic meter.
+        title: Exposure to particulate matter air pollution
+        description_short: Annual population-weighted average concentration of [fine particulate matter (PM2.5)](#dod:particulate_matter_pollution) in the air, measured in micrograms per cubic meter (µg/m³). Fine particulate matter (PM2.5) consists of tiny particles with a diameter of 2.5 micrometers or less, which can pose significant health risks.
         description_key:
           - Outdoor air pollution, specifically PM2.5, is a major environmental risk factor for health issues such as respiratory and cardiovascular diseases. It is estimated to contribute to millions of premature deaths globally each year.
-        description_from_producer: The data for the annual average concentrations of PM2.5 comes from a satellite-derived particulate pollution concentration dataset constructed by [Donkelaar et al. (2021)](https://sites.wustl.edu/acag/datasets/surface-pm2-5/). More information can be found in the [AQLI methodology and research design document](https://aqli.epic.uchicago.edu/about/methodology/).
+          - The World Health Organization (WHO) recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+          - The Air Quality Life Index (AQLI) uses satellite-derived data to estimate PM2.5 levels, which may differ from local ground monitor readings.
+          - This data uses population-weighted averages to reflect the exposure of people in a region. It also excludes natural sources of PM2.5, such as dust and sea salt, to focus on human-caused pollution.
+          - You can learn more about the data and methodology in the [AQLI methodology and research design document](https://aqli.epic.uchicago.edu/about/methodology/).
+        description_from_producer: *description_aqli
         display:
           roundingMode: significantFigures
           numSignificantFigures: 2
