@@ -8,6 +8,7 @@ What do we do here?
 - Set indices and verify integrity
 """
 
+from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -67,6 +68,142 @@ LOCATION_TYPES_XLSX = [
     "World",
 ]
 
+# Interim update: mapping from snapshot short_name to the CSV filename inside the interim ZIP.
+# Only files that are actually used in the pipeline are listed here.
+INTERIM_CSV_MAP = {
+    "un_wpp_population_estimates.csv": "WPP2024_PopulationBySingleAgeSex_Medium_Update.csv",
+    "un_wpp_population_medium.csv": "WPP2024_PopulationBySingleAgeSex_Medium_Update.csv",
+    "un_wpp_population_jan_estimates.csv": "WPP2024_Population1JanuaryBySingleAgeSex_Medium_Update.csv",
+    "un_wpp_population_jan_medium.csv": "WPP2024_Population1JanuaryBySingleAgeSex_Medium_Update.csv",
+    "un_wpp_fertility.csv": "WPP2024_Fertility_by_Age5_Medium_Update.csv",
+    "un_wpp_fertility_single_age.csv": "WPP2024_Fertility_by_Age1_Medium_Update.csv",
+    "un_wpp_deaths_estimates.csv": "WPP2024_DeathsBySingleAgeSex_Medium_Update.csv",
+    "un_wpp_deaths_medium.csv": "WPP2024_DeathsBySingleAgeSex_Medium_Update.csv",
+}
+
+# Mapping from interim demographic indicators CSV columns to the long XLSX column names.
+INTERIM_DEMO_INDICATORS_RENAME = {
+    "PopDensity": "Population Density, as of 1 July (persons per square km)",
+    "PopGrowthRate": "Population Growth Rate (percentage)",
+    "NatChangeRT": "Rate of Natural Change (per 1,000 population)",
+    "NetMigrations": "Net Number of Migrants (thousands)",
+    "CNMR": "Net Migration Rate (per 1,000 population)",
+    "CDR": "Crude Death Rate (deaths per 1,000 population)",
+    "CBR": "Crude Birth Rate (births per 1,000 population)",
+    "MedianAgePop": "Median Age, as of 1 July (years)",
+    "MAC": "Mean Age Childbearing (years)",
+    "TFR": "Total Fertility Rate (live births per woman)",
+    "Births": "Births (thousands)",
+    "Q5": "Under-Five Mortality (deaths under age 5 per 1,000 live births)",
+    "IMR": "Infant Mortality Rate (infant deaths per 1,000 live births)",
+    "LEx": "Life Expectancy at Birth, both sexes (years)",
+    "LExMale": "Male Life Expectancy at Birth (years)",
+    "LExFemale": "Female Life Expectancy at Birth (years)",
+    "LE15": "Life Expectancy at Age 15, both sexes (years)",
+    "LE15Male": "Male Life Expectancy at Age 15 (years)",
+    "LE15Female": "Female Life Expectancy at Age 15 (years)",
+    "LE65": "Life Expectancy at Age 65, both sexes (years)",
+    "LE65Male": "Male Life Expectancy at Age 65 (years)",
+    "LE65Female": "Female Life Expectancy at Age 65 (years)",
+    "LE80": "Life Expectancy at Age 80, both sexes (years)",
+    "LE80Male": "Male Life Expectancy at Age 80 (years)",
+    "LE80Female": "Female Life Expectancy at Age 80 (years)",
+}
+
+# Interim snapshot short names (add more here for future interim updates).
+INTERIM_SNAPSHOTS = [
+    "un_wpp_interim_20260119_togo.zip",
+]
+
+
+def _load_interim_csvs() -> Dict[str, Table]:
+    """Load all interim update ZIPs and return a dict mapping CSV filename to Table (concatenated across all ZIPs)."""
+    all_csvs: Dict[str, List[Table]] = defaultdict(list)
+    for snap_name in INTERIM_SNAPSHOTS:
+        snap = paths.load_snapshot(snap_name)
+        with snap.extracted() as archive:
+            for name in archive.glob("*.csv"):
+                tb = archive.read(name)
+                all_csvs[name].append(tb)
+    # Concat tables from multiple ZIPs if present
+    result = {}
+    for name, tbs in all_csvs.items():
+        result[name] = concat(tbs, ignore_index=True) if len(tbs) > 1 else tbs[0]
+    return result
+
+
+def _apply_interim_csv(tb: Table, interim_csvs: Dict[str, Table], short_name: str) -> Table:
+    """Replace rows for interim-updated countries in a CSV-based table.
+
+    Drops rows from `tb` that match interim country+variant, then appends the interim rows.
+    """
+    interim_filename = INTERIM_CSV_MAP.get(short_name)
+    if interim_filename is None or interim_filename not in interim_csvs:
+        return tb
+
+    tb_interim = interim_csvs[interim_filename].copy()
+
+    # Get the set of (Location, Variant) pairs in the interim data
+    interim_countries = set(tb_interim["Location"].unique())
+    interim_variants = set(tb_interim["Variant"].unique())
+
+    # Drop matching rows from the original table
+    mask = tb["Location"].isin(interim_countries) & tb["Variant"].isin(interim_variants)
+    # Also drop "Estimates" variant for the same countries, since interim covers the full 1950-2100 range as "Medium"
+    mask_estimates = tb["Location"].isin(interim_countries) & (tb["Variant"] == "Estimates")
+    tb = tb.loc[~(mask | mask_estimates)]
+
+    # Append interim data
+    tb = concat([tb, tb_interim], ignore_index=True)
+    return tb
+
+
+def _apply_interim_xlsx(tb: Table, interim_csvs: Dict[str, Table]) -> Table:
+    """Replace rows for interim-updated countries in the XLSX-based demographic indicators table.
+
+    The interim CSV uses short column names (TFR, LEx, etc.) while the XLSX uses long names.
+    We rename the interim columns, drop matching rows from the original, and append.
+    """
+    interim_filename = "WPP2024_Demographic_Indicators_Medium_Update.csv"
+    if interim_filename not in interim_csvs:
+        return tb
+
+    tb_interim = interim_csvs[interim_filename].copy()
+
+    # Get interim countries (use the already-renamed "country" column if present, else "Location")
+    country_col = "country" if "country" in tb.columns else "Region, subregion, country or area *"
+    variant_col = "variant" if "variant" in tb.columns else "Variant"
+
+    # Rename interim columns to match XLSX column names
+    rename_map = {
+        "Location": country_col,
+        "Time": "year" if "year" in tb.columns else "Year",
+        "Variant": variant_col,
+        "LocTypeName": "Type" if "Type" in tb.columns else "LocTypeName",
+    }
+    rename_map.update(INTERIM_DEMO_INDICATORS_RENAME)
+    tb_interim = tb_interim.rename(columns=rename_map)
+
+    year_col = "year" if "year" in tb.columns else "Year"
+
+    # Keep only columns that exist in the original table
+    common_cols = [c for c in tb_interim.columns if c in tb.columns]
+    tb_interim = tb_interim[common_cols]
+
+    # Ensure year types match
+    tb_interim[year_col] = tb_interim[year_col].astype(tb[year_col].dtype)
+
+    interim_countries = set(tb_interim[country_col].unique())
+    interim_variants = set(tb_interim[variant_col].unique())
+
+    # Drop matching rows + estimates for the same countries
+    mask = tb[country_col].isin(interim_countries) & tb[variant_col].isin(interim_variants)
+    mask_estimates = tb[country_col].isin(interim_countries) & (tb[variant_col] == "Estimates")
+    tb = tb.loc[~(mask | mask_estimates)]
+
+    tb = concat([tb, tb_interim], ignore_index=True)
+    return tb
+
 
 def run(dest_dir: str) -> None:
     #
@@ -74,9 +211,13 @@ def run(dest_dir: str) -> None:
     #
     paths.log.info("reading snapshots...")
 
+    # Load interim update CSVs
+    paths.log.info("loading interim update data...")
+    interim_csvs = _load_interim_csvs()
+
     # Main file: Demography indicators
     paths.log.info("reading main file: demography indicators...")
-    tb_main = read_from_xlsx("un_wpp_demographic_indicators.xlsx")
+    tb_main = read_from_xlsx("un_wpp_demographic_indicators.xlsx", interim_csvs=interim_csvs)
     # Process data.
     # Population density add month column
     tb_population_density = clean_table_standard_xlsx(
@@ -103,14 +244,14 @@ def run(dest_dir: str) -> None:
 
     # # Population
     paths.log.info("reading population...")
-    tb_population = make_tb_population()
+    tb_population = make_tb_population(interim_csvs)
 
     # # Fertility rate
-    tb_fertility, tb_births = make_tb_fertility_births(tb_main)
-    tb_fertility_births_single = make_tb_fertility_births_single_age()
+    tb_fertility, tb_births = make_tb_fertility_births(tb_main, interim_csvs)
+    tb_fertility_births_single = make_tb_fertility_births_single_age(interim_csvs)
 
     # Deaths
-    tb_deaths = make_tb_deaths()
+    tb_deaths = make_tb_deaths(interim_csvs)
 
     #
     # Save outputs.
@@ -145,21 +286,21 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
 
-def make_tb_population() -> Table:
+def make_tb_population(interim_csvs: Dict[str, Table]) -> Table:
     """Make population table."""
-    tb_population = read_from_csv("un_wpp_population_estimates.csv")
+    tb_population = read_from_csv("un_wpp_population_estimates.csv", interim_csvs)
     tb_population["month"] = "July"
-    tb_population_jan = read_from_csv("un_wpp_population_jan_estimates.csv")
+    tb_population_jan = read_from_csv("un_wpp_population_jan_estimates.csv", interim_csvs)
     tb_population_jan["month"] = "January"
-    tb_population_jan_medium = read_from_csv("un_wpp_population_jan_medium.csv")
+    tb_population_jan_medium = read_from_csv("un_wpp_population_jan_medium.csv", interim_csvs)
     tb_population_jan_medium["month"] = "January"
-    tb_population_l = read_from_csv("un_wpp_population_low.csv")
+    tb_population_l = read_from_csv("un_wpp_population_low.csv", interim_csvs)
     tb_population_l["month"] = "July"
-    tb_population_m = read_from_csv("un_wpp_population_medium.csv")
+    tb_population_m = read_from_csv("un_wpp_population_medium.csv", interim_csvs)
     tb_population_m["month"] = "July"
-    tb_population_h = read_from_csv("un_wpp_population_high.csv")
+    tb_population_h = read_from_csv("un_wpp_population_high.csv", interim_csvs)
     tb_population_h["month"] = "July"
-    tb_population_c = read_from_csv("un_wpp_population_constant_fertility.csv")
+    tb_population_c = read_from_csv("un_wpp_population_constant_fertility.csv", interim_csvs)
     tb_population_c["month"] = "July"
     tb_population = combine_population(
         [
@@ -288,9 +429,9 @@ def make_tb_life_expectancy(tb_main: Table) -> Table:
     return tb
 
 
-def make_tb_fertility_births_single_age():
+def make_tb_fertility_births_single_age(interim_csvs: Dict[str, Table]) -> Table:
     # Read
-    tb = read_from_csv("un_wpp_fertility_single_age.csv")
+    tb = read_from_csv("un_wpp_fertility_single_age.csv", interim_csvs)
     # Clean
     tb = clean_table_standard_csv(tb, metrics_rename={"ASFR": "fertility_rate", "Births": "births"})
     # Add missing dimension
@@ -300,7 +441,7 @@ def make_tb_fertility_births_single_age():
     return tb
 
 
-def make_tb_fertility_births(tb_main: Table) -> Tuple[Table, Table]:
+def make_tb_fertility_births(tb_main: Table, interim_csvs: Dict[str, Table]) -> Tuple[Table, Table]:
     """Make Births and Fertility tables.
 
     This is done together because the data is in the same file.
@@ -314,7 +455,7 @@ def make_tb_fertility_births(tb_main: Table) -> Tuple[Table, Table]:
         "fertility_rate",
         format_table=False,
     )
-    tb_fertility_age = read_from_csv("un_wpp_fertility.csv")
+    tb_fertility_age = read_from_csv("un_wpp_fertility.csv", interim_csvs)
     tb_fertility_age = clean_table_standard_csv(
         tb_fertility_age, metrics_rename={"ASFR": "fertility_rate", "Births": "births"}
     )
@@ -355,13 +496,13 @@ def make_tb_fertility_births(tb_main: Table) -> Tuple[Table, Table]:
     return tb_fertility, tb_births
 
 
-def make_tb_deaths() -> Table:
+def make_tb_deaths(interim_csvs: Dict[str, Table]) -> Table:
     """Make table with deaths.
 
     NOTE: no data available for scenarios other than Medium.
     """
-    tb_deaths = read_from_csv("un_wpp_deaths_estimates.csv")
-    tb_deaths_m = read_from_csv("un_wpp_deaths_medium.csv")
+    tb_deaths = read_from_csv("un_wpp_deaths_estimates.csv", interim_csvs)
+    tb_deaths_m = read_from_csv("un_wpp_deaths_medium.csv", interim_csvs)
     tb_deaths = [
         clean_table_standard_csv(tb_deaths, ["DeathTotal", "DeathFemale", "DeathMale"]),
         clean_table_standard_csv(tb_deaths_m, ["DeathTotal", "DeathFemale", "DeathMale"]),
@@ -388,7 +529,7 @@ def make_tb_deaths() -> Table:
     return tb_deaths
 
 
-def read_from_xlsx(short_name: str) -> Table:
+def read_from_xlsx(short_name: str, interim_csvs: Optional[Dict[str, Table]] = None) -> Table:
     """Read from XLSX. Clean and format table."""
     paths.log.info(f"reading {short_name}...")
     # Read snap
@@ -415,10 +556,14 @@ def read_from_xlsx(short_name: str) -> Table:
     # Keep relevant rows, drop location_type column
     tb = tb.loc[tb["Type"].isin(LOCATION_TYPES_XLSX)]
 
+    # Apply interim update for demographic indicators
+    if interim_csvs:
+        tb = _apply_interim_xlsx(tb, interim_csvs)
+
     return tb
 
 
-def read_from_csv(short_name: str) -> Table:
+def read_from_csv(short_name: str, interim_csvs: Optional[Dict[str, Table]] = None) -> Table:
     paths.log.info(f"reading {short_name}...")
     # Read snap
     tb = paths.read_snap_table(short_name, compression="gzip")
@@ -426,6 +571,9 @@ def read_from_csv(short_name: str) -> Table:
     tb = tb.drop(columns=["Notes"])
     # Filter relevant variants
     tb = tb.loc[tb["Variant"].isin(SCENARIOS)]
+    # Apply interim update (replace data for updated countries)
+    if interim_csvs:
+        tb = _apply_interim_csv(tb, interim_csvs, short_name)
     # Optimize memory
     return tb
 
