@@ -40,7 +40,6 @@ def run() -> None:
 
     # Keep per-carrier rows so values can be verified before aggregation in garden
     tb = tb[["carrier_name", "date"] + numeric_cols]
-    print(tb)
     # Improve tables format.
     tables = [tb.format(["carrier_name", "date"])]
 
