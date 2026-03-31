@@ -826,10 +826,8 @@ steps:
   data://grapher/happiness/2026-03-16/happiness:
     - data://garden/happiness/2026-03-16/happiness
 
-<<<<<<< atus-update
-
   #
-  # TODO: add step name (just something recognizable)
+  # ATUS - American Time Use Survey (incl 2024 data)
   #
   data://meadow/atus/2026-03-10/atus_time_spent_with:
     - snapshot://atus/2026-03-10/atus_who.zip
@@ -840,11 +838,11 @@ steps:
     - data://meadow/atus/2026-03-10/atus_time_spent_with
   data://grapher/atus/2026-03-10/atus_time_spent_with:
     - data://garden/atus/2026-03-10/atus_time_spent_with
-=======
+
+    
   # USA PPI New Office Construction (US Bureau of Labor Statistics)
   data://garden/bls/2026-03-24/us_ppi_construction:
     - snapshot://bls/2026-03-24/us_ppi_construction.csv
->>>>>>> master
 
 include:
   - dag/open_numbers.yml
