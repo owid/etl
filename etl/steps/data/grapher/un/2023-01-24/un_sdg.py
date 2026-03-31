@@ -8,6 +8,7 @@ from typing import Any, Dict, cast
 import pandas as pd
 import requests
 from owid.catalog import Dataset, Source, Table, VariableMeta
+from owid.catalog.core.warnings import DisplayNameWarning, NoOriginsWarning, ignore_warnings
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
@@ -54,7 +55,8 @@ def run(dest_dir: str) -> None:
                 ds_grapher.add(wide_table)
 
     # Save changes in the new grapher dataset.
-    ds_grapher.save()
+    with ignore_warnings([NoOriginsWarning, DisplayNameWarning]):
+        ds_grapher.save()
 
 
 def clean_source_name(raw_source: pd.Series, clean_source_map: Dict[str, str]) -> str:

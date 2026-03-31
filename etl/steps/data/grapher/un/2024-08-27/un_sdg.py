@@ -9,6 +9,7 @@ from typing import Any, Dict, cast
 import pandas as pd
 import requests
 from owid.catalog import Dataset, License, Origin, Table, VariableMeta
+from owid.catalog.core.warnings import DisplayNameWarning, NoOriginsWarning, ignore_warnings
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
@@ -88,8 +89,9 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
-    ds_grapher.save()
+    with ignore_warnings([NoOriginsWarning, DisplayNameWarning]):
+        ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
+        ds_grapher.save()
 
 
 def clean_source_name(tb: Table, clean_source_map: Dict[str, str], additional_source_map: Dict[str, str]) -> str:

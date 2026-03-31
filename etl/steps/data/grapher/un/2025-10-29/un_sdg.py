@@ -10,6 +10,7 @@ from typing import Any, Dict, cast
 import pandas as pd
 import requests
 from owid.catalog import License, Origin, Table, VariableMeta
+from owid.catalog.core.warnings import DisplayNameWarning, NoOriginsWarning, ignore_warnings
 from owid.catalog.utils import underscore
 from structlog import getLogger
 from tqdm import tqdm
@@ -150,11 +151,12 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds_grapher = paths.create_dataset(
-        tables=all_tables,
-        default_metadata=ds_garden.metadata,
-    )
-    ds_grapher.save()
+    with ignore_warnings([NoOriginsWarning, DisplayNameWarning]):
+        ds_grapher = paths.create_dataset(
+            tables=all_tables,
+            default_metadata=ds_garden.metadata,
+        )
+        ds_grapher.save()
 
     # Show warnings at the very end so they are not lost in the middle of the processing logs
     for warning in warnings:
