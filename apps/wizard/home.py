@@ -19,6 +19,23 @@ MAX_COLS_PER_ROW = 3
 
 
 def st_show_home():
+    #########################
+    # QUERY REDIRECTS
+    # Check early to avoid rendering the home page before redirecting.
+    #########################
+    if "page" in st.query_params:
+        for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
+            if st.query_params["page"] == step_name:
+                st.switch_page(step_props["entrypoint"])
+        for section in WIZARD_CONFIG["sections"]:
+            for app in section["apps"]:
+                if st.query_params["page"] == app["alias"]:
+                    st.switch_page(app["entrypoint"])
+        if ("legacy" in WIZARD_CONFIG) and ("apps" in WIZARD_CONFIG["legacy"]):
+            for app in WIZARD_CONFIG["legacy"]["apps"]:
+                if st.query_params["page"] == app["alias"]:
+                    st.switch_page(app["entrypoint"])
+
     # Page config
     container = st.container(border=False, horizontal=True, vertical_alignment="bottom")
     with container:
@@ -181,21 +198,7 @@ def st_show_home():
                             text=text,
                         )
 
-    #########################
-    # QUERY REDIRECTS
-    #########################
-    if "page" in st.query_params:
-        for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
-            if st.query_params["page"] == step_name:
-                st.switch_page(step_props["entrypoint"])
-        for section in WIZARD_CONFIG["sections"]:
-            for app in section["apps"]:
-                if st.query_params["page"] == app["alias"]:
-                    st.switch_page(app["entrypoint"])
-        if ("legacy" in WIZARD_CONFIG) and ("apps" in WIZARD_CONFIG["legacy"]):
-            for app in WIZARD_CONFIG["legacy"]["apps"]:
-                if st.query_params["page"] == app["alias"]:
-                    st.switch_page(app["entrypoint"])
+
 
 
 # Show the home page
