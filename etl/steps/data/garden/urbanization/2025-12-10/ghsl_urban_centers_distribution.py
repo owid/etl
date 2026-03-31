@@ -181,7 +181,9 @@ def run() -> None:
             tb[col].metadata.unit = "%"
             tb[col].metadata.short_unit = "%"
             tb[col].metadata.title = f"Share of urban-centre population by city size ({year}, {suffix})"
-            tb[col].metadata.description_short = (
+            tb[
+                col
+            ].metadata.description_short = (
                 f"Share of urban-centre population living in cities of each size category, {year} ({suffix})."
             )
 
