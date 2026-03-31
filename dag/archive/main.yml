@@ -716,6 +716,20 @@ steps:
   data://grapher/bls/2025-04-12/us_consumer_prices:
     - data://garden/bls/2025-04-12/us_consumer_prices
 
+      # ATUS - American Time Use Survey
+  data://meadow/atus/2024-12-10/atus_0323:
+    - snapshot://atus/2024-12-10/atus_who.zip
+    - snapshot://atus/2024-12-10/atus_activities.zip
+    - snapshot://atus/2024-12-10/atus_summary.zip
+    - snapshot://atus/2024-12-10/activity_codes_2023.xls
+    - snapshot://atus/2024-12-10/atus_respondent.zip
+
+  data://garden/atus/2025-01-06/atus_who:
+    - data://meadow/atus/2024-12-10/atus_0323
+
+  data://grapher/atus/2025-01-06/atus_who:
+    - data://garden/atus/2025-01-06/atus_who
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
