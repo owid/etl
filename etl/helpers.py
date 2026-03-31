@@ -172,7 +172,7 @@ def create_dataset(
                 # Ignore extra variables for the following pass of metadata
                 extra_variables = "ignore"
             else:
-                log.info("long_to_wide.skip", short_name=table.m.short_name)
+                pass
 
         ds.add(table, formats=formats, repack=repack)
 

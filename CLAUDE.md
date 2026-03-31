@@ -36,6 +36,13 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 
 Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
 
+### Running Snapshot Steps
+
+```bash
+.venv/bin/etls namespace/version/dataset               # Download & upload snapshot
+.venv/bin/etls namespace/version/dataset --skip-upload  # Download only
+```
+
 **Important:**
 - **Avoid `--force`** — `etlr` has built-in change detection and only re-runs steps whose code or data changed. Use `--force` only when you need to re-run a step despite no code changes (e.g., after fixing external data). Never use `--force` alone — always pair with `--only`.
 - For `grapher://` steps, always add `--grapher` flag
