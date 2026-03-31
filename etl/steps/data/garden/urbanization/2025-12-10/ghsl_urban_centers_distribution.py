@@ -194,7 +194,9 @@ def run() -> None:
             tb[col].metadata.unit = "%"
             tb[col].metadata.short_unit = "%"
             tb[col].metadata.title = f"Share of urban-centre population by city size ({year}, {suffix})"
-            tb[col].metadata.description_short = (
+            tb[
+                col
+            ].metadata.description_short = (
                 f"Share of urban-centre population living in cities of each size category, {year} ({suffix})."
             )
         elif col.startswith("pop_") and not col.startswith("pop_share"):
@@ -204,7 +206,9 @@ def run() -> None:
             tb[col].metadata.unit = "people"
             tb[col].metadata.short_unit = ""
             tb[col].metadata.title = f"Population living in urban centres by city size ({year}, {suffix})"
-            tb[col].metadata.description_short = (
+            tb[
+                col
+            ].metadata.description_short = (
                 f"Total population living in urban centres of each size category, {year} ({suffix})."
             )
 
