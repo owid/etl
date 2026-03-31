@@ -55,9 +55,8 @@ tables:
 
           The original data reports distance in miles. We converted to kilometers by multiplying by 1.60934.
         description_key:
-          - This measures how far people have traveled in paid robotaxi trips that are approved to operate in California.
-          - The calculation multiplies passengers by distance. So if 2 people share a 5 km ride, that's 10 passenger-kilometers. For rides where passengers get in or out partway, each part of the trip is counted based on how many people were actually in the car.
-          - Excludes empty cars driving between pickups, test rides, and any non-passenger travel.
-          - Originally both Cruise and Waymo reported this data. Cruise suspended its service after a safety incident in October 2023; its last reported trips are from November 2023. From December 2023 onward, Waymo is the sole reporter of actual trip data.
+          - This tracks the total distance traveled by passengers in paid robotaxi trips by services licensed to operate in California, measured in passenger-kilometers. One passenger traveling one kilometer equals one passenger-kilometer — so two people sharing a five-kilometer ride counts as ten. For trips where passengers join or leave mid-journey, each leg is counted separately based on how many people were in the car at the time.
+          - Only passenger-carrying trips are included. Empty vehicles traveling between pickups and test rides are excluded.
+          - Both Cruise and Waymo reported data until October 2023, when Cruise suspended its service following a safety incident. Waymo has been the sole reporter since December 2023.
         display:
           numDecimalPlaces: 0
