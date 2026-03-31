@@ -170,13 +170,9 @@ def run() -> None:
     tb_sum = tb_sum[["case_id", "age", "gender", "year", "final_weight", "final_weight_2020"]]
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb_who = tb_who.reset_index().format(["index"], short_name="atus_who")
-    tb_act = tb_act.reset_index().format(["index"], short_name="atus_act")
+    tb_who = tb_who.format(["index"], short_name="atus_who")
+    tb_act = tb_act.format(["index"], short_name="atus_act")
     tb_sum = tb_sum.format(["case_id"], short_name="atus_sum")
-
-    # drop level_0 (is index)
-    tb_who = tb_who.drop(columns=["level_0"])
-    tb_act = tb_act.drop(columns=["level_0"])
 
     #
     # Save outputs.
