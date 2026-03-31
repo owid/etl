@@ -51,9 +51,9 @@ tables:
         short_unit: km
         description_short: Monthly passenger kilometers traveled in California’s paid driverless taxis, summing the kilometers actually traveled by individual passengers across all trips.
         description_processing: |-
-          We summed values across all approved robotaxi carriers operating in California to produce monthly totals. Both Cruise and Waymo reported actual trip data through November 2023. After that, only Waymo data is included, as Cruise suspended its robotaxi service following a safety incident in October 2023. Cruise continued to file regulatory reports with zero trips through at least mid-2024.
-
           The original data reports distance in miles. We converted to kilometers by multiplying by 1.60934.
+
+          We summed values across all approved robotaxi carriers operating in California to produce monthly totals. Both Cruise and Waymo reported actual trip data through November 2023. After that, only Waymo data is included, as Cruise suspended its robotaxi service following a safety incident in October 2023. Cruise continued to file regulatory reports with zero trips through at least mid-2024.
         description_key:
           - This indicator tracks the total distance traveled by paying passengers in robotaxi trips operated by licensed services in California, expressed in passenger-kilometers.
           - A passenger-kilometer is one kilometer traveled by one passenger. For example, a five-kilometer trip with two passengers equals ten passenger-kilometers. If passengers join or leave during a trip, each segment is counted separately based on the number of passengers in the vehicle.
