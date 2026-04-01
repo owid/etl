@@ -215,6 +215,9 @@ class Collection(MDIMBase):
         # Check that all indicators in collection exist
         validate_indicators_in_db(indicators, owid_env.engine)
 
+        # Ensure at least one topic tag is set (needed for search)
+        self.validate_topic_tags()
+
         # Run sanity checks on grouped views
         self.validate_grouped_views()
 
@@ -508,6 +511,14 @@ class Collection(MDIMBase):
             if not any(indicator.startswith(f"{dep}/") for dep in deps):
                 raise ValueError(f"Indicator {indicator} is not covered by any dependency: {deps}")
         return True
+
+    def validate_topic_tags(self):
+        """Ensure that at least one topic tag is set. Required for search."""
+        if not self.topic_tags:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' must have at least one topic tag. "
+                "Add 'topic_tags' to your config YAML."
+            )
 
     def validate_grouped_views(self):
         for view in self.views:

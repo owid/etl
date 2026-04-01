@@ -398,27 +398,46 @@ def add_region_aggregates(
             num_countries_relevant_with_data = len(set(countries_that_must_have_data).intersection(countries_with_data))
             return num_countries_relevant_with_data / num_countries_relevant >= frac_countries_that_must_have_data
 
-    df_region = groupby_agg(
-        df=df_countries,
-        groupby_columns=[column for column in index_columns if column != country_col],
-        aggregations=dict(
-            **aggregations,
-            **{country_col: lambda x: _check_countries_must_have_data(x)},
-        ),
-        num_allowed_nans=num_allowed_nans_per_year,
-        frac_allowed_nans=frac_allowed_nans_per_year,
-        min_num_values=min_num_values_per_year,
-    ).reset_index()
+    # When no country-level checks are needed, skip the expensive per-group lambda.
+    # Mixing a Python callable with string aggregations (e.g. "sum") forces pandas off
+    # its fast C path, causing ~10x slowdown on all aggregations — not just the lambda.
+    _needs_country_check = bool(countries_that_must_have_data) or (frac_countries_that_must_have_data is not None)
 
-    # Create filter that detects rows where the most contributing countries are not present.
-    if df_region[country_col].dtypes == "category":
-        # Doing df_region[country_col].any() fails if the country column is categorical.
-        mask_countries_present = ~(df_region[country_col].astype(str))
+    groupby_columns = [column for column in index_columns if column != country_col]
+
+    if _needs_country_check:
+        df_region = groupby_agg(
+            df=df_countries,
+            groupby_columns=groupby_columns,
+            aggregations=dict(
+                **aggregations,
+                **{country_col: lambda x: _check_countries_must_have_data(x)},
+            ),
+            num_allowed_nans=num_allowed_nans_per_year,
+            frac_allowed_nans=frac_allowed_nans_per_year,
+            min_num_values=min_num_values_per_year,
+        ).reset_index()
+
+        # Create filter that detects rows where the most contributing countries are not present.
+        if df_region[country_col].dtypes == "category":
+            # Doing df_region[country_col].any() fails if the country column is categorical.
+            mask_countries_present = ~(df_region[country_col].astype(str))
+        else:
+            mask_countries_present = ~df_region[country_col]
+        if mask_countries_present.any():
+            # Make nan all aggregates if the most contributing countries were not present.
+            df_region.loc[mask_countries_present, variables] = np.nan
     else:
-        mask_countries_present = ~df_region[country_col]
-    if mask_countries_present.any():
-        # Make nan all aggregates if the most contributing countries were not present.
-        df_region.loc[mask_countries_present, variables] = np.nan
+        # Fast path: no country-level checks needed, use pure string aggregations.
+        df_region = groupby_agg(
+            df=df_countries.drop(columns=[country_col]),
+            groupby_columns=groupby_columns,
+            aggregations=aggregations,
+            num_allowed_nans=num_allowed_nans_per_year,
+            frac_allowed_nans=frac_allowed_nans_per_year,
+            min_num_values=min_num_values_per_year,
+        ).reset_index()
+
     # Replace the column that was used to check if most contributing countries were present by the region's name.
     df_region[country_col] = region
 
@@ -446,9 +465,11 @@ def add_region_aggregates(
         # For now, simply warn that the original data for the region for those columns was deleted.
         columns_without_aggregate = set(df.drop(columns=index_columns).columns) - set(aggregations)
         if (len(columns_without_aggregate) > 0) and (len(df[df[country_col] == region]) > 0):
+            cols_preview = sorted(columns_without_aggregate)[:5]
+            n = len(columns_without_aggregate)
             log.warning(
-                f"Region {region} already has data for columns that do not have a defined aggregation method: "
-                f"({columns_without_aggregate}). That data will become nan."
+                f"Region {region} already has data for {n} column(s) without a defined aggregation method "
+                f"(e.g. {', '.join(cols_preview)}). That data will become nan."
             )
 
     # Sort conveniently.

@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: California Public Utilities Commission
+    title: CPUC AV Passenger Service Deployment programs - Quarterly Reports
+    description: |-
+      The dataset contains quarterly reports submitted to the California Public Utilities Commission (CPUC) by carriers in the AV Passenger Service Deployment programs. Reports cover AV passenger service operations statewide and include disaggregated incident records.
+    citation_full: |-
+      California Public Utilities Commission (CPUC). AV Passenger Service Deployment — Quarterly Reports (template effective Jan 1, 2025). Quarterly submissions pursuant to D.20-11-046 (as modified by D.21-05-017) and D.24-11-002.
+    attribution_short: CPUC
+    url_main: |-
+      https://www.cpuc.ca.gov/regulatory-services/licensing/transportation-licensing-and-analysis-branch/autonomous-vehicle-programs/quarterly-reporting
+    date_accessed: '2026-03-30'
+    date_published: '2026-02-02'
+    license:
+      name: Public domain
+      url: https://www.cpuc.ca.gov/about-cpuc/conditions-of-use
+outs:
+  - md5: 1fea159ce14fc59b29c0ec90c7a0e9f1
+    size: 16070
+    path: robotaxis.csv

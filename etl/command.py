@@ -197,6 +197,7 @@ def main_cli(
 
     from etl import config, files
 
+    config.enable_structlog_filtering()
     config.enable_sentry()
 
     # in watch mode, run steps in-process (no subprocess) so exceptions propagate and the loop continues
@@ -524,13 +525,13 @@ def exec_steps(
                     failing_steps.append(step)
                     exceptions.append(e)
                     skipped_steps.append(step)
-                    click.echo(click.style("FAILED", fg="red"))
+                    click.echo(click.style(f"--- FAILED {step}", fg="red"))
                     continue
                 else:
                     raise e
             execution_times[str(step)] = time_taken
 
-            click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
+            click.echo(f"--- Finished {step} ({time_taken:.1f}s)")
             print()
 
         # Write the recorded execution times to the file after all steps have been executed

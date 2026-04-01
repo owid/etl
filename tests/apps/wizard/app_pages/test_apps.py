@@ -115,7 +115,7 @@ def test_app_fasttrack():
     assert not at.exception
 
     # Try to reimport the latest uploaded sheet
-    at.button_group[0].set_value(["update_gsheet"])
+    at.button_group[0].set_value("update_gsheet")
     # at.radio[0].set_value("update_gsheet")
     _pick_button_by_label(at, "Submit").click().run()
 
