@@ -103,6 +103,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__agricultural_use__005157__tonnes
           display:
             color: "#3BB273"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Nitrogen fertilizer use
       subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
@@ -115,6 +117,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__use_per_area_of_cropland__005159__kilograms_per_hectare
           display:
             color: "#3BB273"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Nitrogen fertilizer use per area of cropland
       subtitle: Measured in kilograms of nitrogen (N) per hectare of cropland.
@@ -127,6 +131,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__production__005510__tonnes
           display:
             color: "#3BB273"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Nitrogen fertilizer production
       subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
@@ -139,6 +145,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__export_quantity__005910__tonnes
           display:
             color: "#3BB273"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Nitrogen fertilizer exports
       subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
@@ -151,6 +159,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__import_quantity__005610__tonnes
           display:
             color: "#3BB273"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Nitrogen fertilizer imports
       subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
@@ -164,6 +174,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__agricultural_use__005157__tonnes
           display:
             color: "#883079"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Phosphate fertilizer use
       subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
@@ -176,6 +188,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__use_per_area_of_cropland__005159__kilograms_per_hectare
           display:
             color: "#883079"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Phosphate fertilizer use per area of cropland
       subtitle: Measured in kilograms of phosphate (P₂O₅) per hectare of cropland.
@@ -188,6 +202,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__production__005510__tonnes
           display:
             color: "#883079"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Phosphate fertilizer production
       subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
@@ -200,6 +216,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__export_quantity__005910__tonnes
           display:
             color: "#883079"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Phosphate fertilizer exports
       subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
@@ -212,6 +230,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__import_quantity__005610__tonnes
           display:
             color: "#883079"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Phosphate fertilizer imports
       subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
@@ -225,6 +245,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__agricultural_use__005157__tonnes
           display:
             color: "#2166AC"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Potash fertilizer use
       subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
@@ -237,6 +259,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__use_per_area_of_cropland__005159__kilograms_per_hectare
           display:
             color: "#2166AC"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Potash fertilizer use per area of cropland
       subtitle: Measured in kilograms of potash (K₂O) per hectare of cropland.
@@ -249,6 +273,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__production__005510__tonnes
           display:
             color: "#2166AC"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Potash fertilizer production
       subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
@@ -261,6 +287,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__export_quantity__005910__tonnes
           display:
             color: "#2166AC"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Potash fertilizer exports
       subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
@@ -273,6 +301,8 @@ views:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__import_quantity__005610__tonnes
           display:
             color: "#2166AC"
+            roundingMode: significantFigures
+            numSignificantFigures: 3
     config:
       title: Potash fertilizer imports
       subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
