@@ -67,6 +67,8 @@ git push
 gh pr edit <number> --body "..."
 ```
 
+**Always include `@codex review` in PR descriptions** to request a Codex review.
+
 ### Commit Message Emojis
 
 | Emoji | Use for |

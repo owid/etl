@@ -94,9 +94,14 @@ def load_table_stats(
     year_min = year_max = entity_count = None
     sampled_entities: list[str] | None = None
     if "year" in tb.columns:
-        year_col = tb["year"].astype(int)
-        year_min = int(year_col.min())
-        year_max = int(year_col.max())
+        try:
+            year_col = tb["year"].astype(int)
+            year_min = int(year_col.min())
+            year_max = int(year_col.max())
+        except (ValueError, TypeError):
+            # Year column contains non-numeric values like ranges ("2020-2025")
+            # Disable sparklines since they require sortable numeric years
+            can_sparkline = False
     if "country" in tb.columns:
         all_entities = list(tb["country"].unique())
         entity_count = len(all_entities)

@@ -2,6 +2,9 @@ title:
   title: Deaths from air pollution
   title_variant: ""
 
+topic_tags:
+  - Air Pollution
+
 default_selection:
   - World
   - China
