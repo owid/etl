@@ -697,11 +697,10 @@ def _categorize_index(tb: Table) -> Table:
     """Convert string index levels to categoricals to reduce feather file size and read time."""
     _CATEGORICAL_COLS = {"country", "variant", "sex", "age", "month"}
     idx_names = list(tb.index.names)
-    cols_to_convert = [n for n in idx_names if n in _CATEGORICAL_COLS]
+    cols_to_convert = {n: "string" for n in idx_names if n in _CATEGORICAL_COLS}
     if not cols_to_convert:
         return tb
     tb = tb.reset_index()
-    for col in cols_to_convert:
-        tb[col] = tb[col].astype("category")
+    tb = tb.astype(cols_to_convert)
     tb = tb.format(idx_names, short_name=tb.metadata.short_name)
     return tb
