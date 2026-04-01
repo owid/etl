@@ -1,31 +1,33 @@
-"""Create city-size distribution table for bespoke Grapher visualization.
+"""Rank-size (Zipf) chart: city share of total population by rank, years as lines.
 
 Data model
 ----------
-Index : (country, year)
-    country  – harmonised country name or region/income-group aggregate
-    year     – bin upper-bound integer (the x-axis in Grapher)
-               25 log-uniform bins from 50k to 50M (ratio ≈ 1.33×); sentinel 100_000_000 for 50M+
+Index : (country, year) where year = city rank (1 = most populous)
+Vars  : city_pop_share_YYYY_estimates / city_pop_share_YYYY_projections
 
-Variables (one per 5-year time step)
-    pop_share_YYYY_estimates   – % of urban-centre population in this bin (historical)
-    pop_share_YYYY_projections – % of urban-centre population in this bin (projected)
+Interpretation
+--------------
+"In 2020, Lima (rank 1 in Peru) was home to 30% of Peru's total population."
+"In 2020, Paris (rank 1 in France) was home to 14% of France's total population."
+
+Lines shifting upward over time show cities growing relative to the total population.
+Countries with a steep drop from rank 1 to rank 2 have a dominant primate city.
+
+Configure in Grapher admin
+--------------------------
+- Set y-axis to log scale
+- Add horizontal reference lines at 0.75%, 4.5%, 15% (approx. 500k/3M/10M for a
+  country of 67M like France) — or describe class boundaries in subtitle
 
 Grapher chart type
 ------------------
-Designed to render like "Monthly average surface temperatures by decade":
-    x-axis   = bin upper-bound  (the 'year' column in Grapher)
-    lines    = each pop_share_YYYY variable (one calendar year per indicator)
-    entities = countries / regions (switchable in the chart)
-
-Each x-axis tick is the *upper* population limit of the bin:
-    x = 100_000  → cities with 50k ≤ pop < 100k
-    x = 200_000  → cities with 100k ≤ pop < 200k
-    …
-    x = 100_000_000 → cities with pop ≥ 50M  (sentinel value)
+x-axis   = city rank (the 'year' column, 1–50)
+lines    = each calendar year (one indicator per year)
+entities = countries / regions
 """
 
 import numpy as np
+import pandas as pd
 import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
@@ -34,177 +36,136 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 START_OF_PROJECTIONS = 2025
+MAX_RANK = 50
 
 REGIONS = [
-    "North America",
-    "South America",
-    "Europe",
-    "Africa",
-    "Asia",
-    "Oceania",
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
-    "World",
+    "North America", "South America", "Europe", "Africa", "Asia", "Oceania",
+    "Low-income countries", "Upper-middle-income countries",
+    "Lower-middle-income countries", "High-income countries", "World",
 ]
 
-# Log-uniform bins: 25 steps from 50k to 50M (ratio ≈ 1.33× per step).
-# Each bin's x-axis value is its upper bound (integer).
-# Last bin (50M+) uses 100_000_000 as a sentinel integer x-value.
-_N_BINS = 25
-_POP_MIN = 50_000
-_POP_MAX = 50_000_000
-_EDGES = np.geomspace(_POP_MIN, _POP_MAX, _N_BINS + 1).round().astype(int).tolist()
-BINS = []
-for _i in range(_N_BINS):
-    _lo = _EDGES[_i]
-    _hi = _EDGES[_i + 1] if _i < _N_BINS - 1 else float("inf")
-    _x = _EDGES[_i + 1] if _i < _N_BINS - 1 else 100_000_000
-    BINS.append({"lo": _lo, "hi": _hi, "x": _x})
 
-BIN_X_VALUES = [b["x"] for b in BINS]
-
-
-def assign_bin_vectorized(urban_pop):
-    """Assign each city population to a bin x-value using vectorized operations."""
-    result = np.full(len(urban_pop), np.nan)
-    for b in BINS:
-        mask = (urban_pop >= b["lo"]) & (urban_pop < b["hi"])
-        result[mask] = b["x"]
-    return result
+def _expand_to_regions(tb, ds_regions, ds_income_groups):
+    """Duplicate city rows so each region entity gets all cities from its member countries."""
+    rows = [tb]
+    # World = all cities
+    world_tb = tb.copy()
+    world_tb["country"] = "World"
+    rows.append(world_tb)
+    # Other regions
+    for region in REGIONS:
+        if region == "World":
+            continue
+        try:
+            members = geo.list_members_of_region(
+                region, ds_regions=ds_regions, ds_income_groups=ds_income_groups
+            )
+            region_tb = tb[tb["country"].isin(members)].copy()
+            if len(region_tb):
+                region_tb["country"] = region
+                rows.append(region_tb)
+        except Exception:
+            pass
+    return pd.concat(rows, ignore_index=True)
 
 
 def run() -> None:
-    # ── Load inputs ────────────────────────────────────────────────────────────
-    ds_meadow = paths.load_dataset("ghsl_urban_centers")
-    ds_regions = paths.load_dataset("regions")
+    ds_meadow        = paths.load_dataset("ghsl_urban_centers")
+    ds_meadow_ctry   = paths.load_dataset("ghsl_countries")
+    ds_regions       = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
 
-    # Raw city-level table: (country, urban_center_name, year) → urban_pop
-    tb_raw = ds_meadow.read("ghsl_urban_centers_raw").reset_index()
+    tb_raw   = ds_meadow.read("ghsl_urban_centers_raw").reset_index()
+    _origins = ds_meadow.read("ghsl_urban_centers")["urban_pop"].metadata.origins
 
-    # Grab origins from the main table whose urban_pop has them set by the meadow step.
-    tb_main = ds_meadow.read("ghsl_urban_centers")
-    _origins = tb_main["urban_pop"].metadata.origins
+    # ── Total population by (country, year) ───────────────────────────────────
+    tb_ctry = ds_meadow_ctry.read("ghsl_countries", safe_types=False).reset_index()
+    tb_total_pop = (
+        tb_ctry.groupby(["country", "year"], observed=True)["population"]
+        .sum()
+        .reset_index()
+        .rename(columns={"population": "total_pop"})
+    )
+    tb_total_pop["total_pop"] = pd.to_numeric(tb_total_pop["total_pop"], errors="coerce")
 
     # ── Harmonize country names ────────────────────────────────────────────────
-    # Reuse the mapping file from the parent step (same source data, same countries).
-    countries_file = paths.directory / "ghsl_urban_centers.countries.json"
+    countries_file          = paths.directory / "ghsl_urban_centers.countries.json"
     excluded_countries_file = paths.directory / "ghsl_urban_centers.excluded_countries.json"
     tb_raw = paths.regions.harmonize_names(
-        tb_raw,
-        countries_file=countries_file,
-        excluded_countries_file=excluded_countries_file,
+        tb_raw, countries_file=countries_file, excluded_countries_file=excluded_countries_file,
+    )
+    tb_total_pop = paths.regions.harmonize_names(
+        tb_total_pop, countries_file=countries_file, excluded_countries_file=excluded_countries_file,
     )
 
-    # ── Assign bins ────────────────────────────────────────────────────────────
-    tb_raw["bin_x"] = assign_bin_vectorized(tb_raw["urban_pop"].to_numpy(dtype=float))
-    tb_raw = tb_raw.dropna(subset=["bin_x"])
-    tb_raw["bin_x"] = tb_raw["bin_x"].astype(int)
+    # ── Expand cities and total pop to regions ────────────────────────────────
+    tb_cities_exp = _expand_to_regions(
+        tb_raw[["country", "year", "urban_pop"]].copy(),
+        ds_regions, ds_income_groups,
+    )
 
-    # ── Aggregate: sum city populations per (country, year, bin_x) ────────────
-    tb_agg = tb_raw.groupby(["country", "year", "bin_x"], as_index=False)["urban_pop"].sum()
-
-    # ── Pivot bins into columns so geo.add_regions_to_table can aggregate ─────
-    tb_wide = tb_agg.pivot_table(
-        index=["country", "year"], columns="bin_x", values="urban_pop", aggfunc="sum"
-    ).reset_index()
-    tb_wide.columns = ["country", "year"] + [f"bin_{x}" for x in BIN_X_VALUES]
-    bin_cols = [f"bin_{x}" for x in BIN_X_VALUES]
-
-    # Fill NaN with 0 (country had no cities in that bin for that year)
-    tb_wide[bin_cols] = tb_wide[bin_cols].fillna(0)
-
-    # ── Add regional / income-group aggregates ─────────────────────────────────
-    tb_wide = geo.add_regions_to_table(
-        tb_wide,
-        aggregations={col: "sum" for col in bin_cols},
+    # Regional total pop = sum across member countries
+    tb_total_pop_wide = tb_total_pop.rename(columns={"total_pop": "_total_pop"})
+    tb_total_pop_wide = geo.add_regions_to_table(
+        tb_total_pop_wide,
+        aggregations={"_total_pop": "sum"},
         regions=REGIONS,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
     )
 
-    # ── Convert to shares; keep raw population too ────────────────────────────
-    tb_wide["_total"] = tb_wide[bin_cols].sum(axis=1)
-    for col in bin_cols:
-        x = int(col.split("_", 1)[1])
-        tb_wide[f"share_{x}"] = (tb_wide[col] / tb_wide["_total"]) * 100
-        tb_wide[f"pop_{x}"] = tb_wide[col]  # raw population (people)
-    tb_wide = tb_wide.drop(columns=bin_cols + ["_total"])
-    share_cols = [f"share_{x}" for x in BIN_X_VALUES]
-    pop_cols = [f"pop_{x}" for x in BIN_X_VALUES]
-
-    # ── Melt both metrics to long format ──────────────────────────────────────
-    tb_long_share = tb_wide.melt(
-        id_vars=["country", "year"],
-        value_vars=share_cols,
-        var_name="bin_col",
-        value_name="pop_share",
+    # ── Rank cities within each (country, year) ────────────────────────────────
+    tb_cities_exp["rank"] = (
+        tb_cities_exp.groupby(["country", "year"])["urban_pop"]
+        .rank(method="first", ascending=False)
+        .astype(int)
     )
-    tb_long_share["bin_x"] = tb_long_share["bin_col"].str.removeprefix("share_").astype(int)
-    tb_long_share = tb_long_share.drop(columns=["bin_col"])
-
-    tb_long_pop = tb_wide.melt(
-        id_vars=["country", "year"],
-        value_vars=pop_cols,
-        var_name="bin_col",
-        value_name="pop",
+    tb_long = (
+        tb_cities_exp[tb_cities_exp["rank"] <= MAX_RANK]
+        .rename(columns={"year": "cal_year", "rank": "year"})
+        [["country", "cal_year", "year", "urban_pop"]]
+        .copy()
     )
-    tb_long_pop["bin_x"] = tb_long_pop["bin_col"].str.removeprefix("pop_").astype(int)
-    tb_long_pop = tb_long_pop.drop(columns=["bin_col"])
 
-    tb_long = pr.merge(tb_long_share, tb_long_pop, on=["country", "year", "bin_x"], how="outer")
+    # ── Merge total pop and compute share of total population ─────────────────
+    tb_long = tb_long.merge(
+        tb_total_pop_wide.rename(columns={"year": "cal_year"}),
+        on=["country", "cal_year"], how="left",
+    )
+    tb_long["city_pop_share"] = (tb_long["urban_pop"] / tb_long["_total_pop"]) * 100
 
-    # ── Split into estimates / projections ────────────────────────────────────
-    past = tb_long[tb_long["year"] < START_OF_PROJECTIONS].copy()
-    future = tb_long[tb_long["year"] >= START_OF_PROJECTIONS - 5].copy()
+    # Cumulative share: top-N cities combined as % of total population
+    tb_long = tb_long.sort_values(["country", "cal_year", "year"])
+    tb_long["city_pop_share"] = tb_long.groupby(["country", "cal_year"])["city_pop_share"].cumsum()
 
-    def pivot_years(df, suffix):
-        pt_share = df.pivot_table(index=["country", "bin_x"], columns="year", values="pop_share")
-        pt_share.columns = [f"pop_share_{y}_{suffix}" for y in pt_share.columns]
-        pt_pop = df.pivot_table(index=["country", "bin_x"], columns="year", values="pop")
-        pt_pop.columns = [f"pop_{y}_{suffix}" for y in pt_pop.columns]
-        return pr.merge(pt_share.reset_index(), pt_pop.reset_index(), on=["country", "bin_x"], how="outer")
+    # ── Split estimates / projections, pivot calendar years into columns ───────
+    past   = tb_long[tb_long["cal_year"] < START_OF_PROJECTIONS]
+    future = tb_long[tb_long["cal_year"] >= START_OF_PROJECTIONS - 5]
 
-    tb_est = pivot_years(past, "estimates")
-    tb_proj = pivot_years(future, "projections")
+    def pivot(df, suffix):
+        pt = df.pivot_table(index=["country", "year"], columns="cal_year", values="city_pop_share")
+        pt.columns = [f"city_pop_share_{y}_{suffix}" for y in pt.columns]
+        return pt.reset_index()
 
-    tb = pr.merge(tb_est, tb_proj, on=["country", "bin_x"], how="outer")
+    tb = pr.merge(pivot(past, "estimates"), pivot(future, "projections"), on=["country", "year"], how="outer")
 
-    # ── Set metadata on all generated indicator columns ──────────────────────
-    origins = _origins
+    # ── Metadata ──────────────────────────────────────────────────────────────
     for col in tb.columns:
-        if col.startswith("pop_share_"):
-            parts = col.split("_")
-            year, suffix = parts[2], parts[3]
-            tb[col].metadata.origins = origins
+        if col.startswith("city_pop_share_"):
+            parts = col.split("_"); yr, sfx = parts[3], parts[4]
+            tb[col].metadata.origins = _origins
             tb[col].metadata.unit = "%"
             tb[col].metadata.short_unit = "%"
-            tb[col].metadata.title = f"Share of urban-centre population by city size ({year}, {suffix})"
-            tb[
-                col
-            ].metadata.description_short = (
-                f"Share of urban-centre population living in cities of each size category, {year} ({suffix})."
-            )
-        elif col.startswith("pop_") and not col.startswith("pop_share"):
-            parts = col.split("_")
-            year, suffix = parts[1], parts[2]
-            tb[col].metadata.origins = origins
-            tb[col].metadata.unit = "people"
-            tb[col].metadata.short_unit = ""
-            tb[col].metadata.title = f"Population living in urban centres by city size ({year}, {suffix})"
-            tb[
-                col
-            ].metadata.description_short = (
-                f"Total population living in urban centres of each size category, {year} ({suffix})."
+            tb[col].metadata.title = f"Cumulative share of total population in top-N cities ({yr}, {sfx})"
+            tb[col].metadata.description_short = (
+                f"Share of the total population living in the top N largest cities combined, "
+                f"{yr} ({sfx}). At rank 5, this is the share of the total population living in the 5 largest cities."
             )
 
-    # ── Format: bin_x becomes 'year' (the Grapher x-axis) ────────────────────
-    tb = tb.rename(columns={"bin_x": "year"})
     tb = tb.format(["country", "year"], short_name="ghsl_urban_centers_distribution")
 
-    # ── Save ──────────────────────────────────────────────────────────────────
-    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
     ds_garden.save()
