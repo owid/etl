@@ -21,6 +21,10 @@ DIMENSIONS_CONFIG = {
 
 PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences in living costs between countries."
 
+# Set x (population) and color (region) indicators needed by the Marimekko tab.
+POPULATION_PATH = "grapher/demography/2024-07-15/population/historical#population_historical"
+REGION_PATH = "grapher/regions/2023-01-01/regions/regions#owid_region"
+
 
 def run() -> None:
     #
@@ -202,23 +206,17 @@ def run() -> None:
                     ind.display = {"name": name}
 
     # Add Marimekko as an additional chart type for mean and median views.
-    # Set x (population) and color (region) indicators needed by the Marimekko tab.
-    POPULATION_PATH = "grapher/demography/2024-07-15/population/population#population"
-    REGION_PATH = "grapher/regions/2023-01-01/regions/regions#owid_region"
-    c.dependencies.update(
-        {
-            "grapher/demography/2024-07-15/population",
-            "grapher/regions/2023-01-01/regions",
-        }
-    )
     for view in c.views:
-        if view.matches(indicator=["mean", "median"], decile="nan"):
+        if view.matches(survey_comparability="No spells") and not view.matches(
+            decile=["all", "all_bar", "10_40_50", "10_40_50_bar"]
+        ):
             view.config = view.config or {}
-            view.config["chartTypes"] = ["LineChart", "Marimekko"]
+            view.config["chartTypes"] = ["LineChart", "DiscreteBar", "Marimekko"]
             view.indicators.set_indicator(
                 x=POPULATION_PATH,
                 color=REGION_PATH,
             )
+            view.config["matchingEntitiesOnly"] = True
 
     #
     # Save garden dataset.
