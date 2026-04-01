@@ -111,6 +111,14 @@ steps:
   data://grapher/urbanization/2025-12-10/ghsl_city_tiers:
     - data://garden/urbanization/2025-12-10/ghsl_city_tiers
 
+  # City primacy ratio (largest city vs next-largest cities)
+  data://garden/urbanization/2025-12-10/ghsl_primacy_ratio:
+    - data://meadow/urbanization/2025-12-10/ghsl_urban_centers
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/urbanization/2025-12-10/ghsl_primacy_ratio:
+    - data://garden/urbanization/2025-12-10/ghsl_primacy_ratio
+
   #
   # UN WUP National Definitions
   #

@@ -1,0 +1,65 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+
+  desc_key: &desc_key
+    - The [GHSL Urban Centre Database (GHS-UCDB R2024A)](https://human-settlement.emergency.copernicus.eu/ghs_ucdb2024.php) tracks population and land use for 11,422 [cities](#dod:cities-degurba) around the world. Cities are identified using the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php), based on population density and settlement size rather than administrative boundaries. To qualify as a city, an area must have at least 1,500 people per square kilometre and a total population of at least 50,000.
+    - City boundaries are fixed at their 2025 extent and held constant across all years. This means historical values reflect conditions within today's city boundary, not the city as it was defined at the time.
+    - The underlying population figures have been rescaled to match UN World Population Prospects 2022 national totals, so country-level numbers are consistent with UN estimates.
+
+  desc_processing: &desc_processing |-
+    For each country and year, cities are ranked by population in descending order. The 2-city primacy ratio is the population of the largest city divided by the population of the 2nd largest city. The 4-city primacy ratio is the population of the largest city divided by the combined population of the 2nd, 3rd, and 4th largest cities. Regional aggregates pool all cities from member countries before ranking.
+
+tables:
+  ghsl_primacy_ratio:
+    variables:
+
+      primacy_ratio_2city_estimates:
+        title: 2-city primacy ratio (historical)
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          The population of the largest city divided by the population of the 2nd largest city (historical). A value greater than 1 means the largest city has more people than the 2nd largest city.
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 2
+
+      primacy_ratio_2city_projections:
+        title: 2-city primacy ratio (projected)
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          The population of the largest city divided by the population of the 2nd largest city (projected). A value greater than 1 means the largest city has more people than the 2nd largest city.
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 2
+          isProjection: true
+
+      primacy_ratio_4city_estimates:
+        title: 4-city primacy ratio (historical)
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          The population of the largest city divided by the combined population of the 2nd, 3rd, and 4th largest cities (historical). A value greater than 1 means the largest city has more people than the next three cities combined.
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 2
+
+      primacy_ratio_4city_projections:
+        title: 4-city primacy ratio (projected)
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          The population of the largest city divided by the combined population of the 2nd, 3rd, and 4th largest cities (projected). A value greater than 1 means the largest city has more people than the next three cities combined.
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 2
+          isProjection: true
