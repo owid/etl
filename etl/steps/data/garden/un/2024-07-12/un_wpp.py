@@ -371,7 +371,7 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb = process_standard(tb)
     tb = set_variant_to_estimates(tb)
     tb_rate = process_standard(tb_rate)
-    tb_rate = set_variant_to_estimates(tb)
+    tb_rate = set_variant_to_estimates(tb_rate)
 
     # Standardise sex dimension values
     tb = harmonize_dimension(
