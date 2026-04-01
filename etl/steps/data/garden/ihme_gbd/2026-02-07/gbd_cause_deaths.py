@@ -31,6 +31,7 @@ def run() -> None:
     # Drop population_group_name as it only contains 'All Population'
     tb = tb.drop(columns=["population_group_name"])
     ds_regions = paths.load_dataset("regions")
+    ds_un_wpp = paths.load_dataset("un_wpp")
     #
     # Process data.
     #
@@ -39,6 +40,7 @@ def run() -> None:
     tb = add_regional_aggregates(
         tb=tb,
         ds_regions=ds_regions,
+        ds_un_wpp=ds_un_wpp,
         index_cols=["country", "year", "metric", "measure", "cause", "age"],
         regions=REGIONS,
         age_group_mapping=AGE_GROUPS_RANGES,

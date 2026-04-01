@@ -31,9 +31,10 @@ def run(dest_dir: str) -> None:
 
     # Create long and short units columns
     tb = create_units(tb_meadow)
-
     tb = manual_clean_data(tb)
     tb = remove_cities(tb)
+
+    tb = labor_share_to_hours(tb)
     #
     # Process data.
     #
@@ -45,6 +46,7 @@ def run(dest_dir: str) -> None:
     tb = fix_informality_indicators(tb)
 
     tb = duplicate_latin_america_rows(tb)
+
     # Create a new table with the processed data.
     all_tables = create_tables(tb)
 
@@ -56,7 +58,7 @@ def run(dest_dir: str) -> None:
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
     for table in all_tables:
-        log.info(
+        log.debug(
             "un_sdg.create_garden_table",
             indicator=table.index[0][4],
             series_code=table.index[0][5],
@@ -71,6 +73,55 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("un_sdg.end")
+
+
+def labor_share_to_hours(tb: pd.DataFrame):
+    """
+    Convert units for "Share of day women spend on unpaid domestic and care work" (indicator 5.4.1) to hours per day, as this is more intuitive to understand than a share of the day.
+    This affects indicators 5.4.1 with series codes: SL_DOM_TSPD (total unpaid domestic labor), SL_DOM_TSPDCW (care work) and SL_DOM_TSPDW (domestic chores).
+    """
+    tb_dl = tb[(tb["indicator"] == "5.4.1")]
+
+    # assert all entries have series code in the set of the three series codes mentioned above
+    assert (
+        tb_dl["seriescode"].isin(["SL_DOM_TSPD", "SL_DOM_TSPDCW", "SL_DOM_TSPDDC"]).all()
+    ), "Unexpected series codes found for indicator 5.4.1: {}".format(tb_dl["seriescode"].unique())
+
+    # assert all entries have units and short_unit %
+    assert (tb_dl["long_unit"] == "%").all(), "Unexpected long units found for indicator 5.4.1: {}".format(
+        tb_dl["long_unit"].unique()
+    )
+    assert (tb_dl["short_unit"] == "%").all(), "Unexpected short units found for indicator 5.4.1: {}".format(
+        tb_dl["short_unit"].unique()
+    )
+
+    # Convert value to hours per day (value is currently a share of the day, so multiply by 24)
+    tb.loc[tb["indicator"] == "5.4.1", "value"] = tb.loc[tb["indicator"] == "5.4.1", "value"].astype(float) * 24 * 0.01
+    # Update units to hours per day
+    tb.loc[tb["indicator"] == "5.4.1", "long_unit"] = "hours per day"
+    tb.loc[tb["indicator"] == "5.4.1", "short_unit"] = "h/day"
+
+    # add categories to series description (since it's a categorical variable for storage saving reasons)
+    tb["seriesdescription"] = tb["seriesdescription"].cat.add_categories(
+        [
+            "Hours per day spent on unpaid domestic labor, by sex, age and location (hrs per day)",
+            "Hours per day spent on unpaid care work, by sex, age and location (hrs per day)",
+            "Hours per day spent on unpaid domestic chores, by sex, age and location (hrs per day)",
+        ]
+    )
+
+    # update the metadata for the indicator to reflect the change in units
+    tb.loc[tb["seriescode"] == "SL_DOM_TSPD", "seriesdescription"] = (
+        "Hours per day spent on unpaid domestic labor, by sex, age and location (hrs per day)"
+    )
+    tb.loc[tb["seriescode"] == "SL_DOM_TSPDCW", "seriesdescription"] = (
+        "Hours per day spent on unpaid care work, by sex, age and location (hrs per day)"
+    )
+    tb.loc[tb["seriescode"] == "SL_DOM_TSPDDC", "seriesdescription"] = (
+        "Hours per day spent on unpaid domestic chores, by sex, age and location (hrs per day)"
+    )
+
+    return tb
 
 
 def create_units(df: pd.DataFrame) -> pd.DataFrame:
@@ -250,7 +301,7 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
     output_tables = []
     len_dimensions = []
     for group_name, df_group in all_series:
-        log.info(
+        log.debug(
             "un_sdg.create_dataframe.group",
             indicator=group_name[0],
             series=group_name[1],

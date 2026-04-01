@@ -21,7 +21,7 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import Table, Variable, VariableMeta, utils
-from owid.catalog.core.meta import update_variable_metadata
+from owid.catalog.core.meta import Source, update_variable_metadata
 from owid.catalog.core.paths import CatalogPath
 from owid.catalog.core.utils import hash_any
 from sqlalchemy import select, text, update
@@ -53,7 +53,7 @@ class DatasetUpsertResult:
 
 
 def upsert_dataset(
-    engine: Engine, dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
+    engine: Engine, dataset: catalog.Dataset, namespace: str, sources: List[Source]
 ) -> DatasetUpsertResult:
     assert dataset.metadata.short_name, "Dataset must have a short_name"
     assert dataset.metadata.version, "Dataset must have a version"
@@ -260,7 +260,7 @@ def upsert_table(
     # Both checksums match
     if checksums.get("dataChecksum") == checksum_data and checksums.get("metadataChecksum") == checksum_metadata:
         if verbose:
-            log.info("upsert_table.skipped_no_changes", size=len(df), catalog_path=catalog_path)
+            log.debug("upsert_table.skipped_no_changes", size=len(df), catalog_path=catalog_path)
         return
 
     with Session(engine) as session:

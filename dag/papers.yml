@@ -113,3 +113,10 @@ steps:
     - data://garden/papers/2026-01-27/meijer_2021
   export://multidim/plastic_waste/latest/plastic_emissions_oceans:
     - data://grapher/papers/2026-01-27/meijer_2021
+  #
+  # Schneider et al. (2026) - Long-run child stunting
+  #
+  data://garden/papers/2026-03-27/long_run_stunting:
+    - snapshot://papers/2026-03-27/long_run_stunting.xlsx
+  data://grapher/papers/2026-03-27/long_run_stunting:
+    - data://garden/papers/2026-03-27/long_run_stunting

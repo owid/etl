@@ -547,6 +547,7 @@ class Table(pd.DataFrame):
             if time.time() - t > 5:
                 log.warning(
                     "repacking took a long time, consider adding create_dataset(..., repack=False)",
+                    path=path,
                     time=time.time() - t,
                 )
 
@@ -3037,11 +3038,19 @@ def check_all_variables_have_metadata(tables: Iterable[Table], fields: list[str]
 
     for table in tables:
         table_name = table.metadata.short_name
+        missing: dict[str, list[str]] = {field: [] for field in fields}
         for column in table.columns:
             for field in fields:
                 if not getattr(table[column].metadata, field):
-                    warning_class = warnings.NoOriginsWarning if field == "origins" else warnings.MetadataWarning
-                    warnings.warn(f"Table {table_name}, column {column} has no {field}.", warning_class)
+                    missing[field].append(column)
+        for field in fields:
+            if missing[field]:
+                cols = missing[field]
+                warning_class = warnings.NoOriginsWarning if field == "origins" else warnings.MetadataWarning
+                warnings.warn(
+                    f"Table {table_name}: {len(cols)} column(s) have no {field} (e.g. {', '.join(cols[:3])}).",
+                    warning_class,
+                )
 
 
 def _resolve_collisions(

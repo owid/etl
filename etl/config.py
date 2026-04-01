@@ -8,6 +8,7 @@ only important for OWID staff.
 """
 
 import asyncio
+import logging
 import os
 import pwd
 import re
@@ -75,6 +76,31 @@ def get_container_name(branch_name):
 
 
 load_env()
+
+# Log level for structlog filtering (applied in enable_structlog_filtering below).
+# By default, only INFO and above are shown. Set DEBUG=1 in .env to see DEBUG messages.
+STRUCTLOG_LOG_LEVEL = logging.DEBUG if env.get("DEBUG") in ("True", "true", "1") else logging.INFO
+
+
+def enable_structlog_filtering() -> None:
+    """Configure structlog log-level filtering.
+
+    Called from the ETL CLI entry point, not at import time, to avoid
+    interfering with other tools (e.g. Streamlit apps) that import etl.config.
+    """
+    kwargs: dict = dict(wrapper_class=structlog.make_filtering_bound_logger(STRUCTLOG_LOG_LEVEL))
+
+    # Allow disabling timestamps via ETL_LOG_TIMESTAMPS=0
+    if env.get("ETL_LOG_TIMESTAMPS", "0") == "0":
+        kwargs["processors"] = [
+            structlog.contextvars.merge_contextvars,
+            structlog.processors.add_log_level,
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.dev.ConsoleRenderer(),
+        ]
+
+    structlog.configure(**kwargs)
 
 
 pd.set_option("future.no_silent_downcasting", True)
@@ -251,9 +277,6 @@ ETL_EPOCH = 5
 STRICT_AFTER = "2023-06-25"
 
 SLACK_API_TOKEN = env.get("SLACK_API_TOKEN")
-
-# if True, commit and push updates to YAML files coming from admin
-ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
 
 # if True, commit and push updates from fasttrack
 FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")

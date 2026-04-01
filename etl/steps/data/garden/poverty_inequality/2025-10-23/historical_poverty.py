@@ -843,11 +843,6 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, tb_population_
     # Concatenate with original tb_thousand_bins to get the 1000-binned distribution from EARLIEST_YEAR to present
     tb_thousand_bins_extended = pr.concat([tb_thousand_bins, tb_thousand_bins_to_extrapolate], ignore_index=True)
 
-    # Sort values
-    tb_thousand_bins_extended = tb_thousand_bins_extended.sort_values(["country", "year", "quantile"]).reset_index(
-        drop=True
-    )
-
     return tb_thousand_bins_extended
 
 
@@ -867,34 +862,23 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
     # TODO: These should be already categoricals in the first place!
     tb = tb.astype({"country": "category", "region": "category", "region_old": "category", "year": "UInt16"})
 
-    # Sort table by year and avg
-    tb = tb.sort_values(["year", "avg"]).reset_index(drop=True)
-
-    # Calculate the cumulative sum of the population by year
-    tb["cum_pop"] = tb.groupby("year", observed=True)["pop"].cumsum()
-
-    # Calculate the global population as the last value of cum_pop by year
-    tb["global_population"] = tb.groupby("year", observed=True)["cum_pop"].transform("max")
-
-    # Calculate the cumulative sum of the population as a percentage of the global population by year
-    tb["percentage_global_pop"] = tb["cum_pop"] / tb["global_population"] * 100
-
-    # Optimization: Use drop_duplicates instead of groupby for better performance
-    # Select only the columns we need to reduce memory and improve cache locality
-    output_cols = ["year", "global_population", "cum_pop", "percentage_global_pop"]
+    # Calculate global population per year (sum of all quantile populations)
+    tb_global_pop = tb.groupby("year", observed=True)["pop"].sum().reset_index()
+    tb_global_pop = tb_global_pop.rename(columns={"pop": "population"})
 
     # Define empty list to store poverty rows
     tb_poverty = []
 
     # Calculate results for each poverty line
     for poverty_line in POVERTY_LINES:
-        # Filter rows where avg is less than poverty line
-        # Direct boolean indexing without intermediate copy
-        mask = tb["avg"] < poverty_line
-
-        # Select columns directly and use drop_duplicates in one go
-        # drop_duplicates with subset+keep='last' is faster than groupby().last()
-        tb_poverty_line = tb.loc[mask, output_cols].drop_duplicates(subset=["year"], keep="last").copy()
+        # For each year, sum population of quantiles below the poverty line
+        # This is equivalent to: sort by avg, cumsum pop, take last row where avg < poverty_line
+        tb_poverty_line = (
+            tb[tb["avg"] < poverty_line]
+            .groupby("year", observed=True, as_index=False)["pop"]
+            .sum()
+            .rename(columns={"pop": "headcount"})
+        )
 
         # Add poverty_line column
         tb_poverty_line["poverty_line"] = poverty_line
@@ -905,11 +889,11 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
     # Concatenate all poverty lines
     tb_poverty = pr.concat(tb_poverty, ignore_index=True)
 
-    # Rename columns
-    tb_poverty = tb_poverty.rename(
-        columns={"cum_pop": "headcount", "percentage_global_pop": "headcount_ratio", "global_population": "population"},
-        errors="raise",
-    )
+    # Merge with global population
+    tb_poverty = pr.merge(tb_poverty, tb_global_pop, on="year", how="left")
+
+    # Calculate headcount ratio
+    tb_poverty["headcount_ratio"] = tb_poverty["headcount"] / tb_poverty["population"] * 100
 
     # Copy origins from avg to headcount
     tb_poverty["headcount"].m.origins = (tb["avg"] + tb["pop"]).m.origins
@@ -1651,13 +1635,22 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
         drop=True
     )
 
-    # Generate mean column using priority: survey > filled
-    tb_gini_mean[["mean", "mean_origin"]] = tb_gini_mean.apply(select_mean, axis=1)
-    tb_gini_mean["mean"] = tb_gini_mean["mean"].astype("Float64")
+    # Generate mean column using priority: filled > survey (vectorized)
+    tb_gini_mean["mean"] = tb_gini_mean["mean_filled"].fillna(tb_gini_mean["mean_survey"]).astype("Float64")
+    tb_gini_mean["mean_origin"] = np.where(tb_gini_mean["mean_filled"].notna(), "filled", "survey")
 
-    # Generate gini column using priority: survey > filled > van_zanden
-    tb_gini_mean[["gini", "gini_origin"]] = tb_gini_mean.apply(select_gini, axis=1)
-    tb_gini_mean["gini"] = tb_gini_mean["gini"].astype("Float64")
+    # Generate gini column using priority: filled > survey > van_zanden (vectorized)
+    tb_gini_mean["gini"] = (
+        tb_gini_mean["gini_filled"]
+        .fillna(tb_gini_mean["gini_survey"])
+        .fillna(tb_gini_mean["gini_van_zanden"])
+        .astype("Float64")
+    )
+    tb_gini_mean["gini_origin"] = np.select(
+        [tb_gini_mean["gini_filled"].notna(), tb_gini_mean["gini_survey"].notna()],
+        ["filled", "survey"],
+        default="van_zanden",
+    )
 
     # Keep only relevant columns
     tb_gini_mean = tb_gini_mean[["country", "year", "mean", "gini"]]
@@ -1854,10 +1847,9 @@ def prepare_mean_gini_data(tb: Table, tb_gdp: Table) -> Table:
         suffixes=("_mean", "_gdp"),
     )
 
-    # Select growth factor for mean using priority: original > gdp
-    tb_before_pip[["growth_factor", "growth_factor_origin"]] = tb_before_pip.apply(
-        select_growth_factor_for_mean, axis=1
-    )
+    # Select growth factor for mean using priority: original > gdp (vectorized)
+    tb_before_pip["growth_factor"] = tb_before_pip["growth_factor_mean"].fillna(tb_before_pip["growth_factor_gdp"])
+    tb_before_pip["growth_factor_origin"] = np.where(tb_before_pip["growth_factor_mean"].notna(), "mean", "gdp")
 
     # Shift growth_factor down by one year to align with the starting year of extrapolation
     tb_before_pip["growth_factor"] = tb_before_pip.groupby("country")["growth_factor"].shift(-1)
@@ -2401,9 +2393,6 @@ def interpolate_quantiles_in_thousand_bins(
     # Concatenate both tables back together
     tb = pr.concat([tb_thousand_bins, tb_expanded], ignore_index=True)
 
-    # Sort by country, year, and quantile
-    tb = tb.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
-
     # Copy origins for avg
     tb["avg"].m.origins = tb_thousand_bins_interpolated_quantiles["avg"].m.origins
 
@@ -2699,27 +2688,34 @@ def add_population_with_ireland_patch(
     Add population to the table, with a patch for Ireland.
 
     Ireland's population data is missing for years before 1950, so we manually add it here.
+
+    OPTIMIZATION: Population is the same for all quantiles in a given country-year, so we
+    compute population on a deduplicated country-year table and then join back, avoiding
+    expensive merge/interpolation on millions of rows.
     """
 
-    tb = paths.regions.add_population(
-        tb=tb,
+    # Deduplicate to country-year level for efficient population lookup
+    tb_cy = tb[["country", "year"]].drop_duplicates().reset_index(drop=True)
+
+    tb_cy = paths.regions.add_population(
+        tb=tb_cy,
         population_col=population_col,
         warn_on_missing_countries=warn_on_missing_countries,
         interpolate_missing_population=interpolate_missing_population,
         expected_countries_without_population=expected_countries_without_population,
     )
 
-    # See if Ireland is in tb
-    if patch_ireland and "Ireland" in tb["country"].unique():
-        # Filter tb for Ireland
-        tb_ireland = tb[tb["country"] == "Ireland"].copy()
+    # See if Ireland is in tb_cy
+    if patch_ireland and "Ireland" in tb_cy["country"].unique():
+        # Filter for Ireland
+        tb_ireland_cy = tb_cy[tb_cy["country"] == "Ireland"].copy()
 
-        if tb_ireland["year"].min() < 1950:
-            # Drop Ireland from tb
-            tb = tb[tb["country"] != "Ireland"].reset_index(drop=True)
+        if tb_ireland_cy["year"].min() < 1950:
+            # Drop Ireland from tb_cy
+            tb_cy = tb_cy[tb_cy["country"] != "Ireland"].reset_index(drop=True)
 
-            # Make population_col in tb_ireland NaN for years before 1950
-            tb_ireland.loc[tb_ireland["year"] < 1950, population_col] = pd.NA
+            # Make population_col NaN for years before 1950
+            tb_ireland_cy.loc[tb_ireland_cy["year"] < 1950, population_col] = pd.NA
 
             # Filter tb_population_patch for Ireland
             tb_population_patch_ireland = tb_population_patch[
@@ -2731,35 +2727,29 @@ def add_population_with_ireland_patch(
                 columns={"population": population_col}, errors="raise"
             )
 
-            # Merge population for Ireland into tb
-            tb_ireland = pr.merge(
-                tb_ireland,
+            # Merge population for Ireland
+            tb_ireland_cy = pr.merge(
+                tb_ireland_cy,
                 tb_population_patch_ireland,
                 on=["country", "year"],
                 how="left",
                 suffixes=("", "_ireland_patch"),
             )
 
-            # Where population is NaN and population_maddison is not NaN, fill population with population from Maddison
-            tb_ireland.loc[
-                tb_ireland[population_col].isna() & tb_ireland[f"{population_col}_ireland_patch"].notna(),
+            # Where population is NaN and patch is not NaN, fill from patch
+            tb_ireland_cy.loc[
+                tb_ireland_cy[population_col].isna() & tb_ireland_cy[f"{population_col}_ireland_patch"].notna(),
                 population_col,
-            ] = tb_ireland[f"{population_col}_ireland_patch"]
+            ] = tb_ireland_cy[f"{population_col}_ireland_patch"]
 
             # Drop population_patch column
-            tb_ireland = tb_ireland.drop(columns=[f"{population_col}_ireland_patch"], errors="raise")
+            tb_ireland_cy = tb_ireland_cy.drop(columns=[f"{population_col}_ireland_patch"], errors="raise")
 
             # Interpolate Ireland population if still missing
-            if tb_ireland[population_col].isna().any():
-                # Make tb_ireland_to_interpolate, a table with only country, year, and population_col, dropping duplicates
-                tb_ireland_to_interpolate = tb_ireland[["country", "year", population_col]].drop_duplicates().copy()
-
-                # Drop population_col in tb_reland
-                tb_ireland = tb_ireland.drop(columns=[population_col], errors="raise")
-
+            if tb_ireland_cy[population_col].isna().any():
                 # Interpolate
-                tb_ireland_to_interpolate = interpolate_table(
-                    tb_ireland_to_interpolate,
+                tb_ireland_cy = interpolate_table(
+                    tb_ireland_cy,
                     entity_col="country",
                     time_col="year",
                     time_mode="full_range",
@@ -2769,8 +2759,8 @@ def add_population_with_ireland_patch(
                 )
 
                 # Extrapolate up until 1820
-                tb_ireland_to_interpolate = interpolate_table(
-                    tb_ireland_to_interpolate,
+                tb_ireland_cy = interpolate_table(
+                    tb_ireland_cy,
                     entity_col="country",
                     time_col="year",
                     time_mode="full_range",
@@ -2779,18 +2769,14 @@ def add_population_with_ireland_patch(
                     limit_area="outside",
                 )
 
-                # Merge interpolated population back into tb_ireland
-                tb_ireland = pr.merge(
-                    tb_ireland,
-                    tb_ireland_to_interpolate,
-                    on=["country", "year"],
-                    how="left",
-                )
+            # Concatenate Ireland back to tb_cy
+            tb_cy = pr.concat([tb_cy, tb_ireland_cy], ignore_index=True)
 
-            # Concatenate Ireland back to tb
-            tb = pr.concat([tb, tb_ireland], ignore_index=True)
+    # Join population back to original table (many quantiles per country-year)
+    tb = pr.merge(tb, tb_cy[["country", "year", population_col]], on=["country", "year"], how="left")
 
-            # Restore categorical dtype for country column after concat
-            tb["country"] = tb["country"].astype("category")
+    # Restore categorical dtype for country column after merge
+    if not isinstance(tb["country"].dtype, pd.CategoricalDtype):
+        tb["country"] = tb["country"].astype("category")
 
     return tb

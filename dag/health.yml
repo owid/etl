@@ -1055,6 +1055,8 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2025-05-19/gho:
     - data://garden/who/2025-05-19/gho
+     #export://multidim/who/latest/share_overweight_adults:
+     #- data://grapher/who/2025-05-19/gho
 
   # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
   data://garden/health/2025-07-16/drug_approvals:
@@ -1292,6 +1294,7 @@ steps:
     - data://meadow/tuberculosis/2026-02-05/burden_disaggregated
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
+    - data://garden/un/2022-07-11/un_wpp
   data://grapher/tuberculosis/2026-02-05/burden_disaggregated:
     - data://garden/tuberculosis/2026-02-05/burden_disaggregated
 
@@ -1301,7 +1304,7 @@ steps:
   data-private://garden/ihme_gbd/2026-02-07/gbd_mental_health:
     - data-private://meadow/ihme_gbd/2026-02-07/gbd_mental_health
     - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_mental_health:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_mental_health
 
@@ -1311,7 +1314,7 @@ steps:
   data-private://garden/ihme_gbd/2026-02-07/gbd_cause_deaths:
     - data-private://meadow/ihme_gbd/2026-02-07/gbd_cause_deaths
     - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_cause_deaths:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_cause_deaths
 
@@ -1321,7 +1324,7 @@ steps:
   data-private://garden/ihme_gbd/2026-02-07/gbd_cause_dalys:
     - data-private://meadow/ihme_gbd/2026-02-07/gbd_cause_dalys
     - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_cause_dalys:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_cause_dalys
 
@@ -1331,7 +1334,7 @@ steps:
   data-private://garden/ihme_gbd/2026-02-07/gbd_prevalence:
     - data-private://meadow/ihme_gbd/2026-02-07/gbd_prevalence
     - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_prevalence:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_prevalence
   data-private://grapher/ihme_gbd/2026-02-07/gbd_incidence:
@@ -1343,9 +1346,11 @@ steps:
   data-private://garden/ihme_gbd/2026-02-07/gbd_risk_deaths:
     - data-private://meadow/ihme_gbd/2026-02-07/gbd_risk_deaths
     - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_deaths:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_deaths
+  export://multidim/ihme_gbd/latest/air_pollution:
+    - data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_deaths
 
   # GBD 2023 - GBD Risk Factor - DALYs
   data-private://meadow/ihme_gbd/2026-02-07/gbd_risk_dalys:
@@ -1353,7 +1358,7 @@ steps:
   data-private://garden/ihme_gbd/2026-02-07/gbd_risk_dalys:
     - data-private://meadow/ihme_gbd/2026-02-07/gbd_risk_dalys
     - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_dalys:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_dalys
 

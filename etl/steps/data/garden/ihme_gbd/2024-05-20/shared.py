@@ -10,6 +10,7 @@ from etl.data_helpers.population import add_population
 def add_regional_aggregates(
     tb: Table,
     ds_regions: Dataset,
+    ds_un_wpp: Dataset,
     index_cols: List[str],
     regions: List[str],
     age_group_mapping: Dict[str, List[int]],
@@ -29,7 +30,7 @@ def add_regional_aggregates(
     tb_rate = tb[tb["metric"] == "Rate"].copy()
 
     # Calculate region aggregates for Number
-    tb_number = add_regions_to_number(tb_number, age_group_mapping, ds_regions, index_cols, regions)
+    tb_number = add_regions_to_number(tb_number, age_group_mapping, ds_regions, ds_un_wpp, index_cols, regions)
     # Calculate region aggregates for Rate
     tb_rate_regions = add_regions_to_rate(tb_number, regions)
     tb_rate = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)  # type: ignore
@@ -44,6 +45,16 @@ def add_regional_aggregates(
     tb_out = pr.concat([tb_out, tb_percent], ignore_index=True)
     assert tb_out.age.m.origins
     tb_out = tb_out.drop(columns="population")
+
+    # Ensure low-cardinality string/object columns are categorical.
+    # This matters because ds.read() with safe_types=True (the default) converts
+    # category → string. Without this, repack_frame has to rediscover the optimal
+    # dtype for each column via a slow to_int → to_float → to_category cascade
+    # (~20s+ for 23M rows).
+    for col in tb_out.columns:
+        if tb_out[col].dtype == "object" or tb_out[col].dtype.name == "string":
+            tb_out[col] = tb_out[col].astype("category")
+
     return tb_out
 
 
@@ -74,7 +85,6 @@ def add_regions_to_rate(tb_number: Table, regions: List[str]) -> Table:
     # Calculate rates per 100,000 for regions
     tb_rate["value"] = (tb_rate["value"] / tb_rate["population"]) * 100000
     tb_rate["metric"] = "Rate"
-    tb_rate = tb_rate.astype({"metric": "category"})
     return tb_rate
 
 
@@ -82,6 +92,7 @@ def add_regions_to_number(
     tb_number: Table,
     age_group_mapping: Dict[str, List[int]],
     ds_regions: Dataset,
+    ds_un_wpp: Dataset,
     index_cols: List[str],
     regions: List[str],
 ) -> Table:
@@ -97,6 +108,7 @@ def add_regions_to_number(
             sex_group_all="Both",
             sex_group_female="Female",
             sex_group_male="Male",
+            ds_un_wpp=ds_un_wpp,
         )
     else:
         tb_number = add_population(
@@ -105,6 +117,7 @@ def add_regions_to_number(
             year_col="year",
             age_col="age",
             age_group_mapping=age_group_mapping,
+            ds_un_wpp=ds_un_wpp,
         )
     assert tb_number["value"].notna().all(), "Values are missing in the Number table, check configuration"
     # Add region aggregates - for Number
