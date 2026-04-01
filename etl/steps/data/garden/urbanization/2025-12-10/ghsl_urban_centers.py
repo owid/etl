@@ -285,11 +285,14 @@ def run() -> None:
     ####################################################################################################################
     # SECTION 5: Merge all processed tables
     ####################################################################################################################
+    # City size distribution: restrict to regions only.
+    tb_city_sizes = tb_city_sizes[tb_city_sizes["country"].isin(REGIONS)].copy()
+
     # Combine all the separate tables back together:
     # - tb_capitals: country-level + regional aggregates with capital data and shares
     # - tb_largest_city: country-level only with largest city data and shares
     # - tb_top_100: individual city rows (e.g., "Paris (France)")
-    # - tb_city_sizes: country-level + regional aggregates with city size distributions and shares
+    # - tb_city_sizes: regional aggregates only with city size distributions and shares
     tb = pr.merge(tb_capitals, tb_largest_city, on=["country", "year"], how="outer")
     tb = pr.merge(tb, tb_top_100, on=["country", "year"], how="outer")
     tb = pr.merge(tb, tb_city_sizes, on=["country", "year"], how="outer")
@@ -322,10 +325,9 @@ def run() -> None:
         "urban_density_top_100",
         "urban_pop_top_100",
     ]
-    # Add all city size categories.
+    # City size distribution columns (regions only, but split same way).
     columns_to_split.extend([f"pop_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
     columns_to_split.extend([f"popshare_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
-    # Add aggregate city size columns.
     columns_to_split.extend(
         [
             "pop_citysize_above_300k",
@@ -352,8 +354,6 @@ def run() -> None:
     ####################################################################################################################
     # SECTION 7: Calculate growth rates
     ####################################################################################################################
-    # Calculate annualized growth rates for city size share above 300k.
-    # For projections, fill gaps with estimates data to enable growth calculation across the boundary year.
     tb_for_proj_growth = tb.copy()
     tb_for_proj_growth["popshare_citysize_above_300k_projections"] = tb_for_proj_growth[
         "popshare_citysize_above_300k_projections"
