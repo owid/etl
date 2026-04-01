@@ -959,7 +959,7 @@ tables:
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
-          name: Below 300,000
+          name: 50,000 to 300,000
           numDecimalPlaces: 1
         presentation:
           title_public: Share of population living in cities with 50,000 to 300,000 people
