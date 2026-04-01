@@ -75,7 +75,7 @@ dimensions:
         description: Potash (K₂O) nutrient in fertilizers
 
   - slug: metric
-    name: Metric
+    name: Indicator
     choices:
       - slug: agricultural_use
         name: Agricultural use
