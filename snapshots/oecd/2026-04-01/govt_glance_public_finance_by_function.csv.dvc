@@ -23,3 +23,7 @@ meta:
     license:
       name: OECD Terms and Conditions
       url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: 91e58731f5ed5bb1dda3f733e4c6d497
+    size: 38249009
+    path: govt_glance_public_finance_by_function.csv
