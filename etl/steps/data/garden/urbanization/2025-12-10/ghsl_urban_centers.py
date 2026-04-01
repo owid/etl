@@ -285,14 +285,8 @@ def run() -> None:
     ####################################################################################################################
     # SECTION 5: Merge all processed tables
     ####################################################################################################################
-    # City size distribution: restrict to regions only.
-    tb_city_sizes = tb_city_sizes[tb_city_sizes["country"].isin(REGIONS)].copy()
-
-    # Combine all the separate tables back together:
-    # - tb_capitals: country-level + regional aggregates with capital data and shares
-    # - tb_largest_city: country-level only with largest city data and shares
-    # - tb_top_100: individual city rows (e.g., "Paris (France)")
-    # - tb_city_sizes: regional aggregates only with city size distributions and shares
+    # Combine all the separate tables back together (city sizes kept for all countries here
+    # so that growth rates can be calculated correctly; non-region rows will be nulled out later).
     tb = pr.merge(tb_capitals, tb_largest_city, on=["country", "year"], how="outer")
     tb = pr.merge(tb, tb_top_100, on=["country", "year"], how="outer")
     tb = pr.merge(tb, tb_city_sizes, on=["country", "year"], how="outer")
@@ -364,6 +358,31 @@ def run() -> None:
     tb["popshare_citysize_above_300k_growth_projections"] = tb_for_proj_growth[
         "popshare_citysize_above_300k_growth_projections"
     ]
+
+    # Null out city size pop/share columns for non-region countries (keep growth rates for all).
+    city_size_pop_share_cols = (
+        [
+            f"pop_citysize_{s}_estimates"
+            for s in list(CITY_SIZE_CUTOFFS.keys()) + ["above_300k", "above_1m", "below_50k"]
+        ]
+        + [
+            f"pop_citysize_{s}_projections"
+            for s in list(CITY_SIZE_CUTOFFS.keys()) + ["above_300k", "above_1m", "below_50k"]
+        ]
+        + [
+            f"popshare_citysize_{s}_estimates"
+            for s in list(CITY_SIZE_CUTOFFS.keys()) + ["above_300k", "above_1m", "below_50k"]
+        ]
+        + [
+            f"popshare_citysize_{s}_projections"
+            for s in list(CITY_SIZE_CUTOFFS.keys()) + ["above_300k", "above_1m", "below_50k"]
+        ]
+        + ["totalshare_citysize_above_1m_estimates", "totalshare_citysize_above_1m_projections"]
+    )
+    non_region_mask = ~tb["country"].isin(REGIONS)
+    for col in city_size_pop_share_cols:
+        if col in tb.columns:
+            tb.loc[non_region_mask, col] = None
 
     ####################################################################################################################
     # SECTION 8: Format and validate
