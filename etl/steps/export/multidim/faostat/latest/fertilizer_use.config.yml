@@ -1,0 +1,278 @@
+title:
+  title: Fertilizer production, trade and use
+  title_variant: by nutrient and metric
+
+default_selection:
+  - World
+
+topic_tags:
+  - Agricultural Production
+
+default_dimensions:
+  nutrient: nitrogen
+  metric: agricultural_use
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes:
+          - LineChart
+          - DiscreteBar
+        yAxis:
+          min: 0
+        originUrl: ourworldindata.org/fertilizers
+    - dimensions:
+        metric: use_per_area_of_cropland
+      config:
+        tab: map
+    - dimensions:
+        metric: agricultural_use
+      config:
+        tab: map
+    - dimensions:
+        metric: production
+      config:
+        tab: map
+    - dimensions:
+        nutrient: nitrogen
+      config:
+        map:
+          colorScale:
+            baseColorScheme: Greens
+            binningStrategy: equalSizeBins-normal
+            minValue: 0
+    - dimensions:
+        nutrient: phosphate
+      config:
+        map:
+          colorScale:
+            baseColorScheme: Purples
+            binningStrategy: equalSizeBins-normal
+            minValue: 0
+    - dimensions:
+        nutrient: potash
+      config:
+        map:
+          colorScale:
+            baseColorScheme: Blues
+            binningStrategy: equalSizeBins-normal
+            minValue: 0
+
+dimensions:
+  - slug: nutrient
+    name: Nutrient
+    choices:
+      - slug: nitrogen
+        name: Nitrogen
+        description: Nitrogen (N) nutrient in fertilizers
+      - slug: phosphate
+        name: Phosphate
+        description: Phosphate (P₂O₅) nutrient in fertilizers
+      - slug: potash
+        name: Potash
+        description: Potash (K₂O) nutrient in fertilizers
+
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: agricultural_use
+        name: Agricultural use
+        description: Amount used in the agricultural sector
+      - slug: use_per_area_of_cropland
+        name: Use per area of cropland
+        description: Amount used per hectare of cropland
+      - slug: production
+        name: Production
+        description: Amount produced
+      - slug: export_quantity
+        name: Export quantity
+        description: Amount exported
+      - slug: import_quantity
+        name: Import quantity
+        description: Amount imported
+
+views:
+  # Nitrogen
+  - dimensions:
+      nutrient: nitrogen
+      metric: agricultural_use
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__agricultural_use__005157__tonnes
+          display:
+            color: "#3BB273"
+    config:
+      title: Nitrogen fertilizer use
+      subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
+
+  - dimensions:
+      nutrient: nitrogen
+      metric: use_per_area_of_cropland
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__use_per_area_of_cropland__005159__kilograms_per_hectare
+          display:
+            color: "#3BB273"
+    config:
+      title: Nitrogen fertilizer use per area of cropland
+      subtitle: Measured in kilograms of nitrogen (N) per hectare of cropland.
+
+  - dimensions:
+      nutrient: nitrogen
+      metric: production
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__production__005510__tonnes
+          display:
+            color: "#3BB273"
+    config:
+      title: Nitrogen fertilizer production
+      subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
+
+  - dimensions:
+      nutrient: nitrogen
+      metric: export_quantity
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__export_quantity__005910__tonnes
+          display:
+            color: "#3BB273"
+    config:
+      title: Nitrogen fertilizer exports
+      subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
+
+  - dimensions:
+      nutrient: nitrogen
+      metric: import_quantity
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__import_quantity__005610__tonnes
+          display:
+            color: "#3BB273"
+    config:
+      title: Nitrogen fertilizer imports
+      subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
+
+  # Phosphate
+  - dimensions:
+      nutrient: phosphate
+      metric: agricultural_use
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__agricultural_use__005157__tonnes
+          display:
+            color: "#883079"
+    config:
+      title: Phosphate fertilizer use
+      subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
+
+  - dimensions:
+      nutrient: phosphate
+      metric: use_per_area_of_cropland
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__use_per_area_of_cropland__005159__kilograms_per_hectare
+          display:
+            color: "#883079"
+    config:
+      title: Phosphate fertilizer use per area of cropland
+      subtitle: Measured in kilograms of phosphate (P₂O₅) per hectare of cropland.
+
+  - dimensions:
+      nutrient: phosphate
+      metric: production
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__production__005510__tonnes
+          display:
+            color: "#883079"
+    config:
+      title: Phosphate fertilizer production
+      subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
+
+  - dimensions:
+      nutrient: phosphate
+      metric: export_quantity
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__export_quantity__005910__tonnes
+          display:
+            color: "#883079"
+    config:
+      title: Phosphate fertilizer exports
+      subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
+
+  - dimensions:
+      nutrient: phosphate
+      metric: import_quantity
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__import_quantity__005610__tonnes
+          display:
+            color: "#883079"
+    config:
+      title: Phosphate fertilizer imports
+      subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
+
+  # Potash
+  - dimensions:
+      nutrient: potash
+      metric: agricultural_use
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__agricultural_use__005157__tonnes
+          display:
+            color: "#2166AC"
+    config:
+      title: Potash fertilizer use
+      subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
+
+  - dimensions:
+      nutrient: potash
+      metric: use_per_area_of_cropland
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__use_per_area_of_cropland__005159__kilograms_per_hectare
+          display:
+            color: "#2166AC"
+    config:
+      title: Potash fertilizer use per area of cropland
+      subtitle: Measured in kilograms of potash (K₂O) per hectare of cropland.
+
+  - dimensions:
+      nutrient: potash
+      metric: production
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__production__005510__tonnes
+          display:
+            color: "#2166AC"
+    config:
+      title: Potash fertilizer production
+      subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
+
+  - dimensions:
+      nutrient: potash
+      metric: export_quantity
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__export_quantity__005910__tonnes
+          display:
+            color: "#2166AC"
+    config:
+      title: Potash fertilizer exports
+      subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
+
+  - dimensions:
+      nutrient: potash
+      metric: import_quantity
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__import_quantity__005610__tonnes
+          display:
+            color: "#2166AC"
+    config:
+      title: Potash fertilizer imports
+      subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
