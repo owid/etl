@@ -25,9 +25,17 @@ paths = PathFinder(__file__)
 START_OF_PROJECTIONS = 2025
 
 REGIONS = [
-    "North America", "South America", "Europe", "Africa", "Asia", "Oceania",
-    "Low-income countries", "Upper-middle-income countries",
-    "Lower-middle-income countries", "High-income countries", "World",
+    "North America",
+    "South America",
+    "Europe",
+    "Africa",
+    "Asia",
+    "Oceania",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+    "World",
 ]
 
 
@@ -41,9 +49,7 @@ def _expand_to_regions(tb, ds_regions, ds_income_groups):
         if region == "World":
             continue
         try:
-            members = geo.list_members_of_region(
-                region, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-            )
+            members = geo.list_members_of_region(region, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
             region_tb = tb[tb["country"].isin(members)].copy()
             if len(region_tb):
                 region_tb["country"] = region
@@ -76,16 +82,21 @@ def run() -> None:
     countries_file = paths.directory / "ghsl_urban_centers.countries.json"
     excluded_countries_file = paths.directory / "ghsl_urban_centers.excluded_countries.json"
     tb_raw = paths.regions.harmonize_names(
-        tb_raw, countries_file=countries_file, excluded_countries_file=excluded_countries_file,
+        tb_raw,
+        countries_file=countries_file,
+        excluded_countries_file=excluded_countries_file,
     )
     tb_total_pop = paths.regions.harmonize_names(
-        tb_total_pop, countries_file=countries_file, excluded_countries_file=excluded_countries_file,
+        tb_total_pop,
+        countries_file=countries_file,
+        excluded_countries_file=excluded_countries_file,
     )
 
     # ── Expand cities and total pop to regions ────────────────────────────────
     tb_cities_exp = _expand_to_regions(
         tb_raw[["country", "year", "urban_pop"]].copy(),
-        ds_regions, ds_income_groups,
+        ds_regions,
+        ds_income_groups,
     )
 
     tb_total_pop_wide = tb_total_pop.rename(columns={"total_pop": "_total_pop"})
@@ -100,26 +111,23 @@ def run() -> None:
 
     # ── Rank cities and assign tiers ──────────────────────────────────────────
     tb_cities_exp["rank"] = (
-        tb_cities_exp.groupby(["country", "year"])["urban_pop"]
-        .rank(method="first", ascending=False)
-        .astype(int)
+        tb_cities_exp.groupby(["country", "year"])["urban_pop"].rank(method="first", ascending=False).astype(int)
     )
 
     def _tier(r):
-        if r == 1:    return "tier1"
-        elif r <= 5:  return "tier2"
-        elif r <= 50: return "tier3"
+        if r == 1:
+            return "tier1"
+        elif r <= 5:
+            return "tier2"
+        elif r <= 50:
+            return "tier3"
         return None
 
     tb_cities_exp["tier"] = tb_cities_exp["rank"].map(_tier)
     tb_tier = tb_cities_exp.dropna(subset=["tier"])
 
     # ── Sum population per (country, year, tier) ──────────────────────────────
-    tb_agg = (
-        tb_tier.groupby(["country", "year", "tier"])["urban_pop"]
-        .sum()
-        .reset_index()
-    )
+    tb_agg = tb_tier.groupby(["country", "year", "tier"])["urban_pop"].sum().reset_index()
 
     # ── Urban total (all top-50 cities) per (country, year) ───────────────────
     tb_urban_total = (
@@ -132,31 +140,23 @@ def run() -> None:
     # ── Merge total pop + urban total and compute shares ──────────────────────
     tb_agg = tb_agg.merge(
         tb_total_pop_wide[["country", "year", "_total_pop"]],
-        on=["country", "year"], how="left",
+        on=["country", "year"],
+        how="left",
     )
     tb_agg = tb_agg.merge(tb_urban_total, on=["country", "year"], how="left")
-    tb_agg["pop_share"]   = tb_agg["urban_pop"] / tb_agg["_total_pop"]   * 100
+    tb_agg["pop_share"] = tb_agg["urban_pop"] / tb_agg["_total_pop"] * 100
     tb_agg["urban_share"] = tb_agg["urban_pop"] / tb_agg["_urban_total"] * 100
 
     # ── Pivot raw pop, total-pop share, and urban share into columns ──────────
-    tb_pop = (
-        tb_agg.pivot_table(index=["country", "year"], columns="tier", values="urban_pop")
-        .reset_index()
-    )
+    tb_pop = tb_agg.pivot_table(index=["country", "year"], columns="tier", values="urban_pop").reset_index()
     tb_pop.columns.name = None
     tb_pop = tb_pop.rename(columns={t: f"{t}_pop" for t in ("tier1", "tier2", "tier3")})
 
-    tb_share = (
-        tb_agg.pivot_table(index=["country", "year"], columns="tier", values="pop_share")
-        .reset_index()
-    )
+    tb_share = tb_agg.pivot_table(index=["country", "year"], columns="tier", values="pop_share").reset_index()
     tb_share.columns.name = None
     tb_share = tb_share.rename(columns={t: f"{t}_pop_share" for t in ("tier1", "tier2", "tier3")})
 
-    tb_urban_share = (
-        tb_agg.pivot_table(index=["country", "year"], columns="tier", values="urban_share")
-        .reset_index()
-    )
+    tb_urban_share = tb_agg.pivot_table(index=["country", "year"], columns="tier", values="urban_share").reset_index()
     tb_urban_share.columns.name = None
     tb_urban_share = tb_urban_share.rename(columns={t: f"{t}_urban_share" for t in ("tier1", "tier2", "tier3")})
 
@@ -164,22 +164,19 @@ def run() -> None:
     tb_wide = tb_wide.merge(tb_urban_share, on=["country", "year"], how="outer")
 
     # ── Split estimates / projections ─────────────────────────────────────────
-    past   = tb_wide[tb_wide["year"] < START_OF_PROJECTIONS].copy()
+    past = tb_wide[tb_wide["year"] < START_OF_PROJECTIONS].copy()
     future = tb_wide[tb_wide["year"] >= START_OF_PROJECTIONS - 5].copy()
 
     def add_suffix(df, suffix):
-        return df.rename(columns={
-            c: f"{c}_{suffix}" for c in df.columns if c not in ("country", "year")
-        })
+        return df.rename(columns={c: f"{c}_{suffix}" for c in df.columns if c not in ("country", "year")})
 
-    tb = pr.merge(add_suffix(past, "estimates"), add_suffix(future, "projections"),
-                  on=["country", "year"], how="outer")
+    tb = pr.merge(add_suffix(past, "estimates"), add_suffix(future, "projections"), on=["country", "year"], how="outer")
 
     # ── Metadata ──────────────────────────────────────────────────────────────
     TIER_LABELS = {
-        "tier1": ("largest city",           "the single largest city"),
+        "tier1": ("largest city", "the single largest city"),
         "tier2": ("2nd–5th largest cities", "the 2nd to 5th largest cities combined"),
-        "tier3": ("6th largest and above",   "the 6th largest city and above"),
+        "tier3": ("6th largest and above", "the 6th largest city and above"),
     }
     for tier, (short_label, long_label) in TIER_LABELS.items():
         for sfx in ("estimates", "projections"):
@@ -190,9 +187,7 @@ def run() -> None:
                 tb[col_pop].metadata.unit = "people"
                 tb[col_pop].metadata.short_unit = ""
                 tb[col_pop].metadata.title = f"Population in {short_label} ({sfx})"
-                tb[col_pop].metadata.description_short = (
-                    f"Total population living in {long_label} ({sfx})."
-                )
+                tb[col_pop].metadata.description_short = f"Total population living in {long_label} ({sfx})."
             # share of total population
             col_share = f"{tier}_pop_share_{sfx}"
             if col_share in tb.columns:
@@ -200,9 +195,9 @@ def run() -> None:
                 tb[col_share].metadata.unit = "%"
                 tb[col_share].metadata.short_unit = "%"
                 tb[col_share].metadata.title = f"Share of total population in {short_label} ({sfx})"
-                tb[col_share].metadata.description_short = (
-                    f"Share of the total population living in {long_label} ({sfx})."
-                )
+                tb[
+                    col_share
+                ].metadata.description_short = f"Share of the total population living in {long_label} ({sfx})."
             # share of urban (city) population
             col_urban = f"{tier}_urban_share_{sfx}"
             if col_urban in tb.columns:
@@ -210,13 +205,13 @@ def run() -> None:
                 tb[col_urban].metadata.unit = "%"
                 tb[col_urban].metadata.short_unit = "%"
                 tb[col_urban].metadata.title = f"Share of city population in {short_label} ({sfx})"
-                tb[col_urban].metadata.description_short = (
+                tb[
+                    col_urban
+                ].metadata.description_short = (
                     f"Share of the total tracked city population living in {long_label} ({sfx})."
                 )
 
     tb = tb.format(["country", "year"], short_name="ghsl_city_tiers")
 
-    ds_garden = paths.create_dataset(
-        tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
     ds_garden.save()

@@ -39,9 +39,17 @@ START_OF_PROJECTIONS = 2025
 MAX_RANK = 50
 
 REGIONS = [
-    "North America", "South America", "Europe", "Africa", "Asia", "Oceania",
-    "Low-income countries", "Upper-middle-income countries",
-    "Lower-middle-income countries", "High-income countries", "World",
+    "North America",
+    "South America",
+    "Europe",
+    "Africa",
+    "Asia",
+    "Oceania",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+    "World",
 ]
 
 
@@ -57,9 +65,7 @@ def _expand_to_regions(tb, ds_regions, ds_income_groups):
         if region == "World":
             continue
         try:
-            members = geo.list_members_of_region(
-                region, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-            )
+            members = geo.list_members_of_region(region, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
             region_tb = tb[tb["country"].isin(members)].copy()
             if len(region_tb):
                 region_tb["country"] = region
@@ -70,12 +76,12 @@ def _expand_to_regions(tb, ds_regions, ds_income_groups):
 
 
 def run() -> None:
-    ds_meadow        = paths.load_dataset("ghsl_urban_centers")
-    ds_meadow_ctry   = paths.load_dataset("ghsl_countries")
-    ds_regions       = paths.load_dataset("regions")
+    ds_meadow = paths.load_dataset("ghsl_urban_centers")
+    ds_meadow_ctry = paths.load_dataset("ghsl_countries")
+    ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
 
-    tb_raw   = ds_meadow.read("ghsl_urban_centers_raw").reset_index()
+    tb_raw = ds_meadow.read("ghsl_urban_centers_raw").reset_index()
     _origins = ds_meadow.read("ghsl_urban_centers")["urban_pop"].metadata.origins
 
     # ── Total population by (country, year) ───────────────────────────────────
@@ -89,19 +95,24 @@ def run() -> None:
     tb_total_pop["total_pop"] = pd.to_numeric(tb_total_pop["total_pop"], errors="coerce")
 
     # ── Harmonize country names ────────────────────────────────────────────────
-    countries_file          = paths.directory / "ghsl_urban_centers.countries.json"
+    countries_file = paths.directory / "ghsl_urban_centers.countries.json"
     excluded_countries_file = paths.directory / "ghsl_urban_centers.excluded_countries.json"
     tb_raw = paths.regions.harmonize_names(
-        tb_raw, countries_file=countries_file, excluded_countries_file=excluded_countries_file,
+        tb_raw,
+        countries_file=countries_file,
+        excluded_countries_file=excluded_countries_file,
     )
     tb_total_pop = paths.regions.harmonize_names(
-        tb_total_pop, countries_file=countries_file, excluded_countries_file=excluded_countries_file,
+        tb_total_pop,
+        countries_file=countries_file,
+        excluded_countries_file=excluded_countries_file,
     )
 
     # ── Expand cities and total pop to regions ────────────────────────────────
     tb_cities_exp = _expand_to_regions(
         tb_raw[["country", "year", "urban_pop"]].copy(),
-        ds_regions, ds_income_groups,
+        ds_regions,
+        ds_income_groups,
     )
 
     # Regional total pop = sum across member countries
@@ -117,21 +128,19 @@ def run() -> None:
 
     # ── Rank cities within each (country, year) ────────────────────────────────
     tb_cities_exp["rank"] = (
-        tb_cities_exp.groupby(["country", "year"])["urban_pop"]
-        .rank(method="first", ascending=False)
-        .astype(int)
+        tb_cities_exp.groupby(["country", "year"])["urban_pop"].rank(method="first", ascending=False).astype(int)
     )
     tb_long = (
         tb_cities_exp[tb_cities_exp["rank"] <= MAX_RANK]
-        .rename(columns={"year": "cal_year", "rank": "year"})
-        [["country", "cal_year", "year", "urban_pop"]]
+        .rename(columns={"year": "cal_year", "rank": "year"})[["country", "cal_year", "year", "urban_pop"]]
         .copy()
     )
 
     # ── Merge total pop and compute share of total population ─────────────────
     tb_long = tb_long.merge(
         tb_total_pop_wide.rename(columns={"year": "cal_year"}),
-        on=["country", "cal_year"], how="left",
+        on=["country", "cal_year"],
+        how="left",
     )
     tb_long["city_pop_share"] = (tb_long["urban_pop"] / tb_long["_total_pop"]) * 100
 
@@ -140,7 +149,7 @@ def run() -> None:
     tb_long["city_pop_share"] = tb_long.groupby(["country", "cal_year"])["city_pop_share"].cumsum()
 
     # ── Split estimates / projections, pivot calendar years into columns ───────
-    past   = tb_long[tb_long["cal_year"] < START_OF_PROJECTIONS]
+    past = tb_long[tb_long["cal_year"] < START_OF_PROJECTIONS]
     future = tb_long[tb_long["cal_year"] >= START_OF_PROJECTIONS - 5]
 
     def pivot(df, suffix):
@@ -153,7 +162,8 @@ def run() -> None:
     # ── Metadata ──────────────────────────────────────────────────────────────
     for col in tb.columns:
         if col.startswith("city_pop_share_"):
-            parts = col.split("_"); yr, sfx = parts[3], parts[4]
+            parts = col.split("_")
+            yr, sfx = parts[3], parts[4]
             tb[col].metadata.origins = _origins
             tb[col].metadata.unit = "%"
             tb[col].metadata.short_unit = "%"
@@ -165,7 +175,5 @@ def run() -> None:
 
     tb = tb.format(["country", "year"], short_name="ghsl_urban_centers_distribution")
 
-    ds_garden = paths.create_dataset(
-        tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
     ds_garden.save()

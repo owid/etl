@@ -26,9 +26,17 @@ paths = PathFinder(__file__)
 START_OF_PROJECTIONS = 2025
 
 REGIONS = [
-    "North America", "South America", "Europe", "Africa", "Asia", "Oceania",
-    "Low-income countries", "Upper-middle-income countries",
-    "Lower-middle-income countries", "High-income countries", "World",
+    "North America",
+    "South America",
+    "Europe",
+    "Africa",
+    "Asia",
+    "Oceania",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+    "World",
 ]
 
 
@@ -42,9 +50,7 @@ def _expand_to_regions(tb, ds_regions, ds_income_groups):
         if region == "World":
             continue
         try:
-            members = geo.list_members_of_region(
-                region, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-            )
+            members = geo.list_members_of_region(region, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
             region_tb = tb[tb["country"].isin(members)].copy()
             if len(region_tb):
                 region_tb["country"] = region
@@ -66,30 +72,28 @@ def run() -> None:
     countries_file = paths.directory / "ghsl_urban_centers.countries.json"
     excluded_countries_file = paths.directory / "ghsl_urban_centers.excluded_countries.json"
     tb_raw = paths.regions.harmonize_names(
-        tb_raw, countries_file=countries_file, excluded_countries_file=excluded_countries_file,
+        tb_raw,
+        countries_file=countries_file,
+        excluded_countries_file=excluded_countries_file,
     )
 
     # ── Expand cities to regions ───────────────────────────────────────────────
     tb_cities_exp = _expand_to_regions(
         tb_raw[["country", "year", "urban_pop"]].copy(),
-        ds_regions, ds_income_groups,
+        ds_regions,
+        ds_income_groups,
     )
 
     # ── Rank cities within each (country, year) ────────────────────────────────
     tb_cities_exp["rank"] = (
-        tb_cities_exp.groupby(["country", "year"])["urban_pop"]
-        .rank(method="first", ascending=False)
-        .astype(int)
+        tb_cities_exp.groupby(["country", "year"])["urban_pop"].rank(method="first", ascending=False).astype(int)
     )
 
     # Keep only top-4 cities (all we need for the 4-city ratio)
     tb_top4 = tb_cities_exp[tb_cities_exp["rank"] <= 4].copy()
 
     # ── Pivot so each rank is a column ────────────────────────────────────────
-    tb_pivot = (
-        tb_top4.pivot_table(index=["country", "year"], columns="rank", values="urban_pop")
-        .reset_index()
-    )
+    tb_pivot = tb_top4.pivot_table(index=["country", "year"], columns="rank", values="urban_pop").reset_index()
     tb_pivot.columns.name = None
     tb_pivot.columns = ["country", "year"] + [f"rank{i}" for i in range(1, 5)]
 
@@ -111,14 +115,13 @@ def run() -> None:
     future = tb_wide[tb_wide["year"] >= START_OF_PROJECTIONS - 5].copy()
 
     def add_suffix(df, suffix):
-        return df.rename(columns={
-            c: f"{c}_{suffix}" for c in df.columns if c not in ("country", "year")
-        })
+        return df.rename(columns={c: f"{c}_{suffix}" for c in df.columns if c not in ("country", "year")})
 
     tb = pr.merge(
         add_suffix(past, "estimates"),
         add_suffix(future, "projections"),
-        on=["country", "year"], how="outer",
+        on=["country", "year"],
+        how="outer",
     )
 
     # ── Metadata ──────────────────────────────────────────────────────────────
@@ -147,7 +150,5 @@ def run() -> None:
 
     tb = tb.format(["country", "year"], short_name="ghsl_primacy_ratio")
 
-    ds_garden = paths.create_dataset(
-        tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
     ds_garden.save()
