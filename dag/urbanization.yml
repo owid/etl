@@ -102,6 +102,15 @@ steps:
   data://grapher/urbanization/2025-12-10/ghsl_urban_centers_distribution:
     - data://garden/urbanization/2025-12-10/ghsl_urban_centers_distribution
 
+  # City-tier population shares (Top-1 / Top-2–5 / Top-6–50)
+  data://garden/urbanization/2025-12-10/ghsl_city_tiers:
+    - data://meadow/urbanization/2025-12-10/ghsl_urban_centers
+    - data://meadow/urbanization/2025-12-10/ghsl_countries
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/urbanization/2025-12-10/ghsl_city_tiers:
+    - data://garden/urbanization/2025-12-10/ghsl_city_tiers
+
   #
   # UN WUP National Definitions
   #
