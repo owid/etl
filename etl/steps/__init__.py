@@ -682,10 +682,26 @@ class DataStep(Step):
             except ValueError:
                 pass  # not all systems support RLIMIT_AS
 
+        # Flush before forking to prevent the child from inheriting (and
+        # potentially re-flushing) buffered output from the parent, which
+        # causes duplicate "--- Starting / Finished" lines in CI logs.
+        sys.stdout.flush()
+        sys.stderr.flush()
+
         pid = os.fork()
         if pid == 0:
             # ---------- child process ----------
             try:
+                # Close all inherited file descriptors except stdin/stdout/stderr.
+                # The forked child inherits FDs for the multiprocessing Manager
+                # proxy, ProcessPoolExecutor pipes, DB connections, etc.  When
+                # os._exit() later closes them implicitly it can confuse the
+                # Manager server and cause the parent worker to hang.
+                import resource as _resource
+
+                _max_fd = _resource.getrlimit(_resource.RLIMIT_NOFILE)[0]
+                os.closerange(3, _max_fd)
+
                 config.enable_structlog_filtering()
                 step_type, path = str(self).split("://", 1)
                 step_type = step_type.replace("-private", "")
@@ -699,7 +715,7 @@ class DataStep(Step):
                 step_module = import_module(import_path)
                 run_module_run(step_module, self._dest_dir.as_posix())
                 os._exit(0)
-            except Exception:
+            except BaseException:
                 traceback.print_exc()
                 os._exit(1)
         else:
