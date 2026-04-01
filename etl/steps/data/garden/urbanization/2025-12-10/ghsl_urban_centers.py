@@ -362,9 +362,9 @@ def run() -> None:
     # Null out fine-grained city size breakdown for non-region countries.
     # Broad aggregates (above_300k, above_1m, below_50k, totalshare_above_1m) are kept for all countries.
     fine_grained_cols = (
-        [f"pop_citysize_{s}_estimates"      for s in CITY_SIZE_CUTOFFS.keys()]
-        + [f"pop_citysize_{s}_projections"  for s in CITY_SIZE_CUTOFFS.keys()]
-        + [f"popshare_citysize_{s}_estimates"   for s in CITY_SIZE_CUTOFFS.keys()]
+        [f"pop_citysize_{s}_estimates" for s in CITY_SIZE_CUTOFFS.keys()]
+        + [f"pop_citysize_{s}_projections" for s in CITY_SIZE_CUTOFFS.keys()]
+        + [f"popshare_citysize_{s}_estimates" for s in CITY_SIZE_CUTOFFS.keys()]
         + [f"popshare_citysize_{s}_projections" for s in CITY_SIZE_CUTOFFS.keys()]
     )
     non_region_mask = ~tb["country"].isin(REGIONS)
