@@ -127,7 +127,6 @@ def run() -> None:
 
     # BIRTHS #
     tb_births = process_births(tb_births, tb_birth_rate)
-    tb_births = set_variant_to_estimates(tb_births)
     del tb_birth_rate
     tb_births = add_owid_regions(tb_births, indicators=["births"])
     tb_births = tb_births.format(COLUMNS_INDEX, short_name="births")
@@ -372,6 +371,7 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb = process_standard(tb)
     tb = set_variant_to_estimates(tb)
     tb_rate = process_standard(tb_rate)
+    tb_rate = set_variant_to_estimates(tb)
 
     # Standardise sex dimension values
     tb = harmonize_dimension(
@@ -444,7 +444,9 @@ def process_births(tb: Table, tb_rate: Table) -> Table:
     """
     # Basic processing
     tb = process_standard(tb)
+    tb = set_variant_to_estimates(tb)
     tb_rate = process_standard(tb_rate)
+    tb_rate = set_variant_to_estimates(tb_rate)
 
     # Standardise sex/age dimension values
     tb = harmonize_dimension(
