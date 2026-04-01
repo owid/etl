@@ -121,14 +121,24 @@ def run() -> None:
         .reset_index()
     )
 
-    # ── Merge total pop and compute share ─────────────────────────────────────
+    # ── Urban total (all top-50 cities) per (country, year) ───────────────────
+    tb_urban_total = (
+        tb_tier.groupby(["country", "year"])["urban_pop"]
+        .sum()
+        .reset_index()
+        .rename(columns={"urban_pop": "_urban_total"})
+    )
+
+    # ── Merge total pop + urban total and compute shares ──────────────────────
     tb_agg = tb_agg.merge(
         tb_total_pop_wide[["country", "year", "_total_pop"]],
         on=["country", "year"], how="left",
     )
-    tb_agg["pop_share"] = tb_agg["urban_pop"] / tb_agg["_total_pop"] * 100
+    tb_agg = tb_agg.merge(tb_urban_total, on=["country", "year"], how="left")
+    tb_agg["pop_share"]   = tb_agg["urban_pop"] / tb_agg["_total_pop"]   * 100
+    tb_agg["urban_share"] = tb_agg["urban_pop"] / tb_agg["_urban_total"] * 100
 
-    # ── Pivot raw pop and share into columns ──────────────────────────────────
+    # ── Pivot raw pop, total-pop share, and urban share into columns ──────────
     tb_pop = (
         tb_agg.pivot_table(index=["country", "year"], columns="tier", values="urban_pop")
         .reset_index()
@@ -143,7 +153,15 @@ def run() -> None:
     tb_share.columns.name = None
     tb_share = tb_share.rename(columns={t: f"{t}_pop_share" for t in ("tier1", "tier2", "tier3")})
 
+    tb_urban_share = (
+        tb_agg.pivot_table(index=["country", "year"], columns="tier", values="urban_share")
+        .reset_index()
+    )
+    tb_urban_share.columns.name = None
+    tb_urban_share = tb_urban_share.rename(columns={t: f"{t}_urban_share" for t in ("tier1", "tier2", "tier3")})
+
     tb_wide = tb_pop.merge(tb_share, on=["country", "year"], how="outer")
+    tb_wide = tb_wide.merge(tb_urban_share, on=["country", "year"], how="outer")
 
     # ── Split estimates / projections ─────────────────────────────────────────
     past   = tb_wide[tb_wide["year"] < START_OF_PROJECTIONS].copy()
@@ -161,7 +179,7 @@ def run() -> None:
     TIER_LABELS = {
         "tier1": ("largest city",           "the single largest city"),
         "tier2": ("2nd–5th largest cities", "the 2nd to 5th largest cities combined"),
-        "tier3": ("6th–50th largest cities","the 6th to 50th largest cities combined"),
+        "tier3": ("6th largest and above",   "the 6th largest city and above"),
     }
     for tier, (short_label, long_label) in TIER_LABELS.items():
         for sfx in ("estimates", "projections"):
@@ -175,7 +193,7 @@ def run() -> None:
                 tb[col_pop].metadata.description_short = (
                     f"Total population living in {long_label} ({sfx})."
                 )
-            # share
+            # share of total population
             col_share = f"{tier}_pop_share_{sfx}"
             if col_share in tb.columns:
                 tb[col_share].metadata.origins = _origins
@@ -184,6 +202,16 @@ def run() -> None:
                 tb[col_share].metadata.title = f"Share of total population in {short_label} ({sfx})"
                 tb[col_share].metadata.description_short = (
                     f"Share of the total population living in {long_label} ({sfx})."
+                )
+            # share of urban (city) population
+            col_urban = f"{tier}_urban_share_{sfx}"
+            if col_urban in tb.columns:
+                tb[col_urban].metadata.origins = _origins
+                tb[col_urban].metadata.unit = "%"
+                tb[col_urban].metadata.short_unit = "%"
+                tb[col_urban].metadata.title = f"Share of city population in {short_label} ({sfx})"
+                tb[col_urban].metadata.description_short = (
+                    f"Share of the total tracked city population living in {long_label} ({sfx})."
                 )
 
     tb = tb.format(["country", "year"], short_name="ghsl_city_tiers")
