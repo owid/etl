@@ -8,7 +8,7 @@ meta:
     url_main: https://today.yougov.com/topics/politics/trackers/worry-about-automation
     url_download: https://today.yougov.com/_pubapis/v5/us/trackers/worry-about-automation/download
     date_accessed: '2026-03-23'
-    date_published: '2025-12-31'
+    date_published: '2026-01-07'
     license:
       name: YouGov terms & conditions of use
       url: https://today.yougov.com/about/terms

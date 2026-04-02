@@ -1,6 +1,8 @@
 title:
   title: Gini coefficient
   title_variant: Luxembourg Income Study
+topic_tags:
+  - Economic Inequality
 
 default_selection:
   - United States

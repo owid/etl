@@ -216,7 +216,11 @@ class Collection(MDIMBase):
         validate_indicators_in_db(indicators, owid_env.engine)
 
         # Ensure at least one topic tag is set (needed for search)
+<<<<<<< data-interim-wpp-togo
         # Disabled as it is not really necessary?
+=======
+        # commenting out since this fails on CI/CD
+>>>>>>> master
         # self.validate_topic_tags()
 
         # Run sanity checks on grouped views

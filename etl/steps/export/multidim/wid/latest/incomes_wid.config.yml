@@ -1,6 +1,9 @@
 title:
   title: Incomes of the richest
   title_variant: World Inequality Database
+topic_tags:
+  - Economic Inequality
+
 default_selection:
   - Chile
   - Brazil
