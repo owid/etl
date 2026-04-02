@@ -16,7 +16,7 @@ dataset:
 tables:
   air_traffic:
     variables:
-      aircraft_deps:
+      aircraft_departures:
         title: Aircraft departures
         unit: departures
         description_short: The total number of plane take-offs by passenger and cargo airlines.
@@ -39,25 +39,13 @@ tables:
         short_unit: km
         description_short: The total distance flown by cargo airlines multiplied by the number of revenue tons.
 
-      freight_rtks:
-        title: Freight revenue ton kilometers (RTKs)
-        unit: kilometers
-        short_unit: km
-        description_short: The total distance flown by freight airlines multiplied by the number of revenue tons.
-
       freight_tonnes:
         title: Freight tonnage
         unit: tonnes
         short_unit: t
         description_short: The total weight of freight transported by airlines.
 
-      mail_rtks:
-        title: Mail revenue ton kilometers (RTKs)
-        unit: kilometers
-        short_unit: km
-        description_short: The total distance flown by mail airlines multiplied by the number of revenue tons.
-
-      pax:
+      passengers:
         title: Passengers
         unit: passengers
         description_short: This represents total, not unique, passenger activity—so a person taking multiple trips is counted multiple times.
@@ -72,7 +60,7 @@ tables:
         title: Share of seats not filled with passengers
         unit: "%"
         short_unit: "%"
-        description_short:  The percentage of available passenger seats that are not filled with passengers.
+        description_short: The percentage of available passenger seats that are not filled with passengers.
 
       rpks:
         title: Revenue passenger kilometers (RPKs)
