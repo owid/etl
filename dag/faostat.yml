@@ -290,6 +290,7 @@ steps:
     - data://garden/faostat/2026-02-25/faostat_rfn
   export://multidim/faostat/latest/fertilizer_use:
     - data://grapher/faostat/2026-02-25/faostat_rfn
+    - data://grapher/faostat/2026-02-25/additional_variables
   data://grapher/faostat/2026-02-25/faostat_rl:
     - data://garden/faostat/2026-02-25/faostat_rl
   data://grapher/faostat/2026-02-25/faostat_rp:

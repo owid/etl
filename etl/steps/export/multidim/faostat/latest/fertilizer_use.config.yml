@@ -59,6 +59,22 @@ definitions:
             baseColorScheme: Blues
             binningStrategy: equalSizeBins-normal
             minValue: 0
+    - dimensions:
+        nutrient: all_fertilizers
+      config:
+        map:
+          colorScale:
+            baseColorScheme: GnBu
+            binningStrategy: manual
+            customNumericValues:
+              - 0
+              - 100000
+              - 250000
+              - 500000
+              - 1000000
+              - 5000000
+              - 10000000
+              - 50000000
 
 dimensions:
   - slug: nutrient
@@ -73,6 +89,9 @@ dimensions:
       - slug: potash
         name: Potash
         description: Potash (K₂O) nutrient in fertilizers
+      - slug: all_fertilizers
+        name: All fertilizers
+        description: All fertilizer nutrients combined
 
   - slug: metric
     name: Indicator
@@ -306,3 +325,34 @@ views:
     config:
       title: Potash fertilizer imports
       subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
+
+  # All fertilizers
+  - dimensions:
+      nutrient: all_fertilizers
+      metric: agricultural_use
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/additional_variables/fertilizers#all_fertilizers_use
+    config:
+      title: Fertilizer use
+      subtitle: Total fertilizer use is the sum of synthetic inputs of nitrogen, potassium and phosphorous, plus organic nitrogen inputs.
+
+  - dimensions:
+      nutrient: all_fertilizers
+      metric: use_per_area_of_cropland
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/additional_variables/fertilizers#all_fertilizers_per_cropland
+    config:
+      title: Fertilizer use per area of cropland
+      subtitle: Application of all fertilizer products (including nitrogenous, potash, and phosphate fertilizers), measured in kilograms of total nutrient per hectare of cropland.
+      map:
+        colorScale:
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 50
+            - 100
+            - 200
