@@ -54,6 +54,9 @@ steps:
   data://garden/un/2024-07-12/un_wpp:
     - data://meadow/un/2024-07-12/un_wpp
     - data://garden/regions/2023-01-01/regions
+  data://garden/un/2024-07-12/un_wpp_single_age:
+    - data://meadow/un/2024-07-12/un_wpp
+    - data://garden/regions/2023-01-01/regions
   data://grapher/un/2024-07-12/un_wpp:
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/un/2024-07-12/un_wpp_full:

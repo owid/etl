@@ -17,35 +17,14 @@ matplotlib.rcParams["svg.fonttype"] = "none"
 
 paths = PathFinder(__file__)
 
-# Standard 5-year age groups for the pyramid (bottom to top)
-AGE_GROUPS = [
-    "0-4",
-    "5-9",
-    "10-14",
-    "15-19",
-    "20-24",
-    "25-29",
-    "30-34",
-    "35-39",
-    "40-44",
-    "45-49",
-    "50-54",
-    "55-59",
-    "60-64",
-    "65-69",
-    "70-74",
-    "75-79",
-    "80-84",
-    "85-89",
-    "90-94",
-    "95-99",
-]
-# Midpoint age for each group (for smooth y-axis placement)
-AGE_MIDPOINTS = [int(ag.split("-")[0]) + 2.5 for ag in AGE_GROUPS]
+# Single-year age groups for the pyramid (bottom to top)
+AGE_GROUPS = [str(i) for i in range(100)]
+# Y-axis position for each age (integer ages 0–99)
+AGE_MIDPOINTS = list(range(100))
 
 # Fixed decades to display (historical + projection anchors)
 # The latest historical year is inserted dynamically from the data
-FIXED_HISTORICAL_YEARS = [1950, 1960, 1970, 1980, 1990, 2000, 2010]
+FIXED_HISTORICAL_YEARS = [1950, 1960, 1970, 1980, 1990, 2000]
 PROJECTION_YEARS = [2050, 2075, 2100]
 
 # Color palette: high-contrast progression dark navy → teal → green → lime → amber
@@ -57,7 +36,6 @@ YEAR_COLORS_FIXED = {
     1980: "#10a88c",  # medium teal
     1990: "#18c070",  # sea green
     2000: "#58c83c",  # bright green
-    2010: "#a0d020",  # yellow-green
     2050: "#f0b000",  # amber
     2075: "#f07020",  # orange
     2100: "#e83820",  # red-orange
@@ -73,7 +51,6 @@ LABEL_YEAR_AGES_FIXED = {
     1980: 25,
     1990: 35,
     2000: 43,
-    2010: 52,
     2050: 70,
     2075: 78,
     2100: 85,
@@ -148,13 +125,6 @@ def build_source_citation(ds_wpp) -> str:
     return "Data source: " + "; ".join(parts)
 
 
-def smooth_curve(y_pts: np.ndarray, x_pts: np.ndarray, n: int = 300) -> tuple[np.ndarray, np.ndarray]:
-    """Return a smoothed curve using linear interpolation (no oscillations at base)."""
-    y_fine = np.linspace(y_pts[0], y_pts[-1], n)
-    x_fine = np.interp(y_fine, y_pts, x_pts)
-    x_fine = np.clip(x_fine, 0, None)
-    return y_fine, x_fine
-
 
 def create_visualization(
     tb: pd.DataFrame,
@@ -173,9 +143,7 @@ def create_visualization(
 
     age_midpts = np.array(AGE_MIDPOINTS)  # y-coordinates
 
-    # Pre-compute max x for axis range
-    max_pop = tb[["male", "female"]].max().max()
-    x_max = np.ceil(max_pop / 50) * 50  # round up to nearest 50M
+    x_max = 70  # fixed axis range: 0–70 million per side
 
     fig, ax = plt.subplots(figsize=(16, 12))
     fig.patch.set_alpha(0)
@@ -187,9 +155,9 @@ def create_visualization(
         if year_data.empty:
             continue
 
-        # Sort by age group
-        age_order = {ag: i for i, ag in enumerate(AGE_GROUPS)}
-        year_data["age_idx"] = year_data["age"].map(age_order)
+        # Sort by age (numeric)
+        year_data = year_data.copy()
+        year_data["age_idx"] = year_data["age"].astype(int)
         year_data = year_data.sort_values("age_idx")
 
         male_vals = year_data["male"].values.astype(float)
@@ -197,16 +165,15 @@ def create_visualization(
 
         color = year_colors[year]
 
-        # Smooth contour: extend the 0-4 value down to y=0 and taper to 0 at top
-        y_with_base = np.concatenate([[-1], age_midpts, [102]])
-        male_with_base = np.concatenate([[male_vals[0]], male_vals, [0]])
-        female_with_base = np.concatenate([[female_vals[0]], female_vals, [0]])
+        # Taper to 0 at the top
+        y_pts = np.concatenate([age_midpts, [102]])
+        male_pts = np.concatenate([male_vals, [0]])
+        female_pts = np.concatenate([female_vals, [0]])
 
-        y_smooth, male_smooth = smooth_curve(y_with_base, male_with_base)
-        _, female_smooth = smooth_curve(y_with_base, female_with_base)
-
-        ax.fill_betweenx(y_smooth, 0, -male_smooth, color=color, alpha=0.9, linewidth=0)
-        ax.fill_betweenx(y_smooth, 0, female_smooth, color=color, alpha=0.9, linewidth=0)
+        ax.fill_betweenx(y_pts, 0, -male_pts, color=color, alpha=0.9, linewidth=0)
+        ax.fill_betweenx(y_pts, 0, female_pts, color=color, alpha=0.9, linewidth=0)
+        ax.plot(-male_pts, y_pts, color=color, linewidth=0.8, alpha=1)
+        ax.plot(female_pts, y_pts, color=color, linewidth=0.8, alpha=1)
 
         # Year labels on contours for selected years
         if year in label_year_ages:
@@ -248,8 +215,7 @@ def create_visualization(
     ax.xaxis.tick_top()
     ax.xaxis.set_label_position("top")
 
-    tick_step = 100 if x_max > 200 else 50
-    x_tick_vals = np.arange(0, x_max + 1, tick_step)
+    x_tick_vals = np.arange(0, x_max + 1, 10)
     all_x_ticks = np.concatenate([-x_tick_vals[1:][::-1], x_tick_vals])
     ax.set_xticks(all_x_ticks)
     ax.set_xticklabels(
@@ -351,7 +317,7 @@ def create_visualization(
 
 def run() -> None:
     """Create world population pyramid visualization (SVG + PNG)."""
-    ds_wpp = paths.load_dataset("un_wpp")
+    ds_wpp = paths.load_dataset("un_wpp_single_age")
 
     latest_historical_year = get_latest_historical_year(ds_wpp)
     display_years, year_colors, label_year_ages = build_display_config(latest_historical_year)
