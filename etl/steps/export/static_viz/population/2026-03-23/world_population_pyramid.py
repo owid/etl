@@ -125,7 +125,6 @@ def build_source_citation(ds_wpp) -> str:
     return "Data source: " + "; ".join(parts)
 
 
-
 def create_visualization(
     tb: pd.DataFrame,
     median_ages: dict[int, float],
