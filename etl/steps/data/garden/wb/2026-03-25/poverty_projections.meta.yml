@@ -52,13 +52,12 @@ definitions:
   description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for this by including the estimated value of non-market income, such as food grown by subsistence farmers for their own use.
 
   description_key_scenarios: |-
-    This data combines data based on household surveys or extrapolated up until the year of the data release using GDP per capita growth estimates and forecasts, with projections from 2026-2030 based on GDP per capita growth projections from the World Bank's Global Economic Prospects (June 2025), supplemented by IMF's World Economic Outlook (April 2025). For the period 2031-2050, the data is projected using the average annual historical GDP per capita growth over 2015-2024.
+    This data combines data based on household surveys or extrapolated up until the year of the data release using GDP per capita growth estimates and forecasts, with projections from 2027-2030 based on GDP per capita growth projections from the World Bank's Global Economic Prospects (January 2026), supplemented by IMF's World Economic Outlook (October 2025). For the period 2031-2050, the data is projected using the average annual historical GDP per capita growth over 2015-2024.
 
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  title: Poverty projections by the World Bank
   update_period_days: 180
 
 
@@ -94,6 +93,35 @@ tables:
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_scenarios}"
+        presentation:
+          grapher_config:
+            title: Total population living in extreme poverty by world region
+            subtitle: Extreme poverty is defined as living below the [International Poverty Line](#dod:international-poverty-line) of $3 per day. This data is adjusted for inflation and differences in living costs between countries. [Projections](#dod:wb-poverty-projection) are from the World Bank. From 2027–2030 they are based on growth forecasts from the World Bank and IMF. From 2031, they are based on observed 2015–2024 growth rates.
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. It relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
+            variantName: with World Bank projections
+            originUrl: /poverty
+            baseColorScheme: OwidCategoricalE
+            selectedEntityNames:
+              - South Asia (WB)
+              - East Asia and Pacific (WB)
+              - Sub-Saharan Africa (WB)
+              - Middle East, North Africa, Afghanistan and Pakistan (WB)
+              - Latin America and Caribbean (WB)
+              - Europe and Central Asia (WB)
+              - North America (WB)
+            addCountryMode: disabled
+            chartTypes:
+              - StackedArea
+            yAxis:
+              min: 0
+            invertColorScheme: true
+            hideRelativeToggle: false
+            timelineMinTime: 1990
+            timelineMaxTime: 2040
+            hideTimeline: true
+            comparisonLines:
+              - label: → Projections by the World Bank
+                xEquals: 2027
         display:
           name: Number of people in poverty ({definitions.poverty_line_a_day})
           numDecimalPlaces: 0
