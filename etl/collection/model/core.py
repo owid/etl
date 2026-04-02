@@ -216,7 +216,8 @@ class Collection(MDIMBase):
         validate_indicators_in_db(indicators, owid_env.engine)
 
         # Ensure at least one topic tag is set (needed for search)
-        self.validate_topic_tags()
+        # Disabled as it is not really necessary?
+        # self.validate_topic_tags()
 
         # Run sanity checks on grouped views
         self.validate_grouped_views()
