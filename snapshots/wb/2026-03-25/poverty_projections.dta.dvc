@@ -1,18 +1,24 @@
 meta:
   origin:
     producer: Lakner et al.
-    title: Reproducibility package for Poverty, Prosperity and Planet Report 2024
+    title: Poverty projections from World Bank PIP
     description: |-
-      The World Bank has set a clear mission: ending extreme poverty and boosting shared prosperity on a livable planet. This new edition of the biennial series, previously titled Poverty and Shared Prosperity, assesses the three components of the mission and emphasizes that reducing poverty and increasing shared prosperity must be achieved without high costs to the environment. The current polycrisis—where the multiple crises of slow economic growth, increased fragility, climate risks, and heightened uncertainty have come together at the same time—makes national development strategies and international cooperation difficult. This overview summarizes the progress toward achieving these goals, outlines promising pathways to speed up the progress on multiple fronts, and proposes priorities tailored to countries at various levels of poverty, income, and environmental vulnerability. Offering the first post-COVID-19 (Coronavirus) pandemic assessment of global progress on this interlinked agenda, the report finds that global poverty reduction has resumed but at a pace slower than before the COVID-19 crisis. It also provides evidence that the number of countries with high levels of income inequality has declined considerably during the past two decades, but the pace of improvements in shared prosperity has slowed and that inequality remains high in Latin America and the Caribbean and in Sub-Saharan Africa. The report also finds evidence of countries’ increasing ability to manage natural hazards where there has been progress in poverty reduction and shared prosperity; but in the poorest settings, the report finds that climate risks are significantly higher.
-    title_snapshot: Reproducibility package for Poverty, Prosperity and Planet Report 2024 - Poverty projections in 2021 prices
+      This dataset was created using the March 2026 vintage of [Poverty and Inequality Platform](https://pip.worldbank.org/home) (PIP). This dataset contains a series of country-level and global-level poverty rate projections up to 2050, updating the projections reported in [Poverty, Prosperity, and Planet Report (2024)](https://www.worldbank.org/en/publication/poverty-prosperity-and-planet). The methodology and the reproducibility package for the projections can be found [here](https://reproducibility.worldbank.org/catalog/250).
+    title_snapshot: Poverty projections from World Bank PIP - Country-level historical and projected poverty rates
     description_snapshot: |-
-      This file contains an update of the poverty projections estimated originally in the Poverty, Prosperity and Planet Report 2024 report. This version of the data uses the World Bank Poverty and Inequality data published on September 2025, in 2021 prices.
+      Historical poverty rates from 1981 to 2026 from PIP and projected poverty rates from 2027 to 2050.
     citation_full: |-
-      Lakner, C., Genoni, M. E., Stemmler, H., Yonzan, N., & Tetteh Baah, S. K. (2024). Reproducibility package for Poverty, Prosperity and Planet Report 2024, updated using Poverty and Inequality Platform (version September 2025). World Bank. https://doi.org/10.60572/KGE4-CX54
-    attribution: Lakner et al. (2024) (updated using World Bank PIP in September 2025)
-    url_main: https://reproducibility.worldbank.org/index.php/catalog/189/
-    date_accessed: '2026-03-25'
-    date_published: '2025-11-07'
+      Lakner, C., Genoni, M. E., Stemmler, H., Yonzan, N., & Tetteh Baah, S. K. (2025). Reproducibility package for Poverty, Prosperity and Planet Report 2024. World Bank. https://doi.org/10.60572/01JA-MK74. Updated with Poverty and Inequality Platform (March 2026).
+    attribution: Lakner et al. (2025) (updated using World Bank PIP in March 2026)
+    url_main: https://datacatalog.worldbank.org/search/dataset/0067066/pip-poverty-projections
+    url_download: |-
+      https://datacatalogfiles.worldbank.org/ddh-published/0067066/DR0096010/Country_FGT_1981_2050_20260324_2021_01_02_PROD.dta
+    date_accessed: '2026-04-02'
+    date_published: '2025-03-31'
     license:
-      name: Modified BSD3
-      url: https://reproducibility.worldbank.org/index.php/catalog/189/#project_desc_container1674844764972
+      name: CC0
+      url: https://datacatalog.worldbank.org/search/dataset/0067066/pip-poverty-projections
+outs:
+  - md5: 08b6c92f4c41bab5a105e3a9c078d750
+    size: 10731172
+    path: poverty_projections.dta
