@@ -67,7 +67,7 @@ tables:
           - A flight with 200 seats flying 1,000 km generates 200,000 available seat-kilometers.
           - This is the standard way to measure how much capacity airlines put into service, regardless of how many tickets were sold.
         presentation:
-          title_public: Total airline seat capacity
+          title_public: Distance airlines could carry passengers
         display:
           numDecimalPlaces: 0
           name: Available seat km
