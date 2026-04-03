@@ -36,6 +36,10 @@ definitions:
       config:
         tab: map
     - dimensions:
+        metric: share_of_global_exports
+      config:
+        tab: map
+    - dimensions:
         nutrient: nitrogen
       config:
         map:
@@ -103,6 +107,9 @@ dimensions:
       - slug: import_quantity
         name: Import quantity
         description: Amount imported
+      - slug: share_of_global_exports
+        name: Share of global exports
+        description: Each country's share of global exports
 
 views:
   # Nitrogen
@@ -113,7 +120,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__agricultural_use__005157__tonnes
           display:
-            color: "#3BB273"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -127,7 +133,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__use_per_area_of_cropland__005159__kilograms_per_hectare
           display:
-            color: "#3BB273"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -141,7 +146,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__production__005510__tonnes
           display:
-            color: "#3BB273"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -155,7 +159,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__export_quantity__005910__tonnes
           display:
-            color: "#3BB273"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -169,7 +172,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__import_quantity__005610__tonnes
           display:
-            color: "#3BB273"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -184,7 +186,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__agricultural_use__005157__tonnes
           display:
-            color: "#883079"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -198,7 +199,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__use_per_area_of_cropland__005159__kilograms_per_hectare
           display:
-            color: "#883079"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -212,7 +212,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__production__005510__tonnes
           display:
-            color: "#883079"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -226,7 +225,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__export_quantity__005910__tonnes
           display:
-            color: "#883079"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -240,7 +238,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__import_quantity__005610__tonnes
           display:
-            color: "#883079"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -255,7 +252,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__agricultural_use__005157__tonnes
           display:
-            color: "#2166AC"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -269,7 +265,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__use_per_area_of_cropland__005159__kilograms_per_hectare
           display:
-            color: "#2166AC"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -283,7 +278,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__production__005510__tonnes
           display:
-            color: "#2166AC"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -297,7 +291,6 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__export_quantity__005910__tonnes
           display:
-            color: "#2166AC"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
@@ -311,12 +304,51 @@ views:
       y:
         - catalogPath: grapher/faostat/2026-02-25/faostat_rfn/faostat_rfn_flat#nutrient_potash_k2o__total__00003104__import_quantity__005610__tonnes
           display:
-            color: "#2166AC"
             roundingMode: significantFigures
             numSignificantFigures: 3
     config:
       title: Potash fertilizer imports
       subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
+
+  # Share of global exports
+  - dimensions:
+      nutrient: nitrogen
+      metric: share_of_global_exports
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/additional_variables/fertilizer_share_of_exports#nitrogen_share_of_global_exports
+          display:
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+    config:
+      title: "Nitrogen fertilizer: share of global exports"
+      subtitle: Each country's share of total global nitrogen (N) fertilizer exports. Includes synthetic fertilizers alongside organic inputs from manure and crop fixation.
+
+  - dimensions:
+      nutrient: phosphate
+      metric: share_of_global_exports
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/additional_variables/fertilizer_share_of_exports#phosphate_share_of_global_exports
+          display:
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+    config:
+      title: "Phosphate fertilizer: share of global exports"
+      subtitle: Each country's share of total global phosphate (P₂O₅) fertilizer exports. Includes phosphate from all fertilizer products.
+
+  - dimensions:
+      nutrient: potash
+      metric: share_of_global_exports
+    indicators:
+      y:
+        - catalogPath: grapher/faostat/2026-02-25/additional_variables/fertilizer_share_of_exports#potash_share_of_global_exports
+          display:
+            roundingMode: significantFigures
+            numSignificantFigures: 2
+    config:
+      title: "Potash fertilizer: share of global exports"
+      subtitle: Each country's share of total global potash (K₂O) fertilizer exports. Includes potash from all fertilizer products.
 
   # All fertilizers
   - dimensions:
