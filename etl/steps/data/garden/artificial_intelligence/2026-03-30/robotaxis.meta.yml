@@ -58,6 +58,6 @@ tables:
           - This indicator tracks the total distance traveled by paying passengers in robotaxi trips operated by licensed services in California, expressed in passenger-kilometers.
           - A passenger-kilometer is one kilometer traveled by one passenger. For example, a five-kilometer trip with two passengers equals ten passenger-kilometers. If passengers join or leave during a trip, each segment is counted separately based on the number of passengers in the vehicle.
           - Only passenger-carrying trips are included. Empty vehicles traveling between pickups and test rides are excluded.
-          - Both Cruise and Waymo reported data until October 2023, when Cruise suspended its service following a safety incident. Waymo has been the sole reporter since December 2023.
+          - Both Cruise and Waymo reported data until October 2023, when Cruise suspended its service following a safety incident. Waymo has been the sole reporter since then.
         display:
           numDecimalPlaces: 0
