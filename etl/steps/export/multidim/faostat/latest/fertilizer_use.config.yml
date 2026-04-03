@@ -41,27 +41,6 @@ definitions:
         tab: map
     - dimensions:
         nutrient: nitrogen
-        metric: share_of_global_exports
-      config:
-        map:
-          colorScale:
-            binningStrategy: log-1-2-5
-    - dimensions:
-        nutrient: phosphate
-        metric: share_of_global_exports
-      config:
-        map:
-          colorScale:
-            binningStrategy: log-1-2-5
-    - dimensions:
-        nutrient: potash
-        metric: share_of_global_exports
-      config:
-        map:
-          colorScale:
-            binningStrategy: log-1-2-5
-    - dimensions:
-        nutrient: nitrogen
       config:
         map:
           colorScale:
