@@ -104,12 +104,12 @@ dimensions:
       - slug: export_quantity
         name: Export quantity
         description: Amount exported
-      - slug: import_quantity
-        name: Import quantity
-        description: Amount imported
       - slug: share_of_global_exports
         name: Share of global exports
         description: Each country's share of global exports
+      - slug: import_quantity
+        name: Import quantity
+        description: Amount imported
 
 views:
   # Nitrogen
