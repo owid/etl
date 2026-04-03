@@ -282,7 +282,3 @@ def main(upload: bool) -> None:
 
     # Save the data to the snapshot.
     snap.create_snapshot(upload=upload, data=df)
-
-
-if __name__ == "__main__":
-    main()

@@ -11,7 +11,7 @@ dataset:
 tables:
   nvidia_revenue:
     variables:
-      revenue_millions:
+      revenue:
         title: NVIDIA's revenue by market segment
         unit: "US dollars"
         short_unit: "$"
@@ -23,8 +23,9 @@ tables:
           - Revenue is grouped by the end market each product is sold into, so changes in the areas reflect shifts in what NVIDIA sells and who its customers are.
           - Because it focuses on revenue rather than profit, the chart shows where NVIDIA’s sales are growing or shrinking, but not how profitable each line of business is or how many units it sells.
         description_processing: We aligned NVIDIA's fiscal quarters with calendar quarters and assigned each data point to the first day of the quarter. Professional Visualization (workstations and design software), Automotive (automotive computing platforms), and OEM & Other (original equipment manufacturing and miscellaneous sales) segments are grouped together as "Other".
+        processing_level: major
         presentation:
           grapher_config:
-            note: NVIDIA’s fiscal quarters were aligned with calendar quarters, with data points assigned to the first day of each quarter. "Other" includes revenue from professional visualization, automotive tech, and chips sold to other manufacturers.'"Other" includes revenue from professional visualization, automotive tech, and chips sold to other manufacturers.'
+            note: NVIDIA’s fiscal quarters were aligned with calendar quarters, with data points assigned to the first day of each quarter. "Other" includes revenue from professional visualization, automotive tech, and chips sold to other manufacturers.
         display:
           numDecimalPlaces: 0
