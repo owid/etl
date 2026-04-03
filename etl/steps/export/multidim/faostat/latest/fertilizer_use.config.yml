@@ -45,32 +45,24 @@ definitions:
         map:
           colorScale:
             baseColorScheme: Greens
-            binningStrategy: equalSizeBins-normal
-            minValue: 0
     - dimensions:
         nutrient: phosphate
       config:
         map:
           colorScale:
             baseColorScheme: Purples
-            binningStrategy: equalSizeBins-normal
-            minValue: 0
     - dimensions:
         nutrient: potash
       config:
         map:
           colorScale:
             baseColorScheme: Blues
-            binningStrategy: equalSizeBins-normal
-            minValue: 0
     - dimensions:
         nutrient: all_fertilizers
       config:
         map:
           colorScale:
             baseColorScheme: Oranges
-            binningStrategy: equalSizeBins-normal
-            minValue: 0
 
 dimensions:
   - slug: nutrient
@@ -125,6 +117,10 @@ views:
     config:
       title: Nitrogen fertilizer use
       subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: nitrogen
@@ -138,6 +134,10 @@ views:
     config:
       title: Nitrogen fertilizer use per area of cropland
       subtitle: Measured in kilograms of nitrogen (N) per hectare of cropland.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: nitrogen
@@ -151,6 +151,10 @@ views:
     config:
       title: Nitrogen fertilizer production
       subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: nitrogen
@@ -164,6 +168,10 @@ views:
     config:
       title: Nitrogen fertilizer exports
       subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: nitrogen
@@ -177,6 +185,10 @@ views:
     config:
       title: Nitrogen fertilizer imports
       subtitle: Measures total nitrogen inputs, including synthetic fertilizers alongside organic inputs from manure and crop fixation. Measured in tonnes of nitrogen.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   # Phosphate
   - dimensions:
@@ -191,6 +203,10 @@ views:
     config:
       title: Phosphate fertilizer use
       subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: phosphate
@@ -204,6 +220,10 @@ views:
     config:
       title: Phosphate fertilizer use per area of cropland
       subtitle: Measured in kilograms of phosphate (P₂O₅) per hectare of cropland.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: phosphate
@@ -217,6 +237,10 @@ views:
     config:
       title: Phosphate fertilizer production
       subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: phosphate
@@ -230,6 +254,10 @@ views:
     config:
       title: Phosphate fertilizer exports
       subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: phosphate
@@ -243,6 +271,10 @@ views:
     config:
       title: Phosphate fertilizer imports
       subtitle: Includes phosphate (P₂O₅) from all fertilizer products, measured in tonnes.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   # Potash
   - dimensions:
@@ -257,6 +289,10 @@ views:
     config:
       title: Potash fertilizer use
       subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: potash
@@ -270,6 +306,10 @@ views:
     config:
       title: Potash fertilizer use per area of cropland
       subtitle: Measured in kilograms of potash (K₂O) per hectare of cropland.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: potash
@@ -283,6 +323,10 @@ views:
     config:
       title: Potash fertilizer production
       subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: potash
@@ -296,6 +340,10 @@ views:
     config:
       title: Potash fertilizer exports
       subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   - dimensions:
       nutrient: potash
@@ -309,6 +357,10 @@ views:
     config:
       title: Potash fertilizer imports
       subtitle: Includes potash (K₂O) from all fertilizer products, measured in tonnes.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
 
   # Share of global exports
   - dimensions:
@@ -388,3 +440,7 @@ views:
     config:
       title: Fertilizer use per area of cropland
       subtitle: Application of all fertilizer products (including nitrogenous, potash, and phosphate fertilizers), measured in kilograms of total nutrient per hectare of cropland.
+      map:
+        colorScale:
+          binningStrategy: equalSizeBins-normal
+          minValue: 0
