@@ -1,4 +1,3 @@
-# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
     processing_level: minor
@@ -6,68 +5,69 @@ definitions:
       topic_tags:
         - Transport
 
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
 
 tables:
   air_traffic:
     variables:
-      aircraft_departures:
-        title: Aircraft departures
-        unit: departures
-        description_short: The total number of plane take-offs by passenger and cargo airlines.
-
-      aircraft_kms:
-        title: Aircraft kilometers
-        unit: kilometers
-        short_unit: km
-        description_short: The total distance flown by passenger and cargo airlines.
-
-      asks:
-        title: Available seat kilometers (ASKs)
-        unit: kilometers
-        short_unit: km
-        description_short: Available kilometers measure carrying capacity as the total distance flown by passenger airlines multiplied by the number of available seats.
-
-      cargo_rtks:
-        title: Cargo revenue ton kilometers (RTKs)
-        unit: kilometers
-        short_unit: km
-        description_short: The total distance flown by cargo airlines multiplied by the number of revenue tons.
-
-      freight_tonnes:
-        title: Freight tonnage
-        unit: tonnes
-        short_unit: t
-        description_short: The total weight of freight transported by airlines.
-
-      passengers:
-        title: Passengers
-        unit: passengers
-        description_short: This represents total, not unique, passenger activity—so a person taking multiple trips is counted multiple times.
-
-      plf:
-        title: Passenger load factor (PLF)
+      passenger_load_factor:
+        title: Passenger load factor
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of available passenger seats that are filled with passengers.
-
-      plf_empty:
-        title: Share of seats not filled with passengers
-        unit: "%"
-        short_unit: "%"
-        description_short: The percentage of available passenger seats that are not filled with passengers.
-
-      rpks:
-        title: Revenue passenger kilometers (RPKs)
-        unit: kilometers
-        short_unit: km
-        description_short: Passenger-seat kilometers measure the actual number of kilometers flown by paying customers—they are calculated by multiplying the total distance flown by passenger airlines by the number of paying passengers on board.
+        description_short: The share of seats on commercial flights that were occupied by paying passengers.
         description_key:
-          - A passenger is someone whose travel generates income for the airline.
-          - This includes people traveling under promotional offers, loyalty programs, as compensation for denied boarding, or using corporate and discounted fares such as those for government, military, or students.
-          - It does not include people traveling completely free, airline staff or their families using employee discounts, or infants who do not occupy a seat.
+          - A load factor of 80% means that, on average, 80 out of every 100 seats were sold to paying passengers.
+          - Airlines aim for high load factors because an empty seat generates no revenue once a flight departs.
+          - Load factors tend to rise when demand is strong relative to the number of flights operated.
+        presentation:
+          title_public: Share of airline seats occupied by paying passengers
+        display:
+          numDecimalPlaces: 1
+          name: Seats filled
+
+      share_empty_seats:
+        title: Share of empty airline seats
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of seats on commercial flights that flew without a paying passenger.
+        description_key:
+          - An empty-seat share of 20% means that, on average, 1 in 5 seats on commercial flights carried no paying passenger.
+          - Empty seats reflect a gap between the capacity airlines choose to operate and actual passenger demand.
+        processing_level: major
+        presentation:
+          title_public: Share of airline seats that flew empty
+        display:
+          numDecimalPlaces: 1
+          name: Empty seats
+        description_processing: We calculated the share of empty seats by subtracting the passenger load factor from 100%.
+
+      revenue_passenger_kilometers:
+        title: Revenue passenger-kilometers
+        unit: passenger-kilometres
+        short_unit: km
+        description_short: The total distance traveled by paying passengers on commercial flights, in kilometers.
+        description_key:
+          - One revenue passenger-kilometer equals one paying passenger flying one kilometer.
+          - A flight carrying 150 passengers over 1,000 km generates 150,000 revenue passenger-kilometers.
+          - This is the standard way to measure how much air travel people actually use, because it accounts for both the number of passengers and the distances they fly.
+        presentation:
+          title_public: Total distance flown by paying passengers
+        display:
+          numDecimalPlaces: 0
+          name: Passenger seat km
+
+      available_seat_kilometers:
+        title: Available seat-kilometers
+        unit: seat-kilometres
+        short_unit: km
+        description_short: The total distance that could have been flown by passengers on commercial flights, based on seats available, in kilometers.
+        description_key:
+          - One available seat-kilometer equals one seat on a plane flying one kilometer, whether occupied or not.
+          - A flight with 200 seats flying 1,000 km generates 200,000 available seat-kilometers.
+          - This is the standard way to measure how much capacity airlines put into service, regardless of how many tickets were sold.
+        presentation:
+          title_public: Total airline seat capacity
+        display:
+          numDecimalPlaces: 0
+          name: Available seat km
