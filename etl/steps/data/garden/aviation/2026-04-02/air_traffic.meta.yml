@@ -15,13 +15,13 @@ tables:
         title: Passenger load factor
         unit: "%"
         short_unit: "%"
-        description_short: The share of seats on commercial flights that were occupied by paying passengers.
+        description_short: The share of airline seats filled by paying passengers.
         description_key:
-          - A load factor of 80% means that, on average, 80 out of every 100 seats were sold to paying passengers.
-          - Airlines aim for high load factors because an empty seat generates no revenue once a flight departs.
-          - Load factors tend to rise when demand is strong relative to the number of flights operated.
+          - Passenger load factor shows how full flights were, on average.
+          - It is calculated by comparing passenger traffic with the total seating capacity airlines provided.
+          - A load factor of 80% means that, on average, 80 out of every 100 available seats were filled by paying passengers.
         presentation:
-          title_public: Share of airline seats occupied by paying passengers
+          title_public: Share of airline seats filled by paying passengers
         display:
           numDecimalPlaces: 1
           name: Seats filled
@@ -30,44 +30,48 @@ tables:
         title: Share of empty airline seats
         unit: "%"
         short_unit: "%"
-        description_short: The share of seats on commercial flights that flew without a paying passenger.
+        description_short: The share of airline seats that flew empty.
         description_key:
-          - An empty-seat share of 20% means that, on average, 1 in 5 seats on commercial flights carried no paying passenger.
-          - Empty seats reflect a gap between the capacity airlines choose to operate and actual passenger demand.
+          - This indicator shows the share of available airline seats that were not filled by paying passengers.
+          - A value of 20% means that, on average, 1 in 5 available seats flew empty.
         processing_level: major
         presentation:
           title_public: Share of airline seats that flew empty
         display:
           numDecimalPlaces: 1
           name: Empty seats
-        description_processing: We calculated the share of empty seats by subtracting the passenger load factor from 100%.
+        description_processing: Calculated by subtracting the passenger load factor from 100%.
 
       revenue_passenger_kilometers:
-        title: Revenue passenger-kilometers
+        title: Revenue passenger-kilometres
         unit: passenger-kilometres
         short_unit: km
-        description_short: The total distance traveled by paying passengers on commercial flights, in kilometers.
+        description_short: The total distance traveled by paying passengers on flights.
         description_key:
-          - One revenue passenger-kilometer equals one paying passenger flying one kilometer.
-          - A flight carrying 150 passengers over 1,000 km generates 150,000 revenue passenger-kilometers.
-          - This is the standard way to measure how much air travel people actually use, because it accounts for both the number of passengers and the distances they fly.
+          - Revenue passenger-kilometres measure total passenger traffic by air.
+          - One revenue passenger-kilometre equals one paying passenger traveling one kilometre.
+          - A flight carrying 150 paying passengers over 1,000 kilometres generates 150,000 revenue passenger-kilometres.
+          - This metric combines passenger numbers and distances traveled, so it is more informative than passenger counts alone.
+          - "It is not a simple count of passengers: long-distance travel contributes more than short-distance travel."
         presentation:
-          title_public: Total distance flown by paying passengers
+          title_public: Distance traveled by airline passengers
         display:
           numDecimalPlaces: 0
-          name: Passenger seat km
+          name: Passenger seat-km
 
       available_seat_kilometers:
-        title: Available seat-kilometers
+        title: Available seat-kilometres
         unit: seat-kilometres
         short_unit: km
-        description_short: The total distance that could have been flown by passengers on commercial flights, based on seats available, in kilometers.
+        description_short: The total seating capacity provided by airlines.
         description_key:
-          - One available seat-kilometer equals one seat on a plane flying one kilometer, whether occupied or not.
-          - A flight with 200 seats flying 1,000 km generates 200,000 available seat-kilometers.
-          - This is the standard way to measure how much capacity airlines put into service, regardless of how many tickets were sold.
+          - Available seat-kilometres measure how much passenger-carrying capacity airlines offered.
+          - One available seat-kilometre equals one seat flown one kilometre, whether it was filled or empty.
+          - A flight with 200 seats flying 1,000 kilometres generates 200,000 available seat-kilometres.
+          - This metric combines seat numbers and distances flown, so it is more informative than flight counts alone.
+          - It measures capacity offered, not how many passengers actually traveled.
         presentation:
-          title_public: Distance airlines could carry passengers
+          title_public: Total seating capacity provided by airlines
         display:
           numDecimalPlaces: 0
-          name: Available seat km
+          name: Available seat-km
