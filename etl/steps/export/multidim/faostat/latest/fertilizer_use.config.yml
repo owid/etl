@@ -39,6 +39,9 @@ definitions:
         metric: share_of_global_exports
       config:
         tab: map
+        map:
+          colorScale:
+            binningStrategy: log-1-2-5
     - dimensions:
         nutrient: nitrogen
       config:
@@ -363,6 +366,9 @@ views:
     config:
       title: Fertilizer use
       subtitle: Total fertilizer use is the sum of synthetic inputs of nitrogen, potassium and phosphorous, plus organic nitrogen inputs.
+      map:
+        colorScale:
+          binningStrategy: log-1-2-5
 
   - dimensions:
       nutrient: all_fertilizers
