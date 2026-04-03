@@ -140,6 +140,8 @@ def prepare_fertilizer_share_of_exports(tb_fertilizer_exports: Table) -> Table:
         tb[column].metadata.unit = "%"
         tb[column].metadata.short_unit = "%"
 
+    tb = tb.reset_index()
+    tb.columns.name = None
     tb = tb.format(["country", "year"], short_name="fertilizer_share_of_exports")
 
     return tb
