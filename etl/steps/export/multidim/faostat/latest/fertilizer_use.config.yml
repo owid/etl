@@ -41,6 +41,27 @@ definitions:
         tab: map
     - dimensions:
         nutrient: nitrogen
+        metric: share_of_global_exports
+      config:
+        map:
+          colorScale:
+            binningStrategy: log-1-2-5
+    - dimensions:
+        nutrient: phosphate
+        metric: share_of_global_exports
+      config:
+        map:
+          colorScale:
+            binningStrategy: log-1-2-5
+    - dimensions:
+        nutrient: potash
+        metric: share_of_global_exports
+      config:
+        map:
+          colorScale:
+            binningStrategy: log-1-2-5
+    - dimensions:
+        nutrient: nitrogen
       config:
         map:
           colorScale:
@@ -323,9 +344,6 @@ views:
     config:
       title: "Nitrogen fertilizer: share of global exports"
       subtitle: Each country's share of total global nitrogen (N) fertilizer exports. Includes synthetic fertilizers alongside organic inputs from manure and crop fixation.
-      map:
-        colorScale:
-          binningStrategy: log-1-2-5
 
   - dimensions:
       nutrient: phosphate
@@ -339,9 +357,6 @@ views:
     config:
       title: "Phosphate fertilizer: share of global exports"
       subtitle: Each country's share of total global phosphate (P₂O₅) fertilizer exports. Includes phosphate from all fertilizer products.
-      map:
-        colorScale:
-          binningStrategy: log-1-2-5
 
   - dimensions:
       nutrient: potash
@@ -355,9 +370,6 @@ views:
     config:
       title: "Potash fertilizer: share of global exports"
       subtitle: Each country's share of total global potash (K₂O) fertilizer exports. Includes potash from all fertilizer products.
-      map:
-        colorScale:
-          binningStrategy: log-1-2-5
 
   # All fertilizers
   - dimensions:
