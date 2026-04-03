@@ -730,6 +730,15 @@ steps:
   data://grapher/atus/2025-01-06/atus_who:
     - data://garden/atus/2025-01-06/atus_who
 
+  #
+  # World Airlines Traffic and Capacity
+  #
+  data://meadow/aviation/2025-04-01/air_traffic:
+    - snapshot://aviation/2025-04-01/air_traffic.csv
+  data://garden/aviation/2025-04-01/air_traffic:
+    - data://meadow/aviation/2025-04-01/air_traffic
+  data://grapher/aviation/2025-04-01/air_traffic:
+    - data://garden/aviation/2025-04-01/air_traffic
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
