@@ -43,15 +43,15 @@ def run() -> None:
     ds_meadow = paths.load_dataset("un_wpp")
 
     # Load tables (safe_types=False preserves categoricals from meadow, much faster for large tables)
-    tb_population = ds_meadow.read("population", safe_types=False)
+    tb_population = ds_meadow.read("population", safe_types=False)  #
     tb_population_density = ds_meadow.read("population_density", safe_types=False)
     tb_growth_rate = ds_meadow.read("growth_rate", safe_types=False)
     tb_nat_change = ds_meadow.read("natural_change_rate", safe_types=False)
     tb_fertility = ds_meadow.read("fertility_rate", safe_types=False)
-    tb_fertility_births_single = ds_meadow.read("fertility_births_single", safe_types=False)
+    tb_fertility_births_single = ds_meadow.read("fertility_births_single", safe_types=False)  #
     tb_migration = ds_meadow.read("net_migration", safe_types=False)
     tb_migration_rate = ds_meadow.read("net_migration_rate", safe_types=False)
-    tb_deaths = ds_meadow.read("deaths", safe_types=False)
+    tb_deaths = ds_meadow.read("deaths", safe_types=False)  #
     tb_death_rate = ds_meadow.read("death_rate", safe_types=False)
     tb_births = ds_meadow.read("births", safe_types=False)
     tb_birth_rate = ds_meadow.read("birth_rate", safe_types=False)
@@ -115,9 +115,9 @@ def run() -> None:
 
     # MIGRATION #
     tb_migration = process_migration(tb_migration, tb_migration_rate)
+    tb_migration = set_variant_to_estimates(tb_migration)
     tb_migration = add_owid_regions(tb_migration, indicators=["net_migration"])
     del tb_migration_rate
-    tb_migration = set_variant_to_estimates(tb_migration)
     tb_migration = tb_migration.format(COLUMNS_INDEX, short_name="migration")
 
     # DEATHS #
@@ -129,7 +129,6 @@ def run() -> None:
     tb_births = process_births(tb_births, tb_birth_rate)
     del tb_birth_rate
     tb_births = add_owid_regions(tb_births, indicators=["births"])
-    tb_births = set_variant_to_estimates(tb_births)
     tb_births = tb_births.format(COLUMNS_INDEX, short_name="births")
 
     # MEDIAN_AGE #
@@ -372,6 +371,7 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb = process_standard(tb)
     tb = set_variant_to_estimates(tb)
     tb_rate = process_standard(tb_rate)
+    tb_rate = set_variant_to_estimates(tb_rate)
 
     # Standardise sex dimension values
     tb = harmonize_dimension(
@@ -444,7 +444,9 @@ def process_births(tb: Table, tb_rate: Table) -> Table:
     """
     # Basic processing
     tb = process_standard(tb)
+    tb = set_variant_to_estimates(tb)
     tb_rate = process_standard(tb_rate)
+    tb_rate = set_variant_to_estimates(tb_rate)
 
     # Standardise sex/age dimension values
     tb = harmonize_dimension(
@@ -836,7 +838,7 @@ def harmonize_country_names(tb: Table):
 
 def add_owid_regions(tb: Table, indicators: list[str], index_columns: str | None = None) -> Table:
     """Add OWID regions to the table."""
-    if index_columns is None:
+    if index_columns is None:  # ERR: TOGO AS MEDIUM BEFORE 2023!
         index_columns = COLUMNS_INDEX
     aggregations = {indicator: "sum" for indicator in indicators}
     tb = paths.regions.add_aggregates(

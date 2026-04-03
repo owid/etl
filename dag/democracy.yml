@@ -41,15 +41,15 @@ steps:
   data://grapher/democracy/2026-03-27/bti:
     - data://garden/democracy/2026-03-27/bti
 
-  # Lexical Index (2025)
-  data://meadow/democracy/2025-06-26/lexical_index:
-    - snapshot://democracy/2025-06-26/lexical_index.xlsx
-  data://garden/democracy/2025-06-26/lexical_index:
+  # Lexical Index (2026)
+  data://meadow/democracy/2026-04-02/lexical_index:
+    - snapshot://democracy/2026-04-02/lexical_index.xlsx
+  data://garden/democracy/2026-04-02/lexical_index:
     - data://garden/regions/2023-01-01/regions
-    - data://meadow/democracy/2025-06-26/lexical_index
+    - data://meadow/democracy/2026-04-02/lexical_index
     - data://garden/demography/2024-07-15/population
-  data://grapher/democracy/2025-06-26/lexical_index:
-    - data://garden/democracy/2025-06-26/lexical_index
+  data://grapher/democracy/2026-04-02/lexical_index:
+    - data://garden/democracy/2026-04-02/lexical_index
 
   # EIU (2025)
   data://meadow/democracy/2025-03-05/eiu:
