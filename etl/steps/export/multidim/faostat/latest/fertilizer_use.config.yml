@@ -377,7 +377,15 @@ views:
       subtitle: Each country's share of total global nitrogen (N) fertilizer exports. Includes synthetic fertilizers alongside organic inputs from manure and crop fixation.
       map:
         colorScale:
-          binningStrategy: log-1-2-5
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 1
+            - 2
+            - 5
+            - 10
+            - 20
+            - 50
 
   - dimensions:
       nutrient: phosphate
@@ -393,7 +401,15 @@ views:
       subtitle: Each country's share of total global phosphate (P₂O₅) fertilizer exports. Includes phosphate from all fertilizer products.
       map:
         colorScale:
-          binningStrategy: log-1-2-5
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 1
+            - 2
+            - 5
+            - 10
+            - 20
+            - 50
 
   - dimensions:
       nutrient: potash
@@ -409,7 +425,15 @@ views:
       subtitle: Each country's share of total global potash (K₂O) fertilizer exports. Includes potash from all fertilizer products.
       map:
         colorScale:
-          binningStrategy: log-1-2-5
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 1
+            - 2
+            - 5
+            - 10
+            - 20
+            - 50
 
   # All fertilizers
   - dimensions:
@@ -426,7 +450,16 @@ views:
       subtitle: Total fertilizer use is the sum of synthetic inputs of nitrogen, potassium and phosphorous, plus organic nitrogen inputs.
       map:
         colorScale:
-          binningStrategy: log-1-2-5
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - 100000
+            - 300000
+            - 1000000
+            - 3000000
+            - 10000000
+            - 30000000
+            - 100000000
 
   - dimensions:
       nutrient: all_fertilizers
