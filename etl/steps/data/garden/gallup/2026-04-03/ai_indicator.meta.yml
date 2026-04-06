@@ -1,0 +1,56 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+      grapher_config:
+        note: Annual data points (2023 and 2024) reflect surveys conducted in May. From 2025, surveys are conducted quarterly (May, August, November).
+
+  description_key_methodology: &methodology
+    - Respondents are adults aged 18 and older who work full or part time for organizations in the United States, surveyed online through the Gallup Panel.
+    - The Gallup Panel uses probability-based, random sampling. Results are weighted to match U.S. national demographics for gender, age, race, ethnicity, education, and region.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 90
+
+tables:
+  ai_indicator:
+    variables:
+      daily_ai_users:
+        title: Share of U.S. employees using AI daily
+        unit: "%"
+        short_unit: "%"
+        description_short: Based on Gallup surveys of U.S. employees. Covers adults working full or part time for U.S. organizations.
+        description_key:
+          - *methodology
+        display:
+          numDecimalPlaces: 0
+          name: Daily AI users
+
+      frequent_ai_users:
+        title: Share of U.S. employees using AI frequently
+        unit: "%"
+        short_unit: "%"
+        description_short: Based on Gallup surveys of U.S. employees. "Frequent" means at least a few times a week.
+        description_key:
+          - *methodology
+          - Gallup defines "frequent AI users" as employees who use AI at work a few times a week or more.
+        display:
+          numDecimalPlaces: 0
+          name: Frequent AI users
+
+      total_ai_users:
+        title: Share of U.S. employees using AI at least occasionally
+        unit: "%"
+        short_unit: "%"
+        description_short: Based on Gallup surveys of U.S. employees. "Occasional" means at least a few times a year.
+        description_key:
+          - *methodology
+          - Gallup defines "total AI users" as employees who use AI at work a few times a year or more.
+        display:
+          numDecimalPlaces: 0
+          name: Total AI users
