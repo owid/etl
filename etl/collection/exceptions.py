@@ -39,3 +39,9 @@ class MissingDimensionalIndicatorError(Exception):
     """Raised when a dimension is missing an indicator that is required for its configuration."""
 
     pass
+
+
+class InvalidColorScaleConfigError(Exception):
+    """Raised when a view's color scale config has incompatible settings (e.g. log binning with non-positive minValue)."""
+
+    pass
