@@ -115,7 +115,9 @@ def run() -> None:
     decile_values = [
         slug
         for slug, name in decile_choices.items()
-        if name and slug not in (
+        if name
+        and slug
+        not in (
             "all",
             # "all_bar",
             "10_40_50",
