@@ -1,0 +1,23 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+tables:
+  ai_diffusion_msft:
+    variables:
+      ai_user_share:
+        title: Share of working-age population using generative AI (H2 2025)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the working-age population (aged 15–64) who used a generative AI product during the second half of 2025 (July–December).
+        description_key:
+          - These are estimates based on aggregated and anonymized data from Microsoft devices. They are not survey data.
+          - To account for differences in device and OS market share, mobile usage rates, and opt-out rates, the raw telemetry data was adjusted using a methodology described in the accompanying technical paper.
+          - Users with less than 90 minutes of total monthly usage were excluded to filter out one-time or very infrequent visitors.
+          - Coverage may be limited in some countries due to insufficient telemetry data.
+          - Several countries share identical values, which likely reflects grouped estimation rather than individual measurement for those countries.
+          - 2025 is the first year this data was published.
+        description_from_producer: |-
+          AI Diffusion is measured as the share of the working-age population (15–64) who used a generative AI product during the reporting period. The estimates are derived from aggregated and anonymized Microsoft telemetry data, adjusted to account for differences in operating system and device market share, internet penetration, and country population. Users with less than 90 minutes of total monthly usage were excluded.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of working-age population using generative AI
