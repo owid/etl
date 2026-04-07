@@ -7,11 +7,14 @@ definitions:
         - Artificial Intelligence
 
   # See the Survey Methods sections in Gallup's workplace articles for more detail: https://www.gallup.com/workplace/691643/work-nearly-doubled-two-years.aspx.
+  # More details in 'Learn more about how the Gallup Panel works. View complete question responses and trends (PDF download) - https://www.gallup.com/workplace/701195/frequent-workplace-continued-rise.aspx?thank-you-subscription-form=1'
   description_key_methodology: &methodology
     - Based on online surveys of adults aged 18 and older who work full time or part time for organizations in the United States.
+    - 'Gallup asks U.S. employees: "How often do you use artificial intelligence in your role?"'
     - Gallup surveys members of its panel using a sampling method designed to give people in the target population a known chance of being selected, rather than relying only on volunteers who choose to take part.
     - Responses are weighted to reflect the U.S. employed adult population by gender, age, race, ethnicity, education, and region.
     - Each survey round covered around 19,000 to 23,000 employed U.S. adults.
+
 dataset:
   update_period_days: 90
 
@@ -24,7 +27,7 @@ tables:
         short_unit: "%"
         description_short: The share of U.S. employees who say they use artificial intelligence at work every day.
         description_key:
-          - This indicator measures daily use of artificial intelligence at work.
+          - Daily AI users are employees who say they use artificial intelligence in their role daily.
           - *methodology
         display:
           numDecimalPlaces: 0
@@ -36,11 +39,12 @@ tables:
         short_unit: "%"
         description_short: The share of U.S. employees who say they use artificial intelligence at work a few times a week or more.
         description_key:
-          - Gallup defines frequent users as employees who say they use artificial intelligence at work a few times a week or more.
+          - Frequent AI users are employees who say they use artificial intelligence in their role at least a few times a week.
+          - This includes employees who say they use it daily or a few times a week.
           - *methodology
         display:
           numDecimalPlaces: 0
-          name: Weekly AI users
+          name: Frequent AI users
 
       total_ai_users:
         title: Share of U.S. employees who use AI at work a few times a year or more
@@ -48,8 +52,9 @@ tables:
         short_unit: "%"
         description_short: The share of U.S. employees who say they use artificial intelligence at work a few times a year or more.
         description_key:
-          - Gallup defines total users as employees who say they use artificial intelligence at work daily, a few times a week, a few times a month, or a few times a year.
+          - Total AI users are employees who say they use artificial intelligence in their role at least a few times a year.
+          - This includes employees who say they use it daily, a few times a week, a few times a month, or a few times a year.
           - *methodology
         display:
           numDecimalPlaces: 0
-          name: Total users
+          name: Total AI users
