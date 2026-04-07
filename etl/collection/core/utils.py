@@ -21,6 +21,10 @@ def process_views(
         # Combine metadata/config with definitions.common_views
         if (collection.definitions is not None) and (collection.definitions.common_views is not None):
             view.combine_with_common(collection.definitions.common_views)
+        else:
+            # Validate even when there are no common_views to merge — the view's own config
+            # might have incompatible settings
+            view.validate_color_scale_config()
 
         # Combine metadata in views which contain multiple indicators
         if combine_metadata_when_mult and view.metadata_is_needed:  # Check if view "contains multiple indicators"
