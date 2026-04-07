@@ -848,7 +848,50 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
         return tb_fixed
 
 
+class NegativePotashUseSierraLeoneAnomaly(DataAnomaly):
+    description = "* Potash (K2O) agricultural use for Sierra Leone in 2003 was reported as -177 tonnes, which is physically impossible. This single value was removed.\n"
+
+    affected_item_codes = [
+        "00003104",
+    ]
+    affected_element_codes = [
+        "005157",
+    ]
+    affected_years = [
+        2003,
+    ]
+    affected_countries = [
+        "Sierra Leone",
+    ]
+
+    def check(self, tb):
+        assert (
+            tb[
+                (tb["country"] == "Sierra Leone")
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
+            ]["value"]
+            < 0
+        ).all()
+
+    def inspect(self, tb):
+        pass
+
+    def fix(self, tb):
+        indexes_to_drop = tb[
+            (tb["country"].isin(self.affected_countries))
+            & (tb["item_code"].isin(self.affected_item_codes))
+            & (tb["element_code"].isin(self.affected_element_codes))
+            & (tb["year"].isin(self.affected_years))
+        ].index
+        return tb.drop(indexes_to_drop).reset_index(drop=True)
+
+
 detected_anomalies = {
+    "faostat_rfn": [
+        NegativePotashUseSierraLeoneAnomaly,
+    ],
     "faostat_qcl": [
         SpinachAreaHarvestedAnomaly,
         EggYieldNorthernEuropeAnomaly,
