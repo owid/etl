@@ -68,7 +68,7 @@ def convert_notebooks(docs_dir: Path, output_dir: Path, verbose: bool):
         click.echo(f"Error: Template page not found at {template_path}", err=True)
         return 1
 
-    with open(template_path, "r", encoding="utf-8") as f:
+    with open(template_path, encoding="utf-8") as f:
         zensical_template = f.read()
 
     converted_count = 0
@@ -84,7 +84,7 @@ def convert_notebooks(docs_dir: Path, output_dir: Path, verbose: bool):
                 continue
 
             # Read the notebook
-            with open(notebook_path, "r", encoding="utf-8") as f:
+            with open(notebook_path, encoding="utf-8") as f:
                 nb = nbformat.read(f, as_version=4)
 
             # Convert to HTML

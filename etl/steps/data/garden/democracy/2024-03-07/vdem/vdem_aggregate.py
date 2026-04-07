@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from itertools import chain
-from typing import Dict, Optional, Tuple, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -89,7 +89,7 @@ INDICATORS_REGION_AVERAGES = [[f"{ind_name}{dim}" for dim in ["", "_low", "_high
 INDICATORS_REGION_AVERAGES = list(chain.from_iterable(INDICATORS_REGION_AVERAGES)) + ["wom_parl_vdem"]
 
 
-def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table, Table, Table, Table]:
+def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table, Table, Table, Table]:
     # Create table with sums and averages
     tb_countries_counts, tb_countries_avg = make_table_countries(tb, ds_regions)
 
@@ -109,7 +109,7 @@ def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, 
 
 
 # %% NUM_COUNTRIES TABLES
-def make_table_countries(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
+def make_table_countries(tb: Table, ds_regions: Dataset) -> tuple[Table, Table]:
     """Estimate number of countries in X and averages over countries for each region."""
     # Remove imputed countries (they did not exist, so should not count them!)
     tb_ = tb.loc[~tb["regime_imputed"]].copy()
@@ -188,7 +188,7 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
 
 
 # %% POPULATION TABLES
-def make_table_population(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table]:
+def make_table_population(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table]:
     """Estimate number of people in X regime, and averages over countries for each region."""
     tb_ = tb.copy()
 
@@ -404,7 +404,7 @@ def expand_observations_without_leading_to_duplicates(tb: Table) -> Table:
 
 
 # %% MAIN TABLES
-def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Table) -> Tuple[Table, Table, Table]:
+def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Table) -> tuple[Table, Table, Table]:
     """Integrate the indicators from region aggregates and add dimensions to indicators.
 
     This method generates three tables:
@@ -455,7 +455,7 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
     return tb_uni, tb_multi_without_regions, tb_multi_with_regions
 
 
-def _split_into_uni_and_multi(tb: Table) -> Tuple[Table, Table]:
+def _split_into_uni_and_multi(tb: Table) -> tuple[Table, Table]:
     """Split a table into two: one with uni-dimensional indicators, and one with multi-dimensional indicators.
 
     The table with multi-dimensional indicators will have an additional column (`category`) to differentiate between the different dimension values.
@@ -516,9 +516,9 @@ def _add_note_on_region_averages(tb: Table) -> Table:
 def add_regions_and_global_aggregates(
     tb: Table,
     ds_regions: Dataset,
-    aggregations: Optional[Dict[str, str]] = None,
-    min_num_values_per_year: Optional[int] = None,
-    aggregations_world: Optional[Dict[str, str]] = None,
+    aggregations: dict[str, str] | None = None,
+    min_num_values_per_year: int | None = None,
+    aggregations_world: dict[str, str] | None = None,
 ) -> Table:
     """Add regions, and world aggregates."""
     tb_regions = geo.add_regions_to_table(

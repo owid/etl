@@ -1,6 +1,6 @@
 import json
 import webbrowser
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import click
 import structlog
@@ -295,7 +295,7 @@ def cli(
         )
 
 
-def _get_origins(tab: Table, ds: Dataset) -> List[Origin]:
+def _get_origins(tab: Table, ds: Dataset) -> list[Origin]:
     # TODO: check that sources of all indicators are the same
     var_origins = tab.iloc[:, 0].m.origins
 
@@ -319,7 +319,7 @@ def _get_origins(tab: Table, ds: Dataset) -> List[Origin]:
         return [_create_origin_from_source(ds, ds.metadata.sources[0], license)]
 
 
-def _create_origin_from_source(ds: Dataset, source: Source, license: Optional[License]) -> Origin:
+def _create_origin_from_source(ds: Dataset, source: Source, license: License | None) -> Origin:
     description = ""
     if ds.metadata.description:
         description = ds.metadata.description + "\n"
@@ -346,7 +346,7 @@ def _create_origin_from_source(ds: Dataset, source: Source, license: Optional[Li
     return origin
 
 
-def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> Dict[Any, Any]:
+def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> dict[Any, Any]:
     """TODO: This is work in progress! Update this function as you like."""
     q = f"""
     select
@@ -379,7 +379,7 @@ def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> Dict
     return json.loads(cf.iloc[0]["config"])
 
 
-def _prune_chart_config(config: Dict[Any, Any]) -> Dict[Any, Any]:
+def _prune_chart_config(config: dict[Any, Any]) -> dict[Any, Any]:
     # prune fields not useful for ETL grapher_config
     for field in ("id", "version", "dimensions", "isPublished", "data", "slug"):
         config.pop(field, None)

@@ -13,7 +13,6 @@ This module contains:
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import numpy as np
 import owid.catalog.core.processing as pr
@@ -474,7 +473,7 @@ def harmonize_items(tb: Table, dataset_short_name: str, item_col: str = "item") 
 
 
 def harmonize_elements(
-    tb: Table, dataset_short_name: str, element_col: str = "element", unit_col: Optional[str] = "unit"
+    tb: Table, dataset_short_name: str, element_col: str = "element", unit_col: str | None = "unit"
 ) -> Table:
     """Harmonize element codes (by ensuring they are strings of numbers with a fixed length, prepended with zeros), and
     make element codes and elements of categorical dtype.
@@ -705,7 +704,7 @@ def remove_columns_with_only_nans(tb: Table, verbose: bool = True) -> Table:
     return tb
 
 
-def remove_duplicates(tb: Table, index_columns: List[str], verbose: bool = True) -> Table:
+def remove_duplicates(tb: Table, index_columns: list[str], verbose: bool = True) -> Table:
     """Remove rows with duplicated index (country, year, item, element, unit).
 
     First attempt to use flags to remove duplicates. If there are still duplicates, remove in whatever way possible.
@@ -891,7 +890,7 @@ def add_custom_names_and_descriptions(tb: Table, items_metadata: Table, elements
     return tb
 
 
-def remove_regions_from_countries_regions_members(countries_regions: Table, regions_to_remove: List[str]) -> Table:
+def remove_regions_from_countries_regions_members(countries_regions: Table, regions_to_remove: list[str]) -> Table:
     """Remove regions that have to be ignored from the lists of members in the countries-regions dataset.
 
     Parameters
@@ -1534,7 +1533,7 @@ def add_modified_variables(tb: Table, dataset_short_name: str) -> Table:
     return tb
 
 
-def clean_data_values(values: Variable, amendments: Dict[str, str]) -> Variable:
+def clean_data_values(values: Variable, amendments: dict[str, str]) -> Variable:
     """Fix spurious data values (defined in value_amendments.csv) and make values a float column.
 
     Parameters
@@ -1575,7 +1574,7 @@ def clean_data(
     items_metadata: Table,
     elements_metadata: Table,
     countries_metadata: Table,
-    amendments: Dict[str, str],
+    amendments: dict[str, str],
 ) -> Table:
     """Process data (with already harmonized item codes and element codes), before adding aggregate regions and
     per-capita variables.
@@ -1909,7 +1908,7 @@ def prepare_wide_table(tb: Table) -> Table:
     return tb_wide
 
 
-def _variable_name_map(data: Table, column: str, enforce_unique: bool = True) -> Dict[str, str]:
+def _variable_name_map(data: Table, column: str, enforce_unique: bool = True) -> dict[str, str]:
     """Extract map {variable name -> column} from dataframe and make sure it is unique (i.e. ensure that one variable
     does not map to two distinct values)."""
     pivot = data.dropna(subset=[column]).groupby(["variable_name"], observed=True)[column].apply(set)

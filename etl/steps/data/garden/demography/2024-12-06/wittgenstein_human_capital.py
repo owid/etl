@@ -5,8 +5,6 @@ NOTES (January 2026):
 - tb_hist: Contains historical data (starting 1950/1955), and often also data after 2020. We deal with this when we run .drop_duplicates() after concatenation.
 """
 
-from typing import List
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -55,7 +53,7 @@ DTYPES = {
 
 
 def combine_tables_with_extra_hist_cols(
-    tb_proj: Table, tb_hist: Table, extra_cols: List[str], index_cols: List[str]
+    tb_proj: Table, tb_hist: Table, extra_cols: list[str], index_cols: list[str]
 ) -> Table:
     """Combine tables, adding extra columns from historical via merge.
 

@@ -1,7 +1,5 @@
 """Garden step for Shift data on energy production from fossil fuels."""
 
-from typing import Dict, List, Optional, Union
-
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
@@ -93,9 +91,9 @@ HISTORIC_TO_CURRENT_REGION = {
 
 def detect_overlapping_data_for_regions_and_members(
     df: pd.DataFrame,
-    index_columns: List[str],
-    regions_and_members: Dict[str, Dict[str, Union[str, List[str]]]],
-    known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]],
+    index_columns: list[str],
+    regions_and_members: dict[str, dict[str, str | list[str]]],
+    known_overlaps: list[dict[str, str | list[int]]] | None,
     ignore_zeros: bool = True,
 ) -> None:
     """Raise a warning if there is data for a particular region and for a country that is a member of that region.
@@ -185,7 +183,7 @@ def detect_overlapping_data_for_regions_and_members(
 
 def remove_overlapping_data_for_regions_and_members(
     df: pd.DataFrame,
-    known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]],
+    known_overlaps: list[dict[str, str | list[int]]] | None,
     country_col: str = "country",
     year_col: str = "year",
     ignore_zeros: bool = True,
@@ -245,15 +243,15 @@ def remove_overlapping_data_for_regions_and_members(
 
 def add_region_aggregates(
     data: Table,
-    regions: List[str],
-    index_columns: List[str],
+    regions: list[str],
+    index_columns: list[str],
     ds_regions: Dataset,
     ds_income_groups: Dataset,
     country_column: str = "country",
     year_column: str = "year",
-    aggregates: Optional[Dict[str, str]] = None,
-    known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]] = None,
-    keep_original_region_with_suffix: Optional[str] = None,
+    aggregates: dict[str, str] | None = None,
+    known_overlaps: list[dict[str, str | list[int]]] | None = None,
+    keep_original_region_with_suffix: str | None = None,
 ) -> Table:
     """Add region aggregates for all regions (which may include continents and income groups).
 

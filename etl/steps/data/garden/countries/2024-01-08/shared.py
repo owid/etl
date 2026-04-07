@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from typing import Optional, cast
+from typing import cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -88,12 +88,12 @@ def expand_observations(tb: Table, col_year_start: str, col_year_end: str) -> Ta
 
 def fill_timeseries(
     tb: Table,
-    year_min: Optional[int],
-    year_max: Optional[int],
+    year_min: int | None,
+    year_max: int | None,
     default_min: bool = False,
     default_max: bool = False,
-    col_year_start: Optional[str] = None,
-    col_year_end: Optional[str] = None,
+    col_year_start: str | None = None,
+    col_year_end: str | None = None,
     filter_times: bool = False,
 ) -> Table:
     """Complement table with missing years."""

@@ -12,8 +12,6 @@ To do this, we use different sources, depending on the year and metric:
     - HMD for data prior to 1950.
 """
 
-from typing import List
-
 import pandas as pd
 import yaml
 from owid.catalog import Dataset, DatasetMeta, Table, TableMeta
@@ -189,7 +187,7 @@ def add_metadata_to_table(tb: Table, only_historical: bool, only_projections: bo
     return tb
 
 
-def make_metadata(all_ds: List[Dataset]) -> DatasetMeta:
+def make_metadata(all_ds: list[Dataset]) -> DatasetMeta:
     """Create metadata for the dataset."""
     log.info("life_expectancy: creating metadata")
     # description

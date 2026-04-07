@@ -10,7 +10,6 @@ Notes:
 """
 
 import json
-from typing import Dict, List, Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -297,7 +296,7 @@ def format_wpp(tb: Table, column_indicator: str, indicator_dtype: str) -> Table:
 ######################
 # Gapminder SG #######
 ######################
-def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
+def format_gapminder_sg(tb: Table) -> tuple[Table, Table]:
     """Format Gapminder Systema Globalis table."""
     columns_rename = {
         "country": "country",
@@ -305,7 +304,7 @@ def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
         "total_population_with_projections": "population",
     }
 
-    def _core_formatting(tb: Table, country_rename: Dict[str, str]) -> Table:
+    def _core_formatting(tb: Table, country_rename: dict[str, str]) -> Table:
         ## rename countries
         tb["country"] = tb["geo"].map(country_rename)
         ## rename columns
@@ -825,7 +824,7 @@ def _estimate_growth_rate(tb_population: Table) -> Table:
 ##########################
 # Historical & Projections
 ##########################
-def make_table_historical(tbs: List[Table]) -> Table:
+def make_table_historical(tbs: list[Table]) -> Table:
     """Create a table with historical data."""
     tbs_ = []
     for tb in tbs:
@@ -837,7 +836,7 @@ def make_table_historical(tbs: List[Table]) -> Table:
     return tb
 
 
-def make_table_projection(tbs: List[Table]) -> Table:
+def make_table_projection(tbs: list[Table]) -> Table:
     """Create a table with projection data."""
     tbs_ = []
     for tb in tbs:

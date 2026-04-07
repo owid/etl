@@ -2,7 +2,7 @@ import random
 import tempfile
 import time
 from pathlib import Path
-from typing import List, Literal, Optional, Tuple, cast, get_args
+from typing import Literal, cast, get_args
 
 import numpy as np
 import pandas as pd
@@ -53,7 +53,7 @@ def load_detector(anomaly_type: ANOMALY_TYPE) -> AnomalyDetector:
 
 
 def get_variables_views_in_charts(
-    variable_ids: Optional[List[int]] = None,
+    variable_ids: list[int] | None = None,
 ) -> pd.DataFrame:
     # Assumed base url for all charts.
     base_url = "https://ourworldindata.org/grapher/"
@@ -440,13 +440,13 @@ def add_auxiliary_scores(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def anomaly_detection(
-    anomaly_types: Optional[Tuple[str, ...]] = None,
-    variable_mapping: Optional[dict[int, int]] = None,
-    variable_ids: Optional[list[int]] = None,
+    anomaly_types: tuple[str, ...] | None = None,
+    variable_mapping: dict[int, int] | None = None,
+    variable_ids: list[int] | None = None,
     dry_run: bool = False,
     force: bool = False,
     reset_db: bool = False,
-    sample_n: Optional[int] = None,
+    sample_n: int | None = None,
     append: bool = False,
 ) -> None:
     """Detect anomalies."""
@@ -734,7 +734,7 @@ def _load_variables_meta(engine: Engine, variable_ids: list[int]) -> list[gm.Var
         return gm.Variable.load_variables(session, list(df["id"]))
 
 
-def combine_and_reduce_scores_df(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
+def combine_and_reduce_scores_df(anomalies: list[gm.Anomaly]) -> pd.DataFrame:
     """Get the combined dataframe with scores for all anomalies, and reduce it to include only the largest anomaly for each contry-indicator."""
     # Combine the reduced dataframes for all anomalies into a single dataframe.
     dfs = []
@@ -753,7 +753,7 @@ def combine_and_reduce_scores_df(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
     return df_reduced
 
 
-def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]:
+def _sample_variables(variables: list[gm.Variable], n: int) -> list[gm.Variable]:
     """Sample n variables. Prioritize variables that are used in charts, then fill the rest
     with random variables."""
     if len(variables) <= n:
@@ -781,7 +781,7 @@ def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]
 
 
 def get_anomalies_for_chart_ids(
-    chart_ids: Optional[List[int]] = None, anomaly_types: Optional[Tuple[str, ...]] = ("upgrade_change",)
+    chart_ids: list[int] | None = None, anomaly_types: tuple[str, ...] | None = ("upgrade_change",)
 ) -> pd.DataFrame:
     """Get datasets of the variables used in a list of charts, given the chart ids.
 

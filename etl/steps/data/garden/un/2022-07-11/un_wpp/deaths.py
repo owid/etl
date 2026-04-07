@@ -1,6 +1,6 @@
 """Deaths table"""
 
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 from owid.catalog import Table
@@ -14,7 +14,7 @@ COLUMNS_ID = {
     "variant": "variant",
     "sex": "sex",
 }
-COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
+COLUMNS_METRICS: dict[str, dict[str, Any]] = {
     **{
         f"_{i}": {
             "name": "deaths",

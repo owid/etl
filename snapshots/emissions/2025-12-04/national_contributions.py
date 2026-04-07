@@ -8,7 +8,6 @@ modifications, if needed.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Dict
 
 import click
 import requests
@@ -53,7 +52,7 @@ def run(upload: bool) -> None:
         snap.create_snapshot(upload=upload)
 
 
-def extract_metadata_from_main_page(snap: Snapshot) -> Dict[str, str]:
+def extract_metadata_from_main_page(snap: Snapshot) -> dict[str, str]:
     """Extract the publication date."""
     # Get the full HTML content of the main page.
     response = requests.get(snap.metadata.origin.url_main)  # ty: ignore

@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import json
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -84,7 +84,7 @@ def create_units(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_attributes_description() -> Dict:
+def get_attributes_description() -> dict:
     units = paths.load_snapshot(short_name="un_sdg_unit.csv")
     df_units = pd.read_csv(units.path)
     dict_units = df_units.set_index("AttCode").to_dict()["AttValue"]
@@ -173,7 +173,7 @@ def remove_cities(df: pd.DataFrame) -> pd.DataFrame:
     return original_df
 
 
-def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
+def create_tables(original_df: pd.DataFrame) -> list[pd.DataFrame]:
     original_df = original_df.copy(deep=False)
 
     dim_description = get_dimension_description()
@@ -273,7 +273,7 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
 def generate_tables_for_indicator_and_series(
     dim_dict: dict[Any, Any],
     data_dimensions: pd.DataFrame,
-    dimensions: List[str],
+    dimensions: list[str],
 ) -> pd.DataFrame:
     if len(dimensions) == 0:
         return data_dimensions
@@ -286,9 +286,9 @@ def generate_tables_for_indicator_and_series(
 
 def get_series_with_relevant_dimensions(
     data_series: pd.DataFrame,
-    init_dimensions: List[str],
-    init_non_dimensions: List[str],
-) -> Tuple[pd.DataFrame, List[str]]:
+    init_dimensions: list[str],
+    init_non_dimensions: list[str],
+) -> tuple[pd.DataFrame, list[str]]:
     """For a given indicator and series, return a tuple:
     - data filtered to that indicator and series
     - names of relevant dimensions
@@ -313,7 +313,7 @@ def get_series_with_relevant_dimensions(
     )
 
 
-def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
+def create_omms(all_tabs: list[pd.DataFrame]) -> list[pd.DataFrame]:
     new_tabs = []
     for table in all_tabs:
         if table.index[0][5] in ("ER_BDY_ABT2NP", "SG_SCP_PROCN"):
@@ -334,7 +334,7 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
     return new_tabs
 
 
-def combine_paris_principles(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
+def combine_paris_principles(all_tabs: list[pd.DataFrame]) -> list[pd.DataFrame]:
     """
     Combine the four variables regarding country's accreditation with the Paris Principles (having independent Human Rights Institutions)
 

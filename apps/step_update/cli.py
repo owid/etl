@@ -3,7 +3,7 @@ import fnmatch
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import click
 import structlog
@@ -64,7 +64,7 @@ class StepUpdater:
             log.error(error_message)
             sys.exit(1)
 
-    def get_step_info(self, step: str) -> Dict[str, Any]:
+    def get_step_info(self, step: str) -> dict[str, Any]:
         # Get info for step to be updated.
         step_info = self.steps_df[self.steps_df["step"] == step].iloc[0].to_dict()
 
@@ -73,8 +73,8 @@ class StepUpdater:
     def _update_snapshot_step(
         self,
         step: str,
-        step_version_new: Optional[str] = STEP_VERSION_NEW,
-        step_header: Optional[str] = None,
+        step_version_new: str | None = STEP_VERSION_NEW,
+        step_header: str | None = None,
     ) -> int:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
@@ -177,8 +177,8 @@ class StepUpdater:
     def _update_data_step(
         self,
         step: str,
-        step_version_new: Optional[str] = STEP_VERSION_NEW,
-        step_header: Optional[str] = None,
+        step_version_new: str | None = STEP_VERSION_NEW,
+        step_header: str | None = None,
     ) -> int:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
@@ -256,7 +256,7 @@ class StepUpdater:
         return 0
 
     def _update_step(
-        self, step: str, step_version_new: Optional[str] = STEP_VERSION_NEW, step_header: Optional[str] = None
+        self, step: str, step_version_new: str | None = STEP_VERSION_NEW, step_header: str | None = None
     ) -> int:
         """Update step to new version."""
 
@@ -281,11 +281,11 @@ class StepUpdater:
 
     def update_steps(
         self,
-        steps: List[str],
-        step_version_new: Optional[str] = STEP_VERSION_NEW,
+        steps: list[str],
+        step_version_new: str | None = STEP_VERSION_NEW,
         include_dependencies: bool = False,
         include_usages: bool = False,
-        step_headers: Optional[Dict[str, str]] = None,
+        step_headers: dict[str, str] | None = None,
         direct_only: bool = False,
     ) -> None:
         """Update one or more steps to their new version, if possible."""
@@ -417,7 +417,7 @@ class StepUpdater:
             # Reload steps dataframe.
             self._load_version_tracker()
 
-    def archive_steps(self, steps: Union[str, List[str]], include_usages: bool = False) -> None:
+    def archive_steps(self, steps: str | list[str], include_usages: bool = False) -> None:
         """Move one or more steps from their active to their archive dag."""
 
         # If a single step is given, convert it to a list.
@@ -500,7 +500,7 @@ def _extract_step_pattern(step: str) -> tuple[str, str, str]:
         raise ValueError(f"Could not parse step URI: {step}")
 
 
-def _filter_direct_only_steps(original_steps: List[str], all_steps: List[str]) -> List[str]:
+def _filter_direct_only_steps(original_steps: list[str], all_steps: list[str]) -> list[str]:
     """Filter steps to only include those with the same namespace/version/short_name pattern as original steps.
 
     Args:
@@ -530,7 +530,7 @@ def _filter_direct_only_steps(original_steps: List[str], all_steps: List[str]) -
     return filtered_steps
 
 
-def _expand_wildcard_patterns(patterns: List[str], active_steps: List[str]) -> List[str]:
+def _expand_wildcard_patterns(patterns: list[str], active_steps: list[str]) -> list[str]:
     """Expand wildcard patterns to match actual step names.
 
     Args:
@@ -566,7 +566,7 @@ def _expand_wildcard_patterns(patterns: List[str], active_steps: List[str]) -> L
     return result
 
 
-def _confirm_choice(multiple_files: List[Any]) -> int:
+def _confirm_choice(multiple_files: list[Any]) -> int:
     choice_default = 0
     for i, file_name in enumerate(multiple_files):
         print(f"    {i} - {file_name}")
@@ -584,7 +584,7 @@ def _confirm_choice(multiple_files: List[Any]) -> int:
 
 
 @click.command(name="update", cls=RichCommand, help=__doc__)
-@click.argument("steps", type=str or List[str], nargs=-1)
+@click.argument("steps", type=str or list[str], nargs=-1)
 @click.option(
     "--step-version-new", type=str, default=STEP_VERSION_NEW, help=f"New version for step. Default: {STEP_VERSION_NEW}."
 )
@@ -624,8 +624,8 @@ def _confirm_choice(multiple_files: List[Any]) -> int:
     help="When used with --include-usages, only include steps with the same namespace/version/short_name pattern. Default: False.",
 )
 def cli(
-    steps: Union[str, List[str]],
-    step_version_new: Optional[str] = STEP_VERSION_NEW,
+    steps: str | list[str],
+    step_version_new: str | None = STEP_VERSION_NEW,
     include_dependencies: bool = False,
     include_usages: bool = False,
     dry_run: bool = False,
@@ -709,7 +709,7 @@ def cli(
 
 
 @click.command(name="archive", cls=RichCommand, help=__doc__)
-@click.argument("steps", type=str or List[str], nargs=-1)
+@click.argument("steps", type=str or list[str], nargs=-1)
 @click.option(
     "--include-usages",
     is_flag=True,
@@ -732,7 +732,7 @@ def cli(
     help="Skip user interactions (for confirmation and when there is ambiguity). Default: False.",
 )
 def archive_cli(
-    steps: Union[str, List[str]],
+    steps: str | list[str],
     include_usages: bool = False,
     dry_run: bool = False,
     interactive: bool = True,

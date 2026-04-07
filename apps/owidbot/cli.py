@@ -1,7 +1,7 @@
 import datetime as dt
 import re
 import time
-from typing import Any, Dict, List, Literal, get_args
+from typing import Any, Literal, get_args
 
 import click
 import structlog
@@ -52,7 +52,7 @@ SERVICES = Literal["data-diff", "chart-diff", "grapher", "anomalist"]
 )
 def cli(
     repo_branch: str,
-    services: List[str],
+    services: list[str],
     include: str,
     dry_run: bool,
 ) -> None:
@@ -137,7 +137,7 @@ def strip_appendix(body: str) -> str:
     return body
 
 
-def services_from_comment(comment: Any) -> Dict[str, str]:
+def services_from_comment(comment: Any) -> dict[str, str]:
     services = {}
 
     for service_name in get_args(SERVICES):
@@ -149,7 +149,7 @@ def services_from_comment(comment: Any) -> Dict[str, str]:
     return services
 
 
-def create_comment_body(branch: str, services: Dict[str, str], start_time: float):
+def create_comment_body(branch: str, services: dict[str, str], start_time: float):
     container_name = get_container_name(branch) if branch else "dry-run"
     cloudflare_subdomain = get_cloudflare_subdomain(branch) if branch else "dry-run"
 

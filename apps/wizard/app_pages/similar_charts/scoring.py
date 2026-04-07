@@ -1,6 +1,5 @@
 import json
 import time
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -58,7 +57,7 @@ class ScoringModel:
     # Weights for the different scores
     weights: dict[str, float]
 
-    def __init__(self, model: SentenceTransformer, weights: Optional[dict[str, float]] = None) -> None:
+    def __init__(self, model: SentenceTransformer, weights: dict[str, float] | None = None) -> None:
         self.model = model
         self.weights = weights or DEFAULT_WEIGHTS.copy()
 

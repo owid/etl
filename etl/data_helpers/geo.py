@@ -3,10 +3,11 @@
 import functools
 import json
 import warnings
+from collections.abc import Hashable
 from datetime import datetime
 from functools import cache
 from pathlib import Path
-from typing import Any, Hashable, Literal, TypeVar, cast
+from typing import Any, Literal, TypeVar, cast
 
 import numpy as np
 import owid.catalog.processing as pr

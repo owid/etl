@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Tuple, cast
+from typing import cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -149,7 +149,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def process_population_sex_ratio(tb: Table, tb_density: Table, tb_doubling: Table) -> Tuple[Table, Table]:
+def process_population_sex_ratio(tb: Table, tb_density: Table, tb_doubling: Table) -> tuple[Table, Table]:
     """Process the population table.
 
     Also estimate sex ratio.
@@ -452,7 +452,7 @@ def process_mortality(tb: Table) -> Table:
     return tb
 
 
-def process_standard(tb: Table, allowed_nans: Optional[Dict[str, int]] = None) -> Table:
+def process_standard(tb: Table, allowed_nans: dict[str, int] | None = None) -> Table:
     """Process the population table."""
     paths.log.info("Processing population variables...")
 
@@ -490,7 +490,7 @@ def process_standard(tb: Table, allowed_nans: Optional[Dict[str, int]] = None) -
     return tb
 
 
-def estimate_sex_ratio(tb: Table, age_groups: Optional[List[str]] = None):
+def estimate_sex_ratio(tb: Table, age_groups: list[str] | None = None):
     # Select relevant age groups
     if age_groups is None:
         age_groups = ["0", "5", "10", "15"] + [str(i) for i in range(20, 100, 10)] + ["100+"]
@@ -590,7 +590,7 @@ def estimate_age_groups(tb: Table) -> Table:
     return tb_population
 
 
-def _add_age_group(tb: Table, age_min: int, age_max: int, age_group: Optional[str] = None) -> Table:
+def _add_age_group(tb: Table, age_min: int, age_max: int, age_group: str | None = None) -> Table:
     """Estimate a new age group."""
     # Get subset of entries, apply groupby-sum if needed
     if age_min == age_max:
@@ -640,7 +640,7 @@ def add_sex_ratio_all(tb_sex: Table, tb: Table) -> Table:
     return tb_sex
 
 
-def harmonize_dimension(tb: Table, column_name: str, mapping: Dict[str, str], strict: bool = True) -> Table:
+def harmonize_dimension(tb: Table, column_name: str, mapping: dict[str, str], strict: bool = True) -> Table:
     """Harmonize a dimension in a table using a mapping.
 
     tb: Table to harmonize.

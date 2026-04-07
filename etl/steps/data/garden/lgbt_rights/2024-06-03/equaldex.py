@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table, VariableMeta, VariablePresentationMeta
 from owid.datautils.dataframes import map_series
@@ -275,7 +273,7 @@ def make_table_wide_and_map_categories(tb: Table) -> Table:
 
 
 def add_population_weighted_aggregations(
-    tb: Table, columns: List[str], ds_regions: Dataset, ds_population: Dataset, regions: List[str]
+    tb: Table, columns: list[str], ds_regions: Dataset, ds_population: Dataset, regions: list[str]
 ) -> Table:
     """
     Add population-weighted aggregations for the columns in the list
@@ -314,7 +312,7 @@ def add_population_weighted_aggregations(
 
 
 def add_country_counts_and_population_by_status(
-    tb: Table, columns: List[str], ds_regions: Dataset, ds_population: Dataset, regions: List[str]
+    tb: Table, columns: list[str], ds_regions: Dataset, ds_population: Dataset, regions: list[str]
 ) -> Table:
     """
     Add country counts and population by status for the columns in the list

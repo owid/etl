@@ -7,7 +7,7 @@ All these things are done in a single script because the processes are intertwin
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from zipfile import ZipFile
 
 import owid.catalog.processing as pr
@@ -476,7 +476,7 @@ UNITS_MAPPING = {
 
 def extract_metadata_from_xml(file_path):
     # Remove spurious symbols from the XML file (this happens at least to 2024 mcs2024-plati_meta.xml file).
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(file_path, encoding="utf-8") as file:
         content = file.read().replace("&", "&amp;")
 
     root = ET.fromstring(content)
@@ -558,7 +558,7 @@ def extract_data_and_metadata_from_compressed_file(zip_file_path: Path):
     return data_for_year
 
 
-def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int, mineral: str) -> pd.DataFrame:
+def extract_and_clean_data_for_year_and_mineral(data: dict[int, Any], year: int, mineral: str) -> pd.DataFrame:
     d = data[year][mineral]["data"].copy()
     # Remove empty rows and columns.
     d = d.dropna(axis=1, how="all")
@@ -728,7 +728,7 @@ def clean_spurious_values(series: pd.Series) -> pd.Series:
     return series
 
 
-def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional[pd.DataFrame]:
+def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataFrame | None:
     d = d.copy()
     # Select columns related to reserves data.
     columns_reserves = [
@@ -843,7 +843,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional
         return df_reserves
 
 
-def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional[pd.DataFrame]:
+def prepare_production_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataFrame | None:
     d = d.copy()
 
     # Select columns related to production data.
@@ -1020,7 +1020,7 @@ def harmonize(df):
     return df
 
 
-def fix_duplicates(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def fix_duplicates(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     # After harmonization, some countries that appeared with an annotation become the same.
     # This happens to Helium production and reserves, where the US appears as:
     # "United States (from Cliffside Field)" and "United States (extracted from natural gas)".
@@ -1216,7 +1216,7 @@ def clean_notes(notes):
     return notes_clean
 
 
-def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
+def gather_notes(tb: Table, notes_columns: list[str]) -> dict[str, str]:
     # Create another table with the same structure, but containing notes.
     tb_flat_notes = tb.pivot(
         index=["country", "year"],

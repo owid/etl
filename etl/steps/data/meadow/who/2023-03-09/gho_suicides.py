@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     snap: Snapshot = paths.load_dependency("gho_suicides.json")
 
     # Load data from snapshot.
-    with open(snap.path, "r") as f:
+    with open(snap.path) as f:
         data = json.load(f)
     df = pd.DataFrame.from_records(data["value"])
 

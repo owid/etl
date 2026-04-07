@@ -3,7 +3,6 @@
 import tempfile
 from pathlib import Path
 from time import sleep
-from typing import Optional
 from zipfile import ZipFile
 
 import click
@@ -77,7 +76,7 @@ def get_table_of_commodities_and_urls(url_main: str) -> pd.DataFrame:
     return df
 
 
-def _fetch_file_url_from_media_path(media_path: str) -> Optional[str]:
+def _fetch_file_url_from_media_path(media_path: str) -> str | None:
     # The link to the file of some of the commodities lead to a subpage.
     # In those cases, the url is a media path, e.g. "/media/files/aluminum-historical-statistics-data-series-140"
     url = f"https://www.usgs.gov{media_path}"

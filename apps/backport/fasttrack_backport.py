@@ -1,6 +1,6 @@
 import datetime as dt
 import os
-from typing import Optional, cast
+from typing import cast
 
 import gspread
 import pandas as pd
@@ -54,7 +54,7 @@ SHEET_TO_GID = {
 )
 def cli(
     dataset_id: int,
-    short_name: Optional[str] = None,
+    short_name: str | None = None,
     backport: bool = True,
     recreate: bool = False,
 ) -> None:
@@ -192,7 +192,7 @@ def _copy_template(client, spreadsheet_title):
 
 def migrate(
     dataset_id: int,
-    short_name: Optional[str] = None,
+    short_name: str | None = None,
     backport: bool = True,
     recreate: bool = False,
 ) -> None:

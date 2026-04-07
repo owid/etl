@@ -2,12 +2,13 @@
 
 import functools
 import tempfile
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from owid.datautils.web import download_file_from_url
 
 
-def enable_file_download(path_arg_name: Optional[str] = None) -> Callable[[Any], Any]:
+def enable_file_download(path_arg_name: str | None = None) -> Callable[[Any], Any]:
     """Decorator that allows functions expecting local file paths to accept URLs and S3 paths.
 
     This decorator automatically downloads remote files to temporary storage before calling

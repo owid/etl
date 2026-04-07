@@ -2,7 +2,7 @@ import re
 from copy import deepcopy
 from dataclasses import dataclass
 from types import SimpleNamespace
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError, InvalidColorScaleConfigError
 from etl.collection.model.base import MDIMBase, pruned_json
@@ -27,9 +27,9 @@ class ReadOnlyNamespace(SimpleNamespace):
 @pruned_json
 @dataclass
 class CommonView(MDIMBase):
-    dimensions: Dict[str, Any] | None = None
-    config: ViewConfig | Dict[str, Any] | None = None
-    metadata: ViewMetadata | Dict[str, Any] | None = None
+    dimensions: dict[str, Any] | None = None
+    config: ViewConfig | dict[str, Any] | None = None
+    metadata: ViewMetadata | dict[str, Any] | None = None
 
     @property
     def num_dimensions(self) -> int:
@@ -40,7 +40,7 @@ class CommonView(MDIMBase):
 @dataclass
 class Indicator(MDIMBase):
     catalogPath: str
-    display: Dict[str, Any] | None = None
+    display: dict[str, Any] | None = None
 
     def __post_init__(self):
         # Validate that the catalog path is either (i) complete or (ii) in the format table#indicator.
@@ -52,7 +52,7 @@ class Indicator(MDIMBase):
         complete = bool(pattern.match(self.catalogPath))
         return complete
 
-    def update_display(self, display: Dict[str, Any]):
+    def update_display(self, display: dict[str, Any]):
         """Update the display dictionary of the indicator."""
         if self.display is None:
             self.display = {}
@@ -76,7 +76,7 @@ class Indicator(MDIMBase):
                 raise ValueError(f"Invalid catalog path: {value}")
         return super().__setattr__(name, value)
 
-    def expand_path(self, tables_by_name: Dict[str, List[str]]):
+    def expand_path(self, tables_by_name: dict[str, list[str]]):
         # Do nothing if path is already complete
         if self.has_complete_path():
             return self
@@ -109,7 +109,7 @@ class Indicator(MDIMBase):
 class ViewIndicators(MDIMBase):
     """Indicators in a MDIM/Explorer view."""
 
-    y: List[Indicator] | None = None
+    y: list[Indicator] | None = None
     x: Indicator | None = None
     size: Indicator | None = None
     color: Indicator | None = None
@@ -124,7 +124,7 @@ class ViewIndicators(MDIMBase):
         return any([getattr(self, dim, None) is not None for dim in CHART_DIMENSIONS[1:]])
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "ViewIndicators":
+    def from_dict(cls, d: dict[str, Any]) -> "ViewIndicators":
         """Coerce the dictionary into the expected shape before passing it to the parent class."""
         # Make a shallow copy so we don't mutate the user's dictionary in-place
         data = dict(d)
@@ -142,7 +142,7 @@ class ViewIndicators(MDIMBase):
         # Now that data is in the expected shape, let the parent class handle the rest
         return super().from_dict(data)
 
-    def to_records(self) -> List[Dict[str, str | Dict[str, Any]]]:
+    def to_records(self) -> list[dict[str, str | dict[str, Any]]]:
         indicators = []
         for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
@@ -163,7 +163,7 @@ class ViewIndicators(MDIMBase):
                 indicators.append(indicator_)
         return indicators
 
-    def expand_paths(self, tables_by_name: Dict[str, List[str]]):
+    def expand_paths(self, tables_by_name: dict[str, list[str]]):
         """Expand the catalog paths of all indicators in the view."""
         for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
@@ -179,7 +179,7 @@ class ViewIndicators(MDIMBase):
 
     def set_indicator(
         self,
-        y: List[str] | List[Dict[str, Any]] | str | Dict[str, Any] | None = None,
+        y: list[str] | list[dict[str, Any]] | str | dict[str, Any] | None = None,
         x: str | None = None,
         color: str | None = None,
         size: str | None = None,
@@ -213,11 +213,11 @@ class ViewIndicators(MDIMBase):
 class View(MDIMBase):
     """MDIM/Explorer view configuration."""
 
-    dimensions: Dict[str, str]
+    dimensions: dict[str, str]
     indicators: ViewIndicators
     # config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
-    config: ViewConfig | Dict[str, Any] | None = None
-    metadata: ViewMetadata | Dict[str, Any] | None = None
+    config: ViewConfig | dict[str, Any] | None = None
+    metadata: ViewMetadata | dict[str, Any] | None = None
     _is_grouped: bool = False  # Private flag to mark views created by grouping
 
     @property
@@ -273,7 +273,7 @@ class View(MDIMBase):
     def metadata_is_needed(self) -> bool:
         return self.has_multiple_indicators and (self.metadata is None)
 
-    def expand_paths(self, tables_by_name: Dict[str, List[str]]):
+    def expand_paths(self, tables_by_name: dict[str, list[str]]):
         """Expand all indicator paths in the view.
 
         Make sure that they are all complete paths. This includes indicators in view, but also those in config (if any).
@@ -294,7 +294,7 @@ class View(MDIMBase):
 
         return self
 
-    def combine_with_common(self, common_views: List[CommonView], common_has_priority: bool = False):
+    def combine_with_common(self, common_views: list[CommonView], common_has_priority: bool = False):
         """Combine config and metadata fields in view with those specified by definitions.common_views."""
         # Update config
         new_config = merge_common_metadata_by_dimension(
@@ -335,7 +335,7 @@ class View(MDIMBase):
         LOG_BINNING_STRATEGIES = ("log-auto", "log-1-2-5", "log-1-3", "log-10")
 
         # Collect all colorScale configs to validate: top-level and map-level
-        color_scales: List[tuple[str, Dict[str, Any]]] = []
+        color_scales: list[tuple[str, dict[str, Any]]] = []
         if "colorScale" in self.config and isinstance(self.config["colorScale"], dict):
             color_scales.append(("config.colorScale", self.config["colorScale"]))
         if "map" in self.config and isinstance(self.config["map"], dict):
@@ -374,7 +374,7 @@ class View(MDIMBase):
 
             # Update indicators from map.columnSlug
             if ("map" in self.config) and "columnSlug" in self.config["map"]:
-                indicators.append((self.config["map"]["columnSlug"]))
+                indicators.append(self.config["map"]["columnSlug"])
 
         return indicators
 
@@ -430,7 +430,7 @@ class View(MDIMBase):
 
 def merge_common_metadata_by_dimension(
     common_config,
-    view_dimensions: Dict[str, Any],
+    view_dimensions: dict[str, Any],
     view_config,
     field_name: str,
     common_has_priority: bool = False,

@@ -1,7 +1,8 @@
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -23,10 +24,10 @@ from etl.paths import EXPORT_EXPLORER_DIR
 class Explorer(Collection):
     """Model for Explorer configuration."""
 
-    config: Dict[str, Any] = field(default_factory=dict)
+    config: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> Self:
+    def from_dict(cls, d: dict[str, Any]) -> Self:
         """Coerce the dictionary into the expected shape before passing it to the parent class."""
         # Make a shallow copy so we don't mutate the user's dictionary in-place
         data = dict(d)
@@ -90,7 +91,7 @@ class Explorer(Collection):
             mapping[dim.slug] = dix
         return mapping
 
-    def sort_indicators(self, order: List[str] | Callable, indicators_slug: str | None = None):
+    def sort_indicators(self, order: list[str] | Callable, indicators_slug: str | None = None):
         """Sort indicators in all views."""
         if indicators_slug is None:
             indicators_slug = INDICATORS_SLUG
@@ -122,7 +123,7 @@ class Explorer(Collection):
 ###################################################
 def extract_explorers_tables(
     explorer: Explorer,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     1. Obtain `dimensions_display` dictionary. This helps later when remixing the Explorer configuration.
     2. Obtain `tables_by_name`: This helps in expanding the indicator paths if incomplete (e.g. table_name#short_name -> complete URI based on dependencies).
@@ -175,8 +176,8 @@ def extract_explorers_tables(
 
 
 def _extract_explorers_tables(
-    explorer: Explorer, dimensions_display: Dict[str, Any]
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    explorer: Explorer, dimensions_display: dict[str, Any]
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     records_grapher = []
     records_columns = []
     for view in explorer.views:
@@ -232,7 +233,7 @@ def _extract_explorers_tables(
     return df_grapher, df_columns
 
 
-def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: OWIDEnv | None = None) -> Dict[str, str]:
+def get_mapping_paths_to_id(catalog_paths: list[str], owid_env: OWIDEnv | None = None) -> dict[str, str]:
     # Check if given path is actually an ID
     # Get ID, assuming given path is a catalog path
     if owid_env is None:
@@ -394,7 +395,7 @@ def _order_columns(df, columns_widgets):
     return df
 
 
-def _order_explorer_views(df: pd.DataFrame, dimensions_display: Dict[str, Any]) -> pd.DataFrame:
+def _order_explorer_views(df: pd.DataFrame, dimensions_display: dict[str, Any]) -> pd.DataFrame:
     ## Order rows
     for _, properties in dimensions_display.items():
         column = properties["widget_name"]
@@ -411,7 +412,7 @@ def _order_explorer_views(df: pd.DataFrame, dimensions_display: Dict[str, Any]) 
     return df
 
 
-def _set_checkbox_as_boolean(df: pd.DataFrame, dimensions_display: Dict[str, Any]) -> pd.DataFrame:
+def _set_checkbox_as_boolean(df: pd.DataFrame, dimensions_display: dict[str, Any]) -> pd.DataFrame:
     for _, properties in dimensions_display.items():
         if "checkbox_true" in properties:
             column = properties["widget_name"]
@@ -421,7 +422,7 @@ def _set_checkbox_as_boolean(df: pd.DataFrame, dimensions_display: Dict[str, Any
     return df
 
 
-def bake_dimensions_view(dimensions_display: Dict[str, Any], view) -> Dict[str, str]:
+def bake_dimensions_view(dimensions_display: dict[str, Any], view) -> dict[str, str]:
     """Configure dimension details for an Explorer view.
 
     Given is dimension_slug: choice_slug. We need to convert it to dimension_name: choice_name (using dimensions_display).
@@ -438,7 +439,7 @@ def bake_dimensions_view(dimensions_display: Dict[str, Any], view) -> Dict[str, 
     return view_dimensions
 
 
-def bake_indicators_view(indicator_paths) -> Dict[str, List[str]]:
+def bake_indicators_view(indicator_paths) -> dict[str, list[str]]:
     """Configure the indicator details for an Explorer view."""
     # Format them
     indicators = defaultdict(list)

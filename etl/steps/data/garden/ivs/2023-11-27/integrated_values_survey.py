@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 from owid.catalog import Table
 from structlog import get_logger
 from tabulate import tabulate
@@ -292,7 +290,7 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     return tb
 
 
-def replace_dont_know_by_null(tb: Table, questions: List[str], answers: List[str]) -> Table:
+def replace_dont_know_by_null(tb: Table, questions: list[str], answers: list[str]) -> Table:
     """
     Replace empty don't know answers when the rest of the answers is null
     """
@@ -314,9 +312,9 @@ def replace_dont_know_by_null(tb: Table, questions: List[str], answers: List[str
 
 def solve_nulls_values_in_schwartz_questions(
     tb: Table,
-    questions: List[str],
+    questions: list[str],
     main_answer: str,
-    other_answers: List[str],
+    other_answers: list[str],
 ) -> Table:
     """
     Replace null values in Schwartz questions by 0 when the main answer is not null
@@ -471,7 +469,7 @@ def sanity_checks(tb: Table) -> Table:
     return tb
 
 
-def check_sum_100(tb: Table, questions: List[str], answers: List[str], margin: float) -> Table:
+def check_sum_100(tb: Table, questions: list[str], answers: list[str], margin: float) -> Table:
     """
     Check if the sum of the answers is 100
     """

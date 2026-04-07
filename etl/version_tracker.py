@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 import click
 import numpy as np
@@ -52,7 +52,7 @@ class UpdateState(Enum):
     UNUSED = "Not yet used"
 
 
-def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
+def list_all_steps_in_dag(dag: dict[str, Any]) -> list[str]:
     """List all steps in a dag.
 
     Parameters
@@ -71,7 +71,7 @@ def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
     return all_steps
 
 
-def get_direct_step_dependencies(dag: Dict[str, Any], step: str) -> List[str]:
+def get_direct_step_dependencies(dag: dict[str, Any], step: str) -> list[str]:
     """Get direct dependencies of a given step in a dag.
 
     Direct dependencies of a step are those datasets that are listed in the dag as the step's dependencies.
@@ -99,7 +99,7 @@ def get_direct_step_dependencies(dag: Dict[str, Any], step: str) -> List[str]:
     return dependencies
 
 
-def get_direct_step_usages(dag: Dict[str, Any], step: str) -> List[str]:
+def get_direct_step_usages(dag: dict[str, Any], step: str) -> list[str]:
     """Get direct usages of a given step in a dag.
 
     Direct usages of a step are those datasets that have the current step listed in the dag as one of the dependencies.
@@ -123,7 +123,7 @@ def get_direct_step_usages(dag: Dict[str, Any], step: str) -> List[str]:
     return used_by
 
 
-def get_all_step_dependencies(dag: Dict[str, Any], step: str) -> List[str]:
+def get_all_step_dependencies(dag: dict[str, Any], step: str) -> list[str]:
     """Get all dependencies for a given step in a dag.
 
     This function returns all dependencies of a step, as well as their direct dependencies, and so on. In the end, the
@@ -146,7 +146,7 @@ def get_all_step_dependencies(dag: Dict[str, Any], step: str) -> List[str]:
     return dependencies
 
 
-def get_all_step_usages(dag_reverse: Dict[str, Any], step: str) -> List[str]:
+def get_all_step_usages(dag_reverse: dict[str, Any], step: str) -> list[str]:
     """Get all dependencies for a given step in a dag.
 
     This function returns all datasets for which a given step is a dependency, as well as those datasets for which they
@@ -173,7 +173,7 @@ def get_all_step_usages(dag_reverse: Dict[str, Any], step: str) -> List[str]:
     return dependencies
 
 
-def load_steps_for_each_dag_file() -> Dict[str, Dict[str, List[str]]]:
+def load_steps_for_each_dag_file() -> dict[str, dict[str, list[str]]]:
     """Return a dictionary of all ETL (active and archive) dag files, and the steps they contain.
 
     Returns
@@ -188,7 +188,7 @@ def load_steps_for_each_dag_file() -> Dict[str, Dict[str, List[str]]]:
     for dag_file_path in dag_file_paths:
         for dag_file in dag_file_paths[dag_file_path]:
             # Open the current dag file and read its steps.
-            with open(dag_file, "r") as f:
+            with open(dag_file) as f:
                 content = yaml.load(f, Loader=yaml.Loader)["steps"]
                 if content:
                     # Add an entry to the dictionary, with the name of the dag file, and the set of steps it contains.
@@ -197,7 +197,7 @@ def load_steps_for_each_dag_file() -> Dict[str, Dict[str, List[str]]]:
     return dag_file_steps
 
 
-def load_dag_file_for_each_step() -> Dict[str, str]:
+def load_dag_file_for_each_step() -> dict[str, str]:
     """Return a dictionary of all ETL (active and archive) steps and name of their dag file.
 
     Returns
@@ -220,7 +220,7 @@ def load_dag_file_for_each_step() -> Dict[str, str]:
     return dag_file_steps_reverse
 
 
-def _recursive_get_all_step_dependencies(dag: Dict[str, Any], step: str, dependencies: Set[str] = set()) -> Set[str]:
+def _recursive_get_all_step_dependencies(dag: dict[str, Any], step: str, dependencies: set[str] = set()) -> set[str]:
     if step in dag:
         # If step is in the dag, gather all its substeps.
         substeps = dag[step]
@@ -239,8 +239,8 @@ def _recursive_get_all_step_dependencies(dag: Dict[str, Any], step: str, depende
 
 
 def _recursive_get_all_step_dependencies_ndim(
-    dag: Dict[str, Any], step: str, memo: Dict[str, Set[str]]
-) -> Tuple[Set[str], Dict[str, Set[str]]]:
+    dag: dict[str, Any], step: str, memo: dict[str, set[str]]
+) -> tuple[set[str], dict[str, set[str]]]:
     """Optimised version of `_recursive_get_all_step_dependencies` using `memo` to store already computed dependencies."""
     if step in memo:
         # Return already computed dependencies immediately
@@ -325,7 +325,7 @@ class VersionTracker:
         warn_on_archivable: bool = True,
         warn_on_unused: bool = True,
         ignore_archive: bool = False,
-        exclude_steps: Optional[list[str]] = None,
+        exclude_steps: list[str] | None = None,
     ):
         # Load dag of active steps (a dictionary step: set of dependencies).
         self.dag_active = load_dag(paths.DAG_FILE)
@@ -384,13 +384,13 @@ class VersionTracker:
         # This dataframe will have as many rows as entries in the dag.
         self._steps_df = None
 
-    def get_direct_step_dependencies(self, step: str) -> List[str]:
+    def get_direct_step_dependencies(self, step: str) -> list[str]:
         """Get direct dependencies of a given step in the dag."""
         dependencies = get_direct_step_dependencies(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_direct_step_usages(self, step: str) -> List[str]:
+    def get_direct_step_usages(self, step: str) -> list[str]:
         """Get direct usages of a given step in the dag."""
         dependencies = get_direct_step_usages(dag=self.dag_all, step=step)
 
@@ -412,7 +412,7 @@ class VersionTracker:
         direct_usages = [sorted(direct_usages_dict[step]) for step in self.all_steps]
         return direct_usages
 
-    def get_all_step_dependencies(self, step: str, only_active: bool = False) -> List[str]:
+    def get_all_step_dependencies(self, step: str, only_active: bool = False) -> list[str]:
         """Get all dependencies for a given step in the dag (including dependencies of dependencies)."""
         if only_active:
             dependencies = get_all_step_dependencies(dag=self.dag_active, step=step)
@@ -421,7 +421,7 @@ class VersionTracker:
 
         return dependencies
 
-    def get_all_step_usages(self, step: str, only_active: bool = False) -> List[str]:
+    def get_all_step_usages(self, step: str, only_active: bool = False) -> list[str]:
         """Get all usages for a given step in the dag (including usages of usages)."""
         if only_active:
             dependencies = get_all_step_usages(dag_reverse=self.dag_active_reverse, step=step)
@@ -430,7 +430,7 @@ class VersionTracker:
 
         return dependencies
 
-    def get_all_step_usages_ndim(self, only_active: bool = False) -> List[str]:
+    def get_all_step_usages_ndim(self, only_active: bool = False) -> list[str]:
         """Get all usages for a given step in the dag (including usages of usages)."""
         dependencies = []
         memo = {}
@@ -448,19 +448,19 @@ class VersionTracker:
 
         return dependencies
 
-    def get_all_step_versions(self, step: str) -> List[str]:
+    def get_all_step_versions(self, step: str) -> list[str]:
         """Get all versions of a given step in the dag."""
         return self.steps_df[self.steps_df["step"] == step]["same_steps_all"].item()
 
-    def get_forward_step_versions(self, step: str) -> List[str]:
+    def get_forward_step_versions(self, step: str) -> list[str]:
         """Get all forward versions of a given step in the dag."""
         return self.steps_df[self.steps_df["step"] == step]["same_steps_forward"].item()
 
-    def get_backward_step_versions(self, step: str) -> List[str]:
+    def get_backward_step_versions(self, step: str) -> list[str]:
         """Get all backward versions of a given step in the dag."""
         return self.steps_df[self.steps_df["step"] == step]["same_steps_backward"].item()
 
-    def get_all_dependencies_of_active_steps(self) -> List[str]:
+    def get_all_dependencies_of_active_steps(self) -> list[str]:
         """Get all dependencies of active steps in the dag."""
         # Gather all dependencies of active steps in the dag.
         active_dependencies = set()
@@ -478,7 +478,7 @@ class VersionTracker:
 
         return dag_file_name
 
-    def get_path_to_script(self, step: str, omit_base_dir: bool = False) -> Optional[Path]:
+    def get_path_to_script(self, step: str, omit_base_dir: bool = False) -> Path | None:
         """Get the path to the script of a given step."""
         # Get step attributes.
         _, step_type, _, channel, namespace, version, name, _ = extract_step_attributes(step=step).values()
@@ -994,7 +994,7 @@ class VersionTracker:
             elif warning_or_error == "warning":
                 log.warning(error_message)
 
-    def _generate_error_for_missing_dependencies(self, missing_steps: Set[str]) -> str:
+    def _generate_error_for_missing_dependencies(self, missing_steps: set[str]) -> str:
         error_message = "Missing dependencies in the dag:"
         for missing_step in missing_steps:
             error_message += f"\n* Missing step \n    {missing_step}\n  is a dependency of the following active steps:"

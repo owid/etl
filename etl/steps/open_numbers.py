@@ -15,7 +15,7 @@ import tempfile
 import warnings
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Dict, List, Tuple, cast
+from typing import cast
 
 import frictionless
 import pandas as pd
@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
     assert repo.cache_dir.is_dir()
 
     # load it as a frictionless package
-    package = frictionless.Package((repo.cache_dir / "datapackage.json"))
+    package = frictionless.Package(repo.cache_dir / "datapackage.json")
 
     # make an empty dataset
     ds = Dataset.create_empty(dest_dir)
@@ -67,7 +67,7 @@ def add_resource(
     ds: Dataset,
     repo: GithubRepo,
     short_name: str,
-    resources: List[frictionless.Resource],
+    resources: list[frictionless.Resource],
 ) -> None:
     print(f"- {short_name}")
     try:
@@ -111,10 +111,10 @@ def load_table(resource: frictionless.Resource) -> pd.DataFrame:
     return df
 
 
-def load_and_combine(path: Path, resources: List[frictionless.Resource]) -> pd.DataFrame:
+def load_and_combine(path: Path, resources: list[frictionless.Resource]) -> pd.DataFrame:
     first = True
-    primary_key: List[str] = []
-    columns: List[str]
+    primary_key: list[str] = []
+    columns: list[str]
 
     with tempfile.NamedTemporaryFile(suffix=".csv") as f:
         for resource in resources:
@@ -163,8 +163,8 @@ def load_and_combine(path: Path, resources: List[frictionless.Resource]) -> pd.D
 
 
 def remap_names(
-    resources: List[frictionless.Resource],
-) -> Dict[str, frictionless.Resource]:
+    resources: list[frictionless.Resource],
+) -> dict[str, frictionless.Resource]:
     "Short names must be unique, so fix name collisions."
     rows = []
     for resource in resources:
@@ -201,7 +201,7 @@ def remap_names(
     return names
 
 
-def parse_name(name: str) -> Tuple[str, str]:
+def parse_name(name: str) -> tuple[str, str]:
     # ddf files have names like "ddf--datapoints--deaths--by--country--age--year.csv""""
     parts = name[len("ddf--datapoints--") : -4].split("--")
     assert parts[1] == "by"
@@ -214,7 +214,7 @@ def parse_name(name: str) -> Tuple[str, str]:
     return preferred_name, hashed_name
 
 
-def norm_primary_key(primary_key: List[str]) -> List[str]:
+def norm_primary_key(primary_key: list[str]) -> list[str]:
     return [k if k != "global" else "geo" for k in primary_key]
 
 

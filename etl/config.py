@@ -17,7 +17,7 @@ import warnings
 from dataclasses import dataclass, fields
 from os import environ as env
 from pathlib import Path
-from typing import List, Literal, Optional, cast
+from typing import Literal, cast
 from urllib.parse import quote
 
 import git
@@ -163,7 +163,7 @@ if DB_IS_PRODUCTION:
     assert DATA_API_ENV == "production", "DATA_API_ENV must be set to production when publishing to live_grapher"
 
 
-def load_STAGING() -> Optional[str]:
+def load_STAGING() -> str | None:
     # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
 
@@ -670,7 +670,7 @@ class OWIDEnv:
             else:
                 raise ValueError(f"Unsupported engine type {type(self.engine)}")
 
-    def read_sqls(self, sql: List[str], *args, **kwargs) -> List[pd.DataFrame]:
+    def read_sqls(self, sql: list[str], *args, **kwargs) -> list[pd.DataFrame]:
         """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
 
         It can read multiple sql queries, to exploit the same connection and cursor.

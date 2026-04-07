@@ -68,12 +68,12 @@ class _DESAdapter(HTTPAdapter):  # ty: ignore
     def init_poolmanager(self, *args, **kwargs):  # ty: ignore
         context = create_urllib3_context(ciphers=self.ciphers)
         kwargs["ssl_context"] = context
-        return super(_DESAdapter, self).init_poolmanager(*args, **kwargs)
+        return super().init_poolmanager(*args, **kwargs)
 
     def proxy_manager_for(self, *args, **kwargs):  # ty: ignore
         context = create_urllib3_context(ciphers=self.ciphers)
         kwargs["ssl_context"] = context
-        return super(_DESAdapter, self).proxy_manager_for(*args, **kwargs)
+        return super().proxy_manager_for(*args, **kwargs)
 
 
 def download_file_from_url(

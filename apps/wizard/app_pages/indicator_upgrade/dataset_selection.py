@@ -1,6 +1,6 @@
 """Search configuration."""
 
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -64,7 +64,7 @@ def sort_datasets_old(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "SearchConfigForm":
+def build_dataset_form(df: pd.DataFrame, similarity_names: dict[str, Any]) -> "SearchConfigForm":
     """Form to input dataset 1 and dataset 2."""
     if not st.session_state.is_any_migration:
         st.warning(

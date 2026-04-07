@@ -8,7 +8,7 @@ into beautiful, interactive-looking markdown files compatible with Zensical/Mate
 import json
 import re
 import textwrap
-from typing import Any, Dict, List
+from typing import Any
 
 
 def format_description_for_table(description: str) -> str:
@@ -22,7 +22,7 @@ def format_description_for_table(description: str) -> str:
 
     lines = description.strip().split("\n")
     result_parts = []
-    current_list_items: List[str] = []
+    current_list_items: list[str] = []
     in_list = False
 
     def flush_list():
@@ -60,7 +60,7 @@ def format_description_for_table(description: str) -> str:
     return "<br/>".join(result_parts)
 
 
-def format_type(schema: Dict[str, Any]) -> str:
+def format_type(schema: dict[str, Any]) -> str:
     """Format schema type information."""
     if not schema:
         return "any"
@@ -85,7 +85,7 @@ def format_type(schema: Dict[str, Any]) -> str:
     return schema_type
 
 
-def format_constraints(schema: Dict[str, Any]) -> str:
+def format_constraints(schema: dict[str, Any]) -> str:
     """Format schema constraints (min, max, default)."""
     constraints = []
 
@@ -108,7 +108,7 @@ def format_constraints(schema: Dict[str, Any]) -> str:
     return " | ".join(constraints) if constraints else ""
 
 
-def render_parameter_table(parameters: List[Dict[str, Any]]) -> str:
+def render_parameter_table(parameters: list[dict[str, Any]]) -> str:
     """Render parameters as a markdown table."""
     if not parameters:
         return ""
@@ -142,7 +142,7 @@ def render_json_example(example: Any, indent: int = 2) -> str:
     return json.dumps(example, indent=indent, ensure_ascii=False)
 
 
-def build_request_url(base_url: str, path: str, params: Dict[str, Any]) -> str:
+def build_request_url(base_url: str, path: str, params: dict[str, Any]) -> str:
     """Build a complete request URL from base URL, path, and parameters.
 
     Handles both path parameters (e.g., {slug}) and query parameters.
@@ -174,8 +174,8 @@ def build_request_url(base_url: str, path: str, params: Dict[str, Any]) -> str:
 
 
 def generate_code_samples(
-    base_url: str, path: str, params: Dict[str, Any], content_type: str = "application/json"
-) -> Dict[str, str]:
+    base_url: str, path: str, params: dict[str, Any], content_type: str = "application/json"
+) -> dict[str, str]:
     """Generate code samples in multiple languages."""
     request_url = build_request_url(base_url, path, params)
 
@@ -241,7 +241,7 @@ const data = await response.{response_handler};"""
     return samples
 
 
-def render_schema_properties(schema: Dict[str, Any], components: Dict[str, Any]) -> str:
+def render_schema_properties(schema: dict[str, Any], components: dict[str, Any]) -> str:
     """Render schema properties as a table."""
     properties = schema.get("properties", {})
     required_fields = schema.get("required", [])
@@ -296,7 +296,7 @@ def render_schema_properties(schema: Dict[str, Any], components: Dict[str, Any])
     return "\n".join(lines)
 
 
-def extract_params_from_example(example_data: Dict[str, Any]) -> Dict[str, Any]:
+def extract_params_from_example(example_data: dict[str, Any]) -> dict[str, Any]:
     """Extract request parameters from example data.
 
     First checks for x-request-params field, then falls back to inferring from response value.
@@ -315,13 +315,13 @@ def extract_params_from_example(example_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def render_example_content(
-    example_data: Dict[str, Any],
+    example_data: dict[str, Any],
     base_url: str,
     path: str,
     content_type: str,
-    content_schema: Dict[str, Any],
+    content_schema: dict[str, Any],
     indent: str = "    ",
-) -> List[str]:
+) -> list[str]:
     """Render the content for a single example (request URL, code samples, response).
 
     Args:
@@ -416,7 +416,7 @@ def render_example_content(
 
 
 def render_endpoint(
-    path: str, method: str, operation: Dict[str, Any], components: Dict[str, Any], base_url: str = ""
+    path: str, method: str, operation: dict[str, Any], components: dict[str, Any], base_url: str = ""
 ) -> str:
     """Render a single API endpoint."""
     lines = []
@@ -570,7 +570,7 @@ def render_endpoint(
     return "\n".join(lines)
 
 
-def render_schema(schema_name: str, schema: Dict[str, Any], components: Dict[str, Any]) -> str:
+def render_schema(schema_name: str, schema: dict[str, Any], components: dict[str, Any]) -> str:
     """Render a schema definition."""
     lines = []
 
@@ -598,7 +598,7 @@ def render_schema(schema_name: str, schema: Dict[str, Any], components: Dict[str
     return "\n".join(lines)
 
 
-def generate_markdown(spec: Dict[str, Any], interactive_docs_url: str | None = None) -> str:
+def generate_markdown(spec: dict[str, Any], interactive_docs_url: str | None = None) -> str:
     """Generate complete markdown documentation from OpenAPI spec.
 
     Args:

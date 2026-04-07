@@ -19,7 +19,7 @@ Notes:
             5 = Americas (GWNo: 2-199)
 """
 
-from typing import List, Optional, cast
+from typing import cast
 
 import geopandas as gpd
 import numpy as np
@@ -135,7 +135,7 @@ def _sanity_checks(ds: Dataset) -> None:
         tb_type: Table,
         death_col: str,
         type_of_violence: int,
-        conflict_ids_errors: Optional[List[int]] = None,
+        conflict_ids_errors: list[int] | None = None,
     ):
         ERR_THRESHOLD = 0.015
 
@@ -211,9 +211,9 @@ def run_pipeline(
     ds_population: Dataset,
     num_missing_location: int,
     last_year: int,
-    last_year_preview: Optional[int] = None,
-    short_name: Optional[str] = None,
-) -> List[Table]:
+    last_year_preview: int | None = None,
+    short_name: str | None = None,
+) -> list[Table]:
     # Sanity checks (2)
     assert tb_conflict["year"].max() == last_year, (
         f"Unexpected max year in `ucdp_battle_related_conflict` ({tb_conflict['year'].max()})!"
@@ -827,7 +827,7 @@ def estimate_metrics_locations(
     ###################
     paths.log.info("estimating number of locations with conflict...")
 
-    def _get_number_of_locations_with_conflict_regions(tb: Table, cols: List[str]) -> Table:
+    def _get_number_of_locations_with_conflict_regions(tb: Table, cols: list[str]) -> Table:
         """Get number of locations with conflict."""
         # For each group, get the number of unique locations
         tb = (
@@ -1025,7 +1025,7 @@ def _add_missing_values(
 
 
 # Sanity checks
-def _sanity_check_conflict_types(tb: Table, until_year: Optional[int] = None):
+def _sanity_check_conflict_types(tb: Table, until_year: int | None = None):
     """Check conflict type.
 
     - Only transitions accepted are between intrastate conflicts.
@@ -1492,7 +1492,7 @@ def merge_country_and_region_data(tb: Table, tb_locations: Table) -> Table:
         # Number of ongoing conflicts
         "number_ongoing_conflicts": "number_ongoing_conflicts",
     }
-    col_names = list((cols_rename.keys()))
+    col_names = list(cols_rename.keys())
     tb_locations_ = tb_locations.copy().loc[:, col_names].rename(columns=cols_rename)
     ## Remove all-NA rows
     cols_index = ["year", "region", "conflict_type"]

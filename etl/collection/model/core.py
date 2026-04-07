@@ -4,10 +4,11 @@ import inspect
 import json
 import re
 from collections import defaultdict
+from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, cast
+from typing import Any, cast
 
 import fastjsonschema
 import pandas as pd

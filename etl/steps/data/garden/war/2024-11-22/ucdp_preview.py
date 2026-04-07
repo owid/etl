@@ -25,7 +25,6 @@ Notes:
 """
 
 from datetime import datetime
-from typing import List, Optional
 
 import geopandas as gpd
 import numpy as np
@@ -269,7 +268,7 @@ def _sanity_checks(ds: Dataset) -> None:
         tb_type: Table,
         death_col: str,
         type_of_violence: int,
-        conflict_ids_errors: Optional[List[int]] = None,
+        conflict_ids_errors: list[int] | None = None,
     ):
         ERR_THRESHOLD = 0.015
 
@@ -1202,7 +1201,7 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     ###################
     paths.log.info("estimating number of locations with conflict...")
 
-    def _get_number_of_locations_with_conflict_regions(tb: Table, cols: List[str]) -> Table:
+    def _get_number_of_locations_with_conflict_regions(tb: Table, cols: list[str]) -> Table:
         """Get number of locations with conflict."""
         # For each group, get the number of unique locations
         tb = (

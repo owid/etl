@@ -704,11 +704,11 @@ class TableMeta(MetaBase):
         # Render a nice display of the table metadata
         record = self.to_dict()
         short_name = record.pop("short_name")
-        return """
-             <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
+        return f"""
+             <h2 style="margin-bottom: 0em"><pre>{short_name}</pre></h2>
              <p style="font-variant: small-caps; font-family: sans-serif; font-size: 1.5em; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">table meta</p>
-             {}
-        """.format(short_name, to_html(record))
+             {to_html(record)}
+        """
 
     @property
     def uri(self) -> str:
@@ -727,9 +727,7 @@ def to_html(record: Any) -> str | None:
                 continue
             v_str = to_html(v)
             rows.append(
-                """<tr><th style="text-align: right; font-family: sans-serif; vertical-align: top; padding: 0.2em 1em;"><strong>{}</strong></th><td style="text-align: left; padding: 0.2em 1em;">{}</td></tr>""".format(
-                    k, v_str
-                )
+                f"""<tr><th style="text-align: right; font-family: sans-serif; vertical-align: top; padding: 0.2em 1em;"><strong>{k}</strong></th><td style="text-align: left; padding: 0.2em 1em;">{v_str}</td></tr>"""
             )
         return '<table style="margin: 0em"><tbody>{}</tbody></table>'.format("".join(rows))
 

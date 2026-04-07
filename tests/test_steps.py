@@ -12,9 +12,9 @@ import shutil
 import string
 import sys
 import tempfile
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator
 from unittest.mock import patch
 
 import pandas as pd

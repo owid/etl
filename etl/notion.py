@@ -1,7 +1,7 @@
 """Helper functions for reading data from Notion."""
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 import requests
@@ -38,7 +38,7 @@ class NotionClient:
             "Notion-Version": NOTION_API_VERSION,
         }
 
-    def get_database(self, database_id: str, page_size: int = 100, max_rows: Optional[int] = None) -> Dict[str, Any]:
+    def get_database(self, database_id: str, page_size: int = 100, max_rows: int | None = None) -> dict[str, Any]:
         """
         Fetch all data from a Notion database.
 
@@ -98,7 +98,7 @@ class NotionClient:
 
         return database_results
 
-    def _parse_property(self, prop_data: Dict[str, Any]) -> Any:
+    def _parse_property(self, prop_data: dict[str, Any]) -> Any:
         """Parse a Notion property based on its type."""
         prop_type = prop_data["type"]
 
@@ -146,7 +146,7 @@ class NotionClient:
             return str(prop_data)
 
     def database_to_dataframe(
-        self, database_id: str, include_row_urls: bool = True, max_rows: Optional[int] = None
+        self, database_id: str, include_row_urls: bool = True, max_rows: int | None = None
     ) -> pd.DataFrame:
         """
         Convert a Notion database to a pandas DataFrame.
@@ -196,7 +196,7 @@ class NotionClient:
 
 
 def get_table_from_notion_url(
-    notion_url: str, include_row_urls: bool = False, max_rows: Optional[int] = None
+    notion_url: str, include_row_urls: bool = False, max_rows: int | None = None
 ) -> pd.DataFrame:
     """Create a dataframe from a table in a Notion page."""
     client = NotionClient()
@@ -207,10 +207,10 @@ def get_table_from_notion_url(
 
 
 def get_impact_highlights(
-    producers: Optional[List[str]] = None,
+    producers: list[str] | None = None,
     min_date: str = NOTION_IMPACT_HIGHLIGHTS_MIN_DATE,
     max_date: str = NOTION_IMPACT_HIGHLIGHTS_MAX_DATE,
-    max_rows: Optional[int] = None,
+    max_rows: int | None = None,
 ) -> pd.DataFrame:
     # Name of column of related data producers.
     producer_col = "Data provider(s) related"
@@ -241,7 +241,7 @@ def get_impact_highlights(
     return df
 
 
-def get_data_producer_contacts(producers: Optional[List[str]] = None) -> pd.DataFrame:
+def get_data_producer_contacts(producers: list[str] | None = None) -> pd.DataFrame:
     # Fetch data providers contacts table from Notion.
     df = get_table_from_notion_url(notion_url=NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL)  # ty: ignore
 

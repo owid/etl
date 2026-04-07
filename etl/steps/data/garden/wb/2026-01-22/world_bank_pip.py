@@ -8,8 +8,6 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 
 """
 
-from typing import List, Tuple
-
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
@@ -500,7 +498,7 @@ def identify_rural_urban(tb: Table) -> Table:
     return tb
 
 
-def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
+def create_stacked_variables(tb: Table) -> tuple[Table, list, list]:
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
@@ -632,7 +630,7 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     return tb
 
 
-def pivot_table(tb: Table, index: List[str], columns: List[str], join_column_levels_with: str | None = None) -> Table:
+def pivot_table(tb: Table, index: list[str], columns: list[str], join_column_levels_with: str | None = None) -> Table:
     """
     Pivot the table to calculate indicators more easily
     """
@@ -644,7 +642,7 @@ def pivot_table(tb: Table, index: List[str], columns: List[str], join_column_lev
     return tb_pivot
 
 
-def unpivot_table(tb: Table, index: List[str], level: List[str]) -> Table:
+def unpivot_table(tb: Table, index: list[str], level: list[str]) -> Table:
     """
     Unpivot table, using set_index and stack
     """
@@ -960,7 +958,7 @@ def sanity_checks(
     return tb
 
 
-def inc_or_cons_data(tb: Table, dimensions: List[str]) -> Tuple[Table, Table, Table]:
+def inc_or_cons_data(tb: Table, dimensions: list[str]) -> tuple[Table, Table, Table]:
     """
     Separate income and consumption data
     """
@@ -1031,7 +1029,7 @@ def inc_or_cons_data(tb: Table, dimensions: List[str]) -> Tuple[Table, Table, Ta
     return tb, tb_no_spells, tb_no_spells_smooth
 
 
-def create_smooth_inc_cons_series(tb: Table, dimensions: List[str]) -> Table:
+def create_smooth_inc_cons_series(tb: Table, dimensions: list[str]) -> Table:
     """
     Construct an income and consumption series that is a combination of the two.
     """
@@ -1485,7 +1483,7 @@ def survey_count(tb: Table) -> Table:
     return tb_survey
 
 
-def make_distributional_indicators_long(tb: Table) -> Tuple[Table, Table]:
+def make_distributional_indicators_long(tb: Table) -> tuple[Table, Table]:
     """
     Convert decile1, ..., decile10 and decile1_thr, ..., decile9_thr to a long format.
     """
@@ -1666,7 +1664,7 @@ def make_relative_poverty_long(tb: Table) -> Table:
     return tb
 
 
-def separate_rest_of_tables(tb: Table) -> Tuple[Table, Table, Table, Table]:
+def separate_rest_of_tables(tb: Table) -> tuple[Table, Table, Table, Table]:
     """
     Separate the tables for a clearer dimensionality between them
     From tb, I produce tb_inequality, tb_cpi and tb_rest (the latter depending on PPPs)
@@ -1706,7 +1704,7 @@ def separate_rest_of_tables(tb: Table) -> Tuple[Table, Table, Table, Table]:
     return tb, tb_inequality, tb_cpi, tb_rest  # ty: ignore
 
 
-def separate_filled_and_unfilled_data(tb: Table) -> Tuple[Table, Table]:
+def separate_filled_and_unfilled_data(tb: Table) -> tuple[Table, Table]:
     """
     Separate filled and unfilled data.
 
@@ -1720,7 +1718,7 @@ def separate_filled_and_unfilled_data(tb: Table) -> Tuple[Table, Table]:
     return tb_filled, tb_unfilled
 
 
-def concatenate_and_fill_empty_spells(tb_list: List[Table], add_no_spells: bool) -> Table:
+def concatenate_and_fill_empty_spells(tb_list: list[Table], add_no_spells: bool) -> Table:
     """
     Concatenate smooth table with the rest of the data and fill empty spells in the filled data.
     """

@@ -46,7 +46,7 @@ import hashlib
 import os
 import re
 import uuid
-from typing import Optional, cast
+from typing import cast
 
 import click
 import questionary
@@ -141,9 +141,9 @@ MODEL_DEFAULT = "gpt-5-mini"
 )
 def cli(
     title: str,
-    category: Optional[str],
-    scope: Optional[str],
-    work_branch: Optional[str],
+    category: str | None,
+    scope: str | None,
+    work_branch: str | None,
     base_branch: str,
     direct: bool,
     private: bool,
@@ -212,7 +212,7 @@ def _validate_title(title):
         raise click.ClickException("Invalid title! Use at least one word!")
 
 
-def ensure_category(category: Optional[str]):
+def ensure_category(category: str | None):
     """Get category if not provided."""
     if category is None:
         # show suggestions
@@ -340,7 +340,7 @@ def create_pr(repo, work_branch, base_branch, pr_title):
         raise click.ClickException(f"Failed to create draft pull request:\n{response.json()}")
 
 
-def _generate_pr_title(title: str, category: str, scope: str | None) -> Optional[str]:
+def _generate_pr_title(title: str, category: str, scope: str | None) -> str | None:
     """Generate the PR title.
 
     title + category + scope -> 'category scope: title'

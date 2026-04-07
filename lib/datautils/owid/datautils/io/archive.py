@@ -3,7 +3,7 @@
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Union, cast
+from typing import cast
 
 from py7zr import SevenZipFile
 
@@ -12,8 +12,8 @@ from owid.datautils.decorators import enable_file_download
 
 @enable_file_download(path_arg_name="input_file")
 def decompress_file(
-    input_file: Union[str, Path],
-    output_folder: Union[str, Path],
+    input_file: str | Path,
+    output_folder: str | Path,
     overwrite: bool = False,
 ) -> None:
     """Extract a zip or tar file.
@@ -41,8 +41,8 @@ def decompress_file(
 
 
 def _decompress_zip_file(
-    input_file: Union[str, Path],
-    output_folder: Union[str, Path],
+    input_file: str | Path,
+    output_folder: str | Path,
     overwrite: bool = False,
 ) -> None:
     """Unpack zip file."""
@@ -61,8 +61,8 @@ def _decompress_zip_file(
 
 
 def _decompress_tar_file(
-    input_file: Union[str, Path],
-    output_folder: Union[str, Path],
+    input_file: str | Path,
+    output_folder: str | Path,
     overwrite: bool = False,
 ) -> None:
     """Unpack tar file."""

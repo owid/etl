@@ -8,7 +8,7 @@ import datetime as dt
 import json
 import urllib.error
 import urllib.parse
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -39,7 +39,7 @@ SHEET_TO_GID = {
 }
 
 
-def load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
+def load_existing_sheets_from_snapshots() -> list[dict[str, str]]:
     """Load available sheets from local environment."""
     # get all fasttrack snapshots
     metas = [SnapshotMeta.load_from_yaml(path) for path in (SNAPSHOTS_DIR / "fasttrack").rglob("*.dvc")]
@@ -183,8 +183,8 @@ def parse_data_from_csv(csv_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def parse_metadata_from_csv(
-    filename: str, columns: List[str]
-) -> Tuple[DatasetMeta, Dict[str, VariableMeta], Optional[Origin]]:
+    filename: str, columns: list[str]
+) -> tuple[DatasetMeta, dict[str, VariableMeta], Origin | None]:
     filename = filename.replace(".csv", "")
     title = f"DRAFT {filename}"
     dataset_dict: dict[str, Any] = {
@@ -231,7 +231,7 @@ def _fetch_url_or_empty_dataframe(url, **kwargs):
         return pd.DataFrame()
 
 
-def import_google_sheets(url: str) -> Dict[str, Any]:
+def import_google_sheets(url: str) -> dict[str, Any]:
     # read dataset first to check if we're using data_url instead of data sheet
     dataset_meta = pd.read_csv(f"{url}&gid={SHEET_TO_GID['dataset_meta']}", header=None)
     data_url = _get_data_url(dataset_meta, url)
@@ -287,7 +287,7 @@ def _is_valid_date(series: pd.Series) -> bool:
     return bool(converted.notna().all())
 
 
-def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
+def _parse_sources(sources_meta_df: pd.DataFrame) -> Source | None:
     if sources_meta_df.empty:
         return None
 
@@ -313,7 +313,7 @@ def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
     return Source(**source)  # ty: ignore[call-non-callable]
 
 
-def _parse_origins(origins_meta_df: pd.DataFrame) -> Optional[Origin]:
+def _parse_origins(origins_meta_df: pd.DataFrame) -> Origin | None:
     if origins_meta_df.empty:
         return None
 
@@ -363,7 +363,7 @@ def _parse_dataset(dataset_meta_df: pd.DataFrame) -> DatasetMeta:
     return dataset_meta
 
 
-def _parse_variables(variables_meta_df: pd.DataFrame) -> Dict[str, VariableMeta]:
+def _parse_variables(variables_meta_df: pd.DataFrame) -> dict[str, VariableMeta]:
     variables_meta_df = variables_meta_df.dropna(subset=["short_name"])
 
     variables_list = [_prune_empty(v) for v in variables_meta_df.to_dict(orient="records")]  # ty: ignore
@@ -399,7 +399,7 @@ def parse_metadata_from_sheets(
     variables_meta_df: pd.DataFrame,
     sources_meta_df: pd.DataFrame,
     origins_meta_df: pd.DataFrame,
-) -> Tuple[DatasetMeta, Dict[str, VariableMeta], Optional[Origin]]:
+) -> tuple[DatasetMeta, dict[str, VariableMeta], Origin | None]:
     source = _parse_sources(sources_meta_df)
     origin = _parse_origins(origins_meta_df)
     dataset_meta = _parse_dataset(dataset_meta_df)
@@ -415,7 +415,7 @@ def parse_metadata_from_sheets(
     return dataset_meta, variables_meta_dict, origin
 
 
-def _prune_empty(d: Dict[str, Any]) -> Dict[str, Any]:
+def _prune_empty(d: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in d.items() if v is not None and v != "" and not pd.isnull(v)}
 
 

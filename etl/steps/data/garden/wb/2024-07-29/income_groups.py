@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
@@ -162,10 +160,10 @@ def harmonize_income_group_labels(tb: Table) -> Table:
 
 def add_country_counts_and_population_by_status(
     tb: Table,
-    columns: List[str],
+    columns: list[str],
     ds_regions: Dataset,
     ds_population: Dataset,
-    regions: List[str],
+    regions: list[str],
     missing_data_on_columns: bool = False,
 ) -> Table:
     """
@@ -251,7 +249,7 @@ def add_country_counts_and_population_by_status(
     return tb
 
 
-def assign_french_overseas_group_same_as_france(tb: Table, list_of_territories: List[str]) -> Table:
+def assign_french_overseas_group_same_as_france(tb: Table, list_of_territories: list[str]) -> Table:
     """
     Assign the same income group as France to the French overseas territories.
     """

@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, cast
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -54,8 +55,8 @@ REGIONS = {
 
 def from_wide_to_long(
     tb: Table,
-    indicator_name_callback: Optional[Callable] = None,
-    indicator_category_callback: Optional[Callable] = None,
+    indicator_name_callback: Callable | None = None,
+    indicator_category_callback: Callable | None = None,
     column_dimension_name: str = "category",
     separator: str = SEPARATOR,
 ) -> Table:
@@ -117,7 +118,7 @@ def from_wide_to_long(
     return tb_
 
 
-def expand_observations(tb: Table, regions: Set | None = None) -> Table:
+def expand_observations(tb: Table, regions: set | None = None) -> Table:
     """Expand to have a row per (year, country)."""
     # Add missing years for each triplet ("warcode", "campcode", "ccode")
 
@@ -142,7 +143,7 @@ def expand_observations(tb: Table, regions: Set | None = None) -> Table:
 def add_population_in_dummies(
     tb: Table,
     ds_population: Dataset,
-    expected_countries_without_population: Optional[List[str]] = None,
+    expected_countries_without_population: list[str] | None = None,
     drop_population: bool = True,
 ):
     # Add population column
@@ -171,7 +172,7 @@ def add_population_in_dummies(
 
 def make_table_with_dummies(
     tb: Table,
-    indicators: List[Dict[str, Any]],
+    indicators: list[dict[str, Any]],
     separator: str = SEPARATOR,
 ) -> Table:
     """Format table to have dummy indicators.
@@ -285,10 +286,10 @@ def make_table_with_dummies(
 def add_regions_and_global_aggregates(
     tb: Table,
     ds_regions: Dataset,
-    regions: Optional[Dict[str, Any]] = None,
-    aggregations: Optional[Dict[str, str]] = None,
-    min_num_values_per_year: Optional[int] = None,
-    aggregations_world: Optional[Dict[str, str]] = None,
+    regions: dict[str, Any] | None = None,
+    aggregations: dict[str, str] | None = None,
+    min_num_values_per_year: int | None = None,
+    aggregations_world: dict[str, str] | None = None,
     short_name: str = "region_counts",
 ) -> Table:
     """Add regions, and world aggregates."""
@@ -321,7 +322,7 @@ def add_regions_and_global_aggregates(
 
 def add_count_years_in_regime(
     tb: Table,
-    columns: List[Tuple[str, str, int]],
+    columns: list[tuple[str, str, int]],
     na_is_zero: bool = False,
 ) -> Table:
     """Add years in a certain regime.
@@ -370,8 +371,8 @@ def add_age_groups(
     column: str,
     column_raw: str,
     threshold: int,
-    category_names: Dict[Any, str],
-    age_bins: List[int | float] | None = None,
+    category_names: dict[Any, str],
+    age_bins: list[int | float] | None = None,
 ) -> Table:
     """Create category for `column`."""
     column_new = f"group_{column}"
@@ -406,7 +407,7 @@ def add_age_groups(
 def add_imputes(
     tb: Table,
     path: Path,
-    cols_verify: List[str] | None = None,
+    cols_verify: list[str] | None = None,
     col_flag_imputed: str | None = None,
     verify_integrity: bool = True,
 ) -> Table:

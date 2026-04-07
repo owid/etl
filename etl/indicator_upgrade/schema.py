@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Dict, Optional
+from typing import Any
 
 from jsonschema import Draft202012Validator, validate, validators
 from structlog import get_logger
@@ -10,15 +10,15 @@ from etl.files import get_schema_from_url
 log = get_logger()
 
 
-def validate_chart_config(config: Dict[str, Any]) -> None:
+def validate_chart_config(config: dict[str, Any]) -> None:
     """Validate the schema of a chart configuration."""
     schema = get_schema_from_url(config["$schema"])
     validate(config, schema)
 
 
 def validate_chart_config_and_set_defaults(
-    config: Dict[str, Any], schema: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
+    config: dict[str, Any], schema: dict[str, Any] | None = None
+) -> dict[str, Any]:
     """Add properties with default values to a config file, if they are not present.
 
     Parameters
@@ -43,13 +43,12 @@ def validate_chart_config_and_set_defaults(
                 if "default" in subschema:
                     instance.setdefault(property, subschema["default"])
 
-            for error in validate_properties(
+            yield from validate_properties(
                 validator,
                 properties,
                 instance,
                 schema,
-            ):
-                yield error
+            )
 
         return validators.extend(
             validator_class,
@@ -90,7 +89,7 @@ def validate_chart_config_and_set_defaults(
     return config_new
 
 
-def fix_errors_in_schema(config: Dict[str, Any]) -> Dict[str, Any]:
+def fix_errors_in_schema(config: dict[str, Any]) -> dict[str, Any]:
     """Fix common errors in schema and tries to catch up with latest schema version."""
     config_new = copy.deepcopy(config)
     if "map" in config_new:
@@ -103,8 +102,8 @@ def fix_errors_in_schema(config: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def validate_chart_config_and_remove_defaults(
-    config: Dict[str, Any], schema: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
+    config: dict[str, Any], schema: dict[str, Any] | None = None
+) -> dict[str, Any]:
     """Remove properties with values equal to their defaults from schema.
 
     Parameters
@@ -131,13 +130,12 @@ def validate_chart_config_and_remove_defaults(
                     if not is_required and subschema["default"] == instance[property]:
                         del instance[property]
 
-            for error in validate_properties(
+            yield from validate_properties(
                 validator,
                 properties,
                 instance,
                 schema,
-            ):
-                yield error
+            )
 
         return validators.extend(
             validator_class,

@@ -6,10 +6,10 @@
 import concurrent.futures
 import re
 import sys
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from http.client import IncompleteRead
 from pathlib import Path
-from typing import Any, Dict, Iterator, Optional, cast
+from typing import Any, cast
 from urllib.error import HTTPError
 
 import pandas as pd
@@ -98,7 +98,7 @@ def sanity_checks(catalog: Path, channel: CHANNEL) -> None:
 
 
 def sync_catalog_to_s3(
-    bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False, private_bucket: Optional[str] = None
+    bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False, private_bucket: str | None = None
 ) -> None:
     s3 = connect_r2()
     if is_catalog_up_to_date(s3, bucket, catalog, channel):
@@ -128,7 +128,7 @@ def sync_datasets(
     channel: CHANNEL,
     delete_datasets: bool = False,
     dry_run: bool = False,
-    private_bucket: Optional[str] = None,
+    private_bucket: str | None = None,
 ) -> None:
     """Go dataset by dataset and check if each one needs updating.
     :param delete_datasets: if True, delete datasets from S3 that are not in the local catalog
@@ -185,7 +185,7 @@ def sync_folder(
     dest_path: str,
     delete: bool = True,
     public: bool = True,
-    private_bucket: Optional[str] = None,
+    private_bucket: str | None = None,
 ) -> None:
     """
     Perform a content-based sync of a local folder with a "folder" on an S3 bucket,
@@ -201,7 +201,7 @@ def sync_folder(
 
     # For private datasets, we need to check both buckets for existing files
     existing = {o["Key"]: object_md5(s3, bucket, o["Key"], o) for o in walk_s3(s3, bucket, dest_path)}
-    existing_private: Dict[str, Optional[str]] = {}
+    existing_private: dict[str, str | None] = {}
     if private_bucket and not public:
         existing_private = {
             o["Key"]: object_md5(s3, private_bucket, o["Key"], o) for o in walk_s3(s3, private_bucket, dest_path)
@@ -229,7 +229,7 @@ def sync_folder(
             if checksum != existing_checksum:
                 bucket_label = f"[{target_bucket}]" if target_bucket != bucket else ""
                 print(f"  PUT {rel_filename} {bucket_label}")
-                ExtraArgs: Dict[str, Any] = {"Metadata": {"md5": checksum}}
+                ExtraArgs: dict[str, Any] = {"Metadata": {"md5": checksum}}
                 # Only set public-read ACL for files going to public bucket
                 if target_bucket == bucket:
                     ExtraArgs["ACL"] = "public-read"
@@ -283,18 +283,18 @@ def sync_folder(
         concurrent.futures.wait(futures)
 
 
-def object_md5(s3: Any, bucket: str, key: str, obj: Dict[str, Any]) -> Optional[str]:
+def object_md5(s3: Any, bucket: str, key: str, obj: dict[str, Any]) -> str | None:
     maybe_md5 = obj["ETag"].strip('"')
     if re.match("^[0-9a-f]{32}$", maybe_md5):
         return cast(str, maybe_md5)
 
     return cast(
-        Optional[str],
+        str | None,
         s3.head_object(Bucket=bucket, Key=key).get("Metadata", {}).get("md5"),
     )
 
 
-def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[Dict[str, Any]]:
+def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[dict[str, Any]]:
     objs = s3.list_objects(Bucket=bucket, Prefix=path, MaxKeys=100)
     yield from objs.get("Contents", [])
 
@@ -339,7 +339,7 @@ def update_catalog(s3: Any, bucket: str, catalog: Path, channel: CHANNEL) -> Non
     )
 
 
-def get_published_checksums(bucket: str, channel: CHANNEL) -> Dict[str, str]:
+def get_published_checksums(bucket: str, channel: CHANNEL) -> dict[str, str]:
     "Get the checksum of every dataset that's been published."
     format = INDEX_FORMATS[0]
     uri = f"https://{bucket.replace('owid-', '')}.owid.io/{_channel_path(channel, format)}"
@@ -353,10 +353,10 @@ def get_published_checksums(bucket: str, channel: CHANNEL) -> Dict[str, str]:
         print(f"ERROR: error when reading {uri}: {e}", file=sys.stderr)
         raise e
 
-    return cast(Dict[str, str], existing)
+    return cast(dict[str, str], existing)
 
 
-def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
+def get_remote_checksum(s3: Any, bucket: str, path: str) -> str | None:
     try:
         obj = s3.head_object(Bucket=bucket, Key=path)
     except ClientError as e:

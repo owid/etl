@@ -1,8 +1,6 @@
 # NOTE: After December 2024 update, check the steps in `remove_jumps_in_the_data_and_unneeded_cols`
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
@@ -290,7 +288,7 @@ def run() -> None:
 
 
 def reformat_table_and_make_it_wide(
-    tb: Table, short_name: str, columns_in_current_prices: List[str], recipient_or_donor: str
+    tb: Table, short_name: str, columns_in_current_prices: list[str], recipient_or_donor: str
 ) -> Table:
     """
     Filter the categories we want, reformat the category names, change units and make table wide.
@@ -341,7 +339,7 @@ def reformat_table_and_make_it_wide(
     return tb
 
 
-def create_indicators_per_capita(tb: Table, indicator_list: List[str]) -> Table:
+def create_indicators_per_capita(tb: Table, indicator_list: list[str]) -> Table:
     """
     Create indicators per capita for ODA (flows and grant equivalent).
     This function uses the population data from the OECD Data Explorer.
@@ -356,7 +354,7 @@ def create_indicators_per_capita(tb: Table, indicator_list: List[str]) -> Table:
     return tb
 
 
-def create_indicators_as_share_of_gni(tb: Table, indicator_list: List[str]) -> Table:
+def create_indicators_as_share_of_gni(tb: Table, indicator_list: list[str]) -> Table:
     """
     Create indicators as share of GNI for ODA (flows and grant equivalent).
     I do this because the official figures for net disbursements end in 2017 and the grant equivalents continue from 2018.
@@ -489,7 +487,7 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     return tb
 
 
-def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List[str], ds_population: Dataset) -> Table:
+def create_indicators_per_capita_owid_population(tb: Table, indicator_list: list[str], ds_population: Dataset) -> Table:
     """
     Create indicators per capita for the recipient indicators.
     The per capita values available in the OECD Data Explorer are in current prices, so we want to use the constant values.
@@ -623,7 +621,7 @@ def combine_net_and_grant_equivalents(tb: Table) -> Table:
     return tb
 
 
-def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: List[str]) -> Table:
+def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: list[str]) -> Table:
     """
     Divide some of the ODA components by the total ODA to get the share of each component.
     Add also the total of these components, together with the difference (aid overseas).

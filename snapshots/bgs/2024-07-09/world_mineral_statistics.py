@@ -9,7 +9,6 @@ import json
 import time
 import zipfile
 from pathlib import Path
-from typing import Dict, List
 
 import click
 import requests
@@ -32,7 +31,7 @@ URL_BASE = "https://www2.bgs.ac.uk/mineralsuk/statistics/wms.cfc"
 TIME_BETWEEN_QUERIES = 0.1
 
 
-def fetch_raw_data(data_types: List[str], years: List[int], commodity_to_id: Dict[str, int]):
+def fetch_raw_data(data_types: list[str], years: list[int], commodity_to_id: dict[str, int]):
     # To load data for all countries we can set "country=" in the query.
     # Queries need to be in groups of maximum 10 years.
     # Example query:

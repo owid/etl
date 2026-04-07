@@ -20,7 +20,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 json_file_path = os.path.join(os.getcwd(), f"snapshots/cardiovascular_diseases/{SNAPSHOT_VERSION}/esc_links.json")
 
 # Open the JSON file to get the dictionary with names and links of the ESC datasets
-with open(json_file_path, "r") as json_file:
+with open(json_file_path) as json_file:
     # Use json.load() to load the contents of the file into a Python dictionary
     HTML_DICTIONARY = json.load(json_file)
 

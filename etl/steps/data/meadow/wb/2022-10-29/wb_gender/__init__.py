@@ -3,7 +3,7 @@
 import re
 import tempfile
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Any
 
 import pandas as pd
 import structlog
@@ -46,7 +46,7 @@ METADATA_VARIABLES_FILENAME = "Gender_StatsSeries.csv"
 METADATA_COUNTRIES_FILENAME = "Gender_StatsCountry.csv"
 
 
-def load_data_from_walden(walden_ds: walden.Catalog) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def load_data_from_walden(walden_ds: walden.Catalog) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Load data and metadata."""
     # Get Walden dataset
     with tempfile.TemporaryDirectory() as f:

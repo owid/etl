@@ -2,7 +2,6 @@
 
 import re
 from pathlib import Path
-from typing import List, Union
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -125,10 +124,10 @@ def make_tb(snap_1: Snapshot, snap_2: Snapshot):
     return tb
 
 
-def _read_txt_without_comments(path: Union[Path, str]) -> List[str]:
+def _read_txt_without_comments(path: Path | str) -> list[str]:
     """Read the text in a file wihout the commented lines.
 
     A commented line is such that starts with a '#'."""
-    with open(path, "r") as f:
+    with open(path) as f:
         text = [line for line in f.readlines() if not line.startswith("#")]
     return text

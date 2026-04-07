@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     # Loop through each extracted file
     snap = cast(Snapshot, paths.load_dependency("papers_with_code_atari.html"))
 
-    with open(snap.path, "r") as file:
+    with open(snap.path) as file:
         html_content = file.read()
     df = extract_data_papers_with_code_atari(html_content, "atari")
     df.drop("additional_data", axis=1, inplace=True)

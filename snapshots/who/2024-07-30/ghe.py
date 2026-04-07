@@ -2,7 +2,6 @@
 
 import json
 from pathlib import Path
-from typing import List
 
 import click
 import pandas as pd
@@ -43,7 +42,7 @@ def main(upload: bool) -> None:
     snap.create_snapshot(data=df, upload=upload)
 
 
-def get_causes_list() -> List[str]:
+def get_causes_list() -> list[str]:
     url = "https://xmart-api-public.who.int/DEX_CMS/GHE_FULL?$apply=groupby((DIM_GHECAUSE_TITLE))"
     res = requests.get(url)
     assert res.ok

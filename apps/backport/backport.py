@@ -1,6 +1,6 @@
 import datetime as dt
 import json
-from typing import Any, List, Optional
+from typing import Any
 
 import pandas as pd
 import rich_click as click
@@ -79,7 +79,7 @@ class PotentialBackport:
     ds: gm.Dataset
     config: GrapherConfig
     md5_config: str
-    variable_ids: List[int]
+    variable_ids: list[int]
 
     def __init__(self, dataset_id: int):
         self.dataset_id = dataset_id
@@ -171,7 +171,7 @@ def backport(
     dry_run: bool = False,
     upload: bool = True,
     data_metadata: bool = False,
-    engine: Optional[Engine] = None,
+    engine: Engine | None = None,
 ) -> None:
     lg = log.bind(dataset_id=dataset_id)
 
@@ -232,7 +232,7 @@ def _upload_data_metadata(lg: Any, backport_short_name: str, dry_run: bool) -> N
         .astype({"value": str})
     )
 
-    with open(snap_config.path, "r") as f:
+    with open(snap_config.path) as f:
         config = json.load(f)
 
     variables = config["variables"]

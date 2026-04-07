@@ -6,8 +6,6 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 
 """
 
-from typing import List
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
@@ -140,7 +138,7 @@ def run(dest_dir: str) -> None:
 
 # This function makes the table wide and modifies some columns before that
 # It is applied to the three LIS datasets
-def make_table_wide(tb: Table, cols_to_wide: List[str]) -> Table:
+def make_table_wide(tb: Table, cols_to_wide: list[str]) -> Table:
     # Drop dataset variable, to not see it multiplied
     tb = tb.drop(columns=["dataset"])
 
@@ -180,7 +178,7 @@ def load_keyvars(age: str, ds_meadow: Dataset) -> Table:
 
 
 # Create additional (relative) poverty variables
-def create_relative_pov_variables(tb_keyvars: Table, relative_povlines: List[int]) -> Table:
+def create_relative_pov_variables(tb_keyvars: Table, relative_povlines: list[int]) -> Table:
     for povline in relative_povlines:
         # Rename relative poverty variables suffix from 40/50/60 to 40/50/60_median
         tb_keyvars.columns = tb_keyvars.columns.str.replace(f"{povline}", f"{povline}_median")

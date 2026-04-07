@@ -1,6 +1,6 @@
 """Google API class."""
 
-from typing import Any, Optional
+from typing import Any
 
 import gdown
 from pydrive2.auth import GoogleAuth
@@ -20,7 +20,7 @@ from owid.datautils.google.sheets import GSheetsApi
 class GoogleApi:
     """API for Google Drive."""
 
-    def __init__(self, clients_secrets_file: Optional[str] = None) -> None:
+    def __init__(self, clients_secrets_file: str | None = None) -> None:
         """Initialise Google API.
 
         To obtain `client_secrets_file`, follow the instructions from:
@@ -74,8 +74,8 @@ class GoogleApi:
     def download_file(
         cls,
         output: str,
-        url: Optional[str] = None,
-        file_id: Optional[str] = None,
+        url: str | None = None,
+        file_id: str | None = None,
         quiet: bool = True,
         **kwargs: Any,
     ) -> None:

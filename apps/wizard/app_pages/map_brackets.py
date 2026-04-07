@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -79,7 +79,7 @@ class EqualMinimumAndMaximumValues(ExceptionFromDocstring):
 
 
 @st.cache_data
-def load_mappable_regions_and_ids(df: pd.DataFrame) -> Dict[str, int]:
+def load_mappable_regions_and_ids(df: pd.DataFrame) -> dict[str, int]:
     # Load the external regions dataset.
     regions = fetch("external/owid_grapher/latest/regions/regions")
     regions_mappable = regions[regions["is_mappable"]]["name"].tolist()
@@ -114,7 +114,7 @@ def load_variable_from_catalog_path(catalog_path: str):
 
 
 @st.cache_data
-def load_variable_metadata(variable: Variable) -> Dict[str, Any]:
+def load_variable_metadata(variable: Variable) -> dict[str, Any]:
     metadata = requests.get(variable.s3_metadata_path(typ="http")).json()
 
     return metadata
@@ -129,7 +129,7 @@ def load_variable_data(variable: Variable) -> pd.DataFrame:
 
 
 @st.cache_data
-def create_default_chart_config_for_variable(metadata: Dict[str, Any]) -> Dict[str, Any]:
+def create_default_chart_config_for_variable(metadata: dict[str, Any]) -> dict[str, Any]:
     """Create a default chart for a variable with id `variable_id`."""
     chart_config = {
         "hasMapTab": True,
@@ -157,21 +157,21 @@ def create_default_chart_config_for_variable(metadata: Dict[str, Any]) -> Dict[s
 @st.cache_data
 def load_explorer(explorer_path: Path) -> str:
     # Load explorer file as a string.
-    with open(explorer_path, "r") as f:
+    with open(explorer_path) as f:
         explorer = f.read()
 
     return explorer
 
 
 @st.cache_data
-def load_color_schemes() -> List[str]:
+def load_color_schemes() -> list[str]:
     data = requests.get("https://files.ourworldindata.org/schemas/grapher-schema.004.json").json()
     color_schemes = data["$defs"]["colorScale"]["properties"]["baseColorScheme"]["enum"]
 
     return color_schemes
 
 
-def dispersion(hist: Union[List[float], np.ndarray]) -> float:
+def dispersion(hist: list[float] | np.ndarray) -> float:
     """Estimate the dispersion of a histogram.
 
     It's based on the Gini coefficient. It's zero if a histogram contains the same number of non-zero elements, and
@@ -309,7 +309,7 @@ class MapBracketer:
 
         return lower_bracket_open, upper_bracket_open
 
-    def get_all_brackets(self) -> Dict[str, np.ndarray]:
+    def get_all_brackets(self) -> dict[str, np.ndarray]:
         # Find the minimum and maximum absolute nonzero values.
         values_nonzero = abs(self.values[abs(self.values) > self.smallest_number])
         if values_nonzero.empty:

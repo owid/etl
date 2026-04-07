@@ -1,6 +1,5 @@
 import datetime as dt
 import random
-from typing import List
 
 import numpy as np
 import pandas as pd
@@ -172,7 +171,7 @@ def st_related_charts_table(
     )
 
 
-def add_coviews_to_charts(charts: List[data.Chart], chosen_chart: data.Chart, coviews: pd.Series) -> List[data.Chart]:
+def add_coviews_to_charts(charts: list[data.Chart], chosen_chart: data.Chart, coviews: pd.Series) -> list[data.Chart]:
     """
     For the chosen chart, fetch its coview info from a coview Series and attach
     to each chart object as `chart.coviews`.

@@ -1,6 +1,6 @@
 import json
 from copy import deepcopy
-from typing import Any, Dict, List, Union
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -11,7 +11,7 @@ from structlog import get_logger
 log = get_logger()
 
 
-def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
+def variable_data(data_df: pd.DataFrame) -> dict[str, Any]:
     data_df = data_df.rename(
         columns={
             "value": "values",
@@ -24,7 +24,7 @@ def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
     return data  # ty: ignore
 
 
-def _load_variable(session: Session, variable_id: int) -> Dict[str, Any]:
+def _load_variable(session: Session, variable_id: int) -> dict[str, Any]:
     sql = """
     SELECT
         variables.*,
@@ -48,7 +48,7 @@ def _load_variable(session: Session, variable_id: int) -> Dict[str, Any]:
     return dict(result._mapping)
 
 
-def _load_topic_tags(session: Session, variable_id: int) -> List[str]:
+def _load_topic_tags(session: Session, variable_id: int) -> list[str]:
     sql = """
     SELECT
         tags.name
@@ -65,7 +65,7 @@ def _load_topic_tags(session: Session, variable_id: int) -> List[str]:
     return [row[0] for row in result]
 
 
-def _load_faqs(session: Session, variable_id: int) -> List[Dict[str, Any]]:
+def _load_faqs(session: Session, variable_id: int) -> list[dict[str, Any]]:
     sql = """
     SELECT
         gdocId,
@@ -105,12 +105,12 @@ def _load_origins_df(session: Session, variable_id: int) -> pd.DataFrame:
 
 
 def _variable_metadata(
-    db_variable_row: Dict[str, Any],
+    db_variable_row: dict[str, Any],
     variable_data: pd.DataFrame,
     db_origins_df: pd.DataFrame,
     db_topic_tags: list[str],
     db_faqs: list[dict],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     row = db_variable_row
 
     sourceId = row.pop("sourceId")
@@ -212,7 +212,7 @@ def _variable_metadata(
     return variableMetadata
 
 
-def _move_population_origin_to_end(origins: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _move_population_origin_to_end(origins: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Move population origin to the end of the list of origins. This way it gets displayed last on data page."""
     new_origins = []
     pop_origin = None
@@ -226,7 +226,7 @@ def _move_population_origin_to_end(origins: List[Dict[str, Any]]) -> List[Dict[s
     return new_origins
 
 
-def variable_metadata(session: Session, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
+def variable_metadata(session: Session, variable_id: int, variable_data: pd.DataFrame) -> dict[str, Any]:
     """Fetch metadata for a single variable from database. This function was initially based on the
     one from owid-grapher repository and uses raw SQL commands. It'd be interesting to rewrite it
     using SQLAlchemy ORM in grapher.model.py.
@@ -240,7 +240,7 @@ def variable_metadata(session: Session, variable_id: int, variable_data: pd.Data
     )
 
 
-def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
+def _convert_strings_to_numeric(lst: list[str]) -> list[int | float | str]:
     """Convert strings to numeric values. String `nan` remains as string."""
     result = []
     for item in lst:
@@ -269,7 +269,7 @@ def _omit_nullable_values(d: dict) -> dict:
     return out
 
 
-def filter_out_fields_in_metadata_for_checksum(meta: Dict[str, Any]) -> Dict[str, Any]:
+def filter_out_fields_in_metadata_for_checksum(meta: dict[str, Any]) -> dict[str, Any]:
     """Drop fields that are not needed to estimate the checksum."""
     meta_ = deepcopy(meta)
 

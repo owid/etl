@@ -3,7 +3,6 @@ import random
 import time
 import warnings
 from multiprocessing import Pool
-from typing import Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -44,7 +43,7 @@ def _load_population():
     return pop.set_index("entity_name")["population"]
 
 
-def _processing_queue(items: list[tuple[str, int]]) -> List[tuple]:
+def _processing_queue(items: list[tuple[str, int]]) -> list[tuple]:
     """
     Create a processing queue of (entity, variable_id) pairs, weighted by population probability.
     """
@@ -76,7 +75,7 @@ def _processing_queue(items: list[tuple[str, int]]) -> List[tuple]:
 class AnomalyGaussianProcessOutlier(AnomalyDetector):
     anomaly_type = "gp_outlier"
 
-    def __init__(self, max_time: Optional[float] = ANOMALIST_MAX_TIME, n_jobs: int = ANOMALIST_N_JOBS):
+    def __init__(self, max_time: float | None = ANOMALIST_MAX_TIME, n_jobs: int = ANOMALIST_N_JOBS):
         self.max_time = max_time
         self.n_jobs = n_jobs
 
@@ -84,7 +83,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
     def get_text(entity: str, year: int) -> str:
         return f"There are some outliers for {entity} in year {year}! These were detected using Gaussian processes. There might be other data points affected."
 
-    def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_score_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         # Convert to long format
         df_wide = df.melt(id_vars=["entity_name", "year"], var_name="variable_id")
         # Filter to only include the specified variable IDs.
@@ -246,7 +245,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         return mean_pred, std_pred
 
-    def viz(self, df: pd.DataFrame, variable: gm.Variable, country: Optional[str] = None):
+    def viz(self, df: pd.DataFrame, variable: gm.Variable, country: str | None = None):
         assert {"country", "year", variable.id} <= set(df.columns)
         if df.empty:
             log.warning("No data to visualize")
@@ -287,7 +286,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         return z
 
-    def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_scale_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         # NOTE: Ideally, for this detector, the scale should be the difference between a value and the mean, divided by the range of values of the variable. But calculating that may be hard to implement in an efficient way.
 
         log.info("gp_outlier.get_scale_df.start")

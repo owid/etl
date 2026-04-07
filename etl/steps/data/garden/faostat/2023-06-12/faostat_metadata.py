@@ -41,7 +41,7 @@ import json
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Tuple, cast
+from typing import cast
 
 import pandas as pd
 from owid import catalog
@@ -605,7 +605,7 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
 
 
 def check_countries_to_exclude_or_harmonize(
-    countries_in_data: pd.DataFrame, excluded_countries: List[str], countries_harmonization: Dict[str, str]
+    countries_in_data: pd.DataFrame, excluded_countries: list[str], countries_harmonization: dict[str, str]
 ) -> None:
     # Check that all excluded countries are in the data.
     unknown_excluded_countries = set(excluded_countries) - set(countries_in_data["fao_country"])
@@ -627,9 +627,9 @@ def check_countries_to_exclude_or_harmonize(
 
 def clean_global_countries_dataframe(
     countries_in_data: pd.DataFrame,
-    country_groups: Dict[str, List[str]],
-    countries_harmonization: Dict[str, str],
-    excluded_countries: List[str],
+    country_groups: dict[str, list[str]],
+    countries_harmonization: dict[str, str],
+    excluded_countries: list[str],
 ) -> pd.DataFrame:
     """Clean dataframe of countries gathered from the data of the individual domains, harmonize country names (and
     country names of members of regions), and create a clean global countries dataframe.
@@ -692,7 +692,7 @@ def clean_global_countries_dataframe(
     return countries_df
 
 
-def create_table(df: pd.DataFrame, short_name: str, index_cols: List[str]) -> catalog.Table:
+def create_table(df: pd.DataFrame, short_name: str, index_cols: list[str]) -> catalog.Table:
     """Create a table with optimal format and basic metadata, out of a dataframe.
 
     Parameters
@@ -827,10 +827,10 @@ def process_metadata(
     custom_datasets: pd.DataFrame,
     custom_elements: pd.DataFrame,
     custom_items: pd.DataFrame,
-    countries_harmonization: Dict[str, str],
-    excluded_countries: List[str],
+    countries_harmonization: dict[str, str],
+    excluded_countries: list[str],
     value_amendments: pd.DataFrame,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Apply various sanity checks, gather data (about dataset, item, element and unit names and descriptions) from all
     domains, compare with data from its corresponding metadata file, and create clean dataframes of metadata about
     dataset, elements, units, items, and countries.
@@ -890,7 +890,7 @@ def process_metadata(
 
     # Initialise list of all countries in all datasets, and all country groups.
     countries_in_data = pd.DataFrame({"area_code": [], "fao_country": []}).astype({"area_code": "Int64"})
-    country_groups_in_data: Dict[str, List[str]] = {}
+    country_groups_in_data: dict[str, list[str]] = {}
 
     # Gather all variables from the latest version of each meadow dataset.
     for dataset_short_name in tqdm(dataset_short_names, file=sys.stdout):

@@ -12,14 +12,14 @@ Output: docs/api/semantic-search-api.md
 """
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import requests
 
 from .openapi_to_markdown import generate_markdown  # ty: ignore
 
 
-def load_openapi_spec_from_url(url: str = "https://search.owid.io/openapi.json") -> Dict[str, Any]:
+def load_openapi_spec_from_url(url: str = "https://search.owid.io/openapi.json") -> dict[str, Any]:
     """Load OpenAPI specification from a public URL.
 
     Args:

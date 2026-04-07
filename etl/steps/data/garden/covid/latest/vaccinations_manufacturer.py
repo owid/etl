@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, Optional, cast
+from typing import cast
 
 from owid.catalog import Dataset, Table
 from owid.catalog.processing import concat
@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_regional_aggregates(tb: Table, ds_regions: Dataset, index_columns: Optional[List[str]] = None) -> Table:
+def add_regional_aggregates(tb: Table, ds_regions: Dataset, index_columns: list[str] | None = None) -> Table:
     tb_agg = add_regions(
         tb, ds_regions, keep_only_regions=True, regions={"European Union (27)": {}}, index_columns=index_columns
     )
@@ -97,7 +97,7 @@ def fill_time_gaps(tb: Table) -> Table:
 
 
 def _interp_ffill_fillna(
-    tb: Table, columns: List[str], entity_col: str | List[str] = "country", time_col: str = "date"
+    tb: Table, columns: list[str], entity_col: str | list[str] = "country", time_col: str = "date"
 ) -> Table:
     if isinstance(entity_col, str):
         columns_all = columns + [entity_col, time_col]

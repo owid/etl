@@ -3,7 +3,7 @@ from copy import deepcopy
 from datetime import date
 from datetime import datetime as dt
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Type, cast
+from typing import Any, cast
 
 import jsonref
 import jsonschema
@@ -31,7 +31,7 @@ def is_snake(s: str) -> bool:
 class StepForm(BaseModel):
     """Form abstract class."""
 
-    errors: Dict[str, Any] = {}
+    errors: dict[str, Any] = {}
     step_name: str
 
     def __init__(self: Self, **kwargs: str | int) -> None:  # ty: ignore
@@ -40,14 +40,14 @@ class StepForm(BaseModel):
         self.validate()
 
     @classmethod
-    def filter_relevant_fields(cls: Type[Self], step_name: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    def filter_relevant_fields(cls: type[Self], step_name: str, data: dict[str, Any]) -> dict[str, Any]:
         """Filter relevant fields from form."""
         return {k.replace(f"{step_name}.", ""): v for k, v in data.items() if k.startswith(f"{step_name}.")}
 
     @classmethod
-    def from_state(cls: Type[Self]) -> Self:
+    def from_state(cls: type[Self]) -> Self:
         """Build object from session_state variables."""
-        session_state = cast(Dict[str, Any], dict(st.session_state))
+        session_state = cast(dict[str, Any], dict(st.session_state))
         data = cls.filter_relevant_fields(step_name=st.session_state["step_name"], data=session_state)
         return cls(**data)
 
@@ -66,7 +66,7 @@ class StepForm(BaseModel):
             assert self.metadata
             f.write(ruamel_dump(self.metadata))
 
-    def validate_schema(self: Self, schema: Dict[str, Any], ignore_keywords: Optional[List[str]] = None) -> None:
+    def validate_schema(self: Self, schema: dict[str, Any], ignore_keywords: list[str] | None = None) -> None:
         """Validate form fields against schema.
 
         Note that not all form fields are present in the schema (some do not belong to metadata, but are needed to generate the e.g. dataset URI)
@@ -135,7 +135,7 @@ class StepForm(BaseModel):
         field_name = re.findall(rex, error.message)[0]
         return field_name
 
-    def check_required(self: Self, fields_names: List[str]) -> None:
+    def check_required(self: Self, fields_names: list[str]) -> None:
         """Check that all fields in `fields_names` are not empty."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
@@ -143,14 +143,14 @@ class StepForm(BaseModel):
             if attr in ["", []]:
                 self.errors[field_name] = f"`{field_name}` is a required property"
 
-    def check_snake(self: Self, fields_names: List[str]) -> None:
+    def check_snake(self: Self, fields_names: list[str]) -> None:
         """Check that all fields in `fields_names` are in snake case."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
             if not is_snake(attr):
                 self.errors[field_name] = f"`{field_name}` must be in snake case"
 
-    def check_is_version(self: Self, fields_names: List[str]) -> None:
+    def check_is_version(self: Self, fields_names: list[str]) -> None:
         """Check that all fields in `fields_names` are in snake case."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
@@ -165,7 +165,7 @@ class DataForm(StepForm):
     step_name: str = "data"
 
     # List of steps
-    steps_to_create: List[str]
+    steps_to_create: list[str]
     # Common
     namespace: str
     short_name: str
@@ -174,14 +174,14 @@ class DataForm(StepForm):
     is_private: bool
     add_to_dag: bool
     # Only in Meadow
-    snapshot_dependencies: Optional[List[str]] = None
+    snapshot_dependencies: list[str] | None = None
     # Only in Garden
-    update_period_days: Optional[int] = None
-    topic_tags: Optional[List[str]] = None
-    update_period_date: Optional[date] = None  # Custom
-    notebook: Optional[bool] = None
+    update_period_days: int | None = None
+    topic_tags: list[str] | None = None
+    update_period_date: date | None = None  # Custom
+    notebook: bool | None = None
     # Extra steps
-    dependencies_extra: Dict[str, Any]
+    dependencies_extra: dict[str, Any]
 
     def __init__(self: Self, **data: Any) -> None:  # ty: ignore
         """Construct class."""
@@ -238,7 +238,7 @@ class DataForm(StepForm):
         return f"{self.namespace}/{self.version}/{self.short_name}"
 
     @property
-    def snapshot_names_with_extension(self) -> List[str]:
+    def snapshot_names_with_extension(self) -> list[str]:
         """Get snapshot names with extension."""
         assert "meadow" in self.steps_to_create, "Snapshot names are only needed for meadow steps!"
         assert self.snapshot_dependencies is not None, "Snapshot dependencies must be present!"
@@ -328,7 +328,7 @@ class DataForm(StepForm):
                 raise ValueError(f"Channel `{channel}` not recognized.")
         return common
 
-    def create_files(self, channel: str) -> List[Dict[str, Any]]:
+    def create_files(self, channel: str) -> list[dict[str, Any]]:
         # Generate files
         DATASET_DIR = generate_step_to_channel(cookiecutter_path=COOKIE_STEPS[channel], data=self.to_dict(channel))
         # Remove playground notebook if not needed
@@ -384,7 +384,7 @@ class DataForm(StepForm):
             return ""
 
     @property
-    def dag(self) -> Dict[str, Any]:
+    def dag(self) -> dict[str, Any]:
         dag = {}
 
         # Meadow dependencies (snapshots)
@@ -424,7 +424,7 @@ class SnapshotForm(StepForm):
     date_published: str
     producer: str
     citation_full: str
-    attribution: Optional[str]
+    attribution: str | None
     attribution_short: str
     url_main: str
     url_download: str
@@ -456,7 +456,7 @@ class SnapshotForm(StepForm):
         if not self.errors:
             self.attribution = self.parse_attribution(data)
 
-    def parse_attribution(self: Self, data: Dict[str, str | int]) -> str | None:
+    def parse_attribution(self: Self, data: dict[str, str | int]) -> str | None:
         """Parse the field attribution.
 
         By default, the field attribution contains the format of the attribution, not the actual attribution. This function
@@ -500,7 +500,7 @@ class SnapshotForm(StepForm):
             raise ValueError("attribution must be present!")
 
     @property
-    def metadata(self: Self) -> Dict[str, Any]:  # ty: ignore[invalid-method-override]
+    def metadata(self: Self) -> dict[str, Any]:  # ty: ignore[invalid-method-override]
         """Define metadata for easy YAML-export."""
         license_field = {
             "name": self.license_name,
@@ -527,7 +527,7 @@ class SnapshotForm(StepForm):
                 "is_public": not self.is_private,
             }
         }
-        meta = cast(Dict[str, Any], clean_empty_dict(meta))
+        meta = cast(dict[str, Any], clean_empty_dict(meta))
         return meta
 
 
@@ -550,7 +550,7 @@ class CollectionForm(StepForm):
         # st.write(data)
         super().__init__(**data)  # ty: ignore
 
-    def create_files(self) -> List[Dict[str, Any]]:
+    def create_files(self) -> list[dict[str, Any]]:
         # Generate files
         COLLECTION_DIR = generate_export_step_to_channel(
             cookiecutter_path=COOKIE_STEPS[self.step_name], data=self.to_dict()
@@ -575,7 +575,7 @@ class CollectionForm(StepForm):
         return DAG_DIR / self.dag_file
 
     @property
-    def dag(self) -> Dict[str, Any]:
+    def dag(self) -> dict[str, Any]:
         dag = {self.step_uri: [f"data://grapher/{self.base_step_name}"]}
         return dag
 
@@ -629,7 +629,7 @@ class CollectionForm(StepForm):
         self.check_is_version(fields_version)
 
 
-def generate_export_step_to_channel(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
+def generate_export_step_to_channel(cookiecutter_path: Path, data: dict[str, Any]) -> Path:
     assert {"namespace", "version"} <= data.keys()
 
     target_dir = STEP_DIR / "export" / "multidim"

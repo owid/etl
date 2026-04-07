@@ -3,7 +3,6 @@
 import os
 from pathlib import Path
 from shutil import copyfile
-from typing import Union
 
 import yaml
 from pydrive2.auth import GoogleAuth
@@ -15,7 +14,7 @@ SETTINGS_PATH = os.path.join(CONFIG_DIR, "google_settings.yaml")
 CREDENTIALS_PATH = os.path.join(CONFIG_DIR, "google_credentials.json")
 
 
-def google_config_init(client_secrets_file: Union[str, Path], encoding: str = "utf8") -> GoogleAuth:
+def google_config_init(client_secrets_file: str | Path, encoding: str = "utf8") -> GoogleAuth:
     """Initialise Google configuration files.
 
     Uses `clients_secrets` to generate all the required Google configuration files: `SETTINGS_PATH`, `CREDENTIALS_PATH`.

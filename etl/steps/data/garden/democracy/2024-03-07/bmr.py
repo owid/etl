@@ -34,7 +34,8 @@ Some additional files are provided to help out in the processing:
 """
 
 import json
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union, cast
+from collections.abc import Callable
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -375,7 +376,7 @@ def _add_categories_years_in_democracy(tb: Table, column: str) -> Table:
     return tb
 
 
-def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
+def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> tuple[Table, Table]:
     """Get tables with number of countries in democracy.
 
     Creates two tables.
@@ -421,7 +422,7 @@ def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table,
     return tb_num_countries, tb_num_countries_years_consec
 
 
-def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table]:
+def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table]:
     """Get tables with number of people in democracy.
 
     Creates two tables.
@@ -497,9 +498,7 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
     return tb_population, tb_population_years_consec
 
 
-def make_table_with_dummies(
-    tb: Table, ds_regions: Dataset, indicators: Union[List[Dict[str, Any]], None] = None
-) -> Table:
+def make_table_with_dummies(tb: Table, ds_regions: Dataset, indicators: list[dict[str, Any]] | None = None) -> Table:
     """Format table to have dummy indicators.
 
     From a table with categorical indicators, create a new table with dummy indicator for each indicator-category pair.
@@ -622,7 +621,7 @@ def expand_observations_without_leading_to_duplicates(tb: Table, ds_regions: Dat
     return tb
 
 
-def _get_countries_to_ignore_population(ds_regions: Dataset) -> Set[str]:
+def _get_countries_to_ignore_population(ds_regions: Dataset) -> set[str]:
     """List of countries to ignore when working with population.
 
     To avoid double-counting population, former countries are ignored.
@@ -642,7 +641,7 @@ def _get_countries_to_ignore_population(ds_regions: Dataset) -> Set[str]:
 
 
 def split_into_two_tables(
-    tb: Table, column_renames: Dict[str, str], table_1_name: str, table_2_name: str
+    tb: Table, column_renames: dict[str, str], table_1_name: str, table_2_name: str
 ) -> tuple[Table, Table]:
     """Make two tables from a single table.
 
@@ -702,8 +701,8 @@ def split_into_two_tables(
 
 def from_wide_to_long(
     tb: Table,
-    indicator_name_callback: Optional[Callable] = None,
-    indicator_category_callback: Optional[Callable] = None,
+    indicator_name_callback: Callable | None = None,
+    indicator_category_callback: Callable | None = None,
     column_dimension_name: str = "category",
 ) -> Table:
     """Format a particular shape of table from wide to long format.

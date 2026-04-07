@@ -338,7 +338,7 @@ def get_data_by_raw_mention(country_names=None, year_range=None, output_file=Non
 
 def get_country_queries(country_names=None):
     """Get country queries from COUNTRY_QUERIES_FILE."""
-    with open(COUNTRY_QUERIES_FILE, "r") as file:
+    with open(COUNTRY_QUERIES_FILE) as file:
         country_queries = yaml.safe_load(file)
     if "queries" not in country_queries:
         raise KeyError(f"No 'queries' key found in {COUNTRY_QUERIES_FILE}")

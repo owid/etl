@@ -74,7 +74,6 @@ ON REGIONS
 """
 
 import json
-from typing import List, Set, Tuple
 
 import numpy as np
 import pandas as pd
@@ -152,7 +151,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def load_tables(ds: Dataset) -> Tuple[Table, Table, Table, Table]:
+def load_tables(ds: Dataset) -> tuple[Table, Table, Table, Table]:
     """Load all CoW tables.
 
     This includes tables for extra-, non-, inter- and intra-state conflicts.
@@ -641,7 +640,7 @@ def standardise_region_ids(tb: Table) -> Table:
         4: 4,  # Africa (SSA)
     }
     # Load custom mapping
-    with open(PATH_CUSTOM_REGIONS_INTRASTATE, "r") as f:
+    with open(PATH_CUSTOM_REGIONS_INTRASTATE) as f:
         regions_mapping_default = json.load(f)
     regions_mapping_default = {float(k): v for k, v in regions_mapping_default.items()}
     # Apply custom & default mapping
@@ -693,8 +692,8 @@ def load_cow_table(
     column_start_year: str,
     column_end_year: str,
     column_location: str,
-    columns_deaths: List[str],
-    values_exp_wartype: Set[int],
+    columns_deaths: list[str],
+    values_exp_wartype: set[int],
     check_unique_for_location: bool = True,
 ):
     """Read table from dataset."""
@@ -751,7 +750,7 @@ def load_cow_table(
     return tb
 
 
-def expand_observations(tb: Table, column_metrics: List[int]) -> Table:
+def expand_observations(tb: Table, column_metrics: list[int]) -> Table:
     """Add year per observation."""
     # Expand to all observation years
     # Add years

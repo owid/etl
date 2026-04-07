@@ -1,7 +1,7 @@
 import os
 import pickle
 import time
-from typing import Any, Dict, Optional
+from typing import Any
 
 import streamlit as st
 import torch
@@ -45,7 +45,7 @@ def get_model(model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
 def get_embeddings(
     model: SentenceTransformer,
     texts: list[str],
-    model_name: Optional[str] = None,
+    model_name: str | None = None,
     batch_size=32,
     workers=1,
 ) -> torch.Tensor:
@@ -138,7 +138,7 @@ def get_embeddings(
 
 # TODO: caching isn't working properly when on different devices
 # @st.cache_data(show_spinner=False, persist="disk", max_entries=1)
-def get_insights_embeddings(_model, insights: list[Dict[str, Any]]) -> list:
+def get_insights_embeddings(_model, insights: list[dict[str, Any]]) -> list:
     with st.spinner("Generating embeddings...", show_time=True):
         # Combine the title, body and authors of each insight into a single string.
         insights_texts = [
@@ -149,8 +149,8 @@ def get_insights_embeddings(_model, insights: list[Dict[str, Any]]) -> list:
 
 
 def get_sorted_documents_by_similarity(
-    model: SentenceTransformer, input_string: str, docs: list[Dict[str, str]], embeddings: torch.Tensor
-) -> list[Dict[str, Any]]:
+    model: SentenceTransformer, input_string: str, docs: list[dict[str, str]], embeddings: torch.Tensor
+) -> list[dict[str, Any]]:
     """Ingests an input string and a list of documents, returning the list of documents sorted by their semantic similarity to the input string."""
     log.info("get_sorted_documents_by_similarity.start", n_docs=len(docs))
     t = time.time()

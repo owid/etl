@@ -17,7 +17,6 @@ Four sources are used overall:
 """
 
 import json
-from typing import List
 
 import owid.catalog.processing as pr
 from gapminder import load_gapminder
@@ -135,7 +134,7 @@ def select_source(df: Table) -> Table:
     return df
 
 
-def _assert_unique(df: Table, subset: List[str]) -> None:
+def _assert_unique(df: Table, subset: list[str]) -> None:
     """Ensure that dataframe has only one row per columns in subset"""
     # NOTE: this could be moved to helpers
     df_deduped = df.drop_duplicates(subset=subset)

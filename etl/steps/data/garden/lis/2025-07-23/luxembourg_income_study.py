@@ -6,8 +6,6 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 
 """
 
-from typing import List
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
@@ -143,7 +141,7 @@ def run() -> None:
 
 
 # It is applied to the three LIS datasets
-def make_table_wide(tb: Table, cols_to_wide: List[str]) -> Table:
+def make_table_wide(tb: Table, cols_to_wide: list[str]) -> Table:
     """
     Make table wide and modify the equivalization variable to make it distinguishable
     """
@@ -189,7 +187,7 @@ def load_keyvars(age: str, ds_meadow: Dataset) -> Table:
 
 
 # Create additional (relative) poverty variables
-def create_relative_pov_variables(tb_keyvars: Table, relative_povlines: List[int]) -> Table:
+def create_relative_pov_variables(tb_keyvars: Table, relative_povlines: list[int]) -> Table:
     """
     Create additional relative poverty variables: number in poverty, income gap ratio, average shortfall and total shortfall
     """

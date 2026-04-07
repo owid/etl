@@ -1,7 +1,7 @@
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -103,7 +103,7 @@ def run() -> None:
 
     # validate that all columns have title
     for col in tb_garden.columns:
-        assert tb_garden[col].metadata.title is not None, 'Variable "{}" has no title'.format(col)
+        assert tb_garden[col].metadata.title is not None, f'Variable "{col}" has no title'
 
     # add armed personnel as share of population
     tb_garden = add_armed_personnel_as_share_of_population(tb_garden, ds_population)
@@ -636,16 +636,16 @@ def add_variable_metadata(tb: Table, tb_metadata: Table) -> Table:
     return tb
 
 
-def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:
+def load_clean_source_mapping() -> dict[str, dict[str, str]]:
     # The mapping is maintained using update_wdi_metadata.py CLI
-    with open(Path(__file__).parent / "wdi.sources.json", "r") as f:
+    with open(Path(__file__).parent / "wdi.sources.json") as f:
         sources = json.load(f)
         source_mapping = {source["rawName"]: source for source in sources}
         assert len(sources) == len(source_mapping)
     return source_mapping
 
 
-def create_description_from_producer(var: Dict[str, Any]) -> Optional[str]:
+def create_description_from_producer(var: dict[str, Any]) -> str | None:
     desc = ""
     if pd.notnull(var["long_definition"]) and len(var["long_definition"].strip()) > 0:
         desc += var["long_definition"]

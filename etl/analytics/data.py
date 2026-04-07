@@ -1,7 +1,6 @@
 """Functions to get analytics data, including specific answers."""
 
 from datetime import datetime
-from typing import List, Optional, Union
 
 import pandas as pd
 
@@ -43,8 +42,8 @@ def get_number_of_days(
     date_max: str,
     table_name: str,
     day_column_name: str = "day",
-    published_at: Optional[pd.Series] = None,
-) -> Union[pd.Series, int]:
+    published_at: pd.Series | None = None,
+) -> pd.Series | int:
     """
     Calculate the number of days for which the views are counted.
 
@@ -103,7 +102,7 @@ def get_number_of_days(
 
 
 def get_chart_views_per_day_by_chart_id(
-    chart_ids: Optional[List[int]] = None,
+    chart_ids: list[int] | None = None,
     date_min: str = DATE_MIN,
     date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
@@ -154,7 +153,7 @@ def get_chart_views_per_day_by_chart_id(
 
 
 def get_chart_views_by_chart_id(
-    chart_ids: Optional[List[int]] = None,
+    chart_ids: list[int] | None = None,
     date_min: str = DATE_MIN,
     date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
@@ -220,7 +219,7 @@ def get_chart_views_by_chart_id(
 
 
 def get_chart_views_last_n_days(
-    chart_ids: Optional[List[int]] = None,
+    chart_ids: list[int] | None = None,
     n_days: int = 30,
 ) -> pd.DataFrame:
     """
@@ -250,7 +249,7 @@ def get_chart_views_last_n_days(
 
 
 def get_post_views_by_url(
-    urls: Optional[List[str]] = None,
+    urls: list[str] | None = None,
     date_min: str = DATE_MIN,
     date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
@@ -337,7 +336,7 @@ def get_post_views_by_url(
 
 
 def _get_post_references_of_charts_and_redirected_charts(
-    chart_ids: Optional[List[int]] = None, component_types: Optional[List[str]] = None
+    chart_ids: list[int] | None = None, component_types: list[str] | None = None
 ) -> pd.DataFrame:
     # Prepare list of component types to consider.
     if component_types is None:
@@ -417,7 +416,7 @@ def _get_post_references_of_charts_and_redirected_charts(
     return df
 
 
-def _get_post_references_of_charts_via_narrative_charts(chart_ids: Optional[List[int]] = None) -> pd.DataFrame:
+def _get_post_references_of_charts_via_narrative_charts(chart_ids: list[int] | None = None) -> pd.DataFrame:
     """Get posts (including articles, topic pages, and data insights) that use narrative chart, and link them to the original (parent) chart."""
     # Prepare query.
     query = """SELECT
@@ -450,7 +449,7 @@ def _get_post_references_of_charts_via_narrative_charts(chart_ids: Optional[List
 
 
 def get_topic_tags_for_chart_ids(
-    chart_ids: Optional[List[int]] = None, only_topics_with_all_charts_block: bool = False
+    chart_ids: list[int] | None = None, only_topics_with_all_charts_block: bool = False
 ) -> pd.DataFrame:
     """Get topic tags, and their corresponding posts (usually topic pages), for a list of chart ids.
 
@@ -505,8 +504,8 @@ def get_topic_tags_for_chart_ids(
 
 
 def get_post_references_of_charts(
-    chart_ids: Optional[List[int]] = None,
-    component_types: Optional[List[str]] = None,
+    chart_ids: list[int] | None = None,
+    component_types: list[str] | None = None,
     include_parents_of_narrative_charts: bool = True,
     include_references_of_all_charts_block: bool = True,
 ) -> pd.DataFrame:
@@ -572,7 +571,7 @@ def get_post_references_of_charts(
 
 
 def get_post_views_by_chart_id(
-    chart_ids: Optional[List[int]] = None,
+    chart_ids: list[int] | None = None,
     date_min: str = DATE_MIN,
     date_max: str = DATE_MAX,
     include_parents_of_narrative_charts: bool = True,
@@ -625,7 +624,7 @@ def get_post_views_by_chart_id(
 
 
 def get_post_views_last_n_days(
-    chart_ids: Optional[List[int]] = None,
+    chart_ids: list[int] | None = None,
     n_days: int = 30,
     include_parents_of_narrative_charts: bool = True,
     include_references_of_all_charts_block: bool = True,
@@ -669,7 +668,7 @@ def get_post_views_last_n_days(
 
 
 def get_visualizations_using_data_by_producer(
-    producers: Optional[List[str]] = None, excluded_steps: Optional[List[str]] = None
+    producers: list[str] | None = None, excluded_steps: list[str] | None = None
 ) -> pd.DataFrame:
     """Get all OWID visualizations (charts and collection views) using data from a given list of producers.
 

@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import ast
-from typing import Dict, List
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -931,8 +930,8 @@ def clean_notes(notes):
 
 
 def gather_notes(
-    tb: Table, notes_columns: List[str], notes_original: Dict[str, List[str]], notes_edited: Dict[str, List[str]]
-) -> Dict[str, str]:
+    tb: Table, notes_columns: list[str], notes_original: dict[str, list[str]], notes_edited: dict[str, list[str]]
+) -> dict[str, str]:
     # Create another table with the same structure, but containing notes.
     tb_flat_notes = tb.pivot(
         index=["country", "year"],

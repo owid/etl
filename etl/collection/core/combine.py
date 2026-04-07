@@ -3,8 +3,9 @@
 Additional: combine dimensions (using raw dictionaries)
 """
 
+from collections.abc import Mapping
 from copy import deepcopy
-from typing import Any, Dict, List, Mapping, Set, Tuple, TypeVar, overload
+from typing import Any, TypeVar, overload
 
 import pandas as pd
 from structlog import get_logger
@@ -27,8 +28,8 @@ E = TypeVar("E", bound=Explorer)
 
 # COMBINE DIMENSIONS
 def combine_config_dimensions(
-    config_dimensions: List[Dict[str, Any]],
-    config_dimensions_yaml: List[Dict[str, Any]],
+    config_dimensions: list[dict[str, Any]],
+    config_dimensions_yaml: list[dict[str, Any]],
     choices_top: bool = False,
     dimensions_top: bool = False,
 ):
@@ -160,45 +161,45 @@ def _order(config_yaml, config_combined):
 
 @overload
 def combine_collections(
-    collections: List[E],
+    collections: list[E],
     collection_name: str | None = None,
     catalog_path: str | None = None,
     config: dict[str, Any] | None = None,
-    dependencies: Set[str] | None = None,
+    dependencies: set[str] | None = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: str | None = None,
     collection_dimension_slug: str | None = None,
-    collection_choices_names: List[str] | None = None,
+    collection_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
 ) -> E: ...
 
 
 @overload
 def combine_collections(
-    collections: List[T],
+    collections: list[T],
     collection_name: str | None = None,
     catalog_path: str | None = None,
     config: dict[str, Any] | None = None,
-    dependencies: Set[str] | None = None,
+    dependencies: set[str] | None = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: str | None = None,
     collection_dimension_slug: str | None = None,
-    collection_choices_names: List[str] | None = None,
+    collection_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
 ) -> T: ...
 
 
 # COMBINE COLLECTIONS
 def combine_collections(
-    collections: List[Collection] | List[Explorer],
+    collections: list[Collection] | list[Explorer],
     collection_name: str | None = None,
     catalog_path: str | None = None,
     config: dict[str, Any] | None = None,
-    dependencies: Set[str] | None = None,
+    dependencies: set[str] | None = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: str | None = None,
     collection_dimension_slug: str | None = None,
-    collection_choices_names: List[str] | None = None,
+    collection_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
 ) -> Collection | Explorer:
     """Combine multiple collections (MDIMs or Explorers) into a single one.
@@ -412,7 +413,7 @@ def combine_collections(
     return combined
 
 
-def _extract_choice_slug_changes(df_choices) -> Dict[str, Any]:
+def _extract_choice_slug_changes(df_choices) -> dict[str, Any]:
     # Track modifications (useful later for views)
     slug_changes = (
         df_choices.loc[df_choices["in_conflict"]]
@@ -426,8 +427,8 @@ def _extract_choice_slug_changes(df_choices) -> Dict[str, Any]:
 
 
 def _combine_dimensions(
-    df_choices: pd.DataFrame, cols_choices: List[str], collection: Explorer | Collection
-) -> List[Dimension]:
+    df_choices: pd.DataFrame, cols_choices: list[str], collection: Explorer | Collection
+) -> list[Dimension]:
     """Combine dimensions from different explorers"""
     # Dimension bucket
     dimensions = collection.dimensions.copy()
@@ -477,7 +478,7 @@ def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapp
     return collection_by_id
 
 
-def _build_df_choices(collections_by_id: Mapping[str, Collection | Explorer]) -> Tuple[pd.DataFrame, List[str]]:
+def _build_df_choices(collections_by_id: Mapping[str, Collection | Explorer]) -> tuple[pd.DataFrame, list[str]]:
     # Collect all choices in a dataframe: choice_slug, choice_name, ..., collection_id, dimension_slug.
     records = []
     for i, explorer in collections_by_id.items():

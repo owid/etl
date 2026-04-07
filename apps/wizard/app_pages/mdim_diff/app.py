@@ -1,6 +1,5 @@
 import urllib.parse
 from pathlib import Path
-from typing import Dict, Optional
 
 import pandas as pd
 import streamlit as st
@@ -119,7 +118,7 @@ def _fetch_mdims(mdim_catalog_path: str) -> tuple[gm.MultiDimDataPage, gm.MultiD
     return source_mdim, target_mdim
 
 
-def _display_config_diff(config_source: Dict, config_target: Optional[Dict]):
+def _display_config_diff(config_source: dict, config_target: dict | None):
     """Display MDIM config diff."""
     st.subheader("Config Diff")
 
@@ -135,7 +134,7 @@ def _display_config_diff(config_source: Dict, config_target: Optional[Dict]):
         st_show_diff(truncate_lines(diff_str, MAX_DIFF_LINES))
 
 
-def _display_config_in_tabs(config_source: Dict, config_target: Optional[Dict], max_lines: int):
+def _display_config_in_tabs(config_source: dict, config_target: dict | None, max_lines: int):
     """Display config sections in tabs for easy comparison."""
     st.subheader("Config Sections")
 

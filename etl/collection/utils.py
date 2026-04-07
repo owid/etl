@@ -8,7 +8,7 @@ from collections import defaultdict
 from copy import deepcopy
 from itertools import product
 from string import Formatter
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any
 
 from deprecated import deprecated
 from owid.catalog import Dataset
@@ -62,7 +62,7 @@ def load_dataset_from_step(step: str) -> Dataset:
 
 
 # .has_duplicate_table_names
-def load_table_names_from_dependencies(dependencies: Set[str]) -> List[str]:
+def load_table_names_from_dependencies(dependencies: set[str]) -> list[str]:
     table_names = []
     for uri in dependencies:
         ds = load_dataset_from_step(uri)
@@ -72,13 +72,13 @@ def load_table_names_from_dependencies(dependencies: Set[str]) -> List[str]:
 
 
 # core.create
-def has_duplicate_table_names(dependencies: Set[str]) -> bool:
+def has_duplicate_table_names(dependencies: set[str]) -> bool:
     table_names = load_table_names_from_dependencies(dependencies)
     return len(table_names) != len(set(table_names))
 
 
 # core.create
-def get_tables_by_name_mapping(dependencies: Set[str]) -> Dict[str, List[str]]:
+def get_tables_by_name_mapping(dependencies: set[str]) -> dict[str, list[str]]:
     """Dictionary mapping table short name to table object.
 
     Note that the format is {"table_name": [table_uri], ...}. This is because there could be collisions where multiple table names are mapped to the same table (e.g. two datasets could have a table with the same name).
@@ -129,8 +129,8 @@ def expand_combinations(dim_dict):
 
 # model.core
 def get_complete_dimensions_filter(
-    dimensions_available: Dict[str, Set[str]], dimensions_filter: Dict[str, Any]
-) -> List[Dict[str, str]]:
+    dimensions_available: dict[str, set[str]], dimensions_filter: dict[str, Any]
+) -> list[dict[str, str]]:
     """Given a dimension filter"""
     dimensions_filter_complete = {}
 
@@ -153,7 +153,7 @@ def get_complete_dimensions_filter(
 
 
 # model.core
-def unique_records(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def unique_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Return a list of unique records based on a specific key."""
     # Deduplicate by converting to tuples (which are hashable)
     seen = set()
@@ -263,7 +263,7 @@ def _check_missing_fields(template: str, params: dict) -> None:
         raise ParamKeyError(f"Missing keys for placeholders {missing!r} in template: {template!r}")
 
 
-def fill_placeholders(data, params) -> Dict[str, Any] | List[Any] | Set[Any] | Tuple[Any] | str:
+def fill_placeholders(data, params) -> dict[str, Any] | list[Any] | set[Any] | tuple[Any] | str:
     """
     Recursively walk *data* (dicts, lists, tuples, sets, primitives) and
     replace any `{placeholder}` found in strings using values from *params*.

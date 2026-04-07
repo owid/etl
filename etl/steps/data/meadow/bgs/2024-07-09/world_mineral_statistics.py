@@ -3,7 +3,7 @@
 import json
 import re
 import zipfile
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -59,7 +59,7 @@ def _create_raw_dataframe_from_soup(soup: BeautifulSoup) -> pd.DataFrame:
     return df_raw
 
 
-def _extract_notes_and_footnotes_from_soup(soup: BeautifulSoup) -> Tuple[List[str], Dict[str, str]]:
+def _extract_notes_and_footnotes_from_soup(soup: BeautifulSoup) -> tuple[list[str], dict[str, str]]:
     # Extract notes and footnotes from the soup.
     notes_section = soup.find("h2", string="Notes")
 
@@ -90,7 +90,7 @@ def _extract_notes_and_footnotes_from_soup(soup: BeautifulSoup) -> Tuple[List[st
     return notes, footnotes
 
 
-def _extract_unit_from_soup(soup) -> Optional[str]:
+def _extract_unit_from_soup(soup) -> str | None:
     # Find the table in the soup.
     table = soup.find("table", class_="bodyTable")
 
@@ -155,7 +155,7 @@ def _clean_raw_dataframe(df_raw: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_raw_data(data: Dict[str, Any]):
+def process_raw_data(data: dict[str, Any]):
     # Initialize a dataframe that will contain all the combined data.
     df_all = pd.DataFrame(
         columns=["Country", "Commodity", "Sub-commodity", "Year", "Category", "Note", "Value", "Unit", "General notes"]

@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import numpy as np
 from owid.catalog import Table
 from owid.catalog import processing as pr
@@ -14,7 +12,7 @@ paths = PathFinder(__file__)
 REGIONS = ["Europe", "Africa", "Asia", "Oceania", "World"]
 
 
-def add_data_for_regions(tb: Table, regions: List[str]) -> Table:
+def add_data_for_regions(tb: Table, regions: list[str]) -> Table:
     """Add regional aggregates to the table."""
     tb_with_regions = paths.regions.add_aggregates(
         tb=tb,

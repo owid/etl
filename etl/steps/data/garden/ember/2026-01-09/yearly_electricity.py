@@ -1,7 +1,5 @@
 """Garden step for Ember's Yearly Electricity Data (combining global and European data)."""
 
-from typing import Dict
-
 import owid.catalog.processing as pr
 from owid.catalog import Table, utils
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
@@ -308,7 +306,7 @@ def make_table_electricity_demand(tb: Table) -> Table:
     return table
 
 
-def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
+def combine_yearly_electricity_data(tables: dict[str, Table]) -> Table:
     """Combine all tables in Ember's Yearly Electricity Data into one table.
 
     Parameters

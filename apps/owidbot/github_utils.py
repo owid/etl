@@ -1,6 +1,6 @@
 import hashlib
 import time
-from typing import Any, Optional
+from typing import Any
 
 import github
 import github.PullRequest
@@ -15,7 +15,7 @@ from etl import config
 log = structlog.get_logger()
 
 
-def get_repo(repo_name: str, access_token: Optional[str] = None) -> github.Repository.Repository:
+def get_repo(repo_name: str, access_token: str | None = None) -> github.Repository.Repository:
     if not access_token:
         # Don't auth, be aware that you won't be able to do write operations. You should
         # set up your access token on https://github.com/settings/tokens.
@@ -27,7 +27,7 @@ def get_repo(repo_name: str, access_token: Optional[str] = None) -> github.Repos
     return g.get_repo(f"owid/{repo_name}")
 
 
-def get_pr(repo: github.Repository.Repository, branch_name: str) -> Optional[github.PullRequest.PullRequest]:
+def get_pr(repo: github.Repository.Repository, branch_name: str) -> github.PullRequest.PullRequest | None:
     # Find pull requests for the branch (assuming you're looking for open PRs)
     pulls = repo.get_pulls(state="open", sort="created", head=f"{repo.owner.login}:{branch_name}")
     pulls = list(pulls)
@@ -41,7 +41,7 @@ def get_pr(repo: github.Repository.Repository, branch_name: str) -> Optional[git
     return pulls[0]
 
 
-def get_comment_from_pr(pr: Any) -> Optional[Any]:
+def get_comment_from_pr(pr: Any) -> Any | None:
     comments = pr.get_issue_comments()
 
     owidbot_comments = [comment for comment in comments if comment.user.login == "owidbot"]
@@ -61,7 +61,7 @@ def generate_jwt(client_id: str, private_key_path: str) -> str:
         "exp": now + (10 * 60),  # JWT expiration time (10 minutes)
         "iss": client_id,
     }
-    with open(private_key_path, "r") as key_file:
+    with open(private_key_path) as key_file:
         private_key = key_file.read()
     token = jwt.encode(payload, private_key, algorithm="RS256")
     return token
@@ -101,7 +101,7 @@ def compute_git_blob_sha1(content: bytes) -> str:
     """Compute the SHA-1 hash of a file as Git would."""
     # Calculate the blob header
     size = len(content)
-    header = f"blob {size}\0".encode("utf-8")
+    header = f"blob {size}\0".encode()
 
     # Compute the SHA-1 hash of the header + content
     sha1 = hashlib.sha1()

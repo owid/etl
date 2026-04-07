@@ -3,7 +3,6 @@
 import re
 from io import StringIO
 from pathlib import Path
-from typing import List
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -172,7 +171,7 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
 
-def make_tb(path: Path, main_folders: List[str], regex: str, snap) -> Table:
+def make_tb(path: Path, main_folders: list[str], regex: str, snap) -> Table:
     """Create table from multiple category folders.
 
     It inspects the content in `main_folders` (should be in `path`), and looks for TXT files to parse into tables.
@@ -245,7 +244,7 @@ def make_tb_from_txt(text_path: Path, regex: str, snap) -> Table:
 def extract_fields(regex: str, path: Path) -> dict:
     """Structure the fields in the raw TXT file."""
     # Read single file
-    with open(path, "r") as f:
+    with open(path) as f:
         text = f.read()
     # Get relevant fields
     match = re.search(regex, text)

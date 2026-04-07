@@ -3,10 +3,11 @@ import json
 import re
 import tempfile
 import time
+from collections.abc import Callable, Generator, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Union, cast
+from typing import Any, cast
 
 import owid.catalog.core.processing as pr
 import pandas as pd
@@ -79,7 +80,7 @@ class SnapshotArchive:
     def __init__(self, snapshot: "Snapshot", path: Path):  # noqa: F821
         self._snapshot = snapshot
         self._path = path
-        self._files: Optional[List[str]] = None
+        self._files: list[str] | None = None
 
     @property
     def path(self) -> Path:
@@ -87,13 +88,13 @@ class SnapshotArchive:
         return self._path
 
     @property
-    def files(self) -> List[str]:
+    def files(self) -> list[str]:
         """List all files in the archive (relative paths, sorted)."""
         if self._files is None:
             self._files = sorted(str(p.relative_to(self._path)) for p in self._path.rglob("*") if p.is_file())
         return self._files
 
-    def glob(self, pattern: str) -> List[str]:
+    def glob(self, pattern: str) -> list[str]:
         """Find files matching a glob pattern.
 
         Args:
@@ -128,7 +129,7 @@ class SnapshotArchive:
         """
         return (self._path / filename).is_file()
 
-    def read(self, filename: str, force_extension: Optional[str] = None, **kwargs) -> Table:
+    def read(self, filename: str, force_extension: str | None = None, **kwargs) -> Table:
         """Read a file from the archive.
 
         Args:
@@ -171,7 +172,7 @@ class SnapshotArchive:
 class Snapshot:
     uri: str
     metadata: "SnapshotMeta"
-    _unarchived_dir: Optional[Path] = None
+    _unarchived_dir: Path | None = None
 
     def __init__(self, uri: str) -> None:
         """
@@ -347,7 +348,7 @@ class Snapshot:
         md5 = checksum_file(self.path)
 
         # Get metadata file
-        with open(self.metadata_path, "r") as f:
+        with open(self.metadata_path) as f:
             meta = ruamel_load(f)
 
         # If the file already exists with the same md5, verify it's actually on R2 before skipping
@@ -367,8 +368,8 @@ class Snapshot:
 
     def create_snapshot(
         self,
-        filename: Optional[Union[str, Path]] = None,
-        data: Optional[Union[Table, pd.DataFrame]] = None,
+        filename: str | Path | None = None,
+        data: Table | pd.DataFrame | None = None,
         upload: bool = False,
         download_retries: int = 1,
     ) -> None:
@@ -426,7 +427,7 @@ class Snapshot:
     def to_table_metadata(self) -> TableMeta:
         return self.metadata.to_table_metadata()
 
-    def read(self, file_extension: Optional[str] = None, *args, **kwargs) -> Table:
+    def read(self, file_extension: str | None = None, *args, **kwargs) -> Table:
         """Read file based on its Snapshot extension."""
         return read_table_from_snapshot(
             *args,
@@ -467,7 +468,7 @@ class Snapshot:
         """Read R data .rda file into a Table and populate it with metadata."""
         return pr.read_rda(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
-    def read_rda_multiple(self, *args, **kwargs) -> Dict[str, Table]:
+    def read_rda_multiple(self, *args, **kwargs) -> dict[str, Table]:
         """Read R data .rda file into multiple Tables and populate it with metadata.
 
         RData objects can contain multiple dataframes.
@@ -596,7 +597,7 @@ class Snapshot:
             temp_dir.cleanup()
             self._unarchived_dir = None
 
-    def read_from_archive(self, filename: str, force_extension: Optional[str] = None, **kwargs) -> Table:
+    def read_from_archive(self, filename: str, force_extension: str | None = None, **kwargs) -> Table:
         """Read a file in an archive.
 
         Use this function within a 'with snap.extracted():' context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
@@ -649,7 +650,7 @@ class Snapshot:
         return temp_dir
 
     @deprecated("This function will be deprecated. Use `extracted()` context manager instead.")
-    def read_in_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
+    def read_in_archive(self, filename: str, force_extension: str | None = None, *args, **kwargs) -> Table:
         """Read data from file inside a zip/tar archive.
 
         DEPRECATED: This function will be deprecated. Use `extracted()` context manager instead.
@@ -691,18 +692,18 @@ class SnapshotMeta(MetaBase):
     file_extension: str
 
     # NOTE: origin should actually never be None, it's here for backward compatibility
-    origin: Optional[Origin] = None
-    source: Optional[Source] = None  # source is being slowly deprecated, use origin instead
+    origin: Origin | None = None
+    source: Source | None = None  # source is being slowly deprecated, use origin instead
 
     # name and description are usually part of origin or source, they are here only for backward compatibility
-    name: Optional[str] = None
-    description: Optional[str] = None
+    name: str | None = None
+    description: str | None = None
 
-    license: Optional[License] = None
+    license: License | None = None
 
-    access_notes: Optional[str] = None
+    access_notes: str | None = None
 
-    is_public: Optional[bool] = True
+    is_public: bool | None = True
 
     outs: Any = None
 
@@ -762,7 +763,7 @@ class SnapshotMeta(MetaBase):
 
     def _update_metadata_file(self, d: dict[str, Any]) -> None:
         """Update metadata YAML file with given dictionary."""
-        with open(self.path, "r") as f:
+        with open(self.path) as f:
             meta = ruamel_load(f)
 
         # Update everything from `meta`
@@ -796,7 +797,7 @@ class SnapshotMeta(MetaBase):
         # Edit existing file, keep outs
         else:
             # Load outs from existing file
-            with open(self.path, "r") as f:
+            with open(self.path) as f:
                 yaml = yaml_load(f)
                 outs = yaml.get("outs", None)
                 # wdir is a legacy field, we just ignore it
@@ -821,7 +822,7 @@ class SnapshotMeta(MetaBase):
         return f"{self.namespace}/{self.version}/{self.short_name}.{self.file_extension}"
 
     @classmethod
-    def load_from_yaml(cls, filename: Union[str, Path]) -> "SnapshotMeta":
+    def load_from_yaml(cls, filename: str | Path) -> "SnapshotMeta":
         """Load metadata from YAML file. Metadata must be stored under `meta` key."""
         with open(filename) as istream:
             yml = yaml.safe_load(istream)
@@ -952,9 +953,9 @@ class SnapshotMeta(MetaBase):
 
 
 def read_table_from_snapshot(
-    path: Union[str, Path],
+    path: str | Path,
     table_metadata: TableMeta,
-    snapshot_origin: Union[Origin, None],
+    snapshot_origin: Origin | None,
     file_extension: str,
     safe_types: bool = True,
     read_function: Callable | None = None,

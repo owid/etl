@@ -29,8 +29,6 @@ Therefore, the strategy should be:
 
 """
 
-from typing import Tuple
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table, VariablePresentationMeta
 from owid.datautils.dataframes import map_series
@@ -129,7 +127,7 @@ def combine_individual_demand_tables(ds_meadow: Dataset) -> Table:
     tb_demand = pr.concat(tables)
 
     # Ignore aggregates in the data.
-    tb_demand = tb_demand[~tb_demand["mineral"].str.startswith(("Total"))].reset_index(drop=True)
+    tb_demand = tb_demand[~tb_demand["mineral"].str.startswith("Total")].reset_index(drop=True)
 
     # Combine data for magnet rare earth elements.
     # Check that they are all in the data.
@@ -337,7 +335,7 @@ def run_sanity_checks_on_outputs(tb_demand: Table, tb_total: Table) -> None:
     assert compared[compared["_deviation"] > 1].empty, error
 
 
-def add_share_columns(tb_demand: Table, tb_supply: Table) -> Tuple[Table, Table]:
+def add_share_columns(tb_demand: Table, tb_supply: Table) -> tuple[Table, Table]:
     # Create a table for global demand.
     # For each case-scenario-mineral-year, we need the global demand of all technologies.
     # NOTE: Global mineral demand, including uses outside clean tech, is only given for "Base case" for a few minerals (for which "Other uses" is explicitly given).
@@ -494,7 +492,7 @@ def clean_demand_table(tb_demand: Table) -> Table:
     return tb_demand
 
 
-def harmonize_units(tb_demand: Table, tb_supply: Table, tb_total: Table) -> Tuple[Table, Table, Table]:
+def harmonize_units(tb_demand: Table, tb_supply: Table, tb_total: Table) -> tuple[Table, Table, Table]:
     tb_demand = tb_demand.copy()
     tb_supply = tb_supply.copy()
     tb_total = tb_total.copy()
@@ -507,7 +505,7 @@ def harmonize_units(tb_demand: Table, tb_supply: Table, tb_total: Table) -> Tupl
     return tb_demand, tb_supply, tb_total
 
 
-def harmonize_minerals_and_processes(tb_demand: Table, tb_supply: Table) -> Tuple[Table, Table]:
+def harmonize_minerals_and_processes(tb_demand: Table, tb_supply: Table) -> tuple[Table, Table]:
     # For consistency, rename some minerals.
     tb_demand["mineral"] = tb_demand["mineral"].replace({GRAPHITE_ALL_LABEL: GRAPHITE_ALL_LABEL_NEW})
     tb_demand["mineral"] = tb_demand["mineral"].replace(

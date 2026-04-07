@@ -11,8 +11,6 @@ tb.sort_values("v2elvaptrn", ascending=False)[["country", "year", "v2elvaptrn"]]
 Unclear why this occurs, but leads to sudden jumps for region aggregates, e.g. for Africa in 1986 (chart_id=7777).
 """
 
-from typing import List
-
 import vdem_aggregate as aggregate  # VDEM's aggregating library
 import vdem_clean as clean  # VDEM's cleaning library
 import vdem_impute as impute  # VDEM's imputing library
@@ -263,7 +261,7 @@ def run() -> None:
 
 
 # %%
-def adjust_citation_full(tbs: List[Table]) -> List[Table]:
+def adjust_citation_full(tbs: list[Table]) -> list[Table]:
     """Adjust the citation_full metadata field for some indicators."""
     for tb in tbs:
         tb = replace_citation_full(tb)

@@ -4,7 +4,6 @@ import datetime as dt
 import math
 from itertools import product
 from pathlib import Path
-from typing import List, Tuple
 
 import geopandas as gpd
 import pandas as pd
@@ -219,7 +218,7 @@ else:
 
 
 @st.cache_data
-def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame]:
+def load_data() -> tuple[pd.DataFrame, gpd.GeoDataFrame]:
     """Load data for the game."""
     # Load population indicator
     ds = Dataset(DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp")
@@ -442,7 +441,7 @@ def calculate_flat_earth_bearing(lat1, lon1, lat2, lon2):
     return bearing
 
 
-def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
+def distance_to_solution(country_selected: str) -> tuple[str, str, str]:
     """Estimate distance (km) from guessed to solution, including direction.
 
     ref: https://stackoverflow.com/a/47780264
@@ -538,7 +537,7 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     return distance, arrow, score
 
 
-def distance_to_solution_year(year_selected: int) -> Tuple[str, str, str]:
+def distance_to_solution_year(year_selected: int) -> tuple[str, str, str]:
     st.session_state.user_has_succeded_year = False
     diff = SOLUTION_YEAR - year_selected
     if diff == 0:
@@ -644,7 +643,7 @@ def guess() -> None:
 #
 ##########################################
 def _plot_chart(
-    countries_guessed: List[str],
+    countries_guessed: list[str],
     solution: str,
     column_indicator: str,
     title: str,
@@ -714,8 +713,8 @@ def _plot_chart(
 
 
 def _plot_chart_hard(
-    countries_guessed: List[str],
-    years_guessed: List[str],
+    countries_guessed: list[str],
+    years_guessed: list[str],
     solution: str,
     column_indicator: str,
     title: str,
@@ -799,7 +798,7 @@ def _plot_chart_hard(
 
 
 # @st.cache_data
-def plot_chart_population(countries_guessed: List[str], years_guessed: List[str], solution: str):
+def plot_chart_population(countries_guessed: list[str], years_guessed: list[str], solution: str):
     """Plot timeseries."""
     if st.session_state.owidle_difficulty == 2:
         _plot_chart_hard(
@@ -821,7 +820,7 @@ def plot_chart_population(countries_guessed: List[str], years_guessed: List[str]
 
 
 # @st.cache_data
-def plot_chart_gdp_pc(countries_guessed: List[str], years_guessed: List[str], solution: str):
+def plot_chart_gdp_pc(countries_guessed: list[str], years_guessed: list[str], solution: str):
     """Plot timeseries."""
     if st.session_state.owidle_difficulty == 2:
         _plot_chart_hard(

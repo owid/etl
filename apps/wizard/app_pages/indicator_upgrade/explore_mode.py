@@ -4,7 +4,7 @@ This is currently shown in the indicator upgrader, but might be moved to chart-d
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, Optional, Tuple, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -167,7 +167,7 @@ def get_comparison_table(
     df: pd.DataFrame,
     indicator_old: str,
     indicator_new: str,
-) -> Tuple[pd.DataFrame, bool]:
+) -> tuple[pd.DataFrame, bool]:
     """Create comparison df.
 
     Columns:
@@ -260,7 +260,7 @@ def _add_error_columns(df: pd.DataFrame, indicator_old: str, indicator_new: str)
 
 def get_similarity_score(
     df: pd.DataFrame, column_old: str | None = None, column_new: str | None = None
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Get similarity score between old and new indicators.
 
     - numeric only positive: mean log error, and mean relative error.
@@ -295,7 +295,7 @@ def get_similarity_score(
 
 @dataclass
 class SummaryDiff:
-    num_nan_score: Optional[int] = None
+    num_nan_score: int | None = None
     num_rows_change_relative: float = field(default=0.0)
     num_rows_start: int = field(default=0)
     num_rows_changed: int = field(default=0)

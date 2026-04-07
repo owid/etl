@@ -33,7 +33,7 @@ To be able to use them, you will first need to generate your own credentials, fo
 import pickle
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -123,7 +123,7 @@ class GoogleDrive:
         # Return the authenticated credentials object.
         return credentials
 
-    def create_doc(self, body: Optional[Dict[str, str]] = None) -> str:
+    def create_doc(self, body: dict[str, str] | None = None) -> str:
         """
         Create a new Google Doc and return its ID.
 
@@ -176,7 +176,7 @@ class GoogleDrive:
             fileId=file_id, addParents=folder_id, removeParents=prev_parents, fields="id, parents"
         ).execute()
 
-    def copy(self, file_id: str, body: Optional[Dict[str, str]] = None) -> str:
+    def copy(self, file_id: str, body: dict[str, str] | None = None) -> str:
         """
         Copy a file and return the new file ID.
 
@@ -243,8 +243,8 @@ class GoogleDrive:
         self,
         file_id: str,
         role: str = "reader",
-        general_access: Optional[str] = None,
-        emails: Optional[List[str]] = None,
+        general_access: str | None = None,
+        emails: list[str] | None = None,
         send_notification_email: bool = False,
     ) -> None:
         """
@@ -321,7 +321,7 @@ class GoogleDoc:
         """
         self.drive.move(folder_id=folder_id, file_id=self.doc_id)
 
-    def copy(self, body: Optional[Dict[str, str]] = None) -> str:
+    def copy(self, body: dict[str, str] | None = None) -> str:
         """
         Copy the document and return the new document ID.
 
@@ -341,7 +341,7 @@ class GoogleDoc:
         """
         return self.drive.copy(file_id=self.doc_id, body=body)
 
-    def edit(self, requests: List[Dict[str, Any]]) -> None:
+    def edit(self, requests: list[dict[str, Any]]) -> None:
         """
         Edit the document using the provided requests.
 
@@ -353,7 +353,7 @@ class GoogleDoc:
         """
         self.drive.docs_service.documents().batchUpdate(documentId=self.doc_id, body={"requests": requests}).execute()
 
-    def replace_text(self, mapping: Dict[str, str]) -> None:
+    def replace_text(self, mapping: dict[str, str]) -> None:
         """
         Replace all occurrences of specified placeholders in the document with the corresponding replacements.
 
@@ -450,9 +450,7 @@ class GoogleDoc:
         # Remove the original placeholder text.
         self.replace_text(mapping={placeholder: ""})
 
-    def save_as_pdf(
-        self, pdf_name: Optional[str] = None, folder_id: Optional[str] = None, overwrite: bool = False
-    ) -> str:
+    def save_as_pdf(self, pdf_name: str | None = None, folder_id: str | None = None, overwrite: bool = False) -> str:
         """
         Export this Google Doc as PDF and save it to Google Drive.
 
@@ -584,7 +582,7 @@ class GoogleSheet:
         """
         self.drive.move(folder_id=folder_id, file_id=self.sheet_id)
 
-    def copy(self, body: Optional[Dict[str, str]] = None) -> str:
+    def copy(self, body: dict[str, str] | None = None) -> str:
         """
         Copy the spreadsheet and return the new spreadsheet ID.
 
@@ -604,7 +602,7 @@ class GoogleSheet:
         """
         return self.drive.copy(file_id=self.sheet_id, body=body)
 
-    def get_values(self, range_name: str) -> List[List[str]]:
+    def get_values(self, range_name: str) -> list[list[str]]:
         """
         Get values from a specified range in the spreadsheet.
 
@@ -624,7 +622,7 @@ class GoogleSheet:
         )
         return result.get("values", [])
 
-    def update_values(self, range_name: str, values: List[List[Any]], value_input_option: str = "USER_ENTERED") -> None:
+    def update_values(self, range_name: str, values: list[list[Any]], value_input_option: str = "USER_ENTERED") -> None:
         """
         Update values in a specified range of the spreadsheet.
 
@@ -644,7 +642,7 @@ class GoogleSheet:
             spreadsheetId=self.sheet_id, range=range_name, valueInputOption=value_input_option, body=body
         ).execute()
 
-    def append_values(self, range_name: str, values: List[List[Any]], value_input_option: str = "USER_ENTERED") -> None:
+    def append_values(self, range_name: str, values: list[list[Any]], value_input_option: str = "USER_ENTERED") -> None:
         """
         Append values to the end of a specified range in the spreadsheet.
 
@@ -676,7 +674,7 @@ class GoogleSheet:
         """
         self.sheets_service.spreadsheets().values().clear(spreadsheetId=self.sheet_id, range=range_name).execute()
 
-    def batch_update_values(self, value_ranges: List[Dict[str, Any]], value_input_option: str = "USER_ENTERED") -> None:
+    def batch_update_values(self, value_ranges: list[dict[str, Any]], value_input_option: str = "USER_ENTERED") -> None:
         """
         Update multiple ranges in the spreadsheet in a single request.
 
@@ -737,7 +735,7 @@ class GoogleSheet:
         body = {"requests": [{"deleteSheet": {"sheetId": sheet_id}}]}
         self.sheets_service.spreadsheets().batchUpdate(spreadsheetId=self.sheet_id, body=body).execute()
 
-    def get_sheet_properties(self) -> List[Dict[str, Any]]:
+    def get_sheet_properties(self) -> list[dict[str, Any]]:
         """
         Get properties of all sheets in the spreadsheet.
 
@@ -750,7 +748,7 @@ class GoogleSheet:
         spreadsheet = self.sheets_service.spreadsheets().get(spreadsheetId=self.sheet_id).execute()
         return [sheet["properties"] for sheet in spreadsheet.get("sheets", [])]
 
-    def get_sheet_data(self, sheet_name: str = "Sheet1") -> List[List[str]]:
+    def get_sheet_data(self, sheet_name: str = "Sheet1") -> list[list[str]]:
         """
         Get all data from a worksheet by name.
 
@@ -770,7 +768,7 @@ class GoogleSheet:
         return self.get_values(range_name)
 
     def write_sheet_data(
-        self, data: List[List[Any]], sheet_name: str = "Sheet1", value_input_option: str = "USER_ENTERED"
+        self, data: list[list[Any]], sheet_name: str = "Sheet1", value_input_option: str = "USER_ENTERED"
     ) -> None:
         """
         Write data to a worksheet, starting from A1.
@@ -800,7 +798,7 @@ class GoogleSheet:
         self.update_values(range_name, data, value_input_option)
 
     def append_sheet_data(
-        self, data: List[List[Any]], sheet_name: str = "Sheet1", value_input_option: str = "USER_ENTERED"
+        self, data: list[list[Any]], sheet_name: str = "Sheet1", value_input_option: str = "USER_ENTERED"
     ) -> None:
         """
         Append data to the end of a worksheet.
@@ -1068,7 +1066,7 @@ class GoogleSheet:
             num //= 26
         return result
 
-    def get_sheet_names(self) -> List[str]:
+    def get_sheet_names(self) -> list[str]:
         """
         Get the names of all worksheets in the spreadsheet.
 
@@ -1083,7 +1081,7 @@ class GoogleSheet:
 
     @classmethod
     def create_or_update_sheet(
-        cls, title: str, df: pd.DataFrame, folder_id: Optional[str] = None, update_existing: bool = False
+        cls, title: str, df: pd.DataFrame, folder_id: str | None = None, update_existing: bool = False
     ) -> "GoogleSheet":
         """
         Create a new Google Sheet or update an existing one and return a GoogleSheet instance.
@@ -1114,7 +1112,7 @@ class GoogleSheet:
                 drive = GoogleDrive()
 
                 # Use the Drive API to create the spreadsheet file
-                file_metadata: Dict[str, Any] = {"name": title, "mimeType": "application/vnd.google-apps.spreadsheet"}
+                file_metadata: dict[str, Any] = {"name": title, "mimeType": "application/vnd.google-apps.spreadsheet"}
 
                 if folder_id:
                     file_metadata["parents"] = [folder_id]
@@ -1148,7 +1146,7 @@ class GoogleSheet:
                 else:
                     # No existing sheet found, create new one
                     log.info(f"No existing sheet found with title '{title}', creating new one")
-                    file_metadata: Dict[str, Any] = {
+                    file_metadata: dict[str, Any] = {
                         "name": title,
                         "mimeType": "application/vnd.google-apps.spreadsheet",
                     }

@@ -7,7 +7,7 @@ If you want to learn more about it, start from its `show` method.
 import difflib
 import json
 import os
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, cast
 
 import pandas as pd
 import streamlit as st
@@ -128,18 +128,18 @@ class ChartDiffShow:
         return label
 
     @property
-    def status_names(self) -> List[str]:
+    def status_names(self) -> list[str]:
         """List with names of accepted statuses."""
         return list(DISPLAY_STATE_OPTIONS.keys())
 
     @property
-    def status_names_binary(self) -> List[str]:
+    def status_names_binary(self) -> list[str]:
         """List with names of accepted statuses."""
         status = list(DISPLAY_STATE_OPTIONS.keys())
         status = [s for s in status if s not in {gm.ChartStatus.REJECTED.value}]
         return status
 
-    def _push_status(self, session: Optional[Session] = None) -> None:
+    def _push_status(self, session: Session | None = None) -> None:
         """Change state of the ChartDiff based on session state."""
         if session is None:
             session = self.source_session
@@ -150,7 +150,7 @@ class ChartDiffShow:
         # (displaying elements in fragment callbacks causes duplication bugs)
         st.session_state[f"toast-{self.diff.chart_id}"] = status
 
-    def _push_status_binary(self, session: Optional[Session] = None) -> None:
+    def _push_status_binary(self, session: Session | None = None) -> None:
         """Change state of the ChartDiff based on session state."""
         if session is None:
             session = self.source_session
@@ -453,7 +453,7 @@ class ChartDiffShow:
             cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
             st.info(cost_msg)
 
-    def _show_chart_comparison(self) -> Tuple[Any, bool]:
+    def _show_chart_comparison(self) -> tuple[Any, bool]:
         """Show charts (horizontally or vertically)."""
 
         def _show_chart_old():
@@ -503,7 +503,7 @@ class ChartDiffShow:
 
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
-        def _show_charts_comparison_v() -> Tuple[Any, bool]:
+        def _show_charts_comparison_v() -> tuple[Any, bool]:
             """Show charts on top of each other."""
             # Chart production
             config_ref, is_prod = _show_chart_old()
@@ -513,7 +513,7 @@ class ChartDiffShow:
 
             return config_ref, is_prod
 
-        def _show_charts_comparison_h() -> Tuple[Any, bool]:
+        def _show_charts_comparison_h() -> tuple[Any, bool]:
             """Show charts next to each other."""
             # Create two columns for the iframes
             col1, col2 = st.columns(2)
@@ -779,7 +779,7 @@ def compare_strings(s1: str, s2: str, fromfile: str, tofile: str = "staging"):
     return diff_string
 
 
-def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str, tofile: str = "staging"):
+def compare_dictionaries(dix_1: dict[str, Any], dix_2: dict[str, Any], fromfile: str, tofile: str = "staging"):
     """Get diff of two dictionaries.
 
     Useful for chart config diffs, indicator metadata diffs, etc.
@@ -792,7 +792,7 @@ def st_show_diff(diff_str, **kwargs):
     st.code(diff_str, line_numbers=True, language="diff", **kwargs)
 
 
-def _show_dict_diff(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str):
+def _show_dict_diff(dix_1: dict[str, Any], dix_2: dict[str, Any], fromfile: str):
     """Show diff of two dictionaries.
 
     Used to show chart config diffs, indicator metadata diffs, etc.

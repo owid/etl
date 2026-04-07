@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, cast
+from typing import cast
 
 import numpy as np
 from owid.catalog import Dataset, Table
@@ -194,7 +194,7 @@ def add_regional_aggregates(tb: Table, ds_regions: Dataset, ds_income: Dataset) 
     return tb
 
 
-def _interp_ffill_fillna(tb: Table, columns: List[str], entity_col: str = "country", time_col: str = "date") -> Table:
+def _interp_ffill_fillna(tb: Table, columns: list[str], entity_col: str = "country", time_col: str = "date") -> Table:
     tb = interpolate_table(
         df=tb.loc[:, columns + [entity_col, time_col]],
         entity_col=entity_col,

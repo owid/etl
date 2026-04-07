@@ -11,7 +11,7 @@ import time
 from dataclasses import dataclass
 from functools import wraps
 from pathlib import Path
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, cast
 
 import requests
 import sh
@@ -79,7 +79,7 @@ class GithubRepo:
     @property
     def latest_sha(self) -> str:
         master_file = self.cache_dir / ".git/refs/heads/master"
-        with open(master_file, "r") as f:
+        with open(master_file) as f:
             sha = f.read().strip()
 
         return sha
@@ -151,12 +151,12 @@ def log_time(func):
 
 # @log_time
 def get_changed_files(
-    current_branch: Optional[str] = None,
-    base_branch: Optional[str] = None,
-    repo_path: Union[Path, str] = BASE_DIR,
+    current_branch: str | None = None,
+    base_branch: str | None = None,
+    repo_path: Path | str = BASE_DIR,
     only_committed: bool = False,
     fetch: bool = False,
-) -> Dict[str, Dict[str, str]]:
+) -> dict[str, dict[str, str]]:
     """Return files that are different between the current branch and the specified base branch. This can
     be really slow if the number of files is large.
 

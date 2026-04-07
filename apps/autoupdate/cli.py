@@ -162,7 +162,7 @@ def run_updates(
             raise
 
         # Load md5 and size from the (possibly) updated file
-        with open(dvc_file, "r") as f:
+        with open(dvc_file) as f:
             new_outs = yaml.safe_load(f)["outs"][0]
 
         # Data is not new, MD5 or size is identical.
@@ -244,7 +244,7 @@ def cli(
         # Quite rare but possible to have multiple .dvc files for a single snapshot.
         dvc_file = dvc_files[0]
 
-        with open(dvc_file, "r") as f:
+        with open(dvc_file) as f:
             meta = yaml.safe_load(f)
             if not meta.get("autoupdate"):
                 # log.info("run_all_snapshots.skip", snapshot=snapshot, reason="autoupdate not enabled")

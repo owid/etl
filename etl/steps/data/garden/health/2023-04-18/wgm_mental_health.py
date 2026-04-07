@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, cast
+from typing import cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -189,7 +189,7 @@ def _make_df_with_share_answers(df: pd.DataFrame, weight_column: str = "weight_i
 
 
 def _make_individual_df_with_share_answers(
-    df: pd.DataFrame, weight_column: str, dimensions: List[str] = []
+    df: pd.DataFrame, weight_column: str, dimensions: list[str] = []
 ) -> pd.DataFrame:
     """Obtain table with answer percentages and counts to each question for all demographic groups and countries.
 

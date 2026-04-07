@@ -12,8 +12,6 @@ This is an adaptation of the original script created by Pablo A and Joe for Joe'
 We want to process this data inside the ETL now.
 """
 
-from typing import Dict, List
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -152,8 +150,8 @@ def run() -> None:
 
 def match_ref_years(
     tb: Table,
-    series: List[str],
-    reference_years: Dict[int, Dict[str, int]],
+    series: list[str],
+    reference_years: dict[int, dict[str, int]],
     only_all_series: bool,
     exclude_different_welfare: bool = True,
     exclude_different_reporting_level: bool = False,
@@ -450,7 +448,7 @@ def add_regions_columns(tb: Table, ds_regions: Dataset) -> Table:
 
 def add_metadata_from_original_tables(
     tb: Table,
-    indicator_match: Dict[str, str],
+    indicator_match: dict[str, str],
     tb_pip: Table,
     tb_wid: Table,
 ) -> Table:
@@ -472,7 +470,7 @@ def add_metadata_from_original_tables(
     return tb
 
 
-def create_analysis_and_grapher_tables(tb: Table) -> List[Table]:
+def create_analysis_and_grapher_tables(tb: Table) -> list[Table]:
     """
     Create two different tables with the same data: one with data for analysis and another with more restricted data for Grapher
     """

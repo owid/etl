@@ -1,6 +1,6 @@
 """Concerns the second stage of wizard charts, when the indicator mapping is constructed."""
 
-from typing import Dict, List, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -36,7 +36,7 @@ MAPPINGS_PER_PAGE_DEFAULT = 50
 COLUMN_LAYOUT = [10, 40, 50, 7, 4.5]
 
 
-def render_indicator_mapping(search_form) -> Dict[int, int]:
+def render_indicator_mapping(search_form) -> dict[int, int]:
     """Render indicator mapping section."""
 
     indicator_mapping = {}
@@ -249,7 +249,7 @@ def st_show_header(search_form):
 
 def st_show_indicator_upgrades(
     indicator_ups, pagination_key, indicator_id_to_display, df_data
-) -> List["IndicatorUpgrade"]:
+) -> list["IndicatorUpgrade"]:
     """Display indicator upgrades."""
     # Pagination
     pagination = Pagination(
@@ -274,7 +274,7 @@ def st_show_indicator_upgrades(
 
 
 class IndicatorUpgrade:
-    def __init__(self, id_old: int, ids_new: List[int], auto: bool, scores: Dict[int, float] = {}):
+    def __init__(self, id_old: int, ids_new: list[int], auto: bool, scores: dict[int, float] = {}):
         """Handle a single indicator mapping."""
         self.id_old = id_old
         self.ids_new = ids_new
@@ -308,7 +308,7 @@ class IndicatorUpgrade:
         """
         ids_new = list(suggestions["id_new"])
         scores = suggestions.set_index("id_new")["similarity"].to_dict()
-        scores = cast(Dict[int, float], scores)
+        scores = cast(dict[int, float], scores)
         return cls(
             id_old=id_old,
             ids_new=ids_new,
@@ -502,7 +502,7 @@ def get_indicator_id_to_display(old_indicators, new_indicators):
 
 
 @st.cache_data(show_spinner=False)
-def get_indicator_data_cached(indicator_ids: List[int]):
+def get_indicator_data_cached(indicator_ids: list[int]):
     with st.spinner(
         "Retrieving data values from S3. This might take some time... If you don't need this, disable the 'Explore' option from the 'parameters' section.",
         show_time=True,
@@ -519,7 +519,7 @@ def get_indicator_data_cached(indicator_ids: List[int]):
     return df
 
 
-def convert_year_to_date(df: pd.DataFrame, indicator_ids: List[int]) -> pd.DataFrame:
+def convert_year_to_date(df: pd.DataFrame, indicator_ids: list[int]) -> pd.DataFrame:
     """Convert year to date if zeroDay is True. Keep the column named 'year'."""
     q = """
     select

@@ -2,7 +2,7 @@
 
 import copy
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union
+from typing import Any, Literal
 
 import pandas as pd
 import rich_click as click
@@ -42,7 +42,7 @@ def cli(
     dataset_path: str,
     output: str,
     show: bool,
-    decimals: Optional[str],
+    decimals: str | None,
 ) -> None:
     """Export dataset, tables & indicator metadata in YAML format.
 
@@ -75,7 +75,7 @@ def main(
     path: str,
     output: str,
     show: bool,
-    decimals: Optional[str],
+    decimals: str | None,
 ) -> str:
     """Read docstring of `cli`."""
     ds = Dataset(path=path)
@@ -105,11 +105,11 @@ def main(
     return str(output_path)
 
 
-def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path, delete_empty: bool = True) -> str:
+def merge_or_create_yaml(meta_dict: dict[str, Any], output_path: Path, delete_empty: bool = True) -> str:
     """Merge metadata with existing YAML file or create a new one and return it as string."""
     # if output_path exists, update its values, but keep YAML structure intact
     if output_path.exists():
-        with open(output_path, "r") as f:
+        with open(output_path) as f:
             doc = ruamel_load(f) or {}
 
         if "dataset" not in doc:
@@ -161,7 +161,7 @@ def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path, delete_em
 def metadata_export(
     ds: Dataset,
     prune: bool = False,
-    decimals: Optional[Union[int, Literal["auto", "no"]]] = None,
+    decimals: int | Literal["auto", "no"] | None = None,
     keep_title: bool = False,
 ) -> dict:
     """
@@ -300,7 +300,7 @@ def metadata_export(
     return reorder_fields(meta)
 
 
-def reorder_fields(m: Dict[str, Any]) -> Dict[str, Any]:
+def reorder_fields(m: dict[str, Any]) -> dict[str, Any]:
     """Reorder metadata fields to have consistent YAML."""
     # make copy and then modify everything in place
     m = copy.deepcopy(m)
@@ -370,14 +370,14 @@ def reorder_fields(m: Dict[str, Any]) -> Dict[str, Any]:
     return m
 
 
-def _reorder_keys(d: Dict[str, Any], order: List[str]) -> None:
+def _reorder_keys(d: dict[str, Any], order: list[str]) -> None:
     keys = order + [k for k in d.keys() if k not in order]
     for k in keys:
         if k in d:
             d[k] = d.pop(k)
 
 
-def _move_sources_to_dataset(ds_meta: Dict[str, Any], tb_meta: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+def _move_sources_to_dataset(ds_meta: dict[str, Any], tb_meta: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     """If all variables have the same source, move it to dataset. Otherwise return
     the original metadata.
     """
@@ -406,7 +406,7 @@ def _move_sources_to_dataset(ds_meta: Dict[str, Any], tb_meta: Dict[str, Any]) -
     return ds_meta, tb_meta
 
 
-def _prune_empty(d: Dict[str, Any]) -> None:
+def _prune_empty(d: dict[str, Any]) -> None:
     """Remove empty values from dict."""
     for k, v in list(d.items()):
         if not v:

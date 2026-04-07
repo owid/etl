@@ -3,8 +3,6 @@ Load the three LIS snapshots and creates three tables in the luxembourg_income_s
 Country names are converted from iso-2 codes in this step and years are reformated from "YY" to "YYYY"
 """
 
-from typing import Dict
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
@@ -60,7 +58,7 @@ def run(dest_dir: str) -> None:
 
 
 def process_tables(
-    age_dict: Dict[str, str], snapshots_dict: Dict[str, list], tb_countries_regions: Table
+    age_dict: dict[str, str], snapshots_dict: dict[str, list], tb_countries_regions: Table
 ) -> list[Table]:
     """
     Format year and country of each table and add them to the meadow dataset.

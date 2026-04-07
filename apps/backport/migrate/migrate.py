@@ -2,7 +2,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional, cast
+from typing import cast
 
 import rich_click as click
 import structlog
@@ -89,7 +89,7 @@ def cli(
     dataset_id: int,
     namespace: str,
     version: str,
-    short_name: Optional[str] = None,
+    short_name: str | None = None,
     backport: bool = True,
     force: bool = False,
     dry_run: bool = False,
@@ -130,12 +130,12 @@ def migrate(
     dataset_id: int,
     namespace: str,
     version: str = "latest",
-    short_name: Optional[str] = None,
+    short_name: str | None = None,
     backport: bool = True,
     force: bool = False,
     dry_run: bool = False,
     upload: bool = True,
-    engine: Optional[Engine] = None,
+    engine: Engine | None = None,
     run: bool = False,
 ) -> None:
     lg = log.bind(dataset_id=dataset_id)

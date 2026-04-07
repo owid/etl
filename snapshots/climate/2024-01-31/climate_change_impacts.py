@@ -8,7 +8,6 @@ assumed to be the same as the access date. These dates will be written to the me
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import click
 import requests
@@ -77,7 +76,7 @@ FILES = [
 ########################################################################################################################
 
 
-def find_date_published(snap: Snapshot) -> Optional[str]:
+def find_date_published(snap: Snapshot) -> str | None:
     # Extract publication date for each individual origin, if possible.
     # Otherwise, assign the current access date as publication date.
     if snap.path.name == "sea_ice_index.xlsx":

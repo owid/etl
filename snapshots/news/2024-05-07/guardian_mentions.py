@@ -192,7 +192,7 @@ import os
 import pathlib
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 import click
 import numpy as np
@@ -223,7 +223,7 @@ API_TAGS_URL = "https://content.guardianapis.com/tags"
 
 
 # Load YAML file with country tags
-with open(COUNTRY_TAGS_FILE, "r") as file:
+with open(COUNTRY_TAGS_FILE) as file:
     COUNTRY_TAGS = yaml.safe_load(file)
 COUNTRIES = list(COUNTRY_TAGS.keys())
 
@@ -235,7 +235,7 @@ log = get_logger()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--tags", type=str, help="Path to local data file.")
 @click.option("--mentions", type=str, help="Path to local data file.")
-def main(tags: Optional[str], mentions: Optional[str], upload: bool) -> None:
+def main(tags: str | None, mentions: str | None, upload: bool) -> None:
     params = [
         (tags, f"news/{SNAPSHOT_VERSION}/guardian_mentions.csv"),
         (mentions, f"news/{SNAPSHOT_VERSION}/guardian_mentions_raw.csv"),
@@ -304,7 +304,7 @@ def get_data(output_file, country_tags=COUNTRY_TAGS, year_range=None):
     df_data.to_csv(output_file, index=False)
 
 
-def get_pages_from_tags(tags: List[str], lazy: bool = True, year: Optional[int] = None):
+def get_pages_from_tags(tags: list[str], lazy: bool = True, year: int | None = None):
     """Get the pages categorised under certain tag(s) for a given year.
 
     Use lazy=False to get the actual list of page ids.
@@ -323,7 +323,7 @@ def get_pages_from_tags(tags: List[str], lazy: bool = True, year: Optional[int] 
     return num_pages, page_ids
 
 
-def get_pages_from_tags_slice(tags: List[str], lazy: bool = True, year: Optional[int] = None) -> Tuple[int, Set[Any]]:
+def get_pages_from_tags_slice(tags: list[str], lazy: bool = True, year: int | None = None) -> tuple[int, set[Any]]:
     """Get the pages categorised under certain tags. Use lazy=False to get the actual list of page ids."""
     # Get list of articles for each tag
     tag_or = "|".join(tags)
@@ -356,7 +356,7 @@ def get_pages_from_tags_slice(tags: List[str], lazy: bool = True, year: Optional
     return num_pages, page_ids
 
 
-def _get_page_ids(api_url: str, params: Dict[str, Any], response: Dict["str", Any]) -> set[Any]:
+def _get_page_ids(api_url: str, params: dict[str, Any], response: dict["str", Any]) -> set[Any]:
     """Get the page ids with a certain tag."""
     # Sanity check
     assert "results" in response, "'results' not found in response"
@@ -394,12 +394,12 @@ def get_country_tags(output_file: str | Path = COUNTRY_TAGS_FILE):
         yaml.dump(country_tags, file, default_flow_style=False, sort_keys=False)
 
 
-def get_summary_data(countries: List[str] = COUNTRIES, output_file: str | None = None) -> pd.DataFrame:
+def get_summary_data(countries: list[str] = COUNTRIES, output_file: str | None = None) -> pd.DataFrame:
     """Get tags and number of pages for each country over year period."""
     data_all = []
     # For each country, get tags and number of pages
     for i, country in enumerate(countries):
-        data_: Dict[str, Any] = {
+        data_: dict[str, Any] = {
             "country": country,
         }
         if i % 10 == 0:
@@ -438,7 +438,7 @@ def get_summary_data(countries: List[str] = COUNTRIES, output_file: str | None =
     return df
 
 
-def get_tags_for_title(title: str, verbose: bool = False, year: Optional[int] = None) -> List[str]:
+def get_tags_for_title(title: str, verbose: bool = False, year: int | None = None) -> list[str]:
     """Get the list of tags for a given title.
 
     For our purposes, "title" is the name of a country. For instance, for "Spain" there are various tags like "world/spain", "travel/spain", etc.
@@ -554,7 +554,7 @@ def get_data_by_tags_from_tuples(country_year_pairs, output_file) -> None:
     Get data for a country based on tags associated to it.
     """
     # Get country -> tags mapping
-    with open(COUNTRY_TAGS_FILE, "r") as file:
+    with open(COUNTRY_TAGS_FILE) as file:
         COUNTRY_TAGS = yaml.safe_load(file)
 
     # Get missing data
@@ -674,7 +674,7 @@ COUNTRY_EXCEPTIONS = {
 }
 
 
-def get_country_name_variations(country_names: Optional[Set[str]] = None):
+def get_country_name_variations(country_names: set[str] | None = None):
     # Load regions table from disk
     tb_regions = Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")["regions"]
     # Extract list with country names

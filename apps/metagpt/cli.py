@@ -1,7 +1,7 @@
 """Client module."""
 
 import os
-from typing import Any, Dict, Literal, cast
+from typing import Any, Literal, cast
 
 import click
 import structlog
@@ -160,9 +160,9 @@ class MetadataGPTUpdater:
             log.error(f"Required garden dataset {self.path_to_dataset} does not exist. Run the garden step first.")
             raise Exception("Required garden dataset does not exist. Run the garden step first.")
 
-    def load_yaml_metadata(self: Self) -> Dict[str, Any]:
+    def load_yaml_metadata(self: Self) -> dict[str, Any]:
         """Load dataset metadata from YAML."""
-        with open(self.path_to_file, "r") as file:
+        with open(self.path_to_file) as file:
             original_yaml_content = yaml.safe_load(file)
         return original_yaml_content
 

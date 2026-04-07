@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import requests
 
@@ -25,7 +25,7 @@ TEMPLATE_PROPERTY = """
 """
 
 
-def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_level: bool = False) -> str:
+def render_prop_doc(prop: dict[str, Any], prop_name: str, level: int = 1, top_level: bool = False) -> str:
     """Render a particular property."""
     prop_title = f"{'#' * (level)} `{prop_name}`"
     if top_level:
@@ -88,16 +88,16 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
     return prop_docs
 
 
-def _extract_type(prop: Dict[str, Any]) -> str:
+def _extract_type(prop: dict[str, Any]) -> str:
     return prop.get("type") or prop["enum"]
 
 
 def render_props_recursive(
-    prop: Dict[str, Any],
+    prop: dict[str, Any],
     prop_name: str,
     level: int,
     text: str,
-    ignore_fields: Optional[List[str]] = None,
+    ignore_fields: list[str] | None = None,
     render_top_as_scalar: bool = True,
 ) -> str:
     """Render all properties."""
@@ -178,7 +178,7 @@ def render_indicator(level: int = 1) -> str:
     return documentation
 
 
-def guidelines_to_markdown(guidelines: List[Any], extra_tab: int = 0) -> str:
+def guidelines_to_markdown(guidelines: list[Any], extra_tab: int = 0) -> str:
     """Render guidelines to markdown from given list in schema."""
     tab = "\t" * extra_tab
     text = ""
@@ -236,8 +236,8 @@ def _guideline_to_markdown(text: str, tab: str, guideline):
 
 
 def examples_to_markdown(
-    examples: List[str],
-    examples_bad: List[Any],
+    examples: list[str],
+    examples_bad: list[Any],
     extra_tab: int = 0,
     do_sign: str = ":material-check:",
     dont_sign: str = ":material-close:",
@@ -268,7 +268,7 @@ def examples_to_markdown(
     return text
 
 
-def faqs_to_markdown(faqs: List[Any], extra_tab: int = 0) -> str:
+def faqs_to_markdown(faqs: list[Any], extra_tab: int = 0) -> str:
     """Render FAQs to markdown from given list in schema."""
     tab = "\t" * extra_tab
     texts = []

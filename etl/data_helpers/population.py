@@ -1,6 +1,6 @@
 """Tools to load population data."""
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 from owid.catalog import Dataset
@@ -15,13 +15,13 @@ def add_population(
     df: pd.DataFrame,
     country_col: str,
     year_col: str,
-    ds_un_wpp: Optional[Dataset] = None,
-    sex_col: Optional[str] = None,
-    sex_group_all: Optional[str] = None,
-    sex_group_female: Optional[str] = None,
-    sex_group_male: Optional[str] = None,
-    age_col: Optional[str] = None,
-    age_group_mapping: Optional[Dict[str, Optional[Any]]] = None,
+    ds_un_wpp: Dataset | None = None,
+    sex_col: str | None = None,
+    sex_group_all: str | None = None,
+    sex_group_female: str | None = None,
+    sex_group_male: str | None = None,
+    age_col: str | None = None,
+    age_group_mapping: dict[str, Any | None] | None = None,
 ) -> pd.DataFrame:
     """Add population to dataframe.
 

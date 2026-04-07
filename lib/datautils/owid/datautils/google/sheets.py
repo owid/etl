@@ -1,7 +1,7 @@
 """Google Sheet utils."""
 
 import os
-from typing import Any, Optional, Union
+from typing import Any
 
 import pandas as pd
 from gsheets import Sheets
@@ -35,7 +35,7 @@ class GSheetsApi:
         if not os.path.isdir(credentials_folder):
             os.makedirs(credentials_folder, exist_ok=True)
 
-    def get(self, spreadsheet_id: str, worksheet_id: Optional[int] = None) -> Union[SpreadSheet, WorkSheet]:
+    def get(self, spreadsheet_id: str, worksheet_id: int | None = None) -> SpreadSheet | WorkSheet:
         """Get a spreadsheet or worksheet from a Google sheet.
 
         If only `spreadsheet_id` is provided, this will return the entire spreadsheet. Otherwise,
@@ -57,7 +57,7 @@ class GSheetsApi:
         self,
         spreadsheet_id: str,
         worksheet_id: int,
-        output_path: Optional[str] = None,
+        output_path: str | None = None,
         encoding: str = "utf-8",
         **kwargs: Any,
     ) -> None:

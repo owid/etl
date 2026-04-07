@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -70,7 +70,7 @@ def get_explorers_views():
 
 
 @st_cache_data(custom_text="Getting datasets...", ttl=TTL_DEFAULT, show_time=True)
-def get_datasets() -> Dict[int, Dict[str, Any]]:
+def get_datasets() -> dict[int, dict[str, Any]]:
     """Get list of datasets.
 
     NOTE: Only datasets with a catalogPath are considered (i.e. ETL-era).

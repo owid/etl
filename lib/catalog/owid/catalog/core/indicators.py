@@ -269,11 +269,11 @@ class Indicator(pd.Series):
 
     def _repr_html_(self):
         html = str(self)
-        return """
-             <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
+        return f"""
+             <h2 style="margin-bottom: 0em"><pre>{self.name}</pre></h2>
              <p style="font-variant: small-caps; font-size: 1.5em; font-family: sans-serif; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">indicator</p>
-             <pre>{}</pre>
-        """.format(self.name, html)
+             <pre>{html}</pre>
+        """
 
     def __add__(self, other: Scalar | Series | Indicator) -> Indicator:  # ty: ignore
         indicator_name = self.name or UNNAMED_INDICATOR

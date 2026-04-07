@@ -6,7 +6,6 @@ Notes:
 """
 
 import json
-from typing import Dict, Tuple
 
 import owid.catalog.processing as pr
 from owid.catalog import License, Origin, Table
@@ -224,7 +223,7 @@ def format_wpp(tb: Table) -> Table:
 ######################
 # Gapminder SG #######
 ######################
-def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
+def format_gapminder_sg(tb: Table) -> tuple[Table, Table]:
     """Format Gapminder Systema Globalis table."""
     columns_rename = {
         "country": "country",
@@ -232,7 +231,7 @@ def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
         "total_population_with_projections": "population",
     }
 
-    def _core_formatting(tb: Table, country_rename: Dict[str, str]) -> Table:
+    def _core_formatting(tb: Table, country_rename: dict[str, str]) -> Table:
         ## rename countries
         tb["country"] = tb["geo"].map(country_rename)
         ## rename columns

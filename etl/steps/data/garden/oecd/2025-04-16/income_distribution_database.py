@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from structlog import get_logger
@@ -168,7 +166,7 @@ def sanity_checks(tb: Table) -> None:
     return None
 
 
-def check_between_0_and_1(tb: Table, variables: List[str]) -> None:
+def check_between_0_and_1(tb: Table, variables: list[str]) -> None:
     """
     Check that indicators are between 0 and 1
     """

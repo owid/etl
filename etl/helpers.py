@@ -5,9 +5,10 @@
 import os
 import re
 import time
+from collections.abc import Callable, Iterable
 from functools import cache
 from pathlib import Path
-from typing import Any, Callable, Iterable, Literal, Optional, overload
+from typing import Any, Literal, overload
 
 import deprecated
 import pandas as pd
@@ -650,7 +651,7 @@ class PathFinder:
         assert isinstance(cs, CollectionSet)
         return cs
 
-    def init_snapshot(self, filename: Optional[str] = None) -> Snapshot:
+    def init_snapshot(self, filename: str | None = None) -> Snapshot:
         """Create a snapshot using the current step's location to determine namespace, version, and optionally filename.
 
         Args:

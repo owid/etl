@@ -13,12 +13,12 @@ Note: This script is a pyright-specific helper. It intentionally inserts
 
 def add_type_ignore_to_lines(file_path, line_number, rule):
     """Reads a file, adds # ty: ignore to the specified line, and writes it back."""
-    with open(file_path, "r") as file:
+    with open(file_path) as file:
         lines = file.readlines()
 
     # We need to insert # ty: ignore at the end of the line
     target_line = lines[line_number - 1].rstrip()  # Pyright uses 1-based indexing for lines
-    if  "# ty: ignore" not in target_line and "# ty: ignore" not in target_line:
+    if "# ty: ignore" not in target_line and "# ty: ignore" not in target_line:
         lines[line_number - 1] = f"{target_line}  # ty: ignore\n"
 
     with open(file_path, "w") as file:

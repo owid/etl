@@ -3,7 +3,7 @@ import re
 import zipfile
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 import structlog
@@ -59,7 +59,7 @@ def run(dest_dir: str) -> None:
 
     # validate that all columns have title
     for col in tb_garden.columns:
-        assert tb_garden[col].metadata.title is not None, 'Variable "{}" has no title'.format(col)
+        assert tb_garden[col].metadata.title is not None, f'Variable "{col}" has no title'
 
     ####################################################################################################################
     # Fix issue with Papua New Guinea's electricity access.
@@ -418,16 +418,16 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
     return table
 
 
-def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:
+def load_clean_source_mapping() -> dict[str, dict[str, str]]:
     # TODO: say something about how it was created
-    with open(Path(__file__).parent / "wdi.sources.json", "r") as f:
+    with open(Path(__file__).parent / "wdi.sources.json") as f:
         sources = json.load(f)
         source_mapping = {source["rawName"]: source for source in sources}
         assert len(sources) == len(source_mapping)
     return source_mapping
 
 
-def create_description(var: Dict[str, Any]) -> Optional[str]:
+def create_description(var: dict[str, Any]) -> str | None:
     desc = ""
     if pd.notnull(var["long_definition"]) and len(var["long_definition"].strip()) > 0:
         desc += var["long_definition"]

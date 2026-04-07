@@ -16,7 +16,7 @@ import json
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Union, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -630,7 +630,7 @@ def remove_columns_with_only_nans(data: pd.DataFrame, verbose: bool = True) -> p
     return data
 
 
-def remove_duplicates(data: pd.DataFrame, index_columns: List[str], verbose: bool = True) -> pd.DataFrame:
+def remove_duplicates(data: pd.DataFrame, index_columns: list[str], verbose: bool = True) -> pd.DataFrame:
     """Remove rows with duplicated index (country, year, item, element, unit).
 
     First attempt to use flags to remove duplicates. If there are still duplicates, remove in whatever way possible.
@@ -812,7 +812,7 @@ def add_custom_names_and_descriptions(
 
 
 def remove_regions_from_countries_regions_members(
-    countries_regions: pd.DataFrame, regions_to_remove: List[str]
+    countries_regions: pd.DataFrame, regions_to_remove: list[str]
 ) -> pd.DataFrame:
     """Remove regions that have to be ignored from the lists of members in the countries-regions dataset.
 
@@ -931,7 +931,7 @@ def load_income_groups() -> pd.DataFrame:
     return cast(pd.DataFrame, income_groups)
 
 
-def list_countries_in_region(region: str, countries_regions: pd.DataFrame, income_groups: pd.DataFrame) -> List[str]:
+def list_countries_in_region(region: str, countries_regions: pd.DataFrame, income_groups: pd.DataFrame) -> list[str]:
     """List all countries in a specific region or income group.
 
     Parameters
@@ -1029,7 +1029,7 @@ def remove_overlapping_data_between_historical_regions_and_successors(
     return data_region
 
 
-def remove_outliers(data: pd.DataFrame, outliers: List[Dict[str, List[Union[str, int]]]]) -> pd.DataFrame:
+def remove_outliers(data: pd.DataFrame, outliers: list[dict[str, list[str | int]]]) -> pd.DataFrame:
     """Remove known outliers (defined in OUTLIERS_TO_REMOVE) from processed data.
 
     The argument "outliers" is the list of outliers to remove: data points that are wrong and create artefacts in the
@@ -1821,7 +1821,7 @@ def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
     return wide_table
 
 
-def _variable_name_map(data: pd.DataFrame, column: str) -> Dict[str, str]:
+def _variable_name_map(data: pd.DataFrame, column: str) -> dict[str, str]:
     """Extract map {variable name -> column} from dataframe and make sure it is unique (i.e. ensure that one variable
     does not map to two distinct values)."""
     pivot = data.dropna(subset=[column]).groupby(["variable_name"], observed=True)[column].apply(set)
@@ -1871,7 +1871,7 @@ def run(dest_dir: str) -> None:
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
 
     # Load file of detected outliers.
-    with open(outliers_file, "r") as _json_file:
+    with open(outliers_file) as _json_file:
         outliers = json.loads(_json_file.read())
 
     ####################################################################################################################

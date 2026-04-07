@@ -66,7 +66,7 @@ class SiteSearchAPI:
         ```
     """
 
-    def __init__(self, client: "Client", base_url: str, site_url: str) -> None:
+    def __init__(self, client: Client, base_url: str, site_url: str) -> None:
         """Initialize the SiteSearchAPI.
 
         Args:

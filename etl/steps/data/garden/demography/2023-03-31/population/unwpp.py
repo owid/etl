@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import List
 
 import pandas as pd
 from owid.catalog import Table
@@ -65,8 +64,8 @@ def _post_sanity_checks(df: pd.DataFrame) -> None:
     assert df.groupby(["country", "year"])["population"].count().max() == 1
 
 
-def load_excluded_countries(excluded_countries_path: Path) -> List[str]:
-    with open(excluded_countries_path, "r") as f:
+def load_excluded_countries(excluded_countries_path: Path) -> list[str]:
+    with open(excluded_countries_path) as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data

@@ -2,7 +2,6 @@
 
 import re
 from datetime import datetime
-from typing import Dict, List
 
 import click
 import pandas as pd
@@ -60,7 +59,7 @@ def run_sanity_checks(df_charts: pd.DataFrame, df_posts: pd.DataFrame) -> None:
     assert df_posts[df_posts.duplicated(subset=["url"])].empty, error
 
 
-def gather_producer_analytics(producers: List[str], min_date: str, max_date: str) -> Dict[str, pd.DataFrame]:
+def gather_producer_analytics(producers: list[str], min_date: str, max_date: str) -> dict[str, pd.DataFrame]:
     # Get charts using data from the data producer(s).
     df_producer_charts = get_visualizations_using_data_by_producer(producers=producers)
 
@@ -157,7 +156,7 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
 class Report:
     """An analytics report for a data producer."""
 
-    def __init__(self, producer: str, period: str, year: int, aliases: List[str] | None = None):
+    def __init__(self, producer: str, period: str, year: int, aliases: list[str] | None = None):
         self.producer = producer  # Canonical name for display
         self.aliases = aliases or []
         self.all_producer_names = [producer] + self.aliases  # All names for data gathering
@@ -178,7 +177,7 @@ class Report:
 
         # Data provider emails, that will be granted reading permissions to access the pdf reports.
         # NOTE: They will be fetched by gather_emails()
-        self.emails: List[str] | None = None
+        self.emails: list[str] | None = None
 
         for file in files:
             if file["name"] == self.title:
@@ -204,7 +203,7 @@ class Report:
             log.info(f"No existing files found for {self.title}")
 
         # Initialize other attributes (that will be populated later on).
-        self.analytics: Dict[str, pd.DataFrame] | None = None
+        self.analytics: dict[str, pd.DataFrame] | None = None
         self.google_doc: GoogleDoc | None = None
         if self.doc_id:
             self.google_doc = GoogleDoc(doc_id=self.doc_id)
@@ -375,7 +374,7 @@ class Report:
         if self.doc_link or self.pdf_link:
             log.info(f"Files are saved in folder: {self.folder_link}")
 
-    def get_links(self) -> Dict[str, str]:
+    def get_links(self) -> dict[str, str]:
         """Get all available links for this report."""
         links = {}
         if self.doc_link:

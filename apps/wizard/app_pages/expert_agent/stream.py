@@ -1,8 +1,8 @@
 import asyncio
 import queue
 import threading
-from collections.abc import AsyncIterable
-from typing import AsyncGenerator, List, Literal
+from collections.abc import AsyncGenerator, AsyncIterable
+from typing import Literal
 
 import streamlit as st
 from pydantic import BaseModel, Field
@@ -142,9 +142,9 @@ def _agent_stream_sync(
     session_updates_callback=None,
     question_id: str | None = None,
 ):
-    text_q: "queue.Queue[AnswerChunk | str | None]" = queue.Queue()
-    updates_q: "queue.Queue[dict | None]" = queue.Queue()
-    ui_messages_q: "queue.Queue[dict | None]" = queue.Queue()
+    text_q: queue.Queue[AnswerChunk | str | None] = queue.Queue()
+    updates_q: queue.Queue[dict | None] = queue.Queue()
+    ui_messages_q: queue.Queue[dict | None] = queue.Queue()
 
     async def async_worker():
         try:
@@ -493,7 +493,7 @@ async def agent_stream(agent, prompt: str, model_name: str, message_history) -> 
         status.update(label="Got the answer!", state="complete", expanded=False)
 
 
-async def _collect_agent_stream2(agent, prompt: str, model_name: str, message_history) -> List[str]:
+async def _collect_agent_stream2(agent, prompt: str, model_name: str, message_history) -> list[str]:
     """Collect all chunks from agent_stream2 in one async context to avoid task switching issues."""
     chunks = []
     model = _get_model_from_name(model_name)

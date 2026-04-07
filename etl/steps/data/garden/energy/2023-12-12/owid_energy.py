@@ -16,8 +16,6 @@ In the future we may want to avoid it, and use the propagated metadata, without 
 
 """
 
-from typing import Dict
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Origin, Table
@@ -33,7 +31,7 @@ VARIABLE_MAPPING_FILE = paths.directory / "owid_energy_variable_mapping.csv"
 
 
 def combine_tables_data_and_metadata(
-    tables: Dict[str, Table],
+    tables: dict[str, Table],
     ds_population: Dataset,
     ds_regions: Dataset,
     ds_gdp: Dataset,

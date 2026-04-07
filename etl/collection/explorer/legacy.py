@@ -11,7 +11,7 @@ TODO:
 from copy import copy
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -70,10 +70,10 @@ class ExplorerLegacy:
     def __init__(
         self,
         name: str | None = None,
-        config: Dict[str, Any] | None = None,
+        config: dict[str, Any] | None = None,
         df_graphers: pd.DataFrame | None = None,
         df_columns: pd.DataFrame | None = None,
-        comments: List[str] | None = None,
+        comments: list[str] | None = None,
     ):
         """Build Explorer object from `content`.
 
@@ -223,7 +223,7 @@ class ExplorerLegacy:
         return EXPORT_DIR / "explorers" / (self.catalog_path.replace("#", "/") + ".tsv")
 
     @staticmethod
-    def _parse_config(config_raw, sep) -> Dict[str, Any]:
+    def _parse_config(config_raw, sep) -> dict[str, Any]:
         """Parse the config at the top of the explorer file."""
         config_raw = [c for c in config_raw if c.strip() != ""]
         if sep == ",":
@@ -577,7 +577,7 @@ class ExplorerLegacy:
 
         return content_has_changed
 
-    def get_variable_config(self, variable_id: int) -> Dict[str, Any]:
+    def get_variable_config(self, variable_id: int) -> dict[str, Any]:
         variable_config = {}
         # Load configuration for a variable from the explorer columns section, if any.
         if "variableId" in self.df_columns:
@@ -590,7 +590,7 @@ class ExplorerLegacy:
 
         return variable_config  # ty: ignore[invalid-return-type]
 
-    def get_variable_config_from_catalog_path(self, catalog_path: str) -> Dict[str, Any]:
+    def get_variable_config_from_catalog_path(self, catalog_path: str) -> dict[str, Any]:
         variable_config = {}
         if "catalogPath" in self.df_columns:
             variable_row = self.df_columns.loc[self.df_columns["catalogPath"] == catalog_path]
@@ -666,7 +666,7 @@ class ExplorerLegacy:
 
 def create_explorer_legacy(
     catalog_path: str,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     df_graphers: pd.DataFrame,
     explorer_name: str,
     df_columns: pd.DataFrame | None = None,

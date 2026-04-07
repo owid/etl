@@ -1,19 +1,19 @@
 """Fertility table."""
 
-from typing import Any, Dict, List
+from typing import Any
 
 from owid.catalog import Table
 
 from .dtypes import optimize_dtypes
 
 # rename columns
-COLUMNS_ID: Dict[str, str] = {
+COLUMNS_ID: dict[str, str] = {
     "location": "location",
     "time": "year",
     "variant": "variant",
     "agegrp": "age",
 }
-COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
+COLUMNS_METRICS: dict[str, dict[str, Any]] = {
     "asfr": {
         "name": "fertility_rate",
         "sex": "all",
@@ -25,7 +25,7 @@ COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
         "operation": lambda x: x * 1000,
     },
 }
-COLUMNS_ORDER: List[str] = [
+COLUMNS_ORDER: list[str] = [
     "location",
     "year",
     "metric",

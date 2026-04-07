@@ -1913,13 +1913,13 @@ class Table(pd.DataFrame):
     def sort_index(self, *args: Any, **kwargs: Any) -> Table:
         return super().sort_index(*args, **kwargs)  # ty: ignore
 
-    def groupby(self, *args: Any, observed: bool = True, **kwargs: Any) -> "TableGroupBy":
+    def groupby(self, *args: Any, observed: bool = True, **kwargs: Any) -> TableGroupBy:
         """Groupby that preserves metadata. It uses observed=True by default."""
         return TableGroupBy(
             pd.DataFrame.groupby(self.copy(deep=False), *args, observed=observed, **kwargs), self.metadata, self._fields
         )
 
-    def rolling(self, *args: Any, **kwargs: Any) -> "TableRolling":
+    def rolling(self, *args: Any, **kwargs: Any) -> TableRolling:
         """Rolling operation that preserves metadata."""
         return TableRolling(super().rolling(*args, **kwargs), self.metadata, self._fields)  # ty: ignore
 
@@ -2092,7 +2092,7 @@ class TableGroupBy:
             # func returns a scalar, output is a Table
             return _create_table(df, self.metadata, self._fields)
 
-    def rolling(self, *args: Any, **kwargs: Any) -> "TableRollingGroupBy":
+    def rolling(self, *args: Any, **kwargs: Any) -> TableRollingGroupBy:
         rolling_groupby = self.groupby.rolling(*args, **kwargs)
         return TableRollingGroupBy(rolling_groupby, self.metadata, self._fields)
 
@@ -2131,7 +2131,7 @@ class VariableGroupBy:
 
         return func  # ty: ignore
 
-    def rolling(self, *args: Any, **kwargs: Any) -> "VariableGroupBy":
+    def rolling(self, *args: Any, **kwargs: Any) -> VariableGroupBy:
         """Apply rolling window function and return a new VariableGroupBy with proper metadata."""
         rolling_groupby = self.groupby.rolling(*args, **kwargs)
         return VariableGroupBy(rolling_groupby, self.name, self.metadata, self.table_metadata)

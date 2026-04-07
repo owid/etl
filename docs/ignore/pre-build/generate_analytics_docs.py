@@ -13,7 +13,6 @@ The TypeScript file is fetched from the owid-grapher repository on GitHub.
 
 import re
 from pathlib import Path
-from typing import Dict, List
 
 import click
 
@@ -65,7 +64,7 @@ def extract_file_header_comments(content: str) -> str:
     return "\n".join(header_lines)
 
 
-def parse_enum_values(content: str) -> Dict[str, str]:
+def parse_enum_values(content: str) -> dict[str, str]:
     """Extract EventCategory enum values and their string representations."""
     enum_pattern = r"export enum EventCategory \{([^}]+)\}"
     match = re.search(enum_pattern, content, re.DOTALL)
@@ -141,7 +140,7 @@ def parse_interface(content: str, interface_name: str) -> tuple:
     return properties, line_num
 
 
-def parse_section_comments(content: str) -> Dict[int, str]:
+def parse_section_comments(content: str) -> dict[int, str]:
     """Parse section comments (e.g., '// Site Events') from the TypeScript file.
 
     Returns:
@@ -161,7 +160,7 @@ def parse_section_comments(content: str) -> Dict[int, str]:
     return sections
 
 
-def get_section_for_interface(interface_line: int, sections: Dict[int, str]) -> str:
+def get_section_for_interface(interface_line: int, sections: dict[int, str]) -> str:
     """Find which section an interface belongs to based on line numbers."""
     # Find the most recent section comment before this interface
     section_lines = sorted([line for line in sections.keys() if line < interface_line])
@@ -172,7 +171,7 @@ def get_section_for_interface(interface_line: int, sections: Dict[int, str]) -> 
     return "Other Events"
 
 
-def parse_type_definitions(content: str) -> Dict[str, List[str]]:
+def parse_type_definitions(content: str) -> dict[str, list[str]]:
     """Parse type definitions for action types."""
     types = {}
 
@@ -192,7 +191,7 @@ def parse_type_definitions(content: str) -> Dict[str, List[str]]:
     return types
 
 
-def parse_inline_comments(content: str) -> Dict[str, str]:
+def parse_inline_comments(content: str) -> dict[str, str]:
     """Parse inline comments for type values."""
     comments = {}
 
@@ -207,7 +206,7 @@ def parse_inline_comments(content: str) -> Dict[str, str]:
     return comments
 
 
-def generate_event_section(event_name: str, params_interface: str, properties: List[Dict[str, str]]) -> str:
+def generate_event_section(event_name: str, params_interface: str, properties: list[dict[str, str]]) -> str:
     """Generate markdown section for a single event."""
     md = f"### `{event_name}`\n\n"
 
@@ -269,7 +268,7 @@ def generate_introduction(header_comments: str) -> str:
     return doc
 
 
-def generate_type_sections(type_definitions: Dict[str, List[str]], inline_comments: Dict[str, str]) -> str:
+def generate_type_sections(type_definitions: dict[str, list[str]], inline_comments: dict[str, str]) -> str:
     """Generate sections for type definitions found in the file."""
     doc = "\n## Event Action Types\n\n"
     doc += "The following type definitions are used across multiple events:\n\n"
@@ -325,7 +324,7 @@ def main(output_file: Path, local_file: Path | None):
     doc = generate_introduction(header_comments)
 
     # Group events by section based on their interface location in the file
-    events_by_section: Dict[str, List[tuple]] = {}
+    events_by_section: dict[str, list[tuple]] = {}
 
     for event_key, event_name in sorted(events.items()):
         params_interface = f"{event_key}Params"

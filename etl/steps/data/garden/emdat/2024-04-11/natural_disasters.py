@@ -1,7 +1,7 @@
 """Process and harmonize EM-DAT natural disasters dataset."""
 
 import datetime
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -117,7 +117,7 @@ ACCEPTED_OVERLAPS = [{1911: {"USSR", "Kazakhstan"}}, {1991: {"Georgia", "USSR"}}
 DATA_CORRECTIONS = []
 
 
-def correct_data_points(tb: Table, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> Table:
+def correct_data_points(tb: Table, corrections: list[tuple[dict[Any, Any], dict[Any, Any]]]) -> Table:
     """Make individual corrections to data points in a table.
 
     Parameters
@@ -414,7 +414,7 @@ def calculate_yearly_impacts(tb: Table) -> Table:
     return tb_yearly
 
 
-def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Tuple[Table, Table]:
+def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> tuple[Table, Table]:
     # We can try to replicate the chart from Guha-Sapir et al. (2004).
     # According to them:
     # * The human impact of a natural disaster is considered by CRED as "small" when the number of deaths was lower than
@@ -576,7 +576,7 @@ def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_group
 
 def calculate_n_events_over_a_threshold_of_deaths(
     tb: Table, ds_regions: Dataset, ds_income_groups: Dataset
-) -> Tuple[Table, Table]:
+) -> tuple[Table, Table]:
     # Calculate the number of events with more than a certain threshold of deaths.
     # With this, we can notice that "big events" (with over 5000 victims) have been roughly constant over the years.
     # However, "small events" (with less than 200 victims) have been increasing over the years.

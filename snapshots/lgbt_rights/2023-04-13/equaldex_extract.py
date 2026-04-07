@@ -21,7 +21,6 @@ import datetime
 import json
 import os
 from pathlib import Path
-from typing import List, Tuple
 
 import pandas as pd
 import requests
@@ -38,7 +37,7 @@ GET_DATA_FROM_API = True
 
 
 # Function to extract data from the EqualDex API
-def extract_from_api(country_list: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def extract_from_api(country_list: list[str]) -> tuple[pd.DataFrame, pd.DataFrame]:
     # Initialize logger.
     log = get_logger()
 

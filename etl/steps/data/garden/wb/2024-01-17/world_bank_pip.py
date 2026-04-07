@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Tuple
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -346,7 +344,7 @@ def process_data(tb: Table) -> Table:
     return tb
 
 
-def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -> Tuple[Table, list, list]:
+def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -> tuple[Table, list, list]:
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
@@ -713,7 +711,7 @@ def sanity_checks(
     return tb
 
 
-def separate_ppp_data(tb: Table) -> Tuple[Table, Table]:
+def separate_ppp_data(tb: Table) -> tuple[Table, Table]:
     """
     Separate out ppp data from the main dataset
     """
@@ -726,7 +724,7 @@ def separate_ppp_data(tb: Table) -> Tuple[Table, Table]:
     return tb_2011, tb_2017
 
 
-def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
+def inc_or_cons_data(tb: Table) -> tuple[Table, Table, Table]:
     """
     Separate income and consumption data
     """

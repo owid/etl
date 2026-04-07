@@ -3,8 +3,6 @@
 
 """
 
-from typing import Dict, List
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -70,7 +68,7 @@ def process_statistical_review_data(tb_review: Table) -> Table:
     }
     tb_review = tb_review[list(columns)].rename(columns=columns, errors="raise")
     # New columns to be created by summing other columns.
-    aggregates: Dict[str, List[str]] = {
+    aggregates: dict[str, list[str]] = {
         "fossil_generation__twh": [
             "oil_generation__twh",
             "coal_generation__twh",

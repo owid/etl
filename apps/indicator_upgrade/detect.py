@@ -4,8 +4,6 @@ This module provides functions to detect which datasets need indicator upgrades,
 based on version tracker changes and database state.
 """
 
-from typing import List, Tuple
-
 import pandas as pd
 from pymysql import OperationalError
 from rapidfuzz import fuzz
@@ -19,7 +17,7 @@ log = get_logger()
 
 def detect_dataset_migrations(
     archived: bool = False,
-) -> List[Tuple[int, int]]:
+) -> list[tuple[int, int]]:
     """Detect dataset pairs that need indicator upgrades.
 
     This function identifies new datasets that have been added to the grapher

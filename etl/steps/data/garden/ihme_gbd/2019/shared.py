@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, List, cast
+from typing import Any, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table, Variable, VariableMeta
@@ -13,8 +13,8 @@ from etl.paths import DATA_DIR
 log = get_logger()
 
 
-def load_excluded_countries(excluded_countries_path: Path) -> List[str]:
-    with open(excluded_countries_path, "r") as f:
+def load_excluded_countries(excluded_countries_path: Path) -> list[str]:
+    with open(excluded_countries_path) as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data
@@ -57,25 +57,25 @@ def prepare_garden(df: pd.DataFrame) -> Table:
     return tb_garden
 
 
-def _pivot_number(df: pd.DataFrame, dims: List[str]) -> Any:
+def _pivot_number(df: pd.DataFrame, dims: list[str]) -> Any:
     df_number = df[df.metric == "Number"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
     df_number = df_number.rename(columns=lambda c: c + " - Number")
     return df_number
 
 
-def _pivot_percent(df: pd.DataFrame, dims: List[str]) -> Any:
+def _pivot_percent(df: pd.DataFrame, dims: list[str]) -> Any:
     df_percent = df[df.metric == "Percent"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
     df_percent = df_percent.rename(columns=lambda c: c + " - Percent")
     return df_percent
 
 
-def _pivot_rate(df: pd.DataFrame, dims: List[str]) -> Any:
+def _pivot_rate(df: pd.DataFrame, dims: list[str]) -> Any:
     df_rate = df[df.metric == "Rate"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
     df_rate = df_rate.rename(columns=lambda c: c + " - Rate")
     return df_rate
 
 
-def _pivot_share(df: pd.DataFrame, dims: List[str]) -> Any:
+def _pivot_share(df: pd.DataFrame, dims: list[str]) -> Any:
     df_share = df[df.metric == "Share of the population"].pivot(
         index=["country", "year"] + dims, columns="measure", values="value"
     )
@@ -83,7 +83,7 @@ def _pivot_share(df: pd.DataFrame, dims: List[str]) -> Any:
     return df_share
 
 
-def pivot(df: pd.DataFrame, dims: List[str]) -> pd.DataFrame:
+def pivot(df: pd.DataFrame, dims: list[str]) -> pd.DataFrame:
     # NOTE: processing them separately simplifies the code and is faster (and less memory heavy) than
     # doing it all in one pivot operation
     df_number = _pivot_number(df, dims)
@@ -267,7 +267,7 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
     return new_variable
 
 
-def add_metadata(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: List[str]) -> Dataset:
+def add_metadata(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: list[str]) -> Dataset:
     """
     Adding metadata at the variable level
     First step is to group by the dims, which are normally: age, sex and cause.
@@ -328,7 +328,7 @@ def run_wrapper(
     country_mapping_path: Path,
     excluded_countries_path: Path,
     dest_dir: str,
-    dims: List[str],
+    dims: list[str],
 ) -> None:
     # read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / f"meadow/ihme_gbd/2019/{dataset}")

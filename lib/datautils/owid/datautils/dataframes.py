@@ -1,7 +1,8 @@
 """Objects related to pandas dataframes."""
 
 import warnings
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
+from collections.abc import Callable
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -71,7 +72,7 @@ class ObjectsAreNotDataframes(ExceptionFromDocstring):
 def compare(
     df1: pd.DataFrame,
     df2: pd.DataFrame,
-    columns: Optional[List[str]] = None,
+    columns: list[str] | None = None,
     absolute_tolerance: float = 1e-8,
     relative_tolerance: float = 1e-8,
 ) -> pd.DataFrame:
@@ -153,7 +154,7 @@ def are_equal(
     absolute_tolerance: float = 1e-8,
     relative_tolerance: float = 1e-8,
     verbose: bool = True,
-) -> Tuple[bool, pd.DataFrame]:
+) -> tuple[bool, pd.DataFrame]:
     """Check if two DataFrames are equal with detailed comparison report.
 
     Comprehensive equality check that compares structure, dtypes, and values
@@ -308,11 +309,11 @@ def _calculate_weighted_mean(
 
 def groupby_agg(
     df: pd.DataFrame,
-    groupby_columns: Union[List[str], str],
-    aggregations: Optional[Dict[str, Any]] = None,
-    num_allowed_nans: Optional[int] = None,
-    frac_allowed_nans: Optional[float] = None,
-    min_num_values: Optional[int] = None,
+    groupby_columns: list[str] | str,
+    aggregations: dict[str, Any] | None = None,
+    num_allowed_nans: int | None = None,
+    frac_allowed_nans: float | None = None,
+    min_num_values: int | None = None,
 ) -> pd.DataFrame:
     """Group DataFrame with intelligent NaN handling during aggregation.
 
@@ -481,7 +482,7 @@ def groupby_agg(
     return cast(pd.DataFrame, grouped)
 
 
-def count_missing_in_groups(df: pd.DataFrame, groupby_columns: List[str], **kwargs: Any) -> pd.DataFrame:
+def count_missing_in_groups(df: pd.DataFrame, groupby_columns: list[str], **kwargs: Any) -> pd.DataFrame:
     """Count the number of missing values in each group.
 
     This is equivalent but faster than:
@@ -500,7 +501,7 @@ def count_missing_in_groups(df: pd.DataFrame, groupby_columns: List[str], **kwar
     return cast(pd.DataFrame, num_nans_detected)
 
 
-def multi_merge(dfs: List[pd.DataFrame], on: Union[List[str], str], how: str = "inner") -> pd.DataFrame:
+def multi_merge(dfs: list[pd.DataFrame], on: list[str] | str, how: str = "inner") -> pd.DataFrame:
     """Merge multiple DataFrames on common columns.
 
     Convenience function for merging more than two DataFrames sequentially.
@@ -540,7 +541,7 @@ def multi_merge(dfs: List[pd.DataFrame], on: Union[List[str], str], how: str = "
 
 def map_series(
     series: pd.Series,
-    mapping: Dict[Any, Any],
+    mapping: dict[Any, Any],
     make_unmapped_values_nan: bool = False,
     warn_on_missing_mappings: bool = False,
     warn_on_unused_mappings: bool = False,
@@ -665,7 +666,7 @@ def map_series(
     return series_mapped
 
 
-def rename_categories(series: pd.Series, mapping: Dict[Any, Any]) -> pd.Series:
+def rename_categories(series: pd.Series, mapping: dict[Any, Any]) -> pd.Series:
     """Alternative to pd.Series.cat.rename_categories which supports non-unique categories.
 
     We do that by replacing non-unique categories first and then mapping with unique categories.
@@ -677,7 +678,7 @@ def rename_categories(series: pd.Series, mapping: Dict[Any, Any]) -> pd.Series:
 
     series = series.copy()
 
-    new_mapping: Dict[Any, Any] = {}
+    new_mapping: dict[Any, Any] = {}
     for map_from, map_to in mapping.items():
         # Map nulls right away
         if pd.isnull(map_to):
@@ -697,7 +698,7 @@ def rename_categories(series: pd.Series, mapping: Dict[Any, Any]) -> pd.Series:
     )
 
 
-def concatenate(objs: List[pd.DataFrame], **kwargs: Any) -> pd.DataFrame:
+def concatenate(objs: list[pd.DataFrame], **kwargs: Any) -> pd.DataFrame:
     """Concatenate while preserving categorical columns.
 
     Original source code from https://stackoverflow.com/a/57809778/1275818.
@@ -717,7 +718,7 @@ def concatenate(objs: List[pd.DataFrame], **kwargs: Any) -> pd.DataFrame:
         return pd.concat(objs, **kwargs)
 
 
-def apply_on_categoricals(cat_series: List[pd.Series], func: Callable[..., str]) -> pd.Series:
+def apply_on_categoricals(cat_series: list[pd.Series], func: Callable[..., str]) -> pd.Series:
     """Apply a function across multiple categorical Series efficiently.
 
     High-performance operation that applies a function to categorical Series
@@ -774,7 +775,7 @@ def apply_on_categoricals(cat_series: List[pd.Series], func: Callable[..., str])
 def combine_two_overlapping_dataframes(
     df1: pd.DataFrame,
     df2: pd.DataFrame,
-    index_columns: Optional[List[str]] = None,
+    index_columns: list[str] | None = None,
     keep_column_order: bool = False,
 ) -> pd.DataFrame:
     """Combine two DataFrames with overlapping columns, prioritizing the first.

@@ -37,8 +37,9 @@ from google import genai  # ty: ignore
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from etl.config import OWID_ENV  # ty: ignore
 from owid.catalog import s3_utils  # ty: ignore
+
+from etl.config import OWID_ENV  # ty: ignore
 
 S3_BUCKET_NAME = "owid-public"
 S3_VOCABULARY_PATH = "topic_vocabulary.json"

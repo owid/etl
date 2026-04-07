@@ -2,7 +2,7 @@
 #  converters.py
 #
 
-from typing import Any, Dict
+from typing import Any
 
 from owid.catalog import DatasetMeta, Source, VariableMeta
 
@@ -44,7 +44,7 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
     return ds_meta
 
 
-def convert_grapher_source(s: Dict[str, Any]) -> Source:
+def convert_grapher_source(s: dict[str, Any]) -> Source:
     description = s["description"].get("additionalInfo") or ""
 
     # append publisher source to description
@@ -60,7 +60,7 @@ def convert_grapher_source(s: Dict[str, Any]) -> Source:
     )
 
 
-def convert_grapher_dataset(ds: Dict[str, Any], sources: list[Dict[str, Any]], short_name: str) -> DatasetMeta:
+def convert_grapher_dataset(ds: dict[str, Any], sources: list[dict[str, Any]], short_name: str) -> DatasetMeta:
     """
     Convert grapher dataset row into DatasetMeta.
 
@@ -94,7 +94,7 @@ def convert_grapher_dataset(ds: Dict[str, Any], sources: list[Dict[str, Any]], s
     )
 
 
-def convert_grapher_variable(v: Dict[str, Any], s: Dict[str, Any]) -> VariableMeta:
+def convert_grapher_variable(v: dict[str, Any], s: dict[str, Any]) -> VariableMeta:
     """Convert grapher variable row into VariableMeta.
 
     Example:

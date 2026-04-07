@@ -2,8 +2,6 @@
 # NOTE: We have manually modified the value for Ethiopia, because, although it is included in the file, it has officially a temporary status of unclassification.
 # NOTE: Check this back when it's fixed in the source file.
 
-from typing import List
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
@@ -147,7 +145,7 @@ def harmonize_income_group_labels(tb: Table) -> Table:
     return tb
 
 
-def assign_french_overseas_group_same_as_france(tb: Table, list_of_territories: List[str]) -> Table:
+def assign_french_overseas_group_same_as_france(tb: Table, list_of_territories: list[str]) -> Table:
     """
     Assign the same income group as France to the French overseas territories.
     """

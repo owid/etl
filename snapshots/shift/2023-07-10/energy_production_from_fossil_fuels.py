@@ -5,7 +5,6 @@ import re
 import sys
 from pathlib import Path
 from time import sleep
-from typing import List
 
 import click
 import numpy as np
@@ -276,7 +275,7 @@ SHIFT_COUNTRIES = [
 ]
 
 
-def prepare_query_url(energy_source: str, countries: List[str]) -> str:
+def prepare_query_url(energy_source: str, countries: list[str]) -> str:
     """Prepare a query URL to request data for a specific energy source and a list of countries.
 
     Parameters
@@ -309,7 +308,7 @@ def prepare_query_url(energy_source: str, countries: List[str]) -> str:
     return query_url
 
 
-def fetch_data_for_energy_source_and_a_list_of_countries(energy_source: str, countries: List[str]) -> pd.DataFrame:
+def fetch_data_for_energy_source_and_a_list_of_countries(energy_source: str, countries: list[str]) -> pd.DataFrame:
     """Fetch data from Shift for a specific energy source and a list of countries.
 
     Parameters

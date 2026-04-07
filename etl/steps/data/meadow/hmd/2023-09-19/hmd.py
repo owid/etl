@@ -3,10 +3,10 @@
 import os
 import re
 import tempfile
+from collections.abc import Callable
 from glob import glob
 from io import StringIO
 from pathlib import Path
-from typing import Callable, List
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -149,7 +149,7 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
 
-def _make_tb(path: Path, folders_names: List[str], make_tb_from_txt_callable: Callable) -> Table:
+def _make_tb(path: Path, folders_names: list[str], make_tb_from_txt_callable: Callable) -> Table:
     """Create tables from multiple folders.
 
     It uses `make_tb_from_txt_callable` to load and parse each txt file into a table.
@@ -198,7 +198,7 @@ def _make_tb_from_txt_lt(txt_path: Path | str) -> Table:
         r"\tLast modified: (?P<last_modified>\d+ [a-zA-Z]{3} \d+);  Methods Protocol: v\d+ \(\d+\)\n\n(?P<data>(?s:.)*)"
     )
     # Read single file
-    with open(txt_path, "r") as f:
+    with open(txt_path) as f:
         text = f.read()
     # Get relevant fields
     match = re.search(FILE_REGEX, text)
@@ -229,7 +229,7 @@ def _make_tb_from_txt_exp(txt_path: Path | str) -> Table:
         r"(?P<last_modified>\d+ [a-zA-Z]{3} \d+);  Methods Protocol: v\d+ \(\d+\)\n\n(?P<data>(?s:.)*)"
     )
     # Read single file
-    with open(txt_path, "r") as f:
+    with open(txt_path) as f:
         text = f.read()
     # Get relevant fields
     match = re.search(FILE_REGEX, text)
@@ -261,7 +261,7 @@ def _make_tb_from_txt_de(txt_path: Path | str) -> Table:
         r"(?P<last_modified>\d+ [a-zA-Z]{3} \d+);  Methods Protocol: v\d+ \(\d+\)\n\n(?P<data>(?s:.)*)"
     )
     # Read single file
-    with open(txt_path, "r") as f:
+    with open(txt_path) as f:
         text = f.read()
     # Get relevant fields
     match = re.search(FILE_REGEX, text)

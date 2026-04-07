@@ -3,9 +3,10 @@ import os
 import re
 import traceback
 import urllib.error
+from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional, Union, cast
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -39,14 +40,14 @@ class DatasetDiff:
 
     def __init__(
         self,
-        ds_a: Optional[Dataset],
-        ds_b: Optional[Dataset],
+        ds_a: Dataset | None,
+        ds_b: Dataset | None,
         verbose: bool = False,
-        cols: Optional[str] = None,
-        tables: Optional[str] = None,
+        cols: str | None = None,
+        tables: str | None = None,
         print: Callable = rich.print,
         snippet: bool = False,
-        country: Optional[str] = None,
+        country: str | None = None,
     ):
         """
         :param cols: Only compare columns matching pattern
@@ -75,7 +76,7 @@ class DatasetDiff:
             return table.loc[country_mask].copy()
         return table
 
-    def _diff_datasets(self, ds_a: Optional[Dataset], ds_b: Optional[Dataset]):
+    def _diff_datasets(self, ds_a: Dataset | None, ds_b: Dataset | None):
         if ds_a and ds_b:
             ds_short_name = ds_a.metadata.short_name
             assert ds_short_name
@@ -290,7 +291,7 @@ tb = {_snippet_dataset(ds_b, table_name)}
 class RemoteDataset:
     """Dataset from remote catalog with the same interface as Dataset."""
 
-    def __init__(self, dataset_meta: DatasetMeta, table_names: List[str]):
+    def __init__(self, dataset_meta: DatasetMeta, table_names: list[str]):
         self.metadata = dataset_meta
         self.table_names = table_names
 
@@ -371,13 +372,13 @@ def cli(
     path_b: str,
     channel: Iterable[CHANNEL],
     changed: bool,
-    include: Optional[str],
-    cols: Optional[str],
-    tables: Optional[str],
-    exclude: Optional[str],
+    include: str | None,
+    cols: str | None,
+    tables: str | None,
+    exclude: str | None,
     verbose: bool,
     snippet: bool,
-    country: Optional[str],
+    country: str | None,
     workers: int,
 ) -> None:
     """Compare all datasets from two catalogs and print out a summary of their differences.
@@ -572,7 +573,7 @@ def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 10
     return index_a.equals(index_b)
 
 
-def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, color: bool = True, **kwargs) -> str:
+def _dict_diff(dict_a: dict[str, Any], dict_b: dict[str, Any], tabs: int = 0, color: bool = True, **kwargs) -> str:
     """Convert dictionaries into YAML and compare them using difflib. Return colored diff as a string."""
     meta_a = yaml_dump(dict_a, **kwargs)
     meta_b = yaml_dump(dict_b, **kwargs)
@@ -749,7 +750,7 @@ def _sort_index(df: Table) -> Table:
     return df
 
 
-def _match_dataset(path_to_ds: Dict[str, Any], path: str) -> Optional[Dataset]:
+def _match_dataset(path_to_ds: dict[str, Any], path: str) -> Dataset | None:
     """Get dataset from dictionary {path -> dataset}. Return dataset with the same version if available,
     otherwise return older version or None if there is no such dataset."""
     if path in path_to_ds:
@@ -775,8 +776,8 @@ def _match_dataset(path_to_ds: Dict[str, Any], path: str) -> Optional[Dataset]:
 
 
 def _load_catalog_datasets(
-    catalog_path: str, channels: Iterable[CHANNEL], include: Optional[str], exclude: Optional[str]
-) -> Dict[str, Any]:
+    catalog_path: str, channels: Iterable[CHANNEL], include: str | None, exclude: str | None
+) -> dict[str, Any]:
     if catalog_path == "REMOTE":
         assert include, "You have to filter with --include when comparing with remote catalog"
         return _remote_catalog_datasets(channels=channels, include=include, exclude=exclude)
@@ -784,7 +785,7 @@ def _load_catalog_datasets(
         return _local_catalog_datasets(catalog_path, channels=channels, include=include, exclude=exclude)
 
 
-def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
+def _table_metadata_dict(tab: Table) -> dict[str, Any]:
     """Extract metadata from Table object, prune and and return it as a dictionary"""
     d = tab.metadata.to_dict()
 
@@ -807,7 +808,7 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
     return d
 
 
-def _column_metadata_dict(meta: VariableMeta) -> Dict[str, Any]:
+def _column_metadata_dict(meta: VariableMeta) -> dict[str, Any]:
     d = meta.to_dict()
 
     # remove origins, they're displayed on table level
@@ -821,7 +822,7 @@ def _column_metadata_dict(meta: VariableMeta) -> Dict[str, Any]:
     return d
 
 
-def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
+def _dataset_metadata_dict(ds: Dataset) -> dict[str, Any]:
     """Extract metadata from Dataset object, prune and and return it as a dictionary"""
     d = ds.metadata.to_dict()
 
@@ -834,8 +835,8 @@ def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
 
 
 def _local_catalog_datasets(
-    catalog_path: Union[str, Path], channels: Iterable[CHANNEL], include: Optional[str], exclude: Optional[str]
-) -> Dict[str, Dataset]:
+    catalog_path: str | Path, channels: Iterable[CHANNEL], include: str | None, exclude: str | None
+) -> dict[str, Dataset]:
     """Return a mapping from dataset path to Dataset object of local catalog."""
     catalog_path = Path(catalog_path)
     catalog_dir = catalog_path
@@ -884,7 +885,7 @@ def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
     return RemoteDataset(ds_meta, table_names)
 
 
-def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude: Optional[str]) -> Dict[str, Dataset]:
+def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude: str | None) -> dict[str, Dataset]:
     """Return a mapping from dataset path to Dataset object of remote catalog."""
     rc = ETLCatalog(channels=channels)
     frame = rc.frame

@@ -4,7 +4,7 @@ In particular, it gets analytics from Big Query, and from the version tracker (D
 """
 
 from datetime import timedelta
-from typing import Optional, cast
+from typing import cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -76,8 +76,8 @@ def get_chart_views(min_date: str, max_date: str) -> pd.DataFrame:
 def get_chart_views_from_bq(
     date_start: str = MIN_DATE.strftime("%Y-%m-%d"),
     date_end: str = TODAY.strftime("%Y-%m-%d"),
-    groupby: Optional[list[str]] = None,
-    grapher_urls: Optional[list[str]] = None,
+    groupby: list[str] | None = None,
+    grapher_urls: list[str] | None = None,
 ) -> pd.DataFrame:
     grapher_filter = ""
     if grapher_urls:

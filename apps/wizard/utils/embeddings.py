@@ -1,9 +1,10 @@
 import os
 import pickle
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 import torch
 from joblib import Memory
@@ -50,7 +51,7 @@ def get_model(model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
 
 @dataclass
 class Doc:
-    similarity: Optional[float] = field(default=None, init=False)
+    similarity: float | None = field(default=None, init=False)
 
     def text(self) -> str:
         raise NotImplementedError
@@ -64,7 +65,7 @@ class EmbeddingsModel(Generic[TDoc]):
     docs: list[TDoc]
     embeddings: torch.Tensor
 
-    def __init__(self, model: SentenceTransformer, model_name: Optional[str] = None) -> None:
+    def __init__(self, model: SentenceTransformer, model_name: str | None = None) -> None:
         # Get model name
         if model_name is None:
             # NOTE: this is a bit of a hack, it's better to pass it explicitly
@@ -102,7 +103,7 @@ class EmbeddingsModel(Generic[TDoc]):
         with open(self.cache_file_keys, "wb") as f:
             pickle.dump(keys, f)
 
-    def fit(self, docs: list[TDoc], text: Optional[Callable] = None, batch_size=32, workers=1) -> "EmbeddingsModel":
+    def fit(self, docs: list[TDoc], text: Callable | None = None, batch_size=32, workers=1) -> "EmbeddingsModel":
         """Fit the model to the documents.
 
         :param docs: List of documents to fit the model to.

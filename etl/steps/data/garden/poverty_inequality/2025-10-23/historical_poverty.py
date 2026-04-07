@@ -16,7 +16,6 @@ The approach:
 """
 
 from multiprocessing import Pool
-from typing import Set, Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -846,7 +845,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, tb_population_
     return tb_thousand_bins_extended
 
 
-def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Table:
+def calculate_poverty_measures(tb: Table, maddison_world_years: set[int]) -> Table:
     """
     Calculate poverty headcount and headcount ratios and for all poverty lines.
     For each year, the data is sorted by income avg, and the cumulative population is calculated.
@@ -926,7 +925,7 @@ def calculate_poverty_measures(tb: Table, maddison_world_years: Set[int]) -> Tab
     return tb_poverty
 
 
-def calculate_population_of_a_group_of_countries(countries: Set[str]) -> None:
+def calculate_population_of_a_group_of_countries(countries: set[str]) -> None:
     """
     Calculate population estimates for a group of countries in the main population dataset, and what do they represent as a share of the world population.
     """
@@ -1208,7 +1207,7 @@ def create_stacked_variables(tb: Table) -> Table:
     return tb
 
 
-def add_population_comparison(tb_poverty: Table) -> Tuple[Table, Table]:
+def add_population_comparison(tb_poverty: Table) -> tuple[Table, Table]:
     """
     Add population_omm from Our World in Data and create a population table with population differences.
     """
@@ -1482,7 +1481,7 @@ def add_randomized_gini_series(tb_gini_mean: Table) -> Table:
     return tb_gini_mean
 
 
-def run_randomized_gini_iteration(args: Tuple[int, Table, Table, Table, list]) -> Table:
+def run_randomized_gini_iteration(args: tuple[int, Table, Table, Table, list]) -> Table:
     """
     Run a single iteration of randomized gini poverty estimation with a specific seed.
     This function is designed to be called in parallel.
@@ -1576,7 +1575,7 @@ def average_randomized_results(results: list[Table]) -> Table:
 
 def compare_countries_available_in_two_tables(
     tb_1: Table, tb_2: Table, name_tb_1: str, name_tb_2: str
-) -> Tuple[Set[str], Set[str]]:
+) -> tuple[set[str], set[str]]:
     """
     Compare countries available in two tables and log warnings if there are discrepancies (if SHOW_WARNINGS is True).
     Returns two sets: countries missing in tb_2 compared to tb_1, and countries missing in tb_1 compared to tb_2.

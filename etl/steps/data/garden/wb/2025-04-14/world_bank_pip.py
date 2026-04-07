@@ -8,8 +8,6 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 
 """
 
-from typing import List, Tuple
-
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
@@ -460,7 +458,7 @@ def identify_rural_urban(tb: Table) -> Table:
     return tb
 
 
-def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
+def create_stacked_variables(tb: Table) -> tuple[Table, list, list]:
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
@@ -564,7 +562,7 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     return tb
 
 
-def pivot_table(tb: Table, index: List[str], columns: List[str], join_column_levels_with: str | None = None) -> Table:
+def pivot_table(tb: Table, index: list[str], columns: list[str], join_column_levels_with: str | None = None) -> Table:
     """
     Pivot the table to calculate indicators more easily
     """
@@ -576,7 +574,7 @@ def pivot_table(tb: Table, index: List[str], columns: List[str], join_column_lev
     return tb_pivot
 
 
-def unpivot_table(tb: Table, index: List[str], level: List[str]) -> Table:
+def unpivot_table(tb: Table, index: list[str], level: list[str]) -> Table:
     """
     Unpivot table, using set_index and stack
     """
@@ -880,7 +878,7 @@ def sanity_checks(
     return tb
 
 
-def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
+def inc_or_cons_data(tb: Table) -> tuple[Table, Table]:
     """
     Separate income and consumption data
     """

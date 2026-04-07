@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from math import trunc
-from typing import List
 
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
@@ -363,7 +362,7 @@ def calculate_under_fifteen_mortality_rates(tb_com: Table) -> Table:
     return result_tb
 
 
-def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -> Table:
+def remove_duplicates(tb: Table, preferred_source: str, dimensions: list[str]) -> Table:
     """
     Removing rows where there are overlapping years with a preference for IGME data.
 

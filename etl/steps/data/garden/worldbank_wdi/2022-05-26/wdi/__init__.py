@@ -10,7 +10,7 @@ import re
 import zipfile
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import pandas as pd
 import structlog
@@ -448,29 +448,29 @@ def add_variable_metadata(table: Table) -> Table:
     return table
 
 
-def load_country_mapping() -> Dict[str, str]:
-    with open(COUNTRY_MAPPING_PATH, "r") as f:
+def load_country_mapping() -> dict[str, str]:
+    with open(COUNTRY_MAPPING_PATH) as f:
         mapping = json.load(f)
         assert isinstance(mapping, dict)
     return mapping
 
 
-def load_excluded_countries() -> List[str]:
-    with open(Path(__file__).parent / "wdi.country_exclude.json", "r") as f:
+def load_excluded_countries() -> list[str]:
+    with open(Path(__file__).parent / "wdi.country_exclude.json") as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data
 
 
-def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:
-    with open(Path(__file__).parent / "wdi.sources.json", "r") as f:
+def load_clean_source_mapping() -> dict[str, dict[str, str]]:
+    with open(Path(__file__).parent / "wdi.sources.json") as f:
         sources = json.load(f)
         source_mapping = {source["rawName"]: source for source in sources}
         assert len(sources) == len(source_mapping)
     return source_mapping
 
 
-def create_description(var: Dict[str, Any]) -> Optional[str]:
+def create_description(var: dict[str, Any]) -> str | None:
     desc = ""
     if pd.notnull(var["long_definition"]) and len(var["long_definition"].strip()) > 0:
         desc += var["long_definition"]
@@ -498,7 +498,7 @@ def create_description(var: Dict[str, Any]) -> Optional[str]:
     return desc
 
 
-def replace_years(s: str, year: Union[int, str]) -> str:
+def replace_years(s: str, year: int | str) -> str:
     """replaces all years in string with {year}.
 
     Example:

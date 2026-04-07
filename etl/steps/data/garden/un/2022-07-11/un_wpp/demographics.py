@@ -1,6 +1,6 @@
 """Demographics table."""
 
-from typing import Any, Dict
+from typing import Any
 
 from owid.catalog import Table
 
@@ -12,7 +12,7 @@ COLUMNNS_ID = {
     "time": "year",
     "variant": "variant",
 }
-COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
+COLUMNS_METRICS: dict[str, dict[str, Any]] = {
     "popdensity": {
         "name": "population_density",
         "sex": "all",

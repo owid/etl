@@ -3,7 +3,7 @@
 import json
 import subprocess
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -13,7 +13,7 @@ log = get_logger()
 
 
 @st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
-def fetch_host_memory_stats(host: str = "gaia-1") -> Tuple[Optional[Dict], Optional[str]]:
+def fetch_host_memory_stats(host: str = "gaia-1") -> tuple[dict | None, str | None]:
     """
     Fetch host memory statistics from the LXC host.
 
@@ -85,7 +85,7 @@ def fetch_host_memory_stats(host: str = "gaia-1") -> Tuple[Optional[Dict], Optio
 
 
 @st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
-def fetch_lxc_servers_data(host: str = "gaia-1") -> Tuple[Optional[pd.DataFrame], Optional[str]]:
+def fetch_lxc_servers_data(host: str = "gaia-1") -> tuple[pd.DataFrame | None, str | None]:
     """
     Fetch LXC server information from the specified host.
 
@@ -197,7 +197,7 @@ def _process_server_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _extract_memory_used_gb(memory_info: Dict) -> Optional[float]:
+def _extract_memory_used_gb(memory_info: dict) -> float | None:
     """Extract used memory in GB from memory info dict."""
     try:
         if isinstance(memory_info, dict) and "used_mb" in memory_info:
@@ -207,7 +207,7 @@ def _extract_memory_used_gb(memory_info: Dict) -> Optional[float]:
         return None
 
 
-def _extract_memory_total_gb(memory_info: Dict) -> Optional[float]:
+def _extract_memory_total_gb(memory_info: dict) -> float | None:
     """Extract total memory in GB from memory info dict."""
     try:
         if isinstance(memory_info, dict) and "total_mb" in memory_info:
@@ -217,7 +217,7 @@ def _extract_memory_total_gb(memory_info: Dict) -> Optional[float]:
         return None
 
 
-def _calculate_memory_usage_pct(row: pd.Series) -> Optional[float]:
+def _calculate_memory_usage_pct(row: pd.Series) -> float | None:
     """Calculate memory usage percentage."""
     try:
         if pd.isna(row["memory_used_gb"]) or pd.isna(row["memory_total_gb"]) or row["memory_total_gb"] == 0:
@@ -244,7 +244,7 @@ def _calculate_days_since_commit(commit_series: pd.Series) -> pd.Series:
     return commit_series.apply(calc_days)  # ty: ignore
 
 
-def get_server_summary_stats(df: pd.DataFrame, host_memory_stats: Optional[Dict] = None) -> Dict[str, Any]:
+def get_server_summary_stats(df: pd.DataFrame, host_memory_stats: dict | None = None) -> dict[str, Any]:
     """
     Generate summary statistics for the servers.
 
@@ -275,7 +275,7 @@ def get_server_summary_stats(df: pd.DataFrame, host_memory_stats: Optional[Dict]
     }
 
 
-def format_commit_info(commit_timestamp: str, days_old: Optional[int]) -> str:
+def format_commit_info(commit_timestamp: str, days_old: int | None) -> str:
     """
     Format commit information for display.
 
@@ -312,7 +312,7 @@ def format_commit_info(commit_timestamp: str, days_old: Optional[int]) -> str:
         return f"❌ {int(days_old)} days ago"
 
 
-def get_display_columns() -> Dict[str, str]:
+def get_display_columns() -> dict[str, str]:
     """
     Get the column mapping for display in the table.
 
@@ -403,7 +403,7 @@ def prepare_display_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return display_df
 
 
-def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
+def reset_mysql_database(server_name: str) -> tuple[bool, str]:
     """
     Reset the MySQL database for a staging server by running 'make refresh' in owid-grapher
     and pruning associated R2 files.
@@ -523,7 +523,7 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
         return False, error_msg
 
 
-def destroy_server(server_name: str) -> Tuple[bool, str]:
+def destroy_server(server_name: str) -> tuple[bool, str]:
     """
     Destroy a staging server completely.
 

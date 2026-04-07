@@ -88,7 +88,7 @@ class Dataset:
     """
 
     path: str
-    metadata: "DatasetMeta"
+    metadata: DatasetMeta
 
     def __init__(self, path: str | Path) -> None:
         """Initialize a Dataset from a directory path.

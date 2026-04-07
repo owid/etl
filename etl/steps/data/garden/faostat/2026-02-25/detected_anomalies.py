@@ -8,7 +8,6 @@ See documentation of class DataAnomaly below for more details on how anomaly cla
 
 import abc
 import os
-from typing import Tuple
 
 import plotly.express as px
 import plotly.io as pio
@@ -909,7 +908,7 @@ detected_anomalies = {
 }
 
 
-def handle_anomalies(dataset_short_name: str, tb: Table) -> Tuple[Table, str]:
+def handle_anomalies(dataset_short_name: str, tb: Table) -> tuple[Table, str]:
     if dataset_short_name not in detected_anomalies:
         # If there is no anomaly class for a given dataset, return the same data and an empty anomaly description.
         return tb, ""

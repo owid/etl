@@ -1,8 +1,9 @@
 """Methods and tools to create collections of indicators."""
 
 import inspect
+from collections.abc import Callable, Mapping, Sequence
 from copy import deepcopy
-from typing import Any, Callable, Mapping, Sequence, TypeAlias, TypeVar, cast
+from typing import Any, TypeAlias, TypeVar, cast
 
 from owid.catalog import Table
 from structlog import get_logger

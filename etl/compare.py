@@ -3,7 +3,7 @@
 #
 
 from pathlib import Path
-from typing import Any, Optional, Union, cast
+from typing import Any, cast
 
 import click
 import pandas as pd
@@ -122,7 +122,7 @@ def etl_catalog(
     namespace: str,
     dataset: str,
     table: str,
-    version: Optional[Union[str, int]],
+    version: str | int | None,
     debug: bool,
 ) -> None:
     """

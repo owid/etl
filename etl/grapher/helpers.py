@@ -1,7 +1,8 @@
 import copy
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, Optional, Set, Union, cast
+from typing import Any, Literal, cast
 
 import numpy as np
 import pandas as pd
@@ -123,7 +124,7 @@ def _yield_wide_table(
             yield tab
 
 
-def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: str) -> catalog.VariableMeta:
+def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: dict[str, Any], column: str) -> catalog.VariableMeta:
     """Add dimensions to metadata and expand Jinja in metadata fields."""
     # Add info about dimensions to metadata
     if dim_dict:
@@ -156,7 +157,7 @@ def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any
         ) from e
 
 
-def _create_dim_dict(dim_names: List[str], dim_values: List[Any]) -> Dict[str, Any]:
+def _create_dim_dict(dim_names: list[str], dim_values: list[Any]) -> dict[str, Any]:
     # Filter NaN values from dimensions and return dictionary
     return {n: v for n, v in zip(dim_names, dim_values) if pd.notnull(v)}
 
@@ -207,7 +208,7 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
     return wide_tb
 
 
-def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[str, Any]:
+def render_yaml_file(path: str | Path, dim_dict: dict[str, str]) -> dict[str, Any]:
     """Load YAML file and render Jinja in all fields. Return a dictionary.
 
     Usage:
@@ -222,7 +223,7 @@ def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[s
     return jinja._expand_jinja(meta, dim_dict)
 
 
-def _title_column_and_dimensions(title: str, dim_dict: Dict[str, Any]) -> str:
+def _title_column_and_dimensions(title: str, dim_dict: dict[str, Any]) -> str:
     """Create new title from column title and dimensions.
     For instance `Deaths`, ["age", "sex"], ["10-18", "male"] will be converted into
     Deaths - Age: 10-18 - Sex: male
@@ -231,7 +232,7 @@ def _title_column_and_dimensions(title: str, dim_dict: Dict[str, Any]) -> str:
     return " - ".join([title] + dims)
 
 
-def _underscore_column_and_dimensions(column: str, dim_dict: Dict[str, Any], trim_long_short_name: bool = True) -> str:
+def _underscore_column_and_dimensions(column: str, dim_dict: dict[str, Any], trim_long_short_name: bool = True) -> str:
     # add dimension names to dimensions
     dims = [f"{dim_name}_{dim_value}" for dim_name, dim_value in dim_dict.items()]
 
@@ -274,7 +275,7 @@ def _assert_long_table(table: catalog.Table) -> None:
 
 def long_to_wide_tables(
     table: catalog.Table,
-    metadata_path: Optional[Path] = None,
+    metadata_path: Path | None = None,
 ) -> Iterable[catalog.Table]:
     """Yield wide tables from long table with the following columns:
     - variable: short variable name (needs to be underscored)
@@ -309,14 +310,14 @@ def long_to_wide_tables(
 
 
 def _get_entities_from_db(
-    countries: Set[str], by: Literal["name", "code"], engine: Engine | None = None
-) -> Dict[str, int]:
+    countries: set[str], by: Literal["name", "code"], engine: Engine | None = None
+) -> dict[str, int]:
     q = f"select id as entity_id, {by} from entities where {by} in %(names)s"
     df = read_sql(q, engine, params={"names": list(countries)})
-    return cast(Dict[str, int], df.set_index(by).entity_id.to_dict())
+    return cast(dict[str, int], df.set_index(by).entity_id.to_dict())
 
 
-def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = None) -> Dict[str, int]:
+def _get_and_create_entities_in_db(countries: set[str], engine: Engine | None = None) -> dict[str, int]:
     engine = engine or get_engine()
     with Session(engine) as session:
         log.info("Creating entities in DB", countries=countries)
@@ -404,12 +405,12 @@ def country_to_entity_id(
     return cast(pd.Series, entity_id.astype(int))
 
 
-def _unique(x: List[Any]) -> List[Any]:
+def _unique(x: list[Any]) -> list[Any]:
     """Uniquify a list, preserving order."""
     return list(dict.fromkeys(x))
 
 
-def combine_metadata_sources(sources: List[catalog.Source]) -> catalog.Source:
+def combine_metadata_sources(sources: list[catalog.Source]) -> catalog.Source:
     """Combine each of the attributes in the sources and assign them to the first source, since
     that is the only source that grapher will read.
 
@@ -588,7 +589,7 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
                 else:
                     source.description = dataset_meta.description
         else:
-            sources: List[catalog.Source] = table[column].metadata.sources
+            sources: list[catalog.Source] = table[column].metadata.sources
 
             if len(sources) > 1:
                 # Combine multiple sources into one.
@@ -634,7 +635,7 @@ class IntRange:
         self._max = int(x)
 
     @staticmethod
-    def from_values(xs: List[int]) -> "IntRange":
+    def from_values(xs: list[int]) -> "IntRange":
         return IntRange(min=min(xs), max=max(xs))  # ty: ignore[unknown-argument]
 
     def to_values(self) -> list[int]:
@@ -659,10 +660,10 @@ def sanitize_numpy(obj: Any) -> Any:
 
 def add_columns_for_multiindicator_chart(
     table: catalog.Table,
-    columns_in_chart: List[str],
+    columns_in_chart: list[str],
     chart_slug: str,
-    suffix_for_titles: Optional[str] = None,
-    columns_to_fill_with_zeros: Optional[List[str]] = None,
+    suffix_for_titles: str | None = None,
+    columns_to_fill_with_zeros: list[str] | None = None,
 ) -> catalog.Table:
     """Add columns that will be used in a specific multi-indicator (e.g. a stacked area) chart handling issues with
     missing data.
@@ -750,7 +751,7 @@ def add_columns_for_multiindicator_chart(
 
 def adapt_table_with_dates_to_grapher(
     tb: catalog.Table,
-    columns: Optional[List[str]] = None,
+    columns: list[str] | None = None,
     date_column: str = "date",
     country_column: str = "country",
     drop_date_column: bool = True,

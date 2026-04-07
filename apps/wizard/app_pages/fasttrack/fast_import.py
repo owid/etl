@@ -4,7 +4,6 @@ import datetime as dt
 import difflib
 import html
 from pathlib import Path
-from typing import Optional, Tuple
 
 import pandas as pd
 from git.repo import Repo
@@ -39,7 +38,7 @@ class FasttrackImport:
     def __init__(
         self,
         dataset: Dataset,
-        origin: Optional[Origin],
+        origin: Origin | None,
         dataset_uri: str,
         is_gsheet: bool = False,
     ) -> None:
@@ -177,7 +176,7 @@ class FasttrackImport:
         return snap.metadata_path
 
     # Check diff
-    def data_diff(self) -> Tuple[bool, str]:
+    def data_diff(self) -> tuple[bool, str]:
         """Get difference between existing and imported data.
 
         Only applicable when the Import is from a Google Sheet that already exists in ETL.
@@ -210,7 +209,7 @@ class FasttrackImport:
             html,
         )
 
-    def metadata_diff(self) -> Tuple[bool, str]:
+    def metadata_diff(self) -> tuple[bool, str]:
         """Get differences in metadata files.
 
         Tuple with two elements:

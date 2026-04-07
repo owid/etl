@@ -5,8 +5,9 @@
 #
 from __future__ import annotations
 
+from collections.abc import Callable, Iterator
 from pathlib import Path
-from typing import Any, Callable, Generic, Iterator, TypeVar, overload
+from typing import Any, Generic, TypeVar, overload
 from urllib import parse
 
 import pandas as pd
@@ -65,9 +66,9 @@ class ResponseSet(BaseModel, Generic[T]):
     def __getitem__(self, index: int) -> T: ...
 
     @overload
-    def __getitem__(self, index: slice) -> "ResponseSet[T]": ...
+    def __getitem__(self, index: slice) -> ResponseSet[T]: ...
 
-    def __getitem__(self, index: int | slice) -> "T | ResponseSet[T]":
+    def __getitem__(self, index: int | slice) -> T | ResponseSet[T]:
         if isinstance(index, slice):
             return ResponseSet(
                 items=self.items[index],
@@ -370,7 +371,7 @@ class ResponseSet(BaseModel, Generic[T]):
 
         return list(self.items)  # ty: ignore[invalid-argument-type, invalid-return-type]
 
-    def filter(self, predicate: Callable[[T], bool]) -> "ResponseSet[T]":
+    def filter(self, predicate: Callable[[T], bool]) -> ResponseSet[T]:
         """Filter results by predicate function.
 
         Returns a new ResponseSet with only items that match the predicate.
@@ -403,7 +404,7 @@ class ResponseSet(BaseModel, Generic[T]):
             _ui_advanced=self._ui_advanced,
         )
 
-    def sort_by(self, key: str | Callable[[T], Any], *, reverse: bool = False) -> "ResponseSet[T]":
+    def sort_by(self, key: str | Callable[[T], Any], *, reverse: bool = False) -> ResponseSet[T]:
         """Sort results by attribute name or key function.
 
         Returns a new ResponseSet with items sorted by the specified key.
@@ -445,7 +446,7 @@ class ResponseSet(BaseModel, Generic[T]):
             _ui_advanced=self._ui_advanced,
         )
 
-    def set_ui_advanced(self) -> "ResponseSet[T]":
+    def set_ui_advanced(self) -> ResponseSet[T]:
         """Switch to advanced display showing all fields (type, slug, popularity, etc.).
 
         Returns:
@@ -459,7 +460,7 @@ class ResponseSet(BaseModel, Generic[T]):
         self._ui_advanced = True
         return self
 
-    def set_ui_basic(self) -> "ResponseSet[T]":
+    def set_ui_basic(self) -> ResponseSet[T]:
         """Switch to basic display showing only key fields (title, description, url).
 
         Returns:

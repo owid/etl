@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import json
-from typing import List
 
 import pandas as pd
 from owid.catalog import Table
@@ -153,7 +152,7 @@ def add_europe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _add_region(df: pd.DataFrame, members: List[str], region: str, remove_members: bool = True) -> pd.DataFrame:
+def _add_region(df: pd.DataFrame, members: list[str], region: str, remove_members: bool = True) -> pd.DataFrame:
     """Aggregate data for a region.
 
     This function is useful when adding regions that are not currently considered by etl.data_helpers.geo.add_region_aggregates.
@@ -172,7 +171,7 @@ def _add_region(df: pd.DataFrame, members: List[str], region: str, remove_member
 
 
 def _check_country_mapping():
-    with open(paths.country_mapping_path, "r") as f:
+    with open(paths.country_mapping_path) as f:
         dix = json.load(f)
     assert len(dix.values()) == len(set(dix.values())), (
         "There are multiple countries with the same standardised name. Join step in Meadow might not be working"

@@ -1,7 +1,5 @@
 """Detect anomalies in a given grapher dataset."""
 
-from typing import Dict, List, Optional, Tuple
-
 import click
 import pandas as pd
 import plotly.express as px
@@ -33,7 +31,7 @@ log = get_logger()
 engine = get_engine()
 
 
-def get_dataset_id_of_previous_version(dataset_id: int) -> Optional[int]:
+def get_dataset_id_of_previous_version(dataset_id: int) -> int | None:
     """Find the previous version of a dataset, if it exists.
 
     NOTE: Archived datasets are also considered.
@@ -63,7 +61,7 @@ def get_dataset_id_of_previous_version(dataset_id: int) -> Optional[int]:
     return dataset_id_previous
 
 
-def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Variable]]:
+def load_data_for_dataset_id(dataset_id: int) -> tuple[pd.DataFrame, list[gm.Variable]]:
     # Get variable ids and names for the current dataset.
     # NOTE: This is necessary to fetch data from S3, but also to be able to map local data column names to variable ids.
     with Session(engine) as session:
@@ -155,8 +153,8 @@ def get_all_necessary_data(dataset_id: int):
 def inspect_anomalies(
     df: pd.DataFrame,
     df_data: pd.DataFrame,
-    metadata: Dict[int, gm.Variable],
-    variable_mapping: Dict[int, int],
+    metadata: dict[int, gm.Variable],
+    variable_mapping: dict[int, int],
     n_anomalies_max: int = 50,
 ) -> None:
     # Create a temporary dataframe to display.

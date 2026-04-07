@@ -41,7 +41,7 @@ LABELS
 """
 
 import ast
-from typing import Tuple, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -257,7 +257,7 @@ def add_age_and_experience(tb: Table) -> Table:
     return tb
 
 
-def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
+def get_country_data(tb: Table, ds_regions: Dataset) -> tuple[Table, Table]:
     """Estimate number of countries in each regime, and country-average for some indicators.
 
     Returns two tables:
@@ -353,7 +353,7 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
     return tb_num, tb_avg
 
 
-def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table]:
+def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table]:
     """Estimate people living in each regime, and population-weighted averages for some indicators.
 
     regime_polity (people living)

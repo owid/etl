@@ -1,7 +1,5 @@
 """Garden step for EIA total energy consumption."""
 
-from typing import Dict, List, Optional, Union
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -38,13 +36,13 @@ REGIONS_TO_ADD = [
 ]
 
 # Additional countries to include in region aggregates.
-ADDITIONAL_COUNTRIES_IN_REGIONS: Dict[str, List[str]] = {}
+ADDITIONAL_COUNTRIES_IN_REGIONS: dict[str, list[str]] = {}
 
 # When creating region aggregates, decide how to distribute historical regions.
 # TODO: Once the regions dataset is refactored, the following information could be extracted directly from ds_regions.
 # The following decisions are based on the current location of the countries that succeeded the region, and their income
 # group.
-HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
+HISTORIC_TO_CURRENT_REGION: dict[str, dict[str, str | list[str]]] = {
     "Czechoslovakia": {
         "members": [
             # Europe - High-income countries.
@@ -156,9 +154,9 @@ OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
 
 def detect_overlapping_data_for_regions_and_members(
     df: pd.DataFrame,
-    index_columns: List[str],
-    regions_and_members: Dict[str, Dict[str, Union[str, List[str]]]],
-    known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]],
+    index_columns: list[str],
+    regions_and_members: dict[str, dict[str, str | list[str]]],
+    known_overlaps: list[dict[str, str | list[int]]] | None,
     ignore_zeros: bool = True,
 ) -> None:
     """Raise a warning if there is data for a particular region and for a country that is a member of that region.
@@ -248,7 +246,7 @@ def detect_overlapping_data_for_regions_and_members(
 
 def remove_overlapping_data_for_regions_and_members(
     df: pd.DataFrame,
-    known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]],
+    known_overlaps: list[dict[str, str | list[int]]] | None,
     country_col: str = "country",
     year_col: str = "year",
     ignore_zeros: bool = True,
@@ -308,15 +306,15 @@ def remove_overlapping_data_for_regions_and_members(
 
 def add_region_aggregates(
     data: Table,
-    regions: List[str],
-    index_columns: List[str],
+    regions: list[str],
+    index_columns: list[str],
     ds_regions: Dataset,
     ds_income_groups: Dataset,
     country_column: str = "country",
     year_column: str = "year",
-    aggregates: Optional[Dict[str, str]] = None,
-    known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]] = None,
-    keep_original_region_with_suffix: Optional[str] = None,
+    aggregates: dict[str, str] | None = None,
+    known_overlaps: list[dict[str, str | list[int]]] | None = None,
+    keep_original_region_with_suffix: str | None = None,
 ) -> Table:
     """Add region aggregates for all regions (which may include continents and income groups).
 

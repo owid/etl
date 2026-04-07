@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Optional, cast
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -104,7 +104,7 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
     # add variables metadata
     # NOTE: some datasets such as `dataset_5438_global_health_observatory__world_health_organization__2021_12`
     #   would benefit from compression metadata as it is almost as large as the data itself (uncompressed)
-    variable_dict: Dict[str, Dict[str, Any]] = {v["name"]: v for v in config["variables"]}
+    variable_dict: dict[str, dict[str, Any]] = {v["name"]: v for v in config["variables"]}
     variable_source_dict = {s["id"]: s for s in config["sources"]}
 
     for col, variable in variable_dict.items():
@@ -123,7 +123,7 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
     return underscore_table(t, collision="rename")
 
 
-def create_dataset(dest_dir: str, short_name: str, new_short_name: Optional[str] = None) -> Dataset:
+def create_dataset(dest_dir: str, short_name: str, new_short_name: str | None = None) -> Dataset:
     """Create Dataset from backported dataset in Snapshot. Convert
     it into wide format and add metadata."""
     new_short_name = new_short_name or short_name

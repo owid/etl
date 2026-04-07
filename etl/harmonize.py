@@ -7,7 +7,7 @@ import json
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import DefaultDict, Dict, List, Literal, Set, cast
+from typing import Literal, cast
 
 import click
 import ipywidgets as widgets
@@ -146,9 +146,9 @@ def read_table(input_file: str) -> pd.DataFrame:
 
 class CountryRegionMapper:
     # known aliases of our canonical geo-regions
-    aliases: Dict[str, str]
-    valid_names: Set[str]
-    owid_continents: Set[str]
+    aliases: dict[str, str]
+    valid_names: set[str]
+    owid_continents: set[str]
 
     def __init__(self) -> None:
         try:
@@ -189,7 +189,7 @@ class CountryRegionMapper:
     def __getitem__(self, key: str) -> str:
         return self.aliases[key.lower()]
 
-    def suggestions(self, region: str, institution: str | None = None, num_suggestions: int = 5) -> List[str]:
+    def suggestions(self, region: str, institution: str | None = None, num_suggestions: int = 5) -> list[str]:
         if institution is None:
             # get the aliases which score highest on fuzzy matching
             results = process.extract(region.lower(), self.aliases.keys(), limit=1000)
@@ -211,7 +211,7 @@ class CountryRegionMapper:
 
         # some of these aliases will actually be for the same country/region,
         # just take the best score for each match
-        best: DefaultDict[str, int] = defaultdict(int)
+        best: defaultdict[str, int] = defaultdict(int)
         for match, score, _ in results:
             key = self.aliases[match]
             best[key] = max(best[key], int(score))
@@ -238,7 +238,7 @@ def save_alias_to_regions_yaml(name: str, alias: str) -> None:
     Save alias to regions.yml definitions. It doesn't modify original formatting of the file, but assumes
     that `alias` is always the last element in the region block.
     """
-    with open(LATEST_REGIONS_YML, "r") as f:
+    with open(LATEST_REGIONS_YML) as f:
         yaml_content = f.read()
 
     with open(LATEST_REGIONS_YML, "w") as f:
@@ -324,7 +324,7 @@ class Harmonizer:
             # Reload previous work
             if (self.output_file is not None) and Path(self.output_file).exists():
                 print("Resuming from existing mapping...\n")
-                with open(self.output_file, "r") as istream:
+                with open(self.output_file) as istream:
                     self._mapping = json.load(istream)
             else:
                 self._mapping = {}

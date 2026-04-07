@@ -9,8 +9,6 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 
 """
 
-from typing import Tuple
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
@@ -185,7 +183,7 @@ def combine_tables(tb: Table, tb_extrapolated: Table) -> Table:
     return tb_combined
 
 
-def make_table_long_and_separate(tb: Table) -> Tuple[Table, Table]:
+def make_table_long_and_separate(tb: Table) -> tuple[Table, Table]:
     """
     Convert the table to long format, to create dimensionality for indicators.
     Also, separate the tables into two: one for inequality indicators and another for income indicators (avg, thr, share, median, mean).

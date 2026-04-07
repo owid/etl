@@ -82,6 +82,6 @@ class ChartTable(Table):
             )
 
     @property
-    def _constructor(self) -> type["ChartTable"]:
+    def _constructor(self) -> type[ChartTable]:
         """Return ChartTable for pandas operations that return new instances."""
         return ChartTable

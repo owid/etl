@@ -2,7 +2,7 @@ import concurrent.futures
 import configparser
 import os
 import threading
-from functools import lru_cache
+from functools import cache
 from os import environ as env
 from pathlib import Path
 from urllib.parse import urlparse
@@ -369,7 +369,7 @@ def connect_r2() -> BaseClient:
     return client
 
 
-@lru_cache(maxsize=None)
+@cache
 def _connect_r2_cached() -> BaseClient:
     return connect_r2()
 

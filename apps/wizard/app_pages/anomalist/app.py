@@ -19,7 +19,7 @@ TODO:
 
 """
 
-from typing import List, Tuple, Union, cast
+from typing import cast
 
 import pandas as pd
 import streamlit as st
@@ -377,7 +377,7 @@ def _filter_df(
 
 
 @st.cache_data
-def _sort_df(df: pd.DataFrame, sort_strategy: Union[str, List[str]]) -> Tuple[pd.DataFrame, list[str]]:
+def _sort_df(df: pd.DataFrame, sort_strategy: str | list[str]) -> tuple[pd.DataFrame, list[str]]:
     """Used in filter_df."""
     if not sort_strategy:
         columns_sort = list(SORTING_COLUMNS.values())

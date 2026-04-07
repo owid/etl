@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import TypeVar, Union
+from typing import TypeVar
 
 from owid.catalog.core.meta import MetaBase
 
@@ -8,7 +8,7 @@ T = TypeVar("T")
 
 
 class MDIMBase(MetaBase):
-    def save_file(self, filename: Union[str, Path], force_create: bool = False) -> None:
+    def save_file(self, filename: str | Path, force_create: bool = False) -> None:
         path = Path(filename)
         if force_create:
             path.parent.mkdir(parents=True, exist_ok=True)

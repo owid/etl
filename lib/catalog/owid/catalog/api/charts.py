@@ -554,7 +554,7 @@ class ChartsAPI:
         ```
     """
 
-    def __init__(self, client: "Client", site_url: str) -> None:
+    def __init__(self, client: Client, site_url: str) -> None:
         """Initialize the ChartsAPI.
 
         Args:

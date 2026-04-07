@@ -19,8 +19,6 @@ Notes:
             5 = Americas (GWNo: 2-199)
 """
 
-from typing import List, Optional
-
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -377,7 +375,7 @@ def _sanity_check_prio_conflict_types(tb: Table) -> Table:
     assert not transitions_unk, f"Unknown transitions found: {transitions_unk}"
 
 
-def replace_missing_data_with_zeros(tb: Table, columns: Optional[List[str]] = None) -> Table:
+def replace_missing_data_with_zeros(tb: Table, columns: list[str] | None = None) -> Table:
     """Replace missing data with zeros.
 
     In some instances (e.g. extrasystemic conflicts after ~1964) there is missing data. Instead, we'd like this to be zero-valued.
@@ -1081,7 +1079,7 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     ###################
     paths.log.info("estimating number of locations with conflict...")
 
-    def _get_number_of_locations_with_conflict_regions(tb: Table, cols: List[str]) -> Table:
+    def _get_number_of_locations_with_conflict_regions(tb: Table, cols: list[str]) -> Table:
         """Get number of locations with conflict."""
         # For each group, get the number of unique locations
         tb = (

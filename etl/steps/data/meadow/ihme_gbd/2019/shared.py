@@ -1,5 +1,3 @@
-from typing import List
-
 import pandas as pd
 import pyarrow.compute as pc
 from owid.catalog import Dataset, License, Origin, Table, TableMeta
@@ -58,7 +56,7 @@ def read_and_clean_data(local_file: str) -> pd.DataFrame:
         partition = ""
 
     if partition:
-        dfs: List[pd.DataFrame] = []
+        dfs: list[pd.DataFrame] = []
         for partition_name in arrow_table[partition].unique().to_pylist():
             dfs.append(clean_data(arrow_table.filter(pc.equal(arrow_table[partition], partition_name)).to_pandas()))
         return pd.concat(dfs)

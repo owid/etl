@@ -3,8 +3,6 @@ This function creates the metadata for each variable in the WID dataset, from th
 If new variables are included in the dataset (from `wid` command in Stata) the dictionaries feeding metadata functions have to be updated (if not an error will show up)
 """
 
-from typing import List
-
 from owid.catalog import Table, VariableMeta
 
 # Define PPP year
@@ -480,7 +478,7 @@ def var_metadata_income_relative(var, origins, wel, rel, ext) -> VariableMeta:
     return meta
 
 
-def add_descriptions_depending_on_welfare(wel: str) -> List[str]:
+def add_descriptions_depending_on_welfare(wel: str) -> list[str]:
     """
     Add different descriptions depending on the welfare variable (pretax, posttax_dis, posttax_nat, wealth)
     """

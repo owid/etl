@@ -1,4 +1,4 @@
-from typing import Any, Dict, Set, Union, overload
+from typing import Any, overload
 
 from etl.collection.explorer import Explorer
 from etl.collection.model.core import Collection
@@ -6,8 +6,8 @@ from etl.collection.utils import get_tables_by_name_mapping
 
 
 def process_views(
-    collection: Union[Collection, Explorer],
-    dependencies: Set[str],
+    collection: Collection | Explorer,
+    dependencies: set[str],
     combine_metadata_when_mult: bool = False,
 ):
     """Process views in Collection configuration."""
@@ -38,8 +38,8 @@ def process_views(
 
 @overload
 def create_collection_from_config(
-    config: Dict[str, Any],
-    dependencies: Set[str],
+    config: dict[str, Any],
+    dependencies: set[str],
     catalog_path: str,
     *,  # Force keyword-only arguments after this
     dependencies_combined: set[str] | None = None,
@@ -50,8 +50,8 @@ def create_collection_from_config(
 
 @overload
 def create_collection_from_config(
-    config: Dict[str, Any],
-    dependencies: Set[str],
+    config: dict[str, Any],
+    dependencies: set[str],
     catalog_path: str,
     *,  # Force keyword-only arguments after this
     dependencies_combined: set[str] | None = None,
@@ -61,14 +61,14 @@ def create_collection_from_config(
 
 
 def create_collection_from_config(
-    config: Dict[str, Any],
-    dependencies: Set[str],
+    config: dict[str, Any],
+    dependencies: set[str],
     catalog_path: str,
     *,  # Force keyword-only arguments after this
     dependencies_combined: set[str] | None = None,
     validate_schema: bool = True,
     explorer: bool = False,
-) -> Union[Explorer, Collection]:
+) -> Explorer | Collection:
     """Create a Collection or Explorer instance from a configuration dictionary.
 
     config: Configuration of the collection.

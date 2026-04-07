@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import List
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
@@ -78,7 +76,7 @@ def extract_data_from_excel(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _get_years(df: pd.DataFrame) -> List[int]:
+def _get_years(df: pd.DataFrame) -> list[int]:
     # Get years
     row_years = 4
     years = list(df.loc[row_years])

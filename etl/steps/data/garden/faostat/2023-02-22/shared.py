@@ -13,7 +13,7 @@ This module contains:
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -622,7 +622,7 @@ def remove_columns_with_only_nans(data: pd.DataFrame, verbose: bool = True) -> p
     return data
 
 
-def remove_duplicates(data: pd.DataFrame, index_columns: List[str], verbose: bool = True) -> pd.DataFrame:
+def remove_duplicates(data: pd.DataFrame, index_columns: list[str], verbose: bool = True) -> pd.DataFrame:
     """Remove rows with duplicated index (country, year, item, element, unit).
 
     First attempt to use flags to remove duplicates. If there are still duplicates, remove in whatever way possible.
@@ -804,7 +804,7 @@ def add_custom_names_and_descriptions(
 
 
 def remove_regions_from_countries_regions_members(
-    countries_regions: pd.DataFrame, regions_to_remove: List[str]
+    countries_regions: pd.DataFrame, regions_to_remove: list[str]
 ) -> pd.DataFrame:
     """Remove regions that have to be ignored from the lists of members in the countries-regions dataset.
 
@@ -924,7 +924,7 @@ def load_income_groups() -> pd.DataFrame:
     return cast(pd.DataFrame, income_groups)
 
 
-def list_countries_in_region(region: str, countries_regions: pd.DataFrame, income_groups: pd.DataFrame) -> List[str]:
+def list_countries_in_region(region: str, countries_regions: pd.DataFrame, income_groups: pd.DataFrame) -> list[str]:
     """List all countries in a specific region or income group.
 
     Parameters
@@ -1405,7 +1405,7 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
     return data
 
 
-def clean_data_values(values: pd.Series, amendments: Dict[str, str]) -> pd.Series:
+def clean_data_values(values: pd.Series, amendments: dict[str, str]) -> pd.Series:
     """Fix spurious data values (defined in value_amendments.csv) and make values a float column.
 
     Parameters
@@ -1442,7 +1442,7 @@ def clean_data(
     items_metadata: pd.DataFrame,
     elements_metadata: pd.DataFrame,
     countries_metadata: pd.DataFrame,
-    amendments: Dict[str, str],
+    amendments: dict[str, str],
 ) -> pd.DataFrame:
     """Process data (with already harmonized item codes and element codes), before adding aggregate regions and
     per-capita variables.
@@ -1771,7 +1771,7 @@ def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
     return wide_table
 
 
-def _variable_name_map(data: pd.DataFrame, column: str) -> Dict[str, str]:
+def _variable_name_map(data: pd.DataFrame, column: str) -> dict[str, str]:
     """Extract map {variable name -> column} from dataframe and make sure it is unique (i.e. ensure that one variable
     does not map to two distinct values)."""
     pivot = data.dropna(subset=[column]).groupby(["variable_name"], observed=True)[column].apply(set)

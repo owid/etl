@@ -51,7 +51,7 @@ mock_income_groups = pd.DataFrame(
 )
 
 
-def mock_opens(filename, _):
+def mock_opens(filename, _="r"):
     # This function mocks opening a file with path given by filename, and returns custom content for that file.
     mock_files_content = {
         "MOCK_COUNTRIES_FILE": mock_countries,

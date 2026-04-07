@@ -194,7 +194,7 @@ class CatalogMixin:
     """Abstract catalog interface for finding and loading data."""
 
     channels: Iterable[CHANNEL]
-    frame: "CatalogFrame"
+    frame: CatalogFrame
     uri: str
 
     def find(
@@ -207,7 +207,7 @@ class CatalogMixin:
         case: bool = False,
         match: Literal["exact", "contains", "regex", "fuzzy"] = "exact",
         fuzzy_threshold: int = 70,
-    ) -> "CatalogFrame":
+    ) -> CatalogFrame:
         """Search catalog for tables matching specified criteria.
 
         Args:
@@ -381,7 +381,7 @@ class LocalCatalog(CatalogMixin):
         self.frame = index
 
     @staticmethod
-    def _merge_index(frame: "CatalogFrame", update: "CatalogFrame") -> "CatalogFrame":
+    def _merge_index(frame: CatalogFrame, update: CatalogFrame) -> CatalogFrame:
         """Merge two indexes."""
         return CatalogFrame(
             pd.concat(
@@ -390,7 +390,7 @@ class LocalCatalog(CatalogMixin):
             )
         )
 
-    def _save_index(self, frame: "CatalogFrame") -> None:
+    def _save_index(self, frame: CatalogFrame) -> None:
         """Save all channels to disk in separate catalog files."""
         for channel in self.channels:
             channel_frame = frame.loc[frame.channel == channel].reset_index(drop=True)
@@ -400,7 +400,7 @@ class LocalCatalog(CatalogMixin):
 
         self._save_metadata({"format_version": OWID_CATALOG_VERSION})
 
-    def _scan_for_datasets(self, include: str | None = None) -> "CatalogFrame":
+    def _scan_for_datasets(self, include: str | None = None) -> CatalogFrame:
         """Scan datasets. You can filter by `include` to get better performance."""
         frames = []
         log.info("reindex.start", channels=self.channels, include=include)
@@ -499,7 +499,7 @@ class CatalogFrame(pd.DataFrame):
             raise ValueError(f"only one table can be loaded at once (tables found: {', '.join(self.table.tolist())})")
 
     @staticmethod
-    def create_empty() -> "CatalogFrame":
+    def create_empty() -> CatalogFrame:
         return CatalogFrame(
             {
                 "namespace": [],

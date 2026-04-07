@@ -1,4 +1,4 @@
-from typing import Tuple, cast
+from typing import cast
 
 import pandas as pd
 import streamlit as st
@@ -31,7 +31,7 @@ st_title_with_expert(
 )
 
 
-def get_trajectory_prompt(conn, base_prompt: str, slug: str, codes: bool = False) -> Tuple[str, pd.DataFrame]:
+def get_trajectory_prompt(conn, base_prompt: str, slug: str, codes: bool = False) -> tuple[str, pd.DataFrame]:
     df = fetch_chart_data(slug, conn=conn, codes=codes)
 
     config = df.attrs["config"]

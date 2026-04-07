@@ -1,7 +1,7 @@
 """Tools to generate chart configs."""
 
 from copy import deepcopy
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -72,15 +72,15 @@ CONFIG_BASE = {
 
 
 def bake_chart_config(
-    catalog_path: Optional[str] = None,
-    variable_id: Optional[int | List[int]] = None,
-    variable: Optional[Variable | List[Variable]] = None,
-    selected_entities: Optional[list] = None,
-    included_entities: Optional[list] = None,
-    display: Optional[List[Any]] = None,
-    tab: Optional[str] = None,
+    catalog_path: str | None = None,
+    variable_id: int | list[int] | None = None,
+    variable: Variable | list[Variable] | None = None,
+    selected_entities: list | None = None,
+    included_entities: list | None = None,
+    display: list[Any] | None = None,
+    tab: str | None = None,
     owid_env: OWIDEnv = OWID_ENV,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Bake a Grapher chart configuration.
 
     Bakes a very basic config, which will be enough most of the times. If you want a more complex config, use this as a baseline to adjust to your needs.

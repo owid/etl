@@ -5,8 +5,6 @@ Because the format of the snapshots are very particular, I prefer to to run seve
 
 """
 
-from typing import Dict, List
-
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -194,7 +192,7 @@ def run() -> None:
     ds_meadow.save()
 
 
-def load_tables_from_snapshot(snap: Snapshot, sheets: Dict) -> List[Table]:
+def load_tables_from_snapshot(snap: Snapshot, sheets: dict) -> list[Table]:
     """Load all the sheets from the snapshot."""
     tables = []
     for sheet in sheets:
@@ -206,8 +204,8 @@ def load_tables_from_snapshot(snap: Snapshot, sheets: Dict) -> List[Table]:
 
 
 def format_long_tables(
-    tb: List[Table], countries: List[str], columns: Dict, cols_to_drop: List[str] = []
-) -> List[Table]:
+    tb: list[Table], countries: list[str], columns: dict, cols_to_drop: list[str] = []
+) -> list[Table]:
     """Format inequality and poverty tables, which share a similar, long format."""
 
     tables = []
