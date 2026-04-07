@@ -115,7 +115,12 @@ def run() -> None:
     decile_values = [
         slug
         for slug, name in decile_choices.items()
-        if name and slug not in ("all", "all_bar", "10_40_50", "10_40_50_bar")
+        if name and slug not in (
+            "all",
+            # "all_bar",
+            "10_40_50",
+            # "10_40_50_bar",
+        )
     ]
     c.group_views(
         groups=[
@@ -137,25 +142,25 @@ def run() -> None:
                     "description_short": "{subtitle}",
                 },
             },
-            {
-                "dimension": "decile",
-                "choices": decile_values,
-                "choice_new_slug": "all_bar",
-                "view_config": {
-                    "hideRelativeToggle": True,
-                    "selectedFacetStrategy": "entity",
-                    "hasMapTab": False,
-                    "tab": "chart",
-                    "chartTypes": ["StackedDiscreteBar"],
-                    "hideTotalValueLabel": True,
-                    "baseColorScheme": "OwidCategoricalE",
-                    "title": "{title}",
-                    "subtitle": "{subtitle}",
-                },
-                "view_metadata": {
-                    "description_short": "{subtitle}",
-                },
-            },
+            # {
+            #     "dimension": "decile",
+            #     "choices": decile_values,
+            #     "choice_new_slug": "all_bar",
+            #     "view_config": {
+            #         "hideRelativeToggle": True,
+            #         "selectedFacetStrategy": "entity",
+            #         "hasMapTab": False,
+            #         "tab": "chart",
+            #         "chartTypes": ["StackedDiscreteBar"],
+            #         "hideTotalValueLabel": True,
+            #         "baseColorScheme": "OwidCategoricalE",
+            #         "title": "{title}",
+            #         "subtitle": "{subtitle}",
+            #     },
+            #     "view_metadata": {
+            #         "description_short": "{subtitle}",
+            #     },
+            # },
         ],
         params={
             "title": _get_grouped_decile_title,
@@ -170,9 +175,22 @@ def run() -> None:
     c.drop_views(
         [
             {"decile": ["2", "3", "4", "6", "7", "8"]},
-            {"decile": ["all_bar", "10_40_50", "10_40_50_bar"], "indicator": non_share},
+            {
+                "decile": [
+                    # "all_bar",
+                    "10_40_50",
+                    # "10_40_50_bar",
+                ],
+                "indicator": non_share,
+            },
             {"decile": ["5", "9"], "indicator": non_thr},
-            {"decile": ["all", "all_bar"], "survey_comparability": "Spells"},
+            {
+                "decile": [
+                    "all",
+                    # "all_bar",
+                ],
+                "survey_comparability": "Spells",
+            },
         ]
     )
 
@@ -186,18 +204,18 @@ def run() -> None:
             # For share: richest to poorest; for others: poorest to richest
             # For all_bar: inverse order
             reverse_order = view.matches(indicator="share")
-            if view.matches(decile="all_bar"):
-                reverse_order = not reverse_order
+            # if view.matches(decile="all_bar"):
+            #     reverse_order = not reverse_order
             view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
 
             # For all_bar views, set sortBy to column and sortColumnSlug to decile 10 indicator
-            if view.matches(decile="all_bar"):
-                decile_10_ind = next((ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None)
-                if decile_10_ind:
-                    if view.config is None:
-                        view.config = {}
-                    view.config["sortBy"] = "column"
-                    view.config["sortColumnSlug"] = decile_10_ind.catalogPath
+            # if view.matches(decile="all_bar"):
+            #     decile_10_ind = next((ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None)
+            #     if decile_10_ind:
+            #         if view.config is None:
+            #             view.config = {}
+            #         view.config["sortBy"] = "column"
+            #         view.config["sortColumnSlug"] = decile_10_ind.catalogPath
 
             # Set display names extracted from original indicator titles
             for ind in view.indicators.y:
@@ -208,7 +226,12 @@ def run() -> None:
     # Add Marimekko as an additional chart type for mean and median views.
     for view in c.views:
         if view.matches(survey_comparability="No spells") and not view.matches(
-            decile=["all", "all_bar", "10_40_50", "10_40_50_bar"]
+            decile=[
+                "all",
+                # "all_bar",
+                "10_40_50",
+                # "10_40_50_bar",
+            ]
         ):
             view.config = view.config or {}
             view.config["chartTypes"] = ["LineChart", "DiscreteBar", "Marimekko"]
