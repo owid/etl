@@ -5,7 +5,7 @@ To overcome this we have:
 - 2021-2023: Transcribed each PDF report into a CSV file.
 - 2006-2020: Sourced the data from Gapminder, who have themselves compiled the data from the EIU reports.
 
-All these trancriptions and imports are saved in a Google sheet: https://docs.google.com/spreadsheets/d/1902iwPdR-PKjmpONceb1u9h2GzR-9Kzac4C9cnNDcHo/edit?usp=sharing.
+All these transcriptions and imports are saved in a Google sheet: https://docs.google.com/spreadsheets/d/1902iwPdR-PKjmpONceb1u9h2GzR-9Kzac4C9cnNDcHo/edit?usp=sharing.
 
 To run this step, download each of the sheets in there (except README) and pass their local paths to this script.
 
