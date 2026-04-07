@@ -19,16 +19,12 @@ def run() -> None:
     # Process data.
     #
     # Bring the economy index into a column and keep only H2 2025.
-    tb = tb.reset_index()[["economy", "ai_diffusion_h2_2025"]].rename(
+    tb = tb[["economy", "ai_diffusion_h2_2025"]].rename(
         columns={"economy": "country", "ai_diffusion_h2_2025": "ai_user_share"}
     )
 
     # Harmonize country names.
-    tb = paths.regions.harmonize_names(
-        tb=tb,
-        country_col="country",
-        excluded_countries_file=paths.excluded_countries_path,
-    )
+    tb = paths.regions.harmonize_names(tb=tb, country_col="country")
 
     # Add year column.
     tb["year"] = YEAR
