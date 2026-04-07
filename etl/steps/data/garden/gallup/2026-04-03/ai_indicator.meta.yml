@@ -10,9 +10,8 @@ definitions:
   description_key_methodology: &methodology
     - Based on online surveys of adults aged 18 and older who work full time or part time for organizations in the United States.
     - Gallup surveys members of its panel using a sampling method designed to give people in the target population a known chance of being selected, rather than relying only on volunteers who choose to take part.
-    - Results are weighted to better reflect the population of employed U.S. adults by gender, age, race, ethnicity, education, and region.
-    - Sample sizes among employed U.S. adults were 18,871 in May 2023, 21,543 in May 2024, 19,043 in May 2025, 23,068 in August 2025, and 22,368 in October-November 2025.
-
+    - Responses are weighted to reflect the U.S. employed adult population by gender, age, race, ethnicity, education, and region.
+    - Each survey round covered around 19,000 to 23,000 employed U.S. adults.
 dataset:
   update_period_days: 90
 
@@ -25,11 +24,11 @@ tables:
         short_unit: "%"
         description_short: The share of U.S. employees who say they use artificial intelligence at work every day.
         description_key:
-          - *methodology
           - This indicator measures daily use of artificial intelligence at work.
+          - *methodology
         display:
           numDecimalPlaces: 0
-          name: Use AI daily
+          name: Daily AI users
 
       frequent_ai_users:
         title: Share of U.S. employees who use AI at work a few times a week or more
@@ -37,11 +36,11 @@ tables:
         short_unit: "%"
         description_short: The share of U.S. employees who say they use artificial intelligence at work a few times a week or more.
         description_key:
-          - *methodology
           - Gallup defines frequent users as employees who say they use artificial intelligence at work a few times a week or more.
+          - *methodology
         display:
           numDecimalPlaces: 0
-          name: Use AI weekly
+          name: Weekly AI users
 
       total_ai_users:
         title: Share of U.S. employees who use AI at work a few times a year or more
@@ -49,8 +48,8 @@ tables:
         short_unit: "%"
         description_short: The share of U.S. employees who say they use artificial intelligence at work a few times a year or more.
         description_key:
-          - *methodology
           - Gallup defines total users as employees who say they use artificial intelligence at work daily, a few times a week, a few times a month, or a few times a year.
+          - *methodology
         display:
           numDecimalPlaces: 0
           name: Total users
