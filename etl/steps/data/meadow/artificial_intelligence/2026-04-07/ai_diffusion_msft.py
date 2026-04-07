@@ -15,9 +15,7 @@ APPENDIX_PAGES = [13, 14, 15, 16]
 
 # Regex to match a data row: country name followed by three percentage values.
 # Handles negative values (e.g. "-0.10%") and country names with parentheses (e.g. "Congo (DRC)").
-ROW_PATTERN = re.compile(
-    r"^(.+?)\s+([-\d]+\.\d+)%\s+([-\d]+\.\d+)%\s+([-\d]+\.\d+)%$"
-)
+ROW_PATTERN = re.compile(r"^(.+?)\s+([-\d]+\.\d+)%\s+([-\d]+\.\d+)%\s+([-\d]+\.\d+)%$")
 
 # Lines to skip (page headers / section titles).
 SKIP_LINES = {
