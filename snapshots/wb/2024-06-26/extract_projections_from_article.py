@@ -11,7 +11,7 @@ Steps:
     1. Update the data_dictionary.json file if necessary.
     2. Run this script to extract the data and save it as a CSV file.
     3. Create a snapshot of the dataset.
-        python snapshots/wb/2024-06-26/poverty_projections_share_regions.py --path-to-file snapshots/wb/2024-06-26/poverty_projections_share_regions.csv
+        etls wb/2024-06-26/poverty_projections_share_regions --path-to-file snapshots/wb/2024-06-26/poverty_projections_share_regions.csv
 
 Based on https://stackoverflow.com/questions/62031809/extracting-javascript-variables-into-python-dictionaries
 """

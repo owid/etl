@@ -9,7 +9,7 @@ TODO: This file contains some code that needs some revision:
 """
 
 import concurrent.futures
-import io
+import json
 import warnings
 from collections import defaultdict
 from http.client import RemoteDisconnected
@@ -23,6 +23,7 @@ import structlog
 import validators
 from deprecated import deprecated
 from owid.catalog import Dataset, Table
+from owid.catalog.core import CatalogPath
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from tenacity import Retrying
@@ -369,7 +370,8 @@ def _fetch_data_df_from_s3(variable_id: int):
     # Compare ETags
     if stored_etag and current_etag and stored_etag == current_etag:
         # ETag matches, load from cache
-        data_df = pd.read_json(cache_filename)
+        with open(cache_filename) as f:
+            raw = json.loads(f.read())
     else:
         # Fetch new data
         response = _fetch_response("GET", url)
@@ -382,7 +384,9 @@ def _fetch_data_df_from_s3(variable_id: int):
             etag_filename.write_text(current_etag)
         elif etag_filename.exists():
             etag_filename.unlink()
-        data_df = pd.read_json(io.StringIO(response.text))
+        raw = json.loads(response.text)
+    # Use json.loads instead of pd.read_json to handle very large integers
+    data_df = pd.DataFrame(raw)
 
     # Process DataFrame
     data_df = data_df.rename(
@@ -481,12 +485,10 @@ def variable_data_table_from_catalog(
     to_read = defaultdict(list)
 
     # Group variables by dataset and table
-    # TODO: use CatalogPath object
     for variable in variables:
         assert variable.catalogPath, f"Variable {variable.id} has no catalogPath"
-        path, short_name = variable.catalogPath.split("#")
-        ds_path, table_name = path.rsplit("/", 1)
-        to_read[(ds_path, table_name)].append(variable)
+        p = CatalogPath.from_str(variable.catalogPath)
+        to_read[(p.dataset_path, p.table)].append(variable)
 
     # Read the table and load all its variables
     tbs = []
@@ -701,29 +703,17 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
 
     query = """\
     SELECT
-        q1.datasetId AS dataset_id,
+        d.id AS dataset_id,
         d.name AS dataset_name,
-        q1.etlPath AS etl_path,
+        d.catalogPath AS etl_path,
         d.isArchived AS is_archived,
         d.isPrivate AS is_private,
         q2.chartIds AS chart_ids,
-        q2.updatePeriodDays AS update_period_days
-    FROM
-        (SELECT
-            datasetId,
-            MIN(catalogPath) AS etlPath
-        FROM
-            variables
-        WHERE
-            catalogPath IS NOT NULL
-        GROUP BY
-            datasetId) q1
+        d.updatePeriodDays AS update_period_days
+    FROM datasets d
     LEFT JOIN
         (SELECT
             d.id AS datasetId,
-            d.isArchived,
-            d.isPrivate,
-            d.updatePeriodDays,
             GROUP_CONCAT(DISTINCT c.id) AS chartIds
         FROM
             datasets d
@@ -735,12 +725,10 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
             json_extract(cc.full, "$.isPublished") = TRUE
         GROUP BY
             d.id) q2
-        ON q1.datasetId = q2.datasetId
-    JOIN
-        datasets d ON q1.datasetId = d.id
+        ON d.id = q2.datasetId
+    WHERE d.catalogPath IS NOT NULL
     ORDER BY
-        q1.datasetId ASC;
-
+        d.id ASC;
     """
 
     with warnings.catch_warnings():
@@ -788,14 +776,6 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
     # Make is_archived and is_private boolean columns.
     df["is_archived"] = df["is_archived"].astype(bool)
     df["is_private"] = df["is_private"].astype(bool)
-
-    # Sanity check.
-    unknown_channels = set([etl_path.split("/")[0] for etl_path in set(df["etl_path"])]) - {"grapher"}
-    if len(unknown_channels) > 0:
-        log.error(
-            "Variables in grapher DB are expected to come only from ETL grapher channel, "
-            f"but other channels were found: {unknown_channels}"
-        )
 
     return df
 
@@ -973,6 +953,10 @@ def get_variables_data(
         # Fetch data for all variables.
         df = _get_variables_data_with_filter(db_conn=db_conn)
 
+    # Add parsed catalog_path column if catalogPath exists
+    if "catalogPath" in df.columns and len(df) > 0:
+        df["catalog_path"] = [CatalogPath.from_str(p) if p else None for p in df["catalogPath"]]
+
     return df
 
 
@@ -1015,3 +999,14 @@ def trim_long_variable_name(short_name: str) -> str:
         return short_name[: (255 - len(unique_hash))] + unique_hash
     else:
         return short_name
+
+
+#
+
+
+def get_tags(owid_env: OWIDEnv = OWID_ENV) -> List[str]:
+    with Session(owid_env.engine) as session:
+        # with get_session() as session:
+        tag_list_ = gm.Tag.load_tags(session)
+        tag_list = sorted(tag.name for tag in tag_list_)
+    return tag_list

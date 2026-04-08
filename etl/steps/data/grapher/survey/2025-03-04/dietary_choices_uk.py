@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -11,7 +11,7 @@ paths = PathFinder(__file__)
 SELECTED_GROUPS = ["All adults", "18-24", "25-49", "50-64", "65+"]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -51,7 +51,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb])
+    ds_grapher = paths.create_dataset(tables=[tb])
 
     # Save grapher dataset.
     ds_grapher.save()

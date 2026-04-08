@@ -1,0 +1,126 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Homicides
+      attribution: UN, World Population Prospects (2024); United Nations Office on Drugs and Crime (2025)
+    description_processing: |-
+      Values for the United Kingdom are calculated by Our World in Data from UNODC data for England, Wales, Scotland and Northern Ireland.
+
+      Rates for the most recent year are calculated using medium population projection estimates from the United Nations World Population Prospects.
+    description_key:
+      - UNODC collects intentional homicide data from criminal justice systems (law enforcement records) and public health systems (death certificates).
+      - "Intentional homicide requires three elements: one person killing another, intent to kill or seriously injure, and the act was illegal. For example, a person who kills another in self-defence is not considered to have committed an intentional homicide as justifiable homicide in self-defence is not illegal."
+      - All killings that meet the criteria listed below are to be considered intentional homicides, irrespective of definitions provided by national legislations or practices.
+      - Terrorist killings are included as intentional homicides.
+
+  metric: |-
+    <% if unit_of_measurement == "Counts" %>
+    Number of intentional [homicides](#dod:homicide)
+    <%- elif unit_of_measurement == "Rate per 100,000 population" %>
+    [Intentional homicide](#dod:homicide) rate per 100,000 population
+    <%- endif %>
+  metric_title: <% if unit_of_measurement == "Counts" %>
+    Homicides
+    <%- elif unit_of_measurement == "Rate per 100,000 population" %>
+    Homicide rate per 100,000 population
+    <%- endif %>
+  sex: |-
+    <% if sex == "Total" %>
+    <%- elif sex == "Male" -%>
+    of male victims
+    <%- elif sex == "Female" -%>
+    of female victims
+    <% endif %>
+  age: |-
+    <% if age == "Total" %>
+    <%- elif age == "30-44" -%>
+    aged 30-44 years
+    <%- elif age == "45-59" -%>
+    aged 45-59 years
+    <%- elif age == "60 and older" -%>
+    aged over 60 years
+    <%- elif age == "0-9" -%>
+    aged 0-9 years
+    <%- elif age == "10 -14" -%>
+    aged 10-14 years
+    <%- elif age == "15 -17" -%>
+    aged 15-17 years
+    <%- elif age == "18-19" -%>
+    aged 18-19 years
+    <%- elif age == "20-24" -%>
+    aged 20-24 years
+    <%- elif age == "25-29" -%>
+    aged 25-29 years
+    <%- elif age == "Unknown" -%>
+    of unknown age
+    <%- endif -%>
+  unit: |-
+    <% if unit_of_measurement == "Counts" %>
+    homicides
+    <%- elif unit_of_measurement == "Rate per 100,000 population" %>
+    homicides per 100,000 population
+    <%- endif %>
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  by_mechanisms:
+    variables:
+      value:
+        title: |-
+          {definitions.metric_title} - << category >>
+        description_short: |-
+          {definitions.metric} {definitions.sex} {definitions.age} where the weapon was << category.lower() >>.
+        unit: |-
+          {definitions.unit}
+        presentation:
+          title_public: |-
+            {definitions.metric_title} {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
+        display:
+          numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
+  by_relationship_to_perpetrator:
+    variables:
+      value:
+        title: |-
+          {definitions.metric_title} - << category >> - sex: << sex >>
+        description_short: |-
+          {definitions.metric} {definitions.sex} {definitions.age} where the << category.lower() >>.
+        unit: |-
+          {definitions.unit}
+        presentation:
+          title_public: |-
+            {definitions.metric_title} {definitions.sex} {definitions.age} where the << category.lower() >>
+        display:
+          numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
+  by_situational_context:
+    variables:
+      value:
+        title: |-
+          {definitions.metric_title} - << category >> - sex: << sex >>
+        description_short: |-
+          {definitions.metric} {definitions.sex} {definitions.age} where the situation was << category.lower() >>.
+        unit: |-
+          {definitions.unit}
+        presentation:
+          title_public: |-
+            {definitions.metric_title} {definitions.sex} {definitions.age} where the situation was << category.lower() >>
+        display:
+          numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
+  total:
+    variables:
+      value:
+        title: |-
+          {definitions.metric_title} - sex: << sex >> - age: << age >>
+        description_short: |-
+          {definitions.metric}{definitions.sex}{definitions.age}.
+        presentation:
+          title_public: |-
+            {definitions.metric_title} {definitions.sex} {definitions.age}
+        unit: |-
+          {definitions.unit}
+        display:
+          numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>

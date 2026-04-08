@@ -3,13 +3,13 @@
 import pandas as pd
 
 from etl.catalog_helpers import last_date_accessed
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     paths.log.info("epoch_aggregates_domain.start")
 
     #
@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
         "organization_categorization",
         "parameters",
         "training_compute__flop",
-        "training_dataset_size__datapoints",
+        "training_dataset_size__total",
         "notability_criteria",
     ]
     # Drop the unused columns
@@ -92,8 +92,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb_agg],
         yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
     )

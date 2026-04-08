@@ -3,17 +3,15 @@ from typing import cast
 from owid.catalog import Table
 from owid.catalog.processing import concat
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-TABLES_EXCLUDE = [
-    "fertility_single",
-]
+# Exclude the last three as we want to treat them differently and remove the january rows from them
+TABLES_EXCLUDE = ["fertility_single", "population_january"]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -23,7 +21,12 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tables = [reshape_table(ds_garden[tb_name]) for tb_name in ds_garden.table_names if tb_name not in TABLES_EXCLUDE]
+    tables = []
+    for tb_name in ds_garden.table_names:
+        # print(tb_name)
+        if tb_name not in TABLES_EXCLUDE:
+            tb_new = reshape_table(ds_garden[tb_name])
+            tables.append(tb_new)
 
     # Edit title
     ds_garden.metadata.title = cast(str, ds_garden.metadata.title) + " (projections full timeseries)"
@@ -32,8 +35,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create grapher dataset
-    ds_grapher = create_dataset(
-        dest_dir,
+    ds_grapher = paths.create_dataset(
         tables=tables,
         check_variables_metadata=True,
         default_metadata=ds_garden.metadata,

@@ -1,0 +1,14 @@
+dataset:
+  title: DRAFT end_of_slavery
+  description: ''
+tables:
+  end_of_slavery:
+    variables:
+      slavery_substantial:
+        title: slavery_substantial
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

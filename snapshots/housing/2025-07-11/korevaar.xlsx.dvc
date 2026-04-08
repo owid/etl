@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "The Housing Affordability Revolution"
+    description: |-
+      The paper documents the long-run evolution of urban housing affordability in seven major European cities from 1500 to 2024. Using nearly half a million rent observations, we construct annual indices of rents and wages and develop new estimates of housing quality, inequality, and expenditure shares. Over this period, real rents increased slowly—by just 0.17 percent annually on average—while housing quality improved substantially even before industrialization. From the 1910s to the 1970s, we document a “housing affordability revolution”: real wages grew markedly faster than rents, housing quality rose sharply, and housing consumption inequality declined—coinciding with large-scale housing policy. Yet housing expenditure shares are higher today than a century ago, not because affordability declined, but because housing consumption increased and household size declined - challenging models with constant expenditure shares. Our findings establish new stylized facts on housing rents, quality, and inequality over five centuries, and highlight the long-run role of preferences, institutions, and policy in shaping affordability. 
+    date_published: "2025-07-08"
+
+    # Citation
+    producer: Eichholtz, Korevaar, and Lindenthal
+    citation_full: |-
+      Eichholtz, Piet and Korevaar, Matthijs and Lindenthal, Thies, The Housing Affordability Revolution (July 08, 2025). Available at SSRN: https://ssrn.com/abstract=3418495 or http://dx.doi.org/10.2139/ssrn.3418495 
+
+    # Files
+    url_main: https://papers.ssrn.com/sol3/Papers.cfm?abstract_id=3418495
+    date_accessed: '2025-07-11'
+
+    # License
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: b626645e00990f2cb87f4da1d7f57500
+    size: 126356
+    path: korevaar.xlsx

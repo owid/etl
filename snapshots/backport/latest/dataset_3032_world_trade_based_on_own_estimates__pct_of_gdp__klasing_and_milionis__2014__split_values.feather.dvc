@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3032
-    date_accessed: 2023-08-10 10:30:28.936193
+    url: https://admin.owid.io/admin/datasets/3032
+    date_accessed: 2026-03-05 09:53:12.161397+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: World trade based on own estimates (% of GDP) (Klasing and Milionis (2014))  (split)
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c66279034d299e35c9df621ce14478bb
-  size: 7498
-  path: 
-    dataset_3032_world_trade_based_on_own_estimates__pct_of_gdp__klasing_and_milionis__2014__split_values.feather
+  - md5: b41a7b2752ddd7fddeae8ceb116e76d6
+    size: 7530
+    path: dataset_3032_world_trade_based_on_own_estimates__pct_of_gdp__klasing_and_milionis__2014__split_values.feather

@@ -1,17 +1,15 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3094
-    date_accessed: 2023-08-10 08:27:12.057969
+    url: https://admin.owid.io/admin/datasets/3094
+    date_accessed: 2026-03-05 09:53:26.458894+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_3094_global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018
+  name: Grapher metadata for dataset_3094_global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018
   description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: aca6ba2f57943db6563e51fa03a8f69d
-  size: 11377
-  path: 
-    dataset_3094_global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018_config.json
+  - md5: 1feb24220ff71eb72bfd5614293b9f7a
+    size: 11972
+    path: dataset_3094_global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018_config.json

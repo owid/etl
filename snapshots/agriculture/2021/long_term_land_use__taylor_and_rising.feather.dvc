@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Taylor & Rising (2021); UN World Population Prospects (2021)
+    url: https://iopscience.iop.org/article/10.1088/1748-9326/ac3c6d
+    date_accessed: 2026-03-05
+    published_by: |-
+      Taylor, C. A., & Rising, J. (2021). Tipping point dynamics in global land use. Environmental Research Letters, 16(12), 125012.
+  name: Long-term land use (Taylor and Rising)
+  description: ''
+  is_public: false
+outs:
+  - md5: 3ffa48edc9a26e356ae268940e21bda7
+    size: 1015970
+    path: long_term_land_use__taylor_and_rising.feather

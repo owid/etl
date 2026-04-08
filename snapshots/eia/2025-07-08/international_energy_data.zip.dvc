@@ -1,0 +1,18 @@
+meta:
+  origin:
+    title: International Energy Data
+    producer: U.S. Energy Information Administration
+    attribution_short: EIA
+    citation_full: |-
+      U.S. Energy Information Administration (EIA) - International Energy Data (2025).
+    date_accessed: '2025-07-08'
+    date_published: '2025-07-07'
+    url_main: https://www.eia.gov/opendata/bulkfiles.php
+    url_download: https://api.eia.gov/bulk/INTL.zip
+    license:
+      name: Public domain
+      url: https://www.eia.gov/about/copyrights_reuse.php
+outs:
+  - md5: b57cb1c93f8fb2fad1167a5bc990e2c2
+    size: 24458694
+    path: international_energy_data.zip

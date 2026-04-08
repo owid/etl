@@ -1,0 +1,24 @@
+dataset:
+  title: Corporal Punishment in Schools - Longitudinal Evidence from Ethiopia, India, Peru and Vietnam (UNICEF 2015)
+tables:
+  corporal_punishment_in_schools__longitudinal_evidence_from_ethiopia__india__peru_and_vietnam__unicef_2015:
+    variables:
+      children_age_15_who_report_physical_punishment_by_teachers:
+        title: Children age 15 who report physical punishment by teachers
+        unit: '%'
+        description: |-
+          Children’s self-reports of teacher’s use of physical punishment in the past week, at age 15. Reports combine the response categories ‘once or twice’ and ‘most/all of the time’.
+      children_age_8_who_report_physical_punishment_by_teachers:
+        title: Children age 8 who report physical punishment by teachers
+        unit: '%'
+        description: |-
+          Children’s self-reports of teacher’s use of physical punishment in the past week, at age 8. Reports combine the response categories ‘once or twice’ and ‘most/all of the time’.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,38 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Energy and AI
+    date_published: "2025-06-16"
+    description_snapshot: |
+      This dataset contains world and regional data on energy consumption and infrastructure related to artificial intelligence, including:
+      - Installed capacity
+      - Power usage effectiveness (PUE)
+      - Load factor
+      - Electricity consumption
+
+      The data provides insights into the energy requirements and efficiency of AI infrastructure globally.
+
+    # Citation
+    producer: International Energy Agency
+    citation_full: "International Energy Agency (IEA), 'Energy and AI'. Published online at iea.org. Retrieved from: 'https://www.iea.org/data-and-statistics/data-product/energy-and-ai' [online resource]"
+
+    # Files
+    url_main: https://www.iea.org/data-and-statistics/data-product/energy-and-ai
+    date_accessed: '2025-11-07'
+
+    # Manual download instructions:
+    # 1. Visit: https://www.iea.org/data-and-statistics/data-product/energy-and-ai
+    # 2. Create an IEA account or log in if you already have one
+    # 3. Download the Excel file
+    # 4. Run: etls artificial_intelligence/2025-11-07/energy_ai --path-to-file <path_to_downloaded_file>
+
+    # License
+    license:
+      name: © OECD/IEA 2024
+      url: https://www.iea.org/terms
+outs:
+  - md5: 9fc209c5a9b8a724b9d21b4a6acc9436
+    size: 24210
+    path: energy_ai.xlsx

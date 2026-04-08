@@ -9,7 +9,7 @@ INSTRUCTIONS
 	2. Extract the dta file from the zip file.
 	3. Run this do-file in Stata.
 	4. Add snapshot. Currently the command is
- 		python snapshots/wvs/2023-03-08/wvs_trust.py --path-to-file snapshots/wvs/2023-03-08/wvs_trust.csv
+ 		etls wvs/2023-03-08/wvs_trust --path-to-file snapshots/wvs/2023-03-08/wvs_trust.csv
 	5. Delete csv file
 	6. Run etl wvs_trust
 
@@ -144,7 +144,7 @@ foreach var in $additional_questions {
 	collapse (mean) confidence_`var', by (year country)
 	tempfile confidence_`var'_file
 	save "`confidence_`var'_file'"
-	
+
 	restore
 	preserve
 }

@@ -258,7 +258,7 @@ def filter_entries_by_age(df: pd.DataFrame):
 
 def add_uk_by_age(df: pd.DataFrame):
     # Get UK Nations data
-    df_uk = df[df["entity"].isin(["England & Wales", "Scotland", "Northern Ireland"])].copy()
+    df_uk = df[df["entity"].isin(["England and Wales", "Scotland", "Northern Ireland"])].copy()
     # Check time_unit
     time_units = df_uk["time_unit"].unique()
     assert len(time_units) == 1, "There are multiple time units for UK Nations"

@@ -1,0 +1,26 @@
+title:
+  title: Plastic waste generation
+  title_variant: by measure
+
+default_selection:
+  - Russia
+  - China
+  - United States
+  - Brazil
+  - Nigeria
+
+topic_tags:
+  - Plastic Pollution
+dimensions:
+  - slug: "measure"
+    name: "Measure"
+    choices:
+      - slug: "total"
+        name: "Total"
+        description: "Total plastic waste generation in tonnes"
+      - slug: "per_person"
+        name: "Per person"
+        description: "Plastic waste generation per capita in kilograms"
+views:
+  # Views will be filled out programmatically.
+  []

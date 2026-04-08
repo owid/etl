@@ -215,7 +215,7 @@ def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
                 _number_of_comment_lines += 1
                 new_lines.append(line)
                 continue
-            elif line.strip().startswith(step):
+            elif line.strip().startswith(step + ":"):
                 if _number_of_comment_lines > 0:
                     # Remove the previous comment lines and ignore the current line.
                     new_lines = new_lines[:-_number_of_comment_lines]
@@ -332,3 +332,37 @@ def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
     steps = dag["steps"] or {}
 
     return {node: set(deps) if deps else set() for node, deps in steps.items()}
+
+
+def graph_nodes(graph: Graph) -> Set[str]:
+    """Get all nodes from a DAG (both keys and values)."""
+    all_steps = set(graph)
+    for children in graph.values():
+        all_steps.update(children)
+    return all_steps
+
+
+def get_active_snapshots() -> Set[str]:
+    DAG = load_dag()
+
+    active_snapshots = set()
+
+    for s in graph_nodes(DAG):
+        if s.startswith("snapshot"):
+            active_snapshots.add(s.split("://")[1])
+
+    # Strip extension
+    return {s.split(".")[0] + ".py" for s in active_snapshots}
+
+
+def get_active_steps() -> Set[str]:
+    DAG = load_dag()
+
+    active_steps = set()
+
+    for s in graph_nodes(DAG):
+        if not s.startswith("snapshot"):
+            active_steps.add(s.split("://")[1])
+
+    # Strip dataset name after version
+    return {s.rsplit("/", 1)[0] for s in active_steps}

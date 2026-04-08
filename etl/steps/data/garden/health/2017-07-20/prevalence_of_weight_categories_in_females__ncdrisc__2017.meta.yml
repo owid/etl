@@ -1,0 +1,32 @@
+dataset:
+  title: Prevalence of weight categories in females - NCDRisC (2017)
+tables:
+  prevalence_of_weight_categories_in_females__ncdrisc__2017:
+    variables:
+      healthy__ncdrisc__2017:
+        title: Healthy (NCDRisC (2017))
+        unit: '%'
+        description: Share of women (as % of adult population) who are healthy.
+      obese__ncdrisc__2017:
+        title: Obese (NCDRisC (2017))
+        unit: '%'
+        short_unit: '%'
+        description: Share of women (as % of adult population) who are obese.
+      overweight_or_obese__ncdrisc__2017:
+        title: Overweight or Obese (NCDRisC (2017))
+        unit: '%'
+        short_unit: '%'
+        description: Share of women (as % of adult population) who are overweight or obese.
+      underweight__ncdrisc__2017:
+        title: Underweight (NCDRisC (2017))
+        unit: '%'
+        description: Share of women (as % of adult population) who are underweight.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

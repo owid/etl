@@ -1,3 +1,7 @@
+---
+icon: material/waves-arrow-right
+---
+
 !!! warning "This is still being written."
 
     Our metadata formats are still in flux, and are likely to change over the coming weeks.

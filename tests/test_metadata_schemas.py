@@ -1,5 +1,7 @@
+import subprocess
 from pathlib import Path
 
+import structlog
 import yaml
 from jsonschema import (
     Draft7Validator,
@@ -8,7 +10,9 @@ from jsonschema.exceptions import ValidationError
 from yaml.loader import SafeLoader
 
 from etl.files import read_json_schema
-from etl.paths import SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
+from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
+
+log = structlog.get_logger()
 
 DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
 SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
@@ -36,11 +40,81 @@ def load_yaml_as_string(path):
         return yaml.load(file, Loader=SafeLoader)
 
 
+def _get_changed_files_vs_master(pattern: str) -> set[str] | None:
+    """Return set of files changed vs master matching pattern, or None to validate all.
+
+    Returns None (= validate all) if:
+    - We're on master itself
+    - git isn't available
+    - The schema files themselves changed
+    """
+    try:
+        # Check if we're on master
+        branch = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        if branch.returncode != 0 or branch.stdout.strip() == "master":
+            return None
+
+        # Check if schema files changed — if so, validate everything
+        schema_diff = subprocess.run(
+            ["git", "diff", "--name-only", "master", "--", "schemas/"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        if schema_diff.returncode != 0 or schema_diff.stdout.strip():
+            return None
+
+        # Get changed files matching pattern
+        result = subprocess.run(
+            ["git", "diff", "--name-only", "master", "--", pattern],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        if result.returncode != 0:
+            return None
+
+        return set(result.stdout.strip().splitlines())
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return None
+
+
+def _should_validate(file_path: Path, changed_files: set[str] | None) -> bool:
+    """Check if a file should be validated based on the changed files set.
+
+    `changed_files` contains repo-relative paths as returned by git (e.g.
+    ``etl/steps/data/garden/foo/2024-01-01/foo.meta.yml``), so we must
+    convert the absolute ``file_path`` to a repo-relative path before
+    checking membership.
+    """
+    if changed_files is None:
+        return True
+    try:
+        rel = str(file_path.relative_to(BASE_DIR))
+    except ValueError:
+        # file_path is outside the repo — fall back to str comparison
+        rel = str(file_path)
+    return rel in changed_files
+
+
 def test_dataset_schemas():
+    changed_files = _get_changed_files_vs_master("etl/steps/data/**/*.meta.yml")
+    if changed_files is not None and not changed_files:
+        return  # No meta.yml files changed, skip entirely
+
     validator = Draft7Validator(DATASET_SCHEMA)
+    validation_errors = []
 
     # Walk over all files in STEPS_DATA_DIR with *.meta.yml extension
     for meta_file_path in Path(STEPS_DATA_DIR).glob("**/*.meta.yml"):
+        if not _should_validate(meta_file_path, changed_files):
+            continue
+
         # extract version from path
         version = meta_file_path.relative_to(STEPS_DATA_DIR).parts[2]
 
@@ -64,17 +138,38 @@ def test_dataset_schemas():
                 if "description" in ind:
                     del ind["description"]
 
+                # Ignore pinned schemas in presentation.grapher_config
+                if "$schema" in ind.get("presentation", {}).get("grapher_config", {}):
+                    del ind["presentation"]["grapher_config"]
+
         # Validate the loaded data against the schema
         try:
             validator.validate(data)
         except ValidationError as e:
-            raise ValidationError(f"Validation error in file: {meta_file_path}") from e
+            validation_errors.append((meta_file_path, e))
+
+    # If there are validation errors, log summary and raise the first one
+    if validation_errors:
+        log.error("VALIDATION SUMMARY", error_count=len(validation_errors))
+        for i, (file_path, error) in enumerate(validation_errors, 1):
+            log.error("Validation error", index=i, file=str(file_path), message=error.message)
+
+        # Raise the first error
+        first_file, first_error = validation_errors[0]
+        raise ValidationError(f"Validation error in file: {first_file}") from first_error
 
 
 def test_snapshot_schemas():
+    changed_files = _get_changed_files_vs_master("snapshots/**/*.dvc")
+    if changed_files is not None and not changed_files:
+        return  # No .dvc files changed, skip entirely
+
     validator = Draft7Validator(SNAPSHOT_SCHEMA)
 
     for meta_file_path in Path(SNAPSHOTS_DIR).glob("**/*.dvc"):
+        if not _should_validate(meta_file_path, changed_files):
+            continue
+
         # extract version from etl/snapshots/namespace/version/snapshot_name.ext.dvc
         version = meta_file_path.parent.name
 

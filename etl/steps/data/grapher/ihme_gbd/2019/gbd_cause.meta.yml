@@ -51,6 +51,7 @@ tables:
                   - null
                   - null
                 customNumericValues:
+                  - 0
                   - 1
                   - 2
                   - 5
@@ -60,7 +61,6 @@ tables:
                   - 100
                   - 200
                   - 500
-                customNumericMinValue: 0
             selectedEntityNames:
               - Ethiopia
               - Kenya

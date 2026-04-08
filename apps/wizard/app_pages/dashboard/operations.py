@@ -50,7 +50,7 @@ def render_action_update():
         with st.popover("More settings", icon=":material/settings:"):
             dry_run_update = st.toggle(
                 "Dry run",
-                True,
+                False,
                 help="If checked, the update command will not write anything to the DAG or create any files.",
             )
             version_new = st.text_input("New version", value=TODAY, help="Version of the new steps to be created.")
@@ -59,7 +59,7 @@ def render_action_update():
             help="Update all steps in the **Operations list**.",
             type="primary",
             icon=":material/play_circle:",
-            # use_container_width=True,
+            # width="stretch",
         )
 
     # Button to execute the update command and show its output.
@@ -99,7 +99,7 @@ def render_action_execute(steps_df: pd.DataFrame):
         with st.popover("More settings", icon=":material/settings:"):
             dry_run_etl = st.toggle(
                 "Dry run",
-                True,
+                False,
                 help="If checked, no snapshots will be executed, and ETL will be executed in dry-run mode.",
             )
             force_only = st.toggle(
@@ -123,7 +123,7 @@ def render_action_execute(steps_df: pd.DataFrame):
             help="Run ETL on all data steps in the **Operations list** (and optionally also execute snapshots).",
             type="primary",
             icon=":material/play_circle:",
-            # use_container_width=True,
+            # width="stretch",
         )
 
         # Button to execute the update command and show its output.
@@ -158,7 +158,7 @@ def render_action_archive():
         with st.popover("More settings", icon=":material/settings:"):
             dry_run_archive = st.toggle(
                 "Dry run",
-                True,
+                False,
                 help="If checked, nothing will be written to the dag.",
             )
             include_usages_archive = st.toggle(
@@ -172,7 +172,7 @@ def render_action_archive():
             help="Move archivable steps in the **Operations list** to their corresponding archive dag.",
             type="primary",
             icon=":material/play_circle:",
-            # use_container_width=True,
+            # width="stretch",
         )
 
     # Button to execute the update command and show its output.

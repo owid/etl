@@ -1,0 +1,147 @@
+definitions:
+  description_short_dollars: &description_short_dollars |-
+    This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries.
+  common:
+    processing_level: minor
+    description_key:
+      - This data primarily focuses on economic instruments targeting carbon dioxide (CO₂) emissions.
+      - In some cases these instruments also cover other greenhouse gases. However, any pricing mechanisms that specifically target non-CO₂ gases (such as methane or nitrous oxide) are not included.
+      - A country is considered to have a carbon tax or emissions trading system if at least one IPCC sector or gas is covered by the instrument. These instruments do not need to cover all sectors within the economy for this to apply.
+      - Only countries with a carbon tax at the national level are included.
+      - |-
+        For each country, researchers calculate an emissions-weighted carbon price for the economy. To do this, they rely on two metrics:
+        - Carbon prices applied at the sectoral level (e.g. electricity, or road transport).
+        - Each sector's contribution to a country's CO₂ emissions (e.g. what percentage of a country's emissions come from electricity, or road transport).
+        They then weight each sector's carbon price by the relevant sector's contribution to CO₂ emissions, and aggregate these figures to get an economy-wide weighted carbon price.
+      - A full technical note on the methodology is provided by the authors [in this report](https://www.rff.org/publications/working-papers/emissions-weighted-carbon-price-sources-and-methods/).
+    presentation:
+      topic_tags:
+      - CO2 & Greenhouse Gas Emissions
+
+dataset:
+  update_period_days: 365
+
+tables:
+  emissions_weighted_carbon_price:
+    title: Emissions-weighted carbon price
+    variables:
+      co2_with_ets_as_share_of_co2:
+        title: CO₂ emissions covered by an ETS as a share of the country's CO₂ emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      co2_with_ets_as_share_of_ghg:
+        title: CO₂ emissions covered by an ETS as a share of the country's GHG emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      co2_with_ets_as_share_of_world_co2:
+        title: CO₂ emissions covered by an ETS as a share of the world's CO₂ emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      co2_with_ets_as_share_of_world_ghg:
+        title: CO₂ emissions covered by an ETS as a share of the world's GHG emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      co2_with_tax_as_share_of_co2:
+        title: CO₂ emissions covered by a carbon tax as a share of the country's CO₂ emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      co2_with_tax_as_share_of_ghg:
+        title: CO₂ emissions covered by a carbon tax as a share of the country's GHG emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      co2_with_tax_as_share_of_world_co2:
+        title: CO₂ emissions covered by a carbon tax as a share of the world's CO₂ emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      co2_with_tax_as_share_of_world_ghg:
+        title: CO₂ emissions covered by a carbon tax as a share of the world's GHG emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      co2_with_tax_or_ets_as_share_of_co2:
+        title: CO₂ emissions covered by a carbon tax or an ETS as a share of the country's CO₂ emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      co2_with_tax_or_ets_as_share_of_ghg:
+        title: CO₂ emissions covered by a carbon tax or an ETS as a share of the country's GHG emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      co2_with_tax_or_ets_as_share_of_world_co2:
+        title: CO₂ emissions covered by a carbon tax or an ETS as a share of the world's CO₂ emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      co2_with_tax_or_ets_as_share_of_world_ghg:
+        title: CO₂ emissions covered by a carbon tax or an ETS as a share of the world's GHG emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+      price_with_ets_weighted_by_share_of_co2:
+        title: Average price on emissions covered by an ETS, weighted by the share of the country's CO₂ emissions
+        description_short: *description_short_dollars
+        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        short_unit: $/t
+        display:
+          numDecimalPlaces: 2
+          shortUnit: $
+      price_with_ets_weighted_by_share_of_ghg:
+        title: Average price on emissions covered by an ETS, weighted by the share of the country's GHG emissions
+        description_short: *description_short_dollars
+        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        short_unit: $/t
+        display:
+          numDecimalPlaces: 2
+          shortUnit: $
+      price_with_tax_or_ets_weighted_by_share_of_co2:
+        title: Average price on emissions covered by a carbon tax or an ETS, weighted by the share of the country's CO₂ emissions
+        description_short: *description_short_dollars
+        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        short_unit: $/t
+        display:
+          numDecimalPlaces: 2
+          shortUnit: $
+      price_with_tax_or_ets_weighted_by_share_of_ghg:
+        title: Average price on emissions covered by a carbon tax or an ETS, weighted by the share of the country's GHG emissions
+        description_short: *description_short_dollars
+        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        short_unit: $/t
+        display:
+          numDecimalPlaces: 2
+          shortUnit: $
+      price_with_tax_weighted_by_share_of_co2:
+        title: Average price on emissions covered by a carbon tax, weighted by the share of the country's CO₂ emissions
+        description_short: *description_short_dollars
+        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        short_unit: $/t
+        display:
+          numDecimalPlaces: 2
+          shortUnit: $
+      price_with_tax_weighted_by_share_of_ghg:
+        title: Average price on emissions covered by a carbon tax, weighted by the share of the country's GHG emissions
+        description_short: *description_short_dollars
+        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        short_unit: $/t
+        display:
+          numDecimalPlaces: 2
+          shortUnit: $

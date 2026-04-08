@@ -1,0 +1,68 @@
+dataset:
+  title: Death rate by age group in England and Wales - ONS
+tables:
+  death_rate_by_age_group_england_and_wales__ons:
+    variables:
+      _1_4_years_old:
+        title: 1-4 years old
+        unit: deaths per 1,000
+      _10_14_years_old:
+        title: 10-14 years old
+        unit: deaths per 1,000
+      _15_19_years_old:
+        title: 15-19 years old
+        unit: deaths per 1,000
+      _20_24_years_old:
+        title: 20-24 years old
+        unit: deaths per 1,000
+      _25_29_years_old:
+        title: 25-29 years old
+        unit: deaths per 1,000
+      _30_34_years_old:
+        title: 30-34 years old
+        unit: deaths per 1,000
+      _35_39_years_old:
+        title: 35-39 years old
+        unit: deaths per 1,000
+      _40_44_years_old:
+        title: 40-44 years old
+        unit: deaths per 1,000
+      _45_49_years_old:
+        title: 45-49 years old
+        unit: deaths per 1,000
+      _5_9_years_old:
+        title: 5-9 years old
+        unit: deaths per 1,000
+      _50_54_years_old:
+        title: 50-54 years old
+        unit: deaths per 1,000
+      _55_59_years_old:
+        title: 55-59 years old
+        unit: deaths per 1,000
+      _60_64_years_old:
+        title: 60-64 years old
+        unit: deaths per 1,000
+      _65_69_years_old:
+        title: 65-69 years old
+        unit: deaths per 1,000
+      _70_74_years_old:
+        title: 70-74 years old
+        unit: deaths per 1,000
+      _75_79_years_old:
+        title: 75-79 years old
+        unit: deaths per 1,000
+      _80plus_years_old:
+        title: 80+ years old
+        unit: deaths per 1,000
+      lt_1_year_old:
+        title: <1 year old
+        unit: deaths per 1,000
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,14 @@
+To update:
+
+1. Download the files from the LIS FTP platform: https://ftps.lisdatacenter.org/file (ask for credentials if you don't have them).
+2. Copy them to this directory.
+3. Rename the files deleting their timestamp, by running:
+    for f in snapshots/lis/2025-12-12/*_[0-9][0-9][0-9][0-9]_[0-9][0-9]_[0-9][0-9].csv; do mv "$f" "${f/_[0-9][0-9][0-9][0-9]_[0-9][0-9]_[0-9][0-9]/}"; done
+4. Run the following
+    etls snapshots/lis/2025-12-12/lis_absolute_poverty.py --path-to-file snapshots/lis/2025-12-12/absolute_poverty.csv
+    etls snapshots/lis/2025-12-12/lis_incomes.py --path-to-file snapshots/lis/2025-12-12/incomes.csv
+    etls snapshots/lis/2025-12-12/lis_inequality.py --path-to-file snapshots/lis/2025-12-12/inequality.csv
+    etls snapshots/lis/2025-12-12/lis_relative_poverty.py --path-to-file snapshots/lis/2025-12-12/relative_poverty.csv
+5. Delete the csv files by running
+    rm snapshots/lis/2025-12-12/*.csv
+

@@ -87,6 +87,7 @@ tables:
                 baseColorScheme: OrRd
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 3
                   - 10
                   - 20
@@ -148,6 +149,7 @@ tables:
                 baseColorScheme: OrRd
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -207,6 +209,7 @@ tables:
                 baseColorScheme: YlOrBr
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 5
                   - 10
                   - 15
@@ -262,8 +265,8 @@ tables:
               colorScale:
                 baseColorScheme: Oranges
                 binningStrategy: manual
-                customNumericMinValue: 1
                 customNumericValues:
+                  - 1
                   - 0.3
                   - 0.35
                   - 0.4
@@ -318,6 +321,7 @@ tables:
                 baseColorScheme: YlOrBr
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 3
                   - 6
                   - 9

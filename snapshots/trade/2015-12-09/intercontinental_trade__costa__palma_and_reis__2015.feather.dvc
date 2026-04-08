@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Costa, Palma and Reis (2015)
+    description: |-
+      Citation: Costa, Palma and Reis (2015). The Great Escape? The Contribution of the Empire to Portugal's Economic Growth, 1500-1800. European Review of Economic History (2015) 19 (1): 1-22
+    url: http://ereh.oxfordjournals.org/content/19/1/1.abstract
+    date_accessed: 2015-12-09
+    published_by: Nuno Palma
+  name: Intercontinental Trade - Costa, Palma and Reis (2015)
+  description: ''
+outs:
+  - md5: ce68fda6265e7e3d534c5e15d7d97dc3
+    size: 3362
+    path: intercontinental_trade__costa__palma_and_reis__2015.feather

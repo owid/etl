@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Reconstruction of historical global extreme poverty rates, 1820-2017 (Roser and Hasell (2021) and World Bank(2020))
+    description: |-
+      See the data appendix describing the source data and methods underlying these estimates: https://ourworldindata.org/history-of-poverty-data-appendix
+    date_accessed: 2026-03-05
+    published_by: Reconstruction of historical global extreme poverty rates, 1820-2017 (Roser and Hasell (2021) and World Bank(2020))
+  name: Reconstruction of historical global extreme poverty rates, 1820-2017 (Roser and Hasell (2021) and World Bank(2020))
+  description: ''
+  is_public: false
+outs:
+  - md5: 8c5e3b85dcef5d1def9ed7a1a92c9f7c
+    size: 5594
+    path: reconstruction_of_historical_global_extreme_poverty_rates__1820_2017__roser_and_hasell__2021__and_world_bank__2020.feather

@@ -1,0 +1,244 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+    display:
+      numDecimalPlaces: 0
+
+  description_processing_investment: |-
+      - Reporting a time series of AI investments in nominal prices would make it difficult to compare observations across time. To make these comparisons possible, one has to take into account that prices change (inflation).
+      - It is not obvious how to adjust this time series for inflation, and our team discussed the best solutions at our disposal.
+      - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services purchased through these investments. This would make it possible to calculate a volume measure of AI investments and tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost of some crucial AI technology has fallen rapidly in price.
+      - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. Ultimately, we decided to use the US Consumer Price Index (CPI).
+      - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments, therefore, lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+      - World aggregate does not include data for Micronesia, Tonga, Samoa, Kiribati, Fiji, Papua New Guinea, Palau, Tuvalu, Bermuda, Armenia, Belarus, Georgia, Gibraltar, Jersey, Kosovo, Moldova, Isle of Man, Iceland, Albania, Andorra, Bosnia and Herzegovina, Malta, Montenegro, San Marino, North Macedonia, Liechtenstein, Monaco, Vatican City, Guernsey, Afghanistan, Kyrgyzstan, Bahrain, Laos, Bangladesh, Lebanon, Bhutan, Maldives, Cambodia, Syria, Tajikistan, Cyprus, Mongolia, North Korea, Myanmar, Timor-Leste, Nepal, Turkmenistan, Pakistan, Palestine, Iraq, United Arab Emirates, Uzbekistan, Kazakhstan, Qatar, Vietnam, Yemen, Kuwait, Algeria, Cape Verde, Equatorial Guinea, Swaziland, Namibia, Central African Republic (the), Angola, Ethiopia, Niger, Benin, Gabon, Nigeria, Botswana, Gambia, Rwanda, Burkina Faso, Ghana, São Tomé and Príncipe, Burundi, Guinea, Senegal, Guinea-Bissau, Seychelles, Cameroon, Sierra Leone, Lesotho, Somalia, Chad, Liberia, Libya, South Sudan, Congo, Madagascar, Sudan, Côte d'Ivoire, Malawi, Togo, Mali, Djibouti, Mauritania, Uganda, Egypt, Mauritius, Tanzania, Zambia, Eritrea, Mozambique, Zimbabwe, Comoros, Antigua and Barbuda, Bolivia, Suriname, Nicaragua, Dominican Republic, Bahamas, Ecuador, Paraguay, Barbados, Saint Vincent and the Grenadines, El Salvador, Belize, Grenada, Saint Kitts and Nevis, Guatemala, Guyana, Haiti, Honduras, Trinidad and Tobago, Jamaica, Venezuela, Puerto Rico, Cayman Islands (the), Turks and Caicos Islands, Saint Lucia, and Dominica.
+  description_processing_other:  |-
+      - World aggregate does not include data for Micronesia, Tonga, Samoa, Kiribati, Fiji, Papua New Guinea, Palau, Tuvalu, Bermuda, Armenia, Belarus, Georgia, Gibraltar, Jersey, Kosovo, Moldova, Isle of Man, Iceland, Albania, Andorra, Bosnia and Herzegovina, Malta, Montenegro, San Marino, North Macedonia, Liechtenstein, Monaco, Vatican City, Guernsey, Afghanistan, Kyrgyzstan, Bahrain, Laos, Bangladesh, Lebanon, Bhutan, Maldives, Cambodia, Syria, Tajikistan, Cyprus, Mongolia, North Korea, Myanmar, Timor-Leste, Nepal, Turkmenistan, Pakistan, Palestine, Iraq, United Arab Emirates, Uzbekistan, Kazakhstan, Qatar, Vietnam, Yemen, Kuwait, Algeria, Cape Verde, Equatorial Guinea, Swaziland, Namibia, Central African Republic (the), Angola, Ethiopia, Niger, Benin, Gabon, Nigeria, Botswana, Gambia, Rwanda, Burkina Faso, Ghana, São Tomé and Príncipe, Burundi, Guinea, Senegal, Guinea-Bissau, Seychelles, Cameroon, Sierra Leone, Lesotho, Somalia, Chad, Liberia, Libya, South Sudan, Congo, Madagascar, Sudan, Côte d'Ivoire, Malawi, Togo, Mali, Djibouti, Mauritania, Uganda, Egypt, Mauritius, Tanzania, Zambia, Eritrea, Mozambique, Zimbabwe, Comoros, Antigua and Barbuda, Bolivia, Suriname, Nicaragua, Dominican Republic, Bahamas, Ecuador, Paraguay, Barbados, Saint Vincent and the Grenadines, El Salvador, Belize, Grenada, Saint Kitts and Nevis, Guatemala, Guyana, Haiti, Honduras, Trinidad and Tobago, Jamaica, Venezuela, Puerto Rico, Cayman Islands (the), Turks and Caicos Islands, Saint Lucia, and Dominica.
+
+  description_short_investment: Money put into privately held AI companies by private investors. This excludes publicly traded companies (e.g., public Big Tech companies) and companies’ own internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation. Data for {year} is incomplete and includes investments up to October {year}.
+  description_short_articles: English- and Chinese-language scholarly publications related to the development and application of AI. This includes journal articles, conference papers, repository publications (such as arXiv), books, and theses.
+  description_short_patents: Patents related to artificial intelligence first submitted in the selected country's patent office. Subsequent granting of that patent could be by any country's patent office.
+  description_short_citations: Citations take time to accumulate so recent years may have fewer citations, and the measure for these years may not completely reflective of their eventual total.
+
+  description_key_articles: &description_key_articles
+    - CSET sources the data on the number of articles and citations from the Merged Academic Corpus (MAC), which includes over 260 million academic articles.
+    - Articles are marked as AI-related using an automated system.
+    - Articles are linked to countries based on the authors’ listed organizations. If at least one author is from an institution in a country, the article counts for that country.
+    - If authors are from multiple countries, the article counts once for each country, but only once per country even if there are multiple authors from the same place.
+    - For example, an article with authors from both the U.S. and Japan counts once for each.
+
+  description_key_patents:  &description_key_patents
+    - CSET sources patent data from 1790 Analytics, PATSTAT, and The Lens.
+    - Patent data can be delayed, as some patent offices take years to release filings, so the most recent years may be incomplete and should be used with caution.
+    - Here, we’ve chosen not to include the most recent years of data in the dataset, as they are likely incomplete, as noted in the original dataset provided by CSET.
+    - The dataset includes over 360,000 AI-related patent families—groups of documents related to a single invention—and counts each family as one patent, treating it as a "granted patent" if any document in the family has been granted, or as a "patent application" if all documents are still pending.
+    - Inventors often apply for the same patent in multiple countries, so the dataset groups all filings for one invention across jurisdictions into a single patent family, using the year and country of the first application to assign a filing date and location.
+    - For example, if someone files a robot patent first in the European Patent Office and then in China, all documents are grouped under one EPO patent.
+    - The dataset reports where patents are filed, not where inventors are from—for instance, many patents filed in the U.S. are by non-U.S. inventors—so filing location is used as a proxy for innovation and market interest.
+
+  description_key_investment: &description_key_investment
+    - This data focuses on external private-market investment, such as venture-capital and private-equity deals.
+    - It does not include internal corporate R&D, capital expenditure (CapEx), or public-sector funding. Publicly traded companies, including large tech firms, are excluded.
+    - Because this data covers only one form of financing, it underestimates total global spending on AI.
+    - Large single deals can cause spikes in specific years. Broader economic conditions (interest rates, investor sentiment) can also drive changes that are not specific to AI.
+    - CSET's data for {year} is preliminary. This means estimates may be too low because more information becomes available later. We still show this data to provide more up-to-date information, but figures on this chart may change in the future if CSET revises its estimates.
+    - The “World” total reflects only the countries covered by the dataset and does not represent every country’s activity.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  cset:
+    variables:
+      disclosed_investment:
+        title: Disclosed investment
+        unit: constant 2021 US$
+        short_unit: $
+        description_short: |-
+          {definitions.description_short_investment}
+        description_processing: |-
+          {definitions.description_processing_investment}
+        description_key:
+          - *description_key_investment
+        presentation:
+          title_public: |-
+              <% if field == "All" -%>
+              Annual private investment in artificial intelligence (disclosed)
+              <%- else -%>
+              Annual private investment in << field|lower >> (disclosed)
+              <%- endif %>
+        display:
+          name: << field >>
+
+      estimated_investment:
+        title: Estimated investment
+        unit: constant 2021 US$
+        short_unit: $
+        description_short: |-
+          {definitions.description_short_investment}
+        description_processing: |-
+          {definitions.description_processing_investment}
+        description_key:
+          - *description_key_investment
+        presentation:
+          title_public: |-
+              <% if field == "All" -%>
+              Annual private investment in artificial intelligence (estimated)
+              <%- else -%>
+              Annual private investment in << field|lower >> (estimated)
+              <%- endif %>
+        display:
+          name: << field >>
+
+      estimated_investment_projected:
+        title: Estimated investment (projected)
+        unit: constant 2021 US$
+        short_unit: $
+        description_short: |-
+          Projected estimates of private investment in AI. {definitions.description_short_investment}
+        description_processing: |-
+          {definitions.description_processing_investment}
+        description_key:
+          - *description_key_investment
+          - Projected values represent forecasted investment amounts for future years.
+        presentation:
+          title_public: |-
+              <% if field == "All" -%>
+              Annual private investment in artificial intelligence (estimated, projected)
+              <%- else -%>
+              Annual private investment in << field|lower >> (estimated, projected)
+              <%- endif %>
+        display:
+          name: << field >> (projected)
+          isProjection: true
+
+
+      num_patent_applications:
+        title: Patent applications
+        unit: applications
+        description_short: |-
+          {definitions.description_short_patents}
+        description_key:
+          - *description_key_patents
+        description_processing: |-
+          {definitions.description_processing_other}
+        presentation:
+          title_public: |-
+              <% if field == "All" -%>
+              Artificial intelligence patent applications
+              <%- else -%>
+              Patent applications in << field|lower >>
+              <%- endif %>
+        display:
+          name: << field >>
+
+      num_patent_granted:
+        title: Patent applications granted
+        unit: granted applications
+        description_short: |-
+          {definitions.description_short_patents}
+        description_key:
+          - *description_key_patents
+        description_processing: |-
+          {definitions.description_processing_other}
+        presentation:
+          title_public: |-
+              <% if field == "All" -%>
+              Artificial intelligence patent applications granted
+              <%- else -%>
+              Patent applications granted in << field|lower >>
+              <%- endif %>
+        display:
+          name: << field >>
+
+      num_articles:
+        title: Number of articles
+        unit: articles
+        description_short: |-
+          {definitions.description_short_articles}
+        description_key:
+          - *description_key_articles
+        presentation:
+          title_public: |-
+              <% if field == "All" -%>
+              Scholarly publications in artificial intelligence
+              <%- else -%>
+              Scholarly publications in << field|lower >>
+              <%- endif %>
+        display:
+          name: << field >>
+
+      num_citations:
+        title: Number of citations
+        unit: citations
+        description_short: |-
+          {definitions.description_short_citations}
+        description_key:
+          - *description_key_articles
+        presentation:
+          title_public: |-
+              <% if field == "All" -%>
+              Citations of artificial intelligence publications
+              <%- else -%>
+              Citations of << field|lower >> publications
+              <%- endif %>
+        display:
+          name: << field >>
+
+      num_patent_applications_per_mil:
+        title: Patent applications per 1 million people
+        unit: applications per 1 million people
+        description_short: Yearly total number of patent applications per 1 million people. {definitions.description_short_patents}
+        description_key:
+          - *description_key_patents
+        description_processing: |-
+          {definitions.description_processing_other}
+        presentation:
+          title_public: |-
+              <% if field == "All" -%>
+              Artificial intelligence patent applications per million people
+              <%- else -%>
+              Patent applications in << field|lower >> per million people
+              <%- endif %>
+        display:
+          name: << field >>
+
+      num_patent_granted_per_mil:
+        title: Patent applications granted per 1 million people
+        unit: granted applications per 1 million people
+        description_short: Yearly total number of patents granted per 1 million people. {definitions.description_short_patents}
+        description_key:
+          - *description_key_patents
+        description_processing: |-
+          {definitions.description_processing_other}
+        presentation:
+          title_public: |-
+              <% if field == "All" -%>
+              Artificial intelligence patent applications granted per million people
+              <%- else -%>
+              Patent applications granted in << field|lower >> per million people
+              <%- endif %>
+        display:
+          name: << field >>
+
+      num_articles_per_mil:
+        title: Number of articles per 1 million people
+        unit: articles per 1 million people
+        description_short: Yearly number of articles published in AI fields per 1 million people. {definitions.description_short_articles}
+        description_key:
+          - *description_key_articles
+        presentation:
+          title_public: |-
+              <% if field == "All" -%>
+              Scholarly publications in artificial intelligence per million people
+              <%- else -%>
+              Scholarly publications in << field|lower >> per million people
+              <%- endif %>
+        display:
+          name: << field >>

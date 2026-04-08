@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Global historical electricity"
+    description: |-
+      Global historical electricity, from 1900 to 2017. The data was extracted from the supplementary materials of Pinto et al. (2023), "The rise and stall of world electricity efficiency:1900–2017, results and insights for the renewables transition".
+    date_published: "2023-04-15"
+
+    # Citation
+    producer: Pinto et al.
+    citation_full: |-
+      Ricardo Pinto, Sofia T. Henriques, Paul E. Brockway, Matthew Kuperus Heun, Tânia Sousa,
+      The rise and stall of world electricity efficiency:1900–2017, results and insights for the renewables transition, Energy, Volume 269, 2023, 126775, ISSN 0360-5442, https://doi.org/10.1016/j.energy.2023.126775.
+
+    # Files
+    url_main: https://doi.org/10.1016/j.energy.2023.126775
+    date_accessed: '2026-02-06'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://doi.org/10.1016/j.energy.2023.126775
+outs:
+  - md5: 1e1dfcb1b32586717e290e7791b9e0fd
+    size: 431485
+    path: global_historical_electricity.zip

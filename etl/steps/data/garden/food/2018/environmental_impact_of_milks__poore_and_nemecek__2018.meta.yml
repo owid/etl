@@ -1,0 +1,44 @@
+dataset:
+  title: Environmental impact of milks (Poore and Nemecek, 2018)
+tables:
+  environmental_impact_of_milks__poore_and_nemecek__2018:
+    variables:
+      eutrophication_from_milks__g_po43_eq:
+        title: Eutrophication from milks (g PO43-eq)
+        unit: kg PO₄eq per liter
+        short_unit: kg
+        display:
+          name: Eutrophication
+        description: |-
+          Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which affect and pollute ecosystems. They are measured in grams of phosphate equivalents (PO₄eq).
+      ghg_emissions_of_milks__kg_co2eq:
+        title: GHG emissions of milks (kg CO2eq)
+        unit: kgCO₂eq per liter
+        short_unit: kg
+        display:
+          name: Greenhouse gas emissions
+        description: |-
+          Greenhouse gas emissions across the supply chain, per liter of different milk products. Greenhouse gas emissions are measured in kilograms of carbon dioxide equivalents (kgCO₂eq). This means non-CO₂ greenhouse gases are included and weighted by their relative warming impact.
+      land_use_of_milks__m2:
+        title: Land use of milks (m2)
+        unit: m² per liter
+        short_unit: m²
+        display:
+          name: Land use
+        description: Agricultural land use requirements per liter of production for different milk products.
+      water_use_of_milks__l:
+        title: Water use of milks (L)
+        unit: liters per liter
+        short_unit: L
+        display:
+          name: Freshwater use
+        description: Freshwater use requirements per liter of production for different milk products.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

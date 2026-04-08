@@ -1,0 +1,94 @@
+dataset:
+  title: Infant Mortality Rates in UK (ONS, 2018)
+tables:
+  infant_mortality_rates_in_uk__ons__2018:
+    variables:
+      infant_mortality__under_1_year:
+        title: Infant mortality (under 1 year)
+        unit: ''
+        display:
+          name: deaths per 1,000 total births
+        sources:
+          - name: Infant Mortality Rates in UK (ONS, 2018)
+            description: |-
+              Infant mortality rates as reported by the UK Office for National Statistics (ONS). Infant mortality rates have be subdivided into categories depending on the age of the infant as follows:
+
+              - Perinatal – stillbirths and early neonatal deaths.
+              - Neonatal – deaths of those aged under 28 days.
+              - Postneonatal – deaths of those aged between 28 days and 1 year.
+              - Infant – deaths of those aged under 1 year.
+
+              Neonatal and postneonatal are reported as the number of deaths per 1,000 live births. Perinatal and infant mortality is reported as the number of deaths per 1,000 total births (the sum of stillbirths and live births). Note that stillbirths are only recorded for births with 24 weeks of gestation or more (i.e. stillbirths less than 24 weeks gestation are not recorded).
+            url: |-
+              https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/childhoodinfantandperinatalmortalityinenglandandwales/2016
+            date_accessed: 2018-11-19
+            published_by: UK Office for National Statistics (ONS)
+      neonatal_mortality__less_than_28_days:
+        title: Neonatal mortality (less than 28 days)
+        unit: deaths per 1,000 live births
+        display:
+          name: Neonatal mortality (less than 28 days)
+        sources:
+          - name: Infant Mortality Rates in UK (ONS, 2018)
+            description: |-
+              Infant mortality rates as reported by the UK Office for National Statistics (ONS). Infant mortality rates have be subdivided into categories depending on the age of the infant as follows:
+
+              - Perinatal – stillbirths and early neonatal deaths.
+              - Neonatal – deaths of those aged under 28 days.
+              - Postneonatal – deaths of those aged between 28 days and 1 year.
+              - Infant – deaths of those aged under 1 year.
+
+              Neonatal and postneonatal are reported as the number of deaths per 1,000 live births. Perinatal and infant mortality is reported as the number of deaths per 1,000 total births (the sum of stillbirths and live births). Note that stillbirths are only recorded for births with 24 weeks of gestation or more (i.e. stillbirths less than 24 weeks gestation are not recorded).
+            url: |-
+              https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/childhoodinfantandperinatalmortalityinenglandandwales/2016
+            date_accessed: 2018-11-19
+            published_by: UK Office for National Statistics (ONS)
+      perinatal_mortality__stillbirths_and_early_neonatal:
+        title: Perinatal mortality (stillbirths and early neonatal)
+        unit: deaths per 1,000 total births
+        display:
+          name: Perinatal mortality (stillbirths and early neonatal)
+        sources:
+          - name: Infant Mortality Rates in UK (ONS, 2018)
+            description: |-
+              Infant mortality rates as reported by the UK Office for National Statistics (ONS). Infant mortality rates have be subdivided into categories depending on the age of the infant as follows:
+
+              - Perinatal – stillbirths and early neonatal deaths.
+              - Neonatal – deaths of those aged under 28 days.
+              - Postneonatal – deaths of those aged between 28 days and 1 year.
+              - Infant – deaths of those aged under 1 year.
+
+              Neonatal and postneonatal are reported as the number of deaths per 1,000 live births. Perinatal and infant mortality is reported as the number of deaths per 1,000 total births (the sum of stillbirths and live births). Note that stillbirths are only recorded for births with 24 weeks of gestation or more (i.e. stillbirths less than 24 weeks gestation are not recorded).
+            url: |-
+              https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/childhoodinfantandperinatalmortalityinenglandandwales/2016
+            date_accessed: 2018-11-19
+            published_by: UK Office for National Statistics (ONS)
+      postneonatal_mortality__aged_28_days_to_1_year:
+        title: Postneonatal mortality (aged 28 days to 1 year)
+        unit: deaths per 1,000 live births
+        display:
+          name: Postneonatal mortality (aged 28 days to 1 year)
+        sources:
+          - name: Infant Mortality Rates in UK (ONS, 2018)
+            description: |-
+              Infant mortality rates as reported by the UK Office for National Statistics (ONS). Infant mortality rates have be subdivided into categories depending on the age of the infant as follows:
+
+              - Perinatal – stillbirths and early neonatal deaths.
+              - Neonatal – deaths of those aged under 28 days.
+              - Postneonatal – deaths of those aged between 28 days and 1 year.
+              - Infant – deaths of those aged under 1 year.
+
+              Neonatal and postneonatal are reported as the number of deaths per 1,000 live births. Perinatal and infant mortality is reported as the number of deaths per 1,000 total births (the sum of stillbirths and live births). Note that stillbirths are only recorded for births with 24 weeks of gestation or more (i.e. stillbirths less than 24 weeks gestation are not recorded).
+            url: |-
+              https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/childhoodinfantandperinatalmortalityinenglandandwales/2016
+            date_accessed: 2018-11-19
+            published_by: UK Office for National Statistics (ONS)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,23 @@
+dataset:
+  title: Top marginal income tax rate - World Inequality Report (2018)
+tables:
+  top_marginal_income_tax_rate__world_inequality_report__2018:
+    variables:
+      top_marginal_income_tax_rate__wir__2018:
+        title: Top marginal income tax rate (WIR (2018))
+        unit: percent
+        short_unit: '%'
+        display:
+          name: Top marginal income tax rate
+        description: |-
+          The top marginal income tax rate is the maximum amount of tax paid on an additional unit
+          of income for the highest income earners.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

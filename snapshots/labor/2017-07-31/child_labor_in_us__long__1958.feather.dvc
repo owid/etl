@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Child Labour in US - Long (1958)
+    description: |-
+      The incidence of child labour in males and females aged 10-13 has been taken directly from the source; this is available for both rural and urban demographics individually.
+
+      To calculate the incidence of child labour across both sexes combined, we have weighted gender-specific incidences based on the male:female ratio in the total population for this age bracket (these are based on reported gender ratios, which may incur rounding errors). The same weighting application of population in rural vs. urban areas has been carried out to provide a combined rural & urban figure of incidence.
+    url: http://econpapers.repec.org/bookchap/nbrnberbk/long58-1.htm
+    date_accessed: 2017-07-31
+    published_by: 'Long, C. D. (1958) The labor force under changing income and employment. Princeton, N.J.: Princeton University Press'
+  name: Child Labor in US - Long (1958)
+  description: ''
+outs:
+  - md5: 852ffc934f510558068b9920237a8a97
+    size: 3338
+    path: child_labor_in_us__long__1958.feather

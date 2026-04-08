@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2515
-    date_accessed: 2023-08-10 09:00:03.993856
+    url: https://admin.owid.io/admin/datasets/2515
+    date_accessed: 2026-03-05 09:36:48.472617+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Global meat projections to 2050 - FAO
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4361918f27555883fc132ed7945afba1
-  size: 8202
-  path: dataset_2515_global_meat_projections_to_2050__fao_values.feather
+  - md5: 2061650ac87b6f860a3d0e75938953dc
+    size: 8234
+    path: dataset_2515_global_meat_projections_to_2050__fao_values.feather

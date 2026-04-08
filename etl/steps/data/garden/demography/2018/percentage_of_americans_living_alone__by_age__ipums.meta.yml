@@ -1,0 +1,38 @@
+dataset:
+  title: Percentage of Americans living alone, by age - IPUMS
+tables:
+  percentage_of_americans_living_alone__by_age__ipums:
+    variables:
+      percentage_of_americans_living_alone__by_age__female__ipums:
+        title: Percentage of Americans living alone, by age, female (IPUMS)
+        unit: '%'
+        description: Share of female Americans living alone, by age.
+      percentage_of_americans_living_alone__by_age__male__ipums:
+        title: Percentage of Americans living alone, by age, male (IPUMS)
+        unit: '%'
+        description: Share of male Americans living alone, by age.
+      percentage_of_americans_living_alone__by_age__total__ipums:
+        title: Percentage of Americans living alone, by age, total (IPUMS)
+        unit: '%'
+        description: Share of Americans living alone, by age.
+      percentage_of_americans_living_alone__by_year__female__ipums:
+        title: Percentage of Americans living alone, by year, female (IPUMS)
+        unit: '%'
+        description: Share of female Americans living alone, by year.
+      percentage_of_americans_living_alone__by_year__male__ipums:
+        title: Percentage of Americans living alone, by year, male (IPUMS)
+        unit: '%'
+        description: Share of male Americans living alone, by year.
+      percentage_of_americans_living_alone__by_year__total__ipums:
+        title: Percentage of Americans living alone, by year, total (IPUMS)
+        unit: '%'
+        description: Share of Americans living alone, by year.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

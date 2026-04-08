@@ -7,11 +7,12 @@ meta:
     attribution_short: Smil
     date_published: 2017-01-01
     date_accessed: 2023-12-12
-    url_main: https://vaclavsmil.com/2016/12/14/energy-transitions-global-and-national-perspectives-second-expanded-and-updated-edition/
-    url_download: https://vaclavsmil.com/wp-content/uploads/2017/01/ET2_Appendix_A.pdf
+    url_main: https://vaclavsmil.com/book/energy-transitions-global-and-national-perspectives-second-expanded-and-updated-edition/
+    # The following link no longer works, and I couldn't find any publicly available URL to the appendix of the book.
+    # url_download: https://vaclavsmil.com/wp-content/uploads/2017/01/ET2_Appendix_A.pdf
     license:
       name: CC BY 4.0
-      url: https://vaclavsmil.com/2016/12/14/energy-transitions-global-and-national-perspectives-second-expanded-and-updated-edition/
+      url: https://vaclavsmil.com/book/energy-transitions-global-and-national-perspectives-second-expanded-and-updated-edition/
 
 wdir: ../../../data/snapshots/papers/2023-12-12
 outs:

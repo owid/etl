@@ -11,9 +11,9 @@ start_time=$(date +%s)
 
 echo '--- Update excess mortality'
 cd /home/owid/etl
-uv run python snapshots/excess_mortality/latest/wmd.py
-uv run python snapshots/excess_mortality/latest/xm_karlinsky_kobak.py
-uv run python snapshots/excess_mortality/latest/hmd_stmf.py
+uv run etls excess_mortality/latest/wmd
+uv run etls excess_mortality/latest/xm_karlinsky_kobak
+uv run etls excess_mortality/latest/hmd_stmf
 
 # commit to master will trigger ETL which is gonna run the step
 echo '--- Commit and push changes'

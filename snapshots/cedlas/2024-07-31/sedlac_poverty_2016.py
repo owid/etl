@@ -7,7 +7,7 @@ This data was saved by Cameron Appel and Joe Hasell in 2021 in Google Sheets: ht
 
 In case the snapshot breaks, update it by downloading the data from the Google Sheets, saving it in this folder and running the script again:
 
-    python snapshots/cedlas/2024-07-31/sedlac_poverty_2016.py --path-to-file "snapshots/cedlas/2024-07-31/SEDLAC 2016 - poverty.xls"
+    etls cedlas/2024-07-31/sedlac_poverty_2016.py --path-to-file "snapshots/cedlas/2024-07-31/SEDLAC 2016 - poverty.xls"
 """
 
 from pathlib import Path

@@ -89,7 +89,11 @@ if ("legacy" in WIZARD_CONFIG) and ("apps" in WIZARD_CONFIG["legacy"]):
 # RUN PAGES
 ###########################################
 # Create navigation
-page = st.navigation(pages)
+page = st.navigation(
+    pages,
+    expanded=False,
+    position="sidebar",
+)
 
 # Run navigation
 if page is not None:

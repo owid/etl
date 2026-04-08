@@ -1,11 +1,11 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog import Table
+from owid.datautils.dataframes import map_series
 from structlog import get_logger
 from tabulate import tabulate
 
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialize logger.
 log = get_logger()
@@ -23,7 +23,7 @@ EXTREME_POVERTY_LINE = 1.9 * 365
 TABLEFMT = "pretty"
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -31,23 +31,41 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("maddison_project_database")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["maddison_project_database"].reset_index()
+    tb = ds_meadow.read("maddison_project_database")
 
     #
     # Process data.
-    tb = adjust_pop_units_and_add_gdp(tb)
+    #
+    # Convert units of population, from thousands to people.
+    tb["pop"] *= 1000
+
+    # Add GDP column.
+    tb["gdp"] = tb["gdppc"] * tb["pop"]
 
     # Remove unnecessary columns.
     tb = tb.drop(columns=["countrycode"])
 
-    tb = remove_empty_rows_and_rename_columns(tb)
+    # Drop rows with empty values for all indicators.
+    # MPD keeps ~100,000 rows with empty values for all indicators (probably for aggregation purposes).
+    tb = tb.dropna(axis=0, subset=MPD_COLUMNS.keys(), how="all", ignore_index=True)
 
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
+    # Rename columns.
+    tb = tb.rename(columns=MPD_COLUMNS, errors="raise")
+
+    # Harmonize country names.
+    tb = paths.regions.harmonize_names(tb=tb)
+
+    # Sanity checks.
+    # DEBUG: Turn on the warning to inspect implausibly low per capita GDP levels below substinence level.
+    sanity_checks(tb, warn_on_subsistence_levels=False)
+
+    # Rename Western Offshoots -> Western offshoots in the region column.
+    tb["region"] = map_series(
+        series=tb["region"],
+        mapping={"Western Offshoots": "Western offshoots"},
+        warn_on_missing_mappings=False,
+        warn_on_unused_mappings=True,
     )
-
-    sanity_checks(tb)
 
     tb = tb.format(["country", "year"])
 
@@ -55,41 +73,13 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
 
 
-def adjust_pop_units_and_add_gdp(tb: Table) -> Table:
-    """
-    Show population in people instead of thousands and add GDP column.
-    """
-    tb["pop"] *= 1000
-
-    tb["gdp"] = tb["gdppc"] * tb["pop"]
-
-    return tb
-
-
-def remove_empty_rows_and_rename_columns(tb: Table) -> Table:
-    """
-    Remove rows with empty values for all the indicators.
-    MPD keeps ~100,000 rows with empty values for all indicators (probably for aggregation purposes).
-    """
-
-    # Drop rows with empty values for all indicators.
-    tb = tb.dropna(axis=0, subset=MPD_COLUMNS.keys(), how="all", ignore_index=True)
-
-    # Rename columns
-    tb = tb.rename(columns=MPD_COLUMNS, errors="raise")
-
-    return tb
-
-
-def sanity_checks(tb: Table) -> None:
+def sanity_checks(tb: Table, warn_on_subsistence_levels: bool = False) -> None:
     """
     Check if values are negative, zero or there are too many values under subsistence levels.
     """
@@ -127,7 +117,7 @@ def sanity_checks(tb: Table) -> None:
 
     list_of_countries = list(tb_error.country.unique())
 
-    if not tb_error.empty:
+    if not tb_error.empty and warn_on_subsistence_levels:
         log.warning(
             f"""There are {len(tb_error)} observations with values under subsistence levels (${EXTREME_POVERTY_LINE}) for GDP per capita. For these {len(list_of_countries)} countries: {list_of_countries}
             {tabulate(tb_error[['country', 'year', 'gdp_per_capita']].sort_values('gdp_per_capita').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT)}"""

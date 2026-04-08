@@ -1,0 +1,297 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      grapher_config:
+        # data goes further than that, but CT.gov has only been established in 2000 with data imported from 1997
+        # also data for 2025 is not yet complete, so we limit the timeline to 1997-2024
+        maxTime: 2024
+        timelineMinTime: 2000
+        timelineMaxTime: 2024
+        note: |-
+          ClinicalTrials.gov was established in 2000 and data on trials starting before that is incomplete. There can also be a delay in registration, so latest years might not have complete data yet.
+      topic_tags:
+        - Medicine & Biotechnology
+    display:
+          numDecimalPlaces: 0
+    processing_level: major
+  notes:
+    completed_trials: |
+      This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes [interventional](#dod:interventional-trial) or [observational](#dod:observational-trial) clinical trials that are marked as "completed" and have a valid "completion date". [Expanded access studies](#dod:expanded-access), which provide access to investigational drugs or devices for patients with serious conditions, are not included in this data.
+    countries: |-
+      Registration in the ClinicalTrials.gov database is mandatory for trials in the United States and for treatments that seek FDA approval, but voluntary for other trials conducted in other countries.
+
+dataset:
+  update_period_days: 365 # dataset itself is updated continuously, but I think updating it every year is sufficient for us
+
+tables:
+  trials_per_year:
+    variables:
+      n_studies_country:
+        title: Number of clinical trials
+        description_short: |
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database for each country. Registration in the ClinicalTrials database is mandatory for trials in the United States, but voluntary for other countries.
+        unit: trials
+        short_unit: ""
+        description_processing: |-
+          - If multiple locations are listed, the country with the most locations listed is used. If multiple countries have the same number of locations, the first one listed is used.
+          - If a trial has no locations listed or the country is not specified, the location is set to "Location not specified".
+        description_key:
+          - "{definitions.notes.completed_trials}"
+          - Country location is determined by the country with the most locations listed in the trial. If multiple countries have the same number of locations, the first one listed is used.
+          - The year is the year of the trial's completion date. This is first entered (as a planned completion data) when the trial is first registered, and then updated when the trial is completed.
+  sponsor_per_year:
+    variables:
+      n_studies_sponsor:
+        title: Number of clinical trials by sponsor
+        description_short: |
+          Annual number of clinical trials globally registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, by sponsor type. ClinicalTrials.gov has four sponsor categories: Trials funded by the National Institutes of Health (NIH), other US federal agencies (e.g., [FDA](#dod:us-fda), industry (e.g., pharmaceutical companies), and other sponsors (e.g., non-US governments, academic institutions, non-profits, and other people or entities).
+        unit: trials
+        short_unit: ""
+        description_key:
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+          - ClinicalTrials.gov has four categories for sponsors, but offers the option to classify as "Network", "Other Governmental Organization" or "Individual" as well. As these are not officially defined categories, but rather subcategories of the "Other" category, they are grouped under "Other" in this dataset.
+        description_from_producer: |-
+          Funder type describes the organization that provides funding or support for a clinical study. This support may include activities related to funding, design, implementation, data analysis, or reporting. Organizations listed as sponsors and collaborators for a study are considered the funders of the study. ClinicalTrials.gov refers to four types of funders:
+
+          - U.S. National Institutes of Health
+          - Other U.S. Federal agencies (for example, Food and Drug Administration, Centers for Disease Control and Prevention, or U.S. Department of Veterans Affairs)
+          - Industry (for example: pharmaceutical and device companies)
+          - All others (including individuals, universities, and community-based organizations)
+  interventions_per_year:
+    variables:
+      behavioral:
+        title: Number of clinical trials with behavioral interventions
+        description_short: |
+           Annual number of completed clinical trials registered globally in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve behavioral interventions. Behavioral interventions can include lifestyle changes, counseling, or other non-pharmaceutical treatments
+        unit: trials
+        short_unit: ""
+        description_key:
+          - Behavioral interventions are non-pharmaceutical treatments that focus on changing behaviors or habits. They can include lifestyle changes, counseling, or other non-pharmaceutical treatments.
+          - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+      biological:
+        title: Number of clinical trials with biological interventions
+        description_short: |
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve biological interventions. Biological interventions can include vaccines or other biological treatments.
+        unit: trials
+        short_unit: ""
+        description_key:
+          - Biological interventions are treatments that involve giving biological products to participants. These can include vaccines, blood products, or other biological treatments.
+          - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+      device:
+        title: Number of clinical trials with device-based interventions
+        description_short: |
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve devices used for treatment. These interventions include the use of medical devices, implants, or other technological treatments.
+        unit: trials
+        short_unit: ""
+        description_key:
+          - Device-based interventions involve the use of medical devices, implants, or other technological treatments. These can include pacemakers, prosthetics, or other medical devices. Using a placebo device also counts as a device-based intervention.
+          - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+      drug:
+        title: Number of clinical trials with pharmaceutical interventions
+        description_short: |
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve a pharmaceutical treatment, such as a drug or medication.
+        unit: trials
+        short_unit: ""
+        description_key:
+          - Pharmaceutical interventions involve giving participants a chemical drug or medication. Using a placebo drug also counts as a pharmaceutical intervention.
+          - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+      diagnostic_test:
+        title: Number of clinical trials with diagnostic interventions
+        description_short: |
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve diagnostic interventions. These interventions include tests or procedures used to diagnose a condition.
+        unit: trials
+        short_unit: ""
+        description_key:
+          - Diagnostic interventions involve tests or procedures used to diagnose a condition. These can include blood tests, in vitro diagnostic tests, imaging tests, or other diagnostic procedures.
+          - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+      dietary_supplement:
+        title: Number of clinical trials with dietary supplement interventions
+        description_short: |
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve dietary supplements. These interventions include giving patients vitamins, minerals, or other nutritional supplements.
+        unit: trials
+        short_unit: ""
+        description_key:
+          - Dietary supplement interventions involve giving participants vitamins, minerals, or other nutritional supplements.
+          - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+      genetic:
+        title: Number of clinical trials with genetic interventions
+        description_short: |
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve genetic interventions. These interventions include gene transfers, gene therapy, or stem-cell therapy.
+        unit: trials
+        short_unit: ""
+        description_key:
+          - Genetic interventions involve treating patients with a gene-based therapy, including gene transfers, recombinant DNA or stem-cell therapy.
+          - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+      procedure:
+        title: Number of clinical trials with surgical interventions
+        description_short: |
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve surgical interventions.
+        unit: trials
+        short_unit: ""
+        description_key:
+          - Surgical interventions involve procedures that are performed on patients, such as surgeries or other invasive procedures.
+          - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+      radiation:
+        title: Number of clinical trials with radiation interventions
+        description_short: |
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve radiation as a part of the treatment.
+        unit: trials
+        short_unit: ""
+        description_key:
+          - Radiation interventions involve the use of radiation as a part of the treatment, such as radiation therapy for cancer.
+          - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+      other:
+        title: Number of clinical trials with other interventions
+        description_short: |
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve types of interventions that do not fit into any other category. Since the interventions are categorized by the researchers conducting the study, rather than being strictly standardized, it can also include interventions from other categories or combinations of interventions.
+        unit: trials
+        short_unit: ""
+        description_key:
+          - Other interventions include types of interventions that do not fit into any other category. Since the interventions are categorized by the researchers conducting the study, it can also include interventions that could fit into other categories or combinations of interventions.
+          - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+      combination_product:
+        title: Number of clinical trials with combination product interventions
+        description_short: |
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve a combination of different types of interventions, e.g a drug and a device or a drug and a procedure. Some researchers do not use this category, but rather categorize the intervention by the main type of intervention used.
+        unit: trials
+        short_unit: ""
+        description_key:
+          - Combination product interventions involve a combination of different types of interventions, such as a drug and a device or a drug and a procedure. Some researchers do not use this category, but rather categorize the intervention by the main type of intervention used.
+          - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
+  study_type_per_year:
+    variables:
+      n_studies_type:
+        title: Number of clinical trials by study type
+        description_short: |
+          Annual number of completed clinical trials registered globally in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, by study types. Study types include [interventional trials](#dod:interventional-trial) (when people are given a treatment or intervention), [observational trials](#dod:observational-trial) (when people are tracked without intervention), and [expanded access studies](#dod:expanded-access) (when people with serious conditions are given experimental treatments).
+
+        unit: trials
+        short_unit: ""
+        description_processing: |-
+          - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database and is sorted by completion year. It only includes clinical trials with a valid "completion date".
+        description_key:
+          - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database and is sorted by completion year. It only includes clinical trials with a valid "completion date".
+          - Interventional studies involve testing new treatments or interventions and comparing them to a baseline or other treatments.
+          - Observational studies observe patients and collect data on participants without an intervention.
+          - Expanded access studies provide access to investigational drugs or devices for patients with serious conditions who do not have other treatment options.
+          - "{definitions.notes.countries}"
+  purpose_per_year:
+    variables:
+      n_studies_purpose:
+        title: Number of clinical trials by purpose
+        description_short: |
+          Annual number of completed clinical trials registered globally in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, by purpose. The purpose of a clinical trial refers to the main objective or goal of the study, such as testing a new treatment, comparing treatments, or understanding a disease. This includes only [interventional trials](#dod:interventional-trial).
+        unit: trials
+        short_unit: ""
+        description_processing: |-
+          - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes [interventional clinical trials](#dod:interventional-trial) that are marked as "completed" and have a valid "completion date".
+        description_key:
+          - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes [interventional clinical trials](#dod:interventional-trial) that are marked as "completed" and have a valid "completion date".
+          - The purpose of a clinical trial refers to the main objective or goal of the study, such as testing a new treatment, comparing treatments, or understanding a disease.
+          - Possible purposes include testing a new treatment (drug or device), improving diagnostics, preventing disease, or understanding a disease.
+          - "{definitions.notes.countries}"
+        description_from_producer: |-
+          The main objective of the intervention(s) being evaluated by the clinical trial.
+
+          - Treatment: One or more interventions are being evaluated for treating a disease, syndrome, or condition.
+          - Prevention: One or more interventions are being assessed for preventing the development of a specific disease or health condition.
+          - Diagnostic: One or more interventions are being evaluated for identifying a disease or health condition.
+          - Supportive Care: One or more interventions are evaluated for maximizing comfort, minimizing side effects, or mitigating against a decline in the participant's health or function.
+          - Screening: One or more interventions are assessed or examined for identifying a condition, or risk factors for a condition, in people who are not yet known to have the condition or risk factor.
+          - Health Services Research: One or more interventions for evaluating the delivery, processes, management, organization, or financing of healthcare.
+          - Basic Science: One or more interventions for examining the basic mechanism of action (for example, physiology or biomechanics of an intervention).
+          - Device Feasibility: An intervention of a device product is being evaluated in a small clinical trial (generally fewer than 10 participants) to determine the feasibility of the product; or a clinical trial to test a prototype device for feasibility and not health outcomes. Such studies are conducted to confirm the design and operating specifications of a device before beginning a full clinical trial.
+          - Other: None of the other options applies.
+  status_per_year:
+    variables:
+      n_studies_status:
+        title: Number of clinical trials by status
+        description_short: |
+          Annual number of clinical trials registered globally in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, by status. The status of a clinical trial indicates whether the trial is recruiting participants, has completed, or is in another phase of the study.
+        unit: trials
+        short_unit: ""
+        description_processing: |-
+          - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. Only clinical trials with a "start_date" are included.
+        description_key:
+          - Studies are currently active if they are "not yet recruiting", "enrolling by invitation" , "recruiting" or "active, not recruiting".
+          - \"Enrolling by invitation" means the study is not open to the general public. In this case the researchers conducting the study are focusing on a specific group of people and are inviting them to participate in the study.
+          - \"Active, not recruiting" means the study has finished recruiting participants but is still collecting data.
+          - Studies are finished if they are "completed", "terminated", or "withdrawn". Completed studies have been finished, terminated studies have been stopped before completion, and withdrawn studies have been stopped before enrolling participants.
+          - Studies which are "paused/suspended" have been put on hold and are not currently recruiting or enrolling participants. They may resume later.
+          - Studies that provide access to promising investigational treatment for patients with serious conditions ([expanded access studies](#dod:expanded-access)) are not included here.
+          - "{definitions.notes.countries}"
+  results_per_year:
+    variables:
+      n_studies_results:
+        title: Number of clinical trials with results posted
+        description_short: |
+          Annual number of completed clinical trials registered globally in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that have results posted. Registering trial results is important for transparency and accountability.
+        description_key:
+          - "{definitions.notes.completed_trials}"
+          - If a trial has results posted, it means that the results of the trial have been published in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database.
+          - If a trial has no results posted, it could be that the trial has been completed, but the results are not yet available or have not been published. It can also mean that the results have been published elsewhere (e.g. in a scientific journal) but have not been added to the ClinicalTrials.gov database.
+          - Registering trial results is important for transparency and accountability. Most US-regulated clinical trials are legally required to report results on ClinicalTrials.gov, except for [Phase 1 trials](#dod:phase-one-trial), [observational trials](#dod:observational-trial), and trials conducted entirely outside the U.S. without FDA oversight.
+          - "{definitions.notes.countries}"
+        unit: trials
+        short_unit: ""
+  length_per_year:
+    variables:
+      avg_study_length_days:
+        title: Average study length by phase
+        description_short: |
+          Median length of completed clinical trials by phase. The phase refers to the phase of drug development the drug is currently in ([early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial) or [phase 4](#dod:phase-four-trial)). The study length is the time from start date to completion date, given in days.
+        unit: days
+        short_unit: days
+        description_processing: |-
+          - First we calculate the length of each trial by taking the difference between the start date and completion date of each trial.
+          - Then we group the trials by phase and completion year, and calculate the [median](#dod:median) length of each group.
+        description_key:
+          - Clinical trials are conducted in different phases of the development of a new treatment or intervention, such as [early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial), or [phase 4](#dod:phase-four-trial).
+          - Early phase 1 trials are exploratory trials that test the effect of an intervention on the human body, often with a small number of participants. Not every treatment has an early phase 1 trial.
+          - Phase 1 trials test the safety and dosage of a new treatment, phase 2 trials test the effectiveness and side effects, and phase 3 trials compare the new treatment to standard treatments.
+          - Phase 4 trials are conducted after a treatment has been approved and are used to monitor the long-term effects and side-effects of the treatment. Not every treatment has a phase 4 trial.
+          - \"Phase 1/phase 2\" trials are a combination of phase 1 and phase 2 trials, and "phase 2/phase 3" trials are a combination of phase 2 and phase 3 trials.
+          - The average length is calculated by taking the difference between the start date and completion date of each trial, grouped by phase and completion year.
+          - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes [interventional clinical trials](#dod:interventional-trial) that are marked as "completed" and have a valid "completion date".
+          - "{definitions.notes.countries}"
+  participants_per_year:
+    variables:
+      avg_participants:
+        title: Average number of participants in clinical trials
+        description_short: |
+          Median number of participants in completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, grouped by phase and completion year. The phase refers to the phase of drug development the drug is currently in ([early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial) or [phase 4](#dod:phase-four-trial)).
+        unit: participants
+        short_unit: ""
+        description_processing: |-
+          - We group the trials by phase and completion year, and calculate the [median](#dod:median) number of participants in each group.
+        description_key:
+          - Clinical trials are conducted in different phases of the development of a new treatment or intervention, such as [early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial), or [phase 4](#dod:phase-four-trial).
+          - Phase 1 trials test the safety and dosage of a new treatment, phase 2 trials test the effectiveness and side effects, and phase 3 trials compare the new treatment to standard treatments.
+          - \"Phase 1/phase 2\" trials are a combination of phase 1 and phase 2 trials, and "phase 2/phase 3" trials are a combination of phase 2 and phase 3 trials.
+          - The median number of participants is calculated by grouping the trials by phase and completion year, and then taking the middle value of the number of participants in each group.
+          - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes [interventional clinical trials](#dod:interventional-trial) that are marked as "completed" and have a valid "completion date".
+          - "{definitions.notes.countries}"

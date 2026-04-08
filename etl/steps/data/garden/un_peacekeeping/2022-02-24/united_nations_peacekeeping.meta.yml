@@ -1,0 +1,35 @@
+dataset:
+  title: United Nations Peacekeeping
+tables:
+  united_nations_peacekeeping:
+    variables:
+      civilian_police__peacekeepers__united_nations_peacekeeping:
+        title: Civilian police (peacekeepers) (United Nations Peacekeeping)
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      military_observers_and_staff_officers__peacekeepers__united_nations_peacekeeping:
+        title: Military Observers and staff officers (peacekeepers) (United Nations Peacekeeping)
+        unit: ''
+      number_of_peacekeeping_missions__united_nations_peacekeeping:
+        title: Number of peacekeeping missions (United Nations Peacekeeping)
+        unit: missions
+        display:
+          numDecimalPlaces: 0
+      size_of_total_peacekeeping_force__united_nations_peacekeeping:
+        title: Size of total peacekeeping force (United Nations Peacekeeping)
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      troops__peacekeepers__united_nations_peacekeeping:
+        title: Troops (peacekeepers) (United Nations Peacekeeping)
+        unit: £ per capita
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

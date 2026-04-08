@@ -1,3 +1,4 @@
+!.claude/
 .coverage
 **/__pycache__
 .virtual_documents
@@ -36,6 +37,7 @@ playground.ipynb
 docs/_build
 docs/.vscode
 
+ai/
 *.xlsx
 *.zip
 *.dta
@@ -58,3 +60,20 @@ notebooks/
 zpop/
 node_modules/
 dist/
+
+.claude/settings.local.json
+CLAUDE.local.md
+
+workbench/
+
+
+docs/architecture/metadata/reference/collections.md
+docs/architecture/metadata/reference/index.md
+docs/api/example-usage.md
+docs/api/catalog-api.md
+docs/api/search-api.md
+docs/api/semantic-search-api.md
+docs/api/chart-api.md
+docs/guides/analytics-events.md
+
+.auto-claude/

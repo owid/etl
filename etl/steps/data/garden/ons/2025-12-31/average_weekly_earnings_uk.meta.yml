@@ -1,0 +1,29 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  average_weekly_earnings_uk:
+    variables:
+      average_weekly_earnings:
+        title: Real average weekly earnings
+        unit: "2015 British pounds"
+        short_unit: "£"
+        description_short: Average weekly earnings for the whole economy, for total pay. This data is expressed in British pounds, adjusted for inflation.
+        processing_level: major
+        description_processing: "We averaged the monthly average weekly earnings data to obtain annual figures."
+        display:
+          name: Real average weekly earnings
+          numDecimalPlaces: 0
+          tolerance: 0
+

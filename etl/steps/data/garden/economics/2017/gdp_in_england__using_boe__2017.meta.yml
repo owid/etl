@@ -1,0 +1,34 @@
+dataset:
+  title: GDP in England (using BoE, 2017)
+tables:
+  gdp_in_england__using_boe__2017:
+    variables:
+      population__boe__2017:
+        title: Population (BoE (2017))
+        unit: people
+        description: Population of England
+      real_gdp__at_market_prices__boe__2017:
+        title: Real GDP (at market prices) (BoE (2017))
+        unit: £
+        short_unit: £
+        display:
+          numDecimalPlaces: 0
+          shortUnit: £
+          unit: constant 2013 GBP
+        description: |-
+          It measures the gross domestic product (GDP) of England at market prices. GDP is calculated in real terms using 2013 prices.
+      real_gdp_per_capita__boe__2017:
+        title: Real GDP per capita (BoE (2017))
+        unit: £
+        short_unit: £
+        description: |-
+          Real gross domestic product (GDP) per capita of England is calculated by dividing its Real GDP (in market prices) with the population.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

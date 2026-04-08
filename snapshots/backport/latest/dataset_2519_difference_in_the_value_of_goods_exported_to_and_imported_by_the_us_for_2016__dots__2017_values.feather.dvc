@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2519
-    date_accessed: 2023-08-10 08:04:42.307559
+    url: https://admin.owid.io/admin/datasets/2519
+    date_accessed: 2026-03-05 13:34:56.798890+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Difference in the value of goods exported to and imported by the US for 2016
-    (DOTS (2017))
+  name: Difference in the value of goods exported to and imported by the US for 2016 (DOTS (2017))
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 18016b6e8260b8d4c71f89efbc3a244f
-  size: 13690
-  path: 
-    dataset_2519_difference_in_the_value_of_goods_exported_to_and_imported_by_the_us_for_2016__dots__2017_values.feather
+  - md5: 7fb4dbceb56bc98e7e55ba78418f9591
+    size: 13722
+    path: dataset_2519_difference_in_the_value_of_goods_exported_to_and_imported_by_the_us_for_2016__dots__2017_values.feather

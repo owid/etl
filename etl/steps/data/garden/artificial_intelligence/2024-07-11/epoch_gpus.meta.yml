@@ -38,7 +38,7 @@ tables:
         title: Release price
         unit: US$
         short_unit: $
-        description_short: The price of the GPU at the time of its release.Data is expressed in constant 2023 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
+        description_short: The price of the GPU at the time of its release. Data is expressed in constant 2023 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
 
       comp_performance_per_dollar:
         title: GPU computational performance per dollar

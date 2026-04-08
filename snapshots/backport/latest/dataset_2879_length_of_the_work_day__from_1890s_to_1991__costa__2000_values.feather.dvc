@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2879
-    date_accessed: 2023-08-10 10:31:33.445287
+    url: https://admin.owid.io/admin/datasets/2879
+    date_accessed: 2026-03-05 14:31:58.737115+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: 'Length of the work day: from 1890s to 1991 - Costa (2000)'
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4e5195dc11ff25126d3af402026ec936
-  size: 7330
-  path: 
-    dataset_2879_length_of_the_work_day__from_1890s_to_1991__costa__2000_values.feather
+  - md5: 85bd167c92b406850c8f5f91c5ea7cc3
+    size: 7386
+    path: dataset_2879_length_of_the_work_day__from_1890s_to_1991__costa__2000_values.feather

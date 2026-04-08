@@ -1,13 +1,12 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, cast
+from typing import List
 
 import numpy as np
-import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
+from owid.catalog import processing as pr
 
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -15,68 +14,63 @@ paths = PathFinder(__file__)
 REGIONS = ["Europe", "Africa", "Asia", "Oceania", "World"]
 
 
-def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset) -> Table:
-    tb_with_regions = tb.copy()
-    for region in REGIONS:
-        # Find members of current region.
-        members = geo.list_members_of_region(
-            region=region,
-            ds_regions=ds_regions,
-        )
-        tb_with_regions = geo.add_region_aggregates(
-            df=tb_with_regions,
-            region=region,
-            countries_in_region=members,
-            countries_that_must_have_data=[],
-            num_allowed_nans_per_year=None,
-            frac_allowed_nans_per_year=0.99999,
-        )
+def add_data_for_regions(tb: Table, regions: List[str]) -> Table:
+    """Add regional aggregates to the table."""
+    tb_with_regions = paths.regions.add_aggregates(
+        tb=tb,
+        index_columns=["country", "year"],
+        regions=regions,
+        countries_that_must_have_data=[],
+        num_allowed_nans_per_year=None,
+        frac_allowed_nans_per_year=0.99999,
+    )
 
     return tb_with_regions
 
 
-def add_deaths_and_population(tb_terrorism: pd.DataFrame) -> pd.DataFrame:
+def add_deaths_and_population(tb_terrorism: Table) -> Table:
     """
     Enriches the given terrorism DataFrame with population and deaths data.
 
     Parameters:
-        tb_terrorism (pd.DataFrame): A DataFrame containing terrorism data with columns 'country' and 'year'.
+        tb_terrorism (Table): A DataFrame containing terrorism data with columns 'country' and 'year'.
 
     Returns:
-        pd.DataFrame: The enriched DataFrame with additional 'population' and 'deaths' columns.
+        Table: The enriched DataFrame with additional 'population' and 'deaths' columns.
     """
 
-    # Step 1: Load population data and merge with terrorism data
-    ds_population = cast(Dataset, paths.load_dependency("population"))
-    tb_population = ds_population["population"].reset_index(drop=False)
-    df_pop_add = pd.merge(
+    # Load population data and merge with terrorism data
+    ds_population = paths.load_dataset("population")
+    tb_population = ds_population.read("population")
+    df_pop_add = pr.merge(
         tb_terrorism, tb_population[["country", "year", "population"]], how="left", on=["country", "year"]
     )
 
-    # Step 2: Load deaths data and merge with terrorism data
-    ds_meadow_un = cast(Dataset, paths.load_dependency("un_wpp"))
-    tb_un = ds_meadow_un["un_wpp"]
+    # Load deaths data and merge with terrorism data
+    ds_meadow_un = paths.load_dataset("un_wpp")
+    tb_un = ds_meadow_un.read("un_wpp").reset_index()
 
-    # Step 3: Extract 'deaths' data with specific criteria
-    deaths_df = tb_un.xs("deaths", level="metric")
-    deaths_df_all_sex = deaths_df.xs("all", level="sex")
-    deaths_df_estimates = deaths_df_all_sex.xs("estimates", level="variant")
-    deaths_final_df = deaths_df_estimates.xs("all", level="age")
-    deaths_final_df.reset_index(inplace=True)
-    deaths_final_df.rename(columns={"location": "country", "value": "deaths"}, inplace=True)
+    # Extract 'deaths' data with specific criteria
+    deaths_df = tb_un[
+        (tb_un["metric"] == "deaths")
+        & (tb_un["sex"] == "all")
+        & (tb_un["variant"] == "estimates")
+        & (tb_un["age"] == "all")
+    ].copy()
+    deaths_df = deaths_df.rename(columns={"location": "country", "value": "deaths"})
 
-    # Step 4: Merge 'deaths' data with the enriched DataFrame
-    df_deaths_add = pd.merge(df_pop_add, deaths_final_df, how="left", on=["country", "year"])
+    # Merge 'deaths' data with the enriched DataFrame
+    df_deaths_add = pr.merge(df_pop_add, deaths_df[["country", "year", "deaths"]], how="left", on=["country", "year"])
 
     return df_deaths_add
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     """
     Process terrorism data and save the results in a new garden dataset.
 
     This function loads the terrorism data from the meadow dataset, calculates yearly sums of:
-        - terroris attacks
+        - terrorism attacks
         - number of people killed
         - number of people wounded
         - number of terrorism attacks by target
@@ -85,29 +79,27 @@ def run(dest_dir: str) -> None:
 
     It then calculates per capita metrics, adds decadal averages, and saves the results in a new garden
     dataset.
-
-    Parameters:
-        dest_dir (str): The destination directory where the new garden dataset will be saved.
-
-    Returns:
-        None
     """
-
-    # Load inputs from the meadow dataset.
-    ds_meadow_terrorism = cast(Dataset, paths.load_dependency("global_terrorism_database"))
-    tb_terrorism = ds_meadow_terrorism["global_terrorism_database"]
+    #
+    # Load inputs.
+    #
+    ds_meadow_terrorism = paths.load_dataset("global_terrorism_database")
+    tb_terrorism = ds_meadow_terrorism.read("global_terrorism_database")
     tb_terrorism = tb_terrorism.astype(
         {
             "nkill": float,
             "nwound": float,
         }
     )
-    tb_terrorism.reset_index(inplace=True)
+    tb_terrorism = tb_terrorism.reset_index()
 
-    # Process data to calculate statistics related to terrorism incidents.
-    tb: Table = geo.harmonize_countries(df=tb_terrorism, countries_file=paths.country_mapping_path)
+    #
+    # Process data.
+    #
+    # Harmonize country names
+    tb: Table = paths.regions.harmonize_names(tb_terrorism)
     # Make sure year and country are correct datatypes to ensure aggregations are done correctly
-    total_df = pd.DataFrame()
+    total_df = Table()
 
     # Check if the 'country' column is of type 'category'; if not, convert it
     if tb["country"].dtype.name != "category":
@@ -178,13 +170,12 @@ def run(dest_dir: str) -> None:
         if key == "target":
             pivot_tables[key] = add_suffix(pivot_tables[key], "_target")
         if key != "attack_type":
-            merged_df = pd.merge(merged_df, pivot_tables[key], on=["year", "country"], how="outer")
+            merged_df = pr.merge(merged_df, pivot_tables[key], on=["year", "country"], how="outer")
 
-    merge_all = pd.merge(total_df, merged_df, on=["country", "year"], how="outer")
+    merge_all = pr.merge(total_df, merged_df, on=["country", "year"], how="outer")
     # Add deaths and population data, and region aggregates.
     df_pop_deaths = add_deaths_and_population(merge_all)
-    ds_regions: Dataset = paths.load_dependency("regions")
-    df_pop_deaths = add_data_for_regions(tb=df_pop_deaths, regions=REGIONS, ds_regions=ds_regions)
+    df_pop_deaths = add_data_for_regions(tb=df_pop_deaths, regions=REGIONS)
     # Calculate statistics per capita
     df_pop_deaths["terrorism_wounded_per_100k"] = df_pop_deaths["total_wounded"] / (
         df_pop_deaths["population"] / 100000
@@ -200,8 +191,13 @@ def run(dest_dir: str) -> None:
 
     # Convert DataFrame to a new garden dataset table.
     tb_garden = Table(df_pop_deaths, short_name=paths.short_name, underscore=True)
-    tb_garden.set_index(["country", "year"], inplace=True)
-    # Creat a copy of deaths for plotting across sources
+    tb_garden = tb_garden.set_index(["country", "year"], verify_integrity=True)
+
+    # Propagate origins from the meadow table to all columns
+    for column in tb_garden.columns:
+        tb_garden[column].metadata.origins = tb_terrorism["nkill"].metadata.origins
+
+    # Create a copy of deaths for plotting across sources
     tb_garden["total_killed_gtd"] = tb_garden["total_killed"].copy()
 
     # Add deaths and attacks per suicide/ non-suicide terrorist attack
@@ -218,31 +214,31 @@ def run(dest_dir: str) -> None:
     tb_garden["injured_per_non_suicide_attack"] = (
         tb_garden["total_nwound_no_suicide"] / tb_garden["total_incident_counts_no_suicide"]
     )
+
+    #
+    # Save outputs.
+    #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow_terrorism.metadata)
+    ds_garden = paths.create_dataset(tables=[tb_garden], default_metadata=ds_meadow_terrorism.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
 
 
-def add_suffix(df: pd.DataFrame, suffix: str) -> pd.DataFrame:
+def add_suffix(df: Table, suffix: str) -> Table:
     """
     Add a suffix to the column names of the given DataFrame, excluding 'year' and 'country' columns.
 
     Parameters:
-        df (pd.DataFrame): The DataFrame containing the data.
+        df (Table): The DataFrame containing the data.
         suffix (str): The suffix to be added to the column names.
 
     Returns:
-        pd.DataFrame: The DataFrame with column names suffixed (excluding 'year' and 'country').
+        Table: The DataFrame with column names suffixed (excluding 'year' and 'country').
     """
-
-    # loop over each column and add the suffix if the column name is not 'year' or 'country'
-    for column in df.columns:
-        if column not in ["year", "country"]:
-            df.rename(columns={column: column + suffix}, inplace=True)
-
-    return df
+    # Create a mapping for columns to rename
+    rename_dict = {column: column + suffix for column in df.columns if column not in ["year", "country"]}
+    return df.rename(columns=rename_dict)
 
 
 def clean_countries(df):
@@ -339,18 +335,18 @@ def add_regions(df, total_df):
     Aggregates incident data by regions and years, summarizing the total killed, wounded, and incident counts.
 
     Args:
-        df (pd.DataFrame): A DataFrame containing the columns 'region_txt', 'year', 'nkill', 'nwound',
+        df (Table): A DataFrame containing the columns 'region_txt', 'year', 'nkill', 'nwound',
                            and 'total_incident_counts'. 'region_txt' refers to the region text, 'nkill'
                            to the number of people killed, 'nwound' to the number of people wounded,
                            and 'total_incident_counts' to the total number of incidents.
 
     Returns:
-        pd.DataFrame: A concatanated DataFrame with original data concatenated with aggregated data grouped by region and year, containing the total number
+        Table: A concatanated DataFrame with original data concatenated with aggregated data grouped by region and year, containing the total number
                       of killed, wounded, and incidents.
 
     """
     grouped_regions_df = df.groupby(["region_txt", "year"], observed=False)
-    summary_regions_df = pd.DataFrame()
+    summary_regions_df = Table()
 
     for column in ["nkill", "nwound"]:
         summary_regions_df[f"total_{column}"] = grouped_regions_df[column].sum()
@@ -358,8 +354,13 @@ def add_regions(df, total_df):
     summary_regions_df["total_incident_counts"] = grouped_regions_df.size()
     summary_regions_df = summary_regions_df.rename_axis(index={"region_txt": "country"})
 
-    summary_regions_df.rename(columns={"total_nkill": "total_killed", "total_nwound": "total_wounded"}, inplace=True)
-    merged_df = pd.concat([summary_regions_df, total_df])
+    summary_regions_df = summary_regions_df.rename(
+        columns={"total_nkill": "total_killed", "total_nwound": "total_wounded"}
+    )
+    # Reset index before concatenation to avoid index conflict
+    summary_regions_df = summary_regions_df.reset_index()
+    total_df_reset = total_df.reset_index()
+    merged_df = pr.concat([summary_regions_df, total_df_reset])
 
     return merged_df
 
@@ -388,7 +389,7 @@ def generate_summary_dataframe(df, group_column, target_columns):
     else:
         grouped_df = df.groupby(["year", group_column], observed=False)
 
-    summary_df = pd.DataFrame()
+    summary_df = Table()
 
     for column in target_columns:
         summary_df[f"total_{column}"] = grouped_df[column].sum()
@@ -396,16 +397,19 @@ def generate_summary_dataframe(df, group_column, target_columns):
     summary_df["total_incident_counts"] = grouped_df.size()
     if group_column != "region_txt":
         grouped_regions_df = df.groupby(["region_txt", "year", group_column], observed=False)
-        summary_regions_df = pd.DataFrame()
+        summary_regions_df = Table()
 
         for column in target_columns:
             summary_regions_df[f"total_{column}"] = grouped_regions_df[column].sum()
 
         summary_regions_df["total_incident_counts"] = grouped_regions_df.size()
         summary_regions_df = summary_regions_df.rename_axis(index={"region_txt": "country"})
-        merge_GTD_regions = pd.concat([summary_regions_df, summary_df])
+        # Reset index before concatenation to avoid index conflict
+        summary_regions_df = summary_regions_df.reset_index()
+        summary_df = summary_df.reset_index()
+        merge_GTD_regions = pr.concat([summary_regions_df, summary_df])
 
-        return merge_GTD_regions.reset_index()
+        return merge_GTD_regions
     else:
         return summary_df.reset_index()
 
@@ -415,18 +419,18 @@ def pivot_dataframe(dataframe, index_columns, pivot_column, value_columns):
     Pivot the dataframe based on the given parameters.
 
     Parameters:
-        dataframe (pd.DataFrame): The input DataFrame to be pivoted.
+        dataframe (Table): The input DataFrame to be pivoted.
         index_columns (list): List of column names to be used as index in the pivot.
         pivot_column (str): Column name to be used for creating columns in the pivot.
         value_columns (list): List of column names to be aggregated in the pivot.
 
     Returns:
-        pd.DataFrame: The pivoted DataFrame.
+        Table: The pivoted DataFrame.
     """
-    pivot_df = pd.pivot(dataframe, index=index_columns, columns=pivot_column, values=value_columns)
-    pivot_df.reset_index(inplace=True)
+    pivot_df = pr.pivot(dataframe, index=index_columns, columns=pivot_column, values=value_columns)
+    pivot_df = pivot_df.reset_index()
 
-    # If 'country' is not a column, add a column with default value 'GTD' id Global Tourism Dataset (when pivoting using GTD defined regions)
+    # If 'country' is not a column, add a column with default value 'GTD' (Global Terrorism Database when pivoting using GTD defined regions)
     if "country" not in pivot_df.columns:
         pivot_df["country"] = "GTD"
 
@@ -455,17 +459,20 @@ def severity(tb):
                           grouped by year and severity level. The DataFrame has columns "country," "year,"
                           "severity," and "total_incident_severity."
     """
-    total_severity_country = pd.DataFrame()
+    total_severity_country = Table()
     total_severity_country["total_incident_severity"] = tb.groupby(
         ["country", "year", "severity"], observed=False
     ).size()
 
-    total_severity_regions = pd.DataFrame()
+    total_severity_regions = Table()
     total_severity_regions["total_incident_severity"] = tb.groupby(
         ["region_txt", "year", "severity"], observed=False
     ).size()
 
     total_severity_regions = total_severity_regions.rename_axis(index={"region_txt": "country"})
-    merge_GTD_regions = pd.concat([total_severity_country, total_severity_regions])
+    # Reset index before concatenation to avoid index conflict
+    total_severity_country = total_severity_country.reset_index()
+    total_severity_regions = total_severity_regions.reset_index()
+    merge_GTD_regions = pr.concat([total_severity_country, total_severity_regions])
 
-    return merge_GTD_regions.reset_index()
+    return merge_GTD_regions

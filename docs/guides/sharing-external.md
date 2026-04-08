@@ -1,4 +1,5 @@
 ---
+icon: material/share-variant
 tags:
     - 👷 Staff
 ---
@@ -14,6 +15,39 @@ etl chart-sync my-branch my-branch-public
 ```
 If your charts don't appear on `https://staging-site-my-branch-public.tail6e23.ts.net/grapher/xyz`, try triggering manual deploy. -->
 
+
+### Sharing articles (Google Docs)
+
+To share a draft article with external reviewers:
+
+1. **Create a staging server from GitHub**:
+    - Go to the [ETL repository on GitHub](https://github.com/owid/etl)
+    - Click the branch dropdown (shows "master") and type a new branch name (e.g., `my-article-preview`)
+    - Click "Create branch: my-article-preview from master"
+    - Go to [Pull Requests](https://github.com/owid/etl/pulls) and click "New pull request"
+    - Set the compare branch to your new branch and click "Create pull request"
+    - Wait a few minutes for OWIDbot to post links including a "Site preview" URL like `https://<branch>.owid.pages.dev/`
+
+2. **Add the `staging-bake` label** to your PR. This ensures the preview site stays up to date when you republish.
+
+3. **Publish your article on the staging server**:
+    - Go to the staging admin: `http://staging-site-<branch>/admin/gdocs/<your-gdoc-id>/preview`
+    - Click "Publish" (or "Republish" if updating)
+
+4. **Share the public preview URL** with your external reviewer:
+    - Format: `https://<branch>.owid.pages.dev/<article-slug>`
+    - Example: `https://work-and-employment.owid.pages.dev/work-employment`
+
+5. **Iterate**: When you make changes, republish from the staging admin and the public preview will update automatically (thanks to the `staging-bake` label).
+
+!!! warning "Common mistakes"
+
+    - **Using the wrong admin**: Make sure you publish from the staging server admin (`http://staging-site-<branch>/admin/...`), not from `admin.owid.io`. Changes on production admin won't appear on your staging preview.
+    - **Forgetting the `staging-bake` label**: Without this label, republishing won't update the Cloudflare preview.
+
+!!! tip "When you're done"
+
+    Close the PR or let someone know when you no longer need the preview. The staging server will be stopped and destroyed after 3 days of the PR being closed.
 
 ### Sharing explorers
 
@@ -35,9 +69,9 @@ To share explorers with the public, follow these steps:
 If you created a private staging server with a `-private` suffix, the domain `https://<branch>.owid.pages.dev/` will not be publicly accessible. However, you can share it with specific external people by making it public initially and then protecting it with Cloudflare Access.
 
 1. **Do not** use the `-private` suffix in your branch name.
-2. Go to [Cloudflare Access -> Applications](https://one.dash.cloudflare.com/078fcdfed9955087315dd86792e71a7e/access/apps?search=) and edit the application [Cloudflare Pages (owid)](https://one.dash.cloudflare.com/078fcdfed9955087315dd86792e71a7e/access/apps/edit/d8c658c3-fd20-477e-ac20-e7ed7fd656de?tab=overview).
+2. Go to [:octicons-link-external-16: Cloudflare Access -> Applications](https://one.dash.cloudflare.com/078fcdfed9955087315dd86792e71a7e/access/apps?search=) and edit the application [:octicons-link-external-16: Cloudflare Pages (owid)](https://one.dash.cloudflare.com/078fcdfed9955087315dd86792e71a7e/access/apps/edit/d8c658c3-fd20-477e-ac20-e7ed7fd656de?tab=overview).
 3. In the `Overview` tab, click on `+Add domain` and enter the subdomain of your staging server.
-4. Go to the [Policies](https://one.dash.cloudflare.com/078fcdfed9955087315dd86792e71a7e/access/apps/edit/d8c658c3-fd20-477e-ac20-e7ed7fd656de?tab=policies) tab and edit the [External e-mails](https://one.dash.cloudflare.com/078fcdfed9955087315dd86792e71a7e/access/apps/rules/d8c658c3-fd20-477e-ac20-e7ed7fd656de/4c7bfba1-7bca-4e7c-8a32-5a11ab5f36fe) policy.
+4. Go to the [:octicons-link-external-16: Policies](https://one.dash.cloudflare.com/078fcdfed9955087315dd86792e71a7e/access/apps/edit/d8c658c3-fd20-477e-ac20-e7ed7fd656de?tab=policies) tab and edit the [:octicons-link-external-16: External e-mails](https://one.dash.cloudflare.com/078fcdfed9955087315dd86792e71a7e/access/apps/rules/d8c658c3-fd20-477e-ac20-e7ed7fd656de/4c7bfba1-7bca-4e7c-8a32-5a11ab5f36fe) policy.
 5. Add the e-mail addresses of the people you want to share the staging server with.
 
 Once set up, the URL `https://<branch>.owid.pages.dev/` will require authentication. People with the e-mails you added in the policy will be able to access it via Google or by entering their e-mail address and using the code sent to them.

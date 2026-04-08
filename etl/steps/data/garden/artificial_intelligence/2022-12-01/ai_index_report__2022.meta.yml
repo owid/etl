@@ -1,0 +1,409 @@
+dataset:
+  title: AI Index Report (2022)
+tables:
+  ai_index_report__2022:
+    variables:
+      ai_job_postings:
+        title: ai_job_postings
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+        description: |-
+          According to the AI Index: "Emsi Burning Glass delivers job market analytics that empower employers, workers, and educators to make data-driven decisions. The company’s artificial intelligence technology analyzes hundreds of millions of job postings and real-life career transitions to provide insight into labor market patterns."
+      casp_median_accuracy_gdt_ts:
+        title: casp_median_accuracy_gdt_ts
+        unit: ''
+        description: |-
+          This data is from the 2021 AI Index Report. It was extracted from Figure 2.7.3 using <a href="https://apps.automeris.io/wpd/" target=”_blank”>WebPlotDigitizer</a>.
+      conference_attendance:
+        title: conference_attendance
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          The 16 major conferences included are:
+          • International Conference on Machine Learning (ICML)
+          • Conference and Workshop on Neural Information Processing Systems (NeurIPS)
+          • IEEE Conference on Computer Vision and Pattern Recognition (CVPR)
+          • International Conference on Learning Representations (ICLR)
+          • International Conference on Computer Vision (ICCV)
+          • Association for the Advancement of Artificial Intelligence (AAAI)
+          • Conference on Empirical Methods in Natural Language Processing (EMNLP)
+          • International Conference on Intelligent Robots and Systems (IROS)
+          • Conference on Uncertainty in Artificial Intelligence (UAI)
+          • International Joint Conference on Artificial Intelligence (IJCAI)
+          • ACM Conference on Fairness, Accountability, and Transparency (ACM FAccT)
+          • International Conference on Autonomous Agents and Multi-agent Systems (AAMAS)
+          • International Conference on Robotics and Automation (ICRA)
+          • International Conference on Principles of Knowledge Representation and Reasoning (KR)
+          • International Conference on Automated Planning and Scheduling (ICAPS)
+          • Annual Meeting of the Association for Computational Linguistics (ACL)
+      growth_ai_hiring:
+        title: growth_ai_hiring
+        unit: ''
+        description: |-
+          The overall hiring rate is the number of LinkedIn members who added a new employer in the same period the job began, divided by the total number of LinkedIn members in the corresponding location.
+
+          The hiring rate for AI jobs is the number of LinkedIn members with AI skills on their profile or working in AI-related occupations who added a new employer in the same period the job began, divided by the total number of LinkedIn members in the corresponding location.
+      growth_ai_hiring_smoothed:
+        title: growth_ai_hiring_smoothed
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        description: |-
+          The overall hiring rate is the number of LinkedIn members who added a new employer in the same period the job began, divided by the total number of LinkedIn members in the corresponding location.
+
+          The hiring rate for AI jobs is the number of LinkedIn members with AI skills on their profile or working in AI-related occupations who added a new employer in the same period the job began, divided by the total number of LinkedIn members in the corresponding location.
+      imagenet_extra_training_data:
+        title: imagenet_extra_training_data
+        unit: ''
+      imagenet_training_cost_usd:
+        title: imagenet_training_cost_usd
+        unit: current US$
+        short_unit: $
+        description: |-
+          Top-5 accuracy measures how often any one of the system's five most probable labels (out of 1000 possible labels) matches the target label.
+
+          Additional source information according to the AI Index: "DAWNBench is a benchmark suite for end-to-end deep-learning training and inference. DAWNBench provides a reference set of common deep learning workloads for quantifying training time, training cost, inference latency, and inference cost across different optimization strategies, model architectures, software frameworks, clouds, and hardware. More details available at <a href="https://dawn.cs.stanford.edu/" target=”_blank”>DAWNBench</a>. Because DAWNBench was deprecated after March 2020, data on the training cost for the most recent round of... submissions was manually collected by Deepak Narayanan."
+      mean_normalized_human_score:
+        title: mean_normalized_human_score
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Mean human normalized score
+          numDecimalPlaces: 0
+      new_cs_undergraduate_graduates_at_doctoral_institutions:
+        title: new_cs_undergraduate_graduates_at_doctoral_institutions
+        unit: ''
+      newly_funded_ai_companies:
+        title: newly_funded_ai_companies
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          According to the AI Index: "NetBase Quid... aggregates over 6 million global public and private company profiles, updated on a weekly basis, including metadata on investments, location of headquarters, and more. NetBase Quid also applies natural language processing technology to search, analyze, and identify patterns in large, unstructured datasets, like aggregated blogs, company and patent databases."
+      number_ai_bills_cumulative:
+        title: number_ai_bills_cumulative
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      number_ai_phds_employed_academia:
+        title: number_ai_phds_employed_academia
+        unit: ''
+        display:
+          name: Academia
+          numDecimalPlaces: 0
+        description: |-
+          According to the AI Index: "Computing Research Association (CRA) members are 200-plus North American organizations active in computing research: academic departments of computer science and computer engineering; laboratories and centers in industry, government, and academia; and affiliated professional societies (AAAI, ACM, CACS/AIC, IEEE Computer Society, SIAM USENIX). CRA’s mission is to enhance innovation by joining with industry, government, and academia to strengthen research and advanced education in computing."
+
+          This data is from CRA's Taulbee Survey, which they conduct during the fall of each academic year by reaching out to over 200 PhD-granting departments. Details about the Taulbee Survey can be found <a href="https://cra.org/resources/taulbee-survey/" target=”_blank”>here.</a>
+      number_ai_phds_employed_government:
+        title: number_ai_phds_employed_government
+        unit: ''
+        display:
+          name: Government
+          numDecimalPlaces: 0
+        description: |-
+          According to the AI Index: "Computing Research Association (CRA) members are 200-plus North American organizations active in computing research: academic departments of computer science and computer engineering; laboratories and centers in industry, government, and academia; and affiliated professional societies (AAAI, ACM, CACS/AIC, IEEE Computer Society, SIAM USENIX). CRA’s mission is to enhance innovation by joining with industry, government, and academia to strengthen research and advanced education in computing."
+
+          This data is from CRA's Taulbee Survey, which they conduct during the fall of each academic year by reaching out to over 200 PhD-granting departments. Details about the Taulbee Survey can be found <a href="https://cra.org/resources/taulbee-survey/" target=”_blank”>here.</a>
+      number_ai_phds_employed_industry:
+        title: number_ai_phds_employed_industry
+        unit: ''
+        display:
+          name: Industry
+          numDecimalPlaces: 0
+        description: |-
+          According to the AI Index: "Computing Research Association (CRA) members are 200-plus North American organizations active in computing research: academic departments of computer science and computer engineering; laboratories and centers in industry, government, and academia; and affiliated professional societies (AAAI, ACM, CACS/AIC, IEEE Computer Society, SIAM USENIX). CRA’s mission is to enhance innovation by joining with industry, government, and academia to strengthen research and advanced education in computing."
+
+          This data is from CRA's Taulbee Survey, which they conduct during the fall of each academic year by reaching out to over 200 PhD-granting departments. Details about the Taulbee Survey can be found <a href="https://cra.org/resources/taulbee-survey/" target=”_blank”>here.</a>
+      number_ai_publications_by_country:
+        title: number_ai_publications_by_country
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          The Center for Security and Emerging Technology (CSET) is a policy research organization within Georgetown University’s Walsh School of Foreign Service. CSET produces data-driven research at the intersection of security and technology, providing nonpartisan analysis to the policy community.
+      number_ai_publications_by_field:
+        title: number_ai_publications_by_field
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          The Center for Security and Emerging Technology (CSET) is a policy research organization within Georgetown University’s Walsh School of Foreign Service. CSET produces data-driven research at the intersection of security and technology, providing nonpartisan analysis to the policy community.
+      number_mentions_ai_legislative_proceedings:
+        title: number_mentions_AI_legislative_proceedings
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      number_new_cs_phds_by_specialty:
+        title: number_new_cs_phds_by_specialty
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          According to the AI Index: "Computing Research Association (CRA) members are 200-plus North American organizations active in computing research: academic departments of computer science and computer engineering; laboratories and centers in industry, government, and academia; and affiliated professional societies (AAAI, ACM, CACS/AIC, IEEE Computer Society, SIAM USENIX). CRA’s mission is to enhance innovation by joining with industry, government, and academia to strengthen research and advanced education in computing."
+
+          This data is from CRA's Taulbee Survey, which they conduct during the fall of each academic year by reaching out to over 200 PhD-granting departments. Details about the Taulbee Survey can be found <a href="https://cra.org/resources/taulbee-survey/" target=”_blank”>here.</a>
+      number_patent_filings:
+        title: number_patent_filings
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          The Center for Security and Emerging Technology (CSET) is a policy research organization within Georgetown University’s Walsh School of Foreign Service. CSET produces data-driven research at the intersection of security and technology, providing nonpartisan analysis to the policy community.
+      share_ai_phds_employed_academia:
+        title: share_ai_phds_employed_academia
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+          name: Academia
+          numDecimalPlaces: 1
+        description: |-
+          According to the AI Index: "Computing Research Association (CRA) members are 200-plus North American organizations active in computing research: academic departments of computer science and computer engineering; laboratories and centers in industry, government, and academia; and affiliated professional societies (AAAI, ACM, CACS/AIC, IEEE Computer Society, SIAM USENIX). CRA’s mission is to enhance innovation by joining with industry, government, and academia to strengthen research and advanced education in computing."
+
+          This data is from CRA's Taulbee Survey, which they conduct during the fall of each academic year by reaching out to over 200 PhD-granting departments. Details about the Taulbee Survey can be found <a href="https://cra.org/resources/taulbee-survey/" target=”_blank”>here.</a>
+      share_ai_phds_employed_government:
+        title: share_ai_phds_employed_government
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+          name: Government
+          numDecimalPlaces: 1
+        description: |-
+          According to the AI Index: "Computing Research Association (CRA) members are 200-plus North American organizations active in computing research: academic departments of computer science and computer engineering; laboratories and centers in industry, government, and academia; and affiliated professional societies (AAAI, ACM, CACS/AIC, IEEE Computer Society, SIAM USENIX). CRA’s mission is to enhance innovation by joining with industry, government, and academia to strengthen research and advanced education in computing."
+
+          This data is from CRA's Taulbee Survey, which they conduct during the fall of each academic year by reaching out to over 200 PhD-granting departments. Details about the Taulbee Survey can be found <a href="https://cra.org/resources/taulbee-survey/" target=”_blank”>here.</a>
+      share_ai_phds_employed_industry:
+        title: share_ai_phds_employed_industry
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+          name: Industry
+          numDecimalPlaces: 1
+        description: |-
+          According to the AI Index: "Computing Research Association (CRA) members are 200-plus North American organizations active in computing research: academic departments of computer science and computer engineering; laboratories and centers in industry, government, and academia; and affiliated professional societies (AAAI, ACM, CACS/AIC, IEEE Computer Society, SIAM USENIX). CRA’s mission is to enhance innovation by joining with industry, government, and academia to strengthen research and advanced education in computing."
+
+          This data is from CRA's Taulbee Survey, which they conduct during the fall of each academic year by reaching out to over 200 PhD-granting departments. Details about the Taulbee Survey can be found <a href="https://cra.org/resources/taulbee-survey/" target=”_blank”>here.</a>
+      share_companies_using_ai:
+        title: share_companies_using_ai
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+          numDecimalPlaces: 0
+        description: |-
+          The data is from the McKinsey Global Survey <a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/global-survey-the-state-of-ai-in-2021" target=”_blank”>"The state of AI in 2021."</a>
+      share_new_cs_phds_by_specialty:
+        title: share_new_cs_phds_by_specialty
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+          numDecimalPlaces: 1
+        description: |-
+          According to the AI Index: "Computing Research Association (CRA) members are 200-plus North American organizations active in computing research: academic departments of computer science and computer engineering; laboratories and centers in industry, government, and academia; and affiliated professional societies (AAAI, ACM, CACS/AIC, IEEE Computer Society, SIAM USENIX). CRA’s mission is to enhance innovation by joining with industry, government, and academia to strengthen research and advanced education in computing."
+
+          This data is from CRA's Taulbee Survey, which they conduct during the fall of each academic year by reaching out to over 200 PhD-granting departments. Details about the Taulbee Survey can be found <a href="https://cra.org/resources/taulbee-survey/" target=”_blank”>here.</a>
+      share_new_female_ai_phds:
+        title: share_new_female_ai_phds
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+          name: Artificial intelligence
+          numDecimalPlaces: 1
+        description: |-
+          According to the AI Index: "Computing Research Association (CRA) members are 200-plus North American organizations active in computing research: academic departments of computer science and computer engineering; laboratories and centers in industry, government, and academia; and affiliated professional societies (AAAI, ACM, CACS/AIC, IEEE Computer Society, SIAM USENIX). CRA’s mission is to enhance innovation by joining with industry, government, and academia to strengthen research and advanced education in computing."
+
+          This data is from CRA's Taulbee Survey, which they conduct during the fall of each academic year by reaching out to over 200 PhD-granting departments. Details about the Taulbee Survey can be found <a href="https://cra.org/resources/taulbee-survey/" target=”_blank”>here.</a>
+      share_new_female_cs_phds:
+        title: share_new_female_cs_phds
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+          name: Computer science
+          numDecimalPlaces: 1
+        description: |-
+          According to the AI Index: "Computing Research Association (CRA) members are 200-plus North American organizations active in computing research: academic departments of computer science and computer engineering; laboratories and centers in industry, government, and academia; and affiliated professional societies (AAAI, ACM, CACS/AIC, IEEE Computer Society, SIAM USENIX). CRA’s mission is to enhance innovation by joining with industry, government, and academia to strengthen research and advanced education in computing."
+
+          This data is from CRA's Taulbee Survey, which they conduct during the fall of each academic year by reaching out to over 200 PhD-granting departments. Details about the Taulbee Survey can be found <a href="https://cra.org/resources/taulbee-survey/" target=”_blank”>here.</a>
+      share_new_international_ai_phds:
+        title: share_new_international_ai_phds
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+          numDecimalPlaces: 1
+        description: |-
+          According to the AI Index: "Computing Research Association (CRA) members are 200-plus North American organizations active in computing research: academic departments of computer science and computer engineering; laboratories and centers in industry, government, and academia; and affiliated professional societies (AAAI, ACM, CACS/AIC, IEEE Computer Society, SIAM USENIX). CRA’s mission is to enhance innovation by joining with industry, government, and academia to strengthen research and advanced education in computing."
+
+          This data is from CRA's Taulbee Survey, which they conduct during the fall of each academic year by reaching out to over 200 PhD-granting departments. Details about the Taulbee Survey can be found <a href="https://cra.org/resources/taulbee-survey/" target=”_blank”>here.</a>
+      share_new_international_cs_phds:
+        title: share_new_international_cs_phds
+        unit: ''
+      share_race_ethnicity_new_cs_phds:
+        title: share_race_ethnicity_new_cs_phds
+        unit: ''
+      top1_accuracy:
+        title: top1_accuracy
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+          name: Top-1 accuracy
+        description: |-
+          An asterisk (*) is used to distinguish when a system (i.e., Vgg-19 and Inception v3) was trained with extra training data, solely to enable plotting. Our visualization tool does not currently allow plotting of multiple entities with exactly the same name.
+      top5_accuracy:
+        title: top5_accuracy
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+          name: Top-5 accuracy
+      total_corporate_investment:
+        title: total_corporate_investment
+        unit: current US$
+        short_unit: $
+        description: |-
+          According to the AI Index: "NetBase Quid... aggregates over 6 million global public and private company profiles, updated on a weekly basis, including metadata on investments, location of headquarters, and more. NetBase Quid also applies natural language processing technology to search, analyze, and identify patterns in large, unstructured datasets, like aggregated blogs, company and patent databases."
+      total_corporate_investment_by_activity:
+        title: total_corporate_investment_by_activity
+        unit: current US$
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          According to the AI Index: "NetBase Quid... aggregates over 6 million global public and private company profiles, updated on a weekly basis, including metadata on investments, location of headquarters, and more. NetBase Quid also applies natural language processing technology to search, analyze, and identify patterns in large, unstructured datasets, like aggregated blogs, company and patent databases."
+
+          Merger/acquisition: refers to a buyer acquiring more than 50% of the existing ownership stake in entities, asset product, and business divisions.
+
+          Private investment: a private placement is a private sale of newly issued securities (equity or debt) by a company to a selected investor or a selected group of investors. The stakes that buyers take in private placements are often minority stakes (under 50%), although it is possible to take control of a company through a private placement as well, in which case the private placement would be a majority stake investment.
+
+          Minority stake: These refer to minority stake acquisitions in Quid, which take place when the buyer acquires less than 50% of the existing ownership stake in entities, asset product, and business divisions.
+      total_corporate_investment_by_activity_inflation_adjusted:
+        title: total_corporate_investment_by_activity_inflation_adjusted
+        unit: constant 2021 US$
+        short_unit: $
+        description: |-
+          We have adjusted this data for inflation using the US Consumer Price Index (CPI).
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available.
+
+          (While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price. For example, it has become much cheaper to <a href="https://ourworldindata.org/grapher/imagenet-training-cost" target=”_blank”>train an AI system</a>.)
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
+          According to the AI Index: "NetBase Quid... aggregates over 6 million global public and private company profiles, updated on a weekly basis, including metadata on investments, location of headquarters, and more. NetBase Quid also applies natural language processing technology to search, analyze, and identify patterns in large, unstructured datasets, like aggregated blogs, company and patent databases."
+
+          Merger/acquisition: refers to a buyer acquiring more than 50% of the existing ownership stake in entities, asset product, and business divisions.
+
+          Private investment: a private placement is a private sale of newly issued securities (equity or debt) by a company to a selected investor or a selected group of investors. The stakes that buyers take in private placements are often minority stakes (under 50%), although it is possible to take control of a company through a private placement as well, in which case the private placement would be a majority stake investment.
+
+          Minority stake: These refer to minority stake acquisitions in Quid, which take place when the buyer acquires less than 50% of the existing ownership stake in entities, asset product, and business divisions.
+      total_corporate_investment_inflation_adjusted:
+        title: total_corporate_investment_inflation_adjusted
+        unit: constant 2021 US$
+        short_unit: $
+        description: |-
+          We have adjusted this data for inflation using the US Consumer Price Index (CPI).
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available.
+
+          (While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price. For example, it has become much cheaper to <a href="https://ourworldindata.org/grapher/imagenet-training-cost" target=”_blank”>train an AI system</a>.)
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
+          According to the AI Index: "NetBase Quid... aggregates over 6 million global public and private company profiles, updated on a weekly basis, including metadata on investments, location of headquarters, and more. NetBase Quid also applies natural language processing technology to search, analyze, and identify patterns in large, unstructured datasets, like aggregated blogs, company and patent databases."
+      total_number_ai_phds_employed:
+        title: total_number_ai_phds_employed
+        unit: ''
+      total_private_investment_by_country:
+        title: total_private_investment_by_country
+        unit: current US$
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          According to the AI Index: "NetBase Quid... aggregates over 6 million global public and private company profiles, updated on a weekly basis, including metadata on investments, location of headquarters, and more. NetBase Quid also applies natural language processing technology to search, analyze, and identify patterns in large, unstructured datasets, like aggregated blogs, company and patent databases."
+
+          Private investment: a private placement is a private sale of newly issued securities (equity or debt) by a company to a selected investor or a selected group of investors. The stakes that buyers take in private placements are often minority stakes (under 50%), although it is possible to take control of a company through a private placement as well, in which case the private placement would be a majority stake investment.
+      total_private_investment_by_country_inflation_adjusted:
+        title: total_private_investment_by_country_inflation_adjusted
+        unit: constant 2021 US$
+        short_unit: $
+        description: |-
+          We have adjusted this data for inflation using the US Consumer Price Index (CPI).
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available.
+
+          (While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price. For example, it has become much cheaper to <a href="https://ourworldindata.org/grapher/imagenet-training-cost" target=”_blank”>train an AI system</a>.)
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
+          According to the AI Index: "NetBase Quid... aggregates over 6 million global public and private company profiles, updated on a weekly basis, including metadata on investments, location of headquarters, and more. NetBase Quid also applies natural language processing technology to search, analyze, and identify patterns in large, unstructured datasets, like aggregated blogs, company and patent databases."
+
+          Private investment: a private placement is a private sale of newly issued securities (equity or debt) by a company to a selected investor or a selected group of investors. The stakes that buyers take in private placements are often minority stakes (under 50%), although it is possible to take control of a company through a private placement as well, in which case the private placement would be a majority stake investment.
+      total_private_investment_by_focus_area:
+        title: total_private_investment_by_focus_area
+        unit: current US$
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          According to the AI Index: "NetBase Quid... aggregates over 6 million global public and private company profiles, updated on a weekly basis, including metadata on investments, location of headquarters, and more. NetBase Quid also applies natural language processing technology to search, analyze, and identify patterns in large, unstructured datasets, like aggregated blogs, company and patent databases."
+      total_private_investment_by_focus_area_inflation_adjusted:
+        title: total_private_investment_by_focus_area_inflation_adjusted
+        unit: constant 2021 US$
+        short_unit: $
+        description: |-
+          We have adjusted this data for inflation using the US Consumer Price Index (CPI).
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available.
+
+          (While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price. For example, it has become much cheaper to <a href="https://ourworldindata.org/grapher/imagenet-training-cost" target=”_blank”>train an AI system</a>.)
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
+          According to the AI Index: "NetBase Quid... aggregates over 6 million global public and private company profiles, updated on a weekly basis, including metadata on investments, location of headquarters, and more. NetBase Quid also applies natural language processing technology to search, analyze, and identify patterns in large, unstructured datasets, like aggregated blogs, company and patent databases."
+
+          Private investment: a private placement is a private sale of newly issued securities (equity or debt) by a company to a selected investor or a selected group of investors. The stakes that buyers take in private placements are often minority stakes (under 50%), although it is possible to take control of a company through a private placement as well, in which case the private placement would be a majority stake investment.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,18 @@
+dataset:
+  title: Absolute deaths from ambient PM2.5 air pollution- State of Global Air
+tables:
+  absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air:
+    variables:
+      absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air:
+        title: Absolute deaths from ambient PM2.5 air pollution- State of Global Air
+        unit: Percent
+        description: Absolute number of deaths per year from ambient particulate matter air pollution- State of Global Air
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

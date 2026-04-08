@@ -16,9 +16,9 @@ definitions:
   routeofadministration: <% if routeofadministration == "O" %>
     orally administered
     <% elif routeofadministration == "P" %>
-    parentearally administered
+    parenterally administered
     <% elif routeofadministration == "R" %>
-    rectally administered4
+    rectally administered
     <% elif routeofadministration == "I" %>
     inhaled
     <% endif %>

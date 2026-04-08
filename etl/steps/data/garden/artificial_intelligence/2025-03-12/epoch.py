@@ -2,13 +2,13 @@
 
 import pandas as pd
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     paths.log.info("epoch.start")
 
     #
@@ -111,6 +111,9 @@ def run(dest_dir: str) -> None:
     # Convert FLOP to petaFLOP and remove the column with FLOPs (along with training time in hours)
     tb["training_computation_petaflop"] = tb["training_compute__flop"] / 1e15
 
+    # Convert training dataset size to numeric
+    tb["training_dataset_size__total"] = pd.to_numeric(tb["training_dataset_size__total"], errors="coerce")
+
     # Convert publication date to a datetime objects
     tb["publication_date"] = pd.to_datetime(tb["publication_date"])
 
@@ -138,15 +141,15 @@ def run(dest_dir: str) -> None:
         axis=1,
     )
     tb = tb.format(["days_since_1949", "model"])
-
     # Add metadata to the publication date column
-    tb["publication_date"].metadata.origins = tb["domain"].metadata.origins
+    for col in ["publication_date", "training_dataset_size__total"]:
+        tb[col].metadata.origins = tb["domain"].metadata.origins
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

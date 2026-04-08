@@ -14,7 +14,7 @@ from owid.catalog import Dataset, Table
 from shared import add_metadata_vars, add_metadata_vars_distribution
 from tabulate import tabulate
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -35,7 +35,7 @@ EQUIVALIZATION_LIST = ["eq", "pc"]
 TABLEFMT = "pretty"
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Create a new garden dataset
     ds_meadow = paths.load_dataset("luxembourg_income_study")
 
@@ -121,8 +121,7 @@ def run(dest_dir: str) -> None:
     tables.append(percentiles_table(tb_name="lis_percentiles_adults", ds_meadow=ds_meadow, tb_keyvars=tables[1]))
 
     # Add tables to dataset
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=tables,
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,

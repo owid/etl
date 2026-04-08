@@ -1,0 +1,198 @@
+# Agent Guide
+
+Our World in Data's ETL system - a content-addressable data pipeline with DAG-based execution.
+
+## Critical Rules
+
+- **Always use `.venv/bin/`** for all Python commands (`etl`, `python`, `pytest`)
+- **Never mask problems** - no empty tables, no commented-out code, no silent exceptions
+- **Trace issues upstream**: snapshot → meadow → garden → grapher
+- **Never push/commit** unless explicitly told to
+- **Ask the user** if unsure - don't guess
+- **Always run `make check` before committing**
+- If not told otherwise, save outputs to `ai/` directory.
+- **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
+
+
+## Pipeline Overview
+
+**snapshot** → **meadow** → **garden** → **grapher** → **export**
+
+| Stage | Location | Purpose |
+|-------|----------|---------|
+| snapshot | `snapshots/` | DVC-tracked raw data |
+| meadow | `etl/steps/data/meadow/` | Basic cleaning |
+| garden | `etl/steps/data/garden/` | Business logic, harmonization |
+| grapher | `etl/steps/data/grapher/` | MySQL ingestion |
+
+## Running ETL Steps
+
+```bash
+.venv/bin/etlr namespace/version/dataset --private      # Run step
+.venv/bin/etlr namespace/version/dataset --grapher      # Upload to grapher
+.venv/bin/etlr namespace/version/dataset --dry-run      # Preview
+.venv/bin/etlr namespace/version/dataset --force --only # Force re-run
+```
+
+Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+
+### Running Snapshot Steps
+
+```bash
+.venv/bin/etls namespace/version/dataset               # Download & upload snapshot
+.venv/bin/etls namespace/version/dataset --skip-upload  # Download only
+```
+
+**Important:**
+- **Avoid `--force`** — `etlr` has built-in change detection and only re-runs steps whose code or data changed. Use `--force` only when you need to re-run a step despite no code changes (e.g., after fixing external data). Never use `--force` alone — always pair with `--only`.
+- For `grapher://` steps, always add `--grapher` flag
+- Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset --private`
+
+## Git Workflow
+
+**Always use `etl pr`** - never use `git checkout -b` + `gh pr create` manually.
+
+```bash
+# 1. Create PR (creates new branch, does NOT commit)
+.venv/bin/etl pr "Update dataset" data
+
+# 2. Stage and commit
+git add .
+git commit -m "🔨🤖 Description"
+
+# 3. Push
+git push
+
+# 4. Add PR description
+gh pr edit <number> --body "..."
+```
+
+**Always include `@codex review` in PR descriptions** to request a Codex review.
+
+### Commit Message Emojis
+
+| Emoji | Use for |
+|-------|---------|
+| 🎉 | New feature |
+| 🐛 | Bug fix |
+| ✨ | Improvement |
+| 🔨 | Code change |
+| 📊 | Data updates |
+| 📜 | Docs |
+| 💄 | Formatting |
+
+Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
+
+## Code Patterns
+
+### Preserving metadata/origins in steps
+
+- **No `np.where`** — strips origins. Use `tb["col"] = tb["b"]; tb.loc[mask, "col"] = tb.loc[mask, "a"]`
+- **No `index.map()`** to pull columns from another table — loses origins. Use `tb.join(other[["col"]], how="left")`
+- **`snap.read_csv/json/excel/feather/...`** — prefer over manual file reading + `pd.DataFrame`
+- **`paths.regions.harmonize_names(tb, country_col=..., countries_file=...)`** — current harmonization API (replaces `geo.harmonize_countries`)
+- **`Table.format()`** needs both `country` and `year`. For year-less tables: `set_index("country")` + set `tb.metadata.short_name`
+- **`*.meta.yml`**: omit `dataset:` block — inherited from origin. Only define `tables:` → `variables:`
+
+### Performance
+
+- **Meadow: use categoricals** — low-cardinality string columns (`country`, `variant`, `sex`, `age`) should be `.astype("category")` before `.format()`. Dramatically reduces feather size and read time.
+- **Garden: `safe_types=False`** — for large tables (>1M rows), use `ds.read("table", safe_types=False)` to preserve categoricals and avoid expensive type conversions.
+- **Inspect feather schema** — use `pyarrow.feather.read_table(path).schema` to check if columns are `large_string` (bad) vs `dictionary` (good).
+
+### Standard Garden Step
+```python
+from etl.helpers import PathFinder
+
+paths = PathFinder(__file__)
+
+def run() -> None:
+    ds_input = paths.load_dataset("input_dataset")
+    tb = ds_input["table_name"].reset_index()
+    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
+    tb = tb.format(short_name=paths.short_name)
+    ds_garden = paths.create_dataset(tables=[tb])
+    ds_garden.save()
+```
+
+### Ad-hoc Data Exploration
+```python
+from etl.snapshot import Snapshot
+snap = Snapshot("namespace/version/file.csv")
+tb = snap.read_csv()
+```
+
+### Catalog System
+
+Built on **owid.catalog** library:
+- **Dataset**: Container for multiple tables with shared metadata
+- **Table**: pandas.DataFrame subclass with rich metadata per column
+- **Variable**: pandas.Series subclass with variable-specific metadata
+- Content-based checksums for change detection
+- Multiple formats (feather, parquet, csv) with automatic schema validation
+
+
+### YAML Editing (preserve comments)
+```python
+from etl.files import ruamel_load, ruamel_dump
+data = ruamel_load(file_path)
+data['key'] = new_value
+with open(file_path, 'w') as f:
+    f.write(ruamel_dump(data))
+```
+
+## Querying MySQL
+
+### Quick queries (staging)
+```bash
+make query SQL="SELECT COUNT(*) FROM variables WHERE catalogPath IS NULL"
+```
+Automatically connects to `staging-site-{branch}` based on current git branch.
+
+### Python (for more control)
+```python
+from etl.config import OWID_ENV
+df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
+```
+
+## Additional Tools
+
+Get `--help` for details on any command.
+
+### Fast File Searching
+
+Use `rg` (ripgrep) instead of `find -exec grep` - it's ~100x faster:
+```bash
+rg -l "pattern" -g "*.py" -g "!.venv"
+```
+
+## Package Management
+
+Use `uv` (not pip):
+```bash
+uv add package_name
+uv remove package_name
+```
+
+## VSCode Extensions
+
+Extensions live in `vscode_extensions/<name>/`. After **every** code change, you must compile, package, and install — just compiling is NOT enough:
+
+```bash
+cd vscode_extensions/<name>
+npm run compile
+npx @vscode/vsce package --out install/<name>-<version>.vsix
+code --install-extension install/<name>-<version>.vsix --force
+```
+
+Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
+
+## Extended Documentation
+
+See `.claude/docs/` for:
+- `debugging.md` - Data quality debugging approach
+- `pipeline-stages.md` - Pipeline architecture details
+
+## Individual Preferences
+
+- @~/.claude/instructions/etl.md

@@ -1,0 +1,50 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    description_key:
+      - Crime data can be difficult to compare between countries because of differences in how justice systems work, when the data is collected (for example, when a crime is first reported or after it has been investigated), and how international guidelines are used in each country.
+      - Many crimes are never reported by victims, so the data cannot be used to measure exactly how common crime is. However, the data is still useful for spotting patterns and trends over time.
+      - Most crime data come from records kept by the police or other law enforcement agencies. Countries vary in whether they record a crime when it is first reported, during an investigation, or after the investigation is finished.
+      - In some countries, more than one agency collects crime data, and these different sets of data must be combined before they are published.
+    presentation:
+      topic_tags:
+        - Corruption
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  corruption:
+    variables:
+      value:
+        title: << indicator >>  - << category.lower() >>  (<< unit_of_measurement.lower() >>)
+        description_short: |-
+          <%- if category == "Corruption" %>
+          Reported national figures on corruption offenses, including bribery, embezzlement, abuse of functions, trading in influence, illicit enrichment, and other unspecified corrupt practices.
+          <% elif category == "Bribery" %>
+          Reported national figures on bribery offenses, including the promising, offering, giving, soliciting, or accepting of an undue advantage by or from a public official or private actor to improperly influence the performance of duties.
+          <% elif category == "Other acts of corruption" %>
+          Reported national figures on corruption offenses that do not involve bribery, including embezzlement, abuse of official capacity, trading in influence, illicit enrichment, and other forms of misconduct classified outside traditional bribery categories.
+          <%- endif -%>
+        description_from_producer: |-
+          <% if category == "Corruption" %>
+          Corruption includes active bribery, passive bribery, embezzlement, abuse of functions, trading in influence, illicit enrichment, and other acts of corruption.
+          <% elif category == "Bribery" %>
+          Promising, offering, giving, soliciting, or accepting an undue advantage to or from a public official or a person who directs or works in a private sector entity, directly or indirectly, in order that the person act or refrain from acting in the exercise of his or her official duties.
+          <% elif category == "Other acts of corruption" %>
+          Other acts of corruption includes embezzlement, abuse of functions, trading in influence, illicit enrichment and all other acts of corruption not mentioned above.
+          <%- endif -%>
+        description_processing:
+         <%- if category == "Corruption" or category == "Other acts of corruption" %>
+         Sweden revised its classification methodology in 2019 for the UN Crime Trends Survey (UN-CTS), with retroactive adjustments applied back to 2015. The revised figures from 2015 onwards include additional offense types such as "misuse of office/misconduct and unlawful disposal" that were not captured in earlier data collection periods. To ensure data consistency and comparability, pre-2015 data points from Sweden have been excluded.
+         <%- endif -%>
+        unit: |-
+          <%- if unit_of_measurement.lower() == "counts" %>
+          << indicator.lower() >>
+          <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
+          << indicator.lower() >> per 100,000 population
+          <%- endif -%>

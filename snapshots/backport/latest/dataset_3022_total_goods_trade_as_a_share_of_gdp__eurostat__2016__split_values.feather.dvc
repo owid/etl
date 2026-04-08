@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3022
-    date_accessed: 2023-08-10 08:04:55.701515
+    url: https://admin.owid.io/admin/datasets/3022
+    date_accessed: 2026-03-10 09:16:02.291497+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Total goods trade as a share of GDP (Eurostat (2016)) (split)
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fe9e4de8d7a7af25a2c1b9dea8bc9d0e
-  size: 10538
-  path: 
-    dataset_3022_total_goods_trade_as_a_share_of_gdp__eurostat__2016__split_values.feather
+  - md5: 815315febe5f22af21b787d0a64bea37
+    size: 10434
+    path: dataset_3022_total_goods_trade_as_a_share_of_gdp__eurostat__2016__split_values.feather

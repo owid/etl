@@ -4,7 +4,7 @@ Script to create a snapshot of dataset.
 The file comes from Becker (1997), hard to find online. (Though maybe is this [P15]: https://publikationen.ub.uni-frankfurt.de/opus4/frontdoor/deliver/index/docId/8047/file/AP_09.pdf)
 I use a csv file from the data extracted in the past by the Chartbook team. See https://docs.google.com/spreadsheets/d/1g8gGUHRye1L7hEu3HqYgM56RvjHrc3LD85kBwRZcYj4/edit?gid=1888715824#gid=1888715824
 After creating the file, run
-    python snapshots/chartbook/2024-08-19/becker_1997_germany.py --path-to-file <path-to-file>
+    etls chartbook/2024-08-19/becker_1997_germany --path-to-file <path-to-file>
 """
 
 from pathlib import Path

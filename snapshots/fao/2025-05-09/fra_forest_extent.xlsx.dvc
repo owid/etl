@@ -1,0 +1,24 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: Global Forest Resources Assessment
+    description: |-
+      FRA 2020 examines the status of, and trends in, more than 60 forest-related variables in 236 countries and territories in the period 1990–2020.
+
+      The information provided by FRA presents a comprehensive view of the world’s forests and the ways in which the resource is changing. Such a clear global picture supports the development of sound policies, practices and investments affecting forests and forestry.
+    citation_full: |-
+      FAO. 2020. Global Forest Resources Assessment 2020: Main report. Rome.
+      https://doi.org/10.4060/ca9825en
+    attribution_short: FAO
+    url_main: https://fra-data.fao.org/assessments/fra/2020/WO/data-download
+    url_download: |-
+      https://fra-data.fao.org/api/file/data-download?assessmentName=fra&cycleName=2020&countryIso=WO&fileName=1_Forest_extent_characteristics_and_changes&fileType=xlsx&language=en
+    date_accessed: '2025-05-09'
+    date_published: '2020-07-21'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: a079d54fbae38ea9107d44d1e289583d
+    size: 910275
+    path: fra_forest_extent.xlsx

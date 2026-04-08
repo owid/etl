@@ -1,20 +1,29 @@
 import copy
+import datetime as dt
 import re
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Set
 
 import click
+import pandas as pd
 import structlog
 from rich import print
 from rich_click.rich_command import RichCommand
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
-from apps.owidbot import github_utils as gh_utils
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader, configs_are_equal
+from apps.wizard.app_pages.chart_diff.chart_diff import (
+    ChartDiff,
+    ChartDiffsLoader,
+    configs_are_equal,
+    get_deleted_charts,
+    tags_are_equal,
+)
 from apps.wizard.utils import get_staging_creation_time
 from etl import config
 from etl.config import OWIDEnv, get_container_name
 from etl.datadiff import _dict_diff
+from etl.git_api_helpers import GithubApiRepo
 from etl.grapher import model as gm
 from etl.slack_helpers import send_slack_message
 
@@ -49,6 +58,24 @@ log = structlog.get_logger()
     type=bool,
     help="Do not write to target database.",
 )
+@click.option(
+    "--ignore-conflicts/--no-ignore-conflicts",
+    default=False,
+    type=bool,
+    help="Sync approved charts even when conflicts are detected. Useful when syncing between staging servers.",
+)
+@click.option(
+    "--archive/--no-archive",
+    default=True,
+    type=bool,
+    help="Archive datasets in target that have no charts using their indicators.",
+)
+@click.option(
+    "--skip-errors/--no-skip-errors",
+    default=False,
+    type=bool,
+    help="Skip charts that fail during sync instead of aborting. Errors are logged.",
+)
 def cli(
     source: str,
     target: str,
@@ -56,7 +83,11 @@ def cli(
     include: Optional[str],
     exclude: Optional[str],
     dry_run: bool,
+    ignore_conflicts: bool,
+    archive: bool,
+    skip_errors: bool,
 ) -> None:
+    # TODO: keep this docstring in sync with apps/wizard/app_pages/chart_diff/app.py
     """Sync Grapher charts and revisions from an environment to the main environment.
 
     It syncs the charts and revisions from `SOURCE` to `TARGET`. This is especially useful for syncing work from staging servers to production.
@@ -71,10 +102,11 @@ def cli(
     - You get a notification if the chart **_has been modified on live_** after staging server was created.
     - If the chart is pending in chart-diff, you'll get a warning and Slack notification
     - Deleted charts are **_not synced_**.
+    - Use `--ignore-conflicts` to sync approved charts ignoring conflicts. Useful when syncing between staging servers.
 
     **Considerations on tags:**
 
-    - Tags are synced only for **_new charts_**, any edits to tags in existing charts are ignored.
+    - Tags are synced for both **_new and existing charts_**.
 
     **Example 1:** Run chart-sync in dry-run mode to see what charts will be updated
 
@@ -93,26 +125,62 @@ def cli(
     ```
     etl chart-sync staging-site-my-branch .env.prod.write --chart-id 123 --dry-run
     ```
+
+    **Example 4:** Ignore conflicts when syncing between staging servers (useful if conflicts with master have already been dealt with in a subbranch server)
+
+    ```
+    etl chart-sync staging-site-my-subbranch staging-site-baseline-branch --ignore-conflicts --dry-run
+    ```
+
+    **Example 5:** Archive datasets that have no charts (dry-run)
+
+    ```
+    etl chart-sync staging-site-my-branch .env.prod.write --archive --dry-run
+    ```
+
+    **Considerations on archiving:**
+
+    - Use `--archive` to automatically archive datasets in TARGET that have no charts using their indicators.
+    - Only datasets that were part of the synced charts are considered for archiving.
+    - Datasets are only archived if the corresponding ETL dataset is in the archive DAG (not in the active DAG).
+    - Archived datasets are not deleted, just marked as archived.
     """
     if _is_commit_sha(source):
-        source = gh_utils.get_git_branch_from_commit_sha(source)
+        repo = GithubApiRepo(repo_name="etl")
+        source = repo.get_git_branch_from_commit_sha(source)
         log.info("chart_sync.use_branch", branch=source)
 
-    source_engine = OWIDEnv.from_staging_or_env_file(source).get_engine()
+    source_env = OWIDEnv.from_staging_or_env_file(source)
+    source_engine = source_env.get_engine()
     target_env = OWIDEnv.from_staging_or_env_file(target)
     target_engine = target_env.get_engine()
 
+    # Safety warning when using ignore-conflicts flag
+    if ignore_conflicts:
+        log.warning(
+            "chart_sync.ignore_conflicts_enabled",
+            message="Ignore-conflicts flag is enabled. Approved charts will be synced even if conflicts are detected.",
+        )
+
     # go through Admin API as creating / updating chart has side effects like
     # adding entries to chart_dimensions. We can't directly update it in MySQL
-    target_api: AdminAPI = AdminAPI(target_env) if not dry_run else None  # type: ignore
+    # We need source_api to fetch narrative chart merged configs, and target_api to update
+    source_api = AdminAPI(source_env)
+    target_api = AdminAPI(target_env)
 
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
             # Get all chart diffs between source and target
             # NOTE: We're creating two paris of sessions here, it'd be nicer to only create a single one
-            cd_loader = ChartDiffsLoader(source_engine, target_engine)
+            cd_loader = ChartDiffsLoader(source_engine, target_engine, chart_ids=[chart_id] if chart_id else None)
             chart_diffs = cd_loader.get_diffs(
-                config=True, metadata=False, data=False, source_session=source_session, target_session=target_session
+                config=True,
+                tags=True,
+                metadata=False,
+                data=False,
+                source_session=source_session,
+                target_session=target_session,
+                ignore_conflicts=ignore_conflicts,
             )
 
             if chart_id:
@@ -125,116 +193,189 @@ def cli(
             log.info("chart_sync.start", n=len(chart_diffs), chart_ids=chart_ids)
 
             charts_synced = 0
+            dods_synced = 0
+            narrative_charts_synced = 0
+            synced_chart_ids: Set[int] = set()  # Track synced chart IDs for narrative chart sync
+            # Collect ALL target dataset IDs from charts being processed BEFORE syncing.
+            # This captures old dataset IDs that may become orphaned after sync.
+            if archive and chart_ids:
+                result = target_session.execute(
+                    select(gm.Variable.datasetId)
+                    .distinct()
+                    .join(gm.ChartDimensions, gm.ChartDimensions.variableId == gm.Variable.id)
+                    .where(gm.ChartDimensions.chartId.in_(chart_ids), gm.Variable.datasetId.isnot(None))
+                )
+                synced_dataset_ids: Set[int] = {row[0] for row in result}
+            else:
+                synced_dataset_ids: Set[int] = set()
 
             # Iterate over all chart diffs
+            failed_charts = []
             for diff in chart_diffs:
                 chart_slug = diff.slug
                 chart_id = diff.source_chart.id
 
-                # Fix charts with non-existing map column slugs. We should ideally fix this
-                # for all charts and make sure it doesn't happen.
-                diff.source_chart.remove_nonexisting_map_column_slug(source_session)
+                try:
+                    # Fix charts with non-existing map column slugs. We should ideally fix this
+                    # for all charts and make sure it doesn't happen.
+                    diff.source_chart.remove_nonexisting_map_column_slug(source_session)
 
-                # Exclude charts with variables whose catalogPath matches the provided string
-                if not _matches_include_exclude(diff.source_chart, source_session, include, exclude):
-                    log.info(
-                        "chart_sync.skip",
-                        slug=chart_slug,
-                        reason="filtered by --include/--exclude",
-                        chart_id=chart_id,
-                    )
-                    continue
-
-                # Rejected diffs are skipped
-                if diff.is_rejected:
-                    log.info(
-                        "chart_sync.is_rejected",
-                        slug=chart_slug,
-                        chart_id=chart_id,
-                    )
-                    continue
-
-                # Map variable IDs from source to target
-                migrated_config = diff.source_chart.migrate_config(source_session, target_session)
-
-                # Get user who edited the chart
-                user_id = diff.source_chart.lastEditedByUserId
-
-                # Chart in target exists, update it
-                if diff.target_chart:
-                    # Configs are equal, no need to update
-                    if configs_are_equal(migrated_config, diff.target_chart.config):
+                    # Exclude charts with variables whose catalogPath matches the provided string
+                    if not _matches_include_exclude(diff.source_chart, source_session, include, exclude):
                         log.info(
                             "chart_sync.skip",
-                            slug=diff.target_chart.slug,
-                            reason="identical chart already exists",
+                            slug=chart_slug,
+                            reason="filtered by --include/--exclude",
                             chart_id=chart_id,
                         )
                         continue
 
-                    # Change has been approved, update the chart
-                    if diff.is_approved:
-                        log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
-                        charts_synced += 1
-                        if not dry_run:
-                            target_api.update_chart(chart_id, migrated_config, user_id=user_id)
-
-                    # Rejected chart diff
-                    elif diff.is_rejected:
-                        raise ValueError("Rejected chart diff should have been skipped")
-
-                    # Pending chart, notify us about it
-                    elif diff.is_pending:
-                        log.warning(
-                            "chart_sync.pending_chart",
-                            slug=chart_slug,
-                            chart_id=chart_id,
-                            source_updatedAt=str(diff.source_chart.updatedAt),
-                            target_updatedAt=str(diff.target_chart.updatedAt),
-                            staging_created_at=SERVER_CREATION_TIME,
-                        )
-                        _notify_slack_chart_update(chart_id, str(source), diff, dry_run)
-                    else:
-                        raise ValueError("Invalid chart diff state")
-
-                # Chart is new, create it
-                else:
-                    chart_tags = diff.source_chart.tags(source_session)
-
-                    # New chart has been approved
-                    if diff.is_approved:
-                        charts_synced += 1
-                        if not dry_run:
-                            resp = target_api.create_chart(migrated_config, user_id=user_id)
-                            target_api.set_tags(resp["chartId"], chart_tags, user_id=user_id)
-                        else:
-                            resp = {"chartId": None}
+                    # Rejected diffs are skipped
+                    if diff.is_rejected:
                         log.info(
-                            "chart_sync.create_chart",
-                            published=migrated_config.get("isPublished"),
-                            slug=chart_slug,
-                            new_chart_id=resp["chartId"],
-                        )
-                    # Rejected chart diff
-                    elif diff.is_rejected:
-                        raise ValueError("Rejected chart diff should have been skipped")
-
-                    # Not approved, create the chart, but notify us about it
-                    elif diff.is_pending:
-                        log.warning(
-                            "chart_sync.new_unapproved_chart",
+                            "chart_sync.is_rejected",
                             slug=chart_slug,
                             chart_id=chart_id,
                         )
-                        _notify_slack_chart_create(chart_id, str(source), dry_run)
+                        continue
 
+                    # Map variable IDs from source to target
+                    migrated_config = diff.source_chart.migrate_config(source_session, target_session)
+
+                    # Get user who edited the chart
+                    user_id = diff.source_chart.lastEditedByUserId
+
+                    # Get source chart tags (needed for both new and existing charts)
+                    source_tags = diff.source_chart.tags(source_session)
+
+                    # Chart in target exists, update it
+                    if diff.target_chart:
+                        # Check if configs and tags are equal
+                        target_tags = diff.target_chart.tags(target_session)
+                        configs_equal = configs_are_equal(migrated_config, diff.target_chart.config)
+                        tags_equal = tags_are_equal(source_tags, target_tags)
+
+                        # Skip if both configs and tags are equal
+                        if configs_equal and tags_equal:
+                            log.info(
+                                "chart_sync.skip",
+                                slug=diff.target_chart.slug,
+                                reason="identical chart already exists",
+                                chart_id=chart_id,
+                            )
+                            continue
+
+                        # Change has been approved, update the chart
+                        if diff.is_approved:
+                            log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
+                            charts_synced += 1
+                            synced_chart_ids.add(chart_id)
+                            if not dry_run:
+                                target_api.update_chart(chart_id, migrated_config, user_id=user_id)
+                                target_api.set_tags(chart_id, source_tags, user_id=user_id)
+
+                        # Rejected chart diff
+                        elif diff.is_rejected:
+                            raise ValueError("Rejected chart diff should have been skipped")
+
+                        # Pending chart, notify us about it
+                        elif diff.is_pending:
+                            log.warning(
+                                "chart_sync.pending_chart",
+                                slug=chart_slug,
+                                chart_id=chart_id,
+                                source_updatedAt=str(diff.source_chart.updatedAt),
+                                target_updatedAt=str(diff.target_chart.updatedAt),
+                                staging_created_at=SERVER_CREATION_TIME,
+                            )
+                            _notify_slack_chart_update(chart_id, str(source), diff, dry_run)
+                        else:
+                            raise ValueError("Invalid chart diff state")
+
+                    # Chart is new, create it
                     else:
-                        raise ValueError("Invalid chart diff state")
+                        # New chart has been approved
+                        if diff.is_approved:
+                            charts_synced += 1
+                            synced_chart_ids.add(chart_id)
+                            # Note: New charts don't have old datasets to archive, so no dataset IDs collected
+                            if not dry_run:
+                                resp = target_api.create_chart(migrated_config, user_id=user_id)
+                                target_api.set_tags(resp["chartId"], source_tags, user_id=user_id)
+                            else:
+                                resp = {"chartId": None}
+                            log.info(
+                                "chart_sync.create_chart",
+                                published=migrated_config.get("isPublished"),
+                                slug=chart_slug,
+                                new_chart_id=resp["chartId"],
+                            )
+                        # Rejected chart diff
+                        elif diff.is_rejected:
+                            raise ValueError("Rejected chart diff should have been skipped")
+
+                        # Not approved, create the chart, but notify us about it
+                        elif diff.is_pending:
+                            log.warning(
+                                "chart_sync.new_unapproved_chart",
+                                slug=chart_slug,
+                                chart_id=chart_id,
+                            )
+                            _notify_slack_chart_create(chart_id, str(source), dry_run)
+
+                        else:
+                            raise ValueError("Invalid chart diff state")
+
+                except Exception as e:
+                    if not skip_errors:
+                        raise
+                    log.error(
+                        "chart_sync.chart_error",
+                        slug=chart_slug,
+                        chart_id=chart_id,
+                        error=str(e),
+                    )
+                    failed_charts.append(chart_id)
+
+            if failed_charts:
+                log.error("chart_sync.failed_charts", chart_ids=failed_charts, count=len(failed_charts))
+
+            # Sync narrative charts for the synced parent charts
+            narrative_charts_synced = _sync_narrative_charts(
+                synced_chart_ids, source_session, target_session, source_api, target_api, dry_run
+            )
+
+            # Sync DoDs
+            dods_synced = _sync_dods(source_session, target_session, target_api, dry_run, SERVER_CREATION_TIME)
+
+            # Archive datasets without charts if requested
+            datasets_archived = 0
+            if archive and synced_dataset_ids:
+                # Refresh session to see chart_dimensions changes made via Admin API
+                # (MySQL REPEATABLE READ keeps a snapshot from transaction start)
+                target_session.commit()
+                datasets_archived = _archive_datasets_without_charts(
+                    target_session, target_api, synced_dataset_ids, str(source), dry_run
+                )
+
+            # Check for deleted charts and notify
+            deleted_charts = get_deleted_charts(source_session, target_session)
+            if deleted_charts:
+                log.info(
+                    "chart_sync.deleted_charts", count=len(deleted_charts), chart_ids=[c["id"] for c in deleted_charts]
+                )
+                _notify_slack_deleted_charts(deleted_charts, str(source), dry_run)
 
     if charts_synced > 0:
         print(f"\n[bold green]Charts synced: {charts_synced}[/bold green]")
-    else:
-        print("\n[bold green]No charts synced[/bold green]")
+    if narrative_charts_synced > 0:
+        print(f"[bold green]Narrative charts synced: {narrative_charts_synced}[/bold green]")
+    if dods_synced > 0:
+        print(f"[bold green]DoDs synced: {dods_synced}[/bold green]")
+    if datasets_archived > 0:
+        print(f"[bold green]Datasets archived: {datasets_archived}[/bold green]")
+    if charts_synced == 0 and narrative_charts_synced == 0 and dods_synced == 0 and datasets_archived == 0:
+        print("\n[bold green]No charts, narrative charts, DoDs, or datasets need to be synced[/bold green]")
 
 
 def _is_commit_sha(source: str) -> bool:
@@ -265,6 +406,76 @@ def _notify_slack_chart_create(source_chart_id: int, source: str, dry_run: bool)
     message = f"""
 :warning: *ETL chart-sync: Pending New Chart Not Synced* from `{source}`
 <http://{get_container_name(source)}/admin/charts/{source_chart_id}/edit|View Staging Chart>
+    """.strip()
+
+    print(message)
+
+    if config.SLACK_API_TOKEN and not dry_run:
+        send_slack_message(channel="#data-architecture-github", message=message)
+
+
+def _notify_slack_dod_conflict(
+    dod_name: str, source: str, source_updated_at: Any, target_updated_at: Any, server_creation_time: Any, dry_run: bool
+) -> None:
+    message = f"""
+:warning: *ETL chart-sync: DoD Conflict Not Synced* from `{source}`
+DoD "{dod_name}" has been updated in production after staging server was created.
+*Staging Updated*: {str(source_updated_at)} UTC
+*Production Updated*: {str(target_updated_at)} UTC
+*Staging Created*: {str(server_creation_time)} UTC
+    """.strip()
+
+    print(message)
+
+    if config.SLACK_API_TOKEN and not dry_run:
+        send_slack_message(channel="#data-architecture-github", message=message)
+
+
+def _notify_slack_deleted_charts(deleted_charts: list[dict], source: str, dry_run: bool) -> None:
+    """Notify about deleted charts via Slack."""
+    chart_count = len(deleted_charts)
+    chart_word = "chart" if chart_count == 1 else "charts"
+
+    # Build list of deleted charts for the message
+    chart_list = "\n".join(
+        [
+            f"• Chart {chart['id']}: `{chart['slug']}` - <https://admin.owid.io/admin/charts/{chart['id']}/edit|View on Production>"
+            for chart in deleted_charts
+        ]
+    )
+
+    message = f"""
+:warning: *ETL chart-sync: {chart_count} Deleted {chart_word.title()} Detected* from `{source}`
+
+The following {chart_word} exist(s) in production but not in staging and may have been deleted:
+
+{chart_list}
+
+chart-sync doesn't delete charts. Make sure to delete them from production if this was intentional.
+    """.strip()
+
+    print(message)
+
+    if config.SLACK_API_TOKEN and not dry_run:
+        send_slack_message(channel="#data-architecture-github", message=message)
+
+
+def _notify_slack_archived_datasets(archived_datasets: list[dict], source: str, dry_run: bool) -> None:
+    """Notify about archived datasets via Slack."""
+    dataset_count = len(archived_datasets)
+    dataset_word = "dataset" if dataset_count == 1 else "datasets"
+
+    # Build list of archived datasets for the message
+    dataset_list = "\n".join(
+        [f"• Dataset {ds['id']}: `{ds['name']}` ({ds['catalogPath'] or 'no catalog path'})" for ds in archived_datasets]
+    )
+
+    message = f"""
+:file_folder: *ETL chart-sync: {dataset_count} {dataset_word.title()} Archived* from `{source}`
+
+The following {dataset_word} had no charts using their indicators and {"was" if dataset_count == 1 else "were"} archived:
+
+{dataset_list}
     """.strip()
 
     print(message)
@@ -308,6 +519,232 @@ def _chart_config_diff(
     return _dict_diff(
         _prune_chart_config(source_config), _prune_chart_config(target_config), tabs=tabs, color=color, width=500
     )
+
+
+def _sync_narrative_charts(
+    synced_chart_ids: Set[int],
+    source_session: Session,
+    target_session: Session,
+    source_api: AdminAPI,
+    target_api: AdminAPI,
+    dry_run: bool,
+) -> int:
+    """Sync narrative charts for the given synced parent chart IDs.
+
+    When a chart is synced, we also sync all its child narrative charts.
+    Narrative charts are matched by ID between environments.
+
+    The sync process:
+    1. Fetch the merged config from source via Admin API
+    2. Remap variable IDs from source to target using catalog paths
+    3. PUT the migrated merged config to target - backend recalculates the patch
+    """
+    if not synced_chart_ids:
+        return 0
+
+    narrative_charts_synced = 0
+
+    # Get all narrative charts that have the synced charts as parents
+    source_narrative_charts = gm.NarrativeChart.load_narrative_charts_by_parent_chart_ids(
+        source_session, synced_chart_ids
+    )
+
+    if not source_narrative_charts:
+        return 0
+
+    log.info(
+        "narrative_chart_sync.start",
+        n=len(source_narrative_charts),
+        narrative_chart_ids=[nc.id for nc in source_narrative_charts],
+    )
+
+    for source_nc in source_narrative_charts:
+        # Check if narrative chart exists in target by ID
+        target_nc = target_session.get(gm.NarrativeChart, source_nc.id)
+
+        if not target_nc:
+            # Narrative chart doesn't exist in target - this is expected if it's new
+            # We cannot create narrative charts via API currently, just log a warning
+            log.warning(
+                "narrative_chart_sync.new_chart_skipped",
+                name=source_nc.name,
+                narrative_chart_id=source_nc.id,
+                reason="creating new narrative charts not supported yet",
+            )
+            continue
+
+        # Fetch full config from source API (full config = parent + patch merged)
+        source_response = source_api.get_narrative_chart(source_nc.id)
+        source_full_config = source_response["configFull"]
+
+        # Migrate the full config (remap variable IDs from source to target)
+        migrated_config = source_nc.migrate_merged_config(source_full_config, source_session, target_session)
+
+        # For comparison, get target's full config via API
+        target_response = target_api.get_narrative_chart(target_nc.id)
+        target_full_config = target_response["configFull"]
+
+        if migrated_config == target_full_config:
+            log.info(
+                "narrative_chart_sync.skip",
+                name=source_nc.name,
+                reason="identical config already exists",
+            )
+            continue
+
+        log.info(
+            "narrative_chart_sync.update",
+            name=source_nc.name,
+            narrative_chart_id=source_nc.id,
+        )
+        narrative_charts_synced += 1
+
+        if not dry_run:
+            # PUT the full migrated config - backend will recalculate the patch
+            target_api.update_narrative_chart(
+                target_nc.id,
+                migrated_config,
+                user_id=source_nc.lastEditedByUserId,
+            )
+
+    return narrative_charts_synced
+
+
+def _sync_dods(
+    source_session: Session,
+    target_session: Session,
+    target_api: AdminAPI | None,
+    dry_run: bool,
+    server_creation_time: Any,
+) -> int:
+    """Sync DoDs from source to target."""
+    dods_synced = 0
+
+    # DoDs were added on 2025-05-16
+    server_creation_time = max(server_creation_time, pd.to_datetime(dt.date(2025, 5, 18)))
+
+    # Get DoDs from source with updatedAt timestamp higher than staging server creation time
+    source_dods = source_session.query(gm.DoD).filter(gm.DoD.updatedAt > server_creation_time).all()
+
+    log.info("dod_sync.start", n=len(source_dods), dod_ids=[dod.id for dod in source_dods])
+
+    for source_dod in source_dods:
+        # Check if DoD exists in target
+        target_dod = target_session.query(gm.DoD).filter(gm.DoD.name == source_dod.name).first()
+
+        if target_dod:
+            # First check if content matches - if yes, no need to sync
+            if source_dod.content == target_dod.content and source_dod.updatedAt <= target_dod.updatedAt:
+                log.info("dod_sync.skip", name=source_dod.name, reason="no changes detected")
+                continue
+
+            # Content differs, check if target DoD was updated after staging server creation time
+            if target_dod.updatedAt > server_creation_time:
+                log.warning(
+                    "dod_sync.production_conflict",
+                    name=source_dod.name,
+                    dod_id=source_dod.id,
+                    source_updatedAt=str(source_dod.updatedAt),
+                    target_updatedAt=str(target_dod.updatedAt),
+                    staging_created_at=str(server_creation_time),
+                )
+                _notify_slack_dod_conflict(
+                    source_dod.name,
+                    str(source_session.bind.url).split("@")[-1],  # type: ignore
+                    source_dod.updatedAt,
+                    target_dod.updatedAt,
+                    server_creation_time,
+                    dry_run,
+                )
+                continue
+
+            # DoD exists and needs updating (no conflict)
+            log.info("dod_sync.update", name=source_dod.name, dod_id=source_dod.id)
+            dods_synced += 1
+
+            if not dry_run and target_api:
+                target_api.update_dod(target_dod.id, source_dod.content, source_dod.lastUpdatedUserId)
+        else:
+            # DoD doesn't exist, create it
+            log.info("dod_sync.create", name=source_dod.name, dod_id=source_dod.id)
+            dods_synced += 1
+
+            if not dry_run and target_api:
+                target_api.create_dod(source_dod.name, source_dod.content, source_dod.lastUpdatedUserId)
+
+    return dods_synced
+
+
+def _archive_datasets_without_charts(
+    target_session: Session,
+    target_api: AdminAPI,
+    dataset_ids: Set[int],
+    source: str,
+    dry_run: bool,
+) -> int:
+    """Archive datasets in target that have no charts using their indicators.
+
+    Only archives datasets that:
+    - Are in the provided dataset_ids set (from synced charts)
+    - Are not already archived
+    - Have no charts using any of their variables in TARGET
+    - Have their corresponding ETL dataset in the archive DAG
+    """
+    if not dataset_ids:
+        return 0
+
+    # Load the active and archive DAGs to check if datasets are archived in ETL
+    from etl import paths
+    from etl.dag_helpers import load_dag
+
+    # Load both DAGs - archive DAG includes active steps via includes
+    archive_dag = load_dag(paths.DAG_ARCHIVE_FILE)
+    archive_dag_steps = set(archive_dag.keys())
+    active_dag = load_dag(paths.DAG_FILE)
+    active_dag_steps = set(active_dag.keys())
+
+    datasets_archived = 0
+    archived_datasets_info: list[dict] = []
+
+    # Find datasets that have no charts using their indicators
+    datasets_without_charts = gm.Dataset.load_datasets_without_charts(target_session, list(dataset_ids))
+
+    if not datasets_without_charts:
+        log.info("archive_datasets.none_found")
+        return 0
+
+    log.info("archive_datasets.start", n=len(datasets_without_charts))
+
+    for dataset in datasets_without_charts:
+        # Check if the dataset is in the archive DAG using step_uri property
+        step_uri = dataset.step_uri
+        if step_uri:
+            # Check if this step exists ONLY in the archive DAG (not in active DAG)
+            is_in_archive_only = step_uri in archive_dag_steps and step_uri not in active_dag_steps
+
+            if not is_in_archive_only:
+                log.info(
+                    "archive_datasets.skip_not_in_archive_dag",
+                    dataset_id=dataset.id,
+                    name=dataset.name,
+                    catalog_path=dataset.catalogPath,
+                    step_uri=step_uri,
+                )
+                continue
+        # else: no catalogPath — legacy dataset, safe to archive if it has no charts
+
+        log.info("archive_datasets.archive", dataset_id=dataset.id, name=dataset.name, catalog_path=dataset.catalogPath)
+        datasets_archived += 1
+        archived_datasets_info.append({"id": dataset.id, "name": dataset.name, "catalogPath": dataset.catalogPath})
+
+        if not dry_run:
+            target_api.set_dataset_archived(dataset.id, is_archived=True)
+
+    # Send Slack notification about archived datasets
+    if archived_datasets_info:
+        _notify_slack_archived_datasets(archived_datasets_info, source, dry_run)
+
+    return datasets_archived
 
 
 if __name__ == "__main__":

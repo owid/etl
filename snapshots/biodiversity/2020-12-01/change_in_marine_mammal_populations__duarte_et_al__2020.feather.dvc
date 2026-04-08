@@ -1,0 +1,20 @@
+meta:
+  source:
+    name: Duarte et al. (2020). Rebuilding marine life. Nature.
+    description: |-
+      Duarte et al. (2020) compiled the share of marine mammal populations increasing, decreasing or showing no change across the world's oceans based on original studies from Lortze et al. (2017); and Magera et al. (2013).
+
+      Lotze, H. K., Mills Flemming, J., Magera, A. Critical factors to marine mammal recovery. Conservation Biology 31, 1301-1311 (2017).
+
+      Magera, A. M. et al. Recovery trends in marine mammal populations. PLoS ONE 8(10): e77908 (2013).
+    url: https://www.nature.com/articles/s41586-020-2146-7
+    date_accessed: 2026-03-06
+    published_by: |-
+      Duarte, C. M., Agusti, S., Barbier, E., Britten, G. L., Castilla, J. C., Gattuso, J. P., ... & Worm, B. (2020). Rebuilding marine life. Nature, 580(7801), 39-51.
+  name: Change in marine mammal populations (Duarte et al. 2020)
+  description: ''
+  is_public: false
+outs:
+  - md5: a00393e3bc008353da0f0891f040a6be
+    size: 4570
+    path: change_in_marine_mammal_populations__duarte_et_al__2020.feather

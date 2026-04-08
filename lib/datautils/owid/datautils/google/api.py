@@ -26,26 +26,27 @@ class GoogleApi:
         To obtain `client_secrets_file`, follow the instructions from:
         https://medium.com/analytics-vidhya/how-to-connect-google-drive-to-python-using-pydrive-9681b2a14f20
 
-        IMPORTANT:
+        Note:
             - Additionally, make sure to add yourself in Test users, as noted in:
               https://stackoverflow.com/questions/65980758/pydrive-quickstart-and-error-403-access-denied
             - Select Desktop App instead of Web Application as the application type.
 
-        Parameters
-        ----------
-        clients_secrets_file : str, optional
-            Path to client_secrets file.
+        Args:
+            clients_secrets_file: Path to client_secrets file.
 
-        Examples
-        --------
-        First time calling the function should look similar to:
+        Example:
+            First time calling the function should look similar to:
 
-        >>> from owid.datautils.google.api import GoogleApi
-        >>> api = GoogleApi("path/to/credentials.json")
+            ```python
+            from owid.datautils.google.api import GoogleApi
+            api = GoogleApi("path/to/credentials.json")
+            ```
 
-        New calls can then be made as follows:
+            New calls can then be made as follows:
 
-        >>> api = GoogleApi()
+            ```python
+            api = GoogleApi()
+            ```
         """
         if not is_google_config_init():
             if not clients_secrets_file:
@@ -62,14 +63,10 @@ class GoogleApi:
 
         The folderm must be public, otherwise this function won't work.
 
-        Parameters
-        ----------
-        url : str
-            URL to the folder on Google Drive (must be public).
-        output : str
-            Local path to save the downloaded folder.
-        quiet: bool, optional
-            Suppress terminal output. Default is False.
+        Args:
+            url: URL to the folder on Google Drive (must be public).
+            output: Local path to save the downloaded folder.
+            quiet: Suppress terminal output. Default is False.
         """
         gdown.download_folder(url, output=output, quiet=quiet, use_cookies=False, **kwargs)
 
@@ -86,21 +83,14 @@ class GoogleApi:
 
         The file must be public, otherwise this function won't work.
 
-        Parameters
-        ----------
-        output : str
-            Local path to save the downloaded file.
-        url : str, optional
-            URL to the file on Google Drive (it must be public), by default None
-        file_id : str, optional
-            ID of the file on Google Drive (the file must be public), by default None.
-        quiet: bool, optional
-            Suppress terminal output. Default is False.
+        Args:
+            output: Local path to save the downloaded file.
+            url: URL to the file on Google Drive (it must be public), by default None
+            file_id: ID of the file on Google Drive (the file must be public), by default None.
+            quiet: Suppress terminal output. Default is False.
 
-        Raises
-        ------
-        ValueError
-            If neither `url` nor `id` are provided.
+        Raises:
+            ValueError: If neither `url` nor `id` are provided.
         """
         if url:
             gdown.download(url=url, output=output, fuzzy=True, quiet=quiet, **kwargs)
@@ -120,15 +110,11 @@ class GoogleApi:
     def list_files(self, parent_id: str) -> GoogleDriveFileList:
         """List files in a Google Drive folder.
 
-        Parameters
-        ----------
-        parent_id : str
-            Google Drive folder ID.
+        Args:
+            parent_id: Google Drive folder ID.
 
-        Returns
-        -------
-        List
-            Files
+        Returns:
+            List of files in the folder.
         """
         request = f"'{parent_id}' in parents and trashed=false"
         # Get list of files

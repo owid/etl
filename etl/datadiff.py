@@ -13,8 +13,9 @@ import requests
 import rich
 import rich_click as click
 import structlog
-from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Table, VariableMeta, find
-from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
+from owid.catalog import Dataset, DatasetMeta, Table, VariableMeta, fetch
+from owid.catalog.api.legacy import CHANNEL, ETLCatalog, LocalCatalog
+from owid.catalog.api.utils import DEFAULT_CATALOG_URL
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
@@ -22,6 +23,8 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 
 from etl.dag_helpers import load_dag
 from etl.files import yaml_dump
+from etl.git_helpers import get_changed_files
+from etl.io import get_all_changed_catalog_paths
 from etl.tempcompare import series_equals
 
 log = structlog.get_logger()
@@ -43,12 +46,14 @@ class DatasetDiff:
         tables: Optional[str] = None,
         print: Callable = rich.print,
         snippet: bool = False,
+        country: Optional[str] = None,
     ):
         """
         :param cols: Only compare columns matching pattern
         :param tables: Only compare tables matching pattern
         :param print: Function to print the diff summary. Defaults to rich.print.
         :param snippet: Print snippet for loading both tables
+        :param country: Filter tables by country if it is in the index
         """
         assert ds_a or ds_b, "At least one Dataset must be provided"
         self.ds_a = ds_a
@@ -58,6 +63,17 @@ class DatasetDiff:
         self.cols = cols
         self.tables = tables
         self.snippet = snippet
+        self.country = country
+
+    def _filter_table_by_country(self, table: Table) -> Table:
+        """Filter table by country if country is in the index."""
+        if "country" in table.index.names:
+            country_mask = table.index.get_level_values("country") == self.country
+            return table.loc[country_mask].copy()
+        elif "entity" in table.index.names:
+            country_mask = table.index.get_level_values("entity") == self.country
+            return table.loc[country_mask].copy()
+        return table
 
     def _diff_datasets(self, ds_a: Optional[Dataset], ds_b: Optional[Dataset]):
         if ds_a and ds_b:
@@ -89,12 +105,12 @@ class DatasetDiff:
         def _snippet_dataset(ds: Dataset, table_name: str) -> str:
             m = ds.metadata
             if isinstance(ds, RemoteDataset):
-                return f'RemoteCatalog(channels=["{m.channel}"]).find_one(table="{table_name}", dataset="{m.short_name}", version="{m.version}", namespace="{m.namespace}", channel="{m.channel}")'
+                return f'ETLCatalog(channels=["{m.channel}"]).find_one(table="{table_name}", dataset="{m.short_name}", version="{m.version}", namespace="{m.namespace}", channel="{m.channel}")'
             else:
                 return f'Dataset(DATA_DIR / "{m.uri}")["{table_name}"]'
 
         code = f"""
-from owid.catalog import RemoteCatalog, Dataset
+from owid.catalog import ETLCatalog, Dataset
 from etl.paths import DATA_DIR
 
 ta = {_snippet_dataset(ds_a, table_name)}
@@ -132,6 +148,11 @@ tb = {_snippet_dataset(ds_b, table_name)}
                 if new_index_cols:
                     table_a = table_a.set_index(new_index_cols)
                     table_b = table_b.set_index(new_index_cols)
+
+            # filter tables by country if specified and country is in the index
+            if self.country:
+                table_a = self._filter_table_by_country(table_a)
+                table_b = self._filter_table_by_country(table_b)
 
             # if using default index, it is possible that we have non-determinstic order
             # try sorting by the first two columns
@@ -216,6 +237,7 @@ tb = {_snippet_dataset(ds_b, table_name)}
                     col_b = table_b[col]
 
                     # sort origins
+                    # NOTE: they're excluded from _column_metadata_dict anyway
                     for tab in (table_a, table_b):
                         tab[col].m.origins = sorted(
                             tab[col].m.origins, key=lambda x: (x.title or "", x.title_snapshot or "")
@@ -273,20 +295,9 @@ class RemoteDataset:
         self.table_names = table_names
 
     def __getitem__(self, name: str) -> Table:
-        tables = find(
-            table=name,
-            namespace=self.metadata.namespace,
-            version=str(self.metadata.version),
-            dataset=self.metadata.short_name,
-            channels=[self.metadata.channel],  # type: ignore
-        )
-
-        tables = tables[tables.channel == self.metadata.channel]  # type: ignore
-
-        # find matches substrings, we have to further filter it
-        tables = tables[tables.table == name]
-
-        return tables.load()
+        tb_uri = f"{self.metadata.channel}/{self.metadata.namespace}/{self.metadata.version}/{self.metadata.short_name}/{name}"
+        tb = fetch(tb_uri)
+        return tb
 
 
 @click.command(name="diff", help=__doc__)
@@ -305,6 +316,11 @@ class RemoteDataset:
     type=click.Choice(CHANNEL.__args__),
     default=["garden", "meadow", "grapher"],
     help="Compare only selected channel (subfolder of data/).",
+)
+@click.option(
+    "--changed",
+    is_flag=True,
+    help="Only compare datasets with changes in git. This can significantly speed it up.",
 )
 @click.option(
     "--include",
@@ -339,6 +355,11 @@ class RemoteDataset:
     help="Print code snippet for loading both tables, useful for debugging in notebook",
 )
 @click.option(
+    "--country",
+    type=str,
+    help="Filter tables by country if it is in the index.",
+)
+@click.option(
     "--workers",
     "-w",
     type=int,
@@ -349,12 +370,14 @@ def cli(
     path_a: str,
     path_b: str,
     channel: Iterable[CHANNEL],
+    changed: bool,
     include: Optional[str],
     cols: Optional[str],
     tables: Optional[str],
     exclude: Optional[str],
     verbose: bool,
     snippet: bool,
+    country: Optional[str],
     workers: int,
 ) -> None:
     """Compare all datasets from two catalogs and print out a summary of their differences.
@@ -373,19 +396,40 @@ def cli(
 
     It uses **source checksums** to find candidates for comparison. Source checksum includes all files used to generate the dataset and should be sufficient to find changed datasets, just note that we're not using checksum of the files themselves. So if you change core ETL code or some of the dependencies, e.g. change in owid-datautils-py, core ETL code or updating library version, the change won't be detected. In cases like these you should increment ETL version which is added to all source checksums (not implemented yet).
 
-    **Example 1:** Compare the remote catalog with a local one
+    **Example 1:** Compare the remote catalog with a local one for changed files
+
+    ```
+    $ etl diff REMOTE data/ --changed
+    ```
+
+    **Example 2:** Compare the remote catalog with a local one
 
     ```
     $ etl diff REMOTE data/ --include maddison
     ```
 
-    **Example 2:** Compare two local catalogs
+    **Example 3:** Compare two local catalogs
 
     ```
     $ etl diff other-data/ data/ --include maddison
     ```
     """
     console = Console(tab_size=2, soft_wrap=True)
+
+    if changed:
+        # Get all changed files in the current git repository
+        files_changed = get_changed_files()
+        catalog_paths = get_all_changed_catalog_paths(files_changed)
+
+        if not catalog_paths:
+            console.print("[green]✅ No differences found[/green]")
+            exit(0)
+
+        # Add those files to `include` regex (use positive look-aheads to match on both)
+        if include:
+            include = rf'(?=.*{include})(?=.*{"|".join(catalog_paths)})'
+        else:
+            include = "|".join(catalog_paths)
 
     path_to_ds_a = _load_catalog_datasets(path_a, channel, include, exclude)
     path_to_ds_b = _load_catalog_datasets(path_b, channel, include, exclude)
@@ -435,6 +479,7 @@ def cli(
                         print=lambda x: lines.append(x),
                         verbose=verbose,
                         snippet=snippet,
+                        country=country,
                     )
                     differ.summary()
                     return lines
@@ -469,7 +514,14 @@ def cli(
 
             try:
                 differ = DatasetDiff(
-                    ds_a, ds_b, tables=tables, cols=cols, print=_append_and_print, verbose=verbose, snippet=snippet
+                    ds_a,
+                    ds_b,
+                    tables=tables,
+                    cols=cols,
+                    print=_append_and_print,
+                    verbose=verbose,
+                    snippet=snippet,
+                    country=country,
                 )
                 differ.summary()
             except DatasetError as e:
@@ -528,6 +580,9 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, co
     lines = difflib.ndiff(meta_a.splitlines(keepends=True), meta_b.splitlines(keepends=True))  # type: ignore
     # do not print lines that are identical
     lines = [line for line in lines if not line.startswith("  ")]
+
+    # do not print ? lines
+    lines = [line for line in lines if not line.strip().startswith("? ")]
 
     # add color
     if color:
@@ -733,6 +788,12 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
     """Extract metadata from Table object, prune and and return it as a dictionary"""
     d = tab.metadata.to_dict()
 
+    # collect unique origins from all columns
+    origins = set()
+    for col in tab.columns:
+        origins.update(tab[col].metadata.origins)
+    d["origins"] = sorted(origins, key=lambda x: (x.title or "", x.title_snapshot or ""))
+
     # add columns
     # d["columns"] = {}
     # for col in tab.columns:
@@ -748,6 +809,10 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
 
 def _column_metadata_dict(meta: VariableMeta) -> Dict[str, Any]:
     d = meta.to_dict()
+
+    # remove origins, they're displayed on table level
+    d.pop("origins", None)
+
     # remove noise
     d.pop("processing_log", None)
     for source in d.get("sources", []):
@@ -808,7 +873,7 @@ def _local_catalog_datasets(
 
 
 def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
-    uri = f"{OWID_CATALOG_URI}{path}/index.json"
+    uri = f"{DEFAULT_CATALOG_URL}{path}/index.json"
     js = requests.get(uri).json()
     # drop origins for backward compatibility
     js.pop("origins", None)
@@ -821,7 +886,7 @@ def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
 
 def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude: Optional[str]) -> Dict[str, Dataset]:
     """Return a mapping from dataset path to Dataset object of remote catalog."""
-    rc = RemoteCatalog(channels=channels)
+    rc = ETLCatalog(channels=channels)
     frame = rc.frame
 
     frame["ds_paths"] = frame["path"].map(os.path.dirname)

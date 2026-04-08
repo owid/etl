@@ -11,6 +11,7 @@ import hashlib
 import os
 import time
 from contextlib import contextmanager
+from functools import cache
 from typing import Any, Dict, Generator, List, Literal, Optional, Tuple
 
 import pandas as pd
@@ -106,7 +107,7 @@ class WizardDB:
                 s.commit()
 
     @classmethod
-    @st.cache_data()
+    @cache
     def get_pr(cls, num_days: int = 7) -> pd.DataFrame:
         """Get PR data from database."""
         data = []
@@ -142,7 +143,7 @@ class WizardDB:
                 s.commit()
 
     @classmethod
-    @st.cache_data()
+    @cache
     def get_news_summary(cls, window_type: WND_LITERAL) -> Tuple[str, str, str] | None:
         """Get nmews (latest) from DB."""
         data = []
@@ -183,8 +184,21 @@ class WizardDB:
         """Add a mapping to TB_VARMAP.
 
         This table should have columns 'id_old' (key), 'id_new' (value), 'timestamp', and 'dataset_id_old' and 'dataset_id_new'.
+
+        If a mapping for an id_old already exists, it will be replaced with the new mapping.
         """
         timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+        # Remove any existing mappings for these id_old values before inserting
+        if mapping and cls.table_exists(TB_VARMAP):
+            id_old_list = list(mapping.keys())
+            placeholders = ", ".join([":id_" + str(i) for i in range(len(id_old_list))])
+            params = {f"id_{i}": id_old for i, id_old in enumerate(id_old_list)}
+            query = f"DELETE FROM {TB_VARMAP} WHERE id_old IN ({placeholders})"
+            engine = get_engine()
+            with Session(engine) as s:
+                s.execute(text(query), params)
+                s.commit()
 
         # Build dataframe
         query_params = [
@@ -239,7 +253,7 @@ class WizardDB:
         query = """
         SELECT *
         FROM information_schema.tables
-        WHERE table_schema = 'owid';
+        WHERE table_schema = DATABASE();
         """
         df = read_sql(query)
         return tb_name in set(df["TABLE_NAME"])

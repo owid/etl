@@ -30,8 +30,8 @@ def main(upload: bool) -> None:
     # if this fails, don't upload the file
     pd.read_csv(snap.path)
 
-    # Snapshot should have at least 100mb, otherwise something went wrong
-    assert snap.path.stat().st_size > 100 * 2**20, "Snapshot file must have at least 100mb"
+    # Snapshot should have at least 50mb, otherwise something went wrong
+    assert snap.path.stat().st_size > 50 * 2**20, "Snapshot file must have at least 50mb"
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)

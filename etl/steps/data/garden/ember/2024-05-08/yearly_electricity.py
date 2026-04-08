@@ -13,7 +13,7 @@ from owid.catalog import Dataset, Table, utils
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialize log.
 log = get_logger()
@@ -358,13 +358,13 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
     return tb_combined
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load dataset from meadow and read its main table.
     ds_meadow = paths.load_dataset("yearly_electricity")
-    tb_meadow = ds_meadow["yearly_electricity"].reset_index()
+    tb_meadow = ds_meadow.read("yearly_electricity")
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")
@@ -468,5 +468,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb_combined])
     ds_garden.save()

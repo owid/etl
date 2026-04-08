@@ -8,13 +8,13 @@ import numpy as np
 import pandas as pd
 import requests
 import streamlit as st
-from owid.catalog import find
+from owid.catalog import fetch
 from owid.datautils.common import ExceptionFromDocstring
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from apps.wizard.utils.components import grapher_chart
-from etl.collections.explorer_legacy import ExplorerLegacy
+from apps.wizard.utils.components import grapher_chart, st_title_with_expert
+from etl.collection.explorer.legacy import ExplorerLegacy
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
 from etl.grapher.model import Entity, Explorer, Variable
@@ -81,9 +81,7 @@ class EqualMinimumAndMaximumValues(ExceptionFromDocstring):
 @st.cache_data
 def load_mappable_regions_and_ids(df: pd.DataFrame) -> Dict[str, int]:
     # Load the external regions dataset.
-    regions = find(
-        "regions", dataset="regions", namespace="owid_grapher", channels=["external"], version="latest"
-    ).load()
+    regions = fetch("external/owid_grapher/latest/regions/regions")
     regions_mappable = regions[regions["is_mappable"]]["name"].tolist()
 
     # List all entity ids used by this variable.
@@ -887,7 +885,7 @@ st.set_page_config(
     page_icon="🪄",
     # initial_sidebar_state="collapsed",
 )
-st.title(":material/map: Map bracketer")
+st_title_with_expert("Map bracketer", icon=":material/map:")
 with st.popover("ℹ️ Learn about it"):
     st.markdown(
         "This tool will find optimal map brackets for a specific variable, and let you manually edit it in a way that is consistent with our guidelines."

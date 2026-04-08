@@ -1,0 +1,22 @@
+meta:
+  source:
+    name: Freedom House, Freedom of the Press (2017)
+    description: |-
+      This dataset provides information on press freedoms, using data from Freedom House's (2017) Freedom of the Press.
+
+      For the years 1979-1987, we use the worse classification across the two dimensions of print and broadcast media.
+
+      For the data covering January 1981 to August 1982 we code the year 1982, and for the data covering August 1982 to November 1983 we code the year 1983.
+
+      We show the data for Czechoslovakia as Czechia, for the USSR as Russia, and for Yugoslavia as Serbia.
+
+      You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/human_rights
+    url: https://freedomhouse.org/sites/default/files/2020-02/FOTP1980-FOTP2017_Public-Data.xlsx
+    date_accessed: 2022-03-08
+    published_by: Freedom House, Freedom of the Press
+  name: Press freedom - Freedom House (2017)
+  description: ''
+outs:
+  - md5: 8aaf9f1d2365cb7b9310928cd3b0c782
+    size: 19786
+    path: press_freedom__freedom_house__2017.feather

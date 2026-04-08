@@ -1,0 +1,82 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  prison_rates:
+    variables:
+      prison_population_total:
+        title: Prison population total
+        description_short: Total prison population including pre-trial detainees and remand prisoners.
+        unit: prisoners
+        display:
+          numDecimalPlaces: 0
+      prison_population_rate:
+        title: Prison population rate
+        description_short: Prison population (including pre-trial detainees and remand prisoners), per 100,000 population.
+        unit: prisoners per 100,000 people
+        display:
+          numDecimalPlaces: 0
+      pretrial_detainees_pct:
+        title: Share of prisoners that are pre-trial detainees
+        description_short: Pre-trial detainees and remand prisoners as a percentage of the total prison population.
+        description_processing: This variable combines data from the main statistics table and time-series data from the further information section. Where time-series data is available, it is used in preference to the main table snapshot.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      female_prisoners_pct:
+        title: Share of prisoners that are female
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      juvenile_prisoners_pct:
+        title: Share of prisoners that are juveniles
+        description_short: The definition of juveniles may vary between countries.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      foreign_prisoners_pct:
+        title: Share of prisoners that are foreigners
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      number_of_institutions:
+        title: Number of institutions
+        unit: institutions
+        display:
+          numDecimalPlaces: 0
+      official_capacity:
+        title: Prison capacity
+        description_short: Total official capacity of prisons, measured as the number of places available for prisoners.
+        unit: places
+        display:
+          numDecimalPlaces: 0
+      occupancy_level_pct:
+        title: Prison capacity percent
+        description_short: Occupancy level of prisons, based on the official capacity; values above 100% indicate that the prison population exceeds official capacity and reflects overcrowding.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      pretrial_remand_number:
+        title: Number of pre-trial/remand prisoners in the prison population
+        unit: prisoners
+        display:
+          numDecimalPlaces: 0
+      pretrial_remand_rate:
+        title: Pre-trial or remand prisoners per 100,000 of population
+        unit: prisoners per 100,000 people
+        display:
+          numDecimalPlaces: 1

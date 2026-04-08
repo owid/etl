@@ -1,0 +1,29 @@
+meta:
+  origin:
+    producer: OECD
+    title: Public finance main indicators - Government at a glance, Yearly updates
+    description: |-
+      This dataset represents a selection of indicators as presented in the 2025 edition of the Government at a Glance publication related to the public finance under the System of national accounts (SNA). Government at a Glance provides a dashboard of indicators assembled to help decision makers and the public analyse and benchmark governments across OECD members and partner countries. With a growing emphasis on governance outcomes, this ninth edition presents the latest evidence on public governance tools and resources that can help public administrations address complex, long-term challenges, while allowing progress to be monitored over time. The Structure and indicators section of the Government at a Glance publication, describes its framework and the structure by chapters.
+
+      The 2025 edition of Government at a Glance presents a structure around three broad categories:
+
+      1) Trust, security and dignity; prosperity and satisfaction with public services;
+      2) Achieving results with good governance practices;
+      3) What resources public institutions use and how are they managed.
+
+      Further information on Government at a Glance 2025 edition via a dedicated web platform, which includes a Government at a Glance Data dashboard (for a selection of indicators in an interactive format) as well as Country fact sheets (key data by country), can be found at: [Government at a Glance website](https://www.oecd.org/en/publications/government-at-a-glance-2025_0efd0bcd-en.html).
+    citation_full: |-
+      OECD (2025). Public finance main indicators - Government at a glance, Yearly updates. OECD Data Explorer, https://data-explorer.oecd.org/.
+    attribution_short: OECD
+    url_main: https://data-explorer.oecd.org/
+    url_download: |-
+      https://sdmx.oecd.org/public/rest/data/OECD.GOV.GIP,DSD_GOV@DF_GOV_PF_YU,1.0/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: '2025-07-10'
+    date_published: '2025-07-10'
+    license:
+      name: OECD Terms and Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: 4bdebe9237f7c66357ca810818a2b172
+    size: 5788667
+    path: govt_glance_public_finance.csv

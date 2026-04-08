@@ -10,7 +10,13 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.related_charts import data, scoring
 from apps.wizard.utils import embeddings as emb
-from apps.wizard.utils.components import st_cache_data, st_horizontal, st_multiselect_wider, url_persist
+from apps.wizard.utils.components import (
+    st_cache_data,
+    st_horizontal,
+    st_multiselect_wider,
+    st_title_with_expert,
+    url_persist,
+)
 from etl import paths
 from etl.config import OWID_ENV
 from etl.db import get_engine
@@ -35,7 +41,7 @@ if not COVIEWS_PATH.exists():
 
 # Page configuration.
 st.set_page_config(
-    page_title="Wizard: Similar Charts",
+    page_title="Wizard: Related Charts",
     page_icon="🪄",
     layout="wide",
 )
@@ -48,7 +54,7 @@ st.set_page_config(
 @st.cache_data(show_spinner=False, ttl="1h")
 def get_charts() -> list[data.Chart]:
     """Fetch chart metadata from the database and return a list of Chart objects."""
-    with st.spinner("Loading charts..."):
+    with st.spinner("Loading charts...", show_time=True):
         df = data.get_raw_charts()
         if len(df) == 0:
             raise ValueError("No charts found in the database.")
@@ -100,9 +106,9 @@ def st_chart_info(chart: data.Chart, show_coviews: bool = True) -> None:
 )
 def get_and_fit_model(charts: list[data.Chart]) -> scoring.ScoringModel:
     """Load an embedding model and fit it to the charts for similarity scoring."""
-    with st.spinner("Loading model..."):
+    with st.spinner("Loading model...", show_time=True):
         scoring_model = scoring.ScoringModel(emb.get_model())
-    with st.spinner("Fitting model..."):
+    with st.spinner("Fitting model...", show_time=True):
         scoring_model.fit(charts)
     return scoring_model
 
@@ -160,7 +166,7 @@ def st_related_charts_table(
 
     st.dataframe(
         df,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config=column_config,
     )
@@ -203,7 +209,7 @@ top_100_charts = sorted(charts, key=lambda x: x.views_365d, reverse=True)[:100] 
 # SIDEBAR / SEARCH
 ########################################################################################################################
 
-st.title(":material/search: Similar charts")
+st_title_with_expert("Related charts", icon=":material/search:")
 
 col1, col2 = st.columns(2)
 with col2:

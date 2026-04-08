@@ -36,6 +36,7 @@ tables:
                   - null
                   - null
                 customNumericValues:
+                  - 0
                   - 1
                   - 2
                   - 5
@@ -44,7 +45,6 @@ tables:
                   - 50
                   - 100
                   - 200
-                customNumericMinValue: 0
               timeTolerance: 0
             selectedEntityNames:
               - Americas (UN)

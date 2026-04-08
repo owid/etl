@@ -1,0 +1,34 @@
+# To create a snapshot of the dataset, follow these steps:
+# * Go to: https://www.ipcc-nggip.iges.or.jp/EFDB/find_ef.php
+#   * By default, it shows over 27k entries. Under the "Basic search" section:
+#   * Click on "Select Gases" and select all gases.
+#   * Click on "Select Fuels" and select all fuels.
+#   * Click on "IPCC Default Data" and select "2006 IPCC default".
+#   * Leave "Select C pools", "Other (non-default) Data", "Regions", and "Countries" empty.
+#   * Ensure the "IPCC Guidelines" dropdown is set to "2006".
+#   * The table should now display about 1.8k entries.
+# * Click on "Export to XLS" (right above the table).
+# * Run this snapshot using the flag "--path-to-file" followed by the path to the downloaded file, e.g.:
+#   > etls 2025-11-26/emission_factors --path-to-file ~/Downloads/EFDB_output.xlsx
+# * To decide on the date_published, see the "What's new" in the [Home page](https://www.ipcc-nggip.iges.or.jp/EFDB/main.php) and pick the latest date.
+meta:
+  origin:
+    producer: Intergovernmental Panel on Climate Change
+    title: Emission Factor Database
+    description: |-
+      The Intergovernmental Panel on Climate Change (IPCC) Emission Factor Database (EFDB) is a library of emission factors and parameters that can be used for estimation of national greenhouse gas emissions/removals. For more details, see [the User Manual](https://www.ipcc-nggip.iges.or.jp/EFDB/documents/EFDB_User_Manual.pdf).
+    citation_full: |-
+      The Intergovernmental Panel on Climate Change (IPCC) Emission Factor Database (EFDB) contains default data from IPCC Guidelines and data from other sources (e.g., peer-reviewed papers) with background information.
+      The data extracted from the IPCC EFDB comes from the 2006 IPCC Guidelines for National Greenhouse Gas Inventories.
+    attribution: IPCC - Emission Factor Database (2025)
+    attribution_short: IPCC
+    url_main: https://www.ipcc-nggip.iges.or.jp/EFDB/
+    date_accessed: '2025-11-26'
+    date_published: '2025-11-04'
+    license:
+      name: © 2021 Intergovernmental Panel on Climate Change (IPCC)
+      url: https://www.ipcc.ch/copyright/
+outs:
+  - md5: 9c1d099b46a4ca12210f3b1f8febdefe
+    size: 176503
+    path: emission_factors.xlsx

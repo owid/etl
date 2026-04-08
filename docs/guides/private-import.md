@@ -1,7 +1,12 @@
 ---
 tags:
   - 👷 Staff
+  - Data Workflow
+  - Advanced
+icon: lucide/lock
 ---
+
+# Private datasets
 
 While most of the data at OWID is publicly available, some datasets are added to our catalog with some restrictions. These include datasets that are not redistributable, or that are not meant to be shared with the public. This can happen due to a strict license by the data provider, or because the data is still in a draft stage and not ready for public consumption.
 
@@ -9,7 +14,7 @@ Various privacy configurations are available:
 
 - Disable data downloading options on Grapher.
 - Disable public access to the original file (snapshot).
-- Hide the dataset from our public catalog (accessible via `owid-catalog-py`).
+- Hide the dataset from our public catalog (accessible via `owid-catalog`).
 
 In the following, we explain how to create private steps in the ETL pipeline and how to run them.
 
@@ -39,9 +44,9 @@ This will prevent the file to be publicly accessible without the appropriate cre
 
 ### Meadow, Garden, Grapher
 
-Creating a private data step means that the data will not be listed in the public catalog, and therefore will not be accessible via `owid-catalog-py`.
+Creating a private data step means that the data will not be listed in the public catalog, and therefore will not be accessible via `owid-catalog`.
 
-To create a private data step (meadow, garden or grapher) simply use `data-private` prefix in the step name in the DAG. For example, the step `grapher/ihme_gbd/2024-06-10/leading_causes_deaths` (this is from [health.yml](https://github.com/owid/etl/blob/master/dag/health.yml)) is private:
+To create a private data step (meadow, garden or grapher) simply use `data-private` prefix in the step name in the DAG. For example, the step `grapher/ihme_gbd/2024-06-10/leading_causes_deaths` (this is from [:fontawesome-brands-github: health.yml](https://github.com/owid/etl/blob/master/dag/health.yml)) is private:
 
 ```yaml
 # IHME GBD Leading cause of  deaths - update
@@ -79,4 +84,4 @@ If you want to make a private step public simply follow the steps below:
 - **In the snapshot DVC file**: Set `meta.is_public` to `true` (or simply remove this property).
 - (Optional) **Allow for Grapher downloads**: Set `dataset.non_redistributable` to `false` in the dataset garden metadata (or simply remove this property).
 
-After this, re-run the snapshot step and commit your changes.
+After this, re-run the snapshot step to upload it to the public bucket (`r2:owid-snapshots/`). Without this step, the file would remain in the private bucket (`r2:owid-snapshots-private/`). Then commit your changes.

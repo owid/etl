@@ -1,9 +1,9 @@
 dataset:
-  title: Cumulative deaths in armed conflicts (UCDP, 2024)
+  title: Cumulative deaths in armed conflicts (UCDP, 2025)
   description: |-
     This dataset is UCDP's most disaggregated dataset, covering individual events of organized violence (phenomena of lethal violence occurring at a given time and place). These events are sufficiently fine-grained to be geo-coded down to the level of individual villages, with temporal durations disaggregated to single, individual days.
 
-    You can find more notes at https://web.archive.org/web/20230618115833/https://ucdp.uu.se/downloads/ged/ged231.pdf
+    You can find more notes at https://ucdp.uu.se/downloads/ged/ged251.pdf
   licenses:
     - {}
 tables:
@@ -16,7 +16,7 @@ tables:
         display:
           numDecimalPlaces: 0.0
         description: |-
-          The best estimate of the number of deaths of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the number of deaths of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2024.
 
           One-sided violence is the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
       nonstate_deaths:
@@ -26,7 +26,7 @@ tables:
         display:
           numDecimalPlaces: 0.0
         description: |-
-          The best estimate of the number of deaths of combatants and civilians due to fighting in non-state conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the number of deaths of combatants and civilians due to fighting in non-state conflicts that were ongoing between 1989 and 2024.
 
           A non-state conflict is a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year.
       extrastate_deaths:
@@ -36,7 +36,7 @@ tables:
         display:
           numDecimalPlaces: 0.0
         description: |-
-          The best estimate of the number of deaths of combatants and civilians due to fighting in extrasystemic conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the number of deaths of combatants and civilians due to fighting in extrasystemic conflicts that were ongoing between 1989 and 2024.
 
           An extrasystemic conflict is a conflict between a state and a non-state armed group outside the state's territory that causes at least 25 deaths during a year.
       intrastate_deaths:
@@ -46,7 +46,7 @@ tables:
         display:
           numDecimalPlaces: 0.0
         description: |-
-          The best estimate of the number of deaths of combatants and civilians due to fighting in intrastate conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the number of deaths of combatants and civilians due to fighting in intrastate conflicts that were ongoing between 1989 and 2024.
 
           An intrastate conflict is a conflict between a state and a non-state armed group within the state's territory that causes at least 25 deaths during a year.
       interstate_deaths:
@@ -56,7 +56,7 @@ tables:
         display:
           numDecimalPlaces: 0.0
         description: |-
-          The best estimate of the number of deaths of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the number of deaths of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2024.
 
           An interstate conflict is a conflict between states that causes at least 25 deaths during a year.
       all_deaths:
@@ -66,7 +66,7 @@ tables:
         display:
           numDecimalPlaces: 0.0
         description: |-
-          The best estimate of the number of deaths of combatants and civilians due to fighting in armed conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the number of deaths of combatants and civilians due to fighting in armed conflicts that were ongoing between 1989 and 2024.
 
           An armed conflict is a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year.
       onesided_rate:
@@ -74,7 +74,7 @@ tables:
         unit: deaths per 100,000 people
         short_unit: deaths per 100,000 people
         description: |-
-          The best estimate of the death rate of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the death rate of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2024.
 
           One-sided violence is the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
 
@@ -84,7 +84,7 @@ tables:
         unit: deaths per 100,000 people
         short_unit: deaths per 100,000 people
         description: |-
-          The best estimate of the death rate of combatants and civilians due to fighting in non-state conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the death rate of combatants and civilians due to fighting in non-state conflicts that were ongoing between 1989 and 2024.
 
           A non-state conflict is a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year.
 
@@ -94,7 +94,7 @@ tables:
         unit: deaths per 100,000 people
         short_unit: deaths per 100,000 people
         description: |-
-          The best estimate of the death rate of combatants and civilians due to fighting in extrasystemic conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the death rate of combatants and civilians due to fighting in extrasystemic conflicts that were ongoing between 1989 and 2024.
 
           An extrasystemic conflict is a conflict between a state and a non-state armed group outside the state's territory that causes at least 25 deaths during a year.
 
@@ -104,7 +104,7 @@ tables:
         unit: deaths per 100,000 people
         short_unit: deaths per 100,000 people
         description: |-
-          The best estimate of the death rate of combatants and civilians due to fighting in intrastate conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the death rate of combatants and civilians due to fighting in intrastate conflicts that were ongoing between 1989 and 2024.
 
           An intrastate conflict is a conflict between a state and a non-state armed group within the state's territory that causes at least 25 deaths during a year.
 
@@ -114,7 +114,7 @@ tables:
         unit: deaths per 100,000 people
         short_unit: deaths per 100,000 people
         description: |-
-          The best estimate of the death rate of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the death rate of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2024.
 
           An interstate conflict is a conflict between states that causes at least 25 deaths during a year.
 
@@ -124,8 +124,13 @@ tables:
         unit: deaths per 100,000 people
         short_unit: deaths per 100,000 people
         description: |-
-          The best estimate of the death rate of combatants and civilians due to fighting in armed conflicts that were ongoing between 1989 and 2023.
+          The best estimate of the death rate of combatants and civilians due to fighting in armed conflicts that were ongoing between 1989 and 2024.
 
           An armed conflict is a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year.
 
           The rate is the deaths divided by the 1989 population, and expressed per 100,000 people.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

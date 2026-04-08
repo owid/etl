@@ -1,0 +1,24 @@
+dataset:
+  title: Interpersonal Trust - General Social Survey (GSS)
+tables:
+  interpersonal_trust__general_social_survey__gss:
+    variables:
+      interpersonal_trust__pct:
+        title: Interpersonal Trust (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          shortUnit: '%'
+          unit: '%'
+        description: |-
+          Share of survey respondents responding to the question "Generally speaking, would you say that most people can be trusted or that you can't be too careful in dealing with people?" Available replies are "Can trust", "Can't be too careful", "Depends", "Don't know" and "No answer".
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,52 @@
+title:
+  title: Vaccination introduction
+  title_variant: by vaccine
+default_selection:
+  - World
+dimensions:
+  - name: Vaccine
+    slug: description
+    choices:
+      - slug: "aP (acellular pertussis) vaccine"
+        name: "Acellular pertussis vaccine"
+      - slug: "Varicella vaccine"
+        name: "Chickenpox vaccine"
+      - slug: "Hepatitis A vaccine"
+        name: "Hepatitis A vaccine"
+      - slug: "Hepatitis B vaccine"
+        name: "Hepatitis B vaccine"
+      - slug: "HepB birth dose"
+        name: "Hepatitis B birth dose"
+      - slug: "Hib (Haemophilus influenzae type B) vaccine"
+        name: "Hib (Haemophilus influenzae type B) vaccine"
+      - slug: "HPV (Human Papilloma Virus) vaccine"
+        name: "Human Papilloma Virus (HPV) vaccine"
+      - slug: "IPV (Inactivated polio vaccine)"
+        name: "Inactivated polio vaccine"
+      - slug: "IPV (Inactivated polio vaccine) 2nd dose"
+        name: "Inactivated polio vaccine, second dose"
+      - slug: "Japanese Encephalitis"
+        name: "Japanese encephalitis vaccine"
+      - slug: "Malaria vaccine"
+        name: "Malaria vaccine"
+      - slug: "Measles-containing vaccine 2nd dose"
+        name: "Measles-containing vaccine, second dose"
+      - slug: "Meningococcal meningitis vaccines (all strains)"
+        name: "Meningococcal meningitis vaccines (all strains)"
+      - slug: "Mumps vaccine"
+        name: "Mumps vaccine"
+      - slug: "PCV (Pneumococcal conjugate vaccine)"
+        name: "Pneumococcal conjugate vaccine"
+      - slug: "PPV (Pneumococcal polysaccharide vaccine)"
+        name: "Pneumococcal polysaccharide vaccine"
+      - slug: "Rotavirus vaccine"
+        name: "Rotavirus vaccine"
+      - slug: "Rubella vaccine"
+        name: "Rubella vaccine"
+      - slug: "Seasonal Influenza vaccine"
+        name: "Seasonal influenza vaccine"
+      - slug: "Typhoid"
+        name: "Typhoid vaccine"
+      - slug: "YF (Yellow fever) vaccine"
+        name: "Yellow fever vaccine"
+views: []

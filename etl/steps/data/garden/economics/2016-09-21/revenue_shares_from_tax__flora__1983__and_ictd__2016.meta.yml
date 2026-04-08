@@ -1,0 +1,18 @@
+dataset:
+  title: Revenue shares from tax – Flora (1983) and ICTD (2016)
+tables:
+  revenue_shares_from_tax__flora__1983__and_ictd__2016:
+    variables:
+      share_of_revenue_from_income_tax__flora__1983__and_ictd__2016:
+        title: Share of Revenue from Income tax (Flora (1983) and ICTD (2016))
+        unit: '% of total revenue'
+        short_unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

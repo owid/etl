@@ -10,7 +10,7 @@ INSTRUCTIONS
         3. Run this ess_trust.do in Stata. If it fails, check the name of the dta file in the first line of the code.
         4. The output is given in Stata's output window. Copy and paste it into a csv file, called `ess_trust.csv`.
         5. Add snapshot. The command is:
-                python snapshots/ess/{version}/ess_trust.py --path-to-file snapshots/ess/{version}/ess_trust.csv
+                etls ess/{version}/ess_trust --path-to-file snapshots/ess/{version}/ess_trust.csv
         6. Delete csv file
         7. Run `etl ess_trust`
 

@@ -1,0 +1,101 @@
+dataset:
+  title: Long run time use in Norway, by sex - Norway Statistics
+tables:
+  long_run_time_use_in_norway__by_sex__norway_statistics:
+    variables:
+      time_spent_on_education__all__statistics_norway:
+        title: Time spent on education, all (Statistics Norway)
+        unit: minutes
+        description: Time spent on education activities on an average day.
+      time_spent_on_education__female__statistics_norway:
+        title: Time spent on education, female (Statistics Norway)
+        unit: minutes
+        description: Time spent on education activities, by females, on an average day.
+      time_spent_on_education__male__statistics_norway:
+        title: Time spent on education, male (Statistics Norway)
+        unit: minutes
+        description: Time spent on education activities, by males, on an average day.
+      time_spent_on_household_work__all__statistics_norway:
+        title: Time spent on household work, all (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on household work on an average day. Household work includes activities such as house work, maintenance, family care, shopping and services, other household work, and travel connected to household work.
+      time_spent_on_household_work__female__statistics_norway:
+        title: Time spent on household work, female (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on household work, by females, on an average day. Household work includes activities such as house work, maintenance, family care, shopping and services, other household work, and travel connected to household work.
+      time_spent_on_household_work__male__statistics_norway:
+        title: Time spent on household work, male (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on household work, by males, on an average day. Household work includes activities such as house work, maintenance, family care, shopping and services, other household work, and travel connected to household work.
+      time_spent_on_income_producing_work__all__statistics_norway:
+        title: Time spent on income producing work, all (Statistics Norway)
+        unit: minutes
+        description: Time spent on income producing work on an average day. Income producing work includes the travel to/from
+          work.
+      time_spent_on_income_producing_work__female__statistics_norway:
+        title: Time spent on income producing work, female (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on income producing work, by females, on an average day. Income producing work includes the travel to/from work.
+      time_spent_on_income_producing_work__male__statistics_norway:
+        title: Time spent on income producing work, male (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on income producing work, by males, on an average day. Income producing work includes the travel to/from work.
+      time_spent_on_leisure__all__statistics_norway:
+        title: Time spent on leisure, all (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on leisure on an average day. Leisure activities includes sports and outdoor activities, entertainment and culture, socialising, reading, television viewing, other leisure time, and travel connected to leisure time activities.
+      time_spent_on_leisure__female__statistics_norway:
+        title: Time spent on leisure, female (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on leisure, by females, on an average day. Leisure activities includes sports and outdoor activities, entertainment and culture, socialising, reading, television viewing, other leisure time, and travel connected to leisure time activities.
+      time_spent_on_leisure__male__statistics_norway:
+        title: Time spent on leisure, male (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on leisure, by males, on an average day. Leisure activities includes sports and outdoor activities, entertainment and culture, socialising, reading, television viewing, other leisure time, and travel connected to leisure time activities.
+      time_spent_on_other_activities__all__statistics_norway:
+        title: Time spent on other activities, all (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on other activities on an average day. Other activities includes all time that has not been accounted for by income producing work, household work, education, personal needs, or leisure time.
+      time_spent_on_other_activities__females__statistics_norway:
+        title: Time spent on other activities, females (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on other activities, by females, on an average day. Other activities includes all time that has not been accounted for by income producing work, household work, education, personal needs, or leisure time.
+      time_spent_on_other_activities__males__statistics_norway:
+        title: Time spent on other activities, males (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on other activities, by males, on an average day. Other activities includes all time that has not been accounted for by income producing work, household work, education, personal needs, or leisure time.
+      time_spent_on_personal_needs__all__statistics_norway:
+        title: Time spent on personal needs, all (Statistics Norway)
+        unit: minutes
+        description: Time spent on personal needs on an average day. Personal needs include night sleep, other personal care,
+          and meals.
+      time_spent_on_personal_needs__females__statistics_norway:
+        title: Time spent on personal needs, females (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on personal needs, by females, on an average day. Personal needs include night sleep, other personal care, and meals.
+      time_spent_on_personal_needs__males__statistics_norway:
+        title: Time spent on personal needs, males (Statistics Norway)
+        unit: minutes
+        description: |-
+          Time spent on personal needs, by males, on an average day. Personal needs include night sleep, other personal care, and meals.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

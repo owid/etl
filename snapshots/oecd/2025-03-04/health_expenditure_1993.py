@@ -9,7 +9,7 @@ There is no link of the book available online, but we have this folder in Google
 In the folder you can find a scan of the relevant tables, and an Excel file with the data extracted from the scan. We are using that file, available in the Manipulation folder.
 
 Download and copy to this directory and run:
-    python snapshots/oecd/{version}/health_expenditure_1993.py --path_to_file {path_to_file}
+    etls oecd/{version}/health_expenditure_1993 --path_to_file {path_to_file}
 
 """
 

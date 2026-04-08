@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: OECD
+    title: OECD Social Expenditure Database (SOCX)
+    description: |-
+      The OECD Social Expenditure Database (SOCX) has been developed in order to serve a growing need for indicators of social policy. It includes reliable and internationally comparable statistics on public and mandatory and voluntary private social expenditure at programme level. SOCX provides a unique tool for monitoring trends in aggregate social expenditure and analysing changes in its composition. It covers 38 OECD countries and some accession countries for the period 1980-2021/23 and estimates for aggregates for 2022-24. A Social Expenditure Update can be found under [this page](https://www.oecd.org/en/data/datasets/social-expenditure-database-socx.html). The main social policy areas are as follows: Old age, Survivors, Incapacity-related benefits, Health, Family, Active labor market programmes, Unemployment, Housing, and Other social policy areas. This version also includes estimates of [net total social spending](https://data-explorer.oecd.org/vis?lc=en&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_SOCX_AGG%40DF_NET_GDP&df[ag]=OECD.ELS.SPD&df[vs]=1.0&dq=.A..PT_B1GQ.ES50._T._T.&pd=2010%2C&to[TIME_PERIOD]=false&vw=tb) for 2021 for 38 OECD countries. SOCX aggregated data as well as sources and methodology are described in [The OECD SOCX Manual – 2019 edition- A guide to the OECD Social Expenditure Database](http://www.oecd.org/social/soc/SOCX_Manuel_2019.pdf).
+    citation_full: OECD (2025). Social expenditure aggregates. OECD Data Explorer, https://data-explorer.oecd.org/.
+    attribution_short: OECD
+    url_main: https://www.oecd.org/en/data/datasets/social-expenditure-database-socx.html
+    date_accessed: '2025-12-11'
+    date_published: '2025-10-06'
+    license:
+      name: OECD Terms and Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: 95af8d81a2b111f560d539d2aa509181
+    size: 503651986
+    path: social_expenditure.csv

@@ -26,11 +26,28 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"covid/{SNAPSHOT_VERSION}/cases_deaths.csv")
 
+    # Load existing snapshot for size comparison
+    try:
+        orig_snapshot_df = snap.read()
+    except FileNotFoundError:
+        orig_snapshot_df = None
+
     # Update metadata
     snap = modify_metadata(snap)
 
-    # Download data from source, add file to DVC and upload to S3.
-    snap.create_snapshot(upload=upload)
+    # Download data from source without committing to DVC
+    snap.download_from_source()
+
+    # Check if new snapshot is smaller than the original
+    if orig_snapshot_df is not None:
+        new_snapshot_df = snap.read()
+        if len(new_snapshot_df) < len(orig_snapshot_df):
+            raise ValueError(
+                f"New snapshot has fewer rows ({len(new_snapshot_df)}) than the original snapshot ({len(orig_snapshot_df)}). Data source could be down or data is missing."
+            )
+
+    # Only add to DVC and upload if size check passes
+    snap.dvc_add(upload=upload)
 
 
 def modify_metadata(snap: Snapshot) -> Snapshot:

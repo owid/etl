@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: |-
+      West, Gerber, Engstrom, Mueller, Brauman, Carlson, Cassidy, Johnston, MacDonald, Ray & Siebert (2014). Leverage points for improving global food security and the environment. Science.
+    description: |-
+      This data reprersents the nutrient balance of global croplands for nitrogen and phosphorous. It quantifies nutrient inputs to the crops across multiple sources – synthetic fertilizers, organic fertilizers such as manures, and nutrient fixation from legume crops.
+
+      Nutrient removal at harvest was estimated using nutrient density data for the dry fraction of harvested material. "Excess nutrients" is the difference between nutrient inputs and the amount harvested in crop material. This represents nutrients that are lost to the environment and can create ecological imbalances on ecosystems and in water bodies.
+    url: https://science.sciencemag.org/content/345/6194/325
+    date_accessed: 2026-03-05
+    published_by: |-
+      West, P. C., Gerber, J. S., Engstrom, P. M., Mueller, N. D., Brauman, K. A., Carlson, K. M., ... & Siebert, S. (2014). Leverage points for improving global food security and the environment. Science, 345(6194), 325-328.
+  name: Excess fertilizers (West et al. 2014)
+  description: ''
+  is_public: false
+outs:
+  - md5: a22c146ed933a829cb009b2d913e9026
+    size: 30130
+    path: excess_fertilizers__west_et_al__2014.feather

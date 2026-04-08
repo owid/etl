@@ -16,7 +16,9 @@ import datetime as dt
 import json
 import re
 import sys
+from collections.abc import Mapping
 from datetime import date
+from functools import cache, wraps
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Union, cast
 
@@ -25,6 +27,7 @@ import streamlit as st
 from owid.catalog import Dataset
 from sentry_sdk import capture_exception
 from sqlalchemy.orm import Session
+from streamlit.runtime.runtime import Runtime
 from structlog import get_logger
 from typing_extensions import Self
 from wfork_streamlit_profiler import Profiler
@@ -90,8 +93,8 @@ DUMMY_DATA = {
     "url_main": "https://www.url-dummy.com/",
     "license_name": "MIT dummy license",
 }
-# Session state to track staging creation time
-VARNAME_STAGING_CREATION_TIME = "staging_creation_time"
+# Cache for staging creation times (keyed by session bind string)
+_staging_creation_time_cache: dict[str, Any] = {}
 
 
 def start_profiler() -> Profiler:
@@ -156,7 +159,7 @@ class classproperty(property):
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data"]
+    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "collection"]
     dataset_edit: Dict[str, Dataset | None] = {
         "snapshot": None,
         "meadow": None,
@@ -164,6 +167,7 @@ class AppState:
         "grapher": None,
         "express": None,
         "data": None,
+        "collection": None,
     }
     _previous_step: str | None = None
 
@@ -368,39 +372,6 @@ class AppState:
         self.display_error(key)
         return widget
 
-    def st_selectbox_responsive(
-        self: "AppState",
-        custom_label: str,
-        **kwargs,
-    ) -> None:
-        """Render the namespace field within the form.
-
-        We want the namespace field to be a selectbox, but with the option to add a custom namespace.
-
-        This is a workaround to have repsonsive behaviour within a form.
-
-        Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
-        """
-        # Handle kwargs
-        kwargs["options"] = [custom_label] + kwargs["options"]
-        key = cast(str, kwargs["key"])
-
-        # Render and get element depending on selection in selectbox
-        with st.container():
-            field = self.st_widget(**kwargs)
-        with st.empty():
-            if (field == custom_label) | (str(field) not in kwargs["options"]):
-                st.toast("showing custom input")
-                default_value = self.default_value(key)
-                field = self.st_widget(
-                    st.text_input,
-                    label="↳ *Use custom value*",
-                    placeholder="",
-                    help="Enter custom value.",
-                    key=f"{key}_custom",
-                    default_last=default_value,
-                )
-
     @classproperty
     def args(cls: "AppState") -> argparse.Namespace:
         """Get arguments passed from command line."""
@@ -435,7 +406,7 @@ def preview_dag_additions(dag_content: str, dag_path: str | Path, prefix: str = 
             st.code(dag_content, "yaml")
 
 
-@st.cache_data
+@cache
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
     with open(CURRENT_DIR / f"{st.session_state['step_name']}.md", "r") as f:
@@ -587,21 +558,33 @@ def enable_sentry_for_streamlit():
 
 
 def _get_staging_creation_time(session: Session):
-    """Get staging server creation time."""
-    query_ts = "show table status like 'charts'"
+    """Get staging server creation time.
+
+    Uses the earliest creation time among critical tables to ensure we capture
+    all changes made after the database was initially set up. Some tables may be
+    created/recreated later during the setup process, so we use the minimum.
+    """
+    query_ts = """
+    SELECT MIN(create_time) as min_create_time
+    FROM information_schema.tables
+    WHERE table_schema = DATABASE()
+      AND table_name IN ('charts', 'variables', 'datasets', 'chart_dimensions')
+    """
     df = read_sql(query_ts, session)
-    assert len(df) == 1, "There was some error. Make sure that the staging server was properly set."
-    create_time = df["Create_time"].item()
+    assert (
+        len(df) == 1 and df["min_create_time"].notna().all()
+    ), "Failed to get staging server creation time. Make sure the staging server was properly set up."
+    create_time = df["min_create_time"].item()
     return create_time
 
 
 def get_staging_creation_time(session: Session):
     """Get staging server creation time."""
     # Create a unique key for a session to avoid conflicts when working with multiple staging servers.
-    key = f"{VARNAME_STAGING_CREATION_TIME}_{str(session.bind)}"
-    if key not in st.session_state:
-        st.session_state[key] = _get_staging_creation_time(session)
-    return st.session_state[key]
+    key = str(session.bind)
+    if key not in _staging_creation_time_cache:
+        _staging_creation_time_cache[key] = _get_staging_creation_time(session)
+    return _staging_creation_time_cache[key]
 
 
 def default_converter(o):
@@ -635,6 +618,54 @@ def as_list(s):
         except (ValueError, SyntaxError):
             return s
     return s
+
+
+@cache
+def is_running_in_streamlit():
+    """Check if running in Streamlit."""
+    return Runtime.exists()
+
+
+def _canon(x):
+    # Fast paths first
+    if x is None or isinstance(x, (int, float, str, bytes, bool)):
+        return x
+    if isinstance(x, tuple):
+        return tuple(_canon(v) for v in x)
+    if isinstance(x, list):
+        return tuple(_canon(v) for v in x)
+    if isinstance(x, set):
+        return frozenset(_canon(v) for v in x)
+    if isinstance(x, Mapping):
+        # sort by key for deterministic ordering
+        return tuple(sorted((k, _canon(v)) for k, v in x.items()))
+    if isinstance(x, np.ndarray):
+        # stable, hashable representation for numpy arrays
+        return ("__np__", x.dtype.str, x.shape, x.tobytes())
+    # Fallback: try dataclasses/objects with __dict__
+    if hasattr(x, "__dict__"):
+        return ("__obj__", x.__class__.__qualname__, _canon(vars(x)))
+    # Last resort: use repr (only if you accept collisions when repr changes)
+    return ("__repr__", repr(x))
+
+
+def cache_all(f):
+    """A caching decorator that works for unhashable types (lists, dicts)."""
+
+    @cache
+    def _cached(key):
+        args_c, kwargs_c = key
+        return f(*args_c, **dict(kwargs_c))
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        key = (
+            tuple(_canon(a) for a in args),
+            tuple(sorted((k, _canon(v)) for k, v in kwargs.items())),
+        )
+        return _cached(key)
+
+    return wrapper
 
 
 # Enable sentry when apps.wizard.utils is loaded

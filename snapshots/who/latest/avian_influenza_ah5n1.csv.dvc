@@ -1,7 +1,7 @@
 meta:
   origin:
-    producer: WHO, Global Influenza Programme
     title: Human Cases with Highly Pathogenic Avian Influenza A/H5N1
+    producer: WHO, Global Influenza Programme
     description: |-
       This dataset contains all human infections with HPAI A(H5N1​​​​​) bird flu virus reported to the World Health Organization (WHO), since the first human cases in 1997.
 
@@ -9,15 +9,15 @@ meta:
 
       A(H5N1​​​​​) bird flu viruses that are currently circulating in wild birds and poultry in much of the world are genetically different from earlier versions of the virus and emerged to become the predominant subtype of HPAI H5 in the fall of 2021. These viruses have caused sporadic wild bird infections and poultry outbreaks in many countries, including the United States, with spillover to mammals in some countries. In contrast to previous A(H5N1​​​​​) viruses, which still circulate to a lesser extent in several countries, at this time, a small number of sporadic human cases with current A(H5N1​​​​​) bird flu viruses have been reported globally. However, illness in humans from all bird flu virus infections has ranged in severity from no symptoms or mild illness to severe disease that resulted in death.
     citation_full: |-
-      Human Cases with Highly Pathogenic Avian Influenza A/H5N1. World Health Organization, Global Influenza Programme; 2024. Licence: CC BY-NC-SA 3.0 IGO. Retrieved from CDC May 23, 2024.
+      Human Cases with Highly Pathogenic Avian Influenza A/H5N1. World Health Organization, Global Influenza Programme; 2026. Licence: CC BY-NC-SA 3.0 IGO. Retrieved from CDC March 20, 2026.
     attribution_short: WHO
     url_main: https://www.cdc.gov/bird-flu/php/avian-flu-summary/chart-epi-curve-ah5n1.html
-    date_accessed: 2025-01-28
-    date_published: "2024-10-26"
+    date_accessed: 2026-04-03
+    date_published: "2026-03-20"
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
 outs:
-  - md5: f2e7ea82d0c490ec646b37349f7f106f
-    size: 25020
+  - md5: 2feda544796d8d8b1746fc6c72c22798
+    size: 26809
     path: avian_influenza_ah5n1.csv

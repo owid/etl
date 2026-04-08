@@ -17,10 +17,10 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     type=bool,
     help="Upload dataset to Snapshot",
 )
-def main(upload: bool) -> None:
+def run(upload: bool) -> None:
     snap = Snapshot(f"unep/{SNAPSHOT_VERSION}/global_trends_in_renewable_energy_investment.pdf")
     snap.create_snapshot(upload=upload)
 
 
 if __name__ == "__main__":
-    main()
+    run()

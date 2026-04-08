@@ -1,0 +1,50 @@
+dataset:
+  title: Emissions intensity & value added by sector - Linus et al.
+tables:
+  emissions_intensity__and__value_added_by_sector__linus_et_al:
+    variables:
+      emissions_growth__pct__china:
+        title: Emissions growth (%) - China
+        unit: '%'
+      emissions_growth__pct__germany:
+        title: Emissions growth (%) - Germany
+        unit: '%'
+      emissions_growth__pct__usa:
+        title: Emissions growth (%) - USA
+        unit: '%'
+      share_of_co2_emissions__pct__china:
+        title: Share of CO2 emissions (%) - China
+        unit: '%'
+      share_of_co2_emissions__pct__germany:
+        title: Share of CO2 emissions (%) - Germany
+        unit: '%'
+      share_of_co2_emissions__pct__usa:
+        title: Share of CO2 emissions (%) - USA
+        unit: '%'
+      value_added_growth__pct__china:
+        title: Value added growth (%) - China
+        unit: '%'
+      value_added_growth__pct__germany:
+        title: Value added growth (%) - Germany
+        unit: '%'
+      value_added_growth__pct__usa:
+        title: Value added growth (%) - USA
+        unit: '%'
+      value_added_to_gdp__pct__china:
+        title: Value added to GDP (%) - China
+        unit: '%'
+      value_added_to_gdp__pct__germany:
+        title: Value added to GDP (%) - Germany
+        unit: '%'
+      value_added_to_gdp__pct__usa:
+        title: Value added to GDP (%) - USA
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

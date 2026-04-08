@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - Homicides
     description_processing: |-
-      Values for the United Kingdom are calcuated by Our World in Data from UNODC data for England, Wales, Scotland and Northern Ireland.
+      Values for the United Kingdom are calculated by Our World in Data from UNODC data for England, Wales, Scotland and Northern Ireland.
 
   metric: |-
     <% if unit_of_measurement == "Counts" %>
@@ -56,58 +56,57 @@ definitions:
 dataset:
   update_period_days: 365
 
-
 tables:
-    by_mechanisms:
-      variables:
-        value:
-          title: |-
-            {definitions.metric} - << category >>
-          description_short: |-
+  by_mechanisms:
+    variables:
+      value:
+        title: |-
+          {definitions.metric} - << category >>
+        description_short: |-
+          {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
+        unit: |-
+          {definitions.unit}
+        presentation:
+          title_public: |-
             {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
-          unit: |-
-            {definitions.unit}
-          presentation:
-            title_public: |-
-              {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
-          display:
-            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
-    by_relationship_to_perpetrator:
-      variables:
-        value:
-          title: |-
-            {definitions.metric} - << category >> - sex: << sex >>
-          description_short: |-
+        display:
+          numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
+  by_relationship_to_perpetrator:
+    variables:
+      value:
+        title: |-
+          {definitions.metric} - << category >> - sex: << sex >>
+        description_short: |-
+          {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
+        unit: |-
+          {definitions.unit}
+        presentation:
+          title_public: |-
             {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
-          unit: |-
-            {definitions.unit}
-          presentation:
-            title_public: |-
-              {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
-          display:
-            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
-    by_situational_context:
-      variables:
-        value:
-          title: |-
-            {definitions.metric} - << category >> - sex: << sex >>
-          description_short: |-
+        display:
+          numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
+  by_situational_context:
+    variables:
+      value:
+        title: |-
+          {definitions.metric} - << category >> - sex: << sex >>
+        description_short: |-
+          {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
+        unit: |-
+          {definitions.unit}
+        presentation:
+          title_public: |-
             {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
-          unit: |-
-            {definitions.unit}
-          presentation:
-            title_public: |-
-              {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
-          display:
-            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
-    total:
-      variables:
-        value:
-          title: |-
-            {definitions.metric} - sex: << sex >> - age: << age >>
-          description_short: |-
-            {definitions.metric} of {definitions.sex} {definitions.age}
-          unit: |-
-            {definitions.unit}
-          display:
-            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
+        display:
+          numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
+  total:
+    variables:
+      value:
+        title: |-
+          {definitions.metric} - sex: << sex >> - age: << age >>
+        description_short: |-
+          {definitions.metric} of {definitions.sex} {definitions.age}
+        unit: |-
+          {definitions.unit}
+        display:
+          numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>

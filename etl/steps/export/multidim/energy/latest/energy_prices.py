@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 from owid.catalog.utils import underscore
 from pandas import DataFrame
 
-from etl.collections import multidim
+from etl.collection.model.view import View
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -133,7 +133,10 @@ def create_stacked_component_views(tb_annual: DataFrame) -> List[Dict[str, Any]]
                             "unit": unit,
                         },
                         "indicators": {
-                            "y": [f"energy_prices_annual#{indicator}" for indicator in indicators],
+                            "y": [
+                                f"{tb_annual.m.dataset.uri}/energy_prices_annual#{indicator}"
+                                for indicator in indicators
+                            ],
                         },
                         "config": {
                             "chartTypes": ["StackedBar"],
@@ -168,12 +171,12 @@ def run() -> None:
     #
     # Process data.
     #
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # Define common view configuration
     common_view_config = {
         "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-        "chartTypes": ["LineChart"],
+        "chartTypes": ["LineChart", "DiscreteBar"],
         "hasMapTab": True,
         "tab": "map",
         "map": {
@@ -188,29 +191,21 @@ def run() -> None:
 
     # Create standard line/map views
     dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
-    annual_config = multidim.expand_config(
-        tb_annual.loc[:, use_cols_annual],
+    c = paths.create_collection(
+        config=config,
+        tb=[
+            tb_annual.loc[:, use_cols_annual],
+            tb_monthly.loc[:, ["monthly_electricity_all_wholesale_euro"]],
+        ],
         indicator_names=["price"],
         dimensions=dimensions,
         common_view_config=common_view_config,
     )
 
-    monthly_config = multidim.expand_config(
-        tb_monthly.loc[:, ["monthly_electricity_all_wholesale_euro"]],
-        indicator_names=["price"],
-        dimensions=dimensions,
-        common_view_config=common_view_config,
-    )
-
-    # Combine standard views
-    config["views"] = annual_config["views"] + monthly_config["views"]
-
-    # Create and add stacked component views
+    # Add stacked views
     component_views = create_stacked_component_views(tb_annual)
-    config["views"].extend(component_views)
+    component_views = [View.from_dict(view) for view in component_views]
+    c.views.extend(component_views)
 
-    #
-    # Save outputs.
-    #
-    mdim = paths.create_mdim(config=config)
-    mdim.save()
+    # Save
+    c.save()

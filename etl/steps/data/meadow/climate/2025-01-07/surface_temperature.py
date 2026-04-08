@@ -1,4 +1,4 @@
-"""Load a snapshot and create a meadow dataset."""
+"""Load a snapshot and create a meadow dataset.."""
 
 import tempfile
 import zipfile
@@ -14,7 +14,7 @@ from shapely.geometry import mapping
 from structlog import get_logger
 from tqdm import tqdm
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
@@ -27,22 +27,22 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     log.info("Load temperature data")
     with zipfile.ZipFile(snap.path, "r") as zip_file:
         for file_info in zip_file.infolist():
-            if file_info.filename.endswith((".grb", ".grib")):  # Filter GRIB files
+            if file_info.filename.endswith(".nc"):  # Filter NetCDF files
                 with zip_file.open(file_info) as file:
                     file_content = file.read()
 
                 # Write to a temporary file
-                with tempfile.NamedTemporaryFile(delete=True, suffix=".grib") as tmp_file:
+                with tempfile.NamedTemporaryFile(delete=True, suffix=".nc") as tmp_file:
                     tmp_file.write(file_content)
                     tmp_file.flush()  # Ensure all data is written
 
-                    # Load the GRIB file using xarray and cfgrib
-                    da = xr.open_dataset(tmp_file.name, engine="cfgrib").load()
+                    # Load the NetCDF file using xarray
+                    da = xr.open_dataset(tmp_file.name, engine="h5netcdf").load()
     # Convert temperature from Kelvin to Celsius.
     da = da["t2m"] - 273.15
 
     # Set the coordinate reference system for the temperature data to EPSG 4326.
-    da = da.rio.write_crs("epsg:4326")
+    da = da.rio.write_crs("EPSG:4326")
 
     return da
 
@@ -65,7 +65,7 @@ def _load_shapefile(file_path: str, shapefile: str) -> pd.DataFrame:
     return shapefile[["geometry", "country"]]  # type: ignore
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Activates the usage of the global context. Using this option can enhance the performance
     # of initializing objects in single-threaded applications.
     pyproj.set_use_global_context(True)  # type: ignore
@@ -155,12 +155,9 @@ def run(dest_dir: str) -> None:
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
 
-    # Define the start and end dates
-    da["time"] = xr.DataArray(pd.to_datetime(da["time"].values), dims=da["valid_time"].dims)
-
-    # Now you can access the 'dt' accessor
-    start_time = da["time"].min().dt.date.astype(str).item()
-    end_time = da["time"].max().dt.date.astype(str).item()
+    # Define the start and end dates using valid_time coordinate (h5netcdf format)
+    start_time = pd.to_datetime(da["valid_time"].min().values).date().isoformat()
+    end_time = pd.to_datetime(da["valid_time"].max().values).date().isoformat()
 
     # Generate a date range from start_time to end_time with monthly frequency
     month_middles = pd.date_range(start=start_time, end=end_time, freq="MS") + pd.offsets.Day(14)
@@ -183,7 +180,9 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
+    # Save changes in the new garden dataset.
+    ds_meadow.save()
     # Save changes in the new garden dataset.
     ds_meadow.save()

@@ -14,11 +14,11 @@ HOW TO EXECUTE:
 
 1. Open this do-file in a local installation of Stata (execution time: ~40 minutes)
 2. It generates four files, which exclude and include extrapolations. They need to be imported as snapshots in the ETL, as
-	python snapshots/wid/2024-05-24/world_inequality_database.py --path-to-file snapshots/wid/2024-05-24/wid_indices_992j_exclude.csv
-	python snapshots/wid/2024-05-24/world_inequality_database_with_extrapolations.py --path-to-file snapshots/wid/2024-05-24/wid_indices_992j_include.csv
-	python snapshots/wid/2024-05-24/world_inequality_database_distribution.py --path-to-file snapshots/wid/2024-05-24/wid_distribution_992j_exclude.csv
-	python snapshots/wid/2024-05-24/world_inequality_database_distribution_with_extrapolations.py --path-to-file snapshots/wid/2024-05-24/wid_distribution_992j_include.csv
-	python snapshots/wid/2024-05-24/world_inequality_database_fiscal.py --path-to-file snapshots/wid/2024-05-24/wid_indices_fiscal_992ijt_exclude.csv
+	etls wid/2024-05-24/world_inequality_database --path-to-file snapshots/wid/2024-05-24/wid_indices_992j_exclude.csv
+	etls wid/2024-05-24/world_inequality_database_with_extrapolations --path-to-file snapshots/wid/2024-05-24/wid_indices_992j_include.csv
+	etls wid/2024-05-24/world_inequality_database_distribution --path-to-file snapshots/wid/2024-05-24/wid_distribution_992j_exclude.csv
+	etls wid/2024-05-24/world_inequality_database_distribution_with_extrapolations --path-to-file snapshots/wid/2024-05-24/wid_distribution_992j_include.csv
+	etls wid/2024-05-24/world_inequality_database_fiscal --path-to-file snapshots/wid/2024-05-24/wid_indices_fiscal_992ijt_exclude.csv
 3. After the execution above ends, delete the csv files created by this do-file.
 
 	(Change the date for future updates)
@@ -108,18 +108,18 @@ foreach option in $options {
 			global exclude_option
 			local excl_option_slug = "include"
 		}
-		
+
 		foreach c in `list_of_countries' {
 
 			*Get average and threshold income for pre tax and post tax (nat and dis) data
 			qui wid, indicators($indicators_avg_thr) perc($percentiles) areas(`c') ages($age) pop($unit) $exclude_option clear
-			
+
 			local c: subinstr local c "-" "_", all
-	
+
 			tempfile avgthr_`c'
 			qui save "`avgthr_`c''"
 		}
-		
+
 		clear
 
 		foreach c in `list_of_countries' {
@@ -135,18 +135,18 @@ foreach option in $options {
 		drop _merge
 		tempfile avgthr
 		qui save "`avgthr'"
-		
+
 		foreach c in `list_of_countries' {
 
 			*Gets shares and Gini for pre and post tax income
 			qui wid, indicators($indicators_gini_share) perc($percentiles) areas(`c') ages($age) pop($unit) $exclude_option clear
-			
+
 			local c: subinstr local c "-" "_", all
-	
+
 			tempfile ginishare_`c'
 			qui save "`ginishare_`c''"
 		}
-		
+
 		clear
 
 		foreach c in `list_of_countries' {

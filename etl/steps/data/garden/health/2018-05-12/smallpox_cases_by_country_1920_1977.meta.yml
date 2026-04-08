@@ -1,0 +1,17 @@
+dataset:
+  title: Smallpox cases by country 1920-1977
+tables:
+  smallpox_cases_by_country_1920_1977:
+    variables:
+      reported_smallpox_cases__who:
+        title: Reported Smallpox cases (WHO)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

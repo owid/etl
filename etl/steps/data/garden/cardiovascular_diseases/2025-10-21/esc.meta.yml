@@ -1,0 +1,96 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: 'per million people'
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Cardiovascular Diseases
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  esc:
+    variables:
+        cardiac_surgeons__per_million_people:
+          title: Cardiac surgeons per million people
+          description_short: Number of cardiac surgeons per million people in the population.
+          display:
+            numDecimalPlaces: 1
+
+        cardiologists__total__per_million_people:
+          title: Total cardiologists per million people
+          description_short: Number of cardiologists per million people in the population.
+          display:
+            numDecimalPlaces: 0
+
+        coronary_angiography_and_diagnostic_cardiac_catheterization__per_million_people:
+          title: Coronary angiography and diagnostic cardiac catheterization per million people
+          description_short: Number of [coronary angiographies](#dod:coronary-angiography), a technique for visualizing heart vessels, and [diagnostic cardiac catheterizations](#dod:cardiac-catheterization), a procedure for examining heart health, per million people in the population.
+          display:
+            numDecimalPlaces: 0
+
+        coronary_stents__per_million_people:
+          title: Coronary stents per million people
+          description_short: Number of [coronary stent](#dod:stent) implantations, which are devices that open and support blocked arteries to improve heart blood flow, per million people in the population.
+          display:
+            numDecimalPlaces: 0
+
+        hospital_with_cath_labs__per_million_people:
+          title: Hospitals with cath labs per million people
+          description_short: Number of hospitals with [catheterization labs](#dod:catheterization-labs), per million people in the population.
+          display:
+            numDecimalPlaces: 1
+
+        hospitals_with_advanced_ultrasound_imaging__per_million_people:
+          title: Hospitals with advanced ultrasound imaging per million people
+          description_short: Number of hospitals equipped with advanced ultrasound imaging technology per million people in the population.
+          display:
+            numDecimalPlaces: 0
+
+        hospitals_with_cardiac_rehabilitation_programmes__per_million_people:
+          title: Hospitals with cardiac rehabilitation programmes per million people
+          description_short: Number of hospitals offering cardiac rehabilitation programs, per million people in the population.
+          display:
+            numDecimalPlaces: 0
+
+        hospitals_with_dedicated_hf_centers__per_million_people:
+          title: Hospitals with dedicated heart failure centers per million people
+          description_short: Number of hospitals with dedicated heart failure centers, per million people in the population.
+          display:
+            numDecimalPlaces: 1
+
+        hospitals_with_dedicated_coronary_care_units__per_million_people:
+          title: Hospitals with dedicated coronary care units per million people
+          description_short: Number of hospitals with dedicated coronary care units (CCUs), per million people in the population.
+          display:
+            numDecimalPlaces: 0
+
+        hospitals_with_dedicated_stroke_units__per_million_people:
+          title: Hospitals with dedicated stroke units per million people
+          description_short: Number of hospitals with dedicated stroke units, per million people in the population.
+          display:
+            numDecimalPlaces: 1
+
+        implantable_cardioverter_defibrillator__icd__implantations__per_million_people:
+          title: Implantable cardioverter defibrillator (ICD) implantations per million people
+          description_short: Number of [implantable cardioverter-defibrillators (ICDs)](#dod:implantable-cardioverter-defibrillators), per million people in the population.
+          display:
+            numDecimalPlaces: 0
+
+        pacemaker_implantations__per_million_people:
+          title: Pacemaker implantations per million people
+          description_short: Number of [pacemaker](#dod:pacemaker) implantations used to treat heart rhythm disorders, per million people in the population.
+          display:
+            numDecimalPlaces: 0
+
+        percutaneous_aortic_valve_implantation__tavi__per_million_people:
+          title: Percutaneous aortic valve implantation (TAVI) per million people
+          description_short: Number of [percutaneous aortic valve implantation (TAVI)](#dod:percutaneous-aortic-valve-implantations) procedures, per million people in the population.
+          display:
+            numDecimalPlaces: 0

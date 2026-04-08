@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Death rate by age group in England and Wales - ONS
+    description: |-
+      Death rates in England and Wales by age group, measured as the number of deaths from all causes per 1,000 individuals per age bracket.
+    url: https://visual.ons.gov.uk/causes-of-death-over-100-years/
+    date_accessed: 2018-01-31
+    published_by: Office for National Statistics (ONS)
+  name: Death rate by age group in England and Wales - ONS
+  description: ''
+outs:
+  - md5: 532613b21b052f23c2d28ebade3fa744
+    size: 11626
+    path: death_rate_by_age_group_england_and_wales__ons.feather

@@ -1,17 +1,15 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4221
-    date_accessed: 2023-08-10 09:42:53.520774
+    url: https://admin.owid.io/admin/datasets/4221
+    date_accessed: 2026-03-10 09:29:09.973124+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_4221_methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010
+  name: Grapher metadata for dataset_4221_methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010
   description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ee4f126e99d41e421f31c008afc4e919
-  size: 5838
-  path: 
-    dataset_4221_methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010_config.json
+  - md5: dfdad76d1a18e290cbba3efe020f9cd4
+    size: 6340
+    path: dataset_4221_methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010_config.json

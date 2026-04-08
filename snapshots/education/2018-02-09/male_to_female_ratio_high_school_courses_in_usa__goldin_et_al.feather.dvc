@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Male-to-female ratio high school courses in USA - Goldin et al.
+    description: |-
+      Data represents the average male-to-female ratio of students taking maths and science subjects in high school education in the United States.
+    url: http://www.jstor.org/stable/30033687
+    date_accessed: 2018-02-09
+    published_by: |-
+      Goldin, C., Katz, L. F., & Kuziemko, I. (2006). The homecoming of American college women: The reversal of the college gender gap. Journal of Economic perspectives, 20(4), 133-156.
+  name: Male-to-female ratio high school courses in USA - Goldin et al.
+  description: ''
+outs:
+  - md5: f19f8c7db69c713301ec9983f7e469ac
+    size: 3762
+    path: male_to_female_ratio_high_school_courses_in_usa__goldin_et_al.feather

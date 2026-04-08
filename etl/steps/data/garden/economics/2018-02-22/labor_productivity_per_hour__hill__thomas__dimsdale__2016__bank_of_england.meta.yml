@@ -1,0 +1,17 @@
+dataset:
+  title: Labor productivity per hour (Hill, Thomas, Dimsdale (2016), Bank of England)
+tables:
+  labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england:
+    variables:
+      labour_productivity_per_hour__2013_100:
+        title: Labour productivity per hour (2013=100)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

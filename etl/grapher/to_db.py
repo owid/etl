@@ -15,13 +15,15 @@ import os
 import warnings
 from dataclasses import dataclass
 from threading import Lock
-from typing import Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, cast
 
 import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import Table, Variable, VariableMeta, utils
-from owid.catalog.utils import hash_any
+from owid.catalog.core.meta import Source, update_variable_metadata
+from owid.catalog.core.paths import CatalogPath
+from owid.catalog.core.utils import hash_any
 from sqlalchemy import select, text, update
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
@@ -29,7 +31,6 @@ from sqlalchemy.orm import Session
 from apps.backport.datasync import data_metadata as dm
 from apps.backport.datasync.datasync import upload_gzip_string
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 from etl import config
 from etl.db import get_engine, production_or_master_engine, read_sql
 from etl.grapher import helpers as gh
@@ -52,7 +53,7 @@ class DatasetUpsertResult:
 
 
 def upsert_dataset(
-    engine: Engine, dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
+    engine: Engine, dataset: catalog.Dataset, namespace: str, sources: List[Source]
 ) -> DatasetUpsertResult:
     assert dataset.metadata.short_name, "Dataset must have a short_name"
     assert dataset.metadata.version, "Dataset must have a version"
@@ -161,28 +162,6 @@ def _add_or_update_source(
     return source_id
 
 
-def _update_variables_metadata(table: catalog.Table) -> None:
-    """Update variables metadata."""
-    for col in table.columns:
-        meta = table[col].metadata
-
-        # Grapher uses units from field `display` instead of fields `unit` and `short_unit`
-        # before we fix grapher data model, copy them to `display`.
-        meta.display = meta.display or {}
-        if meta.short_unit:
-            meta.display.setdefault("shortUnit", meta.short_unit)
-        if meta.unit:
-            meta.display.setdefault("unit", meta.unit)
-
-        # Templates can make numDecimalPlaces string, convert it to int
-        if meta.display and isinstance(meta.display.get("numDecimalPlaces"), str):
-            meta.display["numDecimalPlaces"] = int(meta.display["numDecimalPlaces"])
-
-        # Prune empty fields from description_key
-        if meta.description_key:
-            meta.description_key = [k for k in meta.description_key if k.strip()]
-
-
 def check_table(table: Table) -> None:
     assert set(table.index.names) >= {"year", "entityId", "entityCode", "entityName"}, (
         "Table to be upserted must have those 4 indices: year, entityId, entityCode, entityName. Instead"
@@ -228,13 +207,13 @@ def _check_upserted_variable(variable: Variable) -> None:
     assert not gh.contains_inf(variable), f"Column `{variable.name}` has inf values"
 
 
-def load_dataset_variables(dataset_id: int, engine: Engine) -> Dict[str, dict]:
+def load_dataset_variables(dataset_id: int, engine: Engine) -> Dict[int | str, Any]:
     q = """
     select catalogPath, id, dataChecksum, metadataChecksum from variables where datasetId = %(dataset_id)s
     """
     return (
         read_sql(q, engine=engine, params={"dataset_id": dataset_id}).set_index("catalogPath").to_dict(orient="index")
-    )  # type: ignore
+    )
 
 
 def upsert_table(
@@ -259,11 +238,11 @@ def upsert_table(
 
     _check_upserted_variable(table.iloc[:, 0])
 
-    _update_variables_metadata(table)
-
     # For easy retrieveal of the value series we store the name
     column_name = table.columns[0]
     variable_meta: VariableMeta = table[column_name].metadata
+
+    variable_meta = update_variable_metadata(variable_meta)
 
     # All following functions assume that `value` is string
     # NOTE: we could make the code more efficient if we didn't convert `value` to string
@@ -281,7 +260,7 @@ def upsert_table(
     # Both checksums match
     if checksums.get("dataChecksum") == checksum_data and checksums.get("metadataChecksum") == checksum_metadata:
         if verbose:
-            log.info("upsert_table.skipped_no_changes", size=len(df), catalog_path=catalog_path)
+            log.debug("upsert_table.skipped_no_changes", size=len(df), catalog_path=catalog_path)
         return
 
     with Session(engine) as session:
@@ -315,7 +294,7 @@ def upsert_table(
         session.commit()
 
         if verbose:
-            log.info("upsert_table.uploaded_to_s3", size=len(df), variable=catalog_path.split("#")[1])
+            log.info("upsert_table.uploaded_to_s3", size=len(df), indicator=CatalogPath.from_str(catalog_path).variable)
 
 
 def upload_data(df: pd.DataFrame, s3_data_path: str) -> None:
@@ -450,8 +429,8 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
             .where(gm.Dataset.id == dataset_id)  # type: ignore
             .values(
                 sourceChecksum=checksum,
-                dataEditedAt=datetime.datetime.utcnow(),
-                metadataEditedAt=datetime.datetime.utcnow(),
+                dataEditedAt=datetime.datetime.now(datetime.timezone.utc),
+                metadataEditedAt=datetime.datetime.now(datetime.timezone.utc),
             )
         )
         session.execute(q)
@@ -500,27 +479,20 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
         if rows:
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
 
+            message = "Variables used in charts will not be deleted automatically. Ignore this if your PR doesn't affect the problematic variables."
+
             if _raise_error_for_deleted_variables(rows):
-                raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
+                raise ValueError(f"{message}:\n{rows}")
             else:
                 # otherwise show a warning
                 log.warning(
-                    "Variables used in charts will not be deleted automatically",
+                    message,
                     rows=rows,
                     variables=variable_ids_to_delete,
                 )
                 return False
 
         # then variables themselves with related data in other tables
-        con.execute(
-            text(
-                """
-            DELETE FROM country_latest_data WHERE variable_id IN :variable_ids
-        """
-            ),
-            {"variable_ids": variable_ids_to_delete},
-        )
-
         # delete relationships
         con.execute(
             text(
@@ -597,6 +569,10 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
     if config.ENV == "staging":
         # It's possible that we merged changes to ETL, but the staging server still uses old charts. In
         # that case, we first check that the charts were really modified on our staging server.
+
+        # Load this dynamically for performance reasons
+        from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
+
         modified_charts = ChartDiffsLoader(config.OWID_ENV.get_engine(), production_or_master_engine()).df
         return bool(set(modified_charts.index) & set(rows.chartId))
     # Only show a warning in production. We can't raise an error because if someone merges changes to ETL

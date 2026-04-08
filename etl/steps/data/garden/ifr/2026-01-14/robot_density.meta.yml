@@ -1,0 +1,23 @@
+dataset:
+  update_period_days: 365
+
+tables:
+  robot_density:
+    variables:
+      robot_density:
+        title: Industrial robots in operation per 1,000 employees
+        description_short: Number of industrial robots in operation per 1,000 employees in the manufacturing industry. Industrial robots are automated, reprogrammable machines that can move in three or more directions and perform a variety of tasks in industrial settings.
+        unit: "robots per 1,000 employees"
+        description_key:
+          - Industrial robots are machines used in factories to automate tasks like welding, assembly, and packaging.
+          - They are defined as automatically controlled, reprogrammable, and multipurpose machines that can move in three or more directions.
+          - Reprogrammable means their functions can be changed through software without altering their physical parts.
+          - Multipurpose means they can be adapted for different tasks with mechanical changes.
+          - Robots are becoming easier to install and more flexible, which means even small production runs can be automated.
+          - Companies use robots to improve product quality, increase speed, reduce waste, and cut costs.
+        short_unit: ""
+        presentation:
+          grapher_config:
+            note: "Example machines that are not classified as robots: software (e.g., voice assistants), remote-controlled drones, self-driving cars, “smart” washing machines."
+        display:
+          numDecimalPlaces: 0

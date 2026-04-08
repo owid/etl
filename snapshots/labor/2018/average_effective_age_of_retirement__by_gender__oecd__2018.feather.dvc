@@ -1,0 +1,23 @@
+meta:
+  source:
+    name: Average effective age of retirement, by gender (OECD, 2018)
+    description: |-
+      The average effective age of retirement is calculated as a weighted average of (net) labour market withdrawals at different ages over a 5-year period for workers initially aged 40 and over.
+
+      The estimate for each year corresponds to the 5 year interval leading up to that year. For example, the observation for 1970 corresponds to (1965-70), 1971 to (1966-71) etc.
+
+      Labour force withdrawals are estimated based on changes in labour force participation rates rather than labour force levels to abstract from compositional effects. Estimates include both interpolations of census data as well as labour force surveys. For a breakdown by observation, see the <a href="http://www.oecd.org/els/emp/Summary_1970%20values.xlsx">following spreadsheet</a>.
+
+      Note: The estimates for women in Turkey are based on 3-yearly moving averages of participation rates for each 5-year age group.
+
+      The 'Europe average' series includes: Austria, Belgium, Bulgaria, Croatia, Cyprus, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Poland, Portugal, Romania, Slovakia, Slovenia, Spain, Sweden, United Kingdom.
+    url: http://www.oecd.org/els/emp/average-effective-age-of-retirement.htm
+    date_accessed: 2020-11-28
+    published_by: OECD Database on Average Effective Retirement Age
+  name: Average effective age of retirement, by gender (OECD, 2018)
+  description: ''
+  is_public: false
+outs:
+  - md5: 1f1877661255323acaf25ee8985470b0
+    size: 19650
+    path: average_effective_age_of_retirement__by_gender__oecd__2018.feather

@@ -1,0 +1,58 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Medicine & Biotechnology
+    processing_level: major
+
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  total_drug_approvals:
+    variables:
+      total_approvals:
+        title: New drugs approved by the FDA
+        unit: 'approvals'
+        short_unit: ''
+        description_short: |-
+          The annual number of new drugs approved by the US Food and Drug Administration (FDA). This is broken down into [new chemical drugs](#dod:new-chemical-entity), new vaccines, and other new biologics such as antibodies and gene therapies. The data does not include [generics](#dod:generic-drug), reformulations, or [biosimilars](#dod:biosimilar).
+        display:
+          numDecimalPlaces: 0
+        description_key:
+          - This data includes both [new drug applications](#dod:new-drug-application) (NDAs) and [biologics license applications](#dod:biologics-license-application) (BLAs) approved by the Center for Drug Evaluation and Research (CDER) and the Center for Biologics Evaluation and Research (CBER) of the FDA.
+        description_processing: |-
+          - Biologicals approved by the CBER have been extracted from the FDA's "Purple Book", which lists all licensed biological products.
+          - CDER approvals (which include some biologics and all chemical drugs) come directly from the "Compilation of CDER NME and New Biologic Approvals" database, which is published by CDER.
+          - This dataset only contains new drugs ([new chemical entities](#dod:new-chemical-entity) and biologics). We removed [biosimilars](#dod:biosimilar) and [generics](#dod:generic-drug) from the dataset, by excluding the "biosimilar" or "interchangeable" license types as well as products with a reference product listed.
+        presentation:
+          grapher_config:
+            note: |-
+              This data includes [biologics license applications (BLAs)](#dod:biologics-license-application) (used for biologics and vaccines) and [new drug applications (NDAs)](#dod:new-drug-application) (used for chemical drugs). Data on approvals of chemical drugs are only available from 1985.
+  drug_approvals_designations:
+    variables:
+      approvals:
+        title: New drugs approved in the United States, by designations
+        unit: 'approvals'
+        short_unit: ''
+        description_short: |-
+          The annual number of new drugs approved by the Center for Drug Evaluation and Research (CDER), that fall under each designation, including [Orphan Drugs](#dod:orphan-drug), [Fast Track](#dod:fda-fast-track), [Accelerated Approval](#dod:fda-accelerated-approval), [Breakthrough Therapy](#dod:breakthrough-therapy), and [Qualified Infectious Disease Product](#dod:qualified-infectious-disease-product).
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            note: |-
+              Designations can be overlapping; a drug can receive multiple designations or no designation at all. CDER is part of the US Food and Drug Administration (FDA).
+        description_key:
+          - This data only includes drugs approved by the Center for Drug Evaluation and Research (CDER). It does not include any biologics approved by the Center for Biologics Evaluation and Research (CBER) such as vaccines, allergenic products, or blood and blood components.
+          - Orphan drugs are drugs that treat rare diseases or conditions, affecting fewer than 200,000 people in the US. As developing these drugs would not be profitable for drug companies on their own, the Orphan Drug Act provides incentives such as tax credits and market exclusivity for these drugs.
+          - Fast track is a process created by the FDA to help drugs for serious conditions reach patients more quickly when there is an unmet medical need. It allows drug developers to have more frequent meetings with the FDA and to submit parts of their application as they’re ready, instead of waiting until everything is complete.
+          - Accelerated Approval is an FDA pathway that allows certain drugs for serious conditions to be approved based on earlier evidence — such as lab results or imaging — instead of waiting for direct proof of clinical benefit.
+          - Breakthrough Therapy is a designation the FDA can give drugs when early clinical evidence suggests that a new treatment may offer substantial improvement over existing options for a serious illness.
+          - A Qualified Infectious Disease Product is a drug intended to treat serious or life-threatening bacterial or fungal infections. The FDA grants this status under a law called the GAIN Act to encourage new antibiotics and antifungals.
+          - Designations can be overlapping; a drug can receive multiple designations or no designation at all.
+          - The data does not include [generics](#dod:generic-drug) or reformulations of existing drugs.
+
+

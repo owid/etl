@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "World Prison Brief"
+    description: |-
+      The World Prison Brief is an online database providing free access to information on prison systems around the world. It is a unique resource, which supports evidence-based development of prison policy and practice globally.
+
+      The World Prison Brief is hosted by the Institute for Crime & Justice Policy Research (ICPR), at Birkbeck, University of London. ICPR hosts and updates the World Prison Brief as part of its World Prison Research Programme. This programme, which involves collaboration with research partners, civil society organisations and policy makers, aims to inform and promote debate and policy reform through international comparative research projects, publications and civil society engagement.
+
+      In addition to providing access to the World Prison Brief database, this website holds other prisons publications by ICPR, including World Prison Population Lists, the handbook A Human Rights Approach to Prison Management, research project reports, blogs and expert commentary on prisons issues.
+    date_published: "2026-01-20"
+    # Citation
+    producer: Institute for Crime & Justice Policy Research
+    citation_full: |-
+      World Prison Brief, Institute for Crime & Justice Policy Research.
+    attribution_short: ICJPR
+    # Files
+    url_main: https://www.prisonstudies.org/highest-to-lowest/prison_population_rate?field_region_taxonomy_tid=All
+    date_accessed: "2026-01-20"
+
+    # License
+    license:
+      name: © 2024 Institute for Crime & Justice Policy Research and the authors
+outs:
+  - md5: c3dad677a51cc497fbf9f00f7f2149bf
+    size: 125183
+    path: prison_rates.csv

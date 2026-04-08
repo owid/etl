@@ -74,7 +74,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000]
+                customNumericValues: [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000]
                 baseColorScheme: RdPu
       total_cases_per_million:
         title: "Total confirmed cases of COVID-19 per million people"
@@ -90,7 +90,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+                customNumericValues: [0, 100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
                 baseColorScheme: OrRd
         display:
           numDecimalPlaces: 3
@@ -115,7 +115,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+                customNumericValues: [0, 100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
                 baseColorScheme: RdPu
       new_cases_per_million:
         title: "Daily new confirmed cases of COVID-19 per million people"
@@ -131,7 +131,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
+                customNumericValues: [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
                 baseColorScheme: OrRd
 
       ## Daily (smoothed)
@@ -146,7 +146,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+                customNumericValues: [0, 100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
                 baseColorScheme: RdPu
       new_cases_per_million_7_day_avg_right:
         title: "Daily new confirmed cases of COVID-19 per million people (rolling 7-day average, right-aligned)"
@@ -165,7 +165,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
+                customNumericValues: [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
                 baseColorScheme: OrRd
 
       ## Days since
@@ -208,7 +208,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [1000, 5000, 10000, 50000, 100000, 500000, 1000000, 5000000]
+                customNumericValues: [0, 1000, 5000, 10000, 50000, 100000, 500000, 1000000, 5000000]
                 baseColorScheme: RdPu
       weekly_cases_per_million:
         title: "Weekly cases per million people"
@@ -225,7 +225,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10, 50, 100, 500, 1000, 5000, 10000, 50000]
+                customNumericValues: [0, 10, 50, 100, 500, 1000, 5000, 10000, 50000]
                 baseColorScheme: OrRd
         display:
           numDecimalPlaces: 3
@@ -247,10 +247,9 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [-200, -100, -50, -20, 0, 20, 50, 100, 200, 1]
+                customNumericValues: [-1, -200, -100, -50, -20, 0, 20, 50, 100, 200, 1]
                 colorSchemeInvert: true
                 baseColorScheme: RdBu
-                customNumericMinValue: -1
         display:
           numDecimalPlaces: 2
           tolerance: 30
@@ -275,7 +274,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [5000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000]
+                customNumericValues: [0, 5000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000]
                 baseColorScheme: RdPu
       biweekly_cases_per_million:
         title: "Biweekly cases per million people"
@@ -296,7 +295,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
+                customNumericValues: [0, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
                 baseColorScheme: OrRd
       biweekly_pct_growth_cases:
         title: Biweekly case growth (%)
@@ -318,10 +317,9 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [-500, -100, -50, 0, 50, 100, 500, 1]
+                customNumericValues: [-1, -500, -100, -50, 0, 50, 100, 500, 1]
                 colorSchemeInvert: true
                 baseColorScheme: RdBu
-                customNumericMinValue: -1
 
       # Deaths
       ################
@@ -345,7 +343,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]
+                customNumericValues: [0, 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]
                 baseColorScheme: RdPu
       total_deaths_per_million:
         title: "Total confirmed deaths due to COVID-19 per million people"
@@ -361,7 +359,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [1000, 2000, 3000, 4000, 5000, 6000]
+                customNumericValues: [0, 1000, 2000, 3000, 4000, 5000, 6000]
                 baseColorScheme: OrRd
         display:
           numDecimalPlaces: 3
@@ -405,7 +403,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [1, 3, 10, 30, 100, 300, 1000, 3000, -1]
+                customNumericValues: [0, 1, 3, 10, 30, 100, 300, 1000, 3000, -1]
                 baseColorScheme: RdPu
       new_deaths_per_million:
         title: "Daily new confirmed deaths due to COVID-19 per million people"
@@ -448,7 +446,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [1, 3, 10, 30, 100, 300, 1000, 3000, 10000]
+                customNumericValues: [0, 1, 3, 10, 30, 100, 300, 1000, 3000, 10000]
                 baseColorScheme: RdPu
       new_deaths_per_million_7_day_avg_right:
         title: "Daily new confirmed deaths due to COVID-19 per million people (rolling 7-day average, right-aligned)"
@@ -516,7 +514,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [50, 100, 500, 1000, 5000, 10000, 50000]
+                customNumericValues: [0, 50, 100, 500, 1000, 5000, 10000, 50000]
                 baseColorScheme: RdPu
       weekly_deaths_per_million:
         title: "Weekly deaths per million people"
@@ -534,7 +532,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [1, 5, 10, 50, 100, 500]
+                customNumericValues: [0, 1, 5, 10, 50, 100, 500]
                 baseColorScheme: OrRd
         display:
           numDecimalPlaces: 2
@@ -557,8 +555,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericMinValue: 0
-                customNumericValues: [-50, -20, -10, 0, 10, 20, 50, 100, 300]
+                customNumericValues: [0, -50, -20, -10, 0, 10, 20, 50, 100, 300]
                 colorSchemeInvert: true
                 baseColorScheme: RdBu
 
@@ -587,7 +584,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [50, 100, 500, 1000, 5000, 10000, 50000]
+                customNumericValues: [0, 50, 100, 500, 1000, 5000, 10000, 50000]
                 baseColorScheme: RdPu
       biweekly_deaths_per_million:
         title: "Biweekly deaths per million people"
@@ -609,7 +606,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [1, 5, 10, 50, 100, 500]
+                customNumericValues: [0, 1, 5, 10, 50, 100, 500]
                 baseColorScheme: OrRd
       biweekly_pct_growth_deaths:
         title: Biweekly death growth (%)
@@ -631,8 +628,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericMinValue: 0
-                customNumericValues: [-50, -20, -10, 0, 10, 20, 50, 100, 300]
+                customNumericValues: [0, -50, -20, -10, 0, 10, 20, 50, 100, 300]
                 colorSchemeInvert: true
                 baseColorScheme: RdBu
 
@@ -658,7 +654,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+                customNumericValues: [0, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
                 baseColorScheme: RdPu
       total_deaths_per_million_last12m:
         title: "Total confirmed deaths due to COVID-19 per million people (last 12 months)"
@@ -675,7 +671,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [300, 600, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000]
+                customNumericValues: [0, 300, 600, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000]
                 baseColorScheme: OrRd
         display:
           numDecimalPlaces: 2

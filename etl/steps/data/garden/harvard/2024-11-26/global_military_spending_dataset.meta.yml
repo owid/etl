@@ -76,7 +76,7 @@ tables:
           "{definitions.description_from_producer_methodology}"
         processing_level: major
         description_processing: |-
-          We calculated this indicator by dividing the total military expenditure by a population estimate for each year. The population estimates come from a long-run dataset [mantained by Our World in Data](https://ourworldindata.org/population-sources).
+          We calculated this indicator by dividing the total military expenditure by a population estimate for each year. The population estimates come from a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
         presentation:
           title_public: Military expenditure per capita
         display:

@@ -17,7 +17,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     type=bool,
     help="Upload dataset to Snapshot",
 )
-def main(upload: bool) -> None:
+def run(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"irena/{SNAPSHOT_VERSION}/renewable_capacity_statistics.xlsx")
 
@@ -26,4 +26,4 @@ def main(upload: bool) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run()

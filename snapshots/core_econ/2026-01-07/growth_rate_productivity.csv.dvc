@@ -1,0 +1,35 @@
+# NOTE: File was provided by CORE Econ via email.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Total Economy Database"
+    description: |-
+      The Total Economy Database™, (TED) is a comprehensive database with annual data covering GDP, population, employment, hours, labor quality, capital services, labor productivity, and Total Factor Productivity for 131 countries in the world.
+    date_published: "2019-04-01"
+    version_producer: '2019'
+    title_snapshot: Total Economy Database - Productivity growth in the US
+    description_snapshot: |-
+      Productivity growth in the US processed by CORE Econ.
+
+    # Citation
+    producer: Total Economy Database
+    citation_full: |-
+      - Broadberry, S. (2013). Accounting for the Great Divergence. London School of Economics and Political Science
+      - The Conference Board Total Economy Database™, April 2019
+    attribution: Broadberry (2013); The Conference Board (2019)
+
+    # Files
+    url_main: https://eprints.lse.ac.uk/54573/1/WP184.pdf
+    date_accessed: '2026-01-07'
+
+    # License
+    license:
+      name: Terms of use for the Total Economy Database™
+      url: https://www.conference-board.org/topics/total-economy-database
+outs:
+  - md5: b56c2dfc5e77a2583f46177ac189d39a
+    size: 1581
+    path: growth_rate_productivity.csv

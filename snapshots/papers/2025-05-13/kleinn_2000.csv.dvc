@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Kleinn, C., Corrales, L., & Morales, D.
+    title: "Forest area in Costa Rica: A comparative study of tropical forest cover estimates over time"
+    citation_full: |-
+      Kleinn, C., Corrales, L. & Morales, D. Forest Area in Costa Rica: A Comparative Study of Tropical Forest Cover Estimates over Time. Environ Monit Assess 73, 17–40 (2002). https://doi.org/10.1023/A:1012659129083
+    attribution_short: Kleinn, Corrales, & Morales
+    url_main: |-
+      https://link.springer.com/article/10.1023/A:1012659129083
+    date_accessed: "2025-05-08"
+    date_published: "2002-01-01"
+    license:
+      name: © 2002 Kluwer Academic Publishers
+      url: https://link.springer.com/article/10.1023/A:1012659129083
+outs:
+  - md5: c665595e89cf9b054bc80505679170bd
+    size: 191
+    path: kleinn_2000.csv

@@ -1,0 +1,25 @@
+# Go to https://www.space-track.org and log in (create an account if you don't have one).
+# Go to Query Builder.
+# Use the following parameters: Class = gp, Order by = OBJECT_ID, Format = CSV
+# Leave the rest of the parameters as default.
+# Click on BUILD QUERY (bottom left) then RUN QUERY (top right) to download the CSV file (about 38 MB).
+meta:
+  origin:
+    producer: United States Space Force
+    title: Number of objects in space
+    description: |-
+      This dataset is extracted from Space-Track.org, a website maintained by the 18th Space Defense Squadron of the United States Space Force.
+
+      The original data includes information on thousands of space objects tracked over time, including their launch date and decay date (if they have reentered the Earth's atmosphere).
+    citation_full: United States Space Force - Number of objects in space (2026). 18th Space Defense Squadron.
+    url_main: https://www.space-track.org/
+    date_accessed: '2026-01-08'
+    # NOTE: The data seems to be updated regularly, so it's safe to assume that date_published equals date_accessed.
+    date_published: '2026-01-08'
+  license:
+    name: USSPACECOM Basic SSA Data, redistribution allowed with attribution
+    url: https://www.space-track.org/documentation#/odr
+outs:
+  - md5: 233e786cfe0275a2c336d54f688aa3c3
+    size: 38111265
+    path: objects_in_space.csv

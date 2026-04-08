@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2893
-    date_accessed: 2023-08-10 07:44:55.123983
+    url: https://admin.owid.io/admin/datasets/2893
+    date_accessed: 2026-03-10 09:28:10.280172+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Long run time use in Norway, by sex - Norway Statistics
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c8e3f86caaca0e8c7fd267a2b4909350
-  size: 7258
-  path: 
-    dataset_2893_long_run_time_use_in_norway__by_sex__norway_statistics_values.feather
+  - md5: 79c6728b7b5f67a89d64c59e382cd03b
+    size: 7290
+    path: dataset_2893_long_run_time_use_in_norway__by_sex__norway_statistics_values.feather

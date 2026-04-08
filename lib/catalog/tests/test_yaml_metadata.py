@@ -1,6 +1,6 @@
-from owid.catalog import yaml_metadata as ym
-from owid.catalog.meta import Origin, Source
-from owid.catalog.tables import Table
+from owid.catalog.core import yaml_metadata as ym
+from owid.catalog.core.meta import Origin, Source
+from owid.catalog.core.tables import Table
 
 
 def test_update_metadata_from_yaml_description_key(tmp_path):

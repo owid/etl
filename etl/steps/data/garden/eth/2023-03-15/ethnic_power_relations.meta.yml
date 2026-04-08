@@ -159,7 +159,7 @@ tables:
         description: |
           Count variable indicating the number of active groups in this country.
 
-          A group is considered active if it is phisically present in a country and is not currently represented by an active ancestor or descendant.
+          A group is considered active if it is physically present in a country and is not currently represented by an active ancestor or descendant.
         unit: ""
         short_unit: ""
         display:

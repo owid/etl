@@ -3,7 +3,7 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -120,7 +120,7 @@ SNAPSHOTS_DICT = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Keep snapshot info for the main snapshot
     snap_main = paths.load_snapshot("world_inequality_database.csv")
 
@@ -171,8 +171,8 @@ def run(dest_dir: str) -> None:
     tb_fiscal = tb_fiscal.format()
 
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir, tables=tables + [tb_fiscal], check_variables_metadata=True, default_metadata=snap_main.metadata
+    ds_meadow = paths.create_dataset(
+        tables=tables + [tb_fiscal], check_variables_metadata=True, default_metadata=snap_main.metadata
     )
 
     # Save changes in the new meadow dataset.

@@ -17,8 +17,7 @@ meta:
 
     # Files
     url_main: https://doi.org/10.24416/UU01-AEZZIT
-    url_download:
-      https://geo.public.data.uu.nl/vault-hyde/HYDE%203.3%5B1701183392%5D/original/hyde33_c7_base_mrt2023/txt/all_indicators.zip
+    url_download: https://geo.public.data.uu.nl/vault-hyde/HYDE%203.3%5B1701183392%5D/original/hyde33_c7_base_mrt2023/txt/all_indicators.zip
     date_accessed: 2024-01-02
 
     # License
@@ -28,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/hyde/2024-01-02
 outs:
-- md5: 0bdb73545b49292dbe424acf0207f038
-  size: 3241856
-  path: all_indicators.zip
+  - md5: 0bdb73545b49292dbe424acf0207f038
+    size: 3241856
+    path: all_indicators.zip

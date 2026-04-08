@@ -3,7 +3,7 @@
 import pandas as pd
 from migration_config_dict import ADDITIONAL_DESCRIPTIONS, CONFIG_DICT, MAP_BRACKETS, SORTER  # type: ignore
 
-from etl.collections.explorer_legacy import ExplorerLegacy
+from etl.collection.explorer.legacy import ExplorerLegacy
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -143,7 +143,6 @@ def run(dest_dir: str) -> None:
     df_columns = pd.DataFrame(col_dicts)
 
     df_columns["colorScaleNumericMinValue"] = 0
-    df_columns["colorScaleEqualSizeBins"] = True  # equal size bins for all indicators
 
     # Save outputs.
     ds_explorer = paths.create_explorer_legacy(config=config, df_graphers=df_graphers, df_columns=df_columns)

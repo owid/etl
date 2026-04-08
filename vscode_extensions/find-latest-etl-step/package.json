@@ -3,6 +3,7 @@
   "displayName": "Find Latest ETL Step",
   "description": "Find the latest ETL step given a step short name",
   "version": "0.0.2",
+  "icon": "find-latest-etl-step.png",
   "publisher": "owid",
   "engines": {
     "vscode": "^1.93.0"
@@ -36,21 +37,21 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/lodash": "^4.17.9",
-    "@types/mocha": "^10.0.8",
-    "@types/node": "20.x",
-    "@types/vscode": "^1.93.0",
-    "@typescript-eslint/eslint-plugin": "^8.7.0",
-    "@typescript-eslint/parser": "^8.7.0",
+    "@types/lodash": "^4.17.24",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.19.37",
+    "@types/vscode": "^1.110.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1",
-    "esbuild": "^0.24.0",
-    "eslint": "^9.11.1",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.24.2",
+    "eslint": "^9.39.4",
     "npm-run-all": "^4.1.5",
-    "typescript": "^5.6.2"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "ignore": "^6.0.2",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.23"
   }
 }

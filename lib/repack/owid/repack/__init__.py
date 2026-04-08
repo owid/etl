@@ -15,8 +15,9 @@ def repack_frame(
     Rename columns if necessary during the repacking. The column renames
     work even if the column is part of the index.
 
-    :param remap: remap column names
-    :param dtypes: dictionary of fixed dtypes to use
+    Args:
+        remap: remap column names
+        dtypes: dictionary of fixed dtypes to use
     """
     if df.index.names != [None]:
         raise ValueError("repacking is lost for index columns")

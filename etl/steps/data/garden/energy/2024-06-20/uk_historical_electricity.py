@@ -7,7 +7,7 @@ import numpy as np
 from owid.catalog import Table
 from owid.datautils import dataframes
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -155,17 +155,17 @@ def combine_beis_and_electricity_mix_data(tb_beis: Table, tb_elec: Table) -> Tab
     return tb_combined
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load BEIS dataset and read its main table.
     ds_beis = paths.load_dataset("uk_historical_electricity")
-    tb_beis = ds_beis["uk_historical_electricity"].reset_index()
+    tb_beis = ds_beis.read("uk_historical_electricity")
 
     # Load electricity mix dataset and read its main table.
     ds_elec = paths.load_dataset("electricity_mix")
-    tb_elec = ds_elec["electricity_mix"].reset_index()
+    tb_elec = ds_elec.read("electricity_mix")
 
     #
     # Process data.
@@ -186,5 +186,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_combined], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb_combined])
     ds_garden.save()

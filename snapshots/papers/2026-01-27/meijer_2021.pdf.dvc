@@ -1,0 +1,27 @@
+meta:
+  origin:
+    title: More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean
+    description: |-
+      Supplementary materials from Meijer et al. (2021) including Table S8 with country-level statistics
+      on plastic waste emissions into the ocean via rivers.
+    producer: Meijer et al.
+    citation_full: |-
+      Meijer, L. J. J., van Emmerik, T., van der Ent, R., Schmidt, C., & Lebreton, L. (2021).
+      More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean.
+      Science Advances, 7(18), eaaz5803.
+    attribution_short: Meijer et al. (2021)
+    url_main: https://www.science.org/doi/10.1126/sciadv.aaz5803
+    # url_download: https://www.science.org/action/downloadSupplement?doi=10.1126%2Fsciadv.aaz5803&file=aaz5803_sm.pdf
+    # Bot protection on the website means we should manually download the file and upload it to our S3 bucket.
+    # To add the file run: etls cottom_plastic_waste --path-to-file <path_to_downloaded_file>
+
+    date_published: '2021-04-30'
+    date_accessed: '2026-01-27'
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+outs:
+  - md5: a6d59fa9c56a30d7f52dcf0f1ad04c1f
+    size: 1959609
+    path: meijer_2021.pdf

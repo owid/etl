@@ -1,0 +1,22 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Trade & Globalization
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  historic_trade:
+    variables:
+      volume_index:
+        title: Trade volume index
+        unit: index 1913=100
+        description_short: The average of export and import volumes, reconstructed from historical sources and standardized to modern definitions, expressed as an index with 1913 = 100.
+        display:
+          numDecimalPlaces: 1

@@ -1,0 +1,64 @@
+definitions:
+  common:
+    processing_level: major
+    # TODO: Add description_processing
+
+    presentation:
+      topic_tags:
+        - Food Supply
+
+dataset:
+  update_period_days: 365
+  title: "Decoupling of agricultural production and land use"
+
+tables:
+  decoupling_food_production_and_land_use_total:
+    title: "Decoupling of agricultural production and land use"
+    variables:
+      food_quantity:
+        title: "Quantity of food produced"
+        unit: tonnes
+        short_unit: t
+      food_energy:
+        title: "Food production in terms of energy content"
+        unit: kilocalories
+        short_unit: kcal
+      population:
+        title: "Population"
+        unit: persons
+        short_unit: ""
+      production:
+        title: "Total agricultural production"
+        unit: tonnes
+        short_unit: t
+      production_energy:
+        title: "Total agricultural production in terms of energy content"
+        unit: kilocalories
+        short_unit: kcal
+      agricultural_land:
+        title: "Agricultural land area"
+        unit: hectares
+        short_unit: ha
+  decoupling_food_production_and_land_use:
+    title: "Decoupling of agricultural production and land use, by item"
+    variables:
+      food_quantity:
+        title: "Quantity of food produced"
+        unit: tonnes
+        short_unit: t
+      food_energy:
+        title: "Food production in terms of energy content"
+        unit: kilocalories
+        short_unit: kcal
+      population:
+        title: "Population"
+        unit: persons
+        short_unit: ""
+      production:
+        title: "Total agricultural production"
+        unit: tonnes
+        short_unit: t
+      production_energy:
+        title: "Total agricultural production in terms of energy content"
+        unit: kilocalories
+        short_unit: kcal

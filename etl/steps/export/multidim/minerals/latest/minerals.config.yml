@@ -1,0 +1,53 @@
+title:
+  title: Minerals
+  title_variant: production, reserves, and value
+
+default_selection:
+  - World
+  - Australia
+  - Chile
+  - China
+  - United States
+
+topic_tags:
+  - Metals & Minerals
+
+default_dimensions:
+  mineral: copper
+  metric: production
+  type: mine
+  measure: absolute
+
+dimensions:
+  - slug: mineral
+    name: Mineral
+    choices: []
+
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: production
+        name: Production
+        description: Annual production of the mineral
+      - slug: reserves
+        name: Reserves
+        description: Estimated reserves of the mineral
+      - slug: unit_value
+        name: Unit value
+        description: Price per tonne in constant 1998 US dollars
+
+  - slug: type
+    name: Type
+    choices: []
+
+  - slug: measure
+    name: Measure
+    choices:
+      - slug: absolute
+        name: Absolute
+        description: Total quantity
+      - slug: share_of_global
+        name: Share of global
+        description: Share of global total as a percentage
+
+views: []

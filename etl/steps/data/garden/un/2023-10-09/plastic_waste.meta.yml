@@ -77,7 +77,7 @@ tables:
           numDecimalPlaces: 0
 
       import_other_mot:
-        title: Imports of plastic waste via other modes of tranport
+        title: Imports of plastic waste via other modes of transport
         unit: tonnes
         short_unit: t
         description_short: Plastic waste imported via miscellaneous and/or combined transport modes.
@@ -279,5 +279,21 @@ tables:
         short_unit: kg
         processing_level: minor
         description_short: Plastic waste net exports encompassing all transport methods per capita. Net exports are calculated as exports minus imports. These are calculated by dividing by each country's population.
+        display:
+          numDecimalPlaces: 1
+
+      export_share_transported_by_air:
+        title: Share of plastic waste exports transported by air
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of plastic waste exports transported by air from total plastic waste exports. These are calculated by determining the proportion of plastic waste exports transported by air from the total plastic waste exports.
+        display:
+          numDecimalPlaces: 1
+
+      import_share_transported_by_air:
+        title: Share of plastic waste imports transported by air
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of plastic waste imports transported by air from total plastic waste imports. These are calculated by determining the proportion of plastic waste imports transported by air from the total plastic waste imports.
         display:
           numDecimalPlaces: 1

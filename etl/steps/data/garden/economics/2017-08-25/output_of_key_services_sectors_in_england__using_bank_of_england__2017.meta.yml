@@ -1,0 +1,49 @@
+dataset:
+  title: Output of key services sectors in England - using Bank of England (2017)
+tables:
+  output_of_key_services_sectors_in_england__using_bank_of_england__2017:
+    variables:
+      financial_services:
+        title: Financial Services
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of the financial services sector, indexed to the year 1700, in log scale. It shows how much production took place in financial services sector relative to that in 1700 when measured on a log scale.
+      government_services:
+        title: Government Services
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of the government services sector, indexed to the year 1700, in log scale. It shows how much production took place in government services sector relative to that in 1700 when measured on a log scale.
+      housing_and_domestic_services:
+        title: Housing and Domestic Services
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of the housing and domestic services sector, indexed to the year 1700, in log scale. It shows how much production took place in housing and domestic services sector relative to that in 1700 when measured on a log scale.
+      total_services:
+        title: Total Services
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total services output, indexed to the year 1700, in log scale. It shows how much services output was produced relative to that in 1700 when measured on a log scale.
+      trade_and_transport:
+        title: Trade and Transport
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of the trade and transport sector, indexed to the year 1700, in log scale. It shows how much production took place in trade and transport sector relative to that in 1700 when measured on a log scale.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

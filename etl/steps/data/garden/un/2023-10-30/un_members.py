@@ -24,6 +24,7 @@ MAPPABLE_COUNTRIES = [
     "ARE",
     "ARG",
     "ARM",
+    "ATA",
     "ATF",
     "ATG",
     "AUS",

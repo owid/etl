@@ -1,11 +1,12 @@
 ---
 tags:
   - 👷 Staff
+icon: material/code-json
 ---
 
 !!! tip "Working with YAML files in VS Code"
 
-    Install the [YAML extension (by Red Hat)](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) for VS Code to get syntax highlighting and autocompletion for YAML files. This extension will validate your files and highlight any syntax errors.
+    Install the [:octicons-link-external-16: YAML extension (by Red Hat)](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) for VS Code to get syntax highlighting and autocompletion for YAML files. This extension will validate your files and highlight any syntax errors.
 
 ## Creating YAML Files
 
@@ -32,7 +33,7 @@ Check `uv run etl metadata-export --help` for more options.
 
 ## Handling Multi-line Strings and Whitespace
 
-Multi-line strings are often sources of confusion. [YAML multiline](https://yaml-multiline.info/) supports two primary styles for writing them (literal and folded style), and it's up to you which option to use.
+Multi-line strings are often sources of confusion. [:octicons-link-external-16: YAML multiline](https://yaml-multiline.info/) supports two primary styles for writing them (literal and folded style), and it's up to you which option to use.
 
 In addition, using the "strip" chomping indicator, denoted with `-`, after `|` or `>` removes whitespaces at the beginning and end of the string. **This is almost always what you want.**
 
@@ -75,7 +76,7 @@ my_var_1:
 
 ## Anchors & aliases
 
-[Anchors (&) and aliases (\*)](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/) are a native YAML functionality and they can be used to reduce repetition.
+[:octicons-link-external-16: Anchors (&) and aliases (\*)](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/) are a native YAML functionality and they can be used to reduce repetition.
 
 You can define anchors anywhere on the YAML file, but typically we define a special section called `definitions` at the very top of the file, and then use aliases to refer to these definitions.
 
@@ -175,7 +176,7 @@ tables:
 
 ## Dynamic YAML
 
-Anchors and aliases have limitations. One of the main ones is that you cannot use it for in-line text. That's why we've added support for [dynamic-yaml](https://github.com/childsish/dynamic-yaml) which lets you write YAML files likes this:
+Anchors and aliases have limitations. One of the main ones is that you cannot use it for in-line text. That's why we've added support for [:fontawesome-brands-github: dynamic-yaml](https://github.com/childsish/dynamic-yaml) which lets you write YAML files likes this:
 
 ```yaml
 definitions:
@@ -193,7 +194,7 @@ tables:
 
 ## Using Jinja Templates for Advanced Cases
 
-Even more complex metadata can be generated with [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/). This is especially useful for datasets in a long format and multiple dimensions, because Jinja lets you dynamically generate text (titles, descriptions, ...) based on the dimension names.
+Even more complex metadata can be generated with [:octicons-link-external-16:  Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/). This is especially useful for datasets in a long format and multiple dimensions, because Jinja lets you dynamically generate text (titles, descriptions, ...) based on the dimension names.
 
 !!! note
 
@@ -230,7 +231,7 @@ It's also possible to do the same with Jinja `macros`. Check out section below a
 ### Whitespaces
 
 Line breaks and whitespaces can be tricky when using Jinja templates. We use reasonable defaults and strip whitespaces, so in most cases you should be fine with using `<%` and `%>`, but in more complex cases, you might have to experiment with
-more fine grained [whitespace control](https://jinja.palletsprojects.com/en/stable/templates/#whitespace-control) using tags `<%-` and `-%>`. This is most often used in if-else blocks like this (note the `-` after `<%` for all clauses except for the first one):
+more fine grained [:octicons-link-external-16: whitespace control](https://jinja.palletsprojects.com/en/stable/templates/#whitespace-control) using tags `<%-` and `-%>`. This is most often used in if-else blocks like this (note the `-` after `<%` for all clauses except for the first one):
 
 ```yaml
 age: |-
@@ -331,3 +332,47 @@ tables:
             description_short: |-
               The prevalence of << cause >> in << format_sex(sex) >>.
     ```
+
+## Metadata Postprocessing After Dataset Creation
+
+In some cases, you may need to programmatically modify metadata after creating a dataset with `create_dataset()`. This pattern is useful when metadata modifications require dynamic content that cannot be easily expressed in YAML files.
+
+### Pattern
+
+1. Create the dataset using `create_dataset()`
+2. Retrieve the table from the created dataset
+3. Modify metadata programmatically (e.g., using regex, calculations, or conditional logic)
+4. Re-add the modified table to the dataset using `ds.add()`
+5. Save the dataset with `ds.save()`
+
+### Example
+
+```python
+# Create a new grapher dataset
+ds_grapher = create_dataset(
+    dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+)
+
+# Retrieve the table from the created dataset for metadata modification
+tb = ds_grapher["my_table"]
+
+# Modify metadata programmatically
+for col in tb.columns:
+    m = tb[col].m
+
+    # Example: Replace placeholder text with dynamic values
+    if "ANSWER" in m.title:
+        answer_match = re.search(r"(\d+)", col)
+        answer_num = answer_match.group(1)
+
+        m.title = m.title.replace("ANSWER", answer_num)
+        m.description_short = m.description_short.replace("ANSWER", answer_num)
+
+# Re-add the modified table to the dataset
+ds_grapher.add(tb)
+
+# Save the changes
+ds_grapher.save()
+```
+
+This approach allows you to combine the declarative power of YAML metadata with programmatic flexibility when needed.

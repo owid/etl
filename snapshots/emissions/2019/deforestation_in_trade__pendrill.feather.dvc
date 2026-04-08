@@ -1,0 +1,20 @@
+meta:
+  source:
+    name: |-
+      Pendrill, F., Persson, U. M., Godar, J., & Kastner, T. (2019). Deforestation displaced: trade in forest-risk commodities and the prospects for a global forest transition.
+    description: |-
+      Pendrill et al. (2019) developed a land-balance model which attributed detected forest loss across the world to the expansion of croplands, pasture and tree plantations. This is then linked to particular agricultural commodities based on national land use, crop and forest product statistics published in the UN Food and Agricultural Organization balance sheets.
+
+      This study maps deforestation embedded in the international trade of these products using both a physical trade model, and a MRIO (multi-regional input-output) model. This allows for the quantification of deforestation embedded in imported food and forestry products.
+
+      Pendrill et al. (2019) provide data on exported and imported deforestation. Our World in Data have additionally calculated the net deforestation embedded in trade for each country by subtracting exports from imports.
+    url: https://iopscience.iop.org/article/10.1088/1748-9326/ab0d41
+    date_accessed: 2020-11-20
+    published_by: |-
+      Pendrill, F., Persson, U. M., Godar, J., & Kastner, T. (2019). Deforestation displaced: trade in forest-risk commodities and the prospects for a global forest transition. Environmental Research Letters, 14(5), 055003.
+  name: Deforestation in trade (Pendrill)
+  description: ''
+outs:
+  - md5: be50385cf497bc73157bb60ed3f5984f
+    size: 145242
+    path: deforestation_in_trade__pendrill.feather

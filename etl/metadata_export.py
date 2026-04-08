@@ -1,3 +1,5 @@
+"""Export dataset, tables & indicator metadata in YAML format."""
+
 import copy
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Tuple, Union
@@ -5,7 +7,7 @@ from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 import pandas as pd
 import rich_click as click
 from owid.catalog import Dataset, utils
-from owid.catalog.yaml_metadata import _merge_variable_metadata
+from owid.catalog.core.yaml_metadata import _merge_variable_metadata
 from rich.console import Console
 from rich.syntax import Syntax
 
@@ -13,7 +15,7 @@ from etl import paths
 from etl.files import ruamel_dump, ruamel_load, yaml_dump
 
 
-@click.command(name="metadata-export", help=__doc__)
+@click.command(name="metadata-export")
 @click.argument(
     "dataset_path",
     type=click.Path(),
@@ -156,6 +158,7 @@ def metadata_export(
     ds: Dataset,
     prune: bool = False,
     decimals: Optional[Union[int, Literal["auto", "no"]]] = None,
+    keep_title: bool = False,
 ) -> dict:
     """
     :param prune: If True, remove origins and licenses that would be propagated from the snapshot.
@@ -218,8 +221,10 @@ def metadata_export(
                     display.pop("includeInTable")
 
                 # if title is underscored and identical to column name, try to use display name as title
+                # skip this for migrations where preserving original variable names is critical
                 if (
-                    col == variable["title"]
+                    not keep_title
+                    and col == variable["title"]
                     and utils.underscore(variable["title"]) == variable["title"]
                     and display.get("name")
                     and display["name"] not in used_titles

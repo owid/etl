@@ -1,6 +1,7 @@
 ---
 tags:
     - 👷 Staff
+icon: lucide/bot
 ---
 # Meta Update Tool
 

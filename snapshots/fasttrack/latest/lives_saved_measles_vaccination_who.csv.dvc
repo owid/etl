@@ -8,11 +8,11 @@ meta:
     url_main: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(24)00850-X/fulltext
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vR4f5d_qUHzskVIZHJYM_KoVdMia4zqztzErRm1D1S6nUu3eF5dB5XRmClh8xwU0bWbv03ceQUlm0b1/pub?output=csv
-    date_accessed: '2025-03-28'
+    date_accessed: '2025-04-15'
   name: Lives saved by measles vaccinations (WHO, 2024)
   description: Estimates of the number of lives saved by vaccination over the last 50 years (from 1974 to 2024).
   license: {}
 outs:
-  - md5: 11eef60fae23b38146b48b4e599aa2ae
-    size: 14155
+  - md5: 9e9732945d5d4eed0a68cd9a26d035f9
+    size: 13339
     path: lives_saved_measles_vaccination_who.csv

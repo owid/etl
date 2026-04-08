@@ -1,18 +1,18 @@
 """Load renewable energy investments data from garden and create a grapher dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Load paths and naming conventions.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load dataset from garden and read its main table.
     ds_garden = paths.load_dataset("renewable_energy_investments")
-    tb = ds_garden["renewable_energy_investments"]
+    tb = ds_garden.read("renewable_energy_investments", reset_index=False)
 
     #
     # Prepare data.
@@ -27,5 +27,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_grapher = paths.create_dataset(tables=[tb])
     ds_grapher.save()

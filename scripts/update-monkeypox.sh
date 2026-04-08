@@ -6,8 +6,8 @@ start_time=$(date +%s)
 
 echo '--- Update Monkeypox'
 cd /home/owid/etl
-uv run python snapshots/who/latest/monkeypox.py
-uv run python snapshots/health/latest/global_health_mpox.py
+uv run etls who/latest/monkeypox
+uv run etls health/latest/global_health_mpox
 
 # commit to master will trigger ETL which is gonna run the step
 echo '--- Commit and push changes'

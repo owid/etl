@@ -6,7 +6,7 @@ import pandas as pd
 from owid.catalog import Table
 from sklearn.linear_model import LinearRegression
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -16,7 +16,7 @@ START_DATE = 1950
 END_DATE = 2025.2
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     paths.log.info("epoch.start")
 
     #
@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -51,7 +51,7 @@ def run(dest_dir: str) -> None:
 def fit_exponential(models, metric):
     """Fit an exponential model to the given metric data. Code provided by Epoch AI team."""
     x = models["frac_year"].values.reshape(-1, 1)
-    y = models[metric]
+    y = pd.to_numeric(models[metric], errors="coerce")
 
     # Filter out non-positive values
     positive_mask = y > 0
@@ -91,7 +91,7 @@ def run_regression(tb):
         f"{DL_ERA_START}–{int(END_DATE)}": np.array([DL_ERA_START, END_DATE]),
     }
 
-    metrics = ["training_computation_petaflop", "parameters", "training_dataset_size__datapoints"]
+    metrics = ["training_computation_petaflop", "parameters", "training_dataset_size__total"]
     new_tables = []
 
     for metric in metrics:

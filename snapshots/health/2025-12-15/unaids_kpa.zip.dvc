@@ -1,0 +1,38 @@
+# Find data at https://aidsinfo.unaids.org/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Global AIDS Update, Key Population Atlas"
+    description: |-
+      The Key Populations Atlas brings together data from diverse sources into one visual tool.
+
+      With the collaboration of the Global Fund to Fight AIDS, Tuberculosis and Malaria, the World Health Organization, the Division of Global HIV and Tuberculosis of the U.S. Centers for Disease Control and Prevention, UNAIDS collected, collated and assessed selected indicators in a single database.
+
+      The purpose of the project is to provide more local level data for local level action for policy-makers, program directors, and community activists and advocates among others.
+
+      This Atlas extends the data dissemination and displaying capacity of AIDSinfo to better match local person, place and time data with the exigencies of an effective response to the HIV epidemic. The indicators included extend beyond traditional Global AIDS Monitoring.
+
+      Data on stigma and discrimination, particularly in the health service sector, and the legal environment were extracted and mapped, for example, to better capture some of the structural challenges in mounting effective responses for key populations communities.
+
+    date_published: "2025-07-10"
+
+    # Citation
+    producer: Joint United Nations Programme on HIV/AIDS
+    citation_full: |-
+      AIDS, crisis and the power to transform: UNAIDS Global AIDS Update 2025. Geneva: Joint United Nations Programme on HIV/AIDS; 2025. Full report: https://www.unaids.org/en/resources/documents/2025/2025-global-aids-update-summary
+
+    attribution_short: UNAIDS
+
+    # Files
+    url_main: https://aidsinfo.unaids.org/dataset
+    url_download: https://aidsinfo.unaids.org/documents/KPAtlasDB_2025_en.zip
+    date_accessed: "2025-12-15"
+
+    # License
+    license:
+      name: CC BY 3.0
+      url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
+outs:
+  - md5: eb2064273619f99882f0b272a8ea3263
+    size: 878991
+    path: unaids_kpa.zip

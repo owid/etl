@@ -827,6 +827,231 @@ class TestGroupbyAggregate:
             df2=df_out,
         )[0]
 
+    # Tests for weighted aggregation functionality
+    def test_weighted_aggregation_basic(self):
+        """Test basic weighted mean aggregation with single groupby column."""
+        df_in = pd.DataFrame(
+            {
+                "year": [2020, 2020, 2021, 2021],
+                "country": ["A", "B", "A", "B"],
+                "gdp": [100, 200, 150, 250],
+                "population": [10, 20, 15, 25],
+            }
+        )
+
+        result = dataframes.groupby_agg(df_in, ["year"], aggregations={"gdp": "mean_weighted_by_population"})
+
+        # 2020: (100*10 + 200*20) / (10+20) = 5000/30 = 166.67
+        # 2021: (150*15 + 250*25) / (15+25) = 8500/40 = 212.5
+        expected_2020 = (100 * 10 + 200 * 20) / (10 + 20)
+        expected_2021 = (150 * 15 + 250 * 25) / (15 + 25)
+
+        assert abs(result.loc[2020, "gdp"] - expected_2020) < 0.01
+        assert abs(result.loc[2021, "gdp"] - expected_2021) < 0.01
+
+    def test_weighted_aggregation_multiple_columns(self):
+        """Test weighted aggregation with multiple groupby columns."""
+        df_in = pd.DataFrame(
+            {
+                "year": [2020, 2020, 2020, 2020],
+                "category": ["A", "A", "B", "B"],
+                "country": ["X", "Y", "X", "Y"],
+                "value": [100, 200, 300, 400],
+                "weight": [1, 2, 3, 4],
+            }
+        )
+
+        result = dataframes.groupby_agg(df_in, ["year", "category"], aggregations={"value": "mean_weighted_by_weight"})
+
+        # Category A: (100*1 + 200*2) / (1+2) = 500/3 = 166.67
+        # Category B: (300*3 + 400*4) / (3+4) = 2500/7 = 357.14
+        expected_a = (100 * 1 + 200 * 2) / (1 + 2)
+        expected_b = (300 * 3 + 400 * 4) / (3 + 4)
+
+        result_a = result.loc[(2020, "A"), "value"]
+        result_b = result.loc[(2020, "B"), "value"]
+
+        assert abs(result_a - expected_a) < 0.01
+        assert abs(result_b - expected_b) < 0.01
+
+    def test_weighted_aggregation_mixed_with_regular(self):
+        """Test mixing weighted and regular aggregations in same call."""
+        df_in = pd.DataFrame(
+            {
+                "year": [2020, 2020, 2021, 2021],
+                "gdp": [100, 200, 150, 250],
+                "population": [10, 20, 15, 25],
+                "area": [50, 100, 75, 125],
+            }
+        )
+
+        result = dataframes.groupby_agg(
+            df_in,
+            ["year"],
+            aggregations={
+                "gdp": "mean_weighted_by_population",  # Weighted
+                "area": "sum",  # Regular
+                "population": "mean",  # Regular
+            },
+        )
+
+        # Check weighted aggregation worked
+        expected_gdp_2020 = (100 * 10 + 200 * 20) / (10 + 20)
+        assert abs(result.loc[2020, "gdp"] - expected_gdp_2020) < 0.01
+
+        # Check regular aggregations worked
+        assert result.loc[2020, "area"] == 150  # 50 + 100
+        assert result.loc[2020, "population"] == 15  # (10 + 20) / 2
+
+    def test_weighted_aggregation_with_nan_handling(self):
+        """Test weighted aggregation with NaN handling parameters."""
+        df_in = pd.DataFrame(
+            {"year": [2020, 2020, 2020, 2020], "value": [100, np.nan, 200, 300], "weight": [1, 2, np.nan, 3]}
+        )
+
+        # With strict NaN handling - should be NaN because > 1 NaN
+        result_strict = dataframes.groupby_agg(
+            df_in, ["year"], aggregations={"value": "mean_weighted_by_weight"}, num_allowed_nans=1
+        )
+        assert pd.isna(result_strict.loc[2020, "value"])
+
+        # With lenient NaN handling - should calculate from valid data
+        result_lenient = dataframes.groupby_agg(
+            df_in, ["year"], aggregations={"value": "mean_weighted_by_weight"}, num_allowed_nans=3
+        )
+        # Only 100*1 and 300*3 are valid: (100*1 + 300*3)/(1+3) = 1000/4 = 250
+        expected = (100 * 1 + 300 * 3) / (1 + 3)
+        assert abs(result_lenient.loc[2020, "value"] - expected) < 0.01
+
+    def test_weighted_aggregation_frac_allowed_nans(self):
+        """Test weighted aggregation with fractional NaN tolerance."""
+        df_in = pd.DataFrame(
+            {"year": [2020, 2020, 2020, 2020], "value": [100, np.nan, 200, np.nan], "weight": [1, 2, 3, 4]}
+        )
+
+        # 50% NaN fraction - should be rejected with 0.4 tolerance
+        result_strict = dataframes.groupby_agg(
+            df_in, ["year"], aggregations={"value": "mean_weighted_by_weight"}, frac_allowed_nans=0.4
+        )
+        assert pd.isna(result_strict.loc[2020, "value"])
+
+        # 50% NaN fraction - should be accepted with 0.6 tolerance
+        result_lenient = dataframes.groupby_agg(
+            df_in, ["year"], aggregations={"value": "mean_weighted_by_weight"}, frac_allowed_nans=0.6
+        )
+        # Only 100*1 and 200*3 are valid
+        expected = (100 * 1 + 200 * 3) / (1 + 3)
+        assert abs(result_lenient.loc[2020, "value"] - expected) < 0.01
+
+    def test_weighted_aggregation_min_num_values(self):
+        """Test weighted aggregation with minimum values requirement."""
+        df_in = pd.DataFrame(
+            {"year": [2020, 2020, 2020, 2020], "value": [100, np.nan, np.nan, np.nan], "weight": [1, 2, 3, 4]}
+        )
+
+        # Require at least 2 values - should be NaN with only 1 valid
+        result_strict = dataframes.groupby_agg(
+            df_in, ["year"], aggregations={"value": "mean_weighted_by_weight"}, min_num_values=2
+        )
+        assert pd.isna(result_strict.loc[2020, "value"])
+
+        # Require at least 1 value - should work with 1 valid value
+        result_lenient = dataframes.groupby_agg(
+            df_in, ["year"], aggregations={"value": "mean_weighted_by_weight"}, min_num_values=1
+        )
+        # Only 100*1 is valid
+        assert result_lenient.loc[2020, "value"] == 100
+
+    def test_weighted_aggregation_zero_weights(self):
+        """Test weighted aggregation handles zero weights correctly."""
+        df_in = pd.DataFrame(
+            {
+                "year": [2020, 2020, 2020],
+                "value": [100, 200, 300],
+                "weight": [1, 0, 2],  # Middle weight is zero
+            }
+        )
+
+        result = dataframes.groupby_agg(df_in, ["year"], aggregations={"value": "mean_weighted_by_weight"})
+
+        # Should ignore zero weight: (100*1 + 300*2) / (1+2) = 700/3
+        expected = (100 * 1 + 300 * 2) / (1 + 2)
+        assert abs(result.loc[2020, "value"] - expected) < 0.01
+
+    def test_weighted_aggregation_all_nan_values(self):
+        """Test weighted aggregation when all values are NaN."""
+        df_in = pd.DataFrame({"year": [2020, 2020], "value": [np.nan, np.nan], "weight": [1, 2]})
+
+        result = dataframes.groupby_agg(df_in, ["year"], aggregations={"value": "mean_weighted_by_weight"})
+
+        assert pd.isna(result.loc[2020, "value"])
+
+    def test_weighted_aggregation_all_zero_weights(self):
+        """Test weighted aggregation when all weights are zero."""
+        df_in = pd.DataFrame({"year": [2020, 2020], "value": [100, 200], "weight": [0, 0]})
+
+        result = dataframes.groupby_agg(df_in, ["year"], aggregations={"value": "mean_weighted_by_weight"})
+
+        assert pd.isna(result.loc[2020, "value"])
+
+    def test_weighted_aggregation_missing_weight_column(self):
+        """Test error handling for missing weight column."""
+        df_in = pd.DataFrame(
+            {
+                "year": [2020, 2020],
+                "value": [100, 200],
+                # No weight column
+            }
+        )
+
+        with raises(ValueError, match="Weight column 'missing_weight' not found in data"):
+            dataframes.groupby_agg(df_in, ["year"], aggregations={"value": "mean_weighted_by_missing_weight"})
+
+    def test_weighted_aggregation_performance_multiple_weighted_columns(self):
+        """Test weighted aggregation with multiple weighted columns."""
+        df_in = pd.DataFrame(
+            {
+                "year": [2020, 2020, 2021, 2021],
+                "gdp": [100, 200, 150, 250],
+                "emissions": [10, 30, 15, 35],
+                "population": [10, 20, 15, 25],
+                "area": [5, 15, 7, 18],
+            }
+        )
+
+        result = dataframes.groupby_agg(
+            df_in, ["year"], aggregations={"gdp": "mean_weighted_by_population", "emissions": "mean_weighted_by_area"}
+        )
+
+        # Check both weighted calculations
+        expected_gdp_2020 = (100 * 10 + 200 * 20) / (10 + 20)
+        expected_emissions_2020 = (10 * 5 + 30 * 15) / (5 + 15)
+
+        assert abs(result.loc[2020, "gdp"] - expected_gdp_2020) < 0.01
+        assert abs(result.loc[2020, "emissions"] - expected_emissions_2020) < 0.01
+
+    def test_weighted_aggregation_with_lambda_functions(self):
+        """Test weighted aggregation mixed with lambda aggregations (common in ETL)."""
+        df_in = pd.DataFrame(
+            {"year": [2020, 2020, 2020], "value": [100, 200, 300], "weight": [1, 2, 3], "flag": ["A", "A", "B"]}
+        )
+
+        result = dataframes.groupby_agg(
+            df_in,
+            ["year"],
+            aggregations={
+                "value": "mean_weighted_by_weight",
+                "flag": lambda x: "MIXED" if len(x.unique()) > 1 else x.iloc[0],
+            },
+        )
+
+        # Check weighted mean
+        expected_value = (100 * 1 + 200 * 2 + 300 * 3) / (1 + 2 + 3)
+        assert abs(result.loc[2020, "value"] - expected_value) < 0.01
+
+        # Check lambda function
+        assert result.loc[2020, "flag"] == "MIXED"
+
 
 class TestMultiMerge:
     df1 = pd.DataFrame({"col_01": ["aa", "ab", "ac"], "col_02": ["ba", "bb", "bc"]})

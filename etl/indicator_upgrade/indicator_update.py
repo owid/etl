@@ -47,6 +47,44 @@ def find_charts_from_variable_ids(variable_ids: Set[int]) -> List[gm.Chart]:
     return list(charts)
 
 
+def update_narrative_chart_config(
+    config: Dict[str, Any],
+    indicator_mapping: Dict[int, int],
+) -> Dict[str, Any]:
+    """Update indicator references in a narrative chart config.
+
+    Narrative charts have a simpler config structure (just the patch).
+    We only need to update the dimensions and map columnSlug.
+    """
+    config_new = deepcopy(config)
+
+    # Update dimensions
+    if "dimensions" in config_new:
+        for dimension in config_new["dimensions"]:
+            if dimension.get("variableId") in indicator_mapping:
+                dimension["variableId"] = indicator_mapping[dimension["variableId"]]
+
+    # Update map columnSlug if present
+    if "map" in config_new and "columnSlug" in config_new["map"]:
+        try:
+            map_var_id = int(config_new["map"]["columnSlug"])
+            if map_var_id in indicator_mapping:
+                config_new["map"]["columnSlug"] = str(indicator_mapping[map_var_id])
+        except (ValueError, TypeError):
+            pass  # columnSlug might not be a numeric variable ID
+
+    # Update sortColumnSlug if present
+    if config_new.get("sortBy") == "column" and "sortColumnSlug" in config_new:
+        try:
+            var_old_id = int(config_new["sortColumnSlug"])
+            if var_old_id in indicator_mapping:
+                config_new["sortColumnSlug"] = str(indicator_mapping[var_old_id])
+        except (ValueError, TypeError):
+            pass
+
+    return config_new
+
+
 def update_chart_config(
     config: Dict[str, Any],
     indicator_mapping: Dict[int, int],

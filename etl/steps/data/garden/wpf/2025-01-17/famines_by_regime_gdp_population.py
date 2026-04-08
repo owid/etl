@@ -7,7 +7,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -26,7 +26,6 @@ CUSTOM_REGIMES = {
     ("Turkey, Armenians", range(1915, 1917)): 3,
     ("Iran", range(1870, 1873)): 3,
     ("Philippines", 1899): 3,
-    ("Poland", range(1915, 1918)): 3,
     ("Poland", range(1940, 1944)): 3,
     ("Russia, Kazakhstan", range(1932, 1935)): 3,
     ("Russia, Ukraine", range(1915, 1923)): 3,
@@ -46,10 +45,11 @@ CUSTOM_REGIMES = {
     ("Russia, Western Soviet States", range(1939, 1948)): 3,
     ("Somaliland, African Red Sea Region", range(1910, 2020)): 3,
     ("Sudan", range(1888, 1893)): 3,
+    ("Austria, Hungary", range(1915, 1919)): 3,
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
     ds_gdp = paths.load_dataset("maddison_project_database")
     tb_gdp = ds_gdp.read("maddison_project_database")
 
-    tb_gdp = tb_gdp[["year", "country", "gdp_per_capita"]]
+    tb_gdp = tb_gdp.loc[:, ["year", "country", "gdp_per_capita"]]
 
     ds_population = paths.load_dataset("population")
 
@@ -100,9 +100,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_famines.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_famines.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -126,22 +124,22 @@ def add_regime(tb_famines: Table, ds_regime: Dataset) -> Table:
 
     Parameters:
     tb_famines (Table): Table containing famine data.
-    ds_regime (Dataset): Dataset containing regime data, expected to have a key "vdem" with a DataFrame value.
+    ds_regime (Dataset): Dataset containing regime data, expected to have a key "vdem_uni_without_regions" with a DataFrame value.
 
     Returns:
     Table: The updated Table with regime information added.
 
     The function performs the following steps:
-    1. Extracts the "vdem" DataFrame from the ds_regime dictionary and resets its index.
+    1. Extracts the "vdem_uni_without_regions" DataFrame from the ds_regime dictionary and resets its index.
     2. Reduces the regime DataFrame to only include the columns "country", "year", and "regime_redux_row_owid".
     3. Combines autocracies by setting the "regime_redux_row_owid" value to 3 for rows where it is 0 or 1.
     4. Merges the reduced regime DataFrame with the famines DataFrame on "country" and "year".
     5. Applies custom regime rules defined in the CUSTOM_REGIMES dictionary to assign regime values.
     6. Ensures there are no NaN values in the "regime_redux_row_owid" column.
     """
-    tb_regime = ds_regime["vdem"].reset_index()
+    tb_regime = ds_regime.read("vdem_uni_without_regions")
 
-    reduced_regime = tb_regime[["country", "year", "regime_redux_row_owid"]]
+    reduced_regime = tb_regime.loc[:, ["country", "year", "regime_redux_row_owid"]]
 
     # Combine autocracies
     reduced_regime.loc[reduced_regime["regime_redux_row_owid"].isin([0, 1]), "regime_redux_row_owid"] = 3
@@ -180,7 +178,7 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
     Table: The updated Table with GDP information added.
 
     The function performs the following steps:
-    1. Replaces 'Former Sudan' with 'Sudan' in the 'country' column of tb_gdp.
+    1. Replaces 'Sudan (former)' with 'Sudan' in the 'country' column of tb_gdp.
     2. Merges the famine table (tb) with the GDP table (tb_gdp) on 'country' and 'year'.
     3. Defines and applies replacement rules for specific countries and years, using either a reference year or an average GDP over a range of years.
     4. Handles special cases for multiple countries, replacing GDP values for specified years with either a specific year's GDP or an average GDP.
@@ -195,8 +193,8 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
     - For China, the GDP values for the years 1876 to 1879 are replaced with the average GDP from 1870 to 1887.
     """
 
-    # Replace 'former Sudan' with 'Sudan' in the 'country' column of tb_gdp
-    tb_gdp["country"] = tb_gdp["country"].astype(str).replace("Former Sudan", "Sudan")
+    # Replace 'Sudan (former)' with 'Sudan' in the 'country' column of tb_gdp
+    tb_gdp["country"] = tb_gdp["country"].astype(str).replace("Sudan (former)", "Sudan")
 
     tb = pr.merge(tb, tb_gdp, on=["country", "year"], how="left")
 
@@ -211,7 +209,6 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
         {"country": "India", "years": [1876, 1877, 1878], "year_range": [1870, 1884]},
         {"country": "Turkey", "years": [1894, 1895, 1896], "year_range": [1870, 1913]},
         {"country": "Philippines", "years": [1899, 1900, 1901], "ref_year": 1902},
-        {"country": "Poland", "years": [1915, 1916, 1917, 1918], "year_range": [1913, 1920]},
         {"country": "Poland", "years": [1940, 1941, 1942, 1943, 1944, 1945], "year_range": [1938, 1948]},
         {"country": "Iran", "years": [1871, 1872], "ref_year": 1870},
         {"country": "Iran", "years": [1917, 1918, 1919], "ref_year": 1913},
@@ -228,6 +225,14 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
         elif "year_range" in rule:
             gdp_value = calculate_average_gdp(tb_gdp, rule["country"], rule["year_range"])
         replace_gdp(tb, rule["country"], rule["years"], gdp_value)
+
+    # Special case for Austria-Hungary - use average of Austria, Hungary, and Poland GDP data
+    austria_hungary_years = [1915, 1916, 1917, 1918]
+    austria_gdp = calculate_average_gdp(tb_gdp, "Austria", [1913, 1920])
+    hungary_gdp = calculate_average_gdp(tb_gdp, "Hungary", [1913, 1920])
+    poland_gdp = calculate_average_gdp(tb_gdp, "Poland", [1913, 1920])
+    combined_gdp = (austria_gdp + hungary_gdp + poland_gdp) / 3
+    replace_gdp(tb, "Austria, Hungary", austria_hungary_years, combined_gdp)
 
     # Special cases for USSR/Russian Empire  - these countries were a part of the USSR/Russian Empire at the time so use the GDP of the USSR/Russia; some years aren't available so use an average of the surrounding years
     special_cases = {
@@ -315,12 +320,13 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
 
     tb_ext = tb_ext.rename(columns={"country": "original_country"})
 
-    # Mapping dictionary to rename specified countries to "USSR"
+    # Mapping dictionary to rename specified countries for population lookup
     country_mapping = {
         "Kazakhstan": "USSR",
-        "Russia, Ukraine": "Russia",  # Ukrane was a part of the Russian Emprie
+        "Russia, Ukraine": "Russia",  # Ukraine was a part of the Russian Empire
         "Russia, Western Soviet States": "USSR",
         "Moldova, Ukraine, Russia, Belarus": "USSR",
+        "Austria, Hungary": "Austria",  # Temporarily use Austria, will average with Hungary and Poland below
     }
 
     # Create a new column with the renamed countries
@@ -328,6 +334,31 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
 
     # Add population data to the extended table
     tb_ext = geo.add_population_to_table(tb_ext, ds_population)
+
+    # Special handling for Austria, Hungary - add Hungary and Poland populations and average with Austria
+    austria_hungary_rows = tb_ext["original_country"] == "Austria, Hungary"
+    if austria_hungary_rows.any():
+        # Get Hungary population for the same years/famines
+        tb_hungary = tb_ext[austria_hungary_rows].copy()
+        tb_hungary["country"] = "Hungary"
+        tb_hungary = tb_hungary.drop(columns=["population"])
+        tb_hungary = geo.add_population_to_table(tb_hungary, ds_population)
+
+        # Get Poland population for the same years/famines
+        tb_poland = tb_ext[austria_hungary_rows].copy()
+        tb_poland["country"] = "Poland"
+        tb_poland = tb_poland.drop(columns=["population"])
+        tb_poland = geo.add_population_to_table(tb_poland, ds_population)
+
+        # Average Austria (already in tb_ext), Hungary, and Poland populations
+        austria_pop = tb_ext.loc[austria_hungary_rows, "population"]
+        hungary_pop = tb_hungary["population"]
+        poland_pop = tb_poland["population"]
+        avg_population = ((austria_pop + hungary_pop.values + poland_pop.values) / 3).astype("Int64")
+
+        # Replace with average
+        tb_ext.loc[austria_hungary_rows, "population"] = avg_population.values
+
     tb_ext = tb_ext.drop(columns={"country"})
     tb_ext = tb_ext.rename(columns={"original_country": "country"})
 

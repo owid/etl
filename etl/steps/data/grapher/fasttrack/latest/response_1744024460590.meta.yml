@@ -1,0 +1,137 @@
+dataset:
+  title: DRAFT response_1744024460590
+  description: ''
+tables:
+  response_1744024460590:
+    variables:
+      region_name:
+        title: region_name
+        unit: ''
+      region_code:
+        title: region_code
+        unit: ''
+      country_code:
+        title: country_code
+        unit: ''
+      reporting_level:
+        title: reporting_level
+        unit: ''
+      survey_acronym:
+        title: survey_acronym
+        unit: ''
+      survey_coverage:
+        title: survey_coverage
+        unit: ''
+      survey_year:
+        title: survey_year
+        unit: ''
+      welfare_type:
+        title: welfare_type
+        unit: ''
+      survey_comparability:
+        title: survey_comparability
+        unit: ''
+      comparable_spell:
+        title: comparable_spell
+        unit: ''
+      poverty_line:
+        title: poverty_line
+        unit: ''
+      headcount:
+        title: headcount
+        unit: ''
+      poverty_gap:
+        title: poverty_gap
+        unit: ''
+      poverty_severity:
+        title: poverty_severity
+        unit: ''
+      watts:
+        title: watts
+        unit: ''
+      mean:
+        title: mean
+        unit: ''
+      median:
+        title: median
+        unit: ''
+      mld:
+        title: mld
+        unit: ''
+      gini:
+        title: gini
+        unit: ''
+      polarization:
+        title: polarization
+        unit: ''
+      decile1:
+        title: decile1
+        unit: ''
+      decile2:
+        title: decile2
+        unit: ''
+      decile3:
+        title: decile3
+        unit: ''
+      decile4:
+        title: decile4
+        unit: ''
+      decile5:
+        title: decile5
+        unit: ''
+      decile6:
+        title: decile6
+        unit: ''
+      decile7:
+        title: decile7
+        unit: ''
+      decile8:
+        title: decile8
+        unit: ''
+      decile9:
+        title: decile9
+        unit: ''
+      decile10:
+        title: decile10
+        unit: ''
+      cpi:
+        title: cpi
+        unit: ''
+      ppp:
+        title: ppp
+        unit: ''
+      reporting_pop:
+        title: reporting_pop
+        unit: ''
+      reporting_gdp:
+        title: reporting_gdp
+        unit: ''
+      reporting_pce:
+        title: reporting_pce
+        unit: ''
+      is_interpolated:
+        title: is_interpolated
+        unit: ''
+      distribution_type:
+        title: distribution_type
+        unit: ''
+      estimation_type:
+        title: estimation_type
+        unit: ''
+      spl:
+        title: spl
+        unit: ''
+      spr:
+        title: spr
+        unit: ''
+      pg:
+        title: pg
+        unit: ''
+      estimate_type:
+        title: estimate_type
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

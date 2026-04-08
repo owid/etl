@@ -6,14 +6,12 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Set, Union, cas
 import numpy as np
 import pandas as pd
 import pymysql
-import sqlalchemy
 import structlog
-from jsonschema import validate
 from owid import catalog
-from owid.catalog import Table, jinja, warnings
-from owid.catalog.utils import dynamic_yaml_load, dynamic_yaml_to_dict, underscore
-from owid.catalog.yaml_metadata import merge_with_shared_meta
-from sqlalchemy import text
+from owid.catalog.core import Table, jinja, warnings
+from owid.catalog.core.utils import dynamic_yaml_load, dynamic_yaml_to_dict, underscore
+from owid.catalog.core.yaml_metadata import merge_with_shared_meta
+from sqlalchemy import exc, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
@@ -335,7 +333,7 @@ def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = 
                     {"name": name},
                 )
                 session.commit()
-            except (pymysql.IntegrityError, sqlalchemy.exc.IntegrityError):
+            except (pymysql.IntegrityError, exc.IntegrityError):
                 # If another process inserted the same entity before us, we can
                 # safely ignore the error and fetch the ID
                 pass
@@ -372,6 +370,20 @@ def country_to_entity_id(
     :param errors: how to handle missing countries
     :param by: use `name` if you use country names, `code` if you use ISO codes
     """
+    if country.dtype in ("int32", "int64"):
+        country = country.astype(str)
+    elif country.dtype == "object":
+        # Check if all values are strings or can be converted to strings
+        if not all(isinstance(x, (str, type(None))) for x in country.dropna()):
+            raise TypeError(
+                f"Country series contains unsupported data types. Expected strings or integers, got: {country.dtype}"
+            )
+    elif country.dtype.name == "category":
+        # Convert categorical to string
+        country = country.astype(str)
+    elif not country.dtype.name.startswith(("str", "string")):
+        raise TypeError(f"Country series has unsupported data type: {country.dtype}. Expected strings or integers.")
+
     # fill entities from DB
     db_entities = _get_entities_from_db(set(country.unique()), by=by, engine=engine)
     entity_id = country.map(db_entities).astype(float)
@@ -621,7 +633,7 @@ class IntRange:
 
     @staticmethod
     def from_values(xs: List[int]) -> "IntRange":
-        return IntRange(min(xs), max(xs))
+        return IntRange(min(xs), max(xs))  # type: ignore[unknown-argument]
 
     def to_values(self) -> list[int]:
         return [self.min, self.max]
@@ -818,6 +830,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
         else:
             raise AssertionError("Table must have columns country and year or date.")
 
+        cols_missing_title_public = []
         for col in tab:
             if col in ("year", "country"):
                 continue
@@ -844,10 +857,13 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             display_name = (tab[col].m.display or {}).get("name")
             title_public = getattr(tab[col].m.presentation, "title_public", None)
             if warn_title_public and display_name and not title_public:
-                warnings.warn(
-                    f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
-                    warnings.DisplayNameWarning,
-                )
+                cols_missing_title_public.append(col)
+
+        if cols_missing_title_public:
+            warnings.warn(
+                f"{len(cols_missing_title_public)} column(s) use display.name but no presentation.title_public (e.g. {', '.join(cols_missing_title_public[:3])}). Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
+                warnings.DisplayNameWarning,
+            )
 
 
 def _validate_grapher_config(tab: Table, col: str) -> None:
@@ -860,6 +876,8 @@ def _validate_grapher_config(tab: Table, col: str) -> None:
         schema = get_schema_from_url(grapher_config["$schema"])
         # schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version", "title")]
         schema["required"] = []
+
+        from jsonschema import validate
 
         validate(grapher_config, schema)
 

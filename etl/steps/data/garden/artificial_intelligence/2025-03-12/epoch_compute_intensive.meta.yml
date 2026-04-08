@@ -45,22 +45,6 @@ tables:
           zeroDay: '1949-01-01'
           yearIsDay: true
 
-      training_dataset_size__datapoints:
-        title: Training dataset size
-        unit: 'datapoints'
-        description_short: The number of examples provided to train an AI model. Typically, more data results in a more comprehensive understanding by the model.
-        description_key:
-          - Training data size refers to the volume of data employed to train an artificial intelligence (AI) model effectively. It's a representation of the number of examples that the model learns from during its training process. It is a fundamental measure of the scope of the data used in the model's learning phase.
-
-          - To grasp the concept of training data size, imagine teaching a friend the art of distinguishing different types of birds. In this analogy, each bird picture presented to your friend corresponds to an individual piece of training data. If you showed them 100 unique bird photos, then the training data size in this scenario would be quantified as 100.
-
-          - Training data size is an essential indicator in AI and machine learning. First and foremost, it directly impacts the depth of learning achieved by the model. The more extensive the dataset, the more profound and comprehensive the model's understanding of the subject matter becomes. Additionally, a large training data size contributes significantly to improved recognition capabilities. By exposing the model to a diverse array of examples, it becomes adept at identifying subtle nuances, much like how it becomes skilled at distinguishing various bird species through exposure to a large variety of bird images.
-
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '1949-01-01'
-          yearIsDay: true
-
       training_computation_petaflop:
         title: Training computation (petaFLOP)
         unit: 'petaFLOP'

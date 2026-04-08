@@ -6,7 +6,7 @@ from typing import List, Union
 
 import pandas as pd
 from owid.catalog import Table
-from owid.catalog.tables import _add_table_and_variables_metadata_to_table
+from owid.catalog.core.tables import _add_table_and_variables_metadata_to_table
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot

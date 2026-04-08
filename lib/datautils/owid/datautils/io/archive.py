@@ -20,15 +20,10 @@ def decompress_file(
 
     It can be a local or a remote file.
 
-    Parameters
-    ----------
-    input_file : Union[str, Path]
-        Path to local zip file, or URL of a remote zip file.
-    output_folder : Union[str, Path]
-        Path to local folder.
-    overwrite : bool
-        Overwrite decompressed content if it already exists (otherwise raises an error if content already exists).
-
+    Args:
+        input_file: Path to local zip file, or URL of a remote zip file.
+        output_folder: Path to local folder.
+        overwrite: Overwrite decompressed content if it already exists (otherwise raises an error if content already exists).
     """
     if isinstance(input_file, str):
         input_file = Path(input_file)

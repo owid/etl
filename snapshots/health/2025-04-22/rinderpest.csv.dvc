@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: World Organisation for Animal Health and Food and Agriculture Organization of the United Nations
+    title: Rinderpest and its Eradication
+    description: Data taken from the table commencing on page 743 in Appendix 1 of the ['Rinderpest and its eradication report'](https://www.woah.org/en/document/rinderpest-and-its-eradication/).
+    citation_full: |-
+      Taylor W.E., Gibbs E.P.J., Bandyopadhyay S.K., Pastoret P-P., Atang P. (2022). - Rinderpest and its eradication. Paris, OIE and FAO, 816 p. (DOI: https://doi.org/10.20506/9789295115606). Licence: CC BY-NC-SA 3.0 IGO.
+    attribution_short: WOAH & FAO
+    url_main: https://www.woah.org/en/document/rinderpest-and-its-eradication/
+    date_accessed: "2025-04-22"
+    date_published: "2022"
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.woah.org/en/document/rinderpest-and-its-eradication/
+outs:
+  - md5: d58a772aecf6ca64ada9c0ba2af2f1fc
+    size: 10525
+    path: rinderpest.csv

@@ -49,7 +49,7 @@ ANOMALY_DETECTORS = {
 
 def load_detector(anomaly_type: ANOMALY_TYPE) -> AnomalyDetector:
     """Load detector."""
-    return ANOMALY_DETECTORS[anomaly_type]
+    return ANOMALY_DETECTORS[anomaly_type]  # type: ignore[return-value]
 
 
 def get_variables_views_in_charts(
@@ -447,6 +447,7 @@ def anomaly_detection(
     force: bool = False,
     reset_db: bool = False,
     sample_n: Optional[int] = None,
+    append: bool = False,
 ) -> None:
     """Detect anomalies."""
     engine = get_engine()
@@ -507,7 +508,10 @@ def anomaly_detection(
         except FileNotFoundError as e:
             # This happens when a dataset is in DB, but not in a local catalog.
             log.error("loading_data.error", error=str(e))
-            continue
+            raise FileNotFoundError(
+                f"Dataset {dataset.catalogPath} (ID: {dataset_id}) not found in local catalog. "
+                f"Run the ETL step to generate it locally."
+            ) from e
 
         log.info("loading_data.end", t=time.time() - t)
 
@@ -519,7 +523,8 @@ def anomaly_detection(
             if anomaly_type not in ANOMALY_DETECTORS:
                 raise ValueError(f"Unsupported anomaly type: {anomaly_type}")
 
-            if not force:
+            # Skip update check if force or append is enabled
+            if not force and not append:
                 if not needs_update(engine, dataset, anomaly_type):
                     log.info(f"Anomaly type {anomaly_type} for dataset {dataset_id} already exists in the database.")
                     continue
@@ -591,21 +596,58 @@ def anomaly_detection(
 
             if not dry_run:
                 with Session(engine) as session:
-                    # log.info("Deleting existing anomalies")
-                    session.query(gm.Anomaly).filter(
-                        gm.Anomaly.datasetId == dataset_id,
-                        gm.Anomaly.anomalyType == anomaly_type,
-                    ).delete(synchronize_session=False)
-                    session.commit()
+                    if append:
+                        # Load existing anomaly record and append new data
+                        try:
+                            existing_anomaly = gm.Anomaly.load(
+                                session,
+                                dataset_id=dataset_id,
+                                anomaly_type=anomaly_type,
+                            )
+                            log.info("Appending to existing anomaly record")
 
-                    # Don't save anomalies if there are none
-                    if df_score_long.empty:
-                        log.info(f"No anomalies found for anomaly type {anomaly_type} in dataset {dataset_id}")
+                            # Use the model's append method
+                            records_before = (
+                                len(existing_anomaly.dfReduced) if existing_anomaly.dfReduced is not None else 0
+                            )
+                            existing_anomaly.append_anomalies(df_score_long_reduced)
+                            records_after = (
+                                len(existing_anomaly.dfReduced) if existing_anomaly.dfReduced is not None else 0
+                            )
+
+                            # Update checksum
+                            existing_anomaly.datasetSourceChecksum = dataset.sourceChecksum
+
+                            log.info(
+                                f"Appended anomalies: {len(df_score_long_reduced)} new, {records_after} total "
+                                f"(was {records_before})"
+                            )
+
+                            session.commit()
+                        except Exception as e:
+                            log.info(f"No existing anomaly found, creating new record: {e}")
+                            # No existing record, create new one
+                            if not df_score_long.empty:
+                                session.add(anomaly)
+                                session.commit()
+                                log.info(f"Created new anomaly record with {len(df_score_long_reduced)} records")
                     else:
-                        # Insert new anomalies
-                        log.info("Writing anomaly to database")
-                        session.add(anomaly)
+                        # Original behavior: delete and replace
+                        # log.info("Deleting existing anomalies")
+                        session.query(gm.Anomaly).filter(
+                            gm.Anomaly.datasetId == dataset_id,
+                            gm.Anomaly.anomalyType == anomaly_type,
+                        ).delete(synchronize_session=False)
                         session.commit()
+
+                        # Don't save anomalies if there are none
+                        if df_score_long.empty:
+                            log.info(f"No anomalies found for anomaly type {anomaly_type} in dataset {dataset_id}")
+                        else:
+                            # Insert new anomalies
+                            log.info("Writing anomaly to database")
+                            session.add(anomaly)
+                            session.commit()
 
 
 def needs_update(engine: Engine, dataset: gm.Dataset, anomaly_type: str) -> bool:
@@ -736,3 +778,75 @@ def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]
         new_n=len(sample_ids),
     )
     return [v for v in variables if v.id in sample_ids]
+
+
+def get_anomalies_for_chart_ids(
+    chart_ids: Optional[List[int]] = None, anomaly_types: Optional[Tuple[str, ...]] = ("upgrade_change",)
+) -> pd.DataFrame:
+    """Get datasets of the variables used in a list of charts, given the chart ids.
+
+    NOTE: It's unclear what the most relevant information is for a given chart. For now, get the average anomaly score and average scale score of the datasets of variables used in those charts.
+
+    """
+    # Get a dataframe of chart ids, variable ids (used in those charts), and their datasets ids.
+    query = """SELECT DISTINCT cd.chartId AS chart_id, v.id AS variable_id, v.datasetId AS dataset_id
+    FROM variables v
+    JOIN chart_dimensions cd
+    ON cd.variableId = v.id
+    """
+    if chart_ids:
+        id_list = ", ".join(str(cid) for cid in chart_ids)
+        query += f" AND cd.chartId IN ({id_list})"
+    df = OWID_ENV.read_sql(sql=query)
+
+    # Get all anomalies from DB for the relevant datasets.
+    with Session(OWID_ENV.engine) as session:
+        anomalies = [
+            anomaly
+            for anomaly in gm.Anomaly.load_anomalies(session=session, dataset_id=sorted(set(df["dataset_id"])))
+            if anomaly.anomalyType in anomaly_types  # type: ignore
+        ]
+
+    # Simplify the original dataframe to only contain the charts and datasets for which there are anomalies calculated.
+    dataset_ids_with_anomalies = [anomaly.datasetId for anomaly in anomalies]
+    df = df[df["dataset_id"].isin(dataset_ids_with_anomalies)].reset_index(drop=True)
+
+    # Gather anomalies for all variables, datasets, and anomaly types.
+    df_anomalies_all = [
+        anomaly.dfReduced.assign(**{"dataset_id": anomaly.datasetId, "anomaly_type": anomaly.anomalyType})  # type: ignore
+        for anomaly in anomalies
+    ]
+    if len(df_anomalies_all) == 0:
+        return pd.DataFrame(columns=["chart_id", "score_anomaly", "score_scale", "score_population", "score_mean"])
+
+    df_anomalies = pd.concat(
+        df_anomalies_all,
+        ignore_index=True,
+    ).rename(columns={"anomaly_score": "score_anomaly"})  # type: ignore
+
+    # Add the population score.
+    df_anomalies = add_population_score(df_reduced=df_anomalies)
+
+    # Calculate an average score.
+    df_anomalies["score_mean"] = (
+        df_anomalies["score_anomaly"] + df_anomalies["score_scale"] + df_anomalies["score_population"]
+    ) / 3
+
+    # Select the variables that are used by the given charts, and calculate their average anomaly and scale scores.
+    scores_all = ["score_anomaly", "score_scale", "score_population", "score_mean"]
+    df_anomalies_mean = df_anomalies.groupby(["variable_id"], as_index=False, observed=True).agg(
+        {score: "mean" for score in scores_all}
+    )
+
+    # Check that for each variable id and anomaly type there is only one row.
+    assert df_anomalies_mean[df_anomalies_mean.duplicated(subset=["variable_id"])].empty
+
+    # Add anomalies of each variable and anomaly type to the original dataframe.
+    df_with_anomalies = df.merge(df_anomalies_mean, on=["variable_id"], how="inner")
+    # In the end we need just one anomaly score for each chart.
+    # This would correspond to the maximum anomaly (among all selected anomaly types and variables in the chart).
+    df_with_anomalies = df_with_anomalies.groupby(["chart_id"], as_index=False).agg(
+        {score: "max" for score in scores_all}
+    )
+
+    return df_with_anomalies

@@ -1,0 +1,59 @@
+# Script to create a snapshot of USGS Mineral Commodity Summaries for a specific year.
+# To create a snapshot for another year:
+# - Copy this file, and rename it for the corresponding year.
+# - Go to the ScienceBase-Catalog and search for "Mineral Commodity Summaries", or simply go to this page:
+# https://www.sciencebase.gov/catalog/items?parentId=5c8c03e4e4b0938824529f7d&q=Mineral%20Commodity%20Summaries
+# - Click on the Mineral Commodity Summaries of the year you need. In the case of 2025, for example, this is the main page:
+# https://www.sciencebase.gov/catalog/item/677eaf95d34e760b392c4970
+# - On the top-right corner, click on the "View" button, and select "JSON" (optionally, tick on "Pretty print" on the top-left).
+# - Search (cmd+f) for "world". There should be two zip files named "World*.zip". The first one should be inside an element as follows:
+#     {
+#       "cuid": null,
+#       "key": null,
+#       ...
+#       "name": "World_Data_Release_MCS_2025.zip",
+#       ...
+#       "url": "https://www.sciencebase.gov/catalog/file/get/6197ccbed34eb622f692ee1c?f=__disk__ef%2Fa8%2F27%2Fefa827f9cad2012de291a711b2a073b0a7cd4aa5",
+#       "downloadUri": "https://www.sciencebase.gov/catalog/file/get/6197ccbed34eb622f692ee1c?f=__disk__ef%2Fa8%2F27%2Fefa827f9cad2012de291a711b2a073b0a7cd4aa5"
+#     }
+# - Copy the "downloadUri". This is the URL that you should use in the Snapshot url_download field.
+# - Update other metadata fields:
+#     - Replace all instances of the year with the new year.
+#     - Update the date_published with the new date (which can be found at the beginning of the main page for that new year, next to "Publication Date").
+#     - Update the date_accessed.
+#     - Replace the citation_full with the text suggested in "Citation" at the beginning of the main page.
+#     - Replace the url_main with the doi that appears in the citation.
+#     - Replace the url_download with the "downloadUri" copied before.
+# - Remove the "outs" part of the snapshot .zip.dvc file.
+# - Check that the license URL works, otherwise update it.
+# - Execute the new snapshot.
+# - Add this snapshot as a dependency of the new meadow mineral_commodity_summaries step, and add the year to YEARS_TO_PROCESS there.
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Mineral Commodity Summaries
+    title_snapshot: Mineral Commodity Summaries 2025
+    description: |-
+      This dataset contains world production statistics for over 88 nonfuel mineral commodities.
+    date_published: "2025-01-31"
+
+    # Citation
+    producer: United States Geological Survey
+    citation_full: |-
+      National Minerals Information Center, 2025, U.S. Geological Survey Mineral Commodity Summaries 2025 Data Release (ver. 2.0, April 2025): U.S. Geological Survey data release. https://doi.org/10.5066/P13XCP3R
+    attribution: USGS - Mineral Commodity Summaries (2025)
+    attribution_short: USGS
+
+    # Files
+    url_main: https://doi.org/10.5066/P13XCP3R
+    url_download: https://www.sciencebase.gov/catalog/file/get/677eaf95d34e760b392c4970?f=__disk__70%2Fcf%2F36%2F70cf3695ad9405884df4a4758e4b609013e3fb1e
+    date_accessed: '2025-12-15'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.usgs.gov/faqs/what-usgs-products-are-already-publicly-available
+outs:
+  - md5: e118dee17775f593724ee7da8b91acc4
+    size: 22615
+    path: mineral_commodity_summaries_2025.zip

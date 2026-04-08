@@ -1,0 +1,31 @@
+dataset:
+  title: Long-term corn production and yield in the US (US Census Bureau; USDA)
+tables:
+  long_term_corn_production_and_yield_in_the_us__us_census_bureau__usda:
+    variables:
+      corn_production__tonnes:
+        title: Corn production (tonnes)
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Corn production
+      corn_yield__tonnes_per_hectare:
+        title: Corn yield (tonnes per hectare)
+        unit: tonnes per hectare
+        display:
+          name: Corn yield
+      corn__area_harvested__hectares:
+        title: Corn, area harvested (hectares)
+        unit: hectares
+        short_unit: ha
+        display:
+          name: Area harvested for corn
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

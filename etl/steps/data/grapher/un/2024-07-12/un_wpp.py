@@ -12,7 +12,8 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("un_wpp")
     #
     # Process data.
-    #
+
+    # Import tables
     tables = [
         ds_garden["population"],
         ds_garden["growth_rate"],

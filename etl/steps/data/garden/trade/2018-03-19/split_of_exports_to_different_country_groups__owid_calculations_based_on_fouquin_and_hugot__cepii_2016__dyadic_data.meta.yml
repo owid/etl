@@ -1,0 +1,79 @@
+dataset:
+  title: Split of exports to different country groups - OWID calculations based on Fouquin and Hugot (CEPII 2016) dyadic data
+tables:
+  split_of_exports_to_different_country_groups__owid_calculations_based_on_fouquin_and_hugot__cepii_2016__dyadic_data:
+    variables:
+      exports_to_africa__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to Africa (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by continental destination as a share of GDP. All partner countries are classified into continent groupings according to OWID's classification.  Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_antarctica__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to Antarctica (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by continental destination as a share of GDP. All partner countries are classified into continent groupings according to OWID's classification.  Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_asia__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to Asia (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by continental destination as a share of GDP. All partner countries are classified into continent groupings according to OWID's classification.  Calculations use Fouqin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_eastern_europe__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to Eastern Europe (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by continental destination as a share of GDP. All partner countries are classified into continent groupings according to OWID's classification.  Calculations use Fouqin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_north_america__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to North America (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by continental destination as a share of GDP. All partner countries are classified into continent groupings according to OWID's classification.  Calculations use Fouqin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_oceania__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to Oceania (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by continental destination as a share of GDP. All partner countries are classified into continent groupings according to OWID's classification.  Calculations use Fouqin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_south_america__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to South America (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by continental destination as a share of GDP. All partner countries are classified into continent groupings according to OWID's classification.  Calculations use Fouqin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_western_europe__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to Western Europe (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by continental destination as a share of GDP. All partner countries are classified into continent groupings according to OWID's classification.  Calculations use Fouqin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_high_income_grouping__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to high-income grouping (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by destination as a share of GDP. All partner countries are classified into income groups according to the latest World Bank classification. Calculations use Fouqin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_low_income_grouping__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to low-income grouping (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          The share of exports from each entity exported to low-income country grouping. Income groupings are determined according to the World Bank's 2016 income classification. Calculations use Fouqin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_lower_middle_income_grouping__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to lower-middle income grouping (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by destination as a share of GDP. All partner countries are classified into income groups according to the latest World Bank classification. Calculations use Fouqin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_the_world__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to the World (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by destination as a share of GDP. Calculations use Fouqin and Hugot (CEPII 2016) dyadic trade data.
+      exports_to_upper_middle_income_grouping__fouquin_and_hugot__cepii_2016__dyadic:
+        title: Exports to upper-middle income grouping (Fouquin and Hugot (CEPII 2016), Dyadic)
+        unit: '%'
+        description: |-
+          Value of merchandise exports by destination as a share of GDP. All partner countries are classified into income groups according to the latest World Bank classification. Calculations use Fouqin and Hugot (CEPII 2016) dyadic trade data.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

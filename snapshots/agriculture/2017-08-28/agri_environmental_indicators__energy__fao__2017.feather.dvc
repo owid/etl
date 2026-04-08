@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Energy - FAO (2017)
+    description: |-
+      :
+      Agriculture and forestry energy use as a percentage of total energy use. Total of bioenergy production is given by the sum of different bioenergy sources (e.g. biodiesel, biogases). Bioenergy production as percentage of Total renewable production.
+    url: http://www.fao.org/faostat/en/?#data/
+    date_accessed: 2017-08-28
+    published_by: Food and Agriculture Organization of the United Nations (FAO) (2017)
+  name: 'Agri-Environmental Indicators: Energy - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+outs:
+  - md5: d3a978a91a6fc9ba929b321851cee8fb
+    size: 50794
+    path: agri_environmental_indicators__energy__fao__2017.feather

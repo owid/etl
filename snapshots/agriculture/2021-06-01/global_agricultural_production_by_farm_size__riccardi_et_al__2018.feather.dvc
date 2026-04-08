@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Ricciardi et al. (2018), How much of the world's food do smallholders produce?. Global Food Security.
+    url: https://www.sciencedirect.com/science/article/pii/S2211912417301293
+    date_accessed: 2026-03-05
+    published_by: |-
+      Ricciardi, V., Ramankutty, N., Mehrabi, Z., Jarvis, L., & Chookolingo, B. (2018). How much of the world's food do smallholders produce?. Global Food Security, 17, 64-72.
+  name: Global agricultural production by farm size (Riccardi et al. 2018)
+  description: ''
+  is_public: false
+outs:
+  - md5: 6ae068aecdb77e9ba004084822301b1b
+    size: 9642
+    path: global_agricultural_production_by_farm_size__riccardi_et_al__2018.feather

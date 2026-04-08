@@ -1,0 +1,20 @@
+meta:
+  source:
+    name: Thompson and Kalkowska (2020)
+    description: |-
+      This dataset shows actual and estimated costs of polio vaccines by type, dosage, route of administration and type of vaccination schedule.
+
+      Polio vaccines can be of two types: Oral Poliovirus Vaccines (OPV) or Inactivated Poliovirus Vaccines (IPV). They can be given at different doses (full or fractional). They can be administered in different ways: orally (for OPVs), by needle, device, or patch (for IPVs). They are either given during routine immunizations (RI) or during supplementary immunization activities (SIAs) where large groups tend to be vaccinated at the same time. SIAs are performed as preventative (pSIAs) or as part of an outbreak-response (oSIAs).
+
+      In eligible countries, Gavi funds IPVs to make them more affordable.
+    url: https://onlinelibrary.wiley.com/doi/pdfdirect/10.1111/risa.13557
+    date_accessed: 2026-03-05
+    published_by: |-
+      Thompson, K. M., & Kalkowska, D. A. (2021). Potential future use, costs, and value of poliovirus vaccines. Risk Analysis, 41(2), 349-363.
+  name: Polio vaccine costs in low-income countries
+  description: ''
+  is_public: false
+outs:
+  - md5: 669127a96a3ae1ffb7ccc4e05ca89b09
+    size: 5522
+    path: polio_vaccine_costs_in_low_income_countries.feather

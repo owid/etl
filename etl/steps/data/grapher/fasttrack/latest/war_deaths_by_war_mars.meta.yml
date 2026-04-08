@@ -12,20 +12,26 @@ dataset:
     - {}
 tables:
   war_deaths_by_war_mars:
+    common:
+      description_processing: |-
+        We have changed the names of two wars in the original dataset:
+
+        - "Third Sino-Japanese War" -> "Second Sino-Japanese War"
+        - "Second Sino-Japanese War" -> "Japanese Invasion of Manchuria"
     variables:
       war_deaths_low:
         title: War deaths (lower estimate)
         unit: deaths
-        description: The low estimate of the number of deaths over the duration of this war. Deaths of combatants due to fighting
+        description_short: The low estimate of the number of deaths over the duration of this war. Deaths of combatants due to fighting
           are included.
       war_deaths_high:
         title: War deaths (higher estimate)
         unit: deaths
-        description: The high estimate of the number of deaths over the duration of this war. Deaths of combatants due to
+        description_short: The high estimate of the number of deaths over the duration of this war. Deaths of combatants due to
           fighting are included.
       civil_war:
         title: Civil war
-        unit: ''
-        description: The indicator distinguishes between civil and interstate wars. A civil war is a conflict between combatants
+        unit: ""
+        description_short: The indicator distinguishes between civil and interstate wars. A civil war is a conflict between combatants
           that were previously part of the same state, but now at least one seeks control or secession. An interstate war
           is a conflict between states.

@@ -500,10 +500,10 @@ def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str, is_numeric: bool)
         st.header("Charts")
         if COLUMN_RELATIVE_ERROR in df.columns:
             fig = px.histogram(df, x=COLUMN_RELATIVE_ERROR, nbins=100, title="Distribution of relative error")
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         if COLUMN_LOG_ERROR in df.columns:
             fig = px.histogram(df, x=COLUMN_LOG_ERROR, nbins=100, title="Distribution of relative log error")
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
 
 
 def st_show_country_overview(df_indicators: pd.DataFrame, indicator_old: str, indicator_new: str):

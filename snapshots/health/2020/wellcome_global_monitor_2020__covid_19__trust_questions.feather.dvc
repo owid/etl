@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Wellcome Global Monitor (2020)
+    description: |-
+      The Wellcome Global Monitor is a large global study into how people think and feel about science and health challenges. It surveys over 140,000 people from more than 140 countries.
+    url: https://wellcome.org/reports/wellcome-global-monitor-covid-19/2020
+    date_accessed: 2023-11-04
+    published_by: Wellcome Global Monitor (2020)
+  name: 'Wellcome Global Monitor 2020: Covid-19 - Trust questions'
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/wellcome_global_monitor
+outs:
+  - md5: 8995adc31a7ffb36e139a8e8820a84b7
+    size: 15234
+    path: wellcome_global_monitor_2020__covid_19__trust_questions.feather

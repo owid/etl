@@ -1,0 +1,29 @@
+dataset:
+  title: Government Transparency index - Hollyer et al. (2014)
+tables:
+  government_transparency_index__hollyer_et_al__2014:
+    variables:
+      gov_transparency:
+        title: gov_transparency
+        unit: ''
+        description: The variable denotes the best estimate of the extent to which governments report economic data to the
+          World Bank.
+      gov_transparency_lower:
+        title: gov_transparency_lower
+        unit: ''
+        description: The variable denotes the lower-bound estimate of the extent to which governments report economic data
+          to the World Bank.
+      gov_transparency_upper:
+        title: gov_transparency_upper
+        unit: ''
+        description: The variable denotes the upper-bound estimate of the extent to which governments report economic data
+          to the World Bank.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -2,7 +2,7 @@ all_sources:
   - who_gho: &who-gho
       name: WHO, Global Health Observatory (2022); United Nations - Population Division (2022)
       published_by: WHO, Global Health Observatory (2022); United Nations - Population Division (2022)
-      url: https://ghoapi.azureedge.net/api/; https://population.un.org/wpp/Download/
+      url: https://ghoapi.azureedge.net/api/; https://population.un.org/wpp/downloads/
       date_accessed: 2022-08-03
       publication_year: 2022
 
@@ -12,7 +12,7 @@ dataset:
   short_name: vehicles
   description: |-
     The total number of registered vehicles (i.e. vehicles reported to a government agency and given some form of registration) in each county.
-    
+
     Data were collected from a number of different sectors and stakeholders in each country and were submitted to the World Health Organization after consensus meetings, facilitated by   national data coordinators. All legislative documents were analysed by lawyers at WHO headquarters who extracted the relevant information. The legal analysis was then shared with   National Data Coordinators and a validation process resolved any data conflicts through discussion and submission of new legal documents.
   sources:
     - *who-gho

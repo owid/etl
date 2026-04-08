@@ -2,18 +2,20 @@ import datetime as dt
 import json
 import re
 import tempfile
+import time
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, Optional, Union, cast
+from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Union, cast
 
-import owid.catalog.processing as pr
+import owid.catalog.core.processing as pr
 import pandas as pd
+import requests
 import structlog
 import yaml
 from deprecated import deprecated
 from owid.catalog import Table, s3_utils
-from owid.catalog.meta import (
+from owid.catalog.core.meta import (
     DatasetMeta,
     License,
     MetaBase,
@@ -25,11 +27,144 @@ from owid.catalog.meta import (
 from owid.datautils import dataframes
 from owid.datautils.io import decompress_file
 from owid.repack import to_safe_types
+from tenacity import Retrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from etl import config, download_helpers, paths
-from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump
+from etl.download_helpers import DownloadCorrupted
+from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump, yaml_load
 
 log = structlog.get_logger()
+
+
+class SnapshotNotFoundException(Exception):
+    """Raised when a snapshot file is not found on the remote server.
+
+    This is a plain Exception subclass (no unpicklable attributes) so it can
+    safely travel across process boundaries in ProcessPoolExecutor workers.
+    """
+
+    def __init__(self, uri: str, md5: str) -> None:
+        super().__init__(
+            f"Snapshot file not found on the remote server: {uri} (md5: {md5}). "
+            f"Have you run `etls {uri} --upload` to upload it?"
+        )
+
+
+class SnapshotArchive:
+    """Context manager for reading files from snapshot archives.
+
+    Provides an intuitive interface for working with archived snapshot files:
+
+    Example:
+        ```python
+        with snap.extracted() as archive:
+            # List all files
+            print(archive.files)  # ['data/file1.csv', 'data/file2.csv']
+
+            # Find files with glob patterns
+            csv_files = archive.glob("**/*.csv")
+
+            # Read a file (with helpful error if not found)
+            tb = archive.read("data/file1.csv")
+
+            # Check if file exists
+            if "data/file1.csv" in archive:
+                ...
+
+            # Access path for custom operations
+            path = archive.path / "data" / "file1.csv"
+        ```
+    """
+
+    def __init__(self, snapshot: "Snapshot", path: Path):  # noqa: F821
+        self._snapshot = snapshot
+        self._path = path
+        self._files: Optional[List[str]] = None
+
+    @property
+    def path(self) -> Path:
+        """Root path of extracted archive."""
+        return self._path
+
+    @property
+    def files(self) -> List[str]:
+        """List all files in the archive (relative paths, sorted)."""
+        if self._files is None:
+            self._files = sorted(str(p.relative_to(self._path)) for p in self._path.rglob("*") if p.is_file())
+        return self._files
+
+    def glob(self, pattern: str) -> List[str]:
+        """Find files matching a glob pattern.
+
+        Args:
+            pattern: Glob pattern to match files against.
+
+        Returns:
+            List of matching file paths (relative to archive root), sorted.
+
+        Examples:
+            ```python
+            archive.glob("*.csv")         # CSVs in root
+            archive.glob("**/*.csv")      # All CSVs recursively
+            archive.glob("data/*.csv")    # CSVs in data/ folder
+            ```
+        """
+        return sorted(str(p.relative_to(self._path)) for p in self._path.glob(pattern) if p.is_file())
+
+    def __contains__(self, filename: str) -> bool:
+        """Check if file exists in archive.
+
+        Args:
+            filename: Relative path to check.
+
+        Returns:
+            True if file exists in archive.
+
+        Example:
+            ```python
+            if "data.csv" in archive:
+                tb = archive.read("data.csv")
+            ```
+        """
+        return (self._path / filename).is_file()
+
+    def read(self, filename: str, force_extension: Optional[str] = None, **kwargs) -> Table:
+        """Read a file from the archive.
+
+        Args:
+            filename: Relative path to the file within the archive.
+            force_extension: Override file extension for read method selection.
+            **kwargs: Additional arguments passed to the read function.
+
+        Returns:
+            Table with the file contents and snapshot metadata.
+
+        Raises:
+            FileNotFoundError: If file doesn't exist, with helpful message listing available files.
+
+        Example:
+            ```python
+            with snap.extracted() as archive:
+                tb = archive.read("data/2020.csv")
+            ```
+        """
+        file_path = self._path / filename
+        if not file_path.is_file():
+            available = "\n".join(f"  - {f}" for f in self.files)
+            raise FileNotFoundError(f"File '{filename}' not found in archive.\nAvailable files:\n{available}")
+
+        if force_extension is None:
+            extension = filename.split(".")[-1]
+        else:
+            extension = force_extension
+
+        return read_table_from_snapshot(
+            path=file_path,
+            table_metadata=self._snapshot.to_table_metadata(),
+            snapshot_origin=self._snapshot.metadata.origin,
+            file_extension=extension,
+            **kwargs,
+        )
 
 
 @dataclass
@@ -75,6 +210,20 @@ class Snapshot:
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def _snapshot_exists_on_remote(self, md5: str) -> bool:
+        """Check if snapshot file exists on R2 without downloading it."""
+        if self.metadata.is_public:
+            url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
+            try:
+                resp = requests.head(url, timeout=10)
+                return resp.status_code == 200
+            except requests.RequestException:
+                return False
+        else:
+            # For private snapshots, assume it exists if md5 matches — we can't
+            # easily do a HEAD request on S3 without more setup
+            return True
+
     def _download_dvc_file(self, md5: str) -> None:
         """Download file from remote to self.path."""
         self.path.parent.mkdir(exist_ok=True, parents=True)
@@ -82,7 +231,12 @@ class Snapshot:
             # TODO: temporarily download files from R2 instead of public link to prevent
             # issues with cached snapshots. Remove this when convenient
             download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
-            download_helpers.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
+            try:
+                download_helpers.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
+            except requests.exceptions.HTTPError as e:
+                if e.response is not None and e.response.status_code == 404:
+                    raise SnapshotNotFoundException(self.uri, md5) from None
+                raise
         else:
             download_url = f"s3://{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
             s3_utils.download(download_url, str(self.path))
@@ -96,7 +250,7 @@ class Snapshot:
                 f"Checksum mismatch for {self.path}: expected {md5}, got {downloaded_md5}. It is possible that download got interrupted."
             )
 
-    def pull(self, force=True) -> None:
+    def pull(self, force=True, retries: int = 1) -> None:
         """Pull file from S3."""
         if not force and not self.is_dirty():
             return
@@ -104,7 +258,18 @@ class Snapshot:
         assert len(self.metadata.outs) == 1, ".dvc file is missing 'outs' field. Have you run the snapshot?"
         expected_md5 = self.metadata.outs[0]["md5"]
 
-        self._download_dvc_file(expected_md5)
+        if retries > 1:
+            for attempt in Retrying(
+                retry=retry_if_exception_type(
+                    (requests.exceptions.HTTPError, requests.exceptions.ChunkedEncodingError, DownloadCorrupted)
+                ),
+                stop=stop_after_attempt(retries),
+                wait=wait_exponential(multiplier=1, min=1, max=10),
+            ):
+                with attempt:
+                    self._download_dvc_file(expected_md5)
+        else:
+            self._download_dvc_file(expected_md5)
 
         expected_size = self.metadata.outs[0]["size"]
         downloaded_size = self.path.stat().st_size
@@ -185,37 +350,78 @@ class Snapshot:
         with open(self.metadata_path, "r") as f:
             meta = ruamel_load(f)
 
-        # If the file already exists with the same md5, skip the upload
+        # If the file already exists with the same md5, verify it's actually on R2 before skipping
         if meta.get("outs") and meta["outs"][0]["md5"] == md5:
-            log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
-            return
+            if self._snapshot_exists_on_remote(md5):
+                log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
+                return
+            else:
+                log.warning("File md5 matches .dvc metadata but is missing from R2, re-uploading", snapshot=self.uri)
 
         # Upload to S3
         bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
         assert self.metadata.is_public is not None
         s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
 
-        meta["outs"] = [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]
-
-        with open(self.metadata_path, "w") as f:
-            f.write(ruamel_dump(meta))
+        self.m._update_metadata_file({"outs": [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]})
 
     def create_snapshot(
         self,
         filename: Optional[Union[str, Path]] = None,
         data: Optional[Union[Table, pd.DataFrame]] = None,
         upload: bool = False,
+        download_retries: int = 1,
     ) -> None:
         """Create a new snapshot from a local file, or from data in memory, or from a download link.
         Then upload it to S3. This is the recommended way to create a snapshot.
+
+        Args:
+            uri (str): URI of the snapshot file, typically `namespace/version/short_name.ext`. Metadata file
+                `namespace/version/short_name.ext.dvc` must exist!
+            filename (str or None): Path to local data file (if dataframe is not given).
+            data (Table or pd.DataFrame or None): Data to upload (if filename is not given).
+            upload (bool): True to upload data to bucket.
+            download_retries (int): Number of retries for downloading from source (default: 1, no retries).
         """
-        if (filename is not None) or (data is not None):
-            # Create snapshot from either a local file or from data in memory.
-            add_snapshot(uri=self.uri, filename=filename, dataframe=data, upload=upload)
+        assert not (filename is not None and data is not None), "Pass either a filename or data, but not both."
+
+        if filename is not None:
+            # Ensure destination folder exists.
+            self.path.parent.mkdir(exist_ok=True, parents=True)
+
+            # Copy local data file to snapshots data folder.
+            self.path.write_bytes(Path(filename).read_bytes())
+        elif data is not None:
+            # Copy dataframe to snapshots data folder.
+            dataframes.to_file(data, file_path=self.path)
+        elif self.metadata.origin and self.metadata.origin.url_download:
+            # Create snapshot by downloading data from a URL with retry logic.
+            for attempt in range(1, download_retries + 1):
+                try:
+                    self.download_from_source()
+                    break
+                except DownloadCorrupted as e:
+                    log.warning(
+                        str(e),
+                        attempt=attempt,
+                        max_attempts=download_retries,
+                    )
+                    if attempt == download_retries:
+                        # Re-raise the exception on final attempt
+                        raise
+                    else:
+                        # Wait before retrying (exponential backoff)
+                        wait_time = min(4 * (2 ** (attempt - 1)), 10)
+                        time.sleep(wait_time)
         else:
-            # Create snapshot by downloading data from a URL.
-            self.download_from_source()
-            self.dvc_add(upload=upload)
+            # Maybe file is already there
+            assert self.path.exists(), "File not found. Provide a filename, data or add url_download to metadata."
+
+        # Upload data to R2
+        self.dvc_add(upload=upload)
+
+        # Save metadata to file
+        self.metadata.save()
 
     def to_table_metadata(self) -> TableMeta:
         return self.metadata.to_table_metadata()
@@ -306,11 +512,134 @@ class Snapshot:
             self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
         )
 
+    def read_from_df(self, *args, **kwargs) -> Table:
+        """Read data from a dataframe into a Table and populate it with metadata."""
+        return pr.read_from_df(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def read_custom(self, read_function: Callable, *args, **kwargs) -> Table:
+        """Read data file using a custom reader function, and return a Table with metadata.
+
+        Use this method when standard read methods (read_csv, read_excel, etc.) don't meet
+        your needs. The custom function receives the snapshot file path and should return
+        a pandas DataFrame or compatible data structure.
+
+        Parameters
+        ----------
+        read_function : Callable
+            Custom function to read the data. Must accept a file path as first argument
+            and return a DataFrame or Table.
+        *args
+            Additional positional arguments to pass to read_function.
+        **kwargs
+            Additional keyword arguments to pass to read_function.
+
+        Returns
+        -------
+        Table
+            Data read by the custom function as a Table with snapshot metadata.
+
+        Examples
+        --------
+        Read a table from an HTML file:
+
+        ```python
+        tb = snap.read_custom(read_function=lambda x: pd.read_html(x)[0])
+        ```
+        """
+        return pr.read_custom(
+            filepath_or_buffer=self.path,
+            read_function=read_function,
+            *args,
+            metadata=self.to_table_metadata(),
+            origin=self.metadata.origin,
+            **kwargs,
+        )
+
+    @contextmanager
+    def extracted(self) -> Generator[SnapshotArchive, None, None]:
+        """Extract archive to temporary directory and provide access to its contents.
+
+        Returns a SnapshotArchive object that provides an intuitive interface
+        for listing and reading files from the archive. The temporary directory
+        is automatically cleaned up when the context manager exits.
+
+        Yields:
+            SnapshotArchive: Object with methods for listing and reading archive contents.
+
+        Example:
+            ```python
+            snap = Snapshot(...)
+
+            with snap.extracted() as archive:
+                # List all files
+                print(archive.files)  # ['data/file1.csv', 'meta/info.json']
+
+                # Find files with glob patterns
+                csv_files = archive.glob("**/*.csv")
+
+                # Read a file
+                tb = archive.read("data/file1.csv")
+
+                # Check if file exists
+                if "optional.csv" in archive:
+                    ...
+            ```
+        """
+        temp_dir = tempfile.TemporaryDirectory()
+        try:
+            decompress_file(self.path, temp_dir.name)
+            archive = SnapshotArchive(self, Path(temp_dir.name))
+            # Keep backward compatibility
+            self._unarchived_dir = archive.path
+            yield archive
+        finally:
+            temp_dir.cleanup()
+            self._unarchived_dir = None
+
+    def read_from_archive(self, filename: str, force_extension: Optional[str] = None, **kwargs) -> Table:
+        """Read a file in an archive.
+
+        Use this function within a 'with snap.extracted():' context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
+
+        The read method is inferred based on the file extension of `filename`. Use `force_extension` if you want to override this.
+
+        Note:
+            Consider using `archive.read()` directly from the context manager for better error messages:
+
+            ```python
+            with snap.extracted() as archive:
+                tb = archive.read("filename.csv")  # Better error messages
+            ```
+
+        Example:
+            ```python
+            snap = Snapshot(...)
+
+            with snap.extracted():
+                table1 = snap.read_from_archive("filename1.csv")
+                table2 = snap.read_from_archive("filename2.csv")
+            ```
+        """
+        if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
+            raise RuntimeError("Archive is not unarchived. Use 'with snap.extracted()' context manager.")
+
+        # Delegate to SnapshotArchive.read() for consistent error handling
+        archive = SnapshotArchive(self, self._unarchived_dir)
+        return archive.read(filename, force_extension=force_extension, **kwargs)
+
+    @property
+    def path_unarchived(self) -> Path:
+        if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
+            raise RuntimeError("Archive is not unarchived. Use 'with snap.extracted():' context manager.")
+
+        return self._unarchived_dir
+
     # Methods to deal with archived files
-    @deprecated("This function will be deprecated. Use `open_archive` context manager instead.")
+    @deprecated("This function will be deprecated. Use `extracted()` context manager instead.")
     def extract(self, output_dir: Path | str):
         decompress_file(self.path, output_dir)
 
+    @deprecated("This function will be deprecated. Use `extracted()` context manager instead.")
     def extract_to_tempdir(self) -> Any:
         # Create temporary directory
         temp_dir = tempfile.TemporaryDirectory()
@@ -319,8 +648,14 @@ class Snapshot:
         # Return temporary directory
         return temp_dir
 
+    @deprecated("This function will be deprecated. Use `extracted()` context manager instead.")
     def read_in_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read data from file inside a zip/tar archive.
+
+        DEPRECATED: This function will be deprecated. Use `extracted()` context manager instead.
+            >>> with snap.extracted():
+            ...     table1 = snap.read_from_archive("filename1.csv")
+            ...     table2 = snap.read_from_archive("filename2.csv")
 
         If the relevant data file is within a zip/tar archive, this method will read this file and return it as a table.
 
@@ -344,56 +679,6 @@ class Snapshot:
                 **kwargs,
             )
             return tb
-
-    @contextmanager
-    def open_archive(self):
-        """Use this context manager to read multiple files in an archive without unarchiving multiple times.
-
-        Example:
-
-        ```python
-        snap = Snapshot(...)
-
-        with snap.open_archive():
-            table1 = snap.read_from_archive("filename1.csv")
-            table2 = snap.read_from_archive("filename2.csv")
-        ```
-
-        It creates a temporary directory with the unarchived content. This temporary directory is saved in class attribute `_unarchived_dir` and is deleted when the context manager exits.
-        """
-        temp_dir = tempfile.TemporaryDirectory()
-        try:
-            decompress_file(self.path, temp_dir.name)
-            self._unarchived_dir = Path(temp_dir.name)
-            yield
-        finally:
-            temp_dir.cleanup()
-            self._unarchived_dir = None
-
-    def read_from_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
-        """Read a file in an archive.
-
-        Use this function within a context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
-
-        The read method is inferred based on the file extension of `filename`. Use `force_extension` if you want to override this.
-        """
-        if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
-            raise RuntimeError("Archive is not unarchived. Use 'with snap.unarchived()' context manager.")
-
-        if force_extension is None:
-            new_extension = filename.split(".")[-1]
-        else:
-            new_extension = force_extension
-
-        tb = read_table_from_snapshot(
-            *args,
-            path=self._unarchived_dir / filename,
-            table_metadata=self.to_table_metadata(),
-            snapshot_origin=self.metadata.origin,
-            file_extension=new_extension,
-            **kwargs,
-        )
-        return tb
 
 
 @pruned_json
@@ -475,33 +760,61 @@ class SnapshotMeta(MetaBase):
 
         return yaml_dump({"meta": d})  # type: ignore
 
-    def save(self) -> None:  # type: ignore
-        self.path.parent.mkdir(exist_ok=True, parents=True)
+    def _update_metadata_file(self, d: dict[str, Any]) -> None:
+        """Update metadata YAML file with given dictionary."""
+        with open(self.path, "r") as f:
+            meta = ruamel_load(f)
+
+        # Update everything from `meta`
+        update_meta = d.pop("meta", {})
+        for k, v in update_meta.items():
+            if k in meta["meta"]:
+                if isinstance(meta["meta"][k], dict):
+                    meta["meta"][k].update(v)
+                else:
+                    meta["meta"][k] = v
+            else:
+                meta["meta"][k] = v
+
+        # Update remaining fields
+        meta.update(d)
+
         with open(self.path, "w") as f:
-            f.write(self.to_yaml())
+            f.write(ruamel_dump(meta))
 
-    # def save(self) -> None:  # type: ignore
-    #     self.path.parent.mkdir(exist_ok=True, parents=True)
+    def save(self) -> None:  # type: ignore
+        """Save metadata to YAML file. This is useful if you're dynamically changing
+        metadata (like dates) from the script and need to save them into YAML. This
+        function doesn't upload the file to S3, use `create_snapshot` instead.
+        """
+        self.path.parent.mkdir(exist_ok=True, parents=True)
 
-    #     # Create new file
-    #     if not self.path.exists():
-    #         with open(self.path, "w") as f:
-    #             f.write(self.to_yaml())
-    #     # Edit existing file, keep outs
-    #     else:
-    #         # Load outs from existing file
-    #         with open(self.path, "r") as f:
-    #             yaml = ruamel_load(f)
-    #             outs = yaml.get("outs", None)
-    #             wdir = yaml.get("wdir", None)
+        # Create new file
+        if not self.path.exists():
+            with open(self.path, "w") as f:
+                f.write(self.to_yaml())
+        # Edit existing file, keep outs
+        else:
+            # Load outs from existing file
+            with open(self.path, "r") as f:
+                yaml = yaml_load(f)
+                outs = yaml.get("outs", None)
+                # wdir is a legacy field, we just ignore it
 
-    #         # Save metadata to file
-    #         meta = self._meta_to_dict()
-    #         with open(self.path, "w") as f:
-    #             d = {"meta": meta, "outs": outs}
-    #             if wdir:
-    #                 d["wdir"] = wdir
-    #             f.write(yaml_dump(d))
+            # Save metadata to file
+            # NOTE: meta does not have `outs` field, it's reset when saving
+            meta = self._meta_to_dict()
+
+            # No change, keep the file as is
+            if yaml["meta"] == meta:
+                return
+
+            # Otherwise update the file
+            # set `outs` back
+            d = {"meta": meta}
+            if outs:
+                d["outs"] = outs
+            self._update_metadata_file(d)
 
     @property
     def uri(self):
@@ -578,7 +891,9 @@ class SnapshotMeta(MetaBase):
             js = json.load(f)
 
         # NOTE: this is similar to `convert_grapher_source`, DRY it when possible
-        assert len(js["sources"]) == 1
+        assert len(js["sources"]) >= 1
+        # Use only the first source for snapshot metadata; the garden step
+        # handles per-variable sources from the backport config separately.
         s = js["sources"][0]
         self.name = js["dataset"]["name"]
         self.source = Source(
@@ -642,6 +957,7 @@ def read_table_from_snapshot(
     snapshot_origin: Union[Origin, None],
     file_extension: str,
     safe_types: bool = True,
+    read_function: Callable | None = None,
     *args,
     **kwargs,
 ) -> Table:
@@ -657,61 +973,15 @@ def read_table_from_snapshot(
         "origin": snapshot_origin,
     }
     # Read table
-    if file_extension == "csv":
-        tb = pr.read_csv(*args, **kwargs)
-    elif file_extension == "feather":
-        tb = pr.read_feather(*args, **kwargs)
-    elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
-        tb = pr.read_excel(*args, **kwargs)
-    elif file_extension == "json":
-        tb = pr.read_json(*args, **kwargs)
-    elif file_extension == "dta":
-        tb = pr.read_stata(*args, **kwargs)
-    elif file_extension == "rds":
-        tb = pr.read_rds(*args, **kwargs)
-    elif file_extension == "rda":
-        tb = pr.read_rda(*args, **kwargs)
-    elif file_extension == "parquet":
-        tb = pr.read_parquet(*args, **kwargs)
+    if read_function is not None:
+        tb = pr.read_custom(read_function, *args, **kwargs)
     else:
-        raise ValueError(f"Unknown extension {file_extension}")
+        tb = pr.read(*args, file_extension=file_extension, **kwargs)
 
     if safe_types:
         tb = cast(Table, to_safe_types(tb))
 
     return tb
-
-
-def add_snapshot(
-    uri: str,
-    filename: Optional[Union[str, Path]] = None,
-    dataframe: Optional[Union[Table, pd.DataFrame]] = None,
-    upload: bool = False,
-) -> None:
-    """Helper function for adding snapshots with metadata, where the data is either
-    a local file, or a dataframe in memory.
-
-    Args:
-        uri (str): URI of the snapshot file, typically `namespace/version/short_name.ext`. Metadata file
-            `namespace/version/short_name.ext.dvc` must exist!
-        filename (str or None): Path to local data file (if dataframe is not given).
-        dataframe (Table or pd.DataFrame or None): Data to upload (if filename is not given).
-        upload (bool): True to upload data to bucket.
-    """
-    snap = Snapshot(uri)
-
-    if (filename is not None) and (dataframe is None):
-        # Ensure destination folder exists.
-        snap.path.parent.mkdir(exist_ok=True, parents=True)
-
-        # Copy local data file to snapshots data folder.
-        snap.path.write_bytes(Path(filename).read_bytes())
-    elif (dataframe is not None) and (filename is None):
-        dataframes.to_file(dataframe, file_path=snap.path)
-    else:
-        raise ValueError("Pass either a filename or data, but not both.")
-
-    snap.dvc_add(upload=upload)
 
 
 def snapshot_catalog(match: str = r".*") -> Iterator[Snapshot]:

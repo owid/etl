@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5266
-    date_accessed: 2023-08-10 08:44:18.772680
+    url: https://admin.owid.io/admin/datasets/5266
+    date_accessed: 2026-03-10 09:19:21.817829+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5266_global_wildlife_trade__harfoot_et_al__2018
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 08401fd987fb13282145f933a5fe7f45
-  size: 13036
-  path: dataset_5266_global_wildlife_trade__harfoot_et_al__2018_config.json
+  - md5: 16ea55cb17320c83138d7fb7459cc9f3
+    size: 14282
+    path: dataset_5266_global_wildlife_trade__harfoot_et_al__2018_config.json

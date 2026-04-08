@@ -71,7 +71,7 @@ steps:
     - data://meadow/animal_welfare/2024-12-12/number_of_farmed_fish
     - data://garden/animal_welfare/2024-12-12/farmed_finfishes_used_for_food
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
   data://grapher/animal_welfare/2024-12-12/number_of_farmed_fish:
     - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
@@ -84,7 +84,7 @@ steps:
   data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
     - data://meadow/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
   data://grapher/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
     - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
@@ -96,7 +96,7 @@ steps:
   data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
     - data://meadow/animal_welfare/2025-01-23/number_of_farmed_crustaceans
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
   data://grapher/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
     - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
@@ -117,29 +117,29 @@ steps:
   data://grapher/animal_welfare/2024-12-17/fur_laws:
     - data://garden/animal_welfare/2024-12-17/fur_laws
   #
-  # Total number of animals used for food.
-  #
-  data://garden/animal_welfare/2025-03-26/animals_used_for_food:
-    - data://garden/faostat/2025-03-17/faostat_qcl
-    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
-    - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
-    - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
-  #
-  # Total number of animals used for food.
-  #
-  data://grapher/animal_welfare/2025-03-26/animals_used_for_food:
-    - data://garden/animal_welfare/2025-03-26/animals_used_for_food
-  #
-  # Land animals killed for food (grouped into main animals and "other").
-  #
-  data://grapher/animal_welfare/2025-03-26/land_animals_killed_for_food:
-    - data://garden/faostat/2025-03-17/faostat_qcl
-  #
   # Animal welfare data explorer.
   #
   export://explorers/animal_welfare/latest/animal_welfare:
-    - data://grapher/animal_welfare/2025-03-26/animals_used_for_food
-    - data://grapher/animal_welfare/2023-08-01/global_hen_inventory
-    - data://grapher/animal_welfare/2023-09-01/chick_culling_laws
+    - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
     - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
+    - data://grapher/animal_welfare/2023-09-01/chick_culling_laws
+    - data://grapher/animal_welfare/2023-08-01/global_hen_inventory
     - data://grapher/animal_welfare/2024-12-17/fur_laws
+  #
+  # Total number of animals used for food.
+  #
+  data://garden/animal_welfare/2026-03-03/animals_used_for_food:
+    - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+    - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
+  #
+  # Total number of animals used for food.
+  #
+  data://grapher/animal_welfare/2026-03-03/animals_used_for_food:
+    - data://garden/animal_welfare/2026-03-03/animals_used_for_food
+  #
+  # Land animals killed for food (grouped into main animals and "other").
+  #
+  data://grapher/animal_welfare/2026-03-03/land_animals_killed_for_food:
+    - data://garden/faostat/2026-02-25/faostat_qcl

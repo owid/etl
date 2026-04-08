@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4120
-    date_accessed: 2023-08-10 08:59:53.036069
+    url: https://admin.owid.io/admin/datasets/4120
+    date_accessed: 2026-03-04 14:28:28.074448+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4120_human_height__ncd_risc__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 981980e97379616f6e9c2e8e57f5d833
-  size: 9042
-  path: dataset_4120_human_height__ncd_risc__2017_config.json
+  - md5: e0479b9f0bc6fe9a587fd9121a45b128
+    size: 10009
+    path: dataset_4120_human_height__ncd_risc__2017_config.json

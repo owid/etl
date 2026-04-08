@@ -295,6 +295,35 @@ class FasttrackImport:
             assert ds.id, "No ID found in dataset object!"
             return ds.id
 
+    def rollback(self) -> None:
+        """Rollback all generated files."""
+        repo = Repo(BASE_DIR)
+
+        # Collect all paths to check
+        paths_to_check = [self.metadata_path, self.step_path, DAG_FASTTRACK_PATH]
+
+        # Add snapshot paths if available
+        try:
+            if self.__snapshot_path is not None:
+                paths_to_check.append(Path(self.__snapshot_path))
+            paths_to_check.append(self.snapshot.path)
+        except Exception:
+            log.info("Snapshot path not available, skipping")
+
+        # Process each file
+        for path in paths_to_check:
+            if not path.exists():
+                continue
+
+            try:
+                # Try to restore from git (works for tracked files)
+                repo.git.checkout("HEAD", "--", str(path))
+                log.info(f"Restored {path} to previous state")
+            except Exception:
+                # For new files not tracked by git, just delete them
+                path.unlink(missing_ok=True)
+                log.info(f"Removed file {path}")
+
 
 def _diff_files_as_list(current, new):
     """Get differences item by item from `current` and `new` lists."""

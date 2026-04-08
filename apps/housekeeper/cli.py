@@ -2,10 +2,9 @@
 
 from typing import Optional
 
-import click
-from rich_click import RichCommand
+import rich_click as click
 
-from apps.housekeeper.charts import send_slack_chart_review
+from apps.housekeeper.charts import send_slack_chart_reviews
 
 # TODO: Add more review types
 REVIEW_TYPES = [
@@ -15,12 +14,9 @@ REVIEW_TYPES = [
 
 # Config
 CHANNEL_NAME = "#chart-reviews"
-# CHANNEL_NAME = "#lucas-playground"
-SLACK_USERNAME = "housekeeper"
-ICON_EMOJI = "sus-blue"
 
 
-@click.command("housekeeper", cls=RichCommand, help=__doc__)
+@click.command("housekeeper", help=__doc__)
 @click.option(
     "--review-type",
     "-t",
@@ -31,14 +27,23 @@ ICON_EMOJI = "sus-blue"
     "--channel",
     "-c",
     type=str,
-    help=f"Name of the slack channel to send the message two. If None, {CHANNEL_NAME} will be used",
+    help=f"Name of the slack channel to send the message to. If None, {CHANNEL_NAME} will be used",
 )
-def main(review_type: str, channel: Optional[str] = None):
+@click.option(
+    "--dev",
+    is_flag=True,
+    default=False,
+    help="Dev mode: replaces Slack mentions with code-formatted names so nobody gets pinged. Requires --channel.",
+)
+def main(review_type: str, channel: Optional[str] = None, dev: bool = False):
+    if dev and channel is None:
+        raise click.UsageError("--dev requires --channel to avoid posting to the main channel")
+
     channel_name = CHANNEL_NAME if channel is None else channel
     # Review charts
     if review_type == "chart":
-        send_slack_chart_review(
+        send_slack_chart_reviews(
             channel_name=channel_name,
-            slack_username=SLACK_USERNAME,
-            icon_emoji=ICON_EMOJI,
+            include_draft=True,
+            dev=dev,
         )

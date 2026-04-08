@@ -43,6 +43,9 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb_orig = tb.copy()
+    tb["country"] = tb["country"].str.replace(
+        "CÃ´te dâ\x80\x99Ivoire", "Cote d'Ivoire", regex=False
+    )  # countries.json struggling with the original name
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,

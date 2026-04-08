@@ -9,11 +9,11 @@ Important - You need and account to access the data.
 * In Measure select 'Deaths' and 'DALYs'
 * In Metric select 'Number','Percent' and 'Rate'
 * In Cause select:
-    * 'Select all causes'
+    * All causes
     * Tuberculosis
     * HIV/AIDS
     * STIs excluding HIV
-    * Tuberculosis, Lower Respiratory Infections, Upper Respiratory Infections
+    * Lower Respiratory Infections, Upper Respiratory Infections
     * COVID-19
     * Enteric infections and the level nested under it
     * Malaria

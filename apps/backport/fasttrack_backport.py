@@ -143,7 +143,7 @@ def _fill_variables_meta(spreadsheet, meta, short_name):
     dataset["version"] = "latest"
     dataset["short_name"] = short_name
     dataset["description"] = source["description"]
-    dataset["updated"] = str(dt.datetime.utcnow())
+    dataset["updated"] = str(dt.datetime.now(dt.timezone.utc))
 
     # add dataset to the spreadsheet
     wks = spreadsheet.get_worksheet_by_id(SHEET_TO_GID["dataset_meta"])

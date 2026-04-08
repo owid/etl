@@ -9,14 +9,16 @@ import streamlit as st
 from structlog import get_logger
 
 import etl.grapher.model as gm
-from apps.chart_sync.admin_api import AdminAPI
+from apps.indicator_upgrade.upgrade import (
+    cli_upgrade_indicators,
+    get_affected_narrative_charts_cli,
+    push_new_narrative_charts_cli,
+)
 from apps.wizard.utils import set_states
-from apps.wizard.utils.cached import get_grapher_user
 from apps.wizard.utils.components import st_toast_error, st_wizard_page_link
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
-from etl.files import get_schema_from_url
-from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
+from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids
 
 # Logger
 log = get_logger()
@@ -37,7 +39,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
     # 1/ Get affected charts
     ########################################################
     # If user submitted variable mapping (i.e. clicked on "Next (2/3)"), then get charts and update them accordingly.
-    with st.spinner("Retrieving charts to be updated. This can take up to 1 minute..."):
+    with st.spinner("Retrieving charts to be updated. This can take up to 1 minute...", show_time=True):
         try:
             log.info("building updaters and getting charts!")
             st.session_state.indicator_mapping = indicator_mapping
@@ -48,13 +50,23 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
             charts = []
 
     ########################################################
-    # 2/ Preview submission
+    # 2/ Get affected narrative charts
     ########################################################
-    # 2.1/ Display details
+    narrative_charts = get_affected_narrative_charts_cli(charts) if charts else []
+    num_narrative_charts = len(narrative_charts)
+
+    ########################################################
+    # 3/ Preview submission
+    ########################################################
+    # 3.1/ Display details
     if (num_charts := len(charts)) > 0:
         with st.container(border=True):
             ## Number of charts being updated and variable mapping
-            with st.popover(f"{num_charts} charts affected!"):
+            if num_narrative_charts > 0:
+                popover_label = f"{num_charts} charts & {num_narrative_charts} narrative charts affected!"
+            else:
+                popover_label = f"{num_charts} charts affected!"
+            with st.popover(popover_label):
                 # Build Series with slugs
                 slugs = pd.DataFrame(
                     {
@@ -82,7 +94,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
             # Button to finally submit the revisions
             st.button(
                 label="🚀 Update charts (3/3)",
-                use_container_width=True,
+                width="stretch",
                 type="primary",
                 on_click=trigger_chart_submission,
             )
@@ -93,47 +105,78 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
     return charts
 
 
-def push_new_charts(charts: List[gm.Chart]) -> None:
-    """Updating charts in the database."""
-    # Use Tailscale user if it is available, otherwise use GRAPHER_USER_ID from env
-    grapher_user_id = get_grapher_user().id
+def push_new_charts() -> None:
+    """Updating charts and narrative charts in the database."""
+    with st.spinner("Updating charts and narrative charts..."):
+        try:
+            # Use the CLI function which handles both charts and narrative charts
+            result = cli_upgrade_indicators(dry_run=False)
 
-    # API to interact with the admin tool
-    api = AdminAPI(OWID_ENV, grapher_user_id=grapher_user_id)
-    # Update charts
-    progress_text = "Updating charts..."
-    bar = st.progress(0, progress_text)
-    try:
-        for i, chart in enumerate(charts):
-            log.info(f"creating comparison for chart {chart.id}")
-            # Update chart config
-            config_new = update_chart_config(
-                chart.config,
-                st.session_state.indicator_mapping,
-                get_schema_from_url(chart.config["$schema"]),
-            )
-            # Push new chart to DB
-            if chart.id:
-                chart_id = chart.id
-            elif "id" in chart.config:
-                chart_id = chart.config["id"]
+            if not result["success"]:
+                # Partial failure - some charts updated successfully, but some failed
+                chart_errors = result["chart_errors"]
+                narrative_chart_errors = result["narrative_chart_errors"]
+                total_errors = len(chart_errors) + len(narrative_chart_errors)
+
+                st.warning(
+                    f"⚠️ Indicator upgrade completed with {total_errors} errors. "
+                    "Some charts were updated successfully, but there were errors with others. "
+                    "You can proceed to chart-diff to review the successful updates, "
+                    "but some charts may need manual attention."
+                )
+
+                # Display chart errors
+                if chart_errors:
+                    with st.expander(f"❌ Chart Errors ({len(chart_errors)})", expanded=True):
+                        error_data = []
+                        for err in chart_errors:
+                            chart_url = OWID_ENV.chart_site(err["chart_slug"])
+                            error_data.append(
+                                {
+                                    "Chart ID": err["chart_id"],
+                                    "Chart URL": chart_url,
+                                    "Error": err["error"],
+                                }
+                            )
+                        st.dataframe(
+                            pd.DataFrame(error_data),
+                            column_config={
+                                "Chart URL": st.column_config.LinkColumn(
+                                    "Chart URL",
+                                    display_text=r"https?://.*?/grapher/(.*)",
+                                ),
+                            },
+                            hide_index=True,
+                        )
+
+                # Display narrative chart errors
+                if narrative_chart_errors:
+                    with st.expander(f"❌ Narrative Chart Errors ({len(narrative_chart_errors)})", expanded=True):
+                        error_data = []
+                        for err in narrative_chart_errors:
+                            error_data.append(
+                                {
+                                    "Narrative Chart ID": err["narrative_chart_id"],
+                                    "Name": err["name"],
+                                    "Error": err["error"],
+                                }
+                            )
+                        st.dataframe(pd.DataFrame(error_data), hide_index=True)
+
+                st_wizard_page_link("anomalist")
+                st_wizard_page_link("chart-diff")
             else:
-                raise ValueError(f"Chart {chart} does not have an ID in config.")
-            api.update_chart(chart_id=chart_id, chart_config=config_new)
-            # Show progress bar
-            percent_complete = int(100 * (i + 1) / len(charts))
-            bar.progress(percent_complete, text=f"{progress_text} {percent_complete}%")
-    except Exception as e:
-        st.error(
-            "Something went wrong! Maybe the server was not properly launched? Check the job on the GitHub pull request."
-        )
-        st.exception(e)
-    else:
-        st.success(
-            "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
-        )
-        st_wizard_page_link("anomalist")
-        st_wizard_page_link("chart-diff")
+                st.success(
+                    "✅ The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
+                )
+                st_wizard_page_link("anomalist")
+                st_wizard_page_link("chart-diff")
+
+        except Exception as e:
+            st.error(
+                "❌ Something went wrong! Maybe the server was not properly launched? Check the job on the GitHub pull request."
+            )
+            st.exception(e)
 
 
 def save_variable_mapping(
@@ -155,10 +198,17 @@ def undo_indicator_upgrade(indicator_mapping):
             mapping_inverted,
         )
 
+        # Get affected narrative charts (children of affected charts)
+        narrative_charts = get_affected_narrative_charts_cli(charts)
+
         # TODO: instead of pushing new charts, we should revert the changes!
         # To do this, we should have kept a copy or reference to the original revision.
         # Idea: when 'push_new_charts' is called, store in a table the original revision of the chart.
-        push_new_charts(charts)
+        push_new_charts()
+
+        # Undo narrative chart upgrades
+        if narrative_charts:
+            push_new_narrative_charts_cli(narrative_charts, mapping_inverted, dry_run=False)
 
         # Reset variable mapping
         WizardDB.delete_variable_mapping()

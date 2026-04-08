@@ -4,10 +4,12 @@
 #
 import graphlib
 import hashlib
+import importlib.util
 import inspect
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -17,9 +19,11 @@ from collections.abc import Generator
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from functools import partial
 from glob import glob
 from importlib import import_module
 from pathlib import Path
+from types import ModuleType
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, cast
 from urllib.parse import urlparse
 
@@ -29,10 +33,11 @@ import requests
 import structlog
 from owid import catalog
 from owid.catalog import s3_utils
-from owid.catalog.catalogs import OWID_CATALOG_URI
-from owid.catalog.datasets import DEFAULT_FORMATS
+from owid.catalog.api.utils import DEFAULT_CATALOG_URL
+from owid.catalog.core.datasets import DEFAULT_FORMATS
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
+from tqdm import tqdm
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl import config, files, git_helpers, paths
@@ -40,68 +45,69 @@ from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.grapher import helpers as gh
 from etl.grapher import model as gm
+from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
 
-Graph = Dict[str, Set[str]]
-DAG = Dict[str, Any]
+DAG = Dict[str, Set[str]]
 
 
 ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".ipynb_lock")
 
+# Dictionary to store metadata changes for each dataset if INSTANT flag is set
+INSTANT_METADATA_DIFF = {}
+
 
 def compile_steps(
     dag: DAG,
-    includes: Optional[List[str]] = None,
-    excludes: Optional[List[str]] = None,
-    downstream: bool = False,
-    only: bool = False,
-    exact_match: bool = False,
+    subdag: DAG,
 ) -> List["Step"]:
     """
     Return the list of steps which, if executed in order, mean that every
     step has its dependencies ready for it.
-    """
-    includes = includes or []
-    excludes = excludes or []
 
+    Parameters
+    ----------
+    dag : DAG
+        The full DAG containing all steps and their complete dependency information.
+        Required to get the full dependencies of each step during parsing.
+    subdag : DAG
+        The filtered subset of steps to execute. Used to determine execution order
+        while maintaining access to complete dependency information from the full DAG.
+
+    Returns
+    -------
+    List[Step]
+        Steps in dependency order, ready for execution.
+    """
     # make sure each step runs after its dependencies
-    steps = to_dependency_order(dag, includes, excludes, downstream=downstream, only=only, exact_match=exact_match)
+    steps = to_dependency_order(subdag)
 
     # parse the steps into Python objects
+    # NOTE: We need the full DAG here to get complete dependencies of each step
     return [parse_step(name, dag) for name in steps]
 
 
-def to_dependency_order(
-    dag: DAG,
-    includes: List[str],
-    excludes: List[str],
-    downstream: bool = False,
-    only: bool = False,
-    exact_match: bool = False,
-) -> List[str]:
+def to_dependency_order(dag: DAG) -> List[str]:
     """
     Organize the steps in dependency order with a topological sort. In other words,
     the resulting list of steps is a valid ordering of steps such that no step is run
     before the steps it depends on. Note: this ordering is not necessarily unique.
     """
-    subgraph = (
-        filter_to_subgraph(dag, includes, downstream=downstream, only=only, exact_match=exact_match)
-        if includes
-        else dag
-    )
-    in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
+    in_order = list(graphlib.TopologicalSorter(dag).static_order())
 
-    # filter out explicit excludes
-    filtered = [s for s in in_order if not any(re.findall(pattern, s) for pattern in excludes)]
-
-    return filtered
+    return in_order
 
 
 def filter_to_subgraph(
-    graph: Graph, includes: Iterable[str], downstream: bool = False, only: bool = False, exact_match: bool = False
-) -> Graph:
+    graph: DAG,
+    includes: Iterable[str],
+    downstream: bool = False,
+    only: bool = False,
+    exact_match: bool = False,
+    excludes: Optional[List[str]] = None,
+) -> DAG:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
 
@@ -112,31 +118,57 @@ def filter_to_subgraph(
     dependent on B).
     """
     all_steps = graph_nodes(graph)
-    if exact_match:
-        included = set(includes) & all_steps
+    includes_list = list(includes)
+
+    # Handle exclusions first - find all steps that should be excluded
+    excluded_steps = set()
+    if excludes:
+        compiled_excludes = [re.compile(p) for p in excludes]
+        for step in all_steps:
+            if any(p.search(step) for p in compiled_excludes):
+                excluded_steps.add(step)
+
+    # Find downstream dependencies of excluded steps that should also be excluded
+    if excluded_steps:
+        downstream_of_excluded = set(traverse(reverse_graph(graph), excluded_steps))
+        excluded_steps.update(downstream_of_excluded)
+
+    # Remove excluded steps from consideration
+    available_steps = all_steps - excluded_steps
+
+    # If includes is empty, include all available steps
+    if not includes_list:
+        included = available_steps
+    elif exact_match:
+        included = set(includes_list) & available_steps
     else:
-        compiled_includes = [re.compile(p) for p in includes]
-        included = {s for s in all_steps if any(p.search(s) for p in compiled_includes)}
+        compiled_includes = [re.compile(p) for p in includes_list]
+        included = {s for s in available_steps if any(p.search(s) for p in compiled_includes)}
 
     if only:
-        # Only include explicitly selected nodes
-        return {step: graph.get(step, set()) & included for step in included}
+        # Only include explicitly selected nodes, but filter out excluded steps
+        return {step: graph.get(step, set()) & included for step in included if step not in excluded_steps}
 
     if downstream:
         # Reverse the graph to find all nodes dependent on included nodes (forward deps)
         forward_deps = set(traverse(reverse_graph(graph), included))
         included = included.union(forward_deps)
+        # Remove any excluded steps from the included set
+        included = included - excluded_steps
 
     # Now traverse the other way to find all dependencies of included nodes (backward deps)
-    return traverse(graph, included)
+    subgraph = traverse(graph, included)
+
+    # Ensure no excluded steps are in the final subgraph
+    return {step: deps - excluded_steps for step, deps in subgraph.items() if step not in excluded_steps}
 
 
-def traverse(graph: Graph, nodes: Set[str]) -> Graph:
+def traverse(graph: DAG, nodes: Set[str]) -> DAG:
     """
     Use BFS to find all nodes in a graph that are reachable from a given
     subset of nodes.
     """
-    reachable: Graph = defaultdict(set)
+    reachable: DAG = defaultdict(set)
     to_visit = nodes.copy()
 
     while to_visit:
@@ -155,7 +187,7 @@ def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
     return {node: set(deps) if deps else set() for node, deps in steps.items()}
 
 
-def reverse_graph(graph: Graph) -> Graph:
+def reverse_graph(graph: DAG) -> DAG:
     """
     Invert the edge direction of a graph.
     """
@@ -170,7 +202,7 @@ def reverse_graph(graph: Graph) -> Graph:
     return dict(g)
 
 
-def graph_nodes(graph: Graph) -> Set[str]:
+def graph_nodes(graph: DAG) -> Set[str]:
     all_steps = set(graph)
     for children in graph.values():
         all_steps.update(children)
@@ -403,21 +435,33 @@ class DataStep(Step):
 
         ds_idex_mtime = self._dataset_index_mtime()
 
+        # if INSTANT flag is set, just update the metadata
+        if config.INSTANT and self.channel == "garden":
+            self._run_instant_metadata()
+            return
+
         sp = self._search_path
-        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
-            if config.DEBUG:
-                self._run_py_isolated()
+        try:
+            if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
+                if config.DEBUG:
+                    self._run_py_isolated()
+                else:
+                    self._run_py()
+
+            # We lock this to prevent the following error
+            # ImportError: PyO3 modules may only be initialized once per interpreter process
+            elif sp.with_suffix(".ipynb").exists():
+                with ipynb_lock:
+                    self._run_notebook()
+
             else:
-                self._run_py()
-
-        # We lock this to prevent the following error
-        # ImportError: PyO3 modules may only be initialized once per interpreter process
-        elif sp.with_suffix(".ipynb").exists():
-            with ipynb_lock:
-                self._run_notebook()
-
-        else:
-            raise Exception(f"have no idea how to run step: {self.path}")
+                raise Exception(f"have no idea how to run step: {self.path}")
+        except Exception:
+            # Clean up partial output so subsequent runs don't see an incomplete dataset
+            # (a directory without index.json would cause Dataset.__init__ to fail)
+            if self._dest_dir.is_dir() and not (self._dest_dir / "index.json").exists():
+                shutil.rmtree(self._dest_dir)
+            raise
 
         # was the index file modified? if not then `save` was not called
         # NOTE: we se warnings.warn instead of log.warning because we want this in stderr
@@ -449,13 +493,33 @@ class DataStep(Step):
                 raise e
         exp_source_checksum = self.checksum_input()
 
+        # if INSTANT is on, we use _instant suffix in a checksum
+        if config.INSTANT and found_source_checksum:
+            found_source_checksum = found_source_checksum.replace("_instant", "")
+
         if found_source_checksum != exp_source_checksum:
             return True
 
         return False
 
     def has_existing_data(self) -> bool:
-        return self._dest_dir.is_dir()
+        if not (self._dest_dir.is_dir() and (self._dest_dir / "index.json").exists()):
+            return False
+        # Check that every data file has its .meta.json sidecar — a missing
+        # sidecar indicates a previous run crashed mid-save, so treat the
+        # output as incomplete and re-run the step.
+        for f in self._dest_dir.iterdir():
+            if f.suffix in (".feather", ".parquet", ".csv"):
+                if not f.with_suffix(".meta.json").exists():
+                    log.warning(
+                        "corrupt_step_output",
+                        step=self.path,
+                        data_file=f.name,
+                        missing=f.with_suffix(".meta.json").name,
+                        msg="Missing .meta.json sidecar — marking step as dirty for re-run",
+                    )
+                    return False
+        return True
 
     def can_execute(self, archive_ok: bool = True) -> bool:
         sp = self._search_path
@@ -514,7 +578,7 @@ class DataStep(Step):
             return [p.as_posix() for p in files.walk(self._search_path)]
 
         # if a dataset is a single file, use [dataset].py and shared* files
-        return glob(self._search_path.as_posix() + ".*") + glob((self._search_path.parent / "shared*").as_posix())
+        return glob(self._search_path.as_posix() + "*") + glob((self._search_path.parent / "shared*").as_posix())
 
     @property
     def _search_path(self) -> Path:
@@ -528,6 +592,50 @@ class DataStep(Step):
     @property
     def _dest_dir(self) -> Path:
         return paths.DATA_DIR / self.path.lstrip("/")
+
+    def _run_instant_metadata(self) -> None:
+        """If INSTANT flag is set, instead of running the whole garden step, just load
+        the existing dataset and update its metadata. This is useful for fast-tracking
+        metadata changes without having to rerun the whole step.
+        """
+
+        meta_path = get_metadata_path(self._dest_dir.as_posix())
+        if not meta_path.exists():
+            return
+
+        ds = catalog.Dataset(self._dest_dir.as_posix())
+
+        # Read metadata before
+        table_meta_before = _load_tables_metadata(ds)
+
+        # Save dataset, but use _instant suffix in the checksum to make sure we
+        # trigger fresh run when not using INSTANT
+        ds.update_metadata(meta_path)
+
+        # Also load the override metadata file if it exists (similar to create_dataset in helpers.py)
+        meta_override_path = meta_path.with_suffix(".override.yml")
+        if meta_override_path.exists():
+            ds.update_metadata(meta_override_path)
+
+        ds.metadata.source_checksum = self.checksum_input() + "_instant"
+        ds.save()
+
+        # Read metadata after
+        table_meta_after = _load_tables_metadata(ds)
+
+        INSTANT_METADATA_DIFF[ds.m.short_name] = defaultdict(list)
+
+        for table_name in ds.table_names:
+            # Find variables with metadata changes
+            for var_name in table_meta_before[table_name]["fields"]:
+                if (
+                    table_meta_before[table_name]["fields"][var_name]
+                    != table_meta_after[table_name]["fields"][var_name]
+                ):
+                    log.info("instant.update", table_name=table_name, var_name=var_name)
+                    # Add the variable to a global variable so that we can only rerun changed
+                    # variables in the grapher step
+                    INSTANT_METADATA_DIFF[ds.m.short_name][table_name].append(var_name)
 
     def _run_py_isolated(self) -> None:
         """
@@ -545,9 +653,84 @@ class DataStep(Step):
     def _run_py(self) -> None:
         """
         Import the Python module for this step and call run() on it.
+
+        Uses os.fork() to avoid the ~3-5s overhead of spawning a new Python
+        process via subprocess for every step. The forked child inherits all
+        already-imported modules, runs the step, and exits — so any memory
+        leaked by feather serialisation dies with the child process.
+
+        Works on both Linux and macOS (both provide os.fork()). Falls back to
+        subprocess only on platforms where fork() is unavailable (Windows) or
+        when IPDB debugging is enabled (debugger needs a proper subprocess).
         """
-        # use a subprocess to isolate each step from the others, and avoid state bleeding
-        # between them
+        if hasattr(os, "fork") and not config.IPDB_ENABLED:
+            self._run_py_fork()
+        else:
+            self._run_py_subprocess()
+
+    def _run_py_fork(self) -> None:
+        """Run the step in a forked child process (Linux only)."""
+        import resource
+        import traceback
+
+        # Apply the same virtual-memory limit that prlimit would enforce
+        if sys.platform == "linux":
+            try:
+                resource.setrlimit(
+                    resource.RLIMIT_AS, (config.MAX_VIRTUAL_MEMORY_LINUX, config.MAX_VIRTUAL_MEMORY_LINUX)
+                )
+            except ValueError:
+                pass  # not all systems support RLIMIT_AS
+
+        # Flush before forking to prevent the child from inheriting (and
+        # potentially re-flushing) buffered output from the parent, which
+        # causes duplicate "--- Starting / Finished" lines in CI logs.
+        sys.stdout.flush()
+        sys.stderr.flush()
+
+        pid = os.fork()
+        if pid == 0:
+            # ---------- child process ----------
+            try:
+                # Close all inherited file descriptors except stdin/stdout/stderr.
+                # The forked child inherits FDs for the multiprocessing Manager
+                # proxy, ProcessPoolExecutor pipes, DB connections, etc.  When
+                # os._exit() later closes them implicitly it can confuse the
+                # Manager server and cause the parent worker to hang.
+                import resource as _resource
+
+                _max_fd = _resource.getrlimit(_resource.RLIMIT_NOFILE)[0]
+                os.closerange(3, _max_fd)
+
+                config.enable_structlog_filtering()
+                step_type, path = str(self).split("://", 1)
+                step_type = step_type.replace("-private", "")
+                step_path = paths.STEP_DIR / step_type / path
+                module_dir = step_path if step_path.is_dir() else step_path.parent
+                if module_dir.as_posix() not in sys.path:
+                    sys.path.append(module_dir.as_posix())
+
+                module_path = path.replace("/", ".")
+                import_path = f"{paths.BASE_PACKAGE}.steps.{step_type}.{module_path}"
+                step_module = import_module(import_path)
+                run_module_run(step_module, self._dest_dir.as_posix())
+                os._exit(0)
+            except BaseException:
+                traceback.print_exc()
+                os._exit(1)
+        else:
+            # ---------- parent process ----------
+            _, status = os.waitpid(pid, 0)
+            if os.WIFEXITED(status):
+                exit_code = os.WEXITSTATUS(status)
+                if exit_code != 0:
+                    sys.exit(exit_code)
+            elif os.WIFSIGNALED(status):
+                sig = os.WTERMSIG(status)
+                raise Exception(f"Step {self} was killed by signal {sig}")
+
+    def _run_py_subprocess(self) -> None:
+        """Run the step in a new subprocess (fallback for non-Linux or debug mode)."""
         args = []
 
         if sys.platform == "linux":
@@ -571,11 +754,8 @@ class DataStep(Step):
 
         try:
             subprocess.check_call(args, env=env)
-        except subprocess.CalledProcessError:
-            # swallow this exception and just exit -- the important stack trace
-            # will already have been printed to stderr
-            print(f'\nCOMMAND: {" ".join(args)}', file=sys.stderr)
-            sys.exit(1)
+        except subprocess.CalledProcessError as e:
+            sys.exit(e.returncode)
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
@@ -606,7 +786,7 @@ class DataStep(Step):
 
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
-        url = f"{OWID_CATALOG_URI}/{self.path}/index.json"
+        url = f"{DEFAULT_CATALOG_URL}{self.path}/index.json"
         resp = requests.get(url, verify=TLS_VERIFY)
         if not resp.ok:
             return False
@@ -619,8 +799,11 @@ class DataStep(Step):
 
         r2 = s3_utils.connect_r2_cached()
 
+        # Private datasets have their data files in a separate private bucket
+        bucket = config.R2_BUCKET if self.is_public else config.R2_BUCKET_PRIVATE
+
         # Get available formats of a dataset
-        s3_files = s3_utils.list_s3_objects(f"s3://owid-catalog/{self.path}/", client=s3_utils.connect_r2_cached())
+        s3_files = s3_utils.list_s3_objects(f"s3://{bucket}/{self.path}/", client=s3_utils.connect_r2_cached())
         available_formats = {f.split(".")[-1] for f in s3_files} - {"json"}
 
         # if one of the format is in DEFAULT_FORMATS, download it
@@ -634,13 +817,28 @@ class DataStep(Step):
         include = [".meta.json"] + [f".{format}" for format in download_formats]
 
         s3_utils.download_s3_folder(
-            f"s3://owid-catalog/{self.path}/",
+            f"s3://{bucket}/{self.path}/",
             self._dest_dir,
             client=r2,
             include=include,
             exclude=["index.json"],
             delete=True,
         )
+
+        # Fallback: for private datasets, .meta.json may only exist in the public
+        # bucket (before the catalog is re-published with duplicated metadata).
+        # TODO: Remove this fallback once the catalog has been fully re-synced.
+        if not self.is_public:
+            for f in self._dest_dir.iterdir():
+                if f.suffix in (".feather", ".parquet", ".csv") and not f.with_suffix(".meta.json").exists():
+                    s3_utils.download_s3_folder(
+                        f"s3://{config.R2_BUCKET}/{self.path}/",
+                        self._dest_dir,
+                        client=r2,
+                        include=[".meta.json"],
+                        delete=False,
+                    )
+                    break
 
         """download files over HTTPS, the problem is that we don't have a list of tables to download
         in index.json
@@ -654,7 +852,7 @@ class DataStep(Step):
                 futures.append(
                     executor.submit(
                         download_file_from_url,
-                        f"{OWID_CATALOG_URI}/{self.path}/{fname}",
+                        f"{DEFAULT_CATALOG_URL}/{self.path}/{fname}",
                         f"{self._dest_dir}/{fname}",
                     )
                 )
@@ -690,7 +888,7 @@ class SnapshotStep(Step):
 
     def run(self) -> None:
         snap = Snapshot(self.path)
-        snap.pull(force=True)
+        snap.pull(force=True, retries=3)
 
     def is_dirty(self) -> bool:
         snap = Snapshot(self.path)
@@ -768,7 +966,7 @@ class GrapherStep(Step):
 
         # dataset exists, but it is possible that we haven't inserted everything into DB
         dataset = self.dataset
-        return db.fetch_db_checksum(dataset) != self.data_step.checksum_input()
+        return db.fetch_db_checksum(dataset) != self.checksum_input()
 
     def run(self) -> None:
         import etl.grapher.to_db as db
@@ -809,12 +1007,32 @@ class GrapherStep(Step):
             # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
             # is fetching the whole dataset from data-api as they would receive all tables merged in a single
             # table. This won't be a problem after we introduce the concept of "tables"
-            for table in dataset:
+            for table in tqdm(dataset):
                 assert not table.empty, f"table {table.metadata.short_name} is empty"
 
-                # if GRAPHER_FILTER is set, only upsert matching columns
-                if config.GRAPHER_FILTER:
-                    cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
+                # if SUBSET is set, only upsert matching variables
+                if config.SUBSET:
+                    cols_regex = config.SUBSET
+                # if INSTANT is set, only upsert variables with changed metadata
+                elif config.INSTANT:
+                    dataset_name = dataset.m.short_name
+                    table_name = table.metadata.short_name
+
+                    # dataset wasn't run with instant, rerun it
+                    if dataset_name not in INSTANT_METADATA_DIFF:
+                        cols_regex = None
+                    else:
+                        instant_variables = INSTANT_METADATA_DIFF[dataset_name].get(table_name)
+                        if not instant_variables:
+                            # no changes in table, skip it
+                            continue
+                        else:
+                            cols_regex = "|".join(instant_variables)
+                else:
+                    cols_regex = None
+
+                if cols_regex:
+                    cols = table.filter(regex=cols_regex).columns.tolist()
                     if not cols:
                         continue
                     cols += [c for c in table.columns if c in {"year", "date", "country"} and c not in cols]
@@ -859,7 +1077,16 @@ class GrapherStep(Step):
             # wait for all tables to be inserted
             [future.result() for future in as_completed(futures)]
 
-        if not config.GRAPHER_FILTER and not config.SUBSET:
+        # If INSTANT flag is set, don't clean ghost variables, but update the checksum (with _instant suffix)
+        if INSTANT_METADATA_DIFF:
+            db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.checksum_input())
+
+        # If filtering is on, don't set checksum. Allow the next ETL run to set it
+        elif config.SUBSET:
+            pass
+
+        # Otherwise, clean up ghost resources and set checksum
+        else:
             # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
             # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
             # needed for remapping. However, we can delete it on next ETL run
@@ -869,12 +1096,15 @@ class GrapherStep(Step):
 
             # set checksum and updatedAt timestamps after all data got inserted
             if success:
-                checksum = self.data_step.checksum_input()
+                checksum = self.checksum_input()
             # if cleanup was not successful, don't set checksum and let ETL rerun it on its next try
             else:
                 checksum = "to_be_rerun"
 
             db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
+
+    def checksum_input(self) -> str:
+        return self.data_step.checksum_input()
 
     def checksum_output(self) -> str:
         """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
@@ -946,12 +1176,14 @@ class ExportStep(DataStep):
             else:
                 DataStep._run_py(self)  # type: ignore
 
-        # save checksum
+        # save checksum (only update index.json, don't call ds.save() which iterates
+        # table_names and would pick up custom JSON files written by the export script)
         ds.metadata.source_checksum = self.checksum_input()
-        ds.save()
+        ds.metadata.save(ds._index_file)
 
     def checksum_output(self) -> str:
-        raise NotImplementedError("ExportStep should not be used as an input")
+        # output checksum is checksum of all ingredients
+        return self.checksum_input()
 
     @property
     def _search_path(self) -> Path:
@@ -1067,17 +1299,20 @@ def _step_is_dirty(s: Step) -> bool:
     return s.is_dirty()
 
 
-def _cached_is_dirty(self: Step, cache: files.RuntimeCache) -> bool:
-    key = str(self)
+def _cached_is_dirty(step: Step, cache: files.RuntimeCache) -> bool:
+    key = str(step)
     if key not in cache:
-        cache.add(key, self._is_dirty())  # type: ignore
-    return cache[key]  # type: ignore
+        # _is_dirty is a dynamically added copy of the original is_dirty method (see _add_is_dirty_cached)
+        cache.add(key, step._is_dirty())  # type: ignore[attr-defined]
+    return cache[key]  # type: ignore[return-value]
 
 
 def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     """Save copy of a method to _is_dirty and replace it with a cached version."""
-    s._is_dirty = s.is_dirty  # type: ignore
-    s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
+    # Intentional monkey-patching: save original method and replace with cached version
+    s._is_dirty = s.is_dirty  # type: ignore[attr-defined]
+    s._cache = cache  # type: ignore[attr-defined]
+    s.is_dirty = partial(_cached_is_dirty, s, cache)  # type: ignore[method-assign]
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
 
@@ -1091,7 +1326,7 @@ def _uses_old_schema(e: KeyError) -> bool:
 @contextmanager
 def isolated_env(
     working_dir: Path,
-    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy",
+    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy|pyproj|geopandas|google|plotly|shapely|h5py",
 ) -> Generator[None, None, None]:
     """Add given directory to pythonpath, run code in context, and
     then remove from pythonpath and unimport modules imported in context.
@@ -1101,18 +1336,63 @@ def isolated_env(
 
     :param keep_modules: regex of modules to keep imported
     """
-    # add module dir to pythonpath
-    sys.path.append(working_dir.as_posix())
-
-    # remember modules that were imported before
+    # Remember original sys.path and modules
+    original_path = sys.path.copy()
     imported_modules = set(sys.modules.keys())
 
-    yield
+    # Create a temporary module registry for this context
+    context_modules: dict[str, ModuleType] = {}
 
-    # unimport modules imported during execution unless they match `keep_modules`
-    for module_name in set(sys.modules.keys()) - imported_modules:
-        if not re.search(keep_modules, module_name):
-            sys.modules.pop(module_name)
+    try:
+        # Insert working_dir at the beginning to give it highest priority
+        # This ensures this process's modules take precedence
+        sys.path.insert(0, working_dir.as_posix())
 
-    # remove module dir from pythonpath
-    sys.path.remove(working_dir.as_posix())
+        # Monkey-patch __import__ to handle relative imports more safely
+        original_import = __builtins__["__import__"]
+
+        def safe_import(name, globals=None, locals=None, fromlist=(), level=0):
+            # For relative imports or modules that might exist in working_dir,
+            # check working_dir first
+            if level == 0 and globals and hasattr(globals.get("__spec__"), "submodule_search_locations"):
+                # Try to load from working_dir first for potential conflicts
+                module_path = working_dir / f"{name}.py"
+                if module_path.exists() and name not in context_modules:
+                    spec = importlib.util.spec_from_file_location(name, module_path)
+                    if spec and spec.loader:
+                        module = importlib.util.module_from_spec(spec)
+                        context_modules[name] = module
+                        sys.modules[name] = module
+                        spec.loader.exec_module(module)
+                        return module
+
+            return original_import(name, globals, locals, fromlist, level)
+
+        __builtins__["__import__"] = safe_import
+
+        yield
+
+    finally:
+        # Restore original import function
+        __builtins__["__import__"] = original_import
+
+        # Restore original sys.path
+        sys.path[:] = original_path
+
+        # Unimport modules imported during execution unless they match `keep_modules`
+        for module_name in set(sys.modules.keys()) - imported_modules:
+            if not re.search(keep_modules, module_name):
+                sys.modules.pop(module_name, None)
+
+        # Clean up context modules
+        for module_name in context_modules:
+            sys.modules.pop(module_name, None)
+
+
+def _load_tables_metadata(ds: catalog.Dataset) -> Dict[str, Dict[str, Any]]:
+    """Load metadata for all tables in a dataset."""
+    table_meta = {}
+    for table_name in ds.table_names:
+        with open(Path(ds.path) / f"{table_name}.meta.json") as f:
+            table_meta[table_name] = json.load(f)
+    return table_meta

@@ -10,10 +10,10 @@ from pathlib import Path
 from typing import List, Union
 from unittest.mock import patch
 
-from etl import paths
+from etl import config, paths
 from etl.command import _detect_strictness_level, _grapher_steps
 from etl.dag_helpers import load_dag
-from etl.steps import DataStep, Step, compile_steps
+from etl.steps import DataStep, Step, compile_steps, filter_to_subgraph
 
 
 def test_all_data_steps_have_code():
@@ -34,22 +34,22 @@ def test_detect_strictness():
     for channel in ["meadow", "open_numbers"]:
         # lax channel with date after STRICT_AFTER
         step = DataStep(f"{channel}/_/2023-06-01/_", [])
-        assert not _detect_strictness_level(step)
+        assert not _detect_strictness_level(step, config.STRICT_AFTER)
 
     channels = ["garden", "grapher"]
     for channel in channels:
         # strict channel with date before STRICT_AFTER
         step = DataStep(f"{channel}/_/2023-05-30/_", [])
-        assert not _detect_strictness_level(step)
+        assert not _detect_strictness_level(step, config.STRICT_AFTER)
 
         # strict channel with date after STRICT_AFTER
         step = DataStep(f"{channel}/_/2023-06-01/_", [])
-        assert _detect_strictness_level(step)
+        assert _detect_strictness_level(step, config.STRICT_AFTER)
 
         # lax channel using "latest"
         # TODO: make this strict once the data passes
         step = DataStep(f"{channel}/_/latest/_", [])
-        assert not _detect_strictness_level(step)
+        assert not _detect_strictness_level(step, config.STRICT_AFTER)
 
 
 def get_all_steps(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> List[Step]:
@@ -58,7 +58,7 @@ def get_all_steps(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> List[S
     # add grapher steps
     dag.update(_grapher_steps(dag, private=True))
 
-    steps = compile_steps(dag, [])
+    steps = compile_steps(dag, dag)
     return steps
 
 
@@ -66,26 +66,27 @@ def test_get_exact_matches():
     dag = load_dag("tests/data/dag.yml")
 
     # Try all possible combinations of "exact_match" and "only" arguments, when passing the full step uri as arguments.
-    assert [s.path for s in compile_steps(dag, includes=["data://test/step_1"], exact_match=True, only=True)] == [
-        "test/step_1"
-    ]
-    assert [s.path for s in compile_steps(dag, includes=["data://test/step_1"], exact_match=True, only=False)] == [
-        "test/step_0",
-        "test/step_1",
-    ]
-    assert [s.path for s in compile_steps(dag, includes=["data://test/step_1"], exact_match=False, only=True)] == [
-        "test/step_1"
-    ]
-    assert [s.path for s in compile_steps(dag, includes=["data://test/step_1"], exact_match=False, only=False)] == [
-        "test/step_0",
-        "test/step_1",
-    ]
+    subdag = filter_to_subgraph(dag, includes=["data://test/step_1"], exact_match=True, only=True)
+    assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_1"]
+
+    subdag = filter_to_subgraph(dag, includes=["data://test/step_1"], exact_match=True, only=False)
+    assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_0", "test/step_1"]
+
+    subdag = filter_to_subgraph(dag, includes=["data://test/step_1"], exact_match=False, only=True)
+    assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_1"]
+
+    subdag = filter_to_subgraph(dag, includes=["data://test/step_1"], exact_match=False, only=False)
+    assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_0", "test/step_1"]
 
     # Try all possible combinations of "exact_match" and "only" arguments, when passing a substring of the step uri.
-    assert [s.path for s in compile_steps(dag, includes=["step_1"], exact_match=True, only=True)] == []
-    assert [s.path for s in compile_steps(dag, includes=["step_1"], exact_match=True, only=False)] == []
-    assert [s.path for s in compile_steps(dag, includes=["step_1"], exact_match=False, only=True)] == ["test/step_1"]
-    assert [s.path for s in compile_steps(dag, includes=["step_1"], exact_match=False, only=False)] == [
-        "test/step_0",
-        "test/step_1",
-    ]
+    subdag = filter_to_subgraph(dag, includes=["step_1"], exact_match=True, only=True)
+    assert [s.path for s in compile_steps(dag, subdag)] == []
+
+    subdag = filter_to_subgraph(dag, includes=["step_1"], exact_match=True, only=False)
+    assert [s.path for s in compile_steps(dag, subdag)] == []
+
+    subdag = filter_to_subgraph(dag, includes=["step_1"], exact_match=False, only=True)
+    assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_1"]
+
+    subdag = filter_to_subgraph(dag, includes=["step_1"], exact_match=False, only=False)
+    assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_0", "test/step_1"]

@@ -14,6 +14,7 @@ if ("steps" in st.session_state) and ("garden" in st.session_state.steps):
 st.set_page_config(
     page_title="Wizard: Entity Harmonizer",
     page_icon="🪄",
+    layout="centered",
 )
 
 render(path)

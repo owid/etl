@@ -1,0 +1,23 @@
+meta:
+  source:
+    name: |-
+      Lassaletta, Billen, Grizzetti, Anglade & Garnier (2014). 50 year trends in nitrogen use efficiency of world cropping systems: the relationship between yield and nitrogen input to cropland. Environmental Research Letters.
+    description: |-
+      This dataset measures the nitrogen balance of agricultural inputs and outputs.
+
+      Nitrogen inputs are measured as the application of nitrogen to crops either from synthetic fertilizers, or organic sources such as manure.
+
+      Nitrogen output is measured as the nitrogen produced in the form of crops.
+
+      Nitrogen use efficiency (NUE) is the ratio between nitrogen inputs and output. A NUE of 40% means that only 40% of nitrogen inputs are converted into nitrogen in the form of crops. The remaining 60% is lost to the environment as a pollutant.
+    url: https://iopscience.iop.org/article/10.1088/1748-9326/9/10/105011/meta
+    date_accessed: 2026-03-05
+    published_by: |-
+      Lassaletta, L., Billen, G., Grizzetti, B., Anglade, J., & Garnier, J. (2014). 50 year trends in nitrogen use efficiency of world cropping systems: the relationship between yield and nitrogen input to cropland. Environmental Research Letters, 9(10), 105011.
+  name: Nitrogen efficiency (Lassaletta et al. 2014)
+  description: ''
+  is_public: false
+outs:
+  - md5: 54ec611d5c8ec338623b3d397202951e
+    size: 244690
+    path: nitrogen_efficiency__lassaletta_et_al__2014.feather

@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Real average weekly earnings using consumer price inflation (seasonally adjusted)"
+    description: |-
+      Average weekly earnings for the whole economy, for total and regular pay, in real terms (adjusted for consumer price inflation), UK, monthly, seasonally adjusted.
+    date_published: "2025-12-16"
+
+    # Citation
+    producer: Office for National Statistics, United Kingdom
+    citation_full: |-
+      Office for National Statistics, United Kingdom (2025). X09: Real average weekly earnings using consumer price inflation (seasonally adjusted).
+
+    # Files
+    url_main: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/x09realaverageweeklyearningsusingconsumerpriceinflationseasonallyadjusted
+    url_download: https://www.ons.gov.uk/file?uri=/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/x09realaverageweeklyearningsusingconsumerpriceinflationseasonallyadjusted/december2025/x09dec2025.xlsx
+    date_accessed: '2025-12-31'
+
+    # License
+    license:
+      name: Open Government License 3.0
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+outs:
+  - md5: f2d7a6d85a4cc568a02b9f3fa6c598ea
+    size: 63966
+    path: real_average_weekly_earnings_uk.xlsx

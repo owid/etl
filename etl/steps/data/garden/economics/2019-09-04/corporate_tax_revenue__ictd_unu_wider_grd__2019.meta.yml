@@ -1,0 +1,27 @@
+dataset:
+  title: Corporate tax revenue - ICTD UNU-WIDER GRD (2019)
+tables:
+  corporate_tax_revenue__ictd_unu_wider_grd__2019:
+    variables:
+      revenue_from_corporate_income_taxes__pct_gdp__ictd_grd__2019:
+        title: Revenue from corporate income taxes (% GDP) (ICTD GRD (2019))
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Revenue from corporate income taxes as a percentage of GDP, including natural resource taxes.
+      share_of_corporate_income_taxes_in_total_tax_revenue__pct_of_revenue__ictd_grd__2019:
+        title: Share of corporate income taxes in total tax revenue (% of revenue) (ICTD GRD (2019))
+        unit: '%'
+        description: |-
+          Corporate income taxes as a share of total tax revenue,  by country.
+          Calculated as: [ corporate income tax revenue (% GDP) / total tax revenue (% of GDP) ] * 100
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,24 @@
+meta:
+  origin:
+    producer: Ember
+    title: Yearly Electricity Data Europe
+    description: |-
+      This dataset contains yearly electricity generation, capacity, emissions, import and demand data for over European countries.
+
+      You can find more about Ember's methodology in [this document](https://storage.googleapis.com/emb-prod-bkt-publicdata/public-downloads/ember_electricity_data_methodology.pdf).
+    citation_full: |-
+      Ember - Yearly Electricity Data Europe (2025).
+
+      Most of the data is taken from the European Commission's Eurostat annual data.
+    attribution_short: Ember
+    url_main: https://ember-energy.org/data/yearly-electricity-data/
+    url_download: https://storage.googleapis.com/emb-prod-bkt-publicdata/public-downloads/europe_yearly_full_release_long_format.csv
+    date_accessed: '2025-05-12'
+    date_published: '2025-05-12'
+    license:
+      name: CC BY 4.0
+      url: https://ember-energy.org/creative-commons/
+outs:
+  - md5: ef07b7f987114d5909297e1a1671f3d9
+    size: 8448249
+    path: yearly_electricity__europe.csv

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Estevadeordal, Frantz, and Taylor (2003)
+    description: |-
+      Notes on the calculation of the lower and upper bound estimates from the authors: "1500–1800: Trade growth rates from O’Rourke and Williamson [2002, Table 1; volume estimates only]. Level index derived, and scaled by world GDP levels from Maddison [2001, Table B-18]. The “upper bound” series is then scaled to the benchmark 8 percent European trade-GDP ratio for 1780 due to O’Brien [1982], probably an overstatement of the world trade-GDP ratio. The “lower bound” series is scaled to the benchmark 2 percent world trade-GDP ratio for 1820 due to Maddison [1995, Table 2-4], possibly biased downwards relative to the long-run trend because of the blockades during the Napoleonic Wars."
+    url: https://www.jstor.org/stable/25053910?seq=1#page_scan_tab_contents
+    date_accessed: 2018-07-20
+    published_by: |-
+      Estevadeordal, A., Frantz, B., & Taylor, A. (2003). The Rise and Fall of World Trade, 1870-1939. The Quarterly Journal of Economics, 118(2), 359-407. Retrieved from http://www.jstor.org/stable/25053910
+  name: World trade - upper bound (% of GDP) (Estevadeordal, Frantz, and Taylor (2003)) (split)
+  description: ''
+  is_public: false
+outs:
+  - md5: dc71723ae6115551134cd48898422eb5
+    size: 4114
+    path: world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split.feather

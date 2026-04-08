@@ -6,7 +6,7 @@ import pandas as pd
 from owid.catalog import Table
 from sklearn.linear_model import LinearRegression
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -16,7 +16,7 @@ START_DATE = 1950
 END_DATE = 2025.2
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     paths.log.info("epoch.start")
 
     #
@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

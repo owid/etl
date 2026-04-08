@@ -1,0 +1,86 @@
+dataset:
+  title: Alcohol expenditure in the USA long-term (USDA, 2018)
+tables:
+  alcohol_expenditure_in_the_usa_long_term__usda__2018:
+    variables:
+      all_other__away_from_home__usda__2018:
+        title: All other (away from home) (USDA, 2018)
+        unit: US$
+        short_unit: $
+        display:
+          name: All other (away from home)
+          unit: $
+        description: Alcohol expenditure is measured in constant 1998 US$. Values also include taxes and tips.
+      food_stores__at_home__usda__2018:
+        title: Food stores (at home) (USDA, 2018)
+        unit: US$
+        short_unit: $
+        display:
+          name: Food stores (at home)
+          unit: $
+        description: Alcohol expenditure is measured in constant 1998 US$. Values also include taxes and tips.
+      hotels__and__motels__away_from_home__usda__2018:
+        title: Hotels & motels (away from home) (USDA, 2018)
+        unit: US$
+        short_unit: $
+        display:
+          name: Hotels & motels (away from home)
+          unit: $
+        description: Alcohol expenditure is measured in constant 1998 US$. Values also include taxes and tips.
+      liquor_stores__at_home__usda__2018:
+        title: Liquor stores (at home) (USDA, 2018)
+        unit: US$
+        short_unit: $
+        display:
+          name: Liquor stores (at home)
+          unit: $
+        description: Alcohol expenditure is measured in constant 1998 US$. Values also include taxes and tips.
+      other__at_home__usda__2018:
+        title: Other (at home) (USDA, 2018)
+        unit: US$
+        short_unit: $
+        display:
+          name: Other (at home)
+          unit: $
+        description: Alcohol expenditure is measured in constant 1998 US$. Values also include taxes and tips.
+      restaurants__and__bars__away_from_home__usda__2018:
+        title: Restaurants & bars (away from home) (USDA, 2018)
+        unit: US$
+        short_unit: $
+        display:
+          name: Restaurants & bars (away from home)
+          unit: $
+        description: Alcohol expenditure is measured in constant 1998 US$. Values also include taxes and tips.
+      total__at_home__usda__2018:
+        title: Total (at home) (USDA, 2018)
+        unit: US$
+        short_unit: $
+        display:
+          name: Total (at home)
+          unit: $
+        description: Alcohol expenditure is measured in constant 1998 US$. Values also include taxes and tips.
+      total__away_from_home:
+        title: Total (away from home)
+        unit: US$
+        short_unit: $
+        display:
+          name: Total (away from home) (USDA, 2018)
+          unit: $
+        description: Alcohol expenditure is measured in constant 1998 US$. Values also include taxes and tips.
+      total_alcohol_expenditure__usda__2018:
+        title: Total alcohol expenditure (USDA, 2018)
+        unit: US$
+        short_unit: $
+        display:
+          name: Total alcohol expenditure
+          unit: $
+        description: Alcohol expenditure is measured in constant 1998 US$. Values also include taxes and tips.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

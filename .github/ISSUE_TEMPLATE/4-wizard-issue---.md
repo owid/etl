@@ -3,7 +3,6 @@ name: "wizard issue"
 about: For issues that involve `wizard` program.
 title: "wizard: meaningful title for the issue"
 labels: wizard
-assignees: marigold,lucasrodes
 
 ---
 

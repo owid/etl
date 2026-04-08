@@ -1,4 +1,6 @@
 {
+  // Needed for ty type checker to work correctly
+  "python.languageServer": "None",
   "esbonio.sphinx.confDir": "",
   "files.associations": {
     "*.dvc": "yaml"
@@ -10,8 +12,8 @@
       "**/*.meta.yml",
       "**/*.meta.override.yml"
     ],
-    "schemas/multidim-schema.json": "export/multidim/**/*.yml",
-    "schemas/explorer-schema.json": "export/explorers/**/*.yml",
+    "schemas/multidim-schema.json": "etl/steps/export/multidim/**/*.config.yml",
+    "schemas/explorer-schema.json": "etl/steps/export/explorers/**/*.config.yml"
   },
   "[python]": {
     "editor.formatOnSave": true,
@@ -46,8 +48,23 @@
       "file": ".copilot-commit-message-instructions.md"
     }
   ],
+  "files.exclude": {
+    "snapshots/backport": true,
+  },
+  "search.exclude": {
+    "snapshots/backport": true,
+  },
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "chat.mcp.discovery.enabled": {
+    "claude-desktop": true,
+    "windsurf": true,
+    "cursor-global": true,
+    "cursor-workspace": true
+  },
+  "ruff.configuration": "${workspaceFolder}/pyproject.toml",
 
   // Settings for the "Run Until Cursor" extension
   "runUntilCursor.execDelay": 100,    // Delay before executing code (default: 100ms)
-  "runUntilCursor.cursorDelay": 500   // Delay before moving the cursor into run() (default: 500ms)
+  "runUntilCursor.cursorDelay": 1500, // Delay before moving the cursor into run() (default: 1500ms)
+  "chat.mcp.access": "all",
 }

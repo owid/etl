@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5354
-    date_accessed: 2023-08-10 09:11:30.056937
+    url: https://admin.owid.io/admin/datasets/5354
+    date_accessed: 2026-03-10 07:48:28.871844+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Employment in fisheries and aquaculture (UN FAO, 2021)
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 732bc9b754fa2e6d23b5b7cec008e4be
-  size: 7170
-  path: 
-    dataset_5354_employment_in_fisheries_and_aquaculture__un_fao__2021_values.feather
+  - md5: 069680857029bc15cb1969b6c1e4475f
+    size: 7354
+    path: dataset_5354_employment_in_fisheries_and_aquaculture__un_fao__2021_values.feather

@@ -1,0 +1,29 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  cpi_uk:
+    variables:
+      cpi:
+        title: Consumer price index (CPI) (2015=100)
+        unit: ""
+        short_unit: ""
+        description_short: The CPI shows the average price level of goods and services purchased by consumers. This is expressed relative to a base year – in this case 2015. For example, a CPI of 120 means that prices were 20% higher than in 2015.
+        processing_level: minor
+        display:
+          name: Consumer price index (CPI)
+          numDecimalPlaces: 1
+          tolerance: 0
+
+

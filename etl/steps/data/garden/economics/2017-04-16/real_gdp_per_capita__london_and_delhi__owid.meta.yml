@@ -1,0 +1,20 @@
+dataset:
+  title: Real GDP per capita, London and Delhi - OWID
+tables:
+  real_gdp_per_capita__london_and_delhi__owid:
+    variables:
+      real_gdp_per_capita__owid:
+        title: Real GDP per capita (OWID)
+        unit: 2011 int-$
+        short_unit: $
+        display:
+          unit: deaths per 100,000 individuals
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

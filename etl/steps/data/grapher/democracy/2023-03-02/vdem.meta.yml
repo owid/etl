@@ -490,13 +490,13 @@ tables:
       #           baseColorScheme: GnBu
       #           binningStrategy: manual
       #           customNumericValues:
+      #             - 100
       #             - 50
       #             - 70
       #             - 80
       #             - 90
       #             - 95
       #             - 100
-      #           customNumericMinValue: 100
       #       selectedEntityNames:
       #         - Argentina
       #         - Australia

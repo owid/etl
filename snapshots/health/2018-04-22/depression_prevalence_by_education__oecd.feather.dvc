@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Depression prevalence by education - OECD
+    description: |-
+      Share of adults (aged 25-64 years) who report having depression in data surveys, disaggregated by highest level of education. This is further differentiated based on those who are employed, active (those actively looking for work), and the total (which is the total population, including those unemployed).
+    url: https://stats.oecd.org/Index.aspx?DataSetCode=EAG_ESO#
+    date_accessed: 2018-04-22
+    published_by: Organisation for Economic Co-operation and Development (OECD) Statistics
+  name: Depression prevalence by education - OECD
+  description: ''
+outs:
+  - md5: e7d3b24322c6ecdb41f4a22c03d4c5d9
+    size: 11498
+    path: depression_prevalence_by_education__oecd.feather

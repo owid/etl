@@ -1,5 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import re
+
 import pandas as pd
 from owid.catalog import processing as pr
 
@@ -8,7 +10,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-
+# Columns used in charts
 REL_COL_VAR = [
     "abused",
     "cigarettes",
@@ -63,7 +65,6 @@ def run(dest_dir: str) -> None:
     for var in REL_COL_VAR:
         var_cols = [col for col in tb.columns if var in col]
         tb_var = rm_mean_for_sparse_cty(tb, var, var_cols).reset_index()
-        # alternative: tb_var = tb[var_cols].copy().reset_index()
         tbs.append(tb_var)
 
     tb_res = pr.multi_merge(tbs, on=["country", "year"], how="outer")
@@ -87,6 +88,26 @@ def run(dest_dir: str) -> None:
     ds_grapher = create_dataset(
         dest_dir, tables=[tb_res], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
+
+    # Update metadata of the new table.
+    tb_res = ds_grapher["gfs_wave_one"]
+
+    for col in tb_res.columns:
+        m = tb_res[col].m
+
+        # Survey question, replace ANSWER with the actual answer.
+        if "ANSWER" in m.title:
+            # Extract integer from the column name with regex
+            answer_match = re.search(r"(\d+)", col)
+            assert answer_match, f"Column {col} does not contain an answer number."
+            answer_num = answer_match.group(1)
+
+            # Replace ANSWER in metadata
+            m.title = m.title.replace("ANSWER", answer_num)
+            m.description_short = m.description_short.replace("ANSWER", answer_num)
+
+    # Re-add the table to the grapher dataset.
+    ds_grapher.add(tb_res)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

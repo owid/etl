@@ -11,18 +11,11 @@ import pandas as pd
 from owid.catalog import Table
 from owid.catalog.processing import concat
 
+from etl.data_helpers.geo import INCOME_GROUPS_ENTITY_CODES
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-INCOME_GROUPS_ENTITY_CODES = {
-    "Low-income countries": "OWID_LIC",
-    "Lower-middle-income countries": "OWID_LMC",
-    "Upper-middle-income countries": "OWID_UMC",
-    "High-income countries": "OWID_HIC",
-}
-
 
 # Countries that are mappable in Grapher.
 MAPPABLE_COUNTRIES = [
@@ -33,6 +26,7 @@ MAPPABLE_COUNTRIES = [
     "ARE",
     "ARG",
     "ARM",
+    "ATA",
     "ATF",
     "ATG",
     "AUS",
@@ -234,6 +228,7 @@ MAPPABLE_COUNTRIES = [
 NO_COUNTRY_PAGE = [
     "ALA",
     "ANT",
+    "ATA",
     "ATF",
     "BES",
     "BVT",

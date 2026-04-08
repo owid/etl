@@ -1,0 +1,88 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+  description_processing: |-
+    Where multiple surveys were conducted in a country in a given year we calculated a weighted average of the each response category using the number of respondents as weights. We exclude rows where the sum of the shares of all response categories is less than 98% or greater than 102% of the total number of respondents, as these are occasions when a different set of survey responses were used.
+  question: |-
+    <% if question == "ImpChildren" %>
+    vaccines are important for children
+    <%- elif question == "Effective" %>
+    vaccines are effective
+    <%- elif question == "Safe" %>
+    vaccines are safe
+    <%- elif question == "Beliefs" %>
+    vaccines are compatible with their beliefs
+    <%- endif %>
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  vaccine_confidence:
+    variables:
+      strongly_agree:
+        title: "Share that strongly agrees {definitions.question}"
+        description_short: "The share of respondents who said they 'strongly agree' with the statement {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.description_processing}
+      tend_to_agree:
+        title: "Share that tends to agree that {definitions.question}"
+        description_short: "The share of respondents who said they 'tend to agree' with the statement {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.description_processing}
+      agree:
+        title: "Share that agrees {definitions.question}"
+        description_short: "The share of respondents who said they 'strongly agree' or 'tend to agree' with the statement {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_processing: |-
+          To calculate this value, we sum the shares of people who strongly agree and those who tend to agree with the statement that {definitions.question}. {definitions.description_processing}
+      disagree:
+        title: "Share that disagrees {definitions.question}"
+        description_short: "The share of respondents who said they 'strongly disagree' or 'tend to disagree' with the statement {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_processing: To calculate this value, we sum the shares of people who strongly disagree and those who tend to disagree with the statement that {definitions.question}. {definitions.description_processing}
+      tend_to_disagree:
+        title: "Share that tends to disagree that {definitions.question}"
+        description_short: "The share of respondents who said they 'tend to disagree' with the statement {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.description_processing}
+      strongly_disagree:
+        title: "Share that strongly disagrees {definitions.question}"
+        description_short: "The share of respondents who said they 'strongly disagree' with the statement {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.description_processing}
+      dont_know__prefer_not_to_say:
+        title: "Share who don't know or prefer not to say whether {definitions.question}"
+        description_short: "The share of respondents who said they 'don't know' or 'prefer not to say' whether {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.description_processing}

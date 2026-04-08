@@ -1,0 +1,43 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  historical_inequality_van_zanden_et_al:
+    variables:
+      gini:
+        title: Gini coefficient
+        unit: ""
+        short_unit: ""
+        description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        processing_level: minor
+        description_from_producer: |-
+          Gross household income gini, 1820-2000
+
+          **Methodologies used for data collection and processing**
+
+          Bibliographical research, research of published and Online Databases, and cross-analysis of various datasets
+
+          **Data quality and adjustments made**
+
+              i. Central statistical agencies
+              ii. Historical reconstructions
+              iii. Estimates
+              iv. Conjectures
+          Virtually all benchmark data after 1960 are derived indirectly from Central Statistical Agencies and therefore probably better classify as historical reconstructions. The remaining data are estimates and, further back in time, conjectures.
+        display:
+          name: Gini coefficient
+          numDecimalPlaces: 2
+          tolerance: 5
+
+

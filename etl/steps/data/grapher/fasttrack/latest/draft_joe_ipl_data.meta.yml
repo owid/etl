@@ -1,0 +1,16 @@
+dataset:
+  title: 'DRAFT: Joe''s National poverty lines used for $2.15 and $3 International povety line'
+  description: ''
+  licenses:
+    - {}
+tables:
+  draft_joe_ipl_data:
+    variables:
+      harmonized_national_poverty_line:
+        title: Harmonized national poverty line
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

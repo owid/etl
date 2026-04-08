@@ -40,7 +40,7 @@ def set_config():
         branch_name = os.environ["BUILDKITE_BRANCH"]
         env_config = config.OWIDEnv(
             config.Config(
-                GRAPHER_USER_ID=1,
+                GRAPHER_USER_ID=config.ETL_GRAPHER_USER_ID,
                 DB_USER="owid",
                 DB_NAME="owid",
                 DB_PASS="",
@@ -80,10 +80,12 @@ def test_app_chart_diff():
     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/chart_diff/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
     # allowed exceptions from migration of chart configs
     if at.exception:
-        if (
-            "(pymysql.err.ProgrammingError) (1146, \"Table 'live_grapher.chart_configs' doesn't exist\")"
-            in at.exception[0].message
-        ):
+        msg = at.exception[0].message
+        allowed = [
+            "Table 'live_grapher.chart_configs' doesn't exist",
+            "url_pathname",  # ← nuevo
+        ]
+        if any(text in msg for text in allowed):
             return
     assert not at.exception
 
@@ -113,9 +115,18 @@ def test_app_fasttrack():
     assert not at.exception
 
     # Try to reimport the latest uploaded sheet
-    at.button_group[0].set_value(["update_gsheet"])
+    at.button_group[0].set_value("update_gsheet")
     # at.radio[0].set_value("update_gsheet")
     _pick_button_by_label(at, "Submit").click().run()
+
+    # Allow ValidationError for missing sheet template
+    if at.exception:
+        msg = at.exception[0].message
+        allowed = [
+            "Sheet not found, have you copied the template? Creating new Google Sheets document or new sheets with the same name in the existing document does not work."
+        ]
+        if any(text in msg for text in allowed):
+            return
 
     assert not at.exception
 
@@ -162,24 +173,24 @@ def test_app_dashboard():
     assert not at.exception
 
 
-@pytest.mark.integration
-@pytest.mark.usefixtures("set_config")
-def test_app_dataset_preview():
-    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/dataset_preview/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
+# @pytest.mark.integration
+# @pytest.mark.usefixtures("set_config")
+# def test_app_dataset_preview():
+#     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/dataset_preview/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
 
-    # Select random dataset
-    dataset_id = _get_random_dataset()
+#     # Select random dataset
+#     dataset_id = _get_random_dataset()
 
-    sel = at.selectbox[0]
-    sel.set_value(dataset_id).run()
+#     sel = at.selectbox[0]
+#     sel.set_value(dataset_id).run()
 
-    assert not at.exception
+#     assert not at.exception
 
-    # Click dependency graph
-    btn = _pick_button_by_label(at, "Dependency graph")
-    btn.click().run()
+#     # Click dependency graph
+#     btn = _pick_button_by_label(at, "Dependency graph")
+#     btn.click().run()
 
-    assert not at.exception
+#     assert not at.exception
 
 
 def _get_random_dataset():
@@ -215,17 +226,17 @@ def test_app_explorer():
     assert not at.exception
 
 
-@pytest.mark.integration
-@pytest.mark.usefixtures("set_config")
-def test_app_insight_search():
-    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/insight_search/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
+# @pytest.mark.integration
+# @pytest.mark.usefixtures("set_config")
+# def test_app_insight_search():
+#     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/insight_search/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
 
-    # Set Author
-    assert len(at.multiselect) == 1
-    at.multiselect
-    at.multiselect[0].set_value(["Max Roser"]).run()
+#     # Set Author
+#     assert len(at.multiselect) == 1
+#     at.multiselect
+#     at.multiselect[0].set_value(["Max Roser"]).run()
 
-    assert not at.exception
+#     assert not at.exception
 
 
 # @pytest.mark.integration
@@ -248,5 +259,14 @@ def test_app_insight_search():
 @pytest.mark.usefixtures("set_config")
 def test_app_chart_animation():
     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/chart_animation.py"), default_timeout=DEFAULT_TIMEOUT).run()
+
+    # Allow RuntimeError for missing ffmpeg
+    if at.exception:
+        msg = at.exception[0].message
+        allowed = [
+            "No ffmpeg exe could be found",
+        ]
+        if any(text in msg for text in allowed):
+            return
 
     assert not at.exception

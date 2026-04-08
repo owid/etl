@@ -2,10 +2,8 @@
 name = "etl"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Our World in Data", email = "tech@ourworldindata.org"},
-]
-requires-python = ">=3.10, <3.13"
+authors = [{ name = "Our World in Data", email = "tech@ourworldindata.org" }]
+requires-python = ">=3.10, <3.14"
 dependencies = [
     "click>=8.0.1",
     "PyYAML>=6.0.1",
@@ -19,12 +17,11 @@ dependencies = [
     "python-dotenv>=0.19.0",
     "regex>=2022.1.18",
     "wikipedia>=1.4.0",
-    # sentence-transformers and torch don't yet support numpy 2
-    "numpy>=1.22.1, <2.0.0",
+    "numpy>=2.0.0",
     "pydantic>=1.9.0",
     "structlog>=21.5.0",
     "rich>=12.1.0",
-    "rich-click>=1.7.3",
+    "rich-click>=1.9.4",
     "tenacity>=8.0.1",
     "simplejson>=3.17.6",
     "xlrd>=2.0.1",
@@ -44,7 +41,7 @@ dependencies = [
     "scipy>=1.11.2",
     "selenium>=4.15.1",
     "webdriver-manager>=4.0.1",
-    "geopandas>=0.14.1",
+    "geopandas>=1.1.1",
     "shapely>=2.0.3",
     "fasteners>=0.19",
     "cdsapi>=0.7.4",
@@ -67,20 +64,36 @@ dependencies = [
     "geopy>=2.4.1",
     "py7zr>=0.22.0",
     "pyreadr>=0.5.2",
-    "cfgrib>=0.9.15.0",
-    "streamlit-aggrid>=1.0.5",
-    "sentry-sdk>=2.20.0",
+    "sentry-sdk>=2.43.0",
     "fastjsonschema>=2.21.1",
+    "mediacloud>=4.4.0",
+    # Upgraded to FastMCP 3.0 beta for new component/provider architecture, timeouts, versioning
+    "fastmcp>=3.0.0b1",
+    "pyproj>=3.7.1",
+    "pydantic-ai>=1.40.0,<1.63.0",  # 1.63.0 removed ToolManager._call_tool, breaking sentry-sdk pydantic-ai integration
+    "metabase-api>=3.5.2",
+    "codespell>=2.4.1",
+    "zensical>=0.0.15",
+    "pandas-gbq>=0.29.2",
+    "tomli>=2.2.1",
+    "genai-prices>=0.0.50",
+    "marshmallow>=3.26.2",
+    "brotli>=1.2.0",
+    "pyopenssl>=26.0.0",
+    "google-genai>=1.59.0",
+    "h5py>=3.15.1",
+    "html5lib>=1.1",
+    "requests>=2.32.5",
+    "chardet<6.0.0",  # requests 2.32.5 checks chardet < 6.0.0 and warns if exceeded
 ]
 
 [tool.uv.sources]
 owid-catalog = { path = "lib/catalog", editable = true }
 owid-datautils = { path = "lib/datautils", editable = true }
 owid-repack = { path = "lib/repack", editable = true }
-sqlacodegen = { git = "https://github.com/agronholm/sqlacodegen.git" }
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=8.3.2",
     "watchdog>=4.0.1",
     "pyyaml>=6.0.2",
@@ -92,60 +105,66 @@ dev-dependencies = [
     "cookiecutter>=2.6.0",
     "types-pyyaml>=6.0.12.20240808",
     "hydra-core>=1.3.2",
-    "boto3-stubs[s3]>=1.34.154",
     "gspread>=5.12.4",
     "jsonref>=1.1.0",
+    "kaleido==1.1.0",
+    "mkdocstrings-python>=2.0.1",
     "mkdocs-material>=9.5.34",
     "mkdocs-jupyter>=0.24.8",
     "mkdocs-exclude>=1.0.2",
     "mkdocs-gen-files>=0.5.0",
     "mkdocs-git-authors-plugin>=0.9.2",
     "mkdocs-git-revision-date-localized-plugin>=1.2.6",
-    "mkdocs-click>=0.8.1",
+    "mkdocs-click>=0.9.0",
     "mkdocs-glightbox>=0.3.7",
+    "griffe-typingdoc>=0.3.0",
     "memory-profiler>=0.61.0",
     "line-profiler>=4.1.3",
-    "sqlacodegen",
-    # unpinning those would introduce tons of type errors
-    "pyright==1.1.373",
+    # NOTE: unpinning ty always introduces some new errors, so pin to a known good version
+    "ty==0.0.8",
     "pandas-stubs==1.2.0.62",
-    "ruff>=0.8.2",
+    "ruff==0.8.6",
     "ipdb>=0.13.13",
     "commentjson>=0.9.0",
+    "pytest-asyncio>=1.0.0",
+    "sqlacodegen>=3.1.0",
+    "codespell>=2.4.1",
 ]
 
 [project.optional-dependencies]
 api = [
-    "fastapi>=0.109.0",
+    "fastapi>=0.115.0",
     "uvicorn[standard]>=0.25.0",
     "slack-sdk>=3.26.2",
     "joblib>=1.3.2",
 ]
+
 wizard = [
-    "streamlit>=1.42.0",
-    "streamlit-aggrid>=0.3.4.post3",
+    "streamlit>=1.52.0",
+    "streamlit-aggrid>=1.1.0,!=1.1.8.*,<1.1.9",
     "streamlit-ace>=0.1.1",
     "streamlit-extras>=0.3.6",
     "streamlit-agraph>=0.0.45",
+    "pygwalker>=0.4.9",
     "plotly>=5.23.0",
     "geographiclib>=2.0",
-    "pyproj>=3.6.1",
     "streamlit-feedback>=0.1.3",
     "statsmodels>=0.14.4",
-    # Starting from PyTorch 2.3.0, the minimum requirement for macOS is macOS 11.0+ ARM64. Some poor people on the team still use it. Jeez...
-    # Torch doesn't work with python 3.13
-    # error: distribution torch==2.2.2 @ registry+https://pypi.org/simple can't be installed because it doesn't have a source distribution or wheel for the current platform
-    "torch<2.3.0",
-    "sentence-transformers>=2.2.2",
+    "sentence-transformers>=5.1.0",
     "moviepy>=2.1.1",
     "pandas-gbq>=0.25.0",
     "wfork-streamlit-profiler>=0.2.7",
+    "google-api-python-client>=2.127.0",
+    "google-auth>=2.28.0",
+    "google-auth-httplib2>=0.2.0",
+    "google-auth-oauthlib>=1.2.0",
 ]
 
 [project.scripts]
 etl = 'apps.cli:cli'
 etlwiz = 'apps.wizard.cli:cli'
 etlr = 'etl.command:main_cli'
+etls = 'etl.snapshot_command:snapshot_cli'
 etlp = 'apps.pr.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 compare = 'etl.compare:cli'
@@ -154,24 +173,20 @@ backport = 'apps.backport.backport:backport_cli'
 [tool.ruff]
 lint.extend-select = [
     # isort
-    "I"
+    "I",
 ]
 lint.ignore = ["E501"]
 line-length = 120
 target-version = "py310"
-extend-exclude = [
-    ".ipynb_checkpoints",
-    "*cookiecutter",
-    "*.ipynb",
-]
+extend-exclude = [".ipynb_checkpoints", "*cookiecutter", "*.ipynb"]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.pyright]
+[tool.ty.src]
 exclude = [
-    "lib/",
+    # "lib/",
     "apps/wizard/etl_steps/cookiecutter/",
     "apps/wizard/etl_steps/cookiecutter/snapshot/**",
     "**/node_modules",
@@ -182,11 +197,17 @@ exclude = [
     "playground/",
     ".cachedir/",
     ".cache/",
-    "etl/steps",
-    "snapshots/",
 ]
+
+[tool.ty.rules]
+invalid-method-override = "ignore"
+parameter-already-assigned = "ignore"
+redundant-cast = "ignore"
+possibly-missing-attribute = "ignore"
+no-matching-overload = "ignore"
+invalid-argument-type = "ignore"
 
 [tool.pytest.ini_options]
 markers = [
-    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')"
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
 ]

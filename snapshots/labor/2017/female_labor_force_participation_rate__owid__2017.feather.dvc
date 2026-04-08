@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World In Data based on OECD (2017) and Long (1958)
+    description: |-
+      Estimates in this series come primarily from OECD.stat. However, for Canada, Germany, Great Britain and the US, we combined estimates from Long (1958) and Heckman and Killingsworth (1986), in order to provide a longer perspective. Details on how we combined these sources can be found in this online table (https://ourworldindata.org/wp-content/uploads/2017/07/OECD-historical-female-participation-OWID.xlsx).
+
+      It is important to bear in mind that OECD estimates correspond to population ages 15+, while other estimates correspond to population 14+. Also, for France 1962-1966 we assigned missing values where the OECD.stat file reports zero.
+    url: |-
+      OECD.stat: http://stats.oecd.org/. Long (1958): http://econpapers.repec.org/bookchap/nbrnberbk/long58-1.htm. Heckman and Killingsworth (1986): http://public.econ.duke.edu/~vjh3/e262p/readings/Killingsworth_Heckman.pdf
+    date_accessed: 2017-07-31
+    published_by: |-
+      Long, C. D. (1958) The labor force under changing income and employment. Princeton University Press. Heckman J. and Killingsworth M. (1986) Female Labor Supply: A Survey. in Handbook of Labor Economics, Volume I, Edited by O. Ashenfelter and R. Layard. OECD.Stat
+  name: Female labor force participation rate - OWID (2017)
+  description: This dataset combines historical data with recent series from OECD.stats
+outs:
+  - md5: 678cb7611c291963dd7ca8d1270cf5c3
+    size: 15810
+    path: female_labor_force_participation_rate__owid__2017.feather

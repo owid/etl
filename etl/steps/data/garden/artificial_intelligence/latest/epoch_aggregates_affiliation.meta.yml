@@ -52,7 +52,7 @@ tables:
 
           - Systems are classified as "Industry" when their authors have ties to private sector entities, "Academia" when the authors come from universities or scholarly institutions, and "Industry - Academia Collaboration" if a minimum of 30% of the authors represent each sector.
         description_processing: >
-          For each year starting from 1950, the total number of AI systems in each resercher affiliation category was calculated by adding that year's count to the previous years' counts. This provides a running total or cumulative count of AI systems for each year and researcher affiliation.
+          For each year starting from 1950, the total number of AI systems in each researcher affiliation category was calculated by adding that year's count to the previous years' counts. This provides a running total or cumulative count of AI systems for each year and researcher affiliation.
 
 
           To streamline the categorization of researcher affiliations, the original data underwent the following transformations:

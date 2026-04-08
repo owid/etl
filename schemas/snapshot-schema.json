@@ -74,6 +74,27 @@
     "wdir": {
       "type": "string"
     },
+    "autoupdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the autoupdate. Snapshots that should belong to the same autoupdate should have the same name."
+        },
+        "frequency": {
+          "type": "string",
+          "description": "Frequency of the autoupdate. Can be 'daily', 'weekly', 'monthly', or 'yearly'."
+        },
+        "notify": {
+          "type": "string",
+          "description": "Slack user to notify when the autoupdate is successful."
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
     "outs": {
       "type": "array",
       "items": [

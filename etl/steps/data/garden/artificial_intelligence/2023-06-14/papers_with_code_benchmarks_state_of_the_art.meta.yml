@@ -12,7 +12,7 @@ dataset:
             The goal of Papers With Code website is to compile a comprehensive collection of ML papers, code implementations, datasets, methods, and evaluation tables, all made freely available.
 
 
-            The comparisons to human performance are very approximate and based on small samples of people — they are only meant to give a rough comparison. You can read more details in the papers that describe the benchmarks:
+            The comparisons to human performance are very approximate and based on small samples of people - they are only meant to give a rough comparison. You can read more details in the papers that describe the benchmarks:
 
 
             -Hendrycks et al (2021) Measuring Massive Multitask Language Understanding (MMLU) (page 3): https://arxiv.org/pdf/2009.03300.pdf

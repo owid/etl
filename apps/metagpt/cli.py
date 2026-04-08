@@ -12,7 +12,7 @@ from typing_extensions import Self
 
 from apps.metagpt.prompts import create_query_data_step, create_query_snapshot
 from apps.metagpt.utils import Channels, convert_list_to_dict, read_metadata_file
-from apps.utils.gpt import MODEL_DEFAULT, GPTResponse, OpenAIWrapper
+from apps.utils.llms.gpt import MODEL_DEFAULT, GPTResponse, OpenAIWrapper
 from etl.files import yaml_dump
 
 # Fields to ask GPT for (garden, grapher)

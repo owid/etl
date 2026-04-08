@@ -1,0 +1,21 @@
+meta:
+  source:
+    name: Ozone-depleting substance emissions (Scientific Assessment 2014)
+    description: |-
+      Figures represent emissions of ozone-depleting substances, with substances weighted by their potential to destroy ozone (their ozone-depleting potential). This gives a total value of emissions normalised to their CFC11-equivalents.
+
+      Total emissions is inclusive of naturally-occurring and man-made emissions.
+
+      Data is based on those in Q0-1 in 'Twenty questions and answers about the ozone layer: 2014 update', published as the 2014 edition of the Scientific Assessment Panel of the Montreal Protocol.
+
+      Data was extracted from the static figure, Q0-1, using the extraction tool WebPlotDigitizer (https://apps.automeris.io/wpd/).
+    url: https://www.wmo.int/pages/prog/arep/gaw/ozone_2014/documents/2014%20Twenty%20Questions_Final.pdf
+    date_accessed: 2026-03-10
+    published_by: |-
+      Hegglin, M. I., Fahey, D. W., McFarland, M., Montzka, S. A., & Nash, E. R. (2014). Twenty questions and answers about the ozone layer: 2014 update. World Meteorological Organization, UNEP, NOAA, NASA, and European Commission.
+  name: Ozone depleting emissions since 1960 (Scientific Assessment, 2014)
+  description: ''
+outs:
+  - md5: 3d25db3427dbfc07cf8894638a7d54ec
+    size: 3970
+    path: ozone_depleting_emissions_since_1960__scientific_assessment__2014.feather

@@ -2,7 +2,7 @@ tables:
   plastic_environment_leakage_projections:
     variables:
       value:
-        title: Plastic leakage to the envrionment - projections
+        title: Plastic leakage to the environment - projections
         unit: 'tonnes'
         short_unit: 't'
         display:

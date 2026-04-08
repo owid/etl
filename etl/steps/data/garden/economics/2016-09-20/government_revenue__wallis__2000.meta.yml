@@ -1,0 +1,29 @@
+dataset:
+  title: Government Revenue – Wallis (2000)
+tables:
+  government_revenue__wallis__2000:
+    variables:
+      local_gov_revenues__wallis__2000:
+        title: Local Gov Revenues (Wallis (2000))
+        unit: '% GNP'
+        short_unit: '%'
+        description: 1902-1992
+      national_gov_revenues__wallis__2000:
+        title: National Gov Revenues (Wallis (2000))
+        unit: '% of GNP'
+        short_unit: '%'
+        description: 1902-1992
+      state_gov_revenues__wallis__2000:
+        title: State Gov Revenues (Wallis (2000))
+        unit: '% GNP'
+        short_unit: '%'
+        description: 1902-1992
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

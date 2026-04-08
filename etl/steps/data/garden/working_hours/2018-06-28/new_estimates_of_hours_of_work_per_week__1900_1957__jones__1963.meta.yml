@@ -1,0 +1,54 @@
+dataset:
+  title: New estimates of hours of work per week, 1900-1957 - Jones (1963)
+tables:
+  new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963:
+    variables:
+      average_hours_of_work_per_week_in_anthracite_coal__bls:
+        title: Average hours of work per week in anthracite coal (BLS)
+        unit: hours
+        description: |-
+          Average hours of work per week in bituminous coal. Data gathered using monthly reports from a sample of establishments since 1932. Jones' historical series takes the data from the BLS and performs downward adjustments of the BLS observations necessitated by the introduction of a number of employer pay practices. In 1943, employers began to compensate workers in bituminous and anthracite industries for the hours spent travelling in the mine shaft opening to the place of work within the time. Travel time within the mine is included in average work hours when it is paid for, and excluded when it is not. Employee coverage is limited to production workers.
+      average_hours_of_work_per_week_in_anthracite_coal__jones:
+        title: Average hours of work per week in anthracite coal (Jones)
+        unit: hours
+        description: |-
+          Average hours of work per week in bituminous coal. Data gathered using monthly reports from a sample of establishments since 1932. Jones' historical series takes the data from the BLS and performs downward adjustments of the BLS observations necessitated by the introduction of a number of employer pay practices. In 1943, employers began to compensate workers in bituminous and anthracite industries for the hours spent travelling in the mine shaft opening to the place of work within the time. Travel time within the mine is included in average work hours when it is paid for, and excluded when it is not. Employee coverage is limited to production workers.
+      average_hours_of_work_per_week_in_bituminous_coal__bls:
+        title: Average hours of work per week in bituminous coal (BLS)
+        unit: hours
+        description: |-
+          Average hours of work per week in bituminous coal. Data gathered using monthly reports from a sample of establishments since 1932. Employee coverage is limited to production workers.
+      average_hours_of_work_per_week_in_bituminous_coal__jones:
+        title: Average hours of work per week in bituminous coal (Jones)
+        unit: hours
+        description: |-
+          Average hours of work per week in bituminous coal. Data gathered using monthly reports from a sample of establishments since 1932. Jones' historical series takes the data from the BLS and performs downward adjustments of the BLS observations necessitated by the introduction of a number of employer pay practices. In 1943, employers began to compensate workers in bituminous and anthracite industries for the hours spent travelling in the mine shaft opening to the place of work within the time. Travel time within the mine is included in average work hours when it is paid for, and excluded when it is not. Employee coverage is limited to production workers.
+      average_hours_of_work_per_week_on_railroads__bls:
+        title: Average hours of work per week on railroads (BLS)
+        unit: hours
+        description: |-
+          Average hours of work per week working on railroads. Estimates derived hours per week from the monthly reports on hours filed by Class I steam railroads with the United States Interstate Commerce Commission. Total hours paid have sub-categories which allows the separation of hours paid for into 'hours actually spent at work', and 'hours paid for but not worked'. BLS bases its estimates on total time paid for, including both categories above, whereas Jones' series excludes the sub-category 'time paid for but not worked'.
+      average_hours_of_work_per_week_on_railroads__jones:
+        title: Average hours of work per week on railroads (Jones)
+        unit: hours
+        description: |-
+          Average hours of work per week working on railroads. Estimates derived hours per week from the monthly reports on hours filed by Class I steam railroads with the United States Interstate Commerce Commission. Total hours paid have sub-categories which allows the separation of hours paid for into 'hours actually spent at work', and 'hours paid for but not worked'. BLS bases its estimates on total time paid for, including both categories above, whereas Jones' series excludes the sub-category 'time paid for but not worked'.
+      average_hours_per_week_worked_in_manufacturing__bls:
+        title: Average hours per week worked in manufacturing (BLS)
+        unit: hours
+        description: |-
+          Average hours of work per week in manufacturing using the Bureau of Labour Statistics' (BLS) historical series. Employee coverage is limited to production workers.
+      average_hours_per_week_worked_in_manufacturing__jones:
+        title: Average hours per week worked in manufacturing (Jones)
+        unit: hours
+        description: |-
+          Average hours of work per week in manufacturing using Jones' series construction. Employee coverage is limited to production workers.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

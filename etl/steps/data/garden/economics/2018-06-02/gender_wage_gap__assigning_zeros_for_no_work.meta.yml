@@ -1,0 +1,19 @@
+dataset:
+  title: Gender wage gap (assigning zeros for no work)
+tables:
+  gender_wage_gap__assigning_zeros_for_no_work:
+    variables:
+      womens_income_as_a_percent_of_mens:
+        title: Women's income as a percent of men's
+        unit: '%'
+        description: |-
+          Unadjusted pay gaps assigning zero income to individuals who are not employed. All figures correspond to women's income as a percent of men's, including wages and profits from self-employment.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

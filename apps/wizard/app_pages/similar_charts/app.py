@@ -6,7 +6,13 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.similar_charts import data, scoring
 from apps.wizard.utils import embeddings as emb
-from apps.wizard.utils.components import Pagination, st_horizontal, st_multiselect_wider, url_persist
+from apps.wizard.utils.components import (
+    Pagination,
+    st_horizontal,
+    st_multiselect_wider,
+    st_title_with_expert,
+    url_persist,
+)
 from etl.config import OWID_ENV
 
 # Initialize log.
@@ -26,7 +32,7 @@ st.set_page_config(
 
 @st.cache_data(show_spinner=False, ttl="1h")
 def get_charts() -> list[data.Chart]:
-    with st.spinner("Loading charts..."):
+    with st.spinner("Loading charts...", show_time=True):
         # Get charts from the database..
         df = data.get_raw_charts()
 
@@ -93,7 +99,7 @@ def split_input_string(input_string: str) -> tuple[str, list[str], list[str]]:
 
 @st.cache_data(show_spinner=False, max_entries=1)
 def get_and_fit_model(charts: list[data.Chart]) -> scoring.ScoringModel:
-    with st.spinner("Loading model..."):
+    with st.spinner("Loading model...", show_time=True):
         scoring_model = scoring.ScoringModel(emb.get_model())
     scoring_model.fit(charts)
     return scoring_model
@@ -113,7 +119,13 @@ scoring_model = get_and_fit_model(charts)
 ########################################################################################################################
 
 # Streamlit app layout.
-st.title(":material/search: Similar charts")
+st_title_with_expert("Similar charts", icon=":material/search:")
+
+st.warning(
+    "This app has been deprecated by the simplified Related charts app.",
+    icon="⚠️",
+)
+
 
 col1, col2 = st.columns(2)
 with col2:

@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/1874
-    date_accessed: 2023-08-10 09:04:12.206251
+    url: https://admin.owid.io/admin/datasets/1874
+    date_accessed: 2026-03-05 14:28:01.125332+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Deaths from Smalllpox and all causes in London 1629-1902
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cb0905fc44579df3427f1b4070a05be2
-  size: 11466
-  path: 
-    dataset_1874_deaths_from_smalllpox_and_all_causes_in_london_1629_1902_values.feather
+  - md5: 04f4199c97c6fb2dae370f6533b4dd66
+    size: 11498
+    path: dataset_1874_deaths_from_smalllpox_and_all_causes_in_london_1629_1902_values.feather

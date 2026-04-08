@@ -14,10 +14,10 @@ HOW TO EXECUTE:
 
 1. Open this do-file in a local installation of Stata (execution time: ~40 minutes)
 2. It generates four files, which exclude and include extrapolations. They need to be imported as snapshots in the ETL, as
-	python snapshots/wid/2023-08-24/world_inequality_database.py --path-to-file snapshots/wid/2023-08-24/wid_indices_992j_exclude.csv
-	python snapshots/wid/2023-08-24/world_inequality_database_with_extrapolations.py --path-to-file snapshots/wid/2023-08-24/wid_indices_992j_include.csv
-	python snapshots/wid/2023-08-24/world_inequality_database_distribution.py --path-to-file snapshots/wid/2023-08-24/wid_distribution_992j_exclude.csv
-	python snapshots/wid/2023-08-24/world_inequality_database_distribution_with_extrapolations.py --path-to-file snapshots/wid/2023-08-24/wid_distribution_992j_include.csv
+	etls wid/2023-08-24/world_inequality_database --path-to-file snapshots/wid/2023-08-24/wid_indices_992j_exclude.csv
+	etls wid/2023-08-24/world_inequality_database_with_extrapolations --path-to-file snapshots/wid/2023-08-24/wid_indices_992j_include.csv
+	etls wid/2023-08-24/world_inequality_database_distribution --path-to-file snapshots/wid/2023-08-24/wid_distribution_992j_exclude.csv
+	etls wid/2023-08-24/world_inequality_database_distribution_with_extrapolations --path-to-file snapshots/wid/2023-08-24/wid_distribution_992j_include.csv
 
 	(Change the date for future updates)
 

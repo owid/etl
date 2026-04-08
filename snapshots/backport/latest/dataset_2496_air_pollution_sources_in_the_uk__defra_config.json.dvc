@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2496
-    date_accessed: 2023-08-10 08:08:44.289593
+    url: https://admin.owid.io/admin/datasets/2496
+    date_accessed: 2026-03-10 08:03:17.286275+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2496_air_pollution_sources_in_the_uk__defra
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 839b7941c4f05439cadf15a93a1787aa
-  size: 9534
-  path: dataset_2496_air_pollution_sources_in_the_uk__defra_config.json
+  - md5: 75647c597be91cda24e848c5fb69e805
+    size: 10594
+    path: dataset_2496_air_pollution_sources_in_the_uk__defra_config.json

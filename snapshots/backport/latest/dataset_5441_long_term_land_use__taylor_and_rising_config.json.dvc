@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5441
-    date_accessed: 2023-08-10 09:23:53.481019
+    url: https://admin.owid.io/admin/datasets/5441
+    date_accessed: 2026-03-05 09:57:45.353915+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5441_long_term_land_use__taylor_and_rising
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a76711c6f034ecb599ed900725f53380
-  size: 25659
-  path: dataset_5441_long_term_land_use__taylor_and_rising_config.json
+  - md5: fb4337981c4f5bc4f7f7e338a56d0b3e
+    size: 28820
+    path: dataset_5441_long_term_land_use__taylor_and_rising_config.json

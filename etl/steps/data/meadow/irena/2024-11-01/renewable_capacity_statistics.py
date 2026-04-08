@@ -5,7 +5,7 @@ from typing import Dict
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -61,7 +61,7 @@ def sanity_check_inputs(tables: Dict[str, Table]) -> None:
     assert check[check["Electricity Installed Capacity (MW)"] != check["check"]].empty, error
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -100,5 +100,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_meadow = paths.create_dataset(tables=[tb])
     ds_meadow.save()

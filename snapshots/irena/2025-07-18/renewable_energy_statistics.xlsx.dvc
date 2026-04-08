@@ -1,0 +1,45 @@
+meta:
+  origin:
+    producer: IRENA
+    title: Renewable Energy Statistics
+    description: |-
+      The renewable power capacity data represents the maximum net generating capacity of power plants and other installations that use renewable energy sources to produce electricity. For most countries and technologies, the data reflects the capacity installed and connected at the end of the calendar year. The data is presented in megawatts (MW) rounded to the nearest one megawatt, with figures between zero and 0.5MW shown as a 0. The data has been obtained from a variety of sources, including: the IRENA questionnaire; official statistics; industry association reports; and other reports and news articles.
+
+      Some technologies include others, following this schema:
+
+      - Total renewable capacity (on-grid and off-grid)
+        - Hydropower
+          - Renewable hydropower (including mixed plants)
+          - Pumped storage (note that this is included in total hydropower capacity, but not in total renewable capacity)
+        - Marine energy
+        - Wind energy
+          - Onshore wind energy
+          - Offshore wind energy
+        - Solar energy
+          - Solar photovoltaic
+          - Concentrated solar power
+        - Bioenergy
+          - Solid biofuels and renewable waste
+            - Renewable municipal waste
+            - Bagasse
+            - Other solid biofuels
+          - Liquid biofuels
+          - Biogas
+        - Geothermal
+      - Total off-grid renewable capacity
+        - Off-grid hydropower
+        - Off-grid solar photovoltaic
+        - Other off-grid renewable energy
+    citation_full: IRENA - Renewable energy statistics 2025. International Renewable Energy Agency, Abu Dhabi (2025).
+    attribution_short: IRENA
+    url_main: https://www.irena.org/Publications/2025/Jul/Renewable-energy-statistics-2025
+    url_download: http://www.irena.org/-/media/Files/IRENA/Agency/Publication/2025/Jul/IRENA_Statistics_Extract_2025H2.xlsx
+    date_accessed: '2025-07-18'
+    date_published: '2025-07-01'
+    license:
+      name: ©IRENA 2025
+      url: https://www.irena.org/Publications/2025/Jul/Renewable-energy-statistics-2025
+outs:
+  - md5: 18d1a8d4d6b0181478c48365ace16141
+    size: 12726392
+    path: renewable_energy_statistics.xlsx

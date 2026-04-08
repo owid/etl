@@ -18,9 +18,9 @@ tables:
         title: |-
           {macros}
           <% if measure == 'Deaths'%>
-            << format_title(metric, age, format_cause(cause), rei, 'Deaths') >>
+            << format_title(metric, age, format_cause(cause),  'Deaths',rei) >>
           <% else %>
-            << format_title(metric, age, format_cause(cause), rei, 'DALYs') >>
+            << format_title(metric, age, format_cause(cause),  'DALYs',rei) >>
           <%- endif -%>
         unit: |-
           <% if measure == 'Deaths'%>

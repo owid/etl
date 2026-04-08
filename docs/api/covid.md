@@ -1,6 +1,7 @@
 # COVID-19
 
-This page is a compact summary of our COVID-19 work, with all the relevant links to download our COVID-19 datasets.
+!!! info "This page is a compact summary of our COVID-19 work, with all the relevant links to download our COVID-19 datasets."
+    **Maintained by**: Lucas Rodés-Guirao
 
 !!! tip "I just want [the data](#download-data)!"
 
@@ -10,21 +11,21 @@ Our World in Data (OWID) has collected COVID-19 data from various domains since 
 
 ### Legacy data work
 
-We started working on COVID-19 data in early 2020, developing and implementing several data pipelines to process and publish the data. All this work has been live and shared with the public via our GitHub repository [https://github.com/owid/covid-19-data](https://github.com/owid/covid-19-data) and our [old COVID documentation](https://docs.owid.io/projects/covid/en/latest/). We have complemented our data work with extensive research articles, which we have shared on our [topic page](https://ourworldindata.org/coronavirus).
+We started working on COVID-19 data in early 2020, developing and implementing several data pipelines to process and publish the data. All this work has been live and shared with the public via our GitHub repository [:fontawesome-brands-github: https://github.com/owid/covid-19-data](https://github.com/owid/covid-19-data) and our [:octicons-link-external-16: old COVID documentation](https://docs.owid.io/projects/covid/en/latest/). We have complemented our data work with extensive research articles, which we have shared on our [:octicons-link-external-16: topic page](https://ourworldindata.org/coronavirus).
 
 ### Publications
 
 !!! abstract ""
 
- :material-file-document: Hasell, J., Mathieu, E., Beltekian, D. et al. **A cross-country database of COVID-19 testing**. _Sci Data_ 7, 345 (2020). [https://doi.org/10.1038/s41597-020-00688-8](https://doi.org/10.1038/s41597-020-00688-8)
+    :material-file-document: Hasell, J., Mathieu, E., Beltekian, D. et al. **A cross-country database of COVID-19 testing**. _Sci Data_ 7, 345 (2020). [https://doi.org/10.1038/s41597-020-00688-8](https://doi.org/10.1038/s41597-020-00688-8)
 
 !!! abstract ""
 
- :material-file-document: Mathieu, E., Ritchie, H., Ortiz-Ospina, E. et al. **A global database of COVID-19 vaccinations**. _Nat Hum Behav_ 5, 947–953 (2021). [https://doi.org/10.1038/s41562-021-01122-8](https://doi.org/10.1038/s41562-021-01122-8)
+    :material-file-document: Mathieu, E., Ritchie, H., Ortiz-Ospina, E. et al. **A global database of COVID-19 vaccinations**. _Nat Hum Behav_ 5, 947–953 (2021). [https://doi.org/10.1038/s41562-021-01122-8](https://doi.org/10.1038/s41562-021-01122-8)
 
 !!! abstract ""
 
- :material-file-document: Herre, B., Rodés-Guirao, L., Mathieu, E. et al. **Best practices for government agencies to publish data: lessons from COVID-19**. _The Lancet Public Health_, Viewpoint, Volume 9, ISSUE 6, e407-e410 (2024). [https://doi.org/10.1016/S2468-2667(24)00073-2](<https://doi.org/10.1016/S2468-2667(24)00073-2>)
+    :material-file-document: Herre, B., Rodés-Guirao, L., Mathieu, E. et al. **Best practices for government agencies to publish data: lessons from COVID-19**. _The Lancet Public Health_, Viewpoint, Volume 9, ISSUE 6, e407-e410 (2024). [https://doi.org/10.1016/S2468-2667(24)00073-2](<https://doi.org/10.1016/S2468-2667(24)00073-2>)
 
 ### Transition to ETL
 
@@ -32,10 +33,13 @@ We started working on COVID-19 before our [ETL system](../../architecture). In m
 
 ## Download data
 
-Our _compact COVID-19 dataset_ is a compilation of the most relevant COVID-19 indicators we have collected in the last few years. It consolidates indicators from various datasets into a single file. It comes with metadata, which explains all the indicators in detail. In the past, this dataset was generated and shared in our [GitHub](https://github.com/owid/covid-19-data/blob/master/public/data) repository.
+Our _compact COVID-19 dataset_ is a compilation of the most relevant COVID-19 indicators we have collected in the last few years. It consolidates indicators from various datasets into a single file. It comes with metadata, which explains all the indicators in detail. In the past, this dataset was generated and shared in our [:fontawesome-brands-github: GitHub](https://github.com/owid/covid-19-data/blob/master/public/data) repository.
 
-[:material-download: Download our compact dataset (CSV)](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv){ .md-button .md-button--primary }
+<a href="https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv" download="owid-covid-compact.csv" class="md-button md-button--primary">:material-download: Download our compact dataset (CSV)</a>
 [:material-download: Download metadata](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.meta.json){ .md-button }
+
+!!! warning "Downloading files"
+      If clicking the button opens the CSV in your browser instead of downloading, right-click the button and select "Save Link As..." or "Download Linked File".
 
 In addition to our compact dataset, we provide individual datasets with all our COVID-19 indicators. These files are direct exports from our ETL.
 
@@ -57,7 +61,7 @@ In addition to our compact dataset, we provide individual datasets with all our 
 | **Attitudes (YouGov)** | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/yougov/yougov_composite.csv)                                          | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/yougov/yougov_composite.meta.json)                                          |
 | **Donations (COVAX)** | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/covax/covax.csv)                                          | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/covax/covax.meta.json)                                          |
 
-All our COVID-19 data pipelines are specified in [our DAG](https://github.com/owid/etl/blob/master/dag/covid.yml).
+All our COVID-19 data pipelines are specified in [:fontawesome-brands-github: our DAG](https://github.com/owid/etl/blob/master/dag/covid.yml).
 
 ### Data providers
 
@@ -71,8 +75,6 @@ Our metadata contains all the relevant information about an indicator. This incl
 !!! info "Learn more in our [metadata reference](../architecture/metadata/reference/)."
 
 ## Acces the data with our catalog
-
-!!! warning "Our catalog library is in alpha."
 
 ### Install our catalog package
 
@@ -93,7 +95,8 @@ Where:
 -   `DATASET_NAME` is the name of the dataset (e.g. `case_death`)
 -   `TABLE_NAME` is the name of the table (e.g. `case_death`)
 
-[→ Learn more about our URIs](https://docs.owid.io/projects/etl/architecture/design/uri/?h=uri#path-for-data)
+!!! info "Learn more about our [URIs](../architecture/design/uri/#path-for-data)"
+
 
 **Notes**:
 
@@ -105,13 +108,14 @@ Where:
 Run:
 
 ```python
-from owid import catalog
+from owid.catalog import search
 
-# Preview list of available datasets (each row = dataset)
-catalogs.find(namespace="covid")
+# Search for COVID tables (namespace filter requires kind="table")
+results = search(namespace="covid", kind="table")
+results
 
-# You can load any dataset (using the row of the above-returned table)
-tb = catalogs.find(namespace="covid").iloc[3].load()
+# You can load any table (using the row of the above-returned results)
+tb = results[0].fetch()
 ```
 
 ### Load data
@@ -141,11 +145,8 @@ Use a `URI` from the table below[^1].
 and run the following code:
 
 ```python
-from owid import catalog
-
-rc = catalog.RemoteCatalog()
-uri = "..."
-df = rc[uri]
+from owid.catalog import fetch
+tb = fetch("garden/covid/latest/cases_deaths/cases_deaths")
 ```
 
 ### Access metadata
@@ -154,9 +155,9 @@ Objects `df` are not pure pandas DataFrames, but rather `owid.catalog.Table` dat
 
 ```python
 # Table metadata
-df.metadata
+tb.metadata
 # Column (or indicator) metadata
-df[column_name].metadata
+tb[column_name].metadata
 ```
 
-[→ Learn more about our metadata](https://docs.owid.io/projects/etl/architecture/metadata/)
+!!! info "Learn more about our catalog package in the [catalog reference](../architecture/metadata/)."

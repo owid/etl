@@ -26,6 +26,7 @@ We use various session state indicators to control the flow of the app:
 import streamlit as st
 from structlog import get_logger
 
+from apps.indicator_upgrade.match import SIMILARITY_NAMES
 from apps.wizard import utils
 from apps.wizard.app_pages.indicator_upgrade.charts_update import (
     get_affected_charts_and_preview,
@@ -36,7 +37,7 @@ from apps.wizard.app_pages.indicator_upgrade.charts_update import (
 from apps.wizard.app_pages.indicator_upgrade.dataset_selection import build_dataset_form
 from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import render_indicator_mapping
 from apps.wizard.app_pages.indicator_upgrade.utils import get_datasets
-from etl.match_variables import SIMILARITY_NAMES
+from apps.wizard.utils.components import st_title_with_expert
 
 # logger
 log = get_logger()
@@ -58,7 +59,7 @@ st.set_page_config(
     """,
     },
 )
-st.title(":material/upgrade: Indicator Upgrader")
+st_title_with_expert("Indicator Upgrader", icon=":material/upgrade:")
 st.markdown("Update indicators to their new versions.")  # Get datasets (might take some time)
 
 # Get all datasets
@@ -155,9 +156,6 @@ if st.session_state.submitted_datasets:
             if isinstance(charts, list) and len(charts) > 0:
                 st.toast("Updating charts...")
 
-                # Push charts
-                push_new_charts(charts)
-
                 # Save variable mapping
                 save_variable_mapping(
                     indicator_mapping=indicator_mapping,
@@ -165,6 +163,9 @@ if st.session_state.submitted_datasets:
                     dataset_id_old=int(search_form.dataset_old_id),
                     comments="Done with indicator-upgrader",
                 )
+
+                # Push charts
+                push_new_charts()
 
                 # Undo upgrade
                 st.markdown("Do you want to undo the indicator upgrade?")

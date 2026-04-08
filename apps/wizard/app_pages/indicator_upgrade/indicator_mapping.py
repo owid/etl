@@ -71,7 +71,7 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
             st.button(
                 label="Next (2/3)",
                 type="primary",
-                use_container_width=True,
+                width="stretch",
                 on_click=set_states_after_submitting,
                 help="Only indicators in this page will be submitted. If you want to map molre indicators at once, make the number of elements per page bigger.",
             )
@@ -90,7 +90,9 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
     return indicator_mapping
 
 
-@st.cache_data(ttl=30 * 60)
+# NOTE: we disabled caching because after partial indicator upgrade, refreshing showed all indicators
+#   instead of just those still in charts
+# @st.cache_data(ttl=30 * 60)
 def _get_params_cached(
     dataset_old_id,
     dataset_new_id,
@@ -216,26 +218,32 @@ def st_show_header(search_form):
             on_change=lambda: set_states({"submitted_indicators": False}),
         )
 
+        def _set_all_skip_states(skip: bool):
+            """Set skip state for all indicators by updating both the tracking dict and checkbox keys."""
+            set_states(
+                {
+                    "submitted_indicators": False,
+                    "ignore-all": skip,
+                    "not-ignore-all": not skip,
+                }
+            )
+            # Update the indicator_upgrades_ignore dict
+            if "indicator_upgrades_ignore" in st.session_state:
+                for key in st.session_state["indicator_upgrades_ignore"]:
+                    st.session_state["indicator_upgrades_ignore"][key] = skip
+                    # Also update the checkbox widget's key directly
+                    checkbox_key = f"{key}-ignore"
+                    if checkbox_key in st.session_state:
+                        st.session_state[checkbox_key] = skip
+
         st.divider()
         st.button(
             label="🗑️ Skip all indicators",
-            on_click=lambda: set_states(
-                {
-                    "submitted_indicators": False,
-                    "ignore-all": True,
-                    "not-ignore-all": False,
-                }
-            ),
+            on_click=lambda: _set_all_skip_states(True),
         )
         st.button(
             label="↩️ Unskip all indicators",
-            on_click=lambda: set_states(
-                {
-                    "submitted_indicators": False,
-                    "not-ignore-all": True,
-                    "ignore-all": False,
-                }
-            ),
+            on_click=lambda: _set_all_skip_states(False),
         )
 
 
@@ -450,11 +458,13 @@ class IndicatorUpgradeShow:
             k = "indicator_upgrades_ignore"
             st.session_state[k][self.iu.key] = not st.session_state[k][self.iu.key]
 
+        # Initialize checkbox state if not already set
+        if self.iu.key_ignore not in st.session_state:
+            st.session_state[self.iu.key_ignore] = self.iu.skip
+
         st.checkbox(
             label="Skip",
             key=self.iu.key_ignore,
-            # label_visibility="collapsed",
-            value=self.iu.skip,
             on_change=_set_states_checkbox,
         )
 
@@ -494,7 +504,8 @@ def get_indicator_id_to_display(old_indicators, new_indicators):
 @st.cache_data(show_spinner=False)
 def get_indicator_data_cached(indicator_ids: List[int]):
     with st.spinner(
-        "Retrieving data values from S3. This might take some time... If you don't need this, disable the 'Explore' option from the 'parameters' section."
+        "Retrieving data values from S3. This might take some time... If you don't need this, disable the 'Explore' option from the 'parameters' section.",
+        show_time=True,
     ):
         df = variable_data_df_from_s3(
             get_engine(),

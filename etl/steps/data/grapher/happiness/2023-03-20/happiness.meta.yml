@@ -117,8 +117,8 @@ tables:
                 baseColorScheme: OrRd
                 colorSchemeInvert: true
                 binningStrategy: manual
-                customNumericMinValue: 0
                 customNumericValues:
+                  - 0
                   - 1
                   - 2
                   - 3

@@ -1,0 +1,30 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+dataset:
+  update_period_days: 365
+
+tables:
+  twd_usd_monthly:
+    variables:
+      exchange_rate_monthly_avg:
+        title: Monthly New Taiwan dollar (NT$) to US dollar (US$) exchange rate
+        unit: New Taiwan Dollars per US dollar
+        short_unit: NT$ per US$
+        description_processing: Monthly average exchange rate calculated from daily closing rates.
+        display:
+          numDecimalPlaces: 3
+
+  twd_usd_annual:
+    variables:
+      exchange_rate_annual_avg:
+        title: Annual New Taiwan dollar (NT$) to US dollar (US$) exchange rate
+        unit: New Taiwan Dollars per US dollar
+        short_unit: NT$ per US$
+        description_processing: Annual average exchange rate calculated from daily closing rates.
+        display:
+          numDecimalPlaces: 3

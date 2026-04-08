@@ -17,7 +17,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     type=bool,
     help="Upload dataset to Snapshot",
 )
-def main(upload: bool) -> None:
+def run(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"eia/{SNAPSHOT_VERSION}/international_energy_data.zip")
 
@@ -26,4 +26,4 @@ def main(upload: bool) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run()

@@ -1,0 +1,89 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Medicine & Biotechnology
+    display:
+      numDecimalPlaces: 0
+
+
+dataset:
+  update_period_days: 0 #never gets updated
+
+
+# These get overwritten in grapher metadata
+# Keeping them around in case we want to restructure metadata/ dataset at some point
+tables:
+  epoch_database_growth:
+    variables:
+      refseq_records:
+        title: "Number of records in RefSeq database"
+        unit: "records"
+        short_unit: ""
+        description_short: |-
+          Total number of records in the [RefSeq database](#dod:refseq). RefSeq is a curated collection of DNA, RNA, and protein sequences with the goal of providing reference sequences for each gene in each organism.
+        description_key:
+          - The [RefSeq database](https://www.ncbi.nlm.nih.gov/refseq/) is a curated collection of DNA, RNA, and protein sequences maintained by the National Center for Biotechnology Information (NCBI).
+          - RefSeq provides a comprehensive, integrated, non-redundant set of reference sequences for major research organisms, including humans, model organisms, and pathogens.
+          - These reference sequences integrate information on genomic DNA, transcripts, and proteins to provide a complete picture of each gene.
+          - RefSeq records are created and maintained by NCBI staff through a combination of automated analysis and manual curation to ensure high quality and accuracy.
+          - The RefSeq database is freely accessible to the public and is widely used by researchers, educators, and students worldwide for various purposes, including scientific research, drug discovery, and education.
+      alpha_fold_number_of_predicted_structures:
+        title: "Number of predicted protein structures in AlphaFoldDB"
+        unit: "structures"
+        short_unit: ""
+        description_short: |-
+          Total number of predicted protein structures available in the [AlphaFoldDB](#dod:alphafolddb). AlphaFoldDB is a database that provides high-accuracy predicted 3D structures of proteins using deep learning techniques.
+        description_key:
+          - The [AlphaFold Protein Structure Database (AlphaFoldDB)](https://alphafold.ebi.ac.uk/) is a database of predicted 3D structures of proteins.
+          - AlphaFold is an AI model that uses deep learning to predict protein structures based on their amino acid sequences. AlphaFoldDB is the result of applying this model to a large number of protein sequences.
+          - Structures in AlphaFoldDB have not necessarily been experimentally validated, but many predictions have been shown to be highly accurate.
+          - AlphaFoldDB is freely accessible to the public. Researchers, educators, and students worldwide use the data for various purposes, including scientific research, drug discovery, and education.
+      esm_atlas_number_of_predicted_structures:
+        title: "Number of predicted protein structures in ESMAtlas"
+        unit: "structures"
+        short_unit: ""
+        description_short: |-
+          Total number of predicted protein structures available in the [ESM Metagenomic Atlas](#dod:esmatlas). The ESM Metagenomic Atlas is a database that provides predicted 3D structures of proteins using advanced machine learning models.
+        description_key:
+          - The [ESM Metagenomic Atlas (ESMAtlas)](https://esmatlas.com/) is a is a database of predicted 3D structures of proteins.
+          - ESM is a transformer-based language model that has been trained on large datasets of protein sequences to learn the patterns and relationships between amino acids. It predicts protein structures based on their amino acid sequences.
+          - ESMAtlas contains protein structures predicted by the ESM model.
+          - Structures in ESMAtlas have not necessarily been experimentally validated, but many predictions have been shown to be highly accurate.
+          - ESMAtlas is freely accessible to the public. Researchers, educators, and students worldwide use the data for various purposes, including scientific research, drug discovery, and education.
+      gb_all_reported_sequences:
+        title: "Number of reported nucleotide sequences in GenBank"
+        unit: "sequences"
+        short_unit: ""
+        description_short: |-
+          Total number of sequences reported in [GenBank](#dod:genbank). A nucleotide sequence encodes the genetic information of an organism. Nucleotide sequences in GenBank include DNA and RNA sequences from various organisms, such as viruses, bacteria, plants, and animals.
+        description_key:
+          - "[GenBank](https://www.ncbi.nlm.nih.gov/genbank/) is a comprehensive public database of RNA and DNA sequences maintained by the National Center for Biotechnology Information (NCBI)."
+          - Nucleotide sequences in GenBank include DNA and RNA sequences from various organisms, such as viruses, bacteria, plants, and animals.
+          - Sequences are submitted to GenBank by researchers worldwide. Submissions are reviewed and annotated by NCBI staff to ensure accuracy and consistency, but scientific accuracy is the responsibility of the submitter.
+          - GenBank is part of the International Nucleotide Sequence Database Collaboration (INSDC), which also includes the DNA Data Bank of Japan (DDBJ) and the European Nucleotide Archive (ENA). These databases share data daily to ensure global access to nucleotide sequence information.
+          - Nucleotide sequence data in GenBank is freely accessible to the public. It is used by researchers, educators, and students worldwide for various purposes, including scientific research, education, and biotechnology applications.
+
+      pdb_total_number_of_entries_available:
+        title: "Total number of molecule structures in the Protein Data Bank (PDB)"
+        unit: "molecules"
+        short_unit: ""
+        description_short: |-
+          Total number of molecules with structural information available in the [Protein Data Bank (PDB)](#dod:protein-data-bank). The PDB stores three-dimensional structural data of large biological molecules, such as proteins, DNA or RNA molecules, which are essential for understanding their function and interactions.
+        description_key:
+          - The [Protein Data Bank (PDB)](https://www.rcsb.org/) is a global repository for the three-dimensional structural data of large biological molecules. It is managed by the Research Collaboratory for Structural Bioinformatics (RCSB)
+          - Despite its name, the PDB contains structures of not only proteins but also nucleic acids (DNA and RNA), lipids and carbohydrates and complex assemblies of these molecules, such as protein-DNA complexes.
+          - All data submitted to the PDB has been experimentally determined, for example by X-ray crystallography. Structures predicted by computational methods alone are not accepted.
+          - Protein structures are submitted by researchers from around the world. Each submission is reviewed for quality and accuracy by the RCSB researchers before being added to the database.
+          - The PDB is freely accessible to the public. Researchers, educators, and students worldwide use the data for various purposes, including scientific research, drug discovery, and education.
+      uniprot_uniprotkb_swiss_prot:
+        title: "Proteins with entries in UniProtKB/Swiss-Prot database"
+        unit: "proteins"
+        short_unit: ""
+        description_short: |-
+          Total number of entries in the [UniProtKB/Swiss-Prot database](#dod:uniprotkb). UniProtKB/Swiss-Prot is a database that stores protein sequences and functional information, explaining both how a protein is built and what it does in a biological context. The Swiss-Prot database is manually curated and includes only experimentally verified information.
+        description_key:
+          - The [UniProt Knowledgebase (UniProtKB)](https://www.uniprot.org/uniprotkb) is a high-quality database of protein sequence and functional information. The entries for each protein explain both how it is built and what it does in a biological context.
+          - The Swiss-Prot section of UniProtKB is manually curated and contains only experimentally verified information. Each entry is reviewed and annotated by expert curators to ensure accuracy and consistency.
+          - UniProtKB is freely accessible and widely used by researchers, educators, and students worldwide for various purposes, including scientific research, drug discovery, and education.

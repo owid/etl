@@ -1,4 +1,4 @@
-from etl.collections import multidim
+# Force re-run
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -17,8 +17,7 @@ MOBILITY_CONFIG_DEFAULT = {
 
 
 def run() -> None:
-    # PART 1: MDIMs entirely from YAML files
-    # Load MDIM configurations from YAML files
+    # PART 1: Collections entirely from YAML files (no programmatic config extracted from table)
     filenames = [
         "covid.cases.yml",
         "covid.deaths.yml",
@@ -33,45 +32,30 @@ def run() -> None:
     ]
 
     for fname in filenames:
+        ## Load config
         paths.log.info(fname)
-        config = paths.load_mdim_config(fname)
+        config = paths.load_collection_config(fname)
 
-        mdim = paths.create_mdim(config, mdim_name=fname_to_mdim_name(fname))
-        mdim.save()
+        ## Create and save collection
+        c = paths.create_collection(config=config, short_name=fname_to_short_name(fname))
+        c.save()
 
-    # PART 2: MDIMs hybridly generated (mix of YAML file + data)
+    # PART 2: Collection hybridly generated (YAML file + programmatic config)
+    ## Load data
     ds = paths.load_dataset("google_mobility")
     tb = ds.read("google_mobility", load_data=False)
 
-    # Simple multidim
-    config = paths.load_mdim_config("covid.mobility.yml")
-
-    # Generate config from indicator
-    config_new = multidim.expand_config(
+    ## Create and save collection
+    fname = "covid.mobility.yml"
+    c = paths.create_collection(
+        config=paths.load_collection_config("covid.mobility.yml"),
+        short_name=fname_to_short_name("covid.mobility.yml"),
         tb=tb,
         common_view_config=MOBILITY_CONFIG_DEFAULT,
     )
-
-    # Combine dimension info from YAML + programmatically obtained
-    config["dimensions"] = multidim.combine_config_dimensions(
-        config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config["dimensions"],
-    )
-
-    # Combine views info from YAML + programmatically obtained
-    config["views"] = config["views"] + config_new["views"]
-
-    # WIP: DEBUGGING
-    # multidim.adjust_mdim_views(config, paths.dependencies_by_table_name)
-
-    # Upsert to DB
-    mdim = paths.create_mdim(
-        config=config,
-        mdim_name=fname_to_mdim_name("covid.mobility.yml"),
-    )
-
-    mdim.save()
+    c.save()
 
 
-def fname_to_mdim_name(fname: str) -> str:
+def fname_to_short_name(fname: str) -> str:
+    """Custom MDIM name generator."""
     return f"{fname.replace('.yml', '').replace('.', '_')}"

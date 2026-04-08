@@ -38,6 +38,25 @@ On regions:
         - Eastern Europe, Western Europe -> Europe
         - North america, Latin America -> Americas
 
+
+NOTE: It is unclear what's the best way to map war codes to war names. A workaround for now is explained below:
+    - Go to the codebook (https://dataverse.harvard.edu/file.xhtml?fileId=5857673&version=2.0) and go to table 43 (ctrl+F: "Table 43: Conventional Wars").
+    - Wars are more or less sorted by warcode, even if not shown (thanks)
+    - From section "" we know the following mappings:
+        69  -> Montenegrin-Ottoman War, 1858
+        252 -> Austro-Sardinian War, 1859
+        251 -> Russo-Turkish War, 1877-78
+        141 -> British-Sokoto Caliphate War, 1901-03
+        142 -> Greco-Turkish War, 1920-22
+        236 -> Bosnian War II: Croat-Bosniak War, 1993-94
+    - With these in mind, we can find them in the tables and go up or down counting manually
+    - NOTE: this is not a perfect solution, and should be double checked by looking at the data and if the years and other values make sense.
+
+    They are more or less sorted.
+        227: MNF in Lebanon, 1982-1984
+        227: Tigrean and Eritrean War, 1982-1991
+        236: Bosnian War II: Croat-Bosniak War (reference)
+        239: Afghan War I, 1996-2001
 """
 
 import numpy as np
@@ -203,7 +222,7 @@ def run(dest_dir: str) -> None:
 
     # Add conflict rates
     log.info("war.cow: map fatality codes to names")
-    tb_regions = tb_regions[~tb_regions["region"].isin(["Africa", "Middle East"])]
+    tb_regions = tb_regions.loc[~tb_regions["region"].isin(["Africa", "Middle East"])]
     tb = add_indicators_extra(
         tb,
         tb_regions,
@@ -266,7 +285,7 @@ def clean_table(tb: Table) -> Table:
     ).all(), "Entry found with no region (one more than one region) assigned!"
 
     ## Keep only relevant columns
-    tb = tb[COLUMNS_RELEVANT]
+    tb = tb.loc[:, COLUMNS_RELEVANT]
 
     return tb
 
@@ -279,7 +298,7 @@ def format_region_and_type(tb: Table) -> Table:
     """
     ## Get region label
     tb = tb.melt(id_vars=COLUMNS_CODES + COLUMNS_YEARS + COLUMNS_METRICS + [COLUMN_CIVIL_WAR], var_name="region")
-    tb = tb[tb["value"] == 1].drop(columns="value")
+    tb = tb.loc[tb["value"] == 1].drop(columns="value")
 
     ## Get conflict_type info
     tb[COLUMN_CIVIL_WAR] = tb[COLUMN_CIVIL_WAR].map({0: "others (non-civil)", 1: "civil war"})
@@ -490,7 +509,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     columns_idx = ["year", "country", "id", "conflict_type"]
     tb_country = tb_codes.merge(tb_country, on=columns_idx, how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
-    tb_country = tb_country[columns_idx + ["participated_in_conflict"]]
+    tb_country = tb_country.loc[:, columns_idx + ["participated_in_conflict"]]
 
     # Add all conflict types
     tb_country = aggregate_conflict_types(tb_country, "all")

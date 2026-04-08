@@ -24,6 +24,8 @@ DATA_GRAPHER_DIR = DATA_DIR / "grapher"
 
 # Export folder
 EXPORT_DIR = BASE_DIR / "export"
+EXPORT_MDIMS_DIR = EXPORT_DIR / "multidim"
+EXPORT_EXPLORER_DIR = EXPORT_DIR / "explorers"
 
 # Snapshots
 SNAPSHOTS_DIR = BASE_DIR / "snapshots"
@@ -53,12 +55,13 @@ LATEST_REGIONS_VERSION = sorted((STEPS_GARDEN_DIR / "regions/").glob("*/regions.
 LATEST_REGIONS_YML = STEPS_GARDEN_DIR / "regions" / LATEST_REGIONS_VERSION / "regions.yml"
 LATEST_REGIONS_DATASET_PATH = BASE_DIR / "data/garden/regions" / LATEST_REGIONS_VERSION / "regions"
 
-# WB Income
+# WB Income groups.
 LATEST_INCOME_VERSION = sorted((STEPS_GARDEN_DIR / "wb/").glob("*/income_groups.py"))[-1].parts[-2]
 LATEST_INCOME_DATASET_PATH = BASE_DIR / "data/garden/wb" / LATEST_INCOME_VERSION / "income_groups"
 
 # Population
 LATEST_POPULATION_VERSION = sorted((STEPS_GARDEN_DIR / "demography/").glob("*/population"))[-1].parts[-2]
+LATEST_POPULATION_DATASET_PATH = BASE_DIR / "data/garden/demography" / LATEST_POPULATION_VERSION / "population"
 
 # NOTE: this is useful when your steps are defined in a different package
 BASE_PACKAGE = os.environ.get("BASE_PACKAGE", "etl")
@@ -70,6 +73,28 @@ DEFAULT_DAG_FILE = DAG_FILE
 
 # Hidden ETL file that will keep the time it took to execute each step.
 EXECUTION_TIME_FILE = BASE_DIR / ".execution_time.json"
+
+# Cache file for step browser (stores step list for instant startup)
+STEP_CACHE_FILE = CACHE_DIR / "step_browser.json"
+
+# Cache file for snapshot browser (stores snapshot list for instant startup)
+SNAPSHOT_CACHE_FILE = CACHE_DIR / "snapshot_browser.json"
+
+# Cache file for step popularity data (from Datasette analytics)
+POPULARITY_CACHE_FILE = CACHE_DIR / "step_popularity.json"
+
+# Cache file for browser history (stores last N search queries)
+# NOTE: This is the legacy single-file history, kept for backwards compatibility
+HISTORY_CACHE_FILE = CACHE_DIR / "browser_history.json"
+
+# Per-mode history directory for unified browser
+BROWSER_HISTORY_DIR = CACHE_DIR / "browser_history"
+
+
+def get_mode_history_file(mode_name: str) -> "Path":
+    """Get the history cache file for a specific browser mode."""
+    return BROWSER_HISTORY_DIR / f"{mode_name}.json"
+
 
 # TODO: Remove this once we fully deprecate owid-content
 # Default path to the explorers folder.

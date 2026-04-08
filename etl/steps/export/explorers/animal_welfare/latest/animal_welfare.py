@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from etl.collections.explorer import expand_config
+from etl.collection import expand_config
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -62,7 +62,7 @@ def run() -> None:
     tb = ds.read("animals_used_for_food")
 
     # Load grapher config from YAML.
-    config = paths.load_explorer_config()
+    config = paths.load_collection_config()
 
     #
     # Process data.
@@ -301,7 +301,11 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new explorer.
-    ds_explorer = paths.create_explorer(config=config, explorer_name="animal-welfare")
+    c = paths.create_collection(
+        config=config,
+        short_name="animal-welfare",
+        explorer=True,
+    )
 
     # Save explorer.
-    ds_explorer.save(tolerate_extra_indicators=True)
+    c.save(tolerate_extra_indicators=True)

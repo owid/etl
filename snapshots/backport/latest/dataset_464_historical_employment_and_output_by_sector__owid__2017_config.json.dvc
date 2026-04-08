@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/464
-    date_accessed: 2023-08-10 08:41:50.739373
+    url: https://admin.owid.io/admin/datasets/464
+    date_accessed: 2025-09-26 18:06:09.950507
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_464_historical_employment_and_output_by_sector__owid__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1e056e27b6f1c916989646706291021c
-  size: 7832
-  path: dataset_464_historical_employment_and_output_by_sector__owid__2017_config.json
+  - md5: f426089a613f82a3e2ac35d74a748228
+    size: 8427
+    path: dataset_464_historical_employment_and_output_by_sector__owid__2017_config.json

@@ -1,5 +1,8 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
+autoupdate:
+  name: Vaccination coverage
+
 meta:
   origin:
     # Data product / Snapshot
@@ -8,7 +11,7 @@ meta:
       These estimates are based on quantitative data:
 
       1) Country-reported coverage data (official and administrative coverage)
-      2) survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate).
+      2) Survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate).
 
       As such, these estimates are affected by the availability and quality of the underlying empirical data.
     date_published: "2024-07-15"
@@ -22,14 +25,13 @@ meta:
     # Files
     url_main: https://immunizationdata.who.int/global?topic=Vaccination-coverage&location=
     url_download: https://srhdpeuwpubsa-geecgzbpd5h0fueu.z01.azurefd.net/whdh/WIISE/export/coverage-data.xlsx
-    date_accessed: 2024-12-10
+    date_accessed: '2025-07-15'
 
     # License
     license:
       name: © WHO
       url: https://www.who.int/about/policies/terms-of-use
-
 outs:
-  - md5: ed9a0373711bffcfb39714457d1280fd
-    size: 17324597
+  - md5: db41c85b376c26ebbf9da21ae04bbb87
+    size: 18373215
     path: vaccination_coverage.xlsx

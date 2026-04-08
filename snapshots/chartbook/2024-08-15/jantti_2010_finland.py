@@ -7,7 +7,7 @@ population.
 
 See https://docs.google.com/spreadsheets/d/1ZakjK-hP6s4tLJZCEFjR7NVVqTkb6AXwgpvfpSwsT-I/edit?gid=1888715824#gid=1888715824
 After creating the file, run
-    python snapshots/chartbook/2024-08-15/jantti_2010_finland.py --path-to-file <path-to-file>
+    etls chartbook/2024-08-15/jantti_2010_finland --path-to-file <path-to-file>
 """
 
 from pathlib import Path

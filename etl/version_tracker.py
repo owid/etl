@@ -518,7 +518,7 @@ class VersionTracker:
 
         if omit_base_dir and path_to_script_detected is not None:
             # Return the path relative to the base directory (omitting the local path to the ETL repos).
-            path_to_script_detected = path_to_script_detected.relative_to(paths.BASE_DIR)
+            path_to_script_detected = Path(str(path_to_script_detected).replace(str(paths.BASE_DIR), ""))
 
         return path_to_script_detected
 
@@ -749,7 +749,7 @@ class VersionTracker:
         # So, first, create a temporary merge key to both dataframes.
         # Note that info_df only contains data steps (that should start with either "data://" or "data-private://").
         steps_df["merge_key"] = steps_df["step"].str.replace("data://", "").str.replace("data-private://", "")
-        info_df["merge_key"] = ["/".join(etl_path.split("#")[0].split("/")[:-1]) for etl_path in info_df["etl_path"]]
+        info_df["merge_key"] = "grapher/" + info_df["etl_path"]
 
         # NOTE: This dataframe may have more steps than steps_df, for different reasons:
         #  * A grapher dataset was created by ETL, but the ETL step has been removed from the dag, while the

@@ -8,7 +8,7 @@ meta:
       This dataset provides estimates of plastics leakages to the environment at a global level per source.
 
 
-      Plastic leakages estimates from mismanaged waste and litter correspond to the average of the estimates caclulated using the methodology adapted from (Ryberg et al., 2019) and (Cottom, Cook and Velis, 2020) that were applied on OECD ENV-Linkages model outputs.Plastics leakages from all other sources correspond to the estimates caclulated using the methodology adapted from (Ryberg et al., 2019).
+      Plastic leakages estimates from mismanaged waste and litter correspond to the average of the estimates calculated using the methodology adapted from (Ryberg et al., 2019) and (Cottom, Cook and Velis, 2020) that were applied on OECD ENV-Linkages model outputs.Plastics leakages from all other sources correspond to the estimates calculated using the methodology adapted from (Ryberg et al., 2019).
     date_published: 2022-05-05
 
     # Citation

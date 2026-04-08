@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Marco et al. (2017)
+    description: ''
+    url: http://ssrn.com/abstract=2616724
+    date_accessed: 2017-11-30
+    published_by: |-
+      Marco, Alan C. and Carley, Michael and Jackson, Steven and Myers, Amanda, The USPTO Historical Patent Data Files: Two Centuries of Innovation (June 1, 2015). Available at SSRN: https://ssrn.com/abstract=2616724 or http://dx.doi.org/10.2139/ssrn.2616724
+  name: USA patents granted - US Patent & Trademark Office
+  description: ''
+outs:
+  - md5: 58322b9082f2d489cfaf7df5661c0ada
+    size: 12698
+    path: usa_patents_granted__us_patent__and__trademark_office.feather

@@ -1,0 +1,21 @@
+dataset:
+  title: Deaths per TWh energy production
+tables:
+  deaths_per_twh_energy_production:
+    variables:
+      deaths_per_twh_of_electricity_production:
+        title: Deaths per TWh of electricity production
+        unit: deaths per terawatt-hour
+        display:
+          name: Deaths per terawatt-hour of electricity production
+        description: |-
+          Death rates from energy sources is measured as the number of deaths from air pollution and accidents per terawatt-hour (TWh) of energy production.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

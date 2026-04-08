@@ -1,0 +1,72 @@
+dataset:
+  title: Drug overdose deaths in the US (CDC WONDER)
+tables:
+  drug_overdose_deaths_in_the_us__cdc_wonder:
+    variables:
+      antidepressant_overdose_death_rates__us_cdc_wonder:
+        title: Antidepressant overdose death rates (US CDC WONDER)
+        unit: deaths per 100,000
+        display:
+          name: Antidepressants
+          numDecimalPlaces: 1
+      any_opioid_death_rates__cdc_wonder:
+        title: Any opioid death rates (CDC WONDER)
+        unit: deaths per 100,000
+        display:
+          name: Any opioids
+          numDecimalPlaces: 1
+        description: Deaths per 100,000 people attributed to any opioids.
+      benzodiazepine_overdose_death_rates__cdc_wonder:
+        title: Benzodiazepine overdose death rates (CDC WONDER)
+        unit: deaths per 100,000
+        display:
+          name: Benzodiazepines
+          numDecimalPlaces: 1
+      cocaine_overdose_death_rates__cdc_wonder:
+        title: Cocaine overdose death rates (CDC WONDER)
+        unit: deaths per 100,000
+        display:
+          name: Cocaine
+          numDecimalPlaces: 1
+        description: Death per rate of 100,000 people attributed to cocaine use.
+      heroin_overdose_death_rates__cdc_wonder:
+        title: Heroin overdose death rates (CDC WONDER)
+        unit: deaths per 100,000
+        display:
+          name: Heroin
+          numDecimalPlaces: 1
+        description: Death per rate of 100,000 people attributed to heroin use.
+      prescription_opioids_death_rates__us_cdc_wonder:
+        title: Prescription Opioids death rates (US CDC WONDER)
+        unit: deaths per 100,000
+        display:
+          name: Prescription opioids
+          numDecimalPlaces: 1
+      psychostimulants_death_rates__us_cdc_wonder:
+        title: Psychostimulants death rates (US CDC WONDER)
+        unit: deaths per 100,000
+        display:
+          name: Psychostimulants
+          numDecimalPlaces: 1
+      synthetic_opioids_death_rates__cdc_wonder:
+        title: Synthetic opioids death rates (CDC WONDER)
+        unit: deaths per 100,000
+        display:
+          name: Synthetic opioids
+        description: Deaths per 100,000 people attributed to synthetic opioids other than methadone.
+      total_overdose_death_rates__cdc_wonder:
+        title: Total overdose death rates (CDC WONDER)
+        unit: deaths per 100,000
+        display:
+          name: Total overdoses
+          numDecimalPlaces: 1
+        description: Deaths per 100,000 people of total overdose deaths.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

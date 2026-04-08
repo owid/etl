@@ -311,7 +311,7 @@ def _snapshot_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> 
             published_by="Our World in Data catalog backport",
             url=f"https://admin.owid.io/admin/datasets/{ds.id}",
             publication_date="latest",
-            date_accessed=dt.datetime.utcnow(),  # type: ignore
+            date_accessed=dt.datetime.now(dt.timezone.utc),  # type: ignore
         ),
         file_extension="feather",
         is_public=public,

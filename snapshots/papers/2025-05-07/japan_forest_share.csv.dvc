@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Osamu Saito
+    title: "Forest history and the Great Divergence: China, Japan, and the West compared"
+    citation_full: |-
+      Saito O. Forest history and the Great Divergence: China, Japan, and the West compared. Journal of Global History. 2009;4(3):379-404. doi:10.1017/S1740022809990131
+    attribution_short: Osamu Saito
+    url_main: |-
+      https://www.cambridge.org/core/journals/journal-of-global-history/article/abs/forest-history-and-the-great-divergence-china-japan-and-the-west-compared/6140D78077980694B07B40B6396C0343
+    date_accessed: "2025-05-07"
+    date_published: "2009-11-01"
+    license:
+      name: Copyright © 2009, Cambridge University Press
+      url: https://www.cambridge.org/core/journals/journal-of-global-history/article/abs/forest-history-and-the-great-divergence-china-japan-and-the-west-compared/6140D78077980694B07B40B6396C0343
+outs:
+  - md5: bc613be0d1e62272a90a237b2d053ef7
+    size: 2043
+    path: japan_forest_share.csv

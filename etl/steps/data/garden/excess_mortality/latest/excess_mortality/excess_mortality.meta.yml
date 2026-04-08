@@ -21,6 +21,7 @@ definitions:
         colorSchemeInvert: true
         baseColorScheme: RdYlBu
         customNumericValues:
+          - -100
           - -50
           - -20
           - -10
@@ -33,7 +34,7 @@ definitions:
     hmd: &origin_hmd
       title: "Human Mortality Database"
       producer: Human Mortality Database
-      date_published: "2024"
+      date_published: "2025"
       url_main: "https://www.mortality.org"
       license:
         name: Creative Commons BY 4.0
@@ -84,7 +85,7 @@ dataset:
 
     We calculate P-scores using the reported deaths data from HMD and WMD and the projected deaths since 2020 from WMD (which we use for all countries and regions, including for deaths broken down by age group). The P-score is the percentage difference between the reported number of weekly or monthly deaths since 2020 and the projected number of deaths for the same period based on previous years (years available from 2015 until 2019).
 
-    We calculate the number of weekly deaths for the United Kingdom by summing the weekly deaths from England & Wales, Scotland, and Northern Ireland.
+    We calculate the number of weekly deaths for the United Kingdom by summing the weekly deaths from England and Wales, Scotland, and Northern Ireland.
 
     For important issues and caveats to understand when interpreting excess mortality data, see our excess mortality page at https://ourworldindata.org/excess-mortality-covid.
 
@@ -435,7 +436,6 @@ tables:
             map:
               colorScale:
                 <<: *color_scale_counts
-                customNumericMinValue: 0
                 customNumericValues:
                   - 0
                   - 100000
@@ -577,7 +577,7 @@ tables:
           - *origin_wmd
           - *origin_kk
         sources:
-          - name: Human Mortality Database (2024)
+          - name: Human Mortality Database
           - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
         presentation:

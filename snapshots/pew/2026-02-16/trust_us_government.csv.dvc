@@ -1,0 +1,35 @@
+# To update this snapshot:
+# 1. Go to https://www.pewresearch.org/politics/2025/12/04/public-trust-in-government-1958-2025/ (or search for "Public Trust in Government" on Pew Research Center's website)
+# 2. On the first chart, click on Data and then in "Download data as .csv"
+# 3. Copy the file in this directory
+# 4. Run etls trust_us_government --path-to-file <path-to-file>
+# 5. Delete the csv file you copied in step 3
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Public trust in US government - Pew Research Center"
+    description: |-
+      % who say they trust the government in Washington to do what is right just about always/most of the time. Data from Pew Research Center, National Election Studies, Gallup, ABC/Washington Post, CBS/New York Times, and CNN surveys.
+    date_published: "2025-12-04"
+
+    # Citation
+    producer: Pew Research Center
+    citation_full: |-
+      “Public Trust in Government: 1958-2025.” Pew Research Center, Washington, D.C. (4 December 2025) https://www.pewresearch.org/politics/2025/12/04/public-trust-in-government-1958-2025/.
+    attribution_short: Pew Research Center
+
+    # Files
+    url_main: https://www.pewresearch.org/politics/2025/12/04/public-trust-in-government-1958-2025/
+    date_accessed: '2026-02-16'
+
+    # License
+    license:
+      name: Pew Research Center Terms of Use
+      url: https://www.pewresearch.org/about/terms-and-conditions/
+outs:
+  - md5: 653ccfd96099a9f9d17f78d7663b4afd
+    size: 4753
+    path: trust_us_government.csv

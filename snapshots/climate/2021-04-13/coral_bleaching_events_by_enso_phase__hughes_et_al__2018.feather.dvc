@@ -1,0 +1,20 @@
+meta:
+  source:
+    name: Hughes, T. P., et al. (2018). Spatial and temporal patterns of mass bleaching of corals in the Anthropocene. Science.
+    description: |-
+      Data on the frequency of coral bleaching events comes from the work of Hughes et al. (2018). This measures the number of moderate bleaching events (up to 30% of corals) and severe bleaching events (more than 30% corals) measured at 100 fixed global locations.
+
+      Our World in Data have categorized these events by year based on the stage in the El Nino Southern Oscillation (ENSO) cycle. This is based on the Oceanic Nino Index (ONI) from this source: https://ggweather.com/enso/oni.htm
+
+      The ENSO or ONI categorizes years based on whether they are part of the El Nino (warm phase), La Nina (cool phase) or moderate (neither) stage of the cycle.
+    url: https://science.sciencemag.org/content/359/6371/80
+    date_accessed: 2021-04-13
+    published_by: |-
+      Hughes, T. P., Anderson, K. D., Connolly, S. R., Heron, S. F., Kerry, J. T., Lough, J. M., ... & Wilson, S. K. (2018). Spatial and temporal patterns of mass bleaching of corals in the Anthropocene. Science, 359(6371), 80-83.
+  name: Coral bleaching events by ENSO phase (Hughes et al. 2018)
+  description: ''
+  is_public: false
+outs:
+  - md5: d3afabd819f1ac7222fb479a80350d29
+    size: 4962
+    path: coral_bleaching_events_by_enso_phase__hughes_et_al__2018.feather

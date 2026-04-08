@@ -7,6 +7,7 @@ import concurrent.futures
 import datetime as dt
 import json
 import urllib.error
+import urllib.parse
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
@@ -87,16 +88,20 @@ def load_data_from_csv(uploaded_file):
     # sep=None autodetects separators
     csv_df = pd.read_csv(uploaded_file, sep=None)  # type: ignore
 
-    # Parse dataframe
-    st.write("Parsing data...")
-    data = parse_data_from_csv(csv_df)
+    try:
+        # Parse dataframe
+        st.write("Parsing data...")
+        data = parse_data_from_csv(csv_df)
 
-    # Obtain dataset and other objects
-    st.write("Parsing metadata...")
-    dataset_meta, variables_meta_dict, origin = parse_metadata_from_csv(
-        uploaded_file.name,
-        csv_df.columns,
-    )
+        # Obtain dataset and other objects
+        st.write("Parsing metadata...")
+        dataset_meta, variables_meta_dict, origin = parse_metadata_from_csv(
+            uploaded_file.name,
+            csv_df.columns,
+        )
+    except ValidationError as e:
+        st.exception(e)
+        st.stop()
 
     # Success message
     st.success("Data imported from CSV")
@@ -419,6 +424,14 @@ def _get_data_url(dataset_meta: pd.DataFrame, url: str) -> str:
     data_url = dataset_meta.set_index(0)[1].to_dict().get("external_csv")
 
     if data_url and not pd.isnull(data_url):
+        # Validate the external CSV URL
+        try:
+            parsed = urllib.parse.urlparse(data_url)
+            if not parsed.scheme or not parsed.netloc:
+                raise ValidationError(f"Invalid URL format in cell external_csv: {data_url}")
+        except Exception:
+            raise ValidationError(f"Invalid URL format in cell external_csv: {data_url}")
+
         # files on Google Drive need modified link for downloading raw csv
         if "drive.google.com" in data_url:
             data_url = (

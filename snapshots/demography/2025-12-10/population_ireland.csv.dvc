@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Population in Ireland in the long run"
+    description: |-
+      Population of the Republic of Ireland, combining census data from the Republic of Ireland (1926-) and from the United Kingdom of Great Britain and Ireland (1841-1911), only for the counties of the Republic of Ireland.
+    date_published: "2023"
+
+    # Citation
+    producer: Central Statistics Office, Ireland
+    citation_full: |-
+      Central Statistics Office, Ireland (2023). Census through History.
+
+    # Files
+    url_main: https://www.cso.ie/en/census/censusthroughhistory/
+    date_accessed: '2025-12-10'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.cso.ie/en/aboutus/whoweare/copyrightpolicy/
+outs:
+  - md5: 29b7ade6529b0040ffd4303d58272589
+    size: 911
+    path: population_ireland.csv

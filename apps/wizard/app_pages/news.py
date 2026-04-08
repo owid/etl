@@ -4,12 +4,16 @@ from datetime import datetime
 
 import streamlit as st
 
+from apps.wizard.utils.components import st_title_with_expert
 from apps.wizard.utils.db import DB_IS_SET_UP, WizardDB
 from etl.config import ENV_IS_REMOTE
 
 # Page config
 st.set_page_config(page_title="Wizard: News", page_icon="🪄")
-st.title(":material/newspaper: News")
+st_title_with_expert(
+    title="News",
+    icon="material/newspaper",
+)
 st.markdown("Find news and updates from the [etl project](https://github.com/owid/etl).")
 
 # Only run this on live!
@@ -20,7 +24,7 @@ if (not DB_IS_SET_UP) | (not ENV_IS_REMOTE):
     st.stop()
 
 # GPT
-MODEL_NAME = "gpt-4o"
+MODEL_NAME = "gpt-4.1"
 # Map window types
 WINDOW_TYPES = {
     "7d": "Last 7 days",
@@ -64,7 +68,7 @@ with st.sidebar:
     st.selectbox(
         "News period",
         options=list(WINDOW_TYPES.keys()),
-        format_func=lambda x: WINDOW_TYPES.get(x),
+        format_func=lambda x: WINDOW_TYPES[x],
         key="window_type",
     )
 
@@ -90,7 +94,7 @@ with tab_1:
     # Summary
     st.subheader(f"Summary {window_suffix}")
     # with st.popover("Config"):
-    with st.spinner():
+    with st.spinner(show_time=True):
         result = WizardDB.get_news_summary(window_type=st.session_state.window_type)
         if result:
             summary, dt, cost = result

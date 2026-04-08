@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/385
-    date_accessed: 2023-08-10 08:27:33.461233
+    url: https://admin.owid.io/admin/datasets/385
+    date_accessed: 2026-03-05 09:08:20.203825+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Health Coverage – ILO (2014)
-  description: 'WARNING: Variable "Total health care coverage (ILO and OECD selected
-    years)" is only meaningful in one specific chart'
+  description: 'WARNING: Variable "Total health care coverage (ILO and OECD selected years)" is only meaningful in one specific chart'
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cd8f8893f4dd5913846bf1fa63380004
-  size: 11914
-  path: dataset_385_health_coverage__ilo__2014_values.feather
+  - md5: 4eb27585b0592e3d587ce07f607ca8f0
+    size: 11650
+    path: dataset_385_health_coverage__ilo__2014_values.feather

@@ -10,7 +10,7 @@ STEPS TO CREATE A SNAPSHOT:
     4. Press "Download options" and select "CSV. Download selected data (for database loading)."
     5. Copy the downloaded file to this directory.
     6. Run this script with the path to the downloaded file as an argument.
-        python snapshots/statistics_canada/2024-08-09/gini_coefficients.py --path-to-file <path-to-file>
+        etls statistics_canada/2024-08-09/gini_coefficients --path-to-file <path-to-file>
 
 """
 

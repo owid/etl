@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11-blue.svg)
+![](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue.svg)
 
 # etl
 
@@ -15,6 +15,15 @@ _The compute graph for Our World in Data's data processing._
 ## Documentation
 
 See: https://docs.owid.io/projects/etl/
+
+## Libraries
+
+This repository includes several Python libraries published to PyPI:
+
+| Package | Description | PyPI | Docs |
+| ------- | ----------- | ---- | ---- |
+| [owid-catalog](lib/catalog/) | Core data types for managing OWID data (Dataset, Table, Variable) | [![PyPI](https://img.shields.io/pypi/v/owid-catalog?logo=Python&logoColor=white&color=blue)](https://pypi.org/project/owid-catalog/) | [Docs](https://docs.owid.io/projects/etl/libraries/catalog/) |
+| [owid-repack](lib/repack/) | Pack DataFrames into memory-efficient data types | [![PyPI](https://img.shields.io/pypi/v/owid-repack?logo=Python&logoColor=white&color=blue)](https://pypi.org/project/owid-repack/) | [Docs](https://docs.owid.io/projects/etl/libraries/repack/) |
 
 <hr>
 <p align='center'>

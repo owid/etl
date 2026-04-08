@@ -2,9 +2,9 @@
 This code extracts data from the article "Same-Sex Marriage Around the World" from Pew Research Center, in the format country, year.
 To update:
     1. Run this code:
-        python snapshots/pew/{version}/extract_data.py
+        etls pew/{version}/extract_data
     2. Update snapshot:
-        python snapshots/pew/{version}/same_sex_marriage.py --path-to-file snapshots/pew/{version}/same_sex_marriage.csv
+        etls pew/{version}/same_sex_marriage --path-to-file snapshots/pew/{version}/same_sex_marriage.csv
 """
 
 from pathlib import Path

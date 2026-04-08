@@ -11,6 +11,7 @@ from structlog import get_logger
 
 from apps.utils.files import generate_step_to_channel
 from apps.wizard import utils as wizard_utils
+from apps.wizard.app_pages.fasttrack.fast_import import FasttrackImport
 from apps.wizard.app_pages.fasttrack.load import load_existing_sheets_from_snapshots
 from apps.wizard.app_pages.fasttrack.process import processing_part_1, processing_part_2
 from apps.wizard.app_pages.fasttrack.utils import (
@@ -20,13 +21,17 @@ from apps.wizard.app_pages.fasttrack.utils import (
     UPDATE_GSHEET,
     set_states,
 )
-from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal
+from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal, st_title_with_expert
 from etl import config
 from etl.command import main as etl_main
 from etl.paths import DAG_DIR
 
 # Page config
-st.set_page_config(page_title="Wizard: Import data via Fast-Track", page_icon="🪄")
+st.set_page_config(
+    page_title="Wizard: Import data via Fast-Track",
+    page_icon="🪄",
+    layout="centered",
+)
 
 
 # Reset states
@@ -63,7 +68,10 @@ APP_STATE = wizard_utils.AppState()
 # MAIN ###################################################
 ##########################################################
 # TITLE & description
-st.title(":material/fast_forward: Fast-Track import")
+st_title_with_expert(
+    "Fast-Track import",
+    icon=":material/fast_forward:",
+)
 st.markdown(
     """
             Fast-track is a tool for importing datasets from Google Sheets. The idea is to keep all data and metadata there, and use this interface to import or update the data in grapher database where it can be used to create charts. Fast-track also commits your work to [ETL repository](https://github.com/owid/etl) where you can further process your data with Python.
@@ -126,7 +134,7 @@ with st_horizontal(vertical_alignment="flex-end", justify_content="space-between
     - **Existing Google sheet**: Update from a Google sheet (already imported in the database).
     - **Local CSV**: Import from a local CSV.
     """,
-        default=[IMPORT_GSHEET],
+        default=IMPORT_GSHEET,
     )
 
     # Show brief guidelines for each import method
@@ -142,7 +150,8 @@ with st_horizontal(vertical_alignment="flex-end", justify_content="space-between
 if import_method is None:
     st.warning("Select an import method to proceed.")
 else:
-    with st.form("fasttrack-form"):
+    # with st.form("fasttrack-form"):
+    with st.container(border=True):
         existing_google_sheet = None
         placeholder_for_existing_google_sheet = None
         placeholder_for_private = None
@@ -176,10 +185,10 @@ else:
 
         placeholder_for_private = st.empty()
 
-        submitted = st.form_submit_button(
+        submitted = st.button(
             "Submit",
             type="primary",
-            use_container_width=True,
+            width="stretch",
             on_click=lambda: set_states(
                 {
                     "to_be_submitted": True,
@@ -287,7 +296,7 @@ else:
                 proceed_1 = st.form_submit_button(
                     "Proceed",
                     type="primary",
-                    use_container_width=True,
+                    width="stretch",
                     on_click=lambda: set_states(
                         {
                             "to_be_submitted_confirmed_1": True,
@@ -323,7 +332,7 @@ else:
     if st.session_state.to_be_submitted_confirmed_2:
         if st.session_state.fast_import:
             with st.status("Uploading to Grapher...", expanded=True):
-                fast_import = st.session_state.fast_import
+                fast_import: FasttrackImport = st.session_state.fast_import
                 # add dataset to dag
                 st.write("Adding dataset to the DAG...")
                 dag_content = fast_import.add_to_dag()
@@ -335,7 +344,11 @@ else:
 
                 # Uploading snapshot
                 st.write("Uploading snapshot...")
-                snapshot_path = fast_import.upload_snapshot()
+                try:
+                    snapshot_path = fast_import.upload_snapshot()
+                except:
+                    fast_import.rollback()
+                    raise
                 st.success("Upload successful!")
 
                 # Running ETL and upserting to GrapherDB...
@@ -343,7 +356,7 @@ else:
                 step = f"{fast_import.dataset.metadata.uri}"
                 etl_main(
                     dag_path=DAG_FASTTRACK_PATH,
-                    steps=[step],
+                    includes=[step],
                     grapher=True,
                     private=not fast_import.dataset.metadata.is_public,
                     workers=1,

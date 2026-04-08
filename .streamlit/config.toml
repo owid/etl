@@ -1,5 +1,12 @@
+[server]
+enableStaticServing = true
+
+
 [theme]
 base="light"
 primaryColor="#002147"
 textColor="#333333"
 secondaryBackgroundColor="#f0f4fa"
+
+
+baseRadius = "medium"

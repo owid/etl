@@ -23,13 +23,13 @@ meta:
     attribution_short: UN WPP
 
     # Files
-    url_main: https://population.un.org/wpp/Download/
+    url_main: https://population.un.org/wpp/downloads/
     date_accessed: 2024-12-02
 
     # License
     license:
       name: CC BY 3.0 IGO
-      url: https://population.un.org/wpp/Download/Standard/MostUsed/
+      url: https://population.un.org/wpp/downloads/
 outs:
   - md5: bc8637e9e160cc99e496e245f1d4bff6
     size: 199164889

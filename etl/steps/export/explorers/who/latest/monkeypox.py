@@ -14,11 +14,12 @@ def run() -> None:
     # Load inputs.
     #
     # Load grapher config from YAML
-    config = paths.load_explorer_config()
+    config = paths.load_collection_config()
 
     # Create explorer
-    explorer = paths.create_explorer(
+    explorer = paths.create_collection(
         config=config,
+        explorer=True,
     )
 
     explorer.save(tolerate_extra_indicators=True)

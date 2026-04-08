@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5349
-    date_accessed: 2023-08-10 08:28:53.802759
+    url: https://admin.owid.io/admin/datasets/5349
+    date_accessed: 2026-03-05 09:51:30.031543+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Excess fertilizers (West et al. 2014)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5b7915b00eecf29fbb0bc90559f3c88a
-  size: 29186
-  path: dataset_5349_excess_fertilizers__west_et_al__2014_values.feather
+  - md5: a0463f79678e1a07747bb6156f269269
+    size: 29218
+    path: dataset_5349_excess_fertilizers__west_et_al__2014_values.feather

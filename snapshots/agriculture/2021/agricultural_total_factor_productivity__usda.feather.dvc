@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: United States Department for Agriculture (USDA) Economic Research Service
+    url: https://www.ers.usda.gov/data-products/international-agricultural-productivity
+    date_accessed: 2026-03-05
+    published_by: United States Department for Agriculture (USDA) Economic Research Service. International Agricultural Productivity.
+  name: Agricultural total factor productivity (USDA)
+  description: ''
+outs:
+  - md5: d02cc85fec853cf646c772ab94d234e3
+    size: 1723330
+    path: agricultural_total_factor_productivity__usda.feather

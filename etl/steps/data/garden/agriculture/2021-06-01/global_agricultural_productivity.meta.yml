@@ -1,0 +1,29 @@
+dataset:
+  title: global_agricultural_productivity
+tables:
+  global_agricultural_productivity:
+    variables:
+      improvements_total_factor_productivity:
+        title: improvements_total_factor_productivity
+        unit: ''
+      inputs_per_acre:
+        title: inputs_per_acre
+        unit: ''
+      irrigation:
+        title: irrigation
+        unit: ''
+      land_expansion:
+        title: land_expansion
+        unit: ''
+      output_growth_rate:
+        title: output_growth_rate
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

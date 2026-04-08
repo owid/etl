@@ -1,0 +1,66 @@
+dataset:
+  title: Economic losses from disasters as a share of GDP (Pielke, 2018)
+tables:
+  economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018:
+    variables:
+      aon_benfield_overall_disaster_losses_in_2017_dollar:
+        title: Aon Benfield overall disaster losses in 2017 $
+        unit: $
+        short_unit: $
+        display:
+          conversionFactor: 1000000000
+          name: Aon Benfield overall disaster losses in 2017 $
+      aon_benfield_weather_disaster_losses_in_2017_dollar:
+        title: Aon Benfield weather disaster losses in 2017 $
+        unit: $
+        short_unit: $
+        display:
+          conversionFactor: 1000000000
+          name: Aon Benfield weather disaster losses in 2017 $
+      disaster_losses_as_pct_of_global_gdp__aon_benfield:
+        title: Disaster losses as % of global GDP (Aon Benfield)
+        unit: '% of global GDP'
+        short_unit: '%'
+        display:
+          name: Disaster losses as % of global GDP (Aon Benfield)
+      disaster_losses_as_pct_of_global_gdp__munich_re:
+        title: Disaster losses as % of global GDP (Munich Re)
+        unit: '% of global GDP'
+        short_unit: '%'
+        display:
+          name: Disaster losses as % of global GDP (Munich Re)
+      munich_re_overall_disaster_losses_in_2017_dollar:
+        title: Munich Re overall disaster losses in 2017 $
+        unit: $
+        short_unit: $
+        display:
+          conversionFactor: 1000000000
+          name: Munich Re overall disaster losses in 2017 $
+      munich_re_weather_disaster_losses_in_2017_dollar:
+        title: Munich Re weather disaster losses in 2017 $
+        unit: $
+        short_unit: $
+        display:
+          conversionFactor: 1000000000
+          name: Munich Re weather disaster losses in 2017 $
+      weather_disaster_losses_as_pct_of_global_gdp__aon_benfield:
+        title: Weather disaster losses as % of global GDP (Aon Benfield)
+        unit: '% of global GDP'
+        short_unit: '%'
+        display:
+          name: Weather disaster losses as % of global GDP (Aon Benfield)
+      weather_disaster_losses_as_pct_of_global_gdp__munich_re:
+        title: Weather disaster losses as % of global GDP (Munich Re)
+        unit: '% of global GDP'
+        short_unit: '%'
+        display:
+          name: Weather disaster losses as % of global GDP (Munich Re)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

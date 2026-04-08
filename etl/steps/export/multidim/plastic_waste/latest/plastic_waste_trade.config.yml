@@ -1,0 +1,40 @@
+title:
+  title: Plastic waste trade
+  title_variant: by metric and rate
+
+default_selection:
+  - China
+  - United States
+  - Germany
+  - Japan
+  - Malaysia
+
+topic_tags:
+  - Plastic Pollution
+
+dimensions:
+  - slug: "metric"
+    name: "Metric"
+    choices:
+      - slug: "exports"
+        name: "Exports"
+        description: "Plastic waste exports"
+      - slug: "imports"
+        name: "Imports"
+        description: "Plastic waste imports"
+      - slug: "net_exports"
+        name: "Net exports"
+        description: "Net plastic waste exports (exports minus imports)"
+  - slug: "rate"
+    name: "Rate"
+    choices:
+      - slug: "total"
+        name: "Total"
+        description: "Total plastic waste trade in tonnes"
+      - slug: "per_capita"
+        name: "Per capita"
+        description: "Plastic waste trade per capita in kilograms"
+
+views:
+  # Views will be filled out programmatically.
+  []

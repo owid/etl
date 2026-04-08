@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Ramey (2009)
+    description: |-
+      Ramey (2009), following M.T. Reid, Economics of Household Production (1934), defines 'Home Production' as "those unpaid activities which are carried on, by and for the members, which activities might be replaced by market goods, or paid services, if circumstances such as income, market conditions, and personal inclinations permit the service being delegated to someone outside the household group".
+      For more details on how these data are constructed see Ramey (2009), pp.3-4, and Appendix A.
+    url: http://econweb.ucsd.edu/~vramey/research/Home_Production_published.pdf
+    date_accessed: 2017-04-14
+    published_by: |-
+      Ramey, Valerie R. Time Spent in Home Production in the Twentieth-Century United States: New Estimates from Old Data. The Journal of Economic History, 2009.
+  name: Home production working hours per week in the US, by demographic group (Ramey (2009)) (split)
+  description: ''
+  is_public: false
+outs:
+  - md5: ce39891550a5fcbf26e4d0bfefbca328
+    size: 5514
+    path: home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split.feather

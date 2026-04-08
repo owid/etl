@@ -7,23 +7,26 @@ The environment variables and settings here are for publishing options, they're
 only important for OWID staff.
 """
 
+import asyncio
+import logging
 import os
 import pwd
 import re
+import sys
 import warnings
 from dataclasses import dataclass, fields
 from os import environ as env
 from pathlib import Path
 from typing import List, Literal, Optional, cast
+from urllib.parse import quote
 
 import git
-import pandas as pd
-import sentry_sdk
+import pandas as pd  # 0.2
 import structlog
-from dotenv import dotenv_values, load_dotenv
-from joblib import Memory
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session
+from dotenv import dotenv_values, load_dotenv  # 0
+from joblib import Memory  # 0.08
+from sqlalchemy.engine import Engine  # 0.07
+from sqlalchemy.orm import Session  # ~ 0.07
 
 from etl.paths import BASE_DIR, CACHE_DIR
 
@@ -74,28 +77,61 @@ def get_container_name(branch_name):
 
 load_env()
 
+# Log level for structlog filtering (applied in enable_structlog_filtering below).
+# By default, only INFO and above are shown. Set DEBUG=1 in .env to see DEBUG messages.
+STRUCTLOG_LOG_LEVEL = logging.DEBUG if env.get("DEBUG") in ("True", "true", "1") else logging.INFO
+
+
+def enable_structlog_filtering() -> None:
+    """Configure structlog log-level filtering.
+
+    Called from the ETL CLI entry point, not at import time, to avoid
+    interfering with other tools (e.g. Streamlit apps) that import etl.config.
+    """
+    kwargs: dict = dict(wrapper_class=structlog.make_filtering_bound_logger(STRUCTLOG_LOG_LEVEL))
+
+    # Allow disabling timestamps via ETL_LOG_TIMESTAMPS=0
+    if env.get("ETL_LOG_TIMESTAMPS", "0") == "0":
+        kwargs["processors"] = [
+            structlog.contextvars.merge_contextvars,
+            structlog.processors.add_log_level,
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.dev.ConsoleRenderer(),
+        ]
+
+    structlog.configure(**kwargs)
+
 
 pd.set_option("future.no_silent_downcasting", True)
-
-# When DEBUG is on
-# - run steps in the same process (speeding up ETL)
-DEBUG = env.get("DEBUG") in ("True", "true", "1")
 
 # Environment, e.g. production, staging, dev
 ENV = env.get("ENV", "dev")
 ENV_IS_REMOTE = ENV in ("production", "staging")
+
+# When DEBUG is on
+# - run steps in the same process (speeding up ETL)
+# If DEBUG is not explicitly set, default to ENV == "dev"
+if "DEBUG" not in env:
+    DEBUG = ENV == "dev"
+else:
+    DEBUG = env.get("DEBUG") in ("True", "true", "1")
 
 # Prefer downloading datasets from catalog instead of building them
 PREFER_DOWNLOAD = env.get("PREFER_DOWNLOAD") in ("True", "true", "1")
 
 # publishing to OWID's public data catalog in R2
 R2_BUCKET = "owid-catalog"
+R2_BUCKET_PRIVATE = "owid-catalog-private"
 R2_SNAPSHOTS_PUBLIC = "owid-snapshots"
 R2_SNAPSHOTS_PRIVATE = "owid-snapshots-private"
 R2_SNAPSHOTS_PUBLIC_READ = "https://snapshots.owid.io"
 
 # publishing to grapher's MySQL db
 GRAPHER_USER_ID = int(env["GRAPHER_USER_ID"]) if "GRAPHER_USER_ID" in env else None
+ADMIN_API_KEY = env.get("ADMIN_API_KEY")
+# Default user ID for ETL operations on staging (instead of Admin user 1)
+ETL_GRAPHER_USER_ID = 74
 DB_NAME = env.get("DB_NAME", "grapher")
 DB_HOST = env.get("DB_HOST", "localhost")
 DB_PORT = int(env.get("DB_PORT", "3306"))
@@ -109,7 +145,10 @@ ENV_GRAPHER_USER_ID = GRAPHER_USER_ID
 DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
 # Special ENV file with access to production DB (read-only), used by chart-diff
-ENV_FILE_PROD = os.environ.get("ENV_FILE_PROD")
+if "ENV_FILE_PROD" in env:
+    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # type: ignore
+else:
+    ENV_FILE_PROD = None
 
 if "DATA_API_ENV" in env:
     DATA_API_ENV = env["DATA_API_ENV"]
@@ -128,15 +167,24 @@ def load_STAGING() -> Optional[str]:
     # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
 
+    # Treat empty string and "0" as disabled
+    if STAGING in (None, "", "0"):
+        return None
+
+    # Check if we're running via etl d run-python-step (suppress warnings)
+    is_run_python_step = len(sys.argv) >= 3 and sys.argv[1:3] == ["d", "run-python-step"]
+
     # ENV_FILE takes precedence over STAGING
     if STAGING and ENV_FILE != BASE_DIR / ".env":
-        log.warning("Both ENV_FILE and STAGING is set, STAGING will be ignored.")
+        if not is_run_python_step:
+            log.warning("Both ENV_FILE and STAGING is set, STAGING will be ignored.")
         return None
     # if STAGING=1, use branch name
     elif STAGING == "1":
         branch_name = git.Repo(BASE_DIR).active_branch.name
         if branch_name == "master":
-            log.warning("You're on master branch, using local env instead of STAGING=master")
+            if not is_run_python_step:
+                log.warning("You're on master branch, using local env instead of STAGING=master")
             return None
         else:
             return branch_name
@@ -148,7 +196,7 @@ STAGING = load_STAGING()
 
 # if STAGING is used, override ENV values
 if STAGING is not None:
-    GRAPHER_USER_ID = 1  # use Admin user when working with staging
+    GRAPHER_USER_ID = ETL_GRAPHER_USER_ID
     DB_USER = "owid"
     DB_NAME = "owid"
     DB_PASS = ""
@@ -162,9 +210,19 @@ if STAGING is not None:
 if DATA_API_ENV == "production":
     BAKED_VARIABLES_PATH = "s3://owid-api/v1/indicators"
     DATA_API_URL = "https://api.ourworldindata.org/v1/indicators"
-else:
+    SEARCH_API_URL = "https://search.owid.io"
+elif STAGING is not None:
     BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{DATA_API_ENV}/v1/indicators"
     DATA_API_URL = f"https://api-staging.owid.io/{DATA_API_ENV}/v1/indicators"
+    SEARCH_API_URL = f"http://{get_container_name(STAGING)}/etl/search"
+else:
+    # Local development
+    BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{DATA_API_ENV}/v1/indicators"
+    DATA_API_URL = f"https://api-staging.owid.io/{DATA_API_ENV}/v1/indicators"
+    SEARCH_API_URL = "http://localhost:8084"
+
+# Override URLs from env variables if set
+SEARCH_API_URL = env.get("SEARCH_API_URL", SEARCH_API_URL)
 
 
 def variable_data_url(variable_id):
@@ -186,21 +244,31 @@ DIRTY_STEPS_WORKERS = int(env.get("DIRTY_STEPS_WORKERS", 5))
 # --workers is higher than 1, this will be divided among them
 GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 
-# only upsert indicators matching this filter, this is useful for fast development
-# of data pages for a single indicator
-GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
+# if a step in ETL fails, keep running the rest of the steps and raise an exception at the end
+# (steps with failing step as dependency won't be run)
+# NOTE: This is potentially useful for nightly builds and for more efficient retries, but if we end up
+#   not using it, it could be as well removed
+CONTINUE_ON_FAILURE = env.get("CONTINUE_ON_FAILURE", "0") in ("True", "true", "1")
+
+# if set, skip the actual garden step and only apply the metadata
+INSTANT = env.get("INSTANT", "0") in ("True", "true", "1")
 
 # if set, always upload grapher data & metadata JSON files even if checksums match
 FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
 
-# if set, don't delete indicators from MySQL, only append / update new ones
-# you can use this to only process subset of indicators in your step to
-# speed up development. It's up to you how you define filtering logic in your step
+# if set, export steps will not upload/commit files (e.g. S3, GitHub)
+DRY_RUN = env.get("DRY_RUN", "0") in ("True", "true", "1")
+
+# Filter to speed up development - works as regex for both data processing and grapher upload
+# - In data steps: filters data rows by matching against relevant columns (e.g. causes, indicators)
+#                  this has to be implemented manually
+# - In grapher steps: filters which variables get upserted to MySQL
 SUBSET = env.get("SUBSET", None)
 
 # forbid any individual step from consuming more than this much memory
 # (only enforced on Linux)
-MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
+# 2025-08-01: Increased to 64 GB from 32 GB, it was not enough for garden/agriculture/2025-03-26/daily_calories_per_person
+MAX_VIRTUAL_MEMORY_LINUX = 64 * 2**30  # 64 GB
 
 # increment this to force a full rebuild of all datasets
 ETL_EPOCH = 5
@@ -210,16 +278,16 @@ STRICT_AFTER = "2023-06-25"
 
 SLACK_API_TOKEN = env.get("SLACK_API_TOKEN")
 
-# if True, commit and push updates to YAML files coming from admin
-ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
-
 # if True, commit and push updates from fasttrack
 FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 
 # if True, commit to monkeypox repository from export step
 MONKEYPOX_COMMIT = env.get("MONKEYPOX_COMMIT") in ("True", "true", "1")
 
-ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030")
+ADMIN_HOST = env.get(
+    "ADMIN_HOST",
+    f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030",
+)
 
 # Tailscale address of Admin, this cannot be just `http://owid-admin-prod`
 # because that would resolve to LXC container instead of the actual server
@@ -228,6 +296,8 @@ TAILSCALE_ADMIN_HOST = "http://owid-admin-prod.tail6e23.ts.net"
 SENTRY_DSN = env.get("SENTRY_DSN")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
+ANTHROPIC_API_KEY = env.get("ANTHROPIC_API_KEY", None)
+GOOGLE_API_KEY = env.get("GOOGLE_API_KEY", None)
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
 
@@ -241,22 +311,46 @@ OWIDBOT_APP_INSTALLATION_ID = env.get("OWIDBOT_APP_INSTALLATION_ID", None)
 # Load github token (only used for creating PRs from the command line).
 GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 
+# URL of the Github API, to be used to create a draft pull request in the ETL repos.
+GITHUB_API_BASE = "https://api.github.com/repos/owid/etl"
+GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
+
 # IMPORTANT: only use locally, no production use!
 # Skip SSL verify
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.007.json"
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.010.json"
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
-def enable_sentry() -> None:
+def enable_sentry(enable_logs: bool = False, integrations: list | None = None) -> None:
+    import sentry_sdk  # 0.1
+
     if SENTRY_DSN:
-        sentry_sdk.init(
-            dsn=SENTRY_DSN,
-        )
+
+        def before_send(event, hint):
+            # Ignore normal shutdown signals
+            if "exc_info" in hint:
+                exc_type, exc_value, tb = hint["exc_info"]
+                if exc_type in (KeyboardInterrupt, asyncio.CancelledError):
+                    return None
+            return event
+
+        kwargs: dict = {"dsn": SENTRY_DSN, "before_send": before_send}
+
+        if enable_logs:
+            kwargs["_experiments"] = {"enable_logs": True}
+
+        if integrations:
+            kwargs["integrations"] = integrations
+
+        sentry_sdk.init(**kwargs)
+
+
+DOCS_BUILD = "DOCS_BUILD" not in os.environ
 
 
 # Wizard config
@@ -353,7 +447,7 @@ class OWIDEnv:
     @classmethod
     def from_local(cls):
         conf = Config(
-            GRAPHER_USER_ID=1,
+            GRAPHER_USER_ID=ETL_GRAPHER_USER_ID,
             DB_USER="owid",
             DB_NAME="owid",
             DB_PASS="",
@@ -366,7 +460,7 @@ class OWIDEnv:
     def from_staging(cls, branch: str):
         """Create OWIDEnv for staging."""
         conf = Config(
-            GRAPHER_USER_ID=1,
+            GRAPHER_USER_ID=ETL_GRAPHER_USER_ID,
             DB_USER="owid",
             DB_NAME="owid",
             DB_PASS="",
@@ -487,6 +581,17 @@ class OWIDEnv:
         return self.data_api_url + "/v1/indicators"
 
     @property
+    def catalog_url(self) -> str:
+        """Get catalog url."""
+        if self.env_remote == "production":
+            return "https://catalog.ourworldindata.org"
+        elif self.env_remote == "staging":
+            return f"http://{self.conf.DB_HOST}:8881"
+        else:
+            # For local dev, use production catalog
+            return "https://catalog.ourworldindata.org"
+
+    @property
     def wizard_url(self) -> str:
         """Get wizard url."""
         if self.env_local == "dev":
@@ -533,6 +638,10 @@ class OWIDEnv:
     def data_page_preview(self, variable_id: str | int) -> str:
         """Get indicator admin url."""
         return f"{self.admin_site}/datapage-preview/{variable_id}/"
+
+    def collection_preview(self, catalog_path: str):
+        encoded_path = quote(catalog_path, safe="")
+        return f"{self.admin_site}/grapher/{encoded_path}/"
 
     def thumb_url(self, slug: str):
         """
@@ -600,6 +709,39 @@ def no_trailing_slash(url: str | None) -> None:
         raise ValueError(f"Env {url} should not have a trailing slash.")
 
 
-env_vars = [ADMIN_HOST, TAILSCALE_ADMIN_HOST, DATA_API_URL, BAKED_VARIABLES_PATH, R2_SNAPSHOTS_PUBLIC_READ]
+env_vars = [
+    ADMIN_HOST,
+    TAILSCALE_ADMIN_HOST,
+    DATA_API_URL,
+    BAKED_VARIABLES_PATH,
+    R2_SNAPSHOTS_PUBLIC_READ,
+]
 for env_var in env_vars:
     no_trailing_slash(env_var)
+
+
+# Get Metabase credentials and parameters (for more information, visit the analytics repos).
+METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
+METABASE_API_KEY_ADMIN = os.environ.get("METABASE_API_KEY_ADMIN")
+METABASE_URL = os.environ.get("METABASE_URL")
+METABASE_SEMANTIC_LAYER_DATABASE_ID = 2
+METABASE_URL_LOCAL = os.environ.get("METABASE_URL", "http://localhost:3000")
+METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
+
+########################################################################################################################
+# While users don't have Metadata credentials, default to Datassette.
+FORCE_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
+########################################################################################################################
+# Get Notion credentials.
+NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
+NOTION_IMPACT_HIGHLIGHTS_TABLE_URL = os.environ.get("NOTION_IMPACT_HIGHLIGHTS_TABLE_URL")
+NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL")
+
+# Google drive IDs for folders, docs and sheets, for the data producer reports project.
+# NOTE: Here we fill all variables with "" if not found to simplify type checks (this way we ensure they are strings).
+DATA_PRODUCER_REPORT_FOLDER_ID = os.environ.get("DATA_PRODUCER_REPORT_FOLDER_ID", "")
+DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get("DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", "")
+DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STATUS_SHEET_ID", "")
+
+# MCP server
+OWID_MCP_SERVER_URL = env.get("OWID_MCP_SERVER_URL", "https://mcp.owid.io/mcp")

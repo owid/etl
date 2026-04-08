@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: Skaaning et al.
+    title: Lexical Index of Electoral Democracy (LIED)
+    description: |-
+      LIED is the most comprehensive dataset on democracy in terms of country-years. It covers all independent countries and most semi-sovereign polities and overseas colonies, protectorates, etc. within the 1789 to 2020 timespan. Scores have also been assigned to the units in the case of short- term foreign occupation. Scores for each indicator reflect the status of a country on the last day of the calendar year (31 December) and are not intended to reflect the mean value of an indicator across the previous 364 days. Coding decisions are based on country-specific sources. All original coding has been done by Svend-Erik Skaaning (skaaning@ps.au.dk).
+
+      The dataset consists of 14 original indicators and original two indices. The LIED dataset offers indicators on whether legislative elections are on track (legislative_elections), whether (direct or indirect) executive elections are on track (executive_elections), whether multiple parties are able to run for legislative elections (multi-party_legislative_elections), whether there is universal male suffrage (male_suffrage), and whether there is universal female suffrage (female_suffrage),1 whether elections are genuinely contested (competitive_elections), whether political liberties in the form of freedom of expression, assembly, and association, are respected (political_liberties), whether countries experienced democratic transition in a given year (democratic_transition), the mode of democratic transition (transition_type), whether countries experienced democratic breakdown in a given year (democratic_breakdown), the mode of democratic breakdown (breakdown_type), whether elections led to a government turnover (turnover_event), and whether a period of competitive elections has been characterized by at least one government turnover (turnover_period). Finally, the data are used to construct two indices, i.e., the Lexical Index of Electoral Democracy (lexical_index) and an extended version called Lexical Index of Electoral Democracy+ (lexical_index_plus).
+    citation_full: |-
+      Skaaning, Svend-Erik, 2021, "Lexical Index of Electoral Democracy (LIED) dataset v6.0", https://doi.org/10.7910/DVN/WPKNIT, Harvard Dataverse, V5
+    version_producer: v6.8
+    url_main: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/WPKNIT
+    date_accessed: '2025-06-26'
+    date_published: '2025-06-26'
+    license:
+      name: CC0
+      url: https://creativecommons.org/publicdomain/zero/1.0/
+outs:
+  - md5: 05227c415207024d1ec532f62717ad2d
+    size: 2442745
+    path: lexical_index.xlsx

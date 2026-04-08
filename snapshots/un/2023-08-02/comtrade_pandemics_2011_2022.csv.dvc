@@ -27,7 +27,7 @@ meta:
     # License
     license:
       name: UN Comtrade Copyright
-      url: hhttps://comtrade.un.org/licenseagreement.html
+      url: https://comtrade.un.org/licenseagreement.html
 
 wdir: ../../../data/snapshots/un/2023-08-02
 outs:

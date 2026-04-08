@@ -4,12 +4,13 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
-
+      attribution: "Public Health Reports (1921-1925); Centers for Disease Control and Prevention (1959-2024); Project Tycho (2018)"
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
   title: Reported measles cases in the United States - State Level
+
 tables:
   measles:
     variables:

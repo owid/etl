@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: AI Index Report
+    description: |-
+      The AI Index Report tracks, collates, distills, and visualizes data related to artificial intelligence (AI). The mission is to provide unbiased, rigorously vetted, broadly sourced data to enable policymakers, researchers, executives, journalists, and the general public to develop a more thorough and nuanced understanding of the complex field of AI.
+    date_published: "2025"
+    title_snapshot: AI Index Report - AI Job Postings by Geographic Area
+    description_snapshot: |-
+      Data from Lightcast via the AI Index Report on the share of AI job postings by geographic area. Lightcast has analyzed hundreds of millions of job postings from over 51,000 websites since 2010, identifying those that require AI skills.
+
+    # Citation
+    producer: Lightcast via AI Index Report
+    citation_full: |-
+      Nestor Maslej, Loredana Fattorini, Raymond Perrault, Yolanda Gil, Vanessa Parli, Njenga Kariuki, Emily Capstick, Anka Reuel, Erik
+      Brynjolfsson, John Etchemendy, Katrina Ligett, Terah Lyons, James Manyika, Juan Carlos Niebles, Yoav Shoham, Russell Wald,
+      Tobi Walsh, Armin Hamrah, Lapo Santarlasci, Julia Betts Lotufo, Alexandra Rome, Andrew Shi, Sukrut Oak. “The AI Index 2025
+      Annual Report,” AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2025
+    attribution_short: AI Index Report
+
+    # Files
+    url_main: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
+    date_accessed: 2025-04-08
+
+    # License
+    license:
+      name: CC BY-ND 4.0
+      url: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
+outs:
+  - md5: 5291d21331c369e5828e6a4bc01dcdcf
+    size: 4372
+    path: ai_jobs.csv

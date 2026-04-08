@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/663
-    date_accessed: 2023-08-10 09:11:12.548712
+    url: https://admin.owid.io/admin/datasets/663
+    date_accessed: 2026-03-05 12:25:07.704390+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Long-term energy transitions - Energy History, Harvard (2016)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7022826268d6fa5034ddaf54078572f5
-  size: 49234
-  path: 
-    dataset_663_long_term_energy_transitions__energy_history__harvard__2016_values.feather
+  - md5: ef5e1a146d5dac8f9a46e0c3c0ce9489
+    size: 61722
+    path: dataset_663_long_term_energy_transitions__energy_history__harvard__2016_values.feather

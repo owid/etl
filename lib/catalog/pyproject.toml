@@ -1,40 +1,65 @@
 [project]
 name = "owid-catalog"
-version = "0.3.11"
+version = "1.0.1"
 description = "Core data types used by OWID for managing data."
-authors = [
-    {name = "Our World in Data", email = "tech@ourworldindata.org"},
-]
+readme = "README.md"
+authors = [{ name = "Our World in Data", email = "tech@ourworldindata.org" }]
 license = "MIT"
-requires-python = ">=3.9, <4.0"
+requires-python = ">=3.10, <3.15"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Typing :: Typed",
+]
 dependencies = [
-    "pandas>=2.2.1",
+    "pandas>=2.2.3,<3",
     "jsonschema>=3.2.0",
     "pyarrow>=10.0.1",
     "ipdb>=0.13.9",
     "requests>=2.26.0",
-    "boto3>=1.21.13",
     "Unidecode>=1.3.4",
     "PyYAML>=6.0.1",
     "structlog>=21.5.0",
     "dynamic-yaml>=1.3.5",
     "mistune>=3.0.1",
     "dataclasses-json>=0.6.7",
-    "rdata==0.9",
+    "pyreadr>=0.5.0",
     "owid-datautils",
     "owid-repack",
     "jinja2>=3.1.6",
+    "typing-extensions>=4.7.1",
+    "rdata>=0.11.2",
+    "pydantic>=2.0.0",
+    "Deprecated>=1.2.14",
+    "rapidfuzz>=3.14.3",
+    "tqdm>=4.66.0",
+    "platformdirs>=4.0.0",
+    "marshmallow>=3.26.2",
+    "brotli>=1.2.0",
+    "urllib3>=2.6.3",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=6.2.5",
     "pytest-cov>=2.12.1",
     "watchdog>=2.1.5",
     "argh>=0.26.2",
-    "pyright==1.1.373",
+    "ty==0.0.8",
     "pandas-stubs==1.2.0.62",
-    "ruff==0.8.2"
+    "ruff==0.8.6",
+    "ipykernel>=6.29.0",
 ]
 
 [tool.uv.sources]
@@ -44,9 +69,12 @@ owid-repack = { path = "../repack", editable = true }
 [tool.ruff]
 extend = "../../pyproject.toml"
 
-[tool.pyright]
-reportIncompatibleMethodOverride = "none"
-reportOverlappingOverload = "none"
+[tool.ty.rules]
+invalid-method-override = "ignore"
+parameter-already-assigned = "ignore"
+redundant-cast = "ignore"
+possibly-missing-attribute = "ignore"
+no-matching-overload = "ignore"
 
 [build-system]
 requires = ["hatchling"]
@@ -54,3 +82,10 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["owid"]
+
+[project.urls]
+Homepage = "https://ourworldindata.org"
+Documentation = "https://docs.owid.io/projects/etl/libraries/catalog/"
+Repository = "https://github.com/owid/etl"
+Issues = "https://github.com/owid/etl/issues"
+Changelog = "https://github.com/owid/etl/releases"

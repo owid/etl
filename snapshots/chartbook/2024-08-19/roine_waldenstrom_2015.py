@@ -3,7 +3,7 @@ Script to create a snapshot of dataset.
 
 The file is an extraction of table 7.A2 in chapter 7, available here: https://drive.google.com/file/d/1vuJ3gaEIyA-EQsoh-cAOZnWvWE3s-N19/view.
 After creating the file, run
-    python snapshots/chartbook/2024-08-19/roine_waldenstrom_2015.py --path-to-file <path-to-file>
+    etls chartbook/2024-08-19/roine_waldenstrom_2015 --path-to-file <path-to-file>
 """
 
 from pathlib import Path

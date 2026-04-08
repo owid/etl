@@ -1,0 +1,17 @@
+dataset:
+  title: DRAFT cleaned_traced_news_sentiment
+  description: ''
+tables:
+  cleaned_traced_news_sentiment:
+    variables:
+      news_sentiment:
+        title: news_sentiment
+        unit: ''
+      news_sentiment_mov_avg:
+        title: news_sentiment_mov_avg
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

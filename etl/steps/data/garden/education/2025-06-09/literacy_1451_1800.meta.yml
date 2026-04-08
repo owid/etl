@@ -1,0 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Global Education
+    display:
+      numDecimalPlaces: 1
+    short_unit: "%"
+    unit: "%"
+    description_key:
+      - Measuring literacy rates from centuries ago presents a challenge since governments didn't keep detailed records. Researchers developed an approach using book sales data to estimate how many people could read.
+      - The method relies on a straightforward principle. If we know book prices and purchase volumes, we can work backwards to determine how many literate people were needed to create that demand. People rarely buy books they cannot read.
+      - The approach combines two data sources. Historians Jan Luiten van Zanden and Gregory Clark tracked book prices across Europe over several centuries. Meanwhile, economic research shows that book sales respond predictably to price changes, with sales typically falling 1.4% for every 1% price increase.
+      - These data sources allow researchers to estimate literacy rates. When book sales remained strong despite rising prices, this suggests a sufficient population of literate people willing to pay for books.
+      - The method has important limitations. It only captures books sold in commercial markets, missing borrowed or freely distributed texts. It assumes people's book-buying habits remained constant over time, which likely wasn't accurate. In societies where literacy spread through schools, libraries, or religious institutions rather than book purchases, this approach would underestimate reading ability.
+      - The method provides one approach for measuring literacy in periods before systematic record-keeping began.
+    description_processing: The source gives year spans, so we use the middle year of each span (e.g. “1451–1500” → 1475).
+dataset:
+  update_period_days: 365
+
+tables:
+  literacy_1451_1800:
+    variables:
+      literacy_rate:
+        title: Literacy rate (1451-1800)

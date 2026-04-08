@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: US PPI New Office Construction
+    description: |-
+      BLS uses a method in which office building models are developed and specified to represent the offices being constructed in the marketplace. Multiple office models were developed to accommodate variations in building design. The building models are described as a series of unique production elements or "assemblies" in BLS terminology. Each building assembly represents a building construction activity that can be fully defined as a unique portion of the total project. Each assembly is made up of unit-price components that define the specific type and quantity of materials, labor, and equipment necessary for the assembly’s installation.
+
+      A professional cost-estimating firm developed the building models under BLS direction. To achieve an output price, BLS combines the detailed material and installation (labor and related equipment) cost data, which are updated quarterly by the cost-estimating firm, with margin (overhead and profit) data collected monthly by BLS directly from building construction contractors. BLS aggregates output price changes captured at the assembly level each month to represent the changes in output prices for the total structure. Therefore, the BLS output indexes attempt to measure changes in the input costs for these structures, along with changes in contractor markups.
+    date_published: "2025"
+
+    # Citation
+    producer: U.S. Bureau of Labor Statistics
+    citation_full: |-
+      U.S. Bureau of Labor Statistics
+
+    # Files
+    url_main: https://www.bls.gov/ppi/factsheets/producer-price-index-data-for-nonresidential-building-construction-sector-new-office-building-construction-naics-236223.htm
+    date_accessed: 2025-12-24
+
+    # License
+    license:
+      name: Public domain
+      url: https://www.bls.gov/opub/copyright-information.htm
+
+outs:
+  - md5: 4e5727ca6ef921ad78061cb0695306df
+    size: 9196
+    path: us_ppi_construction.csv

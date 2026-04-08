@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5325
-    date_accessed: 2023-08-10 09:09:53.145872
+    url: https://admin.owid.io/admin/datasets/5325
+    date_accessed: 2026-03-05 12:33:01.592333+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5325_average_farm_size__lowder_et_al__2016
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: feee86f6f876941c2327bbb3a29a7bab
-  size: 3533
-  path: dataset_5325_average_farm_size__lowder_et_al__2016_config.json
+  - md5: 5452238149db379d0aee91a90ad80810
+    size: 3756
+    path: dataset_5325_average_farm_size__lowder_et_al__2016_config.json

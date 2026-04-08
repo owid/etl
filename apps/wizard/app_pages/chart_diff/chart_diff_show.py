@@ -12,37 +12,45 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 import pandas as pd
 import streamlit as st
 from sqlalchemy.orm import Session
+from structlog import get_logger
 
 import etl.grapher.model as gm
 from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
 )
-from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
+from apps.chart_sync.admin_api import AdminAPI
+from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
+from apps.wizard.app_pages.chart_diff.citations import st_show_citations
 from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
-from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
+from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS, SOURCE, TARGET, prettify_date
 from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
 from etl.grapher.io import variable_metadata_df_from_s3
+
+log = get_logger()
+
+# GPT model default
+MODEL_DEFAULT = "gpt-5"
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {
     gm.ChartStatus.APPROVED.value: {
         "label": "Approve",
         "color": "green",
-        "material_icon": ":material/done_outline:",
+        "material_icon": ":material/thumb_up:",
         "icon": "✅",
     },
     gm.ChartStatus.PENDING.value: {
         "label": "Pending",
         "color": "gray",
-        "material_icon": ":material/schedule:",
+        "material_icon": "",
         "icon": "⏳",
     },
     gm.ChartStatus.REJECTED.value: {
         "label": "Reject",
         "color": "red",
-        "material_icon": ":material/delete:",
+        "material_icon": ":material/thumb_down:",
         "icon": "❌",
     },
 }
@@ -104,17 +112,17 @@ class ChartDiffShow:
         label = f"{self.diff.slug}  "
         tags = []
         if self.diff.is_new:
-            tags.append(" :blue-background[:material/grade: **NEW**]")
+            tags.append(" :green-badge[:material/grade: **NEW**]")
         if self.diff.is_draft:
-            tags.append(" :gray-background[:material/draft: **DRAFT**]")
+            tags.append(" :gray-badge[:material/draft: **DRAFT**]")
         if self.diff.error:
-            tags.append(" :red-background[:material/error: **ERROR**]")
+            tags.append(" :red-badge[:material/error: **ERROR**]")
         for change in self.diff.change_types:
-            tags.append(f":red-background[:material/refresh: **{change.upper()} CHANGE**]")
+            tags.append(f":blue-badge[:material/commit: **{change.upper()} CHANGE**]")
 
         # Add TAG if modified and no change_types is provided
         if (self.diff.is_modified) and (tags == []):
-            label += ":rainbow-background[**UNKNOWN -- REPORT THIS**]"
+            label += ":rainbow-badge[**UNKNOWN -- REPORT THIS**]"
         else:
             label += f"{' '.join(tags)}"
         return label
@@ -135,35 +143,22 @@ class ChartDiffShow:
         """Change state of the ChartDiff based on session state."""
         if session is None:
             session = self.source_session
-        with st.spinner():
-            status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
-            self.diff.set_status(session=session, status=status)
-
-            # Notify user
-            match status:
-                case gm.ChartStatus.APPROVED.value:
-                    st.toast(f":green[Chart {self.diff.chart_id} has been **approved**]", icon="✅")
-                case gm.ChartStatus.REJECTED.value:
-                    st.toast(f":red[Chart {self.diff.chart_id} has been **rejected**]", icon="❌")
-                case gm.ChartStatus.PENDING.value:
-                    st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
+        status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
+        self.diff.set_status(session=session, status=status)
         self.diff._clean_cache()
+        # Store toast message in session state to display after fragment reruns
+        # (displaying elements in fragment callbacks causes duplication bugs)
+        st.session_state[f"toast-{self.diff.chart_id}"] = status
 
     def _push_status_binary(self, session: Optional[Session] = None) -> None:
         """Change state of the ChartDiff based on session state."""
         if session is None:
             session = self.source_session
-        with st.spinner():
-            status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
-            self.diff.set_status(session=session, status=status)
-
-            # Notify user
-            match status:
-                case gm.ChartStatus.APPROVED.value:
-                    st.toast(f":green[Chart {self.diff.chart_id} has been **reviewed**]", icon="✅")
-                case gm.ChartStatus.PENDING.value:
-                    st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
+        status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
+        self.diff.set_status(session=session, status=status)
         self.diff._clean_cache()
+        # Store toast message in session state to display after fragment reruns
+        st.session_state[f"toast-{self.diff.chart_id}"] = status
 
     def _refresh_chart_diff(self):
         """Get latest chart version from database."""
@@ -259,9 +254,9 @@ class ChartDiffShow:
                 "No conflicts found actually. Unsure why you were prompted with the conflict resolver. Please report."
             )
 
-    def _show_chart_diff_controls(self):
+    def _show_chart_diff_header(self):
         # Three columns: status, refresh, link
-        col1, col2, col3 = st.columns([2, 1, 3], vertical_alignment="bottom")
+        col1, col2, col3 = st.columns([2, 3, 1], vertical_alignment="bottom")
 
         # Status of chart diff: approve, pending, reject
         with col1:
@@ -307,31 +302,51 @@ class ChartDiffShow:
                     # label_visibility="collapsed",
                 )
 
-        # Refresh chart
+        if len(self.diff.article_refs) > 0:
+            articles_md = "| Article Title | Daily Views |\n" "| --- | --- |\n" + "\n".join(
+                [f"| [{art.title}]({art.url}) | {art.views_daily_pretty} |" for art in self.diff.article_refs]
+            )
+            articles_md = f"\n\n{articles_md}"
+        else:
+            articles_md = ""
+
+        # Scores (analytics, anomalies, etc.)
+        help_txt = (
+            f":violet-badge[:material/auto_awesome: **Relevance**]: An attempt to measure the relative-importance of a specific chart diff. The more 'relevant' it is, the more time should be allocated to carefully review the chart changes. It is estimated by factoring in chart views, article views and anomaly scores. Draft charts have 0% relevance.\n\n"
+            f":primary-badge[:material/remove_red_eye:] **Average number of daily chart views** in the last {ANALYTICS_NUM_DAYS} days.\n\n"
+            f":primary-badge[:material/article:] **Number of articles** that use this chart.{articles_md}\n\n"
+            ":primary-badge[:material/scatter_plot:] **Anomaly score of the chart**, as estimated by Anomalist. It is based on noticeable anomalies due to updating indicators in the chart. A score of 0% means that the chart doesn't have noticeable outliers (relative to the previous indicators), while a score closer to 100% means that there is an indicator with a substantial outlier.\n\n"
+        )
         with col2:
+            st.markdown(
+                self.diff.scores.to_md(),
+                help=help_txt,
+            )
+            # with st.popover(
+            #     self.diff.scores.to_md(),
+            # ):
+            #     st.markdown(help_txt)
+
+            # scores = {}
+            # if self.diff.scores.chart_views is not None:
+            #     scores["chart_views"] = self.diff.scores.chart_views
+            # if self.diff.scores.anomaly is not None:
+            #     scores["anomaly"] = round(self.diff.scores.anomaly, 2)
+            # text = ""
+            # for score_name, score in scores.items():
+            #     text += f"**{score_name}**: {score}\n"
+            # st.markdown(text)
+
+        # Refresh chart
+        with col3:
             st.button(
-                label=":material/refresh: Refresh charts",
+                label="Refresh charts",
+                icon=":material/refresh:",
                 key=f"refresh-btn-{self.diff.chart_id}",
                 help="Get the latest version of the chart from the staging server.",
                 on_click=self._refresh_chart_diff,
                 type="secondary",
             )
-
-        with col3:
-            # Copy link
-            if self.show_link:
-                # with col3:
-                query_params = f"chart_id={self.diff.chart_id}"
-                # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
-                if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
-                    url = f"{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}"
-                    st.caption(
-                        body=url,
-                        help=f"Shown is the link to the remote chart-diff.\n\n Alternatively, local link: {OWID_ENV.wizard_url}?{query_params}",
-                    )
-                else:
-                    url = f"{OWID_ENV.wizard_url}/chart-diff?{query_params}"
-                    st.caption(body=url)
 
     def _show_metadata_diff(self) -> None:
         """Show metadata diff (if applicable).
@@ -345,6 +360,14 @@ class ChartDiffShow:
             f"btn-meta-diff-{self.diff.chart_id}",
         ):
             self._show_metadata_diff_modal()
+
+    def _show_tags_if_changed(self, chart, session):
+        """Show tags as gray badges if there are tag changes."""
+        if "tags" in self.diff.change_types and chart:
+            tags = chart.tags(session)
+            if tags:
+                badges = " ".join([f":gray-badge[{tag['name']}]" for tag in tags])
+                st.markdown(badges)
 
     @st.dialog("Metadata differences", width="large")  # type: ignore
     def _show_metadata_diff_modal(self) -> None:
@@ -379,7 +402,7 @@ class ChartDiffShow:
                 target = filter_out_fields_in_metadata_for_checksum(target)
 
                 # Get meta json diff
-                meta_diff = compare_dictionaries(source, target)  # type: ignore
+                meta_diff = compare_dictionaries(source, target, fromfile="source", tofile="target")
                 if meta_diff:
                     meta_diffs[indicator_id] = meta_diff
 
@@ -415,17 +438,16 @@ class ChartDiffShow:
                     },
                 ]
                 stream = api.chat.completions.create(
-                    model="gpt-4o",
+                    model=MODEL_DEFAULT,
                     messages=messages,  # type: ignore
-                    temperature=0.15,
-                    max_tokens=1000,
+                    max_completion_tokens=1000,
                     stream=True,
                 )
                 response = cast(str, st.write_stream(stream))
 
             # Print cost information
             text_in = "\n".join([m["content"] for m in messages])
-            cost, num_tokens = get_cost_and_tokens(text_in, response, "gpt-4o")
+            cost, num_tokens = get_cost_and_tokens(text_in, response, MODEL_DEFAULT)
             cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
             st.info(cost_msg)
 
@@ -448,6 +470,7 @@ class ChartDiffShow:
                     )
 
                 if option == "prod":
+                    self._show_tags_if_changed(self.diff.target_chart, self.target_session)
                     assert self.diff.target_chart is not None
                     grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
                 elif option == "last":
@@ -458,6 +481,9 @@ class ChartDiffShow:
                     st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
                 else:
                     st.markdown(self._header_production_chart)
+
+                self._show_tags_if_changed(self.diff.target_chart, self.target_session)
+
                 assert self.diff.target_chart is not None
                 grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
 
@@ -470,6 +496,9 @@ class ChartDiffShow:
             else:
                 with st.container(height=40, border=False):
                     st.markdown(self._header_staging_chart)
+
+            self._show_tags_if_changed(self.diff.source_chart, self.source_session)
+
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
         def _show_charts_comparison_v() -> Tuple[Any, bool]:
@@ -555,6 +584,74 @@ class ChartDiffShow:
                 hide_index=True,
             )
 
+    def _show_narrative_charts(self) -> None:
+        """Show narrative charts that use this chart as parent, with side-by-side comparison."""
+        if not self.diff.chart_id:
+            return
+
+        # Load narrative charts for this parent chart
+        narrative_charts = gm.NarrativeChart.load_narrative_charts_by_parent_chart_ids(
+            self.source_session, {self.diff.chart_id}
+        )
+
+        if not narrative_charts:
+            return
+
+        st.markdown("##### 📖 Narrative Charts")
+
+        # Get narrative chart configs from both environments
+        source_api = AdminAPI(SOURCE)
+        target_api = AdminAPI(TARGET)
+
+        for nc in narrative_charts:
+            with st.container(border=True):
+                source_admin_url = f"{SOURCE.admin_site}/narrative-charts/{nc.id}/edit"
+                target_admin_url = f"{TARGET.admin_site}/narrative-charts/{nc.id}/edit"
+
+                # Get full configs from both environments via API
+                try:
+                    source_nc = source_api.get_narrative_chart(nc.id)
+                    source_config = source_nc.get("configFull", {})
+                except Exception as e:
+                    log.warning(f"_show_narrative_charts: source failed nc.id={nc.id}: {e}")
+                    source_config = None
+
+                try:
+                    target_nc = target_api.get_narrative_chart(nc.id)
+                    target_config = target_nc.get("configFull", {})
+                except Exception as e:
+                    log.warning(f"_show_narrative_charts: target failed nc.id={nc.id}: {e}")
+                    target_config = None
+
+                # Show side-by-side comparison
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    st.markdown(f"[Production]({target_admin_url})")
+                    if target_config:
+                        grapher_chart(chart_config=target_config, owid_env=TARGET)
+                    else:
+                        st.info("Not available in production")
+
+                with col2:
+                    st.markdown(f"[Staging]({source_admin_url})")
+                    if source_config:
+                        grapher_chart(chart_config=source_config, owid_env=SOURCE)
+                    else:
+                        st.info("Not available in staging")
+
+    def _show_citations(self) -> None:
+        """Show articles that cite this chart with scroll-to-text fragment URLs."""
+        if not st.session_state.get("show-article-citations", True):
+            return
+        st_show_citations(
+            self.diff.slug,
+            self.source_session,
+            self.target_session,
+            SOURCE,
+            TARGET,
+        )
+
     def _show(self) -> None:
         """Show chart diff.
 
@@ -575,8 +672,8 @@ class ChartDiffShow:
         else:
             st.empty()
 
-        # Show controls: status approval, refresh, link
-        self._show_chart_diff_controls()
+        # Show header: approval/reject controls, refresh btn, scores
+        self._show_chart_diff_header()
 
         if "metadata" in self.diff.change_types:
             self._show_metadata_diff()
@@ -611,9 +708,46 @@ class ChartDiffShow:
             with tab2:
                 self._show_approval_history(self.diff.df_approvals)
 
+        # SHOW NARRATIVE CHARTS
+        self._show_narrative_charts()
+
+        # SHOW ARTICLE CITATIONS
+        self._show_citations()
+
+        # Copy link
+        if self.show_link:
+            # with col3:
+            query_params = f"chart_id={self.diff.chart_id}&show_reviewed="
+            # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
+            if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
+                url = f"{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}"
+                st.caption(
+                    body=url,
+                    help=f"Shown is the link to the remote chart-diff.\n\n Alternatively, local link: {OWID_ENV.wizard_url}?{query_params}",
+                )
+            else:
+                url = f"{OWID_ENV.wizard_url}/chart-diff?{query_params}"
+                st.caption(body=url)
+
+    def _show_deferred_toast(self) -> None:
+        """Show toast message if one was queued by a status change callback."""
+        toast_key = f"toast-{self.diff.chart_id}"
+        if toast_key in st.session_state:
+            status = st.session_state.pop(toast_key)
+            match status:
+                case gm.ChartStatus.APPROVED.value:
+                    st.toast(f":green[Chart {self.diff.chart_id} has been **approved**]", icon="✅")
+                case gm.ChartStatus.REJECTED.value:
+                    st.toast(f":red[Chart {self.diff.chart_id} has been **rejected**]", icon="❌")
+                case gm.ChartStatus.PENDING.value:
+                    st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
+
     @st.fragment
     def show(self):
         """Show chart diff."""
+        # Show deferred toast from previous status change (must be outside callback to avoid duplication bug)
+        self._show_deferred_toast()
+
         # Show in expander or not
         if self.expander:
             with st.expander(
@@ -651,9 +785,9 @@ def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile:
     return compare_strings(json.dumps(dix_1, indent=4), json.dumps(dix_2, indent=4), fromfile=fromfile, tofile=tofile)
 
 
-def st_show_diff(diff_str):
+def st_show_diff(diff_str, **kwargs):
     """Display diff."""
-    st.code(diff_str, line_numbers=True, language="diff")
+    st.code(diff_str, line_numbers=True, language="diff", **kwargs)
 
 
 def _show_dict_diff(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str):

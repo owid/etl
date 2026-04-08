@@ -15,15 +15,11 @@ class IntegerNumber:
     def init_clean(cls, number: Union[int, str]) -> str:
         """First number cleaning steps.
 
-        Parameters
-        ----------
-        number : Union[int, str]
-            Raw number as given.
+        Args:
+            number: Raw number as given.
 
-        Returns
-        -------
-        int
-            Number as a string, wihtout repeated whitespaces.
+        Returns:
+            Number as a string, without repeated whitespaces.
         """
         # Force string
         number = num_to_str(number)
@@ -65,30 +61,22 @@ class IntegerNumberWithSeparators:
     def is_valid(cls, number: str) -> bool:
         """Check if given number has valid separators.
 
-        Parameters
-        ----------
-        number : str
-            Raw number.
+        Args:
+            number: Raw number to validate.
 
-        Returns
-        -------
-        bool:
-            True if valid syntax.
+        Returns:
+            True if number has valid separator syntax.
         """
         return bool(re.fullmatch(cls.regex_number_with_separator(), number))
 
     def clean(self) -> int:
-        """Clean number.
+        """Clean number by removing separators.
 
-        Returns
-        -------
-        int
-            Cleaned number (i.e. without separators).
+        Returns:
+            Cleaned number (i.e., without separators).
 
-        Raises
-        ------
-        ValueError:
-            If provided number was not correct (e.g. does not contain a separator).
+        Raises:
+            ValueError: If provided number was not valid (e.g., does not contain a separator).
         """
         if self.is_valid(self.number_raw):
             n = re.sub(r"[^0-9]", "", str(self.number_raw))
@@ -178,10 +166,8 @@ class IntegerNumberWithWords:
     def regex_number_verbose(cls) -> str:
         """Build regex for a number with words.
 
-        Returns
-        -------
-        str
-            Regex.
+        Returns:
+            Regex pattern string.
         """
         regex = [
             cls.regex_number_verbose_template.format(k, "|".join(v["words"])) for k, v in cls.numeric_words.items()
@@ -192,14 +178,14 @@ class IntegerNumberWithWords:
     def numeric_words_list(cls) -> Set[str]:
         """Return list of all numeric words (flattened)."""
         words = set(word for value in cls.numeric_words.values() for word in value["words"] if word != "")
-        return words
+        return words  # type: ignore
 
     def _match_numeric_words(self) -> Dict[str, Union[str, int]]:
         """Match number with words."""
         match = re.search(self.regex_number_verbose(), self.number)
         if match:
             numbers = match.groupdict(default=0)
-            return numbers
+            return numbers  # type: ignore
         else:
             raise ValueError("Number may not contain numeric words. Please review!")
 
@@ -215,26 +201,20 @@ class IntegerNumberWithWords:
     def is_valid(cls, number: str) -> bool:
         """Check if number contains numeric words.
 
-        Parameters
-        ----------
-        number : str
-            Candidate number.
+        Args:
+            number: Candidate number string to validate.
 
-        Returns
-        -------
-        bool
-            True if number contains numeric valid words.
+        Returns:
+            True if number contains valid numeric words.
         """
         # return any(word in number for word in cls.numeric_words_list())
         return bool(re.fullmatch(cls.regex_number_verbose(), number))
 
     def clean(self) -> int:
-        """Clean number.
+        """Clean number with words to integer.
 
         Returns:
-        --------
-        int:
-            Cleaned number.
+            Cleaned number as integer.
         """
         if self.is_valid(self.number_raw):
             number_dix = self._match_numeric_words()
@@ -246,14 +226,10 @@ class IntegerNumberWithWords:
 def num_to_str(num_as_str: Union[int, str]) -> str:
     """Convert number to string.
 
-    Parameters
-    ----------
-    num_as_str: Union[int, str]
-        Raw number.
+    Args:
+        num_as_str: Raw number (int or str).
 
     Returns:
-    --------
-    str:
         Raw number as string.
     """
     if not isinstance(num_as_str, str):
@@ -262,43 +238,42 @@ def num_to_str(num_as_str: Union[int, str]) -> str:
 
 
 def remove_multiple_whitespaces(text: str) -> str:
-    """Remove excess of whitespaces.
+    """Remove excess whitespaces.
 
-    '  ' -> ' '.
+    Converts multiple consecutive spaces to single space: '  ' -> ' '.
 
-    Parameters
-    ----------
-    text : str
-        Raw text.
+    Args:
+        text: Raw text string.
 
-    Returns
-    -------
-    str
+    Returns:
         String without duplicated whitespaces.
     """
     return re.sub(r"\s+", " ", text)
 
 
 def format_number(number: Union[int, str]) -> int:
-    """Format number.
+    """Format number string to integer.
 
-    Only supports integer conversion.
+    Only supports integer conversion. Handles various formats including
+    separators and numeric words.
 
-    Some examples of transformations are:
+    Args:
+        number: Input raw number to be formatted (int or str).
 
-        - '1 000 000' -> 1000000
-        - '1 million 1 hundred' -> 1000100
-        - '2,000' -> 2000
+    Returns:
+        Formatted number as integer.
 
-    Parameters
-    ----------
-    number : Union[int, str]
-        Input raw number to be formatted.
+    Example:
+        ```python
+        from owid.datautils.format.numbers import format_number
 
-    Returns
-    -------
-    int
-        Formatted number.
+        # Number with separators
+        format_number('1 000 000')  # Returns: 1000000
+        format_number('2,000')      # Returns: 2000
+
+        # Number with words
+        format_number('1 million 1 hundred')  # Returns: 1000100
+        ```
     """
     number_ = IntegerNumber(number)
     return number_.clean()

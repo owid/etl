@@ -1,0 +1,26 @@
+meta:
+  source:
+    name: NBER-United Nations Dataset 1962-2000
+    description: |-
+      To calculate merchandise trade as a share of GDP, the NBER-UN data series uses Fouquin and Hugot (CEPII 2016)'s long run GDP series, converted from nominal British pounds to US$, using historical exchange rates sourced from the Bank of England (see 'A millennium of macroeconomic data' dataset, section VII). NBER-UN has national trade statistics of country exports to the world.
+
+      The total value of exports includes only trade in goods, classified according to the 4 digit Standard International Trade Classification, Revision 2. Authors give primacy to importers' reports whenever they are available, assumed to be more accurate.
+
+      Countries Comoros, Saint Kitts and Nevis, and the Netherlands Antilles have been excluded from the sample as, in the case of the former two, multiple countries are included in these labels in the NBER-UN data, and hence would be inaccurate to calculate the trade share by national GDP. For the Netherlands Antilles there is insufficient alternative trade data by the World Bank and other sources to check whether the figures are correctly estimated.
+
+      The United Kingdom consists of: the UK, British Antarctic Territories, the Falkland Islands, and Saint Helena.
+      Germany consists of: East Germany, West Germany, and Germany.
+      Russia: the former USSR and Russia.
+      France: French Guinea, Guadeloupe, Saint Pierre and Miquelon, and France.
+      Yemen: the Yemen Arab Republic, the Yemen People's Republic, and Yemen.
+    url: |-
+      NBER-UN trade data: http://cid.econ.ucdavis.edu/nberus.html BOE Exchange Rate: https://www.bankofengland.co.uk/statistics/research-datasets CEPII (2016) GDP data: http://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=32
+    date_accessed: 2018-02-21
+    published_by: Robert Feenstra and Robert Lipsey, The Center for International Development, UC Davis
+  name: Total merchandise trade as share of GDP (NBER-United Nations 1962-2000) (split)
+  description: ''
+  is_public: false
+outs:
+  - md5: 18f330a53bd2b7ce1995c41105eb4f8d
+    size: 44458
+    path: total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split.feather

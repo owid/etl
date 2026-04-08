@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+      grapher_config:
+              note:  Most conferences in 2020–2021 were held virtually due to the COVID-19 pandemic.
+    display:
+      numDecimalPlaces: 0
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  ai_conferences:
+    variables:
+      attendees:
+        title: Number of attendees
+        unit: 'attendees'
+        short_unit: ''
+        description_short: Thirteen major conferences are included.
+        description_key:
+          - AI conferences serve as essential platforms for researchers to present their findings and network with peers and collaborators.
+          - Over the past two decades, these conferences have expanded in scale, quantity, and prestige.
+          - Attendance data should be interpreted with caution, as many conferences in recent years have adopted virtual or hybrid formats.
+          - Virtual conferences often attract larger and more global audiences, but exact attendance figures are harder to measure.
+          - The AI Index reports total attendance, including virtual, hybrid, and in-person participation, across conferences such as AAAI, NeurIPS, ICML, CVPR, EMNLP, ICLR, and others.
+          - The significant spike in ICML attendance in 2021 was likely due to the conference being held virtually that year.
+
+

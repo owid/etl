@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Optional
 
 import rich_click as click
-from owid.catalog import CHANNEL, LocalCatalog
+from owid.catalog.api.legacy import CHANNEL, LocalCatalog
 
 from etl import config
 from etl.paths import DATA_DIR
@@ -33,7 +33,7 @@ config.enable_sentry()
 def reindex_cli(channel: Iterable[CHANNEL], include: Optional[str]) -> None:
     """Create a catalog-[channel].feather file inside etl/data with all tables in each channel.
 
-    This enables `catalog.find` to be aware of what datasets currently exists. So, if for example you create a new dataset locally, you won't be able to find it in your local catalog unless you re-run reindex."""
+    This enables `catalog.search` to be aware of what datasets currently exists. So, if for example you create a new dataset locally, you won't be able to find it in your local catalog unless you re-run reindex."""
     return reindex(channel=channel, include=include)
 
 

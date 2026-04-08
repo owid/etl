@@ -2,7 +2,7 @@
 
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -45,15 +45,15 @@ def prepare_item_prices_table(tb_prices: Table, item_name: str) -> Table:
     return tb_item_prices
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load garden dataset and read its main table and the fossil fuel prices table.
     ds_garden = paths.load_dataset("statistical_review_of_world_energy")
-    tb = ds_garden["statistical_review_of_world_energy"]
-    tb_prices = ds_garden["statistical_review_of_world_energy_prices"]
-    tb_price_index = ds_garden["statistical_review_of_world_energy_price_index"]
+    tb = ds_garden.read("statistical_review_of_world_energy", reset_index=False)
+    tb_prices = ds_garden.read("statistical_review_of_world_energy_prices", reset_index=False)
+    tb_price_index = ds_garden.read("statistical_review_of_world_energy_price_index", reset_index=False)
 
     #
     # Process data.
@@ -86,8 +86,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir,
+    ds_grapher = paths.create_dataset(
         tables=[
             tb,
             tb_coal_prices,
@@ -99,6 +98,5 @@ def run(dest_dir: str) -> None:
             tb_oil_price_index,
         ],
         default_metadata=ds_garden.metadata,
-        check_variables_metadata=True,
     )
     ds_grapher.save()

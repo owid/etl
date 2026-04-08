@@ -1,0 +1,72 @@
+dataset:
+  title: Wildlife trade (Scheffers et al. 2019)
+tables:
+  wildlife_trade__scheffers_et_al__2019:
+    variables:
+      number_of_non_traded_species:
+        title: Number of non-traded species
+        unit: species
+        display:
+          name: Number of non-traded species
+          numDecimalPlaces: 0
+        description: Number of species that are not traded locally, nationally or internationally.
+      number_of_species:
+        title: Number of species
+        unit: species
+        display:
+          name: Number of species in each taxonomic group
+          numDecimalPlaces: 0
+        description: The total number of species in each taxonomic group.
+      number_of_species_traded:
+        title: Number of species traded
+        unit: species
+        display:
+          name: Number of species that are traded
+          numDecimalPlaces: 0
+        description: Number of species that are traded locally, nationally or internationally.
+      share_of_species_traded:
+        title: Share of species traded
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of species that are traded
+        description: Share of species that are traded locally, nationally or internationally.
+      species_traded_as_pets__pct:
+        title: Species traded as pets (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of traded species that are traded as pets
+        description: Share of traded species that are traded as pets.
+      species_traded_as_pets__number:
+        title: Species traded as pets (number)
+        unit: species
+        display:
+          name: Number of species traded as pets
+          numDecimalPlaces: 0
+        description: The number of species that are traded as pets.
+      species_traded_as_products__pct:
+        title: Species traded as products (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of traded species that are traded as products
+        description: Share of traded species that are traded for their products (such as meat, medicines, horns, trunks or
+          other body parts).
+      species_traded_as_products__number:
+        title: Species traded as products (number)
+        unit: species
+        display:
+          name: Number of species traded for products
+          numDecimalPlaces: 0
+        description: Number of species that are traded for their products (such as meat, medicines, horns, trunks or other
+          body parts).
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
