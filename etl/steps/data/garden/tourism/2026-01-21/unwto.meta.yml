@@ -258,11 +258,10 @@ tables:
       # =========================================================================
       # INBOUND TOURISM — REGION OF ORIGIN
       # =========================================================================
-
       inbound_tourism_by_region:
         title: International tourist arrivals by region of origin
         unit: arrivals
-        description_short: Global number of arrivals by people travelling from abroad and staying overnight, broken down by the region where visitors reside. Data for the latest years is preliminary because not all countries have reported arrivals by region of origin yet.
+        description_short: Global number of arrivals by people travelling from abroad and staying overnight, broken down by the region where visitors reside.
         description_key:
           - *desc_key_arrivals
           - *desc_key_region_origin
@@ -270,10 +269,12 @@ tables:
           This indicator is calculated by summing the arrivals from each UNWTO region across all destination countries for each year. Because each destination country reports arrivals from each region separately, a tourist who visits multiple countries on a single trip is counted once for each country visited.
         presentation:
           grapher_config:
-            note: Each border crossing counts as one arrival in the global total. For example, a Japanese resident visiting both Brazil and Argentina on a single trip contributes two arrivals, not one.
+            note: Each border crossing counts as one arrival. For example, a Japanese resident visiting both Brazil and Argentina on a single trip contributes two arrivals from East Asia and the Pacific to the global total, not one. Data for the latest years is preliminary because not all countries have reported arrivals by region of origin yet.
         display:
           tolerance: 2
           numDecimalPlaces: 0
+
+
 
       in_tour_regions_trips_region_overnight_vis_tourists_africa_unwto_total:
         title: International tourists visiting from Africa
