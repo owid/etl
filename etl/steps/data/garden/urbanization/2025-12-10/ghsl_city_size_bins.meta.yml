@@ -1,0 +1,114 @@
+tables:
+  ghsl_city_size_bins:
+    variables:
+      # ── Granular bins (300k+) ──────────────────────────────────────────────
+      pop_300k_500k_estimates:
+        title: Population in cities of 300,000–500,000 (estimates)
+        unit: people
+        short_unit: ""
+        description_short: Population living in urban centres with 300,000–500,000 inhabitants.
+      pop_300k_500k_projections:
+        title: Population in cities of 300,000–500,000 (projections)
+        unit: people
+        short_unit: ""
+        description_short: Projected population living in urban centres with 300,000–500,000 inhabitants.
+
+      pop_500k_1m_estimates:
+        title: Population in cities of 500,000–1 million (estimates)
+        unit: people
+        short_unit: ""
+        description_short: Population living in urban centres with 500,000–1,000,000 inhabitants.
+      pop_500k_1m_projections:
+        title: Population in cities of 500,000–1 million (projections)
+        unit: people
+        short_unit: ""
+        description_short: Projected population living in urban centres with 500,000–1,000,000 inhabitants.
+
+      pop_1m_3m_estimates:
+        title: Population in cities of 1–3 million (estimates)
+        unit: people
+        short_unit: ""
+        description_short: Population living in urban centres with 1–3 million inhabitants.
+      pop_1m_3m_projections:
+        title: Population in cities of 1–3 million (projections)
+        unit: people
+        short_unit: ""
+        description_short: Projected population living in urban centres with 1–3 million inhabitants.
+
+      pop_3m_5m_estimates:
+        title: Population in cities of 3–5 million (estimates)
+        unit: people
+        short_unit: ""
+        description_short: Population living in urban centres with 3–5 million inhabitants.
+      pop_3m_5m_projections:
+        title: Population in cities of 3–5 million (projections)
+        unit: people
+        short_unit: ""
+        description_short: Projected population living in urban centres with 3–5 million inhabitants.
+
+      pop_5m_10m_estimates:
+        title: Population in cities of 5–10 million (estimates)
+        unit: people
+        short_unit: ""
+        description_short: Population living in urban centres with 5–10 million inhabitants.
+      pop_5m_10m_projections:
+        title: Population in cities of 5–10 million (projections)
+        unit: people
+        short_unit: ""
+        description_short: Projected population living in urban centres with 5–10 million inhabitants.
+
+      pop_above_10m_estimates:
+        title: Population in cities of more than 10 million (estimates)
+        unit: people
+        short_unit: ""
+        description_short: Population living in urban centres with more than 10 million inhabitants.
+      pop_above_10m_projections:
+        title: Population in cities of more than 10 million (projections)
+        unit: people
+        short_unit: ""
+        description_short: Projected population living in urban centres with more than 10 million inhabitants.
+
+      # ── Combined bins ──────────────────────────────────────────────────────
+      pop_50k_500k_estimates:
+        title: Population in cities of 50,000–500,000 (estimates)
+        unit: people
+        short_unit: ""
+        description_short: Population living in urban centres with 50,000–500,000 inhabitants.
+      pop_50k_500k_projections:
+        title: Population in cities of 50,000–500,000 (projections)
+        unit: people
+        short_unit: ""
+        description_short: Projected population living in urban centres with 50,000–500,000 inhabitants.
+
+      pop_50k_1m_estimates:
+        title: Population in cities of 50,000–1 million (estimates)
+        unit: people
+        short_unit: ""
+        description_short: Population living in urban centres with 50,000–1,000,000 inhabitants.
+      pop_50k_1m_projections:
+        title: Population in cities of 50,000–1 million (projections)
+        unit: people
+        short_unit: ""
+        description_short: Projected population living in urban centres with 50,000–1,000,000 inhabitants.
+
+      pop_1m_5m_estimates:
+        title: Population in cities of 1–5 million (estimates)
+        unit: people
+        short_unit: ""
+        description_short: Population living in urban centres with 1–5 million inhabitants.
+      pop_1m_5m_projections:
+        title: Population in cities of 1–5 million (projections)
+        unit: people
+        short_unit: ""
+        description_short: Projected population living in urban centres with 1–5 million inhabitants.
+
+      pop_3m_10m_estimates:
+        title: Population in cities of 3–10 million (estimates)
+        unit: people
+        short_unit: ""
+        description_short: Population living in urban centres with 3–10 million inhabitants.
+      pop_3m_10m_projections:
+        title: Population in cities of 3–10 million (projections)
+        unit: people
+        short_unit: ""
+        description_short: Projected population living in urban centres with 3–10 million inhabitants.
