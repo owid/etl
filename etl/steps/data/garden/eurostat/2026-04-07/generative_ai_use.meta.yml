@@ -1,39 +1,31 @@
-# Learn more at:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+    description_key:
+      - This data comes from Eurostat's annual survey on the use of information and communication technologies (ICT) in households and by individuals, a sample survey carried out by national statistical institutes.
+      - 'Respondents were asked: "Have you used any generative AI tools (e.g. ChatGPT, Copilot, Gemini, LLaMA, Midjourney, DALL-E) to create content like text, images, programming code, or videos in the last 3 months?"'
+      - In 2025, around 330,000 individuals aged 16 to 74 in the EU were surveyed through face-to-face interviews, telephone interviews, or online questionnaires.
+      - 2025 is the first year Eurostat included questions on generative AI use in this survey, so no earlier time series is available for this indicator.
+      - Results are broadly comparable across countries, although small differences in national survey implementation may affect comparability for some countries.
+    processing_level: minor
+    unit: "%"
+    short_unit: "%"
+    display:
+      numDecimalPlaces: 1
+
+dataset:
+  update_period_days: 365
+
+
 tables:
   generative_ai_use:
     variables:
       pct_used_genai_16_74:
         title: Share of individuals aged 16-74 who used generative AI tools in the last 3 months
-        unit: "%"
-        short_unit: "%"
-        description_short: Share of individuals aged 16 to 74 who used generative AI tools in the previous three months.
-        description_key:
-          - This data comes from Eurostat's annual ICT usage survey (the survey on ICT usage in households and by individuals), based on interviews with around 330,000 people across 35 European countries.
-          - The question asks respondents whether they have used generative AI tools — such as AI text generators, image generators, or coding assistants — in the previous three months.
-          - 2025 is the first year Eurostat included questions on generative AI use in this survey.
-        description_from_producer: |-
-          Individuals who used generative AI tools in the last 3 months, as a percentage of all individuals aged 16 to 74.
+        description_short: Share of individuals aged 16 to 74 who used [generative AI](#dod:generative-ai) tools — such as ChatGPT, Copilot, or Midjourney — to create content in the previous three months.
 
-          Generative AI tools include AI systems that generate content such as text, images, code, audio, or video, based on prompts or instructions.
-        display:
-          numDecimalPlaces: 1
-        presentation:
-          title_public: Share of adults who used generative AI tools in the last 3 months
       pct_used_genai_16_24:
         title: Share of individuals aged 16-24 who used generative AI tools in the last 3 months
-        unit: "%"
-        short_unit: "%"
-        description_short: Share of individuals aged 16 to 24 who used generative AI tools in the previous three months.
-        description_key:
-          - This data comes from Eurostat's annual ICT usage survey (the survey on ICT usage in households and by individuals), based on interviews with around 330,000 people across 35 European countries.
-          - The question asks respondents whether they have used generative AI tools — such as AI text generators, image generators, or coding assistants — in the previous three months.
-          - 2025 is the first year Eurostat included questions on generative AI use in this survey.
-        description_from_producer: |-
-          Individuals who used generative AI tools in the last 3 months, as a percentage of all individuals aged 16 to 24.
-
-          Generative AI tools include AI systems that generate content such as text, images, code, audio, or video, based on prompts or instructions.
-        display:
-          numDecimalPlaces: 1
-        presentation:
-          title_public: Share of young people (16-24) who used generative AI tools in the last 3 months
+        description_short: Share of individuals aged 16 to 24 who used [generative AI](#dod:generative-ai) tools — such as ChatGPT, Copilot, or Midjourney — to create content in the previous three months.
