@@ -15,7 +15,7 @@ tables:
         title: Passenger load factor
         unit: "%"
         short_unit: "%"
-        description_short: The share of airline seats filled by paying passengers.
+        description_short: The share of airline seats filled by paying passengers, also known as the passenger load factor.
         description_key:
           - Passenger load factor shows how full flights were, on average.
           - It is calculated by comparing passenger traffic with the total seating capacity airlines provided.
@@ -45,8 +45,8 @@ tables:
       revenue_passenger_kilometers:
         title: Revenue passenger-kilometres
         unit: passenger-kilometres
-        short_unit: km
-        description_short: The total distance traveled by paying passengers on flights.
+        short_unit: passenger-km
+        description_short: A measure of passenger air traffic – also known as revenue passenger-kilometres – calculated as the number of paying passengers multiplied by the distance they fly.
         description_key:
           - Revenue passenger-kilometres measure total passenger traffic by air.
           - One revenue passenger-kilometre equals one paying passenger traveling one kilometre.
@@ -54,16 +54,16 @@ tables:
           - This metric combines passenger numbers and distances traveled, so it is more informative than passenger counts alone.
           - "It is not a simple count of passengers: long-distance travel contributes more than short-distance travel."
         presentation:
-          title_public: Distance traveled by airline passengers
+          title_public: Passenger air traffic
         display:
           numDecimalPlaces: 0
-          name: Passenger seat-km
+          name: Passenger-km
 
       available_seat_kilometers:
         title: Available seat-kilometres
         unit: seat-kilometres
         short_unit: km
-        description_short: The total seating capacity provided by airlines.
+        description_short: The total seating capacity provided by airlines, also known as available seat-kilometres.
         description_key:
           - Available seat-kilometres measure how much passenger-carrying capacity airlines offered.
           - One available seat-kilometre equals one seat flown one kilometre, whether it was filled or empty.
