@@ -8,7 +8,6 @@ definitions:
 
   # See the Survey Methods sections in Gallup's workplace articles for more detail: https://www.gallup.com/workplace/691643/work-nearly-doubled-two-years.aspx.
   # More details in 'Learn more about how the Gallup Panel works. View complete question responses and trends (PDF download) - https://www.gallup.com/workplace/701195/frequent-workplace-continued-rise.aspx?thank-you-subscription-form=1'
-
   desc_key_question: &desc_key_question |-
     The survey question asked: "How often do you use artificial intelligence in your role?" with response options ranging from "Daily" to "Never."
   description_key_methodology: &methodology
