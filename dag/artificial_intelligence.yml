@@ -291,3 +291,11 @@ steps:
     - data://meadow/artificial_intelligence/2026-04-07/ai_diffusion_msft
   data://grapher/artificial_intelligence/2026-04-07/ai_diffusion_msft:
     - data://garden/artificial_intelligence/2026-04-07/ai_diffusion_msft
+  
+  # Gallup - Artificial Intelligence indicator
+  data://meadow/gallup/2026-04-03/ai_indicator:
+    - snapshot://gallup/2026-04-03/ai_indicator.csv
+  data://garden/gallup/2026-04-03/ai_indicator:
+    - data://meadow/gallup/2026-04-03/ai_indicator
+  data://grapher/gallup/2026-04-03/ai_indicator:
+    - data://garden/gallup/2026-04-03/ai_indicator
