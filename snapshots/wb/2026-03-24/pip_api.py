@@ -824,7 +824,7 @@ def generate_percentiles_raw(wb_api: WB_API):
 
     # Select the dataframe and specific values in grouping_type
     df_region_aux = aux_dict["regions"]
-    df_region_aux = df_region_aux[df_region_aux["grouping_type"].isin(["africa_split", "region", "regionpcn", "world"])]
+    df_region_aux = df_region_aux[df_region_aux["grouping_type"].isin(["africa_split", "region", "world"])]
 
     assert set(df_region["country"].unique()) == set(df_region_aux["region"].unique()), log.fatal(
         "List of regions is not the same as the one defined in PIP!"
