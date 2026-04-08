@@ -8,9 +8,10 @@ Bins included (all for cities ≥ 50k, i.e. urban centres only):
   Combined  : 50k–500k, 50k–1m, 1m–5m, 3m–10m
 """
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
-import owid.catalog.processing as pr
 
 paths = PathFinder(__file__)
 
