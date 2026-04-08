@@ -11,10 +11,13 @@ meta:
     # Citation
     producer: Gallup
     citation_full: |-
-      Gallup (2026). Indicator: What Percentage of Employees Use AI at Work? Retrieved from https://www.gallup.com/699797/indicator-artificial-intelligence.aspx
+      Gallup (2025). Indicator: What Percentage of Employees Use AI at Work? Retrieved from https://www.gallup.com/699797/indicator-artificial-intelligence.aspx
     attribution_short: Gallup
 
     # Files
+    # To download the data: go to url_main, scroll to the chart titled
+    # "1 in 10 U.S. Employees Use AI Daily in Their Role" and click "Download"
+    # beneath it (look for the "Get the data" link below the chart).
     url_main: https://www.gallup.com/699797/indicator-artificial-intelligence.aspx
     date_accessed: "2026-04-03"
 
