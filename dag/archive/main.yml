@@ -46,6 +46,14 @@ steps:
   data://grapher/imf/2023-11-02/world_economic_outlook:
     - data://garden/imf/2023-11-02/world_economic_outlook
 
+  # Global Flourishing Study
+  data-private://meadow/gfs/2024-11-11/gfs_wave_one:
+    - snapshot-private://gfs/2024-11-11/gfs_wave_one.csv
+  data-private://garden/gfs/2024-11-11/gfs_wave_one:
+    - data-private://meadow/gfs/2024-11-11/gfs_wave_one
+  data-private://grapher/gfs/2024-11-11/gfs_wave_one:
+    - data-private://garden/gfs/2024-11-11/gfs_wave_one
+
   # Trust questions in World Values Survey
   data://meadow/wvs/2023-03-08/wvs_trust:
     - snapshot://wvs/2023-03-08/wvs_trust.csv
