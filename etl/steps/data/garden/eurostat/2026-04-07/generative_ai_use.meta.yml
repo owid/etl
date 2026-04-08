@@ -24,8 +24,8 @@ tables:
     variables:
       pct_used_genai_16_74:
         title: Share of individuals aged 16-74 who used generative AI tools in the last 3 months
-        description_short: Share of individuals aged 16 to 74 who used [generative AI](#dod:generative-ai) tools — such as ChatGPT, Copilot, or Midjourney — to create content in the previous three months.
+        description_short: Share of individuals aged 16 to 74 who reported using [generative AI](#dod:generative-ai) tools — such as ChatGPT, Copilot, or Midjourney — to create content in the previous three months.
 
       pct_used_genai_16_24:
         title: Share of individuals aged 16-24 who used generative AI tools in the last 3 months
-        description_short: Share of individuals aged 16 to 24 who used [generative AI](#dod:generative-ai) tools — such as ChatGPT, Copilot, or Midjourney — to create content in the previous three months.
+        description_short: Share of individuals aged 16 to 24 who reported using [generative AI](#dod:generative-ai) tools — such as ChatGPT, Copilot, or Midjourney — to create content in the previous three months.
