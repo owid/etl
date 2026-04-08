@@ -4,6 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: Use of generative AI tools by individuals
+    # NOTE: The date_published is specified in "last update" on the top of url_main.
     date_published: "2026-02-25"
 
     # Citation

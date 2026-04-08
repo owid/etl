@@ -13,7 +13,6 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 # Eurostat API URL for the isoc_ai_iaiu dataset (generative AI use by individuals).
 # NOTE: The API returns already-gzip-compressed content regardless of Content-Encoding header,
 # so we save the raw bytes directly to the .gz file.
-URL = "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/isoc_ai_iaiu?format=TSV&compressed=true"
 
 
 @click.command()
@@ -26,7 +25,7 @@ def run(upload: bool) -> None:
     snap.path.parent.mkdir(exist_ok=True, parents=True)
 
     # Request the data file. The API returns pre-compressed gzip content.
-    response = requests.get(URL)
+    response = requests.get(snap.metadata.origin.url_download)
     response.raise_for_status()
 
     # Save the raw compressed bytes directly (already gzip-compressed by Eurostat).
