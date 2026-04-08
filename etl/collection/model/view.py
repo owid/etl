@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import Any, Dict, List, cast
 
-from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError
+from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError, InvalidColorScaleConfigError
 from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.model.schema_types import ViewConfig, ViewMetadata
 from etl.collection.utils import CHART_DIMENSIONS
@@ -317,7 +317,52 @@ class View(MDIMBase):
         if new_metadata:
             self.metadata = cast(ViewMetadata, new_metadata)
 
+        # Validate the merged config for incompatible color scale settings
+        self.validate_color_scale_config()
+
         return self
+
+    def validate_color_scale_config(self) -> None:
+        """Check that color scale config doesn't have incompatible settings.
+
+        Log binning strategies require strictly positive minValue and maxValue.
+        When a common_view sets minValue: 0 and a view sets binningStrategy: log-*,
+        the Grapher silently renders a grey map with no legend instead of raising an error.
+        """
+        if self.config is None:
+            return
+
+        LOG_BINNING_STRATEGIES = ("log-auto", "log-1-2-5", "log-1-3", "log-10")
+
+        # Collect all colorScale configs to validate: top-level and map-level
+        color_scales: List[tuple[str, Dict[str, Any]]] = []
+        if "colorScale" in self.config and isinstance(self.config["colorScale"], dict):
+            color_scales.append(("config.colorScale", self.config["colorScale"]))
+        if "map" in self.config and isinstance(self.config["map"], dict):
+            if "colorScale" in self.config["map"] and isinstance(self.config["map"]["colorScale"], dict):
+                color_scales.append(("config.map.colorScale", self.config["map"]["colorScale"]))
+
+        for path, cs in color_scales:
+            strategy = cs.get("binningStrategy")
+            if strategy not in LOG_BINNING_STRATEGIES:
+                continue
+
+            min_val = cs.get("minValue")
+            max_val = cs.get("maxValue")
+            errors = []
+            if min_val is not None and min_val <= 0:
+                errors.append(f"minValue={min_val}")
+            if max_val is not None and max_val <= 0:
+                errors.append(f"maxValue={max_val}")
+
+            if errors:
+                raise InvalidColorScaleConfigError(
+                    f"View {self.dimensions}: {path} has binningStrategy='{strategy}' "
+                    f"but {' and '.join(errors)}. Log binning requires strictly positive values. "
+                    f"This would cause a blank grey map with no legend in Grapher. "
+                    f"Either remove minValue/maxValue from the common_view, set them to positive values, "
+                    f"or override binningStrategy in this view."
+                )
 
     @property
     def indicators_in_config(self):
