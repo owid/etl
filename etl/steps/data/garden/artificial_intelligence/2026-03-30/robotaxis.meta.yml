@@ -27,7 +27,7 @@ tables:
           - This counts completed passenger trips in California's paid robotaxi services that are approved to operate.
           - Only includes trips where passengers actually rode in the vehicle and paid for the service.
           - Excludes empty cars driving between pickups, test rides, and any non-passenger travel.
-          - Originally both Cruise and Waymo reported this data. Cruise suspended its service after a safety incident in October 2023; its last reported trips are from November 2023. From December 2023 onward, Waymo is the sole reporter of actual trip data.
+          - Both Cruise and Waymo reported data until October 2023, when California regulators made Cruise suspend its service following a safety incident. Waymo has been the sole reporter since then.
         display:
           numDecimalPlaces: 0
 
@@ -41,7 +41,7 @@ tables:
           - Each person is counted once per trip, so if someone takes multiple trips, they're counted multiple times.
           - For shared rides, each passenger in the vehicle is counted separately. Safety drivers (when present) are not counted as passengers.
           - Excludes empty cars driving between pickups, test rides, and any non-passenger travel.
-          - Originally both Cruise and Waymo reported this data. Cruise suspended its service after a safety incident in October 2023; its last reported trips are from November 2023. From December 2023 onward, Waymo is the sole reporter of actual trip data.
+          - Both Cruise and Waymo reported data until October 2023, when California regulators made Cruise suspend its service following a safety incident. Waymo has been the sole reporter since then.
         display:
           numDecimalPlaces: 0
 
@@ -53,11 +53,11 @@ tables:
         description_processing: |-
           The original data reports distance in miles. We converted to kilometers by multiplying by 1.60934.
 
-          We summed values across all approved robotaxi carriers operating in California to produce monthly totals. Both Cruise and Waymo reported actual trip data through November 2023. After that, only Waymo data is included, as Cruise suspended its robotaxi service following a safety incident in October 2023. Cruise continued to file regulatory reports with zero trips through at least mid-2024.
+          We summed values across all approved robotaxi carriers operating in California to produce monthly totals. Both Cruise and Waymo reported actual trip data through November 2023. After that, only Waymo data is included, as California regulators made Cruise suspend its robotaxi service following a safety incident in October 2023. Cruise continued to file regulatory reports with zero trips through at least mid-2024.
         description_key:
           - This indicator tracks the total distance traveled by paying passengers in robotaxi trips operated by licensed services in California, expressed in passenger-kilometers.
           - A passenger-kilometer is one kilometer traveled by one passenger. For example, a five-kilometer trip with two passengers equals ten passenger-kilometers. If passengers join or leave during a trip, each segment is counted separately based on the number of passengers in the vehicle.
           - Only passenger-carrying trips are included. Empty vehicles traveling between pickups and test rides are excluded.
-          - Both Cruise and Waymo reported data until October 2023, when Cruise suspended its service following a safety incident. Waymo has been the sole reporter since then.
+          - Both Cruise and Waymo reported data until October 2023, when California regulators made Cruise suspend its service following a safety incident. Waymo has been the sole reporter since then.
         display:
           numDecimalPlaces: 0
