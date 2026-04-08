@@ -291,3 +291,10 @@ steps:
     - data://meadow/eurostat/2026-04-07/generative_ai_use
   data://grapher/eurostat/2026-04-07/generative_ai_use:
     - data://garden/eurostat/2026-04-07/generative_ai_use
+  # Gallup - Artificial Intelligence indicator
+  data://meadow/gallup/2026-04-03/ai_indicator:
+    - snapshot://gallup/2026-04-03/ai_indicator.csv
+  data://garden/gallup/2026-04-03/ai_indicator:
+    - data://meadow/gallup/2026-04-03/ai_indicator
+  data://grapher/gallup/2026-04-03/ai_indicator:
+    - data://garden/gallup/2026-04-03/ai_indicator
