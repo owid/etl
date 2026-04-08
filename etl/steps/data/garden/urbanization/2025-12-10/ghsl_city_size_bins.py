@@ -112,6 +112,9 @@ def run() -> None:
         min_num_values_per_year=1,
     )
 
+    # ── Keep only regions and income groups ──────────────────────────────────
+    tb = tb[tb["country"].isin(REGIONS)].copy()
+
     # ── Split estimates / projections ────────────────────────────────────────
     past = tb[tb["year"] < START_OF_PROJECTIONS].copy()
     future = tb[tb["year"] >= START_OF_PROJECTIONS - 5].copy()  # 5-yr overlap
