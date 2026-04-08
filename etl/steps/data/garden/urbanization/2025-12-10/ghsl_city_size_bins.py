@@ -35,17 +35,17 @@ REGIONS = [
 #                 pop_3m_5m, pop_5m_10m, pop_above_10m
 BINS = {
     # Granular bins (300k+ only — 50k–300k not shown standalone)
-    "pop_300k_500k":  ["pop_300k_500k"],
-    "pop_500k_1m":    ["pop_500k_1m"],
-    "pop_1m_3m":      ["pop_1m_3m"],
-    "pop_3m_5m":      ["pop_3m_5m"],
-    "pop_5m_10m":     ["pop_5m_10m"],
-    "pop_above_10m":  ["pop_above_10m"],
+    "pop_300k_500k": ["pop_300k_500k"],
+    "pop_500k_1m": ["pop_500k_1m"],
+    "pop_1m_3m": ["pop_1m_3m"],
+    "pop_3m_5m": ["pop_3m_5m"],
+    "pop_5m_10m": ["pop_5m_10m"],
+    "pop_above_10m": ["pop_above_10m"],
     # Combined bins
-    "pop_50k_500k":   ["pop_below_300k", "pop_300k_500k"],
-    "pop_50k_1m":     ["pop_below_300k", "pop_300k_500k", "pop_500k_1m"],
-    "pop_1m_5m":      ["pop_1m_3m", "pop_3m_5m"],
-    "pop_3m_10m":     ["pop_3m_5m", "pop_5m_10m"],
+    "pop_50k_500k": ["pop_below_300k", "pop_300k_500k"],
+    "pop_50k_1m": ["pop_below_300k", "pop_300k_500k", "pop_500k_1m"],
+    "pop_1m_5m": ["pop_1m_3m", "pop_3m_5m"],
+    "pop_3m_10m": ["pop_3m_5m", "pop_5m_10m"],
 }
 
 
@@ -65,8 +65,13 @@ def run() -> None:
 
     # Keep only the city-size aggregate columns plus country/year.
     meadow_bin_cols = [
-        "pop_below_300k", "pop_300k_500k", "pop_500k_1m",
-        "pop_1m_3m", "pop_3m_5m", "pop_5m_10m", "pop_above_10m",
+        "pop_below_300k",
+        "pop_300k_500k",
+        "pop_500k_1m",
+        "pop_1m_3m",
+        "pop_3m_5m",
+        "pop_5m_10m",
+        "pop_above_10m",
     ]
     tb = tb[["country", "year"] + [c for c in meadow_bin_cols if c in tb.columns]].copy()
 
@@ -83,10 +88,7 @@ def run() -> None:
         tb[col] = tb[col].fillna(0)
 
     # Remap BINS source names to the renamed _src versions.
-    bins_src = {
-        bin_name: [f"{c}_src" for c in source_cols]
-        for bin_name, source_cols in BINS.items()
-    }
+    bins_src = {bin_name: [f"{c}_src" for c in source_cols] for bin_name, source_cols in BINS.items()}
     origins = tb["pop_below_300k_src"].metadata.origins
 
     # ── Compute output bins ──────────────────────────────────────────────────
@@ -124,6 +126,5 @@ def run() -> None:
     # ── Format and save ──────────────────────────────────────────────────────
     tb = tb.format(["country", "year"], short_name="ghsl_city_size_bins")
 
-    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True,
-                                     default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
     ds_garden.save()
