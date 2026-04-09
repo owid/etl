@@ -2,7 +2,7 @@
 tables:
   ghsl_city_size_bins:
     variables:
-      # ── Granular bins (300k+) ──────────────────────────────────────────────
+      # ── Granular bins — share of city population (300k+) ─────────────────
       share_300k_500k_estimates:
         title: Share of city population in cities of 300,000–500,000 (estimates)
         unit: "%"
