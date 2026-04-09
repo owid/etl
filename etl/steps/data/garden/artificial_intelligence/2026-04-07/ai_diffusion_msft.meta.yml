@@ -38,4 +38,7 @@ tables:
           - The metric covers visits to standalone AI platforms only. It does not include AI features built into productivity software or enterprise tools.
         display:
           numDecimalPlaces: 1
+          name: Share of population using generative AI
+        presentation:
+          title_public: Estimated share of population using generative AI tools
 
