@@ -20,17 +20,17 @@ def run() -> None:
     #
     # Bring the economy index into a column and keep only H2 2025.
     tb = tb[["economy", "ai_diffusion_h2_2025"]].rename(
-        columns={"economy": "country", "ai_diffusion_h2_2025": "ai_user_share"}
+        columns={"economy": "country", "ai_diffusion_h2_2025": "ai_user_share"}, errors="raise"
     )
 
     # Harmonize country names.
-    tb = paths.regions.harmonize_names(tb=tb, country_col="country")
+    tb = paths.regions.harmonize_names(tb=tb)
 
     # Add year column.
     tb["year"] = YEAR
 
     # Format the table.
-    tb = tb.format(["country", "year"], short_name="ai_diffusion_msft")
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

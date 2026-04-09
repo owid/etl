@@ -1,28 +1,41 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+dataset:
+  update_period_days: 365
+
+
 tables:
   ai_diffusion_msft:
     variables:
       ai_user_share:
-        title: Share of working-age population using generative AI (H2 2025)
+        title: Share of working-age population using generative AI tools in H2 2025
         unit: "%"
         short_unit: "%"
-        description_short: Estimated share of the working-age population (aged 15–64) who actively used a generative AI tool — such as ChatGPT, Gemini, Copilot, or DeepSeek — during the second half of 2025.
+        description_short: Estimated share of the working-age population (aged 15–64) who actively used a [generative AI](#dod:generative-ai) tool, such as ChatGPT or Gemini, in the second half of 2025.
         description_key:
-          - These are modelled estimates derived from anonymized Microsoft telemetry data on visits to a curated list of ~20 major generative AI platforms (including ChatGPT, Google Gemini, Microsoft Copilot, Claude, DeepSeek, Grok, Midjourney, Perplexity, and others). They are not survey data.
-          - The denominator is the working-age population aged 15–64 in each country, sourced from the World Bank's World Development Indicators.
-          - "To filter out very infrequent visitors, only users with at least 90 minutes of total monthly activity on Microsoft platforms were included in the analysis — equivalent to roughly 3 minutes per day. This is a general platform-activity threshold, not an AI-usage threshold."
-          - The estimates are adjusted for three factors — the share of the population with a desktop or tablet device (using Windows telemetry and StatCounter OS market share data), the share of AI usage that occurs on mobile devices (using StatCounter mobile-to-desktop traffic ratios), and the rate at which users opt out of sharing diagnostic data with Microsoft (countries with low opt-in rates have their estimates blended toward the global average).
-          - For some countries with insufficient telemetry coverage, estimates are regional imputations rather than country-specific measurements. This is why some countries share identical values (for example, several countries in West Africa all show 9.3%, and several in East Africa all show 6.8%).
-          - Estimates for Russia, Iran, and China are flagged in the source report as having limited telemetry coverage and should be interpreted with particular caution.
-          - The data covers usage on desktop and tablet devices, with a modelled adjustment added for mobile usage. Enterprise AI usage and AI features embedded in productivity software (such as Microsoft 365 Copilot) are not included.
-        description_from_producer: |-
-          AI User Share is the estimated share of each country's working-age population (15–64) actively using generative AI tools in a given period. It is computed using anonymized Microsoft telemetry on visits to a curated list of major AI platforms, adjusted for desktop device penetration, mobile usage, and diagnostic data opt-out rates.
+          # Source: Section 2.1, p. 2–3 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - These are modelled estimates based on anonymized Microsoft telemetry, not survey data. They track visits to 19 generative AI platforms, including ChatGPT, Gemini, Copilot, Claude, DeepSeek, Grok, Midjourney, and Perplexity.
 
-          The metric is constructed as follows: (1) compute the share of active Microsoft users (those with ≥90 minutes of monthly usage) who visited a tracked AI site; (2) adjust for opt-out bias by blending country-level estimates with the global average when opt-in rates are below average; (3) scale by desktop device penetration, estimated from Windows monthly active devices divided by Windows OS market share (from StatCounter), divided by the working-age population; (4) add a mobile usage component derived from country-specific mobile-to-desktop traffic ratios (from StatCounter, capped at 1.8× the regional average), applying an independence-based overlap correction.
+          # Source: Section 2.3, p. 4 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - The share is calculated as a proportion of the working-age population aged 15–64, sourced from the World Bank's World Development Indicators, with commercial data sources used as a fallback where World Bank data is unavailable.
 
-          Countries or territories that fall below minimum traffic thresholds are grouped into regional pools, and the regional aggregate estimate is assigned to each country in the group. These countries are marked with a dagger (†) in the source report.
+          # Source: Section 2.1, p. 2–3 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - Only users with at least 90 minutes of total monthly activity on Microsoft platforms are included. This filters out infrequent users and is not specific to AI activity.
+
+          # Source: Section 2.4, p. 5; Table 2, p. 14–18 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - Countries with insufficient data are assigned a regional average rather than a country-specific estimate. This is why some countries share identical values (for example, several countries in West Africa all show 9.3%, and several in East Africa all show 6.8%).
+
+          # Source: Data Coverage Disclaimer, p. 5 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - Estimates for Russia, Iran, and parts of China are based on limited telemetry and should be treated with caution.
+
+          # Source: Appendix A, p. 13 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - The metric covers visits to standalone AI platforms only. It does not include AI features built into productivity software or enterprise tools.
         display:
           numDecimalPlaces: 1
-        presentation:
-          title_public: Share of working-age population using generative AI
+

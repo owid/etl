@@ -2,14 +2,14 @@
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 meta:
   origin:
-    title: AI Diffusion Report 2025 H2
-    date_published: "2026-01-01"
+    title: Microsoft AI Diffusion Report 2025
+    date_published: "2026-01-08"
 
     producer: Microsoft
     citation_full: |-
-      Microsoft Research. AI Diffusion Report 2025 H2. January 2026.
+      Microsoft Research. AI Diffusion Report 2025. January 2026.
 
-    url_main: https://www.microsoft.com/en-us/research/project/ai-diffusion/
+    url_main: https://www.microsoft.com/en-us/corporate-responsibility/topics/AI-Economy-Institute/reports/Global-AI-Adoption-2025/
     url_download: https://www.microsoft.com/en-us/research/wp-content/uploads/2026/01/Microsoft-AI-Diffusion-Report-2025-H2.pdf
     date_accessed: '2026-04-07'
 
