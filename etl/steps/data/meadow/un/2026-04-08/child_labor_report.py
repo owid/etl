@@ -1,29 +1,44 @@
 """Load a snapshot and create a meadow dataset."""
 
+import pandas as pd
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+SNAPSHOTS = {
+    "child_labor_by_region": {
+        "index": ["region_type", "region"],
+    },
+    "hazardous_work_by_region": {
+        "index": ["region_type", "region"],
+    },
+    "child_labor_trends": {
+        "index": ["disaggregation_type", "disaggregation_value"],
+    },
+}
 
 
 def run() -> None:
     #
     # Load inputs.
     #
-    snapshot_names = ["child_labor_trends.csv", "child_labor_by_region.csv", "hazardous_work_by_region.csv"]
     tables = []
-    for snapshot_name in snapshot_names:
+    for snap_name, meta in SNAPSHOTS.items():
         # Retrieve snapshot.
-        snap = paths.load_snapshot(snapshot_name)
+        snap = paths.load_snapshot(f"{snap_name}.csv")
 
         # Load data from snapshot.
         tb = snap.read()
 
         #
-        # Process data.
-        #
         # Improve table format.
-        tb = tb.format(["country", "year"])
+        #
+        tb = tb.format(meta["index"])
+
+        # Convert numeric columns from comma-formatted strings to float.
+        tb = tb.apply(lambda col: pd.to_numeric(col.astype(str).str.replace(",", "", regex=False), errors="coerce"))
 
         # Append current table to list of tables.
         tables.append(tb)
