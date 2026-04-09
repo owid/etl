@@ -159,6 +159,12 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     tb_cl = tb_cl.copy()
     tb_hw = tb_hw.copy()
 
+    # Verify expected region_type categories exist.
+    expected_types = {_NOT_IN_SCHOOL, _BY_SECTOR, "World total"} | set(_REGION_ACRONYMS)
+    for tb, name in [(tb_cl, "child_labor"), (tb_hw, "hazardous_work")]:
+        actual_types = set(tb["region_type"].unique())
+        assert actual_types == expected_types, f"{name} has unexpected region_type values: {actual_types - expected_types}"
+
     # 1. Extract not-in-school rows.
     cl_nis = tb_cl[tb_cl["region_type"] == _NOT_IN_SCHOOL].drop(columns=["region_type", "region"])
     hw_nis = tb_hw[tb_hw["region_type"] == _NOT_IN_SCHOOL].drop(columns=["region_type", "region"])
@@ -176,6 +182,7 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     tb["year"] = LATEST_YEAR
 
     # 4. Concat with trends (2016, 2020, 2024 aggregate-level rows).
+    assert str(LATEST_YEAR) in tb_trends["year"].astype(str).values, f"LATEST_YEAR={LATEST_YEAR} not found in trends"
     tb = pr.concat([tb_trends, tb], ignore_index=True)
     tb = tb.drop_duplicates(subset=["country", "year", "sex", "age"], keep="first")
 
@@ -206,6 +213,7 @@ def _build_sector_table(tb_cl: Table, tb_hw: Table) -> Table:
     """
     tables = []
     for tb, prefix in [(tb_cl, "child_labor"), (tb_hw, "hazardous_work")]:
+        assert _BY_SECTOR in tb["region_type"].values, f"'{_BY_SECTOR}' not found in {prefix}"
         tb = tb[tb["region_type"] == _BY_SECTOR].drop(columns=["region_type"]).copy()
         tb = tb.rename(
             columns={
