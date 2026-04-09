@@ -7,7 +7,7 @@ from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
-# Get paths and naming conventions for current step.
+# Get paths and naming conventions for current step
 paths = PathFinder(__file__)
 
 # Columns used in charts
