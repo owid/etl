@@ -1,6 +1,6 @@
-"""Create a garden dataset of population by city size bin for grapher testing.
+"""Create a garden dataset of city population shares by city size bin for grapher testing.
 
-Produces wide-format population counts for many different binning configurations
+Produces wide-format share-of-city-population for many different binning configurations
 so they can be compared directly in grapher. Both country and regional aggregates.
 
 Bins included (all for cities ≥ 50k, i.e. urban centres only):
@@ -92,7 +92,11 @@ def run() -> None:
     bins_src = {bin_name: [f"{c}_src" for c in source_cols] for bin_name, source_cols in BINS.items()}
     origins = tb["pop_below_300k_src"].metadata.origins
 
-    # ── Compute output bins ──────────────────────────────────────────────────
+    # ── Compute total city population (sum of all 7 size classes) ────────────
+    tb["total_city_pop"] = tb[src_cols].sum(axis=1)
+    tb["total_city_pop"].metadata.origins = origins
+
+    # ── Compute output bins (absolute counts, needed for regional aggregation) ─
     for bin_name, source_cols in bins_src.items():
         valid = [c for c in source_cols if c in tb.columns]
         tb[bin_name] = tb[valid].sum(axis=1)
@@ -103,9 +107,10 @@ def run() -> None:
 
     # ── Add regional aggregates ──────────────────────────────────────────────
     bin_cols = list(BINS.keys())
+    agg_cols = bin_cols + ["total_city_pop"]
     tb = geo.add_regions_to_table(
         tb,
-        aggregations={col: "sum" for col in bin_cols},
+        aggregations={col: "sum" for col in agg_cols},
         regions=REGIONS,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
@@ -115,11 +120,22 @@ def run() -> None:
     # ── Keep only regions and income groups ──────────────────────────────────
     tb = tb[tb["country"].isin(REGIONS)].copy()
 
+    # ── Add share of total city population (%) alongside absolute counts ─────
+    share_cols = []
+    for bin_name in bin_cols:
+        share_name = bin_name.replace("pop_", "share_")
+        tb[share_name] = tb[bin_name] / tb["total_city_pop"] * 100
+        tb[share_name].metadata.origins = origins
+        share_cols.append(share_name)
+    tb = tb.drop(columns=["total_city_pop"])
+
+    all_output_cols = bin_cols + share_cols
+
     # ── Split estimates / projections ────────────────────────────────────────
     past = tb[tb["year"] < START_OF_PROJECTIONS].copy()
     future = tb[tb["year"] >= START_OF_PROJECTIONS - 5].copy()  # 5-yr overlap
 
-    for col in bin_cols:
+    for col in all_output_cols:
         past[f"{col}_estimates"] = tb.loc[tb["year"] < START_OF_PROJECTIONS, col]
         future[f"{col}_projections"] = tb.loc[tb["year"] >= START_OF_PROJECTIONS - 5, col]
         past = past.drop(columns=[col], errors="ignore")

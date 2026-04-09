@@ -1,7 +1,115 @@
+
 tables:
   ghsl_city_size_bins:
     variables:
       # ── Granular bins (300k+) ──────────────────────────────────────────────
+      share_300k_500k_estimates:
+        title: Share of city population in cities of 300,000–500,000 (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of city population living in urban centres with 300,000–500,000 inhabitants.
+        display:
+          name: 300k–500k
+          numDecimalPlaces: 1
+
+      share_300k_500k_projections:
+        title: Share of city population in cities of 300,000–500,000 (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected share of city population living in urban centres with 300,000–500,000 inhabitants.
+        display:
+          name: 300k–500k
+          numDecimalPlaces: 1
+
+      share_500k_1m_estimates:
+        title: Share of city population in cities of 500,000–1 million (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of city population living in urban centres with 500,000–1,000,000 inhabitants.
+        display:
+          name: 500k–1m
+          numDecimalPlaces: 1
+
+      share_500k_1m_projections:
+        title: Share of city population in cities of 500,000–1 million (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected share of city population living in urban centres with 500,000–1,000,000 inhabitants.
+        display:
+          name: 500k–1m
+          numDecimalPlaces: 1
+
+      share_1m_3m_estimates:
+        title: Share of city population in cities of 1–3 million (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of city population living in urban centres with 1–3 million inhabitants.
+        display:
+          name: 1m–3m
+          numDecimalPlaces: 1
+
+      share_1m_3m_projections:
+        title: Share of city population in cities of 1–3 million (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected share of city population living in urban centres with 1–3 million inhabitants.
+        display:
+          name: 1m–3m
+          numDecimalPlaces: 1
+
+      share_3m_5m_estimates:
+        title: Share of city population in cities of 3–5 million (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of city population living in urban centres with 3–5 million inhabitants.
+        display:
+          name: 3m–5m
+      share_3m_5m_projections:
+        title: Share of city population in cities of 3–5 million (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected share of city population living in urban centres with 3–5 million inhabitants.
+        display:
+          name: 3m–5m
+          numDecimalPlaces: 1
+
+      share_5m_10m_estimates:
+        title: Share of city population in cities of 5–10 million (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of city population living in urban centres with 5–10 million inhabitants.
+        display:
+          name: 5m–10m
+          numDecimalPlaces: 1
+
+      share_5m_10m_projections:
+        title: Share of city population in cities of 5–10 million (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected share of city population living in urban centres with 5–10 million inhabitants.
+        display:
+          name: 5m–10m
+          numDecimalPlaces: 1
+
+      share_above_10m_estimates:
+        title: Share of city population in cities of more than 10 million (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of city population living in urban centres with more than 10 million inhabitants.
+        display:
+          name: More than 10m
+          numDecimalPlaces: 1
+
+      share_above_10m_projections:
+        title: Share of city population in cities of more than 10 million (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected share of city population living in urban centres with more than 10 million inhabitants.
+        display:
+          name: More than 10m
+          numDecimalPlaces: 1
+
+      # ── Granular bins — raw population (300k+) ────────────────────────────
       pop_300k_500k_estimates:
         title: Population in cities of 300,000–500,000 (estimates)
         unit: people
@@ -92,7 +200,7 @@ tables:
         display:
           name: More than 10m
 
-      # ── Combined bins ──────────────────────────────────────────────────────
+      # ── Combined bins — raw population ─────────────────────────────────────
       pop_50k_500k_estimates:
         title: Population in cities of 50,000–500,000 (estimates)
         unit: people
@@ -152,3 +260,75 @@ tables:
         description_short: Projected population living in urban centres with 3–10 million inhabitants.
         display:
           name: 3m–10m
+
+      # ── Combined bins — share of city population ───────────────────────────
+      share_50k_500k_estimates:
+        title: Share of city population in cities of 50,000–500,000 (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of city population living in urban centres with 50,000–500,000 inhabitants.
+        display:
+          name: 50k–500k
+          numDecimalPlaces: 1
+
+      share_50k_500k_projections:
+        title: Share of city population in cities of 50,000–500,000 (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected share of city population living in urban centres with 50,000–500,000 inhabitants.
+        display:
+          name: 50k–500k
+          numDecimalPlaces: 1
+
+      share_50k_1m_estimates:
+        title: Share of city population in cities of 50,000–1 million (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of city population living in urban centres with 50,000–1,000,000 inhabitants.
+        display:
+          name: 50k–1m
+          numDecimalPlaces: 1
+
+      share_50k_1m_projections:
+        title: Share of city population in cities of 50,000–1 million (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected share of city population living in urban centres with 50,000–1,000,000 inhabitants.
+        display:
+          name: 50k–1m
+          numDecimalPlaces: 1
+
+      share_1m_5m_estimates:
+        title: Share of city population in cities of 1–5 million (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of city population living in urban centres with 1–5 million inhabitants.
+        display:
+          name: 1m–5m
+          numDecimalPlaces: 1
+
+      share_1m_5m_projections:
+        title: Share of city population in cities of 1–5 million (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected share of city population living in urban centres with 1–5 million inhabitants.
+        display:
+          name: 1m–5m
+          numDecimalPlaces: 1
+      share_3m_10m_estimates:
+        title: Share of city population in cities of 3–10 million (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of city population living in urban centres with 3–10 million inhabitants.
+        display:
+          name: 3m–10m
+          numDecimalPlaces: 1
+
+      share_3m_10m_projections:
+        title: Share of city population in cities of 3–10 million (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected share of city population living in urban centres with 3–10 million inhabitants.
+        display:
+          name: 3m–10m
+          numDecimalPlaces: 1
