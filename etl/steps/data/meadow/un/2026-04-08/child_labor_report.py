@@ -32,13 +32,16 @@ def run() -> None:
         # Load data from snapshot.
         tb = snap.read()
 
+        # Convert numeric columns from comma-formatted strings to float.
+        num_cols = [c for c in tb.columns if c not in meta["index"]]
+        tb[num_cols] = tb[num_cols].apply(
+            lambda col: pd.to_numeric(col.astype(str).str.replace(",", "", regex=False), errors="coerce")
+        )
+
         #
         # Improve table format.
         #
         tb = tb.format(meta["index"])
-
-        # Convert numeric columns from comma-formatted strings to float.
-        tb = tb.apply(lambda col: pd.to_numeric(col.astype(str).str.replace(",", "", regex=False), errors="coerce"))
 
         # Append current table to list of tables.
         tables.append(tb)

@@ -13,7 +13,31 @@ dataset:
 
 
 tables:
-  child_labor_report:
+  child_labor:
+    variables:
+      {}
+
+  child_labor_not_in_school:
+    variables:
+      {}
+
+  child_labor_sector:
+    variables:
+      {}
+
+  hazardous_work:
+    variables:
+      {}
+
+  hazardous_work_not_in_school:
+    variables:
+      {}
+
+  hazardous_work_sector:
+    variables:
+      {}
+
+  child_labor_trends:
     variables:
       # testing_variable:
       #   title: Testing variable title
@@ -53,6 +77,5 @@ tables:
       #     zeroDay:
       #     roundingMode:
       #     numSignificantFigures:
-      #
       {}
 
