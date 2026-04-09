@@ -40,6 +40,11 @@ def run() -> None:
     tb_main = _build_main_table(tb_cl, tb_hw, tb_trends)
     tb_sector = _build_sector_table(tb_cl, tb_hw)
 
+    # Convert number columns from thousands to actual values.
+    for tb in [tb_main, tb_sector]:
+        num_cols = [c for c in tb.columns if c.startswith("number_")]
+        tb[num_cols] = tb[num_cols] * 1000
+
     #
     # Save outputs.
     #
