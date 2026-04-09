@@ -22,9 +22,6 @@ tables:
           # Source: Section 2.1, p. 2–3 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
           - These are modelled estimates based on anonymized Microsoft telemetry, not survey data. They track visits to 19 generative AI platforms, including ChatGPT, Gemini, Copilot, Claude, DeepSeek, Grok, Midjourney, and Perplexity.
 
-          # Source: Section 2.3, p. 4 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
-          - The share is calculated as a proportion of the working-age population aged 15–64, sourced from the World Bank's World Development Indicators, with commercial data sources used as a fallback where World Bank data is unavailable.
-
           # Source: Section 2.1, p. 2–3 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
           - Only users with at least 90 minutes of total monthly activity on Microsoft platforms are included. This filters out infrequent users and is not specific to AI activity.
 
