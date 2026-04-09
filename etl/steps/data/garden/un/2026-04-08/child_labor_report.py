@@ -8,9 +8,14 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define latest year in the report (used for tables without an explicit year column)
 LATEST_YEAR = 2024
+
+# Define not in school and sector categories described in the tables, to extract and merge later.
 _NOT_IN_SCHOOL = "Children in child labour who are not attending school"
 _BY_SECTOR = "Children in child labour by sector of economic activity"
+
+# Define acronyms to disambiguate regions that appear under multiple groupings (e.g. Sub-Saharan Africa appears under both ILO and SDG regions).
 _REGION_ACRONYMS = {"ILO regions": "ILO", "SDG regions": "SDG", "UNICEF regions": "UNICEF"}
 
 
