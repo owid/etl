@@ -94,10 +94,11 @@ title: Number of neutron star mergers (NASA, 2023)
 | `unit` | Lowercase, plural, "per" not "/" | `tonnes per hectare`, `%`, `""` |
 | `short_unit` | SI abbreviation | `t/ha`, `%`, `""` |
 
-- Always set explicitly, even to `""` for dimensionless indicators
+- Always set `unit` explicitly, even to `""` for dimensionless indicators (scores, indexes)
+- `short_unit` is only needed when there's an actual unit to abbreviate. Omit it for dimensionless indicators -- it defaults to `None` and grapher won't show a unit label.
 - Use "person" not "capita" (`kilowatts per person`)
 - Choose human-friendly scales -- if most values are below 1 tonne per person, use "kilograms per person" instead
-- `short_unit` should use SI abbreviations (`g` not `grams`, `%` not `pct`). Keep `short_unit: ""` only when `unit` is also `""`
+- `short_unit` should use SI abbreviations (`g` not `grams`, `%` not `pct`)
 
 **Decimal precision:** 0 for counts, 1 for percentages, 2 for economic/per-capita values. Be consistent across related variables. Always set `numDecimalPlaces` explicitly -- it's a frequent source of review feedback.
 
@@ -214,9 +215,10 @@ For full syntax details, see `docs/architecture/metadata/structuring-yaml.md`.
 Before considering metadata complete:
 
 **Required fields:**
-- [ ] Every variable has `title`, `unit`, `short_unit`, `description_short`
+- [ ] Every variable has `title`, `unit`, `description_short`
+- [ ] `short_unit` set for variables that have actual units (omit for dimensionless indicators)
 - [ ] All descriptions start with capital letter, end with period
-- [ ] Units are lowercase, plural (except `%`); `short_unit` uses SI abbreviations
+- [ ] Units are lowercase, plural (except `%`); `short_unit` uses SI abbreviations when set
 - [ ] `processing_level` set and matches actual transformations; license matches
 - [ ] `update_period_days` is accurate (0 for datasets that will never update)
 
