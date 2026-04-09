@@ -8,53 +8,37 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+LATEST_YEAR = 2024
 _NOT_IN_SCHOOL = "Children in child labour who are not attending school"
 _BY_SECTOR = "Children in child labour by sector of economic activity"
+_REGION_ACRONYMS = {"ILO regions": "ILO", "SDG regions": "SDG", "UNICEF regions": "UNICEF"}
 
 
 def run() -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
     ds_meadow = paths.load_dataset("child_labor_report")
-
-    # Read tables from meadow dataset.
-    tb_by_region = ds_meadow.read("child_labor_by_region")
+    tb_cl = ds_meadow.read("child_labor_by_region")
+    tb_hw = ds_meadow.read("hazardous_work_by_region")
     tb_trends = ds_meadow.read("child_labor_trends")
-    tb_hazardous = ds_meadow.read("hazardous_work_by_region")
 
     #
     # Process data.
     #
-    # Reshape region tables from wide to long (sex × age).
-    tb_by_region = _to_long(tb_by_region)
-    tb_hazardous = _to_long(tb_hazardous)
+    # Reshape wide columns → long (sex × age dimensions).
+    tb_cl = _to_long(tb_cl)
+    tb_hw = _to_long(tb_hw)
     tb_trends = _trends_to_long(tb_trends)
 
-    # Split off "not in school" and "by sector" rows into separate tables.
-    tb_by_region, tb_by_region_not_in_school, tb_by_region_sector = _split_table(tb_by_region, "child_labor")
-    tb_hazardous, tb_hazardous_not_in_school, tb_hazardous_sector = _split_table(tb_hazardous, "hazardous_work")
-
-    # Merge child labor + hazardous work pairs and concat with trends.
-    tb_regions = _merge_and_concat(tb_by_region, tb_hazardous, tb_trends, "child_labor")
-
-    # Merge not-in-school data into the main table as additional columns.
-    tb_regions = _merge_not_in_school(tb_regions, tb_by_region_not_in_school, tb_hazardous_not_in_school)
-
-    # Merge sector tables.
-    tb_sector = _merge_indicators(tb_by_region_sector, tb_hazardous_sector, "sector")
+    # Build output tables.
+    tb_main = _build_main_table(tb_cl, tb_hw, tb_trends)
+    tb_sector = _build_sector_table(tb_cl, tb_hw)
 
     #
     # Save outputs.
     #
-    # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(
-        tables=[tb_regions, tb_sector],
-        default_metadata=ds_meadow.metadata,
-    )
-
-    # Save garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb_main, tb_sector], default_metadata=ds_meadow.metadata)
     ds_garden.save()
 
 
@@ -66,7 +50,7 @@ def _to_long(tb: Table) -> Table:
     """
     tb = tb.reset_index()
 
-    # Unpivot all 24 value columns into a single variable/value pair.
+    # Unpivot all value columns into a single variable/value pair.
     tb = tb.melt(id_vars=["region_type", "region"], var_name="variable", value_name="value")
 
     # Parse sex, age, and indicator from the column name pattern {sex}_{age}_{indicator}.
@@ -85,7 +69,7 @@ def _to_long(tb: Table) -> Table:
     tb = tb.rename(columns={"pct": "share", "no": "number"})
     tb = tb.reset_index()
 
-    return tb.format(["region_type", "region", "sex", "age"])
+    return tb
 
 
 def _trends_to_long(tb: Table) -> Table:
@@ -138,126 +122,98 @@ def _trends_to_long(tb: Table) -> Table:
     tb.loc[is_age, "age"] = tb.loc[is_age, "disaggregation_value"].str.replace(" years", "", regex=False)
 
     # Disambiguate regions that appear under multiple groupings (e.g. Sub-Saharan Africa).
-    for label in ["ILO regions", "SDG regions", "UNICEF regions"]:
-        suffix = label.split(" ")[0]  # "ILO", "SDG", "UNICEF"
+    for label, suffix in _REGION_ACRONYMS.items():
         mask = tb["disaggregation_type"] == label
         tb.loc[mask, "country"] = tb.loc[mask, "country"] + f" ({suffix})"
 
     tb = tb.drop(columns=["disaggregation_type", "disaggregation_value"])
 
-    return tb.format(["country", "year", "sex", "age"])
+    return tb
 
 
-def _split_table(tb: Table, prefix: str) -> tuple[Table, Table, Table]:
-    """Split a reshaped region table into three: regions, not-in-school, and by-sector.
-
-    Returns (tb_regions, tb_not_in_school, tb_sector), each with a distinct short_name.
-    """
-    tb = tb.reset_index()
-
-    # Filter rows for each category.
-    tb_not_in_school = tb[tb["region_type"] == _NOT_IN_SCHOOL].reset_index(drop=True)
-    tb_sector = tb[tb["region_type"] == _BY_SECTOR].reset_index(drop=True)
-    tb = tb[~tb["region_type"].isin([_NOT_IN_SCHOOL, _BY_SECTOR])].reset_index(drop=True)
-
-    # Sector table: drop region_type, rename region to sector, add country="World".
-    tb_sector = tb_sector.drop(columns=["region_type"])
-    tb_sector = tb_sector.rename(columns={"region": "sector"})
-    tb_sector["country"] = "World"
-
-    # Not-in-school table: drop region_type and region (always "Total"), add country="World".
-    tb_not_in_school = tb_not_in_school.drop(columns=["region_type", "region"])
-    tb_not_in_school["country"] = "World"
-
-    # Regions table: append acronym from region_type, rename to country, set "World" for World total.
-    acronym = {"ILO regions": "ILO", "SDG regions": "SDG", "UNICEF regions": "UNICEF"}
+def _apply_country_names(tb: Table) -> None:
+    """Replace region_type + region with a single country column (in-place)."""
     tb.loc[tb["region_type"] == "World total", "region"] = "World"
-    for label, suffix in acronym.items():
+    for label, suffix in _REGION_ACRONYMS.items():
         mask = tb["region_type"] == label
         tb.loc[mask, "region"] = tb.loc[mask, "region"] + f" ({suffix})"
-    tb = tb.drop(columns=["region_type"]).rename(columns={"region": "country"})
-
-    # Re-format each table.
-    tb = tb.format(["country", "sex", "age"], short_name=prefix)
-    tb_not_in_school = tb_not_in_school.format(["country", "sex", "age"], short_name=f"{prefix}_not_in_school")
-    tb_sector = tb_sector.format(["country", "sector", "sex", "age"], short_name=f"{prefix}_sector")
-
-    return tb, tb_not_in_school, tb_sector
+    tb.drop(columns=["region_type"], inplace=True)
+    tb.rename(columns={"region": "country"}, inplace=True)
 
 
-def _merge_indicators(tb_cl: Table, tb_hw: Table, short_name: str) -> Table:
-    """Merge child labor and hazardous work tables into one, suffixing columns by indicator.
+def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
+    """Build the main child_labor table by combining region data, trends, and not-in-school.
 
-    Both tables must have the same index and columns `share`/`number`.
-    Result has columns: share_child_labor, number_child_labor, share_hazardous_work, number_hazardous_work.
+    Steps:
+      1. Extract not-in-school rows (World-only) — will become extra columns.
+      2. Filter to region rows only, build country names with acronyms.
+      3. Merge child_labor + hazardous_work side-by-side, add year=2024.
+      4. Concat with trends (2016/2020/2024 aggregate rows).
+      5. Left-join not-in-school columns for World/2024 rows.
     """
-    tb_cl = tb_cl.reset_index()
-    tb_hw = tb_hw.reset_index()
+    tb_cl = tb_cl.copy()
+    tb_hw = tb_hw.copy()
 
-    # Rename value columns with indicator suffix.
+    # 1. Extract not-in-school rows.
+    cl_nis = tb_cl[tb_cl["region_type"] == _NOT_IN_SCHOOL].drop(columns=["region_type", "region"])
+    hw_nis = tb_hw[tb_hw["region_type"] == _NOT_IN_SCHOOL].drop(columns=["region_type", "region"])
+
+    # 2. Keep only region rows and build country column.
+    tb_cl = tb_cl[~tb_cl["region_type"].isin([_NOT_IN_SCHOOL, _BY_SECTOR])].copy()
+    tb_hw = tb_hw[~tb_hw["region_type"].isin([_NOT_IN_SCHOOL, _BY_SECTOR])].copy()
+    _apply_country_names(tb_cl)
+    _apply_country_names(tb_hw)
+
+    # 3. Suffix value columns and merge child_labor + hazardous_work.
     tb_cl = tb_cl.rename(columns={"share": "share_child_labor", "number": "number_child_labor"})
     tb_hw = tb_hw.rename(columns={"share": "share_hazardous_work", "number": "number_hazardous_work"})
+    tb = tb_cl.merge(tb_hw, on=["country", "sex", "age"], how="outer")
+    tb["year"] = LATEST_YEAR
 
-    # Merge on all shared index columns.
-    index_cols = [c for c in tb_cl.columns if c not in ["share_child_labor", "number_child_labor"]]
-    tb = tb_cl.merge(tb_hw, on=index_cols, how="outer")
-
-    return tb.format(index_cols, short_name=short_name)
-
-
-def _merge_and_concat(tb_cl: Table, tb_hw: Table, tb_trends: Table, short_name: str) -> Table:
-    """Merge child labor + hazardous work region tables, add year=2024, and concat with trends.
-
-    The region tables have no year column (2024 snapshot only). The trends table already has
-    year + the same 4 value columns. Concatenating gives a single table with all years.
-    """
-    # Merge the two 2024 tables.
-    tb_cl = tb_cl.reset_index()
-    tb_hw = tb_hw.reset_index()
-    tb_cl = tb_cl.rename(columns={"share": "share_child_labor", "number": "number_child_labor"})
-    tb_hw = tb_hw.rename(columns={"share": "share_hazardous_work", "number": "number_hazardous_work"})
-
-    index_cols = [c for c in tb_cl.columns if c not in ["share_child_labor", "number_child_labor"]]
-    tb_2024 = tb_cl.merge(tb_hw, on=index_cols, how="outer")
-    tb_2024["year"] = 2024
-
-    # Concat with trends (which has 2016, 2020, 2024 but only aggregate-level rows).
-    tb_trends = tb_trends.reset_index()
-    tb = pr.concat([tb_trends, tb_2024], ignore_index=True)
-
-    # Drop duplicate rows (trends already has some 2024 data that overlaps).
+    # 4. Concat with trends (2016, 2020, 2024 aggregate-level rows).
+    tb = pr.concat([tb_trends, tb], ignore_index=True)
     tb = tb.drop_duplicates(subset=["country", "year", "sex", "age"], keep="first")
 
-    return tb.format(["country", "year", "sex", "age"], short_name=short_name)
+    # 5. Left-join not-in-school columns (only populated for country="World", year=2024).
+    join_cols = ["country", "year", "sex", "age"]
+    for nis, prefix in [(cl_nis, "child_labor"), (hw_nis, "hazardous_work")]:
+        nis = nis.rename(
+            columns={
+                "share": f"share_{prefix}_not_in_school",
+                "number": f"number_{prefix}_not_in_school",
+            }
+        )
+        nis["country"] = "World"
+        nis["year"] = LATEST_YEAR
+        value_cols = [c for c in nis.columns if c not in join_cols]
+        tb = tb.merge(nis[join_cols + value_cols], on=join_cols, how="left")
+
+    tb = tb.format(["country", "year", "sex", "age"], short_name="child_labor")
+
+    return tb
 
 
-def _merge_not_in_school(tb: Table, tb_cl_nis: Table, tb_hw_nis: Table) -> Table:
-    """Merge not-in-school data into the main table as additional columns.
+def _build_sector_table(tb_cl: Table, tb_hw: Table) -> Table:
+    """Build the sector table from sector rows of both region tables.
 
-    The not-in-school tables only have country="World" rows. Their share/number columns
-    become share_child_labor_not_in_school, number_child_labor_not_in_school, etc.
+    Keeps only rows where region_type is "by sector of economic activity",
+    renames region → sector, merges child_labor + hazardous_work side-by-side.
     """
-    tb = tb.reset_index()
+    tables = []
+    for tb, prefix in [(tb_cl, "child_labor"), (tb_hw, "hazardous_work")]:
+        tb = tb[tb["region_type"] == _BY_SECTOR].drop(columns=["region_type"]).copy()
+        tb = tb.rename(
+            columns={
+                "region": "sector",
+                "share": f"share_{prefix}",
+                "number": f"number_{prefix}",
+            }
+        )
+        tb["country"] = "World"
+        tables.append(tb)
 
-    # Prepare not-in-school columns for child labor.
-    cl_nis = tb_cl_nis.reset_index().rename(columns={
-        "share": "share_child_labor_not_in_school",
-        "number": "number_child_labor_not_in_school",
-    })
+    tb = tables[0].merge(tables[1], on=["country", "sector", "sex", "age"], how="outer")
 
-    # Prepare not-in-school columns for hazardous work.
-    hw_nis = tb_hw_nis.reset_index().rename(columns={
-        "share": "share_hazardous_work_not_in_school",
-        "number": "number_hazardous_work_not_in_school",
-    })
+    tb = tb.format(["country", "sector", "sex", "age"], short_name="sector")
 
-    # These tables only have country="World", year is 2024.
-    cl_nis["year"] = 2024
-    hw_nis["year"] = 2024
-
-    # Merge on shared index columns.
-    join_cols = ["country", "sex", "age", "year"]
-    tb = tb.merge(cl_nis[join_cols + ["share_child_labor_not_in_school", "number_child_labor_not_in_school"]], on=join_cols, how="left")
-    tb = tb.merge(hw_nis[join_cols + ["share_hazardous_work_not_in_school", "number_hazardous_work_not_in_school"]], on=join_cols, how="left")
-
-    return tb.format(["country", "year", "sex", "age"], short_name=tb.metadata.short_name)
+    return tb
