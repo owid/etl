@@ -292,6 +292,14 @@ steps:
   data://grapher/artificial_intelligence/2026-04-07/ai_diffusion_msft:
     - data://garden/artificial_intelligence/2026-04-07/ai_diffusion_msft
   
+  # Eurostat — Use of generative AI tools by individuals
+  data://meadow/eurostat/2026-04-07/generative_ai_use:
+    - snapshot://eurostat/2026-04-07/generative_ai_use.gz
+  data://garden/eurostat/2026-04-07/generative_ai_use:
+    - data://meadow/eurostat/2026-04-07/generative_ai_use
+  data://grapher/eurostat/2026-04-07/generative_ai_use:
+    - data://garden/eurostat/2026-04-07/generative_ai_use
+    
   # Gallup - Artificial Intelligence indicator
   data://meadow/gallup/2026-04-03/ai_indicator:
     - snapshot://gallup/2026-04-03/ai_indicator.csv
