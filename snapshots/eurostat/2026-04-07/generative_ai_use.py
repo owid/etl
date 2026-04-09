@@ -34,7 +34,3 @@ def run(upload: bool) -> None:
 
     # Create snapshot and upload to R2.
     snap.create_snapshot(upload=upload, filename=snap.path)
-
-
-if __name__ == "__main__":
-    run()

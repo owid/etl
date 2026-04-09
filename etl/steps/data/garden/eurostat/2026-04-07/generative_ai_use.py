@@ -36,16 +36,14 @@ def run() -> None:
     tb = tb[tb["ind_type"].isin(IND_TYPES)].reset_index(drop=True)
 
     # Rename geo to country and value to a common column.
-    tb = tb.rename(columns={"geo": "country", "value": "share"})
+    tb = tb.rename(columns={"geo": "country", "value": "share"}, errors="raise")
 
     # Drop now-unnecessary dimension columns.
-    tb = tb.drop(columns=["indic_is", "unit"])
+    tb = tb.drop(columns=["indic_is", "unit"], errors="raise")
 
     # Harmonize country names.
     tb = paths.regions.harmonize_names(
         tb=tb,
-        country_col="country",
-        excluded_countries_file=paths.excluded_countries_path,
     )
 
     # Strip flags (letters) from values and convert to float.
@@ -59,14 +57,14 @@ def run() -> None:
     tables = []
     for ind_type_code, col_name in IND_TYPES.items():
         t = tb[tb["ind_type"] == ind_type_code].drop(columns=["ind_type"]).reset_index(drop=True)
-        t = t.rename(columns={"share": col_name})
+        t = t.rename(columns={"share": col_name}, errors="raise")
         tables.append(t)
 
     # Merge the two age-group tables.
     tb = tables[0].merge(tables[1], on=["country", "year"], how="outer")
 
     # Format the table.
-    tb = tb.format(["country", "year"], short_name="generative_ai_use")
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

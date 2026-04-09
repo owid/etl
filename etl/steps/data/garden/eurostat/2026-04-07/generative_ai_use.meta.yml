@@ -5,7 +5,7 @@ definitions:
         - Artificial Intelligence
     description_key:
       - This data comes from Eurostat's annual survey on the use of information and communication technologies (ICT) in households and by individuals, a sample survey carried out by national statistical institutes.
-      - 'Respondents were asked: "Have you used any generative AI tools (e.g. ChatGPT, Copilot, Gemini, LLaMA, Midjourney, DALL-E) to create content like text, images, programming code, or videos in the last 3 months?"'
+      - 'Respondents were asked whether they had used any generative AI tools (e.g. ChatGPT, Copilot, Gemini, LLaMA, Midjourney, DALL-E) to create content like text, images, programming code, or videos in the last 3 months. Possible answers were: Yes or No.'
       - In 2025, around 330,000 individuals aged 16 to 74 in the EU were surveyed through face-to-face interviews, telephone interviews, or online questionnaires.
       - 2025 is the first year Eurostat included questions on generative AI use in this survey, so no earlier time series is available for this indicator.
       - Results are broadly comparable across countries, although small differences in national survey implementation may affect comparability for some countries.
