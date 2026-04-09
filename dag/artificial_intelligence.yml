@@ -283,3 +283,11 @@ steps:
     - data://meadow/artificial_intelligence/2026-04-02/nvidia_revenue
   data://grapher/artificial_intelligence/2026-04-02/nvidia_revenue:
     - data://garden/artificial_intelligence/2026-04-02/nvidia_revenue
+
+  # Gallup - Artificial Intelligence indicator
+  data://meadow/gallup/2026-04-03/ai_indicator:
+    - snapshot://gallup/2026-04-03/ai_indicator.csv
+  data://garden/gallup/2026-04-03/ai_indicator:
+    - data://meadow/gallup/2026-04-03/ai_indicator
+  data://grapher/gallup/2026-04-03/ai_indicator:
+    - data://garden/gallup/2026-04-03/ai_indicator
