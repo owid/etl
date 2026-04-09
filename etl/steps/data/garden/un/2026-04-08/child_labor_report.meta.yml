@@ -1,9 +1,13 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: minor
     presentation:
+      attribution_short: ILO and UNICEF
       topic_tags:
         - Child Labor
+    display: &common_display
+      tolerance: 0
 
 
 # Learn more about the available fields:
@@ -15,9 +19,23 @@ dataset:
 tables:
   child_labor:
     variables:
-      {}
+      share_child_labor:
+        title: Share of children in child labor (<<sex>>, <<age>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_key: []
+        display:
+          name: Share of children in child labor (<<sex>>, <<age>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
 
   sector:
     variables:
       {}
+
+
+          # roundingMode:
+          # numSignificantFigures:
 
