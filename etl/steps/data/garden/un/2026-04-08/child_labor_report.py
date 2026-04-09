@@ -137,6 +137,7 @@ def _trends_to_long(tb: Table) -> Table:
         tb.loc[mask, "country"] = tb.loc[mask, "country"] + f" ({suffix})"
 
     tb = tb.drop(columns=["disaggregation_type", "disaggregation_value"])
+    tb["year"] = tb["year"].astype(int)
 
     return tb
 
@@ -187,8 +188,9 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     tb["year"] = LATEST_YEAR
 
     # 4. Concat with trends (2016, 2020, 2024 aggregate-level rows).
+    # Region data goes first so its rows are kept over trends duplicates (region data is more detailed).
     assert str(LATEST_YEAR) in tb_trends["year"].astype(str).values, f"LATEST_YEAR={LATEST_YEAR} not found in trends"
-    tb = pr.concat([tb_trends, tb], ignore_index=True)
+    tb = pr.concat([tb, tb_trends], ignore_index=True)
     tb = tb.drop_duplicates(subset=["country", "year", "sex", "age"], keep="first")
 
     # 5. Left-join not-in-school columns (only populated for country="World", year=2024).
