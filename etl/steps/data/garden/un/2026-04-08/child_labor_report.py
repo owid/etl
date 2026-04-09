@@ -230,10 +230,11 @@ def _build_sector_table(tb_cl: Table, tb_hw: Table) -> Table:
             }
         )
         tb["country"] = "World"
+        tb["year"] = LATEST_YEAR
         tables.append(tb)
 
-    tb = tables[0].merge(tables[1], on=["country", "sector", "sex", "age"], how="outer")
+    tb = tables[0].merge(tables[1], on=["country", "year", "sector", "sex", "age"], how="outer")
 
-    tb = tb.format(["country", "sector", "sex", "age"], short_name="sector")
+    tb = tb.format(["country", "year", "sector", "sex", "age"], short_name="sector")
 
     return tb

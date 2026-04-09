@@ -30,12 +30,126 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
 
+      number_child_labor:
+        title: Number of children in child labor (<<sex>>, <<age>>)
+        unit: "children"
+        short_unit: ""
+        description_short: Number of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_key: []
+        display:
+          name: Number of children in child labor (<<sex>>, <<age>>)
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      share_hazardous_work:
+        title: Share of children in hazardous work (<<sex>>, <<age>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of children who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_key: []
+        display:
+          name: Share of children in hazardous work (<<sex>>, <<age>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      number_hazardous_work:
+        title: Number of children in hazardous work (<<sex>>, <<age>>)
+        unit: "children"
+        short_unit: ""
+        description_short: Number of children who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_key: []
+        display:
+          name: Number of children in hazardous work (<<sex>>, <<age>>)
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      share_child_labor_not_in_school:
+        title: Share of children in child labor who are not attending school (<<sex>>, <<age>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of children in child labor who are not attending school.
+        description_key: []
+        display:
+          name: Share of children in child labor who are not attending school (<<sex>>, <<age>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      number_child_labor_not_in_school:
+        title: Number of children in child labor who are not attending school (<<sex>>, <<age>>)
+        unit: "children"
+        short_unit: ""
+        description_short: Number of children in child labor who are not attending school.
+        description_key: []
+        display:
+          name: Number of children in child labor who are not attending school (<<sex>>, <<age>>)
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      share_hazardous_work_not_in_school:
+        title: Share of children in hazardous work who are not attending school (<<sex>>, <<age>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of children in hazardous work who are not attending school.
+        description_key: []
+        display:
+          name: Share of children in hazardous work who are not attending school (<<sex>>, <<age>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      number_hazardous_work_not_in_school:
+        title: Number of children in hazardous work who are not attending school (<<sex>>, <<age>>)
+        unit: "children"
+        short_unit: ""
+        description_short: Number of children in hazardous work who are not attending school.
+        description_key: []
+        display:
+          name: Number of children in hazardous work who are not attending school (<<sex>>, <<age>>)
+          numDecimalPlaces: 0
+          <<: *common_display
 
   sector:
     variables:
-      {}
+      share_child_labor:
+        title: "Share of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of children in child labor who are working in a given sector.
+        description_key: []
+        display:
+          name: "Share of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
+          numDecimalPlaces: 1
+          <<: *common_display
 
+      number_child_labor:
+        title: "Number of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
+        unit: "children"
+        short_unit: ""
+        description_short: Number of children in child labor who are working in a given sector.
+        description_key: []
+        display:
+          name: "Number of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
+          numDecimalPlaces: 0
+          <<: *common_display
 
-          # roundingMode:
-          # numSignificantFigures:
+      share_hazardous_work:
+        title: "Share of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of children in hazardous work who are working in a given sector.
+        description_key: []
+        display:
+          name: "Share of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      number_hazardous_work:
+        title: "Number of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
+        unit: "children"
+        short_unit: ""
+        description_short: Number of children in hazardous work who are working in a given sector.
+        description_key: []
+        display:
+          name: "Number of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
+          numDecimalPlaces: 0
+          <<: *common_display
 
