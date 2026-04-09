@@ -327,6 +327,10 @@ def run() -> None:
     for col in tbs_full.columns:
         tbs_full[col].metadata = tb["country"].metadata
         tbs_full[col].metadata.origins = origins
+        # if column ends in na_share, replace 1 with N/A
+        # if na_share is 100%, that means no data is available
+        if col.endswith("_na_share"):
+            tbs_full[col] = tbs_full[col].replace(1, pd.NA)
     log.info("gfs_wave_two.metadata", metadata_copied=len(tbs_full.columns))
 
     tbs_full = tbs_full.format(["country", "year"])

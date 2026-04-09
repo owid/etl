@@ -3,6 +3,7 @@ definitions:
     processing_level: major
     display:
       numDecimalPlaces: 1
+      roundingMode: "significantFigures"
     description_processing: |-
       - All averages are calculated as the mean of the valid responses to the question.
       - For the wave one data of responses, we assigned the year 2023 to all responses, even though a small number of responses (~15%) were collected in 2024 or 2022. This will make it easier to compare developments over the different waves of the survey.
