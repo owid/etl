@@ -1,13 +1,16 @@
-"""Extract statistical annex tables (pages 54–58) from the ILO-UNICEF 2024 Global
-Estimates of Child Labour report and upload them as three separate snapshots:
+"""Extract statistical annex tables (pages 54–58) and chart data (page 9) from the
+ILO-UNICEF 2024 Global Estimates of Child Labour report and upload as three snapshots:
 
   - child_labor_by_region.csv   (pages 54–55): 2024 child labour by region × sex × age
   - hazardous_work_by_region.csv (pages 56–57): 2024 hazardous work by region × sex × age
-  - child_labor_trends.csv      (page 58):     trends 2016/2020/2024 for both indicators
+  - child_labor_trends.csv      (page 58 + page 9): trends 2000–2024 for both indicators
 
 The first two tables are split horizontally across two PDF pages each:
   - Left page: region_type, region, and Total columns (4 age groups × % + No.)
   - Right page: Boys and Girls columns (8 each, identical row order → positional join)
+
+The trends table from the annex (page 58) only covers 2016–2024. Page 9 has chart data
+extending back to 2000 (global) and 2008 (regional, by age). These are merged in.
 """
 
 import tempfile
@@ -61,6 +64,30 @@ _RIGHT_COLS = [
 ]
 
 
+# ── Historical chart data (page 9) ─────────────────────────────────────────────
+# Values read from chart labels on page 9. Numbers are in millions; shares in %.
+# Confirmed via spatial analysis of PDF word positions (pdfplumber extract_words).
+# fmt: off
+_CHART_DATA = {
+    # (disaggregation_type, disaggregation_value): {year: (cl_pct, cl_no_millions, hw_pct, hw_no_millions)}
+    ("World total", None): {
+        2000: (16.0, 245.5, 11.1, 170.5),
+        2004: (14.2, 222.3,  8.2, 128.4),
+        2008: (13.6, 215.2,  7.3, 115.3),
+        2012: (10.6, 168.0,  5.4,  85.3),
+    },
+    # ILO regions — child labour only (no hazardous work in chart)
+    ("ILO regions", "Sub-Saharan Africa"):              {2008: (25.3, 65.1, None, None), 2012: (21.4, 59.0, None, None)},
+    ("ILO regions", "Asia and the Pacific"):            {2008: (13.3, 113.6, None, None), 2012: (9.3, 77.7, None, None)},
+    ("ILO regions", "Latin America and the Caribbean"): {2008: (10.0, 14.1, None, None), 2012: (8.8, 12.5, None, None)},
+    # By age — child labour only
+    ("Age", "5-11 years"):  {2008: (10.7, 91.0, None, None), 2012: (8.5, 73.0, None, None)},
+    ("Age", "12-14 years"): {2008: (17.0, 61.8, None, None), 2012: (13.1, 47.5, None, None)},
+    ("Age", "15-17 years"): {2008: (16.9, 62.4, None, None), 2012: (13.0, 47.5, None, None)},
+}
+# fmt: on
+
+
 # ── Extraction helpers ─────────────────────────────────────────────────────────
 
 
@@ -107,7 +134,35 @@ def _extract_trends_table(pdf: pdfplumber.PDF) -> pd.DataFrame:
     # Forward-fill disaggregation_type
     df["disaggregation_type"] = df["disaggregation_type"].replace("", None).ffill()
 
-    return _clean(df)
+    df = _clean(df)
+
+    # Merge in historical chart data from page 9.
+    df = _merge_chart_data(df)
+
+    return df
+
+
+def _merge_chart_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Add historical columns (2000–2012) from page 9 chart data to the trends table."""
+    for (dtype, dvalue), year_data in _CHART_DATA.items():
+        # Find the matching row in the annex table.
+        mask = df["disaggregation_type"] == dtype
+        if dvalue is not None:
+            mask = mask & (df["disaggregation_value"] == dvalue)
+        else:
+            mask = mask & (df["disaggregation_value"].isna())
+
+        for year, (cl_pct, cl_no, hw_pct, hw_no) in year_data.items():
+            # Numbers in chart are millions; annex uses thousands.
+            cl_no_thousands = cl_no * 1000 if cl_no is not None else None
+            hw_no_thousands = hw_no * 1000 if hw_no is not None else None
+
+            df.loc[mask, f"child_labor_{year}_pct"] = cl_pct
+            df.loc[mask, f"child_labor_{year}_no"] = cl_no_thousands
+            df.loc[mask, f"hazardous_work_{year}_pct"] = hw_pct
+            df.loc[mask, f"hazardous_work_{year}_no"] = hw_no_thousands
+
+    return df
 
 
 def _clean(df: pd.DataFrame) -> pd.DataFrame:

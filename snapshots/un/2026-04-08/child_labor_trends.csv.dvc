@@ -27,6 +27,6 @@ meta:
       name: CC BY 4.0
       url: https://www.ilo.org/sites/default/files/2025-06/2024%20Global%20Estimates%20of%20Child%20Labour%20Report.pdf
 outs:
-  - md5: 721d44040d1102ba4249c8153a2fa753
-    size: 3349
+  - md5: 35ceeffa45395b2801c4734970c5c500
+    size: 4429
     path: child_labor_trends.csv
