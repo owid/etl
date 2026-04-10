@@ -2,6 +2,7 @@
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 definitions:
   common:
+    processing_level: minor
     presentation:
       topic_tags:
         - Artificial Intelligence
@@ -20,7 +21,7 @@ tables:
         description_short: Estimated share of the working-age population (aged 15–64) who actively used a [generative AI](#dod:generative-ai) tool, such as ChatGPT or Gemini, in the second half of 2025.
         description_key:
           # Source: Section 2.1, p. 2–3 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
-          - These are modelled estimates based on anonymized Microsoft telemetry, not survey data. They track visits to 19 generative AI platforms, including ChatGPT, Gemini, Claude, DeepSeek, Grok, Midjourney, and Perplexity.
+          - These are modelled estimates, not survey data. They are derived from anonymized usage signals collected automatically by Microsoft's software and services (such as Windows, Edge, and Bing), which log whether users visited any of 19 generative AI platforms, including ChatGPT, Gemini, Claude, DeepSeek, Grok, Midjourney, and Perplexity.
 
           # Source: Section 2.1, p. 2–3 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
           - Only users with at least 90 minutes of total monthly activity on Microsoft platforms are included. This filters out infrequent users and is not specific to AI activity.
