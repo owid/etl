@@ -38,9 +38,9 @@ def run(dest_dir: str) -> None:
 
     tb = tb.reset_index(drop=True)
 
-    assert (
-        not tb[["name_of_the_hardware", "days_since_2000"]].isnull().any().any()
-    ), "Index columns should not have NaN values"
+    assert not tb[["name_of_the_hardware", "days_since_2000"]].isnull().any().any(), (
+        "Index columns should not have NaN values"
+    )
 
     tb["release_price__usd"] = tb["release_price__usd"].astype(str)
     tb["release_price__usd"] = tb["release_price__usd"].replace({"\$": "", ",": ""}, regex=True).astype(float)

@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import Dict
-
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -58,7 +56,7 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
 
-def process_inequality_data(tb: Table, columns: Dict[str, str], short_name: str) -> Table:
+def process_inequality_data(tb: Table, columns: dict[str, str], short_name: str) -> Table:
     """
     Process the inequality data.
     """
@@ -83,7 +81,7 @@ def process_inequality_data(tb: Table, columns: Dict[str, str], short_name: str)
 
 
 def process_poverty_data(
-    tb: Table, columns: Dict[str, str], relative_poverty_names: Dict[str, str], short_name: str
+    tb: Table, columns: dict[str, str], relative_poverty_names: dict[str, str], short_name: str
 ) -> Table:
     """
     Process the poverty data.

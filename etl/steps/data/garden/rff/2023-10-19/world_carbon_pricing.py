@@ -1,6 +1,6 @@
 """Create a garden dataset from the meadow dataset."""
 
-from typing import Dict, List, cast
+from typing import cast
 
 from owid.catalog import Table, Variable
 from owid.datautils import dataframes, io
@@ -148,7 +148,7 @@ def get_coverage_for_any_sector(tb: Table) -> Table:
     return tb_any_sector
 
 
-def prepare_subnational_data(tb_subnational: Table, country_members: Dict[str, List[str]]) -> Table:
+def prepare_subnational_data(tb_subnational: Table, country_members: dict[str, list[str]]) -> Table:
     """Create a table showing whether a country has any sub-national jurisdiction for which any sector is covered by
     an ets/carbon tax.
 

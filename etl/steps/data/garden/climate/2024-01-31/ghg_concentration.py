@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import pandas as pd
 from owid.catalog import Table
 
@@ -20,7 +18,7 @@ COLUMNS = {
 }
 
 
-def add_rolling_average(tb: Table, original_column_names: List[str]) -> Table:
+def add_rolling_average(tb: Table, original_column_names: list[str]) -> Table:
     tb_with_average = tb.copy()
 
     # Create a date range of each month (on the 15th).

@@ -4,7 +4,6 @@ Relies on Streamlit.
 """
 
 import json
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -149,7 +148,7 @@ def processing_part_2(data, dataset_meta, variables_meta_dict, origin, dataset_u
     return fast_import
 
 
-def _convert_percentages(data: pd.DataFrame, variables_meta_dict: Dict[str, VariableMeta]) -> pd.DataFrame:
+def _convert_percentages(data: pd.DataFrame, variables_meta_dict: dict[str, VariableMeta]) -> pd.DataFrame:
     """Convert percentages to numbers."""
     for col in data.columns:
         if getattr(variables_meta_dict.get(col, {}), "unit", "") == "%":
@@ -179,7 +178,7 @@ def _convert_percentages(data: pd.DataFrame, variables_meta_dict: Dict[str, Vari
     return data
 
 
-def _clean_numeric_formatting(data: pd.DataFrame, variables_meta_dict: Dict[str, VariableMeta]) -> pd.DataFrame:
+def _clean_numeric_formatting(data: pd.DataFrame, variables_meta_dict: dict[str, VariableMeta]) -> pd.DataFrame:
     """Clean numeric formatting issues like commas, extra spaces, etc."""
     data = data.copy()
 
@@ -206,7 +205,7 @@ def _clean_numeric_formatting(data: pd.DataFrame, variables_meta_dict: Dict[str,
     return data
 
 
-def _validate_data(df: pd.DataFrame, variables_meta_dict: Dict[str, VariableMeta]) -> bool:
+def _validate_data(df: pd.DataFrame, variables_meta_dict: dict[str, VariableMeta]) -> bool:
     errors = []
 
     # check column names
@@ -264,7 +263,7 @@ def _validate_data(df: pd.DataFrame, variables_meta_dict: Dict[str, VariableMeta
         return True
 
 
-def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
+def _harmonize_countries(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     """Check if all countries are harmonized.
 
     TODO: Vectorise this function.
@@ -299,7 +298,7 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
 
         # there is an alias for this country
         elif country in alias_to_country.index:
-            df.country = df.country.replace({country: alias_to_country[country]})
+            df.country = df.country.replace({country: alias_to_country[country]})  # ty: ignore[unresolved-attribute]
             st.warning(f"Country `{country}` harmonized to `{alias_to_country.loc[country]}`")
 
         # unknown country
@@ -312,8 +311,8 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
 
 
 def _infer_metadata(
-    data: pd.DataFrame, meta_variables: Dict[str, VariableMeta]
-) -> Tuple[pd.DataFrame, Dict[str, VariableMeta]]:
+    data: pd.DataFrame, meta_variables: dict[str, VariableMeta]
+) -> tuple[pd.DataFrame, dict[str, VariableMeta]]:
     """Infer metadata."""
     # underscore variable names from data sheet, this doesn't raise warnings
     for col in data.columns:

@@ -16,7 +16,7 @@ Four sources are used overall:
 
 import os
 from copy import deepcopy
-from typing import List, cast
+from typing import cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -135,7 +135,7 @@ def select_source(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _assert_unique(df: pd.DataFrame, subset: List[str]) -> None:
+def _assert_unique(df: pd.DataFrame, subset: list[str]) -> None:
     """Ensure that dataframe has only one row per columns in subset"""
     # NOTE: this could be moved to helpers
     df_deduped = df.drop_duplicates(subset=subset)

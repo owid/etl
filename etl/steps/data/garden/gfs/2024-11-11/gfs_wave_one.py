@@ -238,7 +238,7 @@ def run(dest_dir: str) -> None:
         tb[col] = tb[col].astype(str)
 
     for val in ["-98", "98", "99", -98, 98, 99, " ", ""]:
-        tb = tb.replace(val, np.nan)  # type: ignore
+        tb = tb.replace(val, np.nan)  # ty: ignore
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 

@@ -58,7 +58,7 @@ def add_num_days(tb: Table) -> Table:
         tb[column_indicator].metadata.display["zeroDay"] = zero_day.strftime("%Y-%m-%d")
 
     # Add column with number of days after zero_day
-    tb["year"] = (tb["date"] - zero_day).dt.days  # type: ignore
+    tb["year"] = (tb["date"] - zero_day).dt.days  # ty: ignore
 
     # Drop date column
     tb = tb.drop(columns=["date"])

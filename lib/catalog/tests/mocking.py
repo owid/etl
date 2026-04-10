@@ -9,7 +9,7 @@ from typing import Any, Literal, Union
 _MOCK_STRINGS = [
     "alpha",
     "beta",
-    "gamma" "delta",
+    "gammadelta",
     "epsilon",
     "zeta",
     "eta",
@@ -80,7 +80,7 @@ def mock(_type: type) -> Any:
 
         # e.g. List[int] or list[int]
         if args:
-            return [mock(args[0]) for i in range(random.randint(1, 4))]  # type: ignore
+            return [mock(args[0]) for i in range(random.randint(1, 4))]  # ty: ignore
         else:
             return []
 
@@ -88,14 +88,14 @@ def mock(_type: type) -> Any:
         # e.g. Dict[str, int] or dict[str, int]
         args = getattr(_type, "__args__", ())
         if len(args) >= 2:
-            _from, _to = args[0], args[1]  # type: ignore
+            _from, _to = args[0], args[1]  # ty: ignore
             return {mock(_from): mock(_to) for i in range(random.randint(1, 8))}
         else:
             return {}
 
     elif hasattr(_type, "__dataclass_fields__"):
         # all dataclasses
-        return _type(**{f.name: mock(f.type) for f in _type.__dataclass_fields__.values()})  # type: ignore
+        return _type(**{f.name: mock(f.type) for f in _type.__dataclass_fields__.values()})  # ty: ignore
 
     elif getattr(_type, "__name__", None) == "ProcessingLog":
         return _type([])
@@ -107,10 +107,10 @@ def mock(_type: type) -> Any:
         return str(_random_date())
 
     elif getattr(_type, "__origin__", None) == Literal:
-        return random.choice(_type.__args__)  # type: ignore
+        return random.choice(_type.__args__)  # ty: ignore
 
     elif getattr(_type, "__origin__", None) == Union:
-        return mock(random.choice(_type.__args__))  # type: ignore
+        return mock(random.choice(_type.__args__))  # ty: ignore
 
     elif _type is type(None):
         return None

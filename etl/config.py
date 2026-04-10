@@ -17,7 +17,7 @@ import warnings
 from dataclasses import dataclass, fields
 from os import environ as env
 from pathlib import Path
-from typing import List, Literal, Optional, cast
+from typing import Literal, cast
 from urllib.parse import quote
 
 import git
@@ -146,7 +146,7 @@ DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
 # Special ENV file with access to production DB (read-only), used by chart-diff
 if "ENV_FILE_PROD" in env:
-    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # type: ignore
+    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # ty: ignore
 else:
     ENV_FILE_PROD = None
 
@@ -163,7 +163,7 @@ if DB_IS_PRODUCTION:
     assert DATA_API_ENV == "production", "DATA_API_ENV must be set to production when publishing to live_grapher"
 
 
-def load_STAGING() -> Optional[str]:
+def load_STAGING() -> str | None:
     # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
 
@@ -384,7 +384,7 @@ class Config:
                 if field.name not in env_dict:
                     raise KeyError(f"Field {field.name} not found in env file {env_file}!")
                 config_dict[field.name] = env_dict[field.name]
-        return cls(**config_dict)  # type: ignore
+        return cls(**config_dict)  # ty: ignore
 
 
 class UnknownOWIDEnv(Exception):
@@ -670,7 +670,7 @@ class OWIDEnv:
             else:
                 raise ValueError(f"Unsupported engine type {type(self.engine)}")
 
-    def read_sqls(self, sql: List[str], *args, **kwargs) -> List[pd.DataFrame]:
+    def read_sqls(self, sql: list[str], *args, **kwargs) -> list[pd.DataFrame]:
         """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
 
         It can read multiple sql queries, to exploit the same connection and cursor.
