@@ -94,7 +94,8 @@ def update_chart_config(
 
     The chart config contains some fields that point to the indicators in use. In the attempt to migrating these, we should update all references to the new indicators.
     """
-    updater = ChartIndicatorUpdater(indicator_mapping, schema)
+    is_inheritance_enabled = config.get("isInheritanceEnabled", False)
+    updater = ChartIndicatorUpdater(indicator_mapping, schema, is_inheritance_enabled=is_inheritance_enabled)
     config_new = updater.run(deepcopy(config))
     return config_new
 
@@ -106,6 +107,7 @@ class ChartIndicatorUpdater:
         self,
         indicator_mapping: Dict[int, int],
         schema: Dict[str, Any],
+        is_inheritance_enabled: bool = False,
     ) -> None:
         """Constructor.
 
@@ -115,10 +117,18 @@ class ChartIndicatorUpdater:
             Mapping between old and new indicator IDs.
         schema : Optional[Dict[str, Any]]
             Schema of the chart configuration. Defaults to None.
+        is_inheritance_enabled : bool
+            Whether chart inheritance is enabled. When True, we skip stripping
+            schema-default values from the config, because the admin API needs
+            the full config to correctly compute the patch against the indicator's
+            ETL config. Without this, properties like hasMapTab=false (a schema
+            default that overrides the indicator's hasMapTab=true) would be
+            stripped, causing the chart to re-inherit the indicator's value.
         """
         # Variable mapping dictionary: Old variable ID -> New variable ID
         self.indicator_mapping = indicator_mapping
         self.schema = schema
+        self.is_inheritance_enabled = is_inheritance_enabled
 
     def run(self, config: Dict[str, Any]) -> Dict[str, Any]:
         """Run the chart variable updater."""
@@ -132,8 +142,14 @@ class ChartIndicatorUpdater:
         config_new = update_chart_config_dimensions(config_new, self.indicator_mapping)
         # Update sorting
         config_new = update_chart_config_sort(config_new, self.indicator_mapping)
-        # Validate the  configuration of the chart and remove default values (if any)
-        config_new = validate_chart_config_and_remove_defaults(config_new, self.schema)
+        # Validate the configuration of the chart and remove default values (if any).
+        # Skip this for inheritance-enabled charts: the admin API computes the patch
+        # by diffing the full config against the indicator's ETL config. If we strip
+        # schema-default values here, overrides that happen to match the schema default
+        # (e.g. hasMapTab=false) but differ from the indicator default (hasMapTab=true)
+        # would be lost, causing the chart to re-inherit the indicator's value.
+        if not self.is_inheritance_enabled:
+            config_new = validate_chart_config_and_remove_defaults(config_new, self.schema)
         return config_new
 
 
