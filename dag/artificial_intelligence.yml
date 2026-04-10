@@ -268,6 +268,15 @@ steps:
   data://grapher/ifr/2026-01-14/robot_density:
     - data://garden/ifr/2026-01-14/robot_density
 
+  # IFR robot density 2024 data
+  data://meadow/ifr/2026-04-10/robot_density:
+    - snapshot://ifr/2026-04-10/robot_density.csv
+  data://garden/ifr/2026-04-10/robot_density:
+    - data://meadow/ifr/2026-04-10/robot_density
+    - data://garden/ifr/2026-01-14/robot_density
+  data://grapher/ifr/2026-04-10/robot_density:
+    - data://garden/ifr/2026-04-10/robot_density
+
   # Robotaxis dataset
   data://meadow/artificial_intelligence/2026-03-30/robotaxis:
     - snapshot://artificial_intelligence/2026-03-30/robotaxis.csv

@@ -24,6 +24,9 @@ def run() -> None:
 
     tb["robot_density"] = tb["robot_density"] / 10
 
+    # Fix incorrect China 2023 value (revised to 142 robots per 10,000 employees per IFR)
+    tb.loc[(tb["country"] == "China") & (tb["year"] == 2023), "robot_density"] = 142 / 10
+
     # Improve table format.
     tb = tb.format(["country", "year"])
 
