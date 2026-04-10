@@ -160,7 +160,7 @@ Set in `definitions.common`, override per-variable as needed.
 - 1-3 tags, most relevant first. First tag = primary (used in citations).
 - Must match valid tags from the schema. To list them:
   ```bash
-  python3 -c "import json; tags=json.load(open('schemas/dataset-schema.json'))['properties']['tables']['additionalProperties']['properties']['variables']['additionalProperties']['properties']['presentation']['properties']['topic_tags']['items']['enum']; print('\n'.join(tags))"
+  .venv/bin/python -c "import json; tags=json.load(open('schemas/dataset-schema.json'))['properties']['tables']['additionalProperties']['properties']['variables']['additionalProperties']['properties']['presentation']['properties']['topic_tags']['items']['enum']; print('\n'.join(tags))"
   ```
 - Set in `definitions.common.presentation.topic_tags`.
 
