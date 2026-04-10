@@ -19,7 +19,7 @@ tables:
         description_key:
           - Passenger load factor shows how full flights were, on average.
           - It is calculated by comparing passenger traffic with the total available passenger seating capacity airlines provided.
-          - A load factor of 80% means that, on average, 80 out of every 100 available seats were filled by paying passengers.
+          - A load factor of 80% means that, on average, 80 out of every 100 available passenger seats were filled by paying passengers.
         presentation:
           title_public: Share of airline seats filled by paying passengers
         display:
@@ -33,7 +33,7 @@ tables:
         description_short: The share of airline seats that flew empty.
         description_key:
          - This indicator shows the share of available passenger seats that were not filled by paying passengers.
-          - A value of 20% means that, on average, 1 in 5 available seats flew empty.
+          - A value of 20% means that, on average, 1 in 5 available passenger seats flew empty.
         processing_level: major
         presentation:
           title_public: Share of airline seats that flew empty
