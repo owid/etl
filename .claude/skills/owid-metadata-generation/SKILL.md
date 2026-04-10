@@ -110,7 +110,7 @@ title: Number of neutron star mergers (NASA, 2023)
 - Don't mention units, sources, or processing (redundant or belongs elsewhere)
 - Don't just repeat the title -- if it adds nothing beyond the title, omit it entirely
 - Remove filler phrases like "Emissions are..." at the start
-- You can use `[term](#dod:term)` links to reference definitions (see Markdown below)
+- Supports Markdown: `[text](url)` for links, `[term](#dod:term)` for OWID definition popups (e.g. `[stunted](#dod:stunting)`)
 
 ```yaml
 # GOOD
@@ -125,13 +125,10 @@ description_short: |-
 ```
 
 **`description_key`** -- Array of self-contained bullet points for "About this data" panel.
-- Expand all acronyms on first use. Write for a layperson, not a specialist.
-- Replace jargon with plain language (e.g. "livestock digestive processes" not "enteric fermentation")
-- **Add concrete examples** -- reviewers consistently ask "can you give examples?" for abstract scope descriptions (what countries are included, what events qualify, what counts as a "public official")
-- **Order matters**: data-specific points first, methodology second, caveats/limitations last
-- Consolidate related bullets -- don't say the same thing in three different ways
-- **Only describe data that actually exists** in the indicator. If categories or disaggregations aren't in the variable, don't describe them.
-- State implications of limitations explicitly (e.g. "This leads to underestimates and could be one reason for lower reported shares in earlier years" not just "This leads to underestimates")
+- Plain language, no jargon (e.g. "livestock digestive processes" not "enteric fermentation"). Expand acronyms on first use.
+- **Add concrete examples** for abstract scope descriptions (what countries are included, what events qualify)
+- **Order**: data-specific points first, methodology second, caveats last
+- Only describe data that actually exists in the indicator. State implications of limitations explicitly.
 
 ```yaml
 # GOOD
@@ -146,10 +143,9 @@ description_key:
 **`description_from_producer`** -- Exact producer text, verbatim or minimally edited. Only if producer provides clear definitions. Can be set in `definitions.common` when the same producer description applies to all variables, with per-variable overrides as needed.
 
 **`description_processing`** -- What OWID did. Only for major transformations (aggregations, per-capita calculations, combining sources). Don't document routine operations (country harmonization, dropping nulls).
-- **Document dropped data** -- if you exclude data points or make aggregation choices, explain them here
-- **Keep it in sync with code** -- when garden step logic changes, update this field. Outdated descriptions get caught in reviews.
-- **Don't reference internal dataset names** -- readers have no context for "OWID Deflator dataset". Describe what was done, not which internal datasets were used.
-- **Low-visibility field** -- few users see `description_processing`. If a caveat is important for understanding the data, also surface it in `description_short` or `description_key`.
+- Document dropped data and aggregation choices. Keep in sync with code.
+- Don't reference internal dataset names — describe what was done, not which datasets were used.
+- Low-visibility field — surface important caveats in `description_short` or `description_key` too.
 
 ### Processing Level and License
 
@@ -181,37 +177,13 @@ Set in `definitions.common`, override per-variable as needed.
 - `display.tolerance`: Number of years to allow gap-bridging on line charts (default 0). Set higher (e.g. 5-10) for sparse historical data where connecting distant points is acceptable.
 - `display.roundingMode`: Use `"significantFigures"` with `numSignificantFigures` instead of `numDecimalPlaces` when values span many orders of magnitude.
 
-## Markdown in Descriptions
-
-Descriptions support Markdown links and a special definition-of-the-day syntax:
-
-- **External links**: `[visible text](https://example.com)` — use for linking to source methodology, papers, or standards
-- **Definition popups**: `[term](#dod:term)` — renders as a hover/click popup with the OWID definition. Use for technical terms that have standard OWID definitions (e.g. `[stunted](#dod:stunting)`, `[extreme poverty](#dod:extreme-poverty)`)
-- Use sparingly — 1-2 links per description field max. Don't link common terms.
-
 ## YAML Efficiency Patterns
 
 **Use `definitions.common`** when 3+ variables share the same field values. Remember: `common` does NOT merge -- it completely overrides. Use `<<: *anchor` for partial overrides.
 
 **Use anchors/aliases** for identical blocks shared by 2+ variables. Define in `definitions:` at the top. **Name anchors to indicate their target field** (e.g. `description_producer_refugee` not `description_refugee`) so reviewers can tell which metadata field the text will end up in.
 
-**Use `<<: *anchor` merge** to extend a shared mapping while adding or overriding keys:
-
-```yaml
-definitions:
-  common_display: &common_display
-    tolerance: 5
-    numDecimalPlaces: 1
-
-tables:
-  my_table:
-    variables:
-      my_var:
-        display:
-          name: My variable
-          <<: *common_display      # inherits tolerance and numDecimalPlaces
-          numDecimalPlaces: 0      # overrides just this one field
-```
+**Use `<<: *anchor` merge** to extend a shared mapping while overriding specific keys (e.g. `<<: *common_display` then `numDecimalPlaces: 0`).
 
 **Use Jinja templates** for dimensional datasets (age, sex, cause breakdowns). Custom delimiters: `<% %>` for blocks, `<< >>` for expressions.
 
@@ -232,26 +204,7 @@ variables:
       name: With <<who_category>>
 ```
 
-**Use `{definitions.xxx}` string interpolation** to compose text from named definition blocks. Unlike YAML anchors (which substitute entire nodes), this inserts text inline within strings:
-
-```yaml
-definitions:
-  methodology: This data is based on the American Time Use Survey (ATUS).
-  weighting: Data points have been weighted using survey weights provided by ATUS.
-
-tables:
-  my_table:
-    variables:
-      my_var:
-        description_key:
-          - '{definitions.methodology}'
-          - '{definitions.weighting}'
-        description_processing: |-
-          - {definitions.weighting}
-          - Additional processing step here.
-```
-
-Use this when you need to reuse text fragments within larger strings or array items. Use YAML anchors (`&`/`*`) when substituting entire fields or blocks.
+**Use `{definitions.xxx}` string interpolation** for reusing text fragments inline (e.g. `'{definitions.methodology}'` in a `description_key` bullet). Unlike YAML anchors which substitute entire nodes, this inserts text within strings. Use anchors for whole fields/blocks, interpolation for composing text.
 
 **Use `shared.meta.yml`** when multiple `.meta.yml` files in the same directory share definitions or macros. These files contain only Jinja macros and reusable definitions — no actual variable metadata. Step-level `.meta.yml` files then import and call these macros. Used in large multi-file datasets like IHME GBD.
 
@@ -274,53 +227,17 @@ For full syntax details, see `docs/architecture/metadata/structuring-yaml.md`.
 6. **Preview with INSTANT mode**: `INSTANT=1 .venv/bin/etlr data://grapher/<ns>/<ver>/<ds> --grapher --only`
 7. **Check typos**: Run the `check-metadata-typos` skill on the step path
 
-## Tools Reference
-
-| Tool | Command | When |
-|------|---------|------|
-| Generate skeleton | `.venv/bin/etl metadata-export data/garden/... --output /tmp/out.yml` | Starting metadata for existing dataset |
-| Auto-detect decimals | add `--decimals auto` to above | Setting numDecimalPlaces |
-| GPT-assisted enrichment | `.venv/bin/etl metadata-upgrade --path-to-file <file>` | Large datasets, initial draft (verify output!) |
-| Live preview | `INSTANT=1 .venv/bin/etlr ... --grapher --only` | Rapid YAML iteration |
-| Typo check | invoke `check-metadata-typos` skill | Before finalizing |
-| Render Jinja in notebook | `tb.emissions.m.render({'dim': 'value'})` | Testing dimensional metadata |
-
 ## Quality Checklist
 
-Before considering metadata complete:
+Items that are easy to miss (obvious rules like "set title" are omitted — see field guidelines above):
 
-**Required fields:**
-- [ ] Every variable has `title`, `unit`, `description_short`
-- [ ] `short_unit` set for variables that have actual units (omit for dimensionless indicators)
-- [ ] All descriptions start with capital letter, end with period
-- [ ] Units are lowercase, plural (except `%`); `short_unit` uses SI abbreviations when set
-- [ ] `processing_level` set and matches actual transformations; license matches
-- [ ] `update_period_days` is accurate (0 for datasets that will never update)
-
-**Content quality (from real PR review feedback):**
-- [ ] `description_short` adds value beyond the title -- if it just repeats the title, delete it
-- [ ] `description_short` doesn't mention sources, processing, or units
-- [ ] `description_key` bullets are plain language -- no unexpanded acronyms, no jargon a layperson wouldn't know
-- [ ] `description_key` includes concrete examples where scope is abstract (what's included/excluded, what qualifies)
+- [ ] `description_short` adds value beyond the title — if it just repeats the title, delete it
+- [ ] `description_key` includes concrete examples where scope is abstract
 - [ ] `description_key` only describes data that actually exists in the indicator
-- [ ] `description_key` is ordered: data-specific points first, methodology second, caveats last
-- [ ] `description_processing` matches current code (not outdated from previous version)
-- [ ] `description_processing` doesn't reference internal dataset names readers can't see
-- [ ] Important caveats from `description_processing` are also surfaced in `description_short` or `description_key`
-- [ ] Consistency across related variables -- if some have impact descriptions, all should
-
-**Presentation:**
-- [ ] `definitions.common.presentation.topic_tags` set with valid topics
-- [ ] `display.numDecimalPlaces` set and consistent across related variables
-- [ ] `display.name` paired with `presentation.title_public` when set
-- [ ] No redundant `title_variant` + `attribution_short` producing "V-Dem - V-Dem" style duplication
-
-**Structure:**
-- [ ] Repeated text extracted into `definitions:` with anchors/aliases
-- [ ] Anchor names indicate target field (e.g. `description_producer_X`)
-- [ ] Jinja templates used for dimensional datasets with 10+ similar variables
-- [ ] Multi-line strings use `|-` (strip trailing whitespace)
-- [ ] No TODO, FIXME, or placeholder text remains
-- [ ] No producer names/years in titles
-- [ ] No copy-paste errors (e.g. "strongly agree" text on a "strongly disagree" variable)
+- [ ] `description_processing` matches current code and doesn't reference internal dataset names
+- [ ] Important caveats surfaced in `description_short` or `description_key`, not buried in `description_processing`
+- [ ] `numDecimalPlaces` set and consistent across related variables
+- [ ] `display.name` paired with `title_public` when set
+- [ ] No TODO/FIXME, no copy-paste errors, no producer names/years in titles
+- [ ] Repeated text uses anchors/aliases or `{definitions.xxx}`; Jinja for 10+ similar variables
 - [ ] Typo check passed
