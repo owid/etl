@@ -77,6 +77,7 @@ tables:
 - When `display.name` is set, also set `title_public` (see title hierarchy in `docs/architecture/metadata/faqs.md`)
 - **Prefer NOT setting `title_public`** unless the `title` has dimension breakdowns or codes (e.g. SDG indicator numbers). The data page will show the curated chart title instead, which is usually better. Use `display.name` for cleaner legend/table labels.
 - Prefer clear, reader-friendly titles over technically precise ones (e.g. "Share of people who think vaccines are safe" over "Share who strongly agree that...")
+- `title_variant` disambiguates when multiple indicators share a similar title — use short phrases like "Historical data", "WHO", "Age-standardized", "Extrapolated". Watch for redundancy with `attribution_short` (avoid "V-Dem - V-Dem" duplication).
 
 ```yaml
 # GOOD
@@ -104,10 +105,12 @@ title: Number of neutron star mergers (NASA, 2023)
 
 ### Descriptions
 
-**`description_short`** -- 1-2 sentences max. Answers "What does this number measure?" Use `|-` block scalar.
+**`description_short`** -- 1-2 sentences, ~200 characters ideally. Answers "What does this number measure?" Longer explanations belong in `description_key`.
+- Use `|-` block scalar for multi-line; inline strings are fine for single sentences
 - Don't mention units, sources, or processing (redundant or belongs elsewhere)
 - Don't just repeat the title -- if it adds nothing beyond the title, omit it entirely
 - Remove filler phrases like "Emissions are..." at the start
+- You can use `[term](#dod:term)` links to reference definitions (see Markdown below)
 
 ```yaml
 # GOOD
@@ -140,7 +143,7 @@ description_key:
   - Uses IPL of $2.15/day (2017 PPP).
 ```
 
-**`description_from_producer`** -- Exact producer text, verbatim or minimally edited. Only if producer provides clear definitions.
+**`description_from_producer`** -- Exact producer text, verbatim or minimally edited. Only if producer provides clear definitions. Can be set in `definitions.common` when the same producer description applies to all variables, with per-variable overrides as needed.
 
 **`description_processing`** -- What OWID did. Only for major transformations (aggregations, per-capita calculations, combining sources). Don't document routine operations (country harmonization, dropping nulls).
 - **Document dropped data** -- if you exclude data points or make aggregation choices, explain them here
@@ -168,8 +171,23 @@ Set in `definitions.common`, override per-variable as needed.
 ### Presentation & Display
 
 - `presentation.attribution_short`: Short source name ("WHO", "World Bank"). Set in `common` when uniform.
-- `presentation.grapher_config`: Only set when you want a specific default chart view (title, subtitle, note, selectedEntityNames, map settings).
+- `presentation.grapher_config`: Only set when you want a specific default chart view. Common sub-fields:
+  - `note`: Chart footnotes — methodology caveats, sample sizes, inflation adjustments. Keep to 1-2 sentences.
+  - `selectedEntityNames`: Pre-select countries/regions for the default view (e.g. `["United States", "China", "Europe"]`)
+  - `selectedEntityColors`: Map entity names to hex colors (e.g. `{"Africa": "#A2559C", "Asia": "#00847E"}`)
+  - `map`: Map tab settings — `colorScale` with `baseColorScheme` (e.g. `"YlOrRd"`), `binningStrategy` (`"manual"`), and `customNumericValues` for bin thresholds
+  - Set at variable level, or in `definitions.common.presentation` when all variables share the same chart defaults
 - `display.numDecimalPlaces`: Set explicitly. Use `metadata-export --decimals auto` to auto-detect.
+- `display.tolerance`: Number of years to allow gap-bridging on line charts (default 0). Set higher (e.g. 5-10) for sparse historical data where connecting distant points is acceptable.
+- `display.roundingMode`: Use `"significantFigures"` with `numSignificantFigures` instead of `numDecimalPlaces` when values span many orders of magnitude.
+
+## Markdown in Descriptions
+
+Descriptions support Markdown links and a special definition-of-the-day syntax:
+
+- **External links**: `[visible text](https://example.com)` — use for linking to source methodology, papers, or standards
+- **Definition popups**: `[term](#dod:term)` — renders as a hover/click popup with the OWID definition. Use for technical terms that have standard OWID definitions (e.g. `[stunted](#dod:stunting)`, `[extreme poverty](#dod:extreme-poverty)`)
+- Use sparingly — 1-2 links per description field max. Don't link common terms.
 
 ## YAML Efficiency Patterns
 
@@ -177,9 +195,65 @@ Set in `definitions.common`, override per-variable as needed.
 
 **Use anchors/aliases** for identical blocks shared by 2+ variables. Define in `definitions:` at the top. **Name anchors to indicate their target field** (e.g. `description_producer_refugee` not `description_refugee`) so reviewers can tell which metadata field the text will end up in.
 
+**Use `<<: *anchor` merge** to extend a shared mapping while adding or overriding keys:
+
+```yaml
+definitions:
+  common_display: &common_display
+    tolerance: 5
+    numDecimalPlaces: 1
+
+tables:
+  my_table:
+    variables:
+      my_var:
+        display:
+          name: My variable
+          <<: *common_display      # inherits tolerance and numDecimalPlaces
+          numDecimalPlaces: 0      # overrides just this one field
+```
+
 **Use Jinja templates** for dimensional datasets (age, sex, cause breakdowns). Custom delimiters: `<% %>` for blocks, `<< >>` for expressions.
 
-**Use `shared.meta.yml`** when multiple `.meta.yml` files in the same directory share definitions or macros.
+```yaml
+# Jinja example: dimensional variable with conditional descriptions
+variables:
+  time_spent:
+    title: Time spent with <<who_category>> throughout life
+    unit: hours per day
+    short_unit: h
+    description_short: |-
+      <% if who_category == "Alone" %>
+      Time spent alone, by gender and age.
+      <% else %>
+      Time spent with <<who_category.lower()>>, by gender and age.
+      <%- endif -%>
+    display:
+      name: With <<who_category>>
+```
+
+**Use `{definitions.xxx}` string interpolation** to compose text from named definition blocks. Unlike YAML anchors (which substitute entire nodes), this inserts text inline within strings:
+
+```yaml
+definitions:
+  methodology: This data is based on the American Time Use Survey (ATUS).
+  weighting: Data points have been weighted using survey weights provided by ATUS.
+
+tables:
+  my_table:
+    variables:
+      my_var:
+        description_key:
+          - '{definitions.methodology}'
+          - '{definitions.weighting}'
+        description_processing: |-
+          - {definitions.weighting}
+          - Additional processing step here.
+```
+
+Use this when you need to reuse text fragments within larger strings or array items. Use YAML anchors (`&`/`*`) when substituting entire fields or blocks.
+
+**Use `shared.meta.yml`** when multiple `.meta.yml` files in the same directory share definitions or macros. These files contain only Jinja macros and reusable definitions — no actual variable metadata. Step-level `.meta.yml` files then import and call these macros. Used in large multi-file datasets like IHME GBD.
 
 For full syntax details, see `docs/architecture/metadata/structuring-yaml.md`.
 
@@ -188,6 +262,7 @@ For full syntax details, see `docs/architecture/metadata/structuring-yaml.md`.
 - **Per-capita variables**: `processing_level: major`, document the calculation in `description_processing`, use `international-$ per person` not "per capita"
 - **Age-standardized variables**: Use `presentation.title_variant: Age-standardized`, explain standardization method in `description_key`
 - **Absolute + share pairs**: Keep consistent naming; the share variable gets `unit: "%"`, absolute gets the count unit
+- **Survey response breakdowns**: When variables represent response options (e.g. `very_worried`, `not_worried_at_all`), put all shared metadata in `definitions.common` (question text, methodology, unit, display) and give individual variables only a `title`. This avoids repetition and keeps the file compact.
 
 ## Workflow
 
