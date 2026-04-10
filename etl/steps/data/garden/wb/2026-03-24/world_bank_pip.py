@@ -1088,8 +1088,9 @@ def create_smooth_inc_cons_series(tb: Table, dimensions: List[str]) -> Table:
                 .max()
             )
 
-            # Apply the same country-specific logic as in the pivoted version
+            # If there are only two welfare series, use one for these countries
             if number_of_welfare_series == 2:
+                # assert if last_welfare type values are expected
                 if country in ["Armenia", "Belarus", "Kyrgyzstan"]:
                     welfare_expected = ["consumption"]
                     assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
@@ -1103,6 +1104,18 @@ def create_smooth_inc_cons_series(tb: Table, dimensions: List[str]) -> Table:
                     )
                     tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
 
+            # Don't do anything for the rest (keep both)
+            # [
+            #     "China",
+            #     "China (urban)",
+            #     "China (rural)",
+            #     "Kazakhstan",
+            #     "Namibia",
+            #     "Nepal",
+            #     "Seychelles",
+            # ]
+
+            # With Turkey I also want to keep both series, but there are duplicates for some years
             elif country in ["Turkey"]:
                 welfare_expected = ["income"]
                 assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
@@ -1112,6 +1125,7 @@ def create_smooth_inc_cons_series(tb: Table, dimensions: List[str]) -> Table:
                     (~tb_country["duplicate_flag"]) | (tb_country["welfare_type"].isin(last_welfare_type))
                 ].reset_index(drop=True)
 
+            # With Russia, though the last welfare type is income, I want to keep consumption, being the longest series
             elif country in ["Russia"]:
                 welfare_expected = ["consumption"]
                 assert len(last_welfare_type) == 1 and last_welfare_type != welfare_expected, log.fatal(
@@ -1119,6 +1133,7 @@ def create_smooth_inc_cons_series(tb: Table, dimensions: List[str]) -> Table:
                 )
                 tb_country = tb_country[tb_country["welfare_type"].isin(welfare_expected)].reset_index(drop=True)
 
+            # These are countries with both income and consumption as the last welfare type, so I decide case by case
             elif country in ["Haiti", "Philippines", "Saint Lucia"]:
                 welfare_expected = ["consumption", "income"]
                 assert len(last_welfare_type) == 2 and last_welfare_type == welfare_expected, log.fatal(
@@ -1130,6 +1145,7 @@ def create_smooth_inc_cons_series(tb: Table, dimensions: List[str]) -> Table:
                     tb_country = tb_country[tb_country["welfare_type"] == "consumption"].reset_index(drop=True)
 
             else:
+                # Here I keep the most recent welfare type
                 if country in ["Albania", "Belize", "Ukraine"]:
                     welfare_expected = ["consumption"]
                     assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
