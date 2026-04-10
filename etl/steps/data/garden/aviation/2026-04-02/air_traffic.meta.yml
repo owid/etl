@@ -15,10 +15,10 @@ tables:
         title: Passenger load factor
         unit: "%"
         short_unit: "%"
-        description_short: The share of airline seats filled by paying passengers, also known as the passenger load factor.
+        description_short: The share of available passenger seats on commercial airlines filled by paying passengers, also known as the passenger load factor.
         description_key:
-          - Passenger load factor shows how full flights were, on average.
-          - It is calculated by comparing passenger traffic with the total available passenger seating capacity airlines provided.
+          - Passenger load factor shows how full commercial airline flights are, on average.
+          - It is calculated by comparing the number of paying passengers with the total available passenger seating capacity provided by airlines.
           - A load factor of 80% means that, on average, 80 out of every 100 available passenger seats were filled by paying passengers.
         presentation:
           title_public: Share of airline seats filled by paying passengers
@@ -30,9 +30,9 @@ tables:
         title: Share of empty airline seats
         unit: "%"
         short_unit: "%"
-        description_short: The share of airline seats that flew empty.
+        description_short: The share of available passenger seats on commercial airlines that flew empty.
         description_key:
-          - This indicator shows the share of available passenger seats that were not filled by paying passengers.
+          - This indicator shows the share of available passenger seats on commercial airlines that were not filled by paying passengers.
           - A value of 20% means that, on average, 1 in 5 available passenger seats flew empty.
         processing_level: major
         presentation:
@@ -40,7 +40,7 @@ tables:
         display:
           numDecimalPlaces: 1
           name: Empty seats
-        description_processing: Calculated by subtracting the passenger load factor from 100%.
+        description_processing: Calculated by subtracting the passenger load factor (the share of seats filled by paying passengers) from 100%.
 
       revenue_passenger_kilometers:
         title: Revenue passenger-kilometres
