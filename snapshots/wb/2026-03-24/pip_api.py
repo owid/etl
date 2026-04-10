@@ -1929,5 +1929,3 @@ def add_filled_data(df: pd.DataFrame, wb_api: WB_API) -> pd.DataFrame:
     return df
 
 
-if __name__ == "__main__":
-    run()
