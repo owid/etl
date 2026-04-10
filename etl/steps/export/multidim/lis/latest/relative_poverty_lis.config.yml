@@ -35,6 +35,7 @@ dimensions:
 
   - name: Poverty line
     slug: poverty_line
+    description: "Relative poverty is measured as a share of the median income in each country, so the line rises and falls with typical incomes"
     choices:
       - slug: 40% of the median
         name: 40% of median income
@@ -47,10 +48,10 @@ dimensions:
     slug: welfare_type
     choices:
       - slug: dhi
-        name: After tax
+        name: After taxes and benefits
       - slug: mi
-        name: Before tax
+        name: Before taxes and benefits
       - slug: before_vs_after
-        name: Before vs. after tax
+        name: Before vs. after taxes and benefits
 
 views: []
