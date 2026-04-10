@@ -1,0 +1,42 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ai_diffusion_msft:
+    variables:
+      ai_user_share:
+        title: Share of working-age population using generative AI tools in H2 2025
+        unit: "%"
+        short_unit: "%"
+        description_short: Estimated share of the working-age population (aged 15–64) who actively used a [generative AI](#dod:generative-ai) tool, such as ChatGPT or Gemini, in the second half of 2025.
+        description_key:
+          # Source: Section 2.1, p. 2–3 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - These are modelled estimates, not survey data. They are derived from anonymized usage signals collected automatically by Microsoft's software and services, which log whether users visited any of 19 generative AI platforms, including ChatGPT, Gemini, Claude, DeepSeek, Grok, Midjourney, and Perplexity.
+
+          # Source: Section 2.1, p. 2–3 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - Only users with at least 90 minutes of total monthly activity on Microsoft platforms are included. This filters out infrequent users and is not specific to AI activity.
+
+          # Source: Section 2.4, p. 5; Table 2, p. 14–18 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - Countries with insufficient data are assigned a regional average rather than a country-specific estimate. This is why some countries share identical values (for example, several countries in West Africa all show 9.3%, and several in East Africa all show 6.8%).
+
+          # Source: Data Coverage Disclaimer, p. 5 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - Estimates for Russia, Iran, and parts of China are based on limited telemetry and should be treated with caution.
+
+          # Source: Appendix A, p. 13 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - The indicator covers visits to AI platforms only. It does not include AI features built into productivity software or enterprise tools.
+        display:
+          numDecimalPlaces: 1
+          name: Share of population using generative AI
+        presentation:
+          title_public: Estimated share of population using generative AI tools
+
