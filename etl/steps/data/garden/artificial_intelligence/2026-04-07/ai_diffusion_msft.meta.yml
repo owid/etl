@@ -33,7 +33,7 @@ tables:
           - Estimates for Russia, Iran, and parts of China are based on limited telemetry and should be treated with caution.
 
           # Source: Appendix A, p. 13 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
-          - The metric covers visits to AI platforms only. It does not include AI features built into productivity software or enterprise tools.
+          - The indicator covers visits to AI platforms only. It does not include AI features built into productivity software or enterprise tools.
         display:
           numDecimalPlaces: 1
           name: Share of population using generative AI
