@@ -19,7 +19,7 @@ definitions:
   desc_processing_cagr: &desc_processing_cagr |-
     The annualized exponential growth rate was calculated as: 100 × ln(P_t / P_prev) / (year_t - year_prev), where P_t is the population at time t and P_prev is the population at the previous observation. For five-year intervals, year_t - year_prev = 5. This assumes constant exponential growth between observations.
 
-  desc_cities_definition: "[Cities](#dod:cities-degurba) are identified using satellite imagery and population data, applying the same definitions across countries.
+  desc_cities_definition: "[Cities](#dod:cities-degurba) are identified using satellite imagery and population data, applying the same definitions across countries."
 
   desc_crossborder_exclusion: &desc_crossborder_exclusion |-
     Data is excluded for Gibraltar, Macao, and Monaco because their urban centers are cross-border agglomerations that extend beyond the country's boundaries, making the share calculation invalid.
