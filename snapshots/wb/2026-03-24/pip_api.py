@@ -1927,5 +1927,3 @@ def add_filled_data(df: pd.DataFrame, wb_api: WB_API) -> pd.DataFrame:
     log.info("Filled data for countries and regions included. Now we are really done :)")
 
     return df
-
-
