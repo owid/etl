@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
@@ -139,7 +137,7 @@ def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source
     return tb_combined
 
 
-def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -> Table:
+def remove_duplicates(tb: Table, preferred_source: str, dimensions: list[str]) -> Table:
     """
     Removing rows where there are overlapping years with a preference for FRA data.
 

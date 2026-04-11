@@ -64,9 +64,9 @@ def run() -> None:
         if view.dimensions.get("welfare_type") == "before_vs_after" and view.indicators.y:
             for ind in view.indicators.y:
                 if "_dhi_" in ind.catalogPath:
-                    ind.display = {"name": "After tax"}
+                    ind.display = {"name": "After taxes and benefits"}
                 elif "_mi_" in ind.catalogPath:
-                    ind.display = {"name": "Before tax"}
+                    ind.display = {"name": "Before taxes and benefits"}
 
     c.save()
 

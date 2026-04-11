@@ -2,8 +2,6 @@
 
 Formatting of the data file. We also map COUNTRY IDs to COUNTRY NAMES. This facilitates the country harmonization proces in Garden."""
 
-from typing import Dict
-
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
@@ -68,7 +66,7 @@ def add_country_column(df: pd.DataFrame, df_meta: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _build_mapping_country_id_to_country_name(df: pd.DataFrame) -> Dict[str, str]:
+def _build_mapping_country_id_to_country_name(df: pd.DataFrame) -> dict[str, str]:
     print(df.head())
     # Build mapping COUNTRY ID to COUNTRY NAME
     MAPPING_COUNTRY_VALUES = {}

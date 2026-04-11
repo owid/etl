@@ -37,4 +37,4 @@ def run(dest_dir: str) -> None:
 
 
 def uses_dates(s: pd.Series) -> bool:
-    return pd.to_datetime(s, errors="coerce", format="%Y-%m-%d").notnull().all()
+    return bool(pd.to_datetime(s, errors="coerce", format="%Y-%m-%d").notnull().all())

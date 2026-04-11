@@ -1,4 +1,5 @@
-from typing import Callable, List, Optional, cast
+from collections.abc import Callable
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -9,8 +10,8 @@ from etl.data_helpers import geo
 
 def from_wide_to_long(
     tb: Table,
-    indicator_name_callback: Optional[Callable] = None,
-    indicator_category_callback: Optional[Callable] = None,
+    indicator_name_callback: Callable | None = None,
+    indicator_category_callback: Callable | None = None,
     column_dimension_name: str = "category",
 ) -> Table:
     """Format a particular shape of table from wide to long format.
@@ -91,7 +92,7 @@ def expand_observations(tb: Table) -> Table:
 def add_population_in_dummies(
     tb: Table,
     ds_population: Dataset,
-    expected_countries_without_population: Optional[List[str]] = None,
+    expected_countries_without_population: list[str] | None = None,
     drop_population: bool = True,
 ):
     # Add population column

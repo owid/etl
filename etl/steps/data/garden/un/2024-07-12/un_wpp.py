@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Optional, Tuple, cast
+from typing import cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -43,15 +43,15 @@ def run() -> None:
     ds_meadow = paths.load_dataset("un_wpp")
 
     # Load tables (safe_types=False preserves categoricals from meadow, much faster for large tables)
-    tb_population = ds_meadow.read("population", safe_types=False)
+    tb_population = ds_meadow.read("population", safe_types=False)  #
     tb_population_density = ds_meadow.read("population_density", safe_types=False)
     tb_growth_rate = ds_meadow.read("growth_rate", safe_types=False)
     tb_nat_change = ds_meadow.read("natural_change_rate", safe_types=False)
     tb_fertility = ds_meadow.read("fertility_rate", safe_types=False)
-    tb_fertility_births_single = ds_meadow.read("fertility_births_single", safe_types=False)
+    tb_fertility_births_single = ds_meadow.read("fertility_births_single", safe_types=False)  #
     tb_migration = ds_meadow.read("net_migration", safe_types=False)
     tb_migration_rate = ds_meadow.read("net_migration_rate", safe_types=False)
-    tb_deaths = ds_meadow.read("deaths", safe_types=False)
+    tb_deaths = ds_meadow.read("deaths", safe_types=False)  #
     tb_death_rate = ds_meadow.read("death_rate", safe_types=False)
     tb_births = ds_meadow.read("births", safe_types=False)
     tb_birth_rate = ds_meadow.read("birth_rate", safe_types=False)
@@ -115,9 +115,9 @@ def run() -> None:
 
     # MIGRATION #
     tb_migration = process_migration(tb_migration, tb_migration_rate)
+    tb_migration = set_variant_to_estimates(tb_migration)
     tb_migration = add_owid_regions(tb_migration, indicators=["net_migration"])
     del tb_migration_rate
-    tb_migration = set_variant_to_estimates(tb_migration)
     tb_migration = tb_migration.format(COLUMNS_INDEX, short_name="migration")
 
     # DEATHS #
@@ -129,7 +129,6 @@ def run() -> None:
     tb_births = process_births(tb_births, tb_birth_rate)
     del tb_birth_rate
     tb_births = add_owid_regions(tb_births, indicators=["births"])
-    tb_births = set_variant_to_estimates(tb_births)
     tb_births = tb_births.format(COLUMNS_INDEX, short_name="births")
 
     # MEDIAN_AGE #
@@ -197,7 +196,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, Table, Table]:
+def process_population_sex_ratio(tb: Table, tb_density: Table) -> tuple[Table, Table, Table]:
     """Process the population table.
 
     Also estimate sex ratio.
@@ -372,6 +371,7 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb = process_standard(tb)
     tb = set_variant_to_estimates(tb)
     tb_rate = process_standard(tb_rate)
+    tb_rate = set_variant_to_estimates(tb_rate)
 
     # Standardise sex dimension values
     tb = harmonize_dimension(
@@ -397,14 +397,14 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb_total = tb_total.assign(age="all")
 
     # Get 5-year age groups from 0 to 100
-    age_group_mapping = {str(i): f"{i//5 * 5}-{i//5 * 5 + 4}" for i in range(0, 100, 1)}
+    age_group_mapping = {str(i): f"{i // 5 * 5}-{i // 5 * 5 + 4}" for i in range(0, 100, 1)}
     tb_5 = tb.copy()
     tb_5["age"] = tb_5["age"].map(age_group_mapping)
     tb_5 = cast(Table, tb_5.dropna(subset=["age"]))
     tb_5 = tb_5.groupby(COLUMNS_INDEX, as_index=False, observed=True)["deaths"].sum()
 
     # Get 10-year age groups from 0 to 100
-    age_group_mapping = {str(i): f"{i//10 * 10}-{i//10 * 10 + 9}" for i in range(0, 100, 1)}
+    age_group_mapping = {str(i): f"{i // 10 * 10}-{i // 10 * 10 + 9}" for i in range(0, 100, 1)}
     tb_10 = tb.copy()
     tb_10["age"] = tb_10["age"].map(age_group_mapping)
     tb_10 = cast(Table, tb_10.dropna(subset=["age"]))
@@ -444,7 +444,9 @@ def process_births(tb: Table, tb_rate: Table) -> Table:
     """
     # Basic processing
     tb = process_standard(tb)
+    tb = set_variant_to_estimates(tb)
     tb_rate = process_standard(tb_rate)
+    tb_rate = set_variant_to_estimates(tb_rate)
 
     # Standardise sex/age dimension values
     tb = harmonize_dimension(
@@ -526,9 +528,9 @@ def process_fertility(tb: Table) -> Table:
     )
 
     # Drop 55-59 age group in fertility (is all zero!)
-    assert (
-        tb.loc[tb["age"] == "55-59", "fertility_rate"] == 0
-    ).all(), "Unexpected non-zero fertility rate values for age group 55-59."
+    assert (tb.loc[tb["age"] == "55-59", "fertility_rate"] == 0).all(), (
+        "Unexpected non-zero fertility rate values for age group 55-59."
+    )
     tb = tb.loc[tb["age"] != "55-59"]
 
     # Age as string
@@ -591,18 +593,18 @@ def process_mortality(tb: Table) -> Table:
     return tb
 
 
-def process_standard(tb: Table, allowed_nans: Optional[Dict[str, int]] = None) -> Table:
+def process_standard(tb: Table, allowed_nans: dict[str, int] | None = None) -> Table:
     """Standard processing: sanity checks, harmonize country names and dimensions."""
 
     # Sanity check
     if allowed_nans:
         for colname, num_nans in allowed_nans.items():
-            assert (
-                num_nans_real := tb[colname].isna().sum()
-            ) == num_nans, f"Unexpected number ({num_nans_real}) of NaNs for column {colname}"
-        assert (
-            tb[[col for col in tb.columns if col not in allowed_nans.keys()]].notna().all(axis=None)
-        ), "Some NaNs detected"
+            assert (num_nans_real := tb[colname].isna().sum()) == num_nans, (
+                f"Unexpected number ({num_nans_real}) of NaNs for column {colname}"
+            )
+        assert tb[[col for col in tb.columns if col not in allowed_nans.keys()]].notna().all(axis=None), (
+            "Some NaNs detected"
+        )
     else:
         assert tb.notna().all(axis=None), "Some NaNs detected"
 
@@ -633,7 +635,7 @@ def process_standard(tb: Table, allowed_nans: Optional[Dict[str, int]] = None) -
     return tb
 
 
-def estimate_sex_ratio(tb: Table, age_groups: Optional[List[str]] = None):
+def estimate_sex_ratio(tb: Table, age_groups: list[str] | None = None):
     # Select relevant age groups
     if age_groups is None:
         age_groups = ["0", "5", "10", "15"] + [str(i) for i in range(20, 100, 10)] + ["100+"]
@@ -672,7 +674,7 @@ def estimate_age_groups(tb: Table) -> Table:
 
     # 1/ Basic age groups
     age_map = {
-        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
+        **{str(i): f"{i - i % 5}-{i + 4 - i % 5}" for i in range(0, 100)},
         **{"100+": "100+"},
     }
     tb_basic = tb_.assign(age=tb_.age.map(age_map))
@@ -735,7 +737,7 @@ def estimate_age_groups(tb: Table) -> Table:
     return tb_population
 
 
-def _add_age_group(tb: Table, age_min: int, age_max: int, age_group: Optional[str] = None) -> Table:
+def _add_age_group(tb: Table, age_min: int, age_max: int, age_group: str | None = None) -> Table:
     """Estimate a new age group."""
     # Get subset of entries, apply groupby-sum if needed
     if age_min == age_max:
@@ -783,9 +785,9 @@ def add_population_change(tb: Table) -> Table:
     tb = tb_merge.drop(columns=["population_2023"])
 
     # Sanity check
-    assert (years := set(tb.loc[tb[column_pop_change].isna()]["year"])) == {
-        1950
-    }, f"Other than year 1950 detected: {years}"
+    assert (years := set(tb.loc[tb[column_pop_change].isna()]["year"])) == {1950}, (
+        f"Other than year 1950 detected: {years}"
+    )
 
     return tb
 
@@ -799,7 +801,7 @@ def add_sex_ratio_all(tb_sex: Table, tb: Table) -> Table:
     return tb_sex
 
 
-def harmonize_dimension(tb: Table, column_name: str, mapping: Dict[str, str], strict: bool = True) -> Table:
+def harmonize_dimension(tb: Table, column_name: str, mapping: dict[str, str], strict: bool = True) -> Table:
     """Harmonize a dimension in a table using a mapping.
 
     tb: Table to harmonize.
@@ -836,7 +838,7 @@ def harmonize_country_names(tb: Table):
 
 def add_owid_regions(tb: Table, indicators: list[str], index_columns: str | None = None) -> Table:
     """Add OWID regions to the table."""
-    if index_columns is None:
+    if index_columns is None:  # ERR: TOGO AS MEDIUM BEFORE 2023!
         index_columns = COLUMNS_INDEX
     aggregations = {indicator: "sum" for indicator in indicators}
     tb = paths.regions.add_aggregates(
@@ -876,9 +878,9 @@ def estimate_tfr_owid_regions(tb_fertility: Table, tb_births: Table, tb_populati
 
     # Get 15-49 age group female population
     tb_fpop_15_49 = tb_population.reset_index()
-    assert not age_groups - set(
-        tb_fpop_15_49["age"].unique()
-    ), "Some expected age groups are missing in population data"
+    assert not age_groups - set(tb_fpop_15_49["age"].unique()), (
+        "Some expected age groups are missing in population data"
+    )
     tb_fpop_15_49 = tb_fpop_15_49.loc[
         (tb_fpop_15_49["age"].isin(age_groups))
         & (tb_fpop_15_49["country"].isin(REGIONS))

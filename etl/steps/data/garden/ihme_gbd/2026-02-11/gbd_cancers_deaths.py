@@ -51,7 +51,7 @@ def _validate_cancer_totals(tb_cancers: Table, tb_original: Table) -> None:
         paths.log.warning(f"Top discrepancies:\n{sample.to_string()}")
     else:
         paths.log.info(
-            f"Validation passed: Individual cancer deaths sum to total neoplasms within {threshold*100}% tolerance"
+            f"Validation passed: Individual cancer deaths sum to total neoplasms within {threshold * 100}% tolerance"
         )
 
 

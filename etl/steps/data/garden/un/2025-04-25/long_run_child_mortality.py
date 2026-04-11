@@ -296,9 +296,9 @@ def _validate_regional_data(tb_combined_full: Table, tb_combined_sel: Table) -> 
                 if len(recent_data) > 0:
                     recent_rates = recent_data[rate_col].dropna()
                     if len(recent_rates) > 0:
-                        assert (
-                            recent_rates.max() <= 30
-                        ), f"{region}: Unexpectedly high recent mortality rate: {recent_rates.max()}%"
+                        assert recent_rates.max() <= 30, (
+                            f"{region}: Unexpectedly high recent mortality rate: {recent_rates.max()}%"
+                        )
 
             elif region == "Asia":
                 # Asia has varied significantly but should be reasonable
@@ -311,9 +311,9 @@ def _validate_regional_data(tb_combined_full: Table, tb_combined_sel: Table) -> 
                 if len(recent_data) > 0:
                     recent_rates = recent_data[rate_col].dropna()
                     if len(recent_rates) > 0:
-                        assert (
-                            recent_rates.max() <= 25
-                        ), f"{region}: Unexpectedly high recent mortality rate: {recent_rates.max()}%"
+                        assert recent_rates.max() <= 25, (
+                            f"{region}: Unexpectedly high recent mortality rate: {recent_rates.max()}%"
+                        )
 
             elif region == "South America":
                 # Moderate rates expected

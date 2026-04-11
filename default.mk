@@ -64,7 +64,7 @@ check-formatting-default: .venv
 
 check-typing-default: .venv
 	@echo '==> Checking types'
-	.venv/bin/ty check $(SRC)
+	.venv/bin/ty check $(SRC) --python .venv
 
 unittest-default: .venv
 	@echo '==> Running unit tests'

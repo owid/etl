@@ -118,7 +118,7 @@ def prompt_dataset_options(dataset_options):
         format_func=lambda x: DATASETS[x]["display_name"],
         key="dataset_select",
         placeholder="Select dataset",
-        index=dataset_index,  # type: ignore
+        index=dataset_index,  # ty: ignore
         help="By default, only non-archived datasets from ETL are shown. However, if you search for an archived (or pre-ETL) one via QUERY PARAMS, the list will show all datasets. To use QUERY PARAMS, add `?datasetId=YOUR_DATASET_ID` to the URL.",
     )
 
@@ -208,7 +208,7 @@ def st_show_indicator(indicator, indicator_charts, display_charts=True):
                 if var.descriptionShort:
                     st.markdown(var.descriptionShort)
             else:
-                grapher_chart(variable_id=iid, tab="map")  # type: ignore
+                grapher_chart(variable_id=iid, tab="map")  # ty: ignore
 
 
 @st.cache_resource  # heavy work runs only once

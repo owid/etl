@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Gallup Indicator: What Percentage of Employees Use AI at Work?"
+    description: |-
+      Results for the Gallup poll of U.S. employees are based on self-administered web surveys of a random sample of adults who are aged 18 and older, working full time or part time for organizations in the United States, and members of the Gallup Panel. Gallup uses probability-based, random sampling methods to recruit its Panel members. Gallup weighted the obtained samples to correct for nonresponse. Nonresponse adjustments were made by adjusting the sample to match the national demographics of gender, age, race, Hispanic ethnicity, education and region. Demographic weighting targets were based on the most recent Current Population Survey figures for the aged 18 and older U.S. population. In addition to sampling error, question wording and practical difficulties in conducting surveys can introduce error or bias into the findings of public opinion polls.
+    date_published: "2025-11-01"
+
+    # Citation
+    producer: Gallup
+    citation_full: |-
+      Gallup (2025). Indicator: What Percentage of Employees Use AI at Work? Retrieved from https://www.gallup.com/699797/indicator-artificial-intelligence.aspx
+    attribution_short: Gallup
+
+    # Files
+    # To download the data: go to url_main, scroll to the chart titled
+    # "1 in 10 U.S. Employees Use AI Daily in Their Role" and click "Download"
+    # beneath it (look for the "Get the data" link below the chart).
+    url_main: https://www.gallup.com/699797/indicator-artificial-intelligence.aspx
+    date_accessed: "2026-04-03"
+
+    # License
+    license:
+      name: Copyright © Gallup, Inc. All rights reserved
+      url: https://www.gallup.com/corporate/178136/copyright.aspx
+
+outs:
+  - md5: 6c556d4fb188ee470d8f3cc3e56500f5
+    size: 138
+    path: ai_indicator.csv

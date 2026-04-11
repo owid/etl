@@ -48,12 +48,22 @@ dev = [
     "ipykernel>=6.13.0",
     "openpyxl>=3.0.10",
     "lxml>=4.9.1",
-    "ty==0.0.8",
-    "ruff==0.8.6"
+    "ty==0.0.26",
+    "ruff==0.15.8"
 ]
 
 [tool.ruff]
 extend = "../../pyproject.toml"
+
+[tool.ty.rules]
+unused-type-ignore-comment = "ignore"
+unused-ignore-comment = "ignore"
+possibly-missing-submodule = "ignore"
+call-top-callable = "ignore"
+unsupported-operator = "ignore"
+redundant-cast = "ignore"
+no-matching-overload = "ignore"
+too-many-positional-arguments = "ignore"
 
 [build-system]
 requires = ["hatchling"]

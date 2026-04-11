@@ -3,7 +3,7 @@
 import re
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import pandas as pd
 from owid.catalog.utils import underscore
@@ -20,7 +20,7 @@ PATTERN_CSV = r"https://catalog\.ourworldindata\.org/(?P<group>[^/]+/[^/]+/[^/]+
 
 
 class ExplorerMigration:
-    def __init__(self, explorer_as_json: Dict[str, Any], slug: str):
+    def __init__(self, explorer_as_json: dict[str, Any], slug: str):
         """Parse DB"""
         self.slug = slug
         self.explorer_as_json = explorer_as_json
@@ -36,7 +36,7 @@ class ExplorerMigration:
                 config[key] = value
         return config
 
-    def get_blocks(self) -> Tuple[Any, List[Any]]:
+    def get_blocks(self) -> tuple[Any, list[Any]]:
         """Get grapher and table/columns blocks."""
         # Get blocks
         blocks = self.explorer_as_json.get("blocks", [])
@@ -136,9 +136,9 @@ class ExplorerMigration:
         for block in self.table_columns_block:
             if block["type"] == "columns":
                 # Sanity checks
-                assert (
-                    len(block["args"]) == 1
-                ), f"columns is expected to have only one argument. Instead got: {block['args']}"
+                assert len(block["args"]) == 1, (
+                    f"columns is expected to have only one argument. Instead got: {block['args']}"
+                )
 
                 # Get table URI
                 table_slug = block["args"][0]
@@ -390,7 +390,7 @@ def _convert_strings_to_types(config: Any) -> Any:
         return config
 
 
-def _get_explorer_config(owid_env: OWIDEnv, name: str) -> Dict[str, Any]:
+def _get_explorer_config(owid_env: OWIDEnv, name: str) -> dict[str, Any]:
     # Load explorer from DB
     with Session(owid_env.engine) as session:
         db_exp = gm.Explorer.load_explorer(session, slug=name)
@@ -399,7 +399,7 @@ def _get_explorer_config(owid_env: OWIDEnv, name: str) -> Dict[str, Any]:
     return db_exp.config
 
 
-def reorder_dimensions(config: Dict[str, Any], dim_order: List[str]) -> Dict[str, Any]:
+def reorder_dimensions(config: dict[str, Any], dim_order: list[str]) -> dict[str, Any]:
     """Reorder dimensions in the config dictionary."""
     config = deepcopy(config)
     config["dimensions"] = [[dim for dim in config["dimensions"] if dim["slug"] == slug][0] for slug in dim_order]
