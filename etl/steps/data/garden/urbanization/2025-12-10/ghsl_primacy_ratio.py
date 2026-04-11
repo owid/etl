@@ -15,8 +15,8 @@ A ratio > 1 means the largest city is bigger than the comparison group.
 Higher values indicate greater urban primacy (dominance of one primate city).
 """
 
-import pandas as pd
 import owid.catalog.processing as pr
+import pandas as pd
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder

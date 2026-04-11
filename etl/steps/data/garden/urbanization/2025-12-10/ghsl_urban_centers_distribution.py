@@ -26,9 +26,8 @@ lines    = each calendar year (one indicator per year)
 entities = countries / regions
 """
 
-import numpy as np
-import pandas as pd
 import owid.catalog.processing as pr
+import pandas as pd
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder

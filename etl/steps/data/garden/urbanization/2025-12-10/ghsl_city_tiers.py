@@ -14,8 +14,8 @@ Tiers
   tier3 = rank 6–50 cities combined
 """
 
-import pandas as pd
 import owid.catalog.processing as pr
+import pandas as pd
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
