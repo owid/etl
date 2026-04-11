@@ -3,7 +3,6 @@
 import re
 from io import StringIO
 from pathlib import Path
-from typing import List
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -173,7 +172,7 @@ def run() -> None:
     ds_meadow.save()
 
 
-def make_tb(path: Path, main_folders: List[str], regex: str, snap) -> Table:
+def make_tb(path: Path, main_folders: list[str], regex: str, snap) -> Table:
     """Create table from multiple category folders.
 
     It inspects the content in `main_folders` (should be in `path`), and looks for TXT files to parse into tables.
@@ -202,7 +201,7 @@ def make_tb(path: Path, main_folders: List[str], regex: str, snap) -> Table:
     return tb
 
 
-def _get_relevant_paths(path: Path, main_folders: List[str]):
+def _get_relevant_paths(path: Path, main_folders: list[str]):
     """Get list with all relevant TXT file paths in the HMD export structure."""
     filepaths = []
     # Iterate over each top-level folder
@@ -253,7 +252,7 @@ def make_tb_from_txt(filepath: Path, regex: str, snap) -> Table:
 def extract_fields(regex: str, filepath: Path) -> dict:
     """Structure the fields in the raw TXT file."""
     # Read single file
-    with open(filepath, "r") as f:
+    with open(filepath) as f:
         text = f.read()
 
     # Clean (strip leading/trailing spaces)
@@ -287,15 +286,15 @@ def parse_table(data_raw: str, snap):
 def _check_nas(tb, missing_row_max, missing_countries_max):
     """Check missing values & countries in data."""
     row_nans = tb.isna().any(axis=1)
-    assert (
-        row_nans.sum() / len(tb) < missing_row_max
-    ), f"Too many missing values in life tables: {row_nans.sum()/len(tb)}"
+    assert row_nans.sum() / len(tb) < missing_row_max, (
+        f"Too many missing values in life tables: {row_nans.sum() / len(tb)}"
+    )
 
     # Countries missing
     countries_missing_data = tb.loc[row_nans, "PopName"].unique()
-    assert (
-        len(countries_missing_data) / len(tb) < missing_countries_max
-    ), f"Too many missing values in life tables: {len(countries_missing_data)}"
+    assert len(countries_missing_data) / len(tb) < missing_countries_max, (
+        f"Too many missing values in life tables: {len(countries_missing_data)}"
+    )
 
 
 def _clean_population_type(tb):
@@ -312,9 +311,9 @@ def _clean_population_type(tb):
     tb["year"] = tb["year"].astype(int)
 
     # Ensure raw year is as expected
-    assert (
-        tb.groupby(["PopName", "year", "Age", "sex", "format"]).Year.nunique().max() == 2
-    ), "Unexpected number of years (+/-)"
+    assert tb.groupby(["PopName", "year", "Age", "sex", "format"]).Year.nunique().max() == 2, (
+        "Unexpected number of years (+/-)"
+    )
 
     # Drop duplicate years, keeping YYYY+.
     tb["Year"] = tb["Year"].astype("string")

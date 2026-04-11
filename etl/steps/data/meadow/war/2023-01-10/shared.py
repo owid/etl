@@ -1,5 +1,3 @@
-from typing import Dict, Optional
-
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -55,7 +53,7 @@ COLUMNS_REQUIRED = [
 ]
 
 
-def clean_data(df: pd.DataFrame, column_rename: Optional[Dict[str, str]]) -> pd.DataFrame:
+def clean_data(df: pd.DataFrame, column_rename: dict[str, str] | None) -> pd.DataFrame:
     if not column_rename:
         column_rename = COLUMN_RENAME
 
@@ -83,7 +81,7 @@ def clean_data(df: pd.DataFrame, column_rename: Optional[Dict[str, str]]) -> pd.
     return df
 
 
-def run_pipeline(dest_dir: str, paths: PathFinder, column_rename: Optional[Dict[str, str]] = None):
+def run_pipeline(dest_dir: str, paths: PathFinder, column_rename: dict[str, str] | None = None):
     log.info(f"{paths.short_name}.start")
     # read snapshot dataset
     snap = paths.load_dependency(paths.short_name + ".csv")

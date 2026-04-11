@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Any, Dict
+from typing import Any
 
 from owid.catalog import Table
 
@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def extract_origins_per_model(tb: Table) -> Dict[str, Any]:
+def extract_origins_per_model(tb: Table) -> dict[str, Any]:
     names = [
         "icl",
         "ihme",

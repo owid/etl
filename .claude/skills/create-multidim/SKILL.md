@@ -97,6 +97,8 @@ Place it right after the grapher step it depends on.
 
 ### Step 5: Run and verify
 
+**Always run the step after creating it** — schema validation only happens at runtime, so errors (like invalid fields in `config`) won't surface until the step is executed. CI will catch these, but it's better to fix them locally first.
+
 ```bash
 # Export steps are excluded by default — the --export flag is required
 .venv/bin/etl run {short_name} --export --only --private
@@ -134,6 +136,10 @@ definitions:
           - LineChart
         yAxis:
           min: 0
+      metadata:
+        description_key:
+          - First key point about this data.
+          - Second key point about methodology.
 
 dimensions:
   - slug: sex
@@ -239,3 +245,5 @@ Key fields for `config` in views or `common_views`:
 **Step not found in DAG**: Check that the entry is under the `steps:` key in the correct `dag/*.yml` file, and that the file is included from `dag/main.yml`.
 
 **Preview URL shows errors**: Verify that the catalogPaths in your config match actual indicators in the grapher dataset. Check by running the grapher step first: `.venv/bin/etl run {dataset} --grapher --private`.
+
+**`config must not contain {'description_key'}` or similar**: View-level metadata like `description_key`, `description_short`, and `presentation` belong under `metadata`, not `config`. The `config` block is for chart settings only (title, subtitle, chartTypes, etc.).

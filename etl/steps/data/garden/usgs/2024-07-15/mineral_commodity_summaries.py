@@ -7,7 +7,7 @@ All these things are done in a single script because the processes are intertwin
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from zipfile import ZipFile
 
 import owid.catalog.processing as pr
@@ -421,7 +421,7 @@ UNITS_MAPPING = {
 
 def extract_metadata_from_xml(file_path):
     # Remove spurious symbols from the XML file (this happens at least to 2024 mcs2024-plati_meta.xml file).
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(file_path, encoding="utf-8") as file:
         content = file.read().replace("&", "&amp;")
 
     root = ET.fromstring(content)
@@ -434,19 +434,19 @@ def extract_metadata_from_xml(file_path):
     if title_element is not None:
         title_text = title_element.text
         # Extract commodity name from the title.
-        if " - " in title_text:  # type: ignore
-            commodity_name = title_text.split(" - ")[1].replace(" Data Release", "").strip()  # type: ignore
+        if " - " in title_text:  # ty: ignore
+            commodity_name = title_text.split(" - ")[1].replace(" Data Release", "").strip()  # ty: ignore
             world_data["Commodity"] = commodity_name
 
     # Navigate to the world data section.
     for detailed in root.findall(".//detailed"):
         enttypl = detailed.find("enttyp/enttypl")
-        if enttypl is not None and "world" in enttypl.text.lower():  # type: ignore
+        if enttypl is not None and "world" in enttypl.text.lower():  # ty: ignore
             for attr in detailed.findall("attr"):
                 attr_label = attr.find("attrlabl")
                 attr_def = attr.find("attrdef")
                 if attr_label is not None and attr_def is not None:
-                    world_data[attr_label.text] = attr_def.text.strip()  # type: ignore
+                    world_data[attr_label.text] = attr_def.text.strip()  # ty: ignore
 
     return world_data
 
@@ -485,7 +485,7 @@ def extract_data_and_metadata_from_compressed_file(zip_file_path: Path):
     return data_for_year
 
 
-def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int, mineral: str) -> pd.DataFrame:
+def extract_and_clean_data_for_year_and_mineral(data: dict[int, Any], year: int, mineral: str) -> pd.DataFrame:
     d = data[year][mineral]["data"].copy()
     # Remove empty rows and columns.
     d = d.dropna(axis=1, how="all")
@@ -621,7 +621,7 @@ def clean_spurious_values(series: pd.Series) -> pd.Series:
     return series
 
 
-def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional[pd.DataFrame]:
+def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataFrame | None:
     d = d.copy()
     # Select columns related to reserves data.
     columns_reserves = [
@@ -660,7 +660,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional
         elif unit_reserves in ["Mt", "mt"]:
             d[f"Reserves_{unit_reserves}"] *= 1e6
             d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
-        elif (unit_reserves == "mcm") & (d["Mineral"].unique().item() == "Helium"):  # type: ignore
+        elif (unit_reserves == "mcm") & (d["Mineral"].unique().item() == "Helium"):  # ty: ignore
             d["Reserves_mcm"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
             d = d.rename(columns={"Reserves_mcm": "Reserves_t"}, errors="raise")
         elif unit_reserves == "kg":
@@ -674,7 +674,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional
 
         # While production is usually given for an explicit year (actually, usually two years), reserves
         # does not have a year. I will assume that the reserves correspond to the latest informed year.
-        year_reserves = int(d["Source"].unique().item()[-4:]) - 1  # type: ignore
+        year_reserves = int(d["Source"].unique().item()[-4:]) - 1  # ty: ignore
         df_reserves = d[columns].assign(**{"Year": year_reserves})
 
         # Remove rows without data.
@@ -683,7 +683,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional
         return df_reserves
 
 
-def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional[pd.DataFrame]:
+def prepare_production_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataFrame | None:
     d = d.copy()
 
     # Select columns related to production data.
@@ -732,7 +732,7 @@ def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Option
         if unit_production == "Sponge_t":
             unit_production = "t"
             # A footnote will be added to mention that it refers to sponge (see FOOTNOTES).
-        if d["Mineral"].unique().item() == "Soda ash":  # type: ignore
+        if d["Mineral"].unique().item() == "Soda ash":  # ty: ignore
             # For consistency with different years, rename one of the sub-commodities (this happens at least in 2024).
             d["Type"] = d["Type"].replace({"Soda ash, Synthetic": "Soda ash, synthetic"})
 
@@ -762,7 +762,7 @@ def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Option
             df_production["Production_t"] *= 1e3
         elif unit_production in ["Mt", "mmt"]:
             df_production["Production_t"] *= 1e6
-        elif (unit_production == "mcm") and (d["Mineral"].unique().item() == "Helium"):  # type: ignore
+        elif (unit_production == "mcm") and (d["Mineral"].unique().item() == "Helium"):  # ty: ignore
             df_production["Production_t"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
         elif unit_production == "kct":
             df_production["Production_t"] *= THOUSAND_CARATS_TO_TONNES
@@ -828,7 +828,7 @@ def harmonize(df):
     return df
 
 
-def fix_helium_issue(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def fix_helium_issue(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     # After harmonization, some countries that appeared with an annotation become the same.
     # However, there is only one case where this creates ambiguity within the same country-year-mineral-type.
     # That's Helium. Check that this is the case, and remove this commodity.
@@ -1015,7 +1015,7 @@ def clean_notes(notes):
     return notes_clean
 
 
-def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
+def gather_notes(tb: Table, notes_columns: list[str]) -> dict[str, str]:
     # Create another table with the same structure, but containing notes.
     tb_flat_notes = tb.pivot(
         index=["country", "year"],
@@ -1061,7 +1061,7 @@ def run(dest_dir: str) -> None:
     df = gather_and_process_data(data=data)
 
     # Create a table with metadata.
-    tb = pr.read_from_df(df, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)  # type: ignore
+    tb = pr.read_from_df(df, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)  # ty: ignore
 
     # For convenience (and for consistency with other similar datasets) rename columns.
     tb = tb.rename(

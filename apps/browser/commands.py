@@ -1,7 +1,8 @@
 """Slash command system for browser UI (/refresh, /exit, /steps, etc)."""
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Callable, Literal
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from apps.browser.core import BrowserState

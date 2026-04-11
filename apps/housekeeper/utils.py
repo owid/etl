@@ -20,7 +20,7 @@ TODAY = date.today()
 
 # Load LLM configuration
 CURRENT_DIR = Path(__file__).parent
-with open(CURRENT_DIR / "config.yaml", "r") as f:
+with open(CURRENT_DIR / "config.yaml") as f:
     CONFIG = yaml.safe_load(f)
 
 # System prompt to summarize chart information

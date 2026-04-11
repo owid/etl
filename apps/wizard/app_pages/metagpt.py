@@ -6,7 +6,7 @@ Note that it still relies on apps/metagpt.
 import os
 import tempfile
 from pathlib import Path
-from typing import List, cast
+from typing import cast
 
 import streamlit as st
 from streamlit_ace import st_ace
@@ -112,7 +112,7 @@ PREFIX_GRAPHER = "GRAPHER :: "
 
 
 # Get available files
-def get_paths(directory: str, extension: str) -> List[str]:
+def get_paths(directory: str, extension: str) -> list[str]:
     """Get available files."""
     return list(sorted(str(path) for path in Path(directory).rglob(pattern=f"*.{extension}")))
 
@@ -166,7 +166,7 @@ col21, col22 = st.columns(2)
 with col21:
     # Load file
     st.session_state["filepath_metadata"] = get_actual_path(cast(str, metadata_file))
-    with open(st.session_state["filepath_metadata"], "r") as f:
+    with open(st.session_state["filepath_metadata"]) as f:
         file_content = f.read()
     # Show file to the user
     st_ace(file_content, **ACE_DEFAULT)
@@ -189,9 +189,9 @@ if st.session_state["run_gpt"]:
             with col11b:
                 st.button("Approve", type="primary", on_click=run_gpt_confirmed)
     else:
-        assert (
-            st.session_state.gpt_updater.channel == "snapshot"
-        ), "Cost for non-snapshot steps should have been calculated!"
+        assert st.session_state.gpt_updater.channel == "snapshot", (
+            "Cost for non-snapshot steps should have been calculated!"
+        )
     # st.button("Do you want to proceed?", type="primary", on_click=run_gpt_confirmed)
 
 
@@ -221,9 +221,9 @@ if st.session_state.get("show_gpt"):
         # Temporary export
         tf = tempfile.NamedTemporaryFile()
         with open(file=tf.name, mode="w") as f:
-            f.write(yaml_dump(st.session_state["metadata_new"], strip_lines=True, width=float("inf")))  # type: ignore
+            f.write(yaml_dump(st.session_state["metadata_new"], strip_lines=True, width=float("inf")))  # ty: ignore
         ## Show file to the user
-        with open(tf.name, "r") as f:
+        with open(tf.name) as f:
             file_content = f.read()
         # file_content = yaml_dump(st.session_state["metadata_new"], strip_lines=True, width=float("inf"))
         st.session_state["metadata_new_updated"] = st_ace(

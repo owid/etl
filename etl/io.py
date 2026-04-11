@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Dict, List
 
 from structlog import get_logger
 
@@ -11,7 +10,7 @@ from etl.steps import filter_to_subgraph
 log = get_logger()
 
 
-def get_changed_steps(files_changed: Dict[str, Dict[str, str]]) -> List[str]:
+def get_changed_steps(files_changed: dict[str, dict[str, str]]) -> list[str]:
     changed_steps = []
     for file_path, file_status in files_changed.items():
         # File status can be: D (deleted), A (added), M (modified).
@@ -33,7 +32,7 @@ def get_changed_steps(files_changed: Dict[str, Dict[str, str]]) -> List[str]:
     return changed_steps
 
 
-def get_all_changed_catalog_paths(files_changed: Dict[str, Dict[str, str]]) -> List[str]:
+def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]]) -> list[str]:
     """Get all changed steps and their downstream dependencies."""
     dataset_catalog_paths = []
 

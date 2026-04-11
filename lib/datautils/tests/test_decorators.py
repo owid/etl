@@ -60,7 +60,7 @@ class TestEnableDownload:
 
 
 def _test_local_file(path):
-    with open(path, "r") as f:
+    with open(path) as f:
         text = f.read()
     return text
 

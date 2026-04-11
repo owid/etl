@@ -1,7 +1,6 @@
 import os
 import tempfile
 import zipfile
-from typing import List, Optional, Tuple
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -23,7 +22,7 @@ def extract_data(snap: Snapshot, output_dir: str) -> None:
     z.extractall(output_dir)
 
 
-def load_data(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Tuple[Table, ...]:
+def load_data(tmp_dir: str, metadata: TableMeta, origin: Origin) -> tuple[Table, ...]:
     return (
         _load_population(tmp_dir, metadata, origin),
         _load_fertility(tmp_dir, metadata, origin),
@@ -212,7 +211,7 @@ def process(
     df_demographics: Table,
     df_depratio: Table,
     df_deaths: Table,
-) -> Tuple[Table, ...]:
+) -> tuple[Table, ...]:
     # Sanity checks
     (
         df_population,
@@ -246,7 +245,7 @@ def sanity_checks(
     df_demographics: Table,
     df_depratio: Table,
     df_deaths: Table,
-) -> Tuple[Table, ...]:
+) -> tuple[Table, ...]:
     df_population = _sanity_checks(
         df_population,
         "Location",
@@ -285,7 +284,7 @@ def sanity_checks(
     return df_population, df_fertility, df_demographics, df_depratio, df_deaths
 
 
-def std_columns(df_depratio: Table, df_deaths: Table) -> Tuple[Table, ...]:
+def std_columns(df_depratio: Table, df_deaths: Table) -> tuple[Table, ...]:
     columns_rename = {
         "Variant": "Variant",
         "Region, subregion, country or area *": "Location",
@@ -310,7 +309,7 @@ def set_index(
     df_demographics: Table,
     df_depratio: Table,
     df_deaths: Table,
-) -> Tuple[Table, ...]:
+) -> tuple[Table, ...]:
     df_population = df_population.set_index(
         ["Location", "Time", "Variant", "AgeGrp"],
         verify_integrity=True,
@@ -340,7 +339,7 @@ def df_cols_as_str(
     df_demographics: Table,
     df_depratio: Table,
     df_deaths: Table,
-) -> Tuple[Table, ...]:
+) -> tuple[Table, ...]:
     df_population = _df_cols_as_str(df_population)
     df_fertility = _df_cols_as_str(df_fertility)
     df_demographics = _df_cols_as_str(df_demographics)
@@ -349,7 +348,7 @@ def df_cols_as_str(
     return df_population, df_fertility, df_demographics, df_depratio, df_deaths
 
 
-def fix_types(df_depratio: Table, df_deaths: Table) -> Tuple[Table, ...]:
+def fix_types(df_depratio: Table, df_deaths: Table) -> tuple[Table, ...]:
     _type = pd.StringDtype()
     df_depratio = df_depratio.assign(Notes=df_depratio.Notes.astype(_type))
     df_deaths = df_deaths.assign(Notes=df_deaths.Notes.astype(_type))
@@ -365,8 +364,8 @@ def _sanity_checks(
     df: Table,
     column_location: str,
     column_location_id: str,
-    column_location_type: Optional[str] = None,
-    location_type_values: List[str] = [],
+    column_location_type: str | None = None,
+    location_type_values: list[str] = [],
 ) -> Table:
     # Quick filter
     # df = df[-((df[column_location] == "Latin America and Caribbean") & (df[column_location_type] == "SDG region"))]

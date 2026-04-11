@@ -281,10 +281,10 @@ def get_country_name_variations(country_names: set[str] | None = None):
         "United Kingdom": "UK",
         "United States": "US",
     }
-    name_variations = {country_names_guardian.get(c, c): names for c, names in name_variations.items()}  # type: ignore[reportCallIssue]
+    name_variations = {country_names_guardian.get(c, c): names for c, names in name_variations.items()}  # ty: ignore[call-non-callable]
 
     # Sort
-    names_sorted = sorted(name_variations)  # type: ignore
+    names_sorted = sorted(name_variations)  # ty: ignore
     name_variations = {k: name_variations[k] for k in names_sorted}
 
     if country_names is not None:
@@ -338,7 +338,7 @@ def get_data_by_raw_mention(country_names=None, year_range=None, output_file=Non
 
 def get_country_queries(country_names=None):
     """Get country queries from COUNTRY_QUERIES_FILE."""
-    with open(COUNTRY_QUERIES_FILE, "r") as file:
+    with open(COUNTRY_QUERIES_FILE) as file:
         country_queries = yaml.safe_load(file)
     if "queries" not in country_queries:
         raise KeyError(f"No 'queries' key found in {COUNTRY_QUERIES_FILE}")

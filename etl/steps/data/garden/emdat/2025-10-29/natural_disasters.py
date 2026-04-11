@@ -4,7 +4,7 @@ NOTE: Some of the processing is related to inflation adjustments, which we decid
 """
 
 import datetime
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -138,7 +138,7 @@ ACCEPTED_OVERLAPS = [{1911: {"USSR", "Kazakhstan"}}, {1991: {"Georgia", "USSR"}}
 DATA_CORRECTIONS = []
 
 
-def correct_data_points(tb: Table, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> Table:
+def correct_data_points(tb: Table, corrections: list[tuple[dict[Any, Any], dict[Any, Any]]]) -> Table:
     """Make individual corrections to data points in a table.
 
     Parameters
@@ -255,9 +255,9 @@ def sanity_checks_on_inputs(tb: Table) -> None:
     assert (tb.select_dtypes("number").fillna(0) >= 0).all().all(), error
 
     error = "Column 'total_affected' should be the sum of columns 'injured', 'affected', and 'homeless'."
-    assert (
-        tb["total_affected"].fillna(0) == tb[["injured", "affected", "homeless"]].sum(axis=1).fillna(0)
-    ).all(), error
+    assert (tb["total_affected"].fillna(0) == tb[["injured", "affected", "homeless"]].sum(axis=1).fillna(0)).all(), (
+        error
+    )
 
     error = "Natural disasters are not expected to last more than 9 years."
     assert (tb["end_year"] - tb["start_year"]).max() < 10, error
@@ -414,7 +414,7 @@ def calculate_yearly_impacts(tb: Table) -> Table:
                 # Note that the previous line may have introduced rounding errors.
                 impacts["total_affected"] = impacts["injured"] + impacts["affected"] + impacts["homeless"]
                 # Add impacts to the cumulative impacts series.
-                cumulative_impacts += impacts  # type: ignore
+                cumulative_impacts += impacts  # ty: ignore
                 # Normalize data by the number of days affected in this year.
                 new_event.loc[:, IMPACT_COLUMNS] = impacts.values
                 # Correct year and dates.
@@ -423,7 +423,7 @@ def calculate_yearly_impacts(tb: Table) -> Table:
                 new_event["end_date"] = pd.Timestamp(year=year, month=12, day=31)
             else:
                 # Assign all remaining impacts to the last year.
-                impacts = (pd.Series(row[IMPACT_COLUMNS]) - cumulative_impacts).astype(int)  # type: ignore
+                impacts = (pd.Series(row[IMPACT_COLUMNS]) - cumulative_impacts).astype(int)  # ty: ignore
                 new_event.loc[:, IMPACT_COLUMNS] = impacts.values
                 # Correct year and dates.
                 new_event["year"] = year
@@ -432,7 +432,7 @@ def calculate_yearly_impacts(tb: Table) -> Table:
             added_events = pr.concat([added_events, new_event], ignore_index=True).copy()
 
     # Remove multi-year rows from main dataframe, and add those rows after separating events year by year.
-    tb_yearly = pr.concat([tb[~(multi_year_rows_mask)], added_events], ignore_index=True)  # type: ignore
+    tb_yearly = pr.concat([tb[~(multi_year_rows_mask)], added_events], ignore_index=True)  # ty: ignore
 
     # Sort conveniently.
     tb_yearly = tb_yearly.sort_values(["country", "year", "type"]).reset_index(drop=True)
@@ -440,7 +440,7 @@ def calculate_yearly_impacts(tb: Table) -> Table:
     return tb_yearly
 
 
-def create_tables_of_event_sizes(tb: Table) -> Tuple[Table, Table]:
+def create_tables_of_event_sizes(tb: Table) -> tuple[Table, Table]:
     # We can try to replicate the chart from Guha-Sapir et al. (2004).
     # According to them:
     # * The human impact of a natural disaster is considered by CRED as "small" when the number of deaths was lower than
@@ -597,7 +597,7 @@ def create_tables_of_event_sizes(tb: Table) -> Tuple[Table, Table]:
     return tb_yearly, tb_decadal
 
 
-def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> Tuple[Table, Table]:
+def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> tuple[Table, Table]:
     # Calculate the number of events with more than a certain threshold of deaths.
     # With this, we can notice that "big events" (with over 5000 victims) have been roughly constant over the years.
     # However, "small events" (with less than 200 victims) have been increasing over the years.

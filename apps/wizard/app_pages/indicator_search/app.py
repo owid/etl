@@ -1,6 +1,5 @@
 import re
 from dataclasses import dataclass
-from typing import Optional
 
 import pandas as pd
 import requests
@@ -29,11 +28,11 @@ class Indicator:
 
     variableId: int
     name: str
-    description: Optional[str]
+    description: str | None
     n_charts: int
     catalogPath: str
     similarity: float
-    dataset: Optional[str] = None
+    dataset: str | None = None
     popularity: float = 0.0
 
     def to_dict(self):

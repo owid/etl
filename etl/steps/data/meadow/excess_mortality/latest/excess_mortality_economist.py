@@ -44,7 +44,7 @@ def _load_country_data() -> Table:
             "estimated_daily_excess_deaths",
             "estimated_daily_excess_deaths_ci_95_top",
             "estimated_daily_excess_deaths_ci_95_bot",
-        ],  # type: ignore
+        ],  # ty: ignore
     )
     country_wk_100k = paths.read_snap_table(
         "xm_econ_country_100k.csv",
@@ -54,7 +54,7 @@ def _load_country_data() -> Table:
             "estimated_daily_excess_deaths_per_100k",
             "estimated_daily_excess_deaths_ci_95_top_per_100k",
             "estimated_daily_excess_deaths_ci_95_bot_per_100k",
-        ],  # type: ignore
+        ],  # ty: ignore
     )
 
     country_cum = paths.read_snap_table(
@@ -65,7 +65,7 @@ def _load_country_data() -> Table:
             "cumulative_estimated_daily_excess_deaths",
             "cumulative_estimated_daily_excess_deaths_ci_95_top",
             "cumulative_estimated_daily_excess_deaths_ci_95_bot",
-        ],  # type: ignore
+        ],  # ty: ignore
     )
     country_cum_100k = paths.read_snap_table(
         "xm_econ_country_cum_100k",
@@ -75,7 +75,7 @@ def _load_country_data() -> Table:
             "cumulative_estimated_daily_excess_deaths_per_100k",
             "cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k",
             "cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k",
-        ],  # type: ignore
+        ],  # ty: ignore
     )
 
     # this file tells whether reported data is available
@@ -106,7 +106,7 @@ def _load_world_data() -> Table:
             "estimated_daily_excess_deaths",
             "estimated_daily_excess_deaths_ci_95_top",
             "estimated_daily_excess_deaths_ci_95_bot",
-        ],  # type: ignore
+        ],  # ty: ignore
     )
     world_wk_100k = paths.read_snap_table(
         "xm_econ_world_100k.csv",
@@ -116,7 +116,7 @@ def _load_world_data() -> Table:
             "estimated_daily_excess_deaths_per_100k",
             "estimated_daily_excess_deaths_ci_95_top_per_100k",
             "estimated_daily_excess_deaths_ci_95_bot_per_100k",
-        ],  # type: ignore
+        ],  # ty: ignore
     )
 
     world_cum = paths.read_snap_table(
@@ -127,7 +127,7 @@ def _load_world_data() -> Table:
             "cumulative_estimated_daily_excess_deaths",
             "cumulative_estimated_daily_excess_deaths_ci_95_top",
             "cumulative_estimated_daily_excess_deaths_ci_95_bot",
-        ],  # type: ignore
+        ],  # ty: ignore
     )
     world_cum_100k = paths.read_snap_table(
         "xm_econ_world_cum_100k.csv",
@@ -137,7 +137,7 @@ def _load_world_data() -> Table:
             "cumulative_estimated_daily_excess_deaths_per_100k",
             "cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k",
             "cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k",
-        ],  # type: ignore
+        ],  # ty: ignore
     )
 
     world_wk_merge = pr.merge(world_wk, world_wk_100k, on=["world", "date"], how="outer")
