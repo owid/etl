@@ -8,8 +8,6 @@ What do we do here?
 - Set indices and verify integrity
 """
 
-from typing import Dict, List, Optional, Tuple
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -117,12 +115,12 @@ INTERIM_SNAPSHOTS = [
 YEAR_ESTIMATES_END = 2023  # Year up to which the estimates go (inclusive). Projections start in 2024.
 
 
-def _load_interim_csvs() -> Dict[str, Table]:
+def _load_interim_csvs() -> dict[str, Table]:
     """Load all interim update ZIPs and return a dict mapping CSV filename to Table.
 
     Verifies that all loaded CSVs only contain the 'Medium' variant.
     """
-    result: Dict[str, Table] = {}
+    result: dict[str, Table] = {}
     for snap_name in INTERIM_SNAPSHOTS:
         snap = paths.load_snapshot(snap_name)
         with snap.extracted() as archive:
@@ -139,7 +137,7 @@ def _load_interim_csvs() -> Dict[str, Table]:
     return result
 
 
-def _apply_interim_csv(tb: Table, interim_csvs: Dict[str, Table], short_name: str) -> Table:
+def _apply_interim_csv(tb: Table, interim_csvs: dict[str, Table], short_name: str) -> Table:
     """Replace rows for interim-updated countries in a CSV-based table.
 
     Drops rows from `tb` that match interim country+variant, then appends the interim rows.
@@ -172,7 +170,7 @@ def _apply_interim_csv(tb: Table, interim_csvs: Dict[str, Table], short_name: st
     return tb
 
 
-def _apply_interim_xlsx(tb: Table, interim_csvs: Dict[str, Table]) -> Table:
+def _apply_interim_xlsx(tb: Table, interim_csvs: dict[str, Table]) -> Table:
     """Replace rows for interim-updated countries in the XLSX-based demographic indicators table.
 
     The interim CSV uses short column names (TFR, LEx, etc.) while the XLSX uses long names.
@@ -308,7 +306,7 @@ def run() -> None:
     ds_meadow.save()
 
 
-def make_tb_population(interim_csvs: Dict[str, Table]) -> Table:
+def make_tb_population(interim_csvs: dict[str, Table]) -> Table:
     """Make population table."""
     # Get estimates (1950-2023) data
     tb_population = read_from_csv("un_wpp_population_estimates.csv", interim_csvs)
@@ -458,7 +456,7 @@ def make_tb_life_expectancy(tb_main: Table) -> Table:
     return tb
 
 
-def make_tb_fertility_births_single_age(interim_csvs: Dict[str, Table]) -> Table:
+def make_tb_fertility_births_single_age(interim_csvs: dict[str, Table]) -> Table:
     # Read
     tb = read_from_csv("un_wpp_fertility_single_age.csv", interim_csvs)
     # Clean
@@ -470,7 +468,7 @@ def make_tb_fertility_births_single_age(interim_csvs: Dict[str, Table]) -> Table
     return tb
 
 
-def make_tb_fertility_births(tb_main: Table, interim_csvs: Dict[str, Table]) -> Tuple[Table, Table]:
+def make_tb_fertility_births(tb_main: Table, interim_csvs: dict[str, Table]) -> tuple[Table, Table]:
     """Make Births and Fertility tables.
 
     This is done together because the data is in the same file.
@@ -525,7 +523,7 @@ def make_tb_fertility_births(tb_main: Table, interim_csvs: Dict[str, Table]) -> 
     return tb_fertility, tb_births
 
 
-def make_tb_deaths(interim_csvs: Dict[str, Table]) -> Table:
+def make_tb_deaths(interim_csvs: dict[str, Table]) -> Table:
     """Make table with deaths.
 
     NOTE: no data available for scenarios other than Medium.
@@ -558,7 +556,7 @@ def make_tb_deaths(interim_csvs: Dict[str, Table]) -> Table:
     return tb_deaths
 
 
-def read_from_xlsx(short_name: str, interim_csvs: Optional[Dict[str, Table]] = None) -> Table:
+def read_from_xlsx(short_name: str, interim_csvs: dict[str, Table] | None = None) -> Table:
     """Read from XLSX. Clean and format table."""
     paths.log.info(f"reading {short_name}...")
     # Read snap
@@ -592,7 +590,7 @@ def read_from_xlsx(short_name: str, interim_csvs: Optional[Dict[str, Table]] = N
     return tb
 
 
-def read_from_csv(short_name: str, interim_csvs: Optional[Dict[str, Table]] = None) -> Table:
+def read_from_csv(short_name: str, interim_csvs: dict[str, Table] | None = None) -> Table:
     paths.log.info(f"reading {short_name}...")
     # Read snap
     tb = paths.read_snap_table(short_name, compression="gzip")
@@ -608,7 +606,7 @@ def read_from_csv(short_name: str, interim_csvs: Optional[Dict[str, Table]] = No
 
 
 def clean_table_standard_csv(
-    tb: Table, metrics: Optional[List[str]] = None, metrics_rename: Optional[Dict[str, str]] = None
+    tb: Table, metrics: list[str] | None = None, metrics_rename: dict[str, str] | None = None
 ) -> Table:
     if metrics_rename:
         tb = tb.rename(columns=metrics_rename)
@@ -628,7 +626,7 @@ def clean_table_standard_csv(
     return tb
 
 
-def combine_population(tbs: List[Table]) -> Table:
+def combine_population(tbs: list[Table]) -> Table:
     tbs_ = []
     for tb in tbs:
         # Clean table

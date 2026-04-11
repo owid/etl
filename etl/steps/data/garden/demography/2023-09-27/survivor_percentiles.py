@@ -72,7 +72,7 @@ def run(dest_dir: str) -> None:
     # Actual calculation
     paths.log.info("survivor_percentiles: calculate surviorship ages (can take some minutes)...")
     columns_grouping = ["country", "sex", "year"]
-    tb = tb.groupby(columns_grouping).apply(lambda group: obtain_survivorship_ages(group)).reset_index()  # type: ignore
+    tb = tb.groupby(columns_grouping).apply(lambda group: obtain_survivorship_ages(group)).reset_index()  # ty: ignore
 
     # Unpivot
     paths.log.info("survivor_percentiles: unpivot")

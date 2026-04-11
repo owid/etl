@@ -37,7 +37,7 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb=tb)
 
     # add population weighted averages
-    tb = geo.add_population_to_table(tb, ds_population)  # type: ignore
+    tb = geo.add_population_to_table(tb, ds_population)  # ty: ignore
 
     tb["cantril_times_pop"] = tb["ladder_score"] * tb["population"]
     aggr_score = {"cantril_times_pop": "sum", "population": "sum"}

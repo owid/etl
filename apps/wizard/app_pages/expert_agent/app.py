@@ -265,7 +265,7 @@ def show_suggestions():
     chat_history = build_history_chat()
     text = ""
     for msg in chat_history:
-        text += f"{msg['kind']}\n========\n{msg['content']}\n"  # type: ignore
+        text += f"{msg['kind']}\n========\n{msg['content']}\n"  # ty: ignore
 
     result = recommender_agent.run_sync(
         user_prompt=text,

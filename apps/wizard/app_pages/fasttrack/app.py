@@ -141,7 +141,7 @@ with st_horizontal(vertical_alignment="flex-end", justify_content="space-between
     if import_method is not None:
         with st.popover(":material/info: Instructions"):
             assert import_method in IMPORT_OPTIONS, "import_method not found in IMPORT_OPTIONS!"
-            with open(IMPORT_OPTIONS[import_method]["guidelines"]["file_path"], "r") as f:
+            with open(IMPORT_OPTIONS[import_method]["guidelines"]["file_path"]) as f:
                 st.markdown(f.read())
 
 ##########################################################
@@ -207,7 +207,7 @@ else:
             with placeholder_for_existing_google_sheet:
                 existing_google_sheet = st.selectbox(
                     label="Existing Google Sheets",
-                    options=options,  # type: ignore
+                    options=options,  # ty: ignore
                     format_func=lambda x: x["label"],
                     help="Selected sheet will be used if you don't specify Google Sheets URL.",
                     key="existing_sheet",

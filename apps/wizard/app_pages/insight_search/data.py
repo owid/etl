@@ -2,7 +2,7 @@ import datetime as dt
 import json
 import re
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -20,10 +20,10 @@ class Insight(Doc):
     title: str
     raw_text: str
     authors: list[str]
-    url: Optional[str]
-    url_img_desktop: Optional[str]
-    url_img_mobile: Optional[str]
-    url_vid: Optional[str]
+    url: str | None
+    url_img_desktop: str | None
+    url_img_mobile: str | None
+    url_vid: str | None
     slug: str
     is_public: bool
     date_published: dt.date
@@ -46,16 +46,16 @@ def get_raw_data_insights() -> pd.DataFrame:
     return df
 
 
-def get_raw_images() -> Dict[Any, Any]:
+def get_raw_images() -> dict[Any, Any]:
     """Get the content of data insights that exist in the database."""
     # Get all data insights from the database.
     query = "select filename, cloudflareId from images;"
     df = read_sql(query).dropna()
 
-    return df.set_index("filename").squeeze().to_dict()
+    return df.set_index("filename").squeeze().to_dict()  # ty: ignore[unresolved-attribute]
 
 
-def extract_text_from_raw_data_insight(content: Dict[str, Any]) -> str:
+def extract_text_from_raw_data_insight(content: dict[str, Any]) -> str:
     """Extract the text from the raw data insight, ignoring URLs and other fields."""
     texts = []
 
@@ -78,7 +78,7 @@ def extract_text_from_raw_data_insight(content: Dict[str, Any]) -> str:
     return clean_text
 
 
-def extract_image_urls_from_raw_data_insight(content, cf_image_mapping) -> Tuple[str | None, str | None]:
+def extract_image_urls_from_raw_data_insight(content, cf_image_mapping) -> tuple[str | None, str | None]:
     url_img_desktop = None
     url_img_mobile = None
 

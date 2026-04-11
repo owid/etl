@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
 
     # Create a new table and ensure all columns are snake-case.
 
-    with open(snap.path, "r") as file:
+    with open(snap.path) as file:
         html_content = file.read()
     df = imagenet_html_extract(html_content)
     tb = Table(df, short_name="papers_with_code_imagenet", underscore=True)

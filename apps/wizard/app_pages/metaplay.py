@@ -36,14 +36,14 @@ CURRENT_DIR = Path(__file__).parent.absolute()
 
 # Load metadata from Snapshot
 PATH_METADATA_SNAPSHOT = paths.SNAPSHOTS_DIR / "dummy" / "2020-01-01" / f"{DUMMY}.csv.dvc"
-with open(PATH_METADATA_SNAPSHOT, "r") as f:
+with open(PATH_METADATA_SNAPSHOT) as f:
     METADATA_SNAPSHOT_BASE = f.read()
 SNAPSHOT_META_TOKEN_SPLIT = "outs:"
 METADATA_SNAPSHOT_DISPLAY = METADATA_SNAPSHOT_BASE.split(SNAPSHOT_META_TOKEN_SPLIT)[0]
 METADATA_SNAPSHOT_EXTRA = METADATA_SNAPSHOT_BASE.split(SNAPSHOT_META_TOKEN_SPLIT)[1]
 # Load metadata from Garden
 PATH_METADATA_GARDEN = paths.STEP_DIR / "data" / "garden" / "dummy" / "2020-01-01" / f"{DUMMY}.meta.yml"
-with open(PATH_METADATA_GARDEN, "r") as f:
+with open(PATH_METADATA_GARDEN) as f:
     METADATA_GARDEN_BASE = f.read()
 METADATA_GARDEN_DISPLAY = METADATA_GARDEN_BASE
 

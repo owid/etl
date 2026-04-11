@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -264,7 +262,7 @@ def fill_countries_to_start_year(tb: Table) -> Table:
     # Create start_year column
     tb_["start_year"] = START_YEAR
 
-    tb_ = expand_table(tb=tb_, start_col="start_year", end_col="year", status=pd.NA)  # type: ignore
+    tb_ = expand_table(tb=tb_, start_col="start_year", end_col="year", status=pd.NA)  # ty: ignore
 
     # Concatenate the two tables
     tb = pr.concat([tb, tb_], ignore_index=True)
@@ -274,10 +272,10 @@ def fill_countries_to_start_year(tb: Table) -> Table:
 
 def add_country_counts_and_population_by_status(
     tb: Table,
-    columns: List[str],
+    columns: list[str],
     ds_regions: Dataset,
     ds_population: Dataset,
-    regions: List[str],
+    regions: list[str],
     missing_data_on_columns: bool = False,
 ) -> Table:
     """

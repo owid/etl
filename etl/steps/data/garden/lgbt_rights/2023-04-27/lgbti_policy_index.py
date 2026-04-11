@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import map_series
@@ -95,7 +93,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_regional_aggregations(tb: Table, ds_regions: Dataset, ds_population: Dataset, regions: List) -> Table:
+def add_regional_aggregations(tb: Table, ds_regions: Dataset, ds_population: Dataset, regions: list) -> Table:
     """Add regional aggregations using population and country-region mapping."""
 
     tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
@@ -278,7 +276,7 @@ def create_combined_columns(tb: Table) -> Table:
     return tb
 
 
-def create_temporary_category_cols(tb: Table, columns: List) -> Table:
+def create_temporary_category_cols(tb: Table, columns: list) -> Table:
     """
     Create categories for numerical values and avoid code repetition
     """
@@ -293,10 +291,10 @@ def create_temporary_category_cols(tb: Table, columns: List) -> Table:
 
 def add_country_counts_and_population_by_status(
     tb: Table,
-    columns: List[str],
+    columns: list[str],
     ds_regions: Dataset,
     ds_population: Dataset,
-    regions: List[str],
+    regions: list[str],
     missing_data_on_columns: bool = False,
 ) -> Table:
     """

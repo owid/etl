@@ -453,16 +453,6 @@ steps:
   data://grapher/happiness/2025-04-01/happiness_by_age:
     - data://garden/happiness/2025-04-01/happiness_by_age
 
-  #
-  # World Airlines Traffic and Capacity
-  #
-  data://meadow/aviation/2025-04-01/air_traffic:
-    - snapshot://aviation/2025-04-01/air_traffic.csv
-  data://garden/aviation/2025-04-01/air_traffic:
-    - data://meadow/aviation/2025-04-01/air_traffic
-  data://grapher/aviation/2025-04-01/air_traffic:
-    - data://garden/aviation/2025-04-01/air_traffic
-
   # United Nations members
   data://meadow/un/2025-05-15/un_members:
     - snapshot://un/2025-05-15/un_members.csv
@@ -829,6 +819,18 @@ steps:
   # USA PPI New Office Construction (US Bureau of Labor Statistics)
   data://garden/bls/2026-03-24/us_ppi_construction:
     - snapshot://bls/2026-03-24/us_ppi_construction.csv
+
+  #
+  # World Airlines Traffic and Capacity
+  #
+  data://meadow/aviation/2026-04-02/air_traffic:
+    - snapshot://aviation/2026-04-02/air_traffic.csv
+
+  data://garden/aviation/2026-04-02/air_traffic:
+    - data://meadow/aviation/2026-04-02/air_traffic
+
+  data://grapher/aviation/2026-04-02/air_traffic:
+    - data://garden/aviation/2026-04-02/air_traffic
 
 include:
   - dag/open_numbers.yml

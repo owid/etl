@@ -1,7 +1,7 @@
 """Home page of wizard."""
 
 from copy import deepcopy
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import streamlit as st
 from streamlit_card import card
@@ -75,8 +75,8 @@ def st_show_home():
         entrypoint: str,
         title: str,
         image_url: str,
-        text: str | List[str] = "",
-        custom_styles: Optional[Dict[str, Any]] = None,
+        text: str | list[str] = "",
+        custom_styles: dict[str, Any] | None = None,
         small: bool = False,
     ) -> None:
         """Create card."""
@@ -93,7 +93,7 @@ def st_show_home():
             # text=f"Press {i + 1}",
             # text=["This is a test card", "This is a subtext"],
             styles=styles,
-            on_click=lambda: None,  # type: ignore[reportArgumentType]
+            on_click=lambda: None,  # ty: ignore[invalid-argument-type]
         )
         if go_to_page:
             st.switch_page(entrypoint)

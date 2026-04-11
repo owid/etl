@@ -2,7 +2,6 @@
 
 import time
 from enum import Enum
-from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 import streamlit as st
@@ -29,7 +28,7 @@ class AnomalyTypeEnum(Enum):
     # AI = "ai"  # Uncomment if needed
 
 
-def infer_variable_mapping(dataset_id_new: int, dataset_id_old: int) -> Dict[int, int]:
+def infer_variable_mapping(dataset_id_new: int, dataset_id_old: int) -> dict[int, int]:
     engine = get_engine()
     with Session(engine) as session:
         variables_new = gm.Variable.load_variables_in_datasets(session=session, dataset_ids=[dataset_id_new])
@@ -46,7 +45,7 @@ def infer_variable_mapping(dataset_id_new: int, dataset_id_old: int) -> Dict[int
 
 @st.cache_data(show_spinner=False)
 @st.spinner("Retrieving datasets...", show_time=True)
-def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], Dict[int, int]]:
+def get_datasets_and_mapping_inputs() -> tuple[dict[int, str], dict[int, str], dict[int, int]]:
     t = time.time()
     # Get all datasets from DB.
     df_datasets = gm.Dataset.load_all_datasets(columns=["id", "name"])
@@ -72,20 +71,24 @@ def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], D
     variable_mapping = load_variable_mapping(datasets_new_ids, dataset_new_and_old)
 
     # For convenience, create a dataset name "[id] Name".
-    df_datasets["id_name"] = "[" + df_datasets["id"].astype(str) + "] " + df_datasets["name"]
+    df_datasets["id_name"] = (
+        "[" + df_datasets["id"].astype(str) + "] " + df_datasets["name"]  # ty: ignore[unsupported-operator]
+    )
     # List all grapher datasets.
-    datasets_all = df_datasets[["id", "id_name"]].set_index("id").squeeze().to_dict()
+    datasets_all = (
+        df_datasets[["id", "id_name"]].set_index("id").squeeze().to_dict()  # ty: ignore[unresolved-attribute]
+    )
     # List new datasets.
     datasets_new = {k: v for k, v in datasets_all.items() if k in datasets_new_ids}
 
     log.info("get_datasets_and_mapping_inputs", t=time.time() - t)
 
-    return datasets_all, datasets_new, variable_mapping  # type: ignore
+    return datasets_all, datasets_new, variable_mapping  # ty: ignore
 
 
 def load_variable_mapping(
-    datasets_new_ids: List[int], dataset_new_and_old: Optional[Dict[int, Optional[int]]] = None
-) -> Dict[int, int]:
+    datasets_new_ids: list[int], dataset_new_and_old: dict[int, int | None] | None = None
+) -> dict[int, int]:
     mapping = WizardDB.get_variable_mapping_raw()
     if len(mapping) > 0:
         log.info("Using variable mapping created by indicator upgrader.")
@@ -113,7 +116,7 @@ def load_variable_mapping(
         # No mapping available.
         variable_mapping = dict()
 
-    return variable_mapping  # type: ignore
+    return variable_mapping  # ty: ignore
 
 
 def create_tables(_owid_env: OWIDEnv = OWID_ENV):
@@ -125,7 +128,7 @@ def create_tables(_owid_env: OWIDEnv = OWID_ENV):
 
 
 @st.cache_data(show_spinner=False)
-def get_scores(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
+def get_scores(anomalies: list[gm.Anomaly]) -> pd.DataFrame:
     """Combine and reduce scores dataframe."""
     df = combine_and_reduce_scores_df(anomalies)
 

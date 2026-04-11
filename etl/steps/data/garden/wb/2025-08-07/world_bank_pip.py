@@ -8,8 +8,6 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 
 """
 
-from typing import List, Tuple
-
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
@@ -475,7 +473,7 @@ def identify_rural_urban(tb: Table) -> Table:
     return tb
 
 
-def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
+def create_stacked_variables(tb: Table) -> tuple[Table, list, list]:
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
@@ -524,8 +522,8 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
             # If it's the last value calculate the people between this value and the previous
             # and also the people over this poverty line (and percentages)
             else:
-                varname_n = ("headcount_between", ppp_year, f"{povlines[i-1]} and {povlines[i]}")
-                varname_pct = ("headcount_ratio_between", ppp_year, f"{povlines[i-1]} and {povlines[i]}")
+                varname_n = ("headcount_between", ppp_year, f"{povlines[i - 1]} and {povlines[i]}")
+                varname_pct = ("headcount_ratio_between", ppp_year, f"{povlines[i - 1]} and {povlines[i]}")
                 tb_pivot[varname_n] = (
                     tb_pivot[("headcount", ppp_year, povlines[i])] - tb_pivot[("headcount", ppp_year, povlines[i - 1])]
                 )
@@ -606,7 +604,7 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     return tb
 
 
-def pivot_table(tb: Table, index: List[str], columns: List[str], join_column_levels_with: str | None = None) -> Table:
+def pivot_table(tb: Table, index: list[str], columns: list[str], join_column_levels_with: str | None = None) -> Table:
     """
     Pivot the table to calculate indicators more easily
     """
@@ -618,7 +616,7 @@ def pivot_table(tb: Table, index: List[str], columns: List[str], join_column_lev
     return tb_pivot
 
 
-def unpivot_table(tb: Table, index: List[str], level: List[str]) -> Table:
+def unpivot_table(tb: Table, index: list[str], level: list[str]) -> Table:
     """
     Unpivot table, using set_index and stack
     """
@@ -693,7 +691,7 @@ def sanity_checks(
         if not tb_error.empty:
             log.fatal(
                 f"""There are {len(tb_error)} observations with negative values! In:
-                {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT)}"""
+                {tabulate(tb_error[index], headers="keys", tablefmt=TABLEFMT)}"""
             )
             # NOTE: Check if we want to delete these observations
             # tb_pivot = tb_pivot[~mask].reset_index(drop=True)
@@ -717,11 +715,11 @@ def sanity_checks(
             # If it's the last value calculate the people between this value and the previous
             # and also the people over this poverty line (and percentages)
             else:
-                varname_n = ("headcount_between", ppp_year, f"{povlines_stacked[i-1]} and {povlines_stacked[i]}")
+                varname_n = ("headcount_between", ppp_year, f"{povlines_stacked[i - 1]} and {povlines_stacked[i]}")
                 varname_pct = (
                     "headcount_ratio_between",
                     ppp_year,
-                    f"{povlines_stacked[i-1]} and {povlines_stacked[i]}",
+                    f"{povlines_stacked[i - 1]} and {povlines_stacked[i]}",
                 )
                 col_stacked_n_all.append(varname_n)
                 col_stacked_pct_all.append(varname_pct)
@@ -768,7 +766,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""{len(tb_error)} observations of all stacked values are not adding up to 100% and will be deleted:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {tabulate(tb_error[index + ["sum_pct"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                 )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -781,7 +779,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""{len(tb_error)} observations of the reduced set of stacked values are not adding up to 100% and will be deleted:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {tabulate(tb_error[index + ["sum_pct"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                 )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -797,7 +795,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
-                    {tabulate(tb_error[(index + ["headcount_ratio"])], headers = 'keys', tablefmt = TABLEFMT)}"""
+                    {tabulate(tb_error[(index + ["headcount_ratio"])], headers="keys", tablefmt=TABLEFMT)}"""
                 )
 
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
@@ -820,7 +818,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
-                    {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT, floatfmt="0.0f")}"""
+                    {tabulate(tb_error[index], headers="keys", tablefmt=TABLEFMT, floatfmt="0.0f")}"""
                 )
             tb_pivot = tb_pivot[tb_pivot["check_total"]].reset_index(drop=True)
 
@@ -845,7 +843,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
-                    {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT)}"""
+                    {tabulate(tb_error[index], headers="keys", tablefmt=TABLEFMT)}"""
                 )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -869,7 +867,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
-                    {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {tabulate(tb_error[index], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                 )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -889,7 +887,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {tabulate(tb_error[index + ["sum_pct"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                 )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -911,7 +909,7 @@ def sanity_checks(
             if DEBUG:
                 log.warning(
                     f"""{len(tb_error)} observations of shares (with top 1%) are not adding up to 100% and will be converted to null:
-                    {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {tabulate(tb_error[index + ["sum_pct"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                 )
             # Make columns None if mask is True
             tb_pivot.loc[mask, [("top90_99_share", ppp_year, povlines[1]), ("top1_share", ppp_year, povlines[1])]] = (
@@ -931,7 +929,7 @@ def sanity_checks(
     return tb
 
 
-def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
+def inc_or_cons_data(tb: Table) -> tuple[Table, Table]:
     """
     Separate income and consumption data
     """
@@ -1223,7 +1221,7 @@ def check_jumps_in_grapher_dataset(tb: Table) -> None:
         if not tb_error.empty:
             log.fatal(
                 f"""There are {len(tb_error)} observations with abnormal jumps for {col}:
-                {tabulate(tb_error[['ppp_version', 'country', 'year', col, 'check_diff_column', 'check_diff_year']].sort_values('year').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                {tabulate(tb_error[["ppp_version", "country", "year", col, "check_diff_column", "check_diff_year"]].sort_values("year").reset_index(drop=True), headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
             )
             # tb = tb[~mask].reset_index(drop=True)
 
@@ -1559,7 +1557,7 @@ def make_cpi_not_depending_on_ppp(tb: Table) -> Table:
     return tb
 
 
-def separate_filled_and_unfilled_data(tb: Table) -> Tuple[Table, Table]:
+def separate_filled_and_unfilled_data(tb: Table) -> tuple[Table, Table]:
     """
     Separate filled and unfilled data.
 
