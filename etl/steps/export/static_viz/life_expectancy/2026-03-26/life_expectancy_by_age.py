@@ -275,8 +275,7 @@ def create_visualization(tb, source_text: str) -> plt.Figure:
     fig.text(
         0.06,
         0.03,
-        f"{source_text}\n"
-        "OurWorldInData.org – Research and data to make progress against the world's largest problems.",
+        f"{source_text}\nOurWorldInData.org – Research and data to make progress against the world's largest problems.",
         fontsize=9,
         color=grey_text,
         ha="left",
