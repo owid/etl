@@ -14,6 +14,9 @@ config:
   pickerColumnSlugs:
     - asdf
 
+topic_tags:
+  - Economic Inequality
+
 dimensions:
   - name: Indicator
     slug: indicator

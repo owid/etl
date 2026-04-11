@@ -445,20 +445,6 @@ steps:
   export://multidim/owid/latest/ig_countries:
     - data-private://grapher/owid/latest/ig_countries
 
-  # ATUS - American Time Use Survey
-  data://meadow/atus/2024-12-10/atus_0323:
-    - snapshot://atus/2024-12-10/atus_who.zip
-    - snapshot://atus/2024-12-10/atus_activities.zip
-    - snapshot://atus/2024-12-10/atus_summary.zip
-    - snapshot://atus/2024-12-10/activity_codes_2023.xls
-    - snapshot://atus/2024-12-10/atus_respondent.zip
-
-  data://garden/atus/2025-01-06/atus_who:
-    - data://meadow/atus/2024-12-10/atus_0323
-
-  data://grapher/atus/2025-01-06/atus_who:
-    - data://garden/atus/2025-01-06/atus_who
-
   # Happiness by age groups (World Happiness Report 2024)
   data://meadow/happiness/2025-04-01/happiness_by_age:
     - snapshot://happiness/2025-04-01/happiness_by_age.csv
@@ -466,16 +452,6 @@ steps:
     - data://meadow/happiness/2025-04-01/happiness_by_age
   data://grapher/happiness/2025-04-01/happiness_by_age:
     - data://garden/happiness/2025-04-01/happiness_by_age
-
-  #
-  # World Airlines Traffic and Capacity
-  #
-  data://meadow/aviation/2025-04-01/air_traffic:
-    - snapshot://aviation/2025-04-01/air_traffic.csv
-  data://garden/aviation/2025-04-01/air_traffic:
-    - data://meadow/aviation/2025-04-01/air_traffic
-  data://grapher/aviation/2025-04-01/air_traffic:
-    - data://garden/aviation/2025-04-01/air_traffic
 
   # United Nations members
   data://meadow/un/2025-05-15/un_members:
@@ -826,9 +802,35 @@ steps:
   data://grapher/happiness/2026-03-16/happiness:
     - data://garden/happiness/2026-03-16/happiness
 
+  #
+  # ATUS - American Time Use Survey (incl 2024 data)
+  #
+  data://meadow/atus/2026-03-10/atus_time_spent_with:
+    - snapshot://atus/2026-03-10/atus_who.zip
+    - snapshot://atus/2026-03-10/atus_act.zip
+    - snapshot://atus/2026-03-10/atus_sum.zip
+    - snapshot://atus/2024-12-10/activity_codes_2023.xls
+  data://garden/atus/2026-03-10/atus_time_spent_with:
+    - data://meadow/atus/2026-03-10/atus_time_spent_with
+  data://grapher/atus/2026-03-10/atus_time_spent_with:
+    - data://garden/atus/2026-03-10/atus_time_spent_with
+
+
   # USA PPI New Office Construction (US Bureau of Labor Statistics)
   data://garden/bls/2026-03-24/us_ppi_construction:
     - snapshot://bls/2026-03-24/us_ppi_construction.csv
+
+  #
+  # World Airlines Traffic and Capacity
+  #
+  data://meadow/aviation/2026-04-02/air_traffic:
+    - snapshot://aviation/2026-04-02/air_traffic.csv
+
+  data://garden/aviation/2026-04-02/air_traffic:
+    - data://meadow/aviation/2026-04-02/air_traffic
+
+  data://grapher/aviation/2026-04-02/air_traffic:
+    - data://garden/aviation/2026-04-02/air_traffic
 
 include:
   - dag/open_numbers.yml

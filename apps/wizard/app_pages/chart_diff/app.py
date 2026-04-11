@@ -374,14 +374,14 @@ def _show_options_filters():
     def show_reviewed():
         # st.toast(f"ENTERING hide: {st.session_state['show-reviewed-charts']}")
         if st.session_state["show-reviewed-charts"]:
-            st.query_params.update({"show_reviewed": ""})  # type: ignore
+            st.query_params.update({"show_reviewed": ""})  # ty: ignore
         else:
             st.query_params.pop("show_reviewed", None)
 
     def show_all():
         # st.toast(f"ENTERING hide: {st.session_state['show-reviewed-charts']}")
         if st.session_state["show-all-charts"]:
-            st.query_params.update({"show_all": ""})  # type: ignore
+            st.query_params.update({"show_all": ""})  # ty: ignore
         else:
             st.query_params.pop("show_all", None)
 
@@ -410,14 +410,14 @@ def _show_options_filters():
         "**Show** reviewed charts",
         key="show-reviewed-charts",
         value="show_reviewed" in st.query_params,
-        on_change=show_reviewed,  # type: ignore
+        on_change=show_reviewed,  # ty: ignore
         help="Show only chart diffs that are pending approval (or rejection).",
     )
     st.toggle(
         "**Show all charts** (ignores all filters)",
         key="show-all-charts",
         value="show_all" in st.query_params,
-        on_change=show_all,  # type: ignore
+        on_change=show_all,  # ty: ignore
         help="Show all charts. This option ignores all the filters.\n\nIf you want to apply any filter, uncheck this option.",
     )
     url_persist(st.toggle)(
@@ -438,9 +438,9 @@ def _show_options_filters():
             default = ["new", "config", "tags"]
         st.multiselect(
             label="Chart change types",
-            options=["new", "data", "metadata", "config", "tags"],  # type: ignore
+            options=["new", "data", "metadata", "config", "tags"],  # ty: ignore
             format_func=lambda x: x if x == "new" else f"{x} modified",
-            default=default,  # type: ignore
+            default=default,  # ty: ignore
             key="chart-diff-change-type",
             help="Show new charts or modified ones with changes in data, metadata, config, or tags.",
             placeholder="config, data, metadata, tags",
@@ -448,7 +448,7 @@ def _show_options_filters():
         st.multiselect(
             label="Chart IDs",
             options=[c.chart_id for c in st.session_state.chart_diffs.values()],
-            default=[int(n) for n in st.query_params.get_all("chart_id")],  # type: ignore
+            default=[int(n) for n in st.query_params.get_all("chart_id")],  # ty: ignore
             key="chart-diff-filter-id",
             help="Filter chart diffs with charts with given IDs.",
             placeholder="Select chart IDs",
@@ -457,14 +457,14 @@ def _show_options_filters():
             label="Indicator IDs",
             options=sorted(st.session_state.indicators_in_charts.keys()),
             format_func=lambda s: f"[{s}] {st.session_state.indicators_in_charts[s]}",
-            default=[int(n) for n in st.query_params.get_all("indicator_id")],  # type: ignore
+            default=[int(n) for n in st.query_params.get_all("indicator_id")],  # ty: ignore
             key="chart-diff-filter-indicator",
             help="Filter chart diffs to charts containing any of the selected indicators.",
             placeholder="Select indicator IDs",
         )
         st.text_input(
             label="Chart slug",
-            value=st.query_params.get("chart_slug", ""),  # type: ignore
+            value=st.query_params.get("chart_slug", ""),  # ty: ignore
             placeholder="Search for a slug",
             key="chart-diff-filter-slug",
             help="Filter chart diffs with charts with slugs containing any of the given words (fuzzy match).",
@@ -472,7 +472,7 @@ def _show_options_filters():
 
         st.form_submit_button(
             "Apply filters",
-            on_click=apply_search_filters,  # type: ignore
+            on_click=apply_search_filters,  # ty: ignore
         )
 
 
@@ -520,7 +520,7 @@ def _show_options_display():
         st.toggle(
             "Use **vertical arrangement** for chart diffs",
             key="arrange-charts-vertically",
-            on_change=arrange_charts,  # type: ignore
+            on_change=arrange_charts,  # ty: ignore
         )
 
 
@@ -595,7 +595,7 @@ def _show_summary_top(chart_diffs):
 
     # Signal filtering (if any)
     if num_charts_listed != num_charts_total:
-        text_warning = f"{num_charts_total-num_charts_listed} charts are hidden (already reviewed, or filtered)."
+        text_warning = f"{num_charts_total - num_charts_listed} charts are hidden (already reviewed, or filtered)."
         text += f" :orange-badge[:small[{text_warning}]]"
         st.markdown(
             text,

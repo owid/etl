@@ -10,7 +10,7 @@ import tempfile
 from collections import defaultdict
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import click
 import numpy as np
@@ -189,7 +189,7 @@ def download_file(url: str, goal: str, area_codes: list, max_retries: int, bytes
     return content
 
 
-def attributes_description(snap: Snapshot) -> Dict[Any, Any]:
+def attributes_description(snap: Snapshot) -> dict[Any, Any]:
     """Gathers each of the unit codes and their more descriptive counterparts."""
     goal_codes = get_goal_codes(snap)
     a = []
@@ -236,7 +236,7 @@ def dimensions_description(snap: Snapshot) -> dict:
     return dim_dict
 
 
-def get_goal_codes(snap: Snapshot) -> List[int]:
+def get_goal_codes(snap: Snapshot) -> list[int]:
     # retrieves all goal codes
     url = f"{SDG_DATA_API}/v1/sdg/Goal/List"
     res = requests.get(url)

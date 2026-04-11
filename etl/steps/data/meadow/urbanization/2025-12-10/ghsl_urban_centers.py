@@ -10,14 +10,9 @@ paths = PathFinder(__file__)
 
 # City size cutoffs (in population).
 CITY_SIZE_CUTOFFS = {
-    "below_300k": (0, 300000),
-    "300k_500k": (300000, 500000),
-    "500k_1m": (500000, 1000000),
-    "300k_1m": (300000, 1000000),
-    "1m_3m": (1000000, 3000000),
-    "3m_5m": (3000000, 5000000),
+    "50k_300k": (50000, 300000),
+    "50k_1m": (50000, 1000000),
     "1m_5m": (1000000, 5000000),
-    "above_5m": (5000000, float("inf")),
     "5m_10m": (5000000, 10000000),
     "above_10m": (10000000, float("inf")),
 }
@@ -125,6 +120,15 @@ def run() -> None:
     # Drop missing population values.
     tb_all_cities = tb_all_cities.dropna(subset=["urban_pop"])
     tb_all_cities = tb_all_cities[tb_all_cities["urban_pop"] > 0]
+
+    # Sanity check: all urban centres should have at least 50,000 people.
+    below_50k = tb_all_cities[tb_all_cities["urban_pop"] < 50000]
+    if not below_50k.empty:
+        raise AssertionError(
+            f"Found {len(below_50k)} cities with population below 50,000. "
+            f"Urban centres should have at least 50,000 people.\n"
+            f"Examples:\n{below_50k[['country', 'year', 'urban_pop']].head(10)}"
+        )
 
     # Create columns for each city size category using vectorized operations.
     urban_pop = tb_all_cities["urban_pop"]

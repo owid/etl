@@ -292,7 +292,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Drop unneeded columns
-    regions: Table = regions.drop(columns=["defined_by"])  # type: ignore
+    regions: Table = regions.drop(columns=["defined_by"])  # ty: ignore
 
     # Create slugs for all countries and keep track of legacy slugs.
     regions["slug"] = regions["name"].astype(str).map(slugify)

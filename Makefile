@@ -104,7 +104,7 @@ test: check-formatting check-linting check-typing unittest version-tracker
 
 check-typing: .venv
 	@echo '==> Checking types'
-	.venv/bin/ty check $(SRC) --exclude "etl/steps/**" --exclude "snapshots/**"
+	.venv/bin/ty check $(SRC) --exclude "etl/steps/**" --exclude "snapshots/**" --python .venv
 
 test-integration: .venv
 	@echo '==> Running integration tests'

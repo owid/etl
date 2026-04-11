@@ -8,7 +8,6 @@ See documentation of class DataAnomaly below for more details on how anomaly cla
 
 import abc
 import os
-from typing import Tuple
 
 import plotly.express as px
 from owid.catalog import Table
@@ -433,7 +432,7 @@ class TeaProductionAnomaly(DataAnomaly):
             assert high_value / low_value > 3
 
     def inspect(self, tb):
-        log.info("The anomaly causes: " "\n* The production of tea to increase dramatically from 1990 to 1991.")
+        log.info("The anomaly causes: \n* The production of tea to increase dramatically from 1990 to 1991.")
         for element_code in self.affected_element_codes:
             selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
             tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
@@ -451,7 +450,7 @@ class TeaProductionAnomaly(DataAnomaly):
 
 
 class HighYieldAnomaly(DataAnomaly):
-    description = ()  # type: ignore
+    description = ()  # ty: ignore
 
     affected_item_codes = []
     affected_element_codes = []
@@ -480,7 +479,7 @@ class HighYieldAnomaly(DataAnomaly):
         ).all()
 
     def inspect(self, tb):
-        log.info("The anomaly causes: " "\n* The yield of certain items, countries and years to be unreasonably high.")
+        log.info("The anomaly causes: \n* The yield of certain items, countries and years to be unreasonably high.")
         for element_code in self.affected_element_codes:
             selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
             tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
@@ -924,7 +923,7 @@ detected_anomalies = {
 }
 
 
-def handle_anomalies(dataset_short_name: str, tb: Table) -> Tuple[Table, str]:
+def handle_anomalies(dataset_short_name: str, tb: Table) -> tuple[Table, str]:
     if dataset_short_name not in detected_anomalies:
         # If there is no anomaly class for a given dataset, return the same data and an empty anomaly description.
         return tb, ""

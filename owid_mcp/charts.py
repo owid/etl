@@ -93,7 +93,7 @@ async def _fetch_chart_data_impl(
             df = df.drop(columns=["Entity"])
 
     # Convert back to CSV string
-    processed_csv: str = df.to_csv(index=False)  # type: ignore
+    processed_csv: str = df.to_csv(index=False)  # ty: ignore
 
     return ChartDataResult(
         id=chart_id,

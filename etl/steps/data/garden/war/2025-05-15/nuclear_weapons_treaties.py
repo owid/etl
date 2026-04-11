@@ -56,7 +56,7 @@ def run_sanity_checks(tb: Table) -> None:
         assert "Signatory" not in set(_tb[_tb["country"].isin(countries_with_accession)]["status"])
     error = "The list of withdrawals has changed."
     assert sorted(tb[tb["status"] == "Withdrawal"].drop(columns=["status"]).to_dict(orient="records")) == sorted(
-        WITHDRAWALS  # type: ignore
+        WITHDRAWALS  # ty: ignore
     ), error
 
 

@@ -2,7 +2,7 @@ import concurrent.futures
 import configparser
 import os
 import threading
-from functools import lru_cache
+from functools import cache
 from os import environ as env
 from pathlib import Path
 from urllib.parse import urlparse
@@ -93,9 +93,9 @@ def list_s3_objects(s3_folder: str, client: BaseClient | None = None) -> list[st
 
     while True:
         if continuation_token:
-            response = client.list_objects_v2(Bucket=bucket, Prefix=key, ContinuationToken=continuation_token)  # type: ignore
+            response = client.list_objects_v2(Bucket=bucket, Prefix=key, ContinuationToken=continuation_token)  # ty: ignore
         else:
-            response = client.list_objects_v2(Bucket=bucket, Prefix=key)  # type: ignore
+            response = client.list_objects_v2(Bucket=bucket, Prefix=key)  # ty: ignore
 
         if "Contents" in response:
             keys.extend([obj["Key"] for obj in response["Contents"] if not obj["Key"].endswith("/")])
@@ -136,7 +136,7 @@ def download(s3_url: str, filename: str, quiet: bool = False, client: BaseClient
     bucket, key = s3_bucket_key(s3_url)
 
     try:
-        client.download_file(bucket, key, filename)  # type: ignore
+        client.download_file(bucket, key, filename)  # ty: ignore
     except ClientError as e:
         log.error(e)
         raise UploadError(e)
@@ -369,7 +369,7 @@ def connect_r2() -> BaseClient:
     return client
 
 
-@lru_cache(maxsize=None)
+@cache
 def _connect_r2_cached() -> BaseClient:
     return connect_r2()
 

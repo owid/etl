@@ -1,6 +1,6 @@
 import json
 import webbrowser
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import click
 import structlog
@@ -244,9 +244,9 @@ def cli(
     }
 
     if origins:
-        dataset["sources"] = []  # type: ignore
-        definitions["common"]["sources"] = []
-        definitions["common"]["origins"] = [origin.to_dict() for origin in origins]
+        dataset["sources"] = []  # ty: ignore
+        definitions["common"]["sources"] = []  # ty: ignore[invalid-assignment]
+        definitions["common"]["origins"] = [origin.to_dict() for origin in origins]  # ty: ignore[invalid-assignment]
 
     meta_dict = {"dataset": dataset, "definitions": definitions, "tables": {table_name: {"variables": vars}}}
 
@@ -260,7 +260,7 @@ def cli(
     else:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
-            f.write(yaml_str)  # type: ignore
+            f.write(yaml_str)  # ty: ignore
 
         if run_etl:
             log.info(f"Running ETL for {uri}")
@@ -295,7 +295,7 @@ def cli(
         )
 
 
-def _get_origins(tab: Table, ds: Dataset) -> List[Origin]:
+def _get_origins(tab: Table, ds: Dataset) -> list[Origin]:
     # TODO: check that sources of all indicators are the same
     var_origins = tab.iloc[:, 0].m.origins
 
@@ -319,7 +319,7 @@ def _get_origins(tab: Table, ds: Dataset) -> List[Origin]:
         return [_create_origin_from_source(ds, ds.metadata.sources[0], license)]
 
 
-def _create_origin_from_source(ds: Dataset, source: Source, license: Optional[License]) -> Origin:
+def _create_origin_from_source(ds: Dataset, source: Source, license: License | None) -> Origin:
     description = ""
     if ds.metadata.description:
         description = ds.metadata.description + "\n"
@@ -327,26 +327,26 @@ def _create_origin_from_source(ds: Dataset, source: Source, license: Optional[Li
         description += source.description
 
     origin = Origin(
-        title=ds.metadata.title,  # type: ignore[reportArgumentType]
-        producer=source.name,  # type: ignore[reportArgumentType]
+        title=ds.metadata.title,  # ty: ignore[invalid-argument-type]
+        producer=source.name,  # ty: ignore[invalid-argument-type]
         citation_full=source.published_by,
         license=license,
         description=description,
         url_main=source.url,
         url_download=source.source_data_url,
         date_accessed=source.date_accessed,
-        date_published=source.publication_date or source.publication_year,  # type: ignore[reportArgumentType]
+        date_published=source.publication_date or source.publication_year,  # ty: ignore[invalid-argument-type]
     )
 
     if not origin.date_published:
         log.warning(
             f"missing publication_date and publication_year in source, using date_accessed: {origin.date_accessed}"
         )
-        origin.date_published = origin.date_accessed  # type: ignore
+        origin.date_published = origin.date_accessed  # ty: ignore
     return origin
 
 
-def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> Dict[Any, Any]:
+def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> dict[Any, Any]:
     """TODO: This is work in progress! Update this function as you like."""
     q = f"""
     select
@@ -379,7 +379,7 @@ def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> Dict
     return json.loads(cf.iloc[0]["config"])
 
 
-def _prune_chart_config(config: Dict[Any, Any]) -> Dict[Any, Any]:
+def _prune_chart_config(config: dict[Any, Any]) -> dict[Any, Any]:
     # prune fields not useful for ETL grapher_config
     for field in ("id", "version", "dimensions", "isPublished", "data", "slug"):
         config.pop(field, None)

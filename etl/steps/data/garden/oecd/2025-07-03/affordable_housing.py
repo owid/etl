@@ -109,7 +109,7 @@ def run() -> None:
     index_cols = ["country", "year", "quintile", "tenure_type"]
 
     # get all combinations of country, year, quintile, and tenure type
-    full_index = tb_b_full[index_cols].drop_duplicates()  # type:ignore
+    full_index = tb_b_full[index_cols].drop_duplicates()  # ty: ignore
     only_hc_burden = tb_b_full[tb_b_full["hc_burden"].notna()][index_cols + ["hc_burden"]]
     only_hc_overburden = tb_b_full[tb_b_full["hc_overburden"].notna()][index_cols + ["hc_overburden"]]
 
@@ -161,16 +161,16 @@ def remove_notes(tb, break_str: str = BREAK_STR, index_col: str = "index"):
     tb = tb.dropna(subset=[index_col])
     # remove notes
     # check that the break string is in the index column
-    assert (
-        tb[index_col].str.contains(break_str).any()
-    ), "The break string is not found in the index column, please check the spreadsheet format"
+    assert tb[index_col].str.contains(break_str).any(), (
+        "The break string is not found in the index column, please check the spreadsheet format"
+    )
     # find the index of the first occurrence of the break string
     num_rows = tb[tb[index_col] == break_str].index[0]
 
     # check that after break string, there are no more rows
-    assert (
-        tb[tb.columns[1:]].iloc[num_rows + 1 :].isna().all().all()
-    ), "There are more rows after the break string, please check the spreadsheet format"
+    assert tb[tb.columns[1:]].iloc[num_rows + 1 :].isna().all().all(), (
+        "There are more rows after the break string, please check the spreadsheet format"
+    )
     return tb.iloc[:num_rows, :]
 
 

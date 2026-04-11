@@ -33,7 +33,7 @@ import urllib.parse
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import click
 import html2text
@@ -125,7 +125,7 @@ def load_indicators() -> pd.DataFrame:
     return df
 
 
-def load_metadata_urls() -> Dict[str, str]:
+def load_metadata_urls() -> dict[str, str]:
     """Load metadata URLs for indicators. This is more reliable than `url` field in the indicators list which
     could be sometimes empty."""
     log.info("load_metadata_urls")
@@ -135,7 +135,7 @@ def load_metadata_urls() -> Dict[str, str]:
 
     meta_links = {}
 
-    for a_href in soup.find_all("a", href=lambda href: href and "gho/data" in href):  # type: ignore
+    for a_href in soup.find_all("a", href=lambda href: href and "gho/data" in href):  # ty: ignore
         link = a_href.attrs["href"]
         # relative link
         if link.startswith("/data/gho"):
@@ -145,7 +145,7 @@ def load_metadata_urls() -> Dict[str, str]:
     return meta_links
 
 
-def load_metadata_urls_from_registry() -> Dict[str, str]:
+def load_metadata_urls_from_registry() -> dict[str, str]:
     """Load metadata URLs for indicators. This is more reliable than `url` field in the indicators list which
     could be sometimes empty."""
     log.info("load_metadata_urls_from_registry")
@@ -155,7 +155,7 @@ def load_metadata_urls_from_registry() -> Dict[str, str]:
 
     meta_links = {}
 
-    for a_href in soup.find_all("a", href=lambda href: href and "data/gho" in href):  # type: ignore
+    for a_href in soup.find_all("a", href=lambda href: href and "data/gho" in href):  # ty: ignore
         link = a_href.attrs["href"]
         # relative link
         if link.startswith("/data/gho"):
@@ -210,7 +210,7 @@ def fetch_metadata(url: str) -> str:
     return json.dumps(meta)
 
 
-def get_metadata_for_row(row: Any, name_to_metadata_url: Dict[str, str]) -> str:
+def get_metadata_for_row(row: Any, name_to_metadata_url: dict[str, str]) -> str:
     try:
         metadata_url = name_to_metadata_url[row.display]
     except KeyError:

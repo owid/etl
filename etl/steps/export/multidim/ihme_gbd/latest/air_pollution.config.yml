@@ -175,3 +175,6 @@ views:
     config:
       title: Share of deaths from indoor air pollution
       subtitle: Share of deaths, from any cause, which are attributed to indoor air pollution – from burning solid fuels – as a risk factor.
+
+topic_tags:
+  - Air Pollution

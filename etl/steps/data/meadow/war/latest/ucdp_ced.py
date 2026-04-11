@@ -58,7 +58,7 @@ def run() -> None:
     ds_meadow = paths.create_dataset(
         tables=[tb],
         check_variables_metadata=True,
-    )  # type: ignore
+    )  # ty: ignore
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
