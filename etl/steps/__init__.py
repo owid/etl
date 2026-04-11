@@ -15,7 +15,7 @@ import sys
 import tempfile
 import warnings
 from collections import defaultdict
-from collections.abc import Generator
+from collections.abc import Generator, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -24,7 +24,7 @@ from glob import glob
 from importlib import import_module
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, cast
+from typing import Any, Protocol, cast
 from urllib.parse import urlparse
 
 import fasteners
@@ -50,8 +50,7 @@ from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
 
-DAG = Dict[str, Set[str]]
-
+DAG = dict[str, set[str]]
 
 ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".ipynb_lock")
 
@@ -62,7 +61,7 @@ INSTANT_METADATA_DIFF = {}
 def compile_steps(
     dag: DAG,
     subdag: DAG,
-) -> List["Step"]:
+) -> list["Step"]:
     """
     Return the list of steps which, if executed in order, mean that every
     step has its dependencies ready for it.
@@ -89,7 +88,7 @@ def compile_steps(
     return [parse_step(name, dag) for name in steps]
 
 
-def to_dependency_order(dag: DAG) -> List[str]:
+def to_dependency_order(dag: DAG) -> list[str]:
     """
     Organize the steps in dependency order with a topological sort. In other words,
     the resulting list of steps is a valid ordering of steps such that no step is run
@@ -106,7 +105,7 @@ def filter_to_subgraph(
     downstream: bool = False,
     only: bool = False,
     exact_match: bool = False,
-    excludes: Optional[List[str]] = None,
+    excludes: list[str] | None = None,
 ) -> DAG:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
@@ -163,7 +162,7 @@ def filter_to_subgraph(
     return {step: deps - excluded_steps for step, deps in subgraph.items() if step not in excluded_steps}
 
 
-def traverse(graph: DAG, nodes: Set[str]) -> DAG:
+def traverse(graph: DAG, nodes: set[str]) -> DAG:
     """
     Use BFS to find all nodes in a graph that are reachable from a given
     subset of nodes.
@@ -181,7 +180,7 @@ def traverse(graph: DAG, nodes: Set[str]) -> DAG:
     return dict(reachable)
 
 
-def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
+def _parse_dag_yaml(dag: dict[str, Any]) -> dict[str, Any]:
     steps = dag["steps"] or {}
 
     return {node: set(deps) if deps else set() for node, deps in steps.items()}
@@ -202,14 +201,14 @@ def reverse_graph(graph: DAG) -> DAG:
     return dict(g)
 
 
-def graph_nodes(graph: DAG) -> Set[str]:
+def graph_nodes(graph: DAG) -> set[str]:
     all_steps = set(graph)
     for children in graph.values():
         all_steps.update(children)
     return all_steps
 
 
-def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
+def parse_step(step_name: str, dag: dict[str, Any]) -> "Step":
     "Convert each step's name into a step object that we can run."
     parts = urlparse(step_name)
     step_type = parts.scheme
@@ -248,7 +247,7 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     return step
 
 
-def extract_step_attributes(step: str) -> Dict[str, str]:
+def extract_step_attributes(step: str) -> dict[str, str]:
     """Extract attributes of a step from its name in the dag.
 
     Parameters
@@ -351,7 +350,7 @@ class Step(Protocol):
     path: str
     is_public: bool = True
     version: str
-    dependencies: List["Step"]
+    dependencies: list["Step"]
 
     def run(self) -> None: ...
 
@@ -383,9 +382,9 @@ class DataStep(Step):
     """
 
     path: str
-    dependencies: List[Step]
+    dependencies: list[Step]
 
-    def __init__(self, path: str, dependencies: List[Step]) -> None:
+    def __init__(self, path: str, dependencies: list[Step]) -> None:
         self.path = path
         self.dependencies = dependencies
 
@@ -409,7 +408,7 @@ class DataStep(Step):
     def dataset(self) -> str:
         return self.path.split("/")[3]
 
-    def _dataset_index_mtime(self) -> Optional[float]:
+    def _dataset_index_mtime(self) -> float | None:
         try:
             return os.stat(self._output_dataset._index_file).st_mtime
         except KeyError as e:
@@ -571,7 +570,7 @@ class DataStep(Step):
         # output checksum is checksum of all ingredients
         return self.checksum_input()
 
-    def _step_files(self) -> List[str]:
+    def _step_files(self) -> list[str]:
         "Return a list of code files defining this step."
         # if dataset is a folder, use all its files
         if self._search_path.is_dir():
@@ -934,9 +933,9 @@ class GrapherStep(Step):
 
     path: str
     data_step: DataStep
-    dependencies: List[Step]
+    dependencies: list[Step]
 
-    def __init__(self, path: str, dependencies: List[Step]) -> None:
+    def __init__(self, path: str, dependencies: list[Step]) -> None:
         # GrapherStep should have exactly one DataStep dependency
         assert len(dependencies) == 1
         assert path == dependencies[0].path
@@ -1115,8 +1114,8 @@ class GrapherStep(Step):
         cls,
         engine: Engine,
         dataset_upsert_results,
-        catalog_paths: List[str],
-        dataset_upserted_source_ids: List[int],
+        catalog_paths: list[str],
+        dataset_upserted_source_ids: list[int],
     ) -> bool:
         """
         Cleanup all ghost variables that weren't upserted
@@ -1151,9 +1150,9 @@ class ExportStep(DataStep):
     """
 
     path: str
-    dependencies: List[Step]
+    dependencies: list[Step]
 
-    def __init__(self, path: str, dependencies: List[Step]) -> None:
+    def __init__(self, path: str, dependencies: list[Step]) -> None:
         self.dependencies = dependencies
         self.path = path
 
@@ -1172,9 +1171,9 @@ class ExportStep(DataStep):
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
             if config.DEBUG:
-                DataStep._run_py_isolated(self)  # type: ignore
+                DataStep._run_py_isolated(self)  # ty: ignore
             else:
-                DataStep._run_py(self)  # type: ignore
+                DataStep._run_py(self)  # ty: ignore
 
         # save checksum (only update index.json, don't call ds.save() which iterates
         # table_names and would pick up custom JSON files written by the export script)
@@ -1265,7 +1264,7 @@ class ETagStep(Step):
 class PrivateMixin:
     def after_run(self) -> None:
         """Make dataset private"""
-        ds = catalog.Dataset(self._dest_dir.as_posix())  # type: ignore
+        ds = catalog.Dataset(self._dest_dir.as_posix())  # ty: ignore
         ds.metadata.is_public = False
         ds.save()
 
@@ -1277,7 +1276,7 @@ class DataStepPrivate(PrivateMixin, DataStep):
         return f"data-private://{self.path}"
 
 
-def select_dirty_steps(steps: List[Step], workers: int = 1) -> List[Step]:
+def select_dirty_steps(steps: list[Step], workers: int = 1) -> list[Step]:
     """Select dirty steps using threadpool."""
     # dynamically add cached version of `is_dirty` to all steps to avoid re-computing
     # this is a bit hacky, but it's the easiest way to only cache it here without
@@ -1287,7 +1286,7 @@ def select_dirty_steps(steps: List[Step], workers: int = 1) -> List[Step]:
         _add_is_dirty_cached(s, cache_is_dirty)
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
-        steps_dirty = executor.map(_step_is_dirty, steps)  # type: ignore
+        steps_dirty = executor.map(_step_is_dirty, steps)  # ty: ignore
         steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
 
     cache_is_dirty.clear()
@@ -1303,16 +1302,16 @@ def _cached_is_dirty(step: Step, cache: files.RuntimeCache) -> bool:
     key = str(step)
     if key not in cache:
         # _is_dirty is a dynamically added copy of the original is_dirty method (see _add_is_dirty_cached)
-        cache.add(key, step._is_dirty())  # type: ignore[attr-defined]
-    return cache[key]  # type: ignore[return-value]
+        cache.add(key, step._is_dirty())  # ty: ignore[unresolved-attribute]
+    return cache[key]  # ty: ignore[invalid-return-type]
 
 
 def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     """Save copy of a method to _is_dirty and replace it with a cached version."""
     # Intentional monkey-patching: save original method and replace with cached version
-    s._is_dirty = s.is_dirty  # type: ignore[attr-defined]
-    s._cache = cache  # type: ignore[attr-defined]
-    s.is_dirty = partial(_cached_is_dirty, s, cache)  # type: ignore[method-assign]
+    s._is_dirty = s.is_dirty  # ty: ignore[unresolved-attribute]
+    s._cache = cache  # ty: ignore[unresolved-attribute]
+    s.is_dirty = partial(_cached_is_dirty, s, cache)  # ty: ignore[invalid-assignment]
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
 
@@ -1389,7 +1388,7 @@ def isolated_env(
             sys.modules.pop(module_name, None)
 
 
-def _load_tables_metadata(ds: catalog.Dataset) -> Dict[str, Dict[str, Any]]:
+def _load_tables_metadata(ds: catalog.Dataset) -> dict[str, dict[str, Any]]:
     """Load metadata for all tables in a dataset."""
     table_meta = {}
     for table_name in ds.table_names:

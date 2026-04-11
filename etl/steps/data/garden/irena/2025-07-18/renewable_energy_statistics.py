@@ -353,7 +353,7 @@ def run() -> None:
     tb_global = tb[(tb["country"] == "World")][["group_technology", "year", "capacity"]].reset_index(drop=True)
 
     # Remove original regional and global data, and perform some sanity checks.
-    tb = remove_original_regional_and_global_data(tb=tb, tb_global=tb_global)  # type: ignore
+    tb = remove_original_regional_and_global_data(tb=tb, tb_global=tb_global)  # ty: ignore
 
     # Remap categories.
     tb = remap_categories(tb=tb)
@@ -377,7 +377,7 @@ def run() -> None:
         tb = pr.concat([tb, _tb], ignore_index=True)
 
     # Sanity check outputs.
-    sanity_check_outputs(tb=tb, tb_global=tb_global)  # type: ignore
+    sanity_check_outputs(tb=tb, tb_global=tb_global)  # ty: ignore
 
     # Exclude technologies that are not explicitly mentioned in the IRENA's Renewable Capacity Statistics 2024 document.
     tb = tb[~tb["technology"].isin(EXCLUDE_TECHNOLOGIES)].reset_index(drop=True)

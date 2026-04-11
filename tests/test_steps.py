@@ -12,9 +12,9 @@ import shutil
 import string
 import sys
 import tempfile
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator
 from unittest.mock import patch
 
 import pandas as pd
@@ -210,9 +210,9 @@ def test_select_dirty_steps():
     steps = [DummyStep(f"{i}") for i in range(20)]
     for s in steps:
         if random.random() < 0.5:
-            s.is_dirty = lambda: False  # type: ignore
+            s.is_dirty = lambda: False  # ty: ignore
         else:
-            s.is_dirty = lambda: True  # type: ignore
+            s.is_dirty = lambda: True  # ty: ignore
     assert all([s.is_dirty() for s in select_dirty_steps(steps, 10)])
 
 
@@ -239,7 +239,7 @@ def test_SnapshotStep_checksum_output(tmp_path):
         assert step.checksum_output() == "1867a4e329be8bb3c12a727513b931e8"
 
         # change metadata
-        meta["origin"]["producer"] = "B"  # type: ignore[index]
+        meta["origin"]["producer"] = "B"  # ty: ignore[not-subscriptable]
         with open(snapshot_dvc, "w") as f:
             json.dump(meta, f)
 
@@ -251,14 +251,14 @@ def test_isolated_env(tmp_path):
     (tmp_path / "test_abc.py").write_text("B = 1")
 
     with isolated_env(tmp_path):
-        import shared  # type: ignore
+        import shared  # ty: ignore
 
         assert shared.A == 1
         assert shared.test_abc.B == 1
         assert "test_abc" in sys.modules.keys()
 
     with pytest.raises(ModuleNotFoundError):
-        import shared  # type: ignore
+        import shared  # ty: ignore
 
     assert "test_abc" not in sys.modules.keys()
 

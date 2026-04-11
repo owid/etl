@@ -6,7 +6,6 @@ Also, note that the current step is a combination of two old steps, so it is not
 """
 
 import sys
-from typing import List
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table, utils
@@ -542,7 +541,7 @@ def process_combined_data(tb: Table, ds_population: Dataset) -> Table:
     return tb_wide
 
 
-def create_table_for_each_product(tb_garden: Table) -> List[Table]:
+def create_table_for_each_product(tb_garden: Table) -> list[Table]:
     """Create a list of tables, one for each product found in a garden table.
 
     Parameters

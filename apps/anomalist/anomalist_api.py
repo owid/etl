@@ -2,7 +2,7 @@ import random
 import tempfile
 import time
 from pathlib import Path
-from typing import List, Literal, Optional, Tuple, cast, get_args
+from typing import Literal, cast, get_args
 
 import numpy as np
 import pandas as pd
@@ -49,11 +49,11 @@ ANOMALY_DETECTORS = {
 
 def load_detector(anomaly_type: ANOMALY_TYPE) -> AnomalyDetector:
     """Load detector."""
-    return ANOMALY_DETECTORS[anomaly_type]  # type: ignore[return-value]
+    return ANOMALY_DETECTORS[anomaly_type]  # ty: ignore[invalid-return-type]
 
 
 def get_variables_views_in_charts(
-    variable_ids: Optional[List[int]] = None,
+    variable_ids: list[int] | None = None,
 ) -> pd.DataFrame:
     # Assumed base url for all charts.
     base_url = "https://ourworldindata.org/grapher/"
@@ -109,7 +109,7 @@ def renormalize_score(
     # Clip population between the minimum and maximum defined above.
     score_clipped = score.clip(lower=min_value, upper=max_value)
     # Renormalize score.
-    score_renormalized = factor * np.log(score_clipped) + constant  # type: ignore
+    score_renormalized = factor * np.log(score_clipped) + constant  # ty: ignore
     # Sanity checks.
     if len(score_renormalized[score_renormalized.notnull()]) > 0:
         # NOTE: Sometimes the input score may be empty (e.g. because indicators don't have analytics data, or are not used in charts) or nan (e.g. when renormalizing the population score on an array of entities with no population data, like "Northern Hemisphere").
@@ -124,11 +124,11 @@ def pretty_print_number(number):
     if pd.isna(number):
         return "?"
     elif int(number) >= 1e9:
-        return f"{number/1e9:.1f}B"
+        return f"{number / 1e9:.1f}B"
     elif number >= 1e6:
-        return f"{number/1e6:.1f}M"
+        return f"{number / 1e6:.1f}M"
     elif number >= 1e3:
-        return f"{number/1e3:.1f}k"
+        return f"{number / 1e3:.1f}k"
     else:
         return f"{int(number)}"
 
@@ -440,13 +440,13 @@ def add_auxiliary_scores(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def anomaly_detection(
-    anomaly_types: Optional[Tuple[str, ...]] = None,
-    variable_mapping: Optional[dict[int, int]] = None,
-    variable_ids: Optional[list[int]] = None,
+    anomaly_types: tuple[str, ...] | None = None,
+    variable_mapping: dict[int, int] | None = None,
+    variable_ids: list[int] | None = None,
     dry_run: bool = False,
     force: bool = False,
     reset_db: bool = False,
-    sample_n: Optional[int] = None,
+    sample_n: int | None = None,
     append: bool = False,
 ) -> None:
     """Detect anomalies."""
@@ -734,7 +734,7 @@ def _load_variables_meta(engine: Engine, variable_ids: list[int]) -> list[gm.Var
         return gm.Variable.load_variables(session, list(df["id"]))
 
 
-def combine_and_reduce_scores_df(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
+def combine_and_reduce_scores_df(anomalies: list[gm.Anomaly]) -> pd.DataFrame:
     """Get the combined dataframe with scores for all anomalies, and reduce it to include only the largest anomaly for each contry-indicator."""
     # Combine the reduced dataframes for all anomalies into a single dataframe.
     dfs = []
@@ -753,7 +753,7 @@ def combine_and_reduce_scores_df(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
     return df_reduced
 
 
-def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]:
+def _sample_variables(variables: list[gm.Variable], n: int) -> list[gm.Variable]:
     """Sample n variables. Prioritize variables that are used in charts, then fill the rest
     with random variables."""
     if len(variables) <= n:
@@ -781,7 +781,7 @@ def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]
 
 
 def get_anomalies_for_chart_ids(
-    chart_ids: Optional[List[int]] = None, anomaly_types: Optional[Tuple[str, ...]] = ("upgrade_change",)
+    chart_ids: list[int] | None = None, anomaly_types: tuple[str, ...] | None = ("upgrade_change",)
 ) -> pd.DataFrame:
     """Get datasets of the variables used in a list of charts, given the chart ids.
 
@@ -804,7 +804,7 @@ def get_anomalies_for_chart_ids(
         anomalies = [
             anomaly
             for anomaly in gm.Anomaly.load_anomalies(session=session, dataset_id=sorted(set(df["dataset_id"])))
-            if anomaly.anomalyType in anomaly_types  # type: ignore
+            if anomaly.anomalyType in anomaly_types  # ty: ignore
         ]
 
     # Simplify the original dataframe to only contain the charts and datasets for which there are anomalies calculated.
@@ -813,7 +813,7 @@ def get_anomalies_for_chart_ids(
 
     # Gather anomalies for all variables, datasets, and anomaly types.
     df_anomalies_all = [
-        anomaly.dfReduced.assign(**{"dataset_id": anomaly.datasetId, "anomaly_type": anomaly.anomalyType})  # type: ignore
+        anomaly.dfReduced.assign(**{"dataset_id": anomaly.datasetId, "anomaly_type": anomaly.anomalyType})  # ty: ignore
         for anomaly in anomalies
     ]
     if len(df_anomalies_all) == 0:
@@ -822,7 +822,7 @@ def get_anomalies_for_chart_ids(
     df_anomalies = pd.concat(
         df_anomalies_all,
         ignore_index=True,
-    ).rename(columns={"anomaly_score": "score_anomaly"})  # type: ignore
+    ).rename(columns={"anomaly_score": "score_anomaly"})  # ty: ignore
 
     # Add the population score.
     df_anomalies = add_population_score(df_reduced=df_anomalies)

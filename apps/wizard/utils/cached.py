@@ -8,7 +8,7 @@ For DB-related ones, the pattern can be a bit confusing:
 import json
 import logging
 import subprocess
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -32,7 +32,7 @@ logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.E
 
 
 @st.cache_data
-def load_entity_ids(entity_ids: Optional[List[int]] = None):
+def load_entity_ids(entity_ids: list[int] | None = None):
     return gio.load_entity_mapping(entity_ids)
 
 
@@ -40,7 +40,7 @@ def load_entity_ids(entity_ids: Optional[List[int]] = None):
 def execute_bash_command(cmd):
     """Execute a command and get its output."""
     try:
-        result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True, shell=True)
         return result.stdout
     except subprocess.CalledProcessError as e:
         return e.stderr
@@ -48,11 +48,11 @@ def execute_bash_command(cmd):
 
 @st.cache_data
 def load_variables_display_in_dataset(
-    dataset_uri: Optional[List[str]] = None,
-    dataset_id: Optional[List[int]] = None,
-    only_slug: Optional[bool] = False,
+    dataset_uri: list[str] | None = None,
+    dataset_id: list[int] | None = None,
+    only_slug: bool | None = False,
     _owid_env: OWIDEnv = OWID_ENV,
-) -> Dict[int, str]:
+) -> dict[int, str]:
     """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
     indicators = gio.load_variables_in_dataset(
         dataset_uri=dataset_uri,
@@ -71,34 +71,34 @@ def load_variables_display_in_dataset(
 
 
 @st.cache_data
-def get_variable_uris(indicators: List[Variable], only_slug: Optional[bool] = False) -> List[str]:
+def get_variable_uris(indicators: list[Variable], only_slug: bool | None = False) -> list[str]:
     if only_slug:
         return [o.catalog_path.table_variable or "" for o in indicators]
     return [o.catalogPath or "" for o in indicators]
 
 
 @st.cache_data
-def load_dataset_uris_new_in_server() -> List[str]:
+def load_dataset_uris_new_in_server() -> list[str]:
     """Load URIs of datasets that are new in staging server."""
     return gio.load_dataset_uris()
 
 
 @st.cache_data
-def load_dataset_uris() -> List[str]:
+def load_dataset_uris() -> list[str]:
     return gio.load_dataset_uris()
 
 
 @st.cache_data
-def indicators_used_in_charts(indicator_ids: List[int]) -> List[int]:
+def indicators_used_in_charts(indicator_ids: list[int]) -> list[int]:
     return gio.filter_indicators_used_in_charts(indicator_ids)
 
 
 @st.cache_data
 def load_variables_in_dataset(
-    dataset_uri: Optional[List[str]] = None,
-    dataset_id: Optional[List[int]] = None,
+    dataset_uri: list[str] | None = None,
+    dataset_id: list[int] | None = None,
     _owid_env: OWIDEnv = OWID_ENV,
-) -> List[Variable]:
+) -> list[Variable]:
     """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
     return gio.load_variables_in_dataset(
         dataset_uri=dataset_uri,
@@ -109,11 +109,11 @@ def load_variables_in_dataset(
 
 @st.cache_data
 def load_variable_metadata(
-    catalog_path: Optional[str] = None,
-    variable_id: Optional[int] = None,
-    variable: Optional[Variable] = None,
+    catalog_path: str | None = None,
+    variable_id: int | None = None,
+    variable: Variable | None = None,
     _owid_env: OWIDEnv = OWID_ENV,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     return gio.load_variable_metadata(
         catalog_path=catalog_path,
         variable_id=variable_id,
@@ -124,9 +124,9 @@ def load_variable_metadata(
 
 @st.cache_data
 def load_variable_data(
-    catalog_path: Optional[str] = None,
-    variable_id: Optional[int] = None,
-    variable: Optional[Variable] = None,
+    catalog_path: str | None = None,
+    variable_id: int | None = None,
+    variable: Variable | None = None,
     _owid_env: OWIDEnv = OWID_ENV,
 ) -> pd.DataFrame:
     return gio.load_variable_data(
@@ -139,16 +139,16 @@ def load_variable_data(
 
 @st.cache_data
 def load_anomalies_in_dataset(
-    dataset_ids: List[int],
+    dataset_ids: list[int],
     _owid_env: OWIDEnv = OWID_ENV,
-) -> List[Anomaly]:
+) -> list[Anomaly]:
     """Load Anomaly objects that belong to a dataset with URI `dataset_uri`."""
     with Session(_owid_env.engine) as session:
         return Anomaly.load_anomalies(session, dataset_ids)
 
 
 @st.cache_data(show_spinner=False)
-def get_datasets_from_version_tracker() -> Tuple[pd.DataFrame, List[Dict[str, Any]]]:
+def get_datasets_from_version_tracker() -> tuple[pd.DataFrame, list[dict[str, Any]]]:
     """Get dataset info from version tracker (ETL)."""
     # Get steps_df
     vt = VersionTracker()
@@ -196,7 +196,7 @@ def load_latest_population():
 @st.cache_data
 def get_tailscale_ip_to_user_map():
     """Get the mapping of Tailscale IPs to github usernames."""
-    proc = subprocess.run(["tailscale", "status", "--json"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    proc = subprocess.run(["tailscale", "status", "--json"], capture_output=True, text=True)
 
     if proc.returncode != 0:
         log.warning(f"Error getting Tailscale status: {proc.stderr}")
@@ -225,7 +225,7 @@ def get_tailscale_ip_to_user_map():
 ########################################################################
 # TODO: Functions below do not use CACHE, and should be moved elsewhere
 ########################################################################
-def get_grapher_user_from_ip(user_ip: Optional[str] = None) -> gm.User:
+def get_grapher_user_from_ip(user_ip: str | None = None) -> gm.User:
     """Get the Grapher user associated with the given Tailscale IP address.
 
     If no IP is given, it'll try to extract it from the header context.

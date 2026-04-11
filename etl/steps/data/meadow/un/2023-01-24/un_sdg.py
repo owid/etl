@@ -51,5 +51,5 @@ def load_and_clean(original_df: pd.DataFrame) -> pd.DataFrame:
     original_df.dropna(subset=["TimePeriod"], how="all", inplace=True)
     original_df = original_df.loc[pd.to_numeric(original_df["Value"], errors="coerce").notnull()]
     original_df.rename(columns={"GeoAreaName": "Country", "TimePeriod": "Year"}, inplace=True)
-    original_df = original_df.rename(columns=lambda k: re.sub(r"[\[\]]", "", k))  # type: ignore
+    original_df = original_df.rename(columns=lambda k: re.sub(r"[\[\]]", "", k))  # ty: ignore
     return original_df

@@ -137,9 +137,9 @@ def process_lt(tb: Table) -> Table:
     tb["life_expectancy"] = tb["life_expectancy"] + tb["age"]
 
     # Check latest year
-    assert (
-        tb["year"].max() == YEAR_ESTIMATE_LAST
-    ), f"Last year was {tb['year'].max()}, but should be {YEAR_ESTIMATE_LAST}"
+    assert tb["year"].max() == YEAR_ESTIMATE_LAST, (
+        f"Last year was {tb['year'].max()}, but should be {YEAR_ESTIMATE_LAST}"
+    )
 
     # Check column values
     ## sex
@@ -156,9 +156,9 @@ def process_un(tb: Table) -> Table:
     Desired format is with columns location, year, sex, age | life_expectancy.
     """
     # Sanity check
-    assert (
-        tb["year"].min() == YEAR_WPP_START
-    ), f"Year of first estimate is different than {YEAR_WPP_START}, it is {tb['year'].min()}"
+    assert tb["year"].min() == YEAR_WPP_START, (
+        f"Year of first estimate is different than {YEAR_WPP_START}, it is {tb['year'].min()}"
+    )
 
     # Filter
     ## dimension values: metric=life_expectancy, variant=medium, year >= YEAR_ESTIMATE_LAST
@@ -185,9 +185,9 @@ def process_un(tb: Table) -> Table:
     _check_column_values(tb, "age", {0, 15, 65, 80})
 
     # Check minimum year
-    assert (
-        tb.groupby("location", observed=True).year.min() == YEAR_ESTIMATE_LAST + 1
-    ).all(), f"Some entry with latest year different than {YEAR_ESTIMATE_LAST}"
+    assert (tb.groupby("location", observed=True).year.min() == YEAR_ESTIMATE_LAST + 1).all(), (
+        f"Some entry with latest year different than {YEAR_ESTIMATE_LAST}"
+    )
 
     return tb
 
@@ -299,9 +299,9 @@ def add_americas(tb: Table, ds_population: Dataset) -> Table:
     tb_am = tb.loc[(tb["country"].isin(AMERICAS_MEMBERS)) & (tb["sex"] == "all") & (tb["age"] == 0),].copy()
 
     # sanity check
-    assert (
-        tb_am.groupby(["country", "year"]).size().max() == 1
-    ), "There is more than one entry for a (country, year) tuple!"
+    assert tb_am.groupby(["country", "year"]).size().max() == 1, (
+        "There is more than one entry for a (country, year) tuple!"
+    )
 
     # add population for LATAM and Northern America (from WPP, hence since 1950)
     assert tb_am["year"].min() == YEAR_WPP_START

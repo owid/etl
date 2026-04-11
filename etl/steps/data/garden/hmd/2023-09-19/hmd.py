@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, cast
+from typing import cast
 
 import numpy as np
 from owid.catalog import Table
@@ -108,7 +108,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_le_diff_and_ratios(tb: Table, columns_primary: List[str]) -> Table:
+def add_le_diff_and_ratios(tb: Table, columns_primary: list[str]) -> Table:
     """Add metrics on life expectancy ratios and differences between females and males."""
     ## Get relevant metric, split into f and m tables
     metrics = {

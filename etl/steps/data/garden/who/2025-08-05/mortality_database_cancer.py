@@ -365,7 +365,9 @@ def _validate_data_completeness(tb: Table) -> None:
     missing_deaths = tb["number"].isna().sum()
 
     if missing_deaths / total_records > 0.05:  # >5% missing
-        log.warning("High proportion of missing death counts", missing_pct=f"{missing_deaths/total_records*100:.2f}%")
+        log.warning(
+            "High proportion of missing death counts", missing_pct=f"{missing_deaths / total_records * 100:.2f}%"
+        )
 
     # Check temporal completeness for major countries
     for country in ["United States", "Germany", "Japan"]:

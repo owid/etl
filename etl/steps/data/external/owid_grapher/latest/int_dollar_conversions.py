@@ -154,10 +154,12 @@ def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
     missing_from_overrides = countries_with_deviations - PPP_DEVIATIONS_SOURCE_TO_USE.keys()
     stale_in_overrides = PPP_DEVIATIONS_SOURCE_TO_USE.keys() - countries_with_deviations
 
-    assert not missing_from_overrides, f"Countries with deviations (>={PPP_PIP_WDI_MAX_DEVIATION * 100}%) missing from PPP_DEVIATIONS_SOURCE_TO_USE: {missing_from_overrides}"
-    assert (
-        not stale_in_overrides
-    ), f"Countries in PPP_DEVIATIONS_SOURCE_TO_USE that no longer have deviations: {stale_in_overrides}"
+    assert not missing_from_overrides, (
+        f"Countries with deviations (>={PPP_PIP_WDI_MAX_DEVIATION * 100}%) missing from PPP_DEVIATIONS_SOURCE_TO_USE: {missing_from_overrides}"
+    )
+    assert not stale_in_overrides, (
+        f"Countries in PPP_DEVIATIONS_SOURCE_TO_USE that no longer have deviations: {stale_in_overrides}"
+    )
 
     # Apply manual overrides: map Source enum → "pip"/"wdi"/NaN.
     source_to_label = {Source.WDI: "wdi", Source.PIP: "pip"}

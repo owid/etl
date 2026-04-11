@@ -280,7 +280,7 @@ def main(upload: bool) -> None:
         )
 
     # Save the final DataFrame to the specified file path in the snapshot.
-    df_to_file(df_final, file_path=snap.path)  # type: ignore[reportArgumentType]
+    df_to_file(df_final, file_path=snap.path)  # ty: ignore[invalid-argument-type]
 
     # Add date_accessed
     snap = modify_metadata(snap)
@@ -290,8 +290,8 @@ def main(upload: bool) -> None:
 
 
 def modify_metadata(snap: Snapshot) -> Snapshot:
-    snap.metadata.origin.date_published = dt.date.today()  # type: ignore
-    snap.metadata.origin.date_accessed = dt.date.today()  # type: ignore
+    snap.metadata.origin.date_published = dt.date.today()  # ty: ignore
+    snap.metadata.origin.date_accessed = dt.date.today()  # ty: ignore
     snap.metadata.save()
     return snap
 

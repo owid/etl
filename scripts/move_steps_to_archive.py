@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional, Set
 
 import click
 import structlog
@@ -22,13 +21,13 @@ log = structlog.get_logger()
     default=False,
     type=bool,
 )
-def move_steps_to_archive_cli(include: Optional[None], dry_run=False) -> None:
+def move_steps_to_archive_cli(include: None | None, dry_run=False) -> None:
     """Move steps from archive DAG into etl/steps/archive folder."""
     active_steps = _load_active_steps()
     active_snapshots_dirs = {snap.split("//")[1].rsplit("/", 1)[0] for snap in active_steps if "snapshot" in snap}
 
     for dag_yaml in paths.DAG_ARCHIVE_FILE.parent.glob("*.yml"):
-        with open(dag_yaml, "r") as f:
+        with open(dag_yaml) as f:
             meta = yaml.safe_load(f)
             steps = meta["steps"].keys()
 
@@ -86,7 +85,7 @@ def move_steps_to_archive_cli(include: Optional[None], dry_run=False) -> None:
             """
 
 
-def _load_active_steps() -> Set[str]:
+def _load_active_steps() -> set[str]:
     active_dag = load_dag(paths.DAG_FILE)
     return set(active_dag.keys()) | {dep for deps in active_dag.values() for dep in deps}
 

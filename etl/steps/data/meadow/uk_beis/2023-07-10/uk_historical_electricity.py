@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import Dict, List
-
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -10,7 +8,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
-def prepare_data(tb: Table, expected_content: Dict[int, List[str]], columns: Dict[int, str], table_name: str) -> Table:
+def prepare_data(tb: Table, expected_content: dict[int, list[str]], columns: dict[int, str], table_name: str) -> Table:
     """Prepare raw content of a specific sheet in the the BEIS excel file (loaded with a simple pd.read_excel(...)).
 
     It contains some sanity checks due to the poor formatting of the original file, and some basic processing (like
