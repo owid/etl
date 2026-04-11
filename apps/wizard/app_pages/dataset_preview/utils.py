@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -70,7 +70,7 @@ def get_explorers_views():
 
 
 @st_cache_data(custom_text="Getting datasets...", ttl=TTL_DEFAULT, show_time=True)
-def get_datasets() -> Dict[int, Dict[str, Any]]:
+def get_datasets() -> dict[int, dict[str, Any]]:
     """Get list of datasets.
 
     NOTE: Only datasets with a catalogPath are considered (i.e. ETL-era).
@@ -97,7 +97,7 @@ def get_datasets() -> Dict[int, Dict[str, Any]]:
     # Debug
     # st.dataframe(df)
 
-    return dix  # type: ignore
+    return dix  # ty: ignore
 
 
 @st.cache_data(show_spinner="Getting users...", ttl=TTL_DEFAULT)
@@ -139,14 +139,14 @@ def get_table_charts(indicator_charts, users, chart_views, indicator_id=None):
     df_charts = (
         pd.DataFrame(
             {
-                # "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # type: ignore
-                "Chart id": [chart.id for chart in charts],  # type: ignore
-                "Chart": [_get_title_chart(chart) for chart in charts],  # type: ignore
-                # "Views (last 7 days)": [CHART_VIEWS.get(chart.slug)["views_7d"] for chart in charts],  # type: ignore
-                "views": [get_average_daily_views(chart_views, chart.slug) for chart in charts],  # type: ignore
-                "Edit": [OWID_ENV.chart_admin_site(chart.id) for chart in charts],  # type: ignore
-                "User": [users[chart.lastEditedByUserId]["fullName"] for chart in charts],  # type: ignore
-                "Last edited": [chart.lastEditedAt for chart in charts],  # type: ignore
+                # "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # ty: ignore
+                "Chart id": [chart.id for chart in charts],  # ty: ignore
+                "Chart": [_get_title_chart(chart) for chart in charts],  # ty: ignore
+                # "Views (last 7 days)": [CHART_VIEWS.get(chart.slug)["views_7d"] for chart in charts],  # ty: ignore
+                "views": [get_average_daily_views(chart_views, chart.slug) for chart in charts],  # ty: ignore
+                "Edit": [OWID_ENV.chart_admin_site(chart.id) for chart in charts],  # ty: ignore
+                "User": [users[chart.lastEditedByUserId]["fullName"] for chart in charts],  # ty: ignore
+                "Last edited": [chart.lastEditedAt for chart in charts],  # ty: ignore
             }
         )
         .set_index("Chart id")
@@ -168,9 +168,9 @@ def get_table_explorers(indicator_explorers, explorer_views, indicator_id=None):
     df = (
         pd.DataFrame(
             {
-                # "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # type: ignore
-                "Explorer slug": [e for e in explorers],  # type: ignore
-                "views": [get_average_daily_views(explorer_views, slug) for slug in explorers],  # type: ignore
+                # "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # ty: ignore
+                "Explorer slug": [e for e in explorers],  # ty: ignore
+                "views": [get_average_daily_views(explorer_views, slug) for slug in explorers],  # ty: ignore
             }
         )
         .set_index("Explorer slug")
@@ -292,7 +292,7 @@ class IndicatorWithDimensions(IndicatorArray):
         return options
 
     def get_default(self):
-        dimensions = (d[0] for d in self.dimensions.values())
+        dimensions = (d[0] for d in self.dimensions.values())  # ty: ignore[unresolved-attribute]
         return self.get_dimension(dimensions)
 
     def check_and_extract_key(self, indicators):

@@ -1,6 +1,6 @@
 import gzip
 import json
-from typing import Any, Dict
+from typing import Any
 
 import structlog
 from botocore.exceptions import EndpointConnectionError, SSLError
@@ -17,7 +17,7 @@ log = structlog.get_logger()
 config.enable_sentry()
 
 
-def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False) -> None:
+def upload_gzip_dict(d: dict[str, Any], s3_path: str, private: bool = False) -> None:
     return upload_gzip_string(json.dumps(d, default=str), s3_path=s3_path, private=private)
 
 
@@ -38,7 +38,7 @@ def upload_gzip_string(s: str, s3_path: str, private: bool = False) -> None:
         retry=retry_if_exception_type((EndpointConnectionError, SSLError)),
     ):
         with attempt:
-            client.put_object(  # type: ignore[reportAttributeAccessIssue]
+            client.put_object(  # ty: ignore[unresolved-attribute]
                 Bucket=bucket,
                 Body=body_gzip,
                 Key=key,

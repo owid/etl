@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
     # - Filling in NaNs with zeroes, for daily indicators.
     # - Filling in NaNs with the last non-NaN value, for cumulative indicators (forward filling).
     tb[["new_cases", "new_deaths"]] = tb[["new_cases", "new_deaths"]].fillna(0)
-    tb[["total_cases", "total_deaths"]] = tb.groupby("country")[["total_cases", "total_deaths"]].ffill()  # type: ignore
+    tb[["total_cases", "total_deaths"]] = tb.groupby("country")[["total_cases", "total_deaths"]].ffill()  # ty: ignore
 
     # Main processing
     tb["date"] = pd.to_datetime(tb["date"], format=DATE_FORMAT)
@@ -164,7 +164,7 @@ def aggregate_international(tb: Table) -> Table:
     countries_duplicate = set(i[0] for i in countries_duplicate)
     assert countries_duplicate == {"International"}, "There are unexpected duplicates!"
     # Aggregate
-    tb = tb.groupby(["country", "date"]).sum(min_count=1).reset_index()  # type: ignore
+    tb = tb.groupby(["country", "date"]).sum(min_count=1).reset_index()  # ty: ignore
     return tb
 
 

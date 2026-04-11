@@ -8,7 +8,7 @@ Output: docs/api/chart-api.md
 """
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import yaml
 
@@ -19,7 +19,7 @@ from .openapi_utils import (  # ty:ignore
 )
 
 
-def load_openapi_spec(repo_root: Path) -> Dict[str, Any]:
+def load_openapi_spec(repo_root: Path) -> dict[str, Any]:
     """Load OpenAPI spec from local file if available, otherwise from GitHub.
 
     Args:

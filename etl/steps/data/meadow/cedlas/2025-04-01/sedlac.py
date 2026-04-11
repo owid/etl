@@ -5,8 +5,6 @@ Because the format of the snapshots are very particular, I prefer to to run seve
 
 """
 
-from typing import Dict, List
-
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -194,7 +192,7 @@ def run() -> None:
     ds_meadow.save()
 
 
-def load_tables_from_snapshot(snap: Snapshot, sheets: Dict) -> List[Table]:
+def load_tables_from_snapshot(snap: Snapshot, sheets: dict) -> list[Table]:
     """Load all the sheets from the snapshot."""
     tables = []
     for sheet in sheets:
@@ -206,8 +204,8 @@ def load_tables_from_snapshot(snap: Snapshot, sheets: Dict) -> List[Table]:
 
 
 def format_long_tables(
-    tb: List[Table], countries: List[str], columns: Dict, cols_to_drop: List[str] = []
-) -> List[Table]:
+    tb: list[Table], countries: list[str], columns: dict, cols_to_drop: list[str] = []
+) -> list[Table]:
     """Format inequality and poverty tables, which share a similar, long format."""
 
     tables = []
@@ -239,14 +237,14 @@ def format_long_tables(
 
         actual_countries_with_null = t[t["index"] == "nan"]["country"].unique().tolist()
 
-        assert (
-            actual_countries_with_null == countries_with_null
-        ), f"Null values in index are not only for {countries_with_null}. In this case, we have {actual_countries_with_null}."
+        assert actual_countries_with_null == countries_with_null, (
+            f"Null values in index are not only for {countries_with_null}. In this case, we have {actual_countries_with_null}."
+        )
 
         # Assert that the null values are only two
-        assert len(t[t["index"] == "nan"]) == len(
-            countries_with_null
-        ), f"There are more than {len(countries_with_null)} null values in index."
+        assert len(t[t["index"] == "nan"]) == len(countries_with_null), (
+            f"There are more than {len(countries_with_null)} null values in index."
+        )
 
         # Replace empty index values for country = Chile and Argentina and delete for Brazil and Mexico
         # This is done to identify survey spells that are blank in the original table.
@@ -275,11 +273,9 @@ def format_long_tables(
         t.columns = t.columns.str.strip()
 
         # Assert if columns in table are contained in columns dict + country + year + survey
-        assert set(
-            t.columns
-        ).issubset(
-            set(list(columns.keys()) + ["country", "year", "survey"])
-        ), f"Columns not found in the table: {set(t.columns) - set(list(columns.keys()) + ['country', 'year', 'survey'])}."
+        assert set(t.columns).issubset(set(list(columns.keys()) + ["country", "year", "survey"])), (
+            f"Columns not found in the table: {set(t.columns) - set(list(columns.keys()) + ['country', 'year', 'survey'])}."
+        )
 
         # Rename columns with columns dict
         t = t.rename(columns=columns)

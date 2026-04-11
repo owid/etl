@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -54,7 +54,7 @@ METRIC_CATEGORIES = {
 }
 
 
-def merge_dfs(dfs: List[Table]) -> Table:
+def merge_dfs(dfs: list[Table]) -> Table:
     """Merge all datasets"""
     df = pr.concat(dfs, ignore_index=True)
     # Fix variant name
