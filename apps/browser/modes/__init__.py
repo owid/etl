@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Callable, Protocol
+from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     from apps.browser.commands import Command
@@ -56,11 +57,11 @@ class BrowserMode(Protocol):
         """Return cached items if available, None otherwise."""
         ...
 
-    def get_ranker(self) -> "Ranker" | None:
+    def get_ranker(self) -> Ranker | None:
         """Return optional ranker for match ordering."""
         ...
 
-    def get_commands(self) -> list["Command"]:
+    def get_commands(self) -> list[Command]:
         """Return commands available in this mode."""
         ...
 
@@ -88,7 +89,7 @@ class BrowserMode(Protocol):
         """Save browsing history for this mode."""
         ...
 
-    def get_options(self) -> list["BrowserOption"]:
+    def get_options(self) -> list[BrowserOption]:
         """Get CLI options available for this mode.
 
         Returns:
@@ -138,20 +139,20 @@ class ModeRegistry:
         """List all registered modes with their configs."""
         return [(name, mode.config) for name, mode in self._modes.items()]
 
-    def get_mode_switch_commands(self) -> list["Command"]:
+    def get_mode_switch_commands(self) -> list[Command]:
         """Generate commands for switching between modes.
 
         Creates a /{mode_name} command for each registered mode.
         """
         from apps.browser.commands import Command, CommandResult
 
-        commands: list["Command"] = []
+        commands: list[Command] = []
 
         for name, mode in self._modes.items():
             config = mode.config
 
-            def make_handler(mode_name: str) -> Callable[["BrowserState"], CommandResult]:
-                def handler(state: "BrowserState") -> CommandResult:
+            def make_handler(mode_name: str) -> Callable[[BrowserState], CommandResult]:
+                def handler(state: BrowserState) -> CommandResult:
                     return CommandResult(action="switch_mode", target_mode=mode_name)
 
                 return handler

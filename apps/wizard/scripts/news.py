@@ -1,7 +1,6 @@
 """Methods to update Wizard DB to have the necessary PR data."""
 
 import glob
-from typing import Tuple
 
 import requests
 from structlog import get_logger
@@ -31,7 +30,7 @@ def generate_documentation(pages_md: list[str]) -> str:
 
     def read_page_md(page_path: str) -> str:
         """Read text from MD page, add header with page path."""
-        with open(page_path, "r") as f:
+        with open(page_path) as f:
             text = f.read()
         text = f"_page: {page_path}_\n\n" + text
         return text
@@ -139,7 +138,7 @@ def add_pr_data_to_db() -> None:
     WizardDB().add_pr(data)
 
 
-def ask_gpt(df) -> Tuple[str, float, int]:
+def ask_gpt(df) -> tuple[str, float, int]:
     """Ask GPT for news."""
     SYSTEM_PROMPT = f"""You will be given a markdown table with the pull requests merged in the etl repository in the last 7 days.
 
@@ -176,9 +175,9 @@ def ask_gpt(df) -> Tuple[str, float, int]:
     )
     response = api.query_gpt(query=query, model=MODEL_DEFAULT)
 
-    summary = response.message_content  # type: ignore
+    summary = response.message_content  # ty: ignore
     cost, num_tokens = get_cost_and_tokens(SYSTEM_PROMPT + USER_PROMPT, summary, MODEL_DEFAULT)
-    return summary, cost, num_tokens  # type: ignore
+    return summary, cost, num_tokens  # ty: ignore
 
 
 def add_news_data_to_db() -> None:

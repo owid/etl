@@ -1,7 +1,7 @@
 """Home page of wizard."""
 
 from copy import deepcopy
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import streamlit as st
 from streamlit_card import card
@@ -19,6 +19,23 @@ MAX_COLS_PER_ROW = 3
 
 
 def st_show_home():
+    #########################
+    # QUERY REDIRECTS
+    # Check early to avoid rendering the home page before redirecting.
+    #########################
+    if "page" in st.query_params:
+        for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
+            if st.query_params["page"] == step_name:
+                st.switch_page(step_props["entrypoint"])
+        for section in WIZARD_CONFIG["sections"]:
+            for app in section["apps"]:
+                if st.query_params["page"] == app["alias"]:
+                    st.switch_page(app["entrypoint"])
+        if ("legacy" in WIZARD_CONFIG) and ("apps" in WIZARD_CONFIG["legacy"]):
+            for app in WIZARD_CONFIG["legacy"]["apps"]:
+                if st.query_params["page"] == app["alias"]:
+                    st.switch_page(app["entrypoint"])
+
     # Page config
     container = st.container(border=False, horizontal=True, vertical_alignment="bottom")
     with container:
@@ -58,8 +75,8 @@ def st_show_home():
         entrypoint: str,
         title: str,
         image_url: str,
-        text: str | List[str] = "",
-        custom_styles: Optional[Dict[str, Any]] = None,
+        text: str | list[str] = "",
+        custom_styles: dict[str, Any] | None = None,
         small: bool = False,
     ) -> None:
         """Create card."""
@@ -76,7 +93,7 @@ def st_show_home():
             # text=f"Press {i + 1}",
             # text=["This is a test card", "This is a subtext"],
             styles=styles,
-            on_click=lambda: None,  # type: ignore[reportArgumentType]
+            on_click=lambda: None,  # ty: ignore[invalid-argument-type]
         )
         if go_to_page:
             st.switch_page(entrypoint)
@@ -180,22 +197,6 @@ def st_show_home():
                             image_url=app["image_url"],
                             text=text,
                         )
-
-    #########################
-    # QUERY REDIRECTS
-    #########################
-    if "page" in st.query_params:
-        for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
-            if st.query_params["page"] == step_name:
-                st.switch_page(step_props["entrypoint"])
-        for section in WIZARD_CONFIG["sections"]:
-            for app in section["apps"]:
-                if st.query_params["page"] == app["alias"]:
-                    st.switch_page(app["entrypoint"])
-        if ("legacy" in WIZARD_CONFIG) and ("apps" in WIZARD_CONFIG["legacy"]):
-            for app in WIZARD_CONFIG["legacy"]["apps"]:
-                if st.query_params["page"] == app["alias"]:
-                    st.switch_page(app["entrypoint"])
 
 
 # Show the home page

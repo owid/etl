@@ -1,7 +1,6 @@
 """WB Gender Garden step."""
 
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -12,7 +11,6 @@ from etl.data_helpers import geo
 from etl.paths import BASE_DIR as base_path
 
 log = get_logger()
-
 
 DATASET_MEADOW = base_path / "data/meadow/wb/2022-10-29/wb_gender"
 THIS_DIRECTORY = Path(__file__).parent
@@ -181,7 +179,7 @@ def _build_unit(table_metadata: catalog.Table) -> pd.Series:
     return units_
 
 
-def _build_short_unit(units: Union[pd.Series, catalog.Variable]) -> pd.Series:
+def _build_short_unit(units: pd.Series | catalog.Variable) -> pd.Series:
     short_units: pd.Series = units.str.contains(r"\%").replace({True: "%", False: ""})
     return short_units
 

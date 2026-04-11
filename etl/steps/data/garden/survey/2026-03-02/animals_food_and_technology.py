@@ -418,9 +418,9 @@ def run() -> None:
             # Assert mapping didn't introduce new NaN (except for sparse mapping variables).
             if col not in sparse_mapping_vars:
                 nans_after = tb[col].isna().sum()
-                assert (
-                    nans_after == nans_before
-                ), f"Mapping introduced {nans_after - nans_before} new NaN values in '{col}'."
+                assert nans_after == nans_before, (
+                    f"Mapping introduced {nans_after - nans_before} new NaN values in '{col}'."
+                )
 
     # Add country column.
     tb["country"] = "United States"

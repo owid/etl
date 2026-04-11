@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: International Civil Aviation Organization via Airlines for America
+    title: World Airlines Traffic and Capacity
+    description: |-
+      Traffic and operations data on the systemwide scheduled activity of passenger and cargo airlines operating worldwide, as recorded by International Civil Aviation Organization (ICAO).
+    citation_full: World Airlines Traffic and Capacity (2026). International Civil Aviation Organization via Airlines for America.
+
+    url_main: https://www.airlines.org/dataset/world-airlines-traffic-and-capacity/
+    date_accessed: '2026-04-02'
+    date_published: '2026-03-26'
+
+    license:
+      name: © 2026 Airlines for America (A4A)
+      url: https://www.airlines.org/dataset/world-airlines-traffic-and-capacity/
+outs:
+  - md5: 6ab443182db38b0cea8bb37cdb332184
+    size: 9872
+    path: air_traffic.csv

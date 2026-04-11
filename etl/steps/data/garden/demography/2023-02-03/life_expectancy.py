@@ -12,8 +12,6 @@ To do this, we use different sources, depending on the year and metric:
     - HMD for data prior to 1950.
 """
 
-from typing import List
-
 import pandas as pd
 import yaml
 from owid.catalog import Dataset, DatasetMeta, Table, TableMeta
@@ -189,7 +187,7 @@ def add_metadata_to_table(tb: Table, only_historical: bool, only_projections: bo
     return tb
 
 
-def make_metadata(all_ds: List[Dataset]) -> DatasetMeta:
+def make_metadata(all_ds: list[Dataset]) -> DatasetMeta:
     """Create metadata for the dataset."""
     log.info("life_expectancy: creating metadata")
     # description
@@ -328,9 +326,9 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     df = df.assign(life_expectancy_0=df[column_og].fillna(df[column_extra])).drop(columns=[column_extra])
 
     # Merge with Riley (2005)
-    assert not set(df.loc[df["year"] <= df_ril["year"].max(), "country"]).intersection(
-        set(df_ril["country"])
-    ), "There is some overlap between the dataset and Riley (2005) dataset"
+    assert not set(df.loc[df["year"] <= df_ril["year"].max(), "country"]).intersection(set(df_ril["country"])), (
+        "There is some overlap between the dataset and Riley (2005) dataset"
+    )
     df = pd.concat([df, df_ril], ignore_index=True)
 
     # add region aggregates

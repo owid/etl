@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import json
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -52,7 +52,7 @@ def run(dest_dir: str) -> None:
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
     for table in all_tables:
-        log.info(
+        log.debug(
             "un_sdg.create_garden_table",
             indicator=table.index[0][4],
             series_code=table.index[0][5],
@@ -78,7 +78,7 @@ def create_units(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_attributes_description() -> Dict:
+def get_attributes_description() -> dict:
     units_snapshot = paths.load_snapshot(short_name="un_sdg_unit.csv", namespace="un")
     df_units = pd.read_csv(units_snapshot.path)
     dict_units = df_units.set_index("AttCode").to_dict()["AttValue"]
@@ -169,7 +169,7 @@ def remove_cities(df: pd.DataFrame) -> pd.DataFrame:
     return original_df
 
 
-def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
+def create_tables(original_df: pd.DataFrame) -> list[pd.DataFrame]:
     original_df = original_df.copy(deep=False)
 
     dim_description = get_dimension_description()
@@ -183,7 +183,7 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
     output_tables = []
     len_dimensions = []
     for group_name, df_group in all_series:
-        log.info(
+        log.debug(
             "un_sdg.create_dataframe.group",
             indicator=group_name[0],
             series=group_name[1],
@@ -269,7 +269,7 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
 def generate_tables_for_indicator_and_series(
     dim_dict: dict[Any, Any],
     data_dimensions: pd.DataFrame,
-    dimensions: List[str],
+    dimensions: list[str],
 ) -> pd.DataFrame:
     if len(dimensions) == 0:
         return data_dimensions
@@ -282,9 +282,9 @@ def generate_tables_for_indicator_and_series(
 
 def get_series_with_relevant_dimensions(
     data_series: pd.DataFrame,
-    init_dimensions: List[str],
-    init_non_dimensions: List[str],
-) -> Tuple[pd.DataFrame, List[str]]:
+    init_dimensions: list[str],
+    init_non_dimensions: list[str],
+) -> tuple[pd.DataFrame, list[str]]:
     """For a given indicator and series, return a tuple:
     - data filtered to that indicator and series
     - names of relevant dimensions
@@ -309,7 +309,7 @@ def get_series_with_relevant_dimensions(
     )
 
 
-def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
+def create_omms(all_tabs: list[pd.DataFrame]) -> list[pd.DataFrame]:
     new_tabs = []
     for table in all_tabs:
         if table.index[0][5] in ("ER_BDY_ABT2NP", "SG_SCP_PROCN"):
@@ -322,7 +322,7 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
             regions = set(vc[vc > 1].index.get_level_values(0))
             table = table[~table.index.get_level_values("country").isin(regions)]
 
-            table.reset_index(level=["level_status"], inplace=True)  # type: ignore
+            table.reset_index(level=["level_status"], inplace=True)  # ty: ignore
             table["value"] = table["level_status"]
             table.drop(columns=["level_status"], inplace=True)
         new_tabs.append(table)

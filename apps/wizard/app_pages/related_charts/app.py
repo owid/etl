@@ -1,6 +1,5 @@
 import datetime as dt
 import random
-from typing import List
 
 import numpy as np
 import pandas as pd
@@ -63,7 +62,7 @@ def get_charts() -> list[data.Chart]:
     results = []
     for c in charts:
         c["tags"] = c["tags"].split(";") if c["tags"] else []
-        results.append(data.Chart(**c))  # type: ignore
+        results.append(data.Chart(**c))  # ty: ignore
     return results
 
 
@@ -133,7 +132,7 @@ def st_related_charts_table(
     - Rank
     """
     # Sort by the existing `score` column, descending
-    df = df.sort_values("score", ascending=False).head(n).copy()  # type: ignore
+    df = df.sort_values("score", ascending=False).head(n).copy()  # ty: ignore
     df["rank"] = range(1, len(df) + 1)
 
     # Create a clickable link
@@ -172,7 +171,7 @@ def st_related_charts_table(
     )
 
 
-def add_coviews_to_charts(charts: List[data.Chart], chosen_chart: data.Chart, coviews: pd.Series) -> List[data.Chart]:
+def add_coviews_to_charts(charts: list[data.Chart], chosen_chart: data.Chart, coviews: pd.Series) -> list[data.Chart]:
     """
     For the chosen chart, fetch its coview info from a coview Series and attach
     to each chart object as `chart.coviews`.
@@ -203,7 +202,7 @@ scoring_model.charts = charts
 chart_map = {chart.chart_id: chart for chart in charts}
 
 # Pick top 100 charts by pageviews
-top_100_charts = sorted(charts, key=lambda x: x.views_365d, reverse=True)[:100]  # type: ignore
+top_100_charts = sorted(charts, key=lambda x: x.views_365d, reverse=True)[:100]  # ty: ignore
 
 ########################################################################################################################
 # SIDEBAR / SEARCH
@@ -222,7 +221,7 @@ with col2:
     if random_chart or not st.query_params.get("slug"):
         weights = np.array([c.views_365d for c in charts])
         weights = np.nan_to_num(weights, nan=0)
-        chart = random.choices(charts, weights=weights, k=1)[0]  # type: ignore
+        chart = random.choices(charts, weights=weights, k=1)[0]  # ty: ignore
         st.session_state["slug"] = chart.slug
     elif random_100_chart:
         chart_slug = random.sample(top_100_charts, 1)[0].slug

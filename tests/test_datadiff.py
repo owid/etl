@@ -13,11 +13,11 @@ def _create_datasets(tmp_path):
 
     ds_meta_a = DatasetMeta(namespace="n", version="v", short_name="ds", source_checksum="1")
     ds_a = Dataset.create_empty(tmp_path / "catalog_a" / "ds", ds_meta_a)
-    ds_a.metadata.channel = "garden"  # type: ignore
+    ds_a.metadata.channel = "garden"  # ty: ignore
 
     ds_meta_b = DatasetMeta(namespace="n", version="v", short_name="ds", source_checksum="2")
     ds_b = Dataset.create_empty(tmp_path / "catalog_b" / "ds", ds_meta_b)
-    ds_b.metadata.channel = "garden"  # type: ignore
+    ds_b.metadata.channel = "garden"  # ty: ignore
 
     return ds_a, ds_b
 

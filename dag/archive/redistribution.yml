@@ -87,4 +87,25 @@ steps:
   data://grapher/oecd/2025-07-10/health_expenditure:
     - data://garden/oecd/2025-07-10/health_expenditure
 
+  # UNU-WIDER Government Revenue Dataset
+  data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
+    - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
+  data://garden/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
+  data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://garden/unu_wider/2023-11-01/government_revenue_dataset
+
+  #
+  # OECD Government at a Glance
+  #
+  data://meadow/oecd/2025-06-30/government_at_a_glance:
+    - snapshot://oecd/2025-06-30/govt_glance_public_finance_by_function.csv
+    - snapshot://oecd/2025-06-30/govt_glance_size_public_procurement.csv
+    - snapshot://oecd/2025-06-30/govt_glance_public_finance.csv
+    - snapshot://oecd/2025-06-30/govt_glance_public_finance_economic_transaction.csv
+  data://garden/oecd/2025-06-30/government_at_a_glance:
+    - data://meadow/oecd/2025-06-30/government_at_a_glance
+  data://grapher/oecd/2025-06-30/government_at_a_glance:
+    - data://garden/oecd/2025-06-30/government_at_a_glance
+
 

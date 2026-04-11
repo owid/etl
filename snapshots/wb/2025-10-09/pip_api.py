@@ -314,7 +314,7 @@ def _fetch_csv(url: str) -> pd.DataFrame:
 
     # try to get it from cache
     try:
-        obj = r2.get_object(Bucket=r2_bucket, Key=r2_key)  # type: ignore[reportAttributeAccessIssue]
+        obj = r2.get_object(Bucket=r2_bucket, Key=r2_key)  # ty: ignore[unresolved-attribute]
         s = obj["Body"].read().decode("utf-8")
         # we might have cached invalid responses, in that case fetch it again
         if "Server Error" not in s:
@@ -331,7 +331,7 @@ def _fetch_csv(url: str) -> pd.DataFrame:
     log.info("fetch_csv.success", url=url, t=response.elapsed.total_seconds())
 
     # save the result to R2 cache
-    r2.put_object(  # type: ignore[reportAttributeAccessIssue]
+    r2.put_object(  # ty: ignore[unresolved-attribute]
         Body=response.content,
         Bucket=r2_bucket,
         Key=r2_key,
@@ -949,7 +949,7 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
         log.info("Percentiles calculated and consolidated")
 
         # Rename headcount to estimated_percentile and poverty_line to thr
-        df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # type: ignore
+        df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # ty: ignore
 
         # Add official percentiles from the World Bank Databank
         df_percentiles_published_ppp_old = format_official_percentiles(PPP_VERSIONS[0], wb_api)
@@ -1608,7 +1608,7 @@ def generate_key_indicators(wb_api: WB_API):
     df = pd.concat([results, results_region], ignore_index=True)
 
     # Sort ppp_version, country, year and poverty_line
-    df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])  # type: ignore
+    df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])  # ty: ignore
 
     # Save to csv
     df.to_csv(f"{CACHE_DIR}/pip_raw.csv", index=False)

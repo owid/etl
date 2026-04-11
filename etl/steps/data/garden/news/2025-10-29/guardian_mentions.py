@@ -142,9 +142,9 @@ def add_relative_indicator(tb, colname):
     cols = [col for col in tb.columns if col != colname_excluded]
     assert not tb[cols].isna().any().any(), f"NA values found in unexpected columns {cols}"
     countries_with_nas = set(tb.loc[tb[colname_excluded].isna(), "country"].unique())
-    assert (
-        countries_with_nas == COUNTRIES_EXCLUDED
-    ), f"Unexpected countries with NA in {colname_excluded}: {countries_with_nas}"
+    assert countries_with_nas == COUNTRIES_EXCLUDED, (
+        f"Unexpected countries with NA in {colname_excluded}: {countries_with_nas}"
+    )
 
     return tb
 

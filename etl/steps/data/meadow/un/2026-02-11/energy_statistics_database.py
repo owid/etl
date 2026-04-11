@@ -25,12 +25,12 @@ def sanity_check_inputs(tb: Table) -> None:
 def sanity_check_outputs(tb: Table) -> None:
     """Check processed data after codelist mapping."""
     assert tb["country"].notna().all(), f"Unmapped REF_AREA codes: {tb[tb['country'].isna()]['REF_AREA'].unique()}"
-    assert (
-        tb["commodity"].notna().all()
-    ), f"Unmapped COMMODITY codes: {tb[tb['commodity'].isna()]['COMMODITY'].unique()}"
-    assert (
-        tb["transaction"].notna().all()
-    ), f"Unmapped TRANSACTION codes: {tb[tb['transaction'].isna()]['TRANSACTION'].unique()}"
+    assert tb["commodity"].notna().all(), (
+        f"Unmapped COMMODITY codes: {tb[tb['commodity'].isna()]['COMMODITY'].unique()}"
+    )
+    assert tb["transaction"].notna().all(), (
+        f"Unmapped TRANSACTION codes: {tb[tb['transaction'].isna()]['TRANSACTION'].unique()}"
+    )
     assert tb["unit"].notna().all(), f"Unmapped UNIT_MEASURE codes: {tb[tb['unit'].isna()]['UNIT_MEASURE'].unique()}"
 
 
