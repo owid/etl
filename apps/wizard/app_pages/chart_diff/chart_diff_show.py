@@ -7,7 +7,7 @@ If you want to learn more about it, start from its `show` method.
 import difflib
 import json
 import os
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, cast
 
 import pandas as pd
 import streamlit as st
@@ -128,18 +128,18 @@ class ChartDiffShow:
         return label
 
     @property
-    def status_names(self) -> List[str]:
+    def status_names(self) -> list[str]:
         """List with names of accepted statuses."""
         return list(DISPLAY_STATE_OPTIONS.keys())
 
     @property
-    def status_names_binary(self) -> List[str]:
+    def status_names_binary(self) -> list[str]:
         """List with names of accepted statuses."""
         status = list(DISPLAY_STATE_OPTIONS.keys())
         status = [s for s in status if s not in {gm.ChartStatus.REJECTED.value}]
         return status
 
-    def _push_status(self, session: Optional[Session] = None) -> None:
+    def _push_status(self, session: Session | None = None) -> None:
         """Change state of the ChartDiff based on session state."""
         if session is None:
             session = self.source_session
@@ -150,7 +150,7 @@ class ChartDiffShow:
         # (displaying elements in fragment callbacks causes duplication bugs)
         st.session_state[f"toast-{self.diff.chart_id}"] = status
 
-    def _push_status_binary(self, session: Optional[Session] = None) -> None:
+    def _push_status_binary(self, session: Session | None = None) -> None:
         """Change state of the ChartDiff based on session state."""
         if session is None:
             session = self.source_session
@@ -162,7 +162,7 @@ class ChartDiffShow:
 
     def _refresh_chart_diff(self):
         """Get latest chart version from database."""
-        diff_new = ChartDiffsLoader(self.source_session.get_bind(), self.target_session.get_bind()).get_diffs(  # type: ignore
+        diff_new = ChartDiffsLoader(self.source_session.get_bind(), self.target_session.get_bind()).get_diffs(  # ty: ignore
             sync=True, chart_ids=[self.diff.chart_id]
         )[0]
         st.session_state.chart_diffs[self.diff.chart_id] = diff_new
@@ -270,8 +270,10 @@ class ChartDiffShow:
                     key=f"status-ctrl-{self.diff.chart_id}",
                     options=self.status_names_binary,
                     horizontal=True,
-                    format_func=lambda x: f":{DISPLAY_STATE_OPTIONS_BINARY[x]['color']}-background[{DISPLAY_STATE_OPTIONS_BINARY[x]['label']}]",
-                    index=self.status_names_binary.index(self.diff.approval_status),  # type: ignore
+                    format_func=lambda x: (
+                        f":{DISPLAY_STATE_OPTIONS_BINARY[x]['color']}-background[{DISPLAY_STATE_OPTIONS_BINARY[x]['label']}]"
+                    ),
+                    index=self.status_names_binary.index(self.diff.approval_status),  # ty: ignore
                     on_change=self._push_status_binary,
                     help="Note that the changes in the chart come from ETL changes (metadata/data) and therefore there is no way to reject them at this stage. If you are not happy with the changes, please look at the ETL steps involved. We present them to you here as a sanity check, and ask you to review them for correctness.",
                 )
@@ -295,7 +297,7 @@ class ChartDiffShow:
                     key=f"status-ctrl-{self.diff.chart_id}",
                     options=self.status_names,
                     format_func=lambda x: _format_status(x),
-                    default=self.diff.approval_status,  # type: ignore
+                    default=self.diff.approval_status,  # ty: ignore
                     on_change=self._push_status,
                     disabled=self.diff.in_conflict,
                     help=help_text,
@@ -303,7 +305,7 @@ class ChartDiffShow:
                 )
 
         if len(self.diff.article_refs) > 0:
-            articles_md = "| Article Title | Daily Views |\n" "| --- | --- |\n" + "\n".join(
+            articles_md = "| Article Title | Daily Views |\n| --- | --- |\n" + "\n".join(
                 [f"| [{art.title}]({art.url}) | {art.views_daily_pretty} |" for art in self.diff.article_refs]
             )
             articles_md = f"\n\n{articles_md}"
@@ -369,13 +371,13 @@ class ChartDiffShow:
                 badges = " ".join([f":gray-badge[{tag['name']}]" for tag in tags])
                 st.markdown(badges)
 
-    @st.dialog("Metadata differences", width="large")  # type: ignore
+    @st.dialog("Metadata differences", width="large")  # ty: ignore
     def _show_metadata_diff_modal(self) -> None:
         """Show metadata diff in a modal page."""
         # Sanity checks
-        assert (
-            self.diff.is_modified
-        ), "Metadata diff should only be shown for modified charts! Please report this issue."
+        assert self.diff.is_modified, (
+            "Metadata diff should only be shown for modified charts! Please report this issue."
+        )
         assert self.diff.target_chart is not None, "Chart detected as modified but target_chart is None!"
 
         # Get indicator IDs from source & target
@@ -439,7 +441,7 @@ class ChartDiffShow:
                 ]
                 stream = api.chat.completions.create(
                     model=MODEL_DEFAULT,
-                    messages=messages,  # type: ignore
+                    messages=messages,  # ty: ignore
                     max_completion_tokens=1000,
                     stream=True,
                 )
@@ -451,7 +453,7 @@ class ChartDiffShow:
             cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
             st.info(cost_msg)
 
-    def _show_chart_comparison(self) -> Tuple[Any, bool]:
+    def _show_chart_comparison(self) -> tuple[Any, bool]:
         """Show charts (horizontally or vertically)."""
 
         def _show_chart_old():
@@ -501,7 +503,7 @@ class ChartDiffShow:
 
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
-        def _show_charts_comparison_v() -> Tuple[Any, bool]:
+        def _show_charts_comparison_v() -> tuple[Any, bool]:
             """Show charts on top of each other."""
             # Chart production
             config_ref, is_prod = _show_chart_old()
@@ -511,7 +513,7 @@ class ChartDiffShow:
 
             return config_ref, is_prod
 
-        def _show_charts_comparison_h() -> Tuple[Any, bool]:
+        def _show_charts_comparison_h() -> tuple[Any, bool]:
             """Show charts next to each other."""
             # Create two columns for the iframes
             col1, col2 = st.columns(2)
@@ -551,9 +553,9 @@ class ChartDiffShow:
         return config_ref, is_prod
 
     def _show_config_diff(self, config_ref, fromfile: str = "production") -> None:
-        assert (
-            self.diff.target_chart is not None
-        ), "We detected this diff to be a chart modification, but couldn't find target chart!"
+        assert self.diff.target_chart is not None, (
+            "We detected this diff to be a chart modification, but couldn't find target chart!"
+        )
 
         # config_1 = self.diff.target_chart.config
         config_2 = self.diff.source_chart.config
@@ -777,7 +779,7 @@ def compare_strings(s1: str, s2: str, fromfile: str, tofile: str = "staging"):
     return diff_string
 
 
-def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str, tofile: str = "staging"):
+def compare_dictionaries(dix_1: dict[str, Any], dix_2: dict[str, Any], fromfile: str, tofile: str = "staging"):
     """Get diff of two dictionaries.
 
     Useful for chart config diffs, indicator metadata diffs, etc.
@@ -790,7 +792,7 @@ def st_show_diff(diff_str, **kwargs):
     st.code(diff_str, line_numbers=True, language="diff", **kwargs)
 
 
-def _show_dict_diff(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str):
+def _show_dict_diff(dix_1: dict[str, Any], dix_2: dict[str, Any], fromfile: str):
     """Show diff of two dictionaries.
 
     Used to show chart config diffs, indicator metadata diffs, etc.

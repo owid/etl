@@ -477,12 +477,6 @@ steps:
   data://grapher/cancer/2024-09-13/diagnosis_routes_by_route:
     - data://garden/cancer/2024-09-13/diagnosis_routes_by_route
 
-  data://meadow/cancer/2024-09-13/diagnosis_routes_by_stage:
-    - snapshot://cancer/2024-09-13/diagnosis_routes_by_stage.csv
-  data://garden/cancer/2024-09-13/diagnosis_routes_by_stage:
-    - data://meadow/cancer/2024-09-13/diagnosis_routes_by_stage
-  data://grapher/cancer/2024-09-13/diagnosis_routes_by_stage:
-    - data://garden/cancer/2024-09-13/diagnosis_routes_by_stage
 
   data://meadow/cancer/2024-09-13/diagnosis_routes_survival:
     - snapshot://cancer/2024-09-13/diagnosis_routes_survival.csv

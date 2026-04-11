@@ -45,8 +45,8 @@ def _variable_meta():
         "name": "Population density",
         "unit": "people per km²",
         "description": "Population density by country...",
-        "createdAt": pd.Timestamp("2022-09-20 12:16:46"),  # type: ignore
-        "updatedAt": pd.Timestamp("2023-02-10 11:46:31"),  # type: ignore
+        "createdAt": pd.Timestamp("2022-09-20 12:16:46"),  # ty: ignore
+        "updatedAt": pd.Timestamp("2023-02-10 11:46:31"),  # ty: ignore
         "code": None,
         "coverage": "",
         "timespan": "-10000-2100",
@@ -231,4 +231,4 @@ def test_convert_strings_to_numeric():
     assert [type(x) for x in r] == [int, int, float, str, int, str]
 
     with pytest.raises(AssertionError):
-        r = _convert_strings_to_numeric([None, "UK"])  # type: ignore
+        r = _convert_strings_to_numeric([None, "UK"])  # ty: ignore

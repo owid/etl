@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import json
-from typing import List
 
 import pandas as pd
 from owid.catalog import Table
@@ -140,20 +139,20 @@ def add_eu28(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_europe(df: pd.DataFrame) -> pd.DataFrame:
-    assert (
-        "European Union (28)" in df.country.unique()
-    ), "Check data! It looks like `European Union (28)` is not present."
+    assert "European Union (28)" in df.country.unique(), (
+        "Check data! It looks like `European Union (28)` is not present."
+    )
     # EU states
     europe_members = list_countries_in_region("Europe") + ["European Union (28)"]
-    assert (
-        len(set(df.country).intersection(europe_members)) == 18
-    ), "Check data! It might be that individual EU 28 member states are still present."
+    assert len(set(df.country).intersection(europe_members)) == 18, (
+        "Check data! It might be that individual EU 28 member states are still present."
+    )
     # Add EU data
     df = _add_region(df, europe_members, "Europe", remove_members=False)
     return df
 
 
-def _add_region(df: pd.DataFrame, members: List[str], region: str, remove_members: bool = True) -> pd.DataFrame:
+def _add_region(df: pd.DataFrame, members: list[str], region: str, remove_members: bool = True) -> pd.DataFrame:
     """Aggregate data for a region.
 
     This function is useful when adding regions that are not currently considered by etl.data_helpers.geo.add_region_aggregates.
@@ -172,7 +171,7 @@ def _add_region(df: pd.DataFrame, members: List[str], region: str, remove_member
 
 
 def _check_country_mapping():
-    with open(paths.country_mapping_path, "r") as f:
+    with open(paths.country_mapping_path) as f:
         dix = json.load(f)
     assert len(dix.values()) == len(set(dix.values())), (
         "There are multiple countries with the same standardised name. Join step in Meadow might not be working"

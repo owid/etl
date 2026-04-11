@@ -1,6 +1,5 @@
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Optional
 
 import pandas as pd
 
@@ -18,12 +17,12 @@ class Chart(Doc):
     note: str
     tags: list[str]
     slug: str
-    created_at: Optional[datetime] = None
-    views_7d: Optional[int] = None
-    views_14d: Optional[int] = None
-    views_365d: Optional[int] = None
-    gpt_reason: Optional[str] = None
-    coviews: Optional[int] = None
+    created_at: datetime | None = None
+    views_7d: int | None = None
+    views_14d: int | None = None
+    views_365d: int | None = None
+    gpt_reason: str | None = None
+    coviews: int | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)

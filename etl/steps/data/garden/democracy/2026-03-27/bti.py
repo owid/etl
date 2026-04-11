@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Tuple, cast
+from typing import cast
 
 import numpy as np
 from owid.catalog import Dataset, Table
@@ -151,7 +151,7 @@ def check_regime(tb: Table) -> Table:
     return tb
 
 
-def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
+def get_country_data(tb: Table, ds_regions: Dataset) -> tuple[Table, Table]:
     """Estimate number of countries in each regime, and country-average for some indicators.
 
     Returns two tables:
@@ -214,8 +214,8 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
     tb_avg = add_regions_and_global_aggregates(
         tb=tb_avg,
         ds_regions=ds_regions,
-        aggregations={k: "mean" for k in indicators_avg},  # type: ignore
-        aggregations_world={k: np.mean for k in indicators_avg},  # type: ignore
+        aggregations={k: "mean" for k in indicators_avg},  # ty: ignore
+        aggregations_world={k: np.mean for k in indicators_avg},  # ty: ignore
     )
 
     # Keep only certain year range
@@ -224,7 +224,7 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
     return tb_num, tb_avg
 
 
-def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table]:
+def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table]:
     """Estimate people living in each regime, and population-weighted averages for some indicators.
 
     1) tb_num_people: People living in different regimes
@@ -299,7 +299,7 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
     tb_avg = add_regions_and_global_aggregates(
         tb=tb_avg,
         ds_regions=ds_regions,
-        aggregations={k: "sum" for k in indicators_avg} | {"population": "sum"},  # type: ignore
+        aggregations={k: "sum" for k in indicators_avg} | {"population": "sum"},  # ty: ignore
         min_num_values_per_year=1,
     )
 

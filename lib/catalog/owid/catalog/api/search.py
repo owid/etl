@@ -66,7 +66,7 @@ class SiteSearchAPI:
         ```
     """
 
-    def __init__(self, client: "Client", base_url: str, site_url: str) -> None:
+    def __init__(self, client: Client, base_url: str, site_url: str) -> None:
         """Initialize the SiteSearchAPI.
 
         Args:
@@ -207,7 +207,7 @@ class SiteSearchAPI:
             chart = ChartResult(
                 slug=slug,
                 title=hit.get("title", ""),
-                type=chart_type,  # type: ignore[arg-type]
+                type=chart_type,  # ty: ignore[invalid-argument-type]
                 query_params=query_params,
                 subtitle=hit.get("subtitle", ""),
                 available_entities=hit.get("availableEntities", []),

@@ -163,7 +163,7 @@ def run(dest_dir: str) -> None:
     # Create OOMs
     ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
-    create_omms(tables_dict, ds_population, ds_regions)  # type: ignore
+    create_omms(tables_dict, ds_population, ds_regions)  # ty: ignore
 
     #
     # Save outputs.

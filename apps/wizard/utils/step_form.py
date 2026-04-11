@@ -1,7 +1,7 @@
 import re
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Type, cast
+from typing import Any, cast
 
 import jsonref
 import jsonschema
@@ -15,27 +15,27 @@ from etl.files import ruamel_dump
 class StepForm(BaseModel):
     """Form abstract class."""
 
-    errors: Dict[str, Any] = {}
+    errors: dict[str, Any] = {}
     step_name: str
 
-    def __init__(self: Self, **kwargs: str | int) -> None:  # type: ignore[reportInvalidTypeVarUse]
+    def __init__(self: Self, **kwargs: str | int) -> None:  # ty: ignore
         """Construct parent class."""
         super().__init__(**kwargs)
         self.validate()
 
     @classmethod
-    def filter_relevant_fields(cls: Type[Self], step_name: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    def filter_relevant_fields(cls: type[Self], step_name: str, data: dict[str, Any]) -> dict[str, Any]:
         """Filter relevant fields from form."""
         return {k.replace(f"{step_name}.", ""): v for k, v in data.items() if k.startswith(f"{step_name}.")}
 
     @classmethod
-    def from_state(cls: Type[Self]) -> Self:
+    def from_state(cls: type[Self]) -> Self:
         """Build object from session_state variables."""
-        session_state = cast(Dict[str, Any], dict(st.session_state))
+        session_state = cast(dict[str, Any], dict(st.session_state))
         data = cls.filter_relevant_fields(step_name=st.session_state["step_name"], data=session_state)
         return cls(**data)
 
-    def validate(self: Self) -> None:  # type: ignore[reportIncompatibleMethodOverride]
+    def validate(self: Self) -> None:  # ty: ignore[invalid-method-override]
         """Validate form fields."""
         raise NotImplementedError("Needs to be implemented in the child class!")
 
@@ -50,7 +50,7 @@ class StepForm(BaseModel):
             assert self.metadata
             f.write(ruamel_dump(self.metadata))
 
-    def validate_schema(self: Self, schema: Dict[str, Any], ignore_keywords: Optional[List[str]] = None) -> None:
+    def validate_schema(self: Self, schema: dict[str, Any], ignore_keywords: list[str] | None = None) -> None:
         """Validate form fields against schema.
 
         Note that not all form fields are present in the schema (some do not belong to metadata, but are needed to generate the e.g. dataset URI)
@@ -119,7 +119,7 @@ class StepForm(BaseModel):
         field_name = re.findall(rex, error.message)[0]
         return field_name
 
-    def check_required(self: Self, fields_names: List[str]) -> None:
+    def check_required(self: Self, fields_names: list[str]) -> None:
         """Check that all fields in `fields_names` are not empty."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
@@ -127,14 +127,14 @@ class StepForm(BaseModel):
             if attr in ["", []]:
                 self.errors[field_name] = f"`{field_name}` is a required property"
 
-    def check_snake(self: Self, fields_names: List[str]) -> None:
+    def check_snake(self: Self, fields_names: list[str]) -> None:
         """Check that all fields in `fields_names` are in snake case."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
             if not is_snake(attr):
                 self.errors[field_name] = f"`{field_name}` must be in snake case"
 
-    def check_is_version(self: Self, fields_names: List[str]) -> None:
+    def check_is_version(self: Self, fields_names: list[str]) -> None:
         """Check that all fields in `fields_names` are in snake case."""
         for field_name in fields_names:
             attr = getattr(self, field_name)

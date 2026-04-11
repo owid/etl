@@ -2,9 +2,6 @@ title:
   title: Deaths from air pollution
   title_variant: ""
 
-topic_tags:
-  - Air Pollution
-
 default_selection:
   - World
   - China
@@ -178,3 +175,6 @@ views:
     config:
       title: Share of deaths from indoor air pollution
       subtitle: Share of deaths, from any cause, which are attributed to indoor air pollution – from burning solid fuels – as a risk factor.
+
+topic_tags:
+  - Air Pollution

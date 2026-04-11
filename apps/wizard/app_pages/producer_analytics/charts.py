@@ -59,7 +59,7 @@ class UIChartProducerAnalytics:
         df = self.df_filtered
 
         # Get total daily views of selected producers.
-        grapher_urls_selected = df["chart_url"].unique().tolist()  # type: ignore
+        grapher_urls_selected = df["chart_url"].unique().tolist()  # ty: ignore
         df_total_daily_views = get_chart_views_from_bq(
             date_start=min_date,
             date_end=max_date,
@@ -69,7 +69,7 @@ class UIChartProducerAnalytics:
 
         # Get daily views of the top 10 charts.
         grapher_urls_top_10 = (
-            df.sort_values("views_custom", ascending=False)["chart_url"].unique().tolist()[0:10]  # type: ignore
+            df.sort_values("views_custom", ascending=False)["chart_url"].unique().tolist()[0:10]  # ty: ignore
         )
         df_top_10_daily_views = get_chart_views_from_bq(
             date_start=min_date,

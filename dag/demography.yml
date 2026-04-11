@@ -37,6 +37,8 @@ steps:
   data://meadow/un/2024-07-12/un_wpp:
     # Main indicators
     - snapshot://un/2024-07-12/un_wpp_demographic_indicators.xlsx
+    # Interim update (Togo, 2026-01-19)
+    - snapshot://un/2024-07-12/un_wpp_interim_20260119_togo.zip
     # Population
     - snapshot://un/2024-07-12/un_wpp_population_estimates.csv
     - snapshot://un/2024-07-12/un_wpp_population_jan_estimates.csv

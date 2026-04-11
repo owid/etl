@@ -35,7 +35,7 @@ def run() -> None:
         "nim",
     ]
     # Age-specific columns needed for computing regional TFR from scratch
-    AGE_GROUPS = [f"{i}_{i+4}" for i in range(15, 50, 5)]
+    AGE_GROUPS = [f"{i}_{i + 4}" for i in range(15, 50, 5)]
     cols_births = [f"births{ag}" for ag in AGE_GROUPS]
     cols_fpop = [f"fpop{ag}" for ag in AGE_GROUPS]
     cols_asfr = cols_births + cols_fpop

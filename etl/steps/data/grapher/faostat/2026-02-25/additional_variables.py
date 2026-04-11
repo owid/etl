@@ -2,7 +2,6 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
-from owid.catalog.core.utils import underscore_table
 
 from etl.helpers import PathFinder
 
@@ -109,35 +108,43 @@ def prepare_maize_and_wheat_in_the_context_of_the_ukraine_war(tb_maize_and_wheat
     return combined
 
 
-def prepare_fertilizer_exports_in_the_context_of_the_ukraine_war(tb_fertilizer_exports: Table) -> Table:
-    # Select the relevant countries for the chart.
-    fertilizer_exports = tb_fertilizer_exports.loc[["Ukraine", "Russia", "Belarus"]].reset_index()
+def prepare_fertilizer_share_of_exports(tb_fertilizer_exports: Table) -> Table:
+    """Pivot fertilizer export shares from long to wide format for the fertilizer MDim."""
+    tb = tb_fertilizer_exports.reset_index()
 
-    # Transpose data.
-    fertilizer_exports = fertilizer_exports.pivot(
-        index=["item", "year"], columns="country", values=["exports", "share_of_exports"]
+    # Keep only the share_of_exports column.
+    tb = tb[["country", "year", "item", "share_of_exports"]]
+
+    # Pivot: one column per nutrient.
+    tb = tb.pivot(index=["country", "year"], columns="item", values="share_of_exports")
+
+    # Rename columns to match MDim naming conventions.
+    tb = tb.rename(
+        columns={
+            "Nitrogen": "nitrogen_share_of_global_exports",
+            "Phosphate": "phosphate_share_of_global_exports",
+            "Potash": "potash_share_of_global_exports",
+        },
+        errors="raise",
     )
 
-    fertilizer_exports.columns = [column[0] + " " + column[1] for column in fertilizer_exports.columns]
+    # Set metadata.
+    nutrient_labels = {
+        "nitrogen": "Nitrogen (N)",
+        "phosphate": "Phosphate (P₂O₅)",
+        "potash": "Potash (K₂O)",
+    }
+    for column in tb.columns:
+        nutrient = column.split("_")[0]
+        tb[column].metadata.title = f"{nutrient_labels[nutrient]} fertilizer: share of global exports"
+        tb[column].metadata.unit = "%"
+        tb[column].metadata.short_unit = "%"
 
-    # To be able to work in grapher, rename "item" column to "country".
-    fertilizer_exports.index.names = ["country", "year"]
+    tb = tb.reset_index()
+    tb.columns.name = None
+    tb = tb.format(["country", "year"], short_name="fertilizer_share_of_exports")
 
-    # Adapt metadata.
-    fertilizer_exports.metadata.short_name = "fertilizer_exports_in_the_context_of_the_ukraine_war"
-    for column in fertilizer_exports.columns:
-        element, country = column.split(" ")
-        title = element.capitalize().replace("_", " ") + " from " + country
-        fertilizer_exports[column].metadata.title = title
-        if "share" in column:
-            fertilizer_exports[column].metadata.unit = "%"
-            fertilizer_exports[column].metadata.short_unit = "%"
-        else:
-            fertilizer_exports[column].metadata.unit = "tonnes"
-            fertilizer_exports[column].metadata.short_unit = "t"
-    fertilizer_exports = underscore_table(fertilizer_exports)
-
-    return fertilizer_exports
+    return tb
 
 
 def run() -> None:
@@ -190,10 +197,8 @@ def run() -> None:
         tb_maize_and_wheat=tb_maize_and_wheat
     )
 
-    # Prepare fertilizer exports data in the context of the Ukraine war.
-    tb_fertilizer_exports_in_the_context_of_the_ukraine_war = (
-        prepare_fertilizer_exports_in_the_context_of_the_ukraine_war(tb_fertilizer_exports=tb_fertilizer_exports)
-    )
+    # Prepare fertilizer share of global exports for the fertilizer MDim.
+    tb_fertilizer_share_of_exports = prepare_fertilizer_share_of_exports(tb_fertilizer_exports=tb_fertilizer_exports)
 
     #
     # Save outputs.
@@ -214,7 +219,7 @@ def run() -> None:
             tb_hypothetical_animals_slaughtered,
             tb_cereal_allocation,
             tb_maize_and_wheat_in_the_context_of_the_ukraine_war,
-            tb_fertilizer_exports_in_the_context_of_the_ukraine_war,
+            tb_fertilizer_share_of_exports,
             tb_net_exports_as_share_of_supply,
             tb_milk_per_animal,
         ],
