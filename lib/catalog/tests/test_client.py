@@ -950,7 +950,7 @@ class TestQuickSearch:
     def test_search_invalid_kind(self):
         """search() with invalid kind raises ValueError."""
         with pytest.raises(ValueError, match="Invalid kind"):
-            search("x", kind="invalid")  # type: ignore[arg-type]
+            search("x", kind="invalid")  # ty: ignore[invalid-argument-type]
 
 
 class TestQuickFetch:

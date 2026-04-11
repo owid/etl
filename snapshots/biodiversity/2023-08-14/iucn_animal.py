@@ -41,7 +41,7 @@ def main(upload: bool) -> None:
     driver = webdriver.Chrome(options=chrome_options)
     if snap.metadata.source is not None:
         # Only access "url" if snap.metadata.source is not None
-        driver.get(snap.metadata.source.url)  # type: ignore[reportArgumentType]
+        driver.get(snap.metadata.source.url)  # ty: ignore[invalid-argument-type]
     else:
         # Handle the case when snap.metadata.source is None
         print("snap.metadata.source is None, cannot access 'url'.")

@@ -9,7 +9,8 @@ import json
 import os
 import re
 import tempfile
-from typing import TYPE_CHECKING, Callable, Literal, TypeVar, cast
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Literal, TypeVar, cast
 from urllib.parse import urlparse
 
 import numpy as np
@@ -114,7 +115,7 @@ def _read_catalog_index(uri: str, *, timeout: int = 30) -> pd.DataFrame:
 
 
 def _match_score(
-    series: pd.Series,  # type: ignore[type-arg]
+    series: pd.Series,  # ty: ignore
     query: str,
     mode: Literal["exact", "contains", "regex", "fuzzy"],
     case: bool,
@@ -400,7 +401,7 @@ class TablesAPI:
         ```
     """
 
-    def __init__(self, client: "Client", catalog_url: str) -> None:
+    def __init__(self, client: Client, catalog_url: str) -> None:
         """Initialize the TablesAPI.
 
         Args:

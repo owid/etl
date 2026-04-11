@@ -13,8 +13,6 @@ Some of the sheets also contain "cases", which are things like "Base case" (the 
 
 """
 
-from typing import Optional
-
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -50,7 +48,7 @@ def transform_header_rows_into_new_column(tb: Table, header_row_name: str, norma
 
 
 def process_demand_for_key_minerals(
-    data: pr.ExcelFile, sheet_name: str, header_row_name: Optional[str], normal_row_name: str, tb_short_name: str
+    data: pr.ExcelFile, sheet_name: str, header_row_name: str | None, normal_row_name: str, tb_short_name: str
 ) -> Table:
     tb = data.parse(sheet_name)
 

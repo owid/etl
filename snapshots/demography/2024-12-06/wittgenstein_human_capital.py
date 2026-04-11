@@ -10,7 +10,6 @@ Indicators available are listed in https://guyabel.github.io/wcde/reference/get_
 import os
 import shutil
 from pathlib import Path
-from typing import Optional
 
 import click
 import requests
@@ -135,7 +134,7 @@ INDICATORS_HISTORICAL = [
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--path-to-file", "-f1", type=str, help="Path to local data file.")
 @click.option("--path-to-file-historical", "-f2", type=str, help="Path to local data file.")
-def main(path_to_file: Optional[str], path_to_file_historical: str, upload: bool) -> None:
+def main(path_to_file: str | None, path_to_file_historical: str, upload: bool) -> None:
     if path_to_file is not None:
         # Create a new snapshot.
         snap = Snapshot(f"demography/{SNAPSHOT_VERSION}/wittgenstein_human_capital.zip")

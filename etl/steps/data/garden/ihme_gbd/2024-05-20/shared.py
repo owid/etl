@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
@@ -11,9 +9,9 @@ def add_regional_aggregates(
     tb: Table,
     ds_regions: Dataset,
     ds_un_wpp: Dataset,
-    index_cols: List[str],
-    regions: List[str],
-    age_group_mapping: Dict[str, List[int]],
+    index_cols: list[str],
+    regions: list[str],
+    age_group_mapping: dict[str, list[int]],
     run_percent: bool = False,
 ) -> Table:
     """
@@ -33,8 +31,8 @@ def add_regional_aggregates(
     tb_number = add_regions_to_number(tb_number, age_group_mapping, ds_regions, ds_un_wpp, index_cols, regions)
     # Calculate region aggregates for Rate
     tb_rate_regions = add_regions_to_rate(tb_number, regions)
-    tb_rate = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)  # type: ignore
-    tb_out = pr.concat([tb_rate, tb_number], ignore_index=True)  # type: ignore
+    tb_rate = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)  # ty: ignore
+    tb_out = pr.concat([tb_rate, tb_number], ignore_index=True)  # ty: ignore
     if run_percent:
         tb_percent_regions = add_regions_to_percent(tb_number, regions, index_cols)
         # Check there aren't any values above 100
@@ -58,7 +56,7 @@ def add_regional_aggregates(
     return tb_out
 
 
-def add_regions_to_percent(tb_number: Table, regions: List[str], index_cols: List[str]) -> Table:
+def add_regions_to_percent(tb_number: Table, regions: list[str], index_cols: list[str]) -> Table:
     """
     Calculating the share of deaths using the value of 'All causes' for each dataset as a denominator
     """
@@ -79,7 +77,7 @@ def add_regions_to_percent(tb_number: Table, regions: List[str], index_cols: Lis
     return tb_percent
 
 
-def add_regions_to_rate(tb_number: Table, regions: List[str]) -> Table:
+def add_regions_to_rate(tb_number: Table, regions: list[str]) -> Table:
     tb_rate = tb_number[(tb_number["country"].isin(regions)) & (tb_number["metric"] == "Number")].copy()
 
     # Calculate rates per 100,000 for regions
@@ -90,11 +88,11 @@ def add_regions_to_rate(tb_number: Table, regions: List[str]) -> Table:
 
 def add_regions_to_number(
     tb_number: Table,
-    age_group_mapping: Dict[str, List[int]],
+    age_group_mapping: dict[str, list[int]],
     ds_regions: Dataset,
     ds_un_wpp: Dataset,
-    index_cols: List[str],
-    regions: List[str],
+    index_cols: list[str],
+    regions: list[str],
 ) -> Table:
     # Add population data - some datasets will have data disaggregated by sex
     if "sex" in tb_number.columns:

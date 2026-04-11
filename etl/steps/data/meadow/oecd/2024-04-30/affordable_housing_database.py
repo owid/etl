@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import Dict
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
@@ -284,7 +282,7 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
 
-def rename_columns_drop_rows_and_format(tb: Table, columns: Dict[str, str], short_name: str, year: bool) -> Table:
+def rename_columns_drop_rows_and_format(tb: Table, columns: dict[str, str], short_name: str, year: bool) -> Table:
     """
     Rename columns, drop nan rows, and format the table.
     """
@@ -400,7 +398,7 @@ def add_count_and_type_of_homelessness_to_women_data(tb: Table) -> Table:
     return tb
 
 
-def add_national_strategies(national_strategies: Dict[str, list], tb: Table, short_name: str) -> Table:
+def add_national_strategies(national_strategies: dict[str, list], tb: Table, short_name: str) -> Table:
     """
     Create a table with national strategies for homelessness.
     """
