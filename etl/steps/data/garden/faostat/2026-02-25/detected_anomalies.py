@@ -8,7 +8,6 @@ See documentation of class DataAnomaly below for more details on how anomaly cla
 
 import abc
 import os
-from typing import Tuple
 
 import plotly.express as px
 import plotly.io as pio
@@ -438,7 +437,7 @@ class TeaProductionAnomaly(DataAnomaly):
             assert high_value / low_value > 3
 
     def inspect(self, tb):
-        log.info("The anomaly causes: " "\n* The production of tea to increase dramatically from 1990 to 1991.")
+        log.info("The anomaly causes: \n* The production of tea to increase dramatically from 1990 to 1991.")
         for element_code in self.affected_element_codes:
             selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
             tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
@@ -456,7 +455,7 @@ class TeaProductionAnomaly(DataAnomaly):
 
 
 class HighYieldAnomaly(DataAnomaly):
-    description = ()  # type: ignore
+    description = ()  # ty: ignore
 
     affected_item_codes = []
     affected_element_codes = []
@@ -485,7 +484,7 @@ class HighYieldAnomaly(DataAnomaly):
         ).all()
 
     def inspect(self, tb):
-        log.info("The anomaly causes: " "\n* The yield of certain items, countries and years to be unreasonably high.")
+        log.info("The anomaly causes: \n* The yield of certain items, countries and years to be unreasonably high.")
         for element_code in self.affected_element_codes:
             selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
             tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
@@ -848,7 +847,50 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
         return tb_fixed
 
 
+class NegativePotashUseSierraLeoneAnomaly(DataAnomaly):
+    description = "* Potash (K2O) agricultural use for Sierra Leone in 2003 was reported as -177 tonnes, which is physically impossible. This single value was removed.\n"
+
+    affected_item_codes = [
+        "00003104",
+    ]
+    affected_element_codes = [
+        "005157",
+    ]
+    affected_years = [
+        2003,
+    ]
+    affected_countries = [
+        "Sierra Leone",
+    ]
+
+    def check(self, tb):
+        assert (
+            tb[
+                (tb["country"] == "Sierra Leone")
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
+            ]["value"]
+            < 0
+        ).all()
+
+    def inspect(self, tb):
+        pass
+
+    def fix(self, tb):
+        indexes_to_drop = tb[
+            (tb["country"].isin(self.affected_countries))
+            & (tb["item_code"].isin(self.affected_item_codes))
+            & (tb["element_code"].isin(self.affected_element_codes))
+            & (tb["year"].isin(self.affected_years))
+        ].index
+        return tb.drop(indexes_to_drop).reset_index(drop=True)
+
+
 detected_anomalies = {
+    "faostat_rfn": [
+        NegativePotashUseSierraLeoneAnomaly,
+    ],
     "faostat_qcl": [
         SpinachAreaHarvestedAnomaly,
         EggYieldNorthernEuropeAnomaly,
@@ -866,7 +908,7 @@ detected_anomalies = {
 }
 
 
-def handle_anomalies(dataset_short_name: str, tb: Table) -> Tuple[Table, str]:
+def handle_anomalies(dataset_short_name: str, tb: Table) -> tuple[Table, str]:
     if dataset_short_name not in detected_anomalies:
         # If there is no anomaly class for a given dataset, return the same data and an empty anomaly description.
         return tb, ""

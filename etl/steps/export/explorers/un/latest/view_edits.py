@@ -10,7 +10,6 @@ EXTRA: There is also the file map_brackets.yml, which contains relevant informat
 
 import re
 from pathlib import Path
-from typing import Union
 
 import yaml
 
@@ -25,15 +24,15 @@ class ViewEditor:
     NOTE: There might be redundancy in functions.
     """
 
-    def __init__(self, map_brackets_yaml: Union[str, Path]):
+    def __init__(self, map_brackets_yaml: str | Path):
         self.map_brackets = self._load_map_brackets(map_brackets_yaml)
 
-    def _load_map_brackets(self, map_brackets_yaml: Union[str, Path]):
+    def _load_map_brackets(self, map_brackets_yaml: str | Path):
         """Load map brackets.
 
         sex="female" and "male" are filled based on the "all" brackets.
         """
-        with open(map_brackets_yaml, "r") as f:
+        with open(map_brackets_yaml) as f:
             dix = yaml.safe_load(f)
 
         for indicator, values in dix.items():

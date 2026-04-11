@@ -40,9 +40,9 @@ def run(dest_dir: str) -> None:
         summary = tb.groupby(["country", "year", "sex", "type", "age"], as_index=False).size().sort_values("size")
         row_dups = summary.loc[summary["size"] != 1]
         assert row_dups.shape[0] <= 19, "Found duplicated rows in life tables!"
-        assert (row_dups["country"].unique() == "Switzerland").all() & (
-            row_dups["year"] <= 1931
-        ).all(), "Unexpected duplicates in life tables!"
+        assert (row_dups["country"].unique() == "Switzerland").all() & (row_dups["year"] <= 1931).all(), (
+            "Unexpected duplicates in life tables!"
+        )
 
         flag = (
             (tb_lt["country"] == "Switzerland")
@@ -230,8 +230,9 @@ def make_table_diffs_ratios(tb: Table) -> Table:
         .assign(
             life_expectancy_fm_diff=lambda df: df[("life_expectancy", "female")] - df[("life_expectancy", "male")],
             life_expectancy_fm_ratio=lambda df: df[("life_expectancy", "female")] / df[("life_expectancy", "male")],
-            central_death_rate_mf_ratio=lambda df: df[("central_death_rate", "male")]
-            / df[("central_death_rate", "female")],
+            central_death_rate_mf_ratio=lambda df: (
+                df[("central_death_rate", "male")] / df[("central_death_rate", "female")]
+            ),
         )
         .reset_index()
     )

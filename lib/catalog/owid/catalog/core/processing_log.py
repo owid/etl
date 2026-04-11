@@ -51,10 +51,10 @@ class LogEntry:
     parents: tuple[str, ...] = field(default_factory=tuple)
     comment: str | None = None
 
-    def to_dict(self) -> dict[str, Any]: ...  # type: ignore
+    def to_dict(self) -> dict[str, Any]: ...  # ty: ignore
 
     @staticmethod
-    def from_dict(d: dict[str, Any]) -> "LogEntry": ...  # type: ignore
+    def from_dict(d: dict[str, Any]) -> "LogEntry": ...  # ty: ignore
 
     def clone(self, **kwargs: Any):
         """Clone the log entry, optionally overriding some attributes."""
@@ -77,7 +77,7 @@ class ProcessingLog(list[LogEntry]):
     def as_dict(self) -> list[dict[str, Any]]:
         return [r.to_dict() for r in self]
 
-    def clear(self) -> "ProcessingLog":  # type: ignore
+    def clear(self) -> "ProcessingLog":  # ty: ignore
         if enabled():
             super().clear()
         return self
@@ -335,7 +335,7 @@ def _add_upstream_channels(data_dir: Path, pl: ProcessingLog) -> ProcessingLog:
     from owid.catalog import Dataset
 
     # reverse processing log to traverse backwards
-    pl = ProcessingLog(pl[::-1])  # type: ignore
+    pl = ProcessingLog(pl[::-1])  # ty: ignore
     new_pl = []
 
     seen_parents_variables = set()

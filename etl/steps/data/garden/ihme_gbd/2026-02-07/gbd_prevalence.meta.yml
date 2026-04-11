@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Global Health
+      attribution_short: IHME
     processing_level: major
 
 macros: |-

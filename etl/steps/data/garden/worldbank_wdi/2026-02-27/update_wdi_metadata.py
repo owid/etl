@@ -16,7 +16,6 @@ import os
 import re
 from importlib import import_module
 from pathlib import Path
-from typing import Union
 
 import click
 from openai import OpenAI
@@ -50,7 +49,7 @@ def should_keep_variable(var_name: str, keep_patterns: set) -> bool:
     return False
 
 
-def replace_years(s: str, year: Union[int, str]) -> str:
+def replace_years(s: str, year: int | str) -> str:
     """Replace all years in string with {year}.
 
     Example:
@@ -212,7 +211,7 @@ def update_sources(dry_run: bool):
     tb, df_vars = load_metadata(version)
 
     console.print(f"[bold]Loading {sources_path}...[/bold]")
-    with open(sources_path, "r") as f:
+    with open(sources_path) as f:
         sources = json.load(f)
 
     # Remove TODO sources
@@ -242,7 +241,7 @@ def update_sources(dry_run: bool):
 
     # Load good examples from file
     examples_path = Path(__file__).parent / "source_examples.json"
-    with open(examples_path, "r") as f:
+    with open(examples_path) as f:
         GOOD_EXAMPLES = json.load(f)
 
     console.print(f"[green]Loaded {len(GOOD_EXAMPLES)} example source citations[/green]")
@@ -269,7 +268,7 @@ Check out these good examples. Make sure these examples are followed closely.
     for i in range(0, len(missing_sources), MAX_BATCH_SIZE):
         batch_missing_sources = missing_sources[i : i + MAX_BATCH_SIZE]
         console.print(
-            f"[bold]Processing batch {i//MAX_BATCH_SIZE + 1}: {len(batch_missing_sources)} sources (total: {len(missing_sources)})[/bold]"
+            f"[bold]Processing batch {i // MAX_BATCH_SIZE + 1}: {len(batch_missing_sources)} sources (total: {len(missing_sources)})[/bold]"
         )
 
         # Create input data for this batch
@@ -297,9 +296,9 @@ Check out these good examples. Make sure these examples are followed closely.
 
         r = json.loads(response.choices[0].message.content)
 
-        assert len(r["sources"]) == len(
-            batch_missing_sources
-        ), f"Expected {len(batch_missing_sources)} sources, got {len(r['sources'])}"
+        assert len(r["sources"]) == len(batch_missing_sources), (
+            f"Expected {len(batch_missing_sources)} sources, got {len(r['sources'])}"
+        )
 
         all_new_sources.extend(r["sources"])
 

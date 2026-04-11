@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict
+from typing import Any
 
 from etl.paths import BASE_DIR
 
@@ -8,7 +8,7 @@ WIZARD_VARIABLES_DEFAULTS_OLD = BASE_DIR / ".wizard"
 WIZARD_VARIABLES_DEFAULTS = BASE_DIR / ".wizardcfg" / "defaults.json"
 
 
-def load_wizard_defaults() -> Dict[str, Any]:
+def load_wizard_defaults() -> dict[str, Any]:
     """Load default wizard defaults.
 
     Additionally, if no default defaults file is found, one is created.
@@ -32,7 +32,7 @@ def load_wizard_defaults() -> Dict[str, Any]:
         return defaults
 
 
-def create_wizard_defaults(defaults: Dict[str, Any], overwrite: bool = False) -> None:
+def create_wizard_defaults(defaults: dict[str, Any], overwrite: bool = False) -> None:
     """Create wizard defaults file.
 
     Set overwrite=True to overwrite the file if it already exists.

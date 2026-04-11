@@ -15,14 +15,14 @@ def extract_capacity_from_sheet(excel_object: pr.ExcelFile, sheet_name: str) -> 
     # The name of the energy source is given in the very first cell.
     # To get that, I load the file, skipping all rows from the bottom.
     # The first column is the content of the first cell.
-    technology = excel_object.parse(sheet_name=sheet_name, skipfooter=10000).columns[0]  # type: ignore
+    technology = excel_object.parse(sheet_name=sheet_name, skipfooter=10000).columns[0]  # ty: ignore
 
     # Check that the extracted name of the technology is long enough, and does not contain digits.
     assert len(technology) >= 6
     assert all([not character.isdigit() for character in technology])
 
     # The format of this dataset is inconvenient and requires some adjustment that may not work on the next update.
-    tb = excel_object.parse(sheet_name=sheet_name, skiprows=4)  # type: ignore
+    tb = excel_object.parse(sheet_name=sheet_name, skiprows=4)  # ty: ignore
 
     # There are two tables put together: One for capacity and one for production.
     # Keep only columns for capacity that start with a year.
@@ -65,9 +65,9 @@ def _extract_data_sheet_by_sheet(excel_object: pr.ExcelFile, sheet_names: list[s
 def extract_capacity_from_all_sheets(snap: Snapshot) -> Table:
     # Select sheets that contain data (their names are numbers).
     excel_object = snap.ExcelFile()
-    sheet_names = [sheet for sheet in excel_object.sheet_names if sheet.strip().isdigit()]  # type: ignore
+    sheet_names = [sheet for sheet in excel_object.sheet_names if sheet.strip().isdigit()]  # ty: ignore
 
-    all_data = _extract_data_sheet_by_sheet(excel_object, sheet_names, snap)  # type: ignore
+    all_data = _extract_data_sheet_by_sheet(excel_object, sheet_names, snap)  # ty: ignore
 
     # Set a short name to the new table.
     all_data.metadata.short_name = paths.short_name

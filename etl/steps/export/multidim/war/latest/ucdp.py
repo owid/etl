@@ -156,8 +156,9 @@ def run() -> None:
             "title": lambda view: _set_title(view, choice_names),
             "subtitle": lambda view: _set_subtitle(view),
             "note": lambda view: _set_note(view),
-            "hideRelativeToggle": lambda view: (view.dimensions["people"] != "all_stacked")
-            and (view.dimensions["conflict_type"] != "all_stacked"),
+            "hideRelativeToggle": lambda view: (
+                (view.dimensions["people"] != "all_stacked") and (view.dimensions["conflict_type"] != "all_stacked")
+            ),
             "hideFacetControl": False,
             "yAxis": {
                 "facetDomain": lambda view: "independent" if view.d.conflict_type == "all" else "shared",
@@ -319,7 +320,7 @@ def _set_subtitle(view):
     if view.d.conflict_type == "one-sided violence":
         if view.d.indicator == "num_conflicts":
             return "Included are cases of [one-sided violence against civilians](#dod:onesided-ucdp)."
-        return f"Reported deaths of civilians due to [one-sided violence](#dod:onesided-ucdp){', per 100,000 people' if view.d.indicator=='death_rate' else ''}. Deaths due to disease and starvation resulting from one-sided violence are not included."
+        return f"Reported deaths of civilians due to [one-sided violence](#dod:onesided-ucdp){', per 100,000 people' if view.d.indicator == 'death_rate' else ''}. Deaths due to disease and starvation resulting from one-sided violence are not included."
 
     # DoD
     if view.d.conflict_type == "all":

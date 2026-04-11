@@ -2,7 +2,6 @@ import copy
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import List, Optional
 
 import pandas as pd
 import structlog
@@ -16,7 +15,7 @@ log = structlog.get_logger(__name__)
 SDG_SOURCES_FILE = Path(__file__).parent / "sdg_sources.csv"
 
 
-def concat_variables(variables: List[Variable]) -> Table:
+def concat_variables(variables: list[Variable]) -> Table:
     """Concatenate variables into a single table keeping all metadata."""
     t = Table(pd.concat(variables, axis=1))
     for v in variables:
@@ -36,7 +35,7 @@ def _load_sdg_sources() -> pd.DataFrame:
     return sdg_sources
 
 
-def _get_variable_from_backported_table(table: Table, variable_id: str) -> Optional[Variable]:
+def _get_variable_from_backported_table(table: Table, variable_id: str) -> Variable | None:
     """Get variable from backported table."""
     for col in table.columns:
         var_id = table[col].metadata.additional_info["grapher_meta"]["id"]
@@ -49,7 +48,7 @@ def _get_variable_from_backported_table(table: Table, variable_id: str) -> Optio
         return None
 
 
-def _get_variable_from_table(table: Table, variable_title: str) -> Optional[Variable]:
+def _get_variable_from_table(table: Table, variable_title: str) -> Variable | None:
     """Get variable from table based on variable's title."""
     for col in table.columns:
         var_title = table[col].metadata.title
@@ -87,7 +86,7 @@ def run(dest_dir: str) -> None:
     """Assemble SDG dataset."""
     sdg_sources = _load_sdg_sources()
 
-    vars: dict[str, List[Variable]] = defaultdict(list)
+    vars: dict[str, list[Variable]] = defaultdict(list)
 
     # group by datasets to make sure we load each one only once
     for dataset_name, sdg_group in sdg_sources.groupby("dataset_name"):

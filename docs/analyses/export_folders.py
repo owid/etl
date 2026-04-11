@@ -4,7 +4,6 @@ import os
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import Optional
 
 import structlog
 from owid.catalog.s3_utils import upload
@@ -15,8 +14,8 @@ log = structlog.get_logger()
 def create_zip_from_folder(
     folder_path: str,
     zip_path: str,
-    exclude_files: Optional[list[str]] = None,
-    exclude_folders: Optional[list[str]] = None,
+    exclude_files: list[str] | None = None,
+    exclude_folders: list[str] | None = None,
 ) -> None:
     """
     Create a zip file from a folder, with optional exclusions.
@@ -58,9 +57,9 @@ def upload_folder_as_zip(
     local_folder_path: str,
     r2_zip_path: str,
     public: bool = False,
-    exclude_files: Optional[list[str]] = None,
-    exclude_folders: Optional[list[str]] = None,
-    zip_filename: Optional[str] = None,
+    exclude_files: list[str] | None = None,
+    exclude_folders: list[str] | None = None,
+    zip_filename: str | None = None,
     dry_run: bool = False,
 ) -> str:
     """

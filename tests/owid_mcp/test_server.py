@@ -440,7 +440,7 @@ async def test_run_sql_invalid_column_error():
         # The SQL should fail with a clear error message
         # Use raise_on_error=False to get the error in the result instead of raising an exception
         output = await client.call_tool("run_sql", {"query": sql_query})
-        error = output.structured_content["error"]  # type: ignore
+        error = output.structured_content["error"]  # ty: ignore
         assert "column 'abc' does not exist" in error.lower()
 
 
@@ -452,5 +452,5 @@ async def test_run_sql_syntax_error():
         sql_query = "SELECT name FROM variables WHERE"  # Missing condition after WHERE
 
         output = await client.call_tool("run_sql", {"query": sql_query})
-        error = output.structured_content["error"]  # type: ignore
+        error = output.structured_content["error"]  # ty: ignore
         assert "invalid expression" in error.lower() or "unexpected token" in error.lower()

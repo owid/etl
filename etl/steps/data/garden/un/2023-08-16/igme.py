@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from math import trunc
-from typing import List
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
@@ -93,9 +92,9 @@ def convert_to_percentage(tb: Table) -> Table:
     # Dividing values of selected rows by 10
 
     selected_rows = tb["unit_of_measure"].isin(rate_conversions.keys())
-    assert all(
-        key in tb["unit_of_measure"].values for key in rate_conversions.keys()
-    ), "Not all keys are in tb['unit_of_measure']"
+    assert all(key in tb["unit_of_measure"].values for key in rate_conversions.keys()), (
+        "Not all keys are in tb['unit_of_measure']"
+    )
     tb.loc[selected_rows, ["obs_value", "lower_bound", "upper_bound"]] = tb.loc[
         selected_rows, ["obs_value", "lower_bound", "upper_bound"]
     ].div(10)
@@ -248,7 +247,7 @@ def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source
     return tb_combined
 
 
-def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -> Table:
+def remove_duplicates(tb: Table, preferred_source: str, dimensions: list[str]) -> Table:
     """
     Removing rows where there are overlapping years with a preference for IGME data.
 
