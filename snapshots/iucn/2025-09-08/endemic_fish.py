@@ -6,8 +6,8 @@ The data for this snapshot was taken from the IUCN Red List Summary Statistics T
 from __future__ import annotations
 
 import io
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, List
 
 import click
 import pandas as pd
@@ -35,13 +35,13 @@ def main(upload: bool = True) -> None:
     snap.create_snapshot(upload=upload, data=df)
 
 
-def _make_headers(group_row: Iterable, sub_row: Iterable) -> List[str]:
+def _make_headers(group_row: Iterable, sub_row: Iterable) -> list[str]:
     """
     Build flattened headers such as:
       'FW Fishes - Total endemics', 'FW Fishes - Threatened endemics', ...
       'Groupers - Total endemics',  ...  'Sharks & Rays - EX & EW endemics'
     """
-    headers: List[str] = []
+    headers: list[str] = []
     current_group = None
     for i, (g, s) in enumerate(zip(group_row, sub_row)):
         if i == 0:

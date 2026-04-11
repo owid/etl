@@ -1,7 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
 import re
-from typing import Optional, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -65,7 +65,7 @@ def run(dest_dir: str) -> None:
     log.info("monmouth_poll.end")
 
 
-def extract_text_and_tables_from_pdf(pdf_path: str, start_page: Optional[int] = None, end_page: Optional[int] = None):
+def extract_text_and_tables_from_pdf(pdf_path: str, start_page: int | None = None, end_page: int | None = None):
     """
     Extract survey questions and tables from a PDF file within the specified page range.
 

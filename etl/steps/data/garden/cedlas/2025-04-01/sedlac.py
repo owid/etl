@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Dict, List
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
@@ -90,7 +88,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def load_tables(dataset: Dataset, tables_dict: Dict) -> List[Table]:
+def load_tables(dataset: Dataset, tables_dict: dict) -> list[Table]:
     """Load tables from the meadow dataset."""
 
     tables = []
@@ -105,7 +103,7 @@ def load_tables(dataset: Dataset, tables_dict: Dict) -> List[Table]:
     return tables
 
 
-def merge_tables(tables: List[Table], merge_or_concat: str, short_name: str) -> Table:
+def merge_tables(tables: list[Table], merge_or_concat: str, short_name: str) -> Table:
     """Merge tables into a single table."""
 
     if merge_or_concat == "concat":

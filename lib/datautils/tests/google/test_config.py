@@ -88,12 +88,12 @@ def test_google_config_init_error():
         google_config_init(client_secrets_file)
 
 
-@mock.patch.object(pydrive2.auth.GoogleAuth, "__init__", return_value=None)  # type: ignore[reportAttributeAccessIssue]
-@mock.patch.object(pydrive2.auth.GoogleAuth, "CommandLineAuth", return_value=None)  # type: ignore[reportAttributeAccessIssue]
+@mock.patch.object(pydrive2.auth.GoogleAuth, "__init__", return_value=None)  # ty: ignore[unresolved-attribute]
+@mock.patch.object(pydrive2.auth.GoogleAuth, "CommandLineAuth", return_value=None)  # ty: ignore[unresolved-attribute]
 def test_google_config_init_1(mocker_google_1, mocker_google_2):
     # with tempfile.TemporaryDirectory() as config_dir:
-    config_dir = next(tempfile._get_candidate_names())  # type: ignore
-    defult_tmp_dir = tempfile._get_default_tempdir()  # type: ignore
+    config_dir = next(tempfile._get_candidate_names())  # ty: ignore
+    defult_tmp_dir = tempfile._get_default_tempdir()  # ty: ignore
     config_dir = os.path.join(defult_tmp_dir, config_dir)
     with (
         mock.patch("owid.datautils.google.config.CONFIG_DIR", config_dir),

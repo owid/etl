@@ -57,9 +57,9 @@ def run(dest_dir: str) -> None:
     df_latest = df.reset_index().drop_duplicates(subset=["country"], keep="last")
     # Sanity checks of missing countries for latest release
     missing_countries = set(df_latest.loc[df_latest["year"] != df_latest["year"].max(), "country"])
-    assert (
-        missing_countries == EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE
-    ), f"Unexpected missing countries in latest release. All missing countries: {missing_countries}"
+    assert missing_countries == EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE, (
+        f"Unexpected missing countries in latest release. All missing countries: {missing_countries}"
+    )
     # Get data only for latest release (and remove column year)
     df_latest = df_latest[df_latest["year"] == df_latest["year"].max()].drop(columns=["year"])
     # Set index, drop code column

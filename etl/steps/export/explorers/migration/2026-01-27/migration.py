@@ -56,15 +56,15 @@ def run() -> None:
             col_name = tb_path.split("#")[1]
             tb = tables[tb_name]
             if col_name == "net_migration__sex_all__age_all__variant_estimates":
-                view.config["title"] = "Net migration"  # type: ignore[assignment]
+                view.config["title"] = "Net migration"  # ty: ignore[invalid-assignment]
             elif col_name == "net_migration_rate__sex_all__age_all__variant_estimates":
-                view.config["title"] = "Net migration rate"  # type: ignore[assignment]
+                view.config["title"] = "Net migration rate"  # ty: ignore[invalid-assignment]
             else:
                 view.config["title"] = tb[col_name].metadata.title  # ty:ignore[invalid-assignment]
             view.config["subtitle"] = tb[col_name].metadata.description_short  # ty:ignore[invalid-assignment]
             var_pres = tb[col_name].metadata.presentation
             note = var_pres.grapher_config.get("note") if var_pres is not None else None
             if note:
-                view.config["note"] = note  # type: ignore[assignment]
+                view.config["note"] = note  # ty: ignore[invalid-assignment]
 
     c.save()

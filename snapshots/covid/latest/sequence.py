@@ -38,9 +38,9 @@ def _get_latest_update():
 def modify_metadata(snap: Snapshot) -> Snapshot:
     """Modify metadata"""
     # Get access date
-    snap.metadata.origin.date_accessed = date.today()  # type: ignore
+    snap.metadata.origin.date_accessed = date.today()  # ty: ignore
     # Set publication date
-    snap.metadata.origin.date_published = _get_latest_update()  # type: ignore
+    snap.metadata.origin.date_published = _get_latest_update()  # ty: ignore
     # Save
     snap.metadata.save()
     return snap

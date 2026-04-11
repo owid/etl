@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Dict
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table, VariablePresentationMeta
@@ -299,7 +297,7 @@ def clean_notes(note):
     return notes_clean
 
 
-def gather_notes(tb_combined: Table) -> Dict[str, str]:
+def gather_notes(tb_combined: Table) -> dict[str, str]:
     notes_columns = [column for column in tb_combined.columns if column.startswith("notes_")]
     # Create another table with the same structure, but containing notes.
     tb_flat_notes = (
@@ -474,7 +472,7 @@ def prepare_unit_value(tb: Table, tb_metadata: Table) -> Table:
     return tb_unit_value
 
 
-def prepare_wide_table(tb: Table, footnotes: Dict[str, str]) -> Table:
+def prepare_wide_table(tb: Table, footnotes: dict[str, str]) -> Table:
     # Gather all notes in a dictionary.
     notes = gather_notes(tb_combined=tb)
     # Identify data columns.
