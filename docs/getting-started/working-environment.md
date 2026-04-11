@@ -216,6 +216,15 @@ If `make test` succeeds, then you should be able to build any dataset you like, 
 
     Speed it up with multiple processes `make -j 4 test`.
 
+## Git hooks
+
+We recommend installing the pre-commit hook, which automatically runs `make check` (lint, format, type-check) before every `git commit`:
+
+```bash
+make install-hooks
+```
+
+This prevents accidentally pushing code that fails CI.
 
 ## VSCode setup
 

@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, cast
+from typing import cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -14,7 +14,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def melt_and_clean(df: pd.DataFrame, col_name: str, excluded_columns: List[str]) -> pd.DataFrame:
+def melt_and_clean(df: pd.DataFrame, col_name: str, excluded_columns: list[str]) -> pd.DataFrame:
     """
     Melt and clean dataframe based on column name.
     """

@@ -179,9 +179,9 @@ def run(dest_dir: str) -> None:
     #
     # HOTFIX: https://github.com/owid/owid-issues/issues/1356
     msk = (tb["warcode"] == 204) & (tb["ccode"].isin([1090, 678]))
-    assert (tb.loc[msk, "namerica"] == 1).all() & (
-        tb.loc[msk, "nafrme"] == 0
-    ).all(), "The hotfix may not be needed anymore! Check region assigned for warcode 204 (should be 'nafrme')"
+    assert (tb.loc[msk, "namerica"] == 1).all() & (tb.loc[msk, "nafrme"] == 0).all(), (
+        "The hotfix may not be needed anymore! Check region assigned for warcode 204 (should be 'nafrme')"
+    )
     tb.loc[msk, "namerica"] = 0
     tb.loc[msk, "nafrme"] = 1
 
@@ -280,9 +280,9 @@ def clean_table(tb: Table) -> Table:
     tb = tb.dropna(how="all")
 
     ## Check at least one and only one FLAG within each group is always activated
-    assert (
-        tb[COLUMNS_REGIONS].sum(axis=1) == 1
-    ).all(), "Entry found with no region (one more than one region) assigned!"
+    assert (tb[COLUMNS_REGIONS].sum(axis=1) == 1).all(), (
+        "Entry found with no region (one more than one region) assigned!"
+    )
 
     ## Keep only relevant columns
     tb = tb.loc[:, COLUMNS_RELEVANT]
@@ -433,7 +433,7 @@ def _create_metrics_new(tb: Table) -> Table:
     tb_new = pr.concat(
         [tb_new_regions, tb_new_regions_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True
     )
-    tb_new = tb_new.rename(columns={"yrstart": "year"})  # type: ignore
+    tb_new = tb_new.rename(columns={"yrstart": "year"})  # ty: ignore
 
     return tb_new
 

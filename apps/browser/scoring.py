@@ -1,7 +1,8 @@
 """Match scoring and ranking utilities for browser results."""
 
 import re
-from typing import TYPE_CHECKING, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from apps.browser.core import Ranker

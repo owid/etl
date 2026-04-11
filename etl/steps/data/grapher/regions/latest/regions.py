@@ -292,7 +292,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Drop unneeded columns
-    regions: Table = regions.drop(columns=["defined_by"])  # type: ignore
+    regions: Table = regions.drop(columns=["defined_by"])  # ty: ignore
 
     # Create slugs for all countries and keep track of legacy slugs.
     regions["slug"] = regions["name"].astype(str).map(slugify)
@@ -315,8 +315,14 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
+    # Regions is an internal reference table with no external data origins, so skip the origins check.
     ds_grapher = create_dataset(
-        dest_dir, tables=[regions], default_metadata=ds_garden.metadata, formats=["csv"], run_grapher_checks=False
+        dest_dir,
+        tables=[regions],
+        default_metadata=ds_garden.metadata,
+        formats=["csv"],
+        run_grapher_checks=False,
+        check_variables_metadata=False,
     )
 
     # Save changes in the new grapher dataset.

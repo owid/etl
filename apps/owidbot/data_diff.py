@@ -1,7 +1,6 @@
 import os
 import re
 import subprocess
-from typing import Tuple
 
 from rich.ansi import AnsiDecoder
 
@@ -29,7 +28,7 @@ Automatically updated datasets matching _{EXCLUDE_DATASETS}_ are not included
     return body
 
 
-def format_etl_diff(lines: list[str]) -> Tuple[str, str]:
+def format_etl_diff(lines: list[str]) -> tuple[str, str]:
     new_lines = []
     result = ""
     for line in lines:

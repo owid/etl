@@ -3,7 +3,6 @@
 import json
 from os import environ as env
 from pathlib import Path
-from typing import List
 
 import click
 import pandas as pd
@@ -23,7 +22,7 @@ load_dotenv(ENV_FILE, override=True)
 API_KEY = env.get("IHME_SDG_API_KEY")
 
 
-def get_indicator_ids(api_key: str) -> List[int]:
+def get_indicator_ids(api_key: str) -> list[int]:
     """
     Accessing the list of SDG Indicator IDs that IHME has data for.
     """
@@ -35,7 +34,7 @@ def get_indicator_ids(api_key: str) -> List[int]:
     return indicator_ids
 
 
-def get_indicator_data(api_key: str, indicator_ids: List[int]) -> pd.DataFrame:
+def get_indicator_data(api_key: str, indicator_ids: list[int]) -> pd.DataFrame:
     """
     For each Indicator ID, fetch all the available data from the IHME API.
     """

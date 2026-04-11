@@ -197,7 +197,7 @@ def run() -> None:
     #
     # Load data.
     #
-    # Fetch the dataset short name from dest_dir.
+    # Fetch the dataset
     dataset_short_name = "faostat_qv"
 
     # Load snapshot.

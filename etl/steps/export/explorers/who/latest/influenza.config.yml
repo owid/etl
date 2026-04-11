@@ -131,6 +131,10 @@ config:
   hasMapTab: true
   pickerColumnSlugs:
     - Country
+
+topic_tags:
+  - Influenza
+
 dimensions:
   - slug: confirmed_cases_or_symptoms
     name: Confirmed cases or Symptoms

@@ -1,0 +1,34 @@
+# This data has been sent to us by the WHR team under embargo. The data will be published on the WHR website on the 19.03.2026 and can then be accessed at https://worldhappiness.report/ed/2026/.
+
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "World Happiness Report"
+    description: |-
+      The World Happiness Report is a partnership of Gallup, the Oxford Wellbeing Research Centre, the UN Sustainable Development Solutions Network, and the WHR’s Editorial Board.
+
+      It reviews the state of happiness in the world today and shows how the science of happiness explains personal and national variations in happiness.
+    date_published: "2026-03-19"
+    version_producer: '2026'
+
+    # Citation
+    producer: Wellbeing Research Centre
+    citation_full: |-
+      Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E., Aknin, L. B., & Wang, S. (Eds.). (2026).
+      World Happiness Report 2026. University of Oxford: Wellbeing Research Centre.
+    attribution_short: WHR
+
+    # Files
+    url_main: ttps://worldhappiness.report/ed/2026/
+    date_accessed: '2026-03-16'
+
+    # License
+    license:
+      name: World Happiness Report - Data sharing policy
+      url: https://worldhappiness.report/data-sharing/
+
+
+outs:
+  - md5: 2ef4498e972b6c0742c3dc4084f7a47c
+    size: 133569
+    path: happiness.xlsx

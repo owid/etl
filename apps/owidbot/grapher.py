@@ -54,6 +54,8 @@ Number of differences (thumbnails): {svg_tester_thumbnails}
 - [Archived article](http://{container_name}:8789/latest/vaping-vs-smoking-health-risks.html)
 </details>
 
+🎨 [Bespoke dev server](http://{container_name}:8089)
+
 {svg_tester_block}
     """.strip()
 
