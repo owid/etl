@@ -17,6 +17,8 @@ steps:
     - data://grapher/wb/2026-01-22/world_bank_pip
   export://multidim/wb/latest/incomes_pip:
     - data://grapher/wb/2026-01-22/world_bank_pip
+    - data://grapher/demography/2024-07-15/population
+    - data://grapher/regions/2023-01-01/regions
   export://multidim/wb/latest/gini_pip:
     - data://grapher/wb/2026-01-22/world_bank_pip
   export://multidim/wb/latest/palma_ratio_pip:

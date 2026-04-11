@@ -7,7 +7,7 @@ All categories are defined below in 'category_structure'.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 import structlog
@@ -100,7 +100,7 @@ category_structure = {
 }
 
 
-def check_that_category_structure_is_well_defined(md: Dict[str, Any]) -> None:
+def check_that_category_structure_is_well_defined(md: dict[str, Any]) -> None:
     """Check that metadata content is consistent with category_structure (defined above).
 
     If that is not the case, it is possible that the content of metadata has changed, and therefore category_structure
@@ -126,7 +126,7 @@ def check_that_category_structure_is_well_defined(md: Dict[str, Any]) -> None:
                         assert category_index in entry, error
 
 
-def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any]) -> List[Table]:
+def create_tables_for_all_domain_records(additional_metadata: dict[str, Any]) -> list[Table]:
     """Create a table for each of the domain-categories (e.g. 'faostat_qcl_item').
 
     Parameters
@@ -153,7 +153,7 @@ def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any]) ->
                     verify_integrity=True,
                     inplace=True,
                 )
-                table_short_name = f'{NAMESPACE}_{domain.lower()}_{category_structure[category]["short_name"]}'
+                table_short_name = f"{NAMESPACE}_{domain.lower()}_{category_structure[category]['short_name']}"
 
                 # there might be duplicates coming from `itemsgroup` and `itemgroup`
                 if table_short_name in used_short_names:

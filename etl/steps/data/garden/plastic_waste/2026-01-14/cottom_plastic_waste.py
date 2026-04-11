@@ -104,9 +104,11 @@ def run() -> None:
 
             # Calculate share (as percentage)
             tb[f"{var}_share_global"] = tb.apply(
-                lambda row: (row[var] / global_totals.get(row["year"], float("nan"))) * 100
-                if row["country"] != "World" and global_totals.get(row["year"], 0) > 0
-                else float("nan"),
+                lambda row: (
+                    (row[var] / global_totals.get(row["year"], float("nan"))) * 100
+                    if row["country"] != "World" and global_totals.get(row["year"], 0) > 0
+                    else float("nan")
+                ),
                 axis=1,
             )
             # Copy origins from the source variable

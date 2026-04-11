@@ -197,7 +197,7 @@ def save(
     Save the explorer configuration to MySQL via the Admin API.
     """
     # Header is converted into a tab-separated text
-    header_tsv: str = df_header.to_csv(sep="\t", header=False)  # type: ignore
+    header_tsv: str = df_header.to_csv(sep="\t", header=False)  # ty: ignore
 
     # Graphers table is converted into a tab-separated text
     graphers_tsv = df_graphers

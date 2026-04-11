@@ -13,14 +13,13 @@ This module contains:
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import numpy as np
 import owid.catalog.core.processing as pr
 import pandas as pd
 import structlog
 from detected_anomalies import handle_anomalies
-from owid import repack  # type: ignore
+from owid import repack  # ty: ignore
 from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta
 from owid.catalog.core import utils, warnings
 from owid.datautils import dataframes
@@ -474,7 +473,7 @@ def harmonize_items(tb: Table, dataset_short_name: str, item_col: str = "item") 
 
 
 def harmonize_elements(
-    tb: Table, dataset_short_name: str, element_col: str = "element", unit_col: Optional[str] = "unit"
+    tb: Table, dataset_short_name: str, element_col: str = "element", unit_col: str | None = "unit"
 ) -> Table:
     """Harmonize element codes (by ensuring they are strings of numbers with a fixed length, prepended with zeros), and
     make element codes and elements of categorical dtype.
@@ -665,7 +664,7 @@ def remove_rows_with_nan_value(tb: Table, verbose: bool = False) -> Table:
     if n_rows_with_nan_value > 0:
         frac_nan_rows = n_rows_with_nan_value / len(tb)
         if verbose:
-            log.info(f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) " f"with nan in column 'value'.")
+            log.info(f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) with nan in column 'value'.")
         if frac_nan_rows > 0.15:
             log.warning(f"{frac_nan_rows: .0%} rows of nan values removed.")
         tb = tb.dropna(subset="value").reset_index(drop=True)
@@ -705,7 +704,7 @@ def remove_columns_with_only_nans(tb: Table, verbose: bool = True) -> Table:
     return tb
 
 
-def remove_duplicates(tb: Table, index_columns: List[str], verbose: bool = True) -> Table:
+def remove_duplicates(tb: Table, index_columns: list[str], verbose: bool = True) -> Table:
     """Remove rows with duplicated index (country, year, item, element, unit).
 
     First attempt to use flags to remove duplicates. If there are still duplicates, remove in whatever way possible.
@@ -891,7 +890,7 @@ def add_custom_names_and_descriptions(tb: Table, items_metadata: Table, elements
     return tb
 
 
-def remove_regions_from_countries_regions_members(countries_regions: Table, regions_to_remove: List[str]) -> Table:
+def remove_regions_from_countries_regions_members(countries_regions: Table, regions_to_remove: list[str]) -> Table:
     """Remove regions that have to be ignored from the lists of members in the countries-regions dataset.
 
     Parameters
@@ -1214,9 +1213,9 @@ def add_fao_population_if_given(tb: Table) -> Table:
         fao_population = tb[population_rows_mask].reset_index(drop=True)
 
         # Check that population is given in "1000 persons" and convert to persons.
-        assert list(fao_population["unit"].unique()) == [
-            fao_population_unit_name
-        ], "FAO population may have changed units."
+        assert list(fao_population["unit"].unique()) == [fao_population_unit_name], (
+            "FAO population may have changed units."
+        )
         fao_population["value"] *= 1000
 
         # Note: Here we will dismiss the flags related to population. But they are only relevant for those columns
@@ -1410,7 +1409,7 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
         ]["population_with_data"].astype(float)
 
         # Remove nans (which may have been created because of missing FAO population).
-        per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)  # type: ignore
+        per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)  # ty: ignore
 
         # Add "per capita" to all units.
         per_capita_data["unit"] = per_capita_data["unit"].cat.rename_categories(lambda c: f"{c} per capita")
@@ -1534,7 +1533,7 @@ def add_modified_variables(tb: Table, dataset_short_name: str) -> Table:
     return tb
 
 
-def clean_data_values(values: Variable, amendments: Dict[str, str]) -> Variable:
+def clean_data_values(values: Variable, amendments: dict[str, str]) -> Variable:
     """Fix spurious data values (defined in value_amendments.csv) and make values a float column.
 
     Parameters
@@ -1575,7 +1574,7 @@ def clean_data(
     items_metadata: Table,
     elements_metadata: Table,
     countries_metadata: Table,
-    amendments: Dict[str, str],
+    amendments: dict[str, str],
 ) -> Table:
     """Process data (with already harmonized item codes and element codes), before adding aggregate regions and
     per-capita variables.
@@ -1813,11 +1812,9 @@ def prepare_wide_table(tb: Table) -> Table:
     # (which would cause issues when uploading to grapher).
     tb["variable_name"] = dataframes.apply_on_categoricals(
         [tb.item, tb.item_code, tb.element, tb.element_code, tb.unit],
-        lambda item,
-        item_code,
-        element,
-        element_code,
-        unit: f"{item} | {item_code} || {element} | {element_code} || {unit}",
+        lambda item, item_code, element, element_code, unit: (
+            f"{item} | {item_code} || {element} | {element_code} || {unit}"
+        ),
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
@@ -1911,15 +1908,15 @@ def prepare_wide_table(tb: Table) -> Table:
     return tb_wide
 
 
-def _variable_name_map(data: Table, column: str, enforce_unique: bool = True) -> Dict[str, str]:
+def _variable_name_map(data: Table, column: str, enforce_unique: bool = True) -> dict[str, str]:
     """Extract map {variable name -> column} from dataframe and make sure it is unique (i.e. ensure that one variable
     does not map to two distinct values)."""
     pivot = data.dropna(subset=[column]).groupby(["variable_name"], observed=True)[column].apply(set)
     if enforce_unique:
         assert all(pivot.map(len) == 1)
-        return pivot.map(lambda x: list(x)[0]).to_dict()  # type: ignore
+        return pivot.map(lambda x: list(x)[0]).to_dict()  # ty: ignore
     else:
-        return pivot.map(lambda x: "".join(dict.fromkeys(x))).to_dict()  # type: ignore
+        return pivot.map(lambda x: "".join(dict.fromkeys(x))).to_dict()  # ty: ignore
 
 
 def parse_amendments_table(amendments: Table, dataset_short_name: str):

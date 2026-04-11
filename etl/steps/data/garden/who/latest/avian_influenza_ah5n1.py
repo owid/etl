@@ -18,7 +18,7 @@ REGIONS = [
     "Oceania",
 ]
 # Year ranges
-YEAR_MAX = 2025
+YEAR_MAX = 2026
 YEAR_MIN = 1997
 
 
@@ -44,10 +44,14 @@ def run() -> None:
     ## Yearly data
     tb_year = tb_year.rename(columns={"month": "date"})
     ## Monthly data
+    ## FIXES
+    ## Fix "225" should be "2025"
+    tb_month["month"] = tb_month["month"].str.replace("12/1/225", "12/1/2025")
     # date_1 = pd.to_datetime(tb_month["month"], format="%b-%y", errors="coerce")
     # date_2 = pd.to_datetime(tb_month["month"], format="%y-%b", errors="coerce")
     # date_3 = pd.to_datetime("200" + tb_month["month"].astype(str), format="%Y-%b", errors="coerce")
     # tb_month["date"] = date_1.fillna(date_2).fillna(date_3)
+    ## Actual conversion
     tb_month["date"] = pr.to_datetime(tb_month["month"], format="%m/%d/%Y")
     assert tb_month["date"].notna().all(), "Some dates could not be parsed."
     tb_month = tb_month.drop(columns=["month"])

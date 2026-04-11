@@ -4,7 +4,6 @@ Together with utils.db and utils.cached, it might need some rethinking on where 
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import pandas as pd
 from pymysql import OperationalError
@@ -62,7 +61,7 @@ def get_steps_df(archived: bool = True):
 ########################################################################################################################
 
 
-def get_changed_grapher_steps(files_changed: Dict[str, Dict[str, str]]) -> List[str]:
+def get_changed_grapher_steps(files_changed: dict[str, dict[str, str]]) -> list[str]:
     """Get list of new grapher steps with their corresponding old steps."""
     steps = []
     for step_path in get_changed_steps(files_changed):
@@ -73,7 +72,7 @@ def get_changed_grapher_steps(files_changed: Dict[str, Dict[str, str]]) -> List[
     return steps
 
 
-def get_new_grapher_datasets_and_their_previous_versions(session: Session) -> Dict[int, Optional[int]]:
+def get_new_grapher_datasets_and_their_previous_versions(session: Session) -> dict[int, int | None]:
     """Detect which local grapher step files have changed, identify their corresponding grapher dataset ids, and the grapher dataset id of the previous version (if any).
 
     The result is a dictionary {dataset_id (of the new dataset): previous_dataset_id or None (if there is no previous version)}.

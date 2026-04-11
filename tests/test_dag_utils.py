@@ -61,7 +61,7 @@ def _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_r
             steps_to_remove=steps_to_remove,
         )
         # Assert that the file content is the same as before.
-        with open(temp_file, "r") as updated_file:
+        with open(temp_file) as updated_file:
             new_content = updated_file.read()
     assert new_content == expected_content
 
@@ -580,7 +580,7 @@ def _assert_write_to_dag_file(
             indent_dependency=indent_dependency,
         )
         # Assert that the file content is the same as before.
-        with open(temp_file, "r") as updated_file:
+        with open(temp_file) as updated_file:
             new_content = updated_file.read()
     assert new_content == expected_content
 

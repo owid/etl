@@ -141,5 +141,5 @@ def load_and_clean(tb: Table) -> Table:
 
     original_tb = original_tb.loc[pd.to_numeric(original_tb["Value"], errors="coerce").notnull()]
     original_tb.rename(columns={"GeoAreaName": "Country", "TimePeriod": "Year"}, inplace=True)
-    original_tb = original_tb.rename(columns=lambda k: re.sub(r"[\[\]]", "", k))  # type: ignore
+    original_tb = original_tb.rename(columns=lambda k: re.sub(r"[\[\]]", "", k))  # ty: ignore
     return original_tb

@@ -5,7 +5,7 @@ This dataset is a work in progress. We have layed down the foundations for the s
 
 import re
 from copy import deepcopy
-from typing import Any, List
+from typing import Any
 
 import numpy as np
 from owid.catalog import Table
@@ -152,7 +152,7 @@ def add_projection_and_historical_metrics(table: Table, year_threshold: int, met
 def _create_metric_version_from_mask(
     table: Table,
     metric: str,
-    mask: List[Any],
+    mask: list[Any],
     metric_suffix: str,
     title_suffix: str,
     display_name_suffix: str,

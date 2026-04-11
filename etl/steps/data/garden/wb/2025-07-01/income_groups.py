@@ -2,8 +2,6 @@
 # NOTE: We have manually modified the value for Ethiopia, because, although it is included in the file, it has officially a temporary status of unclassification.
 # NOTE: Check this back when it's fixed in the source file.
 
-from typing import List
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
@@ -64,9 +62,9 @@ def run() -> None:
 
     # Check that countries without classification for the latest year are as expected.
     missing_countries = set(tb_latest.loc[tb_latest["year"] != tb_latest["year"].max(), "country"])
-    assert (
-        missing_countries == EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE
-    ), f"Unexpected missing countries in latest release. All missing countries: {missing_countries}"
+    assert missing_countries == EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE, (
+        f"Unexpected missing countries in latest release. All missing countries: {missing_countries}"
+    )
 
     # Extract data only for latest release (and remove column year).
     tb_latest = tb_latest[tb_latest["year"] == tb_latest["year"].max()].drop(columns=["year"])
@@ -147,7 +145,7 @@ def harmonize_income_group_labels(tb: Table) -> Table:
     return tb
 
 
-def assign_french_overseas_group_same_as_france(tb: Table, list_of_territories: List[str]) -> Table:
+def assign_french_overseas_group_same_as_france(tb: Table, list_of_territories: list[str]) -> Table:
     """
     Assign the same income group as France to the French overseas territories.
     """

@@ -56,11 +56,11 @@ def run(path_to_folder: str, upload: bool) -> None:
         snap = Snapshot(f"gcp/{SNAPSHOT_VERSION}/{data_file}")
 
         # Replace the full citation and description in the metadata.
-        snap.metadata.origin.attribution = ATTRIBUTION  # type: ignore
-        snap.metadata.origin.citation_full = CITATION_FULL  # type: ignore
-        snap.metadata.origin.description = DESCRIPTION  # type: ignore
-        snap.metadata.origin.version_producer = VERSION_PRODUCER  # type: ignore
-        snap.metadata.origin.date_published = DATE_PUBLISHED  # type: ignore
+        snap.metadata.origin.attribution = ATTRIBUTION  # ty: ignore
+        snap.metadata.origin.citation_full = CITATION_FULL  # ty: ignore
+        snap.metadata.origin.description = DESCRIPTION  # ty: ignore
+        snap.metadata.origin.version_producer = VERSION_PRODUCER  # ty: ignore
+        snap.metadata.origin.date_published = DATE_PUBLISHED  # ty: ignore
 
         # Rewrite metadata to dvc file.
         snap.metadata_path.write_text(snap.metadata.to_yaml())

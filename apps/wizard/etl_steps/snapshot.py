@@ -3,7 +3,7 @@
 import subprocess
 import traceback
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, cast
 
 import streamlit as st
 
@@ -71,9 +71,7 @@ if "snapshot_file" not in st.session_state:
 #########################################################
 
 
-def _add_dummy_default(
-    args, key: str, default_colname: Optional[str] = None, default_value: Optional[Any] = None
-) -> None:
+def _add_dummy_default(args, key: str, default_colname: str | None = None, default_value: Any | None = None) -> None:
     if default_colname is None:
         default_colname = "value"
     if APP_STATE.args.dummy_data:
@@ -105,7 +103,7 @@ def create_display_name_init_section(name: str) -> str:
 
 
 def create_display_name_snap_section(
-    props: Dict[str, Any], name: str, property_name: str, title: Optional[str] = None
+    props: dict[str, Any], name: str, property_name: str, title: str | None = None
 ) -> str:
     """Create display name for a field."""
     # Get requirement level colored
@@ -122,11 +120,11 @@ def create_display_name_snap_section(
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=MD_SNAPSHOT, mode="r") as f:
+    with open(file=MD_SNAPSHOT) as f:
         return f.read()
 
 
-def create_description(field: Dict[str, Any]) -> str:
+def create_description(field: dict[str, Any]) -> str:
     """Create description for field, using values `description` and `guidelines`."""
     # Main description
     toc = "[Description](#description) "
@@ -253,10 +251,10 @@ def render_fields_init():
 
 
 def render_fields_from_schema(
-    schema: Dict[str, Any],
+    schema: dict[str, Any],
     property_name: str,
-    categories: Optional[List[Any]] = None,
-    container: Optional[Any] = None,
+    categories: list[Any] | None = None,
+    container: Any | None = None,
 ):
     """Render fields from schema.
 
@@ -277,7 +275,7 @@ def render_fields_from_schema(
                 render_fields_from_schema(
                     props["properties"],
                     prop_uri,
-                    container=containers[cat],  # type: ignore
+                    container=containers[cat],  # ty: ignore
                 )
             else:
                 render_fields_from_schema(props["properties"], prop_uri)
@@ -334,12 +332,12 @@ def render_fields_from_schema(
             # Render field in corresponding container
             if categories:
                 with containers[props["category"]]:
-                    APP_STATE.st_widget(**kwargs)  # type: ignore
+                    APP_STATE.st_widget(**kwargs)  # ty: ignore
             elif container:
                 with container:
-                    APP_STATE.st_widget(**kwargs)  # type: ignore
+                    APP_STATE.st_widget(**kwargs)  # ty: ignore
             else:
-                APP_STATE.st_widget(**kwargs)  # type: ignore
+                APP_STATE.st_widget(**kwargs)  # ty: ignore
 
 
 def update_state() -> None:
@@ -356,7 +354,7 @@ def run_snap_step() -> None:
     st.session_state["run_step"] = True
 
 
-def create_snapshot_command(form: SnapshotForm, manual_import_file: Optional[str] = None) -> str:
+def create_snapshot_command(form: SnapshotForm, manual_import_file: str | None = None) -> str:
     """Create the command string for running a snapshot step."""
     snapshot_path = f"{form.namespace}/{form.snapshot_version}/{form.short_name}"
     command = f"etls {snapshot_path}"
@@ -395,9 +393,9 @@ if st.session_state["show_form"]:
 
         # 2) Show fields for metadata fields
         categories_in_schema = {v["category"] for k, v in SCHEMA_ORIGIN.items()}
-        assert categories_in_schema == set(
-            ACCEPTED_CATEGORIES
-        ), f"Unknown categories in schema: {categories_in_schema - set(ACCEPTED_CATEGORIES)}"
+        assert categories_in_schema == set(ACCEPTED_CATEGORIES), (
+            f"Unknown categories in schema: {categories_in_schema - set(ACCEPTED_CATEGORIES)}"
+        )
 
         render_fields_from_schema(SCHEMA_ORIGIN, "origin", categories=ACCEPTED_CATEGORIES)
 
@@ -461,7 +459,7 @@ if submitted:
                 s_file = st.text_input(
                     label="Select local file to import", placeholder="path/to/file.csv", key="snapshot_file"
                 )
-            st.button("Run snapshot step", key="run_snapshot_step", on_click=run_snap_step)  # type: ignore
+            st.button("Run snapshot step", key="run_snapshot_step", on_click=run_snap_step)  # ty: ignore
 
             st.markdown(
                 f"""

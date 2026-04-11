@@ -194,9 +194,9 @@ def process_poverty(tb: Table, absolute: bool) -> Table:
         # Assert the lines in WORLD_BANK_POVERTY_LINES keys are all in tb['poverty_line']
         tb_lines_expected = set(WORLD_BANK_POVERTY_LINES.keys())
         tb_lines_actual = set(tb["poverty_line"].unique())
-        assert tb_lines_expected.issubset(
-            tb_lines_actual
-        ), f"Missing poverty lines: {tb_lines_expected - tb_lines_actual}"
+        assert tb_lines_expected.issubset(tb_lines_actual), (
+            f"Missing poverty lines: {tb_lines_expected - tb_lines_actual}"
+        )
 
         # Rename poverty lines
         tb["poverty_line"] = tb["poverty_line"].replace(WORLD_BANK_POVERTY_LINES)
@@ -207,9 +207,9 @@ def process_poverty(tb: Table, absolute: bool) -> Table:
         # Assert that all poverty lines are in RELATIVE_POVERTY_LINES keys
         poverty_lines_expected = set(RELATIVE_POVERTY_LINES.keys())
         poverty_lines_actual = set(tb["poverty_line"].unique())
-        assert poverty_lines_actual.issubset(
-            poverty_lines_expected
-        ), f"Unexpected poverty lines: {poverty_lines_actual - poverty_lines_expected}"
+        assert poverty_lines_actual.issubset(poverty_lines_expected), (
+            f"Unexpected poverty lines: {poverty_lines_actual - poverty_lines_expected}"
+        )
 
         # Rename poverty lines
         tb["poverty_line"] = tb["poverty_line"].replace(RELATIVE_POVERTY_LINES)

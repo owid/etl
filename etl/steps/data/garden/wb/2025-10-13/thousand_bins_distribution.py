@@ -73,15 +73,15 @@ def rename_columns_regions_and_multiply_pop(tb: Table, regions_mapping: dict) ->
     )
 
     # Rename region column with REGIONS_MAPPING. Assert that all regions are mapped.
-    assert set(tb["region"].unique()) == set(
-        REGIONS_MAPPING.keys()
-    ), f"There are undefined regions in `region`: {set(tb['region'].unique()) - set(REGIONS_MAPPING.keys())}"
+    assert set(tb["region"].unique()) == set(REGIONS_MAPPING.keys()), (
+        f"There are undefined regions in `region`: {set(tb['region'].unique()) - set(REGIONS_MAPPING.keys())}"
+    )
     tb["region"] = tb["region"].map(REGIONS_MAPPING)
 
     # Rename region_old column with REGIONS_MAPPING_OLD. Assert that all regions are mapped.
-    assert (
-        set(tb["region_old"].unique()) == set(REGIONS_MAPPING_OLD.keys())
-    ), f"There are undefined regions in `region_old`: {set(tb['region_old'].unique()) - set(REGIONS_MAPPING_OLD.keys())}"
+    assert set(tb["region_old"].unique()) == set(REGIONS_MAPPING_OLD.keys()), (
+        f"There are undefined regions in `region_old`: {set(tb['region_old'].unique()) - set(REGIONS_MAPPING_OLD.keys())}"
+    )
     tb["region_old"] = tb["region_old"].map(REGIONS_MAPPING_OLD)
 
     # Multiply pop by 1,000,000

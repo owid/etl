@@ -208,7 +208,7 @@ def check_between_0_and_1(tb: Table, variables: list, welfare: list):
                     tb_error = tb[mask].copy().reset_index()
                     paths.log.fatal(
                         f"""Values for {col} are not between 0 and 1:
-                        {_tabulate(tb_error[['country', 'year', col]])}"""
+                        {_tabulate(tb_error[["country", "year", col]])}"""
                     )
 
                 elif any_error and w == "wealth":
@@ -216,7 +216,7 @@ def check_between_0_and_1(tb: Table, variables: list, welfare: list):
                     tb_error = tb[mask].copy().reset_index()
                     paths.log.warning(
                         f"""Values for {col} are not between 0 and 1:
-                        {_tabulate(tb_error[['country', 'year', col]])}"""
+                        {_tabulate(tb_error[["country", "year", col]])}"""
                     )
 
     return tb
@@ -229,7 +229,7 @@ def check_shares_sum_100(tb: Table, welfare: list, margin: float):
 
     tb = tb.copy()
     # Create a list of variables containing pxpy_share
-    variables = [f"p{i}p{i+10}_share" for i in range(0, 100, 10)]
+    variables = [f"p{i}p{i + 10}_share" for i in range(0, 100, 10)]
     for e in EXTRAPOLATED_DICT:
         for w in welfare:
             # Set columns to evaluate
@@ -246,7 +246,7 @@ def check_shares_sum_100(tb: Table, welfare: list, margin: float):
                 tb_error = tb[mask].reset_index(drop=True).copy()
                 paths.log.fatal(
                     f"""{len(tb_error)} share observations ({w}{EXTRAPOLATED_DICT[e]}) are not adding up to 100%:
-                    {_tabulate(tb_error[['country', 'year', 'sum_check']].sort_values(by='sum_check', ascending=False).reset_index(drop=True), floatfmt=".1f")}"""
+                    {_tabulate(tb_error[["country", "year", "sum_check"]].sort_values(by="sum_check", ascending=False).reset_index(drop=True), floatfmt=".1f")}"""
                 )
 
     return tb
@@ -273,7 +273,7 @@ def check_negative_values(tb: Table):
             tb_error = tb[mask].reset_index(drop=True).copy()
             paths.log.warning(
                 f"""{len(tb_error)} observations for {v} are negative:
-                {_tabulate(tb_error[['country', 'year', v]])}"""
+                {_tabulate(tb_error[["country", "year", v]])}"""
             )
 
     return tb
@@ -287,7 +287,7 @@ def check_monotonicity(tb: Table, metric: list, welfare: list):
     tb = tb.copy()
 
     # Create a list of variables containing pxpy_share
-    variables = [f"p{i}p{i+10}" for i in range(0, 100, 10)]
+    variables = [f"p{i}p{i + 10}" for i in range(0, 100, 10)]
 
     for e in EXTRAPOLATED_DICT:
         for w in welfare:
@@ -315,7 +315,7 @@ def check_monotonicity(tb: Table, metric: list, welfare: list):
                     tb_error = tb[mask].reset_index(drop=True).copy()
                     paths.log.fatal(
                         f"""{len(tb_error)} observations for {m}_{w}{EXTRAPOLATED_DICT[e]} are not monotonically increasing:
-                        {_tabulate(tb_error[['country', 'year'] + cols], floatfmt=".2f")}"""
+                        {_tabulate(tb_error[["country", "year"] + cols], floatfmt=".2f")}"""
                     )
 
     return tb
@@ -334,11 +334,11 @@ def check_avg_between_thr(tb: Table, welfare: list) -> Table:
             check_nulls = []
             for i in range(0, 100, 10):
                 # Create lower bound, avg and upper bound columns
-                tb["thr_lower"] = tb[f"p{i}p{i+10}_thr_{w}{EXTRAPOLATED_DICT[e]}"]
-                tb["avg"] = tb[f"p{i}p{i+10}_avg_{w}{EXTRAPOLATED_DICT[e]}"]
+                tb["thr_lower"] = tb[f"p{i}p{i + 10}_thr_{w}{EXTRAPOLATED_DICT[e]}"]
+                tb["avg"] = tb[f"p{i}p{i + 10}_avg_{w}{EXTRAPOLATED_DICT[e]}"]
 
                 if i < 90:
-                    tb["thr_upper"] = tb[f"p{i+10}p{i+20}_thr_{w}{EXTRAPOLATED_DICT[e]}"]
+                    tb["thr_upper"] = tb[f"p{i + 10}p{i + 20}_thr_{w}{EXTRAPOLATED_DICT[e]}"]
 
                     # Count the nulls between the vars I am checking
                     tb[f"null_check_{i}"] = tb[["thr_lower", "avg", "thr_upper"]].isnull().sum(1)
@@ -365,7 +365,7 @@ def check_avg_between_thr(tb: Table, welfare: list) -> Table:
                 tb_error = tb[mask].reset_index(drop=True).copy()
                 paths.log.fatal(
                     f"""{len(tb_error)} observations for avg {w}{EXTRAPOLATED_DICT[e]} are not between the corresponding thresholds:
-                    {_tabulate(tb_error[['country', 'year'] + check_cols])}"""
+                    {_tabulate(tb_error[["country", "year"] + check_cols])}"""
                 )
 
     return tb

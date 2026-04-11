@@ -1,7 +1,7 @@
 import functools
 import os
 import warnings
-from typing import Any, Dict, NoReturn, Optional
+from typing import Any, NoReturn
 from urllib.parse import quote
 
 import pandas as pd
@@ -43,7 +43,7 @@ def _handle_connection_error(e: OperationalError) -> NoReturn:
     raise e
 
 
-def can_connect(conf: Optional[Dict[str, Any]] = None) -> bool:
+def can_connect(conf: dict[str, Any] | None = None) -> bool:
     try:
         get_connection(conf=conf)
         return True
@@ -52,7 +52,7 @@ def can_connect(conf: Optional[Dict[str, Any]] = None) -> bool:
 
 
 @deprecated("This function is deprecated. Instead, look at using etl.db.read_sql function.")
-def get_connection(conf: Optional[Dict[str, Any]] = None) -> pymysql.Connection:
+def get_connection(conf: dict[str, Any] | None = None) -> pymysql.Connection:
     "Connect to the Grapher database."
     cf: Any = dict_to_object(conf) if conf else config
     return pymysql.connect(
@@ -80,7 +80,7 @@ def _get_engine_cached(cf: Any, pid: int) -> Engine:
     )
 
 
-def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
+def get_engine(conf: dict[str, Any] | None = None) -> Engine:
     cf: Any = dict_to_object(d=conf) if conf else config
     # pid in memoization makes sure every process gets its own Engine
     pid = os.getpid()
@@ -91,7 +91,7 @@ def dict_to_object(d):
     return type("DynamicObject", (object,), d)()
 
 
-def read_sql(sql: str, engine: Optional[Engine | Session] = None, *args, **kwargs) -> pd.DataFrame:
+def read_sql(sql: str, engine: Engine | Session | None = None, *args, **kwargs) -> pd.DataFrame:
     """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
     This adds overhead, so if you need performance, reuse the same connection and cursor.
     """
@@ -122,7 +122,7 @@ def read_sql(sql: str, engine: Optional[Engine | Session] = None, *args, **kwarg
             _handle_connection_error(e)
 
 
-def to_sql(df: pd.DataFrame, name: str, engine: Optional[Engine | Session] = None, *args, **kwargs):
+def to_sql(df: pd.DataFrame, name: str, engine: Engine | Session | None = None, *args, **kwargs):
     """Wrapper around pd.to_sql that creates a connection and closes it after reading the data.
     This adds overhead, so if you need performance, reuse the same connection and cursor.
     """

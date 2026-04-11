@@ -32,8 +32,8 @@ metrics = {
 }
 ages = {
     *{str(v) for v in range(100)},  # 1-year age groups
-    *{f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100, 5)},  # 5-year age groups
-    *{f"{i - i%5}-{i + 9 - i%10}" for i in range(0, 100, 10)},  # 10-year age groups
+    *{f"{i - i % 5}-{i + 4 - i % 5}" for i in range(0, 100, 5)},  # 5-year age groups
+    *{f"{i - i % 5}-{i + 9 - i % 10}" for i in range(0, 100, 10)},  # 10-year age groups
     *{  # special age groups
         "0-14",
         "0-24",
