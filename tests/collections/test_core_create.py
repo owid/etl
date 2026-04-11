@@ -177,6 +177,7 @@ class TestCreateCollection:
                             indicators_slug=None,
                             indicator_as_dimension=False,
                             expand_path_mode="table",
+                            additional_indicators=None,
                         )
 
                         # Verify combine_config_dimensions was called
@@ -326,6 +327,7 @@ class TestCreateCollection:
                             indicators_slug="metric",
                             indicator_as_dimension=True,
                             expand_path_mode="full",
+                            additional_indicators=None,
                         )
 
                         assert result == mock_collection

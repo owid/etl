@@ -298,6 +298,129 @@ class TestExpandConfig:
         with pytest.raises(MissingDimensionalIndicatorError):
             expand_config(tb)
 
+    def test_additional_indicators_full_path(self):
+        """Test expand_config with additional_indicators using full catalog paths."""
+        tb = create_test_table()
+
+        config = expand_config(
+            tb,
+            indicator_names="deaths",
+            additional_indicators={
+                "size": "grapher/demography/2024-07-15/population/historical#population_historical",
+                "color": "grapher/regions/2023-01-01/regions/regions#owid_region",
+            },
+        )
+
+        # All views should have y, size, and color indicators
+        assert len(config["views"]) == 2
+        for view in config["views"]:
+            assert "y" in view["indicators"]
+            assert "size" in view["indicators"]
+            assert "color" in view["indicators"]
+            assert (
+                view["indicators"]["size"]
+                == "grapher/demography/2024-07-15/population/historical#population_historical"
+            )
+            assert view["indicators"]["color"] == "grapher/regions/2023-01-01/regions/regions#owid_region"
+
+    def test_additional_indicators_table_path(self):
+        """Test expand_config with additional_indicators using table#indicator paths."""
+        tb = create_test_table()
+
+        config = expand_config(
+            tb,
+            indicator_names="deaths",
+            additional_indicators={
+                "x": "other_table#some_indicator",
+            },
+        )
+
+        for view in config["views"]:
+            assert "y" in view["indicators"]
+            assert "x" in view["indicators"]
+            assert view["indicators"]["x"] == "other_table#some_indicator"
+
+    def test_additional_indicators_short_slug(self):
+        """Test expand_config with additional_indicators using short indicator slug (same table)."""
+        tb = create_test_table()
+
+        config = expand_config(
+            tb,
+            indicator_names="deaths",
+            additional_indicators={
+                "x": "some_column",
+            },
+        )
+
+        # Short slug should be expanded using the table name
+        for view in config["views"]:
+            assert "x" in view["indicators"]
+            assert view["indicators"]["x"] == "test_table#some_column"
+
+    def test_additional_indicators_expand_path_modes(self):
+        """Test additional_indicators short slug expansion with different expand_path_modes."""
+        tb = create_table_with_metadata()
+
+        # Table mode
+        config = expand_config(
+            tb,
+            indicator_names="deaths",
+            expand_path_mode="table",
+            additional_indicators={"x": "my_indicator"},
+        )
+        assert config["views"][0]["indicators"]["x"] == "test_table#my_indicator"
+
+        # Dataset mode
+        config = expand_config(
+            tb,
+            indicator_names="deaths",
+            expand_path_mode="dataset",
+            additional_indicators={"x": "my_indicator"},
+        )
+        assert config["views"][0]["indicators"]["x"] == "test_dataset/test_table#my_indicator"
+
+        # Full mode
+        config = expand_config(
+            tb,
+            indicator_names="deaths",
+            expand_path_mode="full",
+            additional_indicators={"x": "my_indicator"},
+        )
+        assert config["views"][0]["indicators"]["x"] == "garden/test/2024/test_dataset/test_table#my_indicator"
+
+    def test_additional_indicators_invalid_axis(self):
+        """Test expand_config raises error for invalid axis in additional_indicators."""
+        tb = create_test_table()
+
+        with pytest.raises(ValueError, match="Invalid axis names"):
+            expand_config(
+                tb,
+                indicator_names="deaths",
+                additional_indicators={"y": "test_table#indicator"},
+            )
+
+    def test_additional_indicators_with_common_config(self):
+        """Test additional_indicators combined with common_view_config."""
+        tb = create_test_table()
+
+        config = expand_config(
+            tb,
+            indicator_names="deaths",
+            common_view_config={"chartTypes": ["ScatterPlot"]},
+            additional_indicators={
+                "x": "other_table#gdp",
+                "size": "grapher/demography/2024-07-15/population/historical#population_historical",
+            },
+        )
+
+        for view in config["views"]:
+            assert view["indicators"]["x"] == "other_table#gdp"
+            assert (
+                view["indicators"]["size"]
+                == "grapher/demography/2024-07-15/population/historical#population_historical"
+            )
+            assert view["config"]["chartTypes"] == ["ScatterPlot"]
+
 
 class TestCollectionConfigExpander:
     """Test suite for CollectionConfigExpander class methods."""

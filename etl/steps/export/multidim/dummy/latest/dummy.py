@@ -115,4 +115,4 @@ def adjust_grouped_view_as_scatter(views):
     for v in views:
         if v.dimensions["indicator"] == "comparison":
             v.indicators.y, v.indicators.x = [v.indicators.y[0]], v.indicators.y[1]
-            v.indicators.set_indicator(color="grapher/regions/2023-01-01/regions/regions#owid_region")
+            v.indicators.set_indicator(color="regions#owid_region")

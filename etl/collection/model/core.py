@@ -33,6 +33,7 @@ from etl.collection.model.view import CommonView, View, ViewIndicators
 from etl.collection.utils import (
     fill_placeholders,
     get_complete_dimensions_filter,
+    get_tables_by_name_mapping,
     map_indicator_path_to_id,
     unique_records,
     validate_indicators_in_db,
@@ -208,6 +209,10 @@ class Collection(MDIMBase):
 
         # Check that no choice name or slug is repeated
         self.validate_dimension_uniqueness()
+
+        # Expand any short indicator paths (e.g. table#indicator) that were added after initial creation.
+        # This is safe to call multiple times — already-complete paths are skipped.
+        self.expand_indicator_paths()
 
         # Validate that datasets used are part of the dependencies
         indicators = self.indicators_in_use(tolerate_extra_indicators)
@@ -417,6 +422,21 @@ class Collection(MDIMBase):
             validator(self.to_dict())  # ty: ignore
         except fastjsonschema.JsonSchemaException as e:
             raise ValueError(f"Config validation error: {e.message}")  # ty: ignore
+
+    def expand_indicator_paths(self):
+        """Expand short indicator paths in all views using dependency information.
+
+        Converts short paths like `table#indicator` or `dataset/table#indicator` to full
+        catalog paths like `grapher/namespace/version/dataset/table#indicator`.
+
+        Already-complete paths are left unchanged, so this is safe to call multiple times.
+        This is useful after manually adding indicators (e.g. x, size, color) with short paths.
+        """
+        if not self.dependencies:
+            return
+        tables_by_name = get_tables_by_name_mapping(self.dependencies)
+        for view in self.views:
+            view.expand_paths(tables_by_name)
 
     def indicators_in_use(self, tolerate_extra_indicators: bool = False):
         # Get all indicators used in all views

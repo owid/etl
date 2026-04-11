@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.collection.model.view import Indicator
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -256,10 +255,10 @@ def run() -> None:
                 after_tax_ind.display = {"name": "After taxes and benefits"}
                 view.indicators.x = before_tax_ind
                 view.indicators.y = [after_tax_ind]
-                view.indicators.size = Indicator(
-                    catalogPath="grapher/demography/2024-07-15/population/historical#population_historical"
+                view.indicators.set_indicator(
+                    size="historical#population_historical",
+                    color="regions#owid_region",
                 )
-                view.indicators.color = Indicator(catalogPath="grapher/regions/2023-01-01/regions/regions#owid_region")
 
     #
     # Save garden dataset.

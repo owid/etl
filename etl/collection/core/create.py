@@ -37,6 +37,7 @@ def create_collection(
     choice_renames: Listable[Mapping[str, dict[str, str] | Callable] | None] = None,
     catalog_path_full: bool = False,
     explorer: bool = False,
+    additional_indicators: Listable[dict[str, str] | None] = None,
 ) -> Collection:
     """
     Create a collection that supports multiple tables and corresponding list parameters.
@@ -58,6 +59,8 @@ def create_collection(
         choice_renames: Single dict or list of dicts
         catalog_path_full: Whether to use full catalog path (applies to all)
         explorer: Whether to enable explorer (applies to all)
+        additional_indicators: Additional indicators for non-y axes ("x", "size", "color").
+            Single dict or list of dicts (one per table). Keys are axis names, values are indicator paths.
 
     Returns:
         Collection object
@@ -88,6 +91,11 @@ def create_collection(
             choice_renames=choice_renames,
             num_tables=num_tables,
         )
+        # Build additional_indicators
+        additional_indicators_ = _get_additional_indicators(
+            additional_indicators=additional_indicators,
+            num_tables=num_tables,
+        )
 
         # Create collections for each table
         collections = []
@@ -109,6 +117,7 @@ def create_collection(
                 choice_renames=choice_renames_[i],
                 catalog_path_full=catalog_path_full,
                 explorer=explorer,
+                additional_indicators=additional_indicators_[i],
             )
             collections.append(c)
 
@@ -137,6 +146,7 @@ def create_collection(
             choice_renames=cast("dict[str, dict[str, str] | Callable] | None", choice_renames),
             catalog_path_full=catalog_path_full,
             explorer=explorer,
+            additional_indicators=cast("dict[str, str] | None", additional_indicators),
         )
 
     return c
@@ -270,6 +280,29 @@ def _get_choice_renames(
     )
 
 
+AdditionalIndicatorsTypeReturn = list[dict[str, str]] | list[None]
+
+
+def _get_additional_indicators(
+    num_tables: int,
+    additional_indicators: Listable[dict[str, str] | None] = None,
+) -> AdditionalIndicatorsTypeReturn:
+    def _is_single(obj) -> bool:
+        return obj is None or (
+            isinstance(obj, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in obj.items())
+        )
+
+    return cast(
+        AdditionalIndicatorsTypeReturn,
+        _bake_listable(
+            fct_single=_is_single,
+            obj=additional_indicators,
+            obj_name="additional_indicators",
+            num_tables=num_tables,
+        ),
+    )
+
+
 # Create collection from a single table
 def create_collection_single_table(
     config_yaml: dict[str, Any],
@@ -284,6 +317,7 @@ def create_collection_single_table(
     choice_renames: dict[str, dict[str, str] | Callable] | None = None,
     catalog_path_full: bool = False,
     explorer: bool = False,
+    additional_indicators: dict[str, str] | None = None,
 ) -> Collection:
     config = deepcopy(config_yaml)
 
@@ -302,6 +336,7 @@ def create_collection_single_table(
             indicators_slug=indicators_slug,
             indicator_as_dimension=indicator_as_dimension,
             expand_path_mode=expand_path_mode,
+            additional_indicators=additional_indicators,
         )
 
         # Combine & bake dimensions
