@@ -29,8 +29,6 @@ Therefore, the strategy should be:
 
 """
 
-from typing import Tuple
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table, VariablePresentationMeta
 from owid.datautils.dataframes import map_series
@@ -129,13 +127,13 @@ def combine_individual_demand_tables(ds_meadow: Dataset) -> Table:
     tb_demand = pr.concat(tables)
 
     # Ignore aggregates in the data.
-    tb_demand = tb_demand[~tb_demand["mineral"].str.startswith(("Total"))].reset_index(drop=True)
+    tb_demand = tb_demand[~tb_demand["mineral"].str.startswith("Total")].reset_index(drop=True)
 
     # Combine data for magnet rare earth elements.
     # Check that they are all in the data.
-    assert all(
-        [(tb_demand["mineral"] == element).any() for element in RARE_ELEMENTS_LIST]
-    ), "Missing rare elements in demand table."
+    assert all([(tb_demand["mineral"] == element).any() for element in RARE_ELEMENTS_LIST]), (
+        "Missing rare elements in demand table."
+    )
     # Calculate total demand of rare elements.
     rare_elements_data = (
         tb_demand[tb_demand["mineral"].isin(RARE_ELEMENTS_LIST)]
@@ -165,9 +163,9 @@ def prepare_clean_technologies_by_mineral_table(ds_meadow: Dataset) -> Table:
     # Even if not explicitly mentioned, it seems that "Base case" is assumed in this sheet.
     tb_clean["case"] = "Base case"
     # Check that they are all in the data.
-    assert all(
-        [(tb_clean["mineral"] == element).any() for element in RARE_ELEMENTS_LIST]
-    ), "Missing rare elements in clean tech by mineral demand table."
+    assert all([(tb_clean["mineral"] == element).any() for element in RARE_ELEMENTS_LIST]), (
+        "Missing rare elements in clean tech by mineral demand table."
+    )
     # Remove rows for individual rare earth elements.
     tb_clean = tb_clean[~tb_clean["mineral"].isin(RARE_ELEMENTS_LIST)].reset_index(drop=True)
     # Rename "Total rare earth elements" -> "Magnet rare earth elements".
@@ -220,9 +218,9 @@ def add_demand_from_other_graphite(tb_demand: Table, tb_total: Table) -> Table:
 
     # Sanity checks.
     error = "There are new unexpected uses of graphite in the 4.x sheets."
-    assert set(tb_demand[tb_demand["mineral"].str.lower().str.contains("graphite")]["mineral"]) == set(
-        graphite_uses
-    ), error
+    assert set(tb_demand[tb_demand["mineral"].str.lower().str.contains("graphite")]["mineral"]) == set(graphite_uses), (
+        error
+    )
     error = "There are new unexpected uses of graphite in Sheet 1."
     assert set(tb_total[tb_total["mineral"].str.lower().str.contains("graphite")]["mineral"]) == set(
         [GRAPHITE_ALL_LABEL]
@@ -274,9 +272,9 @@ def prepare_total_demand_table(ds_meadow: Dataset) -> Table:
 
     # Sanity checks.
     assert TOTAL_CLEAN_LABEL in set(tb_total["technology"]), f"'{TOTAL_CLEAN_LABEL}' not found in sheet 1."
-    assert not tb_total[
-        (tb_total["technology"].str.startswith("Share of"))
-    ].empty, "Rows for 'Share of...' not found in sheet 1."
+    assert not tb_total[(tb_total["technology"].str.startswith("Share of"))].empty, (
+        "Rows for 'Share of...' not found in sheet 1."
+    )
 
     # Remove rows of shares and total clean technology demand (but keep grand total).
     tb_total = tb_total[
@@ -337,7 +335,7 @@ def run_sanity_checks_on_outputs(tb_demand: Table, tb_total: Table) -> None:
     assert compared[compared["_deviation"] > 1].empty, error
 
 
-def add_share_columns(tb_demand: Table, tb_supply: Table) -> Tuple[Table, Table]:
+def add_share_columns(tb_demand: Table, tb_supply: Table) -> tuple[Table, Table]:
     # Create a table for global demand.
     # For each case-scenario-mineral-year, we need the global demand of all technologies.
     # NOTE: Global mineral demand, including uses outside clean tech, is only given for "Base case" for a few minerals (for which "Other uses" is explicitly given).
@@ -494,7 +492,7 @@ def clean_demand_table(tb_demand: Table) -> Table:
     return tb_demand
 
 
-def harmonize_units(tb_demand: Table, tb_supply: Table, tb_total: Table) -> Tuple[Table, Table, Table]:
+def harmonize_units(tb_demand: Table, tb_supply: Table, tb_total: Table) -> tuple[Table, Table, Table]:
     tb_demand = tb_demand.copy()
     tb_supply = tb_supply.copy()
     tb_total = tb_total.copy()
@@ -507,7 +505,7 @@ def harmonize_units(tb_demand: Table, tb_supply: Table, tb_total: Table) -> Tupl
     return tb_demand, tb_supply, tb_total
 
 
-def harmonize_minerals_and_processes(tb_demand: Table, tb_supply: Table) -> Tuple[Table, Table]:
+def harmonize_minerals_and_processes(tb_demand: Table, tb_supply: Table) -> tuple[Table, Table]:
     # For consistency, rename some minerals.
     tb_demand["mineral"] = tb_demand["mineral"].replace({GRAPHITE_ALL_LABEL: GRAPHITE_ALL_LABEL_NEW})
     tb_demand["mineral"] = tb_demand["mineral"].replace(

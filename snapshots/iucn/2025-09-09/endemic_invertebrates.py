@@ -6,8 +6,8 @@ The data for this snapshot was taken from the IUCN Red List Summary Statistics T
 from __future__ import annotations
 
 import io
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, List
 
 import click
 import pandas as pd
@@ -38,13 +38,13 @@ def main(upload: bool = True) -> None:
 # ---------- helpers ----------
 
 
-def _make_headers(group_row: Iterable, sub_row: Iterable) -> List[str]:
+def _make_headers(group_row: Iterable, sub_row: Iterable) -> list[str]:
     """
     Build flattened headers like:
       'FW Crabs - Total endemics', 'FW Crabs - Threatened endemics', 'FW Crabs - EX & EW endemics',
       ..., 'Reef-forming Corals - EX & EW endemics'
     """
-    headers: List[str] = []
+    headers: list[str] = []
     current_group = None
     for i, (g, s) in enumerate(zip(group_row, sub_row)):
         if i == 0:

@@ -56,9 +56,9 @@ dev = [
     "pytest-cov>=2.12.1",
     "watchdog>=2.1.5",
     "argh>=0.26.2",
-    "ty==0.0.8",
-    "pandas-stubs==1.2.0.62",
-    "ruff==0.8.6",
+    "ty==0.0.26",
+    "pandas-stubs>=2.2.3,<3",
+    "ruff==0.15.8",
     "ipykernel>=6.29.0",
 ]
 
@@ -71,10 +71,19 @@ extend = "../../pyproject.toml"
 
 [tool.ty.rules]
 invalid-method-override = "ignore"
+override-of-final-method = "ignore"
 parameter-already-assigned = "ignore"
 redundant-cast = "ignore"
 possibly-missing-attribute = "ignore"
 no-matching-overload = "ignore"
+invalid-argument-type = "ignore"
+unused-type-ignore-comment = "ignore"
+unused-ignore-comment = "ignore"
+call-top-callable = "ignore"
+possibly-missing-submodule = "ignore"
+# catalog extends pandas Series/DataFrame with custom attributes (metadata, description, title, etc.)
+# ty doesn't resolve these through the pandas subclass hierarchy
+unresolved-attribute = "ignore"
 
 [build-system]
 requires = ["hatchling"]

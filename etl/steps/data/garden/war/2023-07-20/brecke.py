@@ -211,9 +211,9 @@ def add_conflict_type(tb: Table) -> Table:
         "Vietnam, 1964-75",
     ]
     mask_custom = tb["name"].isin(wars_interstate)
-    assert (
-        mask_custom.sum() == len(wars_interstate)
-    ), "Some corrections can't be made, because some war names specified in `wars_interstate` are not found in the data!"
+    assert mask_custom.sum() == len(wars_interstate), (
+        "Some corrections can't be made, because some war names specified in `wars_interstate` are not found in the data!"
+    )
     ## Build final mask
     mask = name_wo_year.str.contains("-") | mask_custom
 
@@ -329,10 +329,10 @@ def _add_ongoing_metrics(tb: Table) -> Table:
         [tb_ongoing, tb_ongoing_all_conf, tb_ongoing_world, tb_ongoing_world_all_conf], ignore_index=True
     )
 
-    tb_ongoing = tb_concat.sort_values(by=["year", "region", "conflict_type"])  # type: ignore
+    tb_ongoing = tb_concat.sort_values(by=["year", "region", "conflict_type"])  # ty: ignore
 
     ## Rename columns
-    tb_ongoing = tb_ongoing.rename(  # type: ignore
+    tb_ongoing = tb_ongoing.rename(  # ty: ignore
         columns={
             "conflict_code": "number_ongoing_conflicts",
             "totalfatalities": "number_deaths_ongoing_conflicts",
@@ -362,12 +362,12 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_world_all_conf["conflict_type"] = "all"
 
     ## Combine
-    tb_new = pr.concat([tb_new, tb_new_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pr.concat([tb_new, tb_new_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True).sort_values(  # ty: ignore
         by=["startyear", "region", "conflict_type"]
     )
 
     ## Rename columns
-    tb_new = tb_new.rename(  # type: ignore
+    tb_new = tb_new.rename(  # ty: ignore
         columns={
             "startyear": "year",
             "conflict_code": "number_new_conflicts",

@@ -5,7 +5,8 @@ various collection utilities to create complete collections and explorers
 from configurations and optional table data.
 """
 
-from typing import Callable, cast
+from collections.abc import Callable
+from typing import cast
 from unittest.mock import Mock, patch
 
 import pytest
@@ -517,7 +518,7 @@ class TestRenameChoices:
         }
 
         with pytest.raises(ValueError, match="Invalid choice_renames format"):
-            _rename_choices(mock_collection, choice_renames)  # type: ignore[arg-type]
+            _rename_choices(mock_collection, choice_renames)  # ty: ignore[invalid-argument-type]
 
 
 class TestIntegration:

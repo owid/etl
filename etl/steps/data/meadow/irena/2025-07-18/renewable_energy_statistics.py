@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import Dict
-
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -37,7 +35,7 @@ EXPECTED_COLUMNS = {
 }
 
 
-def read_data_from_snapshot(snap: Snapshot) -> Dict[str, Table]:
+def read_data_from_snapshot(snap: Snapshot) -> dict[str, Table]:
     data = snap.ExcelFile()
     tables = {}
     for sheet in data.sheet_names:
@@ -50,7 +48,7 @@ def read_data_from_snapshot(snap: Snapshot) -> Dict[str, Table]:
     return tables
 
 
-def sanity_check_inputs(tables: Dict[str, Table]) -> None:
+def sanity_check_inputs(tables: dict[str, Table]) -> None:
     # Sanity checks.
     # NOTE: For convenience, remove spurious spaces in sheet names.
     error = "Sheet names have changed."

@@ -7,8 +7,6 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
     nohup uv run etl run world_bank_pip > output.log 2>&1 &
 """
 
-from typing import Tuple
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -437,7 +435,7 @@ def process_data(tb: Table) -> Table:
     return tb
 
 
-def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -> Tuple[Table, list, list]:
+def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -> tuple[Table, list, list]:
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
@@ -475,9 +473,9 @@ def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -
         # If it's the last value calculate the people between this value and the previous
         # and also the people over this poverty line (and percentages)
         elif i == len(povlines) - 1:
-            varname_n = f"headcount_between_{povlines[i-1]}_{povlines[i]}"
-            varname_pct = f"headcount_ratio_between_{povlines[i-1]}_{povlines[i]}"
-            tb[varname_n] = tb[f"headcount_{povlines[i]}"] - tb[f"headcount_{povlines[i-1]}"]
+            varname_n = f"headcount_between_{povlines[i - 1]}_{povlines[i]}"
+            varname_pct = f"headcount_ratio_between_{povlines[i - 1]}_{povlines[i]}"
+            tb[varname_n] = tb[f"headcount_{povlines[i]}"] - tb[f"headcount_{povlines[i - 1]}"]
             tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
             col_stacked_n.append(varname_n)
             col_stacked_pct.append(varname_pct)
@@ -490,9 +488,9 @@ def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -
 
         # If it's any value between the first and the last calculate the people between this value and the previous (and percentage)
         else:
-            varname_n = f"headcount_between_{povlines[i-1]}_{povlines[i]}"
-            varname_pct = f"headcount_ratio_between_{povlines[i-1]}_{povlines[i]}"
-            tb[varname_n] = tb[f"headcount_{povlines[i]}"] - tb[f"headcount_{povlines[i-1]}"]
+            varname_n = f"headcount_between_{povlines[i - 1]}_{povlines[i]}"
+            varname_pct = f"headcount_ratio_between_{povlines[i - 1]}_{povlines[i]}"
+            tb[varname_n] = tb[f"headcount_{povlines[i]}"] - tb[f"headcount_{povlines[i - 1]}"]
             tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
             col_stacked_n.append(varname_n)
             col_stacked_pct.append(varname_pct)
@@ -643,7 +641,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.fatal(
             f"""There are {len(tb_error)} observations with negative values! In
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type']], headers = 'keys', tablefmt = TABLEFMT)}"""
+            {tabulate(tb_error[["country", "year", "reporting_level", "welfare_type"]], headers="keys", tablefmt=TABLEFMT)}"""
         )
         # NOTE: Check if we want to delete these observations
         # tb = tb[~mask].reset_index(drop=True)
@@ -657,7 +655,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""{len(tb_error)} observations of stacked values are not adding up to 100% and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            {tabulate(tb_error[["country", "year", "reporting_level", "welfare_type", "sum_pct"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
         )
         tb = tb[~mask].reset_index(drop=True).copy()
 
@@ -674,7 +672,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount], headers = 'keys', tablefmt = TABLEFMT)}"""
+            {tabulate(tb_error[["country", "year", "reporting_level", "welfare_type"] + col_headcount], headers="keys", tablefmt=TABLEFMT)}"""
         )
         tb = tb[~mask].reset_index(drop=True)
 
@@ -726,7 +724,7 @@ def sanity_checks(
     for i in range(len(col_headcount)):
         if i > 0:
             check_varname = f"m_check_{i}"
-            tb[check_varname] = tb[f"{col_headcount[i]}"] >= tb[f"{col_headcount[i-1]}"]
+            tb[check_varname] = tb[f"{col_headcount[i]}"] >= tb[f"{col_headcount[i - 1]}"]
             m_check_vars.append(check_varname)
     tb["check_total"] = tb[m_check_vars].all(axis=1)
 
@@ -735,7 +733,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount], headers = 'keys', tablefmt = TABLEFMT, floatfmt="0.0f")}"""
+            {tabulate(tb_error[["country", "year", "reporting_level", "welfare_type"] + col_headcount], headers="keys", tablefmt=TABLEFMT, floatfmt="0.0f")}"""
         )
         tb = tb[tb["check_total"]].reset_index(drop=True)
 
@@ -745,7 +743,7 @@ def sanity_checks(
     for i in range(1, 10):
         if i > 1:
             check_varname = f"m_check_{i}"
-            tb[check_varname] = tb[f"decile{i}_thr"] >= tb[f"decile{i-1}_thr"]
+            tb[check_varname] = tb[f"decile{i}_thr"] >= tb[f"decile{i - 1}_thr"]
             m_check_vars.append(check_varname)
 
     tb["check_total"] = tb[m_check_vars].all(axis=1)
@@ -758,7 +756,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type']], headers = 'keys', tablefmt = TABLEFMT)}"""
+            {tabulate(tb_error[["country", "year", "reporting_level", "welfare_type"]], headers="keys", tablefmt=TABLEFMT)}"""
         )
         tb = tb[~mask].reset_index(drop=True)
 
@@ -768,7 +766,7 @@ def sanity_checks(
     for i in range(1, 11):
         if i > 1:
             check_varname = f"m_check_{i}"
-            tb[check_varname] = tb[f"decile{i}_share"] >= tb[f"decile{i-1}_share"]
+            tb[check_varname] = tb[f"decile{i}_share"] >= tb[f"decile{i - 1}_share"]
             m_check_vars.append(check_varname)
 
     tb["check_total"] = tb[m_check_vars].all(axis=1)
@@ -780,7 +778,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_decile_share], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            {tabulate(tb_error[["country", "year", "reporting_level", "welfare_type"] + col_decile_share], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
         )
         tb = tb[~mask].reset_index(drop=True)
 
@@ -796,7 +794,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            {tabulate(tb_error[["country", "year", "reporting_level", "welfare_type", "sum_pct"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
         )
         tb = tb[~mask].reset_index(drop=True)
 
@@ -815,7 +813,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""{len(tb_error)} observations of shares (with top 1%) are not adding up to 100% and will be converted to null:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            {tabulate(tb_error[["country", "year", "reporting_level", "welfare_type", "sum_pct"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
         )
         # Make columns None if mask is True
         tb.loc[mask, ["top90_99_share", "top1_share"]] = None
@@ -830,7 +828,7 @@ def sanity_checks(
     return tb
 
 
-def separate_ppp_data(tb: Table) -> Tuple[Table, Table]:
+def separate_ppp_data(tb: Table) -> tuple[Table, Table]:
     """
     Separate out ppp data from the main dataset
     """
@@ -843,7 +841,7 @@ def separate_ppp_data(tb: Table) -> Tuple[Table, Table]:
     return tb_2011, tb_2017
 
 
-def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table, Table]:
+def inc_or_cons_data(tb: Table) -> tuple[Table, Table, Table, Table]:
     """
     Separate income and consumption data
     """
@@ -1018,7 +1016,7 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
         if not tb_error.empty:
             log.warning(
                 f"""There are {len(tb_error)} observations with abnormal jumps for {col}:
-                {tabulate(tb_error[['ppp_version', 'country', 'year', 'reporting_level', col, 'check_diff_column', 'check_diff_year']].sort_values('year').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                {tabulate(tb_error[["ppp_version", "country", "year", "reporting_level", col, "check_diff_column", "check_diff_year"]].sort_values("year").reset_index(drop=True), headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
             )
             # tb = tb[~mask].reset_index(drop=True)
 

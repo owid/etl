@@ -65,7 +65,7 @@ def run() -> None:
     tb_origin = (
         tb.drop(columns=["country_of_asylum"])
         .groupby(["country_of_origin", "year"], observed=True)
-        .sum(min_count=1)  # type: ignore
+        .sum(min_count=1)  # ty: ignore
         .reset_index()
     )
     tb_origin = tb_origin.rename(columns={"country_of_origin": "country"})
@@ -73,7 +73,7 @@ def run() -> None:
     tb_asylum = (
         tb.drop(columns=["country_of_origin"])
         .groupby(["country_of_asylum", "year"], observed=True)
-        .sum(min_count=1)  # type: ignore
+        .sum(min_count=1)  # ty: ignore
         .reset_index()
     )
     tb_asylum = tb_asylum.rename(columns={"country_of_asylum": "country"})

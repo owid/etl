@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Literal
+from typing import Any, Literal
 
 import pandas as pd
 from owid.catalog import Table
@@ -9,14 +9,14 @@ from etl.collection.utils import INDICATORS_SLUG
 
 def expand_config(
     tb: Table,
-    indicator_names: str | List[str] | None = None,
+    indicator_names: str | list[str] | None = None,
     dimensions: list[str] | dict[str, list[str] | str] | None = None,
-    common_view_config: Dict[str, Any] | None = None,
+    common_view_config: dict[str, Any] | None = None,
     indicator_as_dimension: bool = False,
     indicators_slug: str | None = None,
     expand_path_mode: Literal["table", "dataset", "full"] = "table",
     additional_indicators: Dict[str, str] | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
 
     This method returns the configuration generated from the table `tb`. You can select a subset of indicators with argument `indicator_names`, otherwise all indicators will be expanded.
@@ -188,7 +188,7 @@ class CollectionConfigExpander:
         self,
         tb: Table,
         indicators_slug: str,
-        indicator_names: str | List[str] | None = None,
+        indicator_names: str | list[str] | None = None,
         indicator_as_dimension: bool = False,
         expand_path_mode: Literal["table", "dataset", "full"] = "table",
     ):
@@ -221,7 +221,7 @@ class CollectionConfigExpander:
 
     def build_dimensions(
         self,
-        dimensions: List[str] | Dict[str, List[str] | str] | None = None,
+        dimensions: list[str] | dict[str, list[str] | str] | None = None,
     ):
         """Create the specs for each dimension."""
         # Support dimension is None
@@ -232,9 +232,9 @@ class CollectionConfigExpander:
             # If table defines dimensions, use them instead!
             if self.tb_dims:
                 dimensions_tb = [str(d["slug"]) for d in self.tb_dims]
-                assert (
-                    set(dimensions) == set(dimensions_tb)
-                ), f"Dimensions in given table are not complete! Expected: {dimensions}, found: {dimensions_tb}. This might be due to some manual adjustments done to the metadata."
+                assert set(dimensions) == set(dimensions_tb), (
+                    f"Dimensions in given table are not complete! Expected: {dimensions}, found: {dimensions_tb}. This might be due to some manual adjustments done to the metadata."
+                )
                 dimensions = dimensions_tb
             else:
                 # If dimensions is None, use a list with all dimension names (in no particular order)
@@ -315,8 +315,8 @@ class CollectionConfigExpander:
 
     def build_views(
         self,
-        dimension_choices: Dict[str, List[str]] | None = None,
-        common_view_config: Dict[str, Any] | None = None,
+        dimension_choices: dict[str, list[str]] | None = None,
+        common_view_config: dict[str, Any] | None = None,
         additional_indicators: Dict[str, str] | None = None,
     ):
         """Generate one view for each indicator in the table."""
@@ -374,7 +374,7 @@ class CollectionConfigExpander:
             raise ValueError(f"Unknown expand_path_mode: {self.expand_path_mode}")
         return f"{table_path}#{indicator_slug}"
 
-    def build_df_dims(self, tb: Table, indicator_names: str | List[str] | None):
+    def build_df_dims(self, tb: Table, indicator_names: str | list[str] | None):
         """Build dataframe with dimensional information from table tb.
 
         It contains the following columns:
@@ -411,9 +411,9 @@ class CollectionConfigExpander:
             self.df_dims = self.df_dims.drop(columns=[self.indicators_slug])
 
         # Final checks
-        assert all(
-            isinstance(indicator_name, str) for indicator_name in self.indicator_names
-        ), "Class attribute indicator_names should be a list of string!"
+        assert all(isinstance(indicator_name, str) for indicator_name in self.indicator_names), (
+            "Class attribute indicator_names should be a list of string!"
+        )
         assert not self.df_dims.empty, "df_dims can't be empty!"
 
     def _build_df_dims(self, tb):
@@ -454,7 +454,7 @@ class CollectionConfigExpander:
 
         return df_dims
 
-    def _sanity_checks_df_dims(self, indicator_names: List[str] | None, df_dims: pd.DataFrame):
+    def _sanity_checks_df_dims(self, indicator_names: list[str] | None, df_dims: pd.DataFrame):
         """Sanity checks of df_dims."""
         # List with names of indicators and dimensions
         indicator_names_available = list(df_dims[self.indicators_slug].unique())

@@ -62,13 +62,13 @@ def _load_shapefile(file_path: str, shapefile: str) -> pd.DataFrame:
         log.info("Process shapefiles with regions")
 
         shapefile = shapefile.rename(columns={"Region": "country"})
-    return shapefile[["geometry", "country"]]  # type: ignore
+    return shapefile[["geometry", "country"]]  # ty: ignore
 
 
 def run() -> None:
     # Activates the usage of the global context. Using this option can enhance the performance
     # of initializing objects in single-threaded applications.
-    pyproj.set_use_global_context(True)  # type: ignore
+    pyproj.set_use_global_context(True)  # ty: ignore
 
     #
     # Load inputs.
