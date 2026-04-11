@@ -1,7 +1,5 @@
 """Generic utils for analytics in ETL."""
 
-from typing import List
-
 import pandas as pd
 from structlog import get_logger
 
@@ -9,7 +7,7 @@ from structlog import get_logger
 log = get_logger()
 
 
-def _safe_concat(dfs: List[pd.DataFrame]) -> pd.DataFrame:
+def _safe_concat(dfs: list[pd.DataFrame]) -> pd.DataFrame:
     """Concatenate DataFrames, ignoring empty ones."""
     # Filter out empty DataFrames.
     dfs_to_concat = [df_ for df_ in dfs if not df_.empty]

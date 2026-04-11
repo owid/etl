@@ -46,7 +46,7 @@ For searching charts and articles by title or content, see our [Search API](http
     )
 
     _app.add_middleware(
-        SentryAsgiMiddleware,  # type: ignore
+        SentryAsgiMiddleware,  # ty: ignore
     )
 
     return _app

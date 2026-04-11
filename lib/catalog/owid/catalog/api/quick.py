@@ -155,7 +155,7 @@ def search(
         raise ValueError(f"Invalid kind='{kind}'. Must be 'table', 'indicator', or 'chart'.")
 
 
-def fetch(path: str) -> "Table | ChartTable":
+def fetch(path: str) -> Table | ChartTable:
     """Fetch data directly by path (auto-detects tables, indicators, or charts).
 
     This function downloads the data associated with the given path. It auto-detects

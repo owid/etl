@@ -4,7 +4,6 @@ Works similarly to a Dataset (from owid.catalog), which is a collection of Table
 """
 
 from pathlib import Path
-from typing import Dict
 
 from etl.collection.model.core import Collection
 
@@ -14,7 +13,7 @@ class CollectionSet:
         self.path = path
         self.collections = self._build_dictionary()
 
-    def _build_dictionary(self) -> Dict[str, Path]:
+    def _build_dictionary(self) -> dict[str, Path]:
         dix = {}
         paths = self.path.glob(r"*.config.json")
         for p in paths:

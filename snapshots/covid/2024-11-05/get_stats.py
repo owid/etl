@@ -7,7 +7,6 @@ pr_comments: list of comments on PRs. These are not regular comments, but commen
 """
 
 from datetime import datetime
-from typing import Optional
 
 import github
 import github.PullRequest
@@ -25,7 +24,7 @@ SKIP_COMMITS = 15_400  # 10_700
 
 
 def get_repo(
-    repo_name: str, access_token: Optional[str] = None, per_page: Optional[int] = None
+    repo_name: str, access_token: str | None = None, per_page: int | None = None
 ) -> github.Repository.Repository:
     """Get repository."""
     if not access_token:

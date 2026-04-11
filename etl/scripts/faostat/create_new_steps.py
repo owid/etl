@@ -11,7 +11,7 @@ When running this script for a given channel (e.g. 'meadow'), it will:
 import argparse
 import re
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple, cast
+from typing import cast
 
 from etl.dag_helpers import load_dag
 from etl.files import checksum_file
@@ -165,7 +165,7 @@ def get_dataset_name_from_dag_line(dag_line: str) -> str:
     return dataset_name
 
 
-def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> List[str]:
+def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> list[str]:
     """List all datasets in a namespace that were updated in the latest snapshot ingestion.
 
     Parameters
@@ -184,7 +184,7 @@ def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> List[str]:
     # List all relevant snapshots.
     snapshots = [snapshot for snapshot in snapshot_catalog(match=namespace) if snapshot.metadata.namespace == namespace]
 
-    snapshots_latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # type: ignore
+    snapshots_latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # ty: ignore
 
     # Find latest version in current channel for the considered namespace.
     latest_version_in_channel = find_latest_version_for_namespace_in_channel(channel=channel)
@@ -207,7 +207,7 @@ def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> List[str]:
     return step_names
 
 
-def list_all_steps() -> List[str]:
+def list_all_steps() -> list[str]:
     """List all datasets (e.g. 'faostat_qcl') that are considered in the snapshot ingestion (even if they were not updated).
 
     Note: The 'faostat_metadata' step is always added as a step.
@@ -258,7 +258,7 @@ def find_latest_version_for_namespace_in_channel(
     return latest_version
 
 
-def find_latest_version_for_step(channel: str, step_name: str, namespace: str = NAMESPACE) -> Optional[str]:
+def find_latest_version_for_step(channel: str, step_name: str, namespace: str = NAMESPACE) -> str | None:
     """Find the latest version of a certain step of a namespace in a channel.
 
     Parameters
@@ -285,7 +285,7 @@ def find_latest_version_for_step(channel: str, step_name: str, namespace: str = 
                 snapshot for snapshot in snapshot_catalog(match=step_name) if snapshot.metadata.namespace == namespace
             ]
             # Find latest version for current step.
-            latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # type: ignore
+            latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # ty: ignore
         except IndexError:
             log.warning(warning_message)
 
@@ -398,7 +398,7 @@ def get_path_to_step_files(channel: str, namespace: str = NAMESPACE) -> Path:
     return versions_dir
 
 
-def create_steps(channel: str, step_names: List[str]) -> None:
+def create_steps(channel: str, step_names: list[str]) -> None:
     """Create all steps in a new version folder for a namespace in a channel.
 
     Parameters
@@ -433,7 +433,7 @@ def create_steps(channel: str, step_names: List[str]) -> None:
 
 def create_dag_line_for_latest_natural_dependency(
     channel: str, step_name: str, namespace: str = NAMESPACE, snapshots_file_extension: str = SNAPSHOTS_FILE_EXTENSION
-) -> Optional[str]:
+) -> str | None:
     """Create dag line for latest version of the natural dependency of a given step.
 
     Natural dependency refers to the analogous step from the previous channel. For example, for a dag line
@@ -472,7 +472,7 @@ def create_dag_line_for_latest_natural_dependency(
     dependency_version = find_latest_version_for_step(
         channel=dependency_channel, step_name=step_name, namespace=namespace
     )
-    dependency_step: Optional[str] = None
+    dependency_step: str | None = None
     if dependency_version is not None:
         # Create dag line for the dependency.
         dependency_step = create_dag_line_name(
@@ -487,11 +487,11 @@ def create_dag_line_for_latest_natural_dependency(
 
 def create_updated_dependency_graph(
     channel: str,
-    step_names: List[str],
+    step_names: list[str],
     namespace: str = NAMESPACE,
     new_version: str = VERSION,
-    additional_dependencies: Optional[Dict[str, List[Tuple[str, str, str]]]] = None,
-) -> Dict[str, Set[str]]:
+    additional_dependencies: dict[str, list[tuple[str, str, str]]] | None = None,
+) -> dict[str, set[str]]:
     """Create additional part of the graph that will need be added to the dag to update it.
 
     Note: This function simply returns that part of the graph, without actually modifying the dag.
@@ -607,7 +607,7 @@ def create_updated_dependency_graph(
     return new_steps
 
 
-def write_steps_to_dag_file(dag_steps: Dict[str, Set[str]], header_line: Optional[str]) -> None:
+def write_steps_to_dag_file(dag_steps: dict[str, set[str]], header_line: str | None) -> None:
     """Add new lines to the dag, given a graph of additional dependencies.
 
     Parameters
@@ -652,7 +652,7 @@ def write_steps_to_dag_file(dag_steps: Dict[str, Set[str]], header_line: Optiona
             _dag_file.write(new_step_lines)
 
 
-def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel: str) -> List[str]:
+def apply_custom_rules_to_list_of_steps_to_create(step_names: list[str], channel: str) -> list[str]:
     """Apply some custom rules to add or remove steps from the list of steps to be created.
 
     Parameters

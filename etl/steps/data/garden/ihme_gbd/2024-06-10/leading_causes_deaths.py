@@ -1,5 +1,3 @@
-from typing import List
-
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.catalog.utils import underscore
@@ -61,7 +59,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: List[str], level: str) -> Table:
+def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: list[str], level: str) -> Table:
     """
     For each level_cause find the relevant table in ds_cause and create a table with the leading cause of death in each country-year
 

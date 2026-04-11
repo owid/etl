@@ -5,7 +5,6 @@ import inspect
 import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Optional
 
 import rich_click as click
 import structlog
@@ -120,7 +119,7 @@ def check_for_version_ambiguity(dataset_name: str) -> None:
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--path-to-file", type=str, help="Path to local data file (for manual upload scenarios)")
 @click.option("--dry-run", is_flag=True, help="Preview what would happen without creating/uploading the snapshot")
-def snapshot_cli(dataset_name: str, upload: bool, path_to_file: Optional[str], dry_run: bool) -> None:
+def snapshot_cli(dataset_name: str, upload: bool, path_to_file: str | None, dry_run: bool) -> None:
     """Create snapshot from a snapshot script or .dvc file.
 
     DATASET_PATH can be provided in several formats:
@@ -231,7 +230,7 @@ def _find_files_by_pattern(dataset_name: str, extension: str) -> list[Path]:
         raise click.ClickException(f"Invalid dataset path format: {dataset_name}")
 
 
-def find_snapshot_script(dataset_name: str) -> Optional[Path]:
+def find_snapshot_script(dataset_name: str) -> Path | None:
     """Find the snapshot script for the given dataset name.
 
     Args:
@@ -266,7 +265,7 @@ def find_snapshot_script(dataset_name: str) -> Optional[Path]:
         raise click.ClickException("Please specify a more specific path to disambiguate.")
 
 
-def run_snapshot_script(script_path: Path, upload: bool, path_to_file: Optional[str] = None) -> None:
+def run_snapshot_script(script_path: Path, upload: bool, path_to_file: str | None = None) -> None:
     """Run a snapshot script based on its structure."""
     # Load the module
     spec = importlib.util.spec_from_file_location("snapshot_module", script_path)
@@ -308,7 +307,7 @@ def run_snapshot_script(script_path: Path, upload: bool, path_to_file: Optional[
 
 
 def _call_snapshot_function(
-    func, func_name: str, script_path: Path, upload: bool, path_to_file: Optional[str] = None
+    func, func_name: str, script_path: Path, upload: bool, path_to_file: str | None = None
 ) -> None:
     """Call a snapshot function, handling both click commands and regular functions."""
     # Check if it's a click command
@@ -344,7 +343,7 @@ def _call_snapshot_function(
             raise
 
 
-def run_snapshot_dvc_only(dataset_name: str, upload: bool, path_to_file: Optional[str] = None) -> None:
+def run_snapshot_dvc_only(dataset_name: str, upload: bool, path_to_file: str | None = None) -> None:
     """Run snapshot creation when only .dvc file exists."""
     # Defer heavy import until needed
     from etl.snapshot import Snapshot

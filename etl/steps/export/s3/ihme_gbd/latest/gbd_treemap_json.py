@@ -248,10 +248,10 @@ def run() -> None:
         save_and_upload_json(data, f"causes-of-death.{entity_id}.json", S3_DATA_DIR)
 
     log.info(
-        f"""Successfully created and uploaded {len(mappings['countries']) + 1} files:
+        f"""Successfully created and uploaded {len(mappings["countries"]) + 1} files:
         - 1 metadata file
-        - {len(mappings['countries'])} entity data files
-        - {len(metadata['dimensions']['variables'])} variables
-        - {len(metadata['dimensions']['ageGroups'])} age groups
-        - {len(metadata['dimensions']['sexes'])} sexes"""
+        - {len(mappings["countries"])} entity data files
+        - {len(metadata["dimensions"]["variables"])} variables
+        - {len(metadata["dimensions"]["ageGroups"])} age groups
+        - {len(metadata["dimensions"]["sexes"])} sexes"""
     )

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Union, cast
+from typing import cast
 
 import pandas as pd
 from owid import catalog
@@ -11,7 +11,7 @@ CURRENT_DIR = Path(__file__).parent
 VERSION = CURRENT_DIR.name
 
 
-HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
+HISTORIC_TO_CURRENT_REGION: dict[str, dict[str, str | list[str]]] = {
     "Netherlands Antilles": {
         "continent": "North America",
         "income_group": "High-income countries",
@@ -51,7 +51,7 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
 }
 
 
-def combine_two_overlapping_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, index_columns: List[str]) -> pd.DataFrame:
+def combine_two_overlapping_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, index_columns: list[str]) -> pd.DataFrame:
     """Combine two dataframes that may have identical columns, prioritising the first one.
 
     Both dataframes must have a dummy index (if not, use reset_index() on both of them).

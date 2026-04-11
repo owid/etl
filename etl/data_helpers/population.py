@@ -1,13 +1,11 @@
 """Tools to load population data."""
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 from owid.catalog import Dataset
 from owid.datautils.dataframes import map_series
 from structlog import get_logger
-
-from etl.paths import DATA_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -17,13 +15,13 @@ def add_population(
     df: pd.DataFrame,
     country_col: str,
     year_col: str,
-    ds_un_wpp: Optional[Dataset] = None,
-    sex_col: Optional[str] = None,
-    sex_group_all: Optional[str] = None,
-    sex_group_female: Optional[str] = None,
-    sex_group_male: Optional[str] = None,
-    age_col: Optional[str] = None,
-    age_group_mapping: Optional[Dict[str, Optional[Any]]] = None,
+    ds_un_wpp: Dataset | None = None,
+    sex_col: str | None = None,
+    sex_group_all: str | None = None,
+    sex_group_female: str | None = None,
+    sex_group_male: str | None = None,
+    age_col: str | None = None,
+    age_group_mapping: dict[str, Any | None] | None = None,
 ) -> pd.DataFrame:
     """Add population to dataframe.
 
@@ -73,11 +71,11 @@ def add_population(
         assert df[age_col].notnull().all(), f"Column {age_col} contains missing values!"
 
     if ds_un_wpp is None:
-        ds_un_wpp_path = DATA_DIR / "garden/un/2022-07-11/un_wpp"
-        log.warning(f"Dataset {ds_un_wpp_path} is silently being loaded.")
-        # Load granular population dataset
-        ds_un_wpp = Dataset(ds_un_wpp_path)
-    pop = ds_un_wpp.read("population_granular", safe_types=False)  # type: ignore
+        raise ValueError(
+            "ds_un_wpp must be provided. Load it explicitly with paths.load_dataset('un_wpp') and ensure "
+            "data://garden/un/2022-07-11/un_wpp is in the step's DAG dependencies."
+        )
+    pop = ds_un_wpp.read("population_granular", safe_types=False)  # ty: ignore
     # Keep only variant='medium'
     pop = pop[pop["variant"] == "medium"].drop(columns=["variant"])
     # Keep only metric='population'

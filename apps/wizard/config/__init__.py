@@ -14,7 +14,7 @@ _config_path = APPS_DIR / "wizard" / "config" / "config.yml"
 def load_wizard_config():  # -> Any:
     """Load config."""
     # Load file
-    with open(_config_path, "r") as file:
+    with open(_config_path) as file:
         config = yaml.safe_load(file)
     # Some input checks
     _check_wizard_config(config)
@@ -87,9 +87,9 @@ def _check_wizard_config(config: dict):
     for step_expected in steps_expected:
         assert step_expected in steps, f"{step_expected} property is required in etl.steps property in wizard config!"
         for prop in etl_steps_properties_expected:
-            assert (
-                prop in steps[step_expected]
-            ), f"`etl.steps.{step_expected}.{prop}` property is required in `etl.steps` property in wizard config!"
+            assert prop in steps[step_expected], (
+                f"`etl.steps.{step_expected}.{prop}` property is required in `etl.steps` property in wizard config!"
+            )
     # Check `sections` property
     assert "sections" in config, "sections property is required in wizard config!"
     for section in config["sections"]:
@@ -98,9 +98,9 @@ def _check_wizard_config(config: dict):
         assert "apps" in section, "`sections.apps` property is required in wizard config!"
         for app in section["apps"]:
             for prop in pages_properties_expected:
-                assert (
-                    prop in app
-                ), f"`sections.apps.{app['title']}.{prop}` property is required in sections.apps property in wizard config!"
+                assert prop in app, (
+                    f"`sections.apps.{app['title']}.{prop}` property is required in sections.apps property in wizard config!"
+                )
 
 
 WIZARD_CONFIG = load_wizard_config()

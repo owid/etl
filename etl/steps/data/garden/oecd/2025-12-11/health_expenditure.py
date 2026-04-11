@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Dict
-
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -51,7 +49,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def make_indicators_wide(tb: Table, indicator_names: Dict[str, str]) -> Table:
+def make_indicators_wide(tb: Table, indicator_names: dict[str, str]) -> Table:
     """
     This function makes the indicators wide
     """

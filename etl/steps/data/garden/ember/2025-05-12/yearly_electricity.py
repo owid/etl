@@ -1,7 +1,5 @@
 """Garden step for Ember's Yearly Electricity Data (combining global and European data)."""
 
-from typing import Dict
-
 import owid.catalog.processing as pr
 from owid.catalog import Table, utils
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
@@ -230,9 +228,9 @@ def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
             .iterrows()
         ]
     )
-    assert (
-        set_global == set_europe
-    ), "After adapting European data, all category-subcategory-variables should be identical, except for:\n* Capacity and total emissions (only given in global), and\n* Hard coal, Lignite, Onshore wind and Offshore wind, only given in European data."
+    assert set_global == set_europe, (
+        "After adapting European data, all category-subcategory-variables should be identical, except for:\n* Capacity and total emissions (only given in global), and\n* Hard coal, Lignite, Onshore wind and Offshore wind, only given in European data."
+    )
 
     # Combine the two overlapping datasets, prioritizing European on overlapping rows.
     tb = combine_two_overlapping_dataframes(
@@ -308,7 +306,7 @@ def make_table_electricity_demand(tb: Table) -> Table:
     return table
 
 
-def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
+def combine_yearly_electricity_data(tables: dict[str, Table]) -> Table:
     """Combine all tables in Ember's Yearly Electricity Data into one table.
 
     Parameters
@@ -348,7 +346,7 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
         )
 
     # Merge all tables into one, with an appropriate short name.
-    tb_combined = pr.multi_merge(list(tables.values()), on=index_columns, how="outer", short_name=paths.short_name)  # type: ignore
+    tb_combined = pr.multi_merge(list(tables.values()), on=index_columns, how="outer", short_name=paths.short_name)  # ty: ignore
 
     # Rename certain columns for consistency.
     tb_combined = tb_combined.rename(
