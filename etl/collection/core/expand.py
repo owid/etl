@@ -15,7 +15,7 @@ def expand_config(
     indicator_as_dimension: bool = False,
     indicators_slug: str | None = None,
     expand_path_mode: Literal["table", "dataset", "full"] = "table",
-    additional_indicators: Dict[str, str] | None = None,
+    additional_indicators: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
 
@@ -317,7 +317,7 @@ class CollectionConfigExpander:
         self,
         dimension_choices: dict[str, list[str]] | None = None,
         common_view_config: dict[str, Any] | None = None,
-        additional_indicators: Dict[str, str] | None = None,
+        additional_indicators: dict[str, str] | None = None,
     ):
         """Generate one view for each indicator in the table."""
         df_dims_filt = self.df_dims.copy()
@@ -328,7 +328,7 @@ class CollectionConfigExpander:
                 df_dims_filt = df_dims_filt[df_dims_filt[dim_name].isin(choices)]
 
         # Pre-expand additional indicator paths (x, size, color)
-        expanded_additional: Dict[str, str] = {}
+        expanded_additional: dict[str, str] = {}
         if additional_indicators:
             valid_axes = {"x", "size", "color"}
             invalid_axes = set(additional_indicators.keys()) - valid_axes
@@ -347,13 +347,13 @@ class CollectionConfigExpander:
         # Filter to only relevant dimensions
         config_views = []
         for _, indicator in df_dims_filt.iterrows():
-            indicators: Dict[str, str] = {
+            indicators: dict[str, str] = {
                 "y": self._expand_indicator_path(indicator.short_name),
             }
             # Add additional indicators (x, size, color)
             indicators.update(expanded_additional)
 
-            view: Dict[str, Any] = {
+            view: dict[str, Any] = {
                 "dimensions": {dim_name: indicator[dim_name] for dim_name in self.dimension_names},
                 "indicators": indicators,
             }
