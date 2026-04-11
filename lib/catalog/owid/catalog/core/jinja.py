@@ -1,5 +1,5 @@
 from dataclasses import is_dataclass
-from functools import lru_cache
+from functools import cache
 from typing import Any
 
 import jinja2
@@ -24,7 +24,7 @@ def raise_helper(msg: str) -> None:
     raise Exception(msg)
 
 
-jinja_env.globals["raise"] = raise_helper
+jinja_env.globals["raise"] = raise_helper  # ty: ignore[invalid-assignment]
 
 
 def _uses_jinja(text: str | None):
@@ -34,7 +34,7 @@ def _uses_jinja(text: str | None):
     return "<%" in text or "<<" in text
 
 
-@lru_cache(maxsize=None)
+@cache
 def _cached_jinja_template(text: str) -> jinja2.environment.Template:
     return jinja_env.from_string(text)
 

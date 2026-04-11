@@ -52,7 +52,7 @@ def clean_who_mortality_data(tb: Table, cause: str) -> Table:
         & (tb["age_group"] == "all ages")
         & (tb["country"] == "United States")
         & (tb["sex"] == "Both sexes")
-    ]  # type: ignore
+    ]  # ty: ignore
     assert tb.shape[0] > 1
     tb = tb.drop(
         columns=[

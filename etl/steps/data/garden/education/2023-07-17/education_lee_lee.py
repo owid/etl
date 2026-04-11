@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import owid.catalog.processing as pr
 import pandas as pd
 import shared
@@ -223,7 +221,7 @@ def extract_recent_data(tb_wb: Table, tb_unesco: Table) -> Table:
     return enrolment_recent
 
 
-def melt_and_pivot(tb, id_vars: List[str], value_vars: List[str], index_vars: List[str], columns_vars: List[str]):
+def melt_and_pivot(tb, id_vars: list[str], value_vars: list[str], index_vars: list[str], columns_vars: list[str]):
     """
     Melt the dataframe to long format and then pivot it to wide format.
 

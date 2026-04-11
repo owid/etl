@@ -24,7 +24,7 @@ origin = Origin(
     producer="Malani and Jacob",
     title="A New Measure of Surviving Children that Sheds Light on Long-term Trends in Fertility",
     citation_full="Malani, A., & Jacob, A. (2024). A New Measure of Surviving Children that Sheds Light on Long-term Trends in Fertility. https://doi.org/10.3386/w33175",
-    date_published="2024-11-01",  # type: ignore
+    date_published="2024-11-01",  # ty: ignore
     description="""
 The world has experienced a dramatic decline in total fertility rate (TFR) since the Industrial Revolution. Yet the consequences of this decline flow not merely from a reduction in births, but from a reduction in the number of surviving children. Authors propose a new measure of the number of surviving children per female, which authors call the effective fertility rate (EFR). EFR can be approximated as the product of TFR and the probability of survival. Moreover, TFR changes can be decomposed into changes that preserve EFR and those that change EFR. Authors specialized EFR to measure the number of daughters that survive to reproduce (reproductive EFR) and the number children that survive to become workers (labor EFR).
 
@@ -95,9 +95,9 @@ def combine_un_hmd(tb_un, tb_hmd):
     countries_unexpected = {
         c for c in countries_hmd if (c not in countries_un) and (c not in UK_NATION_EXTRAPOLATION.keys())
     }
-    assert (
-        countries_unexpected == set()
-    ), f"There should be no country ({countries_unexpected}) in HMD that is not in UN"
+    assert countries_unexpected == set(), (
+        f"There should be no country ({countries_unexpected}) in HMD that is not in UN"
+    )
 
     # UK nation adaptations (extrapolate data from UK & Ireland)
     tb_extra = []
@@ -117,7 +117,7 @@ def get_tfr_estimation(tb_b, tb_p):
     tb_b = tb_b.loc[tb_b["sex"] == "total", ["country", "year", "births"]]
 
     ## Get female population aged 15-49
-    ages = {f"{a}-{a+4}" for a in range(15, 50, 5)}
+    ages = {f"{a}-{a + 4}" for a in range(15, 50, 5)}
     tb_p = tb_p.loc[(tb_p["sex"] == "female") & tb_p.age.isin(ages)]
     ## sanity check
     x = tb_p.groupby(["country", "year"]).agg({"age": ("unique", "nunique")})
@@ -244,9 +244,9 @@ def estimate_cum_survival(tb):
     # Step 2: We only estimate the cumulative survival probability for people born between year_min* and 2023 (reduction of 50% rows)
     # year_min is the first year for which the source reported data (e.g. 1950 for most UN-only countries, varies for HMD countries)
     tb = tb.loc[(tb["year"] >= tb["year_min"]) & (tb["year"] <= YEAR_UN_END)]
-    assert (
-        tb[tb["year"] == tb["year_min"]].groupby("country").age.min().max() == 0
-    ), "There should be age zero for starting year of each country!"
+    assert tb[tb["year"] == tb["year_min"]].groupby("country").age.min().max() == 0, (
+        "There should be age zero for starting year of each country!"
+    )
     # Step 3: Sort by age, so we can do the cumulative product later
     tb = tb.sort_values(["country", "sex", "year", "age"], ignore_index=True)
     # Step 4: Estimate cumulative survival probability

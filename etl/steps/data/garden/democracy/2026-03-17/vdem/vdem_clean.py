@@ -3,8 +3,6 @@
 ref: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_do
 """
 
-from typing import Union
-
 import numpy as np
 from owid.catalog import Table
 
@@ -435,9 +433,9 @@ def estimate_dichotomous_indicators(tb: Table) -> Table:
         tb: Table,
         column_new: str,
         column_condition: str,
-        low: Union[float, None] = None,
-        mid: Union[float, None] = None,
-        up: Union[float, None] = None,
+        low: float | None = None,
+        mid: float | None = None,
+        up: float | None = None,
     ) -> Table:
         tb[column_new] = np.nan
 

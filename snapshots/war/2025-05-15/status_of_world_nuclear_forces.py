@@ -44,7 +44,7 @@ def run(upload: bool) -> None:
     # Initialize a list to hold all rows of data.
     table_data = []
     # Iterate over all rows in the table and gather data.
-    for row in table.find_all("tr"):  # type: ignore
+    for row in table.find_all("tr"):  # ty: ignore
         row_data = [cell.get_text(strip=True) for cell in row.find_all("td")]
         # Add the row data to the table data list
         table_data.append(row_data)

@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, cast
+from typing import cast
 
 import numpy as np
 from owid.catalog import Dataset, Table
@@ -194,7 +194,7 @@ def add_regional_aggregates(tb: Table, ds_regions: Dataset, ds_income: Dataset) 
     return tb
 
 
-def _interp_ffill_fillna(tb: Table, columns: List[str], entity_col: str = "country", time_col: str = "date") -> Table:
+def _interp_ffill_fillna(tb: Table, columns: list[str], entity_col: str = "country", time_col: str = "date") -> Table:
     tb = interpolate_table(
         df=tb.loc[:, columns + [entity_col, time_col]],
         entity_col=entity_col,
@@ -202,7 +202,7 @@ def _interp_ffill_fillna(tb: Table, columns: List[str], entity_col: str = "count
         time_mode="none",
     )
 
-    tb.loc[:, columns] = tb.groupby("country")[columns].ffill().fillna(0)  # type: ignore
+    tb.loc[:, columns] = tb.groupby("country")[columns].ffill().fillna(0)  # ty: ignore
 
     return tb
 
@@ -317,9 +317,9 @@ def add_booster_share(tb: Table) -> Table:
     )
     global_boosters = global_boosters.drop(columns=["total_vaccinations", "total_boosters"])
     tb = tb.merge(global_boosters, how="left", on=["country", "date"], validate="one_to_one")
-    assert (
-        tb.shape[0] == shape_before[0] and tb.shape[1] == shape_before[1] + 1
-    ), "Adding share_of_boosters has changed the shape of the dataframe in an unintended way!"
+    assert tb.shape[0] == shape_before[0] and tb.shape[1] == shape_before[1] + 1, (
+        "Adding share_of_boosters has changed the shape of the dataframe in an unintended way!"
+    )
     return tb
 
 
@@ -359,7 +359,7 @@ def add_rolling_indicators(tb: Table) -> Table:
             tb.groupby("country")["new_vaccinations_interpolated"]
             .rolling(f"{n_days}D", min_periods=1)
             .sum()
-            .reset_index(0, drop=True)  # type: ignore
+            .reset_index(0, drop=True)  # ty: ignore
         )
         # Per capita
         tb[f"rolling_vaccinations_{n_months}m_per_hundred"] = (

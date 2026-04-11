@@ -9,7 +9,7 @@ import re
 import resource
 import sys
 import time
-from collections.abc import MutableMapping
+from collections.abc import Callable, Iterator, MutableMapping
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
 from contextlib import contextmanager
 from functools import partial
@@ -17,7 +17,7 @@ from graphlib import TopologicalSorter
 from multiprocessing import Manager
 from os import environ
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Optional, Set
+from typing import TYPE_CHECKING, Any
 
 import rich_click as click
 
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from etl.steps import DAG, Step
 
 # Simple type alias for runtime use (matches etl.steps.DAG)
-DAG = Dict[str, Set[str]]
+DAG = dict[str, set[str]]
 
 # NOTE: I tried enabling this, but ran into weird errors with unit tests and inconsistencies
 #   with owid libraries. It's better to wait for an official pandas 3.0 release and update
@@ -151,7 +151,7 @@ LIMIT_NOFILE = 4096
     type=str,
 )
 def main_cli(
-    steps: List[str],
+    steps: list[str],
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
@@ -160,16 +160,16 @@ def main_cli(
     ipdb: bool = False,
     only: bool = False,
     exact_match: bool = False,
-    exclude: Optional[str] = None,
+    exclude: str | None = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 1,
     use_threads: bool = True,
-    strict: Optional[bool] = None,
+    strict: bool | None = None,
     watch: bool = False,
     continue_on_failure: bool = False,
     force_upload: bool = False,
     prefer_download: bool = False,
-    subset: Optional[str] = None,
+    subset: str | None = None,
 ) -> None:
     """Generate datasets by running their corresponding ETL steps.
 
@@ -260,15 +260,15 @@ def main_cli(
         if ipdb:
             from ipdb import launch_ipdb_on_exception
 
-            config.IPDB_ENABLED = True  # type: ignore[assignment]
+            config.IPDB_ENABLED = True  # ty: ignore[invalid-assignment][invalid-assignment]
             config.GRAPHER_INSERT_WORKERS = 1
             config.DIRTY_STEPS_WORKERS = 1
             kwargs["workers"] = 1
             with launch_ipdb_on_exception():
-                main(**kwargs)  # type: ignore
+                main(**kwargs)  # ty: ignore
         else:
             try:
-                main(**kwargs)  # type: ignore
+                main(**kwargs)  # ty: ignore
             except Exception:
                 if not watch:
                     raise
@@ -291,7 +291,7 @@ def _find_closest_matches(includes_str: str, dag: DAG) -> None:
 
 def main(
     # TODO: includes should be called `include` and be a regex, not a list of strings. Same for excludes.
-    includes: List[str],
+    includes: list[str],
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
@@ -299,10 +299,10 @@ def main(
     export: bool = False,
     only: bool = False,
     exact_match: bool = False,
-    excludes: Optional[List[str]] = None,
+    excludes: list[str] | None = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 1,
-    strict: Optional[bool] = None,
+    strict: bool | None = None,
 ) -> None:
     """
     Execute all ETL steps listed in dag file.
@@ -380,8 +380,8 @@ def construct_full_dag(dag: DAG) -> DAG:
 
 def construct_subdag(
     dag: "DAG",
-    includes: Optional[List[str]] = None,
-    excludes: Optional[List[str]] = None,
+    includes: list[str] | None = None,
+    excludes: list[str] | None = None,
     grapher: bool = False,
     export: bool = False,
     private: bool = False,
@@ -423,13 +423,13 @@ def construct_subdag(
 
 
 def run_steps(
-    steps: "List[Step]",
+    steps: "list[Step]",
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
     only: bool = False,
     workers: int = 1,
-    strict: Optional[bool] = None,
+    strict: bool | None = None,
 ) -> None:
     """
     Run the selected steps, and anything that needs updating based on them. An empty
@@ -491,16 +491,14 @@ def run_steps(
         )
 
 
-def exec_steps(
-    steps: "List[Step]", strict_after: Any, continue_on_failure: bool, strict: Optional[bool] = None
-) -> None:
+def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool, strict: bool | None = None) -> None:
     import structlog
 
     log = structlog.get_logger()
     execution_times = {}
-    failing_steps: "List[Step]" = []
-    skipped_steps: "List[Step]" = []
-    exceptions: List[Exception] = []
+    failing_steps: list[Step] = []
+    skipped_steps: list[Step] = []
+    exceptions: list[Exception] = []
 
     for i, step in enumerate(steps, 1):
         if continue_on_failure and {s.path for s in step.dependencies} & {s.path for s in skipped_steps}:
@@ -560,7 +558,7 @@ def _steps_sort_key(step: "Step") -> int:
 
 
 def exec_steps_parallel(
-    steps: "List[Step]", workers: int, continue_on_failure: bool, strict_after: bool, strict: Optional[bool] = None
+    steps: "list[Step]", workers: int, continue_on_failure: bool, strict_after: bool, strict: bool | None = None
 ) -> None:
     # put grapher steps in front of the queue to process them as soon as possible and lessen
     # the load on MySQL
@@ -604,7 +602,7 @@ def exec_steps_parallel(
 
 
 def exec_graph_parallel(
-    exec_graph: Dict[str, Any],
+    exec_graph: dict[str, Any],
     func: Callable[[str], None],
     continue_on_failure: bool,
     workers: int,
@@ -630,7 +628,7 @@ def exec_graph_parallel(
     pool_factory = ThreadPoolExecutor if use_threads else ProcessPoolExecutor
     with pool_factory(max_workers=workers) as executor:
         # Dictionary to keep track of future tasks
-        future_to_task: Dict[Future, str] = {}
+        future_to_task: dict[Future, str] = {}
         failed_tasks = set()
         skipped_tasks = set()
         exceptions = []
@@ -692,7 +690,7 @@ def exec_graph_parallel(
 
 
 def _create_expected_time_message(
-    expected_time: Optional[float], prepend_message: str = " (", append_message: str = ")"
+    expected_time: float | None, prepend_message: str = " (", append_message: str = ")"
 ) -> str:
     minutes, seconds = divmod(expected_time or 0, 60)
     if minutes < 1:
@@ -709,9 +707,9 @@ def _create_expected_time_message(
 def _exec_step_job(
     step_name: str,
     execution_times: MutableMapping,
-    step_lookup: "Dict[str, Step]",
+    step_lookup: "dict[str, Step]",
     strict_after: Any,
-    strict: Optional[bool] = None,
+    strict: bool | None = None,
 ) -> None:
     """
     Executes a step.
@@ -735,11 +733,11 @@ def _exec_step_job(
     print(f"--- Finished {step_name} ({execution_times[step_name]:.1f}s)")
 
 
-def _write_execution_times(execution_times: Dict) -> None:
+def _write_execution_times(execution_times: dict) -> None:
     # Write the recorded execution times to a hidden json file that contains the time it took to execute each step
     execution_time_file = paths.EXECUTION_TIME_FILE
     if execution_time_file.exists():
-        with open(execution_time_file, "r") as file:
+        with open(execution_time_file) as file:
             stored_times = json.load(file)
     else:
         stored_times = {}
@@ -753,13 +751,13 @@ def _get_step_identifier(step_name: str) -> str:
     return step_name.replace(step_name.split("/")[-2] + "/", "")
 
 
-def _get_execution_time(step_name: str) -> Optional[float]:
+def _get_execution_time(step_name: str) -> float | None:
     # Read execution time of a given step from the hidden json file
     # If it doesn't exist, try to read another version of the same step, and if no other version exists, return None
     if not paths.EXECUTION_TIME_FILE.exists():
         return None
     else:
-        with open(paths.EXECUTION_TIME_FILE, "r") as file:
+        with open(paths.EXECUTION_TIME_FILE) as file:
             execution_times = json.load(file)
         execution_time = execution_times.get(step_name)
         if not execution_time:
@@ -769,12 +767,12 @@ def _get_execution_time(step_name: str) -> Optional[float]:
         return execution_time
 
 
-def enumerate_steps(steps: "List[Step]") -> None:
+def enumerate_steps(steps: "list[Step]") -> None:
     for i, step in enumerate(steps, 1):
         print(f"{i}. {step}{_create_expected_time_message(_get_execution_time(str(step)))}")
 
 
-def _detect_strictness_level(step: "Step", strict_after: Any, strict: Optional[bool] = None) -> bool:
+def _detect_strictness_level(step: "Step", strict_after: Any, strict: bool | None = None) -> bool:
     from etl.steps import DataStep
 
     # honour the command-line argument over anything else
@@ -852,10 +850,10 @@ def _set_dependencies_to_nondirty(step: "Step") -> None:
 
     if isinstance(step, DataStep):
         for step_dep in step.dependencies:
-            step_dep.is_dirty = _always_clean  # type: ignore[method-assign]
+            step_dep.is_dirty = _always_clean  # ty: ignore[invalid-assignment]
     if isinstance(step, GrapherStep):
         for step_dep in step.data_step.dependencies:
-            step.data_step.is_dirty = _always_clean  # type: ignore[method-assign]
+            step.data_step.is_dirty = _always_clean  # ty: ignore[invalid-assignment]
 
 
 def _check_public_private_steps(dag: DAG) -> None:

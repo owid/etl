@@ -1,5 +1,3 @@
-from typing import Optional
-
 import structlog
 from fastapi import APIRouter, HTTPException, Query
 
@@ -32,10 +30,10 @@ def health() -> dict:
     },
 )
 async def search_indicators_semantic(
-    query: Optional[str] = Query(None, description="Search query", examples=["gdp", "population"]),
-    q: Optional[str] = Query(None, description="Search query (alias for 'query')"),
+    query: str | None = Query(None, description="Search query", examples=["gdp", "population"]),
+    q: str | None = Query(None, description="Search query (alias for 'query')"),
     limit: int = Query(10, description="Limit the number of results", le=100),
-    min_popularity: Optional[float] = Query(
+    min_popularity: float | None = Query(
         None, description="Minimum popularity score (0-1) to filter results", ge=0, le=1
     ),
 ) -> SemanticSearchResponse:

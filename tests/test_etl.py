@@ -7,7 +7,6 @@ Check the integrity of the DAG.
 """
 
 from pathlib import Path
-from typing import List, Union
 from unittest.mock import patch
 
 from etl import config, paths
@@ -52,7 +51,7 @@ def test_detect_strictness():
         assert not _detect_strictness_level(step, config.STRICT_AFTER)
 
 
-def get_all_steps(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> List[Step]:
+def get_all_steps(filename: str | Path = paths.DEFAULT_DAG_FILE) -> list[Step]:
     dag = load_dag(filename)
 
     # add grapher steps
