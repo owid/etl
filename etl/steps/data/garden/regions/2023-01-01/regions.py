@@ -211,9 +211,11 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
+    # Regions is an internal reference table with no external data origins, so skip the origins check.
     ds_garden = create_dataset(
         dest_dir=dest_dir,
         tables=[tb_regions],
+        check_variables_metadata=False,
     )
 
     # Save changes in the new garden dataset.

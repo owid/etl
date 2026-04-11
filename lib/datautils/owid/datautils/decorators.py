@@ -2,12 +2,13 @@
 
 import functools
 import tempfile
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from owid.datautils.web import download_file_from_url
 
 
-def enable_file_download(path_arg_name: Optional[str] = None) -> Callable[[Any], Any]:
+def enable_file_download(path_arg_name: str | None = None) -> Callable[[Any], Any]:
     """Decorator that allows functions expecting local file paths to accept URLs and S3 paths.
 
     This decorator automatically downloads remote files to temporary storage before calling
@@ -55,11 +56,11 @@ def enable_file_download(path_arg_name: Optional[str] = None) -> Callable[[Any],
             # Get path to file
             _used_args = False
             if args:
-                args = list(args)  # type: ignore
+                args = list(args)  # ty: ignore
                 path = args[0]
                 _used_args = True
             else:
-                path = kwargs.get(path_arg_name)  # type: ignore
+                path = kwargs.get(path_arg_name)  # ty: ignore
                 if path is None:
                     raise ValueError(f"Filename was not found in args or kwargs ({path_arg_name}!")
             # Check if download is needed and download
@@ -73,7 +74,7 @@ def enable_file_download(path_arg_name: Optional[str] = None) -> Callable[[Any],
                     elif path.startswith(prefixes["s3"]):
                         try:
                             # Import here to avoid circular dependency
-                            from owid.catalog import s3_utils  # type: ignore
+                            from owid.catalog import s3_utils  # ty: ignore
                         except ImportError as e:
                             raise ImportError("owid-catalog is required for S3 downloads. ") from e
 
@@ -81,9 +82,9 @@ def enable_file_download(path_arg_name: Optional[str] = None) -> Callable[[Any],
 
                     # Modify args/kwargs
                     if _used_args:
-                        args[0] = temp_file.name  # type: ignore
+                        args[0] = temp_file.name  # ty: ignore
                     else:
-                        kwargs[path_arg_name] = temp_file.name  # type: ignore
+                        kwargs[path_arg_name] = temp_file.name  # ty: ignore
                     # Call function
                     return func(*args, **kwargs)
             else:  # Run function on local file

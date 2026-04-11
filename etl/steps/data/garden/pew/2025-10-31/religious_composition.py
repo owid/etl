@@ -99,9 +99,9 @@ def add_owid_regions(tb):
         columns=["count_unrounded"],
         column_new_name=column_tmp,
     )
-    assert set(tb.loc[tb["share"].isna(), "country"].unique()) == set(
-        regions
-    ), "Unexpected missing shares after region aggregation!"
+    assert set(tb.loc[tb["share"].isna(), "country"].unique()) == set(regions), (
+        "Unexpected missing shares after region aggregation!"
+    )
     tb["share"] = tb["share"].fillna(100 * tb[column_tmp])
 
     # Drop temporary columns

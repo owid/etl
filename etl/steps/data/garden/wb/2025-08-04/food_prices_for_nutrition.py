@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -77,7 +75,7 @@ def sanity_check_outputs(tb: Table) -> None:
     assert set(abrupt_changes["country"]) == {"Lebanon", "South Sudan", "Syria"}, error
 
 
-def change_attribution(tb: Table, columns: List[str], attribution_text: str) -> Table:
+def change_attribution(tb: Table, columns: list[str], attribution_text: str) -> Table:
     """
     Change attribution for some indicators as suggested by authors.
     """

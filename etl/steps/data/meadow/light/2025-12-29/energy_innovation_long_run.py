@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import Dict
-
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -80,7 +78,7 @@ def run() -> None:
     ds_meadow.save()
 
 
-def process_table(tb: Table, column_list: Dict[str, str]) -> Table:
+def process_table(tb: Table, column_list: dict[str, str]) -> Table:
     """Process the input table by renaming columns and dropping empty rows/columns.
 
     Args:

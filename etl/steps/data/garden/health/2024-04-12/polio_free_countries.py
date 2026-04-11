@@ -127,9 +127,11 @@ def define_polio_free(tb: Table, latest_year: int) -> Table:
 
     # Define polio status based on the year comparison
     tb_prod["status"] = tb_prod.apply(
-        lambda row: "Endemic"
-        if row["year"] <= tb[tb["country"] == row["country"]]["latest_year_wild_polio_case"].min()
-        else "Polio-free (not certified)",
+        lambda row: (
+            "Endemic"
+            if row["year"] <= tb[tb["country"] == row["country"]]["latest_year_wild_polio_case"].min()
+            else "Polio-free (not certified)"
+        ),
         axis=1,
     )
     # Merge the two tables

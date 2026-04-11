@@ -2,7 +2,6 @@
 
 import re
 from pathlib import Path
-from typing import List, Union
 
 import pandas as pd
 from owid.catalog import Table
@@ -62,9 +61,9 @@ def build_df_p1(snap: Snapshot) -> pd.DataFrame:
     # Sanity checks
     assert re.match(r"\s+Ozone Hole Area\s+Minimum Ozone\n", text[0]), "Data file header might have changed."
     assert re.match(r"\s+Date\s+Value\s+Date\s+Value\n", text[1]), "Data file header might have changed."
-    assert re.match(
-        r"Year\s+\(YYMM\)\s+\(mil km2\)\s+\(YYMM\)\s+\(DU\)\n", text[2]
-    ), "Data file header might have changed."
+    assert re.match(r"Year\s+\(YYMM\)\s+\(mil km2\)\s+\(YYMM\)\s+\(DU\)\n", text[2]), (
+        "Data file header might have changed."
+    )
     assert re.match(r"\-{4}\s+\-{6}\s+\-{9}\s+\-{6}\s+\-{5}\n", text[3]), "Data file header might have changed."
     assert text[4].startswith("1979"), "First expected reported year should be 1979"
     # Get only data values
@@ -131,10 +130,10 @@ def build_df(snap_1: Snapshot, snap_2: Snapshot) -> pd.DataFrame:
     return df
 
 
-def _read_txt_without_comments(path: Union[Path, str]) -> List[str]:
+def _read_txt_without_comments(path: Path | str) -> list[str]:
     """Read the text in a file wihout the commented lines.
 
     A commented line is such that starts with a '#'."""
-    with open(path, "r") as f:
+    with open(path) as f:
         text = [line for line in f.readlines() if not line.startswith("#")]
     return text

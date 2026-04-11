@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import Dict, List
-
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -54,7 +52,7 @@ def run(dest_dir: str) -> None:
 
 
 def reformat_table(
-    tb: Table, aggregation_names: Dict, gross_weekly_earnings_name: str, text_below_table: List[str]
+    tb: Table, aggregation_names: dict, gross_weekly_earnings_name: str, text_below_table: list[str]
 ) -> Table:
     """Format table to be able to process it."""
 

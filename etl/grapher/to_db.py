@@ -15,13 +15,13 @@ import os
 import warnings
 from dataclasses import dataclass
 from threading import Lock
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, cast
 
 import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import Table, Variable, VariableMeta, utils
-from owid.catalog.core.meta import update_variable_metadata
+from owid.catalog.core.meta import Source, update_variable_metadata
 from owid.catalog.core.paths import CatalogPath
 from owid.catalog.core.utils import hash_any
 from sqlalchemy import select, text, update
@@ -49,11 +49,11 @@ CURRENT_DIR = os.path.dirname(__file__)
 @dataclass
 class DatasetUpsertResult:
     dataset_id: int
-    source_ids: Dict[int, int]
+    source_ids: dict[int, int]
 
 
 def upsert_dataset(
-    engine: Engine, dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
+    engine: Engine, dataset: catalog.Dataset, namespace: str, sources: list[Source]
 ) -> DatasetUpsertResult:
     assert dataset.metadata.short_name, "Dataset must have a short_name"
     assert dataset.metadata.version, "Dataset must have a version"
@@ -109,7 +109,7 @@ def upsert_dataset(
             url=f"http://{engine.url.host}/admin/datasets/{ds.id}",
         )
 
-        source_ids: Dict[int, int] = dict()
+        source_ids: dict[int, int] = dict()
         for source in sources:
             assert source.name
             source_ids[hash(source)] = _upsert_source_to_db(session, source, ds.id)
@@ -136,7 +136,7 @@ def _upsert_source_to_db(session: Session, source: catalog.Source, dataset_id: i
 
 def _add_or_update_source(
     session: Session, variable_meta: catalog.VariableMeta, column_name: str, dataset_upsert_result: DatasetUpsertResult
-) -> Optional[int]:
+) -> int | None:
     if not variable_meta.sources:
         assert variable_meta.origins, "Variable must have either sources or origins"
         return None
@@ -202,17 +202,17 @@ def check_table(table: Table) -> None:
 
 def _check_upserted_variable(variable: Variable) -> None:
     assert variable.notnull().all(), (
-        "Tables to be upserted must have no null values. Instead they" f" have:\n{variable.loc[variable.isnull()]}"
+        f"Tables to be upserted must have no null values. Instead they have:\n{variable.loc[variable.isnull()]}"
     )
     assert not gh.contains_inf(variable), f"Column `{variable.name}` has inf values"
 
 
-def load_dataset_variables(dataset_id: int, engine: Engine) -> Dict[int | str, Any]:
+def load_dataset_variables(dataset_id: int, engine: Engine) -> dict[int | str, Any]:
     q = """
     select catalogPath, id, dataChecksum, metadataChecksum from variables where datasetId = %(dataset_id)s
     """
     return (
-        read_sql(q, engine=engine, params={"dataset_id": dataset_id}).set_index("catalogPath").to_dict(orient="index")
+        read_sql(q, engine=engine, params={"dataset_id": dataset_id}).set_index("catalogPath").to_dict(orient="index")  # ty: ignore[invalid-return-type]
     )
 
 
@@ -224,7 +224,7 @@ def upsert_table(
     catalog_path: str,
     checksums: dict,
     db_origins: list[gm.Origin],
-    dimensions: Optional[gm.Dimensions] = None,
+    dimensions: gm.Dimensions | None = None,
     verbose: bool = True,
 ) -> None:
     """This function is used to put one ready to go formatted Table (i.e.
@@ -260,7 +260,7 @@ def upsert_table(
     # Both checksums match
     if checksums.get("dataChecksum") == checksum_data and checksums.get("metadataChecksum") == checksum_metadata:
         if verbose:
-            log.info("upsert_table.skipped_no_changes", size=len(df), catalog_path=catalog_path)
+            log.debug("upsert_table.skipped_no_changes", size=len(df), catalog_path=catalog_path)
         return
 
     with Session(engine) as session:
@@ -331,7 +331,7 @@ def upsert_metadata(
     dataset_upsert_result: DatasetUpsertResult,
     db_origins: list[gm.Origin],
     catalog_path: str,
-    dimensions: Optional[gm.Dimensions],
+    dimensions: gm.Dimensions | None,
     admin_api: AdminAPI,
 ) -> gm.Variable:
     timespan = _get_timespan(df, variable_meta)
@@ -404,7 +404,7 @@ def calculate_checksum_data(df: pd.DataFrame) -> str:
     return str(pd.util.hash_pandas_object(df).sum())
 
 
-def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
+def fetch_db_checksum(dataset: catalog.Dataset) -> str | None:
     """
     Fetch the latest source checksum associated with a given dataset in the db. Can be compared
     with the current source checksum to determine whether the db is up-to-date.
@@ -426,7 +426,7 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
     with Session(get_engine()) as session:
         q = (
             update(gm.Dataset)
-            .where(gm.Dataset.id == dataset_id)  # type: ignore
+            .where(gm.Dataset.id == dataset_id)  # ty: ignore
             .values(
                 sourceChecksum=checksum,
                 dataEditedAt=datetime.datetime.now(datetime.timezone.utc),
@@ -437,7 +437,7 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
         session.commit()
 
 
-def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_ids: List[int]) -> bool:
+def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_ids: list[int]) -> bool:
     """Remove all leftover variables that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete a variable in ETL.
     Raise an error if we try to delete variable used by any chart.
@@ -587,7 +587,7 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
         return True
 
 
-def cleanup_ghost_sources(engine: Engine, dataset_id: int, dataset_upserted_source_ids: List[int]) -> None:
+def cleanup_ghost_sources(engine: Engine, dataset_id: int, dataset_upserted_source_ids: list[int]) -> None:
     """Remove all leftover sources that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete sources.
     :param dataset_id: ID of the dataset
