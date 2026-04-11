@@ -105,9 +105,11 @@ def create_estimations_from_growth(tb: Table, reference_var_suffix: str, to_adju
 
     # Get value from the reference variable in the reference year
     tb["reference_value"] = tb.groupby("country")[f"share_gdp{reference_var_suffix}"].transform(
-        lambda x: x.loc[tb["year"] == tb["reference_year"]].iloc[0]
-        if not x.loc[tb["year"] == tb["reference_year"]].empty
-        else None
+        lambda x: (
+            x.loc[tb["year"] == tb["reference_year"]].iloc[0]
+            if not x.loc[tb["year"] == tb["reference_year"]].empty
+            else None
+        )
     )
 
     # The scalar is the previous value divided by the reference variable. This is the growth that will be applied retroactively to the variable to be adjusted.
@@ -115,9 +117,11 @@ def create_estimations_from_growth(tb: Table, reference_var_suffix: str, to_adju
 
     # Get value to be adjusted in the reference year
     tb["to_adjust_value"] = tb.groupby("country")[f"share_gdp{to_adjust_var_suffix}"].transform(
-        lambda x: x.loc[tb["year"] == tb["reference_year"]].iloc[0]
-        if not x.loc[tb["year"] == tb["reference_year"]].empty
-        else None
+        lambda x: (
+            x.loc[tb["year"] == tb["reference_year"]].iloc[0]
+            if not x.loc[tb["year"] == tb["reference_year"]].empty
+            else None
+        )
     )
 
     # The estimated values are the division between the reference value and the scalars. This is the variable to be adjusted effectively adjusted by the growth of the reference variable.

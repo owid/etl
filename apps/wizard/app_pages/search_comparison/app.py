@@ -17,6 +17,7 @@ from etl.db import read_sql
 # Search source types
 class SearchSource:
     ALGOLIA = "Algolia (Keyword)"
+    TYPESENSE = "Typesense (Hybrid)"
     SEMANTIC = "Semantic (AI)"
     AGENT = "Agent"
 
@@ -34,6 +35,9 @@ class SearchOptions:
     agent_model: str = "gemini-2.5-flash-lite"
     agent_search: str = "keyword"
     agent_type: str = "all"  # all, chart, explorer, or mdim
+
+    # Typesense options
+    typesense_alpha: float = 0.3
 
 
 AGENT_MODELS = [
@@ -145,6 +149,21 @@ def fetch_algolia_search(query: str, hits_per_page: int, api_base: str) -> tuple
         response = requests.get(
             f"{api_base}/api/search",
             params={"q": query, "hitsPerPage": hits_per_page},
+            timeout=30,
+        )
+        response.raise_for_status()
+        return response.json(), time.time() - start
+    except requests.RequestException as e:
+        return {"error": str(e), "hits": []}, time.time() - start
+
+
+def fetch_typesense_search(query: str, hits_per_page: int, api_base: str, alpha: float = 0.3) -> tuple[dict, float]:
+    """Fetch results from Typesense hybrid search API."""
+    start = time.time()
+    try:
+        response = requests.get(
+            f"{api_base}/api/search",
+            params={"q": query, "hitsPerPage": hits_per_page, "alpha": alpha, "dedup": "api"},
             timeout=30,
         )
         response.raise_for_status()
@@ -370,6 +389,17 @@ def render_source_options(side: str, source: str) -> SearchOptions:
                 options=["all", "chart", "explorer", "mdim"],
                 help="Filter results by type",
             )
+    elif source == SearchSource.TYPESENSE:
+        with st_horizontal():
+            options.typesense_alpha = url_persist(st.number_input)(
+                key=f"{side}_typesense_alpha",
+                label="Alpha",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.3,
+                step=0.1,
+                help="Balance between keyword (0) and semantic (1) search",
+            )
     # Algolia has no options
 
     return options
@@ -385,6 +415,8 @@ def fetch_for_source(
     """Fetch results based on the selected source and options."""
     if source == SearchSource.ALGOLIA:
         return fetch_algolia_search(query, hits_per_page, api_base)
+    elif source == SearchSource.TYPESENSE:
+        return fetch_typesense_search(query, hits_per_page, api_base, options.typesense_alpha)
     elif source == SearchSource.SEMANTIC:
         return fetch_semantic_search(
             query,
@@ -413,6 +445,8 @@ def get_source_header(source: str, options: SearchOptions) -> str:
     """Get the header text for a search source."""
     if source == SearchSource.ALGOLIA:
         return "🔤 Algolia (Keyword)"
+    elif source == SearchSource.TYPESENSE:
+        return "🔎 Typesense (Hybrid)"
     elif source == SearchSource.SEMANTIC:
         header = "🧠 Semantic (AI)"
         if options.llm_rerank:
@@ -427,6 +461,8 @@ def get_search_type(source: str) -> str:
     """Get the search type string for display purposes."""
     if source == SearchSource.ALGOLIA:
         return "algolia"
+    elif source == SearchSource.TYPESENSE:
+        return "typesense"
     elif source == SearchSource.SEMANTIC:
         return "semantic"
     elif source == SearchSource.AGENT:
@@ -478,15 +514,23 @@ def main():
     # Options expander
     with st.expander("Options", expanded=False):
         # API servers
-        col_search_server, col_suggestions_server = st.columns(2)
-        with col_search_server:
-            api_base = url_persist(st.text_input)(
-                key="api_base",
-                label="Search API server",
+        col_left_server, col_right_server, col_suggestions_server = st.columns(3)
+        with col_left_server:
+            left_api_base = url_persist(st.text_input)(
+                key="left_api_base",
+                label="Left Search API server",
                 value=API_BASE,
-                help="Base URL for search APIs: /api/search, /api/ai-search/charts, /api/ai-search/agent",
+                help="Base URL for left panel search APIs: /api/search, /api/ai-search/charts, /api/ai-search/agent",
             )
-            api_base = api_base.rstrip("/")
+            left_api_base = left_api_base.rstrip("/")
+        with col_right_server:
+            right_api_base = url_persist(st.text_input)(
+                key="right_api_base",
+                label="Right Search API server",
+                value=API_BASE,
+                help="Base URL for right panel search APIs: /api/search, /api/ai-search/charts, /api/ai-search/agent",
+            )
+            right_api_base = right_api_base.rstrip("/")
         with col_suggestions_server:
             suggestions_api_base = url_persist(st.text_input)(
                 key="suggestions_api_base",
@@ -499,7 +543,7 @@ def main():
         # Panel configuration and other options
         col_left_cfg, col_right_cfg, col_misc = st.columns([2, 2, 1])
 
-        all_sources = [SearchSource.ALGOLIA, SearchSource.SEMANTIC, SearchSource.AGENT]
+        all_sources = [SearchSource.ALGOLIA, SearchSource.TYPESENSE, SearchSource.SEMANTIC, SearchSource.AGENT]
 
         with col_left_cfg:
             left_source = url_persist(st.selectbox)(
@@ -579,9 +623,11 @@ def main():
     # Fetch search results from both panels in parallel
     with st.spinner("Searching..."):
         with ThreadPoolExecutor(max_workers=2) as executor:
-            left_future = executor.submit(fetch_for_source, left_source, query, hits_per_page, left_options, api_base)
+            left_future = executor.submit(
+                fetch_for_source, left_source, query, hits_per_page, left_options, left_api_base
+            )
             right_future = executor.submit(
-                fetch_for_source, right_source, query, hits_per_page, right_options, api_base
+                fetch_for_source, right_source, query, hits_per_page, right_options, right_api_base
             )
             left_data, left_time = left_future.result()
             right_data, right_time = right_future.result()
@@ -590,8 +636,8 @@ def main():
     TYPE_FILTER_MAP = {"Chart": "chart", "Multi-dim": "mdim", "Explorer": "explorer"}
     allowed_types = {TYPE_FILTER_MAP[t] for t in type_filter if t in TYPE_FILTER_MAP}
 
-    left_hits = left_data.get("hits", [])
-    right_hits = right_data.get("hits", [])
+    left_hits = left_data.get("hits", left_data.get("results", []))
+    right_hits = right_data.get("hits", right_data.get("results", []))
     if allowed_types:
         left_hits = [h for h in left_hits if get_hit_type(h) in allowed_types]
         right_hits = [h for h in right_hits if get_hit_type(h) in allowed_types]
@@ -600,7 +646,7 @@ def main():
     # Fetch pageviews and FM ranks for results that don't include them (Algolia, Agent)
     def enrich_hits_with_stats(hits: list[dict], source: str) -> None:
         """Enrich hits with pageviews and FM ranks if the source doesn't provide them."""
-        if source in (SearchSource.ALGOLIA, SearchSource.AGENT):
+        if source in (SearchSource.ALGOLIA, SearchSource.TYPESENSE, SearchSource.AGENT):
             slugs = tuple(h.get("slug") for h in hits if h.get("slug"))
             if slugs:
                 pageviews = get_pageviews_for_slugs(slugs)

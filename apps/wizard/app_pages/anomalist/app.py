@@ -19,7 +19,7 @@ TODO:
 
 """
 
-from typing import List, Tuple, Union, cast
+from typing import cast
 
 import pandas as pd
 import streamlit as st
@@ -199,7 +199,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
     # Get metadata summary
     metadata_summary = ""
     for m in metadata:
-        _summary = f"- {m.name}\n" f"- {m.descriptionShort}\n" f"- {m.unit}"
+        _summary = f"- {m.name}\n- {m.descriptionShort}\n- {m.unit}"
         metadata_summary += f"{_summary}\n-------------\n"
 
     # df = st.session_state.anomalist_df
@@ -288,7 +288,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
         # Ask GPT (stream)
         stream = client.chat.completions.create(
             model=MODEL_DEFAULT,
-            messages=messages,  # type: ignore
+            messages=messages,  # ty: ignore
             max_completion_tokens=3000,
             stream=True,
         )
@@ -377,7 +377,7 @@ def _filter_df(
 
 
 @st.cache_data
-def _sort_df(df: pd.DataFrame, sort_strategy: Union[str, List[str]]) -> Tuple[pd.DataFrame, list[str]]:
+def _sort_df(df: pd.DataFrame, sort_strategy: str | list[str]) -> tuple[pd.DataFrame, list[str]]:
     """Used in filter_df."""
     if not sort_strategy:
         columns_sort = list(SORTING_COLUMNS.values())
@@ -503,7 +503,7 @@ def _change_chart_selection(df, key_table, key_selection):
     st.session_state[key_selection] = df.iloc[rows]["entity_name"].tolist()
 
 
-def _score_table(df: pd.DataFrame) -> pd.DataFrame:
+def _score_table(df: pd.DataFrame) -> "pd.io.formats.style.Styler":  # ty: ignore[invalid-return-type]
     """Return a table of scores and other useful columns for a given indicator. Return styled dataframe."""
     # Filter df_all for the indicator and anomaly type currently displayed.
     df_show = df.copy()
@@ -607,7 +607,7 @@ with st.form(key="dataset_search"):
         format_func=lambda x: DATASETS_ALL[x],
     )
 
-    st.query_params["anomalist_datasets_selected"] = st.session_state.anomalist_datasets_selected  # type: ignore
+    st.query_params["anomalist_datasets_selected"] = st.session_state.anomalist_datasets_selected  # ty: ignore
 
     st.form_submit_button(
         "Detect anomalies",

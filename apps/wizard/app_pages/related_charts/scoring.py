@@ -42,7 +42,7 @@ class ScoringModel:
         d = dict(zip([c.chart_id for c in self.charts], title_scores))
 
         # Return chart_id with the highest score
-        return max(d, key=d.get)  # type: ignore
+        return max(d, key=d.get)  # ty: ignore
 
     def similarity_components(self, chart: Chart) -> pd.DataFrame:
         log.info("similarity_components.start", n_docs=len(self.charts))
@@ -113,7 +113,7 @@ def score_pageviews(pageviews: pd.Series) -> pd.Series:
     """Log transform pageviews and scale them to [0, 1]. Chart with the most pageviews gets score 1 and
     chart with the least pageviews gets score 0.
     """
-    pageviews = np.log(pageviews + 1)  # type: ignore
+    pageviews = np.log(pageviews + 1)  # ty: ignore
     return (pageviews - pageviews.min()) / (pageviews.max() - pageviews.min())
 
 

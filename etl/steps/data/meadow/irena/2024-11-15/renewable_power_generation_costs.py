@@ -155,7 +155,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     onshore_wind = (
         data.parse("Fig 2.11", skiprows=3)
         .drop(columns="Unnamed: 0", errors="raise")
-        .rename(  # type: ignore
+        .rename(  # ty: ignore
             columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
         )
     )
@@ -177,7 +177,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     # Offshore wind.
     error = "The file format for offshore wind LCOE has changed."
     assert data.parse("Fig 4.11", skiprows=1).columns[1] == EXPECTED_LCOE_UNIT, error
-    offshore_wind = data.parse("Fig 4.11", skiprows=3).rename(  # type: ignore
+    offshore_wind = data.parse("Fig 4.11", skiprows=3).rename(  # ty: ignore
         columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
     )[["year", "cost"]]
     offshore_wind["technology"] = "Offshore wind"
@@ -188,7 +188,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     assert data.parse("Fig 8.4", skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     geothermal = data.parse("Fig 8.4", skiprows=5).rename(
         columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
-    )[["year", "cost"]]  # type: ignore
+    )[["year", "cost"]]  # ty: ignore
     geothermal["technology"] = "Geothermal"
 
     # Bioenergy.
@@ -197,7 +197,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     bioenergy = (
         data.parse("Fig 9.1", skiprows=20)
         .dropna(axis=1, how="all")
-        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # ty: ignore
     )
     bioenergy = bioenergy[bioenergy["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
@@ -210,7 +210,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     hydropower = (
         data.parse("Fig 7.1", skiprows=20)
         .dropna(how="all", axis=1)
-        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # ty: ignore
     )
     hydropower = hydropower[hydropower["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"

@@ -19,11 +19,11 @@ def generate_catalog_api_docs():
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Load template
-    with open(DOCS_DIR / "ignore/pre-build/catalog-api.template.md", "r") as f:
+    with open(DOCS_DIR / "ignore/pre-build/catalog-api.template.md") as f:
         template = f.read()
 
     # Load Python content from catalog README
-    with open(LIB_DIR / "catalog/README.md", "r") as f:
+    with open(LIB_DIR / "catalog/README.md") as f:
         python_content = f.read()
 
     # Indent Python content by 4 spaces to fit inside the Python tab

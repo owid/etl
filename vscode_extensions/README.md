@@ -6,8 +6,7 @@
 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
-| `make install-vscode-extensions` | Install all extensions for first time | Initial setup only (skips already-installed) |
-| `make vsce-sync` | Force-reinstall all extensions | After compiling any extension to update it |
+| `make vsce-sync` | Sync all extensions (install missing, upgrade outdated) | Initial setup and after compiling extensions |
 | `make vsce-compile EXT=name INSTALL=1` | Compile and install single extension | Quick development iteration |
 | `make vsce-compile EXT=name BUMP=patch INSTALL=1` | Bump version, compile, and install | Before committing new features |
 
@@ -44,8 +43,7 @@ make vsce-sync
 
 **Installation:**
 - **INSTALL=1**: Immediately installs after compilation with `--force` flag
-- **make vsce-sync**: Force-reinstalls ALL custom extensions with their latest VSIX files
-- **make install-vscode-extensions**: Only installs extensions not already installed (skips updates)
+- **make vsce-sync**: Installs missing extensions and upgrades outdated ones (version-aware)
 
 **File Structure:**
 ```
@@ -63,9 +61,9 @@ vscode_extensions/
 
 ### Troubleshooting
 
-**Problem: "I ran `make install-vscode-extensions` but my extension didn't update"**
-- **Cause**: This command skips already-installed extensions
-- **Solution**: Use `make vsce-sync` instead to force-reinstall all extensions
+**Problem: "I ran `make vsce-sync` but my extension didn't update"**
+- **Cause**: The installed version matches the VSIX version
+- **Solution**: Bump the version with `make vsce-compile EXT=name BUMP=patch INSTALL=1`
 
 **Problem: "Changes to my code aren't showing up in VS Code"**
 - **Cause**: Extension wasn't reinstalled with the new version

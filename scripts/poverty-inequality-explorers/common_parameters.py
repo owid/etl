@@ -126,12 +126,12 @@ PPP_DESCRIPTION_PIP_CURRENT = f"The data is measured in international-$ at {PPP_
 ####################################################################################################
 # WORLD INEQUALITY DATABASE
 ####################################################################################################
-SOURCE_NAME_WID = "World Inequality Database (WID.world) (2025)"
+SOURCE_NAME_WID = "World Inequality Database (WID.world) (2026)"
 DATA_PUBLISHED_BY_WID = "World Inequality Database (WID), https://wid.world"
 SOURCE_LINK_WID = "https://wid.world"
 
 # NOTE: Also update the year here: https://docs.google.com/spreadsheets/d/1wcFsNZCEn_6SJ05BFkXKLUyvCrnigfR8eeemGKgAYsI/edit#gid=329774797
-PPP_VERSION_WID = 2023
+PPP_VERSION_WID = 2024
 
 ADDITIONAL_DESCRIPTION_WID = NEW_LINE.join(
     [
@@ -197,7 +197,7 @@ def save(
     Save the explorer configuration to MySQL via the Admin API.
     """
     # Header is converted into a tab-separated text
-    header_tsv: str = df_header.to_csv(sep="\t", header=False)  # type: ignore
+    header_tsv: str = df_header.to_csv(sep="\t", header=False)  # ty: ignore
 
     # Graphers table is converted into a tab-separated text
     graphers_tsv = df_graphers

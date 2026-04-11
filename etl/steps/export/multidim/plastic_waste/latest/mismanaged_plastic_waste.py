@@ -312,12 +312,16 @@ def run() -> None:
             },
         ],
         params={
-            "title": lambda view: generate_title_by_type(view)
-            if view.dimensions.get("emission_type") == "total_by_type"
-            else generate_title_by_source(view),
-            "subtitle": lambda view: generate_subtitle_by_type(view)
-            if view.dimensions.get("emission_type") == "total_by_type"
-            else generate_subtitle_by_source(view),
+            "title": lambda view: (
+                generate_title_by_type(view)
+                if view.dimensions.get("emission_type") == "total_by_type"
+                else generate_title_by_source(view)
+            ),
+            "subtitle": lambda view: (
+                generate_subtitle_by_type(view)
+                if view.dimensions.get("emission_type") == "total_by_type"
+                else generate_subtitle_by_source(view)
+            ),
         },
     )
 

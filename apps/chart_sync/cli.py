@@ -1,13 +1,14 @@
 import copy
 import datetime as dt
 import re
-from typing import Any, Dict, Optional, Set
+from typing import Any
 
 import click
 import pandas as pd
 import structlog
 from rich import print
 from rich_click.rich_command import RichCommand
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
@@ -78,9 +79,9 @@ log = structlog.get_logger()
 def cli(
     source: str,
     target: str,
-    chart_id: Optional[int],
-    include: Optional[str],
-    exclude: Optional[str],
+    chart_id: int | None,
+    include: str | None,
+    exclude: str | None,
     dry_run: bool,
     ignore_conflicts: bool,
     archive: bool,
@@ -194,8 +195,19 @@ def cli(
             charts_synced = 0
             dods_synced = 0
             narrative_charts_synced = 0
-            synced_chart_ids: Set[int] = set()  # Track synced chart IDs for narrative chart sync
-            synced_dataset_ids: Set[int] = set()  # Track dataset IDs from synced charts for archiving
+            synced_chart_ids: set[int] = set()  # Track synced chart IDs for narrative chart sync
+            # Collect ALL target dataset IDs from charts being processed BEFORE syncing.
+            # This captures old dataset IDs that may become orphaned after sync.
+            if archive and chart_ids:
+                result = target_session.execute(
+                    select(gm.Variable.datasetId)
+                    .distinct()
+                    .join(gm.ChartDimensions, gm.ChartDimensions.variableId == gm.Variable.id)
+                    .where(gm.ChartDimensions.chartId.in_(chart_ids), gm.Variable.datasetId.isnot(None))
+                )
+                synced_dataset_ids: set[int] = {row[0] for row in result}
+            else:
+                synced_dataset_ids: set[int] = set()
 
             # Iterate over all chart diffs
             failed_charts = []
@@ -238,11 +250,6 @@ def cli(
 
                     # Chart in target exists, update it
                     if diff.target_chart:
-                        # Always collect target dataset IDs for archiving consideration,
-                        # even if the chart config hasn't changed
-                        target_variables = diff.target_chart.load_chart_variables(target_session)
-                        synced_dataset_ids.update(v.datasetId for v in target_variables.values() if v.datasetId)
-
                         # Check if configs and tags are equal
                         target_tags = diff.target_chart.tags(target_session)
                         configs_equal = configs_are_equal(migrated_config, diff.target_chart.config)
@@ -344,6 +351,9 @@ def cli(
             # Archive datasets without charts if requested
             datasets_archived = 0
             if archive and synced_dataset_ids:
+                # Refresh session to see chart_dimensions changes made via Admin API
+                # (MySQL REPEATABLE READ keeps a snapshot from transaction start)
+                target_session.commit()
                 datasets_archived = _archive_datasets_without_charts(
                     target_session, target_api, synced_dataset_ids, str(source), dry_run
                 )
@@ -474,7 +484,7 @@ The following {dataset_word} had no charts using their indicators and {"was" if 
         send_slack_message(channel="#data-architecture-github", message=message)
 
 
-def _matches_include_exclude(chart: gm.Chart, session: Session, include: Optional[str], exclude: Optional[str]):
+def _matches_include_exclude(chart: gm.Chart, session: Session, include: str | None, exclude: str | None):
     source_variables = chart.load_chart_variables(session)
 
     # if chart contains a variable that is excluded, skip the whole chart
@@ -495,7 +505,7 @@ def _matches_include_exclude(chart: gm.Chart, session: Session, include: Optiona
     return True
 
 
-def _prune_chart_config(config: Dict[str, Any]) -> Dict[str, Any]:
+def _prune_chart_config(config: dict[str, Any]) -> dict[str, Any]:
     config = copy.deepcopy(config)
     config = {k: v for k, v in config.items() if k not in ("version",)}
     for dim in config.get("dimensions", []):
@@ -504,7 +514,7 @@ def _prune_chart_config(config: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _chart_config_diff(
-    source_config: Dict[str, Any], target_config: Dict[str, Any], tabs: int = 1, color: bool = True
+    source_config: dict[str, Any], target_config: dict[str, Any], tabs: int = 1, color: bool = True
 ) -> str:
     return _dict_diff(
         _prune_chart_config(source_config), _prune_chart_config(target_config), tabs=tabs, color=color, width=500
@@ -512,7 +522,7 @@ def _chart_config_diff(
 
 
 def _sync_narrative_charts(
-    synced_chart_ids: Set[int],
+    synced_chart_ids: set[int],
     source_session: Session,
     target_session: Session,
     source_api: AdminAPI,
@@ -640,7 +650,7 @@ def _sync_dods(
                 )
                 _notify_slack_dod_conflict(
                     source_dod.name,
-                    str(source_session.bind.url).split("@")[-1],  # type: ignore
+                    str(source_session.bind.url).split("@")[-1],  # ty: ignore
                     source_dod.updatedAt,
                     target_dod.updatedAt,
                     server_creation_time,
@@ -668,7 +678,7 @@ def _sync_dods(
 def _archive_datasets_without_charts(
     target_session: Session,
     target_api: AdminAPI,
-    dataset_ids: Set[int],
+    dataset_ids: set[int],
     source: str,
     dry_run: bool,
 ) -> int:

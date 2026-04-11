@@ -1,7 +1,6 @@
 """Auxiliary utils for metagpt app."""
 
 from pathlib import Path
-from typing import Dict, List
 
 
 class Channels:
@@ -17,11 +16,11 @@ class Channels:
 
 def read_metadata_file(path_to_file: str | Path) -> str:
     """Read a metadata file and returns its content."""
-    with open(path_to_file, "r") as file:
+    with open(path_to_file) as file:
         return file.read()
 
 
-def convert_list_to_dict(data_list: List[str]) -> Dict[str, str]:
+def convert_list_to_dict(data_list: list[str]) -> dict[str, str]:
     """Convert a list of string elements in the format "'key': 'value'" into a dictionary."""
     data_dict = {}
     for item in data_list:
