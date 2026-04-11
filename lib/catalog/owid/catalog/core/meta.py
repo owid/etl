@@ -81,7 +81,7 @@ class MetaBase(DataClassJsonMixin):
         """
         return hash_any(self)
 
-    def __eq__(self, other: Self) -> bool:  # type: ignore
+    def __eq__(self, other: Self) -> bool:  # ty: ignore
         """Check equality based on hash values.
 
         Args:
@@ -94,7 +94,7 @@ class MetaBase(DataClassJsonMixin):
             return False
         return self.__hash__() == other.__hash__()
 
-    def to_dict(self, encode_json: bool = False) -> dict[str, Any]:  # type: ignore
+    def to_dict(self, encode_json: bool = False) -> dict[str, Any]:  # ty: ignore
         """Convert metadata object to dictionary.
 
         Args:
@@ -113,7 +113,7 @@ class MetaBase(DataClassJsonMixin):
         return super().to_dict(encode_json=encode_json)
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> T:  # type: ignore
+    def from_dict(cls, d: dict[str, Any]) -> T:  # ty: ignore
         """Create metadata object from dictionary.
 
         Args:
@@ -133,7 +133,7 @@ class MetaBase(DataClassJsonMixin):
             the default dataclasses_json method.
         """
         # NOTE: this is much faster than using dataclasses_json
-        return dataclass_from_dict(cls, d)  # type: ignore
+        return dataclass_from_dict(cls, d)  # ty: ignore
 
     def update(self, **kwargs: dict[str, Any]) -> None:
         """Update metadata fields with new values.
@@ -169,7 +169,7 @@ class MetaBase(DataClassJsonMixin):
             ```
         """
         if not deep:
-            return dataclasses.replace(self)  # type: ignore
+            return dataclasses.replace(self)  # ty: ignore
         else:
             return _deepcopy_dataclass(self)
 
@@ -567,8 +567,8 @@ class VariableMeta(MetaBase):
 
     def copy(self, deep: bool = True) -> Self:
         m = super().copy(deep)
-        m._name = getattr(self, "_name", None)  # type: ignore
-        return m  # type: ignore
+        m._name = getattr(self, "_name", None)  # ty: ignore
+        return m  # ty: ignore
 
 
 @pruned_json
@@ -704,11 +704,11 @@ class TableMeta(MetaBase):
         # Render a nice display of the table metadata
         record = self.to_dict()
         short_name = record.pop("short_name")
-        return """
-             <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
+        return f"""
+             <h2 style="margin-bottom: 0em"><pre>{short_name}</pre></h2>
              <p style="font-variant: small-caps; font-family: sans-serif; font-size: 1.5em; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">table meta</p>
-             {}
-        """.format(short_name, to_html(record))
+             {to_html(record)}
+        """
 
     @property
     def uri(self) -> str:
@@ -727,9 +727,7 @@ def to_html(record: Any) -> str | None:
                 continue
             v_str = to_html(v)
             rows.append(
-                """<tr><th style="text-align: right; font-family: sans-serif; vertical-align: top; padding: 0.2em 1em;"><strong>{}</strong></th><td style="text-align: left; padding: 0.2em 1em;">{}</td></tr>""".format(
-                    k, v_str
-                )
+                f"""<tr><th style="text-align: right; font-family: sans-serif; vertical-align: top; padding: 0.2em 1em;"><strong>{k}</strong></th><td style="text-align: left; padding: 0.2em 1em;">{v_str}</td></tr>"""
             )
         return '<table style="margin: 0em"><tbody>{}</tbody></table>'.format("".join(rows))
 
@@ -744,7 +742,7 @@ def to_html(record: Any) -> str | None:
         return '<ul style="text-align: left; margin-top: 0em; margin-bottom: 0em">{}</ul>'.format("".join(rows))
 
     else:
-        return mistune.html(str(record))  # type: ignore
+        return mistune.html(str(record))  # ty: ignore
 
 
 def is_year_or_date(s: str) -> bool:

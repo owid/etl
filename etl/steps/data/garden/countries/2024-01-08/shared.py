@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from typing import Optional, cast
+from typing import cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -34,9 +34,9 @@ def init_table_countries_in_region(
     # Sanity check
     ## Check that there is only one country per (id, year)
     ## Note that there are multiple countries per ID (max 2; in this case there is one with ID 580: 'Madagascar' and 'Madagascar (Malagasy)')
-    assert (
-        tb_regions.groupby([column_id, column_year])[column_country].nunique().max() == 1
-    ), f"Multiple `country` values for same `{column_id}` and `year`"
+    assert tb_regions.groupby([column_id, column_year])[column_country].nunique().max() == 1, (
+        f"Multiple `country` values for same `{column_id}` and `year`"
+    )
 
     # Keep relevant columns
     tb_regions = tb_regions[[column_id, column_year, column_country]]
@@ -88,12 +88,12 @@ def expand_observations(tb: Table, col_year_start: str, col_year_end: str) -> Ta
 
 def fill_timeseries(
     tb: Table,
-    year_min: Optional[int],
-    year_max: Optional[int],
+    year_min: int | None,
+    year_max: int | None,
     default_min: bool = False,
     default_max: bool = False,
-    col_year_start: Optional[str] = None,
-    col_year_end: Optional[str] = None,
+    col_year_start: str | None = None,
+    col_year_end: str | None = None,
     filter_times: bool = False,
 ) -> Table:
     """Complement table with missing years."""

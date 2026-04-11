@@ -1,5 +1,5 @@
 import io
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Any, Literal
 
@@ -10,7 +10,7 @@ from owid.catalog.core.tables import Table
 from owid.catalog.core.utils import dynamic_yaml_load, dynamic_yaml_to_dict
 
 
-@lru_cache(maxsize=None)
+@cache
 def _load_annot(
     resolved_path: str, frozen_params: tuple[tuple[str, Any], ...], _mtime: tuple[float, float] = (0.0, 0.0)
 ) -> dict[str, Any]:

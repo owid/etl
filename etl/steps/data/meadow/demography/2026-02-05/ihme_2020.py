@@ -38,9 +38,9 @@ def run() -> None:
         # Change table name
         short_name = tb.m.short_name
         assert isinstance(short_name, str), f"Expected short name to be a string, got {type(short_name)}"
-        assert (
-            paths.short_name in short_name
-        ), f"Snapshot name {snapshot_name} does not contain expected short name {paths.short_name}"
+        assert paths.short_name in short_name, (
+            f"Snapshot name {snapshot_name} does not contain expected short name {paths.short_name}"
+        )
         tb.m.short_name = short_name.replace(f"{paths.short_name}_", "")
 
         # Replace unknown scenario with "reference" scenario.

@@ -168,7 +168,6 @@ steps:
     - snapshot://artificial_intelligence/2025-04-08/ai_robots.csv
     - data://garden/artificial_intelligence/2024-06-28/ai_robots
 
-
   # AI Index Report 2024 -  AI robots
   data://garden/artificial_intelligence/2024-06-28/ai_robots:
     - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
@@ -209,17 +208,6 @@ steps:
     - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
 
 
-  #
-  # Robotaxis dataset
-  #
-  data://meadow/artificial_intelligence/2025-12-09/robotaxis:
-    - snapshot://artificial_intelligence/2025-12-09/robotaxis.csv
-  data://garden/artificial_intelligence/2025-12-09/robotaxis:
-    - data://meadow/artificial_intelligence/2025-12-09/robotaxis
-  data://grapher/artificial_intelligence/2025-12-09/robotaxis:
-    - data://garden/artificial_intelligence/2025-12-09/robotaxis
-
-  #
   # Ireland Data Centers Metered Electricity Consumption
   #
   data://meadow/artificial_intelligence/2025-11-10/ireland_metered_consumption:
@@ -229,15 +217,6 @@ steps:
   data://grapher/artificial_intelligence/2025-11-10/ireland_metered_consumption:
     - data://garden/artificial_intelligence/2025-11-10/ireland_metered_consumption
 
-
-  # NVIDIA quarterly revenue dataset
-  data://meadow/artificial_intelligence/2025-11-11/nvidia_revenue:
-    - snapshot://artificial_intelligence/2025-11-11/nvidia_revenue.csv
-  data://garden/artificial_intelligence/2025-11-11/nvidia_revenue:
-    - data://meadow/artificial_intelligence/2025-11-11/nvidia_revenue
-    - data://garden/bls/2026-03-20/us_consumer_prices
-  data://grapher/artificial_intelligence/2025-11-11/nvidia_revenue:
-    - data://garden/artificial_intelligence/2025-11-11/nvidia_revenue
 
   # Datacenter construction spending (U.S. Census Bureau)
   data://meadow/us_census_bureau/2026-03-24/datacenter_construction:
@@ -288,3 +267,43 @@ steps:
     - data://meadow/ifr/2026-01-14/robot_density
   data://grapher/ifr/2026-01-14/robot_density:
     - data://garden/ifr/2026-01-14/robot_density
+
+  # Robotaxis dataset
+  data://meadow/artificial_intelligence/2026-03-30/robotaxis:
+    - snapshot://artificial_intelligence/2026-03-30/robotaxis.csv
+  data://garden/artificial_intelligence/2026-03-30/robotaxis:
+    - data://meadow/artificial_intelligence/2026-03-30/robotaxis
+  data://grapher/artificial_intelligence/2026-03-30/robotaxis:
+    - data://garden/artificial_intelligence/2026-03-30/robotaxis
+
+  # NVIDIA quarterly revenue dataset
+  data://meadow/artificial_intelligence/2026-04-02/nvidia_revenue:
+    - snapshot://artificial_intelligence/2026-04-02/nvidia_revenue.csv
+  data://garden/artificial_intelligence/2026-04-02/nvidia_revenue:
+    - data://meadow/artificial_intelligence/2026-04-02/nvidia_revenue
+  data://grapher/artificial_intelligence/2026-04-02/nvidia_revenue:
+    - data://garden/artificial_intelligence/2026-04-02/nvidia_revenue
+
+  # Microsoft AI Diffusion — Global AI adoption estimates
+  data://meadow/artificial_intelligence/2026-04-07/ai_diffusion_msft:
+    - snapshot://artificial_intelligence/2026-04-07/ai_diffusion_msft.pdf
+  data://garden/artificial_intelligence/2026-04-07/ai_diffusion_msft:
+    - data://meadow/artificial_intelligence/2026-04-07/ai_diffusion_msft
+  data://grapher/artificial_intelligence/2026-04-07/ai_diffusion_msft:
+    - data://garden/artificial_intelligence/2026-04-07/ai_diffusion_msft
+  
+  # Eurostat — Use of generative AI tools by individuals
+  data://meadow/eurostat/2026-04-07/generative_ai_use:
+    - snapshot://eurostat/2026-04-07/generative_ai_use.gz
+  data://garden/eurostat/2026-04-07/generative_ai_use:
+    - data://meadow/eurostat/2026-04-07/generative_ai_use
+  data://grapher/eurostat/2026-04-07/generative_ai_use:
+    - data://garden/eurostat/2026-04-07/generative_ai_use
+    
+  # Gallup - Artificial Intelligence indicator
+  data://meadow/gallup/2026-04-03/ai_indicator:
+    - snapshot://gallup/2026-04-03/ai_indicator.csv
+  data://garden/gallup/2026-04-03/ai_indicator:
+    - data://meadow/gallup/2026-04-03/ai_indicator
+  data://grapher/gallup/2026-04-03/ai_indicator:
+    - data://garden/gallup/2026-04-03/ai_indicator

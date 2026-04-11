@@ -6,6 +6,11 @@ from etl.snapshot import Snapshot
 def process_data(snap: Snapshot):
     """
     Process sheets in the given Excel file and return a combined DataFrame.
+
+    Each sheet corresponds to a demographic group. Response values are stored as proportions
+    rounded to 2 decimal places in the source, which causes sums of 99% or 101% due to
+    independent rounding of each response category. Values are normalized per date so that
+    all response categories sum to exactly 100%.
     """
     sheet_names = snap.ExcelFile().sheet_names
     tables = []
@@ -17,7 +22,10 @@ def process_data(snap: Snapshot):
             id_vars=question, var_name="Date", value_name="Value"
         )  # Melt date columns into one called 'Date'
         filtered_tb = melted_tb[~melted_tb[question].isin(["Unweighted base", "Base"])]  # Exclude sample sizes
-        filtered_tb = filtered_tb.assign(Value=filtered_tb["Value"] * 100, Group=sheet_name)  # Convert to percentages
+        filtered_tb = filtered_tb.assign(Group=sheet_name)
+        # Normalize per date to sum to 100% — source data rounds each response independently,
+        # causing sums of 99% or 101%. We rescale to fix this rounding artifact.
+        filtered_tb["Value"] = filtered_tb.groupby("Date")["Value"].transform(lambda x: x / x.sum() * 100)
 
         tables.append(filtered_tb)
 

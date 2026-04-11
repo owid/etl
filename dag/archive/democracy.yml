@@ -101,3 +101,13 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/democracy/2024-03-07/bmr:
     - data://garden/democracy/2024-03-07/bmr
+
+  # Lexical index 2025
+data://meadow/democracy/2025-06-26/lexical_index:
+  - snapshot://democracy/2025-06-26/lexical_index.xlsx
+data://garden/democracy/2025-06-26/lexical_index:
+  - data://garden/regions/2023-01-01/regions
+  - data://meadow/democracy/2025-06-26/lexical_index
+  - data://garden/demography/2024-07-15/population
+data://grapher/democracy/2025-06-26/lexical_index:
+  - data://garden/democracy/2025-06-26/lexical_index

@@ -8,15 +8,15 @@ steps:
   #
   # OECD Government at a Glance
   #
-  data://meadow/oecd/2025-06-30/government_at_a_glance:
-    - snapshot://oecd/2025-06-30/govt_glance_public_finance_by_function.csv
-    - snapshot://oecd/2025-06-30/govt_glance_size_public_procurement.csv
-    - snapshot://oecd/2025-06-30/govt_glance_public_finance.csv
-    - snapshot://oecd/2025-06-30/govt_glance_public_finance_economic_transaction.csv
-  data://garden/oecd/2025-06-30/government_at_a_glance:
-    - data://meadow/oecd/2025-06-30/government_at_a_glance
-  data://grapher/oecd/2025-06-30/government_at_a_glance:
-    - data://garden/oecd/2025-06-30/government_at_a_glance
+  data://meadow/oecd/2026-04-01/government_at_a_glance:
+    - snapshot://oecd/2026-04-01/govt_glance_public_finance_by_function.csv
+    - snapshot://oecd/2026-04-01/govt_glance_public_finance_economic_transaction.csv
+    - snapshot://oecd/2026-04-01/govt_glance_public_finance.csv
+    - snapshot://oecd/2026-04-01/govt_glance_size_public_procurement.csv
+  data://garden/oecd/2026-04-01/government_at_a_glance:
+    - data://meadow/oecd/2026-04-01/government_at_a_glance
+  data://grapher/oecd/2026-04-01/government_at_a_glance:
+    - data://garden/oecd/2026-04-01/government_at_a_glance
 
   # UNU-WIDER Government Revenue Dataset
   data://meadow/unu_wider/2026-03-24/government_revenue_dataset:

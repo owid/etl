@@ -1451,9 +1451,9 @@ def add_kpa_to_gam(tb_gam, tb_kpa):
         if num_mismatches > 0:
             # TODO: Review mismatches with UNAIDS source
             # mismatches.to_csv("mismatches_kpa_gam.csv", index=False)
-            assert (
-                num_mismatches == NUM_EXPECTED_MISMATCHES_KPA_GAM
-            ), f"Expected 88 mismatches, found {num_mismatches}: {mismatches.head()}"
+            assert num_mismatches == NUM_EXPECTED_MISMATCHES_KPA_GAM, (
+                f"Expected 88 mismatches, found {num_mismatches}: {mismatches.head()}"
+            )
             paths.log.warning(
                 f"Found {num_mismatches} overlapping rows with different values "
                 f"(out of {len(tb_merged)} total overlaps) - favoring GAM values"
@@ -1528,9 +1528,9 @@ def remove_anomalies(tb, anomalies):
                 raise TypeError("Unexpected type for 'year' in anomaly! Must be INT or LIST[INT].")
 
         if "dimensions" in anomaly:
-            assert isinstance(
-                anomaly["dimensions"], dict
-            ), "Unexpected type for 'dimensions' in anomaly! Must be a DICT."
+            assert isinstance(anomaly["dimensions"], dict), (
+                "Unexpected type for 'dimensions' in anomaly! Must be a DICT."
+            )
             for dim, value in anomaly["dimensions"].items():
                 if isinstance(value, list):
                     mask &= tb[dim].isin(value)

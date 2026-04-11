@@ -5,7 +5,7 @@ Helpers for working with Git through PyGithub library.
 import hashlib
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import jwt
 import requests
@@ -27,7 +27,7 @@ from etl.paths import BASE_DIR
 log = get_logger()
 
 
-def get_github_instance(access_token: Optional[str] = None) -> Github:
+def get_github_instance(access_token: str | None = None) -> Github:
     """Return a PyGithub instance authenticated with the token.
 
     Args:
@@ -56,7 +56,7 @@ def generate_jwt(client_id: str, private_key_path: str) -> str:
         "exp": now + (10 * 60),  # JWT expiration time (10 minutes)
         "iss": client_id,
     }
-    with open(private_key_path, "r") as key_file:
+    with open(private_key_path) as key_file:
         private_key = key_file.read()
     token = jwt.encode(payload, private_key, algorithm="RS256")
     return token
@@ -111,7 +111,7 @@ def compute_git_blob_sha1(content: bytes) -> str:
     """
     # Calculate the blob header
     size = len(content)
-    header = f"blob {size}\0".encode("utf-8")
+    header = f"blob {size}\0".encode()
 
     # Compute the SHA-1 hash of the header + content
     sha1 = hashlib.sha1()
@@ -138,7 +138,7 @@ class GithubApiRepo:
     """Class for interacting with a GitHub repository via the GitHub API."""
 
     def __init__(
-        self, org: str = "owid", repo_name: str = "etl", access_token: Optional[str] = None, use_app_auth: bool = False
+        self, org: str = "owid", repo_name: str = "etl", access_token: str | None = None, use_app_auth: bool = False
     ):
         """Initialize with the organization and repository name.
 
@@ -275,7 +275,7 @@ class GithubApiRepo:
                 f"Created merge commit for {branch_name} using master's tree, conflicts will be resolved by file commits"
             )
 
-    def get_open_prs(self, branch_name: str) -> List[PullRequest]:
+    def get_open_prs(self, branch_name: str) -> list[PullRequest]:
         """Get open pull requests for a specific branch.
 
         Args:
@@ -286,7 +286,7 @@ class GithubApiRepo:
         """
         return list(self.repo.get_pulls(state="open", head=f"{self.org}:{branch_name}"))
 
-    def get_pr(self, branch_name: str) -> Optional[PullRequest]:
+    def get_pr(self, branch_name: str) -> PullRequest | None:
         """Get a pull request for a branch.
 
         Args:
@@ -331,7 +331,7 @@ class GithubApiRepo:
 
         return active_prs
 
-    def get_comment_from_pr(self, pr: PullRequest, username: str = "owidbot") -> Optional[Any]:
+    def get_comment_from_pr(self, pr: PullRequest, username: str = "owidbot") -> Any | None:
         """Get a comment from a PR by username.
 
         Args:
@@ -442,7 +442,7 @@ class GithubApiRepo:
         log.info(f"Deleted branch {branch_name}")
         return True
 
-    def create_tree(self, base_tree_sha: str, tree_items: List[Dict[str, str]]) -> str:
+    def create_tree(self, base_tree_sha: str, tree_items: list[dict[str, str]]) -> str:
         """Create a git tree.
 
         Args:
@@ -522,12 +522,12 @@ class GithubApiRepo:
 
     def create_commit_with_files(
         self,
-        files: List[Path],
+        files: list[Path],
         branch_name: str,
         commit_message: str,
         base_dir: Path = BASE_DIR,
-        parent_sha: Optional[str] = None,
-        base_tree_sha: Optional[str] = None,
+        parent_sha: str | None = None,
+        base_tree_sha: str | None = None,
     ) -> tuple[bool, str]:
         """Create a commit with the provided files.
 
@@ -691,7 +691,7 @@ class GithubApiRepo:
         conclusion: str,
         title: str,
         summary: str,
-        text: Optional[str] = None,
+        text: str | None = None,
     ) -> Any:
         """Create a check run for a commit.
 
@@ -718,7 +718,7 @@ class GithubApiRepo:
             head_sha=head_sha,
             status="completed",
             conclusion=conclusion,
-            output=output,  # type: ignore
+            output=output,  # ty: ignore
         )
 
         return check_run

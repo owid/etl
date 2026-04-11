@@ -1,7 +1,7 @@
 import os
 import pickle
 import time
-from typing import Any, Dict, Optional
+from typing import Any
 
 import streamlit as st
 import torch
@@ -45,7 +45,7 @@ def get_model(model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
 def get_embeddings(
     model: SentenceTransformer,
     texts: list[str],
-    model_name: Optional[str] = None,
+    model_name: str | None = None,
     batch_size=32,
     workers=1,
 ) -> torch.Tensor:
@@ -56,7 +56,7 @@ def get_embeddings(
     if model_name is None:
         # NOTE: this is a bit of a hack
         # TODO: fix it when we update to the latest version
-        model_name = model.tokenizer.name_or_path.split("/")[-1]  # type: ignore
+        model_name = model.tokenizer.name_or_path.split("/")[-1]  # ty: ignore
 
     cache_file_keys = CACHE_DIR / f"embeddings_{model_name}.keys.pkl"
     cache_file_tensor = CACHE_DIR / f"embeddings_{model_name}.pt"
@@ -86,7 +86,7 @@ def get_embeddings(
             # Start the multiprocessing pool
             pool = model.start_multi_process_pool(target_devices=workers * [DEVICE])
             # Encode sentences using multiprocessing
-            batch_embeddings = model.encode_multi_process(  # type: ignore
+            batch_embeddings = model.encode_multi_process(  # ty: ignore
                 missing_texts,
                 pool,
                 batch_size=batch_size,
@@ -128,7 +128,7 @@ def get_embeddings(
 
     # Get requested embeddings in order
     indices = [key_to_index[text] for text in texts]
-    req_embeddings = embeddings[indices]  # type: ignore
+    req_embeddings = embeddings[indices]  # ty: ignore
 
     log.info("get_embeddings.end", t=time.time() - t)
 
@@ -138,19 +138,19 @@ def get_embeddings(
 
 # TODO: caching isn't working properly when on different devices
 # @st.cache_data(show_spinner=False, persist="disk", max_entries=1)
-def get_insights_embeddings(_model, insights: list[Dict[str, Any]]) -> list:
+def get_insights_embeddings(_model, insights: list[dict[str, Any]]) -> list:
     with st.spinner("Generating embeddings...", show_time=True):
         # Combine the title, body and authors of each insight into a single string.
         insights_texts = [
             insight["title"] + " " + insight["raw_text"] + " " + " ".join(insight["authors"]) for insight in insights
         ]
 
-        return get_embeddings(_model, insights_texts)  # type: ignore
+        return get_embeddings(_model, insights_texts)  # ty: ignore
 
 
 def get_sorted_documents_by_similarity(
-    model: SentenceTransformer, input_string: str, docs: list[Dict[str, str]], embeddings: torch.Tensor
-) -> list[Dict[str, Any]]:
+    model: SentenceTransformer, input_string: str, docs: list[dict[str, str]], embeddings: torch.Tensor
+) -> list[dict[str, Any]]:
     """Ingests an input string and a list of documents, returning the list of documents sorted by their semantic similarity to the input string."""
     log.info("get_sorted_documents_by_similarity.start", n_docs=len(docs))
     t = time.time()
@@ -170,7 +170,7 @@ def get_sorted_documents_by_similarity(
 
     # Attach the similarity scores to the documents.
     for i, doc in enumerate(_docs):
-        doc["similarity"] = similarities[i]  # type: ignore
+        doc["similarity"] = similarities[i]  # ty: ignore
 
     # Sort the documents by descending similarity score.
     sorted_documents = sorted(_docs, key=lambda x: x["similarity"], reverse=True)

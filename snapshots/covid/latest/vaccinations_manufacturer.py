@@ -5,7 +5,6 @@ Run the lines from https://github.com/owid/covid-19-data/blob/d8fae5631e21302705
 """
 
 from pathlib import Path
-from typing import Optional
 
 import click
 
@@ -18,7 +17,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
-def main(upload: bool, path_to_file: Optional[str] = None) -> None:
+def main(upload: bool, path_to_file: str | None = None) -> None:
     # MANUAL
     ## This is a snapshot from github.com/owid/covid-19-data as of 15th August 2024
     ## No need to re-run it again

@@ -300,7 +300,7 @@ def create_visualization(
     fig.text(
         0.06,
         0.015,
-        f"{source_citation}\n" "The interactive data visualization is available at OurWorldInData.org.",
+        f"{source_citation}\nThe interactive data visualization is available at OurWorldInData.org.",
         ha="left",
         va="bottom",
         fontsize=9,

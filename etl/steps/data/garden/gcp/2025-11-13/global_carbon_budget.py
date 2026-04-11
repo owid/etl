@@ -419,7 +419,7 @@ def prepare_fossil_co2_emissions(tb_co2: Table) -> Table:
     world_missing_years = (
         tb_co2[(tb_co2["country"] == "Global") & (tb_co2["emissions_from_other_industry"].isnull())]["year"]
         .unique()
-        .tolist()  # type: ignore
+        .tolist()  # ty: ignore
     )
     # Data that needs to be aggregated.
     data_missing_in_world = tb_co2[
@@ -678,9 +678,9 @@ def fix_consumption_emissions_for_africa(tb_co2_with_regions: Table) -> Table:
         "Discrepancy in consumption emissions between aggregated Africa and Africa (GCP) no longer exists. "
         "Remove temporary fix"
     )
-    assert (
-        consumption_emissions_africa_gcp - consumption_emissions_africa
-    ) / consumption_emissions_africa_gcp > 0.2, error
+    assert (consumption_emissions_africa_gcp - consumption_emissions_africa) / consumption_emissions_africa_gcp > 0.2, (
+        error
+    )
 
     # Replace consumption emissions for "Africa" by those by "Africa (GCP)".
     consumption_emissions = tb[tb["country"] != "Africa"][["country", "year", "consumption_emissions"]].reset_index(

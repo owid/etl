@@ -52,7 +52,14 @@ def run() -> None:
     decile_values = [
         slug
         for slug, name in decile_choices.items()
-        if name and slug not in ("all", "all_bar", "10_40_50", "10_40_50_bar")
+        if name
+        and slug
+        not in (
+            "all",
+            # "all_bar",
+            "10_40_50",
+            # "10_40_50_bar",
+        )
     ]
     c.group_views(
         groups=[
@@ -74,25 +81,25 @@ def run() -> None:
                     "description_short": "{subtitle}",
                 },
             },
-            {
-                "dimension": "decile",
-                "choices": decile_values,
-                "choice_new_slug": "all_bar",
-                "view_config": {
-                    "hideRelativeToggle": True,
-                    "selectedFacetStrategy": "entity",
-                    "hasMapTab": False,
-                    "tab": "chart",
-                    "chartTypes": ["StackedDiscreteBar"],
-                    "hideTotalValueLabel": True,
-                    "baseColorScheme": "OwidCategoricalE",
-                    "title": "{title}",
-                    "subtitle": "{subtitle}",
-                },
-                "view_metadata": {
-                    "description_short": "{subtitle}",
-                },
-            },
+            # {
+            #     "dimension": "decile",
+            #     "choices": decile_values,
+            #     "choice_new_slug": "all_bar",
+            #     "view_config": {
+            #         "hideRelativeToggle": True,
+            #         "selectedFacetStrategy": "entity",
+            #         "hasMapTab": False,
+            #         "tab": "chart",
+            #         "chartTypes": ["StackedDiscreteBar"],
+            #         "hideTotalValueLabel": True,
+            #         "baseColorScheme": "OwidCategoricalE",
+            #         "title": "{title}",
+            #         "subtitle": "{subtitle}",
+            #     },
+            #     "view_metadata": {
+            #         "description_short": "{subtitle}",
+            #     },
+            # },
         ],
         params={
             "title": _get_grouped_decile_title,
@@ -106,7 +113,14 @@ def run() -> None:
     c.drop_views(
         [
             {"decile": ["2", "3", "4", "6", "7", "8"]},
-            {"decile": ["all_bar", "10_40_50", "10_40_50_bar"], "indicator": non_share},
+            {
+                "decile": [
+                    # "all_bar",
+                    "10_40_50",
+                    # "10_40_50_bar",
+                ],
+                "indicator": non_share,
+            },
             {"decile": ["5", "9"], "indicator": non_thr},
         ]
     )
@@ -119,18 +133,18 @@ def run() -> None:
         if (view.matches(decile="all") or view.matches(decile="all_bar")) and view.indicators.y:
             # Sort indicators by decile number
             reverse_order = view.matches(indicator="share")
-            if view.matches(decile="all_bar"):
-                reverse_order = not reverse_order
+            # if view.matches(decile="all_bar"):
+            #     reverse_order = not reverse_order
             view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
 
             # For all_bar: set sortBy (depends on sorted indicator order)
-            if view.matches(decile="all_bar"):
-                decile_10_ind = next((ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None)
-                if decile_10_ind:
-                    if view.config is None:
-                        view.config = {}
-                    view.config["sortBy"] = "column"
-                    view.config["sortColumnSlug"] = decile_10_ind.catalogPath
+            # if view.matches(decile="all_bar"):
+            #     decile_10_ind = next((ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None)
+            #     if decile_10_ind:
+            #         if view.config is None:
+            #             view.config = {}
+            #         view.config["sortBy"] = "column"
+            #         view.config["sortColumnSlug"] = decile_10_ind.catalogPath
 
             # Set display names
             for ind in view.indicators.y:
@@ -169,16 +183,28 @@ def run() -> None:
     )
 
     # Remove before_vs_after for grouped decile views — too many indicators
-    c.drop_views([{"welfare_type": ["before_vs_after"], "decile": ["all", "all_bar", "10_40_50", "10_40_50_bar"]}])
+    c.drop_views(
+        [
+            {
+                "welfare_type": ["before_vs_after"],
+                "decile": [
+                    "all",
+                    # "all_bar",
+                    "10_40_50",
+                    # "10_40_50_bar",
+                ],
+            }
+        ]
+    )
 
     # Set display names for before_vs_after views
     for view in c.views:
         if view.dimensions.get("welfare_type") == "before_vs_after" and view.indicators.y:
             for ind in view.indicators.y:
                 if "_dhi_" in ind.catalogPath:
-                    ind.display = {"name": "After tax"}
+                    ind.display = {"name": "After taxes and benefits"}
                 elif "_mi_" in ind.catalogPath:
-                    ind.display = {"name": "Before tax"}
+                    ind.display = {"name": "Before taxes and benefits"}
 
     c.save()
 
