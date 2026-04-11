@@ -169,7 +169,9 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     expected_types = {_NOT_IN_SCHOOL, _BY_SECTOR, "World total"} | set(_REGION_ACRONYMS)
     for tb, name in [(tb_cl, "child_labor"), (tb_hw, "hazardous_work")]:
         actual_types = set(tb["region_type"].unique())
-        assert actual_types == expected_types, f"{name} has unexpected region_type values: {actual_types - expected_types}"
+        assert actual_types == expected_types, (
+            f"{name} has unexpected region_type values: {actual_types - expected_types}"
+        )
 
     # 1. Extract not-in-school rows.
     cl_nis = tb_cl[tb_cl["region_type"] == _NOT_IN_SCHOOL].drop(columns=["region_type", "region"])
