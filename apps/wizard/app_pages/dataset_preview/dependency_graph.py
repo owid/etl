@@ -4,7 +4,7 @@
 - [ ] Preview its metadata
 """
 
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 import streamlit as st
 from streamlit_agraph import Config, Edge, Node, agraph
@@ -44,30 +44,30 @@ def load_dag_cached():
 
 
 def generate_graph(
-    dag: Dict[str, Any],
+    dag: dict[str, Any],
     uri_main: str,
     collapse_snapshot: bool = True,
     collapse_others: bool = True,
     collapse_meadow: bool = True,
 ) -> Any:
-    def _friendly_label(attributes: Dict[str, str], length_limit: int = 32) -> str:
+    def _friendly_label(attributes: dict[str, str], length_limit: int = 32) -> str:
         label_1 = f"{attributes['namespace']}/{attributes['name']}"
         if len(label_1) > length_limit:
             label_1 = label_1[:length_limit] + "..."
         label = f"{label_1}\n{attributes['version']}"
         return label
 
-    def _friendly_title(attributes: Dict[str, str], children: List[str]) -> str:
+    def _friendly_title(attributes: dict[str, str], children: list[str]) -> str:
         deps = "\n- ".join(children)
-        title = f"""{attributes['identifier'].upper()}
-        version {attributes['version']} ({attributes['kind']})
+        title = f"""{attributes["identifier"].upper()}
+        version {attributes["version"]} ({attributes["kind"]})
         """
         title = attributes["step"].upper()
         if deps:
             title = title + "\n\ndependencies:\n- " + deps
         return title
 
-    def _collapse_node(attributes: Dict[str, str]) -> bool:
+    def _collapse_node(attributes: dict[str, str]) -> bool:
         if collapse_snapshot and (attributes["channel"] in ["snapshot"]):
             return True
         if collapse_meadow and (attributes["channel"] in ["meadow"]):

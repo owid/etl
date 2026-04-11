@@ -1,5 +1,4 @@
 import re
-from typing import Optional
 
 from owid.catalog import Dataset
 from structlog import getLogger
@@ -9,7 +8,7 @@ from etl.helpers import create_dataset, grapher_checks
 log = getLogger()
 
 
-def run_wrapper(dest_dir: str, garden_dataset: Dataset, include: Optional[str] = None) -> None:
+def run_wrapper(dest_dir: str, garden_dataset: Dataset, include: str | None = None) -> None:
     # Read tables from garden dataset.
     tables = []
     for table_name in garden_dataset.table_names:

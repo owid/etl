@@ -24,10 +24,10 @@ def combine_data_sheets(data: pd.ExcelFile) -> Table:
     combined = Table()
     for sheet_name in sorted(data.sheet_names):
         # Parse sheet for the current year.
-        tb = data.parse(sheet_name, skiprows=3, header=None, names=COLUMNS)  # type: ignore
+        tb = data.parse(sheet_name, skiprows=3, header=None, names=COLUMNS)  # ty: ignore
 
         # As a sanity check.
-        columns_new = data.parse(sheet_name, skiprows=0, header=[0, 1, 2]).columns  # type: ignore
+        columns_new = data.parse(sheet_name, skiprows=0, header=[0, 1, 2]).columns  # ty: ignore
 
         # Combine multiline header.
         error = "Column names may have changed."

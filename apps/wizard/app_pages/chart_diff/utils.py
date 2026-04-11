@@ -52,4 +52,4 @@ def indicators_in_charts(_engine: Engine, chart_ids: list[int]) -> dict[int, str
     with Session(_engine) as session:
         indicator_ids = gm.ChartDimensions.indicators_in_charts(session, chart_ids)
         rows = gm.Variable.from_id(session, variable_id=list(indicator_ids), columns=["id", "name"])
-        return {r.id: r.name for r in rows}  # type: ignore
+        return {r.id: r.name for r in rows}  # ty: ignore

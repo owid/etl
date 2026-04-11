@@ -51,13 +51,13 @@ with st.container(border=True):
         # Downloads
         st.download_button(
             "Download `graphers` (CSV)",
-            explorer._df_graphers_output.to_csv(sep=",", index=False),  # type: ignore
+            explorer._df_graphers_output.to_csv(sep=",", index=False),  # ty: ignore
             file_name="graphers.csv",
         )
         if not explorer.df_columns.empty:
             st.download_button(
                 "Download `columns` (CSV)",
-                explorer._df_columns_output.to_csv(sep=",", index=False),  # type: ignore
+                explorer._df_columns_output.to_csv(sep=",", index=False),  # ty: ignore
                 file_name="columns.csv",
             )
 

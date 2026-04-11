@@ -48,7 +48,7 @@ def main(upload: bool) -> None:
     df = pd.concat(dfs, ignore_index=True)
 
     # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
-    snap.create_snapshot(data=df, upload=upload)  # type: ignore
+    snap.create_snapshot(data=df, upload=upload)  # ty: ignore
 
 
 if __name__ == "__main__":

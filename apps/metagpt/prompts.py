@@ -4,7 +4,7 @@ Contains instructions to correctly query chat GPT for the different use cases (s
 """
 
 import json
-from typing import Any, Dict, List
+from typing import Any
 
 from apps.metagpt.utils import read_metadata_file
 from apps.utils.llms.gpt import GPTQuery
@@ -92,14 +92,14 @@ Metadata Field Guidelines:
 
 # Docs for garden metadata fields
 DOCS = BASE_DIR / "schemas" / "dataset-schema.json"
-with open(DOCS, "r") as f:
+with open(DOCS) as f:
     docs = json.load(f)
 DOCS_METADATA_INDICATORS = docs["properties"]["tables"]["additionalProperties"]["properties"]["variables"][
     "additionalProperties"
 ]["properties"]
 
 
-def create_system_prompt_snapshot(metadata_old_str: str) -> List[Dict[str, str]]:
+def create_system_prompt_snapshot(metadata_old_str: str) -> list[dict[str, str]]:
     """Create the system prompt for the GPT model based on file path."""
     # Load example of new metadata format
     new_metadata_file = read_metadata_file(NEW_METADATA_EXAMPLE)
@@ -139,8 +139,8 @@ def create_query_snapshot(metadata_old_str: str) -> GPTQuery:
 
 
 def create_system_prompt_data_step(
-    variable_title: str, metadata_field: str, ds_meta_description: Dict[str, Any]
-) -> List[Dict[str, str]]:
+    variable_title: str, metadata_field: str, ds_meta_description: dict[str, Any]
+) -> list[dict[str, str]]:
     """
     Generates a system prompt for a gardening application.
 
@@ -176,7 +176,7 @@ def create_system_prompt_data_step(
     return messages
 
 
-def create_query_data_step(variable_title: str, metadata_field: str, ds_meta_description: Dict[str, Any]) -> GPTQuery:
+def create_query_data_step(variable_title: str, metadata_field: str, ds_meta_description: dict[str, Any]) -> GPTQuery:
     """Build GPT query."""
     messages = create_system_prompt_data_step(
         variable_title,

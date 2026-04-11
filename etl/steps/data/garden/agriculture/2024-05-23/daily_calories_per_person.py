@@ -4,8 +4,6 @@ See description_processing (in the adjacent metadata file) for more details on t
 
 """
 
-from typing import Union
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
@@ -23,7 +21,7 @@ ELEMENT_CODE_FOOD_SUPPLY_PER_CAPITA = "0664pc"
 ITEM_CODE_TOTAL = "00002901"
 
 
-def correct_year(year: Union[str, int], verbose: bool = False) -> int:
+def correct_year(year: str | int, verbose: bool = False) -> int:
     # Correct the value of a year, to ensure it is an integer, and, when given a range, take the average value.
     year_str = str(year)
     if len(year_str) == 4:

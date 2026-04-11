@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any
 
 import yaml
 from structlog import get_logger
@@ -7,14 +7,14 @@ from structlog import get_logger
 from etl import paths
 
 log = get_logger()
-Graph = Dict[str, Set[str]]
+Graph = dict[str, set[str]]
 
 
 def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
     """Get the comment lines right above a step in the dag file."""
 
     # Read the content of the dag file.
-    with open(dag_file, "r") as _dag_file:
+    with open(dag_file) as _dag_file:
         lines = _dag_file.readlines()
 
     # Initialize a list to store the header lines.
@@ -46,8 +46,8 @@ def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
 
 def write_to_dag_file(
     dag_file: Path,
-    dag_part: Dict[str, Any],
-    comments: Optional[Dict[str, str]] = None,
+    dag_part: dict[str, Any],
+    comments: dict[str, str] | None = None,
     indent_step=2,
     indent_dependency=4,
 ):
@@ -82,7 +82,7 @@ def write_to_dag_file(
             comments[step] = comments[step] + "\n"
 
     # Read the lines in the original dag file.
-    with open(dag_file, "r") as file:
+    with open(dag_file) as file:
         lines = file.readlines()
 
     # Separate that content into the "steps" section (always given) and the "include" section (sometimes given).
@@ -182,7 +182,7 @@ def write_to_dag_file(
 
 
 def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
-    with open(dag_file, "r") as file:
+    with open(dag_file) as file:
         lines = file.readlines()
 
     new_lines = []
@@ -250,7 +250,7 @@ def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
         file.writelines(new_lines)
 
 
-def remove_steps_from_dag_file(dag_file: Path, steps_to_remove: List[str]) -> None:
+def remove_steps_from_dag_file(dag_file: Path, steps_to_remove: list[str]) -> None:
     """Remove specific steps from a dag file, including their comments.
 
     Parameters
@@ -279,7 +279,7 @@ def create_dag_archive_file(dag_file_archive: Path) -> None:
     dag_file_archive.write_text("steps:\n")
     # Find the number of spaces in the indentation of the main dag archive file.
     n_spaces_include_section = 2
-    with open(paths.DAG_ARCHIVE_FILE, "r") as file:
+    with open(paths.DAG_ARCHIVE_FILE) as file:
         lines = file.readlines()
     for i, line in enumerate(lines):
         if line.strip().startswith("include"):
@@ -292,11 +292,11 @@ def create_dag_archive_file(dag_file_archive: Path) -> None:
         file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")
 
 
-def load_dag(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> Graph:
+def load_dag(filename: str | Path = paths.DEFAULT_DAG_FILE) -> Graph:
     return _load_dag(filename, {})
 
 
-def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
+def _load_dag(filename: str | Path, prev_dag: dict[str, Any]):
     """
     Recursive helper to 1) load a dag itself, and 2) load any sub-dags
     included in the dag via 'include' statements
@@ -323,18 +323,18 @@ def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
     return curr_dag
 
 
-def _load_dag_yaml(filename: str) -> Dict[str, Any]:
+def _load_dag_yaml(filename: str) -> dict[str, Any]:
     with open(filename) as istream:
         return yaml.safe_load(istream)
 
 
-def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
+def _parse_dag_yaml(dag: dict[str, Any]) -> dict[str, Any]:
     steps = dag["steps"] or {}
 
     return {node: set(deps) if deps else set() for node, deps in steps.items()}
 
 
-def graph_nodes(graph: Graph) -> Set[str]:
+def graph_nodes(graph: Graph) -> set[str]:
     """Get all nodes from a DAG (both keys and values)."""
     all_steps = set(graph)
     for children in graph.values():
@@ -342,7 +342,7 @@ def graph_nodes(graph: Graph) -> Set[str]:
     return all_steps
 
 
-def get_active_snapshots() -> Set[str]:
+def get_active_snapshots() -> set[str]:
     DAG = load_dag()
 
     active_snapshots = set()
@@ -355,7 +355,7 @@ def get_active_snapshots() -> Set[str]:
     return {s.split(".")[0] + ".py" for s in active_snapshots}
 
 
-def get_active_steps() -> Set[str]:
+def get_active_steps() -> set[str]:
     DAG = load_dag()
 
     active_steps = set()

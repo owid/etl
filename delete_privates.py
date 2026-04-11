@@ -10,8 +10,9 @@ Usage:
     .venv/bin/python scripts/delete_private_from_public_bucket.py
 """
 
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Dict, Iterator, List
+from typing import Any
 
 import click
 from owid.catalog.api.legacy import CHANNEL, LocalCatalog
@@ -26,7 +27,7 @@ def is_metadata_file(filename: str) -> bool:
     return filename.endswith(".meta.json") or filename.endswith("index.json")
 
 
-def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[Dict[str, Any]]:
+def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[dict[str, Any]]:
     """Walk all objects in an S3 bucket with a given prefix."""
     objs = s3.list_objects(Bucket=bucket, Prefix=path, MaxKeys=100)
     yield from objs.get("Contents", [])
@@ -37,7 +38,7 @@ def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[Dict[str, Any]]:
         yield from objs.get("Contents", [])
 
 
-def delete_files(s3: Any, bucket: str, keys: List[str], dry_run: bool) -> None:
+def delete_files(s3: Any, bucket: str, keys: list[str], dry_run: bool) -> None:
     """Delete files from S3 in batches of 1000."""
     if dry_run or not keys:
         return

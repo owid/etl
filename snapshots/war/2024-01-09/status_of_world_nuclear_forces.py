@@ -25,16 +25,16 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"war/{SNAPSHOT_VERSION}/status_of_world_nuclear_forces.csv")
 
     # Request HTML content from website.
-    response = requests.get(snap.metadata.origin.url_main)  # type: ignore
+    response = requests.get(snap.metadata.origin.url_main)  # ty: ignore
 
     # Parse HTML content.
     soup = BeautifulSoup(response.text, "html.parser")
 
     # Extract the title of the table.
-    title = soup.find("div", class_="data-embed__title").get_text(strip=True)  # type: ignore
+    title = soup.find("div", class_="data-embed__title").get_text(strip=True)  # ty: ignore
 
     # Extract the year from the title.
-    year = int(re.findall("\d{4}", title)[0])  # type: ignore
+    year = int(re.findall("\d{4}", title)[0])  # ty: ignore
 
     # Find the relevant table by its class.
     table = soup.find("div", class_="data-embed__embed data-embed__embed--scroll")
@@ -42,7 +42,7 @@ def main(upload: bool) -> None:
     # Initialize a list to hold all rows of data.
     table_data = []
     # Iterate over all rows in the table and gather data.
-    for row in table.find_all("tr"):  # type: ignore
+    for row in table.find_all("tr"):  # ty: ignore
         row_data = [cell.get_text(strip=True) for cell in row.find_all("td")]
         # Add the row data to the table data list
         table_data.append(row_data)
