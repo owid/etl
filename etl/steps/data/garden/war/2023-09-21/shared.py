@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional, Type
+from typing import Literal
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -8,7 +8,7 @@ from typing_extensions import Self
 
 
 def expand_observations(
-    tb: Table, col_year_start: str, col_year_end: str, cols_scale: Optional[List[str]] = None, rounding: bool = True
+    tb: Table, col_year_start: str, col_year_end: str, cols_scale: list[str] | None = None, rounding: bool = True
 ) -> Table:
     """Expand to have a row per (year, conflict).
 
@@ -61,8 +61,8 @@ def expand_observations(
 def add_indicators_extra(
     tb: Table,
     tb_regions: Table,
-    columns_conflict_rate: Optional[List[str]] = None,
-    columns_conflict_mortality: Optional[List[str]] = None,
+    columns_conflict_rate: list[str] | None = None,
+    columns_conflict_mortality: list[str] | None = None,
 ) -> Table:
     """Scale original columns to obtain new indicators (conflict rate and conflict mortality indicators).
 
@@ -157,7 +157,7 @@ class Normaliser:
         raise NotImplementedError("Subclasses must implement this method")
 
     @classmethod
-    def add_num_countries_per_year(cls: Type[Self], tb: Table) -> Table:
+    def add_num_countries_per_year(cls: type[Self], tb: Table) -> Table:
         """Get number of countries (and country-pairs) per region per year and add it to the table.
 
         `tb` is expected to be the table cow_ssm_system from the cow_ssm dataset.
@@ -168,7 +168,7 @@ class Normaliser:
         return tb
 
     @classmethod
-    def add_indicators(cls: Type[Self], tb: Table, tb_codes: Table, columns_to_scale: List[str]) -> Table:
+    def add_indicators(cls: type[Self], tb: Table, tb_codes: Table, columns_to_scale: list[str]) -> Table:
         """Scale columns `columns_to_scale` based on the number of countries (and country-pairs) in each region and year.
 
         For each indicator listed in `columns_to_scale`, two new columns are added to the table:
@@ -197,7 +197,7 @@ class COWNormaliser(Normaliser):
     country_column: str = "statenme"
 
     @classmethod
-    def code_to_region(cls: Type[Self], cow_code: int) -> str:
+    def code_to_region(cls: type[Self], cow_code: int) -> str:
         """Convert code to region name."""
         match cow_code:
             case c if 2 <= c <= 165:
@@ -293,7 +293,7 @@ def _code_to_region_isd(cow_code: int) -> str:
 
 
 def fill_gaps_with_zeroes(
-    tb: Table, columns: List[str], cols_use_range: Optional[List[str]] = None, use_nan: bool = False
+    tb: Table, columns: list[str], cols_use_range: list[str] | None = None, use_nan: bool = False
 ) -> Table:
     """Fill missing values with zeroes.
 
@@ -322,10 +322,10 @@ def fill_gaps_with_zeroes(
 def aggregate_conflict_types(
     tb: Table,
     parent_name: str,
-    children_names: Optional[List[str]] = None,
-    columns_to_aggregate: Optional[List[str]] = None,
-    columns_to_aggregate_absolute: Optional[List[str]] = None,
-    columns_to_groupby: Optional[List[str]] = None,
+    children_names: list[str] | None = None,
+    columns_to_aggregate: list[str] | None = None,
+    columns_to_aggregate_absolute: list[str] | None = None,
+    columns_to_groupby: list[str] | None = None,
     dim_name: str = "conflict_type",
 ) -> Table:
     """Aggregate metrics in broader conflict types."""

@@ -12,8 +12,8 @@
       "**/*.meta.yml",
       "**/*.meta.override.yml"
     ],
-    "schemas/multidim-schema.json": "export/multidim/**/*.yml",
-    "schemas/explorer-schema.json": "export/explorers/**/*.yml"
+    "schemas/multidim-schema.json": "etl/steps/export/multidim/**/*.config.yml",
+    "schemas/explorer-schema.json": "etl/steps/export/explorers/**/*.config.yml"
   },
   "[python]": {
     "editor.formatOnSave": true,

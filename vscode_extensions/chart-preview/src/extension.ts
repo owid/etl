@@ -609,6 +609,46 @@ function generateEmbedHtml(grapherSrc: string, containerName: string, info: Info
 </html>`;
 }
 
+/** Convert raw text with ANSI escape codes to HTML with colored spans (TypeScript side). */
+function ansiToHtml(raw: string): string {
+	let text = raw
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;');
+
+	const colors: Record<string, string> = {
+		'30': '#000', '31': '#cd3131', '32': '#0dbc79', '33': '#e5e510',
+		'34': '#2472c8', '35': '#bc3fbc', '36': '#11a8cd', '37': '#e5e5e5',
+		'90': '#666', '91': '#f14c4c', '92': '#23d18b', '93': '#f5f543',
+		'94': '#3b8eea', '95': '#d670d6', '96': '#29b8db', '97': '#fff',
+	};
+
+	let bold = false;
+	let fg: string | null = null;
+	let spanOpen = false;
+
+	const result = text.replace(/\x1b\[([0-9;]*)m/g, (_match, codes: string) => {
+		const close = spanOpen ? '</span>' : '';
+		for (const c of codes.split(';')) {
+			if (c === '0' || c === '') { bold = false; fg = null; }
+			else if (c === '1') { bold = true; }
+			else if (colors[c]) { fg = colors[c]; }
+		}
+		if (bold || fg) {
+			let style = '';
+			if (bold) { style += 'font-weight:bold;'; }
+			if (fg) { style += 'color:' + fg + ';'; }
+			spanOpen = true;
+			return close + '<span style="' + style + '">';
+		} else {
+			spanOpen = false;
+			return close;
+		}
+	});
+
+	return result + (spanOpen ? '</span>' : '');
+}
+
 function getLoadingHtml(command: string): string {
 	return `<!DOCTYPE html>
 <html>
@@ -651,9 +691,40 @@ body {
 <pre id="log"></pre>
 <script>
 	const log = document.getElementById('log');
+	function ansiToHtml(text) {
+		text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		var colors = {
+			'30': '#000', '31': '#cd3131', '32': '#0dbc79', '33': '#e5e510',
+			'34': '#2472c8', '35': '#bc3fbc', '36': '#11a8cd', '37': '#e5e5e5',
+			'90': '#666', '91': '#f14c4c', '92': '#23d18b', '93': '#f5f543',
+			'94': '#3b8eea', '95': '#d670d6', '96': '#29b8db', '97': '#fff',
+		};
+		var bold = false, fg = null, open = false;
+		var result = text.replace(/\\x1b\\[([0-9;]*)m/g, function(m, codes) {
+			var close = open ? '</span>' : '';
+			codes.split(';').forEach(function(c) {
+				if (c === '0' || c === '') { bold = false; fg = null; }
+				else if (c === '1') { bold = true; }
+				else if (colors[c]) { fg = colors[c]; }
+			});
+			if (bold || fg) {
+				var s = '';
+				if (bold) s += 'font-weight:bold;';
+				if (fg) s += 'color:' + fg + ';';
+				open = true;
+				return close + '<span style="' + s + '">';
+			} else {
+				open = false;
+				return close;
+			}
+		});
+		return result + (open ? '</span>' : '');
+	}
 	window.addEventListener('message', (e) => {
 		if (e.data.type === 'log') {
-			log.textContent += e.data.text;
+			var span = document.createElement('span');
+			span.innerHTML = ansiToHtml(e.data.text);
+			log.appendChild(span);
 			log.scrollTop = log.scrollHeight;
 		}
 	});
@@ -663,10 +734,7 @@ body {
 }
 
 function getErrorHtml(message: string, title = 'Preview Error'): string {
-	const escaped = message
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;');
+	const escaped = ansiToHtml(message);
 	return `<!DOCTYPE html>
 <html>
 <head>
@@ -1115,24 +1183,26 @@ function renderValueDist(valueCounts) {
 }
 
 function renderSparkline(data) {
-    if (!data || data.length < 2) return '<div class="sparkline-placeholder">No sparkline data</div>';
+    // Compact format: {years: [...], values: [...]}
+    if (!data || !data.years || data.years.length < 2) return '<div class="sparkline-placeholder">No sparkline data</div>';
     var W = 280, H = 40, PAD = 2;
-    var values = data.map(function(d) { return d.value; });
+    var years = data.years, values = data.values, n = years.length;
     var min = Math.min.apply(null, values);
     var max = Math.max.apply(null, values);
     var range = max - min || 1;
-    var points = data.map(function(d, i) {
-        var x = PAD + (i / (data.length - 1)) * (W - 2 * PAD);
-        var y = H - PAD - ((d.value - min) / range) * (H - 2 * PAD);
-        return x.toFixed(1) + ',' + y.toFixed(1);
-    });
+    var points = [];
+    for (var i = 0; i < n; i++) {
+        var x = PAD + (i / (n - 1)) * (W - 2 * PAD);
+        var y = H - PAD - ((values[i] - min) / range) * (H - 2 * PAD);
+        points.push(x.toFixed(1) + ',' + y.toFixed(1));
+    }
     var linePoints = points.join(' ');
     var areaPoints = PAD + ',' + H + ' ' + linePoints + ' ' + (W - PAD) + ',' + H;
     return '<svg width="100%" viewBox="0 0 ' + W + ' ' + (H + 12) + '" preserveAspectRatio="none">' +
         '<polygon points="' + areaPoints + '" fill="#3794ff" fill-opacity="0.06"/>' +
         '<polyline points="' + linePoints + '" fill="none" stroke="#3794ff" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>' +
-        '<text x="' + PAD + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace">' + data[0].year + '</text>' +
-        '<text x="' + (W - PAD) + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace" text-anchor="end">' + data[data.length - 1].year + '</text>' +
+        '<text x="' + PAD + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace">' + years[0] + '</text>' +
+        '<text x="' + (W - PAD) + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace" text-anchor="end">' + years[n - 1] + '</text>' +
         '<text x="' + PAD + '" y="8" font-size="8" fill="#555" font-family="monospace">' + formatNum(max) + '</text>' +
         '<text x="' + (W - PAD) + '" y="' + (H - 2) + '" font-size="8" fill="#555" font-family="monospace" text-anchor="end">' + formatNum(min) + '</text>' +
         '</svg>';

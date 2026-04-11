@@ -66,7 +66,7 @@ def run(dest_dir: str) -> None:
     merged_df_concat = pd.concat([merged_df_drop_, sum_bon_sint_saba], ignore_index=True)
 
     # Set index, check that it's unique and reset index
-    assert not merged_df_concat[["country", "year"]].duplicated().any(), "Index is not well constructed"  # type: ignore
+    assert not merged_df_concat[["country", "year"]].duplicated().any(), "Index is not well constructed"  # ty: ignore
 
     # Aggregate data by region (decided not to do for now)
     # Africa, Oceania, and income level categories

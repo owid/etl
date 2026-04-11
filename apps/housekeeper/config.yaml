@@ -19,7 +19,7 @@ charts:
       - config: The current chart configuration
       - variables: List of indicators used (name, unit, description)
       - revisions: Edit history with diffs showing what changed each time
-      - views_365d: Page views in the last year (median is ~1300)
+      - views_365d: Page views in the last year (median is ~2,663 views)
 
       Based on this information, provide:
       1. description: A 2-3 sentence summary of what the chart shows

@@ -5,7 +5,7 @@ import pandas as pd
 from owid.catalog import Dataset, DatasetMeta, Table, TableMeta
 from owid.catalog.utils import underscore
 from owid.walden import Catalog
-from pandas.api.types import is_numeric_dtype  # type: ignore
+from pandas.api.types import is_numeric_dtype  # ty: ignore
 
 
 def run(dest_dir: str) -> None:
@@ -33,12 +33,12 @@ def run(dest_dir: str) -> None:
     assert df[years].apply(lambda s: is_numeric_dtype(s), axis=0).all(), "One or more {year} columns is non-numeric"
 
     # variable code <-> variable name should be a 1:1 mapping
-    assert (
-        df.groupby("indicator_code")["indicator_name"].apply(lambda gp: gp.nunique()) == 1
-    ).all(), "A variable code in `WDIData.csv` has multiple variable names."
-    assert (
-        df.groupby("indicator_name")["indicator_code"].apply(lambda gp: gp.nunique()) == 1
-    ).all(), "A variable name in `WDIData.csv` has multiple variable codes."
+    assert (df.groupby("indicator_code")["indicator_name"].apply(lambda gp: gp.nunique()) == 1).all(), (
+        "A variable code in `WDIData.csv` has multiple variable names."
+    )
+    assert (df.groupby("indicator_name")["indicator_code"].apply(lambda gp: gp.nunique()) == 1).all(), (
+        "A variable name in `WDIData.csv` has multiple variable codes."
+    )
 
     # reshapes data from `country indicator 1960 1961 ...` format
     # to `country year EG.CFT.ACCS.ZS SH.HIV.INCD.YG ...` format

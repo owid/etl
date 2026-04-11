@@ -2,7 +2,6 @@
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict
 from zipfile import ZipFile
 
 import pandas as pd
@@ -38,7 +37,7 @@ TABLE_NAMES = {
 
 def load_dataframes_from_compressed_folder(
     zip_file_path: str,
-) -> Dict[str, pd.DataFrame]:
+) -> dict[str, pd.DataFrame]:
     # Initialise dictionary that will contain the dataframes.
     dfs = {}
     with TemporaryDirectory() as _temp_folder:
@@ -56,7 +55,7 @@ def load_dataframes_from_compressed_folder(
     return dfs
 
 
-def create_tables(dfs: Dict[str, pd.DataFrame]) -> Dict[str, catalog.Table]:
+def create_tables(dfs: dict[str, pd.DataFrame]) -> dict[str, catalog.Table]:
     tables = {}
     for df_name in list(dfs):
         df = dfs[df_name].set_index(TABLE_INDEXES[df_name], verify_integrity=True)

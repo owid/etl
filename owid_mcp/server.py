@@ -38,7 +38,7 @@ INSTRUCTIONS = (
     "• Don't include 'OWID' or technical terms in search queries"
 )
 
-INSTRUCTIONS_ENTITIES = "• Entity names must match exactly as they appear in OWID:\n" f"{COMMON_ENTITIES}\n\n"
+INSTRUCTIONS_ENTITIES = f"• Entity names must match exactly as they appear in OWID:\n{COMMON_ENTITIES}\n\n"
 
 
 @asynccontextmanager

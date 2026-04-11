@@ -68,7 +68,7 @@ def update_snapshot_metadata(snap: Snapshot) -> None:
     # Update the publication date to be the date of their latest update.
     snap.metadata.origin.date_published = dt.datetime.strptime(
         meta_orig.get("last_updated_date"), "%Y-%m-%dT%H:%M:%S"
-    ).strftime("%Y-%m-%d")  # type: ignore
+    ).strftime("%Y-%m-%d")  # ty: ignore
     # Update the download URL to the latest version.
     snap.metadata.origin.url_download = [r for r in meta_orig["resources"] if r["name"] == "CSV"][0]["distribution"][
         "url"
@@ -81,7 +81,7 @@ def update_snapshot_metadata(snap: Snapshot) -> None:
     snap.metadata.origin.date_accessed = dt.datetime.now().strftime("%Y-%m-%d")
     # Update the full citation.
     snap.metadata.origin.citation_full = (
-        f"World Development Indicators (WDI), The World Bank ({snap.metadata.origin.date_published.split('-')[0]})."  # type: ignore
+        f"World Development Indicators (WDI), The World Bank ({snap.metadata.origin.date_published.split('-')[0]})."  # ty: ignore
     )
 
     # Sanity checks.

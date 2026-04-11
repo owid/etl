@@ -8,6 +8,7 @@ only important for OWID staff.
 """
 
 import asyncio
+import logging
 import os
 import pwd
 import re
@@ -16,7 +17,7 @@ import warnings
 from dataclasses import dataclass, fields
 from os import environ as env
 from pathlib import Path
-from typing import List, Literal, Optional, cast
+from typing import Literal, cast
 from urllib.parse import quote
 
 import git
@@ -76,6 +77,31 @@ def get_container_name(branch_name):
 
 load_env()
 
+# Log level for structlog filtering (applied in enable_structlog_filtering below).
+# By default, only INFO and above are shown. Set DEBUG=1 in .env to see DEBUG messages.
+STRUCTLOG_LOG_LEVEL = logging.DEBUG if env.get("DEBUG") in ("True", "true", "1") else logging.INFO
+
+
+def enable_structlog_filtering() -> None:
+    """Configure structlog log-level filtering.
+
+    Called from the ETL CLI entry point, not at import time, to avoid
+    interfering with other tools (e.g. Streamlit apps) that import etl.config.
+    """
+    kwargs: dict = dict(wrapper_class=structlog.make_filtering_bound_logger(STRUCTLOG_LOG_LEVEL))
+
+    # Allow disabling timestamps via ETL_LOG_TIMESTAMPS=0
+    if env.get("ETL_LOG_TIMESTAMPS", "0") == "0":
+        kwargs["processors"] = [
+            structlog.contextvars.merge_contextvars,
+            structlog.processors.add_log_level,
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.dev.ConsoleRenderer(),
+        ]
+
+    structlog.configure(**kwargs)
+
 
 pd.set_option("future.no_silent_downcasting", True)
 
@@ -120,7 +146,7 @@ DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
 # Special ENV file with access to production DB (read-only), used by chart-diff
 if "ENV_FILE_PROD" in env:
-    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # type: ignore
+    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # ty: ignore
 else:
     ENV_FILE_PROD = None
 
@@ -137,7 +163,7 @@ if DB_IS_PRODUCTION:
     assert DATA_API_ENV == "production", "DATA_API_ENV must be set to production when publishing to live_grapher"
 
 
-def load_STAGING() -> Optional[str]:
+def load_STAGING() -> str | None:
     # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
 
@@ -358,7 +384,7 @@ class Config:
                 if field.name not in env_dict:
                     raise KeyError(f"Field {field.name} not found in env file {env_file}!")
                 config_dict[field.name] = env_dict[field.name]
-        return cls(**config_dict)  # type: ignore
+        return cls(**config_dict)  # ty: ignore
 
 
 class UnknownOWIDEnv(Exception):
@@ -644,7 +670,7 @@ class OWIDEnv:
             else:
                 raise ValueError(f"Unsupported engine type {type(self.engine)}")
 
-    def read_sqls(self, sql: List[str], *args, **kwargs) -> List[pd.DataFrame]:
+    def read_sqls(self, sql: list[str], *args, **kwargs) -> list[pd.DataFrame]:
         """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
 
         It can read multiple sql queries, to exploit the same connection and cursor.
