@@ -31,6 +31,7 @@ def run() -> None:
     # Drop population_group_name as it only contains 'All Population'
     tb = tb.drop(columns=["population_group_name"])
     ds_regions = paths.load_dataset("regions")
+    ds_un_wpp = paths.load_dataset("un_wpp")
     #
     # Process data.
     #
@@ -39,6 +40,7 @@ def run() -> None:
     tb = add_regional_aggregates(
         tb=tb,
         ds_regions=ds_regions,
+        ds_un_wpp=ds_un_wpp,
         index_cols=["country", "year", "metric", "measure", "cause", "age"],
         regions=REGIONS,
         age_group_mapping=AGE_GROUPS_RANGES,
@@ -142,9 +144,9 @@ def add_all_forms_of_violence(tb: Table) -> Table:
 
     tb_violence = tb[(tb["cause"].isin(violence)) & (tb["age"] == "Age-standardized")]
     assert all(tb_violence["metric"] == "Rate")
-    assert all(
-        v in tb_violence["cause"].values for v in violence
-    ), "Not all elements of 'violence' are present in tb_violence['cause']"
+    assert all(v in tb_violence["cause"].values for v in violence), (
+        "Not all elements of 'violence' are present in tb_violence['cause']"
+    )
 
     tb_violence = tb_violence.groupby(["country", "age", "metric", "year"])["value"].sum().reset_index()
     tb_violence["cause"] = "All forms of violence"
@@ -166,9 +168,9 @@ def add_infectious_diseases(tb: Table) -> Table:
     assert len(tb_broad) > 0, "No rows found for 'Communicable, maternal, neonatal, and nutritional diseases'"
 
     tb_maternal_neonatal_nutritional = tb[tb["cause"].isin(maternal_neonatal_nutritional)]
-    assert len(tb_maternal_neonatal_nutritional["cause"].unique()) == len(
-        maternal_neonatal_nutritional
-    ), "Not all elements of 'maternal_neonatal_nutritional' are present in tb['cause']"
+    assert len(tb_maternal_neonatal_nutritional["cause"].unique()) == len(maternal_neonatal_nutritional), (
+        "Not all elements of 'maternal_neonatal_nutritional' are present in tb['cause']"
+    )
     tb_maternal_neonatal_nutritional = (
         tb_maternal_neonatal_nutritional.groupby(["country", "age", "metric", "year"], observed=True)["value"]
         .sum()

@@ -1150,7 +1150,7 @@ def generate_fertilizer_exports(tb_rfn: Table) -> Table:
         columns={"item_code": "item", "value": "exports"}, errors="raise"
     )
     fertilizer_exports["item"] = fertilizer_exports["item"].replace(
-        {ITEM_CODE_FOR_NITROGEN: "Nitrogen", ITEM_CODE_FOR_PHOSPHATE: "Phosphorous", ITEM_CODE_FOR_POTASH: "Potassium"}
+        {ITEM_CODE_FOR_NITROGEN: "Nitrogen", ITEM_CODE_FOR_PHOSPHATE: "Phosphate", ITEM_CODE_FOR_POTASH: "Potash"}
     )
 
     # Add column of global exports.

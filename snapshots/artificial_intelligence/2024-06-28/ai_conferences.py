@@ -58,7 +58,7 @@ def get_data():
 
         return all_dfs
     except Exception as e:
-        raise IOError("Error in fetching or concatenating the data: " + str(e))
+        raise OSError("Error in fetching or concatenating the data: " + str(e))
 
 
 if __name__ == "__main__":

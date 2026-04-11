@@ -4,7 +4,6 @@ import numpy as np
 from owid.catalog import Table
 from shared import add_variable_description_from_producer
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -25,7 +24,7 @@ def run() -> None:
     # Process data.
     #
     tb = add_variable_description_from_producer(tb, dd)
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb)
     tb = add_values_to_hospital_type(tb)
     tb = replace_zero_with_na(tb)
     tb = tb.set_index(["country", "year"], verify_integrity=True)

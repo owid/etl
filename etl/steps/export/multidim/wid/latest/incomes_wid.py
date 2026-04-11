@@ -77,23 +77,23 @@ def run() -> None:
                 },
                 "view_metadata": {"description_short": "{subtitle}"},
             },
-            {
-                "dimension": "quantile",
-                "choices": decile_values,
-                "choice_new_slug": "all_bar",
-                "view_config": {
-                    "hideRelativeToggle": True,
-                    "selectedFacetStrategy": "entity",
-                    "hasMapTab": False,
-                    "tab": "chart",
-                    "chartTypes": ["StackedDiscreteBar"],
-                    "hideTotalValueLabel": True,
-                    "baseColorScheme": "OwidCategoricalE",
-                    "title": "{title}",
-                    "subtitle": "{subtitle}",
-                },
-                "view_metadata": {"description_short": "{subtitle}"},
-            },
+            # {
+            #     "dimension": "quantile",
+            #     "choices": decile_values,
+            #     "choice_new_slug": "all_bar",
+            #     "view_config": {
+            #         "hideRelativeToggle": True,
+            #         "selectedFacetStrategy": "entity",
+            #         "hasMapTab": False,
+            #         "tab": "chart",
+            #         "chartTypes": ["StackedDiscreteBar"],
+            #         "hideTotalValueLabel": True,
+            #         "baseColorScheme": "OwidCategoricalE",
+            #         "title": "{title}",
+            #         "subtitle": "{subtitle}",
+            #     },
+            #     "view_metadata": {"description_short": "{subtitle}"},
+            # },
         ],
         params={
             "title": _get_grouped_quantile_title,
@@ -102,7 +102,15 @@ def run() -> None:
     )
 
     # Filter quantile views: keep only specific quantiles
-    keep_quantiles = {"Richest 0.1%", "Richest 1%", "10", "10_40_50", "10_40_50_bar", "all", "all_bar"}
+    keep_quantiles = {
+        "Richest 0.1%",
+        "Richest 1%",
+        "10",
+        "10_40_50",
+        # "10_40_50_bar",
+        "all",
+        # "all_bar",
+    }
     c.drop_views({"quantile": [q for q in c.dimension_choices["quantile"] if q not in keep_quantiles]})
 
     # Build mapping of catalogPath to display name from table metadata
@@ -118,13 +126,13 @@ def run() -> None:
             view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
 
             # For all_bar views, set sortBy to column and sortColumnSlug to decile 10 indicator
-            if quantile == "all_bar":
-                decile_10_ind = next((ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None)
-                if decile_10_ind:
-                    if view.config is None:
-                        view.config = {}
-                    view.config["sortBy"] = "column"
-                    view.config["sortColumnSlug"] = decile_10_ind.catalogPath
+            # if quantile == "all_bar":
+            #     decile_10_ind = next((ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None)
+            #     if decile_10_ind:
+            #         if view.config is None:
+            #             view.config = {}
+            #         view.config["sortBy"] = "column"
+            #         view.config["sortColumnSlug"] = decile_10_ind.catalogPath
 
             # Set display names extracted from original indicator titles
             for ind in view.indicators.y:
@@ -162,16 +170,26 @@ def run() -> None:
     )
 
     # Remove grouped welfare_type views for quantiles we don't want grouped (keep only Richest 0.1%, Richest 1%, 10)
-    c.drop_views({"welfare_type": ["before_vs_after"], "quantile": ["10_40_50", "10_40_50_bar", "all", "all_bar"]})
+    c.drop_views(
+        {
+            "welfare_type": ["before_vs_after"],
+            "quantile": [
+                "10_40_50",
+                # "10_40_50_bar",
+                "all",
+                # "all_bar",
+            ],
+        }
+    )
 
     # Set display names for before_vs_after views
     for view in c.views:
         if view.dimensions.get("welfare_type") == "before_vs_after" and view.indicators.y:
             for ind in view.indicators.y:
                 if "before_tax" in ind.catalogPath:
-                    ind.display = {"name": "Before tax"}
+                    ind.display = {"name": "Before taxes and benefits"}
                 elif "after_tax" in ind.catalogPath:
-                    ind.display = {"name": "After tax"}
+                    ind.display = {"name": "After taxes and benefits"}
 
     # Group welfare_type (before vs after tax) as scatter plot for specific quantiles
     c.group_views(
@@ -211,7 +229,15 @@ def run() -> None:
 
     # Remove grouped scatter views for quantiles we don't want (keep only Richest 0.1%, Richest 1%, 10)
     c.drop_views(
-        {"welfare_type": ["before_vs_after_scatter"], "quantile": ["10_40_50", "10_40_50_bar", "all", "all_bar"]}
+        {
+            "welfare_type": ["before_vs_after_scatter"],
+            "quantile": [
+                "10_40_50",
+                # "10_40_50_bar",
+                "all",
+                # "all_bar",
+            ],
+        }
     )
 
     # Customize scatter plot views: move before_tax to x axis, keep after_tax on y
@@ -226,8 +252,8 @@ def run() -> None:
                     after_tax_ind = ind
 
             if before_tax_ind and after_tax_ind:
-                before_tax_ind.display = {"name": "Before tax"}
-                after_tax_ind.display = {"name": "After tax"}
+                before_tax_ind.display = {"name": "Before taxes and benefits"}
+                after_tax_ind.display = {"name": "After taxes and benefits"}
                 view.indicators.x = before_tax_ind
                 view.indicators.y = [after_tax_ind]
                 view.indicators.size = Indicator(

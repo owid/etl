@@ -1,7 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from typing import List, Optional
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
@@ -55,7 +53,7 @@ def run(dest_dir: str) -> None:
 
 
 def fill_gaps_with_zeroes(
-    tb: Table, columns: List[str], cols_use_range: Optional[List[str]] = None, use_nan: bool = False
+    tb: Table, columns: list[str], cols_use_range: list[str] | None = None, use_nan: bool = False
 ) -> Table:
     """Fill missing values with zeroes.
 

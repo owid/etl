@@ -1,5 +1,3 @@
-from typing import Dict
-
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
@@ -10,7 +8,7 @@ from etl.data_helpers import geo
 REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
 
-def create_omms(tables_dict: Dict[str, Table], ds_population: Dataset, ds_regions: Dataset) -> None:
+def create_omms(tables_dict: dict[str, Table], ds_population: Dataset, ds_regions: Dataset) -> None:
     #  Adding a global total for Yaws - adding to existing variable
     add_global_yaws(tables_dict, ds_regions)
     # Adding a variables for neonatal cases per million

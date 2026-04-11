@@ -19,6 +19,16 @@
                     "Reference definitions using JSON Pointer syntax or custom logic."
                 ]
             ],
+            "properties": {
+                "common_views": {
+                    "type": "array",
+                    "title": "Common view defaults",
+                    "description": "List of partial view configurations that are merged into all matching views. Each item can optionally specify dimensions to match specific views.",
+                    "items": {
+                        "$ref": "#/$defs/commonView"
+                    }
+                }
+            },
             "additionalProperties": true
         },
         "catalog_path": {
@@ -993,6 +1003,30 @@
         },
         "metadata": {
             "$ref": "dataset-schema.json#/properties/tables/additionalProperties/properties/variables/additionalProperties"
+        },
+        "commonView": {
+            "type": "object",
+            "title": "Common view configuration",
+            "description": "Partial view configuration merged into all matching views. Use dimensions to target specific views.",
+            "additionalProperties": false,
+            "properties": {
+                "dimensions": {
+                    "type": "object",
+                    "title": "Dimension filter",
+                    "description": "Optional dimension constraints to match specific views.",
+                    "patternProperties": {
+                        ".*": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "config": {
+                    "$ref": "#/properties/views/items/properties/config"
+                },
+                "metadata": {
+                    "$ref": "#/$defs/metadata"
+                }
+            }
         }
     }
 }

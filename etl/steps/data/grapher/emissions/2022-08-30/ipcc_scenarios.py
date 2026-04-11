@@ -183,7 +183,7 @@ def run(dest_dir: str) -> None:
 
     # Drop all columns that are not in the YAML file
     # TODO: ideally we have metadata for all columns
-    with open(paths.metadata_path, "r") as f:
+    with open(paths.metadata_path) as f:
         meta = yaml_load(f)
         use_cols = [c for c in meta["tables"]["ipcc_scenarios"]["variables"]]
         tb = tb[use_cols]

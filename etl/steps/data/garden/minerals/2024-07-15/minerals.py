@@ -19,7 +19,6 @@ For debugging:
 """
 
 import warnings
-from typing import List, Optional, Tuple
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -256,7 +255,7 @@ def adapt_flat_table(tb_flat: Table) -> Table:
     return tb_flat
 
 
-def _gather_notes_and_footnotes_from_metadata(tb_flat: Table, column: str) -> Tuple[Optional[str], Optional[str]]:
+def _gather_notes_and_footnotes_from_metadata(tb_flat: Table, column: str) -> tuple[str | None, str | None]:
     # Get notes from description_from_producer field, if given.
     # And gather footnotes from grapher config, if given.
     notes = None
@@ -271,7 +270,7 @@ def _gather_notes_and_footnotes_from_metadata(tb_flat: Table, column: str) -> Tu
     return notes, footnotes
 
 
-def _combine_notes(notes_list: List[Optional[str]], separator: str) -> str:
+def _combine_notes(notes_list: list[str | None], separator: str) -> str:
     # Add notes to metadata.
     combined_notes = ""
     notes_exist = False
@@ -413,7 +412,7 @@ def inspect_overlaps(
     tb_usgs_flat: Table,
     tb_usgs_historical_flat: Table,
     tb_bgs_flat: Table,
-    columns_to_plot: Optional[List[str]] = None,
+    columns_to_plot: list[str] | None = None,
 ) -> None:
     # Find the union of all columns.
     columns = (set(tb_usgs_flat.columns) | set(tb_usgs_historical_flat.columns) | set(tb_bgs_flat.columns)) - set(
@@ -532,7 +531,7 @@ def combine_data(
     tb_usgs_historical_flat: Table,
     tb_bgs_flat: Table,
     ds_regions: Dataset,
-    columns_to_plot: Optional[List[str]] = None,
+    columns_to_plot: list[str] | None = None,
 ) -> Table:
     # Compare the data from different origins where they overlap.
     inspect_overlaps(

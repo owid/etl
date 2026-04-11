@@ -3,8 +3,6 @@ Load the three LIS snapshots and creates three tables in the luxembourg_income_s
 Country names are converted from iso-2 codes in this step and years are reformated from "YY" to "YYYY"
 """
 
-from typing import Dict
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -65,7 +63,7 @@ def run(dest_dir: str) -> None:
 
 
 def edit_snapshots_and_add_to_dataset(
-    ds_meadow: Dataset, age_dict: Dict[str, str], snapshots_dict: Dict[str, list], tb_countries_regions: Table
+    ds_meadow: Dataset, age_dict: dict[str, str], snapshots_dict: dict[str, list], tb_countries_regions: Table
 ) -> Dataset:
     """
     Format year and country of each table and add them to the meadow dataset.
@@ -108,9 +106,9 @@ def edit_snapshots_and_add_to_dataset(
 
             # Assert if there are missing values in the name column and show which countries are missing
             missing_countries = tb[tb["name"].isnull()]["country"].unique()
-            assert (
-                len(missing_countries) == 0
-            ), f"Missing countries in the table {tb_name}{age_suffix}: {missing_countries}"
+            assert len(missing_countries) == 0, (
+                f"Missing countries in the table {tb_name}{age_suffix}: {missing_countries}"
+            )
 
             tb = tb.drop(columns=["country", "iso_alpha2"])
             tb = tb.rename(columns={"name": "country"})

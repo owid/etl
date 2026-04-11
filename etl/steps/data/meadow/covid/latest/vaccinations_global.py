@@ -147,7 +147,7 @@ def add_who_data(tb: Table, tb_who: Table) -> Table:
     ## Build `tb_last`, which contains the latest non-NaN values in the 'main' data
     tb_last = tb.sort_values("date")
     cols = ["total_vaccinations", "people_vaccinated", "people_fully_vaccinated", "total_boosters"]
-    tb_last[cols] = tb_last.groupby("country")[cols].ffill()  # type: ignore
+    tb_last[cols] = tb_last.groupby("country")[cols].ffill()  # ty: ignore
     tb_last = tb_last.drop_duplicates(subset=["country"], keep="last")
 
     ## Merge with WHO, to compare WHO's values with latest in 'main'

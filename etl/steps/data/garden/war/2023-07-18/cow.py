@@ -74,12 +74,11 @@ ON REGIONS
 """
 
 import json
-from typing import List, Set, Tuple
 
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from pandas.api.types import is_integer_dtype  # type: ignore
+from pandas.api.types import is_integer_dtype  # ty: ignore
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -152,7 +151,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def load_tables(ds: Dataset) -> Tuple[Table, Table, Table, Table]:
+def load_tables(ds: Dataset) -> tuple[Table, Table, Table, Table]:
     """Load all CoW tables.
 
     This includes tables for extra-, non-, inter- and intra-state conflicts.
@@ -231,27 +230,27 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
 
     # Fill nulls with zeroes (TODO: this might be wrong, lower-bound is prefered)
     log.info("war.cow: filling NaNs")
-    assert (
-        not tb_nonstate["number_deaths_ongoing_conflicts"].isna().any()
-    ), "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
-    assert (
-        not tb_intra["number_deaths_ongoing_conflicts"].isna().any()
-    ), "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
-    assert (
-        not tb_inter["number_deaths_ongoing_conflicts"].isna().any()
-    ), "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
-    assert (
-        not tb_intra["number_deaths_ongoing_conflicts"].isna().any()
-    ), "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
+    assert not tb_nonstate["number_deaths_ongoing_conflicts"].isna().any(), (
+        "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
+    )
+    assert not tb_intra["number_deaths_ongoing_conflicts"].isna().any(), (
+        "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
+    )
+    assert not tb_inter["number_deaths_ongoing_conflicts"].isna().any(), (
+        "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
+    )
+    assert not tb_intra["number_deaths_ongoing_conflicts"].isna().any(), (
+        "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
+    )
 
     # Check NaNs and negative values in tables
     log.info("war.cow: checking NaNs and negative values")
 
     def _checks(tb: Table, tb_name: str) -> None:
         assert not tb.isna().any(axis=None), f"There are some NaN values in `{tb_name}`!"
-        assert not (
-            tb["number_deaths_ongoing_conflicts"] < 0
-        ).any(), f"There are negative values NaN values in `{tb_name}`!"
+        assert not (tb["number_deaths_ongoing_conflicts"] < 0).any(), (
+            f"There are negative values NaN values in `{tb_name}`!"
+        )
 
     _checks(tb_extra, "tb_extra")
     _checks(tb_nonstate, "tb_nonstate")
@@ -272,7 +271,7 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
 
     # Add yearly observations (scale values)
     log.info("war.cow: expand observations")
-    tb = expand_observations(tb, column_metrics=["number_deaths_ongoing_conflicts"])  # type: ignore
+    tb = expand_observations(tb, column_metrics=["number_deaths_ongoing_conflicts"])  # ty: ignore
 
     # Estimate metrics (do the aggregations)
     log.info("war.cow: estimate metrics")
@@ -288,9 +287,9 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
 
     # Sanity check on NaNs
     log.info("war.cow: check NaNs in `number_deaths_ongoing_conflicts`")
-    assert (
-        not tb["number_deaths_ongoing_conflicts"].isna().any()
-    ), "Some NaNs found in `number_deaths_ongoing_conflicts`!"
+    assert not tb["number_deaths_ongoing_conflicts"].isna().any(), (
+        "Some NaNs found in `number_deaths_ongoing_conflicts`!"
+    )
 
     # Replace missing values with zeroes
     log.info("war.cow: replace missing values with zeroes")
@@ -331,9 +330,9 @@ def make_table_extra(tb: Table) -> Table:
 def _sanity_checks_extra(tb: Table) -> None:
     # Sanity checks
     ## Only one instance per (warnum, ccode1, ccode2) triplet
-    assert (
-        tb.groupby(["warnum", "ccode1", "ccode2"]).size().max() == 1
-    ), "There should only be one instance for each (warnum, ccode1, ccode2) triplet."
+    assert tb.groupby(["warnum", "ccode1", "ccode2"]).size().max() == 1, (
+        "There should only be one instance for each (warnum, ccode1, ccode2) triplet."
+    )
     # A conflict only occurs in one region
     assert tb.groupby("warnum")["region"].nunique().max() == 1, "More than one region for some conflicts!"
     # A conflict only is of one type
@@ -346,9 +345,9 @@ def _sanity_checks_extra(tb: Table) -> None:
     col = "year_end"
     assert set(tb.loc[tb[col] < 0, col]) == {-7}, f"Negative values other than -7 found for {col}"
     # Check max end year is as expected
-    assert (
-        tb["year_end"].max() == END_YEAR_MAX_EXTRA - 1
-    ), f"Extra-state data is expected to have its latest end year by {END_YEAR_MAX_EXTRA - 1}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    assert tb["year_end"].max() == END_YEAR_MAX_EXTRA - 1, (
+        f"Extra-state data is expected to have its latest end year by {END_YEAR_MAX_EXTRA - 1}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    )
 
 
 def replace_negative_values_extra(tb: Table) -> Table:
@@ -433,13 +432,13 @@ def _sanity_check_nonstate(tb: Table) -> None:
     # Check year end
     assert (tb["year_end"] > 1819).all(), "Unexpected value for `year_end`!"
     # Check latest end year
-    assert (
-        tb["year_end"].max() == END_YEAR_MAX_NONSTATE
-    ), f"Non-state data is expected to have its latest end year by {END_YEAR_MAX_NONSTATE}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    assert tb["year_end"].max() == END_YEAR_MAX_NONSTATE, (
+        f"Non-state data is expected to have its latest end year by {END_YEAR_MAX_NONSTATE}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    )
     # Check outcome
-    assert (
-        tb["outcome"] != 5
-    ).all(), "Some conflicts are coded as if they were still on going in 2007! That shouldn't be the case! Check if maximum value for `year_end` has changed."
+    assert (tb["outcome"] != 5).all(), (
+        "Some conflicts are coded as if they were still on going in 2007! That shouldn't be the case! Check if maximum value for `year_end` has changed."
+    )
 
 
 ########################################################################
@@ -472,9 +471,9 @@ def make_table_inter(tb: Table) -> Table:
 def _sanity_checks_inter(tb: Table) -> Table:
     # Sanity checks
     ## Only one instance per (warnum)
-    assert (
-        tb.groupby(["warnum", "ccode", "side"]).size().max() == 1
-    ), "There should only be one instance for each (warnum, ccode, side)."
+    assert tb.groupby(["warnum", "ccode", "side"]).size().max() == 1, (
+        "There should only be one instance for each (warnum, ccode, side)."
+    )
     # A conflict only is of one type
     assert tb.groupby("warnum")["conflict_type"].nunique().max() == 1, "More than one conflict type for some conflicts!"
     # Check negative values in metric deaths
@@ -483,13 +482,13 @@ def _sanity_checks_inter(tb: Table) -> Table:
     # Check year end
     assert not (tb["year_end"].isna().any()), "Unexpected NaN values for `year_end`!"
     assert not ((tb["year_end"] < 0).any()), "Unexpected negative values for `year_end`!"
-    assert (
-        tb["year_end"].max() == END_YEAR_MAX_INTER
-    ), f"Inter-state data is expected to have its latest end year by {END_YEAR_MAX_INTER}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    assert tb["year_end"].max() == END_YEAR_MAX_INTER, (
+        f"Inter-state data is expected to have its latest end year by {END_YEAR_MAX_INTER}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    )
     # Check outcome
-    assert (
-        tb["outcome"] != 5
-    ).all(), "Some conflicts are coded as if they were still on going in 2007! That shouldn't be the case! Check if maximum value for `year_end` has changed."
+    assert (tb["outcome"] != 5).all(), (
+        "Some conflicts are coded as if they were still on going in 2007! That shouldn't be the case! Check if maximum value for `year_end` has changed."
+    )
 
 
 def aggregate_rows_by_periods_inter(tb: Table) -> Table:
@@ -586,9 +585,9 @@ def make_table_intra(tb: Table) -> Table:
     tb = standardise_region_ids(tb)
 
     log.info("war.cow.intra: deaggregate international / non-international intrastate conflicts")
-    assert (
-        tb.groupby("warnum")["intnl"].nunique().max() == 1
-    ), "An intra-state conflict is not expected to change between international / non-international!"
+    assert tb.groupby("warnum")["intnl"].nunique().max() == 1, (
+        "An intra-state conflict is not expected to change between international / non-international!"
+    )
     mask = tb["intnl"] == 1
     tb.loc[mask, "conflict_type"] = "intra-state (internationalized)"
     tb.loc[-mask, "conflict_type"] = "intra-state (non-internationalized)"
@@ -605,9 +604,9 @@ def _sanity_checks_intra(tb: Table) -> None:
     col = "year_end"
     assert not (tb[col].isna().any()), "Unexpected NaN value for `year_end`!"
     assert set(tb.loc[tb[col] < 0, col]) == {-7}, f"Negative values other than -7 found for {col}"
-    assert (
-        tb["year_end"].max() == END_YEAR_MAX_INTRA
-    ), f"Intra-state data is expected to have its latest end year by {END_YEAR_MAX_INTRA}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    assert tb["year_end"].max() == END_YEAR_MAX_INTRA, (
+        f"Intra-state data is expected to have its latest end year by {END_YEAR_MAX_INTRA}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    )
 
 
 def replace_negative_values_intra(tb: Table) -> Table:
@@ -641,7 +640,7 @@ def standardise_region_ids(tb: Table) -> Table:
         4: 4,  # Africa (SSA)
     }
     # Load custom mapping
-    with open(PATH_CUSTOM_REGIONS_INTRASTATE, "r") as f:
+    with open(PATH_CUSTOM_REGIONS_INTRASTATE) as f:
         regions_mapping_default = json.load(f)
     regions_mapping_default = {float(k): v for k, v in regions_mapping_default.items()}
     # Apply custom & default mapping
@@ -693,8 +692,8 @@ def load_cow_table(
     column_start_year: str,
     column_end_year: str,
     column_location: str,
-    columns_deaths: List[str],
-    values_exp_wartype: Set[int],
+    columns_deaths: list[str],
+    values_exp_wartype: set[int],
     check_unique_for_location: bool = True,
 ):
     """Read table from dataset."""
@@ -712,9 +711,9 @@ def load_cow_table(
     cols = ["warname", "wartype"]
     if check_unique_for_location:
         cols += [column_location]
-    assert (tb.groupby("warnum")[cols].nunique().sort_values(cols) == 1).all(
-        axis=None
-    ), "There is multiple (`warname`, `wartype`, `wherefought`) triplets for some `warnum`"
+    assert (tb.groupby("warnum")[cols].nunique().sort_values(cols) == 1).all(axis=None), (
+        "There is multiple (`warname`, `wartype`, `wherefought`) triplets for some `warnum`"
+    )
 
     # Check war types are as expected
     assert is_integer_dtype(tb["wartype"]), "Non integer types found in columnd 'wartype'!"
@@ -751,14 +750,14 @@ def load_cow_table(
     return tb
 
 
-def expand_observations(tb: Table, column_metrics: List[int]) -> Table:
+def expand_observations(tb: Table, column_metrics: list[int]) -> Table:
     """Add year per observation."""
     # Expand to all observation years
     # Add years
     YEAR_MIN = tb["year_start"].min()
     YEAR_MAX = tb["year_end"].max()
     tb_all_years = pd.DataFrame(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
-    tb = tb_all_years.merge(tb, how="cross")  # type: ignore
+    tb = tb_all_years.merge(tb, how="cross")  # ty: ignore
     ## Filter only entries that actually existed
     tb = tb[(tb["year"] >= tb["year_start"]) & (tb["year"] <= tb["year_end"])]
 
@@ -849,12 +848,12 @@ def _get_ongoing_metrics(tb: Table) -> Table:
             tb_ongoing_world_intra,
         ],
         ignore_index=True,
-    ).sort_values(  # type: ignore
+    ).sort_values(  # ty: ignore
         by=["year", "region", "conflict_type"]
     )
 
     ## Rename columns
-    tb_ongoing = tb_ongoing.rename(  # type: ignore
+    tb_ongoing = tb_ongoing.rename(  # ty: ignore
         columns={
             "warnum": "number_ongoing_conflicts",
         }
@@ -905,12 +904,12 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new = pd.concat(
         [tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes, tb_new_intra, tb_new_world_intra],
         ignore_index=True,
-    ).sort_values(  # type: ignore
+    ).sort_values(  # ty: ignore
         by=["year_start", "region", "conflict_type"]
     )
 
     ## Rename columns
-    tb_new = tb_new.rename(  # type: ignore
+    tb_new = tb_new.rename(  # ty: ignore
         columns={
             "year_start": "year",
             "warnum": "number_new_conflicts",

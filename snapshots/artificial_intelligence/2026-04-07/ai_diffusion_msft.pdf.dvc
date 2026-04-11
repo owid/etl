@@ -1,0 +1,24 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    title: Microsoft AI Diffusion Report 2025
+    date_published: "2026-01-08"
+    description: |-
+      Microsoft measures AI diffusion as the share of people worldwide who have used a generative AI product during the reported period. This measure is derived from aggregated and anonymized Microsoft telemetry and then adjusted to reflect differences in OS and device-market share, internet penetration, and country population. Additional details on the methodology are available in their [AI Diffusion technical paper](https://arxiv.org/abs/2511.02781).
+
+    producer: Microsoft
+    citation_full: |-
+      Microsoft Research. AI Diffusion Report 2025. January 2026.
+
+    url_main: https://www.microsoft.com/en-us/corporate-responsibility/topics/AI-Economy-Institute/reports/Global-AI-Adoption-2025/
+    url_download: https://www.microsoft.com/en-us/research/wp-content/uploads/2026/01/Microsoft-AI-Diffusion-Report-2025-H2.pdf
+    date_accessed: '2026-04-07'
+
+    license:
+      name: Microsoft Terms of Use
+      url: https://www.microsoft.com/en-us/legal/intellectualproperty/copyright
+outs:
+  - md5: 83284f6b57c420bce8a45dcd120282b3
+    size: 1895779
+    path: ai_diffusion_msft.pdf

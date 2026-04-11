@@ -21,7 +21,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 json_file_path = os.path.join(os.getcwd(), f"snapshots/cardiovascular_diseases/{SNAPSHOT_VERSION}/esc_links.json")
 
 # Open the JSON file to get the dictionary with names and links of the ESC datasets
-with open(json_file_path, "r") as json_file:
+with open(json_file_path) as json_file:
     # Use json.load() to load the contents of the file into a Python dictionary
     HTML_DICTIONARY = json.load(json_file)
 
@@ -95,7 +95,7 @@ def main(upload: bool) -> None:
     # Attempt to fetch data from the source URL.
     dfs = []
 
-    for title, url_download in tqdm(HTML_DICTIONARY.items(), desc="Fetching data from the ESC website"):  # type: ignore
+    for title, url_download in tqdm(HTML_DICTIONARY.items(), desc="Fetching data from the ESC website"):  # ty: ignore
         # First, get the page to extract the AJAX URL
         response = requests.get(url_download)
 
@@ -126,7 +126,7 @@ def main(upload: bool) -> None:
                 table = soup.find("table", {"class": "active", "id": "datatable_dataTest"})
                 data = []
                 if table is not None:
-                    rows = table.find_all("tr")  # type: ignore
+                    rows = table.find_all("tr")  # ty: ignore
                     for row in rows[1:]:  # Skip the header row
                         columns = row.find_all("td")
                         if len(columns) > 1:
@@ -141,7 +141,7 @@ def main(upload: bool) -> None:
 
     all_dfs = pd.concat(dfs, ignore_index=True)
 
-    df_to_file(all_dfs, file_path=snap.path)  # type: ignore[reportArgumentType]
+    df_to_file(all_dfs, file_path=snap.path)  # ty: ignore[invalid-argument-type]
 
     # Download data from source, add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)

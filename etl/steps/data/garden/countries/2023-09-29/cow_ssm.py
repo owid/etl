@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Optional, cast
+from typing import cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -227,12 +227,12 @@ def create_table_country_years(tb: Table) -> Table:
 
 def fill_timeseries(
     tb: Table,
-    year_min: Optional[int],
-    year_max: Optional[int],
+    year_min: int | None,
+    year_max: int | None,
     default_min: bool = False,
     default_max: bool = False,
-    col_year_start: Optional[str] = None,
-    col_year_end: Optional[str] = None,
+    col_year_start: str | None = None,
+    col_year_end: str | None = None,
     filter_times: bool = False,
 ) -> Table:
     """Complement table with missing years."""

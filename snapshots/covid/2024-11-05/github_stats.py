@@ -25,7 +25,6 @@ NOTE: To get data on when countries first reported vaccination data, please refe
 """
 
 from pathlib import Path
-from typing import Optional
 
 import click
 from structlog import get_logger
@@ -52,15 +51,15 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--commits-users", type=str, help="File with data on commit users.")
 def main(
     upload: bool,
-    issues: Optional[str] = None,
-    issues_comments: Optional[str] = None,
-    issues_users: Optional[str] = None,
-    pr: Optional[str] = None,
-    pr_comments: Optional[str] = None,
-    pr_users: Optional[str] = None,
-    commits: Optional[str] = None,
-    commits_users: Optional[str] = None,
-    vax_reporting: Optional[str] = None,
+    issues: str | None = None,
+    issues_comments: str | None = None,
+    issues_users: str | None = None,
+    pr: str | None = None,
+    pr_comments: str | None = None,
+    pr_users: str | None = None,
+    commits: str | None = None,
+    commits_users: str | None = None,
+    vax_reporting: str | None = None,
 ) -> None:
     snapshot_paths = [
         (issues, "github_stats_issues.csv"),

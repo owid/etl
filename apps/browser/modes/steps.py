@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Set
+from typing import TYPE_CHECKING
 
 from apps.browser.commands import DEFAULT_COMMANDS, Command
 from apps.browser.modes import ModeConfig, ModeResult
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
     from apps.browser.core import Ranker
 
 # Simple type alias - avoids importing heavy etl.steps module
-DAG = dict[str, Set[str]]
+DAG = dict[str, set[str]]
 
 
 class StepMode(BaseBrowserMode):
@@ -108,7 +109,7 @@ class StepMode(BaseBrowserMode):
             refresh_popularity_cache_async(steps, live_data=self._popularity_data)
             self._popularity_refresh_started = True
 
-    def get_ranker(self) -> "Ranker" | None:
+    def get_ranker(self) -> Ranker | None:
         """Return popularity-based ranker for steps."""
         from apps.browser.steps import create_step_ranker
 
