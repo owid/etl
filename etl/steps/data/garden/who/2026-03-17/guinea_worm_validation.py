@@ -192,9 +192,9 @@ def _validate_data_processing(tb_final: Table, tb_cases: Table, current_year: in
 
     # Allow some tolerance for countries that might not appear in all years
     tolerance_ratio = 0.8
-    assert (
-        actual_combinations >= expected_combinations * tolerance_ratio
-    ), f"Missing year-country combinations: expected ~{expected_combinations}, got {actual_combinations}"
+    assert actual_combinations >= expected_combinations * tolerance_ratio, (
+        f"Missing year-country combinations: expected ~{expected_combinations}, got {actual_combinations}"
+    )
     log.info("✓ Year-country combinations filled correctly", expected=expected_combinations, actual=actual_combinations)
 
     # Current year data should be present
