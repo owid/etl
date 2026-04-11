@@ -8,7 +8,6 @@ import re
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import List
 
 import pandas as pd
 import requests
@@ -53,7 +52,7 @@ def run(upload: bool = True) -> None:
         snap.create_snapshot(upload=upload, filename=output_file)
 
 
-def download_and_extract_csv_files(urls: List[str]) -> List[pd.DataFrame]:
+def download_and_extract_csv_files(urls: list[str]) -> list[pd.DataFrame]:
     """Download zip files and extract CSV files that contain TotalPMT column.
 
     Args:

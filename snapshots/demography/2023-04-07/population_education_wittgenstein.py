@@ -10,7 +10,6 @@ The file used in here is downloaded manually from Wittgenstein's site:
 """
 
 from pathlib import Path
-from typing import Union
 
 import click
 
@@ -28,7 +27,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     help="Upload dataset to Snapshot",
 )
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local file.")
-def main(path_to_file: Union[Path, str], upload: bool) -> None:
+def main(path_to_file: Path | str, upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"demography/{SNAPSHOT_VERSION}/population_education_wittgenstein.csv")
 

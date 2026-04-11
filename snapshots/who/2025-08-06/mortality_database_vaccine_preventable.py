@@ -18,7 +18,6 @@ ICD 10 codes were gathered from the downloaded files and the broad cause group w
 
 import os
 from pathlib import Path
-from typing import Dict
 
 import click
 import pandas as pd
@@ -57,7 +56,7 @@ def main(upload: bool) -> None:
     snap.create_snapshot(data=df, upload=upload)
 
 
-def combine_datasets(list_of_causes: Dict) -> pd.DataFrame:
+def combine_datasets(list_of_causes: dict) -> pd.DataFrame:
     base_file_path = LOCAL_DIR
     list_of_files = os.listdir(base_file_path)
     csv_files = list(filter(lambda f: f.endswith(".csv"), list_of_files))

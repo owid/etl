@@ -28,7 +28,7 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)  # type: ignore
+    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)  # ty: ignore
 
     #
     # Checks.

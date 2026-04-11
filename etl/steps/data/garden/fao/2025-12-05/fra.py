@@ -129,9 +129,9 @@ def calculate_share_of_global_forest_area(tb: Table) -> Table:
     tb = tb.merge(tb_global, on="year", how="left")
     tb["forestarea_share_global"] = tb["_1a_forestarea"].div(tb["global_forest_area"]).mul(100)
     tb = tb.drop(columns=["global_forest_area"])
-    assert (
-        tb["forestarea_share_global"].max() <= 100
-    ), "Error in calculating share of global forest area: values exceed 100%"
+    assert tb["forestarea_share_global"].max() <= 100, (
+        "Error in calculating share of global forest area: values exceed 100%"
+    )
     return tb
 
 
@@ -142,9 +142,9 @@ def calculate_share_of_global_deforestation(tb: Table) -> Table:
     tb = tb.merge(tb_global_deforestation, on="year", how="left")
     tb["deforestation_share_global"] = tb["_1d_deforestation"].div(tb["global_deforestation"]).mul(100)
     tb = tb.drop(columns=["global_deforestation"])
-    assert (
-        tb["deforestation_share_global"].max() <= 100
-    ), "Error in calculating share of global deforestation: values exceed 100%"
+    assert tb["deforestation_share_global"].max() <= 100, (
+        "Error in calculating share of global deforestation: values exceed 100%"
+    )
     return tb
 
 
@@ -155,7 +155,7 @@ def calculate_share_of_annual_global_forest_expansion(tb: Table) -> Table:
     tb = tb.merge(tb_global_expansion, on="year", how="left")
     tb["expansion_share_global"] = tb["_1d_expansion"].div(tb["global_forest_expansion"]).mul(100)
     tb = tb.drop(columns=["global_forest_expansion"])
-    assert (
-        tb["expansion_share_global"].max() <= 100
-    ), "Error in calculating share of annual global forest expansion: values exceed 100%"
+    assert tb["expansion_share_global"].max() <= 100, (
+        "Error in calculating share of annual global forest expansion: values exceed 100%"
+    )
     return tb

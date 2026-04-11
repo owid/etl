@@ -1,7 +1,5 @@
 """Combine dataset on coverage of emissions with the average prices of emissions covered by an ETS or a carbon tax."""
 
-from typing import Set
-
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -125,7 +123,7 @@ def run_sanity_checks_on_inputs(tb_economy: Table, tb_coverage: Table) -> None:
             log.warning("The last year in the data may be incomplete. Define LAST_INFORMED_YEAR.")
 
 
-def run_sanity_checks_on_outputs(tb_combined: Table, expected_countries_dropping_taxes: Set) -> None:
+def run_sanity_checks_on_outputs(tb_combined: Table, expected_countries_dropping_taxes: set) -> None:
     """Sanity checks on the output table.
 
     Parameters

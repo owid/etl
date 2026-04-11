@@ -12,8 +12,8 @@ Output: docs/api/search-api.md
 
 from pathlib import Path
 
-from .openapi_to_markdown import generate_markdown  # type: ignore
-from .openapi_utils import load_openapi_spec_from_github  # type: ignore
+from .openapi_to_markdown import generate_markdown  # ty: ignore
+from .openapi_utils import load_openapi_spec_from_github  # ty: ignore
 
 
 def main():

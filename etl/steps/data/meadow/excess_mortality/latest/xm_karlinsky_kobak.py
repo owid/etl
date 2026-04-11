@@ -3,7 +3,6 @@
 In this step we perform sanity checks on the expected input fields and the values that they take."""
 
 from pathlib import Path
-from typing import List, Union
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -77,11 +76,11 @@ def run(dest_dir: str) -> None:
     log.info("xm_karlinsky_kobak.end")
 
 
-def load_dataframe(path: Union[Path, str], column_names: List[str]) -> pd.DataFrame:
+def load_dataframe(path: Path | str, column_names: list[str]) -> pd.DataFrame:
     """Load the data from the latest version of the dataset."""
     df = pd.read_csv(path, names=column_names, encoding="latin-1")
     # Check columns
-    assert (
-        df.reset_index().shape[1] == len(column_names) + 1
-    ), "Check columns in source! There seems to be more (or less) columns."
+    assert df.reset_index().shape[1] == len(column_names) + 1, (
+        "Check columns in source! There seems to be more (or less) columns."
+    )
     return df

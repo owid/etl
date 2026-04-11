@@ -14,7 +14,7 @@ Some notes:
         - UN contains single-age groups from 0 to 99 and 100+ (equivalent to >=100)
 """
 
-from typing import List, cast
+from typing import cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -142,7 +142,7 @@ def combine_tables(tb_hmd: Table, tb_un: Table) -> Table:
     return tb
 
 
-def add_le_diff_and_ratios(tb: Table, columns_primary: List[str]) -> Table:
+def add_le_diff_and_ratios(tb: Table, columns_primary: list[str]) -> Table:
     """Add metrics on life expectancy ratios and differences between females and males."""
     ## Get relevant metric, split into f and m tables
     metrics = {

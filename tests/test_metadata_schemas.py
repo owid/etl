@@ -36,7 +36,7 @@ def construct_yaml_str(self, node):
 
 def load_yaml_as_string(path):
     SafeLoader.add_constructor("tag:yaml.org,2002:timestamp", construct_yaml_str)
-    with open(path, "r") as file:
+    with open(path) as file:
         return yaml.load(file, Loader=SafeLoader)
 
 

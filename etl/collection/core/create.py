@@ -1,8 +1,9 @@
 """Methods and tools to create collections of indicators."""
 
 import inspect
+from collections.abc import Callable, Mapping, Sequence
 from copy import deepcopy
-from typing import Any, Callable, Mapping, Sequence, TypeAlias, TypeVar, cast
+from typing import Any, TypeAlias, TypeVar, cast
 
 from owid.catalog import Table
 from structlog import get_logger
@@ -152,8 +153,7 @@ def _bake_listable(fct_single, obj, obj_name, num_tables):
         return obj
     else:
         raise TypeError(
-            f"Parameter '{obj_name}' must be a list of lists or a single value, "
-            f"but got {type(obj)} with value {obj}"
+            f"Parameter '{obj_name}' must be a list of lists or a single value, but got {type(obj)} with value {obj}"
         )
 
 
@@ -358,7 +358,7 @@ def _rename_choices(coll: Collection, choice_renames: dict[str, dict[str, str] |
                 for choice in dim.choices:
                     if isinstance(renames, dict):
                         if choice.slug in renames:
-                            choice.name = renames[choice.slug]
+                            choice.name = renames[choice.slug]  # ty: ignore[invalid-assignment]
                     elif inspect.isfunction(renames):
                         rename = renames(choice.slug)
                         if rename:

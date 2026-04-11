@@ -12,7 +12,7 @@ from owid.datautils.io.df import from_file, to_file
 
 
 class TestLoadDf:
-    df_original = pd.DataFrame([[1, 2, 3], [4, 5, 6]], columns=["a", "b", "c"])  # type: ignore
+    df_original = pd.DataFrame([[1, 2, 3], [4, 5, 6]], columns=["a", "b", "c"])  # ty: ignore
 
     def test_from_file_basic(self, tmpdir):
         output_methods = {
@@ -30,7 +30,7 @@ class TestLoadDf:
             if extension in ["dta", "pickle", "pkl", "feather"]:
                 funct(file)
             else:
-                funct(file, index=False)  # type: ignore[call-arg]
+                funct(file, index=False)  # ty: ignore[invalid-argument-type, unknown-argument]
             df = from_file(str(file))
             assert df.equals(self.df_original)
 

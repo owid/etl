@@ -1,6 +1,6 @@
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Literal
+from typing import Any, Literal
 
 import pandas as pd
 import plotly.express as px
@@ -41,7 +41,7 @@ from etl.paths import BASE_DIR, DOCS_DIR
 # LOAD KNOWLEDGE BASE
 #######################################################
 # General system prompt and context
-with open(CURRENT_DIR / "context.yml", "r") as f:
+with open(CURRENT_DIR / "context.yml") as f:
     CONTEXT = yaml.safe_load(f)
 SYSTEM_PROMPT = CONTEXT["system_prompt"]
 
@@ -123,7 +123,7 @@ agent = Agent(
     instructions=SYSTEM_PROMPT,
     retries=2,
     model_settings=settings,
-    toolsets=get_toolsets(),  # type: ignore
+    toolsets=get_toolsets(),  # ty: ignore
 )
 
 # Agent for recommending follow-up questions
@@ -278,7 +278,7 @@ async def get_docs_index() -> str:
 
 def read_page_md(page_path: str | Path) -> str:
     """Read text from MD page, add header with page path."""
-    with open(page_path, "r") as f:
+    with open(page_path) as f:
         text = f.read()
     text = f"_page: {page_path}_\n\n" + text
     return text
@@ -362,7 +362,7 @@ async def get_db_tables() -> str:
 
 
 @agent.tool_plain(docstring_format="google")
-async def get_db_table_fields(tb_names: List[str]) -> Dict[str, Any]:
+async def get_db_table_fields(tb_names: list[str]) -> dict[str, Any]:
     """Retrieve the documentation of the columns of a subset of tables in the database table.
 
 
@@ -482,7 +482,7 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
 
 
 @agent.tool_plain(docstring_format="google")
-async def list_available_questions_metabase() -> List[dict]:
+async def list_available_questions_metabase() -> list[dict]:
     """List available questions in Metabase in the "Expert" collection.
 
     Returns a list of questions with their metadata. Use the question names (and descriptions if available) to decide which question to use.
@@ -636,7 +636,7 @@ async def generate_plot(
             # Build prompt with error feedback from previous attempts
             if error_history:
                 error_feedback = "\n\nPREVIOUS ATTEMPT ERRORS:\n" + "\n".join(
-                    f"Attempt {i+1} error: {err}" for i, err in enumerate(error_history)
+                    f"Attempt {i + 1} error: {err}" for i, err in enumerate(error_history)
                 )
                 prompt = context_info + error_feedback + "\n\nPlease fix the code to avoid these errors."
             else:
@@ -687,7 +687,7 @@ async def generate_plot(
 
             # If this was the last retry, raise the error
             if attempt == max_retries - 1:
-                full_error = "\n".join(f"Attempt {i+1}: {err}" for i, err in enumerate(error_history))
+                full_error = "\n".join(f"Attempt {i + 1}: {err}" for i, err in enumerate(error_history))
                 log.error(f"All {max_retries} attempts failed for question {question_id}:\n{full_error}")
                 raise ValueError(f"Failed to generate plot after {max_retries} attempts. Errors:\n{full_error}")
 

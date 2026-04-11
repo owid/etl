@@ -95,9 +95,9 @@ def add_religious_composition(c):
             }
         ],
         params={
-            "indicator": lambda view: "Share of the population"
-            if view.matches(indicator="share")
-            else "Number of people",
+            "indicator": lambda view: (
+                "Share of the population" if view.matches(indicator="share") else "Number of people"
+            ),
         },
     )
 
