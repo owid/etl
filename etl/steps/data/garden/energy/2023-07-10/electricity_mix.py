@@ -3,8 +3,6 @@ Electricity Review and the Yearly Electricity Data) to create the Electricity Mi
 
 """
 
-from typing import Dict, List
-
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
@@ -51,7 +49,7 @@ def process_statistical_review_data(tb_review: Table) -> Table:
     }
     tb_review = tb_review[list(columns)].rename(columns=columns, errors="raise")
     # New columns to be created by summing other columns.
-    aggregates: Dict[str, List[str]] = {
+    aggregates: dict[str, list[str]] = {
         "fossil_generation__twh": [
             "oil_generation__twh",
             "coal_generation__twh",

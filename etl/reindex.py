@@ -5,7 +5,6 @@
 
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Optional
 
 import rich_click as click
 from owid.catalog.api.legacy import CHANNEL, LocalCatalog
@@ -30,14 +29,14 @@ config.enable_sentry()
     type=str,
     help="Reindex only datasets matching pattern",
 )
-def reindex_cli(channel: Iterable[CHANNEL], include: Optional[str]) -> None:
+def reindex_cli(channel: Iterable[CHANNEL], include: str | None) -> None:
     """Create a catalog-[channel].feather file inside etl/data with all tables in each channel.
 
     This enables `catalog.search` to be aware of what datasets currently exists. So, if for example you create a new dataset locally, you won't be able to find it in your local catalog unless you re-run reindex."""
     return reindex(channel=channel, include=include)
 
 
-def reindex(channel: Iterable[CHANNEL], include: Optional[str] = None) -> None:
+def reindex(channel: Iterable[CHANNEL], include: str | None = None) -> None:
     LocalCatalog(Path(DATA_DIR), channels=channel).reindex(include=include)
 
 

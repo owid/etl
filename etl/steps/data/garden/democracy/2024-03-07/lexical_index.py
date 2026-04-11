@@ -264,9 +264,9 @@ def add_universal_suffrage(tb: Table) -> Table:
     tb.loc[(tb["male_suffrage_lied"] == 1) & (tb["female_suffrage_lied"] == 1), "suffrage_lied"] = 2
     tb["suffrage_lied"].metadata = tb["female_suffrage_lied"].metadata
 
-    assert (
-        (tb["suffrage_lied"] == 1.5).sum() == 0
-    ), "There are countries with women suffrage but not men suffrage! This is not expected and can lead to confusing visualisations."
+    assert (tb["suffrage_lied"] == 1.5).sum() == 0, (
+        "There are countries with women suffrage but not men suffrage! This is not expected and can lead to confusing visualisations."
+    )
 
     return tb
 

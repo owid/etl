@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -58,7 +56,7 @@ def adapt_units(tb: Table, tb_wdi: Table) -> Table:
     return tb
 
 
-def change_attribution(tb: Table, columns: List[str], attribution_text: str) -> Table:
+def change_attribution(tb: Table, columns: list[str], attribution_text: str) -> Table:
     """
     Change attribution for some indicators as suggested by authors.
     """

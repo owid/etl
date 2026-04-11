@@ -266,7 +266,7 @@ def _validate_cause_specific_patterns(tb: Table) -> None:
             if elderly_deaths / total_maternal > 0.01:  # >1% in elderly
                 log.warning(
                     "High proportion of elderly maternal deaths",
-                    elderly_pct=f"{elderly_deaths/total_maternal*100:.2f}%",
+                    elderly_pct=f"{elderly_deaths / total_maternal * 100:.2f}%",
                 )
 
     # Sudden infant death syndrome should only occur in infants
@@ -296,7 +296,9 @@ def _validate_data_completeness(tb: Table) -> None:
     missing_deaths = tb["number"].isna().sum()
 
     if missing_deaths / total_records > 0.05:  # >5% missing
-        log.warning("High proportion of missing death counts", missing_pct=f"{missing_deaths/total_records*100:.2f}%")
+        log.warning(
+            "High proportion of missing death counts", missing_pct=f"{missing_deaths / total_records * 100:.2f}%"
+        )
 
     # Check temporal completeness for major countries
     for country in ["World", "United States", "Germany", "Japan"]:

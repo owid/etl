@@ -11,8 +11,6 @@ GDP are included.
 
 """
 
-from typing import List
-
 import numpy as np
 from owid.catalog import Dataset, Source, Table
 
@@ -143,8 +141,8 @@ UNITS = {"tonnes": {"conversion": TONNES_TO_MILLION_TONNES, "new_unit": "million
 
 
 def unique_sources_from_datasets(
-    datasets: List[Dataset],
-) -> List[Source]:
+    datasets: list[Dataset],
+) -> list[Source]:
     """Gather unique sources from datasets.
 
     Note: To check if a source is already listed, only the name of the source is considered (not the description or any
@@ -162,7 +160,7 @@ def unique_sources_from_datasets(
 
     """
     # Initialise list that will gather all unique metadata sources from the tables.
-    known_sources: List[Source] = []
+    known_sources: list[Source] = []
     for ds in datasets:
         # Get list of sources of the dataset of current table.
         table_sources = ds.metadata.sources

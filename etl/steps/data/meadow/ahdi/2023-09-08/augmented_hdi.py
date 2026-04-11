@@ -82,7 +82,7 @@ def run(dest_dir: str) -> None:
         dest_dir,
         tables=[tb_merged],
         check_variables_metadata=True,
-        default_metadata=snap.metadata,  # type: ignore
+        default_metadata=snap.metadata,  # ty: ignore
     )
 
     # Save changes in the new garden dataset.

@@ -2,7 +2,6 @@
 #  to_graphviz.py
 #
 
-from typing import Optional
 
 import rich_click as click
 
@@ -22,7 +21,7 @@ from etl.steps import filter_to_subgraph
     is_flag=True,
     default=False,
 )
-def to_graphviz(output_file: str, filter: Optional[str] = None, targets: bool = False) -> None:
+def to_graphviz(output_file: str, filter: str | None = None, targets: bool = False) -> None:
     """Generate a [Graphviz DOT file](https://graphviz.org/doc/info/lang.html) to see all dependencies.
 
     Saves the output as a file in `OUTPUT_PATH`."""

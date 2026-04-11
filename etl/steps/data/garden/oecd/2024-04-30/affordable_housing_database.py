@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Dict, List
-
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from structlog import get_logger
@@ -180,7 +178,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_years_to_table(tb: Table, years: Dict[int, List[str]]) -> Table:
+def add_years_to_table(tb: Table, years: dict[int, list[str]]) -> Table:
     """Add years to the table. Though the data is shown for DEFAULT_YEAR, in the metadata it is mentioned that several countries have data from previous years."""
     tb = tb.copy()
 
@@ -202,7 +200,7 @@ def add_years_to_table(tb: Table, years: Dict[int, List[str]]) -> Table:
     return tb
 
 
-def add_years_to_table_number_table(tb: Table, years: Dict[int, Dict[int, List[str]]]) -> Table:
+def add_years_to_table_number_table(tb: Table, years: dict[int, dict[int, list[str]]]) -> Table:
     """Add years to the table number experiencing homelessness. Though the data is shown for some years, in the metadata it is mentioned that those years represent different years depending on the country."""
     tb = tb.copy()
 

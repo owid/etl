@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 import pandas as pd
 import structlog
 from sklearn.ensemble import IsolationForest
@@ -23,7 +21,7 @@ def estimate_bard_epsilon(series: pd.Series) -> float:
     # Instead of just taking maximum and minimum, take 95th percentile and 5th percentile.
     eps = (real_values.quantile(0.95) - real_values.quantile(0.05)) / 10
 
-    return eps  # type: ignore
+    return eps  # ty: ignore
 
 
 def get_long_format_score_df(df_score: pd.DataFrame, df_scale: pd.DataFrame) -> pd.DataFrame:
@@ -62,13 +60,13 @@ class AnomalyDetector:
     def get_text(entity: str, year: int) -> str:
         return f"Anomaly happened in {entity} in {year}!"
 
-    def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_score_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         raise NotImplementedError
 
-    def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_scale_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         raise NotImplementedError
 
-    def get_zeros_df(self, df: pd.DataFrame, variable_ids: List[int]) -> pd.DataFrame:
+    def get_zeros_df(self, df: pd.DataFrame, variable_ids: list[int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
         df_zeros = df[INDEX_COLUMNS + variable_ids].copy()
         df_zeros[variable_ids] = 0
@@ -84,7 +82,7 @@ class AnomalyUpgradeMissing(AnomalyDetector):
     def get_text(entity: str, year: int) -> str:
         return f"There are missing values for {entity}! There might be other data points affected."
 
-    def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_score_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
         df_lost = self.get_zeros_df(df, variable_ids)
 
@@ -95,7 +93,7 @@ class AnomalyUpgradeMissing(AnomalyDetector):
 
         return df_lost
 
-    def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_scale_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of ones.
         df_scale = df.copy()
         # NOTE: Maybe, instead of 1, we could add the maximum value of each country divided by the maximum value of the variable.
@@ -113,7 +111,7 @@ class AnomalyUpgradeChange(AnomalyDetector):
     def get_text(entity: str, year: int) -> str:
         return f"There are significant changes for {entity} in {year} with respect to the previous version. There might be other data points affected."
 
-    def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_score_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
         df_version_change = self.get_zeros_df(df, variable_ids)
 
@@ -127,7 +125,7 @@ class AnomalyUpgradeChange(AnomalyDetector):
 
         return df_version_change
 
-    def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_scale_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
         df_scale = self.get_zeros_df(df, variable_ids)
 
@@ -151,7 +149,7 @@ class AnomalyTimeChange(AnomalyDetector):
     def get_text(entity: str, year: int) -> str:
         return f"There are significant changes for {entity} in {year} compared to the previous point. There might be other data points affected."
 
-    def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_score_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
         df_time_change = self.get_zeros_df(df, variable_ids)
 
@@ -173,7 +171,7 @@ class AnomalyTimeChange(AnomalyDetector):
 
         return df_time_change
 
-    def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_scale_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
         df_scale = self.get_zeros_df(df, variable_ids)
 
@@ -194,7 +192,7 @@ class AnomalyIsolationForest(AnomalyDetector):
 
     anomaly_type = "isolation_forest"
 
-    def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_score_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         # Initialize a dataframe of zeros.
         df_anomalies = self.get_zeros_df(df, variable_ids)
 
@@ -218,7 +216,7 @@ class AnomalyIsolationForest(AnomalyDetector):
                 series_scaled = scaler.fit_transform(series_imputed)
 
                 # Initialize the Isolation Forest model.
-                isolation_forest = IsolationForest(contamination=0.05, random_state=1)  # type: ignore
+                isolation_forest = IsolationForest(contamination=0.05, random_state=1)  # ty: ignore
 
                 # Fit the model and calculate anomaly scores.
                 isolation_forest.fit(series_scaled)
@@ -233,7 +231,7 @@ class AnomalyOneClassSVM(AnomalyDetector):
 
     anomaly_type = "one_class_svm"
 
-    def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+    def get_score_df(self, df: pd.DataFrame, variable_ids: list[int], variable_mapping: dict[int, int]) -> pd.DataFrame:
         # Initialize a dataframe of zeros.
         df_anomalies = self.get_zeros_df(df, variable_ids)
 

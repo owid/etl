@@ -1,6 +1,6 @@
 """The functions below are a bit more specific to this step, so maybe harder to generalize."""
 
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, cast
 
 from etl.collection.explorer import Explorer
 from etl.helpers import PathFinder
@@ -32,7 +32,7 @@ class ExplorerCreator:
             self.tbs["proj"][table_name] = self.ds_proj.read(table_name, load_data=False)
         return self.tbs["proj"][table_name]
 
-    def create_manual(self, config: Dict[str, Any], **kwargs) -> Explorer:
+    def create_manual(self, config: dict[str, Any], **kwargs) -> Explorer:
         explorer = self.paths.create_collection(
             config=config,
             indicator_as_dimension=True,
@@ -44,8 +44,8 @@ class ExplorerCreator:
     def create(
         self,
         table_name: str,
-        dimensions: Dict[str, Union[List[str], str]],
-        dimensions_proj: Optional[Dict[str, Union[List[str], str]]] = None,
+        dimensions: dict[str, list[str] | str],
+        dimensions_proj: dict[str, list[str] | str] | None = None,
         **kwargs,
     ) -> Explorer:
         """Creates an explorer based on `tb` (1950-2023) and `tb_proj` (1950-2100)."""

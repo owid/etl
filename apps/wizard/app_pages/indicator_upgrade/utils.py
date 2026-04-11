@@ -1,6 +1,6 @@
 """Utils for chart revision tool."""
 
-from typing import Dict, Tuple, cast
+from typing import cast
 
 import pandas as pd
 import streamlit as st
@@ -47,7 +47,7 @@ def get_datasets_from_db() -> pd.DataFrame:
 @st.cache_data(max_entries=1, ttl=60 * 10)
 def get_indicators_from_datasets(
     dataset_id_1: int, dataset_id_2: int, show_new_not_in_old: int = False
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Get indicators from two datasets."""
     with get_connection() as db_conn:
         # Get indicators from old dataset that have been used in at least one chart.
@@ -65,7 +65,7 @@ def get_indicators_from_datasets(
 @st.cache_data(show_spinner=False)
 def preliminary_mapping_cached(
     old_indicators, new_indicators, match_identical
-) -> Tuple[Dict[int, int], pd.DataFrame, pd.DataFrame]:
+) -> tuple[dict[int, int], pd.DataFrame, pd.DataFrame]:
     """Get preliminary indicator mapping.
 
     This maps indicators based on names that are identical.
@@ -84,7 +84,7 @@ def preliminary_mapping_cached(
         indicator_mapping_auto = {}
 
     # Cast
-    indicator_mapping_auto = cast(Dict[int, int], indicator_mapping_auto)
+    indicator_mapping_auto = cast(dict[int, int], indicator_mapping_auto)
 
     return indicator_mapping_auto, missing_old, missing_new
 
@@ -100,7 +100,7 @@ def find_mapping_suggestions_cached(missing_old, missing_new, similarity_name):
             missing_old=missing_old,
             missing_new=missing_new,
             similarity_name=similarity_name,
-        )  # type: ignore
+        )  # ty: ignore
     # Sort by max similarity: First suggestion is that one that has the highest similarity score with any of its suggested new vars.
     suggestions = sorted(suggestions, key=lambda x: x["new"]["similarity"].max(), reverse=True)
     return suggestions

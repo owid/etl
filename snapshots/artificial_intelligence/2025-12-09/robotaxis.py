@@ -8,7 +8,6 @@ import re
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import List
 from urllib.parse import urljoin
 
 import pandas as pd
@@ -23,7 +22,7 @@ paths = PathFinder(__file__)
 CPUC_URL = "https://www.cpuc.ca.gov/regulatory-services/licensing/transportation-licensing-and-analysis-branch/autonomous-vehicle-programs/quarterly-reporting"
 
 
-def extract_deployment_links() -> List[str]:
+def extract_deployment_links() -> list[str]:
     """Extract all deployment program zip file URLs from CPUC website.
 
     Returns:
@@ -70,7 +69,7 @@ def run(upload: bool = True) -> None:
         snap.create_snapshot(upload=upload, filename=output_file)
 
 
-def download_and_extract_csv_files(urls: List[str]) -> List[pd.DataFrame]:
+def download_and_extract_csv_files(urls: list[str]) -> list[pd.DataFrame]:
     """Download zip files and extract CSV files that contain TotalPMT column.
 
     Args:

@@ -32,9 +32,11 @@ def run() -> None:
 
     # Divide each row's 'wpf_authoritative_mortality_estimate' by the length of the corresponding 'Date' value to assume a uniform distribution of deaths over the period
     tb["wpf_authoritative_mortality_estimate"] = tb.apply(
-        lambda row: row["wpf_authoritative_mortality_estimate"] / len(row["date"].split(","))
-        if pd.notna(row["date"])
-        else row["wpf_authoritative_mortality_estimate"],
+        lambda row: (
+            row["wpf_authoritative_mortality_estimate"] / len(row["date"].split(","))
+            if pd.notna(row["date"])
+            else row["wpf_authoritative_mortality_estimate"]
+        ),
         axis=1,
     )
 
