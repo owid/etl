@@ -2,7 +2,7 @@ definitions:
   global:
     projections: |-
       <% if (variant is defined) and (variant != 'estimates') -%>
-      Projections from 2024 onwards are based on the UN's << variant >> scenario.
+      Future projections are based on the [UN's << variant >> scenario](#dod:un-projection-scenarios).
       <%- endif -%>
     dimensions:
       title: |-
