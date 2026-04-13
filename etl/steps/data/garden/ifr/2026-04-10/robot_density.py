@@ -17,14 +17,16 @@ def run() -> None:
     tb_2024 = ds_meadow.read("robot_density")
 
     # Load garden dataset for 2023 data.
-    ds_garden_2023 = paths.load_dataset("robot_density", namespace="ifr", version="2026-01-14")
-    tb_2023 = ds_garden_2023.read("robot_density", reset_index=True)
+    ds_garden_2023 = paths.load_dataset("robot_density", version="2026-01-14")
+    tb_2023 = ds_garden_2023.read("robot_density")
 
     #
     # Process data.
     #
     # Harmonize country names for 2024 data.
     tb_2024 = paths.regions.harmonize_names(tb=tb_2024)
+
+    # Convert robot density to per 1,000 employees.
     tb_2024["robot_density"] = tb_2024["robot_density_per_10000_employees"] / 10
     tb_2024 = tb_2024.drop(columns=["robot_density_per_10000_employees"])
 
