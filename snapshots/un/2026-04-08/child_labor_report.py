@@ -67,7 +67,6 @@ _RIGHT_COLS = [
 # ── Historical chart data (page 9) ─────────────────────────────────────────────
 # Values read from chart labels on page 9. Numbers are in millions; shares in %.
 # Confirmed via spatial analysis of PDF word positions (pdfplumber extract_words).
-# fmt: off
 _CHART_DATA = {
     # (disaggregation_type, disaggregation_value): {year: (cl_pct, cl_no_millions, hw_pct, hw_no_millions)}
     ("World total", None): {
@@ -85,7 +84,25 @@ _CHART_DATA = {
     ("Age", "12-14 years"): {2008: (17.0, 61.8, None, None), 2012: (13.1, 47.5, None, None)},
     ("Age", "15-17 years"): {2008: (16.9, 62.4, None, None), 2012: (13.0, 47.5, None, None)},
 }
-# fmt: on
+
+# ── Page 8 chart data ─────────────────────────────────────────────────────────
+# Not-in-school shares (page 8, World 2024, sex=total).
+# Can't derive the 5-14 share from 5-11/12-14 sub-age shares without total population data.
+_NOT_IN_SCHOOL_CHART = {
+    ("Not in school", "5-14 years"): {2024: (31.0, None, None, None)},
+    ("Not in school", "15-17 years"): {2024: (59.0, None, None, None)},
+}
+
+# Child labour including household chores (page 8, World 2024, ages 5-14 by sex).
+# Household chores are defined as ≥21 hours per week of unpaid household services.
+_HOUSEHOLD_CHORES_CHART = {
+    ("Including household chores", "Girls 5-11"): {2024: (11.9, None, None, None)},
+    ("Including household chores", "Boys 5-11"): {2024: (11.0, None, None, None)},
+    ("Including household chores", "Girls 12-14"): {2024: (11.6, None, None, None)},
+    ("Including household chores", "Boys 12-14"): {2024: (11.2, None, None, None)},
+    ("Including household chores", "Girls 5-14"): {2024: (11.8, None, None, None)},
+    ("Including household chores", "Boys 5-14"): {2024: (11.1, None, None, None)},
+}
 
 
 # ── Extraction helpers ─────────────────────────────────────────────────────────
@@ -136,21 +153,28 @@ def _extract_trends_table(pdf: pdfplumber.PDF) -> pd.DataFrame:
 
     df = _clean(df)
 
-    # Merge in historical chart data from page 9.
-    df = _merge_chart_data(df)
+    # Merge in chart data from pages 8 and 9.
+    all_chart_data = {**_CHART_DATA, **_NOT_IN_SCHOOL_CHART, **_HOUSEHOLD_CHORES_CHART}
+    df = _merge_chart_data(df, all_chart_data)
 
     return df
 
 
-def _merge_chart_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Add historical columns (2000–2012) from page 9 chart data to the trends table."""
-    for (dtype, dvalue), year_data in _CHART_DATA.items():
+def _merge_chart_data(df: pd.DataFrame, chart_data: dict) -> pd.DataFrame:
+    """Merge chart data into the trends table, updating existing rows or adding new ones."""
+    for (dtype, dvalue), year_data in chart_data.items():
         # Find the matching row in the annex table.
         mask = df["disaggregation_type"] == dtype
         if dvalue is not None:
             mask = mask & (df["disaggregation_value"] == dvalue)
         else:
             mask = mask & (df["disaggregation_value"].isna())
+
+        # If no matching row exists, create one.
+        if mask.sum() == 0:
+            new_row = {"disaggregation_type": dtype, "disaggregation_value": dvalue}
+            df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+            mask = df.index == len(df) - 1
 
         for year, (cl_pct, cl_no, hw_pct, hw_no) in year_data.items():
             # Numbers in chart are millions; annex uses thousands.

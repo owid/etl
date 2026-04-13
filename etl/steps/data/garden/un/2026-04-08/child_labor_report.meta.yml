@@ -107,6 +107,17 @@ tables:
           numDecimalPlaces: 0
           <<: *common_display
 
+      share_child_labor_incl_household_chores:
+        title: Share of children in child labor including household chores (<<sex>>, <<age>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of children aged 5-14 in child labor, including household chores performed for 21 or more hours per week.
+        description_key: []
+        display:
+          name: Share of children in child labor including household chores (<<sex>>, <<age>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
   sector:
     variables:
       share_child_labor:
