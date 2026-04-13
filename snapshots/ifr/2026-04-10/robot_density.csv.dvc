@@ -16,7 +16,7 @@ meta:
 
     #
     # This data was extracted from the following image https://ifr.org/downloads/press_docs/Graph_robot_density_by_country_worldwide_2024.jpg.
-    #
+    # The value for EU was added manually from this page https://ifr.org/ifr-press-releases/news/robot-density-surges-in-europe-asia-and-americas
 
     date_accessed: '2026-04-10'
     date_published: '2025-01-01'
@@ -24,6 +24,6 @@ meta:
       name: © International Federation of Robotics
       url: https://ifr.org/
 outs:
-  - md5: 06627f0f54841b79005046468065c06a
-    size: 454
+  - md5: 4f13ac7d56f5b60e2760bbafc831e4e8
+    size: 474
     path: robot_density.csv
