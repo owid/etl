@@ -19,6 +19,7 @@ def run() -> None:
     #
     # Process data.
     #
+    tb = tb.rename(columns={"name": "country"})
     tb["year"] = 2024
 
     tb = tb.format(["country", "year"])

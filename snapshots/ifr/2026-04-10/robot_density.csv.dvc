@@ -12,10 +12,11 @@ meta:
       Sources: Operational stock data: IFR, national robot associations; labor market data: OECD short-term labour market statistics, ILO LFS employment by economic activity, Eurostat lfsa_egan2, national statistics offices (Canada: Statistics Canada, China: China Statistical Yearbook, Germany: Statistisches Bundesamt, Korea: Ministry of Employment and Labour, USA: Bureau of Labor Statistics, Singapore: Ministry of Manpower).
     attribution: International Federation of Robotics
     attribution_short: IFR
-    url_main: https://ifr.org/
+    url_main: https://ifr.org/ifr-press-releases/news/robot-density-surges-in-europe-asia-and-americas
+
     #
-    # This dataset was obtained from IFR publications and reports.
-    # Data values for 2024 were extracted from the IFR Robot Density 2024 bar chart.
+    # This data was extracted from the following image https://ifr.org/downloads/press_docs/Graph_robot_density_by_country_worldwide_2024.jpg.
+    #
 
     date_accessed: '2026-04-10'
     date_published: '2025-01-01'
@@ -23,6 +24,6 @@ meta:
       name: © International Federation of Robotics
       url: https://ifr.org/
 outs:
-  - md5: e195c4e0038a0ee3b468f9b62e934431
-    size: 339
+  - md5: 06627f0f54841b79005046468065c06a
+    size: 454
     path: robot_density.csv

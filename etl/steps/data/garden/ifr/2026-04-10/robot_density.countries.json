@@ -1,5 +1,6 @@
 {
   "Austria": "Austria",
+  "Canada": "Canada",
   "China": "China",
   "Chinese Taipei": "Taiwan",
   "Czech Republic": "Czechia",
@@ -11,7 +12,6 @@
   "Italy": "Italy",
   "Japan": "Japan",
   "Netherlands": "Netherlands",
-  "Poland": "Poland",
   "Singapore": "Singapore",
   "Slovakia": "Slovakia",
   "Slovenia": "Slovenia",
@@ -20,5 +20,8 @@
   "Switzerland": "Switzerland",
   "United States": "United States",
   "World": "World",
-  "Rep. of Korea": "South Korea"
+  "Rep. of Korea": "South Korea",
+  "Average Western Europe": "Western Europe",
+  "Average North America": "North America",
+  "Average Asia": "Asia"
 }

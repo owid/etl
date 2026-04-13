@@ -25,7 +25,8 @@ def run() -> None:
     #
     # Harmonize country names for 2024 data.
     tb_2024 = paths.regions.harmonize_names(tb=tb_2024)
-    tb_2024["robot_density"] = tb_2024["robot_density"] / 10
+    tb_2024["robot_density"] = tb_2024["robot_density_per_10000_employees"] / 10
+    tb_2024 = tb_2024.drop(columns=["robot_density_per_10000_employees"])
 
     # Combine 2023 and 2024 data.
     tb = pr.concat([tb_2023, tb_2024], ignore_index=True)
