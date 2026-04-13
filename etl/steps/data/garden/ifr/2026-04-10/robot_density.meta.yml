@@ -13,8 +13,10 @@ tables:
           - Robots are becoming easier to install and more flexible, which means even small production runs can be automated.
           - Companies use robots to improve product quality, increase speed, reduce waste, and cut costs.
         short_unit: ""
+        description_from_producer: |-
+          Robot density is the number of operational industrial robots relative to the number of employees. It can cover the whole manufacturing industry or just specific industrial branches. The number of employees serves as a measure of economic size, so the quotient of operational stock over employees puts the operational stock on a uniform base.
         presentation:
           grapher_config:
-            note: 'Example machines that are not classified as robots: software (e.g., voice assistants), remote-controlled drones, self-driving cars, "smart" washing machines.'
+            note: "Example machines that are not classified as robots: software (e.g., voice assistants), remote-controlled drones, self-driving cars, “smart” washing machines."
         display:
           numDecimalPlaces: 0
