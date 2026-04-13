@@ -117,11 +117,11 @@ dimensions:
       - slug: natural_change_rate
         name: Natural population growth rate
       - slug: infant_deaths
-        name: Number of infant deaths
+        name: Infant deaths
       - slug: infant_mortality_rate
         name: Infant mortality rate
       - slug: child_deaths
-        name: Number of child deaths
+        name: Child deaths
       - slug: child_mortality_rate
         name: Child mortality rate
       - slug: age_structure
