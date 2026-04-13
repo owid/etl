@@ -21,7 +21,13 @@ tables:
         description_short: Estimated share of the working-age population (aged 15–64) who actively used a [generative AI](#dod:generative-ai) tool, such as ChatGPT or Gemini, in the second half of 2025.
         description_key:
           # Source: Section 2.1, p. 2–3 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
-          - These are modelled estimates, not survey data. They are derived from anonymized usage signals collected automatically by Microsoft's software and services, which log whether users visited any of 19 generative AI platforms, including ChatGPT, Gemini, Claude, DeepSeek, Grok, Midjourney, and Perplexity.
+          - These are modelled estimates, not survey data. They are derived from anonymized usage signals collected automatically by Microsoft's software and services, which log whether users visited any of 19 generative AI platforms, including ChatGPT, Gemini, Claude, Copilot, DeepSeek, Grok, Midjourney, and Perplexity.
+
+          # Source: Section 2.2, p. 3–5 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - Microsoft can only directly observe AI usage on Windows desktops — not on Macs, Chromebooks, or phones. To estimate total AI usage, the raw data is adjusted in two steps. First, Windows device counts are divided by Windows' market share to estimate total PC and tablet devices in each country, then compared to the working-age population to estimate device access rates. Second, mobile AI usage is estimated using country-level mobile-to-desktop internet traffic ratios. An overlap correction ensures that people who use AI on both desktop and mobile are not counted twice.
+
+          # Source: Section 2.1, p. 3 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          - Many users opt out of sharing diagnostic data with Microsoft, particularly in parts of Europe. In countries with below-average opt-in rates, the estimates are blended with the global average — the lower a country's opt-in rate, the more heavily the global average is weighted. This stabilizes estimates where the sample may be too small to reflect local trends.
 
           # Source: Section 2.1, p. 2–3 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
           - Only users with at least 90 minutes of total monthly activity on Microsoft platforms are included. This filters out infrequent users and is not specific to AI activity.
@@ -32,7 +38,7 @@ tables:
           # Source: Data Coverage Disclaimer, p. 5 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
           - Estimates for Russia, Iran, and parts of China are based on limited telemetry and should be treated with caution.
 
-          # Source: Appendix A, p. 13 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
+          # Source: Appendix A, p. 14 | https://www.microsoft.com/en-us/research/wp-content/uploads/2025/10/AI-Usage-Technical-Report.pdf
           - The indicator covers visits to AI platforms only. It does not include AI features built into productivity software or enterprise tools.
         display:
           numDecimalPlaces: 1
