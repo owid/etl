@@ -104,6 +104,12 @@ _HOUSEHOLD_CHORES_CHART = {
     ("Including household chores", "Boys 5-14"): {2024: (11.1, None, None, None)},
 }
 
+# Child labour share for 5-14 from page 8 chart (can't derive exactly from rounded annex data).
+_CHILD_LABOR_SHARE_5_14_CHART = {
+    ("Child labor share 5-14", "Girls"): {2024: (7.5, None, None, None)},
+    ("Child labor share 5-14", "Boys"): {2024: (8.1, None, None, None)},
+}
+
 
 # ── Extraction helpers ─────────────────────────────────────────────────────────
 
@@ -154,7 +160,7 @@ def _extract_trends_table(pdf: pdfplumber.PDF) -> pd.DataFrame:
     df = _clean(df)
 
     # Merge in chart data from pages 8 and 9.
-    all_chart_data = {**_CHART_DATA, **_NOT_IN_SCHOOL_CHART, **_HOUSEHOLD_CHORES_CHART}
+    all_chart_data = {**_CHART_DATA, **_NOT_IN_SCHOOL_CHART, **_HOUSEHOLD_CHORES_CHART, **_CHILD_LABOR_SHARE_5_14_CHART}
     df = _merge_chart_data(df, all_chart_data)
 
     return df

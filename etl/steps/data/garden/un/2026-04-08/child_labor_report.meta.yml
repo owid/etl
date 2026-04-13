@@ -9,6 +9,46 @@ definitions:
     display: &common_display
       tolerance: 0
 
+  description_key_child_labor: |-
+    <% if age == "5-11" %>
+    Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services during the reference week.
+    <%- elif age == "12-14" %>
+    Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services during the reference week.
+    <%- elif age == "15-17" %>
+    Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
+    <%- elif age == "5-14" %>
+    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services.
+    <%- elif age == "5-17" %>
+    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+    <%- endif %>
+  description_key_child_labor_economic_activity: |-
+    <% if age == "5-11" %>
+    Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity during the reference week.
+    <%- elif age == "12-14" %>
+    Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity during the reference week.
+    <%- elif age == "15-17" %>
+    Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
+    <%- elif age == "5-14" %>
+    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity; for children aged 12-14, it includes those who did at least 14 hours of economic activity.
+    <%- elif age == "5-17" %>
+    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity; for children aged 12-14, it includes those who did at least 14 hours of economic activity; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+    <%- endif %>
+
+  description_key_hazardous_work: |-
+    Children in hazardous work are those who work in hazardous occupations, hazardous industries (mining, quarrying and construction) or working long hours (more than 43 hours per week). The full list of hazardous occupations can be found in the [Methodology of the ILO-UNICEF Global Estimates of Child Labour documentation](https://www.ilo.org/publications/methodology-2024-ilo-unicef-global-estimates-child-labour).
+
+  description_key_modelled_data: |-
+    This data comes from nationally representative household surveys, covering around 60% of the global population of children. To construct a global series with complete coverage, the [International Labour Organization (ILO)](#dod:ilo) and UNICEF use a statistical model to estimate child labor prevalence in countries with missing data. You can read more about how these estimates are produced in the [Methodology of the ILO-UNICEF Global Estimates of Child Labour documentation](https://www.ilo.org/publications/methodology-2024-ilo-unicef-global-estimates-child-labour).
+
+  description_key_sector: |-
+    <% if sector == "Agriculture" %>
+    The agriculture sector includes crop and animal production, hunting, forestry, logging, and fishing and aquaculture activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/).
+    <%- elif sector == "Industry" %>
+    The industry sector includes mining and quarrying, manufacturing, construction, and public utilities (electricity, gas, and water), as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/).
+    <%- elif sector == "Services" %>
+    The services sector includes wholesale and retail trade; restaurants and hotels; transport, storage, and communications; financing, insurance, real estate, and business and administrative services; and public administration, community, social, and personal services, as defined by the International Standard Industrial Classification of All Economic Activities (ISIC).
+    <%- endif %>
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -24,7 +64,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
-        description_key: []
+        description_key:
+          - "{definitions.description_key_child_labor_economic_activity}"
+          - "{definitions.description_key_modelled_data}"
         display:
           name: Share of children in child labor (<<sex>>, <<age>>)
           numDecimalPlaces: 1
@@ -35,7 +77,9 @@ tables:
         unit: "children"
         short_unit: ""
         description_short: Number of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
-        description_key: []
+        description_key:
+          - "{definitions.description_key_child_labor_economic_activity}"
+          - "{definitions.description_key_modelled_data}"
         display:
           name: Number of children in child labor (<<sex>>, <<age>>)
           numDecimalPlaces: 0
@@ -46,7 +90,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Proportion of children who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
-        description_key: []
+        description_key:
+          - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_modelled_data}"
         display:
           name: Share of children in hazardous work (<<sex>>, <<age>>)
           numDecimalPlaces: 1
@@ -57,7 +103,9 @@ tables:
         unit: "children"
         short_unit: ""
         description_short: Number of children who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
-        description_key: []
+        description_key:
+          - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_modelled_data}"
         display:
           name: Number of children in hazardous work (<<sex>>, <<age>>)
           numDecimalPlaces: 0
@@ -68,7 +116,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Proportion of children in child labor who are not attending school.
-        description_key: []
+        description_key:
+          - "{definitions.description_key_child_labor_economic_activity}"
+          - "{definitions.description_key_modelled_data}"
         display:
           name: Share of children in child labor who are not attending school (<<sex>>, <<age>>)
           numDecimalPlaces: 1
@@ -79,7 +129,9 @@ tables:
         unit: "children"
         short_unit: ""
         description_short: Number of children in child labor who are not attending school.
-        description_key: []
+        description_key:
+          - "{definitions.description_key_child_labor_economic_activity}"
+          - "{definitions.description_key_modelled_data}"
         display:
           name: Number of children in child labor who are not attending school (<<sex>>, <<age>>)
           numDecimalPlaces: 0
@@ -90,7 +142,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Proportion of children in hazardous work who are not attending school.
-        description_key: []
+        description_key:
+          - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_modelled_data}"
         display:
           name: Share of children in hazardous work who are not attending school (<<sex>>, <<age>>)
           numDecimalPlaces: 1
@@ -101,7 +155,9 @@ tables:
         unit: "children"
         short_unit: ""
         description_short: Number of children in hazardous work who are not attending school.
-        description_key: []
+        description_key:
+          - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_modelled_data}"
         display:
           name: Number of children in hazardous work who are not attending school (<<sex>>, <<age>>)
           numDecimalPlaces: 0
@@ -112,7 +168,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Proportion of children aged 5-14 in child labor, including household chores performed for 21 or more hours per week.
-        description_key: []
+        description_key:
+          - "{definitions.description_key_child_labor}"
+          - "{definitions.description_key_modelled_data}"
         display:
           name: Share of children in child labor including household chores (<<sex>>, <<age>>)
           numDecimalPlaces: 1
@@ -124,8 +182,11 @@ tables:
         title: "Share of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children in child labor who are working in a given sector.
-        description_key: []
+        description_short: Proportion of children in child labor who are working in the <<sector | lower>> sector.
+        description_key:
+          - "{definitions.description_key_child_labor_economic_activity}"
+          - "{definitions.description_key_modelled_data}"
+          - "{definitions.description_key_sector}"
         display:
           name: "Share of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
           numDecimalPlaces: 1
@@ -135,8 +196,11 @@ tables:
         title: "Number of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "children"
         short_unit: ""
-        description_short: Number of children in child labor who are working in a given sector.
-        description_key: []
+        description_short: Number of children in child labor who are working in the <<sector | lower>> sector.
+        description_key:
+          - "{definitions.description_key_child_labor_economic_activity}"
+          - "{definitions.description_key_modelled_data}"
+          - "{definitions.description_key_sector}"
         display:
           name: "Number of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
           numDecimalPlaces: 0
@@ -146,8 +210,11 @@ tables:
         title: "Share of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children in hazardous work who are working in a given sector.
-        description_key: []
+        description_short: Proportion of children in hazardous work who are working in the <<sector | lower>> sector.
+        description_key:
+          - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_modelled_data}"
+          - "{definitions.description_key_sector}"
         display:
           name: "Share of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
           numDecimalPlaces: 1
@@ -157,8 +224,11 @@ tables:
         title: "Number of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "children"
         short_unit: ""
-        description_short: Number of children in hazardous work who are working in a given sector.
-        description_key: []
+        description_short: Number of children in hazardous work who are working in the <<sector | lower>> sector.
+        description_key:
+          - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_modelled_data}"
+          - "{definitions.description_key_sector}"
         display:
           name: "Number of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
           numDecimalPlaces: 0

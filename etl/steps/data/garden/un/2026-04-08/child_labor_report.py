@@ -148,10 +148,17 @@ def _trends_to_long(tb: Table) -> Table:
     tb.loc[is_hh, "sex"] = parsed_hh[0].str.lower().values
     tb.loc[is_hh, "age"] = parsed_hh[1].values
 
+    # Child labor share 5-14 rows: country="World", age="5-14", sex from value.
+    is_cl514 = tb["disaggregation_type"] == "Child labor share 5-14"
+    tb.loc[is_cl514, "country"] = "World"
+    tb.loc[is_cl514, "age"] = "5-14"
+    tb.loc[is_cl514, "sex"] = tb.loc[is_cl514, "disaggregation_value"].str.lower()
+
     # Tag source type so _build_main_table can separate special rows.
     tb["_source"] = "trends"
     tb.loc[is_nis, "_source"] = "not_in_school"
     tb.loc[is_hh, "_source"] = "household_chores"
+    tb.loc[is_cl514, "_source"] = "child_labor_share_5_14"
 
     tb = tb.drop(columns=["disaggregation_type", "disaggregation_value"])
     tb["year"] = tb["year"].astype(int)
@@ -210,6 +217,7 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     tb_trends = tb_trends.copy()
     tb_nis_chart = tb_trends[tb_trends["_source"] == "not_in_school"].drop(columns=["_source"])
     tb_hh = tb_trends[tb_trends["_source"] == "household_chores"].drop(columns=["_source"])
+    tb_cl514 = tb_trends[tb_trends["_source"] == "child_labor_share_5_14"].drop(columns=["_source"])
     tb_trends = tb_trends[tb_trends["_source"] == "trends"].drop(columns=["_source"])
 
     # 5. Concat with trends (2016, 2020, 2024 aggregate-level rows).
@@ -232,14 +240,28 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
         value_cols = [c for c in nis.columns if c not in join_cols]
         tb = tb.merge(nis[join_cols + value_cols], on=join_cols, how="left")
 
-    # 7. Compute 5-14 age bracket by summing number columns from 5-11 and 12-14.
+    # 7. Compute 5-14 age bracket by summing 5-11 and 12-14.
     tb_5_11 = tb[tb["age"] == "5-11"].sort_values(["country", "year", "sex"]).reset_index(drop=True)
     tb_12_14 = tb[tb["age"] == "12-14"].sort_values(["country", "year", "sex"]).reset_index(drop=True)
     num_cols = [c for c in tb.columns if c.startswith("number_")]
+    share_cols = [c for c in tb.columns if c.startswith("share_")]
     tb_5_14 = tb_5_11[["country", "year", "sex"]].copy()
+    # Sum numbers.
     for col in num_cols:
         tb_5_14[col] = tb_5_11[col].values + tb_12_14[col].values
+    # Compute shares: share_5_14 = number_5_14 / (pop_5_11 + pop_12_14), where pop = number / (share / 100).
+    for col in share_cols:
+        num_col = col.replace("share_", "number_")
+        if num_col in num_cols:
+            pop_5_11 = tb_5_11[num_col].values / (tb_5_11[col].values / 100)
+            pop_12_14 = tb_12_14[num_col].values / (tb_12_14[col].values / 100)
+            tb_5_14[col] = tb_5_14[num_col].values / (pop_5_11 + pop_12_14) * 100
     tb_5_14["age"] = "5-14"
+    # Overwrite child labor shares for 5-14 with report values (calculated shares have rounding errors).
+    if len(tb_cl514) > 0:
+        for _, row in tb_cl514.iterrows():
+            mask = (tb_5_14["country"] == row["country"]) & (tb_5_14["year"] == row["year"]) & (tb_5_14["sex"] == row["sex"])
+            tb_5_14.loc[mask, "share_child_labor"] = row["share_child_labor"]
     tb = pr.concat([tb, tb_5_14], ignore_index=True)
 
     # 8. Left-join not-in-school shares from page 8 chart (for 5-14 and 15-17 age groups).
