@@ -32,7 +32,7 @@ Assumptions:
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Pick 1–3 chart views for the public announcement
-- [ ] Draft Slack announcement, add to PR description with `@codex review`, and notify user to post it to #data-updates-comms
+- [ ] Draft Slack announcement, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 
 Persistence:
@@ -128,7 +128,10 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Ask user if unsure about any details
    - Save the draft to `workbench/<short_name>/slack-announcement.md`
    - **Add the announcement to the PR description** as a collapsed section titled "Slack Announcement"
-   - **Append `@codex review` as the very last line of the PR description** (outside all collapsed sections) to trigger an automated code review
+   - **Post `@codex review` as a separate PR comment** (not in the PR description) to trigger an automated code review. Use:
+     ```bash
+     gh pr comment <pr_number> --body "@codex review"
+     ```
    - Tell the user: "Slack announcement drafted at `workbench/<short_name>/slack-announcement.md` and added to the PR description. Please review and post it to **#data-updates-comms**."
 
 10) Codex review: address comments and resolve threads
