@@ -210,9 +210,9 @@ def test_grapher_config_schema_sync():
     # Load local schema
     with open(SCHEMAS_DIR / "dataset-schema.json") as f:
         dataset_schema = json.load(f)
-    local_gc = dataset_schema["properties"]["tables"]["additionalProperties"]["properties"][
-        "variables"
-    ]["additionalProperties"]["properties"]["presentation"]["properties"]["grapher_config"]
+    local_gc = dataset_schema["properties"]["tables"]["additionalProperties"]["properties"]["variables"][
+        "additionalProperties"
+    ]["properties"]["presentation"]["properties"]["grapher_config"]
     local_props = set(local_gc["properties"].keys())
 
     # Fetch upstream schema
@@ -239,13 +239,11 @@ def test_grapher_config_schema_sync():
             f"\n"
             f"To fix, add these properties inside the 'grapher_config.properties' object in\n"
             f"schemas/dataset-schema.json (before the 'additionalProperties' key):\n"
-            f"\n"
-            + "\n".join(snippets)
-            + "\n\n"
-            f"NOTE: If a property uses a strict type (e.g. enum, array) but our meta.yml files\n"
-            f"use Jinja templates in that field, relax the type to 'string' or use\n"
-            f"oneOf/anyOf to accept both. If the property is ETL-only and intentionally absent\n"
-            f"from upstream, add it to LOCAL_ONLY_PROPERTIES in this test file."
+            f"\n" + "\n".join(snippets) + "\n\n"
+            "NOTE: If a property uses a strict type (e.g. enum, array) but our meta.yml files\n"
+            "use Jinja templates in that field, relax the type to 'string' or use\n"
+            "oneOf/anyOf to accept both. If the property is ETL-only and intentionally absent\n"
+            "from upstream, add it to LOCAL_ONLY_PROPERTIES in this test file."
         )
 
     # Check for local properties removed from upstream (excluding known local-only ones)
@@ -255,4 +253,3 @@ def test_grapher_config_schema_sync():
             "Local grapher_config has properties not in upstream schema (may be deprecated)",
             properties=sorted(removed),
         )
-
