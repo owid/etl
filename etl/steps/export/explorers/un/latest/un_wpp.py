@@ -157,7 +157,7 @@ def run() -> None:
             "sex": "*",
             "variant": ["estimates"],
         },
-        choice_renames={"age": lambda x: f"Mothers aged {x} years" if x != "all" else None},
+        choice_renames={"age": lambda x: f"Women aged {x} years" if x != "all" else None},
     )
     view_editor.edit_views_b(explorer_b)
 
