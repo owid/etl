@@ -17,7 +17,7 @@ def run() -> None:
     tb = ds_garden.read("thousand_bins_distribution", reset_index=False)
 
     # Initialize a new external dataset.
-    ds = paths.create_dataset(tables=[tb], formats=["csv", "json"])
+    ds = paths.create_dataset(tables=[tb])
 
     # Save external dataset.
     ds.save()
