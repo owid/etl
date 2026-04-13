@@ -60,6 +60,8 @@ tables:
 
 **Key rule from CLAUDE.md:** Omit the `dataset:` block entirely (inherited from origin) -- only set `update_period_days` when needed.
 
+**Full field reference:** For a complete list of all supported metadata fields (beyond what's covered here), read `schemas/dataset-schema.json`.
+
 ## Field-by-Field Guidelines
 
 ### Titles
