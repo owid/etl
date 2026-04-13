@@ -27,9 +27,6 @@ tables:
           # Source: Section 2.2, p. 3–5; Section 2.1, p. 3 | AI-Usage-Technical-Report.pdf
           - To do this, Microsoft adjusts for how common desktop and tablet devices are in each country, how much internet use happens on mobile rather than desktop, and how many users share data with Microsoft.
 
-          # Source: Section 2.2, p. 4–5 | AI-Usage-Technical-Report.pdf
-          - These adjustments rely on assumptions that are difficult to test. For example, the report assumes that AI use across desktop and mobile follows broader patterns of internet use.
-
           # Source: Section 2.1, p. 2–3 | AI-Usage-Technical-Report.pdf
           - Users with less than 90 minutes of usage time in a month are excluded, to reduce the influence of one-time or very infrequent users.
 
