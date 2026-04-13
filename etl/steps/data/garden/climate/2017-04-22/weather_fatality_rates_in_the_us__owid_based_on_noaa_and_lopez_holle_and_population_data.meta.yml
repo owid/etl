@@ -1,0 +1,59 @@
+dataset:
+  title: Weather fatality rates in the US – OWID based on NOAA and Lopez Holle and population data
+tables:
+  weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data:
+    variables:
+      cold:
+        title: Cold
+        unit: deaths per million
+        display:
+          unit: Percent
+      flood:
+        title: Flood
+        unit: deaths per million
+        display:
+          unit: Percent
+      heat:
+        title: Heat
+        unit: deaths per million
+        display:
+          unit: Percent
+      hurricane:
+        title: Hurricane
+        unit: deaths per million
+        display:
+          unit: Percent
+      lightning:
+        title: Lightning
+        unit: deaths per million
+        display:
+          unit: Percent
+      rip_current:
+        title: Rip Current
+        unit: deaths per million
+        display:
+          unit: Percent
+      tornado:
+        title: Tornado
+        unit: deaths per million
+        display:
+          unit: Percent
+      wind:
+        title: Wind
+        unit: deaths per million
+        display:
+          unit: Percent
+      winter:
+        title: Winter
+        unit: deaths per million
+        display:
+          unit: Percent
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

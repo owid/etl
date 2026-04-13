@@ -1,0 +1,17 @@
+dataset:
+  title: Land under cereal production index - World Bank (2017)
+tables:
+  land_under_cereal_production_index__world_bank__2017:
+    variables:
+      land_under_cereal_production_index__world_bank__2017:
+        title: Land under cereal production index (World Bank (2017))
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

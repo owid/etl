@@ -55,87 +55,6 @@ steps:
   data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive:
     - snapshot://usda_ers/2025-03-26/food_expenditure_in_us_archive.xlsx
   #
-  # Agriculture - Long-run daily calorie supply per person.
-  #
-  data://garden/agriculture/2025-03-26/daily_calories_per_person:
-    - data://meadow/agriculture/2024-05-23/fao_1949
-    - data://meadow/agriculture/2024-05-23/fogel_2004
-    - data://meadow/agriculture/2024-05-23/grigg_1995
-    - data://meadow/usda_ers/2025-03-26/food_availability
-    - data://meadow/agriculture/2024-05-23/jonsson_1998
-    - data://meadow/agriculture/2024-05-23/fao_2000
-    - data://meadow/agriculture/2024-05-23/harris_et_al_2015
-    - data://garden/faostat/2025-03-17/faostat_fbsc
-    - data://meadow/agriculture/2024-05-23/floud_et_al_2011
-  #
-  # Agriculture - Long-run daily calorie supply per person.
-  #
-  data://grapher/agriculture/2025-03-26/daily_calories_per_person:
-    - data://garden/agriculture/2025-03-26/daily_calories_per_person
-  #
-  # Long-term yields in the United Kingdom.
-  #
-  data://garden/agriculture/2025-03-26/uk_long_term_yields:
-    - data://garden/papers/2024-03-26/brassley_2000
-    - data://garden/faostat/2025-03-17/faostat_qcl
-    - data://garden/papers/2024-03-26/broadberry_et_al_2015
-  #
-  # Long-term wheat yields in Europe.
-  #
-  data://garden/agriculture/2025-03-26/long_term_wheat_yields:
-    - data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984
-    - data://garden/faostat/2025-03-17/faostat_qcl
-  #
-  # Long-term corn yields in United States.
-  #
-  data://meadow/usda_nass/2025-03-26/us_corn_yields:
-    - snapshot://usda_nass/2025-03-26/us_corn_yields.csv
-  #
-  # Long-term corn yields in United States.
-  #
-  data://garden/usda_nass/2025-03-26/us_corn_yields:
-    - data://meadow/usda_nass/2025-03-26/us_corn_yields
-  #
-  # Long-term crop yields.
-  #
-  data://garden/agriculture/2025-03-26/long_term_crop_yields:
-    - data://garden/agriculture/2025-03-26/long_term_wheat_yields
-    - data://garden/agriculture/2025-03-26/uk_long_term_yields
-    - data://garden/usda_nass/2025-03-26/us_corn_yields
-    - data://garden/faostat/2025-03-17/faostat_qcl
-  #
-  # Long-term crop yields.
-  #
-  data://grapher/agriculture/2025-03-26/long_term_crop_yields:
-    - data://garden/agriculture/2025-03-26/long_term_crop_yields
-  #
-  # Attainable yields.
-  #
-  data://garden/agriculture/2025-03-26/attainable_yields:
-    - data://garden/agriculture/2025-03-26/long_term_crop_yields
-    - data://garden/papers/2024-03-26/mueller_et_al_2012
-  #
-  # Attainable yields.
-  #
-  data://grapher/agriculture/2025-03-26/attainable_yields:
-    - data://garden/agriculture/2025-03-26/attainable_yields
-  #
-  # Food expenditure in US - USDA
-  #
-  data://meadow/usda_ers/2025-03-26/food_expenditure_in_us:
-    - snapshot://usda_ers/2025-03-26/food_expenditure_in_us.xlsx
-  #
-  # Food expenditure in US - USDA
-  #
-  data://garden/usda_ers/2025-03-26/food_expenditure_in_us:
-    - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us
-    - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive
-  #
-  # Food expenditure in US - USDA
-  #
-  data://grapher/usda_ers/2025-03-26/food_expenditure_in_us:
-    - data://garden/usda_ers/2025-03-26/food_expenditure_in_us
-  #
   # Food expenditure - USDA
   # NOTE: On every update, the USDA adds a year and removes the oldest year.
   # That's why we keep old snapshots to be able to collect as much data as possible.
@@ -154,23 +73,6 @@ steps:
   #
   data://grapher/usda_ers/2025-03-26/food_expenditure:
     - data://garden/usda_ers/2025-03-26/food_expenditure
-  #
-  # Crop yields explorer.
-  #
-  export://explorers/agriculture/latest/crop_yields:
-    - data://grapher/agriculture/2025-03-26/attainable_yields
-  #
-  # Long-term food and agriculture trends
-  #
-  data://garden/agriculture/2025-07-30/long_term_food_and_agriculture_trends:
-    - data://garden/faostat/2025-03-17/faostat_fbsc
-    - data://garden/faostat/2025-03-17/faostat_rl
-    - data://garden/regions/2023-01-01/regions
-  #
-  # Long-term food and agriculture trends
-  #
-  data://grapher/agriculture/2025-07-30/long_term_food_and_agriculture_trends:
-    - data://garden/agriculture/2025-07-30/long_term_food_and_agriculture_trends
   #
   # Food prices for nutrition - World Bank based on FAO.
   #
@@ -198,32 +100,133 @@ steps:
     - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use
   #
   # Lobell Lab: Crop productivity in southern Africa
+  # NOTE: Not updateable.
   #
   data://meadow/agriculture/2025-10-15/crop_yields_in_southern_africa:
     - snapshot://agriculture/2025-10-15/crop_yields_in_southern_africa.zip
   #
   # Lobell Lab: Crop productivity in southern Africa
+  # NOTE: Not updateable.
   #
   data://garden/agriculture/2025-10-15/crop_yields_in_southern_africa:
     - data://meadow/agriculture/2025-10-15/crop_yields_in_southern_africa
   #
   # Lobell Lab: Crop productivity in southern Africa
+  # NOTE: Not updateable.
   #
   data://grapher/agriculture/2025-10-15/crop_yields_in_southern_africa:
     - data://garden/agriculture/2025-10-15/crop_yields_in_southern_africa
   #
+  # Agriculture - Long-run daily calorie supply per person.
+  #
+  data://garden/agriculture/2026-03-02/daily_calories_per_person:
+    - data://meadow/agriculture/2024-05-23/fao_1949
+    - data://meadow/agriculture/2024-05-23/fao_2000
+    - data://meadow/agriculture/2024-05-23/grigg_1995
+    - data://meadow/agriculture/2024-05-23/harris_et_al_2015
+    - data://meadow/agriculture/2024-05-23/fogel_2004
+    - data://meadow/agriculture/2024-05-23/jonsson_1998
+    - data://meadow/usda_ers/2025-03-26/food_availability
+    - data://meadow/agriculture/2024-05-23/floud_et_al_2011
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+  #
+  # Agriculture - Long-run daily calorie supply per person.
+  #
+  data://grapher/agriculture/2026-03-02/daily_calories_per_person:
+    - data://garden/agriculture/2026-03-02/daily_calories_per_person
+  #
+  # Long-term food and agriculture trends
+  #
+  data://garden/agriculture/2026-03-02/long_term_food_and_agriculture_trends:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+    - data://garden/faostat/2026-02-25/faostat_rl
+  #
+  # Long-term food and agriculture trends
+  #
+  data://grapher/agriculture/2026-03-02/long_term_food_and_agriculture_trends:
+    - data://garden/agriculture/2026-03-02/long_term_food_and_agriculture_trends
+  #
+  # Food expenditure in US - USDA
+  #
+  data://meadow/usda_ers/2026-03-02/food_expenditure_in_us:
+    - snapshot://usda_ers/2026-03-02/food_expenditure_in_us.xlsx
+  #
+  # Food expenditure in US - USDA
+  #
+  data://garden/usda_ers/2026-03-02/food_expenditure_in_us:
+    - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive
+    - data://meadow/usda_ers/2026-03-02/food_expenditure_in_us
+  #
+  # Food expenditure in US - USDA
+  #
+  data://grapher/usda_ers/2026-03-02/food_expenditure_in_us:
+    - data://garden/usda_ers/2026-03-02/food_expenditure_in_us
+  #
   # USDA/FAS - Corn yields
   #
-  data://meadow/agriculture/2025-10-16/corn_yields:
-    - snapshot://agriculture/2025-10-16/corn_yields.xls
+  data://meadow/agriculture/2026-03-02/corn_yields:
+    - snapshot://agriculture/2026-03-02/corn_yields.xls
   #
   # USDA/FAS - Corn yields
   #
-  data://garden/agriculture/2025-10-16/corn_yields:
-    - data://meadow/agriculture/2025-10-16/corn_yields
+  data://garden/agriculture/2026-03-02/corn_yields:
+    - data://meadow/agriculture/2026-03-02/corn_yields
     - data://garden/regions/2023-01-01/regions
   #
   # USDA/FAS - Corn yields
   #
-  data://grapher/agriculture/2025-10-16/corn_yields:
-    - data://garden/agriculture/2025-10-16/corn_yields
+  data://grapher/agriculture/2026-03-02/corn_yields:
+    - data://garden/agriculture/2026-03-02/corn_yields
+  #
+  # Long-term corn yields in United States.
+  #
+  data://meadow/usda_nass/2026-03-02/us_corn_yields:
+    - snapshot://usda_nass/2026-03-02/us_corn_yields.csv
+  #
+  # Long-term corn yields in United States.
+  #
+  data://garden/usda_nass/2026-03-02/us_corn_yields:
+    - data://meadow/usda_nass/2026-03-02/us_corn_yields
+  #
+  # Long-term crop yields.
+  #
+  data://garden/agriculture/2026-03-02/long_term_crop_yields:
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/agriculture/2026-03-02/uk_long_term_yields
+    - data://garden/usda_nass/2026-03-02/us_corn_yields
+    - data://garden/agriculture/2026-03-02/long_term_wheat_yields
+  #
+  # Long-term crop yields.
+  #
+  data://grapher/agriculture/2026-03-02/long_term_crop_yields:
+    - data://garden/agriculture/2026-03-02/long_term_crop_yields
+  #
+  # Long-term yields in the United Kingdom.
+  #
+  data://garden/agriculture/2026-03-02/uk_long_term_yields:
+    - data://garden/papers/2024-03-26/broadberry_et_al_2015
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/papers/2024-03-26/brassley_2000
+  #
+  # Long-term wheat yields in Europe.
+  #
+  data://garden/agriculture/2026-03-02/long_term_wheat_yields:
+    - data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984
+    - data://garden/faostat/2026-02-25/faostat_qcl
+  #
+  # Attainable yields.
+  #
+  data://garden/agriculture/2026-03-02/attainable_yields:
+    - data://garden/papers/2024-03-26/mueller_et_al_2012
+    - data://garden/agriculture/2026-03-02/long_term_crop_yields
+  #
+  # Attainable yields.
+  #
+  data://grapher/agriculture/2026-03-02/attainable_yields:
+    - data://garden/agriculture/2026-03-02/attainable_yields
+  #
+  # Crop yields explorer.
+  #
+  export://explorers/agriculture/latest/crop_yields:
+    - data://grapher/agriculture/2026-03-02/attainable_yields

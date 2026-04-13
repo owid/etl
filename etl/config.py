@@ -8,6 +8,7 @@ only important for OWID staff.
 """
 
 import asyncio
+import logging
 import os
 import pwd
 import re
@@ -16,7 +17,7 @@ import warnings
 from dataclasses import dataclass, fields
 from os import environ as env
 from pathlib import Path
-from typing import List, Literal, Optional, cast
+from typing import Literal, cast
 from urllib.parse import quote
 
 import git
@@ -76,6 +77,31 @@ def get_container_name(branch_name):
 
 load_env()
 
+# Log level for structlog filtering (applied in enable_structlog_filtering below).
+# By default, only INFO and above are shown. Set DEBUG=1 in .env to see DEBUG messages.
+STRUCTLOG_LOG_LEVEL = logging.DEBUG if env.get("DEBUG") in ("True", "true", "1") else logging.INFO
+
+
+def enable_structlog_filtering() -> None:
+    """Configure structlog log-level filtering.
+
+    Called from the ETL CLI entry point, not at import time, to avoid
+    interfering with other tools (e.g. Streamlit apps) that import etl.config.
+    """
+    kwargs: dict = dict(wrapper_class=structlog.make_filtering_bound_logger(STRUCTLOG_LOG_LEVEL))
+
+    # Allow disabling timestamps via ETL_LOG_TIMESTAMPS=0
+    if env.get("ETL_LOG_TIMESTAMPS", "0") == "0":
+        kwargs["processors"] = [
+            structlog.contextvars.merge_contextvars,
+            structlog.processors.add_log_level,
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.dev.ConsoleRenderer(),
+        ]
+
+    structlog.configure(**kwargs)
+
 
 pd.set_option("future.no_silent_downcasting", True)
 
@@ -96,6 +122,7 @@ PREFER_DOWNLOAD = env.get("PREFER_DOWNLOAD") in ("True", "true", "1")
 
 # publishing to OWID's public data catalog in R2
 R2_BUCKET = "owid-catalog"
+R2_BUCKET_PRIVATE = "owid-catalog-private"
 R2_SNAPSHOTS_PUBLIC = "owid-snapshots"
 R2_SNAPSHOTS_PRIVATE = "owid-snapshots-private"
 R2_SNAPSHOTS_PUBLIC_READ = "https://snapshots.owid.io"
@@ -119,7 +146,7 @@ DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
 # Special ENV file with access to production DB (read-only), used by chart-diff
 if "ENV_FILE_PROD" in env:
-    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # type: ignore
+    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # ty: ignore
 else:
     ENV_FILE_PROD = None
 
@@ -136,9 +163,13 @@ if DB_IS_PRODUCTION:
     assert DATA_API_ENV == "production", "DATA_API_ENV must be set to production when publishing to live_grapher"
 
 
-def load_STAGING() -> Optional[str]:
+def load_STAGING() -> str | None:
     # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
+
+    # Treat empty string and "0" as disabled
+    if STAGING in (None, "", "0"):
+        return None
 
     # Check if we're running via etl d run-python-step (suppress warnings)
     is_run_python_step = len(sys.argv) >= 3 and sys.argv[1:3] == ["d", "run-python-step"]
@@ -256,9 +287,6 @@ STRICT_AFTER = "2023-06-25"
 
 SLACK_API_TOKEN = env.get("SLACK_API_TOKEN")
 
-# if True, commit and push updates to YAML files coming from admin
-ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
-
 # if True, commit and push updates from fasttrack
 FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 
@@ -301,13 +329,13 @@ GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.009.json"
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.010.json"
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
-def enable_sentry(enable_logs: bool = False) -> None:
+def enable_sentry(enable_logs: bool = False, integrations: list | None = None) -> None:
     import sentry_sdk  # 0.1
 
     if SENTRY_DSN:
@@ -320,10 +348,13 @@ def enable_sentry(enable_logs: bool = False) -> None:
                     return None
             return event
 
-        kwargs = {"dsn": SENTRY_DSN, "before_send": before_send}
+        kwargs: dict = {"dsn": SENTRY_DSN, "before_send": before_send}
 
         if enable_logs:
             kwargs["_experiments"] = {"enable_logs": True}
+
+        if integrations:
+            kwargs["integrations"] = integrations
 
         sentry_sdk.init(**kwargs)
 
@@ -362,7 +393,7 @@ class Config:
                 if field.name not in env_dict:
                     raise KeyError(f"Field {field.name} not found in env file {env_file}!")
                 config_dict[field.name] = env_dict[field.name]
-        return cls(**config_dict)  # type: ignore
+        return cls(**config_dict)  # ty: ignore
 
 
 class UnknownOWIDEnv(Exception):
@@ -559,6 +590,17 @@ class OWIDEnv:
         return self.data_api_url + "/v1/indicators"
 
     @property
+    def catalog_url(self) -> str:
+        """Get catalog url."""
+        if self.env_remote == "production":
+            return "https://catalog.ourworldindata.org"
+        elif self.env_remote == "staging":
+            return f"http://{self.conf.DB_HOST}:8881"
+        else:
+            # For local dev, use production catalog
+            return "https://catalog.ourworldindata.org"
+
+    @property
     def wizard_url(self) -> str:
         """Get wizard url."""
         if self.env_local == "dev":
@@ -637,7 +679,7 @@ class OWIDEnv:
             else:
                 raise ValueError(f"Unsupported engine type {type(self.engine)}")
 
-    def read_sqls(self, sql: List[str], *args, **kwargs) -> List[pd.DataFrame]:
+    def read_sqls(self, sql: list[str], *args, **kwargs) -> list[pd.DataFrame]:
         """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
 
         It can read multiple sql queries, to exploit the same connection and cursor.
@@ -709,11 +751,6 @@ NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS
 DATA_PRODUCER_REPORT_FOLDER_ID = os.environ.get("DATA_PRODUCER_REPORT_FOLDER_ID", "")
 DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get("DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", "")
 DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STATUS_SHEET_ID", "")
-
-# Logfire for LLM observability
-LOGFIRE_TOKEN_EXPERT = env.get("LOGFIRE_TOKEN_EXPERT")
-LOGFIRE_TOKEN_MCP = env.get("LOGFIRE_TOKEN_MCP")
-LOGFIRE_TOKEN_ETL_API = env.get("LOGFIRE_TOKEN_ETL_API")
 
 # MCP server
 OWID_MCP_SERVER_URL = env.get("OWID_MCP_SERVER_URL", "https://mcp.owid.io/mcp")

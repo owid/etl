@@ -4,7 +4,6 @@ import datetime as dt
 import difflib
 import html
 from pathlib import Path
-from typing import Optional, Tuple
 
 import pandas as pd
 from git.repo import Repo
@@ -39,7 +38,7 @@ class FasttrackImport:
     def __init__(
         self,
         dataset: Dataset,
-        origin: Optional[Origin],
+        origin: Origin | None,
         dataset_uri: str,
         is_gsheet: bool = False,
     ) -> None:
@@ -68,22 +67,22 @@ class FasttrackImport:
 
         The data of the dataset consists of its one and only table.
         """
-        return self.dataset[self.meta.short_name]  # type: ignore
+        return self.dataset[self.meta.short_name]  # ty: ignore
 
     @property
     def dataset_dir(self) -> Path:
         """Directory of the dataset."""
-        return STEP_DIR / "data" / "grapher" / self.meta.namespace / str(self.meta.version)  # type: ignore
+        return STEP_DIR / "data" / "grapher" / self.meta.namespace / str(self.meta.version)  # ty: ignore
 
     @property
     def step_path(self) -> Path:
         """Path to the step python script."""
-        return self.dataset_dir / (self.meta.short_name + ".py")  # type: ignore
+        return self.dataset_dir / (self.meta.short_name + ".py")  # ty: ignore
 
     @property
     def metadata_path(self) -> Path:
         """Path to the step's metadata YAML file."""
-        return self.dataset_dir / (self.meta.short_name + ".meta.yml")  # type: ignore
+        return self.dataset_dir / (self.meta.short_name + ".meta.yml")  # ty: ignore
 
     # Snapshot-level properties
     @property
@@ -121,12 +120,12 @@ class FasttrackImport:
             raise ValueError("Dataset must have either one source or one origin")
 
         return SnapshotMeta(
-            namespace=self.meta.namespace,  # type: ignore
-            short_name=self.meta.short_name,  # type: ignore
-            name=self.meta.title,  # type: ignore
+            namespace=self.meta.namespace,  # ty: ignore
+            short_name=self.meta.short_name,  # ty: ignore
+            name=self.meta.title,  # ty: ignore
             version=str(self.meta.version),
             file_extension="csv",
-            description=self.meta.description,  # type: ignore
+            description=self.meta.description,  # ty: ignore
             source=source,
             origin=origin,
             license=license,
@@ -154,7 +153,7 @@ class FasttrackImport:
         yml = metadata_export(self.dataset)
         # source is already in the snapshot and is propagated
         yml["dataset"].pop("sources", None)
-        return yaml_dump(yml)  # type: ignore
+        return yaml_dump(yml)  # ty: ignore
 
     def save_metadata(self) -> None:
         """Save dataset YAML metadata file as `self.metadata_path`."""
@@ -177,7 +176,7 @@ class FasttrackImport:
         return snap.metadata_path
 
     # Check diff
-    def data_diff(self) -> Tuple[bool, str]:
+    def data_diff(self) -> tuple[bool, str]:
         """Get difference between existing and imported data.
 
         Only applicable when the Import is from a Google Sheet that already exists in ETL.
@@ -210,7 +209,7 @@ class FasttrackImport:
             html,
         )
 
-    def metadata_diff(self) -> Tuple[bool, str]:
+    def metadata_diff(self) -> tuple[bool, str]:
         """Get differences in metadata files.
 
         Tuple with two elements:
@@ -271,10 +270,10 @@ class FasttrackImport:
         snapshot_uri = ds_meta.uri.replace("grapher/", "")
         if ds_meta.is_public:
             to_remove = private_data_step
-            to_add = {public_data_step: {f"snapshot://{snapshot_uri}.csv"}}
+            to_add = {public_data_step: [f"snapshot://{snapshot_uri}.csv"]}
         else:
             to_remove = public_data_step
-            to_add = {private_data_step: {f"snapshot-private://{snapshot_uri}.csv"}}
+            to_add = {private_data_step: [f"snapshot-private://{snapshot_uri}.csv"]}
 
         # Remove the step from the DAG
         wizard_utils.remove_from_dag(to_remove, DAG_FASTTRACK_PATH)
@@ -290,7 +289,7 @@ class FasttrackImport:
                 session,
                 namespace=str(self.dataset.metadata.namespace),
                 short_name=str(self.dataset.metadata.short_name),
-                version=str(self.dataset.metadata.version),  # type: ignore
+                version=str(self.dataset.metadata.version),  # ty: ignore
             )
             assert ds.id, "No ID found in dataset object!"
             return ds.id

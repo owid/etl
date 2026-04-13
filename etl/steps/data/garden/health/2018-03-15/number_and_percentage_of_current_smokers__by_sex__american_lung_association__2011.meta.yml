@@ -1,0 +1,26 @@
+dataset:
+  title: Number and percentage of current smokers, by sex (American Lung Association (2011))
+tables:
+  number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011:
+    variables:
+      number_of_adults_who_were_current_smokers__female__american_lung_association__2011:
+        title: Number of Adults Who Were Current Smokers, Female (American Lung Association (2011))
+        unit: ''
+      number_of_adults_who_were_current_smokers__male__american_lung_association__2011:
+        title: Number of Adults Who Were Current Smokers, Male (American Lung Association (2011))
+        unit: ''
+      percent_of_adults_who_were_current_smokers__female__american_lung_association__2011:
+        title: Percent of Adults Who Were Current Smokers, Female (American Lung Association (2011))
+        unit: ''
+      percent_of_adults_who_were_current_smokers__male__american_lung_association__2011:
+        title: Percent of Adults Who Were Current Smokers, Male (American Lung Association (2011))
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

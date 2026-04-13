@@ -1,5 +1,3 @@
-from typing import Dict, List, Optional
-
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
@@ -44,7 +42,7 @@ COLUMNS_COMMON_NOTES = [
 _INDEX_COLNAME_AUX = "index"
 
 
-def make_tables(df: pd.DataFrame, short_name: str) -> List[Table]:
+def make_tables(df: pd.DataFrame, short_name: str) -> list[Table]:
     """Make tables.
 
     There are three tables created:
@@ -71,7 +69,7 @@ def make_tables(df: pd.DataFrame, short_name: str) -> List[Table]:
     return tables
 
 
-def table_to_clean_df(tb: Table, entities_with_comma: Optional[List[str]] = None) -> pd.DataFrame:
+def table_to_clean_df(tb: Table, entities_with_comma: list[str] | None = None) -> pd.DataFrame:
     """Clean data"""
     # Table to DataFrame
     df = pd.DataFrame(tb)
@@ -119,8 +117,8 @@ def make_table_bulk_id(df: pd.DataFrame) -> Table:
 
 def clean_participants(
     df: pd.DataFrame,
-    mapping: Optional[Dict[str, str]] = None,
-    entities_with_comma: Optional[List[str]] = None,
+    mapping: dict[str, str] | None = None,
+    entities_with_comma: list[str] | None = None,
     default_separator: str = ", ",
     new_separator: str = "; ",
 ) -> pd.DataFrame:
@@ -177,7 +175,7 @@ def get_set_participants(df: pd.DataFrame):
 
 def check_duplicates(df: pd.DataFrame, filename: str, logging: bool = False, force_error: bool = False):
     def _check_duplicates(
-        df, columns_subset: List[str], logging: bool = True, force_error: bool = False, to_csv: Optional[str] = None
+        df, columns_subset: list[str], logging: bool = True, force_error: bool = False, to_csv: str | None = None
     ):
         msk = df.duplicated(subset=columns_subset, keep=False)
         if (n_duplicates := msk.sum()) > 0:

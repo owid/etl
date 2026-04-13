@@ -1,0 +1,23 @@
+dataset:
+  title: Labour Force Dependency Ratio (IIASC)
+tables:
+  labour_force_dependency_ratio__iiasc:
+    variables:
+      age_dependency_ratio:
+        title: age_dependency_ratio
+        unit: ''
+      high_labour_force_dependency:
+        title: high_labour_force_dependency
+        unit: ''
+      labour_force_dependency_ratio:
+        title: labour_force_dependency_ratio
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

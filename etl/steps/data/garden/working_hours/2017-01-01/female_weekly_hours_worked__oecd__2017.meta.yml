@@ -1,0 +1,19 @@
+dataset:
+  title: Female weekly hours worked – OECD (2017)
+tables:
+  female_weekly_hours_worked__oecd__2017:
+    variables:
+      average_weekly_hours_worked__women__15plus__oecd_labor_force_statistics__2017:
+        title: Average weekly hours worked (women, 15+) (OECD Labor Force Statistics (2017))
+        unit: Hours
+        description: |-
+          Average usual weekly hours worked on the main job, for women ages 15+. Estimates correspond to total declared employment. This includes part-time and full-time employment, as well as self-employment and dependent employment.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

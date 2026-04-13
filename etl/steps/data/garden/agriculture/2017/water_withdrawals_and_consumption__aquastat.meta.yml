@@ -1,0 +1,39 @@
+dataset:
+  title: Water withdrawals and consumption - Aquastat
+tables:
+  water_withdrawals_and_consumption__aquastat:
+    variables:
+      agricultural_water_withdrawal:
+        title: Agricultural water withdrawal
+        unit: billion m³ per year
+        short_unit: m³
+        display:
+          conversionFactor: 1000000000
+          unit: m³ per year
+      industrial_water_withdrawal:
+        title: Industrial water withdrawal
+        unit: billion m³ per year
+        short_unit: m³
+        display:
+          conversionFactor: 1000000000
+          unit: m³ per year
+      municipal_water_withdrawal:
+        title: Municipal water withdrawal
+        unit: billion m³ per year
+        short_unit: m³
+        display:
+          conversionFactor: 1000000000
+          unit: m³ per year
+      total_water_withdrawal_per_capita:
+        title: Total water withdrawal per capita
+        unit: m³ per person per year
+        short_unit: m³
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

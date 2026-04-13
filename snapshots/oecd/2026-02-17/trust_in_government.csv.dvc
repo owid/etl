@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "OECD How’s Life? Well-being Database"
+    description: |-
+      The **How’s Life? database** is the one-stop shop for the 80+ indicators of the OECD Well-being Dashboard, covering social, economic and environmental outcomes that matter most for people, the planet and future generations. It consists of six datasets: current well-being, current well-being vertical inequalities, current well-being by age, educational attainment, sex, and resources for future well-being. To learn more about the database, visit the database's [definitions and metadata.](https://www.oecd.org/content/dam/oecd/en/topics/policy-sub-issues/measuring-well-being-and-progress/oecd-well-being-database-definitions.pdf)
+    date_published: "2026-02-10"
+    title_snapshot: OECD How’s Life? Well-being Database - Trust in government
+    description_snapshot: |-
+      Trust in government data coming from the OECD How’s Life? Well-being Database
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2026). Future well-being. OECD Data Explorer.
+    attribution_short: OECD
+
+    # Files
+    url_main: https://www.oecd.org/en/data/indicators/trust-in-government.html
+    url_download: https://sdmx.oecd.org/public/rest/data/OECD.WISE.WDP,DSD_HSL@DF_HSL_FWB,1.1/.14_3.PT_POP_Y_GE15._T._T._T.?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: '2026-02-17'
+
+    # License
+    license:
+      name: OECD Terms and Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: 639006f1e280b780a54dbb76cb91dfb0
+    size: 220226
+    path: trust_in_government.csv

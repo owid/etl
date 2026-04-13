@@ -1,0 +1,34 @@
+dataset:
+  title: Prevalence of weight categories in males - NCDRisC (2017)
+tables:
+  prevalence_of_weight_categories_in_males__ncdrisc__2017:
+    variables:
+      healthy__ncdrisc__2017:
+        title: Healthy (NCDRisC (2017))
+        unit: '%'
+        short_unit: '%'
+        description: Share of men (% of adult population), who are healthy/normal based on body mass index (BMI)
+      obese__ncdrisc__2017:
+        title: Obese (NCDRisC (2017))
+        unit: '%'
+        short_unit: '%'
+        description: Share of men (% of adult population), who are obese based on body mass index (BMI)
+      overweight_or_obese__ncdrisc__2017:
+        title: Overweight or Obese (NCDRisC (2017))
+        unit: '%'
+        short_unit: '%'
+        description: Share of men (% of adult population), who are overweight or obese based on body mass index (BMI)
+      underweight__ncdrisc__2017:
+        title: Underweight (NCDRisC (2017))
+        unit: '%'
+        short_unit: '%'
+        description: Share of men (% of adult population), who are underweight based on body mass index (BMI)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

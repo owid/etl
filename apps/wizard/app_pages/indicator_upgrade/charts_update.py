@@ -1,7 +1,6 @@
 """Handle submission of chart updates."""
 
 from http.client import RemoteDisconnected
-from typing import Dict, List
 from urllib.error import URLError
 
 import pandas as pd
@@ -31,7 +30,7 @@ def trigger_chart_submission():
         st_toast_error("You've changed the indicator mapping. Please submit the form before to update the charts.")
 
 
-def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[gm.Chart]:
+def get_affected_charts_and_preview(indicator_mapping: dict[int, int]) -> list[gm.Chart]:
     """Create submission config."""
     # Get updaters and charts to update
 
@@ -70,8 +69,8 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
                 # Build Series with slugs
                 slugs = pd.DataFrame(
                     {
-                        "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # type: ignore
-                        "url": [OWID_ENV.chart_site(chart.slug) for chart in charts],  # type: ignore
+                        "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # ty: ignore
+                        "url": [OWID_ENV.chart_site(chart.slug) for chart in charts],  # ty: ignore
                     }
                 )
                 st.dataframe(
@@ -110,22 +109,77 @@ def push_new_charts() -> None:
     with st.spinner("Updating charts and narrative charts..."):
         try:
             # Use the CLI function which handles both charts and narrative charts
-            cli_upgrade_indicators(dry_run=False)
+            result = cli_upgrade_indicators(dry_run=False)
+
+            if not result["success"]:
+                # Partial failure - some charts updated successfully, but some failed
+                chart_errors = result["chart_errors"]
+                narrative_chart_errors = result["narrative_chart_errors"]
+                total_errors = len(chart_errors) + len(narrative_chart_errors)
+
+                st.warning(
+                    f"⚠️ Indicator upgrade completed with {total_errors} errors. "
+                    "Some charts were updated successfully, but there were errors with others. "
+                    "You can proceed to chart-diff to review the successful updates, "
+                    "but some charts may need manual attention."
+                )
+
+                # Display chart errors
+                if chart_errors:
+                    with st.expander(f"❌ Chart Errors ({len(chart_errors)})", expanded=True):
+                        error_data = []
+                        for err in chart_errors:
+                            chart_url = OWID_ENV.chart_site(err["chart_slug"])
+                            error_data.append(
+                                {
+                                    "Chart ID": err["chart_id"],
+                                    "Chart URL": chart_url,
+                                    "Error": err["error"],
+                                }
+                            )
+                        st.dataframe(
+                            pd.DataFrame(error_data),
+                            column_config={
+                                "Chart URL": st.column_config.LinkColumn(
+                                    "Chart URL",
+                                    display_text=r"https?://.*?/grapher/(.*)",
+                                ),
+                            },
+                            hide_index=True,
+                        )
+
+                # Display narrative chart errors
+                if narrative_chart_errors:
+                    with st.expander(f"❌ Narrative Chart Errors ({len(narrative_chart_errors)})", expanded=True):
+                        error_data = []
+                        for err in narrative_chart_errors:
+                            error_data.append(
+                                {
+                                    "Narrative Chart ID": err["narrative_chart_id"],
+                                    "Name": err["name"],
+                                    "Error": err["error"],
+                                }
+                            )
+                        st.dataframe(pd.DataFrame(error_data), hide_index=True)
+
+                st_wizard_page_link("anomalist")
+                st_wizard_page_link("chart-diff")
+            else:
+                st.success(
+                    "✅ The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
+                )
+                st_wizard_page_link("anomalist")
+                st_wizard_page_link("chart-diff")
+
         except Exception as e:
             st.error(
-                "Something went wrong! Maybe the server was not properly launched? Check the job on the GitHub pull request."
+                "❌ Something went wrong! Maybe the server was not properly launched? Check the job on the GitHub pull request."
             )
             st.exception(e)
-        else:
-            st.success(
-                "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
-            )
-            st_wizard_page_link("anomalist")
-            st_wizard_page_link("chart-diff")
 
 
 def save_variable_mapping(
-    indicator_mapping: Dict[int, int], dataset_id_new: int, dataset_id_old: int, comments: str = ""
+    indicator_mapping: dict[int, int], dataset_id_new: int, dataset_id_old: int, comments: str = ""
 ) -> None:
     WizardDB.add_variable_mapping(
         mapping=indicator_mapping,

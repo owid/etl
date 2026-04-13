@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: Whale populations (Pershing et al. 2010)
+    description: |-
+      Estimates of whale populations pre-whaling and in 2001 were published by Pershing et al. (2010), and originally sourced from Christensen (2006). See full references below.
+
+      The dates of pre-whaling differs depending on the whale species and oceanic region. This ranges from as far back as 1530 for Right whales. The most common 'pre-whaling' date in the original source was in the late 19th and early 20th century. Here we have coded all pre-whaling dates as 1890 for consistency, but it should be noted that this date varies by species. The latest date – 2001 – is consistent across species.
+
+      All estimates are of the global total.
+    url: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0012444
+    date_accessed: 2019-08-28
+    published_by: |-
+      Pershing, A. J., Christensen, L. B., Record, N. R., Sherwood, G. D., & Stetson, P. B. (2010). The impact of whaling on the ocean carbon cycle: why bigger was better. PloS One, 5(8), e12444.
+  name: Whale populations (Pershing et al. 2010)
+  description: ''
+outs:
+  - md5: 9a53ab7907014e3cd3a84798b57f1177
+    size: 3842
+    path: whale_populations__pershing_et_al__2010.feather

@@ -78,7 +78,7 @@ header_dict = {
 }
 
 # Index-oriented dataframe
-df_header = pd.DataFrame.from_dict(header_dict, orient="index", columns=None)  # type: ignore
+df_header = pd.DataFrame.from_dict(header_dict, orient="index", columns=None)  # ty: ignore
 # Assigns a cell for each entity separated by comma (like in `selection`)
 df_header = df_header[0].apply(pd.Series)
 
@@ -953,6 +953,9 @@ for tab in range(len(tables)):
 df_graphers["relatedQuestionText"] = np.nan
 df_graphers["relatedQuestionUrl"] = np.nan
 
+# Add originURL
+df_graphers["originUrl"] = "https://ourworldindata.org/economic-inequality"
+
 # Add yAxisMin
 df_graphers["yAxisMin"] = yAxisMin
 
@@ -1020,4 +1023,4 @@ df_graphers = df_graphers.drop(columns=["metric_dropdown_aux", "decile_dropdown_
 # ## Explorer generation
 # Here, the header, tables and graphers dataframes are combined to be shown in for format required for OWID data explorers.
 
-save("incomes-across-distribution-wid", tables, df_header, df_graphers, df_tables)  # type: ignore
+save("incomes-across-distribution-wid", tables, df_header, df_graphers, df_tables)  # ty: ignore

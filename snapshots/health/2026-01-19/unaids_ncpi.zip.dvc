@@ -1,0 +1,34 @@
+# Find data at https://aidsinfo.unaids.org/ (go to 'Factsheets')
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Global AIDS Update, Laws and Policies"
+    description: |-
+      The NCPI has been a component of global AIDS monitoring since 2003 and was implemented every two years until 2014. The NCPI underwent an extensive review between 2014 and 2016. The new version of the NCPI was implemented for the first time in 2017; it is included in GAM every two years. A shorter questionnaire consisting of a subset of NCPI questions is included in GAM during interim years. The NCPI was further revised in 2021 to align with targets and commitments adopted in the [2021-2026 UNAIDS Strategy](https://www.unaids.org/sites/default/files/media_asset/global-AIDS-strategy-2021-2026_en.pdf) and the [2021 Political Declaration on HIV and AIDS](https://www.unaids.org/sites/default/files/media_asset/2021_political-declaration-on-hiv-and-aids_en.pdf).
+
+      The NCPI is a questionnaire consisting of two parts: part A, completed by national authorities, and part B, completed by civil society representatives and other nongovernmental partners involved in the AIDS response. During the recommended process for completing the NCPI and GAM reporting overall, countries are encouraged to conduct a validation workshop to jointly analyse indicator data, including on AIDS expenditure, and policy data, in order to identify progress, gaps, challenges and the next steps towards national targets and commitments.
+
+      A validation process of data submitted through the NCPI is undertaken. Following submission of the NCPI by countries, responses are reviewed and compared with other available data.
+
+    date_published: "2026-01-15"
+
+    # Citation
+    producer: Joint United Nations Programme on HIV/AIDS
+    citation_full: |-
+      AIDS, crisis and the power to transform: UNAIDS Global AIDS Update 2025. Geneva: Joint United Nations Programme on HIV/AIDS; 2025. Full report: https://www.unaids.org/en/resources/documents/2025/2025-global-aids-update-summary
+
+    attribution_short: UNAIDS
+
+    # Files
+    url_main: https://aidsinfo.unaids.org/dataset
+    url_download: https://aidsinfo.unaids.org/documents/NCPI_2025_en.zip
+    date_accessed: "2026-01-19"
+
+    # License
+    license:
+      name: CC BY 3.0
+      url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
+outs:
+  - md5: ec955431d61ec796bbb882c26fad2906
+    size: 2981336
+    path: unaids_ncpi.zip

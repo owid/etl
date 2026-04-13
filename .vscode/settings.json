@@ -12,8 +12,8 @@
       "**/*.meta.yml",
       "**/*.meta.override.yml"
     ],
-    "schemas/multidim-schema.json": "export/multidim/**/*.yml",
-    "schemas/explorer-schema.json": "export/explorers/**/*.yml"
+    "schemas/multidim-schema.json": "etl/steps/export/multidim/**/*.config.yml",
+    "schemas/explorer-schema.json": "etl/steps/export/explorers/**/*.config.yml"
   },
   "[python]": {
     "editor.formatOnSave": true,
@@ -65,6 +65,6 @@
 
   // Settings for the "Run Until Cursor" extension
   "runUntilCursor.execDelay": 100,    // Delay before executing code (default: 100ms)
-  "runUntilCursor.cursorDelay": 1500,
-  "chat.mcp.access": "all" // Delay before moving the cursor into run() (default: 1500ms)
+  "runUntilCursor.cursorDelay": 1500, // Delay before moving the cursor into run() (default: 1500ms)
+  "chat.mcp.access": "all",
 }

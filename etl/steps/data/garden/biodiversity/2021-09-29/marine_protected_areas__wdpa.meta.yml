@@ -1,0 +1,37 @@
+dataset:
+  title: Marine protected areas (WDPA)
+tables:
+  marine_protected_areas__wdpa:
+    variables:
+      share_of_ocean_area:
+        title: Share of ocean area
+        unit: ''
+      share_of_total_ocean_that_is_protected:
+        title: Share of total ocean that is protected
+        unit: '%'
+        short_unit: '%'
+        description: Share of the total ocean area that is defined as a protected area.
+      share_of_total_ocean_that_is_unprotected:
+        title: Share of total ocean that is unprotected
+        unit: '%'
+        short_unit: '%'
+        description: Share of the total ocean area that is not defined as a protected area.
+      share_of_zone_that_is_protected:
+        title: Share of zone that is protected
+        unit: '%'
+        short_unit: '%'
+        description: Share of national territorial water and international waters that qualify as a protected area.
+      share_of_zone_that_is_unprotected:
+        title: Share of zone that is unprotected
+        unit: '%'
+        short_unit: '%'
+        description: Share of national territorial water and international waters that does not qualify as a protected area.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

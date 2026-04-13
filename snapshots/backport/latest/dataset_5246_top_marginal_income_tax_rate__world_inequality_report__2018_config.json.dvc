@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5246
-    date_accessed: 2023-08-10 08:01:01.826099
+    url: https://admin.owid.io/admin/datasets/5246
+    date_accessed: 2026-03-05 12:31:48.123334+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5246_top_marginal_income_tax_rate__world_inequality_report__2018
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2154ad77ee284146ddaf8abd885e9d8b
-  size: 2697
-  path: 
-    dataset_5246_top_marginal_income_tax_rate__world_inequality_report__2018_config.json
+  - md5: 8c5243b86d1921f035dc3454362e01a9
+    size: 2827
+    path: dataset_5246_top_marginal_income_tax_rate__world_inequality_report__2018_config.json

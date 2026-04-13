@@ -1,0 +1,17 @@
+dataset:
+  title: Clark, Flèche & Senik – Happiness Inequality
+tables:
+  clark__fleche__and__senik__happiness_inequality:
+    variables:
+      standard_deviation_of_life_satisfaction:
+        title: Standard deviation of life satisfaction
+        unit: (Standard deviation)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

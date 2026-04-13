@@ -1,6 +1,7 @@
 import contextlib
 import warnings
 from collections.abc import Iterable
+from typing import Any
 from warnings import catch_warnings, simplefilter, warn  # noqa: F401
 
 import structlog
@@ -8,12 +9,14 @@ import structlog
 log = structlog.get_logger()
 
 
-def warn_with_structlog(message, category, filename, lineno, file=None, line=None):
+def warn_with_structlog(
+    message: str, category: type, filename: str, lineno: int, file: Any = None, line: str | None = None
+) -> None:
     log.warning(message, category=category.__name__, filename=filename, lineno=lineno)
 
 
 # Replace the default showwarning with structlog warnings
-warnings.showwarning = warn_with_structlog  # type: ignore
+warnings.showwarning = warn_with_structlog  # ty: ignore
 
 
 class MetadataWarning(Warning):
@@ -50,5 +53,5 @@ def ignore_warnings(ignore_warnings: Iterable[type] = (Warning,)):
     """
     with warnings.catch_warnings():
         for w in ignore_warnings:
-            warnings.filterwarnings("ignore", category=w)  # type: ignore
+            warnings.filterwarnings("ignore", category=w)  # ty: ignore
         yield

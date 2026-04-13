@@ -4,11 +4,11 @@ To get the data follow the following steps:
 
 Important - You need and account to access the data.
 
-* Go to: https://vizhub.healthdata.org/gbd-results/
+* Go to: https://collab2023.healthdata.org/gbd-results/
 * In 'GBD Estimate' select 'Cause of death or injury'
 * In Measure select 'Deaths' and 'DALYs'
 * In Metric select 'Number' and 'Rate'
-* In Impairment select 'Select all causes'
+* In Cause select 'Select all causes'
 * In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions'
 * In Age select 'All ages', 'Age-standardized', '<5 years', '5-14 years', '15-49 years', '50-69 years', '70+ years'
 * In Sex select 'Both'
@@ -25,7 +25,7 @@ import click
 import pandas as pd
 from owid.datautils.dataframes import concatenate
 from owid.repack import repack_frame
-from shared import download_data  # type: ignore[reportMissingImports]
+from shared import download_data  # ty: ignore[unresolved-import]
 from structlog import get_logger
 
 from etl.snapshot import Snapshot
@@ -57,13 +57,13 @@ def main(upload: bool) -> None:
             # Downloading the second batch of files
             file_number_two = file_number - NUMBER_OF_FILES
             df = download_data(file_number_two, base_url=BASE_URL_TWO)
-        log.info(f"Download of file {file_number} finished", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
+        log.info(f"Download of file {file_number} finished", size=f"{df.memory_usage(deep=True).sum() / 1e6:.2f} MB")
         dfs.append(df)
 
     # Concatenate the dataframes while keeping categorical columns to reduce memory usage.
     df = repack_frame(concatenate(dfs))
 
-    log.info("Uploading final file", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
+    log.info("Uploading final file", size=f"{df.memory_usage(deep=True).sum() / 1e6:.2f} MB")
     snap.create_snapshot(upload=upload, data=df)
 
 

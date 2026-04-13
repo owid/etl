@@ -9,11 +9,11 @@ TODO: This file contains some code that needs some revision:
 """
 
 import concurrent.futures
-import io
+import json
 import warnings
 from collections import defaultdict
 from http.client import RemoteDisconnected
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, cast
 from urllib.error import HTTPError, URLError
 
 import pandas as pd
@@ -48,7 +48,7 @@ log = structlog.get_logger()
 
 def load_dataset_uris(
     owid_env: OWIDEnv = OWID_ENV,
-) -> List[str]:
+) -> list[str]:
     """Get list of dataset URIs from the database."""
     with Session(owid_env.engine) as session:
         datasets = gm.Dataset.load_datasets_uri(session)
@@ -57,10 +57,10 @@ def load_dataset_uris(
 
 
 def load_variables_in_dataset(
-    dataset_uri: Optional[List[str]] = None,
-    dataset_id: Optional[List[int]] = None,
+    dataset_uri: list[str] | None = None,
+    dataset_id: list[int] | None = None,
     owid_env: OWIDEnv = OWID_ENV,
-) -> List[gm.Variable]:
+) -> list[gm.Variable]:
     """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
     with Session(owid_env.engine) as session:
         indicators = gm.Variable.load_variables_in_datasets(
@@ -98,9 +98,9 @@ def load_variable(
 
 # Load variable object
 def load_variables(
-    ids_or_paths: List[str | int],
+    ids_or_paths: list[str | int],
     owid_env: OWIDEnv = OWID_ENV,
-) -> List[gm.Variable]:
+) -> list[gm.Variable]:
     """Load variable.
 
     If id_or_path is str, it'll be used as catalog path.
@@ -114,7 +114,7 @@ def load_variables(
     return variables
 
 
-def filter_indicators_used_in_charts(indicator_ids: List[int]) -> List[int]:
+def filter_indicators_used_in_charts(indicator_ids: list[int]) -> list[int]:
     """Return a list with only the IDs of the variables used in charts."""
     with Session(OWID_ENV.engine) as session:
         indicator_ids_filtered = gm.ChartDimensions.filter_indicators_used_in_charts(
@@ -131,11 +131,11 @@ def filter_indicators_used_in_charts(indicator_ids: List[int]) -> List[int]:
 # SINGLE INDICATOR
 # Load variable metadata
 def load_variable_metadata(
-    catalog_path: Optional[str] = None,
-    variable_id: Optional[int] = None,
-    variable: Optional[gm.Variable] = None,
+    catalog_path: str | None = None,
+    variable_id: int | None = None,
+    variable: gm.Variable | None = None,
     owid_env: OWIDEnv = OWID_ENV,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Get metadata for an indicator based on its catalog path or variable id.
 
     Parameters
@@ -157,9 +157,9 @@ def load_variable_metadata(
 
 
 def load_variable_data(
-    catalog_path: Optional[str] = None,
-    variable_id: Optional[int] = None,
-    variable: Optional[gm.Variable] = None,
+    catalog_path: str | None = None,
+    variable_id: int | None = None,
+    variable: gm.Variable | None = None,
     owid_env: OWIDEnv = OWID_ENV,
     set_entity_names: bool = True,
 ) -> pd.DataFrame:
@@ -190,9 +190,9 @@ def load_variable_data(
 
 
 def ensure_load_variable(
-    catalog_path: Optional[str] = None,
-    variable_id: Optional[int] = None,
-    variable: Optional[gm.Variable] = None,
+    catalog_path: str | None = None,
+    variable_id: int | None = None,
+    variable: gm.Variable | None = None,
     owid_env: OWIDEnv = OWID_ENV,
 ) -> gm.Variable:
     if variable is None:
@@ -213,9 +213,9 @@ def ensure_load_variable(
 
 
 def load_variables_data(
-    catalog_paths: Optional[List[str]] = None,
-    variable_ids: Optional[List[int]] = None,
-    variables: Optional[List[gm.Variable]] = None,
+    catalog_paths: list[str] | None = None,
+    variable_ids: list[int] | None = None,
+    variables: list[gm.Variable] | None = None,
     owid_env: OWIDEnv = OWID_ENV,
     workers: int = 1,
     value_as_str: bool = True,
@@ -249,12 +249,12 @@ def load_variables_data(
 
 
 def load_variables_metadata(
-    catalog_paths: Optional[List[str]] = None,
-    variable_ids: Optional[List[int]] = None,
-    variables: Optional[List[gm.Variable]] = None,
+    catalog_paths: list[str] | None = None,
+    variable_ids: list[int] | None = None,
+    variables: list[gm.Variable] | None = None,
     owid_env: OWIDEnv = OWID_ENV,
     workers: int = 1,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Get metadata for a list of indicators based on their catalog path or variable id.
 
     Priority: catalog_paths > variable_ids > variables
@@ -283,10 +283,10 @@ def load_variables_metadata(
 
 def _ensure_variable_ids(
     engine: Engine,
-    catalog_paths: Optional[List[str]] = None,
-    variable_ids: Optional[List[int]] = None,
-    variables: Optional[List[gm.Variable]] = None,
-) -> List[int]:
+    catalog_paths: list[str] | None = None,
+    variable_ids: list[int] | None = None,
+    variables: list[gm.Variable] | None = None,
+) -> list[int]:
     if catalog_paths is not None:
         with Session(engine) as session:
             mapping = gm.Variable.catalog_paths_to_variable_ids(session, catalog_paths=catalog_paths)
@@ -302,8 +302,8 @@ def _ensure_variable_ids(
 
 def variable_data_df_from_s3(
     engine: Engine,
-    variable_ids: List[int] = [],
-    workers: Optional[int] = 1,
+    variable_ids: list[int] = [],
+    workers: int | None = 1,
     value_as_str: bool = True,
 ) -> pd.DataFrame:
     """Fetch data from S3 and add entity code and name from DB."""
@@ -311,7 +311,7 @@ def variable_data_df_from_s3(
         results = list(executor.map(_fetch_data_df_from_s3, variable_ids))
 
     if isinstance(results, list) and all(isinstance(df, pd.DataFrame) for df in results):
-        df = pd.concat(cast(List[pd.DataFrame], results))
+        df = pd.concat(cast(list[pd.DataFrame], results))
     else:
         raise TypeError(f"results must be a list of pd.DataFrame, got {type(results)}")
 
@@ -370,7 +370,8 @@ def _fetch_data_df_from_s3(variable_id: int):
     # Compare ETags
     if stored_etag and current_etag and stored_etag == current_etag:
         # ETag matches, load from cache
-        data_df = pd.read_json(cache_filename)
+        with open(cache_filename) as f:
+            raw = json.loads(f.read())
     else:
         # Fetch new data
         response = _fetch_response("GET", url)
@@ -383,7 +384,9 @@ def _fetch_data_df_from_s3(variable_id: int):
             etag_filename.write_text(current_etag)
         elif etag_filename.exists():
             etag_filename.unlink()
-        data_df = pd.read_json(io.StringIO(response.text))
+        raw = json.loads(response.text)
+    # Use json.loads instead of pd.read_json to handle very large integers
+    data_df = pd.DataFrame(raw)
 
     # Process DataFrame
     data_df = data_df.rename(
@@ -413,7 +416,7 @@ def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame
     return pd.merge(df, entities.astype({"entityName": "category", "entityCode": "category"}), on="entityId")
 
 
-def _fetch_entities(session: Session, entity_ids: List[int]) -> pd.DataFrame:
+def _fetch_entities(session: Session, entity_ids: list[int]) -> pd.DataFrame:
     # Query entities from the database
     q = """
     SELECT
@@ -427,12 +430,12 @@ def _fetch_entities(session: Session, entity_ids: List[int]) -> pd.DataFrame:
 
 
 def variable_metadata_df_from_s3(
-    variable_ids: List[int] = [],
+    variable_ids: list[int] = [],
     workers: int = 1,
     env: OWIDEnv | None = None,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Fetch data from S3 and add entity code and name from DB."""
-    args = [variable_ids]
+    args: list = [variable_ids]
     if env:
         args += [[env for _ in range(len(variable_ids))]]
 
@@ -442,10 +445,10 @@ def variable_metadata_df_from_s3(
     if not (isinstance(results, list) and all(isinstance(res, dict) for res in results)):
         raise TypeError(f"results must be a list of dictionaries, got {type(results)}")
 
-    return results  # type: ignore
+    return results  # ty: ignore
 
 
-def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dict[str, Any]:
+def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> dict[str, Any]:
     if env is not None:
         url = env.indicator_metadata_url(variable_id)
     else:
@@ -458,7 +461,7 @@ def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dic
         return response.json()
 
 
-def load_entity_mapping(entity_ids: Optional[List[int]] = None, owid_env: OWIDEnv = OWID_ENV) -> Dict[int, str]:
+def load_entity_mapping(entity_ids: list[int] | None = None, owid_env: OWIDEnv = OWID_ENV) -> dict[int, str]:
     # Fetch the mapping of entity ids to names.
     with Session(owid_env.engine) as session:
         entity_id_to_name = gm.Entity.load_entity_mapping(session=session, entity_ids=entity_ids)
@@ -467,7 +470,7 @@ def load_entity_mapping(entity_ids: Optional[List[int]] = None, owid_env: OWIDEn
 
 
 def variable_data_table_from_catalog(
-    engine: Engine, variables: Optional[List[gm.Variable]] = None, variable_ids: Optional[List[int | str]] = None
+    engine: Engine, variables: list[gm.Variable] | None = None, variable_ids: list[int | str] | None = None
 ) -> Table:
     """Load all variables for a given dataset from local catalog."""
     if variable_ids:
@@ -512,10 +515,10 @@ def variable_data_table_from_catalog(
                 name = trim_long_variable_name(col)
                 matches = [variable for variable in variables if name == variable.shortName]
                 if matches:
-                    col_mapping[col] = matches[0].id  # type: ignore
+                    col_mapping[col] = matches[0].id  # ty: ignore
 
             tb = tb[col_mapping.keys()]
-            tb.columns = col_mapping.values()
+            tb.columns = col_mapping.values()  # ty: ignore[invalid-assignment]
             tbs.append(tb.set_index(["country", year_or_date]))
 
         # Dimensional case
@@ -544,7 +547,7 @@ def variable_data_table_from_catalog(
                                 label.append(f["value"])
                                 break
                         else:
-                            label.append(None)  # type: ignore
+                            label.append(None)  # ty: ignore
                 labels.append(label)
 
             tb = tb_pivoted.loc[:, labels]
@@ -553,7 +556,7 @@ def variable_data_table_from_catalog(
             tbs.append(tb)
 
     # NOTE: this can be pretty slow for datasets with a lot of tables
-    return pd.concat(tbs, axis=1).reset_index()  # type: ignore
+    return pd.concat(tbs, axis=1).reset_index()  # ty: ignore
 
 
 #######################################################################################################
@@ -564,9 +567,7 @@ def variable_data_table_from_catalog(
 #######################################################################################################
 
 
-def get_dataset_id(
-    dataset_name: str, db_conn: Optional[pymysql.Connection] = None, version: Optional[str] = None
-) -> Any:
+def get_dataset_id(dataset_name: str, db_conn: pymysql.Connection | None = None, version: str | None = None) -> Any:
     """Get the dataset ID of a specific dataset name from database.
 
     If more than one dataset is found for the same name, or if no dataset is found, an error is raised.
@@ -610,7 +611,7 @@ def get_dataset_id(
 
 @deprecated("This function is deprecated. Its logic will be soon moved to etl.grapher.model.Dataset.")
 def get_variables_in_dataset(
-    dataset_id: int, only_used_in_charts: bool = False, db_conn: Optional[pymysql.Connection] = None
+    dataset_id: int, only_used_in_charts: bool = False, db_conn: pymysql.Connection | None = None
 ) -> Any:
     """Get all variables data for a specific dataset ID from database.
 
@@ -650,7 +651,7 @@ def get_variables_in_dataset(
     return variables_data
 
 
-def get_all_datasets(archived: bool = True, db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
+def get_all_datasets(archived: bool = True, db_conn: pymysql.Connection | None = None) -> pd.DataFrame:
     """Get all datasets in database.
 
     Parameters
@@ -673,7 +674,7 @@ def get_all_datasets(archived: bool = True, db_conn: Optional[pymysql.Connection
     return datasets.sort_values(["name", "namespace"])
 
 
-def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
+def get_info_for_etl_datasets(db_conn: pymysql.Connection | None = None) -> pd.DataFrame:
     """Get information for datasets that have variables with an ETL path.
 
     This function returns a dataframe with the following columns:
@@ -777,7 +778,7 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
     return df
 
 
-def get_charts_slugs(db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
+def get_charts_slugs(db_conn: pymysql.Connection | None = None) -> pd.DataFrame:
     if db_conn is None:
         db_conn = get_connection()
 
@@ -809,7 +810,7 @@ def get_charts_slugs(db_conn: Optional[pymysql.Connection] = None) -> pd.DataFra
     return df
 
 
-def get_charts_views(db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
+def get_charts_views(db_conn: pymysql.Connection | None = None) -> pd.DataFrame:
     if db_conn is None:
         db_conn = get_connection()
 
@@ -852,7 +853,7 @@ def get_charts_views(db_conn: Optional[pymysql.Connection] = None) -> pd.DataFra
     return df
 
 
-def get_dataset_charts(dataset_ids: List[str], db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
+def get_dataset_charts(dataset_ids: list[str], db_conn: pymysql.Connection | None = None) -> pd.DataFrame:
     if db_conn is None:
         db_conn = get_connection()
 
@@ -908,9 +909,9 @@ def get_dataset_charts(dataset_ids: List[str], db_conn: Optional[pymysql.Connect
 
 
 def get_variables_data(
-    filter: Optional[Dict[str, Any]] = None,
-    condition: Optional[str] = "OR",
-    db_conn: Optional[pymysql.Connection] = None,
+    filter: dict[str, Any] | None = None,
+    condition: str | None = "OR",
+    db_conn: pymysql.Connection | None = None,
 ) -> pd.DataFrame:
     """Get data from variables table, given a certain condition.
 
@@ -952,15 +953,15 @@ def get_variables_data(
 
     # Add parsed catalog_path column if catalogPath exists
     if "catalogPath" in df.columns and len(df) > 0:
-        df["catalog_path"] = [CatalogPath.from_str(p) if p else None for p in df["catalogPath"]]
+        df["catalog_path"] = [CatalogPath.from_str(p) if p else None for p in df["catalogPath"]]  # ty: ignore[invalid-assignment]
 
     return df
 
 
 def _get_variables_data_with_filter(
-    field_name: Optional[str] = None,
-    field_values: Optional[List[Any]] = None,
-    db_conn: Optional[pymysql.Connection] = None,
+    field_name: str | None = None,
+    field_values: list[Any] | None = None,
+    db_conn: pymysql.Connection | None = None,
 ) -> Any:
     if db_conn is None:
         db_conn = get_connection()
@@ -1001,7 +1002,7 @@ def trim_long_variable_name(short_name: str) -> str:
 #
 
 
-def get_tags(owid_env: OWIDEnv = OWID_ENV) -> List[str]:
+def get_tags(owid_env: OWIDEnv = OWID_ENV) -> list[str]:
     with Session(owid_env.engine) as session:
         # with get_session() as session:
         tag_list_ = gm.Tag.load_tags(session)

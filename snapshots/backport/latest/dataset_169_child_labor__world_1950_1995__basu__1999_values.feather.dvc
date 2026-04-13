@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/169
-    date_accessed: 2023-08-10 09:04:59.549698
+    url: https://admin.owid.io/admin/datasets/169
+    date_accessed: 2026-03-06 07:48:30.875642+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Child Labor (World 1950-1995) - Basu (1999)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 72c8899624a0c4d57bd0246f12e30dd5
-  size: 6250
-  path: dataset_169_child_labor__world_1950_1995__basu__1999_values.feather
+  - md5: dd4b652b258dd876439a8f687400a48f
+    size: 6290
+    path: dataset_169_child_labor__world_1950_1995__basu__1999_values.feather

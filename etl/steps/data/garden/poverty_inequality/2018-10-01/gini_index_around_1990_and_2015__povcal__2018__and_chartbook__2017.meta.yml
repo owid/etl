@@ -1,0 +1,23 @@
+dataset:
+  title: Gini Index around 1990 and 2015 – Povcal (2018) and Chartbook (2017)
+tables:
+  gini_index_around_1990_and_2015__povcal__2018__and_chartbook__2017:
+    variables:
+      gini_index_around_1990__1990_2015_countries:
+        title: Gini Index around 1990 (1990-2015 countries)
+        unit: ''
+      gini_index_around_2015__1990_2015_countries:
+        title: Gini Index around 2015 (1990-2015 countries)
+        unit: ''
+      world_bank_region_with_advanced_industrial_category__1990_2015_countries:
+        title: World Bank Region with Advanced Industrial category (1990-2015 countries)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

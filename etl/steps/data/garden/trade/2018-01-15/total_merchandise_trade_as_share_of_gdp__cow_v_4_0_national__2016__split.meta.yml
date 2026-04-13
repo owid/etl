@@ -1,0 +1,17 @@
+dataset:
+  title: Total merchandise trade as share of GDP (COW v 4.0 National (2016)) (split)
+tables:
+  total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split:
+    variables:
+      total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016:
+        title: Total merchandise trade as share of GDP (COW v 4.0 National (2016))
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -3,11 +3,11 @@
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
 
 cause_renaming_dict = {
     "Cardiovascular diseases": "Heart diseases",
@@ -53,27 +53,19 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("gbd_treemap")
-
     # Read table from meadow dataset.
     tb = ds_meadow["gbd_treemap"].reset_index()
+    tb = tb.drop(columns=["measure"])
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
-    # Drop the measure column
-    tb = tb.drop(columns="measure")
+    tb = paths.regions.harmonize_names(tb)
 
     # Reaggregate causes
     tb = reaggregate_causes(tb)
     # Rename causes
     tb = rename_causes(tb=tb, cause_renaming_dict=cause_renaming_dict, broad_cause_dict=broad_cause_dict)
-    # Check for duplicates
-    # index_cols = ["country", "age", "cause", "metric", "year"]
-    # duplicates = tb[tb.duplicated(subset=index_cols, keep=False)]
-    # if len(duplicates) > 0:
-    #    print(f"\nFound {len(duplicates)} duplicate rows:")
-    #    print(duplicates.sort_values(index_cols))
+    tb = tb.drop(columns=["population_group_name"])
     # Format the tables
     tb = tb.format(["country", "year", "broad_cause", "cause", "metric", "age", "sex"], short_name="gbd_treemap")
 
@@ -120,8 +112,6 @@ def reaggregate_causes(tb: Table) -> Table:
     )
     tb = pull_out_cause(tb, pull_out_cause="Falls", aggregate_cause="Unintentional injuries")
 
-    # We have both maternal disorders and neonatal disorders in the data so we can remove their combined grouping
-    tb = tb[tb["cause"] != "Maternal and neonatal disorders"]
     tb = combine_causes(
         tb=tb,
         causes_to_combine=[
@@ -287,8 +277,8 @@ def pull_out_cause(
         tb_residual["residual_value"] = tb_residual["residual_value"] - tb_residual["value"].fillna(0)
         tb_residual = tb_residual.drop(columns=["value"])
 
-    # Validate that residual values are non-negative
-    negative_residuals = tb_residual[tb_residual["residual_value"] < 0]
+    # Validate that residual values are non-negative, use round to omit very small negatives
+    negative_residuals = tb_residual[tb_residual["residual_value"].round(0) < 0]
     if len(negative_residuals) > 0:
         causes_str = "', '".join(pull_out_causes)
         raise ValueError(

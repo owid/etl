@@ -60,12 +60,12 @@ Uses nbconvert's "classic" template which provides:
 After running `make docs.build` and starting the docs server with `make docs.serve`, notebooks can be accessed at:
 
 ```
-http://localhost:8000/projects/etl/[path-to-notebook].html
+http://localhost:9010/projects/etl/[path-to-notebook].html
 ```
 
 For example:
-- `http://localhost:8000/projects/etl/analyses/media_deaths/media_deaths_analysis.html`
-- `http://localhost:8000/projects/etl/api/python.html`
+- `http://localhost:9010/projects/etl/analyses/media_deaths/media_deaths_analysis.html`
+- `http://localhost:9010/projects/etl/api/python.html`
 
 ## Adding New Notebooks
 

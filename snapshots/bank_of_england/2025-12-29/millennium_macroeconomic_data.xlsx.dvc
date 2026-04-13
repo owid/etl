@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "A millennium of macroeconomic data"
+    description: |-
+      The dataset contains a broad set of macroeconomic and financial data for the UK stretching back in some cases to the C13th and with one or two benchmark estimates available for 1086, the year of the Domesday Book. The dataset was originally called the 'Three centuries of macroeconomic data' spreadsheet but has now been renamed given its broader coverage. Version 3.1 of the dataset has now been updated to 2016.
+    date_published: "2017-04-30"
+    version_producer: '3.1'
+
+    # Citation
+    producer: Thomas and Dimsdale
+    citation_full: |-
+      Thomas, R. and Dimsdale, N. (2017). "A Millennium of UK Data". Bank of England.
+    attribution: Thomas and Dimsdale - A millennium of macroeconomic data (2017)
+    attribution_short: Bank of England
+
+    # Files
+    url_main: https://www.bankofengland.co.uk/statistics/research-datasets
+    url_download: https://www.bankofengland.co.uk/-/media/boe/files/statistics/research-datasets/a-millennium-of-macroeconomic-data-for-the-uk.xlsx
+    date_accessed: '2025-12-29'
+
+    # License
+    license:
+      name: UK Open Government License
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+outs:
+  - md5: de399fab8c99a7475e1a773e7437f004
+    size: 27533690
+    path: millennium_macroeconomic_data.xlsx

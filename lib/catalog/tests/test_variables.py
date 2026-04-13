@@ -349,7 +349,7 @@ def test_combine_indicators_metadata_with_different_fields(variable_1, variable_
     variable_2 = variable_2.copy()
     for operation in ["+", "-", "melt", "pivot", "concat"]:
         # TODO: Assert this raises a warning because units are different.
-        metadata = combine_indicators_metadata([variable_1, variable_2], operation=operation)  # type: ignore
+        metadata = combine_indicators_metadata([variable_1, variable_2], operation=operation)  # ty: ignore
         # If titles/descriptions/units/short_units are different, they should not be propagated.
         assert metadata.title is None
         assert metadata.description is None
@@ -371,7 +371,7 @@ def test_combine_indicators_metadata_with_equal_fields(variable_1, variable_2) -
     # Impose that variable 2 is identical to 1.
     variable_2 = variable_1.copy()
     for operation in ["+", "-", "melt", "pivot", "concat"]:
-        metadata = combine_indicators_metadata([variable_1, variable_2], operation=operation)  # type: ignore
+        metadata = combine_indicators_metadata([variable_1, variable_2], operation=operation)  # ty: ignore
         # If titles/descriptions/units/short_units are identical, they should be propagated.
         assert metadata.title == variable_1.metadata.title
         assert metadata.description == variable_1.metadata.description
@@ -410,7 +410,7 @@ def test_copy() -> None:
 
     # change metadata of a new variable
     v2.metadata.title = "cat"
-    v2.metadata.license.name = "cat license"  # type: ignore
+    v2.metadata.license.name = "cat license"  # ty: ignore
 
     # make sure it doesn't affect original variable
     assert v1.metadata.title == "dog"
@@ -509,27 +509,27 @@ def test_presentation_propagation_on_divisions(variable_1, variable_2) -> None:
 
     # If the numerator has no presentation but the denominator has presentation, the result should have no presentation.
     variable_1.metadata.presentation = None
-    variable_2.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
+    variable_2.metadata.presentation = VariablePresentationMeta("test")  # ty: ignore
     variable = variable_1 / variable_2
     assert variable.metadata.presentation is None
 
     # If the numerator has presentation but the denominator has no presentation,
     # the result should have the numerator's presentation.
-    variable_1.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
+    variable_1.metadata.presentation = VariablePresentationMeta("test")  # ty: ignore
     variable_2.metadata.presentation = None
     variable = variable_1 / variable_2
-    assert variable.metadata.presentation == VariablePresentationMeta("test")  # type: ignore
+    assert variable.metadata.presentation == VariablePresentationMeta("test")  # ty: ignore
 
     # If both numerator and denominator have the same presentation, the result should have that presentation.
-    variable_1.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
-    variable_2.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
+    variable_1.metadata.presentation = VariablePresentationMeta("test")  # ty: ignore
+    variable_2.metadata.presentation = VariablePresentationMeta("test")  # ty: ignore
     variable = variable_1 / variable_2
-    assert variable.metadata.presentation == VariablePresentationMeta("test")  # type: ignore
+    assert variable.metadata.presentation == VariablePresentationMeta("test")  # ty: ignore
 
     # If numerator and denominator have different presentations, the result should have no presentation.
     # NOTE: It is not clear if this is the best choice. Alternatively, we could keep the numerator's presentation.
-    variable_1.metadata.presentation = VariablePresentationMeta("test 1")  # type: ignore
-    variable_2.metadata.presentation = VariablePresentationMeta("test 2")  # type: ignore
+    variable_1.metadata.presentation = VariablePresentationMeta("test 1")  # ty: ignore
+    variable_2.metadata.presentation = VariablePresentationMeta("test 2")  # ty: ignore
     variable = variable_1 / variable_2
     assert variable.metadata.presentation is None
 

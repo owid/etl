@@ -1,17 +1,15 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2999
-    date_accessed: 2023-08-10 08:33:13.593482
+    url: https://admin.owid.io/admin/datasets/2999
+    date_accessed: 2026-03-06 07:46:35.788276+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_2999_home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split
+  name: Grapher metadata for dataset_2999_home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split
   description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5ec0fecedce6ae926154fcfcea2643e3
-  size: 3560
-  path: 
-    dataset_2999_home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split_config.json
+  - md5: 6a6351fef546d05387ed250f68fd8d2f
+    size: 3783
+    path: dataset_2999_home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split_config.json

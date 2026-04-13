@@ -11,7 +11,7 @@ import time
 from dataclasses import dataclass
 from functools import wraps
 from pathlib import Path
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, cast
 
 import requests
 import sh
@@ -51,9 +51,9 @@ class GithubRepo:
         if not dest_dir.is_dir():
             dest_dir.parent.mkdir(parents=True, exist_ok=True)
             if shallow:
-                sh.git("clone", "--depth=1", self.github_url, dest_dir.as_posix(), _fg=True)  # type: ignore[reportCallIssue]
+                sh.git("clone", "--depth=1", self.github_url, dest_dir.as_posix(), _fg=True)  # ty: ignore[call-non-callable]
             else:
-                sh.git("clone", self.github_url, dest_dir.as_posix(), _fg=True)  # type: ignore[reportCallIssue]
+                sh.git("clone", self.github_url, dest_dir.as_posix(), _fg=True)  # ty: ignore[call-non-callable]
         else:
             self.update_and_reset()
 
@@ -79,7 +79,7 @@ class GithubRepo:
     @property
     def latest_sha(self) -> str:
         master_file = self.cache_dir / ".git/refs/heads/master"
-        with open(master_file, "r") as f:
+        with open(master_file) as f:
             sha = f.read().strip()
 
         return sha
@@ -88,7 +88,7 @@ class GithubRepo:
         "Execute a git command in the context of this repo."
         return cast(
             str,
-            sh.git("--no-pager", *args, _cwd=self.cache_dir.as_posix(), **kwargs).stdout.decode("utf8").strip(),  # type: ignore[reportCallIssue]
+            sh.git("--no-pager", *args, _cwd=self.cache_dir.as_posix(), **kwargs).stdout.decode("utf8").strip(),  # ty: ignore[call-non-callable]
         )
 
     def is_up_to_date(self) -> bool:
@@ -151,12 +151,12 @@ def log_time(func):
 
 # @log_time
 def get_changed_files(
-    current_branch: Optional[str] = None,
-    base_branch: Optional[str] = None,
-    repo_path: Union[Path, str] = BASE_DIR,
+    current_branch: str | None = None,
+    base_branch: str | None = None,
+    repo_path: Path | str = BASE_DIR,
     only_committed: bool = False,
     fetch: bool = False,
-) -> Dict[str, Dict[str, str]]:
+) -> dict[str, dict[str, str]]:
     """Return files that are different between the current branch and the specified base branch. This can
     be really slow if the number of files is large.
 
@@ -174,6 +174,10 @@ def get_changed_files(
     if base_branch is None:
         # If not specified, use "master" branch.
         base_branch = "master"
+
+    # If comparing branch to itself, return empty dict
+    if current_branch == base_branch:
+        return {}
 
     # Fetch the latest changes from the remote repository
     if fetch:

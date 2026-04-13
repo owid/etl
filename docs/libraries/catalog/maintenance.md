@@ -24,3 +24,13 @@ After working on your changes in the library, publishing to PyPI is automated:
 The workflow triggers automatically when `lib/catalog/pyproject.toml` changes on the master branch. It includes a safety check to ensure the version was actually bumped before publishing.
 
 **Manual trigger:** You can still manually trigger the workflow by clicking `Run Workflow` in [:fontawesome-brands-github: GitHub Actions](https://github.com/owid/etl/actions/workflows/publish-owid-catalog.yml) if needed.
+
+### Generate `llms.txt`
+
+The library ships an `llms.txt` file (at `docs/libraries/catalog/llms.txt`) that is auto-generated from module docstrings and documentation markdown files. To regenerate it after changing docstrings or docs:
+
+```shell
+make docs.llms
+```
+
+This runs `docs/ignore/others/bake_llms_txt.py`, which inspects the public API surface and doc files so the output stays in sync with the codebase.

@@ -1,0 +1,29 @@
+dataset:
+  title: 'Length of the work day: from 1890s to 1991 - Costa (2000)'
+tables:
+  length_of_the_work_day__from_1890s_to_1991__costa__2000:
+    variables:
+      average_daily_hours_of_work__by_industry__men__costa__2000:
+        title: Average daily hours of work, by industry, men (Costa (2000))
+        unit: hours
+        description: Average hours men worked per day, by industry.
+      average_daily_hours_of_work__by_occupation__men__costa__2000:
+        title: Average daily hours of work, by occupation, men (Costa (2000))
+        unit: hours
+        description: Average hours men worked per day, by occupation.
+      percentage_of_men_in_each_industry_group__costa__2000:
+        title: Percentage of men in each industry group (Costa (2000))
+        unit: '%'
+        description: |-
+          Percentage of men across 11 industry groups.
+
+          Note: The 1890s industry distribution is estimated from the 1910 census. Daily hours are missing for industries where cell sizes were too small in the 1890s data. (Industry could not be assigned to all individuals.)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

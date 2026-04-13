@@ -1,0 +1,47 @@
+dataset:
+  title: Air pollution sources in the UK - DEFRA
+tables:
+  air_pollution_sources_in_the_uk__defra:
+    variables:
+      agriculture:
+        title: Agriculture
+        unit: thousand tonnes
+      energy_production:
+        title: Energy production
+        unit: thousand tonnes
+      fugitive_emissions:
+        title: Fugitive emissions
+        unit: thousand tonnes
+      industrial_processes:
+        title: Industrial processes
+        unit: thousand tonnes
+      manufacturing_industry__and__construction:
+        title: Manufacturing industry & construction
+        unit: thousand tonnes
+      military_aircraft_and_naval_shipping:
+        title: Military aircraft and naval shipping
+        unit: thousand tonnes
+      non_road_transport:
+        title: Non-road transport
+        unit: thousand tonnes
+      other:
+        title: Other
+        unit: thousand tonnes
+      road_transport:
+        title: Road transport
+        unit: thousand tonnes
+      small_non_road_mobile_sources__and__machinery:
+        title: Small non-road mobile sources & machinery
+        unit: thousand tonnes
+      waste:
+        title: Waste
+        unit: thousand tonnes
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

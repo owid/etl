@@ -728,6 +728,9 @@ df_graphers = pd.concat([df_graphers_wid, df_graphers_pip], ignore_index=True)
 df_graphers["relatedQuestionText"] = np.nan
 df_graphers["relatedQuestionUrl"] = np.nan
 
+# Add originURL
+df_graphers["originUrl"] = "https://ourworldindata.org/economic-inequality"
+
 # Select one default view
 df_graphers.loc[
     (df_graphers["Data Radio"] == "World Inequality Database (Incomes before tax)")
@@ -739,4 +742,4 @@ df_graphers.loc[
 # ## Explorer generation
 # Here, the header, tables and graphers dataframes are combined to be shown in for format required for OWID data explorers.
 
-save("inequality", all_the_tables, df_header, df_graphers, df_tables)  # type: ignore
+save("inequality", all_the_tables, df_header, df_graphers, df_tables)  # ty: ignore

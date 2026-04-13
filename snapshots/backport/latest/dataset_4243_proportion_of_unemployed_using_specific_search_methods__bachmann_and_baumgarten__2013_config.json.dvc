@@ -1,17 +1,15 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4243
-    date_accessed: 2023-08-10 09:45:53.947340
+    url: https://admin.owid.io/admin/datasets/4243
+    date_accessed: 2026-03-06 07:49:44.485843+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_4243_proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013
+  name: Grapher metadata for dataset_4243_proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013
   description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3f0e0c8e0f5ed84360cfa069d3f044af
-  size: 7208
-  path: 
-    dataset_4243_proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013_config.json
+  - md5: 5daa7208700710003ddc2ccec137f577
+    size: 7896
+    path: dataset_4243_proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013_config.json

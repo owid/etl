@@ -2,11 +2,12 @@ import hashlib
 import json
 import random
 import urllib.parse
+from collections.abc import Callable
 from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional
+from typing import Any, Literal
 
 import numpy as np
 import streamlit as st
@@ -87,14 +88,14 @@ def default_converter(o):
 
 
 def grapher_chart(
-    catalog_path: Optional[str] = None,
-    variable_id: Optional[int | List[int]] = None,
-    variable: Optional[Variable | List[Variable]] = None,
-    chart_config: Optional[Dict[str, Any]] = None,
+    catalog_path: str | None = None,
+    variable_id: int | list[int] | None = None,
+    variable: Variable | list[Variable] | None = None,
+    chart_config: dict[str, Any] | None = None,
     owid_env: OWIDEnv = OWID_ENV,
-    selected_entities: Optional[list] = None,
-    included_entities: Optional[list] = None,
-    tab: Optional[str] = None,
+    selected_entities: list | None = None,
+    included_entities: list | None = None,
+    tab: str | None = None,
     height=600,
     **kwargs,
 ):
@@ -147,11 +148,11 @@ def grapher_chart_from_url(chart_url: str, height=600):
             style="width: 100%; height: 600px; border: 0px none;"
             allow="web-share; clipboard-write"></iframe>
     """
-    return components.html(chart_animation_iframe_html, height=height, width=1.6 * height)  # type: ignore
+    return components.html(chart_animation_iframe_html, height=height, width=1.6 * height)  # ty: ignore
 
 
 def explorer_chart(
-    base_url: str, explorer_slug: str, view: dict, height: int = 600, default_display: Optional[str] = None
+    base_url: str, explorer_slug: str, view: dict, height: int = 600, default_display: str | None = None
 ):
     # First HTML definition with parameters
     url = f"{base_url}/{explorer_slug}"
@@ -177,10 +178,10 @@ def explorer_chart(
     """
 
     # Render the HTML
-    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # type: ignore
+    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # ty: ignore
 
 
-def mdim_chart(url: str, view: dict, height: int = 600, default_display: Optional[str] = None):
+def mdim_chart(url: str, view: dict, height: int = 600, default_display: str | None = None):
     params = {
         "hideControls": "true",
         **view,
@@ -198,10 +199,10 @@ def mdim_chart(url: str, view: dict, height: int = 600, default_display: Optiona
     """
 
     # Render the HTML
-    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # type: ignore
+    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # ty: ignore
 
 
-def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
+def _chart_html(chart_config: dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
     """Plot a Grapher chart using the Grapher API.
 
     Parameters
@@ -227,7 +228,7 @@ def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **k
         <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
         <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
         <script type="module">
-            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.renderSingleGrapherOnGrapherPage(jsonConfig, "{owid_env.data_api_url}/v1/indicators/");
+            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.renderSingleGrapherOnGrapherPage({{ config: jsonConfig, dataApiUrl: "{owid_env.data_api_url}/v1/indicators/", catalogUrl: "{owid_env.catalog_url}" }});
         </script>
     </div>
     """
@@ -235,7 +236,7 @@ def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **k
     components.html(HTML, height=height, width=int(1.6 * height), **kwargs)
 
 
-def tag_in_md(tag_name: str, color: str, icon: Optional[str] = None):
+def tag_in_md(tag_name: str, color: str, icon: str | None = None):
     """Create a custom HTML tag.
 
     Parameters
@@ -303,7 +304,7 @@ class Pagination:
         items: list[Any],
         items_per_page: int,
         pagination_key: str,
-        on_click: Optional[Callable] = None,
+        on_click: Callable | None = None,
         save_in_query: bool = False,
     ):
         """Construct Pagination.
@@ -487,10 +488,10 @@ def st_title_with_expert(title: str, icon: str | None = None, **kwargs):
 
 
 def preview_file(
-    file_path: str | Path, prefix: str = "File", language: str = "python", custom_header: Optional[str] = None
+    file_path: str | Path, prefix: str = "File", language: str = "python", custom_header: str | None = None
 ) -> None:
     """Preview file in streamlit."""
-    with open(file_path, "r") as f:
+    with open(file_path) as f:
         code = f.read()
     if custom_header is None:
         custom_header = f"{prefix}: `{file_path}`"
@@ -508,7 +509,7 @@ def st_toast_success(message: str) -> None:
     st.toast(f"✅ :green[{message}]")
 
 
-def update_query_params(key: str, side_effect: Optional[Callable[[], None]] = None):
+def update_query_params(key: str, side_effect: Callable[[], None] | None = None):
     def _update_query_params():
         value = st.session_state[key]
         if value is not None:
@@ -538,6 +539,15 @@ def url_persist(component: Any) -> Any:
           key="abc",
           ...
         )
+
+    Important notes:
+        - Boolean values (checkbox/toggle) are stored as "True"/"False" strings in URL
+        - The component parses these strings back to booleans when rendered
+        - If you need to check the value before the component renders (e.g., in filtering logic),
+          check st.session_state first, then fall back to parsing st.query_params manually:
+            value = st.session_state.get("key")
+            if value is None:
+                value = st.query_params.get("key") != "False"
     """
 
     def _persist(*args, **kwargs):
@@ -623,7 +633,7 @@ def _get_params(component, key):
 
 
 def st_cache_data(
-    func: Optional[Callable] = None,
+    func: Callable | None = None,
     *,
     custom_text: str = "Running...",
     show_spinner: bool = False,

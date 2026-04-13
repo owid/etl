@@ -1,0 +1,24 @@
+meta:
+  source:
+    name: RAM Legacy Database; Hilborn,et al. (2020). Effective fisheries management instrumental in improving fish stock status.
+    description: |-
+      This dataset provides aggregated data on fish biomass, fishing pressure and catch by region and taxa, based on the results of the RAM Legacy Stock Assessment Database: https://www.ramlegacy.org/
+
+      This aggregated data was provided by Michael Melnychuk, researcher on the RAM Legacy Database.
+
+      These results were published in PNAS here:
+      Hilborn, R., Amoroso, R. O., Anderson, C. M., Baum, J. K., Branch, T. A., Costello, C., ... & Ye, Y. (2020). Effective fisheries management instrumental in improving fish stock status. Proceedings of the National Academy of Sciences, 117(4), 2218-2224. Available at: https://www.pnas.org/content/117/4/2218
+
+      Definitions are as follows:
+      – 'Biomass' is a measure of biomass of fish divided by the biomass of fish at the maximum sustainable yield (B / Bmsy)
+      – 'Fishing pressure' is a measure of fishing pressure divided by the pressure at the maximum sustainable yield (U / Umsy)
+      – 'Catch' is a measure of the annual catch divided by the mean catch across the stock's time series
+    url: https://www.ramlegacy.org/
+    date_accessed: 2021-09-10
+    published_by: RAM Legacy Stock Assessment Database. 2021. Version 4.495-assessment-only. Retrieved from DOI:10.5281/zenodo.4824192.
+  name: Marine stocks by region and taxa (ramlegacy)
+  description: ''
+outs:
+  - md5: a883082a4e71694391b99705c8d3b7b2
+    size: 136258
+    path: marine_stocks_by_region_and_taxa__ramlegacy.feather

@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/596
-    date_accessed: 2023-08-10 08:49:18.697056
+    url: https://admin.owid.io/admin/datasets/596
+    date_accessed: 2026-03-10 09:13:32.316236+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Prevalence of zinc deficiency - Wessells et al. (2012)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 47a7fff57ce837ef39f70136c8b980c0
-  size: 15546
-  path: dataset_596_prevalence_of_zinc_deficiency__wessells_et_al__2012_values.feather
+  - md5: c9078d83b3fe00fb3f8d221b19878c10
+    size: 14570
+    path: dataset_596_prevalence_of_zinc_deficiency__wessells_et_al__2012_values.feather

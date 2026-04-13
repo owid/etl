@@ -22,7 +22,7 @@ TODO: Consider loading field categorizations from the grapher schema (GrapherInt
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 import yaml
@@ -94,8 +94,8 @@ USER_CONTENT_FIELDS = {
 
 
 def calculate_source_checksum(
-    dependencies: List[str],
-    metadata_file: Optional[Path],
+    dependencies: list[str],
+    metadata_file: Path | None,
 ) -> str:
     """
     Calculate checksum for graph step inputs (dependencies + metadata file).
@@ -137,11 +137,11 @@ def calculate_source_checksum(
 
 def upsert_graph(
     slug: str,
-    metadata_file: Optional[Path],
-    dependencies: List[str],
+    metadata_file: Path | None,
+    dependencies: list[str],
     source_checksum: str,
     graph_push: bool = False,
-    yaml_params: Optional[dict] = None,
+    yaml_params: dict | None = None,
 ) -> int:
     """
     Create or update a chart in the grapher database.
@@ -216,17 +216,18 @@ def upsert_graph(
             if has_explicit_config:
                 # User provided explicit metadata - use it
                 log.info("graph.explicit_metadata", file=str(metadata_file))
-                config = {k: v for k, v in metadata.items() if k != "indicators"}
+                config: dict[str, Any] = {k: v for k, v in metadata.items() if k != "indicators"}
                 config["slug"] = slug
                 config.setdefault("$schema", "https://files.ourworldindata.org/schemas/grapher-schema.009.json")
                 # Preserve isPublished from existing chart if not explicitly set in metadata
                 if chart_exists and "isPublished" not in config:
+                    assert chart is not None
                     config["isPublished"] = chart.config.get("isPublished", False)
                 is_inheritance_enabled = False
             else:
                 # Pure inheritance from indicator
                 log.info("graph.auto_inherit")
-                config = {
+                config: dict[str, Any] = {
                     "slug": slug,
                     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.009.json",
                 }
@@ -240,11 +241,12 @@ def upsert_graph(
                     f"(title, subtitle, etc.) in {metadata_file}"
                 )
             log.info("graph.multi_indicator", file=str(metadata_file))
-            config = {k: v for k, v in metadata.items() if k != "indicators"}
+            config: dict[str, Any] = {k: v for k, v in metadata.items() if k != "indicators"}
             config["slug"] = slug
             config.setdefault("$schema", "https://files.ourworldindata.org/schemas/grapher-schema.009.json")
             # Preserve isPublished from existing chart if not explicitly set in metadata
             if chart_exists and "isPublished" not in config:
+                assert chart is not None
                 config["isPublished"] = chart.config.get("isPublished", False)
             is_inheritance_enabled = False
 
@@ -279,6 +281,7 @@ def upsert_graph(
         user_id = int(GRAPHER_USER_ID) if GRAPHER_USER_ID else None
 
         if chart_exists:
+            assert chart is not None
             log.info("graph.update_chart", chart_id=chart.id, inheritance=is_inheritance_enabled)
             config["isInheritanceEnabled"] = is_inheritance_enabled
             result = admin_api.update_chart(
@@ -311,7 +314,7 @@ def upsert_graph(
         return chart_id
 
 
-def pull_graph(slug: str, metadata_file: Path, dependencies: List[str]) -> None:
+def pull_graph(slug: str, metadata_file: Path, dependencies: list[str]) -> None:
     """
     Pull chart configuration from the database and write to .meta.yml file.
 
@@ -342,11 +345,11 @@ def pull_graph(slug: str, metadata_file: Path, dependencies: List[str]) -> None:
             log.info("graph.chart_found", chart_id=chart.id)
         except NoResultFound:
             raise ValueError(
-                f"Chart '{slug}' not found in database. " f"Use Admin UI or create a new graph step to create it first."
+                f"Chart '{slug}' not found in database. Use Admin UI or create a new graph step to create it first."
             )
 
         # 2. Get chart config from database
-        config = dict(chart.config)
+        config: dict[str, Any] = dict(chart.config)
 
         # 3. Convert variable IDs back to short indicator names
         short_paths = []
@@ -405,7 +408,7 @@ def pull_graph(slug: str, metadata_file: Path, dependencies: List[str]) -> None:
         log.info("graph.pull.success", file=str(metadata_file))
 
 
-def _shorten_indicator_path(full_path: str, dependencies: List[str]) -> str:
+def _shorten_indicator_path(full_path: str, dependencies: list[str]) -> str:
     """
     Convert a full catalog path to the shortest unambiguous form.
 
@@ -450,7 +453,7 @@ def _shorten_indicator_path(full_path: str, dependencies: List[str]) -> str:
     return f"{table}#{indicator}"
 
 
-def _save_graph_metadata(slug: str, source_checksum: str, config: Dict[str, Any], to_db: bool = True) -> None:
+def _save_graph_metadata(slug: str, source_checksum: str, config: dict[str, Any], to_db: bool = True) -> None:
     """
     Save graph metadata to local index.json file for dirty detection and conflict detection.
 
@@ -467,9 +470,9 @@ def _save_graph_metadata(slug: str, source_checksum: str, config: Dict[str, Any]
     index_path = graph_dir / "index.json"
     if index_path.exists():
         with open(index_path) as f:
-            metadata = json.load(f)
+            metadata: dict[str, Any] = json.load(f)
     else:
-        metadata = {
+        metadata: dict[str, Any] = {
             "channel": "graph",
             "short_name": slug,
         }
@@ -495,7 +498,7 @@ def _save_graph_metadata(slug: str, source_checksum: str, config: Dict[str, Any]
     log.debug("graph.metadata_saved", path=str(index_path), checksum=source_checksum, to_db=to_db)
 
 
-def _load_graph_metadata(slug: str) -> Dict[str, Any]:
+def _load_graph_metadata(slug: str) -> dict[str, Any]:
     """
     Load graph metadata from local index.json file.
 
@@ -513,7 +516,7 @@ def _load_graph_metadata(slug: str) -> Dict[str, Any]:
         return json.load(f)
 
 
-def fetch_graph_db_checksum(slug: str) -> Optional[str]:
+def fetch_graph_db_checksum(slug: str) -> str | None:
     """
     Fetch the checksum of what was last written to the database for a chart.
 
@@ -584,7 +587,7 @@ def has_db_divergence(slug: str) -> bool:
         return False
 
 
-def _resolve_indicator_paths(session: Session, catalog_paths: List[str]) -> List[int]:
+def _resolve_indicator_paths(session: Session, catalog_paths: list[str]) -> list[int]:
     """
     Convert indicator catalog paths to variable IDs.
 
@@ -618,7 +621,7 @@ def _resolve_indicator_paths(session: Session, catalog_paths: List[str]) -> List
     return variable_ids
 
 
-def _expand_indicator_path(catalog_path: str, dependencies: List[str]) -> str:
+def _expand_indicator_path(catalog_path: str, dependencies: list[str]) -> str:
     """
     Expand a short indicator name to a full catalog path using DAG dependencies.
 
@@ -779,7 +782,7 @@ def _uri_to_catalog_path(uri: str) -> str:
     return catalog_path
 
 
-def _load_metadata_file(metadata_file: Path, yaml_params: Optional[dict] = None) -> Dict[str, Any]:
+def _load_metadata_file(metadata_file: Path, yaml_params: dict | None = None) -> dict[str, Any]:
     """
     Load chart metadata from a .meta.yml file.
 
@@ -790,7 +793,7 @@ def _load_metadata_file(metadata_file: Path, yaml_params: Optional[dict] = None)
     Returns:
         Dictionary with chart configuration
     """
-    with open(metadata_file, "r") as f:
+    with open(metadata_file) as f:
         content = f.read()
 
     # Apply string substitution if yaml_params provided
@@ -811,7 +814,7 @@ def _load_metadata_file(metadata_file: Path, yaml_params: Optional[dict] = None)
 def _check_manual_overrides(
     session: Session,
     chart: Chart,
-    expected_config: Dict[str, Any],
+    expected_config: dict[str, Any],
     is_inheritance_enabled: bool,
     current_checksum: str,
 ) -> None:

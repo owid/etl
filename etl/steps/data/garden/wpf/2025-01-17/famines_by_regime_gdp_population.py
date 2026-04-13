@@ -26,7 +26,6 @@ CUSTOM_REGIMES = {
     ("Turkey, Armenians", range(1915, 1917)): 3,
     ("Iran", range(1870, 1873)): 3,
     ("Philippines", 1899): 3,
-    ("Poland", range(1915, 1918)): 3,
     ("Poland", range(1940, 1944)): 3,
     ("Russia, Kazakhstan", range(1932, 1935)): 3,
     ("Russia, Ukraine", range(1915, 1923)): 3,
@@ -46,6 +45,7 @@ CUSTOM_REGIMES = {
     ("Russia, Western Soviet States", range(1939, 1948)): 3,
     ("Somaliland, African Red Sea Region", range(1910, 2020)): 3,
     ("Sudan", range(1888, 1893)): 3,
+    ("Austria, Hungary", range(1915, 1919)): 3,
 }
 
 
@@ -209,7 +209,6 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
         {"country": "India", "years": [1876, 1877, 1878], "year_range": [1870, 1884]},
         {"country": "Turkey", "years": [1894, 1895, 1896], "year_range": [1870, 1913]},
         {"country": "Philippines", "years": [1899, 1900, 1901], "ref_year": 1902},
-        {"country": "Poland", "years": [1915, 1916, 1917, 1918], "year_range": [1913, 1920]},
         {"country": "Poland", "years": [1940, 1941, 1942, 1943, 1944, 1945], "year_range": [1938, 1948]},
         {"country": "Iran", "years": [1871, 1872], "ref_year": 1870},
         {"country": "Iran", "years": [1917, 1918, 1919], "ref_year": 1913},
@@ -226,6 +225,14 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
         elif "year_range" in rule:
             gdp_value = calculate_average_gdp(tb_gdp, rule["country"], rule["year_range"])
         replace_gdp(tb, rule["country"], rule["years"], gdp_value)
+
+    # Special case for Austria-Hungary - use average of Austria, Hungary, and Poland GDP data
+    austria_hungary_years = [1915, 1916, 1917, 1918]
+    austria_gdp = calculate_average_gdp(tb_gdp, "Austria", [1913, 1920])
+    hungary_gdp = calculate_average_gdp(tb_gdp, "Hungary", [1913, 1920])
+    poland_gdp = calculate_average_gdp(tb_gdp, "Poland", [1913, 1920])
+    combined_gdp = (austria_gdp + hungary_gdp + poland_gdp) / 3
+    replace_gdp(tb, "Austria, Hungary", austria_hungary_years, combined_gdp)
 
     # Special cases for USSR/Russian Empire  - these countries were a part of the USSR/Russian Empire at the time so use the GDP of the USSR/Russia; some years aren't available so use an average of the surrounding years
     special_cases = {
@@ -313,12 +320,13 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
 
     tb_ext = tb_ext.rename(columns={"country": "original_country"})
 
-    # Mapping dictionary to rename specified countries to "USSR"
+    # Mapping dictionary to rename specified countries for population lookup
     country_mapping = {
         "Kazakhstan": "USSR",
-        "Russia, Ukraine": "Russia",  # Ukrane was a part of the Russian Emprie
+        "Russia, Ukraine": "Russia",  # Ukraine was a part of the Russian Empire
         "Russia, Western Soviet States": "USSR",
         "Moldova, Ukraine, Russia, Belarus": "USSR",
+        "Austria, Hungary": "Austria",  # Temporarily use Austria, will average with Hungary and Poland below
     }
 
     # Create a new column with the renamed countries
@@ -326,6 +334,31 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
 
     # Add population data to the extended table
     tb_ext = geo.add_population_to_table(tb_ext, ds_population)
+
+    # Special handling for Austria, Hungary - add Hungary and Poland populations and average with Austria
+    austria_hungary_rows = tb_ext["original_country"] == "Austria, Hungary"
+    if austria_hungary_rows.any():
+        # Get Hungary population for the same years/famines
+        tb_hungary = tb_ext[austria_hungary_rows].copy()
+        tb_hungary["country"] = "Hungary"
+        tb_hungary = tb_hungary.drop(columns=["population"])
+        tb_hungary = geo.add_population_to_table(tb_hungary, ds_population)
+
+        # Get Poland population for the same years/famines
+        tb_poland = tb_ext[austria_hungary_rows].copy()
+        tb_poland["country"] = "Poland"
+        tb_poland = tb_poland.drop(columns=["population"])
+        tb_poland = geo.add_population_to_table(tb_poland, ds_population)
+
+        # Average Austria (already in tb_ext), Hungary, and Poland populations
+        austria_pop = tb_ext.loc[austria_hungary_rows, "population"]
+        hungary_pop = tb_hungary["population"]
+        poland_pop = tb_poland["population"]
+        avg_population = ((austria_pop + hungary_pop.values + poland_pop.values) / 3).astype("Int64")
+
+        # Replace with average
+        tb_ext.loc[austria_hungary_rows, "population"] = avg_population.values
+
     tb_ext = tb_ext.drop(columns={"country"})
     tb_ext = tb_ext.rename(columns={"original_country": "country"})
 

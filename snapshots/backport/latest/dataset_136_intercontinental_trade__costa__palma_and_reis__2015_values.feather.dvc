@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://admin.owid.io/admin/datasets/136
-    date_accessed: 2025-11-28 12:08:08.801303
+    date_accessed: 2026-03-10 09:22:44.029833+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Intercontinental Trade - Costa, Palma and Reis (2015)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-  - md5: a24a8c32e69e8825b96745cd37075c84
-    size: 6530
+  - md5: 160ec7c55aa485762f9f4deae2e2b9a0
+    size: 6570
     path: dataset_136_intercontinental_trade__costa__palma_and_reis__2015_values.feather

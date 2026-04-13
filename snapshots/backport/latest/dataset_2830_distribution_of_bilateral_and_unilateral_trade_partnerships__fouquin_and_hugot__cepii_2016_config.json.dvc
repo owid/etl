@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2830
-    date_accessed: 2023-08-10 08:40:26.327995
+    url: https://admin.owid.io/admin/datasets/2830
+    date_accessed: 2026-03-05 13:34:59.023433+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_2830_distribution_of_bilateral_and_unilateral_trade_partnerships__fouquin_and_hugot__cepii_2016
+  name: Grapher metadata for dataset_2830_distribution_of_bilateral_and_unilateral_trade_partnerships__fouquin_and_hugot__cepii_2016
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e5526f0ad3c5d93b239e5af4bb24006c
-  size: 3948
-  path: 
-    dataset_2830_distribution_of_bilateral_and_unilateral_trade_partnerships__fouquin_and_hugot__cepii_2016_config.json
+  - md5: a0c7e2779ebdff1c648e5dcfbe361423
+    size: 4264
+    path: dataset_2830_distribution_of_bilateral_and_unilateral_trade_partnerships__fouquin_and_hugot__cepii_2016_config.json

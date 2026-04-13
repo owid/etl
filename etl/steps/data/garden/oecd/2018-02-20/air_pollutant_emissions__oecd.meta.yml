@@ -1,0 +1,29 @@
+dataset:
+  title: Air Pollutant Emissions - OECD
+tables:
+  air_pollutant_emissions__oecd:
+    variables:
+      carbon_monoxide__index:
+        title: Carbon Monoxide (Index)
+        unit: (1990 = 100)
+      nox__index:
+        title: NOx (Index)
+        unit: (1990 = 100)
+      pm10__index:
+        title: PM₁₀ (Index)
+        unit: (1990 = 100)
+      pm2_5__index:
+        title: PM₂.₅ (Index)
+        unit: (1990 = 100)
+      so2__index:
+        title: SO₂ (Index)
+        unit: (1990 = 100)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -115,7 +115,7 @@ def test_app_fasttrack():
     assert not at.exception
 
     # Try to reimport the latest uploaded sheet
-    at.button_group[0].set_value(["update_gsheet"])
+    at.button_group[0].set_value("update_gsheet")
     # at.radio[0].set_value("update_gsheet")
     _pick_button_by_label(at, "Submit").click().run()
 
@@ -147,9 +147,9 @@ def test_app_harmonizer():
     sel.set_value(dataset_uri).run()
     assert not at.exception
 
-    assert (
-        len(at.selectbox) == 3
-    ), f"By selecting dataset {dataset_uri}, there should be three selectboxes (automatically populated)."
+    assert len(at.selectbox) == 3, (
+        f"By selecting dataset {dataset_uri}, there should be three selectboxes (automatically populated)."
+    )
 
     # Check selectbox options
     sel2 = at.selectbox[1]
@@ -203,7 +203,7 @@ def _get_random_dataset():
             .first()
         )
 
-    dataset_id = ds.id  # type: ignore
+    dataset_id = ds.id  # ty: ignore
 
     return dataset_id
 
@@ -259,5 +259,14 @@ def test_app_explorer():
 @pytest.mark.usefixtures("set_config")
 def test_app_chart_animation():
     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/chart_animation.py"), default_timeout=DEFAULT_TIMEOUT).run()
+
+    # Allow RuntimeError for missing ffmpeg
+    if at.exception:
+        msg = at.exception[0].message
+        allowed = [
+            "No ffmpeg exe could be found",
+        ]
+        if any(text in msg for text in allowed):
+            return
 
     assert not at.exception

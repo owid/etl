@@ -1,0 +1,72 @@
+dataset:
+  title: GHG emissions from food (Crippa et al. 2021)
+tables:
+  ghg_emissions_from_food__crippa_et_al__2021:
+    variables:
+      food_emissions_by_country:
+        title: Food emissions by country
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000000
+          name: Greenhouse gas emissions from food
+          numDecimalPlaces: 0
+        description: |-
+          Emissions include not only direct emissions from agriculture, but also land use change and supply chain emissions (transport, packaging, food processing, retail, consumer cooking, refrigeration and waste).
+
+          Greenhouse gas emissions are quantified on the basis of their 100-year global warming potential (GWP100) using emission factors from the IPCC 5th Assessment Report (AR5).
+
+          Emissions by country are quantified on the basis of food production, not consumption. This means they do not account for international trade.
+      foods_share_of_total_emissions__excl__lulufc:
+        title: Food's share of total emissions (excl. LULUFC)
+        unit: ''
+      foods_share_of_total_emissions__incl__lulufc:
+        title: Food's share of total emissions (incl. LULUFC)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of total greenhouse gas emissions that come from food
+        description: |-
+          Emissions include not only direct emissions from agriculture, but also land use change and supply chain emissions (transport, packaging, food processing, retail, consumer cooking, refrigeration and waste).
+
+          Greenhouse gas emissions are quantified on the basis of their 100-year global warming potential (GWP100) using emission factors from the IPCC 5th Assessment Report (AR5).
+
+          Emissions by country are quantified on the basis of food production, not consumption. This means they do not account for international trade.
+      share_of_global_food_emissions:
+        title: Share of global food emissions
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of the global emissions from food
+        description: |-
+          Emissions include not only direct emissions from agriculture, but also land use change and supply chain emissions (transport, packaging, food processing, retail, consumer cooking, refrigeration and waste).
+
+          Greenhouse gas emissions are quantified on the basis of their 100-year global warming potential (GWP100) using emission factors from the IPCC 5th Assessment Report (AR5).
+
+          Emissions by country are quantified on the basis of food production, not consumption. This means they do not account for international trade.
+      total_ghg_emissions__tonnes:
+        title: Total GHG Emissions (tonnes)
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000
+          name: Total greenhouse gas emissions
+          numDecimalPlaces: 0
+        description: Total greenhouse gas emissions from all sectors.
+      total_ghg_emissions__edgar:
+        title: Total GHG emissions (EDGAR)
+        unit: tonnes CO₂e
+        short_unit: t
+        display:
+          conversionFactor: 1000
+          name: Total greenhouse gas emissions
+        description: Total greenhouse gas emissions from all sectors.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

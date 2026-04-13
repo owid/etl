@@ -59,9 +59,9 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
         if df[col].dtype == "category" or df[col].dtype == "object" or df[col].dtype == "string":
             df[col] = df[col].str.strip()
             # Check if columns values are contained in the list: ["Yes", "No", "nan"]
-            assert (
-                df[col].isin(["Yes", "No", np.nan]).all()
-            ), f"Column {col} contains values other than 'Yes', 'No' or 'nan'."
+            assert df[col].isin(["Yes", "No", np.nan]).all(), (
+                f"Column {col} contains values other than 'Yes', 'No' or 'nan'."
+            )
 
     # Replace "Yes" and "No" with 1 and 0
     df = df.replace({"Yes": 1, "No": 0})

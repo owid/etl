@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/488
-    date_accessed: 2023-08-10 08:31:51.028457
+    url: https://admin.owid.io/admin/datasets/488
+    date_accessed: 2026-03-10 09:20:03.699388+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_488_prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017
+  name: Grapher metadata for dataset_488_prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9317f4e31194502bd6ca77ac4dbcaefd
-  size: 4343
-  path: 
-    dataset_488_prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017_config.json
+  - md5: fd5fc2daed84467714d43126cf049167
+    size: 4473
+    path: dataset_488_prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017_config.json

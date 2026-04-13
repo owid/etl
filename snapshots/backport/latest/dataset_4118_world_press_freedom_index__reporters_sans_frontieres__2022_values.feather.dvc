@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4118
-    date_accessed: 2023-08-10 09:17:12.790620
+    url: https://admin.owid.io/admin/datasets/4118
+    date_accessed: 2026-03-05 09:54:02.359367+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: World Press Freedom Index - Reporters sans Frontieres (2022)
-  description: We received the combined file for years 2014-2021 via email from the
-    head of the World Press Freedom Index, Nalini Chella-Lepetit.
+  description: We received the combined file for years 2014-2021 via email from the head of the World Press Freedom Index, Nalini Chella-Lepetit.
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 18eed2df66ed49a130f2104d3499fbe8
-  size: 21146
-  path: 
-    dataset_4118_world_press_freedom_index__reporters_sans_frontieres__2022_values.feather
+  - md5: 8386298e2a5218f29b5c4987d83e06b4
+    size: 22762
+    path: dataset_4118_world_press_freedom_index__reporters_sans_frontieres__2022_values.feather

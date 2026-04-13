@@ -5,6 +5,7 @@ definitions:
 
 config:
   explorerTitle: Crop Yields
+  originUrl: https://ourworldindata.org/crop-yields
   explorerSubtitle: Explore crop yields across the world.
   isPublished: 'true'
   selection:

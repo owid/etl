@@ -15,7 +15,7 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap_ced = paths.load_snapshot(short_name="ucdp_ced_v25_01_25_09.csv")
+    snap_ced = paths.load_snapshot(short_name="ucdp_ced_v25_01_25_12.csv")
 
     # Read as tables
     tb_ced = snap_ced.read_csv()
@@ -58,7 +58,7 @@ def run() -> None:
     ds_meadow = paths.create_dataset(
         tables=[tb],
         check_variables_metadata=True,
-    )  # type: ignore
+    )  # ty: ignore
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

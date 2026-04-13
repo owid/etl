@@ -5,21 +5,29 @@ import os
 import re
 from functools import cache
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 import pandas as pd
 import requests
 from owid.catalog import License, Origin, Table, VariableMeta
+from owid.catalog.core.warnings import DisplayNameWarning, NoOriginsWarning, ignore_warnings
 from owid.catalog.utils import underscore
 from structlog import getLogger
+from tqdm import tqdm
 
 from etl.files import yaml_load
 from etl.grapher import helpers as gh
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = getLogger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+PROCESSING_NOTES = {
+    "SL_DOM_TSPD": "Originally reported as a share of the day (%). Converted to hours per day by multiplying by 24.",
+    "SL_DOM_TSPDCW": "Originally reported as a share of the day (%). Converted to hours per day by multiplying by 24.",
+    "SL_DOM_TSPDDC": "Originally reported as a share of the day (%). Converted to hours per day by multiplying by 24.",
+}
 
 # only include tables containing SUBSET string, this is useful for debugging
 SUBSET = os.environ.get("SUBSET")
@@ -29,7 +37,7 @@ if SUBSET:
     # e.g., "_6_2_1__sh_san_safe__all_areas" -> "_6_2_1__sh_san_safe"
     meta_path = Path(__file__).parent / "un_sdg.meta.yml"
     if meta_path.exists():
-        with open(meta_path, "r") as f:
+        with open(meta_path) as f:
             meta = yaml_load(f)
         table_names = list(meta["tables"].keys())
         # Extract unique indicator prefixes (up to second __)
@@ -43,7 +51,7 @@ if SUBSET:
             SUBSET += "|" + "|".join(sorted(indicator_prefixes))
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -65,12 +73,12 @@ def run(dest_dir: str) -> None:
     source_desc = load_source_description()
     short_source_mapping = load_short_source_mapping()
 
-    for var in ds_garden.table_names:
+    for var in tqdm(ds_garden.table_names):
         if SUBSET and not re.search(SUBSET, var):
             log.warning("un_sdg.skip", table_name=var)
             continue
 
-        log.info("un_sdg.process", table_name=var)
+        log.debug("un_sdg.process", table_name=var)
 
         tb = ds_garden.read(var, safe_types=False)
 
@@ -143,15 +151,19 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
-    ds_grapher.save()
+    with ignore_warnings([NoOriginsWarning, DisplayNameWarning]):
+        ds_grapher = paths.create_dataset(
+            tables=all_tables,
+            default_metadata=ds_garden.metadata,
+        )
+        ds_grapher.save()
 
     # Show warnings at the very end so they are not lost in the middle of the processing logs
     for warning in warnings:
         log.warning("un_sdg.warning", **warning)
 
 
-def clean_source_name(tb: Table, clean_source_map: Dict[str, str], additional_source_map: Dict[str, str]) -> str:
+def clean_source_name(tb: Table, clean_source_map: dict[str, str], additional_source_map: dict[str, str]) -> str:
     unique_srcs = tb["source"].drop_duplicates()
     ind_code = tb["variable_name"].iloc[0].split("-")[0].strip()
     if len(unique_srcs) > 1:
@@ -165,7 +177,7 @@ def clean_source_name(tb: Table, clean_source_map: Dict[str, str], additional_so
     return clean_source
 
 
-def add_short_source_name(clean_source: pd.Series, short_source_map: Dict[str, str]) -> str:
+def add_short_source_name(clean_source: pd.Series, short_source_map: dict[str, str]) -> str:
     source_name = clean_source.iloc[0]
     assert source_name in short_source_map, f"{repr(source_name)} not in un_sdg.sources_short.json - please add"
     short_source = short_source_map[source_name]
@@ -177,9 +189,9 @@ def load_source_description() -> dict:
     """
     Load the existing json which loads a more detailed source description for a selection of sources.
     """
-    with open(paths.directory / "un_sdg.source_description.json", "r") as f:
+    with open(paths.directory / "un_sdg.source_description.json") as f:
         sources = json.load(f)
-        return cast(Dict[str, str], sources)
+        return cast(dict[str, str], sources)
 
 
 def get_source(raw_source: pd.Series) -> str:
@@ -206,7 +218,7 @@ def create_metadata_desc(indicator, series_code, source_desc, series_description
         if source_url == "no metadata found":
             source_desc_out = series_description
         else:
-            source_desc_out = series_description + "\n\nFurther information available at: %s" % (source_url)
+            source_desc_out = series_description + f"\n\nFurther information available at: {source_url}"
 
     return source_desc_out
 
@@ -222,6 +234,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, source_desc: dict, date_acce
     indicator = tb["variable_name"].iloc[0].split("-")[0].strip()
     series_code = tb["seriescode"].iloc[0].upper()
     series_description = tb["seriesdescription"].iloc[0]
+    processing_note = PROCESSING_NOTES.get(series_code, None)
     source_desc = create_metadata_desc(
         indicator=indicator, series_code=series_code, source_desc=source_desc, series_description=series_description
     )
@@ -250,6 +263,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, source_desc: dict, date_acce
     tb["meta"] = VariableMeta(
         title=tb["variable_name_meta"].iloc[0],
         description_short=series_description,
+        description_processing=processing_note,
         description_from_producer=str(source_desc),
         origins=[origin],
         unit=tb["long_unit"].iloc[0].lower(),
@@ -324,31 +338,31 @@ def create_table(tb: Table) -> Table:
     return tb
 
 
-def load_clean_source_mapping() -> Dict[str, str]:
+def load_clean_source_mapping() -> dict[str, str]:
     """
     Load the existing json which maps the raw sources to a cleaner version of the sources.
     """
-    with open(paths.directory / "un_sdg.sources.json", "r") as f:
+    with open(paths.directory / "un_sdg.sources.json") as f:
         sources = json.load(f)
-        return cast(Dict[str, str], sources)
+        return cast(dict[str, str], sources)
 
 
-def load_additional_source_mapping() -> Dict[str, str]:
+def load_additional_source_mapping() -> dict[str, str]:
     """
     Load the existing json which maps the raw sources to a cleaner version of the sources.
     """
-    with open(paths.directory / "un_sdg.sources_additional.json", "r") as f:
+    with open(paths.directory / "un_sdg.sources_additional.json") as f:
         sources = json.load(f)
-        return cast(Dict[str, str], sources)
+        return cast(dict[str, str], sources)
 
 
-def load_short_source_mapping() -> Dict[str, str]:
+def load_short_source_mapping() -> dict[str, str]:
     """
     Load the existing json which maps the raw sources to a cleaner version of the sources.
     """
-    with open(paths.directory / "un_sdg.sources_short.json", "r") as f:
+    with open(paths.directory / "un_sdg.sources_short.json") as f:
         sources = json.load(f)
-        return cast(Dict[str, str], sources)
+        return cast(dict[str, str], sources)
 
 
 @cache

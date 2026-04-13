@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List, Optional, Union
 
 import click
 from owid.catalog.core import CatalogPath
@@ -19,7 +18,7 @@ CATALOG_URL = "https://catalog.ourworldindata.org/"
 
 
 @click.command(name="explorer-update", cls=RichCommand, help=__doc__)
-@click.argument("explorer-names", type=str or List[str], nargs=-1)
+@click.argument("explorer-names", type=str or list[str], nargs=-1)
 @click.option(
     "--explorers-dir", type=str, default=EXPLORERS_DIR, help=f"Path to explorer files. Default: {EXPLORERS_DIR}"
 )
@@ -31,8 +30,8 @@ CATALOG_URL = "https://catalog.ourworldindata.org/"
     help="Do not write to explorer files, simply print potential changes. Default: False.",
 )
 def cli(
-    explorer_names: Optional[Union[List[str], str]] = None,
-    explorers_dir: Union[Path, str] = EXPLORERS_DIR,
+    explorer_names: list[str] | str | None = None,
+    explorers_dir: Path | str = EXPLORERS_DIR,
     dry_run: bool = False,
 ) -> None:
     """Update one or more explorer (tsv) files.
@@ -78,7 +77,7 @@ def cli(
         update_explorer(explorer_file=explorer_file, dry_run=dry_run)
 
 
-def extract_variable_ids_from_explorer_content(explorer: str) -> List[int]:
+def extract_variable_ids_from_explorer_content(explorer: str) -> list[int]:
     variable_ids_all = []
     for line in explorer.split("\n"):
         # Select the lines that correspond to subtables.
@@ -105,7 +104,7 @@ def extract_variable_ids_from_explorer_content(explorer: str) -> List[int]:
     return variable_ids
 
 
-def update_file_based_explorer(explorer: str) -> Optional[str]:
+def update_file_based_explorer(explorer: str) -> str | None:
     # Gather all data catalog URLs from the explorer content.
     steps = []
     for line in explorer.split("\n"):
@@ -145,15 +144,17 @@ def update_file_based_explorer(explorer: str) -> Optional[str]:
     # Create an informative log message.
     message = "URLs to be replaced in explorer file:\n"
     for url_old, url_new in url_mapping.items():
-        assert url_new.split("/")[-2] > url_old.split("/")[-2], "New version should be greater than old version."  # type: ignore
+        assert (
+            url_new.split("/")[-2] > url_old.split("/")[-2]  # ty: ignore[unresolved-attribute]
+        ), "New version should be greater than old version."  # ty: ignore
         message += f"{url_old} ->\n{url_new})\n"
-        explorer_new = explorer_new.replace(url_old, url_new)  # type: ignore
+        explorer_new = explorer_new.replace(url_old, url_new)  # ty: ignore
     log.info(message)
 
     return explorer_new
 
 
-def update_indicator_based_explorer(explorer: str) -> Optional[str]:
+def update_indicator_based_explorer(explorer: str) -> str | None:
     # Extract all possible variable ids from the explorer file.
     variable_ids = extract_variable_ids_from_explorer_content(explorer=explorer)
 
@@ -288,7 +289,7 @@ def update_explorer(explorer_file: Path, dry_run: bool = False) -> None:
         raise FileNotFoundError(f"Explorer file not found: {explorer_file}")
 
     # Load explorer file as a string.
-    with open(explorer_file, "r") as f:
+    with open(explorer_file) as f:
         explorer = f.read()
 
     # Initialize variable for the updated explorer content.

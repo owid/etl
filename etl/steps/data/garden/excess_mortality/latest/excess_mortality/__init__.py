@@ -31,6 +31,9 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Keep data only until 2023, as the baseline doesn't make sense beyond that
+YEAR_LIMIT = 2023
+
 
 def run() -> None:
     log.info("excess_mortality: start")
@@ -65,6 +68,9 @@ def run() -> None:
     # Last 12 months
     tb_garden = add_last12m_to_metric(tb_garden, "cum_excess_proj_all_ages", column_country="entity")
     tb_garden = add_last12m_to_metric(tb_garden, "cum_excess_per_million_proj_all_ages", column_country="entity")
+
+    # Keep data until 2023
+    tb_garden = tb_garden[tb_garden["date"].dt.year <= 2023]
 
     # Format
     tb_garden = tb_garden.format(["entity", "date"])

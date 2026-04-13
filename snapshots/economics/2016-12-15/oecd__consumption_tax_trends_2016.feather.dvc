@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: OECD – Consumption Tax Trends 2016
+    url: http://www.oecd-ilibrary.org/taxation/consumption-tax-trends-2016_ctt-2016-en
+    date_accessed: 2016-12-15
+    published_by: OECD (2016), Consumption Tax Trends, OECD Publishing, Paris.
+  name: OECD – Consumption Tax Trends 2016
+  description: ''
+outs:
+  - md5: 6594af983dee6e15bf247e9dda00815c
+    size: 5754
+    path: oecd__consumption_tax_trends_2016.feather

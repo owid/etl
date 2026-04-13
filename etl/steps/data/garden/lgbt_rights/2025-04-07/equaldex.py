@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table, VariableMeta, VariablePresentationMeta
 from owid.datautils.dataframes import map_series
@@ -269,7 +267,7 @@ def make_table_wide_and_map_categories(tb: Table) -> Table:
 
 
 def add_population_weighted_aggregations(
-    tb: Table, columns: List[str], ds_regions: Dataset, ds_population: Dataset, regions: List[str]
+    tb: Table, columns: list[str], ds_regions: Dataset, ds_population: Dataset, regions: list[str]
 ) -> Table:
     """
     Add population-weighted aggregations for the columns in the list
@@ -308,7 +306,7 @@ def add_population_weighted_aggregations(
 
 
 def add_country_counts_and_population_by_status(
-    tb: Table, columns: List[str], ds_regions: Dataset, ds_population: Dataset, regions: List[str]
+    tb: Table, columns: list[str], ds_regions: Dataset, ds_population: Dataset, regions: list[str]
 ) -> Table:
     """
     Add country counts and population by status for the columns in the list
@@ -431,7 +429,7 @@ def add_metadata_for_aggregated_columns(col: str, status: str, count_or_pop: str
     else:
         paths.log.error(f"count_or_pop must be either 'count' or 'pop'. Got {count_or_pop}.")
 
-    return meta  # type: ignore
+    return meta  # ty: ignore
 
 
 def select_only_sovereign_countries(tb: Table, tb_sovereign_countries: Table) -> Table:

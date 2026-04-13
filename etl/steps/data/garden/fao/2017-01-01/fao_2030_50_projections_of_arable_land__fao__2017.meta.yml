@@ -1,0 +1,24 @@
+dataset:
+  title: FAO 2030-50 Projections of Arable Land - FAO (2017)
+tables:
+  fao_2030_50_projections_of_arable_land__fao__2017:
+    variables:
+      arable_land_and_permanent_crops__fao__2017:
+        title: Arable land and permanent crops (FAO (2017))
+        unit: hectares
+        short_unit: ha
+        description: Global land allocated to arable production or permanent crops, measured in total hectares allocated.
+      fao_arable_land_projections__fao__2017:
+        title: FAO arable land projections (FAO (2017))
+        unit: hectares
+        short_unit: ha
+        description: FAO projections of arable land measured in hectares.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

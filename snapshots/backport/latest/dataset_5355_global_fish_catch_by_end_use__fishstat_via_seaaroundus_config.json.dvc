@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5355
-    date_accessed: 2023-08-10 10:32:09.709577
+    url: https://admin.owid.io/admin/datasets/5355
+    date_accessed: 2026-03-05 09:54:47.145646+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5355_global_fish_catch_by_end_use__fishstat_via_seaaroundus
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2468a5c7e048d176d9aab8d8daf88502
-  size: 16765
-  path: dataset_5355_global_fish_catch_by_end_use__fishstat_via_seaaroundus_config.json
+  - md5: 80b16de4a6e8b767292e15d6f40421a6
+    size: 18662
+    path: dataset_5355_global_fish_catch_by_end_use__fishstat_via_seaaroundus_config.json

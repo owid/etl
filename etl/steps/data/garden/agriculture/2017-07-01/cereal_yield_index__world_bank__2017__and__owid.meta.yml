@@ -1,0 +1,19 @@
+dataset:
+  title: Cereal yield index - (World Bank (2017) & OWID)
+tables:
+  cereal_yield_index__world_bank__2017__and__owid:
+    variables:
+      cereal_yield_index__world_bank__2017__and__owid:
+        title: Cereal yield index (World Bank (2017) & OWID)
+        unit: ''
+        description: |-
+          The cereal yield index measures annual cereal production as an index to average yields in 1961, the first year of the original dataset.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

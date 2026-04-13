@@ -3,10 +3,11 @@
 import functools
 import json
 import warnings
+from collections.abc import Hashable
 from datetime import datetime
 from functools import cache
 from pathlib import Path
-from typing import Any, Hashable, Literal, TypeVar, cast
+from typing import Any, Literal, TypeVar, cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -142,7 +143,7 @@ def list_countries_in_region(
 
     if income_groups is None:
         income_groups = _load_income_groups().reset_index()
-    income_groups_names = income_groups["income_group"].dropna().unique().tolist()  # type: ignore
+    income_groups_names = income_groups["income_group"].dropna().unique().tolist()  # ty: ignore
 
     if region in countries_regions["name"].tolist():
         # Find codes of member countries in this region.
@@ -154,7 +155,7 @@ def list_countries_in_region(
         # Get harmonized names of these countries.
         members = countries_regions.loc[member_codes]["name"].tolist()  # type: list[str]
     elif region in income_groups_names:
-        members = income_groups[income_groups["income_group"] == region]["country"].unique().tolist()  # type: ignore
+        members = income_groups[income_groups["income_group"] == region]["country"].unique().tolist()  # ty: ignore
     else:
         raise RegionNotFound
 
@@ -227,7 +228,7 @@ def list_countries_in_region_that_must_have_data(
 
     # Select population data for reference year for all countries in the region.
     reference = (
-        population[(population["country"].isin(members)) & (population["year"] == reference_year)]  # type: ignore
+        population[(population["country"].isin(members)) & (population["year"] == reference_year)]  # ty: ignore
         .dropna(subset="population")
         .sort_values("population", ascending=False)
         .reset_index(drop=True)
@@ -398,27 +399,46 @@ def add_region_aggregates(
             num_countries_relevant_with_data = len(set(countries_that_must_have_data).intersection(countries_with_data))
             return num_countries_relevant_with_data / num_countries_relevant >= frac_countries_that_must_have_data
 
-    df_region = groupby_agg(
-        df=df_countries,
-        groupby_columns=[column for column in index_columns if column != country_col],
-        aggregations=dict(
-            **aggregations,
-            **{country_col: lambda x: _check_countries_must_have_data(x)},
-        ),
-        num_allowed_nans=num_allowed_nans_per_year,
-        frac_allowed_nans=frac_allowed_nans_per_year,
-        min_num_values=min_num_values_per_year,
-    ).reset_index()
+    # When no country-level checks are needed, skip the expensive per-group lambda.
+    # Mixing a Python callable with string aggregations (e.g. "sum") forces pandas off
+    # its fast C path, causing ~10x slowdown on all aggregations — not just the lambda.
+    _needs_country_check = bool(countries_that_must_have_data) or (frac_countries_that_must_have_data is not None)
 
-    # Create filter that detects rows where the most contributing countries are not present.
-    if df_region[country_col].dtypes == "category":
-        # Doing df_region[country_col].any() fails if the country column is categorical.
-        mask_countries_present = ~(df_region[country_col].astype(str))
+    groupby_columns = [column for column in index_columns if column != country_col]
+
+    if _needs_country_check:
+        df_region = groupby_agg(
+            df=df_countries,
+            groupby_columns=groupby_columns,
+            aggregations=dict(
+                **aggregations,
+                **{country_col: lambda x: _check_countries_must_have_data(x)},
+            ),
+            num_allowed_nans=num_allowed_nans_per_year,
+            frac_allowed_nans=frac_allowed_nans_per_year,
+            min_num_values=min_num_values_per_year,
+        ).reset_index()
+
+        # Create filter that detects rows where the most contributing countries are not present.
+        if df_region[country_col].dtypes == "category":
+            # Doing df_region[country_col].any() fails if the country column is categorical.
+            mask_countries_present = ~(df_region[country_col].astype(str))
+        else:
+            mask_countries_present = ~df_region[country_col]
+        if mask_countries_present.any():
+            # Make nan all aggregates if the most contributing countries were not present.
+            df_region.loc[mask_countries_present, variables] = np.nan
     else:
-        mask_countries_present = ~df_region[country_col]
-    if mask_countries_present.any():
-        # Make nan all aggregates if the most contributing countries were not present.
-        df_region.loc[mask_countries_present, variables] = np.nan
+        # Fast path: no country-level checks needed, use pure string aggregations.
+        df_region = groupby_agg(
+            df=df_countries.drop(columns=[country_col]),
+            groupby_columns=groupby_columns,
+            aggregations=aggregations,
+            num_allowed_nans=num_allowed_nans_per_year,
+            frac_allowed_nans=frac_allowed_nans_per_year,
+            min_num_values=min_num_values_per_year,
+        ).reset_index()
+
     # Replace the column that was used to check if most contributing countries were present by the region's name.
     df_region[country_col] = region
 
@@ -446,13 +466,15 @@ def add_region_aggregates(
         # For now, simply warn that the original data for the region for those columns was deleted.
         columns_without_aggregate = set(df.drop(columns=index_columns).columns) - set(aggregations)
         if (len(columns_without_aggregate) > 0) and (len(df[df[country_col] == region]) > 0):
+            cols_preview = sorted(columns_without_aggregate)[:5]
+            n = len(columns_without_aggregate)
             log.warning(
-                f"Region {region} already has data for columns that do not have a defined aggregation method: "
-                f"({columns_without_aggregate}). That data will become nan."
+                f"Region {region} already has data for {n} column(s) without a defined aggregation method "
+                f"(e.g. {', '.join(cols_preview)}). That data will become nan."
             )
 
     # Sort conveniently.
-    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)  # type: ignore
+    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)  # ty: ignore
 
     # Convert country to categorical if the original was
     if df[country_col].dtype.name == "category":
@@ -462,7 +484,7 @@ def add_region_aggregates(
     if isinstance(df, Table):
         return Table(df_updated).copy_metadata(df)
     else:
-        return df_updated  # type: ignore
+        return df_updated  # ty: ignore
 
 
 def harmonize_countries(
@@ -559,7 +581,7 @@ def harmonize_countries(
 
     df_harmonized[country_col] = country_harmonized
 
-    return df_harmonized  # type: ignore
+    return df_harmonized  # ty: ignore
 
 
 def _add_population_to_dataframe(
@@ -647,7 +669,7 @@ def _add_population_to_dataframe(
             pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, year_col])
         )
 
-        population = population.groupby(country_col).transform(
+        population = population.groupby(country_col).transform(  # ty: ignore[call-non-callable]
             lambda x: x.interpolate(method="linear", limit_direction="both")
         )
 
@@ -706,7 +728,7 @@ def interpolate_table(
             return group
 
         # Apply the reindexing to each group
-        df = df.groupby(country_col).apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])  # type: ignore
+        df = df.groupby(country_col).apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])  # ty: ignore
     else:
         # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
         # Optionally fill missing years linearly.
@@ -717,16 +739,16 @@ def interpolate_table(
         else:
             years_in_data = df[time_col].unique()
         # Reindex
-        df = (  # type: ignore[assignment]
+        df = (  # ty: ignore[invalid-assignment]
             df.set_index([country_col, time_col])
-            .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col]))  # type: ignore
+            .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col]))  # ty: ignore
             .sort_index()
         )
 
     # Interpolate
-    df = (  # type: ignore[assignment]
+    df = (  # ty: ignore[invalid-assignment]
         df.groupby(country_col)
-        .transform(lambda x: x.interpolate(method="linear", limit_direction="both"))  # type: ignore
+        .transform(lambda x: x.interpolate(method="linear", limit_direction="both"))  # ty: ignore
         .reset_index()
     )
 
@@ -1033,7 +1055,7 @@ def list_members_of_region(
 
         # Create a dataframe of countries in each income group.
         tb_countries_in_income_group = (
-            tb_income.rename(columns={"classification": "region", "country": "members"})  # type: ignore
+            tb_income.rename(columns={"classification": "region", "country": "members"})  # ty: ignore
             .groupby("region", as_index=True, observed=True)
             .agg({"members": list})
         )
@@ -1129,7 +1151,7 @@ def detect_overlapping_regions(
     # List all variables in data (ignoring index columns).
     variables = [column for column in df.columns if column not in index_columns]
     # List all country names found in data.
-    countries_in_data = set(df[country_col].unique().tolist())  # type: ignore
+    countries_in_data = set(df[country_col].unique().tolist())  # ty: ignore
     # List all regions found in data.
     # TODO: Possible overlaps in custom regions are not considered here. I think it would be simple enough to include
     #   here custom regions and check for overlaps.
@@ -1155,7 +1177,7 @@ def detect_overlapping_regions(
             # Concatenate both selections of data, and select duplicated rows.
             combined = pd.concat([region_values, member_values])
             # Option 1: Check if there is an overlap on the same year (even if not on the same variable).
-            # overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
+            # overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # ty: ignore
             # Option 2: Check if there is an overlap on the same year and on the same variable.
             # Count how many non-nan values are present for each year, among the two countries considered.
             counts = combined.drop(columns=country_col).groupby(year_col, as_index=True, observed=True).count()
@@ -1440,7 +1462,7 @@ def add_regions_to_table(
         # TODO: Add entry to processing log.
         return Table(df_with_regions).copy_metadata(tb)
     else:
-        return df_with_regions  # type: ignore
+        return df_with_regions  # ty: ignore
 
 
 def fill_date_gaps(tb: Table) -> Table:
@@ -1471,7 +1493,9 @@ def make_table_population_daily(ds_population: Dataset, year_min: int, year_max:
     # Filter only years of interest
     population = population[(population["year"] >= year_min) & (population["year"] <= year_max)]
     # Create date column
-    population["date"] = pd.to_datetime(population["year"].astype("string") + "-07-01")
+    population["date"] = pd.to_datetime(
+        population["year"].astype("string") + "-07-01"  # ty: ignore[unsupported-operator]
+    )
     # Keep relevant columns
     population = population.loc[:, ["date", "country", "population"]]
     # Add missing dates
@@ -1498,9 +1522,9 @@ def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: s
     # Check countries that went missing
     if missing_countries is not None:
         countries_missing = countries_start - countries_end
-        assert (
-            countries_missing == missing_countries
-        ), f"Missing countries don't match the expected! {countries_missing}"
+        assert countries_missing == missing_countries, (
+            f"Missing countries don't match the expected! {countries_missing}"
+        )
 
     return tb
 
@@ -1718,21 +1742,21 @@ class Regions:
     def tb_income_groups(self) -> Table:
         """Table of the income groups dataset that contains income groups classification over the years (not just the latest classification)."""
         if self._tb_income_groups is None:
-            self._tb_income_groups = self.ds_income_groups.read("income_groups")  # type: ignore
+            self._tb_income_groups = self.ds_income_groups.read("income_groups")  # ty: ignore
         return self._tb_income_groups
 
     @property
     def tb_income_groups_latest(self) -> Table:
         """Table of the income groups dataset that contains the latest income groups classification."""
         if self._tb_income_groups_latest is None:
-            self._tb_income_groups_latest = self.ds_income_groups.read("income_groups_latest")  # type: ignore
+            self._tb_income_groups_latest = self.ds_income_groups.read("income_groups_latest")  # ty: ignore
         return self._tb_income_groups_latest
 
     @property
     def tb_population(self) -> Table:
         """Main table from the population dataset."""
         if self._tb_population is None:
-            self._tb_population = self.ds_population.read("population")  # type: ignore
+            self._tb_population = self.ds_population.read("population")  # ty: ignore
         return self._tb_population
 
     def get_region(self, name: str, **kwargs) -> dict:
@@ -1755,7 +1779,7 @@ class Regions:
                 region_dict = {column: None for column in self.tb_regions.columns}
                 # Fill with some information.
                 region_dict.update(
-                    {  # type: ignore
+                    {  # ty: ignore
                         "code": INCOME_GROUPS_ENTITY_CODES[name],
                         "name": name,
                         "region_type": "income_group",
@@ -1774,7 +1798,7 @@ class Regions:
             # For now, use the existing function to extract members (as well as successors, for historical regions, and related countries like overseas territories), which has some additional logic.
             subregion_types: list[SubregionType] = ["members", "successors", "related"]
             for subregion_type in subregion_types:
-                region_dict[subregion_type] = list_members_of_region(  # type: ignore
+                region_dict[subregion_type] = list_members_of_region(  # ty: ignore
                     region=name,
                     ds_regions=self.ds_regions,
                     # Load income groups only if necessary (and raise an error if not among dependencies).
@@ -1785,7 +1809,7 @@ class Regions:
                     **kwargs,
                 )
 
-            self._region_cache[name] = region_dict
+            self._region_cache[name] = region_dict  # ty: ignore[invalid-assignment]
         return self._region_cache[name]
 
     def get_regions(
@@ -1858,20 +1882,27 @@ class Regions:
         warn_on_unused_countries: bool = True,
         warn_on_unknown_excluded_countries: bool = True,
         show_full_warning: bool = True,
+        countries_file: Path | str | None = None,
+        excluded_countries_file: Path | str | None = None,
     ) -> Table:
         """Harmonize country names in a table using the countries mapping file."""
-        if self.countries_file is None:
+        if countries_file is None:
+            countries_file = self.countries_file
+        if excluded_countries_file is None:
+            excluded_countries_file = self.excluded_countries_file
+
+        if countries_file is None:
             raise ValueError("The countries_file argument must be defined to use harmonize_countries")
 
-        if not Path(self.countries_file).exists():
+        if not Path(countries_file).exists():
             raise ValueError(
                 "A country mapping must exist before using regions.harmonize_countries. Use regions.harmonizer first."
             )
 
         return harmonize_countries(
             df=tb,
-            countries_file=self.countries_file,
-            excluded_countries_file=self.excluded_countries_file,
+            countries_file=countries_file,
+            excluded_countries_file=excluded_countries_file,
             country_col=country_col,
             warn_on_missing_countries=warn_on_missing_countries,
             make_missing_countries_nan=make_missing_countries_nan,
@@ -1934,7 +1965,7 @@ class Regions:
         """
         tb_with_population = add_population_to_table(
             tb=tb,
-            ds_population=self.ds_population,  # type: ignore
+            ds_population=self.ds_population,  # ty: ignore
             country_col=country_col,
             year_col=year_col,
             population_col=population_col,
@@ -1964,6 +1995,8 @@ class Regions:
         ignore_overlaps_of_zeros: bool = False,
         subregion_type: SubregionType = "successors",
         countries_that_must_have_data: dict[str, list[str]] | None = None,
+        min_num_countries_informed: int | None = None,
+        min_frac_countries_informed: float | None = None,
     ) -> Table:
         """Add region aggregates to a table.
 
@@ -1983,8 +2016,65 @@ class Regions:
             Name of the year column.
         population_col : str
             Name of the population column.
-
-        All other parameters are passed through to RegionAggregator.add_aggregates().
+        num_allowed_nans_per_year : Optional[int], default: None
+            * If a number is passed, this is the maximum number of nans that can be present in a particular variable and
+            year. If that number of nans is exceeded, the aggregate will be nan.
+            * If None, an aggregate is constructed regardless of the number of nans.
+        frac_allowed_nans_per_year : Optional[float], default: None
+            * If a number is passed, this is the maximum fraction of nans that can be present in a particular variable and
+            year. If that fraction of nans is exceeded, the aggregate will be nan.
+            * If None, an aggregate is constructed regardless of the fraction of nans.
+        min_num_values_per_year : Optional[int], default: None
+            * If a number is passed, this is the minimum number of valid (not-nan) values that must be present in a
+            particular variable and year grouped. If that number of values is not reached, the aggregate will be nan.
+            However, if all values in the group are valid, the aggregate will also be valid, even if the number of values
+            in the group is smaller than min_num_values_per_year.
+            * If None, an aggregate is constructed regardless of the number of non-nan values.
+        check_for_region_overlaps : bool, default: True
+            * If True, a warning is raised if a historical region has data on the same year as any of its successors.
+            * If False, any possible overlap is ignored.
+        accepted_overlaps : Optional[list[dict[int, set[str]]]], default: None
+            Only relevant if check_for_region_overlaps is True.
+            * If a dictionary is passed, it must contain years as keys, and sets of overlapping countries as values.
+            This is used to avoid warnings when there are known overlaps in the data that are accepted.
+            Note that, if the overlaps passed here are not present in the data, a warning is also raised.
+            Example: [{1991: {"Georgia", "USSR"}}, {2000: {"Some region", "Some overlapping region"}}]
+            * If None, any possible overlap in the data will raise a warning.
+        ignore_overlaps_of_zeros : bool, default: False
+            Only relevant if check_for_region_overlaps is True.
+            * If True, overlaps of values of zero are ignored. In other words, if a region and one of its successors have
+            both data on the same year, and that data is zero for both, no warning is raised.
+            * If False, overlaps of values of zero are not ignored.
+        subregion_type : SubregionType, default: "successors"
+            Only relevant if check_for_region_overlaps is True.
+            * If "successors", the function will look for overlaps between historical regions and their successors.
+            * If "related", the function will look for overlaps between regions and their possibly related members (e.g.
+            overseas territories).
+        countries_that_must_have_data : Optional[dict[str, list[str]]], default: None
+            * If a dictionary is passed, each key must be a valid region, and the value should be a list of countries that
+            must have data for that region. If any of those countries is not informed on a particular variable and year,
+            that region will have nan for that particular variable and year.
+            * If a list of countries is passed, it will be automatically converted to a dictionary by mapping each of those countries to the regions that contain it.
+            * If None, an aggregate is constructed regardless of the countries missing.
+            NOTE: It is safer to list **countries** that must have data (e.g. {"World": ["China"]}), instead of aggregate regions (e.g. {"World": ["Asia"}). The condition will only work as expected if those countries/regions that must have data existed already in the original data.
+        min_num_countries_informed : Optional[int | dict[str, int]], default: None
+            * If an int is passed, this is the minimum number of countries that must have data (not-nan) in a particular
+            variable, region and year (same threshold for all regions). If that number is not reached, the aggregate will be nan.
+            * If a dict is passed, it maps region names to minimum country counts (e.g., {"Europe": 10, "Africa": 20}).
+            Regions not in the dict will not have this constraint applied.
+            * If None, an aggregate is constructed regardless of the number of countries informed.
+            * This condition is applied after the aggregation, and works together with min_frac_countries_informed (both must be met).
+        min_frac_countries_informed : Optional[float | dict[str, float]], default: None
+            * If a float is passed (between 0 and 1), this is the minimum fraction of countries (relative to the total
+            number of unique countries that have ever had data for this variable in this region across all years) that must
+            have data in a particular variable, region and year (same threshold for all regions). If that fraction is not reached, the aggregate will be nan.
+            * If a dict is passed, it maps region names to minimum fractions (e.g., {"Europe": 0.5, "Africa": 0.3}).
+            Regions not in the dict will not have this constraint applied.
+            * If None, an aggregate is constructed regardless of the fraction of countries informed.
+            * This condition is applied after the aggregation, and works together with min_num_countries_informed (both must be met).
+            Example: If 30 unique countries in Europe have ever reported data for a given indicator (across all years),
+            and min_frac_countries_informed=0.5, then at least 15 countries must have data in any given year, otherwise
+            the aggregate for indicator and that year is nan.
 
         Returns
         -------
@@ -2010,6 +2100,8 @@ class Regions:
             ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
             subregion_type=subregion_type,
             countries_that_must_have_data=countries_that_must_have_data,
+            min_num_countries_informed=min_num_countries_informed,
+            min_frac_countries_informed=min_frac_countries_informed,
         )
 
     def add_per_capita(
@@ -2219,7 +2311,7 @@ class RegionAggregator:
         self._ds_regions = ds_regions
         self._ds_income_groups = ds_income_groups
         self._ds_population = ds_population
-        self.aggregations = aggregations  # type: ignore
+        self.aggregations = aggregations  # ty: ignore
         self.country_col = country_col
         self.year_col = year_col
         self.population_col = population_col
@@ -2438,52 +2530,195 @@ class RegionAggregator:
 
         return df_with_regions
 
-    def _impose_countries_that_must_have_data(self, df_only_regions, columns, countries_that_must_have_data):
-        # Convert list to dict by mapping countries to their regions.
-        if isinstance(countries_that_must_have_data, list):
-            requested = set(countries_that_must_have_data)
-            countries_that_must_have_data = {
-                region: [c for c in requested if c in members]
-                for region, members in self.regions_members.items()
-                if region in self.regions
-            }
-            # Check for unknown countries in list format.
-            if unknown := requested - {c for countries in countries_that_must_have_data.values() for c in countries}:
-                raise ValueError(
-                    f"Countries {unknown} are not members of any of the specified regions {list(self.regions)}"
-                )
-        # Validate all countries in dict format belong to their specified regions.
-        else:
-            for region, countries in countries_that_must_have_data.items():
-                if unknown := set(countries) - set(self.regions_members.get(region, [])):
-                    raise ValueError(f"Countries {unknown} are not members of region {region}")
+    def _impose_country_conditions(
+        self,
+        df_only_regions,
+        columns,
+        countries_that_must_have_data: dict[str, list[str]] | list[str] | None = None,
+        min_num_countries_informed: int | dict[str, int] | None = None,
+        min_frac_countries_informed: float | dict[str, float] | None = None,
+    ):
+        """Impose country-based conditions on region aggregates.
+
+        This function modifies df_only_regions in-place, setting aggregate values to NaN
+        when country coverage conditions are not met.
+
+        Parameters
+        ----------
+        df_only_regions : DataFrame
+            DataFrame containing only region aggregates.
+        columns : list
+            List of column names to apply conditions to.
+        countries_that_must_have_data : dict | list | None
+            Specific countries that must have data for the aggregate to be valid.
+        min_num_countries_informed : int | dict[str, int] | None
+            Minimum number of countries that must have data. Can be an int (same for all regions)
+            or a dict mapping region names to minimum counts.
+        min_frac_countries_informed : float | dict[str, float] | None
+            Minimum fraction of countries (among those ever informed for a given variable) that must have data.
+            Can be a float (same for all regions) or a dict mapping region names to minimum fractions.
+        """
+        # If no conditions specified, return early.
+        if (
+            countries_that_must_have_data is None
+            and min_num_countries_informed is None
+            and min_frac_countries_informed is None
+        ):
+            return
+
         # List all index columns except the country column.
         other_index_columns = [column for column in self.index_columns if column != self.country_col]
-        for column in columns:
-            for region, required_countries in countries_that_must_have_data.items():
-                if df_only_regions[df_only_regions[self.country_col] == region].empty:
+
+        # Handle countries_that_must_have_data conditions.
+        if countries_that_must_have_data is not None:
+            # Convert list to dict by mapping countries to their regions.
+            if isinstance(countries_that_must_have_data, list):
+                requested = set(countries_that_must_have_data)
+                countries_that_must_have_data = {
+                    region: [c for c in requested if c in members]
+                    for region, members in self.regions_members.items()
+                    if region in self.regions
+                }
+                # Check for unknown countries in list format.
+                if unknown := requested - {
+                    c for countries in countries_that_must_have_data.values() for c in countries
+                }:
+                    raise ValueError(
+                        f"Countries {unknown} are not members of any of the specified regions {list(self.regions)}"
+                    )
+            # Validate all countries in dict format belong to their specified regions.
+            else:
+                for region, countries in countries_that_must_have_data.items():
+                    if unknown := set(countries) - set(self.regions_members.get(region, [])):
+                        raise ValueError(f"Countries {unknown} are not members of region {region}")
+
+            # Apply specific country requirements.
+            for column in columns:
+                for region, required_countries in countries_that_must_have_data.items():
+                    if df_only_regions[df_only_regions[self.country_col] == region].empty:
+                        continue
+                    # Within each group check if all required countries have data for this column.
+                    # This ensures all groupings appear in the result, even if no country has data.
+                    df_covered = (
+                        self.tb_coverage[self.index_columns]  # ty: ignore
+                        .groupby(other_index_columns, as_index=False)
+                        .agg(
+                            {
+                                self.country_col: lambda x: (
+                                    set(required_countries) <= set(x[self.tb_coverage.loc[x.index, column]])  # ty: ignore[unresolved-attribute]
+                                )  # ty: ignore
+                            }
+                        )  # ty: ignore
+                    )
+                    groupings_to_nan = df_covered[~df_covered[self.country_col]][other_index_columns]
+                    # Set region aggregate to NaN for those groupings.
+                    df_only_regions.loc[
+                        (df_only_regions[self.country_col] == region)
+                        & df_only_regions[other_index_columns]
+                        .apply(tuple, axis=1)
+                        .isin(groupings_to_nan.apply(tuple, axis=1)),
+                        column,
+                    ] = np.nan
+
+        # Handle minimum country count conditions.
+        if min_num_countries_informed is not None or min_frac_countries_informed is not None:
+            # Convert int/float to dict (same threshold for all regions).
+            if isinstance(min_num_countries_informed, int):
+                min_num_countries_informed = {region: min_num_countries_informed for region in self.regions}
+            if isinstance(min_frac_countries_informed, float):
+                min_frac_countries_informed = {region: min_frac_countries_informed for region in self.regions}
+
+            # Count countries with data for each region, column, and grouping.
+            for column in columns:
+                if column not in df_only_regions.columns:
                     continue
-                # Within each group check if all required countries have data for this column.
-                # This ensures all groupings appear in the result, even if no country has data.
-                df_covered = (
-                    self.tb_coverage[self.index_columns]  # type: ignore
-                    .groupby(other_index_columns, as_index=False)
-                    .agg(
-                        {
-                            self.country_col: lambda x: set(required_countries)
-                            <= set(x[self.tb_coverage.loc[x.index, column]])  # type: ignore
-                        }
-                    )  # type: ignore
-                )
-                groupings_to_nan = df_covered[~df_covered[self.country_col]][other_index_columns]
-                # Set region aggregate to NaN for those groupings
-                df_only_regions.loc[
-                    (df_only_regions[self.country_col] == region)
-                    & df_only_regions[other_index_columns]
-                    .apply(tuple, axis=1)
-                    .isin(groupings_to_nan.apply(tuple, axis=1)),
-                    column,
-                ] = np.nan
+
+                # For each region, calculate country counts.
+                for region in self.regions:
+                    if df_only_regions[df_only_regions[self.country_col] == region].empty:
+                        continue
+
+                    # Get coverage data for this region.
+                    region_coverage = self.tb_coverage[  # ty: ignore
+                        self.tb_coverage[self.country_col].isin(self.regions_members[region])  # ty: ignore
+                    ]
+
+                    if region_coverage.empty:
+                        continue
+
+                    # Count how many countries have data for each grouping.
+                    df_country_counts = region_coverage.groupby(other_index_columns)[column].sum().reset_index()
+                    df_country_counts = df_country_counts.rename(columns={column: f"{column}_count"})
+
+                    # Calculate historical maximum per grouping (excluding year).
+                    grouping_columns = [col for col in other_index_columns if col != self.year_col]
+
+                    if grouping_columns:
+                        # Calculate historical max per grouping (e.g., per variable/unit/category).
+                        # This is the maximum number of countries that have ever reported for each specific combination.
+                        df_historical_max = (
+                            region_coverage[region_coverage[column] == 1]
+                            .groupby(grouping_columns)[self.country_col]
+                            .nunique()
+                            .reset_index()
+                            .rename(columns={self.country_col: f"{column}_historical_max"})
+                        )
+                    else:
+                        # If there are no grouping columns (only country and year), calculate a single global historical max.
+                        historical_max_value = region_coverage[region_coverage[column] == 1][self.country_col].nunique()
+                        df_historical_max = pd.DataFrame({f"{column}_historical_max": [historical_max_value]})
+
+                    # Merge counts with region data.
+                    df_region_subset = df_only_regions[df_only_regions[self.country_col] == region].copy()
+
+                    if df_region_subset.empty:
+                        continue
+
+                    # Store original index before merging to preserve index correspondence
+                    df_region_subset = df_region_subset.reset_index(drop=False)
+                    df_region_subset = df_region_subset.rename(columns={"index": "original_index"})
+                    df_region_subset = df_region_subset.merge(df_country_counts, on=other_index_columns, how="left")
+
+                    # Merge historical max data.
+                    if grouping_columns:
+                        df_region_subset = df_region_subset.merge(df_historical_max, on=grouping_columns, how="left")
+                    else:
+                        # For the case with no grouping columns, add as a constant column.
+                        df_region_subset[f"{column}_historical_max"] = df_historical_max.iloc[0][
+                            f"{column}_historical_max"
+                        ]
+
+                    # Build mask for rows that don't meet conditions.
+                    mask_to_nan = pd.Series([False] * len(df_region_subset), index=df_region_subset.index)
+
+                    # Apply absolute minimum if specified for this region.
+                    if min_num_countries_informed is not None:
+                        if isinstance(min_num_countries_informed, dict) and region in min_num_countries_informed:
+                            mask_to_nan |= df_region_subset[f"{column}_count"] < min_num_countries_informed[region]
+                        elif not isinstance(min_num_countries_informed, dict):
+                            mask_to_nan |= df_region_subset[f"{column}_count"] < min_num_countries_informed
+
+                    # Apply fraction minimum if specified for this region.
+                    if min_frac_countries_informed is not None:
+                        # Use per-row historical_max instead of global value.
+                        historical_max_col = df_region_subset[f"{column}_historical_max"]
+                        # Only apply threshold where historical_max > 0.
+                        if isinstance(min_frac_countries_informed, dict) and region in min_frac_countries_informed:
+                            min_countries_required = min_frac_countries_informed[region] * historical_max_col
+                        elif not isinstance(min_frac_countries_informed, dict):
+                            min_countries_required = min_frac_countries_informed * historical_max_col
+                        else:
+                            # Region not in dict, skip this region
+                            min_countries_required = None
+                        if min_countries_required is not None:
+                            mask_to_nan |= (df_region_subset[f"{column}_count"] < min_countries_required) & (
+                                historical_max_col > 0
+                            )
+
+                    # Set values to NaN where conditions are not met.
+                    # Use the original indices that we stored before merging to avoid index mismatch.
+                    original_indices_to_nan = df_region_subset[mask_to_nan]["original_index"].values
+                    df_only_regions.loc[original_indices_to_nan, column] = np.nan
 
     def add_aggregates(
         self,
@@ -2491,6 +2726,8 @@ class RegionAggregator:
         num_allowed_nans_per_year: int | None = None,
         frac_allowed_nans_per_year: float | None = None,
         min_num_values_per_year: int | None = None,
+        min_num_countries_informed: int | dict[str, int] | None = None,
+        min_frac_countries_informed: float | dict[str, float] | None = None,
         check_for_region_overlaps: bool = True,
         accepted_overlaps: list[dict[int, set[str]]] | None = None,
         ignore_overlaps_of_zeros: bool = False,
@@ -2549,6 +2786,24 @@ class RegionAggregator:
             * If a list of countries is passed, it will be automatically converted to a dictionary by mapping each of those countries to the regions that contain it.
             * If None, an aggregate is constructed regardless of the countries missing.
             NOTE: It is safer to list **countries** that must have data (e.g. {"World": ["China"]}), instead of aggregate regions (e.g. {"World": ["Asia"}). The condition will only work as expected if those countries/regions that must have data existed already in the original data.
+        min_num_countries_informed : Optional[int | dict[str, int]], default: None
+            * If an int is passed, this is the minimum number of countries that must have data (not-nan) in a particular
+            variable, region and year (same threshold for all regions). If that number is not reached, the aggregate will be nan.
+            * If a dict is passed, it maps region names to minimum country counts (e.g., {"Europe": 10, "Africa": 20}).
+            Regions not in the dict will not have this constraint applied.
+            * If None, an aggregate is constructed regardless of the number of countries informed.
+            * This condition is applied after the aggregation, and works together with min_frac_countries_informed (both must be met).
+        min_frac_countries_informed : Optional[float | dict[str, float]], default: None
+            * If a float is passed (between 0 and 1), this is the minimum fraction of countries (relative to the total
+            number of unique countries that have ever had data for this variable in this region across all years) that must
+            have data in a particular variable, region and year (same threshold for all regions). If that fraction is not reached, the aggregate will be nan.
+            * If a dict is passed, it maps region names to minimum fractions (e.g., {"Europe": 0.5, "Africa": 0.3}).
+            Regions not in the dict will not have this constraint applied.
+            * If None, an aggregate is constructed regardless of the fraction of countries informed.
+            * This condition is applied after the aggregation, and works together with min_num_countries_informed (both must be met).
+            Example: If 30 unique countries in Europe have ever reported data for a given indicator (across all years),
+            and min_frac_countries_informed=0.5, then at least 15 countries must have data in any given year, otherwise
+            the aggregate for indicator and that year is nan.
 
         Returns
         -------
@@ -2572,7 +2827,7 @@ class RegionAggregator:
                 if weight_col == self.population_col and weight_col not in tb.columns:
                     tb = add_population_to_table(
                         tb=tb,
-                        ds_population=self.ds_population,  # type: ignore
+                        ds_population=self.ds_population,  # ty: ignore
                         country_col=self.country_col,
                         year_col=self.year_col,
                         population_col=self.population_col,
@@ -2594,7 +2849,7 @@ class RegionAggregator:
                 subregion_type=subregion_type,
             )
 
-        # Create region aggregates on fast subset
+        # Create region aggregates on fast subset.
         df_only_regions = self._create_table_of_only_region_aggregates(
             tb=tb_fast,
             regions=list(self.regions),
@@ -2604,13 +2859,20 @@ class RegionAggregator:
             min_num_values_per_year=min_num_values_per_year,
         )
 
-        if countries_that_must_have_data is not None:
+        # Apply country-based conditions if any are specified.
+        if (
+            countries_that_must_have_data is not None
+            or min_num_countries_informed is not None
+            or min_frac_countries_informed is not None
+        ):
             if self.tb_coverage is None:
                 self._create_coverage_table(tb=tb_fast)
-            self._impose_countries_that_must_have_data(
+            self._impose_country_conditions(
                 df_only_regions=df_only_regions,
                 columns=columns,
                 countries_that_must_have_data=countries_that_must_have_data,
+                min_num_countries_informed=min_num_countries_informed,
+                min_frac_countries_informed=min_frac_countries_informed,
             )
 
         # Create a mask that selects rows of regions in the original data, if any.
@@ -2626,7 +2888,7 @@ class RegionAggregator:
         df_no_regions = tb[~_select_regions]
 
         # Combine the table with only regions and the table with no regions.
-        df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # type: ignore
+        df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # ty: ignore
 
         # Final sort and column ordering.
         df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)[tb.columns]
@@ -2708,7 +2970,7 @@ class RegionAggregator:
         if not was_population_in_table:
             tb_result = add_population_to_table(
                 tb=tb,
-                ds_population=self.ds_population,  # type: ignore
+                ds_population=self.ds_population,  # ty: ignore
                 country_col=self.country_col,
                 year_col=self.year_col,
                 population_col=self.population_col,
@@ -2725,7 +2987,7 @@ class RegionAggregator:
             if self.tb_coverage is None:
                 self._create_coverage_table(tb=tb_result)
             # Create an auxiliary table of informed population. For a given column, each row contains the population of the corresponding region on the corresponding year, or a zero, if that column-row was originally nan.
-            tb_population_informed = self.tb_coverage[self.index_columns + columns].copy()  # type: ignore
+            tb_population_informed = self.tb_coverage[self.index_columns + columns].copy()  # ty: ignore
             tb_population_informed[columns] = tb_population_informed[columns].multiply(
                 tb_result[self.population_col], axis=0
             )

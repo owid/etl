@@ -10,10 +10,11 @@ import re
 import subprocess
 import time
 from collections import OrderedDict
+from collections.abc import Generator
 from functools import cache
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union, cast, overload
+from typing import Any, TextIO, cast, overload
 from urllib.parse import urljoin
 
 import jsonref
@@ -34,8 +35,8 @@ log = structlog.get_logger()
 class RuntimeCache:
     """Runtime cache, we need locks because we usually run it in threads."""
 
-    _cache: Dict[str, str]
-    _locks: Dict[str, Lock]
+    _cache: dict[str, str]
+    _locks: dict[str, Lock]
 
     def __init__(self):
         self._cache = {}
@@ -67,12 +68,12 @@ def checksum_str(s: str) -> str:
     return hashlib.md5(s.encode()).hexdigest()
 
 
-def checksum_dict(d: Dict[str, Any]) -> str:
+def checksum_dict(d: dict[str, Any]) -> str:
     "Return the md5 hex digest of the dictionary."
     return checksum_str(json.dumps(d, default=str))
 
 
-def checksum_file_nocache(filename: Union[str, Path]) -> str:
+def checksum_file_nocache(filename: str | Path) -> str:
     """Return the md5 hex digest of the file without using cache.
 
     Python 3.11 has a built-in function for this. It could be rewritten as
@@ -92,7 +93,7 @@ def checksum_file_nocache(filename: Union[str, Path]) -> str:
     return _hash.hexdigest()
 
 
-def checksum_file(filename: Union[str, Path]) -> str:
+def checksum_file(filename: str | Path) -> str:
     "Return the md5 hex digest of the file contents."
     if isinstance(filename, Path):
         filename = filename.as_posix()
@@ -103,7 +104,7 @@ def checksum_file(filename: Union[str, Path]) -> str:
     if filename not in CACHE_CHECKSUM_FILE:
         # Special case for regions.yml, we want to ignore the 'aliases' key
         if os.path.basename(filename) == "regions.yml":
-            with open(filename, "r") as f:
+            with open(filename) as f:
                 s = f.read()
 
             # Regular expression to match the 'aliases' and its list
@@ -126,7 +127,7 @@ def checksum_df(df: pd.DataFrame, index=True) -> str:
     return hashlib.md5(pd.util.hash_pandas_object(df, index=index).values).hexdigest()
 
 
-def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}) -> List[Path]:
+def walk(folder: Path, ignore_set: set[str] = {"__pycache__", ".ipynb_checkpoints"}) -> list[Path]:
     paths = []
     for p in folder.iterdir():
         if p.is_dir():
@@ -141,7 +142,7 @@ def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoint
 
 class _MyDumper(Dumper):
     def increase_indent(self, flow=False, indentless=False):
-        return super(_MyDumper, self).increase_indent(flow, False)
+        return super().increase_indent(flow, False)
 
 
 def _str_presenter(dumper: Any, data: Any) -> Any:
@@ -165,7 +166,7 @@ _MyDumper.add_representer(
 
 @overload
 def yaml_dump(
-    d: Dict[str, Any],
+    d: dict[str, Any],
     stream: None = None,
     strip_lines: bool = True,
     replace_confusing_ascii: bool = False,
@@ -175,17 +176,17 @@ def yaml_dump(
 
 @overload
 def yaml_dump(
-    d: Dict[str, Any], stream: TextIO, strip_lines: bool = True, replace_confusing_ascii: bool = False, width: int = 120
+    d: dict[str, Any], stream: TextIO, strip_lines: bool = True, replace_confusing_ascii: bool = False, width: int = 120
 ) -> None: ...
 
 
 def yaml_dump(
-    d: Dict[str, Any],
-    stream: Optional[TextIO] = None,
+    d: dict[str, Any],
+    stream: TextIO | None = None,
     strip_lines: bool = True,
     replace_confusing_ascii: bool = False,
     width: int = 120,
-) -> Optional[str]:
+) -> str | None:
     """Alternative to yaml.dump which produces good looking multi-line strings and perserves ordering
     of keys. If strip_lines is True, all lines in the string will be stripped and all tabs will be
     replaced by two spaces."""
@@ -210,23 +211,25 @@ def yaml_dump(
     return s
 
 
-def yaml_load(f: io.TextIOWrapper) -> Dict[str, Any]:
+def yaml_load(f: io.TextIOWrapper) -> dict[str, Any]:
     return yaml.safe_load(f)
 
 
-def ruamel_dump(d: Dict[str, Any]) -> str:
+def ruamel_dump(d: dict[str, Any]) -> str:
     """Dump dictionary with a consistent style using ruamel.yaml."""
     yml = ruamel.yaml.YAML()
     yml.indent(mapping=2, sequence=4, offset=2)
     # prevent line-wrap
     yml.width = 4096
+    # prevent block key syntax (? key) for long mapping keys
+    yml.emitter.MAX_SIMPLE_KEY_LENGTH = 4096
 
     stream = io.StringIO()
     yml.dump(d, stream)
     return stream.getvalue()
 
 
-def ruamel_load(f: io.TextIOWrapper) -> Dict[str, Any]:
+def ruamel_load(f: io.TextIOWrapper) -> dict[str, Any]:
     yaml = YAML(typ="rt")  # Create a YAML object with round-trip type
     yaml.preserve_quotes = True
     return yaml.load(f)  # Load the content using the new API
@@ -253,7 +256,7 @@ def _strip_lines_in_dict(d: Any) -> Any:
         return d
 
 
-def apply_ruff_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
+def apply_ruff_formatter_to_files(file_paths: list[str | Path]) -> None:
     """Apply ruff formatter to a list of files.
 
     Parameters
@@ -275,7 +278,7 @@ def apply_ruff_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
     )
 
 
-def _mtime_mapping(path: Path) -> Dict[Path, float]:
+def _mtime_mapping(path: Path) -> dict[Path, float]:
     return {f: f.stat().st_mtime for f in path.rglob("*") if f.is_file() and "__pycache__" not in f.parts}
 
 
@@ -397,7 +400,7 @@ def run_command_on_server(
         raise RuntimeError(f"Failed to execute command on {ssh_target}:\n{e.stderr}") from e
 
 
-def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
+def read_json_schema(path: Path | str) -> dict[str, Any]:
     """Read JSON schema with resolved references."""
     path = Path(path)
 
@@ -406,14 +409,14 @@ def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
     base_file_url = urljoin(base_dir_url, path.name)
     with path.open("r") as f:
         dix = jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
-        return cast(Dict[str, Any], dix)
+        return cast(dict[str, Any], dix)
 
 
 @cache
 def get_schema_from_url(schema_url: str) -> dict:
     """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
 
-    https://files.ourworldindata.org/schemas/grapher-schema.009.json
+    https://files.ourworldindata.org/schemas/grapher-schema.010.json
 
     More details on available versions can be found
     at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema

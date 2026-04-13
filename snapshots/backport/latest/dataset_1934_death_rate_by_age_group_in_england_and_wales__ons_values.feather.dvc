@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/1934
-    date_accessed: 2023-08-10 07:43:31.964483
+    url: https://admin.owid.io/admin/datasets/1934
+    date_accessed: 2026-03-05 11:04:00.319172+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Death rate by age group in England and Wales - ONS
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 46c3dc6fd1d947b835070e3282fa963b
-  size: 7386
-  path: dataset_1934_death_rate_by_age_group_in_england_and_wales__ons_values.feather
+  - md5: b52c531611664fba266037c2b669b864
+    size: 7410
+    path: dataset_1934_death_rate_by_age_group_in_england_and_wales__ons_values.feather

@@ -1,0 +1,29 @@
+dataset:
+  title: Transport and communication costs, OECD Economic Outlook (2007)
+tables:
+  transport_and_communication_costs__oecd_economic_outlook__2007:
+    variables:
+      international_calling_costs__relative_to_1930__oecd_economic_outlook__2007:
+        title: International calling costs (relative to 1930) (OECD Economic Outlook (2007))
+        unit: '%'
+        short_unit: '%'
+        description: International calling costs relative to 1930
+      passenger_air_transport_cost__relative_to_1930__oecd_economic_outlook__2007:
+        title: Passenger air transport cost (relative to 1930) (OECD Economic Outlook (2007))
+        unit: '%'
+        short_unit: '%'
+        description: Passenger air transport cost relative to 1930.
+      sea_freight_cost__relative_to_1930__oecd_economic_outlook__2007:
+        title: Sea freight cost (relative to 1930) (OECD Economic Outlook (2007))
+        unit: '%'
+        short_unit: '%'
+        description: Sea freight cost, relative to 1930.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

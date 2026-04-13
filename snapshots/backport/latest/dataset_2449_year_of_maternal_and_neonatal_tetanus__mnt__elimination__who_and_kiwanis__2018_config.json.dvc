@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2449
-    date_accessed: 2023-08-10 07:48:00.190909
+    url: https://admin.owid.io/admin/datasets/2449
+    date_accessed: 2026-03-06 07:51:14.732958+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_2449_year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018
+  name: Grapher metadata for dataset_2449_year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c8deaafacd0a1eb4d9e8372162557527
-  size: 3713
-  path: 
-    dataset_2449_year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018_config.json
+  - md5: 279be091b20ce2b1d2956003df82e07f
+    size: 3843
+    path: dataset_2449_year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018_config.json

@@ -20,6 +20,10 @@ uv run python -m create_new_snapshots -r
 ```
 uv run python -m create_new_snapshots
 ```
+* To create new snapshots for all datasets, even if the source data was not updated:
+```
+uv run python -m create_new_snapshots -a
+```
 
 """
 
@@ -27,7 +31,7 @@ import argparse
 import datetime as dt
 import json
 import tempfile
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 import requests
 from dateutil import parser
@@ -51,7 +55,7 @@ from etl.snapshot import Snapshot, SnapshotMeta, snapshot_catalog
 class FAODataset:
     namespace: str = NAMESPACE
 
-    def __init__(self, dataset_metadata: Dict[str, Any]) -> None:
+    def __init__(self, dataset_metadata: dict[str, Any]) -> None:
         """[summary]
 
         Args:
@@ -60,7 +64,7 @@ class FAODataset:
         self._dataset_metadata = dataset_metadata
         self._dataset_server_metadata = self._load_dataset_server_metadata()
 
-    def _load_dataset_server_metadata(self) -> Dict[str, Any]:
+    def _load_dataset_server_metadata(self) -> dict[str, Any]:
         # Fetch only header of the dataset file on the server, which contains additional metadata, like last
         # modification date.
         head_request = requests.head(self.source_data_url)
@@ -102,7 +106,7 @@ class FAODataset:
         return self._dataset_metadata["FileLocation"]
 
     @property
-    def metadata(self) -> Dict[str, Any]:
+    def metadata(self) -> dict[str, Any]:
         """
         Snapshot-compatible view of this dataset's metadata.
 
@@ -161,7 +165,7 @@ class FAODataset:
         snap.create_snapshot(upload=True)
 
 
-def load_faostat_catalog() -> List[Dict[str, Any]]:
+def load_faostat_catalog() -> list[dict[str, Any]]:
     # Some of the texts returned have special characters that seem to require CP-1252 decoding.
     # datasets = requests.get(FAO_CATALOG_URL).json()["Datasets"]["Dataset"]
     datasets = json.loads(requests.get(FAO_CATALOG_URL).content.decode("utf-8"))["Datasets"]["Dataset"]
@@ -169,7 +173,7 @@ def load_faostat_catalog() -> List[Dict[str, Any]]:
 
 
 def is_dataset_already_up_to_date(
-    existing_snapshots: List[Snapshot], source_data_url: str, source_modification_date: dt.date
+    existing_snapshots: list[Snapshot], source_data_url: str, source_modification_date: dt.date
 ) -> bool:
     """Check if our latest snapshot for a particular domain dataset is already up-to-date.
 
@@ -211,7 +215,7 @@ class FAOAdditionalMetadata:
         self.faostat_metadata = None
 
     @property
-    def metadata(self) -> Dict[str, Any]:
+    def metadata(self) -> dict[str, Any]:
         return {
             "namespace": NAMESPACE,
             "short_name": f"{NAMESPACE}_metadata",
@@ -280,7 +284,7 @@ class FAOAdditionalMetadata:
             snap.create_snapshot(filename=f.name, upload=True)
 
 
-def main(read_only: bool = False) -> None:
+def main(read_only: bool = False, include_all_datasets: bool = False) -> None:
     # Load list of existing snapshots related to current NAMESPACE.
     existing_snapshots = [
         snapshot for snapshot in list(snapshot_catalog(match=NAMESPACE)) if "backport/" not in snapshot.uri
@@ -303,7 +307,7 @@ def main(read_only: bool = False) -> None:
         dataset_code = description["DatasetCode"].lower()
         if dataset_code in INCLUDED_DATASETS_CODES:
             faostat_dataset = FAODataset(description)
-            if is_dataset_already_up_to_date(
+            if not include_all_datasets and is_dataset_already_up_to_date(
                 existing_snapshots=existing_snapshots,
                 source_data_url=faostat_dataset.source_data_url,
                 source_modification_date=faostat_dataset.modification_date,
@@ -337,5 +341,12 @@ if __name__ == "__main__":
         action="store_true",
         help="If given, simply check for updates without creating snapshots.",
     )
+    argument_parser.add_argument(
+        "-a",
+        "--include_all_datasets",
+        default=False,
+        action="store_true",
+        help="If given, create snapshots for all datasets, even if the source data was not updated.",
+    )
     args = argument_parser.parse_args()
-    main(read_only=args.read_only)
+    main(read_only=args.read_only, include_all_datasets=args.include_all_datasets)

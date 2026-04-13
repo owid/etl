@@ -1,14 +1,15 @@
 """Input/Output functions for local files."""
 
 import json
+from collections.abc import Hashable
 from pathlib import Path
-from typing import Any, Hashable, List, Tuple, Union
+from typing import Any
 
 from owid.datautils.common import warn_on_list_of_entities
 from owid.datautils.decorators import enable_file_download
 
 
-def _load_json_data_and_duplicated_keys(ordered_pairs: List[Tuple[Hashable, Any]]) -> Any:
+def _load_json_data_and_duplicated_keys(ordered_pairs: list[tuple[Hashable, Any]]) -> Any:
     clean_dict = {}
     duplicated_keys = []
     for key, value in ordered_pairs:
@@ -26,7 +27,7 @@ def _load_json_data_and_duplicated_keys(ordered_pairs: List[Tuple[Hashable, Any]
 
 
 @enable_file_download(path_arg_name="json_file")
-def load_json(json_file: Union[str, Path], warn_on_duplicated_keys: bool = True) -> Any:
+def load_json(json_file: str | Path, warn_on_duplicated_keys: bool = True) -> Any:
     """Load data from JSON file with optional duplicate key detection.
 
     If the JSON file contains duplicated keys, a warning is optionally raised,
@@ -50,7 +51,7 @@ def load_json(json_file: Union[str, Path], warn_on_duplicated_keys: bool = True)
         data = load_json("data.json", warn_on_duplicated_keys=False)
         ```
     """
-    with open(json_file, "r") as _json_file:
+    with open(json_file) as _json_file:
         json_content = _json_file.read()
         if warn_on_duplicated_keys:
             data = json.loads(json_content, object_pairs_hook=_load_json_data_and_duplicated_keys)
@@ -60,7 +61,7 @@ def load_json(json_file: Union[str, Path], warn_on_duplicated_keys: bool = True)
     return data
 
 
-def save_json(data: Any, json_file: Union[str, Path], **kwargs: Any) -> None:
+def save_json(data: Any, json_file: str | Path, **kwargs: Any) -> None:
     """Save data to a JSON file.
 
     Args:

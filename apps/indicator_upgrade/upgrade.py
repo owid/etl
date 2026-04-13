@@ -1,7 +1,6 @@
 """CLI functions for upgrading indicators and charts."""
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict, List
 
 import click
 import pandas as pd
@@ -9,7 +8,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 import etl.grapher.model as gm
-from apps.chart_sync.admin_api import AdminAPI
+from apps.chart_sync.admin_api import AdminAPI, AdminAPIError
 from apps.wizard.utils.cached import get_grapher_user
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
@@ -27,7 +26,7 @@ DEFAULT_MAX_WORKERS = 5
 log = get_logger()
 
 
-def get_affected_charts_cli(indicator_mapping: Dict[int, int]) -> List[gm.Chart]:
+def get_affected_charts_cli(indicator_mapping: dict[int, int]) -> list[gm.Chart]:
     """Get affected charts for CLI (without Streamlit dependencies)."""
     log.info("Finding affected charts...")
     charts = find_charts_from_variable_ids(set(indicator_mapping.keys()))
@@ -36,7 +35,7 @@ def get_affected_charts_cli(indicator_mapping: Dict[int, int]) -> List[gm.Chart]
 
 
 def _update_single_chart(
-    chart: gm.Chart, indicator_mapping: Dict[int, int], api: AdminAPI, user_id: int | None = None
+    chart: gm.Chart, indicator_mapping: dict[int, int], api: AdminAPI, user_id: int | None = None
 ) -> int:
     """Update a single chart and return its ID."""
     # Update chart config
@@ -59,7 +58,7 @@ def _update_single_chart(
     return chart_id
 
 
-def get_affected_narrative_charts_cli(charts: List[gm.Chart]) -> List[gm.NarrativeChart]:
+def get_affected_narrative_charts_cli(charts: list[gm.Chart]) -> list[gm.NarrativeChart]:
     """Get affected narrative charts for CLI (without Streamlit dependencies).
 
     Finds narrative charts by looking up which ones have the affected charts as parents.
@@ -73,20 +72,22 @@ def get_affected_narrative_charts_cli(charts: List[gm.Chart]) -> List[gm.Narrati
 
 
 def push_new_narrative_charts_cli(
-    narrative_charts: List[gm.NarrativeChart],
-    indicator_mapping: Dict[int, int],
+    narrative_charts: list[gm.NarrativeChart],
+    indicator_mapping: dict[int, int],
     dry_run: bool = False,
-) -> None:
+) -> list[dict]:
     """Update narrative charts in the database (CLI version).
 
     Uses AdminAPI to:
     1. GET merged config (full config = parent + patch merged)
     2. Update variable IDs in the merged config
     3. PUT the updated merged config - backend recalculates the patch
+
+    Returns a list of errors (each error is a dict with 'narrative_chart_id', 'name', and 'error' keys).
     """
     if not narrative_charts:
         log.warning("No narrative charts to update")
-        return
+        return []
 
     if dry_run:
         log.info(
@@ -94,7 +95,7 @@ def push_new_narrative_charts_cli(
         )
         for nc in narrative_charts:
             log.info(f"DRY RUN: Would update narrative chart {nc.id} - {nc.name}")
-        return
+        return []
 
     log.info(f"Updating {len(narrative_charts)} narrative charts...")
 
@@ -104,38 +105,62 @@ def push_new_narrative_charts_cli(
     api = AdminAPI(OWID_ENV)
 
     # Update narrative charts sequentially
+    successful_updates = 0
+    errors: list[dict] = []
+
     for nc in narrative_charts:
-        # Get full config via API (full config = parent + patch merged)
-        response = api.get_narrative_chart(nc.id)
-        full_config = response["configFull"]
+        try:
+            # Get full config via API (full config = parent + patch merged)
+            response = api.get_narrative_chart(nc.id)
+            full_config = response["configFull"]
 
-        # Update variable IDs in the full config
-        config_new = update_narrative_chart_config(full_config, indicator_mapping)
+            # Update variable IDs in the full config
+            config_new = update_narrative_chart_config(full_config, indicator_mapping)
 
-        # PUT the updated full config - backend will recalculate the patch
-        api.update_narrative_chart(narrative_chart_id=nc.id, config=config_new, user_id=user_id)
-        log.info(f"Successfully updated narrative chart {nc.id}")
+            # PUT the updated full config - backend will recalculate the patch
+            api.update_narrative_chart(narrative_chart_id=nc.id, config=config_new, user_id=user_id)
+            successful_updates += 1
+            log.info(f"Successfully updated narrative chart {nc.id}")
+        except AdminAPIError as e:
+            log.error(f"Failed to update narrative chart {nc.id} ({nc.name}): {e}")
+            errors.append(
+                {
+                    "narrative_chart_id": nc.id,
+                    "name": nc.name,
+                    "error": str(e),
+                }
+            )
 
-    log.info(f"Successfully updated all {len(narrative_charts)} narrative charts")
+    if errors:
+        log.warning(
+            f"Updated {successful_updates}/{len(narrative_charts)} narrative charts with {len(errors)} failures"
+        )
+    else:
+        log.info(f"Successfully updated all {len(narrative_charts)} narrative charts")
+
+    return errors
 
 
 def push_new_charts_cli(
-    charts: List[gm.Chart],
-    indicator_mapping: Dict[int, int],
+    charts: list[gm.Chart],
+    indicator_mapping: dict[int, int],
     dry_run: bool = False,
     max_workers: int = DEFAULT_MAX_WORKERS,
-) -> None:
-    """Update charts in the database (CLI version)."""
+) -> list[dict]:
+    """Update charts in the database (CLI version).
+
+    Returns a list of errors (each error is a dict with 'chart_id', 'chart_slug', and 'error' keys).
+    """
     if not charts:
         log.warning("No charts to update")
-        return
+        return []
 
     if dry_run:
         log.info(f"DRY RUN: Would update {len(charts)} charts with indicator mapping: {indicator_mapping}")
         for chart in charts:
             chart_url = OWID_ENV.chart_site(chart.slug) if chart.slug else f"Chart {chart.id}"
             log.info(f"DRY RUN: Would update chart {chart.id} - {chart_url}")
-        return
+        return []
 
     log.info(f"Updating {len(charts)} charts in parallel (max_workers={max_workers})...")
 
@@ -146,6 +171,7 @@ def push_new_charts_cli(
 
     # Update charts in parallel
     successful_updates = 0
+    errors: list[dict] = []
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all chart updates
@@ -153,17 +179,41 @@ def push_new_charts_cli(
             executor.submit(_update_single_chart, chart, indicator_mapping, api, user_id): chart for chart in charts
         }
 
-        # Process completed updates - fail fast on any error
+        # Process completed updates - collect AdminAPIError but continue processing
         for future in as_completed(future_to_chart):
-            chart_id = future.result()  # This will raise if the future failed
-            successful_updates += 1
-            log.info(f"Successfully updated chart {chart_id}")
+            chart = future_to_chart[future]
+            try:
+                chart_id = future.result()
+                successful_updates += 1
+                log.info(f"Successfully updated chart {chart_id}")
+            except AdminAPIError as e:
+                chart_id = chart.id or chart.config.get("id", "unknown")
+                chart_slug = chart.slug or chart.config.get("slug", "unknown")
+                log.error(f"Failed to update chart {chart_id} ({chart_slug}): {e}")
+                errors.append(
+                    {
+                        "chart_id": chart_id,
+                        "chart_slug": chart_slug,
+                        "error": str(e),
+                    }
+                )
 
-    log.info(f"Successfully updated all {successful_updates} charts")
+    if errors:
+        log.warning(f"Updated {successful_updates}/{len(charts)} charts with {len(errors)} failures")
+    else:
+        log.info(f"Successfully updated all {successful_updates} charts")
+
+    return errors
 
 
-def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX_WORKERS) -> None:
-    """Main CLI function to upgrade indicators using existing variable mapping in DB."""
+def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX_WORKERS) -> dict:
+    """Main CLI function to upgrade indicators using existing variable mapping in DB.
+
+    Returns a dictionary with:
+        - 'success': bool indicating if all updates succeeded
+        - 'chart_errors': list of chart error dicts
+        - 'narrative_chart_errors': list of narrative chart error dicts
+    """
     log.info("Starting indicator upgrade from existing variable mapping in database")
 
     # 1. Load variable mapping from database
@@ -172,7 +222,7 @@ def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX
     if not indicator_mapping:
         log.error("No variable mappings found in database. Cannot proceed.")
         log.error("Use the Streamlit UI to create a variable mapping first, or manually add one to the database.")
-        return
+        return {"success": False, "chart_errors": [], "narrative_chart_errors": []}
 
     log.info(f"Found {len(indicator_mapping)} variable mappings:")
     log.info(f"{pd.DataFrame(list(indicator_mapping.items()), columns=['old_id', 'new_id'])}")
@@ -182,7 +232,7 @@ def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX
 
     if not charts:
         log.warning("No charts affected by this mapping")
-        return
+        return {"success": True, "chart_errors": [], "narrative_chart_errors": []}
 
     # 3. Show affected charts
     log.info("Affected charts:")
@@ -198,16 +248,32 @@ def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX
         for nc in narrative_charts:
             log.info(f"  - Narrative chart {nc.id}: {nc.name}")
 
-    # 5. Update charts
-    push_new_charts_cli(charts, indicator_mapping, dry_run=dry_run, max_workers=max_workers)
+    # 5. Update charts (collect errors instead of failing)
+    chart_errors = push_new_charts_cli(charts, indicator_mapping, dry_run=dry_run, max_workers=max_workers)
 
-    # 6. Update narrative charts
-    push_new_narrative_charts_cli(narrative_charts, indicator_mapping, dry_run=dry_run)
+    # 6. Update narrative charts (collect errors instead of failing)
+    narrative_chart_errors = push_new_narrative_charts_cli(narrative_charts, indicator_mapping, dry_run=dry_run)
 
-    if not dry_run:
-        log.info("Indicator upgrade completed successfully!")
-    else:
+    # 7. Report final status
+    if dry_run:
         log.info("DRY RUN completed - no changes made")
+        return {"success": True, "chart_errors": [], "narrative_chart_errors": []}
+    else:
+        total_errors = len(chart_errors) + len(narrative_chart_errors)
+        if total_errors > 0:
+            log.error(f"Indicator upgrade completed with {total_errors} errors:")
+            if chart_errors:
+                log.error(f"  Chart errors ({len(chart_errors)}):")
+                for err in chart_errors:
+                    log.error(f"    - Chart {err['chart_id']} ({err['chart_slug']}): {err['error']}")
+            if narrative_chart_errors:
+                log.error(f"  Narrative chart errors ({len(narrative_chart_errors)}):")
+                for err in narrative_chart_errors:
+                    log.error(f"    - Narrative chart {err['narrative_chart_id']} ({err['name']}): {err['error']}")
+            return {"success": False, "chart_errors": chart_errors, "narrative_chart_errors": narrative_chart_errors}
+        else:
+            log.info("Indicator upgrade completed successfully!")
+            return {"success": True, "chart_errors": [], "narrative_chart_errors": []}
 
 
 @click.command()
@@ -219,7 +285,11 @@ def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX
 )
 def main(dry_run: bool, max_workers: int):
     """CLI tool for upgrading chart indicators using existing variable mapping in database."""
-    cli_upgrade_indicators(dry_run=dry_run, max_workers=max_workers)
+    result = cli_upgrade_indicators(dry_run=dry_run, max_workers=max_workers)
+    if not result["success"]:
+        raise RuntimeError(
+            f"Indicator upgrade completed with {len(result['chart_errors']) + len(result['narrative_chart_errors'])} errors. See logs above for details."
+        )
 
 
 if __name__ == "__main__":

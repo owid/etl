@@ -8,12 +8,12 @@ steps:
     - data://garden/biotech/2025-09-09/epoch_database_growth
 
   # Global mobile money dataset (GSMA)
-  data://meadow/technology/2024-05-30/mobile_money:
-    - snapshot://technology/2024-05-30/mobile_money.xlsx
-  data://garden/technology/2024-05-30/mobile_money:
-    - data://meadow/technology/2024-05-30/mobile_money
-  data://grapher/technology/2024-05-30/mobile_money:
-    - data://garden/technology/2024-05-30/mobile_money
+  data://meadow/technology/2026-03-09/mobile_money:
+    - snapshot://technology/2026-03-09/mobile_money.xlsx
+  data://garden/technology/2026-03-09/mobile_money:
+    - data://meadow/technology/2026-03-09/mobile_money
+  data://grapher/technology/2026-03-09/mobile_money:
+    - data://garden/technology/2026-03-09/mobile_money
 
   #
   # Findex 2021
@@ -36,3 +36,11 @@ steps:
   data://grapher/research_development/2025-10-27/patents:
     - data://garden/research_development/2025-10-27/patents
 
+
+  # TOP500 Supercomputers
+  data://meadow/technology/2026-02-01/top500_supercomputers:
+    - snapshot://technology/2026-02-01/top500_supercomputers.csv
+  data://garden/technology/2026-02-01/top500_supercomputers:
+    - data://meadow/technology/2026-02-01/top500_supercomputers
+  data://grapher/technology/2026-02-01/top500_supercomputers:
+    - data://garden/technology/2026-02-01/top500_supercomputers

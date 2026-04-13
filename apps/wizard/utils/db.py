@@ -10,9 +10,10 @@ import datetime as dt
 import hashlib
 import os
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
 from functools import cache
-from typing import Any, Dict, Generator, List, Literal, Optional, Tuple
+from typing import Any, Literal
 
 import pandas as pd
 import streamlit as st
@@ -46,9 +47,9 @@ class WizardDB:
         question: str,
         answer: str,
         cost: float,
-        user: Optional[str] = None,
-        feedback: Optional[int] = None,
-        feedback_text: Optional[str] = None,
+        user: str | None = None,
+        feedback: int | None = None,
+        feedback_text: str | None = None,
     ) -> None:
         """Add usage entry to database table."""
         if DB_IS_SET_UP:
@@ -94,7 +95,7 @@ class WizardDB:
                 "url_patch",
                 "url_html",
             )
-            query = _prepare_query_insert(TB_PR, fields)  # type: ignore
+            query = _prepare_query_insert(TB_PR, fields)  # ty: ignore
             # Get IDs to update
             ids = tuple(str(data["id"]) for data in data_values)
             # Insert in table
@@ -126,7 +127,7 @@ class WizardDB:
         """Add GPT summary entry."""
         if DB_IS_SET_UP:
             fields = ("id", "date", "cost", "summary", "window_type")
-            query = _prepare_query_insert(TB_NS, fields)  # type: ignore
+            query = _prepare_query_insert(TB_NS, fields)  # ty: ignore
             code = hashlib.sha1(window_type.encode()).hexdigest()[:5]
             query_params = {
                 "id": f"{round(time.time())}{code}",
@@ -144,7 +145,7 @@ class WizardDB:
 
     @classmethod
     @cache
-    def get_news_summary(cls, window_type: WND_LITERAL) -> Tuple[str, str, str] | None:
+    def get_news_summary(cls, window_type: WND_LITERAL) -> tuple[str, str, str] | None:
         """Get nmews (latest) from DB."""
         data = []
         if DB_IS_SET_UP:
@@ -179,13 +180,26 @@ class WizardDB:
 
     @classmethod
     def add_variable_mapping(
-        cls, mapping: Dict[int, int], dataset_id_old: int, dataset_id_new: int, comments: str = ""
+        cls, mapping: dict[int, int], dataset_id_old: int, dataset_id_new: int, comments: str = ""
     ) -> None:
         """Add a mapping to TB_VARMAP.
 
         This table should have columns 'id_old' (key), 'id_new' (value), 'timestamp', and 'dataset_id_old' and 'dataset_id_new'.
+
+        If a mapping for an id_old already exists, it will be replaced with the new mapping.
         """
         timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+        # Remove any existing mappings for these id_old values before inserting
+        if mapping and cls.table_exists(TB_VARMAP):
+            id_old_list = list(mapping.keys())
+            placeholders = ", ".join([":id_" + str(i) for i in range(len(id_old_list))])
+            params = {f"id_{i}": id_old for i, id_old in enumerate(id_old_list)}
+            query = f"DELETE FROM {TB_VARMAP} WHERE id_old IN ({placeholders})"
+            engine = get_engine()
+            with Session(engine) as s:
+                s.execute(text(query), params)
+                s.commit()
 
         # Build dataframe
         query_params = [
@@ -212,7 +226,7 @@ class WizardDB:
         return pd.DataFrame()
 
     @classmethod
-    def get_variable_mapping(cls) -> Dict[int, int]:
+    def get_variable_mapping(cls) -> dict[int, int]:
         """Get variable mapping.
 
         This mapping can be the result of multiple mappings.
@@ -240,13 +254,13 @@ class WizardDB:
         query = """
         SELECT *
         FROM information_schema.tables
-        WHERE table_schema = 'owid';
+        WHERE table_schema = DATABASE();
         """
         df = read_sql(query)
         return tb_name in set(df["TABLE_NAME"])
 
     @classmethod
-    def load_anomalies(cls, dataset_ids: List[int], _owid_env: OWIDEnv = OWID_ENV) -> List[Anomaly]:
+    def load_anomalies(cls, dataset_ids: list[int], _owid_env: OWIDEnv = OWID_ENV) -> list[Anomaly]:
         t = time.time()
         with Session(_owid_env.engine) as s:
             anomalies = Anomaly.load_anomalies(s, dataset_ids)
@@ -261,7 +275,7 @@ def create_session(db_name: str) -> Generator[Session, None, None]:
         yield s
 
 
-def _prepare_query_insert(tb_name: str, fields: Tuple[Any]) -> str:
+def _prepare_query_insert(tb_name: str, fields: tuple[Any]) -> str:
     # Prepare query
     values = ":" + ", :".join(fields)
     query = f"INSERT INTO {tb_name} {fields} VALUES ({values});"

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Economic impacts of 2C - Pretis et al. (2018)
+    description: |-
+      Please cite the data as:
+
+      Pretis, Schwarz, Tang, Haustein, and Allen. 2018. "Uncertain Impacts on Economic Growth When Stabilizing Global Temperatures at 1.5°C or 2°C Warming". Philosophical Transactions of the Royal Society, A. DOI 10.1098/rsta.2016.0460.
+    url: https://doi.org/10.1098/rsta.2016.0460
+    date_accessed: 2026-03-10
+    published_by: Philosophical Transactions of the Royal Society, 2018
+  name: Economic impacts of 2C - Pretis et al. (2018)
+  description: ''
+outs:
+  - md5: 6a9f469a32c0f9f8d6e8b9015f90cef0
+    size: 12634
+    path: economic_impacts_of_2c__pretis_et_al__2018.feather

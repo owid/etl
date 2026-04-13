@@ -2,9 +2,9 @@ import re
 from copy import deepcopy
 from dataclasses import dataclass
 from types import SimpleNamespace
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
-from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError
+from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError, InvalidColorScaleConfigError
 from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.model.schema_types import ViewConfig, ViewMetadata
 from etl.collection.utils import CHART_DIMENSIONS
@@ -27,9 +27,9 @@ class ReadOnlyNamespace(SimpleNamespace):
 @pruned_json
 @dataclass
 class CommonView(MDIMBase):
-    dimensions: Dict[str, Any] | None = None
-    config: ViewConfig | Dict[str, Any] | None = None
-    metadata: ViewMetadata | Dict[str, Any] | None = None
+    dimensions: dict[str, Any] | None = None
+    config: ViewConfig | dict[str, Any] | None = None
+    metadata: ViewMetadata | dict[str, Any] | None = None
 
     @property
     def num_dimensions(self) -> int:
@@ -40,7 +40,7 @@ class CommonView(MDIMBase):
 @dataclass
 class Indicator(MDIMBase):
     catalogPath: str
-    display: Dict[str, Any] | None = None
+    display: dict[str, Any] | None = None
 
     def __post_init__(self):
         # Validate that the catalog path is either (i) complete or (ii) in the format table#indicator.
@@ -52,7 +52,7 @@ class Indicator(MDIMBase):
         complete = bool(pattern.match(self.catalogPath))
         return complete
 
-    def update_display(self, display: Dict[str, Any]):
+    def update_display(self, display: dict[str, Any]):
         """Update the display dictionary of the indicator."""
         if self.display is None:
             self.display = {}
@@ -76,7 +76,7 @@ class Indicator(MDIMBase):
                 raise ValueError(f"Invalid catalog path: {value}")
         return super().__setattr__(name, value)
 
-    def expand_path(self, tables_by_name: Dict[str, List[str]]):
+    def expand_path(self, tables_by_name: dict[str, list[str]]):
         # Do nothing if path is already complete
         if self.has_complete_path():
             return self
@@ -85,14 +85,14 @@ class Indicator(MDIMBase):
         table_name, indicator_name = self.catalogPath.split("#")
 
         # Check table is in any of the datasets!
-        assert (
-            table_name in tables_by_name
-        ), f"Table name `{table_name}` not found in dependency tables! Available tables are: {', '.join(tables_by_name.keys())}"
+        assert table_name in tables_by_name, (
+            f"Table name `{table_name}` not found in dependency tables! Available tables are: {', '.join(tables_by_name.keys())}"
+        )
 
         # Check table name to table mapping is unique
-        assert (
-            len(tables_by_name[table_name]) == 1
-        ), f"There are multiple dependencies (datasets) with a table named {table_name}. Please add dataset name (dataset_name/table_name#indicator_name) if you haven't already, or use the complete dataset URI in this case."
+        assert len(tables_by_name[table_name]) == 1, (
+            f"There are multiple dependencies (datasets) with a table named {table_name}. Please add dataset name (dataset_name/table_name#indicator_name) if you haven't already, or use the complete dataset URI in this case."
+        )
 
         # Check dataset in table metadata is not None
         tb_uri = tables_by_name[table_name][0]
@@ -109,7 +109,7 @@ class Indicator(MDIMBase):
 class ViewIndicators(MDIMBase):
     """Indicators in a MDIM/Explorer view."""
 
-    y: List[Indicator] | None = None
+    y: list[Indicator] | None = None
     x: Indicator | None = None
     size: Indicator | None = None
     color: Indicator | None = None
@@ -124,7 +124,7 @@ class ViewIndicators(MDIMBase):
         return any([getattr(self, dim, None) is not None for dim in CHART_DIMENSIONS[1:]])
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "ViewIndicators":
+    def from_dict(cls, d: dict[str, Any]) -> "ViewIndicators":
         """Coerce the dictionary into the expected shape before passing it to the parent class."""
         # Make a shallow copy so we don't mutate the user's dictionary in-place
         data = dict(d)
@@ -142,7 +142,7 @@ class ViewIndicators(MDIMBase):
         # Now that data is in the expected shape, let the parent class handle the rest
         return super().from_dict(data)
 
-    def to_records(self) -> List[Dict[str, str | Dict[str, Any]]]:
+    def to_records(self) -> list[dict[str, str | dict[str, Any]]]:
         indicators = []
         for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
@@ -163,7 +163,7 @@ class ViewIndicators(MDIMBase):
                 indicators.append(indicator_)
         return indicators
 
-    def expand_paths(self, tables_by_name: Dict[str, List[str]]):
+    def expand_paths(self, tables_by_name: dict[str, list[str]]):
         """Expand the catalog paths of all indicators in the view."""
         for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
@@ -179,7 +179,7 @@ class ViewIndicators(MDIMBase):
 
     def set_indicator(
         self,
-        y: List[str] | List[Dict[str, Any]] | str | Dict[str, Any] | None = None,
+        y: list[str] | list[dict[str, Any]] | str | dict[str, Any] | None = None,
         x: str | None = None,
         color: str | None = None,
         size: str | None = None,
@@ -213,11 +213,11 @@ class ViewIndicators(MDIMBase):
 class View(MDIMBase):
     """MDIM/Explorer view configuration."""
 
-    dimensions: Dict[str, str]
+    dimensions: dict[str, str]
     indicators: ViewIndicators
     # config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
-    config: ViewConfig | Dict[str, Any] | None = None
-    metadata: ViewMetadata | Dict[str, Any] | None = None
+    config: ViewConfig | dict[str, Any] | None = None
+    metadata: ViewMetadata | dict[str, Any] | None = None
     _is_grouped: bool = False  # Private flag to mark views created by grouping
 
     @property
@@ -273,7 +273,7 @@ class View(MDIMBase):
     def metadata_is_needed(self) -> bool:
         return self.has_multiple_indicators and (self.metadata is None)
 
-    def expand_paths(self, tables_by_name: Dict[str, List[str]]):
+    def expand_paths(self, tables_by_name: dict[str, list[str]]):
         """Expand all indicator paths in the view.
 
         Make sure that they are all complete paths. This includes indicators in view, but also those in config (if any).
@@ -294,7 +294,7 @@ class View(MDIMBase):
 
         return self
 
-    def combine_with_common(self, common_views: List[CommonView], common_has_priority: bool = False):
+    def combine_with_common(self, common_views: list[CommonView], common_has_priority: bool = False):
         """Combine config and metadata fields in view with those specified by definitions.common_views."""
         # Update config
         new_config = merge_common_metadata_by_dimension(
@@ -317,7 +317,52 @@ class View(MDIMBase):
         if new_metadata:
             self.metadata = cast(ViewMetadata, new_metadata)
 
+        # Validate the merged config for incompatible color scale settings
+        self.validate_color_scale_config()
+
         return self
+
+    def validate_color_scale_config(self) -> None:
+        """Check that color scale config doesn't have incompatible settings.
+
+        Log binning strategies require strictly positive minValue and maxValue.
+        When a common_view sets minValue: 0 and a view sets binningStrategy: log-*,
+        the Grapher silently renders a grey map with no legend instead of raising an error.
+        """
+        if self.config is None:
+            return
+
+        LOG_BINNING_STRATEGIES = ("log-auto", "log-1-2-5", "log-1-3", "log-10")
+
+        # Collect all colorScale configs to validate: top-level and map-level
+        color_scales: list[tuple[str, dict[str, Any]]] = []
+        if "colorScale" in self.config and isinstance(self.config["colorScale"], dict):
+            color_scales.append(("config.colorScale", self.config["colorScale"]))
+        if "map" in self.config and isinstance(self.config["map"], dict):
+            if "colorScale" in self.config["map"] and isinstance(self.config["map"]["colorScale"], dict):
+                color_scales.append(("config.map.colorScale", self.config["map"]["colorScale"]))
+
+        for path, cs in color_scales:
+            strategy = cs.get("binningStrategy")
+            if strategy not in LOG_BINNING_STRATEGIES:
+                continue
+
+            min_val = cs.get("minValue")
+            max_val = cs.get("maxValue")
+            errors = []
+            if min_val is not None and min_val <= 0:
+                errors.append(f"minValue={min_val}")
+            if max_val is not None and max_val <= 0:
+                errors.append(f"maxValue={max_val}")
+
+            if errors:
+                raise InvalidColorScaleConfigError(
+                    f"View {self.dimensions}: {path} has binningStrategy='{strategy}' "
+                    f"but {' and '.join(errors)}. Log binning requires strictly positive values. "
+                    f"This would cause a blank grey map with no legend in Grapher. "
+                    f"Either remove minValue/maxValue from the common_view, set them to positive values, "
+                    f"or override binningStrategy in this view."
+                )
 
     @property
     def indicators_in_config(self):
@@ -329,7 +374,7 @@ class View(MDIMBase):
 
             # Update indicators from map.columnSlug
             if ("map" in self.config) and "columnSlug" in self.config["map"]:
-                indicators.append((self.config["map"]["columnSlug"]))
+                indicators.append(self.config["map"]["columnSlug"])
 
         return indicators
 
@@ -385,7 +430,7 @@ class View(MDIMBase):
 
 def merge_common_metadata_by_dimension(
     common_config,
-    view_dimensions: Dict[str, Any],
+    view_dimensions: dict[str, Any],
     view_config,
     field_name: str,
     common_has_priority: bool = False,
@@ -419,6 +464,8 @@ def merge_common_metadata_by_dimension(
     key_source = {}
     # Map of tuple key paths to their source (for nested keys conflict reporting)
     value_source_map = {}
+    # Map of tuple key paths to their priority levels (for nested priority tracking)
+    value_priority_map = {}
     # Dictionary of conflicts: { key_path_tuple: [ {source: ..., value: ...}, ... ] }
     unresolved_conflicts = {}
 
@@ -456,28 +503,49 @@ def merge_common_metadata_by_dimension(
         dims = entry.get("dimensions")
         return str(dims) if dims and len(dims) > 0 else "default"
 
-    # Record the source for all nested keys in a dict (for conflict reporting)
-    def record_source_for_dict(value, path_prefix, source):
+    # Record the source and priority for all nested keys in a dict (for conflict reporting)
+    def record_source_for_dict(value, path_prefix, source, priority):
         if isinstance(value, dict):
             for sub_key, sub_val in value.items():
                 new_path = path_prefix + (sub_key,)
                 value_source_map[new_path] = source
-                record_source_for_dict(sub_val, new_path, source)
+                value_priority_map[new_path] = priority
+                record_source_for_dict(sub_val, new_path, source, priority)
 
     # Merge dictionaries for equal-priority entries, recording conflicts for differing subkeys
-    def merge_same_level_dict(existing_dict, new_dict, parent_path, source_prev, source_new):
+    def merge_same_level_dict(existing_dict, new_dict, parent_path, source_prev, source_new, current_priority):
         for sub_key, new_val in new_dict.items():
             if sub_key in existing_dict:
                 existing_val = existing_dict[sub_key]
+                conflict_path = parent_path + (sub_key,)
+                existing_priority = value_priority_map.get(conflict_path, 0)
+
+                # If current priority > existing priority, this is NOT a conflict - override
+                if current_priority > existing_priority:
+                    if isinstance(existing_val, dict) and isinstance(new_val, dict):
+                        existing_dict[sub_key] = deep_merge(existing_val, new_val)
+                    else:
+                        existing_dict[sub_key] = deepcopy(new_val)
+                    value_source_map[conflict_path] = source_new
+                    value_priority_map[conflict_path] = current_priority
+                    record_source_for_dict(new_val, conflict_path, source_new, current_priority)
+                    # Remove any existing conflicts for this path and its descendants
+                    for path in list(unresolved_conflicts.keys()):
+                        if len(path) >= len(conflict_path) and path[: len(conflict_path)] == conflict_path:
+                            unresolved_conflicts.pop(path, None)
+                    continue
+
+                # Same priority - proceed with existing conflict detection logic
                 if isinstance(existing_val, dict) and isinstance(new_val, dict):
                     # Recurse into nested dict
-                    merge_same_level_dict(existing_val, new_val, parent_path + (sub_key,), source_prev, source_new)
+                    merge_same_level_dict(
+                        existing_val, new_val, conflict_path, source_prev, source_new, current_priority
+                    )
                 else:
                     # Check for conflicts on this sub-key
                     if deep_equal(existing_val, new_val):
                         # Values are identical – no conflict (already in result, nothing to change)
                         continue
-                    conflict_path = parent_path + (sub_key,)
                     # Determine the original source of the existing value (from value_source_map or default to source_prev)
                     existing_source = value_source_map.get(conflict_path, source_prev)
                     new_source = source_new
@@ -500,8 +568,10 @@ def merge_common_metadata_by_dimension(
             else:
                 # New sub-key (no conflict) – add to dictionary
                 existing_dict[sub_key] = deepcopy(new_val)
-                value_source_map[parent_path + (sub_key,)] = source_new
-                record_source_for_dict(new_val, parent_path + (sub_key,), source_new)
+                new_path = parent_path + (sub_key,)
+                value_source_map[new_path] = source_new
+                value_priority_map[new_path] = current_priority
+                record_source_for_dict(new_val, new_path, source_new, current_priority)
         # (Sub-keys present only in existing_dict remain intact with their original source)
 
     # Process each entry in order, and build the config/metadata PRIOR to merging it to view_config
@@ -526,7 +596,9 @@ def merge_common_metadata_by_dimension(
                     prev_source = key_source[key]
                     if isinstance(existing_val, dict) and isinstance(new_val, dict):
                         # Deep merge dictionaries at the same level, handling sub-conflicts
-                        merge_same_level_dict(existing_val, new_val, (key,), prev_source, entry_source)
+                        merge_same_level_dict(
+                            existing_val, new_val, (key,), prev_source, entry_source, current_priority
+                        )
                         # Update the final_result with merged dict (existing_val is mutated in-place)
                         final_result[key] = existing_val
                     else:
@@ -574,14 +646,16 @@ def merge_common_metadata_by_dimension(
                     key_priority[key] = current_priority
                     key_source[key] = entry_source
                     value_source_map[(key,)] = entry_source
-                    record_source_for_dict(new_val, (key,), entry_source)
+                    value_priority_map[(key,)] = current_priority
+                    record_source_for_dict(new_val, (key,), entry_source, current_priority)
             else:
                 # New key (no existing value in result)
                 final_result[key] = deepcopy(new_val)
                 key_priority[key] = current_priority
                 key_source[key] = entry_source
                 value_source_map[(key,)] = entry_source
-                record_source_for_dict(new_val, (key,), entry_source)
+                value_priority_map[(key,)] = current_priority
+                record_source_for_dict(new_val, (key,), entry_source, current_priority)
 
     # Combine `final_result` and `view_config`
     # - final_result: At this point it contains the combined parameters (config or metadata) from `common_params`.
@@ -611,7 +685,8 @@ def merge_common_metadata_by_dimension(
             key_priority[key] = float("inf")
             key_source[key] = "custom"
             value_source_map[(key,)] = "custom"
-            record_source_for_dict(val, (key,), "custom")
+            value_priority_map[(key,)] = float("inf")
+            record_source_for_dict(val, (key,), "custom", float("inf"))
 
     # If any conflicts remain unresolved, raise an error with details
     if unresolved_conflicts:

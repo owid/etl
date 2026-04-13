@@ -156,9 +156,6 @@ if st.session_state.submitted_datasets:
             if isinstance(charts, list) and len(charts) > 0:
                 st.toast("Updating charts...")
 
-                # Push charts
-                push_new_charts()
-
                 # Save variable mapping
                 save_variable_mapping(
                     indicator_mapping=indicator_mapping,
@@ -166,6 +163,9 @@ if st.session_state.submitted_datasets:
                     dataset_id_old=int(search_form.dataset_old_id),
                     comments="Done with indicator-upgrader",
                 )
+
+                # Push charts
+                push_new_charts()
 
                 # Undo upgrade
                 st.markdown("Do you want to undo the indicator upgrade?")

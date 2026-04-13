@@ -1,0 +1,22 @@
+dataset:
+  title: World trade - upper bound (% of GDP) (Estevadeordal, Frantz, and Taylor (2003)) (split)
+tables:
+  world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split:
+    variables:
+      world_trade__lower_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003:
+        title: World trade - lower bound (% of GDP) (Estevadeordal, Frantz, and Taylor (2003))
+        unit: '%'
+        description: World trade as a share of GDP,  lower bound estimates.
+      world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003:
+        title: World trade - upper bound (% of GDP) (Estevadeordal, Frantz, and Taylor (2003))
+        unit: '%'
+        description: World trade as a share of GDP,  upper bound estimates.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

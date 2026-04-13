@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Women’s earnings as a percentage of men’s - Bureau of Labor Statistics (2017)
+    description: |-
+      Full citation: Bureau of Labor Statistics, U.S. Department of Labor, The Economics Daily, Women’s earnings as a percentage of men’s, 1979-2005 on the Internet at https://www.bls.gov/opub/ted/2006/oct/wk1/art02.htm (visited December 05, 2017).
+    url: https://www.bls.gov/opub/ted/2006/oct/wk1/art02.txt
+    date_accessed: 2017-12-05
+    published_by: Bureau of Labor Statistics, U.S. Department of Labor (2017)
+  name: Women's weekly earnings as a percentage of men's - Bureau of Labor Statistics (2017)
+  description: ''
+outs:
+  - md5: 450526bd40b22f6087ba2ca1108d630e
+    size: 4050
+    path: womens_weekly_earnings__bureau_of_labor_statistics__2017.feather

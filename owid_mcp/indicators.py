@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Dict, List
+from typing import Any
 
 import structlog
 from fastmcp import FastMCP
@@ -34,8 +34,8 @@ INSTRUCTIONS = (
 mcp = FastMCP()
 
 
-@mcp.tool
-async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
+@mcp.tool(tags={"search"})
+async def search_indicator(query: str, limit: int = 10) -> list[dict]:
     """Search for OWID indicators using semantic similarity via API.
 
     Search for indicators by their CONCEPT/NAME using natural language queries.
@@ -71,8 +71,8 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
 
 
 # Create a tool wrapper for the shared run_sql function
-@mcp.tool
-async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any]:
+@mcp.tool(tags={"sql", "query"})
+async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> dict[str, Any]:
     """Execute a **read‑only** SQL SELECT via the OWID public Datasette.
 
     The most useful tables are: `variables`, `datasets`, and `entities`.
@@ -91,17 +91,8 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
     return await _run_sql(query, max_rows)
 
 
-@mcp.tool
-async def fetch_indicator_metadata(indicator_id: int) -> Dict[str, Any]:
-    """Fetch OWID indicator metadata only.
-
-    Args:
-        indicator_id: Numeric OWID indicator id (e.g. 2118)
-
-    Returns:
-        Dict containing filtered metadata for the indicator
-    """
-    # Fetch metadata only
+async def _fetch_indicator_metadata_impl(indicator_id: int) -> dict[str, Any]:
+    """Core implementation for fetching indicator metadata."""
     meta_url = f"{OWID_API_BASE}/{indicator_id}.metadata.json"
     metadata = await fetch_json(meta_url)
 
@@ -112,25 +103,8 @@ async def fetch_indicator_metadata(indicator_id: int) -> Dict[str, Any]:
     return metadata
 
 
-@mcp.tool
-async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> List[Dict[str, Any]]:
-    """Fetch OWID indicator data only.
-
-    Args:
-        indicator_id: Numeric OWID indicator id (e.g. 2118)
-        entity: Optional entity name or ISO-3 code. If provided, returns only rows matching that entity (case-insensitive)
-
-    Returns:
-        List of entities with years and values arrays:
-        [
-            {
-              "entity": "Africa (FAO)",
-              "years": [1961, 1962, 1963, 1964, 1965],
-              "values": [4191055, 4718410, 4248436, 4495870, 4723099]
-            },
-            ...
-        ]
-    """
+async def _fetch_indicator_data_impl(indicator_id: int, entity: str | None = None) -> list[dict[str, Any]]:
+    """Core implementation for fetching indicator data."""
     # Fetch OWID raw data + metadata concurrently
     data_url = f"{OWID_API_BASE}/{indicator_id}.data.json"
     meta_url = f"{OWID_API_BASE}/{indicator_id}.metadata.json"
@@ -159,3 +133,38 @@ async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> 
         rows = filtered_rows
 
     return rows
+
+
+@mcp.tool(tags={"indicator", "metadata"})
+async def fetch_indicator_metadata(indicator_id: int) -> dict[str, Any]:
+    """Fetch OWID indicator metadata only.
+
+    Args:
+        indicator_id: Numeric OWID indicator id (e.g. 2118)
+
+    Returns:
+        Dict containing filtered metadata for the indicator
+    """
+    return await _fetch_indicator_metadata_impl(indicator_id)
+
+
+@mcp.tool(tags={"indicator", "data"})
+async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> list[dict[str, Any]]:
+    """Fetch OWID indicator data only.
+
+    Args:
+        indicator_id: Numeric OWID indicator id (e.g. 2118)
+        entity: Optional entity name or ISO-3 code. If provided, returns only rows matching that entity (case-insensitive)
+
+    Returns:
+        List of entities with years and values arrays:
+        [
+            {
+              "entity": "Africa (FAO)",
+              "years": [1961, 1962, 1963, 1964, 1965],
+              "values": [4191055, 4718410, 4248436, 4495870, 4723099]
+            },
+            ...
+        ]
+    """
+    return await _fetch_indicator_data_impl(indicator_id, entity)

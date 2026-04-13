@@ -5,7 +5,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 {% if cookiecutter.dataset_manual_import == True %}
-def run(upload: bool = True, path_to_file: str = None) -> None:
+def run(upload: bool = True, path_to_file: str | None = None) -> None:
     """Create a new snapshot.
 
     Args:

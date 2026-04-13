@@ -1,0 +1,80 @@
+dataset:
+  title: Deforestation in trade (Pendrill)
+tables:
+  deforestation_in_trade__pendrill:
+    variables:
+      deforestation_domestic_consumption:
+        title: deforestation_domestic_consumption
+        unit: hectares
+        short_unit: ha
+        display:
+          name: Deforestation embedded in goods consumed domestically
+        description: |-
+          Deforestation embedded in goods consumed domestically is the amount of deforestation that is driven by demand in domestic markets (i.e. deforestation that is not exported).
+      domestic_and_imported_deforestation:
+        title: domestic_and_imported_deforestation
+        unit: ''
+      domestic_consumption_deforestation_per_capita:
+        title: domestic_consumption_deforestation_per_capita
+        unit: ''
+      embodied_deforestation:
+        title: embodied_deforestation
+        unit: ''
+      exported_deforestation:
+        title: exported_deforestation
+        unit: hectares
+        short_unit: ha
+        display:
+          name: Deforestation embedded in exported goods
+          numDecimalPlaces: 0
+      exported_deforestation_per_capita:
+        title: exported_deforestation_per_capita
+        unit: hectares
+        short_unit: ha
+        display:
+          name: Exported deforestation per capita
+      imported_deforestation:
+        title: imported_deforestation
+        unit: hectares
+        short_unit: ha
+        display:
+          name: Deforestation embedded in imported goods
+          numDecimalPlaces: 0
+      imported_deforestation_per_capita:
+        title: imported_deforestation_per_capita
+        unit: ''
+        display:
+          name: Imported deforestation per capita
+      net_traded_deforestation:
+        title: net_traded_deforestation
+        unit: hectares
+        short_unit: ha
+        display:
+          name: Net deforestation embedded in trade
+          numDecimalPlaces: 0
+        description: |-
+          Net deforestation embedded in trade is measured as deforestation caused by imported goods, minus deforestation from exported goods. Net importers of deforestation are given as positive values; net exports as negative values.
+      net_traded_deforestation_per_capita:
+        title: net_traded_deforestation_per_capita
+        unit: ''
+      share_deforestation_domestic_consumption:
+        title: share_deforestation_domestic_consumption
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of deforestation driven by domestic consumption
+      share_deforestation_exported:
+        title: share_deforestation_exported
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of deforestation that is exported
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

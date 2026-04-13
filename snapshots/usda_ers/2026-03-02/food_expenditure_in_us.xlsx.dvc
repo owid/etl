@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: USDA Economic Research Service (ERS)
+    title: Food expenditure in United States
+    citation_full: |-
+      Economic Research Service of the United States Department of Agriculture (USDA/ERS) - Food expenditure in United States (2025).
+    attribution_short: USDA/ERS
+    url_main: https://www.ers.usda.gov/data-products/food-expenditure-series/
+    # The new file (and publication date) can be found in
+    # * "National Food Expenditure Series" -> "Normalized food expenditures by all purchasers and household final users"
+    url_download: https://www.ers.usda.gov/media/5197/normalized-food-expenditures-by-all-purchasers-and-household-final-users.xlsx?v=56567
+    date_accessed: '2026-03-02'
+    # The publication date is given at the bottom of the spreadsheet, next to "Source:".
+    date_published: '2025-09-29'
+    license:
+      name: Public domain
+      url: https://www.ers.usda.gov/data-products/food-expenditure-series/
+outs:
+  - md5: 02a7c46ba329c4fb155d314ed7d8f4a3
+    size: 19287
+    path: food_expenditure_in_us.xlsx

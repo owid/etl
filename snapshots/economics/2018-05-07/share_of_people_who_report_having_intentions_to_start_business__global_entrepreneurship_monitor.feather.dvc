@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: 'Global Entrepreneurship Monitor '
+    url: http://www.gemconsortium.org/data/key-aps
+    date_accessed: 2018-05-07
+    published_by: 'Global Entrepreneurship Monitor '
+  name: Share of people who report having intentions to start business - Global Entrepreneurship Monitor
+  description: ''
+outs:
+  - md5: ee4fac61baebc8e8b857332789ae7f18
+    size: 9098
+    path: share_of_people_who_report_having_intentions_to_start_business__global_entrepreneurship_monitor.feather

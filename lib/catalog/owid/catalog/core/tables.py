@@ -24,16 +24,15 @@ import numpy as np
 import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
-import rdata
 import structlog
-from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
+from owid.datautils import dataframes
+from owid.repack import repack_frame
+from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # ty: ignore
 from pandas.core.series import Series
 
 from owid.catalog.core import indicators, utils, warnings
 from owid.catalog.core import processing_log as pl
 from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, Source, TableMeta, VariableMeta
-from owid.datautils import dataframes
-from owid.repack import repack_frame
 
 log = structlog.get_logger()
 
@@ -106,8 +105,8 @@ class Table(pd.DataFrame):
         *args: Any,
         metadata: TableMeta | None = None,
         short_name: str | None = None,
-        underscore=False,
-        camel_to_snake=False,
+        underscore: bool = False,
+        camel_to_snake: bool = False,
         like: Table | None = None,
         **kwargs: Any,
     ) -> None:
@@ -141,9 +140,9 @@ class Table(pd.DataFrame):
 
         # use supplied short_name
         if short_name:
-            assert self.metadata.short_name is None or (
-                self.metadata.short_name == short_name
-            ), "short_name is different from the one in metadata"
+            assert self.metadata.short_name is None or (self.metadata.short_name == short_name), (
+                "short_name is different from the one in metadata"
+            )
             self.metadata.short_name = short_name
 
         # all columns have empty metadata by default
@@ -181,7 +180,7 @@ class Table(pd.DataFrame):
             print(table.primary_key)  # ["country", "year"]
             ```
         """
-        return [n for n in self.index.names if n]
+        return [n for n in self.index.names if n]  # ty: ignore[invalid-return-type]
 
     def to(self, path: str | Path, repack: bool = True) -> None:
         """Save this table to disk in a supported format.
@@ -225,7 +224,7 @@ class Table(pd.DataFrame):
             raise ValueError(f"could not detect a suitable format to save to: {path}")
 
     @classmethod
-    def read(cls, path: str | Path, **kwargs) -> Table:
+    def read(cls, path: str | Path, **kwargs: Any) -> Table:
         """Read a table from disk in any supported format.
 
         Automatically detects the format from file extension and loads
@@ -456,9 +455,9 @@ class Table(pd.DataFrame):
     def to_excel(
         self,
         excel_writer: Any,
-        with_metadata=True,
-        sheet_name="data",
-        metadata_sheet_name="metadata",
+        with_metadata: bool = True,
+        sheet_name: str = "data",
+        metadata_sheet_name: str = "metadata",
         **kwargs: Any,
     ) -> None:
         """Save table to Excel file with optional metadata codebook.
@@ -486,7 +485,7 @@ class Table(pd.DataFrame):
                 self.codebook.to_excel(excel_writer, sheet_name=metadata_sheet_name, index=False)
         else:
             # If excel_writer is a file path, create a new ExcelWriter context.
-            with pd.ExcelWriter(excel_writer) as writer:  # type: ignore
+            with pd.ExcelWriter(excel_writer) as writer:  # ty: ignore
                 super().to_excel(writer, sheet_name=sheet_name, **kwargs)
                 if with_metadata:
                     self.codebook.to_excel(writer, sheet_name=metadata_sheet_name, index=False)
@@ -548,6 +547,7 @@ class Table(pd.DataFrame):
             if time.time() - t > 5:
                 log.warning(
                     "repacking took a long time, consider adding create_dataset(..., repack=False)",
+                    path=path,
                     time=time.time() - t,
                 )
 
@@ -558,7 +558,7 @@ class Table(pd.DataFrame):
     def metadata_filename(self, path: str):
         return splitext(path)[0] + ".meta.json"
 
-    def to_parquet(self, path: Any, repack: bool = True) -> None:  # type: ignore
+    def to_parquet(self, path: Any, repack: bool = True) -> None:  # ty: ignore
         """Save table as Parquet file with metadata sidecar.
 
         Saves the table in Apache Parquet format with a separate JSON metadata file.
@@ -602,7 +602,7 @@ class Table(pd.DataFrame):
 
         # adding metadata would make reading partial content inefficient, see https://github.com/owid/etl/issues/783
         # new_metadata = {
-        #     b"owid_table": json.dumps(self.metadata.to_dict(), default=str),  # type: ignore
+        #     b"owid_table": json.dumps(self.metadata.to_dict(), default=str),  # ty: ignore
         #     b"owid_fields": json.dumps(self._get_fields_as_dict(), default=str),
         #     b"primary_key": json.dumps(self.primary_key),
         #     **t.schema.metadata,
@@ -618,7 +618,7 @@ class Table(pd.DataFrame):
     def _save_metadata(self, filename: str) -> None:
         # write metadata
         with open(filename, "w") as ostream:
-            metadata = self.metadata.to_dict()  # type: ignore
+            metadata = self.metadata.to_dict()  # ty: ignore
             metadata["primary_key"] = self.primary_key
             metadata["fields"] = self._get_fields_as_dict()
             try:
@@ -633,7 +633,7 @@ class Table(pd.DataFrame):
                 raise ValueError(f"metadata contains NaNs:\n{metadata}") from e
 
     @classmethod
-    def read_csv(cls, path: str | Path, **kwargs) -> Table:
+    def read_csv(cls, path: str | Path, **kwargs: Any) -> Table:
         """Read table from CSV file with accompanying metadata.
 
         Loads a table from a CSV file and its associated .meta.json metadata file.
@@ -666,7 +666,7 @@ class Table(pd.DataFrame):
         cls._add_metadata(tb, path, **kwargs)
         return tb
 
-    def update_metadata(self, **kwargs) -> Table:
+    def update_metadata(self, **kwargs: Any) -> Table:
         """Update table-level metadata fields.
 
         Convenience method to update multiple metadata fields at once.
@@ -715,7 +715,7 @@ class Table(pd.DataFrame):
                 tb.set_index(primary_key, inplace=True)
 
     @classmethod
-    def read_feather(cls, path: str | Path, load_data: bool = True, **kwargs) -> Table:
+    def read_feather(cls, path: str | Path, load_data: bool = True, **kwargs: Any) -> Table:
         """Read table from Feather file with accompanying metadata.
 
         Loads a table from a Feather file and its associated .meta.json metadata file.
@@ -758,7 +758,7 @@ class Table(pd.DataFrame):
         return df
 
     @classmethod
-    def read_parquet(cls, path: str | Path, **kwargs) -> Table:
+    def read_parquet(cls, path: str | Path, **kwargs: Any) -> Table:
         """Read table from Parquet file with accompanying metadata.
 
         Loads a table from a Parquet file and its associated .meta.json metadata file.
@@ -792,7 +792,7 @@ class Table(pd.DataFrame):
         return df
 
     @classmethod
-    def read_json(cls, path: str | Path, **kwargs) -> Table:
+    def read_json(cls, path: str | Path, **kwargs: Any) -> Table:
         """
         Read the table from a JSON file plus accompanying JSON sidecar.
 
@@ -960,7 +960,7 @@ class Table(pd.DataFrame):
         else:
             return cast(Table, new_table)
 
-    def __setattr__(self, name: str, value) -> None:
+    def __setattr__(self, name: str, value: Any) -> None:
         # setting columns must rename them
         if name == "columns":
             for old_col, new_col in zip(self.columns, value):
@@ -985,10 +985,10 @@ class Table(pd.DataFrame):
             print(table.all_columns)  # ["country", "year", "gdp", "population"]
             ```
         """
-        combined: list[str] = filter(None, list(self.index.names) + list(self.columns))  # type: ignore
+        combined: list[str] = filter(None, list(self.index.names) + list(self.columns))  # ty: ignore
         return combined
 
-    def get_column_or_index(self, name) -> indicators.Indicator:
+    def get_column_or_index(self, name: str) -> indicators.Indicator:
         """Get a variable by name from either columns or index.
 
         Retrieves a Variable from the table, checking both regular columns
@@ -1011,7 +1011,7 @@ class Table(pd.DataFrame):
             ```
         """
         if name in self.columns:
-            return self[name]
+            return cast(indicators.Indicator, self[name])
         elif name in self.index.names:
             return indicators.Indicator(self.index.get_level_values(name), name=name, metadata=self._fields[name])
         else:
@@ -1183,19 +1183,19 @@ class Table(pd.DataFrame):
             to_return = cast(Table, t)
 
         t.metadata.primary_key = keys
-        t.metadata.dimensions = dimensions  # type: ignore
+        t.metadata.dimensions = dimensions  # ty: ignore
         return to_return
 
     @overload
-    def reset_index(self, level=None, *, inplace: Literal[True], **kwargs) -> None: ...
+    def reset_index(self, level: Any = None, *, inplace: Literal[True], **kwargs: Any) -> None: ...
 
     @overload
-    def reset_index(self, level=None, *, inplace: Literal[False], **kwargs) -> Table: ...
+    def reset_index(self, level: Any = None, *, inplace: Literal[False], **kwargs: Any) -> Table: ...
 
     @overload
-    def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> Table: ...
+    def reset_index(self, level: Any = None, *, inplace: bool = False, **kwargs: Any) -> Table: ...
 
-    def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> Table | None:  # type: ignore
+    def reset_index(self, level: Any = None, *, inplace: bool = False, **kwargs: Any) -> Table | None:  # ty: ignore
         """Reset the index to default integer index.
 
         Extends `pandas.reset_index` with proper type signature for Table.
@@ -1216,7 +1216,7 @@ class Table(pd.DataFrame):
             table.reset_index(inplace=True)  # Modify in place
             ```
         """
-        t = super().reset_index(level=level, inplace=inplace, **kwargs)  # type: ignore
+        t = super().reset_index(level=level, inplace=inplace, **kwargs)  # ty: ignore
 
         if inplace:
             # TODO: make this work for reset_index with subset of levels
@@ -1225,12 +1225,12 @@ class Table(pd.DataFrame):
             return None
         else:
             # preserve metadata in _fields, calling reset_index() on a table drops it
-            t._fields = self._fields  # type: ignore
+            t._fields = self._fields  # ty: ignore
             # drop dimensions
             t.metadata.dimensions = None
-            return t  # type: ignore
+            return t  # ty: ignore
 
-    def astype(self, *args, **kwargs) -> Table:
+    def astype(self, *args: Any, **kwargs: Any) -> Table:
         """Cast table columns to specified dtype(s).
 
         Convert one or more columns to a specified data type. Wrapper
@@ -1259,9 +1259,9 @@ class Table(pd.DataFrame):
             table = table.astype(str)
             ```
         """
-        return super().astype(*args, **kwargs)  # type: ignore
+        return super().astype(*args, **kwargs)  # ty: ignore
 
-    def reindex(self, *args, **kwargs) -> Table:
+    def reindex(self, *args: Any, **kwargs: Any) -> Table:
         """Conform table to new index with optional filling logic.
 
         Create a new Table with changed index. Missing values are filled
@@ -1294,18 +1294,18 @@ class Table(pd.DataFrame):
         return cast(Table, t)
 
     @overload
-    def drop_duplicates(self, *, inplace: Literal[True], **kwargs) -> None: ...
+    def drop_duplicates(self, *, inplace: Literal[True], **kwargs: Any) -> None: ...
 
     @overload
-    def drop_duplicates(self, *, inplace: Literal[False], **kwargs) -> Table: ...
+    def drop_duplicates(self, *, inplace: Literal[False], **kwargs: Any) -> Table: ...
 
     @overload
-    def drop_duplicates(self, **kwargs) -> Table: ...
+    def drop_duplicates(self, **kwargs: Any) -> Table: ...
 
-    def drop_duplicates(self, *args, **kwargs) -> Table | None:
+    def drop_duplicates(self, *args: Any, **kwargs: Any) -> Table | None:
         return super().drop_duplicates(*args, **kwargs)
 
-    def join(self, other: pd.DataFrame | Table, *args, **kwargs) -> Table:
+    def join(self, other: pd.DataFrame | Table, *args: Any, **kwargs: Any) -> Table:
         """Join tables while preserving metadata.
 
         Extends pandas join with proper type signature for Table.
@@ -1326,18 +1326,31 @@ class Table(pd.DataFrame):
             joined = table1.join(table2, how="outer")
             ```
         """
+        lsuffix = kwargs.get("lsuffix", "")
+        rsuffix = kwargs.get("rsuffix", "")
+
         t = super().join(other, *args, **kwargs)
 
         t = t.copy_metadata(self)
 
-        # copy variables metadata from other table
+        # When lsuffix is used, columns from self that were renamed get their metadata copied.
+        if lsuffix:
+            for k, v in self._fields.items():
+                suffixed = k + lsuffix
+                if suffixed in t.columns:
+                    t._fields[suffixed] = v.copy()
+
+        # copy variables metadata from other table, accounting for rsuffix renaming
         if isinstance(other, Table):
             for k, v in other._fields.items():
-                t._fields[k] = v.copy()
-        return t  # type: ignore
+                if k in t.columns:
+                    t._fields[k] = v.copy()
+                elif rsuffix and (k + rsuffix) in t.columns:
+                    t._fields[k + rsuffix] = v.copy()
+        return t  # ty: ignore
 
     def _repr_html_(self):
-        html = super()._repr_html_()  # type: ignore
+        html = super()._repr_html_()  # ty: ignore
         if self.DEBUG:
             self.check_metadata()
         return f"""
@@ -1346,7 +1359,7 @@ class Table(pd.DataFrame):
              {html}
         """
 
-    def merge(self, right, *args, **kwargs) -> Table:
+    def merge(self, right: Any, *args: Any, **kwargs: Any) -> Table:
         """Merge with another DataFrame or Table.
 
         Wrapper around pandas merge that preserves Table metadata.
@@ -1375,8 +1388,8 @@ class Table(pd.DataFrame):
         var_name: str = "variable",
         value_name: str = "value",
         short_name: str | None = None,
-        *args,
-        **kwargs,
+        *args: Any,
+        **kwargs: Any,
     ) -> Table:
         """Unpivot table from wide to long format.
 
@@ -1436,7 +1449,7 @@ class Table(pd.DataFrame):
         join_column_levels_with: str | None = None,
         short_name: str | None = None,
         fill_dimensions: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ) -> Table:
         """Reshape table from long to wide format.
 
@@ -1567,7 +1580,7 @@ class Table(pd.DataFrame):
         sort_rows: bool = True,
         sort_columns: bool = False,
         short_name: str | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> Table:
         """Format the table according to OWID standards.
 
@@ -1659,15 +1672,15 @@ class Table(pd.DataFrame):
         return t
 
     @overload
-    def dropna(self, *, inplace: Literal[True], **kwargs) -> None: ...
+    def dropna(self, *, inplace: Literal[True], **kwargs: Any) -> None: ...
 
     @overload
-    def dropna(self, *, inplace: Literal[False], **kwargs) -> Table: ...
+    def dropna(self, *, inplace: Literal[False], **kwargs: Any) -> Table: ...
 
     @overload
-    def dropna(self, **kwargs) -> Table: ...
+    def dropna(self, **kwargs: Any) -> Table: ...
 
-    def dropna(self, *args, **kwargs) -> Table | None:
+    def dropna(self, *args: Any, **kwargs: Any) -> Table | None:
         tb = super().dropna(*args, **kwargs)
         # inplace returns None
         if tb is None:
@@ -1682,7 +1695,7 @@ class Table(pd.DataFrame):
 
         return cast(Table, tb)
 
-    def drop(self, *args, **kwargs) -> Table:
+    def drop(self, *args: Any, **kwargs: Any) -> Table:
         """Drop specified labels from rows or columns.
 
         Remove rows or columns by specifying label names and axis.
@@ -1713,7 +1726,7 @@ class Table(pd.DataFrame):
         """
         return cast(Table, super().drop(*args, **kwargs))
 
-    def filter(self, *args, **kwargs) -> Table:
+    def filter(self, *args: Any, **kwargs: Any) -> Table:
         """Subset rows or columns based on their labels.
 
         Filter the table to include only specified rows or columns by name.
@@ -1747,7 +1760,7 @@ class Table(pd.DataFrame):
             table = table.filter(regex="^gdp_.*")
             ```
         """
-        return super().filter(*args, **kwargs)  # type: ignore
+        return super().filter(*args, **kwargs)  # ty: ignore
 
     def update_log(
         self,
@@ -1791,7 +1804,7 @@ class Table(pd.DataFrame):
             )
         return self
 
-    def sort_values(self, by: str | list[str], *args, **kwargs) -> Table:
+    def sort_values(self, by: str | list[str], *args: Any, **kwargs: Any) -> Table:
         tb = super().sort_values(by=by, *args, **kwargs).copy()
         for column in list(tb.all_columns):
             if isinstance(by, str):
@@ -1805,32 +1818,32 @@ class Table(pd.DataFrame):
 
         return cast(Table, tb)
 
-    def sum(self, *args, **kwargs) -> indicators.Indicator:
+    def sum(self, *args: Any, **kwargs: Any) -> indicators.Indicator:
         variable_name = indicators.UNNAMED_INDICATOR
-        variable = indicators.Indicator(super().sum(*args, **kwargs), name=variable_name)  # type: ignore
+        variable = indicators.Indicator(super().sum(*args, **kwargs), name=variable_name)  # ty: ignore
         variable.metadata = indicators.combine_indicators_metadata(
             variables=[self[column] for column in self.columns], operation="+", name=variable_name
         )
 
         return variable
 
-    def prod(self, *args, **kwargs) -> indicators.Indicator:
+    def prod(self, *args: Any, **kwargs: Any) -> indicators.Indicator:
         variable_name = indicators.UNNAMED_INDICATOR
-        variable = indicators.Indicator(super().prod(*args, **kwargs), name=variable_name)  # type: ignore
+        variable = indicators.Indicator(super().prod(*args, **kwargs), name=variable_name)  # ty: ignore
         variable.metadata = indicators.combine_indicators_metadata(
             variables=[self[column] for column in self.columns], operation="*", name=variable_name
         )
 
         return variable
 
-    def assign(self, *args, **kwargs) -> Table:
-        return super().assign(*args, **kwargs)  # type: ignore
+    def assign(self, *args: Any, **kwargs: Any) -> Table:
+        return super().assign(*args, **kwargs)  # ty: ignore
 
-    def reorder_levels(self, *args, **kwargs) -> Table:
-        return super().reorder_levels(*args, **kwargs)  # type: ignore
+    def reorder_levels(self, *args: Any, **kwargs: Any) -> Table:
+        return super().reorder_levels(*args, **kwargs)  # ty: ignore
 
     @staticmethod
-    def _update_log(tb: Table, other: Scalar | Series | indicators.Indicator | Table, operation: str) -> None:  # type: ignore
+    def _update_log(tb: Table, other: Scalar | Series | indicators.Indicator | Table, operation: str) -> None:  # ty: ignore
         # The following would have a parents only the scalar, not the scalar and the corresponding variable.
         # tb = update_log(table=tb, operation="+", parents=[other], variable_names=tb.columns)
         # Instead, update the processing log of each variable in the table.
@@ -1841,74 +1854,74 @@ class Table(pd.DataFrame):
                 parents = [tb[column], other]
             tb[column].update_log(parents=parents, operation=operation)
 
-    def __add__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __add__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "+")
         return tb
 
-    def __iadd__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __iadd__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__add__(other)
 
-    def __sub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __sub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         tb = cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "-")
         return tb
 
-    def __isub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __isub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__sub__(other)
 
-    def __mul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __mul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         tb = cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "*")
         return tb
 
-    def __imul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __imul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__mul__(other)
 
-    def __truediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __truediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         tb = cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "/")
         return tb
 
-    def __itruediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __itruediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__truediv__(other)
 
-    def __floordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __floordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         tb = cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "//")
         return tb
 
-    def __ifloordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __ifloordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__floordiv__(other)
 
-    def __mod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __mod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         tb = cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "%")
         return tb
 
-    def __imod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __imod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__mod__(other)
 
-    def __pow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __pow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         tb = cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "**")
         return tb
 
-    def __ipow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # type: ignore
+    def __ipow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__pow__(other)
 
-    def sort_index(self, *args, **kwargs) -> Table:
-        return super().sort_index(*args, **kwargs)  # type: ignore
+    def sort_index(self, *args: Any, **kwargs: Any) -> Table:
+        return super().sort_index(*args, **kwargs)  # ty: ignore
 
-    def groupby(self, *args, observed=True, **kwargs) -> "TableGroupBy":
+    def groupby(self, *args: Any, observed: bool = True, **kwargs: Any) -> TableGroupBy:
         """Groupby that preserves metadata. It uses observed=True by default."""
         return TableGroupBy(
             pd.DataFrame.groupby(self.copy(deep=False), *args, observed=observed, **kwargs), self.metadata, self._fields
         )
 
-    def rolling(self, *args, **kwargs) -> "TableRolling":
+    def rolling(self, *args: Any, **kwargs: Any) -> TableRolling:
         """Rolling operation that preserves metadata."""
-        return TableRolling(super().rolling(*args, **kwargs), self.metadata, self._fields)  # type: ignore
+        return TableRolling(super().rolling(*args, **kwargs), self.metadata, self._fields)  # ty: ignore
 
     def check_metadata(self, ignore_columns: list[str] | None = None) -> None:
         """Check that all variables in the table have origins."""
@@ -1930,7 +1943,7 @@ class Table(pd.DataFrame):
         tb = tb.set_index(column_idx_new)
         return tb
 
-    def fillna(self, value=None, **kwargs) -> Table:
+    def fillna(self, value: Any = None, **kwargs: Any) -> Table:
         """Usual fillna, but, if the object given to fill values with is a table, transfer its metadata to the filled
         table."""
         if value is not None:
@@ -1949,7 +1962,7 @@ class Table(pd.DataFrame):
         return tb
 
     @classmethod
-    def from_records(cls, *args, **kwargs) -> Table:
+    def from_records(cls, *args: Any, **kwargs: Any) -> Table:
         """Calling `Table.from_records` returns a Table, but does not call __init__ and misses metadata."""
         df = super().from_records(*args, **kwargs)
         return Table(df)
@@ -1981,7 +1994,7 @@ class TableGroupBy:
         # Calling method on the groupby object
         if isinstance(getattr(self.groupby, name), types.MethodType):
 
-            def func(*args, **kwargs):
+            def func(*args: Any, **kwargs: Any):
                 """Apply function and return variable with proper metadata."""
                 df = getattr(self.groupby, name)(*args, **kwargs)
                 if df.ndim == 1:
@@ -2022,7 +2035,7 @@ class TableGroupBy:
         for name, group in self.groupby:
             yield name, _create_table(group, self.metadata, self._fields)
 
-    def agg(self, func: Any | None = None, *args, **kwargs) -> Table:
+    def agg(self, func: Any | None = None, *args: Any, **kwargs: Any) -> Table:
         df = self.groupby.agg(func, *args, **kwargs)
         tb = _create_table(df, self.metadata, self._fields)
 
@@ -2041,11 +2054,13 @@ class TableGroupBy:
 
         return tb
 
-    def apply(self, func: Callable[..., Any], *args, include_groups=True, **kwargs) -> Table | indicators.Indicator:
+    def apply(
+        self, func: Callable[..., Any], *args: Any, include_groups: bool = True, **kwargs: Any
+    ) -> Table | indicators.Indicator:
         mem = {}
 
         @wraps(func)
-        def f(g):
+        def f(g: Any) -> Any:
             tb = func(g, *args, **kwargs)
             # remember one table to use its metadata
             if not mem:
@@ -2077,7 +2092,7 @@ class TableGroupBy:
             # func returns a scalar, output is a Table
             return _create_table(df, self.metadata, self._fields)
 
-    def rolling(self, *args, **kwargs) -> "TableRollingGroupBy":
+    def rolling(self, *args: Any, **kwargs: Any) -> TableRollingGroupBy:
         rolling_groupby = self.groupby.rolling(*args, **kwargs)
         return TableRollingGroupBy(rolling_groupby, self.metadata, self._fields)
 
@@ -2091,11 +2106,11 @@ class VariableGroupBy:
         self.name = name
         self.table_metadata = table_metadata
 
-    def __getattr__(self, funcname) -> Callable[..., Table]:
+    def __getattr__(self, funcname: str) -> Callable[..., Table]:
         if funcname == "groupings":
             return self.groupby.groupings
 
-        def func(*args, **kwargs):
+        def func(*args: Any, **kwargs: Any):
             """Apply function and return variable with proper metadata."""
             # out = getattr(self.groupby, funcname)(*args, **kwargs)
             ff = getattr(self.groupby, funcname)
@@ -2114,9 +2129,9 @@ class VariableGroupBy:
             else:
                 raise NotImplementedError()
 
-        return func  # type: ignore
+        return func  # ty: ignore
 
-    def rolling(self, *args, **kwargs) -> "VariableGroupBy":
+    def rolling(self, *args: Any, **kwargs: Any) -> VariableGroupBy:
         """Apply rolling window function and return a new VariableGroupBy with proper metadata."""
         rolling_groupby = self.groupby.rolling(*args, **kwargs)
         return VariableGroupBy(rolling_groupby, self.name, self.metadata, self.table_metadata)
@@ -2135,7 +2150,7 @@ class TableRolling:
         # Calling method on the rolling object
         if isinstance(getattr(self.rolling, name), types.MethodType):
 
-            def func(*args, **kwargs):
+            def func(*args: Any, **kwargs: Any):
                 """Apply function and return variable with proper metadata."""
                 df = getattr(self.rolling, name)(*args, **kwargs)
                 return _create_table(df, self.metadata, self._fields)
@@ -2161,7 +2176,7 @@ class TableRollingGroupBy:
         # Calling method on the rolling object
         if isinstance(getattr(self.rolling_groupby, name), types.MethodType):
 
-            def func(*args, **kwargs):
+            def func(*args: Any, **kwargs: Any):
                 """Apply function and return variable with proper metadata."""
                 df = getattr(self.rolling_groupby, name)(*args, **kwargs)
                 return _create_table(df, self.metadata, self._fields)
@@ -2181,12 +2196,12 @@ def align_categoricals(left: SeriesOrVariable, right: SeriesOrVariable) -> tuple
         if isinstance(left, indicators.Indicator):
             left = left.set_categories(common_categories)
         else:
-            left = left.cat.set_categories(common_categories)
+            left = left.cat.set_categories(common_categories)  # ty: ignore[invalid-assignment]
 
         if isinstance(right, indicators.Indicator):
             right = right.set_categories(common_categories)
         else:
-            right = right.cat.set_categories(common_categories)
+            right = right.cat.set_categories(common_categories)  # ty: ignore[invalid-assignment]
 
         return left, right
     else:
@@ -2194,15 +2209,15 @@ def align_categoricals(left: SeriesOrVariable, right: SeriesOrVariable) -> tuple
 
 
 def merge(
-    left,
-    right,
-    how="inner",
-    on=None,
-    left_on=None,
-    right_on=None,
-    suffixes=("_x", "_y"),
+    left: Table | pd.DataFrame,
+    right: Table | pd.DataFrame,
+    how: str = "inner",
+    on: str | list[str] | None = None,
+    left_on: str | list[str] | None = None,
+    right_on: str | list[str] | None = None,
+    suffixes: tuple[str, str] = ("_x", "_y"),
     short_name: str | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> Table:
     if ("left_index" in kwargs) or ("right_index" in kwargs):
         # TODO: Arguments left_index/right_index are not implemented.
@@ -2264,10 +2279,10 @@ def merge(
         right_on = []
 
     # Find columns that existed in both left and right tables whose name will be modified with suffixes.
-    overlapping_columns = ((set(left.all_columns) - set(left_on)) & (set(right.all_columns) - set(right_on))) - set(on)  # type: ignore
+    overlapping_columns = ((set(left.all_columns) - set(left_on)) & (set(right.all_columns) - set(right_on))) - set(on)  # ty: ignore
 
     # Find columns that existed in both left and right tables that will preserve their names (since they are columns to join on).
-    common_columns = on or (set(left_on) & set(right_on))  # type: ignore
+    common_columns = on or (set(left_on) & set(right_on))  # ty: ignore
 
     columns_from_left = set(left.all_columns) - set(common_columns)
     columns_from_right = set(right.all_columns) - set(common_columns)
@@ -2277,14 +2292,16 @@ def merge(
             new_column = f"{column}{suffixes[0]}"
         else:
             new_column = column
-        tb[new_column].metadata = indicators.combine_indicators_metadata([left[column]], operation="merge", name=column)
+        tb[new_column].metadata = indicators.combine_indicators_metadata(  # ty: ignore[invalid-assignment]
+            [left[column]], operation="merge", name=column
+        )
 
     for column in columns_from_right:
         if column in overlapping_columns:
             new_column = f"{column}{suffixes[1]}"
         else:
             new_column = column
-        tb[new_column].metadata = indicators.combine_indicators_metadata(
+        tb[new_column].metadata = indicators.combine_indicators_metadata(  # ty: ignore[invalid-assignment]
             [right[column]], operation="merge", name=column
         )
 
@@ -2294,7 +2311,7 @@ def merge(
         )
 
     # Update table metadata.
-    tb.metadata = combine_tables_metadata(tables=[left, right], short_name=short_name)
+    tb.metadata = combine_tables_metadata(tables=cast(list[Table], [left, right]), short_name=short_name)
 
     return tb
 
@@ -2306,7 +2323,7 @@ def concat(
     join: str = "outer",
     ignore_index: bool = False,
     short_name: str | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> Table:
     # TODO: Add more logic to this function to handle indexes and possibly other arguments.
     with warnings.catch_warnings():
@@ -2314,8 +2331,8 @@ def concat(
         table = Table(
             # use our concatenate that gracefully handles categoricals
             dataframes.concatenate(
-                objs=objs,  # type: ignore
-                axis=axis,  # type: ignore
+                objs=objs,  # ty: ignore
+                axis=axis,  # ty: ignore
                 join=join,
                 ignore_index=ignore_index,
                 **kwargs,
@@ -2380,8 +2397,8 @@ def melt(
     var_name: str = "variable",
     value_name: str = "value",
     short_name: str | None = None,
-    *args,
-    **kwargs,
+    *args: Any,
+    **kwargs: Any,
 ) -> Table:
     # TODO: We may need to implement some mor logic here to handle multi-index dataframes.
     # Get the new melt table.
@@ -2403,7 +2420,7 @@ def melt(
     elif isinstance(id_vars, str):
         id_vars_list: list[str] = [id_vars]
     else:
-        id_vars_list = id_vars  # type: ignore
+        id_vars_list = id_vars  # ty: ignore
 
     # Get the list of column names used as id and value indicators.
     if value_vars is None:
@@ -2411,7 +2428,7 @@ def melt(
     elif isinstance(value_vars, str):
         value_vars_list = [value_vars]
     else:
-        value_vars_list = value_vars  # type: ignore
+        value_vars_list = value_vars  # ty: ignore
 
     # Combine metadata of value variables and assign the combination to the new "value" column.
     table[value_name].metadata = indicators.combine_indicators_metadata(
@@ -2425,7 +2442,7 @@ def melt(
 
     for variable in id_vars_list:
         # Combine metadata of id variables and assign the combination to the new "id" variable.
-        table[variable].metadata = indicators.combine_indicators_metadata(
+        table[variable].metadata = indicators.combine_indicators_metadata(  # ty: ignore[invalid-assignment]
             variables=[frame[variable]], operation="melt", name=variable
         )
 
@@ -2457,7 +2474,7 @@ def pivot(
     join_column_levels_with: str | None = None,
     short_name: str | None = None,
     fill_dimensions: bool = True,
-    **kwargs,
+    **kwargs: Any,
 ) -> Table:
     if index is not None:
         kwargs["index"] = index
@@ -2503,7 +2520,7 @@ def pivot(
     # Transfer also the metadata of the index columns.
     # Note: This metadata will only be accessible if columns are reset and flattened to one level.
     for index_column in list(table.index.names):
-        table._fields[index_column] = data._fields[index_column]
+        table._fields[index_column] = data._fields[index_column]  # ty: ignore[invalid-assignment]
 
     if join_column_levels_with is not None:
         # Gather metadata of index columns.
@@ -2533,8 +2550,8 @@ def _add_table_and_variables_metadata_to_table(
             if origin:
                 table._fields[column].origins = [origin]
             else:
-                table._fields[column].sources = metadata.dataset.sources  # type: ignore
-            table._fields[column].licenses = metadata.dataset.licenses  # type: ignore
+                table._fields[column].sources = metadata.dataset.sources  # ty: ignore
+            table._fields[column].licenses = metadata.dataset.licenses  # ty: ignore
     table = update_processing_logs_when_loading_or_creating_table(table=table)
 
     return table
@@ -2545,8 +2562,8 @@ def read_csv(
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
     underscore: bool = False,
-    *args,
-    **kwargs,
+    *args: Any,
+    **kwargs: Any,
 ) -> Table:
     table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
@@ -2558,8 +2575,8 @@ def read_fwf(
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
     underscore: bool = False,
-    *args,
-    **kwargs,
+    *args: Any,
+    **kwargs: Any,
 ) -> Table:
     table = Table(pd.read_fwf(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
@@ -2571,8 +2588,8 @@ def read_feather(
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
     underscore: bool = False,
-    *args,
-    **kwargs,
+    *args: Any,
+    **kwargs: Any,
 ) -> Table:
     table = Table(pd.read_feather(filepath, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
@@ -2580,12 +2597,12 @@ def read_feather(
 
 
 def read_excel(
-    io: str | Path,
-    *args,
+    io: str | Path | IO[AnyStr],
+    *args: Any,
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
     underscore: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> Table:
     assert not isinstance(kwargs.get("sheet_name"), list), "Argument 'sheet_name' must be a string or an integer."
     table = Table(pd.read_excel(io=io, *args, **kwargs), underscore=underscore)
@@ -2596,11 +2613,11 @@ def read_excel(
 
 def read_from_records(
     data: Any,
-    *args,
+    *args: Any,
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
     underscore: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ):
     table = Table(pd.DataFrame.from_records(data=data, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
@@ -2609,11 +2626,11 @@ def read_from_records(
 
 def read_from_dict(
     data: dict[Any, Any],
-    *args,
+    *args: Any,
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
     underscore: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> Table:
     table = Table(pd.DataFrame.from_dict(data=data, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
@@ -2636,8 +2653,8 @@ def read_json(
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
     underscore: bool = False,
-    *args,
-    **kwargs,
+    *args: Any,
+    **kwargs: Any,
 ) -> Table:
     table = Table(pd.read_json(path_or_buf=path_or_buf, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
@@ -2649,8 +2666,8 @@ def read_stata(
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
     underscore: bool = False,
-    *args,
-    **kwargs,
+    *args: Any,
+    **kwargs: Any,
 ) -> Table:
     table = Table(pd.read_stata(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
@@ -2664,7 +2681,9 @@ def read_rda(
     origin: Origin | None = None,
     underscore: bool = False,
 ) -> Table:
-    parsed = rdata.parser.parse_file(filepath_or_buffer)  # type: ignore
+    import rdata
+
+    parsed = rdata.parser.parse_file(filepath_or_buffer)  # ty: ignore
     converted = rdata.conversion.convert(parsed)
 
     available_tables = list(converted.keys())
@@ -2692,8 +2711,10 @@ def read_rda_multiple(
     origin: Origin | None = None,
     underscore: bool = False,
 ) -> dict[str, Table]:
+    import rdata
+
     # Read RData
-    parsed = rdata.parser.parse_file(filepath_or_buffer)  # type: ignore
+    parsed = rdata.parser.parse_file(filepath_or_buffer)  # ty: ignore
     converted = rdata.conversion.convert(parsed)
 
     # Init output dictionary
@@ -2736,7 +2757,9 @@ def read_rds(
     origin: Origin | None = None,
     underscore: bool = False,
 ) -> Table:
-    parsed = rdata.parser.parse_file(filepath_or_buffer, extension="rds")  # type: ignore
+    import rdata
+
+    parsed = rdata.parser.parse_file(filepath_or_buffer, extension="rds")  # ty: ignore
     converted = rdata.conversion.convert(parsed)
 
     table = Table(converted, underscore=underscore)
@@ -2749,12 +2772,67 @@ def read_parquet(
     metadata: TableMeta | None = None,
     origin: Origin | None = None,
     underscore: bool = False,
-    *args,
-    **kwargs,
+    *args: Any,
+    **kwargs: Any,
 ) -> Table:
     table = Table(pd.read_parquet(path=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
+
+
+EXTENSION_TO_READER = {
+    "csv": read_csv,
+    "xlsx": read_excel,
+    "xls": read_excel,
+    "xlsm": read_excel,
+    "xlsb": read_excel,
+    "odf": read_excel,
+    "ods": read_excel,
+    "odt": read_excel,
+    "json": read_json,
+    "parquet": read_parquet,
+    "feather": read_feather,
+    "dta": read_stata,
+    "rds": read_rds,
+    "rda": read_rda,
+}
+
+
+def read(
+    filepath_or_buffer: str | Path | IO[AnyStr],
+    *args: Any,
+    file_extension: str | None = None,
+    metadata: TableMeta | None = None,
+    origin: Origin | None = None,
+    underscore: bool = False,
+    **kwargs: Any,
+) -> Table:
+    """Read a file based on extension, dispatching to the appropriate reader.
+
+    Args:
+        filepath_or_buffer: Path to the file or file-like object to read.
+        *args: Additional positional arguments passed to the format-specific reader.
+        file_extension: File extension (without dot). If None, inferred from filepath.
+        metadata: Table metadata.
+        origin: Origin of the table data.
+        underscore: True to make all column names snake case.
+        **kwargs: Additional keyword arguments passed to the format-specific reader.
+
+    Returns:
+        Table with data and metadata.
+
+    Note:
+        For reading ZIP files, use Snapshot.extracted() context manager instead.
+        See etl/snapshot.py for the recommended approach to handling archives.
+    """
+    if file_extension is None:
+        file_extension = str(filepath_or_buffer).split(".")[-1].lower()
+
+    reader = EXTENSION_TO_READER.get(file_extension)
+    if reader is None:
+        raise ValueError(f"Unknown extension: {file_extension}")
+
+    return reader(filepath_or_buffer, *args, metadata=metadata, origin=origin, underscore=underscore, **kwargs)
 
 
 def read_custom(
@@ -2763,8 +2841,8 @@ def read_custom(
     metadata: TableMeta,
     origin: Origin | None = None,
     underscore: bool = False,
-    *args,
-    **kwargs,
+    *args: Any,
+    **kwargs: Any,
 ) -> Table:
     """Read data using a custom reader function and return a Table with metadata.
 
@@ -2791,7 +2869,7 @@ def read_custom(
 
 
 class ExcelFile(pd.ExcelFile):
-    def __init__(self, *args, metadata: TableMeta | None = None, origin: Origin | None = None, **kwargs):
+    def __init__(self, *args: Any, metadata: TableMeta | None = None, origin: Origin | None = None, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.metadata = metadata
         self.origin = origin
@@ -2799,17 +2877,17 @@ class ExcelFile(pd.ExcelFile):
     def parse(
         self,
         sheet_name: str | int = 0,
-        *args,
+        *args: Any,
         metadata: TableMeta | None = None,
         origin: Origin | None = None,
         underscore: bool = False,
-        **kwargs,
+        **kwargs: Any,
     ):
         metadata = metadata or self.metadata
         origin = origin or self.origin
 
         # Note: Maybe we should include the sheet name in parents.
-        df = super().parse(sheet_name=sheet_name, *args, **kwargs)  # type: ignore
+        df = super().parse(sheet_name=sheet_name, *args, **kwargs)  # ty: ignore
         table = Table(df, underscore=underscore, short_name=str(sheet_name))
         if metadata is not None:
             table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
@@ -2820,7 +2898,7 @@ def update_processing_logs_when_loading_or_creating_table(table: Table) -> Table
     # Add entry to processing log, specifying that each variable was loaded from this table.
     try:
         # If the table comes from an ETL dataset, generate a URI for the table.
-        table_uri = f"{table.metadata.dataset.uri}/{table.metadata.short_name}"  # type: ignore
+        table_uri = f"{table.metadata.dataset.uri}/{table.metadata.short_name}"  # ty: ignore
         parents = [table_uri]
         operation = "load"
     except (AssertionError, AttributeError):
@@ -2863,7 +2941,7 @@ def update_processing_logs_when_saving_table(table: Table, path: str | Path) -> 
     return table
 
 
-def copy_metadata(from_table: Table, to_table: Table, deep=False) -> Table:
+def copy_metadata(from_table: Table, to_table: Table, deep: bool = False) -> Table:
     """Copy metadata from a different table to self."""
     tab = Table(pd.DataFrame.copy(to_table, deep=deep), metadata=from_table.metadata.copy())
 
@@ -2962,11 +3040,19 @@ def check_all_variables_have_metadata(tables: Iterable[Table], fields: list[str]
 
     for table in tables:
         table_name = table.metadata.short_name
+        missing: dict[str, list[str]] = {field: [] for field in fields}
         for column in table.columns:
             for field in fields:
                 if not getattr(table[column].metadata, field):
-                    warning_class = warnings.NoOriginsWarning if field == "origins" else warnings.MetadataWarning
-                    warnings.warn(f"Table {table_name}, column {column} has no {field}.", warning_class)
+                    missing[field].append(column)
+        for field in fields:
+            if missing[field]:
+                cols = missing[field]
+                warning_class = warnings.NoOriginsWarning if field == "origins" else warnings.MetadataWarning
+                warnings.warn(
+                    f"Table {table_name}: {len(cols)} column(s) have no {field} (e.g. {', '.join(cols[:3])}).",
+                    warning_class,
+                )
 
 
 def _resolve_collisions(
@@ -2996,7 +3082,7 @@ def _resolve_collisions(
     return new_cols
 
 
-def multi_merge(tables: list[Table], *args, **kwargs) -> Table:
+def multi_merge(tables: list[Table], *args: Any, **kwargs: Any) -> Table:
     """Merge multiple tables.
 
     This is a helper function when merging more than two tables on common columns.
@@ -3020,7 +3106,7 @@ def _extract_variables(t: Table, cols: list[str] | str | None) -> list[indicator
         return []
     if isinstance(cols, str):
         cols = [cols]
-    return [t[col] for col in cols]  # type: ignore
+    return [t[col] for col in cols]  # ty: ignore
 
 
 def read_df(
@@ -3032,14 +3118,10 @@ def read_df(
     """Create a Table (with metadata and an origin) from a DataFrame.
 
     Args:
-        df : pd.DataFrame
-            Input DataFrame.
-        metadata : TableMeta | None, optional
-            Table metadata (with a title and description).
-        origin : Origin | None, optional
-            Origin of the table.
-        underscore : bool, optional
-            True to ensure all column names are snake case.
+        df: Input DataFrame.
+        metadata: Table metadata (with a title and description).
+        origin: Origin of the table.
+        underscore: True to ensure all column names are snake case.
 
     Returns:
         Table: Original data as a Table with metadata and an origin.
@@ -3090,7 +3172,7 @@ to_datetime = keep_metadata(pd.to_datetime)
 to_numeric = keep_metadata(pd.to_numeric)
 
 
-def update_variable_dimensions(variable, dimensions_data: dict[str, Any]) -> None:
+def update_variable_dimensions(variable: indicators.Indicator, dimensions_data: dict[str, Any]) -> None:
     """
     Update a variable's dimensions metadata.
 

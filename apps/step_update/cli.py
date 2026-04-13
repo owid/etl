@@ -3,7 +3,7 @@ import fnmatch
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import click
 import structlog
@@ -64,17 +64,17 @@ class StepUpdater:
             log.error(error_message)
             sys.exit(1)
 
-    def get_step_info(self, step: str) -> Dict[str, Any]:
+    def get_step_info(self, step: str) -> dict[str, Any]:
         # Get info for step to be updated.
         step_info = self.steps_df[self.steps_df["step"] == step].iloc[0].to_dict()
 
-        return step_info
+        return step_info  # ty: ignore[invalid-return-type]
 
     def _update_snapshot_step(
         self,
         step: str,
-        step_version_new: Optional[str] = STEP_VERSION_NEW,
-        step_header: Optional[str] = None,
+        step_version_new: str | None = STEP_VERSION_NEW,
+        step_header: str | None = None,
     ) -> int:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
@@ -96,7 +96,10 @@ class StepUpdater:
 
         # Find script file for old step.
         _step_py_files = list(step_dvc_file.parent.glob("*.py"))
-        if len(_step_py_files) == 1:
+        if len(_step_py_files) == 0:
+            # No .py file found - this is valid for simple snapshots that can be run with just the .dvc file.
+            step_py_file = None
+        elif len(_step_py_files) == 1:
             # Usually there is a single .py file with the same name. But it is possible that:
             #  * The single .py file has a different name.
             #    Example: gcp/2023-12-12/global_carbon_budget.py
@@ -121,7 +124,7 @@ class StepUpdater:
             step_py_file = steps_sorted[choice]
 
         # Define the new step.
-        step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
+        step_new = step.replace(step_info["version"], step_version_new)  # ty: ignore
 
         # Define a header for the new step in the dag file.
         if step_header is None:
@@ -138,19 +141,21 @@ class StepUpdater:
             # Load metadata from last step.
             metadata = SnapshotMeta.load_from_yaml(step_dvc_file)
             # Update version and date accessed.
-            metadata.version = step_version_new  # type: ignore
+            metadata.version = step_version_new  # ty: ignore
             if metadata.origin:
-                metadata.origin.date_accessed = step_version_new  # type: ignore
+                metadata.origin.date_accessed = step_version_new  # ty: ignore
             # Write metadata to new file.
             step_dvc_file_new.write_text(metadata.to_yaml())
 
-            # Check if a new py file already exists.
-            step_py_file_new = folder_new / step_py_file.name
-            if not step_py_file_new.exists():
-                # Create a new py file.
-                # NOTE: If there is already a .py file in the new folder, it may be because another dvc file (used by
-                # that script) has already been updated. So, simply skip it.
-                step_py_file_new.write_bytes(step_py_file.read_bytes())
+            # Copy the .py file if one exists.
+            if step_py_file is not None:
+                # Check if a new py file already exists.
+                step_py_file_new = folder_new / step_py_file.name
+                if not step_py_file_new.exists():
+                    # Create a new py file.
+                    # NOTE: If there is already a .py file in the new folder, it may be because another dvc file (used by
+                    # that script) has already been updated. So, simply skip it.
+                    step_py_file_new.write_bytes(step_py_file.read_bytes())
 
             # Add the new snapshot as a dependency of the temporary dag.
             step_temp = (
@@ -172,8 +177,8 @@ class StepUpdater:
     def _update_data_step(
         self,
         step: str,
-        step_version_new: Optional[str] = STEP_VERSION_NEW,
-        step_header: Optional[str] = None,
+        step_version_new: str | None = STEP_VERSION_NEW,
+        step_header: str | None = None,
     ) -> int:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
@@ -202,7 +207,7 @@ class StepUpdater:
             # If the step has version "latest", the new step will also have version "latest".
             step_new = step
         else:
-            step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
+            step_new = step.replace(step_info["version"], step_version_new)  # ty: ignore
 
         # Find the latest version of each of the step's dependencies.
         step_dependencies = set(self.steps_df[self.steps_df["step"] == step].iloc[0]["direct_dependencies"])
@@ -229,7 +234,7 @@ class StepUpdater:
                 # Copy files to new folder.
                 for step_file in step_files:
                     # Define the path to the new version of this file.
-                    step_file_new = Path(str(step_file).replace(step_info["version"], step_version_new))  # type: ignore
+                    step_file_new = Path(str(step_file).replace(step_info["version"], step_version_new))  # ty: ignore
 
                     # Check that the new file does not exist.
                     if step_file_new.exists():
@@ -251,7 +256,7 @@ class StepUpdater:
         return 0
 
     def _update_step(
-        self, step: str, step_version_new: Optional[str] = STEP_VERSION_NEW, step_header: Optional[str] = None
+        self, step: str, step_version_new: str | None = STEP_VERSION_NEW, step_header: str | None = None
     ) -> int:
         """Update step to new version."""
 
@@ -268,7 +273,7 @@ class StepUpdater:
             log.info(f"Updating {step} to version {step_version_new}.")
         if step_channel == "snapshot":
             return self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
-        elif step_channel in ["meadow", "garden", "grapher", "explorers", "external", "s3", "github"]:
+        elif step_channel in ["meadow", "garden", "grapher", "explorers", "external", "s3", "github", "multidim"]:
             return self._update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
         else:
             log.error(f"Channel {step_channel} not yet supported.")
@@ -276,11 +281,11 @@ class StepUpdater:
 
     def update_steps(
         self,
-        steps: List[str],
-        step_version_new: Optional[str] = STEP_VERSION_NEW,
+        steps: list[str],
+        step_version_new: str | None = STEP_VERSION_NEW,
         include_dependencies: bool = False,
         include_usages: bool = False,
-        step_headers: Optional[Dict[str, str]] = None,
+        step_headers: dict[str, str] | None = None,
         direct_only: bool = False,
     ) -> None:
         """Update one or more steps to their new version, if possible."""
@@ -412,7 +417,7 @@ class StepUpdater:
             # Reload steps dataframe.
             self._load_version_tracker()
 
-    def archive_steps(self, steps: Union[str, List[str]], include_usages: bool = False) -> None:
+    def archive_steps(self, steps: str | list[str], include_usages: bool = False) -> None:
         """Move one or more steps from their active to their archive dag."""
 
         # If a single step is given, convert it to a list.
@@ -421,20 +426,22 @@ class StepUpdater:
         elif isinstance(steps, tuple):
             steps = list(steps)
 
-        # Archivable steps should be archived in groups.
-        # For example, the meadow, garden and grapher steps of a step may be archivable, but we shouldn't archive only
-        # the meadow step without archiving the garden and grapher steps as well (otherwise there would be a broken
-        # dependency in the dag).
         for step in steps:
             if self.steps_df[self.steps_df["step"] == step].empty:
                 log.error(f"Step {step} not found in active dag.")
                 continue
 
+            usages = self.steps_df[self.steps_df["step"] == step]["all_active_usages"].item()
             if include_usages:
-                # Add all active usages of current step to the list of steps to update (if not already in the list).
-                usages = self.steps_df[self.steps_df["step"] == step]["all_active_usages"].item()
-
                 steps += [usage for usage in usages if usage not in steps]
+            else:
+                blocking = [u for u in usages if u not in steps]
+                if blocking:
+                    blocking_list = "\n  ".join(blocking)
+                    raise click.ClickException(
+                        f"Cannot archive '{step}' because it is used by active steps:\n  {blocking_list}\n"
+                        f"Use --include-usages to archive dependent steps as well."
+                    )
 
         # Sort steps in dependency order (i.e. snapshots first). This avoids an error in the following situation:
         # You attempt to archive [meadow_1, snapshot_1] (where snapshot_1 is a dependency of meadow_1).
@@ -493,7 +500,7 @@ def _extract_step_pattern(step: str) -> tuple[str, str, str]:
         raise ValueError(f"Could not parse step URI: {step}")
 
 
-def _filter_direct_only_steps(original_steps: List[str], all_steps: List[str]) -> List[str]:
+def _filter_direct_only_steps(original_steps: list[str], all_steps: list[str]) -> list[str]:
     """Filter steps to only include those with the same namespace/version/short_name pattern as original steps.
 
     Args:
@@ -523,7 +530,7 @@ def _filter_direct_only_steps(original_steps: List[str], all_steps: List[str]) -
     return filtered_steps
 
 
-def _expand_wildcard_patterns(patterns: List[str], active_steps: List[str]) -> List[str]:
+def _expand_wildcard_patterns(patterns: list[str], active_steps: list[str]) -> list[str]:
     """Expand wildcard patterns to match actual step names.
 
     Args:
@@ -559,7 +566,7 @@ def _expand_wildcard_patterns(patterns: List[str], active_steps: List[str]) -> L
     return result
 
 
-def _confirm_choice(multiple_files: List[Any]) -> int:
+def _confirm_choice(multiple_files: list[Any]) -> int:
     choice_default = 0
     for i, file_name in enumerate(multiple_files):
         print(f"    {i} - {file_name}")
@@ -577,7 +584,7 @@ def _confirm_choice(multiple_files: List[Any]) -> int:
 
 
 @click.command(name="update", cls=RichCommand, help=__doc__)
-@click.argument("steps", type=str or List[str], nargs=-1)
+@click.argument("steps", type=str or list[str], nargs=-1)
 @click.option(
     "--step-version-new", type=str, default=STEP_VERSION_NEW, help=f"New version for step. Default: {STEP_VERSION_NEW}."
 )
@@ -617,8 +624,8 @@ def _confirm_choice(multiple_files: List[Any]) -> int:
     help="When used with --include-usages, only include steps with the same namespace/version/short_name pattern. Default: False.",
 )
 def cli(
-    steps: Union[str, List[str]],
-    step_version_new: Optional[str] = STEP_VERSION_NEW,
+    steps: str | list[str],
+    step_version_new: str | None = STEP_VERSION_NEW,
     include_dependencies: bool = False,
     include_usages: bool = False,
     dry_run: bool = False,
@@ -702,7 +709,7 @@ def cli(
 
 
 @click.command(name="archive", cls=RichCommand, help=__doc__)
-@click.argument("steps", type=str or List[str], nargs=-1)
+@click.argument("steps", type=str or list[str], nargs=-1)
 @click.option(
     "--include-usages",
     is_flag=True,
@@ -725,7 +732,7 @@ def cli(
     help="Skip user interactions (for confirmation and when there is ambiguity). Default: False.",
 )
 def archive_cli(
-    steps: Union[str, List[str]],
+    steps: str | list[str],
     include_usages: bool = False,
     dry_run: bool = False,
     interactive: bool = True,

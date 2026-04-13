@@ -2,11 +2,13 @@
 #  helpers.py
 #  etl
 #
+import os
 import re
 import time
+from collections.abc import Callable, Iterable
 from functools import cache
 from pathlib import Path
-from typing import Any, Callable, Iterable, Literal, Optional, overload
+from typing import Any, Literal, overload
 
 import deprecated
 import pandas as pd
@@ -162,7 +164,7 @@ def create_dataset(
             if dim_names:
                 # First pass to update metadata from YAML
                 if meta_path.exists():
-                    table.update_metadata_from_yaml(meta_path, table.m.short_name)  # type: ignore
+                    table.update_metadata_from_yaml(meta_path, table.m.short_name)  # ty: ignore
                 log.info("long_to_wide.start", shape=table.shape, short_name=table.m.short_name, dim_names=dim_names)
                 t = time.time()
                 table = gh.long_to_wide(table)
@@ -171,7 +173,7 @@ def create_dataset(
                 # Ignore extra variables for the following pass of metadata
                 extra_variables = "ignore"
             else:
-                log.info("long_to_wide.skip", short_name=table.m.short_name)
+                pass
 
         ds.add(table, formats=formats, repack=repack)
 
@@ -203,6 +205,22 @@ def get_metadata_path(dest_dir: str) -> Path:
     else:
         N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
     return N.metadata_path
+
+
+def render_yaml_metadata(ds: catalog.Dataset) -> None:
+    """Render Jinja templates in metadata for all tables in a dataset.
+
+    This is useful when metadata YAML files contain Jinja templates that need to be
+    evaluated, but the dataset has no dimensions (so long_to_wide doesn't process them).
+
+    Call this after create_dataset when using Jinja in metadata files for datasets
+    without dimensions.
+    """
+    for table_name in ds.table_names:
+        table = ds[table_name]
+        for col in table.columns:
+            table[col].metadata = table[col].metadata.render({})  # ty: ignore[unresolved-attribute]
+        table._save_metadata(os.path.join(ds.path, table.metadata.checked_name + ".meta.json"))
 
 
 class CurrentFileMustBeAStep(ExceptionFromDocstring):
@@ -298,13 +316,13 @@ class PathFinder:
     @property
     def channel(self) -> CHANNEL:
         if self._is_snapshot_file:
-            return "snapshot"  # type: ignore
+            return "snapshot"  # ty: ignore
         # Check if this is a graph step: etl/steps/graph/namespace/version/slug
         step_dir_parent = self.f.parent.parent.parent.name
         if step_dir_parent == "graph":
             return "graph"  # type: ignore
         # Data steps: etl/steps/data/channel/namespace/version/slug
-        return self.f.parent.parent.parent.name  # type: ignore
+        return self.f.parent.parent.parent.name  # ty: ignore
 
     @property
     def namespace(self) -> str:
@@ -359,7 +377,7 @@ class PathFinder:
         return catalog.Dataset(paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}")
 
     @property
-    def regions(self):
+    def regions(self) -> Regions:
         """Get Regions helper for the specific use of an ETL step."""
         if not hasattr(self, "_regions"):
             try:
@@ -394,7 +412,7 @@ class PathFinder:
         """Return step name."""
         return self.create_step_name(
             short_name=self.short_name,
-            channel=self.channel,  # type: ignore
+            channel=self.channel,  # ty: ignore
             namespace=self.namespace,
             version=self.version,
             step_type=self.step_type,
@@ -602,7 +620,7 @@ class PathFinder:
             )
             dataset = catalog.Dataset(dataset_path)
 
-        return dataset  # type: ignore[reportReturnType]
+        return dataset  # ty: ignore[invalid-return-type]
 
     def load_snapshot(self, short_name: str | None = None, **kwargs) -> Snapshot:
         """Load snapshot dependency. short_name defaults to the current step's short_name."""
@@ -646,7 +664,7 @@ class PathFinder:
         assert isinstance(cs, CollectionSet)
         return cs
 
-    def init_snapshot(self, filename: Optional[str] = None) -> Snapshot:
+    def init_snapshot(self, filename: str | None = None) -> Snapshot:
         """Create a snapshot using the current step's location to determine namespace, version, and optionally filename.
 
         Args:
@@ -958,6 +976,27 @@ class PathFinder:
         )
 
         return explorer
+
+    def export_fig(self, fig, filename: str, extensions: list[str], **kwargs) -> None:
+        """Export a matplotlib figure to multiple formats.
+
+        :param fig: The matplotlib figure to export.
+        :param filename: The base filename (without extension).
+        :param extensions: List of file extensions to export (e.g., ["png", "svg"]).
+        :param kwargs: Additional keyword arguments to pass to fig.savefig().
+        """
+        for ext in extensions:
+            path = self.directory / f"{filename}.{ext}"
+            save_kwargs = {
+                "fname": path,
+                "format": ext,
+                **kwargs,
+            }
+            if ext == "svg":
+                # Remove date metadata for SVG to keep files clean
+                save_kwargs["metadata"] = {"Date": None}
+            fig.savefig(**save_kwargs)
+            self.log.info(f"Saved chart to {path}")
 
 
 def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:

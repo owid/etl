@@ -1324,9 +1324,9 @@
                           },
                           "additionalProperties": false
                         },
-                        "hideLegend": {
+                        "hideSeriesLabels": {
                           "type": "boolean",
-                          "description": "Hide legend in chart.",
+                          "description": "Hide series labels in chart.",
                           "default": false
                         },
                         "hideLogo": {

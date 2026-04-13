@@ -1,0 +1,119 @@
+dataset:
+  title: Time use across activities - OECD Gender data (2020)
+tables:
+  time_use_across_activities__oecd_gender_data__2020:
+    variables:
+      minutes_spent_on_leisure__men__oecd_gender_data__2020:
+        title: Minutes spent on leisure - men (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes men spent on leisure activities out of 24 hours (1440 minutes). Average minutes spent in different activities includes both weekdays and weekends.
+
+          Leisure includes sports, participating/attending events, visiting or entertaining friends,  TV or radio at home, and other leisure activities.
+      minutes_spent_on_leisure__total__oecd_gender_data__2020:
+        title: Minutes spent on leisure - total (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes spent on leisure activities out of 24 hours (1440 minutes) for individuals in the population aged 15-64. Average minutes spent in different activities includes both weekdays and weekends.
+
+          Leisure includes sports, participating/attending events, visiting or entertaining friends,  TV or radio at home, and other leisure activities.
+      minutes_spent_on_leisure__women__oecd_gender_data__2020:
+        title: Minutes spent on leisure - women (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes women spent on leisure activities out of 24 hours (1440 minutes). Average minutes spent in different activities includes both weekdays and weekends.
+
+          Leisure includes sports, participating/attending events, visiting or entertaining friends,  TV or radio at home, and other leisure activities.
+      minutes_spent_on_other_activities__men__oecd_gender_data__2020:
+        title: Minutes spent on other activities - men (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes men spent on other activities out of 24 hours (1440 minutes). Average minutes spent in different activities includes both weekdays and weekends.
+
+          Other activities include religious/spiritual activities and civic obligations.
+      minutes_spent_on_other_activities__total__oecd_gender_data__2020:
+        title: Minutes spent on other activities - total (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes spent on other activities out of 24 hours (1440 minutes) for individuals in the population aged 15-64. Average minutes spent in different activities includes both weekdays and weekends.
+
+          Other activities include religious/spiritual activities and civic obligations.
+      minutes_spent_on_other_activities__women__oecd_gender_data__2020:
+        title: Minutes spent on other activities - women (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes women spent on other activities out of 24 hours (1440 minutes). Average minutes spent in different activities includes both weekdays and weekends.
+
+          Other activities include religious/spiritual activities and civic obligations.
+      minutes_spent_on_paid_work_or_study__men__oecd_gender_data__2020:
+        title: Minutes spent on paid work or study - men (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes men spent on paid work or study out of 24 hours (1440 minutes). Average minutes spent in different activities includes both weekdays and weekends.
+
+          Includes paid work (all jobs), travel to and from work/study, time in school or classes, research/homework, job search, and other paid work or study-related activities.
+      minutes_spent_on_paid_work_or_study__total__oecd_gender_data__2020:
+        title: Minutes spent on paid work or study - total (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes spent on paid work or study out of 24 hours (1440 minutes) for individuals in the population aged 15-64. Average minutes spent in different activities includes both weekdays and weekends.
+
+          Includes paid work (all jobs), travel to and from work/study, time in school or classes, research/homework, job search, and other paid work or study-related activities.
+      minutes_spent_on_paid_work_or_study__women__oecd_gender_data__2020:
+        title: Minutes spent on paid work or study - women (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes women spent on paid work or study out of 24 hours (1440 minutes). Average minutes spent in different activities includes both weekdays and weekends.
+
+          Includes paid work (all jobs), travel to and from work/study, time in school or classes, research/homework, job search, and other paid work or study-related activities.
+      minutes_spent_on_personal_care__men__oecd_gender_data__2020:
+        title: Minutes spent on personal care - men (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes men spent on personal care out of 24 hours (1440 minutes). Average minutes spent in different activities includes both weekdays and weekends.
+
+          Personal care includes sleeping, eating and drinking, personal, household and medical services, plus travel related to personal care.
+      minutes_spent_on_personal_care__total__oecd_gender_data__2020:
+        title: Minutes spent on personal care - total (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes spent on personal care out of 24 hours (1440 minutes) for individuals in the population aged 15-64. Average minutes spent in different activities includes both weekdays and weekends.
+
+          Personal care includes sleeping, eating and drinking, personal, household and medical services, plus travel related to personal care.
+      minutes_spent_on_personal_care__women__oecd_gender_data__2020:
+        title: Minutes spent on personal care - women (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes women spent on personal care out of 24 hours (1440 minutes). Average minutes spent in different activities includes both weekdays and weekends.
+
+          Personal care includes sleeping, eating and drinking, personal, household and medical services, plus travel related to personal care.
+      minutes_spent_on_unpaid_work__men__oecd_gender_data__2020:
+        title: Minutes spent on unpaid work - men (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes men spent on unpaid work out of 24 hours (1440 minutes). Average minutes spent in different activities includes both weekdays and weekends.
+
+          Includes routine housework, shopping, care for household members, child care, adult care, care for non-household members, volunteering, travel related to household activities, other unpaid work.
+      minutes_spent_on_unpaid_work__total__oecd_gender_data__2020:
+        title: Minutes spent on unpaid work - total (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes spent on unpaid work out of 24 hours (1440 minutes) for individuals in the population aged 15-64. Average minutes spent in different activities includes both weekdays and weekends.
+
+          Includes routine housework, shopping, care for household members, child care, adult care, care for non-household members, volunteering, travel related to household activities, other unpaid work.
+      minutes_spent_on_unpaid_work__women__oecd_gender_data__2020:
+        title: Minutes spent on unpaid work - women (OECD Gender data (2020))
+        unit: ''
+        description: |-
+          Average minutes women spent on unpaid work out of 24 hours (1440 minutes). Average minutes spent in different activities includes both weekdays and weekends.
+
+          Includes routine housework, shopping, care for household members, child care, adult care, care for non-household members, volunteering, travel related to household activities, other unpaid work.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

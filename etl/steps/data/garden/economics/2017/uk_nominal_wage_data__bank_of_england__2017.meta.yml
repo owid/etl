@@ -1,0 +1,33 @@
+dataset:
+  title: UK Nominal wage data, price data, and real wage – Bank of England ("Three centuries of macroeconomic data") (2017)
+tables:
+  uk_nominal_wage_data__bank_of_england__2017:
+    variables:
+      nominal_average_weekly_wages__bank_of_england__2017:
+        title: Nominal Average Weekly Wages (Bank of England (2017))
+        unit: £ (nominal)
+        display:
+          unit: Percent
+        description: Nominal average weekly wages are not adjusted for inflation.
+      real_average_weekly_wages__bank_of_england__2017:
+        title: Real Average Weekly Wages (Bank of England (2017))
+        unit: £ (real)
+        display:
+          unit: Percent
+        description: Average weekly earnings are adjusted for inflation.
+      spliced_consumer_price_index_2015_100__bank_of_england__2017:
+        title: Spliced Consumer Price index 2015=100 (Bank of England (2017))
+        unit: 2015=100
+        display:
+          unit: Percent
+        description: |-
+          Splicing the CPI is a technique used to account for some products no longer being traded on the market or introducing new items that were not previously sold.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

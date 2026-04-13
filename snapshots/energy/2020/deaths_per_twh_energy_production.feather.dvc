@@ -1,0 +1,21 @@
+meta:
+  source:
+    name: Deaths per TWh energy production
+    description: |-
+      Death rates from energy production is measured as the number of deaths by energy source per terawatt-hour (TWh) of electricity production.
+
+      Data on death rates from fossil fuels is sourced from Markandya, A., & Wilkinson, P. (2007).
+
+      Data on death rates from solar and wind is sourced from Sovacool et al. (2016) based on a database of accidents from these sources.
+
+      We estimate deaths rates for nuclear energy based on the latest death toll figures from Chernobyl and Fukushima as described in our article here: https://ourworldindata.org/what-was-the-death-toll-from-chernobyl-and-fukushima
+
+      We estimate death rates from hydropower based on an updated list of historical hydropower accidents, dating back to 1965, sourced primarily from the underlying database included in Sovacool et al. (2016). For more information, see our article: https://ourworldindata.org/safest-sources-of-energy
+    date_accessed: 2026-03-05
+    published_by: Sovacool et al. (2016); and Markandya, A., & Wilkinson, P. (2007)
+  name: Deaths per TWh energy production
+  description: ''
+outs:
+  - md5: 2aefdb5488786c47fd76f891188def34
+    size: 3146
+    path: deaths_per_twh_energy_production.feather

@@ -1,5 +1,5 @@
 from dataclasses import is_dataclass
-from functools import lru_cache
+from functools import cache
 from typing import Any
 
 import jinja2
@@ -20,11 +20,11 @@ jinja_env = jinja2.Environment(
 
 
 # Helper function to raise an error with << raise("uh oh...") >>
-def raise_helper(msg):
+def raise_helper(msg: str) -> None:
     raise Exception(msg)
 
 
-jinja_env.globals["raise"] = raise_helper
+jinja_env.globals["raise"] = raise_helper  # ty: ignore[invalid-assignment]
 
 
 def _uses_jinja(text: str | None):
@@ -34,7 +34,7 @@ def _uses_jinja(text: str | None):
     return "<%" in text or "<<" in text
 
 
-@lru_cache(maxsize=None)
+@cache
 def _cached_jinja_template(text: str) -> jinja2.environment.Template:
     return jinja_env.from_string(text)
 
@@ -64,7 +64,7 @@ def _expand_jinja_text(text: str, dim_dict: dict[str, str], remove_dods: bool = 
     return out
 
 
-def _expand_jinja(obj: Any, dim_dict: dict[str, str], **kwargs) -> Any:
+def _expand_jinja(obj: Any, dim_dict: dict[str, str], **kwargs: Any) -> Any:
     """Expand Jinja in all metadata fields. This modifies the original object in place."""
     if obj is None:
         return None

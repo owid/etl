@@ -53,7 +53,7 @@ LAST_YEAR = 2024
 LAST_YEAR_PREVIEW = 2025
 
 # Number of events with no location assigned (see function estimate_metrics_locations)
-NUM_MISSING_LOCATIONS = 1243
+NUM_MISSING_LOCATIONS = 1248
 
 # Catalog path of the main UCDP dataset. NOTE: Change this when there is a new UCDP stable (yearly) release.
 VERSION_UCDP_STABLE = "2025-06-13"
@@ -141,9 +141,9 @@ def import_ucdp_module(catalog_path: str = CATALOG_PATH):
     We need to do this unusual import because the module path contains numeric values.
     """
     step_uri = f"data://{catalog_path}"
-    assert (
-        step_uri in paths.dependencies
-    ), f"ucdp_preview module relies on the code of step {step_uri}. The dag should list this step as a dependency!"
+    assert step_uri in paths.dependencies, (
+        f"ucdp_preview module relies on the code of step {step_uri}. The dag should list this step as a dependency!"
+    )
 
     submodule_path = Path(f"steps/data/{catalog_path}.py")
     submodule_dir = submodule_path.parent

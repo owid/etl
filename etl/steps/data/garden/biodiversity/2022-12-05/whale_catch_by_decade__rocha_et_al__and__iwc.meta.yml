@@ -1,0 +1,105 @@
+dataset:
+  title: Whale catch by decade (Rocha et al. & IWC)
+tables:
+  whale_catch_by_decade__rocha_et_al__and__iwc:
+    variables:
+      all_species__rocha_et_al__and__iwc:
+        title: All species (Rocha et al. & IWC)
+        unit: whales caught
+        display:
+          name: All whale species
+          numDecimalPlaces: 0
+        description: |-
+          The total number of whales caught by decade, where '1900' is the total from 1900 to 1909; '1910' is the total from 1910 to 1919 etc.
+      blue_whale__rocha_et_al__and__iwc:
+        title: Blue whale (Rocha et al. & IWC)
+        unit: whales caught
+        display:
+          name: Blue whale
+          numDecimalPlaces: 0
+        description: |-
+          The number of blue whales caught by decade, where '1900' is the total from 1900 to 1909; '1910' is the total from 1910 to 1919 etc.
+      bowhead_whale__rocha_et_al__and__iwc:
+        title: Bowhead whale (Rocha et al. & IWC)
+        unit: whales killed
+        display:
+          name: Bowhead whales
+          numDecimalPlaces: 0
+        description: |-
+          The number of bowhead whales caught by decade, where '1900' is the total from 1900 to 1909; '1910' is the total from 1910 to 1919 etc.
+      brydes_whale__rocha_et_al__and__iwc:
+        title: Bryde's whale (Rocha et al. & IWC)
+        unit: whales caught
+        display:
+          name: Bryde's whale
+          numDecimalPlaces: 0
+        description: |-
+          The number of Bryde's whales caught by decade, where '1900' is the total from 1900 to 1909; '1910' is the total from 1910 to 1919 etc.
+      fin_whale__rocha_et_al__and__iwc:
+        title: Fin whale (Rocha et al. & IWC)
+        unit: whales caught
+        display:
+          name: Fin whale
+          numDecimalPlaces: 0
+        description: |-
+          The number of fin whales caught by decade, where '1900' is the total from 1900 to 1909; '1910' is the total from 1910 to 1919 etc.
+      gray_whale__rocha_et_al__and__iwc:
+        title: Gray whale (Rocha et al. & IWC)
+        unit: whales caught
+        display:
+          name: Gray whale
+          numDecimalPlaces: 0
+        description: |-
+          The number of gray whales caught by decade, where '1900' is the total from 1900 to 1909; '1910' is the total from 1910 to 1919 etc.
+      humpback_whale__rocha_et_al__and__iwc:
+        title: Humpback whale (Rocha et al. & IWC)
+        unit: whales caught
+        display:
+          name: Humpback whale
+          numDecimalPlaces: 0
+        description: |-
+          The number of humpback whales caught by decade, where '1900' is the total from 1900 to 1909; '1910' is the total from 1910 to 1919 etc.
+      minke_whale__rocha_et_al__and__iwc:
+        title: Minke whale (Rocha et al. & IWC)
+        unit: whales caught
+        display:
+          name: Minke whale
+          numDecimalPlaces: 0
+        description: |-
+          The number of Minke whales caught by decade, where '1900' is the total from 1900 to 1909; '1910' is the total from 1910 to 1919 etc.
+      right_whale__rocha_et_al__and__iwc:
+        title: Right whale (Rocha et al. & IWC)
+        unit: whales caught
+        display:
+          name: Right whale
+          numDecimalPlaces: 0
+        description: |-
+          The number of right whales caught by decade, where '1900' is the total from 1900 to 1909; '1910' is the total from 1910 to 1919 etc.
+      sei_whale__rocha_et_al__and__iwc:
+        title: Sei whale (Rocha et al. & IWC)
+        unit: ''
+      sperm_whale__rocha_et_al__and__iwc:
+        title: Sperm whale (Rocha et al. & IWC)
+        unit: whales caught
+        display:
+          name: Sperm whale
+          numDecimalPlaces: 0
+        description: |-
+          The number of sperm whales caught by decade, where '1900' is the total from 1900 to 1909; '1910' is the total from 1910 to 1919 etc.
+      unspecified_other__rocha_et_al__and__iwc:
+        title: Unspecified/Other (Rocha et al. & IWC)
+        unit: whales caught
+        display:
+          name: Unspecified/Other
+          numDecimalPlaces: 0
+        description: |-
+          The number of unspecified/other whales caught by decade, where '1900' is the total from 1900 to 1909; '1910' is the total from 1910 to 1919 etc.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

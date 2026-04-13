@@ -3,7 +3,7 @@
 import json
 import subprocess
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -13,7 +13,7 @@ log = get_logger()
 
 
 @st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
-def fetch_host_memory_stats(host: str = "gaia-1") -> Tuple[Optional[Dict], Optional[str]]:
+def fetch_host_memory_stats(host: str = "gaia-1") -> tuple[dict | None, str | None]:
     """
     Fetch host memory statistics from the LXC host.
 
@@ -85,7 +85,7 @@ def fetch_host_memory_stats(host: str = "gaia-1") -> Tuple[Optional[Dict], Optio
 
 
 @st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
-def fetch_lxc_servers_data(host: str = "gaia-1") -> Tuple[Optional[pd.DataFrame], Optional[str]]:
+def fetch_lxc_servers_data(host: str = "gaia-1") -> tuple[pd.DataFrame | None, str | None]:
     """
     Fetch LXC server information from the specified host.
 
@@ -197,7 +197,7 @@ def _process_server_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _extract_memory_used_gb(memory_info: Dict) -> Optional[float]:
+def _extract_memory_used_gb(memory_info: dict) -> float | None:
     """Extract used memory in GB from memory info dict."""
     try:
         if isinstance(memory_info, dict) and "used_mb" in memory_info:
@@ -207,7 +207,7 @@ def _extract_memory_used_gb(memory_info: Dict) -> Optional[float]:
         return None
 
 
-def _extract_memory_total_gb(memory_info: Dict) -> Optional[float]:
+def _extract_memory_total_gb(memory_info: dict) -> float | None:
     """Extract total memory in GB from memory info dict."""
     try:
         if isinstance(memory_info, dict) and "total_mb" in memory_info:
@@ -217,7 +217,7 @@ def _extract_memory_total_gb(memory_info: Dict) -> Optional[float]:
         return None
 
 
-def _calculate_memory_usage_pct(row: pd.Series) -> Optional[float]:
+def _calculate_memory_usage_pct(row: pd.Series) -> float | None:
     """Calculate memory usage percentage."""
     try:
         if pd.isna(row["memory_used_gb"]) or pd.isna(row["memory_total_gb"]) or row["memory_total_gb"] == 0:
@@ -241,10 +241,10 @@ def _calculate_days_since_commit(commit_series: pd.Series) -> pd.Series:
         diff = now - dt
         return max(0, diff.days)  # Ensure we don't get negative days
 
-    return commit_series.apply(calc_days)  # type: ignore
+    return commit_series.apply(calc_days)  # ty: ignore
 
 
-def get_server_summary_stats(df: pd.DataFrame, host_memory_stats: Optional[Dict] = None) -> Dict[str, Any]:
+def get_server_summary_stats(df: pd.DataFrame, host_memory_stats: dict | None = None) -> dict[str, Any]:
     """
     Generate summary statistics for the servers.
 
@@ -275,7 +275,7 @@ def get_server_summary_stats(df: pd.DataFrame, host_memory_stats: Optional[Dict]
     }
 
 
-def format_commit_info(commit_timestamp: str, days_old: Optional[int]) -> str:
+def format_commit_info(commit_timestamp: str, days_old: int | None) -> str:
     """
     Format commit information for display.
 
@@ -312,7 +312,7 @@ def format_commit_info(commit_timestamp: str, days_old: Optional[int]) -> str:
         return f"❌ {int(days_old)} days ago"
 
 
-def get_display_columns() -> Dict[str, str]:
+def get_display_columns() -> dict[str, str]:
     """
     Get the column mapping for display in the table.
 
@@ -403,7 +403,7 @@ def prepare_display_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return display_df
 
 
-def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
+def reset_mysql_database(server_name: str) -> tuple[bool, str]:
     """
     Reset the MySQL database for a staging server by running 'make refresh' in owid-grapher
     and pruning associated R2 files.
@@ -414,6 +414,8 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
     Returns:
         Tuple of (success, message)
     """
+    r2_error_msg = None
+
     try:
         # First, prune R2 files for this server
         log.info("Pruning R2 files", server=server_name)
@@ -429,7 +431,8 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
         )
 
         if r2_result.returncode != 0:
-            # Log warning but continue with MySQL reset - R2 purge failure shouldn't block DB reset
+            # Store error but continue with MySQL reset - R2 purge failure shouldn't block DB reset
+            r2_error_msg = f"R2 purge failed: {r2_result.stderr}"
             log.warning(
                 "R2 purge failed but continuing with MySQL reset",
                 error=r2_result.stderr,
@@ -442,7 +445,7 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
         # SSH into the server and run commands in parallel
         # Disable host key checking for staging servers since they're ephemeral
         mysql_cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'cd owid-grapher && make refresh'"
-        rsync_cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'rsync -az --stats owid@staging-site-master:/home/owid/etl/data/ /home/owid/etl/data/'"
+        rsync_cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'rsync -az --stats -e \"ssh -o StrictHostKeyChecking=no\" owid@staging-site-master:/home/owid/etl/data/ /home/owid/etl/data/'"
 
         log.info("Executing MySQL reset and rsync in parallel", server=server_name)
 
@@ -483,22 +486,32 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
             log.error("MySQL reset failed", error=error_msg, server=server_name, stdout=mysql_result["stdout"])
             return False, error_msg
 
-        # Check rsync result (non-critical)
+        # Check rsync result
         rsync_result = results["rsync"]
+        errors = []
+
         if rsync_result["returncode"] != 0:
-            log.warning(
-                "rsync failed but MySQL refresh completed successfully",
+            log.error(
+                "rsync failed",
                 error=rsync_result["stderr"],
                 server=server_name,
                 stdout=rsync_result["stdout"],
             )
-            success_msg = f"MySQL database successfully refreshed for {server_name} (rsync from master failed)"
+            errors.append(f"rsync from master failed: {rsync_result['stderr']}")
         else:
             log.info("ETL data successfully synced from master", server=server_name)
-            success_msg = f"MySQL database successfully refreshed and ETL data synced for {server_name}"
 
-        log.info("MySQL reset completed", server=server_name)
-        return True, success_msg
+        # Add R2 error if it occurred
+        if r2_error_msg:
+            errors.append(r2_error_msg)
+
+        # If there are errors, return failure
+        if errors:
+            error_msg = "; ".join(errors)
+            return False, f"MySQL refresh completed but errors occurred: {error_msg}"
+
+        log.info("MySQL reset completed successfully", server=server_name)
+        return True, f"MySQL database successfully refreshed and ETL data synced for {server_name}"
 
     except subprocess.TimeoutExpired:
         error_msg = "Unexpected timeout in MySQL reset"
@@ -510,7 +523,7 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
         return False, error_msg
 
 
-def destroy_server(server_name: str) -> Tuple[bool, str]:
+def destroy_server(server_name: str) -> tuple[bool, str]:
     """
     Destroy a staging server completely.
 

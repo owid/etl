@@ -1,0 +1,20 @@
+dataset:
+  title: 'Relative earnings of adults, by educational attainment - Education at a Glance 2017: OECD Indicators (2017)'
+tables:
+  relative_earnings_of_adults__by_educational_attainment__education_at_a_glance_2017__oecd_indicators__2017:
+    variables:
+      earnings_of_tertiary_educated_workers_relative_to_the_earnings_of_workers_with_upper_secondary_education__oecd_2017:
+        title: Earnings of tertiary-educated workers relative to the earnings of workers with upper-secondary education (OECD
+          2017)
+        unit: '%'
+        description: |-
+          Earnings of tertiary-educated workers expressed as a percentage of the earnings of workers with upper-secondary education. Estimates correspond to workers ages 25-64. Regular earnings data collection provides information based on an annual, monthly or weekly reference period depending on the country. Data on earnings are before income tax in most countries.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

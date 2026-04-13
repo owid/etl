@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Dal-Ré et al. (2021)
+    description: |-
+      This is a dataset of clinical trials with results reported to the European Clinical Trials Register (EU-CTR). Under EU guidelines, all clinical trials in the European Economic Area are required to be registered in the EudraCT system and to have results submitted within 12 months of the trial's completion or 6 months for certain paediatric trials, as of December 2016. This requirement to report results was retrospectively applied to all completed trials on the registry dating to its launch in 2004. However, many clinical trials breach these requirements. This dataset shows the proportion of all registered clinical trials by non-commercial sponsors in the European Economic Area that reported results in time on the EU-CTR.
+    url: https://www.sciencedirect.com/science/article/pii/S0895435621003577
+    date_accessed: 2021-11-29
+    published_by: |-
+      Dal-Ré, R., Goldacre, B., Mahillo-Fernández, I., & DeVito, N. J. (2021). European non-commercial sponsors showed substantial variation in results reporting to the EU trial registry. Journal of Clinical Epidemiology, S0895435621003577. https://doi.org/10.1016/j.jclinepi.2021.11.005
+  name: Clinical trials results reporting – EU-CTR (Dal-Ré, 2021)
+  description: ''
+  is_public: false
+outs:
+  - md5: 6241411ccd09bd8a066cd66cf7fec86b
+    size: 3250
+    path: clinical_trials_results_reporting__eu_ctr__dal_re__2021.feather

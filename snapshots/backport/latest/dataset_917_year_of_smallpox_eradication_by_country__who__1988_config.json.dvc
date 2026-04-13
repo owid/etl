@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/917
-    date_accessed: 2023-08-10 08:25:17.609994
+    url: https://admin.owid.io/admin/datasets/917
+    date_accessed: 2026-03-05 13:12:33.282754+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_917_year_of_smallpox_eradication_by_country__who__1988
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 42a985e2c709b9ac04d8055033e6e5f0
-  size: 2920
-  path: dataset_917_year_of_smallpox_eradication_by_country__who__1988_config.json
+  - md5: 9af3a4b7035565ecaf557b23e249386c
+    size: 3050
+    path: dataset_917_year_of_smallpox_eradication_by_country__who__1988_config.json

@@ -1,0 +1,33 @@
+dataset:
+  title: Death rate from energy production - Markandya & Wilkinson (2007)
+tables:
+  death_rate_from_energy_production__markandya__and__wilkinson__2007:
+    variables:
+      deaths_from_air_pollution_and_accidents__markandya__and__wilkinson__2007:
+        title: Deaths from air pollution and accidents (Markandya & Wilkinson (2007))
+        unit: deaths per TWh
+        display:
+          name: Death rate from air pollution and accidents
+          unit: deaths per terawatt-hour (TWh)
+        description: Deaths from air pollution and accidents related to energy production (cases per TWh)
+      equivalent_co2_emissions__markandya__and__wilkinson__2007:
+        title: Equivalent CO2 emissions (Markandya & Wilkinson (2007))
+        unit: gCO2/kWh
+      hypothetical_number_of_deaths_from_energy_production__markandya__and__wilkinson__2007:
+        title: Hypothetical number of deaths from energy production (Markandya & Wilkinson (2007))
+        unit: deaths per year
+        display:
+          name: Hypothetical number of deaths from energy production
+          numDecimalPlaces: 0
+          unit: deaths
+        description: |-
+          Hypothetical number of deaths if global energy in 2014 was derived from a single source. This was calculated by multiplying the death rate per energy source (from Markandya & Wilkinson (2007)) by the IEA's estimate of global energy production in 2014 of 159,000TWh.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

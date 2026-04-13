@@ -112,7 +112,7 @@ def run() -> None:
     tb["training_computation_petaflop"] = tb["training_compute__flop"] / 1e15
 
     # Convert training dataset size to numeric
-    tb["training_dataset_size__gradients"] = pd.to_numeric(tb["training_dataset_size__gradients"], errors="coerce")
+    tb["training_dataset_size__total"] = pd.to_numeric(tb["training_dataset_size__total"], errors="coerce")
 
     # Convert publication date to a datetime objects
     tb["publication_date"] = pd.to_datetime(tb["publication_date"])
@@ -142,7 +142,7 @@ def run() -> None:
     )
     tb = tb.format(["days_since_1949", "model"])
     # Add metadata to the publication date column
-    for col in ["publication_date", "training_dataset_size__gradients"]:
+    for col in ["publication_date", "training_dataset_size__total"]:
         tb[col].metadata.origins = tb["domain"].metadata.origins
 
     #

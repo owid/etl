@@ -1,3 +1,6 @@
+topic_tags:
+  - Population Growth
+
 definitions:
   display_mortality_rate: &display_mortality_rate
     display:

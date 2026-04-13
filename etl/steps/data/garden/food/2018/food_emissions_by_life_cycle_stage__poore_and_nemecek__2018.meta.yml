@@ -1,0 +1,68 @@
+dataset:
+  title: Food emissions by life-cycle stage (Poore and Nemecek, 2018)
+tables:
+  food_emissions_by_life_cycle_stage__poore_and_nemecek__2018:
+    variables:
+      food_emissions_animal_feed:
+        title: food_emissions_animal_feed
+        unit: kgCO₂eq per kg
+        short_unit: kg
+        display:
+          name: Animal feed
+      food_emissions_farm:
+        title: food_emissions_farm
+        unit: kgCO₂eq per kg
+        short_unit: kg
+        display:
+          name: Farm
+      food_emissions_land_plus_farm:
+        title: food_emissions_land_plus_farm
+        unit: ''
+      food_emissions_land_use:
+        title: food_emissions_land_use
+        unit: kgCO₂eq per kg
+        short_unit: kg
+        display:
+          name: Land use change
+      food_emissions_losses:
+        title: food_emissions_losses
+        unit: kgCO₂eq per kg
+        short_unit: kg
+        display:
+          name: Losses
+      food_emissions_packaging:
+        title: food_emissions_packaging
+        unit: kgCO₂eq per kg
+        short_unit: kg
+        display:
+          name: Packaging
+      food_emissions_processing:
+        title: food_emissions_processing
+        unit: kgCO₂eq per kg
+        short_unit: kg
+        display:
+          name: Processing
+      food_emissions_retail:
+        title: food_emissions_retail
+        unit: kgCO₂eq per kg
+        short_unit: kg
+        display:
+          name: Retail
+      food_emissions_supply_chain:
+        title: food_emissions_supply_chain
+        unit: ''
+      food_emissions_transport:
+        title: food_emissions_transport
+        unit: kgCO₂eq per kg
+        short_unit: kg
+        display:
+          name: Transport
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

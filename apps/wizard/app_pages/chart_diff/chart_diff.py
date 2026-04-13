@@ -3,7 +3,7 @@ import difflib
 import json
 import pprint
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import git
 import pandas as pd
@@ -39,12 +39,12 @@ EXCLUDE_METADATA_CHANGES = [
 
 @dataclass
 class ChartDiffScores:
-    chart_views: Optional[float]  # Last 30 day average
-    anomaly: Optional[float]
-    num_articles: Optional[int]
+    chart_views: float | None  # Last 30 day average
+    anomaly: float | None
+    num_articles: int | None
 
     # Internal scale factor to regularize score for chart views
-    _relevance: Optional[float] = None
+    _relevance: float | None = None
 
     @property
     def anomaly_pretty(self) -> str:
@@ -63,7 +63,7 @@ class ChartDiffScores:
             return "N/A"
 
     @property
-    def relevance(self) -> Optional[float]:
+    def relevance(self) -> float | None:
         return self._relevance
 
     def estimate_relevance(self, reg_chart_views: float, reg_num_articles: float, reg_anomaly: float) -> None:
@@ -132,30 +132,30 @@ class ChartDiff:
     # Chart in source environment
     source_chart: gm.Chart
     # Chart in target environment (if new in source environment, there won't be one)
-    target_chart: Optional[gm.Chart]
+    target_chart: gm.Chart | None
     # DataFrame for all variables with columns dataChecksum and metadataChecksum
     # If True, then the checksum has changed
-    modified_checksum: Optional[pd.DataFrame]
+    modified_checksum: pd.DataFrame | None
     # Whether the chart has been edited in staging
-    edited_in_staging: Optional[bool]
+    edited_in_staging: bool | None
     # Error preventing the chart from being synced
-    error: Optional[str]
+    error: str | None
 
     def __init__(
         self,
         source_chart: gm.Chart,
-        target_chart: Optional[gm.Chart],
+        target_chart: gm.Chart | None,
         approval: gm.ChartDiffApprovals | None,
         conflict: gm.ChartDiffConflicts | None,
         # approval_status: gm.CHART_DIFF_STATUS | str,
-        modified_checksum: Optional[pd.DataFrame] = None,
-        edited_in_staging: Optional[bool] = None,
-        tags_edited: Optional[bool] = None,
-        error: Optional[str] = None,
-        chart_views: Optional[float] = None,
-        score_indicators_anomalies: Optional[float] = None,
-        article_refs: Optional[List[ArticleRef]] = None,
-        df_approvals: Optional[pd.DataFrame] = None,
+        modified_checksum: pd.DataFrame | None = None,
+        edited_in_staging: bool | None = None,
+        tags_edited: bool | None = None,
+        error: str | None = None,
+        chart_views: float | None = None,
+        score_indicators_anomalies: float | None = None,
+        article_refs: list[ArticleRef] | None = None,
+        df_approvals: pd.DataFrame | None = None,
     ):
         """Constructor of ChartDiff.
 
@@ -191,7 +191,7 @@ class ChartDiff:
         # Cached
         self._in_conflict = None
         self._change_types = None
-        self._approval_status: Optional[gm.CHART_DIFF_STATUS | str] = None
+        self._approval_status: gm.CHART_DIFF_STATUS | str | None = None
 
     def _clean_cache(self):
         self._in_conflict = None
@@ -348,7 +348,8 @@ class ChartDiff:
         target_session: Session,
         estimate_relevance: bool = True,
         ignore_conflicts: bool = False,
-    ) -> List["ChartDiff"]:
+        skip_analytics: bool = False,
+    ) -> list["ChartDiff"]:
         """Get chart diffs from chart ids.
 
         NOTE: I am a bit confused. I see we have df_charts, which has already some information on whether the
@@ -380,16 +381,22 @@ class ChartDiff:
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
 
         # Get all slugs from target
-        slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
+        slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # ty: ignore
 
-        # Get chart views
-        chart_views_all = get_chart_views_cached(chart_ids)
+        # Get chart views, anomalies, and articles (skip if not needed for performance)
+        if skip_analytics:
+            chart_views_all = {}
+            chart_anomalies_all = {}
+            article_refs_all = {}
+        else:
+            # Get chart views
+            chart_views_all = get_chart_views_cached(chart_ids)
 
-        # Anomalies
-        chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
+            # Anomalies
+            chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
 
-        # Articles
-        article_refs_all = get_chart_in_article_views_cached(chart_ids)
+            # Articles
+            article_refs_all = get_chart_in_article_views_cached(chart_ids)
 
         # Get approvals
         df_approvals_all = read_sql(
@@ -446,7 +453,7 @@ class ChartDiff:
             df_approvals = df_approvals_all[df_approvals_all["chartId"] == chart_id]
 
             # Build Chart Diff object
-            chart_diff: "ChartDiff" = cls(
+            chart_diff: ChartDiff = cls(
                 source_chart=source_chart,
                 target_chart=target_chart,
                 approval=approval,
@@ -488,7 +495,7 @@ class ChartDiff:
 
         return chart_diffs
 
-    def get_all_approvals(self, session: Session) -> List[gm.ChartDiffApprovals]:
+    def get_all_approvals(self, session: Session) -> list[gm.ChartDiffApprovals]:
         """Get history of chart diff."""
 
         # Get history
@@ -528,8 +535,8 @@ class ChartDiff:
             approval = gm.ChartDiffApprovals(
                 chartId=self.chart_id,
                 sourceUpdatedAt=self.source_chart.updatedAt,
-                targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # type: ignore
-                status=status,  # type: ignore
+                targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # ty: ignore
+                status=status,  # ty: ignore
             )
             session.add(approval)
             session.commit()
@@ -547,7 +554,7 @@ class ChartDiff:
             assert self.target_chart
         conflict = gm.ChartDiffConflicts(
             chartId=self.chart_id,
-            targetUpdatedAt=self.target_chart.updatedAt,  # type: ignore
+            targetUpdatedAt=self.target_chart.updatedAt,  # ty: ignore
             conflict="resolved",
         )
         session.add(conflict)
@@ -575,7 +582,7 @@ class ChartDiff:
         }
 
     @staticmethod
-    def _get_chart_slugs(target_session: Session, slugs: Optional[set[str]] = None) -> set[str]:
+    def _get_chart_slugs(target_session: Session, slugs: set[str] | None = None) -> set[str]:
         """Get all chart slugs. Use `slugs` to filter slugs as this can be slow otherwise."""
         if slugs is not None:
             where = "WHERE slug IN %(slugs)s"
@@ -624,7 +631,7 @@ class ChartDiff:
     @staticmethod
     def _get_approvals(
         source_session, chart_ids, source_charts, target_charts, ignore_conflicts=False
-    ) -> Dict[int, Optional[gm.ChartDiffApprovals]]:
+    ) -> dict[int, gm.ChartDiffApprovals | None]:
         if ignore_conflicts:
             # If ignore_conflicts is True, get the latest approval state of each chart, without timestamp matching
             approvals = [
@@ -639,7 +646,7 @@ class ChartDiff:
             target_updated_ats = []
             for chart_id in chart_ids:
                 if target_charts.get(chart_id) is not None:
-                    target_updated_ats.append(target_charts[chart_id].updatedAt)  # type: ignore
+                    target_updated_ats.append(target_charts[chart_id].updatedAt)  # ty: ignore
                 else:
                     target_updated_ats.append(None)
 
@@ -654,11 +661,11 @@ class ChartDiff:
         return approvals
 
     @staticmethod
-    def _get_conflicts(source_session, chart_ids, target_charts) -> Dict[int, Optional[gm.ChartDiffConflicts]]:
+    def _get_conflicts(source_session, chart_ids, target_charts) -> dict[int, gm.ChartDiffConflicts | None]:
         target_updated_ats = []
         for chart_id in chart_ids:
             if target_charts.get(chart_id) is not None:
-                target_updated_ats.append(target_charts[chart_id].updatedAt)  # type: ignore
+                target_updated_ats.append(target_charts[chart_id].updatedAt)  # ty: ignore
             else:
                 target_updated_ats.append(None)
         conflicts = gm.ChartDiffConflicts.get_conflict_batch(
@@ -698,15 +705,15 @@ class ChartDiff:
 class ChartDiffsLoader:
     """Detect charts that differ between staging and production and load them."""
 
-    def __init__(self, source_engine: Engine, target_engine: Engine, chart_ids: List[int] | None = None):
+    def __init__(self, source_engine: Engine, target_engine: Engine, chart_ids: list[int] | None = None):
         self.source_engine = source_engine
         self.target_engine = target_engine
         self.df = self.load_df(chart_ids=chart_ids)
 
         # Cache
-        self._diffs: List[ChartDiff] | None = None
+        self._diffs: list[ChartDiff] | None = None
 
-    def load_df(self, chart_ids: List[int] | None = None) -> pd.DataFrame:
+    def load_df(self, chart_ids: list[int] | None = None) -> pd.DataFrame:
         """Load changes in charts between environments from sessions."""
         with Session(self.source_engine) as source_session:
             with Session(self.target_engine) as target_session:
@@ -725,10 +732,10 @@ class ChartDiffsLoader:
     ) -> pd.DataFrame:
         """DataFrame with charts details."""
         return self.df[
-            (self.df.configEdited & config)
-            | (self.df.dataEdited & data)
-            | (self.df.metadataEdited & metadata)
-            | (self.df.tagsEdited & tags)
+            (self.df.configEdited & config)  # ty: ignore[unsupported-operator]
+            | (self.df.dataEdited & data)  # ty: ignore[unsupported-operator]
+            | (self.df.metadataEdited & metadata)  # ty: ignore[unsupported-operator]
+            | (self.df.tagsEdited & tags)  # ty: ignore[unsupported-operator]
         ]
 
     def get_diffs(
@@ -738,11 +745,12 @@ class ChartDiffsLoader:
         metadata: bool = False,
         tags: bool = False,
         sync: bool = False,
-        chart_ids: Optional[List[int]] = None,
-        source_session: Optional[Session] = None,
-        target_session: Optional[Session] = None,
+        chart_ids: list[int] | None = None,
+        source_session: Session | None = None,
+        target_session: Session | None = None,
         ignore_conflicts: bool = False,
-    ) -> List[ChartDiff]:
+        skip_analytics: bool = False,
+    ) -> list[ChartDiff]:
         """Optimised version of get_diffs."""
         if chart_ids:
             assert sync, "If chart_ids are provided, sync must be True."
@@ -757,6 +765,7 @@ class ChartDiffsLoader:
                 source_session=source_session,
                 target_session=target_session,
                 ignore_conflicts=ignore_conflicts,
+                skip_analytics=skip_analytics,
             )
         else:
             with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
@@ -765,6 +774,7 @@ class ChartDiffsLoader:
                     source_session=source_session,
                     target_session=target_session,
                     ignore_conflicts=ignore_conflicts,
+                    skip_analytics=skip_analytics,
                 )
 
         self._diffs = chart_diffs
@@ -791,7 +801,7 @@ class ChartDiffsLoader:
 
 # @log_time
 def _modified_data_metadata_on_staging(
-    source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
+    source_session: Session, target_session: Session, chart_ids: list[int] | None = None
 ) -> pd.DataFrame:
     """
     Get charts with modified data or metadata. This is done by taking all variables used in a chart from
@@ -903,7 +913,7 @@ def _modified_data_metadata_on_staging(
 
 # @log_time
 def _modified_chart_configs_on_staging(
-    source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
+    source_session: Session, target_session: Session, chart_ids: list[int] | None = None
 ) -> pd.DataFrame:
     TIMESTAMP_STAGING_CREATION = get_staging_creation_time(source_session)
 
@@ -985,7 +995,7 @@ def _modified_chart_configs_on_staging(
 
 # @log_time
 def _modified_tags_on_staging(
-    source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
+    source_session: Session, target_session: Session, chart_ids: list[int] | None = None
 ) -> pd.DataFrame:
     """Get charts with modified tags by comparing chart_tags table."""
     TIMESTAMP_STAGING_CREATION = get_staging_creation_time(source_session)
@@ -1063,7 +1073,11 @@ def get_deleted_charts(source_session: Session, target_session: Session) -> list
     """Get charts that exist in target but not in source (deleted charts).
 
     This function matches on chart IDs to identify truly deleted charts,
-    filtering out charts created in target after staging creation time.
+    filtering out charts created in target after staging was created.
+
+    We use two filters to identify charts that existed when staging was created:
+    1. Chart ID must be <= max chart ID on staging (reliable proxy for pre-staging charts)
+    2. Chart createdAt must be < staging creation time (backup filter)
 
     Note: A chart is considered deleted only if its ID doesn't exist at all on staging.
     Charts that exist on staging but with NULL slug (unpublished) are NOT deleted,
@@ -1071,14 +1085,23 @@ def get_deleted_charts(source_session: Session, target_session: Session) -> list
     """
     staging_creation_time = get_staging_creation_time(source_session)
 
+    # Get max chart ID from staging - charts with higher IDs in production were created after staging
+    max_id_query = text("SELECT MAX(id) FROM charts")
+    max_staging_chart_id = source_session.execute(max_id_query).scalar() or 0
+
     # Get chart info from target that existed before staging was created
+    # Use both max ID filter and createdAt filter for robustness
     query = text("""
     SELECT c.id, cc.slug
     FROM charts c
     JOIN chart_configs cc ON c.configId = cc.id
-    WHERE cc.slug IS NOT NULL AND c.createdAt < :staging_creation_time
+    WHERE cc.slug IS NOT NULL
+      AND c.id <= :max_staging_chart_id
+      AND c.createdAt < :staging_creation_time
     """)
-    result = target_session.execute(query, {"staging_creation_time": staging_creation_time}).fetchall()
+    result = target_session.execute(
+        query, {"staging_creation_time": staging_creation_time, "max_staging_chart_id": max_staging_chart_id}
+    ).fetchall()
     target_charts_pre_staging = {row[0]: row[1] for row in result}  # id -> slug mapping
 
     # Get ALL chart IDs from source (regardless of slug status)
@@ -1098,7 +1121,7 @@ def get_deleted_charts(source_session: Session, target_session: Session) -> list
 
 
 def modified_charts_on_staging(
-    source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
+    source_session: Session, target_session: Session, chart_ids: list[int] | None = None
 ) -> pd.DataFrame:
     """Get charts that have been modified in staging.
 
@@ -1152,7 +1175,7 @@ def get_chart_diffs_from_grapher(
     return chart_diffs
 
 
-def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbose=False) -> bool:
+def configs_are_equal(config_1: dict[str, Any], config_2: dict[str, Any], verbose=False) -> bool:
     """Compare two chart configs, ignoring certain fields."""
     assert "isInheritanceEnabled" in config_1, "isInheritanceEnabled must be in config_1"
     assert "isInheritanceEnabled" in config_2, "isInheritanceEnabled must be in config_2"
@@ -1180,7 +1203,7 @@ def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbos
     return False
 
 
-def tags_are_equal(tags_1: List[Dict[str, Any]], tags_2: List[Dict[str, Any]], verbose=False) -> bool:
+def tags_are_equal(tags_1: list[dict[str, Any]], tags_2: list[dict[str, Any]], verbose=False) -> bool:
     """Compare two lists of chart tags."""
     # Sort tags by id for consistent comparison
     tags_1_sorted = sorted(tags_1, key=lambda x: x.get("id", 0))
@@ -1207,21 +1230,21 @@ def tags_are_equal(tags_1: List[Dict[str, Any]], tags_2: List[Dict[str, Any]], v
 
 # TODO: the following functions rely on streamlit. However, we would like to decouple this module from streamlit.
 @st_cache_data(custom_text="Retrieving analytics on chart views...")
-def get_chart_views_cached(chart_ids: List[int]) -> Dict[int, float]:
+def get_chart_views_cached(chart_ids: list[int]) -> dict[int, float]:
     # Get chart views
     df_analytics = get_chart_views_last_n_days(chart_ids, ANALYTICS_NUM_DAYS)
-    return df_analytics.set_index("chart_id")["views_daily"].to_dict()  # type: ignore
+    return df_analytics.set_index("chart_id")["views_daily"].to_dict()  # ty: ignore
 
 
 @st_cache_data(custom_text="Retrieving anomalies in indicators used in charts to review...", show_time=True)
-def get_chart_anomalies_cached(chart_ids: List[int]) -> Dict[int, float]:
+def get_chart_anomalies_cached(chart_ids: list[int]) -> dict[int, float]:
     # Anomalies
     df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("upgrade_change",))
-    return df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()  # type: ignore
+    return df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()  # ty: ignore
 
 
 @st_cache_data(custom_text="Retrieving analytics on article references...")
-def get_chart_in_article_views_cached(chart_ids: List[int]) -> Dict[int, List[ArticleRef]]:
+def get_chart_in_article_views_cached(chart_ids: list[int]) -> dict[int, list[ArticleRef]]:
     # Articles
     df_articles = get_post_views_last_n_days(
         chart_ids=chart_ids,

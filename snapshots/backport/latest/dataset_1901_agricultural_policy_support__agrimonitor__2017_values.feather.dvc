@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/1901
-    date_accessed: 2023-08-10 07:45:05.956878
+    url: https://admin.owid.io/admin/datasets/1901
+    date_accessed: 2026-03-10 09:12:30.941632+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Agricultural policy support - (Agrimonitor, 2017)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4d6d065cde376d8d3ffbf012aa407609
-  size: 8210
-  path: dataset_1901_agricultural_policy_support__agrimonitor__2017_values.feather
+  - md5: e79807d4b10d925582f0bafd61bd08f8
+    size: 8210
+    path: dataset_1901_agricultural_policy_support__agrimonitor__2017_values.feather

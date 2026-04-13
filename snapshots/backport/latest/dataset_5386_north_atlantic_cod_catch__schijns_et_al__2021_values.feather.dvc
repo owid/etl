@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5386
-    date_accessed: 2023-08-10 09:01:45.008206
+    url: https://admin.owid.io/admin/datasets/5386
+    date_accessed: 2026-03-05 13:18:27.195304+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: North Atlantic cod catch (Schijns et al. 2021)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2d6bc6177c47966bc4fbff2d6e1117fd
-  size: 10434
-  path: dataset_5386_north_atlantic_cod_catch__schijns_et_al__2021_values.feather
+  - md5: 3066974850c0beb333ad22f6f5445d99
+    size: 10466
+    path: dataset_5386_north_atlantic_cod_catch__schijns_et_al__2021_values.feather

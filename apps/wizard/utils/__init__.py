@@ -16,11 +16,11 @@ import datetime as dt
 import json
 import re
 import sys
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from datetime import date
 from functools import cache, wraps
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union, cast
+from typing import Any, cast
 
 import numpy as np
 import streamlit as st
@@ -114,7 +114,7 @@ def start_profiler() -> Profiler:
     return profiler
 
 
-def get_namespaces(step_type: str) -> List[str]:
+def get_namespaces(step_type: str) -> list[str]:
     """Get list with namespaces.
 
     Looks for namespaces in `etl/steps/data/<step_type>/`.
@@ -139,7 +139,7 @@ def get_namespaces(step_type: str) -> List[str]:
 
 
 def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
-    with open(dag_path, "r") as f:
+    with open(dag_path) as f:
         doc = ruamel_load(f)
 
     doc["steps"].pop(step, None)
@@ -152,15 +152,15 @@ def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
 class classproperty(property):
     """Decorator."""
 
-    def __get__(self, owner_self: Self, owner_cls: Self):  # type: ignore[reportIncompatibleMethodOverride]
-        return self.fget(owner_cls)  # type: ignore
+    def __get__(self, owner_self: Self, owner_cls: Self):  # ty: ignore[invalid-method-override]
+        return self.fget(owner_cls)  # ty: ignore
 
 
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "collection"]
-    dataset_edit: Dict[str, Dataset | None] = {
+    steps: list[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "collection"]
+    dataset_edit: dict[str, Dataset | None] = {
         "snapshot": None,
         "meadow": None,
         "garden": None,
@@ -222,7 +222,7 @@ class AppState:
         """Set dataset to edit."""
         self.dataset_edit[self.step] = ds
 
-    def get_variables_of_step(self: "AppState") -> Dict[str, Any]:
+    def get_variables_of_step(self: "AppState") -> dict[str, Any]:
         """Get variables of a specific step.
 
         Variables are assumed to have keys `step.NAME`, based on the keys given in the widgets within a form.
@@ -245,7 +245,7 @@ class AppState:
         st.session_state["steps"][self.step] = form.model_dump()
 
     @property
-    def state_step(self: "AppState") -> Dict[str, Any]:
+    def state_step(self: "AppState") -> dict[str, Any]:
         """Get state variables of step."""
         self._check_step()
         return st.session_state["steps"][self.step]
@@ -253,8 +253,8 @@ class AppState:
     def default_value(
         self: "AppState",
         key: str,
-        previous_step: Optional[str] = None,
-        default_last: Optional[str | bool | int | date] = "",
+        previous_step: str | None = None,
+        default_last: str | bool | int | date | None = "",
     ) -> str | bool | int:
         """Get the default value of a variable.
 
@@ -331,11 +331,11 @@ class AppState:
     def st_widget(
         self: "AppState",
         st_widget: Callable,
-        default_last: Optional[str | bool | int | date] = "",
-        dataset_field_name: Optional[str] = None,
-        default_value: Optional[str | bool | int | date] = None,
-        index_if_value_is_none: Optional[int] = 0,
-        **kwargs: Optional[str | int | List[str] | date | Callable],
+        default_last: str | bool | int | date | None = "",
+        dataset_field_name: str | None = None,
+        default_value: str | bool | int | date | None = None,
+        index_if_value_is_none: int | None = 0,
+        **kwargs: str | int | list[str] | date | Callable | None,
     ) -> None:
         """Wrap a streamlit widget with a default value."""
         key = cast(str, kwargs["key"])
@@ -345,7 +345,7 @@ class AppState:
                 if dataset_field_name:
                     default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
                 else:
-                    default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # type: ignore
+                    default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # ty: ignore
             else:
                 default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
@@ -354,8 +354,8 @@ class AppState:
         if "multiselect" not in str(st_widget):
             # Default value for selectbox (and other widgets with selectbox-like behavior)
             if "options" in kwargs:
-                options = cast(List[str], kwargs["options"])
-                index = options.index(default_value) if default_value in options else index_if_value_is_none  # type: ignore
+                options = cast(list[str], kwargs["options"])
+                index = options.index(default_value) if default_value in options else index_if_value_is_none  # ty: ignore
                 kwargs["index"] = index
             # Default value for other widgets (if none is given)
             elif (
@@ -393,7 +393,7 @@ def parse_args_from_cmd() -> argparse.Namespace:
     return st.session_state["args"]
 
 
-def extract(error_message: str) -> List[Any]:
+def extract(error_message: str) -> list[Any]:
     """Get field name that caused the error."""
     rex = r"'(.*)' is a required property"
     return re.findall(rex, error_message)[0]
@@ -409,7 +409,7 @@ def preview_dag_additions(dag_content: str, dag_path: str | Path, prefix: str = 
 @cache
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(CURRENT_DIR / f"{st.session_state['step_name']}.md", "r") as f:
+    with open(CURRENT_DIR / f"{st.session_state['step_name']}.md") as f:
         return f.read()
 
 
@@ -422,7 +422,7 @@ def _check_env() -> bool:
             st.warning(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?")
 
     if ok:
-        st.success(("`.env` configured correctly"))
+        st.success("`.env` configured correctly")
     return ok
 
 
@@ -442,7 +442,7 @@ def _show_environment():
     )
 
 
-def clean_empty_dict(d: Union[Dict[str, Any], List[Any]]) -> Union[Dict[str, Any], List[Any]]:
+def clean_empty_dict(d: dict[str, Any] | list[Any]) -> dict[str, Any] | list[Any]:
     """Remove empty values from dict.
 
     REference: https://stackoverflow.com/a/27974027/5056599
@@ -455,11 +455,11 @@ def clean_empty_dict(d: Union[Dict[str, Any], List[Any]]) -> Union[Dict[str, Any
 
 
 def get_datasets_in_etl(
-    dag: Dict[str, Any] | None = None,
+    dag: dict[str, Any] | None = None,
     dag_path: Path | None = None,
     snapshots: bool = False,
-    prefixes: List[str] | None = None,
-    prefix_priorities: List[str] | None = None,
+    prefixes: list[str] | None = None,
+    prefix_priorities: list[str] | None = None,
 ) -> Any:
     """Show a selectbox with all datasets available."""
     # Load dag
@@ -493,7 +493,7 @@ def get_datasets_in_etl(
     return options
 
 
-def set_states(states_values: Dict[str, Any], logging: bool = False, also_if_not_exists: bool = False) -> None:
+def set_states(states_values: dict[str, Any], logging: bool = False, also_if_not_exists: bool = False) -> None:
     """Set states from any key in dictionary.
 
     Set logging to true to log the state changes
@@ -554,15 +554,27 @@ def enable_sentry_for_streamlit():
 
     for module_name in modules_to_patch:
         module = sys.modules[module_name]
-        module.handle_uncaught_app_exception = sentry_handler  # type: ignore
+        module.handle_uncaught_app_exception = sentry_handler  # ty: ignore
 
 
 def _get_staging_creation_time(session: Session):
-    """Get staging server creation time."""
-    query_ts = "show table status like 'charts'"
+    """Get staging server creation time.
+
+    Uses the earliest creation time among critical tables to ensure we capture
+    all changes made after the database was initially set up. Some tables may be
+    created/recreated later during the setup process, so we use the minimum.
+    """
+    query_ts = """
+    SELECT MIN(create_time) as min_create_time
+    FROM information_schema.tables
+    WHERE table_schema = DATABASE()
+      AND table_name IN ('charts', 'variables', 'datasets', 'chart_dimensions')
+    """
     df = read_sql(query_ts, session)
-    assert len(df) == 1, "There was some error. Make sure that the staging server was properly set."
-    create_time = df["Create_time"].item()
+    assert len(df) == 1 and df["min_create_time"].notna().all(), (
+        "Failed to get staging server creation time. Make sure the staging server was properly set up."
+    )
+    create_time = df["min_create_time"].item()
     return create_time
 
 

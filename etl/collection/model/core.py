@@ -4,10 +4,11 @@ import inspect
 import json
 import re
 from collections import defaultdict
+from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, cast
+from typing import Any, cast
 
 import fastjsonschema
 import pandas as pd
@@ -181,7 +182,7 @@ class Collection(MDIMBase):
         log.info(f"Exporting collection config to {self.local_config_path}")
         self.save_file(self.local_config_path, force_create=True)
 
-    def save(  # type: ignore[override]
+    def save(  # ty: ignore[invalid-method-override]
         self,
         owid_env: OWIDEnv | None = None,
         tolerate_extra_indicators: bool = False,
@@ -214,6 +215,10 @@ class Collection(MDIMBase):
 
         # Check that all indicators in collection exist
         validate_indicators_in_db(indicators, owid_env.engine)
+
+        # Ensure at least one topic tag is set (needed for search)
+        # Disabled as it is not really necessary? This fails on CI/CD for explorers
+        # self.validate_topic_tags()
 
         # Run sanity checks on grouped views
         self.validate_grouped_views()
@@ -335,7 +340,7 @@ class Collection(MDIMBase):
             # Update dimensions
             view.dimensions = view_dimensions
 
-    def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> dict[str, Any]:  # type: ignore
+    def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> dict[str, Any]:  # ty: ignore
         dix = super().to_dict(encode_json=encode_json)
         if drop_definitions:
             dix = {k: v for k, v in dix.items() if k not in {"_definitions", "definitions"}}
@@ -369,13 +374,13 @@ class Collection(MDIMBase):
         for view in self.views:
             for dim_slug, choice_slugs in dix.items():
                 # Check that dimension is defined in the view!
-                assert (
-                    dim_slug in view.dimensions
-                ), f"Dimension {dim_slug} not found in dimensions! View:\n{yaml_dump(view.to_dict())}"
+                assert dim_slug in view.dimensions, (
+                    f"Dimension {dim_slug} not found in dimensions! View:\n{yaml_dump(view.to_dict())}"
+                )
                 # Check that choices defined in the view are valid!
-                assert (
-                    view.dimensions[dim_slug] in choice_slugs
-                ), f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
+                assert view.dimensions[dim_slug] in choice_slugs, (
+                    f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
+                )
 
     def validate_schema(self, schema_path: str | Path | None = None):
         """Validate class against schema."""
@@ -409,9 +414,9 @@ class Collection(MDIMBase):
         )
 
         try:
-            validator(self.to_dict())  # type: ignore
+            validator(self.to_dict())  # ty: ignore
         except fastjsonschema.JsonSchemaException as e:
-            raise ValueError(f"Config validation error: {e.message}")  # type: ignore
+            raise ValueError(f"Config validation error: {e.message}")  # ty: ignore
 
     def indicators_in_use(self, tolerate_extra_indicators: bool = False):
         # Get all indicators used in all views
@@ -509,6 +514,14 @@ class Collection(MDIMBase):
                 raise ValueError(f"Indicator {indicator} is not covered by any dependency: {deps}")
         return True
 
+    def validate_topic_tags(self):
+        """Ensure that at least one topic tag is set. Required for search."""
+        if not self.topic_tags:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' must have at least one topic tag. "
+                "Add 'topic_tags' to your config YAML."
+            )
+
     def validate_grouped_views(self):
         for view in self.views:
             if view.is_grouped:
@@ -529,13 +542,20 @@ class Collection(MDIMBase):
                     if dim.slug in view.dimensions:
                         del view.dimensions[dim.slug]
 
-    def prune_dimension_choices(self):
-        """Remove all dimension choices that are not used in any view."""
+    def prune_dimension_choices(self, dimension_slugs: list[str] | None = None):
+        """Remove all dimension choices that are not used in any view.
+
+        Args:
+            dimension_slugs: If provided, only prune choices for these dimensions.
+                If None, prune choices for all dimensions.
+        """
         all_occurrences = self.dimension_choices_in_use()
 
         # Remove those not in use
         for dim in self.dimensions:
-            dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences[dim.slug]]
+            if dimension_slugs is not None and dim.slug not in dimension_slugs:
+                continue
+            dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences.get(dim.slug, set())]
 
     @property
     def dimension_slugs(self):
@@ -796,9 +816,9 @@ class Collection(MDIMBase):
                 dimension = group["dimension"]
                 choices = _ensure_choices(group, dimension)
                 # Remove views with old choices
-                new_views = [view for view in self.views if view.dimensions[dimension] not in choices]
-                # Remove unused choices
-                self.prune_dimension_choices()
+                self.views = [view for view in self.views if view.dimensions[dimension] not in choices]
+                # Remove unused choices (only for the dimension being replaced, not all dimensions)
+                self.prune_dimension_choices(dimension_slugs=[dimension])
 
         # Drop dimension if it has only one choice in use
         if drop_dimensions_if_single_choice:
@@ -1138,7 +1158,7 @@ def sanity_check_grouped_view(view: View) -> None:
     metadata_dict = (
         view.metadata
         if isinstance(view.metadata, dict)
-        else view.metadata.to_dict()  # type: ignore[union-attr]
+        else view.metadata.to_dict()  # ty: ignore[unresolved-attribute, call-non-callable]
         if hasattr(view.metadata, "to_dict")
         else {}
     )

@@ -1,4 +1,5 @@
-from typing import Dict, List, Optional, Tuple, cast
+import os
+from typing import cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -10,113 +11,157 @@ import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Use this to process a subset of data. Set a comma-separated list of countries. For example:
+# SUBSET='France,Germany' etlr un/2024-07-12/un_wpp --private
+SUBSET = os.environ.get("SUBSET")
 
 YEAR_SPLIT = 2024
 COLUMNS_INDEX = ["country", "year", "sex", "age", "variant"]
 COLUMNS_INDEX_MONTH = COLUMNS_INDEX + ["month"]
 
+# OWID Regions (estimated for certain indicators/tables)
+REGIONS = [
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "South America",
+    "Oceania",
+]
 
-def run(dest_dir: str) -> None:
+
+def run() -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("un_wpp")
 
-    # Load tables
-    tb_population = ds_meadow.read("population")
-    tb_population_density = ds_meadow.read("population_density")
-    tb_growth_rate = ds_meadow.read("growth_rate")
-    tb_nat_change = ds_meadow.read("natural_change_rate")
-    tb_fertility = ds_meadow.read("fertility_rate")
-    tb_fertility_births_single = ds_meadow.read("fertility_births_single")
-    tb_migration = ds_meadow.read("net_migration")
-    tb_migration_rate = ds_meadow.read("net_migration_rate")
-    tb_deaths = ds_meadow.read("deaths")
-    tb_death_rate = ds_meadow.read("death_rate")
-    tb_births = ds_meadow.read("births")
-    tb_birth_rate = ds_meadow.read("birth_rate")
-    tb_median_age = ds_meadow.read("median_age")
-    tb_le = ds_meadow.read("life_expectancy")
-    tb_mortality = ds_meadow.read("mortality_rate")
-    tb_childbearing_age = ds_meadow.read("mean_age_childbearing")
+    # Load tables (safe_types=False preserves categoricals from meadow, much faster for large tables)
+    tb_population = ds_meadow.read("population", safe_types=False)  #
+    tb_population_density = ds_meadow.read("population_density", safe_types=False)
+    tb_growth_rate = ds_meadow.read("growth_rate", safe_types=False)
+    tb_nat_change = ds_meadow.read("natural_change_rate", safe_types=False)
+    tb_fertility = ds_meadow.read("fertility_rate", safe_types=False)
+    tb_fertility_births_single = ds_meadow.read("fertility_births_single", safe_types=False)  #
+    tb_migration = ds_meadow.read("net_migration", safe_types=False)
+    tb_migration_rate = ds_meadow.read("net_migration_rate", safe_types=False)
+    tb_deaths = ds_meadow.read("deaths", safe_types=False)  #
+    tb_death_rate = ds_meadow.read("death_rate", safe_types=False)
+    tb_births = ds_meadow.read("births", safe_types=False)
+    tb_birth_rate = ds_meadow.read("birth_rate", safe_types=False)
+    tb_median_age = ds_meadow.read("median_age", safe_types=False)
+    tb_le = ds_meadow.read("life_expectancy", safe_types=False)
+    tb_mortality = ds_meadow.read("mortality_rate", safe_types=False)
+    tb_childbearing_age = ds_meadow.read("mean_age_childbearing", safe_types=False)
+
+    # Filter to subset of countries if SUBSET is set (for faster development runs).
+    if SUBSET:
+        subset_countries = [c.strip() for c in SUBSET.split(",")]
+        paths.log.info(f"Running on subset of countries: {subset_countries}")
+        tb_population = tb_population[tb_population["country"].isin(subset_countries)]
+        tb_population_density = tb_population_density[tb_population_density["country"].isin(subset_countries)]
+        tb_growth_rate = tb_growth_rate[tb_growth_rate["country"].isin(subset_countries)]
+        tb_nat_change = tb_nat_change[tb_nat_change["country"].isin(subset_countries)]
+        tb_fertility = tb_fertility[tb_fertility["country"].isin(subset_countries)]
+        tb_fertility_births_single = tb_fertility_births_single[
+            tb_fertility_births_single["country"].isin(subset_countries)
+        ]
+        tb_migration = tb_migration[tb_migration["country"].isin(subset_countries)]
+        tb_migration_rate = tb_migration_rate[tb_migration_rate["country"].isin(subset_countries)]
+        tb_deaths = tb_deaths[tb_deaths["country"].isin(subset_countries)]
+        tb_death_rate = tb_death_rate[tb_death_rate["country"].isin(subset_countries)]
+        tb_births = tb_births[tb_births["country"].isin(subset_countries)]
+        tb_birth_rate = tb_birth_rate[tb_birth_rate["country"].isin(subset_countries)]
+        tb_median_age = tb_median_age[tb_median_age["country"].isin(subset_countries)]
+        tb_le = tb_le[tb_le["country"].isin(subset_countries)]
+        tb_mortality = tb_mortality[tb_mortality["country"].isin(subset_countries)]
+        tb_childbearing_age = tb_childbearing_age[tb_childbearing_age["country"].isin(subset_countries)]
 
     #
     # Process data.
     #
 
-    ## Population, Sex ratio
+    # POPULATION #
     tb_population_jan, tb_population, tb_sex_ratio = process_population_sex_ratio(tb_population, tb_population_density)
+    tb_population = add_owid_regions(tb_population, indicators=["population"])
+    ## Format
     tb_population = tb_population.format(COLUMNS_INDEX)
     tb_population_jan = tb_population_jan.format(COLUMNS_INDEX, short_name="population_january")  # January data
 
-    ## Sex ratio
+    # SEX RATIO #
     tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
     tb_sex_ratio = tb_sex_ratio.format(COLUMNS_INDEX, short_name="sex_ratio")
 
-    ## Dependency ratio
+    # DEPENDENCY RATIO #
     tb_dependency = process_dependency(tb_population)
     tb_dependency = tb_dependency.format(COLUMNS_INDEX, short_name="dependency_ratio")
 
-    ## Growth rate
+    # GROWTH RATE #
     tb_growth_rate = process_standard(tb_growth_rate)
     tb_growth_rate = set_variant_to_estimates(tb_growth_rate)
     tb_growth_rate = tb_growth_rate.format(COLUMNS_INDEX)
 
-    ## Natural growth rate
+    # NATURAL GROWTH RATE #
     tb_nat_change = process_standard(tb_nat_change)
     tb_nat_change = set_variant_to_estimates(tb_nat_change)
     tb_nat_change["natural_change_rate"] /= 10
     tb_nat_change = tb_nat_change.format(COLUMNS_INDEX)
 
-    ## Migration
+    # MIGRATION #
     tb_migration = process_migration(tb_migration, tb_migration_rate)
-    del tb_migration_rate
     tb_migration = set_variant_to_estimates(tb_migration)
+    tb_migration = add_owid_regions(tb_migration, indicators=["net_migration"])
+    del tb_migration_rate
     tb_migration = tb_migration.format(COLUMNS_INDEX, short_name="migration")
 
-    ## Deaths
+    # DEATHS #
     tb_deaths = process_deaths(tb_deaths, tb_death_rate)
     del tb_death_rate
     tb_deaths = tb_deaths.format(COLUMNS_INDEX, short_name="deaths")
 
-    ## Births
+    # BIRTHS #
     tb_births = process_births(tb_births, tb_birth_rate)
     del tb_birth_rate
-    tb_births = set_variant_to_estimates(tb_births)
+    tb_births = add_owid_regions(tb_births, indicators=["births"])
     tb_births = tb_births.format(COLUMNS_INDEX, short_name="births")
 
-    ## Median age
+    # MEDIAN_AGE #
     tb_median_age = process_standard(tb_median_age)
     tb_median_age = set_variant_to_estimates(tb_median_age)
     tb_median_age = tb_median_age.format(COLUMNS_INDEX)
 
-    ## Fertility
+    # FERTILITY #
     tb_fertility = process_fertility(tb_fertility)
     tb_fertility = set_variant_to_estimates(tb_fertility)
-    tb_fertility = tb_fertility.format(COLUMNS_INDEX)
+    tb_fertility = estimate_tfr_owid_regions(tb_fertility.copy(), tb_births, tb_population)
 
-    ## Fertility by age (distribution)
+    tb_fertility = tb_fertility.format(COLUMNS_INDEX, short_name="fertility_rate")
+
+    # FERTILITY BY AGE (distribution) #
     tb_fertility_births_single = process_fertility_births_single(tb_fertility_births_single)
 
-    ## Life Expectancy
+    # LIFE EXPECTANCY #
     tb_le = process_le(tb_le)
     tb_le = set_variant_to_estimates(tb_le)
     tb_le = tb_le.format(COLUMNS_INDEX)
 
-    ## Mortality
+    # MORTALITY #
     tb_mortality = process_mortality(tb_mortality)
     tb_mortality = set_variant_to_estimates(tb_mortality)
     tb_mortality = tb_mortality.format(COLUMNS_INDEX)
 
-    ## Mean age at childbearing
+    # MEAN AGE AT CHILDBEARING #
     tb_childbearing_age = process_standard(tb_childbearing_age)
     tb_childbearing_age = set_variant_to_estimates(tb_childbearing_age)
     tb_childbearing_age = tb_childbearing_age.format(COLUMNS_INDEX)
+
+    # Add regions on tb_population (easy), tb_migration (easy), tb_births + tb_population -> tb_fertility
 
     # Build tables list for dataset
     tables = [
@@ -141,8 +186,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=tables,
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
@@ -152,7 +196,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, Table, Table]:
+def process_population_sex_ratio(tb: Table, tb_density: Table) -> tuple[Table, Table, Table]:
     """Process the population table.
 
     Also estimate sex ratio.
@@ -228,18 +272,18 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, T
     tb = tb.merge(tb_density, on=COLUMNS_INDEX_MONTH, how="left")
     del tb_density
 
-    # Age as sting
+    # Age as string
     tb["age"] = tb["age"].astype("string")
     tb_sex["age"] = tb_sex["age"].astype("string")
     # Separate january and july data
     msk_jan = tb["month"] == "January"
-    tb_jan = tb[msk_jan]
-    tb = tb[~msk_jan]
+    tb_jan = tb.loc[msk_jan]
+    tb = tb.loc[~msk_jan]
     tb = tb.drop(columns=["month"])
     tb_jan = tb_jan.drop(columns=["month"])
     # Remove january data for sex ratio
     tb_sex_msk = tb_sex["month"] == "January"
-    tb_sex = tb_sex[~tb_sex_msk]
+    tb_sex = tb_sex.loc[~tb_sex_msk]
     tb_sex = tb_sex.drop(columns=["month"])
 
     return tb_jan, tb, tb_sex
@@ -327,6 +371,7 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb = process_standard(tb)
     tb = set_variant_to_estimates(tb)
     tb_rate = process_standard(tb_rate)
+    tb_rate = set_variant_to_estimates(tb_rate)
 
     # Standardise sex dimension values
     tb = harmonize_dimension(
@@ -352,14 +397,14 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb_total = tb_total.assign(age="all")
 
     # Get 5-year age groups from 0 to 100
-    age_group_mapping = {str(i): f"{i//5 * 5}-{i//5 * 5 + 4}" for i in range(0, 100, 1)}
+    age_group_mapping = {str(i): f"{i // 5 * 5}-{i // 5 * 5 + 4}" for i in range(0, 100, 1)}
     tb_5 = tb.copy()
     tb_5["age"] = tb_5["age"].map(age_group_mapping)
     tb_5 = cast(Table, tb_5.dropna(subset=["age"]))
     tb_5 = tb_5.groupby(COLUMNS_INDEX, as_index=False, observed=True)["deaths"].sum()
 
     # Get 10-year age groups from 0 to 100
-    age_group_mapping = {str(i): f"{i//10 * 10}-{i//10 * 10 + 9}" for i in range(0, 100, 1)}
+    age_group_mapping = {str(i): f"{i // 10 * 10}-{i // 10 * 10 + 9}" for i in range(0, 100, 1)}
     tb_10 = tb.copy()
     tb_10["age"] = tb_10["age"].map(age_group_mapping)
     tb_10 = cast(Table, tb_10.dropna(subset=["age"]))
@@ -399,7 +444,9 @@ def process_births(tb: Table, tb_rate: Table) -> Table:
     """
     # Basic processing
     tb = process_standard(tb)
+    tb = set_variant_to_estimates(tb)
     tb_rate = process_standard(tb_rate)
+    tb_rate = set_variant_to_estimates(tb_rate)
 
     # Standardise sex/age dimension values
     tb = harmonize_dimension(
@@ -481,9 +528,9 @@ def process_fertility(tb: Table) -> Table:
     )
 
     # Drop 55-59 age group in fertility (is all zero!)
-    assert (
-        tb.loc[tb["age"] == "55-59", "fertility_rate"] == 0
-    ).all(), "Unexpected non-zero fertility rate values for age group 55-59."
+    assert (tb.loc[tb["age"] == "55-59", "fertility_rate"] == 0).all(), (
+        "Unexpected non-zero fertility rate values for age group 55-59."
+    )
     tb = tb.loc[tb["age"] != "55-59"]
 
     # Age as string
@@ -546,19 +593,18 @@ def process_mortality(tb: Table) -> Table:
     return tb
 
 
-def process_standard(tb: Table, allowed_nans: Optional[Dict[str, int]] = None) -> Table:
-    """Process the population table."""
-    paths.log.info("Processing population variables...")
+def process_standard(tb: Table, allowed_nans: dict[str, int] | None = None) -> Table:
+    """Standard processing: sanity checks, harmonize country names and dimensions."""
 
     # Sanity check
     if allowed_nans:
         for colname, num_nans in allowed_nans.items():
-            assert (
-                num_nans_real := tb[colname].isna().sum()
-            ) == num_nans, f"Unexpected number ({num_nans_real}) of NaNs for column {colname}"
-        assert (
-            tb[[col for col in tb.columns if col not in allowed_nans.keys()]].notna().all(axis=None)
-        ), "Some NaNs detected"
+            assert (num_nans_real := tb[colname].isna().sum()) == num_nans, (
+                f"Unexpected number ({num_nans_real}) of NaNs for column {colname}"
+            )
+        assert tb[[col for col in tb.columns if col not in allowed_nans.keys()]].notna().all(axis=None), (
+            "Some NaNs detected"
+        )
     else:
         assert tb.notna().all(axis=None), "Some NaNs detected"
 
@@ -589,7 +635,7 @@ def process_standard(tb: Table, allowed_nans: Optional[Dict[str, int]] = None) -
     return tb
 
 
-def estimate_sex_ratio(tb: Table, age_groups: Optional[List[str]] = None):
+def estimate_sex_ratio(tb: Table, age_groups: list[str] | None = None):
     # Select relevant age groups
     if age_groups is None:
         age_groups = ["0", "5", "10", "15"] + [str(i) for i in range(20, 100, 10)] + ["100+"]
@@ -628,7 +674,7 @@ def estimate_age_groups(tb: Table) -> Table:
 
     # 1/ Basic age groups
     age_map = {
-        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
+        **{str(i): f"{i - i % 5}-{i + 4 - i % 5}" for i in range(0, 100)},
         **{"100+": "100+"},
     }
     tb_basic = tb_.assign(age=tb_.age.map(age_map))
@@ -691,7 +737,7 @@ def estimate_age_groups(tb: Table) -> Table:
     return tb_population
 
 
-def _add_age_group(tb: Table, age_min: int, age_max: int, age_group: Optional[str] = None) -> Table:
+def _add_age_group(tb: Table, age_min: int, age_max: int, age_group: str | None = None) -> Table:
     """Estimate a new age group."""
     # Get subset of entries, apply groupby-sum if needed
     if age_min == age_max:
@@ -739,9 +785,9 @@ def add_population_change(tb: Table) -> Table:
     tb = tb_merge.drop(columns=["population_2023"])
 
     # Sanity check
-    assert (years := set(tb.loc[tb[column_pop_change].isna()]["year"])) == {
-        1950
-    }, f"Other than year 1950 detected: {years}"
+    assert (years := set(tb.loc[tb[column_pop_change].isna()]["year"])) == {1950}, (
+        f"Other than year 1950 detected: {years}"
+    )
 
     return tb
 
@@ -755,7 +801,7 @@ def add_sex_ratio_all(tb_sex: Table, tb: Table) -> Table:
     return tb_sex
 
 
-def harmonize_dimension(tb: Table, column_name: str, mapping: Dict[str, str], strict: bool = True) -> Table:
+def harmonize_dimension(tb: Table, column_name: str, mapping: dict[str, str], strict: bool = True) -> Table:
     """Harmonize a dimension in a table using a mapping.
 
     tb: Table to harmonize.
@@ -766,8 +812,15 @@ def harmonize_dimension(tb: Table, column_name: str, mapping: Dict[str, str], st
         # Assert column_name does not contain any other column but those in mapping
         assert set(tb[column_name].unique()) == set(mapping.keys())
 
-    # Replace values in column_name
-    tb[column_name] = tb[column_name].replace(mapping)
+    # Use cat.rename_categories for categorical columns (avoids FutureWarning from .replace())
+    col = tb[column_name]
+    if hasattr(col, "cat"):
+        # Only rename categories that are in the mapping
+        cat_mapping = {k: v for k, v in mapping.items() if k in col.cat.categories}
+        if cat_mapping:
+            tb[column_name] = col.cat.rename_categories(cat_mapping)
+    else:
+        tb[column_name] = col.replace(mapping)
 
     return tb
 
@@ -777,5 +830,78 @@ def harmonize_country_names(tb: Table):
         tb,
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
+        warn_on_unused_countries=False,
+        warn_on_unknown_excluded_countries=False,
     )
+    return tb
+
+
+def add_owid_regions(tb: Table, indicators: list[str], index_columns: str | None = None) -> Table:
+    """Add OWID regions to the table."""
+    if index_columns is None:  # ERR: TOGO AS MEDIUM BEFORE 2023!
+        index_columns = COLUMNS_INDEX
+    aggregations = {indicator: "sum" for indicator in indicators}
+    tb = paths.regions.add_aggregates(
+        tb=tb,
+        aggregations=aggregations,
+        index_columns=index_columns,
+        regions=REGIONS,
+        min_frac_countries_informed=0.7,
+    )
+    return tb
+
+
+def estimate_tfr_owid_regions(tb_fertility: Table, tb_births: Table, tb_population: Table) -> Table:
+    """Estimate TFR for OWID regions using births and population data.
+
+    This is done as
+
+    1. Define age groups of interest: 15-19, 20-24, 25-29, 30-34, 35-39, 40-44, 45-49.
+    2. Get region aggregates on births from females in each age group. Get female population in each age group.
+    3. Estimate regional ASFR values as (births from age group) / (female population in age group). E.g.
+        `ASFR = births from female pop aged 15-19 / female pop aged 15-19`
+    4. Estimate TFR as the sum of ASFR values across age groups, multiplied by 5 (to account for 5-year age groups). E.g.
+        `TFR = 5 * (ASFR_15-19 + ASFR_20-24 + ... + ASFR_45-49)`
+    """
+    # Age groups of interest: 15-19, 20-24, 25-29, 30-34, 35-39, 40-44, 45-49
+    age_groups = {"15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49"}
+    # We will group by COLUMNS_INDEX except for "age", bc TFR only applies to all population
+    columns_group = [col for col in COLUMNS_INDEX if col != "age"]
+
+    # Get births for 15-49 age group
+    tb_births_15_49 = tb_births.reset_index()
+    assert not age_groups - set(tb_births_15_49["age"].unique()), "Some expected age groups are missing in births data"
+    tb_births_15_49 = tb_births_15_49.loc[
+        (tb_births_15_49["age"].isin(age_groups)) & (tb_births_15_49["country"].isin(REGIONS)),
+        COLUMNS_INDEX + ["births"],
+    ]
+
+    # Get 15-49 age group female population
+    tb_fpop_15_49 = tb_population.reset_index()
+    assert not age_groups - set(tb_fpop_15_49["age"].unique()), (
+        "Some expected age groups are missing in population data"
+    )
+    tb_fpop_15_49 = tb_fpop_15_49.loc[
+        (tb_fpop_15_49["age"].isin(age_groups))
+        & (tb_fpop_15_49["country"].isin(REGIONS))
+        & (tb_fpop_15_49["sex"] == "female")
+    ]
+    tb_fpop_15_49["sex"] = "all"
+
+    # Merge births x fem population
+    tb = tb_births_15_49.merge(
+        tb_fpop_15_49,
+        on=COLUMNS_INDEX,
+        validate="1:1",
+    )
+
+    # Estimate TFR
+    tb["fertility_rate"] = 5 * tb["births"] / tb["population"]
+    tb = tb.groupby(columns_group, as_index=False)["fertility_rate"].sum()
+    tb["age"] = "all"
+    # Keep relevant columns
+    tb = tb[COLUMNS_INDEX + ["fertility_rate"]]
+
+    # Add to fertility table
+    tb = pr.concat([tb_fertility, tb], ignore_index=True)
     return tb

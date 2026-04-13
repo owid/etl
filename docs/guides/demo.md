@@ -5,7 +5,6 @@ tags:
   - Documentation
   - Examples
 icon: lucide/popcorn
-status: new
 # hide:
 #   - toc  # Remove this line to show table of contents
 ---

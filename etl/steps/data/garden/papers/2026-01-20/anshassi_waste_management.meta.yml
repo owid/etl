@@ -1,0 +1,236 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+  text_msw_definition: &text_msw_definition
+    Municipal solid waste is everyday, non-hazardous waste from households and similar municipal sources (for example, shops, offices, and institutions).
+
+  text_percent_of_generation: &text_percent_of_generation
+    This is expressed as a share of all waste generated in a country (by mass), not just the portion that was collected.
+
+  text_collection_definition: &text_collection_definition
+    Collected waste is waste that is picked up by organized collection services (such as public, private, or contracted waste collectors) and enters a managed waste system. This is true regardless of how the waste is ultimately disposed of or treated.
+
+  text_uncollected_definition: &text_uncollected_definition
+    Uncollected waste is waste that is not picked up by organized collection services and therefore remains outside the formal waste management system. This waste is often dumped, burned, or handled informally by individuals or communities.
+
+  text_open_dump_definition: &text_open_dump_definition
+    Open dumps are uncontrolled disposal sites with little or no infrastructure to safely contain waste. For example, they typically have minimal covering of waste, no systems to manage contaminated water (leachate), and no systems to manage landfill gas emissions.
+
+  text_controlled_landfill_definition: &text_controlled_landfill_definition
+    Controlled landfills have some basic operational and pollution controls (such as some covering of waste and site management), but have less advanced infrastructure than sanitary landfills.
+
+  text_sanitary_landfill_definition: &text_sanitary_landfill_definition
+    Sanitary landfills are engineered disposal sites with advanced infrastructure designed to safely contain waste and prevent pollution. They typically have protective liners to prevent contamination of soil and groundwater, systems to manage contaminated water (leachate), and in many cases systems to capture or control landfill gas emissions.
+
+  text_open_burning_definition: &text_open_burning_definition
+    Open-air burning is when waste is burned in open, uncontrolled fires (rather than in purpose-built incineration facilities with pollution controls).
+
+  text_mswi_definition: &text_mswi_definition
+    Municipal solid waste incineration is controlled burning of waste in purpose-built incinerators. These facilities typically have emissions controls to reduce air pollution, and some also recover energy from the burning process.
+
+  text_composting_definition: &text_composting_definition
+    Composting is a biological process that breaks down organic waste (such as food scraps and garden waste) to produce compost, which can be used to improve soil quality.
+
+  text_recycling_definition: &text_recycling_definition
+    Recycling is the process of collecting and reprocessing waste materials (such as paper, plastic, glass, and metals) to create new products.
+
+  text_classification_definition: &text_classification_definition
+    Each country is assigned to one of four waste management system levels (1 to 4). Level 1 represents the most advanced systems (with more waste treated via recycling, composting, or incineration, and less waste mismanaged). Level 4 represents the least controlled systems (with less waste treated and more waste ending up in open dumps or burned in the open air).
+
+  text_classification_criteria: &text_classification_criteria
+    "Levels are assigned using two indicators and fixed thresholds. The ICR rate is defined as the sum of the shares of waste that are incinerated, composted, or recycled. The mismanagement rate is defined as the share of waste that is openly dumped, burned in the open air, or otherwise handled in an uncontrolled way.
+
+    Countries are classified as follows:
+    - Level 1: ICR rate > 60% AND mismanagement rate < 3%.
+    - Level 2: ICR rate between 20% and 60% (inclusive) AND mismanagement rate < 3%.
+    - Level 3: mismanagement rate between 3% and 80% (inclusive).
+    - Level 4: mismanagement rate > 80%."
+
+  text_classification_caution: &text_classification_caution
+    This level is a simplified categorization intended for comparing countries globally. Countries within the same level can still differ substantially in how they handle waste.
+
+  text_data_sources: &text_data_sources
+    The indicator is based on waste generation and management data from the World Bank’s What a Waste 2.0 database, combined with mismanagement rates from Lebreton and Andrady (2019). The authors used World Bank data from 2016, standardised it, and projected the results to 2020.
+
+  text_gap_filling: &text_gap_filling
+    For countries with missing data, the authors used proxy countries with similar characteristics (same region, classification level, and income level) to fill gaps in waste composition and management statistics.
+
+  desc_key_final_classification: &desc_key_final_classification
+    - *text_msw_definition
+    - *text_classification_definition
+    - *text_classification_criteria
+    - *text_classification_caution
+
+  desc_key_collected: &desc_key_collected
+    - *text_msw_definition
+    - *text_collection_definition
+    - *text_percent_of_generation
+    - *text_data_sources
+    - *text_gap_filling
+
+  desc_key_uncollected: &desc_key_uncollected
+    - *text_msw_definition
+    - *text_uncollected_definition
+    - *text_percent_of_generation
+    - *text_data_sources
+    - *text_gap_filling
+
+  desc_key_open_dump_landfill: &desc_key_open_dump_landfill
+    - *text_msw_definition
+    - *text_percent_of_generation
+    - *text_open_dump_definition
+    - *text_data_sources
+    - *text_gap_filling
+
+  desc_key_controlled_landfill: &desc_key_controlled_landfill
+    - *text_msw_definition
+    - *text_percent_of_generation
+    - *text_controlled_landfill_definition
+    - *text_data_sources
+    - *text_gap_filling
+
+  desc_key_sanitary_landfill: &desc_key_sanitary_landfill
+    - *text_msw_definition
+    - *text_percent_of_generation
+    - *text_sanitary_landfill_definition
+    - *text_data_sources
+    - *text_gap_filling
+
+  desc_key_open_air_burning: &desc_key_open_air_burning
+    - *text_msw_definition
+    - *text_percent_of_generation
+    - *text_open_burning_definition
+    - *text_data_sources
+    - *text_gap_filling
+
+  desc_key_mswi_incineration: &desc_key_mswi_incineration
+    - *text_msw_definition
+    - *text_percent_of_generation
+    - *text_mswi_definition
+    - *text_data_sources
+    - *text_gap_filling
+
+  desc_key_composting: &desc_key_composting
+    - *text_msw_definition
+    - *text_percent_of_generation
+    - *text_composting_definition
+    - *text_data_sources
+    - *text_gap_filling
+
+  desc_key_recycling: &desc_key_recycling
+    - *text_msw_definition
+    - *text_percent_of_generation
+    - *text_recycling_definition
+    - *text_data_sources
+    - *text_gap_filling
+
+
+tables:
+  anshassi_waste_management:
+    variables:
+      final_classification:
+        title: Waste management system level
+        unit: "1 (best) - 4 (worst)"
+        description_short: Each country is assigned to one of four waste management levels (1–4). Level 1 indicates that most waste is recycled, composted, or incinerated and very little is mismanaged, while Level 4 indicates that little waste is treated and much more is openly dumped or burned in the open air.
+        description_key : *desc_key_final_classification
+        display:
+          numDecimalPlaces: 0
+
+      collected:
+        title: Share of total municipal solid waste collected
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of total municipal solid waste generated that is captured by organised collection services and enters a managed waste stream (regardless of final treatment or disposal method).
+        description_key: *desc_key_collected
+        display:
+          numDecimalPlaces: 1
+
+      uncollected:
+        title: Share of total municipal solid waste uncollected
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of total municipal solid waste generated that is not captured by organised collection services and therefore remains outside formal waste management (often dumped, burned, or handled informally).
+        description_key: *desc_key_uncollected
+        display:
+          numDecimalPlaces: 1
+
+      open_dump_landfill:
+        title: Share of total municipal solid waste sent to open dumps
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of total municipal solid waste generated that ends up in open dumps or other uncontrolled disposal sites with little or no engineering to contain waste (including waste dumped after collection and waste dumped directly when uncollected).
+        description_key: *desc_key_open_dump_landfill
+        description_processing: We estimate this as the share of waste that is collected multiplied by the share of collected waste sent to open dumps, plus the share of waste that is uncollected multiplied by the share of uncollected waste that is openly dumped.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      controlled_landfill:
+        title: Share of total municipal solid waste sent to controlled landfills
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of total municipal solid waste generated that is disposed of in controlled landfills, which have some operational and pollution controls but are less engineered than sanitary landfills.
+        description_key: *desc_key_controlled_landfill
+        description_processing: We estimate this as the share of waste that is collected multiplied by the share of collected waste sent to controlled landfills, plus the share of waste that is uncollected multiplied by the share of uncollected waste that ends up in controlled landfills.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      sanitary_landfill:
+        title: Share of total municipal solid waste sent to sanitary landfills
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of total municipal solid waste generated that is disposed of in sanitary landfills—engineered facilities designed to contain waste (for example with liners and leachate management and often landfill-gas control).
+        description_key: *desc_key_sanitary_landfill
+        description_processing: We estimate this as the share of waste that is collected multiplied by the share of collected waste sent to sanitary landfills, plus the share of waste that is uncollected multiplied by the share of uncollected waste that ends up in sanitary landfills.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      open_air_burning:
+        title: Share of total municipal solid waste burned in the open
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of total municipal solid waste generated that is burned in open, uncontrolled fires (as opposed to engineered incineration).
+        description_key: *desc_key_open_air_burning
+        description_processing: We estimate this as the share of waste that is collected multiplied by the share of collected waste burned in the open, plus the share of waste that is uncollected multiplied by the share of uncollected waste burned in the open.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      mswi_incineration:
+        title: Share of total municipal solid waste incinerated
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of total municipal solid waste generated that is incinerated in engineered facilities (controlled combustion, typically with emissions controls).
+        description_key: *desc_key_mswi_incineration
+        description_processing: We estimate this as the share of waste that is collected multiplied by the share of collected waste that is incinerated, because waste must be collected to be treated in engineered incineration facilities.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      composting:
+        title: Share of total municipal solid waste composted
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of total municipal solid waste generated that is composted (biological processing of organic waste into compost).
+        description_key: *desc_key_composting
+        description_processing: We estimate this as the share of waste that is collected multiplied by the share of collected waste that is composted, because waste must be collected to be composted through formal systems.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      recycling:
+        title: Share of total municipal solid waste recycled
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of total municipal solid waste generated that is recycled (collected and sorted materials reprocessed into secondary materials).
+        description_key: *desc_key_recycling
+        description_processing: We estimate this as the share of waste that is collected multiplied by the share of collected waste that is recycled, because waste must be collected to be recycled through formal systems.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1

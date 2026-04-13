@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Friends and family support – OECD based on Gallup (2016)
+    url: |-
+      https://www.oecd-ilibrary.org/social-support-percentage-of-people-who-report-that-they-have-friends-or-relatives-whom-they-can-count-on-in-times-of-trouble-2014-16-average-or-latest-available-period_5jfkq78rsb6j.xlsx?itemId=%2Fcontent%2Fcomponent%2Fhow_life-2017-graph178-en&mimeType=vnd.openxmlformats-officedocument.spreadsheetml.sheet
+    date_accessed: 2019-11-13
+    published_by: OECD (2017). How's Life? 2017 Measuring Well-being. Online data annex, Figure A.30, Social support.
+  name: Friends and family support – OECD based on Gallup (2016)
+  description: The OECD average is population-weighted.
+outs:
+  - md5: 6c12dbb1fe351e7514c7b77365151ccb
+    size: 3858
+    path: friends_and_family_support__oecd_based_on_gallup__2016.feather

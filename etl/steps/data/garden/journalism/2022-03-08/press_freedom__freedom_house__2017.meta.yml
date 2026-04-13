@@ -1,0 +1,17 @@
+dataset:
+  title: Press freedom - Freedom House (2017)
+tables:
+  press_freedom__freedom_house__2017:
+    variables:
+      freedom_of_the_press:
+        title: Freedom of the Press
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

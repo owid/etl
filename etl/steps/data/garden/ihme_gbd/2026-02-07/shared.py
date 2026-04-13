@@ -1,0 +1,146 @@
+from owid.catalog import Dataset, Table
+from owid.catalog import processing as pr
+
+from etl.data_helpers import geo
+from etl.data_helpers.population import add_population
+
+
+def add_regional_aggregates(
+    tb: Table,
+    ds_regions: Dataset,
+    ds_un_wpp: Dataset,
+    index_cols: list[str],
+    regions: list[str],
+    age_group_mapping: dict[str, list[int]],
+    run_percent: bool = False,
+) -> Table:
+    """
+    Adding the regional aggregated data for the OWID continent regions
+
+    For Number and Percent we can sum the values, as the Percent denominator is the same across countries (total number of deaths/cases etc)
+    Not all datasets will include Percent as this isn't always that meaningful e.g. in prevalence or incidence data.
+
+    For Rate we need to calculate it for each region by dividing the sum of the 'Number' values by the sum of the population.
+    """
+    # Split the table into Number, Percent and Rate
+    tb_percent = tb[tb["metric"].isin(["Percent"])].copy()
+    tb_number = tb[tb["metric"].isin(["Number"])].copy()
+    tb_rate = tb[tb["metric"] == "Rate"].copy()
+
+    # Calculate region aggregates for Number
+    tb_number = add_regions_to_number(tb_number, age_group_mapping, ds_regions, ds_un_wpp, index_cols, regions)
+    # Calculate region aggregates for Rate
+    tb_rate_regions = add_regions_to_rate(tb_number, regions)
+    tb_rate = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)  # ty: ignore
+    tb_out = pr.concat([tb_rate, tb_number], ignore_index=True)  # ty: ignore
+    if run_percent:
+        tb_percent_regions = add_regions_to_percent(tb_number, regions, index_cols)
+        # Check there aren't any values above 100
+        tb_percent = pr.concat([tb_percent, tb_percent_regions], ignore_index=True)
+        assert tb_percent["value"].max() <= 100 or tb_percent.shape[0] == 0
+        assert tb_percent["value"].min() >= 0 or tb_percent.shape[0] == 0
+        # Combine all the metrics back together
+    tb_out = pr.concat([tb_out, tb_percent], ignore_index=True)
+    assert tb_out.age.m.origins
+    tb_out = tb_out.drop(columns="population")
+
+    # Ensure low-cardinality string/object columns are categorical.
+    # This matters because ds.read() with safe_types=True (the default) converts
+    # category → string. Without this, repack_frame has to rediscover the optimal
+    # dtype for each column via a slow to_int → to_float → to_category cascade
+    # (~20s+ for 23M rows).
+    for col in tb_out.columns:
+        if tb_out[col].dtype == "object" or tb_out[col].dtype.name == "string":
+            tb_out[col] = tb_out[col].astype("category")
+
+    return tb_out
+
+
+def add_regions_to_percent(tb_number: Table, regions: list[str], index_cols: list[str]) -> Table:
+    """
+    Calculating the share of deaths using the value of 'All causes' for each dataset as a denominator
+    """
+    tb_number = tb_number.drop(columns="population")
+    tb_percent = tb_number[(tb_number["country"].isin(regions)) & (tb_number["metric"] == "Number")].copy()
+    # Grab the all causes data
+    all_causes = tb_number[tb_number["cause"] == "All causes"]
+    all_causes = all_causes.rename(columns={"value": "all_causes"}).drop(columns=["cause"])
+    # Merge it back in to the main dataset
+    cols = [col for col in index_cols if col != "cause"]
+    tb_percent = tb_percent.merge(all_causes, on=cols)
+    # Use the all causes as denominator of all other causes
+    tb_percent["share"] = tb_percent["value"] / tb_percent["all_causes"] * 100
+    tb_percent = tb_percent.drop(columns=["value", "all_causes"])
+    tb_percent = tb_percent.rename(columns={"share": "value"})
+    tb_percent["metric"] = "Percent"
+
+    return tb_percent
+
+
+def add_regions_to_rate(tb_number: Table, regions: list[str]) -> Table:
+    tb_rate = tb_number[(tb_number["country"].isin(regions)) & (tb_number["metric"] == "Number")].copy()
+
+    # Calculate rates per 100,000 for regions
+    tb_rate["value"] = (tb_rate["value"] / tb_rate["population"]) * 100000
+    tb_rate["metric"] = "Rate"
+    return tb_rate
+
+
+def add_regions_to_number(
+    tb_number: Table,
+    age_group_mapping: dict[str, list[int]],
+    ds_regions: Dataset,
+    ds_un_wpp: Dataset,
+    index_cols: list[str],
+    regions: list[str],
+) -> Table:
+    # Add population data - some datasets will have data disaggregated by sex
+    if "sex" in tb_number.columns:
+        tb_number = add_population(
+            df=tb_number,
+            country_col="country",
+            year_col="year",
+            age_col="age",
+            age_group_mapping=age_group_mapping,
+            sex_col="sex",
+            sex_group_all="Both",
+            sex_group_female="Female",
+            sex_group_male="Male",
+            ds_un_wpp=ds_un_wpp,
+        )
+    else:
+        tb_number = add_population(
+            df=tb_number,
+            country_col="country",
+            year_col="year",
+            age_col="age",
+            age_group_mapping=age_group_mapping,
+            ds_un_wpp=ds_un_wpp,
+        )
+    assert tb_number["value"].notna().all(), "Values are missing in the Number table, check configuration"
+
+    # Add region aggregates - for Number
+    # NOTE: geo.add_regions_to_table handles categorical columns correctly,
+    # no need to convert to string first.
+    tb_number = geo.add_regions_to_table(
+        tb_number,
+        index_columns=index_cols,
+        regions=regions,
+        ds_regions=ds_regions,
+        min_num_values_per_year=1,
+    )
+
+    return tb_number
+
+
+def add_share_population(tb: Table) -> Table:
+    """
+    Add a share of the population column to the table.
+    The 'Rate' column is the number of cases per 100,000 people, we want the equivalent per 100 people.
+    """
+    tb_share = tb[tb["metric"] == "Rate"].copy()
+    tb_share["metric"] = "Share"
+    tb_share["value"] = tb_share["value"] / 1000
+
+    tb = pr.concat([tb, tb_share], ignore_index=True).astype({"metric": "category"})
+    return tb

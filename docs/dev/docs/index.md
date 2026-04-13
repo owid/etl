@@ -37,7 +37,7 @@ The documentation is organized hierarchically using the [:fontawesome-brands-git
 ## Step-by-step guide to modify the documentation
 
 
-First, make sure that you have all the development libraries installed. To preview the documentation on your local machine, run `make docs.serve` and go to [localhost:8000](http://localhost:8000).
+First, make sure that you have all the development libraries installed. To preview the documentation on your local machine, run `make docs.serve` and go to [localhost:9010](http://localhost:9010).
 
 Any change you make to markdown files in  `docs/` will be reflected live on your local documentation site.
 
@@ -67,7 +67,7 @@ Exploit the multiple features that Zensical provides to make your report more en
 Finally, make sure to link your report in the documentation navigation by adding it to the `zensical.toml` file.
 
 ### Previewing your work
-Run `make docs.serve` and go to [localhost:8000](http://localhost:8000) to preview your report locally. You can edit the markdown files and see the changes live.
+Run `make docs.serve` and go to [localhost:9010](http://localhost:9010) to preview your report locally. You can edit the markdown files and see the changes live.
 
 ### Notebooks in technical publications
 

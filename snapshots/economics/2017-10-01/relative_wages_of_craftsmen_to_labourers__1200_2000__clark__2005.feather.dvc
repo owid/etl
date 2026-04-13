@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: The Condition of the Working Class in England, 1209–2004 - Clark (2005)
+    description: Data taken from Table A2.
+    url: http://www.journals.uchicago.edu/doi/abs/10.1086/498123
+    date_accessed: 2017-10-01
+    published_by: |-
+      Clark (2005) The Condition of the Working Class in England, 1209–2004. Journal of Political Economy, Vol. 113, No. 6, pp. 1307-1340.
+  name: Relative wages of craftsmen to labourers, 1200-2000 - Clark (2005)
+  description: |-
+    Unmatched data taken from Table A2. 
+
+
+    The Condition of the Working Class in England, 1209–2004. Gregory Clark. Journal of Political Economy, Vol. 113, No. 6 (December 2005), pp. 1307-1340.
+outs:
+  - md5: 06e881364c1710bf3b5c6dbda518a124
+    size: 3818
+    path: relative_wages_of_craftsmen_to_labourers__1200_2000__clark__2005.feather

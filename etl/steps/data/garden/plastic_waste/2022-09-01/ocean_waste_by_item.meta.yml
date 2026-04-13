@@ -1,0 +1,42 @@
+dataset:
+  title: ocean_waste_by_item
+tables:
+  ocean_waste_by_item:
+    variables:
+      deep_seafloor:
+        title: Deep Seafloor
+        unit: '%'
+        short_unit: '%'
+      nearshore_seafloor:
+        title: Nearshore Seafloor
+        unit: '%'
+        short_unit: '%'
+      nearshore_waters:
+        title: Nearshore Waters
+        unit: '%'
+        short_unit: '%'
+      offshore_waters:
+        title: Offshore Waters
+        unit: '%'
+        short_unit: '%'
+      river_waters:
+        title: River Waters
+        unit: '%'
+        short_unit: '%'
+      riverbed:
+        title: Riverbed
+        unit: '%'
+        short_unit: '%'
+      shoreline:
+        title: Shoreline
+        unit: '%'
+        short_unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -58,7 +58,7 @@ def run() -> None:
     tb_quit = tb_quit[tb_quit[help_quit] != 1]
 
     tb_empower = pr.multi_merge(
-        [tb_taxes, tb_ads, tb_quit, tb_afford, tb_smoke_free],  # type: ignore
+        [tb_taxes, tb_ads, tb_quit, tb_afford, tb_smoke_free],  # ty: ignore
         on=["country", "year"],
         how="outer",
     )

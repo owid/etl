@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any
 from urllib.parse import quote
 
 import requests
@@ -17,14 +17,14 @@ def is_502_error(exception):
     return isinstance(exception, HTTPError) and exception.response.status_code == 502
 
 
-class AdminAPI(object):
-    def __init__(self, owid_env: OWIDEnv, api_key: Optional[str] = ADMIN_API_KEY):
+class AdminAPI:
+    def __init__(self, owid_env: OWIDEnv, api_key: str | None = ADMIN_API_KEY):
         self.owid_env = owid_env
         self.api_key = api_key
 
-    def _headers(self, user_id: Optional[int] = None) -> Dict[str, str]:
+    def _headers(self, user_id: int | None = None) -> dict[str, str]:
         """Build headers for API requests."""
-        headers: Dict[str, str] = {}
+        headers: dict[str, str] = {}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
         if user_id is not None:
@@ -63,10 +63,11 @@ class AdminAPI(object):
         js = self._json_from_response(resp)
         return js
 
-    def create_chart(self, chart_config: dict, user_id: Optional[int] = None) -> dict:
-        # Extract isInheritanceEnabled from config and prepare request params
+    def create_chart(self, chart_config: dict, user_id: int | None = None) -> dict:
+        # Extract chart-table fields; keep them out of chart_configs.full payload.
         config = chart_config.copy()
         is_inheritance_enabled = config.pop("isInheritanceEnabled", None)
+        config.pop("forceDatapage", None)
 
         # Build request parameters
         params = {}
@@ -85,10 +86,11 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "chart_config": chart_config})
         return js
 
-    def update_chart(self, chart_id: int, chart_config: dict, user_id: Optional[int] = None) -> dict:
-        # Extract isInheritanceEnabled from config and prepare request params
+    def update_chart(self, chart_id: int, chart_config: dict, user_id: int | None = None) -> dict:
+        # Extract chart-table fields; keep them out of chart_configs.full payload.
         config = chart_config.copy()
         is_inheritance_enabled = config.pop("isInheritanceEnabled", None)
+        config.pop("forceDatapage", None)
 
         # Build request parameters
         params = {}
@@ -107,7 +109,7 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "chart_config": chart_config})
         return js
 
-    def set_tags(self, chart_id: int, tags: List[Dict[str, Any]], user_id: Optional[int] = None) -> dict:
+    def set_tags(self, chart_id: int, tags: list[dict[str, Any]], user_id: int | None = None) -> dict:
         resp = requests.post(
             f"{self.owid_env.admin_api}/charts/{chart_id}/setTags",
             headers=self._headers(user_id),
@@ -118,7 +120,7 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "tags": tags})
         return js
 
-    def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
+    def put_grapher_config(self, variable_id: int, grapher_config: dict[str, Any]) -> dict:
         # If schema is missing, use the default one
         grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
 
@@ -143,7 +145,7 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "variable_id": variable_id})
         return js
 
-    def put_mdim_config(self, mdim_catalog_path: str, mdim_config: dict, user_id: Optional[int] = None) -> dict:
+    def put_mdim_config(self, mdim_catalog_path: str, mdim_config: dict, user_id: int | None = None) -> dict:
         # Retry in case we're restarting Admin on staging server
         url = self.owid_env.admin_api + f"/multi-dims/{quote(mdim_catalog_path, safe='')}"
         resp = requests_with_retry().put(
@@ -158,7 +160,7 @@ class AdminAPI(object):
             )
         return js
 
-    def put_explorer_config(self, slug: str, tsv: str, user_id: Optional[int] = None) -> dict:
+    def put_explorer_config(self, slug: str, tsv: str, user_id: int | None = None) -> dict:
         # Retry in case we're restarting Admin on staging server
         url = self.owid_env.admin_api + f"/explorers/{slug}"
         resp = requests_with_retry().put(
@@ -171,7 +173,7 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "slug": slug, "tsv": tsv[:1000]})
         return js
 
-    def create_dod(self, name: str, content: str, user_id: int | None = None) -> Dict[str, Any]:
+    def create_dod(self, name: str, content: str, user_id: int | None = None) -> dict[str, Any]:
         """Create a new DoD (Details on Demand)."""
         data = {
             "name": name,
@@ -187,7 +189,7 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "dod_data": data})
         return js
 
-    def update_dod(self, dod_id: int, content: str, user_id: int | None = None) -> Dict[str, Any]:
+    def update_dod(self, dod_id: int, content: str, user_id: int | None = None) -> dict[str, Any]:
         """Update an existing DoD."""
         data = {
             "content": content,
@@ -208,11 +210,12 @@ class AdminAPI(object):
         resp = requests.get(
             f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}.config.json",
             headers=self._headers(),
+            timeout=1,
         )
         js = self._json_from_response(resp)
         return js
 
-    def update_narrative_chart(self, narrative_chart_id: int, config: dict, user_id: Optional[int] = None) -> dict:
+    def update_narrative_chart(self, narrative_chart_id: int, config: dict, user_id: int | None = None) -> dict:
         """Update a narrative chart's config.
 
         Args:
@@ -231,6 +234,27 @@ class AdminAPI(object):
         js = self._json_from_response(resp)
         if not js.get("success", True):  # Some endpoints don't return success
             raise AdminAPIError({"error": js.get("error"), "narrative_chart_id": narrative_chart_id, "config": config})
+        return js
+
+    def set_dataset_archived(self, dataset_id: int, is_archived: bool, user_id: int | None = None) -> dict:
+        """Set the archived status of a dataset.
+
+        Args:
+            dataset_id: The ID of the dataset to archive/unarchive
+            is_archived: Whether to archive (True) or unarchive (False) the dataset
+            user_id: Optional user ID for the session
+
+        Returns:
+            Response dict from the API
+        """
+        resp = requests.post(
+            f"{self.owid_env.admin_api}/datasets/{dataset_id}/setArchived",
+            headers=self._headers(user_id),
+            json={"isArchived": is_archived},
+        )
+        js = self._json_from_response(resp)
+        if not js.get("success", True):
+            raise AdminAPIError({"error": js.get("error"), "dataset_id": dataset_id, "is_archived": is_archived})
         return js
 
 

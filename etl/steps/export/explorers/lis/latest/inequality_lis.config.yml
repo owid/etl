@@ -10,7 +10,11 @@ config:
     - United States
   wpBlockId: 57755
   isPublished: true
-  # pickerColumnSlugs:
+  originUrl: https://ourworldindata.org/economic-inequality
+  pickerColumnSlugs: []
+
+topic_tags:
+  - Economic Inequality
 
 dimensions:
   - name: Indicator

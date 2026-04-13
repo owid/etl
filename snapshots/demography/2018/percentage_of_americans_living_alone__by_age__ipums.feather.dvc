@@ -1,0 +1,21 @@
+meta:
+  source:
+    name: IPUMS
+    description: |-
+      Samples of the decennial Census (1900-2000) and the 2018 ACS from IPUMS-USA has been used to construct variables on the percentage of Americans living alone, by age and sex.
+
+      We include only those people who are reported to be living in a one-person household and who do not live in group quarters.
+
+      The IPUMS defines group quarters as "largely institutions and other group living arrangements, such as rooming houses and military barracks. The definitions vary from year to year, but the pre-1940 samples have generally used a definition of group quarters that includes units with 10 or more individuals unrelated to the householder."
+
+      We have excluded those recorded to be living in institutions, other group quarters, and additional households under the 2000 definition.
+    url: https://usa.ipums.org/usa/
+    date_accessed: 2020-11-06
+    published_by: |-
+      Steven Ruggles, Sarah Flood, Ronald Goeken, Josiah Grover, Erin Meyer, Jose Pacas, and Matthew Sobek. IPUMS USA: Version 8.0 [dataset]. Minneapolis, MN: IPUMS, 2018. https://doi.org/10.18128/D010.V8.0
+  name: Percentage of Americans living alone, by age - IPUMS
+  description: ''
+outs:
+  - md5: 98698494195230d7933955e1a145e6c8
+    size: 19634
+    path: percentage_of_americans_living_alone__by_age__ipums.feather

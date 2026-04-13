@@ -1,0 +1,29 @@
+dataset:
+  title: Child Labor UK (historic) - Cunningham, H. and Viazzo, P.P. (1996)
+tables:
+  child_labor_uk__historic__cunningham__h__and_viazzo__p_p__1996:
+    variables:
+      child_labor_uk__boys__historic__cunningham__h__and_viazzo__p_p__1996:
+        title: Child Labor UK (boys, historic) (Cunningham, H. and Viazzo, P.P. (1996))
+        unit: '% of boys ages 10-14'
+        short_unit: '%'
+        display:
+          name: Total fertility rate
+          unit: Children per woman
+        description: Share of boys in employment aged 10-14.
+      child_labor_uk__girls__historic__cunningham__h__and_viazzo__p_p__1996:
+        title: Child Labor UK (girls, historic) (Cunningham, H. and Viazzo, P.P. (1996))
+        unit: '% of girls ages 10-14'
+        short_unit: '%'
+        display:
+          unit: people
+        description: Share of girls in employment aged 10-14.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

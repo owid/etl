@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: 'UNEP-WCMC and IUCN (2021). Protected Planet: The World Database on Protected Areas (WDPA).'
+    url: https://www.protectedplanet.net/
+    date_accessed: 2021-09-29
+    published_by: |-
+      UNEP-WCMC and IUCN (2021). Protected Planet: The World Database on Protected Areas (WDPA) and World Database on Other Effective Area-based Conservation Measures (WD-OECM) [Online], September 2021, Cambridge, UK: UNEP-WCMC and IUCN.
+  name: Marine protected areas (WDPA)
+  description: ''
+  is_public: false
+outs:
+  - md5: 2a9595fcc376e63bc6b0b1dbc17b2c0d
+    size: 5378
+    path: marine_protected_areas__wdpa.feather

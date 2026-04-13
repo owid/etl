@@ -151,13 +151,18 @@ def run_updates(
 
         # Try to execute snapshot and print error output if it fails.
         try:
-            subprocess.run(["python", snapshot_script, "--upload"], check=True, capture_output=True, text=True)
+            subprocess.run(
+                [str(BASE_DIR / ".venv/bin/etls"), str(snapshot_script.relative_to(SNAPSHOTS_DIR)), "--upload"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
         except subprocess.CalledProcessError as e:
             log.error(f"Snapshot script failed: {snapshot_script}\nstdout:\n{e.stdout}\nstderr:\n{e.stderr}")
             raise
 
         # Load md5 and size from the (possibly) updated file
-        with open(dvc_file, "r") as f:
+        with open(dvc_file) as f:
             new_outs = yaml.safe_load(f)["outs"][0]
 
         # Data is not new, MD5 or size is identical.
@@ -183,7 +188,7 @@ def run_updates(
 
     # If MD5 has changed, create a PR.
     if create_pr and not any(identical for identical in identicals):
-        create_autoupdate_pr(update_name=update.name, files=files_to_update)  # type: ignore
+        create_autoupdate_pr(update_name=update.name, files=files_to_update)  # ty: ignore
 
     # Restore the DVC files to their original state after processing
     if not dry_run:
@@ -239,7 +244,7 @@ def cli(
         # Quite rare but possible to have multiple .dvc files for a single snapshot.
         dvc_file = dvc_files[0]
 
-        with open(dvc_file, "r") as f:
+        with open(dvc_file) as f:
             meta = yaml.safe_load(f)
             if not meta.get("autoupdate"):
                 # log.info("run_all_snapshots.skip", snapshot=snapshot, reason="autoupdate not enabled")

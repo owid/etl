@@ -4,7 +4,6 @@ import re
 import tempfile
 import warnings
 from pathlib import Path
-from typing import Dict, Tuple
 from xml.etree import ElementTree
 from zipfile import ZipFile
 
@@ -13,7 +12,7 @@ import pandas as pd
 from docx import Document
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 
 # Initialize logger.
@@ -53,7 +52,7 @@ World production data for 1928-60 were from the “World Production” table in 
 }
 
 
-def read_data_for_all_commodities(snap: Snapshot) -> Tuple[Dict[str, pr.ExcelFile], Dict[str, str]]:
+def read_data_for_all_commodities(snap: Snapshot) -> tuple[dict[str, pr.ExcelFile], dict[str, str]]:
     # Initialize a dictionary that will gather the excel supply-demand data for each file.
     supply_demand_data = {}
     # Initialize a dictionary that will gather the extracted text from the embedded Word documents.
@@ -221,8 +220,8 @@ def clean_sheet_data(data: pr.ExcelFile, commodity: str, sheet_name: str) -> pd.
 
 
 def combine_data_for_all_commodities(
-    supply_demand_data: Dict[str, pr.ExcelFile], supply_demand_metadata: Dict[str, str]
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    supply_demand_data: dict[str, pr.ExcelFile], supply_demand_metadata: dict[str, str]
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     # Initialize a dataframe that will combine the data for all commodities.
     combined = pd.DataFrame()
     combined_metadata = pd.DataFrame()
@@ -325,7 +324,7 @@ def extract_paragraph(text: str, header: str) -> str:
     return " ".join(paragraph_text).strip()
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -364,8 +363,10 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir, tables=[tb, tb_metadata], check_variables_metadata=True, default_metadata=snap.metadata
+    ds_meadow = paths.create_dataset(
+        tables=[tb, tb_metadata],
+        check_variables_metadata=True,
+        default_metadata=snap.metadata,
     )
 
     # Save changes in the new meadow dataset.

@@ -4,7 +4,7 @@ OWID Posts MCP Server Module
 Provides post markdown content retrieval functionality for Our World in Data posts.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 import structlog
 from fastmcp import FastMCP
@@ -35,7 +35,7 @@ INSTRUCTIONS = (
 mcp = FastMCP()
 
 
-async def _fetch_post_by_identifier(identifier: str) -> Optional[Dict[str, Any]]:
+async def _fetch_post_by_identifier(identifier: str) -> dict[str, Any] | None:
     """
     Fetch post data by slug or Google Doc ID using the public Datasette API.
 
@@ -86,8 +86,8 @@ async def _fetch_post_by_identifier(identifier: str) -> Optional[Dict[str, Any]]
     return None
 
 
-@mcp.tool
-async def fetch_post(identifier: str, include_metadata: bool = False) -> Dict[str, Any]:
+@mcp.tool(tags={"post", "content"})
+async def fetch_post(identifier: str, include_metadata: bool = False) -> dict[str, Any]:
     """
     Fetch markdown content for a post by slug or Google Doc ID from the OWID database.
 
@@ -130,7 +130,7 @@ def _create_post_url(slug: str, typ: str) -> str:
         return f"https://ourworldindata.org/{slug}"
 
 
-def _build_post_result(slug: str, title: str, excerpt: str, typ: str) -> Dict[str, str]:
+def _build_post_result(slug: str, title: str, excerpt: str, typ: str) -> dict[str, str]:
     """Build a standardized post result dictionary."""
     return {
         "slug": slug,
@@ -141,8 +141,8 @@ def _build_post_result(slug: str, title: str, excerpt: str, typ: str) -> Dict[st
     }
 
 
-@mcp.tool
-async def search_posts(query: str, limit: int = 10, use_algolia: bool = True) -> Dict[str, Any]:
+@mcp.tool(tags={"post", "search"})
+async def search_posts(query: str, limit: int = 10, use_algolia: bool = True) -> dict[str, Any]:
     """
     Search for articles and data insights by title or content.
 

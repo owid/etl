@@ -14,9 +14,9 @@ Table of Contents:
 
 import pytest
 
-from etl.collection.exceptions import CommonViewParamConflict
+from etl.collection.exceptions import CommonViewParamConflict, InvalidColorScaleConfigError
 from etl.collection.model.core import Definitions
-from etl.collection.model.view import CommonView, merge_common_metadata_by_dimension
+from etl.collection.model.view import CommonView, View, ViewIndicators, merge_common_metadata_by_dimension
 
 
 def test_merge_common_metadata_1():
@@ -456,6 +456,73 @@ def test_merge_common_metadata_4():
     assert config == config_expected
 
 
+def test_merge_common_metadata_nested_priority_override():
+    """Test that nested values at lower priority can be overridden by higher priority entries.
+
+    This test verifies the fix for the bug where:
+    - Entry at priority 0 sets a nested value (map.colorScale.baseColorScheme: Blues)
+    - Entry at priority 1 sets a sibling nested value (map.colorScale.binningStrategy: manual)
+    - Another entry at priority 1 should be able to override the priority-0 value
+
+    This was incorrectly flagged as a conflict because priority was only tracked
+    at the top-level key, not at nested paths.
+    """
+    common_params = [
+        # Priority 0 - sets baseColorScheme
+        {
+            "config": {
+                "map": {
+                    "colorScale": {
+                        "baseColorScheme": "Blues",
+                    }
+                }
+            }
+        },
+        # Priority 1 - indicator: share - sets binningStrategy (sibling key)
+        {
+            "dimensions": {
+                "indicator": "share",
+            },
+            "config": {
+                "map": {
+                    "colorScale": {
+                        "binningStrategy": "manual",
+                    }
+                }
+            },
+        },
+        # Priority 1 - religion: buddhists - overrides baseColorScheme
+        {
+            "dimensions": {
+                "religion": "buddhists",
+            },
+            "config": {
+                "map": {
+                    "colorScale": {
+                        "baseColorScheme": "Purples",
+                    }
+                }
+            },
+        },
+    ]
+
+    active_dimensions = {"indicator": "share", "religion": "buddhists"}
+
+    common_params = [CommonView.from_dict(r) for r in common_params]
+    config = merge_common_metadata_by_dimension(common_params, active_dimensions, None, "config")
+
+    expected = {
+        "map": {
+            "colorScale": {
+                "baseColorScheme": "Purples",  # Overridden by religion: buddhists (priority 1 > 0)
+                "binningStrategy": "manual",  # Set by indicator: share
+            }
+        }
+    }
+
+    assert config == expected
+
+
 def test_merge_common_metadata_5():
     """Test conflict detection when multiple dimensions compete for same property.
 
@@ -557,3 +624,174 @@ def test_merge_common_metadata_5():
             field_name="config",
             common_has_priority=True,
         )
+
+
+# --- Color scale validation tests ---
+
+
+def _make_view(config=None):
+    """Helper to create a View with minimal required fields."""
+    return View(
+        dimensions={"nutrient": "protein"},
+        indicators=ViewIndicators(y=[]),
+        config=config,
+    )
+
+
+class TestColorScaleValidation:
+    """Tests for validate_color_scale_config on View.
+
+    Ensures that log binning strategies with non-positive minValue/maxValue
+    are caught at ETL time instead of silently producing a blank grey map.
+    """
+
+    def test_log_binning_with_min_value_zero_in_map(self):
+        """minValue=0 + log-1-2-5 in map.colorScale should raise."""
+        view = _make_view(
+            config={
+                "map": {
+                    "colorScale": {
+                        "binningStrategy": "log-1-2-5",
+                        "minValue": 0,
+                    }
+                }
+            }
+        )
+        with pytest.raises(InvalidColorScaleConfigError, match="minValue=0"):
+            view.validate_color_scale_config()
+
+    def test_log_binning_with_negative_min_value(self):
+        """Negative minValue + log-auto should raise."""
+        view = _make_view(
+            config={
+                "map": {
+                    "colorScale": {
+                        "binningStrategy": "log-auto",
+                        "minValue": -5,
+                    }
+                }
+            }
+        )
+        with pytest.raises(InvalidColorScaleConfigError, match="minValue=-5"):
+            view.validate_color_scale_config()
+
+    def test_log_binning_with_max_value_zero(self):
+        """maxValue=0 + log-10 should raise."""
+        view = _make_view(
+            config={
+                "colorScale": {
+                    "binningStrategy": "log-10",
+                    "maxValue": 0,
+                }
+            }
+        )
+        with pytest.raises(InvalidColorScaleConfigError, match="maxValue=0"):
+            view.validate_color_scale_config()
+
+    def test_log_binning_with_both_non_positive(self):
+        """Both minValue and maxValue non-positive should mention both."""
+        view = _make_view(
+            config={
+                "map": {
+                    "colorScale": {
+                        "binningStrategy": "log-1-3",
+                        "minValue": 0,
+                        "maxValue": -1,
+                    }
+                }
+            }
+        )
+        with pytest.raises(InvalidColorScaleConfigError, match="minValue=0 and maxValue=-1"):
+            view.validate_color_scale_config()
+
+    def test_log_binning_with_positive_values_passes(self):
+        """Log binning with positive minValue should pass."""
+        view = _make_view(
+            config={
+                "map": {
+                    "colorScale": {
+                        "binningStrategy": "log-1-2-5",
+                        "minValue": 1,
+                    }
+                }
+            }
+        )
+        # Should not raise
+        view.validate_color_scale_config()
+
+    def test_equal_size_binning_with_zero_min_passes(self):
+        """equalSizeBins-normal with minValue=0 is perfectly fine."""
+        view = _make_view(
+            config={
+                "map": {
+                    "colorScale": {
+                        "binningStrategy": "equalSizeBins-normal",
+                        "minValue": 0,
+                    }
+                }
+            }
+        )
+        # Should not raise
+        view.validate_color_scale_config()
+
+    def test_no_config_passes(self):
+        """Views with no config should pass."""
+        view = _make_view(config=None)
+        view.validate_color_scale_config()
+
+    def test_no_binning_strategy_passes(self):
+        """minValue=0 without binningStrategy is fine."""
+        view = _make_view(
+            config={
+                "map": {
+                    "colorScale": {
+                        "minValue": 0,
+                    }
+                }
+            }
+        )
+        view.validate_color_scale_config()
+
+    def test_top_level_color_scale_validated(self):
+        """config.colorScale (not just map.colorScale) should be validated."""
+        view = _make_view(
+            config={
+                "colorScale": {
+                    "binningStrategy": "log-1-2-5",
+                    "minValue": 0,
+                }
+            }
+        )
+        with pytest.raises(InvalidColorScaleConfigError):
+            view.validate_color_scale_config()
+
+    def test_combine_with_common_triggers_validation(self):
+        """The real scenario: common_view sets minValue=0, view sets log binning.
+
+        This is the exact bug Ed reported — after merging, the view has an
+        incompatible combination that previously caused a silent blank grey map.
+        """
+        common_views = [
+            CommonView.from_dict(
+                {
+                    "config": {
+                        "map": {
+                            "colorScale": {
+                                "minValue": 0,
+                            }
+                        }
+                    }
+                }
+            ),
+        ]
+        view = _make_view(
+            config={
+                "map": {
+                    "colorScale": {
+                        "binningStrategy": "log-1-2-5",
+                    }
+                }
+            }
+        )
+        with pytest.raises(InvalidColorScaleConfigError):
+            view.combine_with_common(common_views)

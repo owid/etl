@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2715
-    date_accessed: 2023-08-10 09:20:58.447063
+    url: https://admin.owid.io/admin/datasets/2715
+    date_accessed: 2026-03-05 13:34:57.220132+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2715_gender_wage_gap__assigning_zeros_for_no_work
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 45f9a918d135712db709cd1ba8d19afa
-  size: 2088
-  path: dataset_2715_gender_wage_gap__assigning_zeros_for_no_work_config.json
+  - md5: 6d6c144b4f8db379566c5a7724c35ae3
+    size: 2218
+    path: dataset_2715_gender_wage_gap__assigning_zeros_for_no_work_config.json

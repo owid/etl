@@ -2,13 +2,13 @@
 
 import pandas as pd
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     """Create meadow dataset from snapshot."""
     # Load inputs
     snap = paths.load_snapshot("ireland_metered_consumption.csv")
@@ -29,8 +29,7 @@ def run(dest_dir: str) -> None:
     tb = tb.format(["date", "year", "electricity_consumption"])
 
     # Save outputs
-    ds_meadow = create_dataset(
-        dest_dir,
+    ds_meadow = paths.create_dataset(
         tables=[tb],
         check_variables_metadata=True,
         default_metadata=snap.metadata,

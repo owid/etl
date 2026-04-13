@@ -1,0 +1,20 @@
+dataset:
+  title: Long-run stunting rates (Schneider et al. 2026)
+  description: Long-run estimates of childhood stunting rates
+  licenses:
+    - {}
+tables:
+  stunting_rate_schneider:
+    variables:
+      stunting_rate:
+        title: Stunting rate among 2 to 10 year olds
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Stunting rate
+        description: The share of 2 to 10-year-olds who are short for their age based on the WHO's Growth Standards.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

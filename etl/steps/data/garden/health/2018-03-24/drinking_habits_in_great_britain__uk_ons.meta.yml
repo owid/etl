@@ -1,0 +1,26 @@
+dataset:
+  title: Drinking habits in Great Britain - UK ONS
+tables:
+  drinking_habits_in_great_britain__uk_ons:
+    variables:
+      dont_drink:
+        title: Don't drink
+        unit: '%'
+      drank_in_last_week:
+        title: Drank in last week
+        unit: '%'
+      drank_on_5_or_more_days_in_last_week:
+        title: Drank on 5 or more days in last week
+        unit: '%'
+      share_of_drinkers_who_binged_on_heaviest_day_of_drinking_in_last_week:
+        title: Share of drinkers who "binged" on heaviest day of drinking in last week
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

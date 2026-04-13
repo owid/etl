@@ -1,0 +1,22 @@
+dataset:
+  title: Lead blood concentrations in USA (US CDC)
+tables:
+  lead_blood_concentrations_in_usa__us_cdc:
+    variables:
+      blood_lead_concentration__1_5_year_olds:
+        title: Blood lead concentration (1-5 year olds)
+        unit: µg/dL
+        short_unit: µg/dL
+        display:
+          name: Lead blood concentrations in children
+        description: This measures the median and 95th percentile of lead blood concentrations in 1-5 year olds in the United
+          States.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

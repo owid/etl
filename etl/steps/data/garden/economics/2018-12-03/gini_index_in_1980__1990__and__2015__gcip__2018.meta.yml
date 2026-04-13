@@ -1,0 +1,69 @@
+dataset:
+  title: Gini index in 1980, 1990 & 2015 – GCIP (2018)
+tables:
+  gini_index_in_1980__1990__and__2015__gcip__2018:
+    variables:
+      country_grouping:
+        title: Country grouping
+        unit: ''
+        display:
+          name: Country grouping
+      gini_index_of_consumption_in_1980__inc__non_survey_years:
+        title: Gini index of consumption in 1980 (inc. non-survey years)
+        unit: ''
+        display:
+          name: Gini index of consumption in 1980
+      gini_index_of_consumption_in_1990__survey_years_only:
+        title: Gini index of consumption in 1990 (Survey years only)
+        unit: ''
+        display:
+          name: Gini index of consumption in 1990
+      gini_index_of_consumption_in_1990__inc__non_survey_years:
+        title: Gini index of consumption in 1990 (inc. non-survey years)
+        unit: ''
+        display:
+          name: Gini index of consumption in 1990
+      gini_index_of_consumption_in_2015__survey_years_only:
+        title: Gini index of consumption in 2015 (Survey years only)
+        unit: ''
+        display:
+          name: Gini index of consumption in 2015
+      gini_index_of_consumption_in_2015__inc__non_survey_years:
+        title: Gini index of consumption in 2015 (inc. non-survey years)
+        unit: ''
+        display:
+          name: Gini index of consumption in 2015
+      gini_index_of_income_in_1980__inc__non_survey_years:
+        title: Gini index of income in 1980 (inc. non-survey years)
+        unit: ''
+        display:
+          name: Gini index of income in 1980
+      gini_index_of_income_in_1990__survey_years_only:
+        title: Gini index of income in 1990 (Survey years only)
+        unit: ''
+        display:
+          name: Gini index of income in 1990
+      gini_index_of_income_in_1990__inc__non_survey_years:
+        title: Gini index of income in 1990 (inc. non-survey years)
+        unit: ''
+        display:
+          name: Gini index of income in 1990
+      gini_index_of_income_in_2015__survey_years_only:
+        title: Gini index of income in 2015 (Survey years only)
+        unit: ''
+        display:
+          name: Gini index of income in 2015
+      gini_index_of_income_in_2015__inc__non_survey_years:
+        title: Gini index of income in 2015 (inc. non-survey years)
+        unit: ''
+        display:
+          name: Gini index of income in 2015
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

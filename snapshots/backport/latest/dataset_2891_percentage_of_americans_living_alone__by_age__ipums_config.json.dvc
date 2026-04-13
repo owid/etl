@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2891
-    date_accessed: 2023-08-10 08:32:05.743230
+    url: https://admin.owid.io/admin/datasets/2891
+    date_accessed: 2026-03-05 11:01:08.196508+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2891_percentage_of_americans_living_alone__by_age__ipums
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dd6511957579faf6baae4124a62f9db9
-  size: 6750
-  path: dataset_2891_percentage_of_americans_living_alone__by_age__ipums_config.json
+  - md5: 57d2c4ef4b2dbc84be877c40eb1413dd
+    size: 7345
+    path: dataset_2891_percentage_of_americans_living_alone__by_age__ipums_config.json

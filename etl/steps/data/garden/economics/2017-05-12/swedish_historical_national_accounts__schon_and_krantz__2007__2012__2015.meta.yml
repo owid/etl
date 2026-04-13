@@ -1,0 +1,62 @@
+dataset:
+  title: Swedish Historical National Accounts - Schön and Krantz (2007, 2012, 2015)
+tables:
+  swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015:
+    variables:
+      agriculture_gdp__sek__constant_prices__1910_12_price_level__schon_and_krantz__2007__2012__2015:
+        title: Agriculture GDP (SEK, constant prices, 1910/12 price level) (Schön and Krantz (2007, 2012, 2015))
+        unit: Swedish Krona (1910/12 price level) (1910/12 price level)
+        short_unit: SEK
+        display:
+          unit: Rate
+        description: Value added by main economic sectors, constant prices (1910/12 price level)
+      building__and__construction_gdp__sek__constant_prices__1910_12_price_level__schon_and_krantz__2007__2012__2015:
+        title: Building & Construction GDP (SEK, constant prices, 1910/12 price level) (Schön and Krantz (2007, 2012, 2015))
+        unit: Swedish Krona (1910/12 price level)
+        short_unit: SEK
+        display:
+          name: Per capita plastic waste
+          shortUnit: kg
+          unit: kilograms per person per day
+        description: Value added by main economic sectors, constant prices (1910/12 price level)
+      labor_productivity__gdp_worker__schon_and_krantz__2007__2012__2015:
+        title: Labor Productivity (GDP/worker) (Schön and Krantz (2007, 2012, 2015))
+        unit: ''
+        description: |-
+          Ratio of value added in agriculture (SEK, constant prices, 1910/12 price level), by number of people employed in agriculture
+      manufacturing__and__industry_gdp__sek__constant_prices__1910_12_price_level__schon_and_krantz__2007__2012__2015:
+        title: Manufacturing & Industry GDP (SEK, constant prices, 1910/12 price level) (Schön and Krantz (2007, 2012, 2015))
+        unit: Swedish Krona (1910/12 price level)
+        short_unit: SEK
+        display:
+          unit: Rate
+        description: Value added by main economic sectors, constant prices (1910/12 price level)
+      private_services_gdp__sek__constant_prices__1910_12_price_level__schon_and_krantz__2007__2012__2015:
+        title: Private services GDP (SEK, constant prices, 1910/12 price level) (Schön and Krantz (2007, 2012, 2015))
+        unit: ''
+        short_unit: SEK
+        description: Value added by main economic sectors, constant prices (1910/12 price level)
+      public_services_gdp__sek__constant_prices__1910_12_price_level__schon_and_krantz__2007__2012__2015:
+        title: Public services GDP (SEK, constant prices, 1910/12 price level) (Schön and Krantz (2007, 2012, 2015))
+        unit: Swedish Krona (1910/12 price level)
+        short_unit: SEK
+        description: Value added by main economic sectors, constant prices (1910/12 price level)
+      services_of_dwellings_gdp__sek__constant_prices__1910_12_price_level__schon_and_krantz__2007__2012__2015:
+        title: Services of dwellings GDP (SEK, constant prices, 1910/12 price level) (Schön and Krantz (2007, 2012, 2015))
+        unit: Swedish Krona (1910/12 price level)
+        short_unit: SEK
+        description: Value added by main economic sectors, constant prices (1910/12 price level)
+      transport__and__comunications_gdp__sek__constant_prices__1910_12_price_level__schon_and_krantz__2007__2012__2015:
+        title: Transport & Comunications GDP (SEK, constant prices, 1910/12 price level) (Schön and Krantz (2007, 2012, 2015))
+        unit: Swedish Krona (1910/12 price level)
+        short_unit: SEK
+        description: Value added by main economic sectors, constant prices (1910/12 price level)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

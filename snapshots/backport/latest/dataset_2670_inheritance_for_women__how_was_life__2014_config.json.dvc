@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2670
-    date_accessed: 2023-08-10 08:03:16.608456
+    url: https://admin.owid.io/admin/datasets/2670
+    date_accessed: 2026-03-10 09:19:46.163407+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2670_inheritance_for_women__how_was_life__2014
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e73cdfb71b4c7ab53eff22373200ebae
-  size: 2573
-  path: dataset_2670_inheritance_for_women__how_was_life__2014_config.json
+  - md5: 9c6def154199b67861bc61c351d39e90
+    size: 2703
+    path: dataset_2670_inheritance_for_women__how_was_life__2014_config.json

@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/189
-    date_accessed: 2023-08-10 08:04:46.690099
+    url: https://admin.owid.io/admin/datasets/189
+    date_accessed: 2026-03-05 13:25:40.417582+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Government Transparency index - Hollyer et al. (2014)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d17f09304ae4bc9867329c8bc1293a10
-  size: 106482
-  path: dataset_189_government_transparency_index__hollyer_et_al__2014_values.feather
+  - md5: 52444b0ea4aae50021b8e7c79d467713
+    size: 103698
+    path: dataset_189_government_transparency_index__hollyer_et_al__2014_values.feather

@@ -1,0 +1,32 @@
+dataset:
+  title: Change in marine mammal populations (Duarte et al. 2020)
+tables:
+  change_in_marine_mammal_populations__duarte_et_al__2020:
+    variables:
+      share_of_marine_mammal_populations__no_change:
+        title: Share of marine mammal populations (no change)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: No change
+      share_of_marine_mammal_populations_decreasing:
+        title: Share of marine mammal populations decreasing
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Decreasing
+      share_of_marine_mammal_populations_increasing:
+        title: Share of marine mammal populations increasing
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Increasing
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,19 @@
+dataset:
+  title: Air pollution by city - Fouquet and DPCC (2011)
+tables:
+  air_pollution_by_city__fouquet_and_dpcc__2011:
+    variables:
+      suspended_particulate_matter__spm__fouquet_and_dpcc__2011:
+        title: Suspended Particulate Matter (SPM) (Fouquet and DPCC (2011))
+        unit: micrograms per cubic metre
+        display:
+          unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

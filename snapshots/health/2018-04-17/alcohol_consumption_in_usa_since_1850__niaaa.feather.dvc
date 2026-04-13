@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Alcohol consumption in USA since 1850 — NIAAA
+    description: |-
+      Liters of ethanol per capita (differentiated by beverage type), based on population aged 15 and older prior to 1970 and on population aged 14 and older thereafter.
+
+      The period 1920–1933 marks a period of alcohol prohibition in the United States. Here it is assumed consumption was zero by the NIAAA.
+
+      Data prior to 1977 are from: HYMAN, M.; ZIMMERMAN, M.; GURIOLI, C.; and HELRICH, A. Drinkers, Drinking and Alcohol–Related Mortality and Hospitalizations: A Statistical Compendium, 1980 Edition. New Brunswick, NJ: Rutgers University, 1980.
+    url: https://pubs.niaaa.nih.gov/publications/surveillance102/tab1_13.htm
+    date_accessed: 2018-04-17
+    published_by: National Institute on Alcohol Abuse and Alcoholism
+  name: Alcohol consumption in USA since 1850 — NIAAA
+  description: ''
+outs:
+  - md5: 5b01d87534eb8f5424d5c9bee43a8241
+    size: 6178
+    path: alcohol_consumption_in_usa_since_1850__niaaa.feather

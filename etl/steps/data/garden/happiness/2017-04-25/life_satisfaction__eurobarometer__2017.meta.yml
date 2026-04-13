@@ -1,0 +1,22 @@
+dataset:
+  title: Life satisfaction – Eurobarometer (2017)
+tables:
+  life_satisfaction__eurobarometer__2017:
+    variables:
+      share_of_people_who_are_happy__eurobarometer_2017:
+        title: Share of people who are happy (Eurobarometer 2017)
+        unit: '%'
+        short_unit: '%'
+        display:
+          unit: Rate
+        description: |-
+          Share of people who say they are 'very satisfied' or 'fairly satisfied' with their life. Full question asks: "On the whole are you very satisfied, fairly satisfied, not very satisfied or not at all satisfied with the life you lead?"
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

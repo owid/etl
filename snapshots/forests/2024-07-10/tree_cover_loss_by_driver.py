@@ -48,7 +48,7 @@ def main(upload: bool) -> None:
     tb = pd.concat(tables)
 
     # Download data from source, add file to DVC and upload to S3.
-    snap.create_snapshot(upload=upload, data=tb)  # type: ignore[reportArgumentType]
+    snap.create_snapshot(upload=upload, data=tb)  # ty: ignore[invalid-argument-type]
 
 
 if __name__ == "__main__":

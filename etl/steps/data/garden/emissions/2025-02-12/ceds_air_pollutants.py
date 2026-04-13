@@ -303,12 +303,12 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
 
     # Check that units are as expected.
     error = "Each pollutant was expected to have just one unit."
-    assert (
-        tb_detailed.groupby("em", as_index=False, observed=True).agg({"units": "nunique"})["units"] == 1
-    ).all(), error
-    assert (
-        tb_bunkers.groupby("em", as_index=False, observed=True).agg({"units": "nunique"})["units"] == 1
-    ).all(), error
+    assert (tb_detailed.groupby("em", as_index=False, observed=True).agg({"units": "nunique"})["units"] == 1).all(), (
+        error
+    )
+    assert (tb_bunkers.groupby("em", as_index=False, observed=True).agg({"units": "nunique"})["units"] == 1).all(), (
+        error
+    )
     error = "Pollutant units have changed."
     assert tb_detailed[["em", "units"]].drop_duplicates().set_index(["em"])["units"].to_dict() == EXPECTED_UNITS, error
     # Specifically, check that all units are in kilotonnes.
@@ -445,9 +445,9 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
         [column for column in compared.columns if column.endswith("_aggregate")]
     ].values
     error = "Expected that, when aggregating all emissions and getting a total of zero, 'global' (potentially spurious) emissions should also be zero. That's no longer the case."
-    assert (
-        len(global_exceptions_values[(global_exceptions_values != 0) & (aggregate_exceptions_values == 0)]) == 0
-    ), error
+    assert len(global_exceptions_values[(global_exceptions_values != 0) & (aggregate_exceptions_values == 0)]) == 0, (
+        error
+    )
     error = "Expected that the given (potentially spurious) global emissions should be a small percentage of the aggregate of emissions (except for oil tanker loading, and international shipping and aviation). That's no longer the case."
     assert (
         max(

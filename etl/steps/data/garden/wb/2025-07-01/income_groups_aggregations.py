@@ -2,8 +2,6 @@
 # NOTE: We have manually modified the value for Ethiopia, because, although it is included in the file, it has officially a temporary status of unclassification.
 # NOTE: Check this back when it's fixed in the source file.
 
-from typing import List
-
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
@@ -59,10 +57,10 @@ def run() -> None:
 
 def add_country_counts_and_population_by_status(
     tb: Table,
-    columns: List[str],
+    columns: list[str],
     ds_regions: Dataset,
     ds_population: Dataset,
-    regions: List[str],
+    regions: list[str],
     missing_data_on_columns: bool = False,
 ) -> Table:
     """

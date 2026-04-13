@@ -3,7 +3,6 @@
 import os
 import tempfile
 import zipfile
-from typing import List
 
 import pandas as pd
 from owid.catalog import Table
@@ -66,7 +65,7 @@ def run() -> None:
     ds_meadow.save()
 
 
-def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> pd.DataFrame:
+def read_and_clean_data(file_ids: list[str], temp_dir: str, field_name: str) -> pd.DataFrame:
     """
     Reads data from a list of CSV files inside a temporary directory, cleans them, and merges into a single DataFrame.
     """
