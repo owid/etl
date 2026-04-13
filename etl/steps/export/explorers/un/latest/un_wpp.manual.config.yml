@@ -29,7 +29,7 @@ definitions:
     - dimensions:
         indicator: population_broad
       config:
-        title: Population by broad age group
+        title: Population by age group
         type: StackedArea
         hasMapTab: false
         selectedFacetStrategy: entity
@@ -127,7 +127,7 @@ dimensions:
       - slug: age_structure
         name: Age structure
       - slug: population_broad
-        name: Population by broad age group
+        name: Population by age group
 
   - slug: sex
     name: Sex
