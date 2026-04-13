@@ -20,7 +20,7 @@
   "United States": "United States",
   "World": "World",
   "Rep. of Korea": "South Korea",
-  "North America": "North America",
-  "European Union": "European Union",
-  "Asia": "Asia"
+  "North America": "North America (IFR)",
+  "European Union": "European Union (IFR)",
+  "Asia": "Asia (IFR)"
 }
