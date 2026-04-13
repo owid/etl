@@ -15,33 +15,39 @@ tables:
         title: Share of working-age population using selected generative AI tools
         unit: "%"
         short_unit: "%"
-        description_short: Estimated share of the working-age population (aged 15–64) who used a [generative AI](#dod:generative-ai) tool, such as ChatGPT or Gemini, in the second half of 2025.
+        description_short: Estimated share of the working-age population (aged 15–64) who used a [generative AI](#dod:generative-ai) website or app, such as ChatGPT or Gemini, in the second half of 2025.
+
         description_key:
           # Source: Section 2, p. 2; Section 2.1, p. 2–3; Appendix A, p. 14 | AI-Usage-Technical-Report.pdf
-          - This is a modelled estimate, not survey data. It estimates the share of the working-age population (aged 15–64) who visited any of 19 selected [generative AI](#dod:generative-ai) websites and apps, based on anonymized data collected by Microsoft software and services.
+          - This is an estimate, not survey data. It is based on anonymized data collected by Microsoft software and services, and measures the share of the working-age population (aged 15–64) who used one of 19 selected [generative AI](#dod:generative-ai) websites and apps.
+
+          # Source: Section 2.2, p. 3–5 | AI-Usage-Technical-Report.pdf
+          - Microsoft can directly observe this mainly on Windows desktops and tablets. It then scales these numbers up to estimate total use across desktop, tablet, and mobile devices in each country.
 
           # Source: Section 2.2, p. 3–5; Section 2.1, p. 3 | AI-Usage-Technical-Report.pdf
-          - The estimates start from Microsoft's data on visits to AI websites and apps on Windows desktops and tablets. They are then adjusted to account for device access, mobile use, and differences in how many users share data with Microsoft.
-
-          # Source: Section 2.1, p. 2–3 | AI-Usage-Technical-Report.pdf
-          - Only users with at least 90 minutes of usage time in a given month are included, to filter out very infrequent users.
+          - To do this, Microsoft adjusts for how common desktop and tablet devices are in each country, how much internet use happens on mobile rather than desktop, and how many users share data with Microsoft.
 
           # Source: Section 2.2, p. 4–5 | AI-Usage-Technical-Report.pdf
-          - These adjustments rely on assumptions about device access, mobile use, and how much overlap there is between people who use AI on desktop and mobile.
+          - These adjustments rely on assumptions that are difficult to test. For example, the report assumes that AI use across desktop and mobile follows broader patterns of internet use.
+
+          # Source: Section 2.1, p. 2–3 | AI-Usage-Technical-Report.pdf
+          - Users with less than 90 minutes of usage time in a month are excluded, to reduce the influence of one-time or very infrequent users.
 
           # Source: Section 2.1, p. 3 | AI-Usage-Technical-Report.pdf
-          - In countries where fewer users share data with Microsoft, estimates are partly blended with the global average. This makes the results more stable but less country-specific.
+          - In countries where fewer users share data with Microsoft, the estimate is partly blended with the global average. This makes the numbers more stable, but less specific to that country.
 
           # Source: Section 2.4, p. 5; Table 2, p. 14–18 | AI-Usage-Technical-Report.pdf
-          - Countries with insufficient data are assigned a regional average rather than a country-specific estimate. This is why some countries share identical values (for example, several countries in West Africa all show 9.3%, and several in East Africa all show 6.8%).
+          - Some countries do not have enough data for their own estimate and are assigned a regional average instead.
 
           # Source: Data Coverage Disclaimer, p. 5 | AI-Usage-Technical-Report.pdf
-          - Coverage is limited in some countries. Estimates for Russia, Iran, and parts of China should be treated with extra caution.
+          - Coverage is limited in some countries, especially Russia, Iran, and parts of China, so estimates for these places should be treated with extra caution.
 
           # Source: Appendix A, p. 14 | AI-Usage-Technical-Report.pdf
-          - This indicator captures visits to selected AI websites and apps only. It does not include AI features built into other software, such as productivity tools or enterprise systems.
+          - This indicator only covers selected AI websites and apps. It does not include AI features built into other software, such as productivity tools or enterprise systems.
+
         display:
           numDecimalPlaces: 1
           name: Share of working-age population using selected generative AI tools
+
         presentation:
           title_public: Estimated share of working-age population using selected generative AI tools
