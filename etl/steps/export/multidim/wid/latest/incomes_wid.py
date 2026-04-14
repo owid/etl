@@ -70,30 +70,13 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
-                    "chartTypes": ["StackedArea"],
+                    "chartTypes": ["StackedArea", "StackedDiscreteBar"],
                     "baseColorScheme": "OwidCategoricalE",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
                 },
                 "view_metadata": {"description_short": "{subtitle}"},
             },
-            # {
-            #     "dimension": "quantile",
-            #     "choices": decile_values,
-            #     "choice_new_slug": "all_bar",
-            #     "view_config": {
-            #         "hideRelativeToggle": True,
-            #         "selectedFacetStrategy": "entity",
-            #         "hasMapTab": False,
-            #         "tab": "chart",
-            #         "chartTypes": ["StackedDiscreteBar"],
-            #         "hideTotalValueLabel": True,
-            #         "baseColorScheme": "OwidCategoricalE",
-            #         "title": "{title}",
-            #         "subtitle": "{subtitle}",
-            #     },
-            #     "view_metadata": {"description_short": "{subtitle}"},
-            # },
         ],
         params={
             "title": _get_grouped_quantile_title,
@@ -107,9 +90,7 @@ def run() -> None:
         "Richest 1%",
         "10",
         "10_40_50",
-        # "10_40_50_bar",
         "all",
-        # "all_bar",
     }
     c.drop_views({"quantile": [q for q in c.dimension_choices["quantile"] if q not in keep_quantiles]})
 
@@ -119,20 +100,9 @@ def run() -> None:
     # Customize grouped quantile views: sort indicators and set display names
     for view in c.views:
         quantile = view.dimensions.get("quantile")
-        if quantile in ["all", "all_bar"] and view.indicators.y:
-            # Sort indicators by decile number
-            # For all: richest to poorest; for all_bar: poorest to richest
-            reverse_order = quantile == "all"
-            view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
-
-            # For all_bar views, set sortBy to column and sortColumnSlug to decile 10 indicator
-            # if quantile == "all_bar":
-            #     decile_10_ind = next((ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None)
-            #     if decile_10_ind:
-            #         if view.config is None:
-            #             view.config = {}
-            #         view.config["sortBy"] = "column"
-            #         view.config["sortColumnSlug"] = decile_10_ind.catalogPath
+        if quantile == "all" and view.indicators.y:
+            # Sort indicators by decile number (richest to poorest)
+            view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=True)
 
             # Set display names extracted from original indicator titles
             for ind in view.indicators.y:
@@ -173,12 +143,7 @@ def run() -> None:
     c.drop_views(
         {
             "welfare_type": ["before_vs_after"],
-            "quantile": [
-                "10_40_50",
-                # "10_40_50_bar",
-                "all",
-                # "all_bar",
-            ],
+            "quantile": ["10_40_50", "all"],
         }
     )
 
@@ -231,12 +196,7 @@ def run() -> None:
     c.drop_views(
         {
             "welfare_type": ["before_vs_after_scatter"],
-            "quantile": [
-                "10_40_50",
-                # "10_40_50_bar",
-                "all",
-                # "all_bar",
-            ],
+            "quantile": ["10_40_50", "all"],
         }
     )
 
