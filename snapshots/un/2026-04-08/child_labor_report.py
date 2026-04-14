@@ -71,21 +71,31 @@ _CHART_DATA = {
     # (disaggregation_type, disaggregation_value): {year: (cl_pct, cl_no_millions, hw_pct, hw_no_millions)}
     ("World total", None): {
         2000: (16.0, 245.5, 11.1, 170.5),
-        2004: (14.2, 222.3,  8.2, 128.4),
-        2008: (13.6, 215.2,  7.3, 115.3),
-        2012: (10.6, 168.0,  5.4,  85.3),
+        2004: (14.2, 222.3, 8.2, 128.4),
+        2008: (13.6, 215.2, 7.3, 115.3),
+        2012: (10.6, 168.0, 5.4, 85.3),
     },
     # ILO regions — child labour only (no hazardous work in chart)
-    ("ILO regions", "Sub-Saharan Africa"):              {2008: (25.3, 65.1, None, None), 2012: (21.4, 59.0, None, None)},
-    ("ILO regions", "Asia and the Pacific"):            {2008: (13.3, 113.6, None, None), 2012: (9.3, 77.7, None, None)},
+    ("ILO regions", "Sub-Saharan Africa"): {2008: (25.3, 65.1, None, None), 2012: (21.4, 59.0, None, None)},
+    ("ILO regions", "Asia and the Pacific"): {2008: (13.3, 113.6, None, None), 2012: (9.3, 77.7, None, None)},
     ("ILO regions", "Latin America and the Caribbean"): {2008: (10.0, 14.1, None, None), 2012: (8.8, 12.5, None, None)},
     # By age — child labour only
-    ("Age", "5-11 years"):  {2008: (10.7, 91.0, None, None), 2012: (8.5, 73.0, None, None)},
+    ("Age", "5-11 years"): {2008: (10.7, 91.0, None, None), 2012: (8.5, 73.0, None, None)},
     ("Age", "12-14 years"): {2008: (17.0, 61.8, None, None), 2012: (13.1, 47.5, None, None)},
     ("Age", "15-17 years"): {2008: (16.9, 62.4, None, None), 2012: (13.0, 47.5, None, None)},
     # By sex — child labour share only (page 30, Fig 14)
-    ("Sex", "Boys"):  {2000: (23.4, None, None, None), 2004: (21.3, None, None, None), 2008: (21.4, None, None, None), 2012: (18.1, None, None, None)},
-    ("Sex", "Girls"): {2000: (22.5, None, None, None), 2004: (19.9, None, None, None), 2008: (16.9, None, None, None), 2012: (15.2, None, None, None)},
+    ("Sex", "Boys"): {
+        2000: (23.4, None, None, None),
+        2004: (21.3, None, None, None),
+        2008: (21.4, None, None, None),
+        2012: (18.1, None, None, None),
+    },
+    ("Sex", "Girls"): {
+        2000: (22.5, None, None, None),
+        2004: (19.9, None, None, None),
+        2008: (16.9, None, None, None),
+        2012: (15.2, None, None, None),
+    },
 }
 
 # ── Page 8 chart data ─────────────────────────────────────────────────────────
@@ -182,7 +192,13 @@ def _extract_trends_table(pdf: pdfplumber.PDF) -> pd.DataFrame:
     df = _clean(df)
 
     # Merge in chart data from pages 8, 9, and 34.
-    all_chart_data = {**_CHART_DATA, **_NOT_IN_SCHOOL_CHART, **_HOUSEHOLD_CHORES_CHART, **_CHILD_LABOR_SHARE_5_14_CHART, **_SECTOR_BY_REGION_CHART}
+    all_chart_data = {
+        **_CHART_DATA,
+        **_NOT_IN_SCHOOL_CHART,
+        **_HOUSEHOLD_CHORES_CHART,
+        **_CHILD_LABOR_SHARE_5_14_CHART,
+        **_SECTOR_BY_REGION_CHART,
+    }
     df = _merge_chart_data(df, all_chart_data)
 
     return df
