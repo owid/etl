@@ -34,7 +34,7 @@ tables:
           - Some countries do not have enough data for their own estimate and are assigned a regional average instead.
 
           # Source: Data Coverage Disclaimer, p. 5 | AI-Usage-Technical-Report.pdf
-          - Coverage is limited in some countries, especially Russia, Iran, and parts of China, so estimates for these places should be treated with extra caution.
+          - Coverage is limited in some countries, especially Russia, Iran, and parts of China, so estimates for these places carry greater uncertainty.
 
           # Source: Appendix A, p. 14 | AI-Usage-Technical-Report.pdf
           - This indicator only covers selected AI websites and apps. It does not include AI features built into other software, such as productivity tools or enterprise systems.
