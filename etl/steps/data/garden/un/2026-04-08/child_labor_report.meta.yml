@@ -73,7 +73,7 @@ tables:
         title: Share of children in child labor (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of {definitions.sex} aged <<age>> who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Percentage of {definitions.sex} aged <<age>> who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
@@ -101,7 +101,7 @@ tables:
         title: Share of children in hazardous work (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of {definitions.sex} aged <<age>> who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Percentage of {definitions.sex} aged <<age>> who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
@@ -127,7 +127,7 @@ tables:
         title: Share of children in child labor who are not attending school (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of {definitions.sex} aged <<age>> in child labor who are not attending school.
+        description_short: Percentage of {definitions.sex} aged <<age>> in child labor who are not attending school.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
@@ -155,7 +155,7 @@ tables:
         title: Share of children in hazardous work who are not attending school (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of {definitions.sex} aged <<age>> in hazardous work who are not attending school.
+        description_short: Percentage of {definitions.sex} aged <<age>> in hazardous work who are not attending school.
         description_key:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
@@ -181,7 +181,7 @@ tables:
         title: Share of children in child labor including household chores (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of {definitions.sex} aged <<age>> in child labor, including household chores performed for 21 or more hours per week.
+        description_short: Percentage of {definitions.sex} aged <<age>> in child labor, including household chores performed for 21 or more hours per week.
         description_key:
           - "{definitions.description_key_child_labor}"
           - "{definitions.description_key_child_labor_hazardous_work}"
@@ -197,7 +197,7 @@ tables:
         title: "Share of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of {definitions.sex} aged <<age>> in child labor who are working in the <<sector | lower>> sector.
+        description_short: Percentage of {definitions.sex} aged <<age>> in child labor who are working in the <<sector | lower>> sector.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
@@ -227,7 +227,7 @@ tables:
         title: "Share of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of {definitions.sex} aged <<age>> in hazardous work who are working in the <<sector | lower>> sector.
+        description_short: Percentage of {definitions.sex} aged <<age>> in hazardous work who are working in the <<sector | lower>> sector.
         description_key:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
