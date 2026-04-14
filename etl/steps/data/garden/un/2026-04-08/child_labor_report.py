@@ -1,4 +1,14 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Garden step for ILO-UNICEF 2024 Global Estimates of Child Labour.
+
+Combines three meadow tables (child_labor_by_region, hazardous_work_by_region,
+child_labor_trends) into two output tables:
+
+  - child_labor: Main table with child labor and hazardous work shares/numbers
+    by country, year, sex, and age. Includes not-in-school rates, household chores,
+    and a computed 5-14 age bracket.
+  - sector: Distribution of child labor and hazardous work across economic sectors
+    (agriculture, industry, services) by country, year, sex, and age.
+"""
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -59,10 +69,11 @@ def run() -> None:
 
 
 def _to_long(tb: Table) -> Table:
-    """Reshape a wide region table into long format with sex and age dimensions.
+    """Reshape a wide region table (child_labor_by_region or hazardous_work_by_region) into long format.
 
-    Columns like `total_5_11_pct` become rows with sex="total", age="5-11", and two
-    value columns: `share` (from pct) and `number` (from no).
+    Input columns like `total_5_11_pct` and `boys_12_14_no` are unpivoted and parsed
+    into three new dimensions — sex (total/boys/girls), age (5-11/12-14/15-17/5-17),
+    and two value columns: `share` (from pct) and `number` (from no).
     """
     tb = tb.reset_index()
 
@@ -89,10 +100,15 @@ def _to_long(tb: Table) -> Table:
 
 
 def _trends_to_long(tb: Table) -> Table:
-    """Reshape the trends table into long format with year as dimension.
+    """Reshape the child_labor_trends table into long format with year as a dimension.
 
-    Columns like `child_labor_2016_pct` become year="2016" with four value columns:
-    `share_child_labor`, `share_hazardous_work`, `number_child_labor`, `number_hazardous_work`.
+    Input columns like `child_labor_2016_pct` and `hazardous_work_2024_no` are unpivoted
+    into a year column and four value columns: share_child_labor, number_child_labor,
+    share_hazardous_work, number_hazardous_work.
+
+    After reshaping, disaggregation_type/value are mapped to standard dimensions
+    (country, sex, age) via _map_disaggregations, and rows are tagged with _source
+    to separate regular trends from chart-derived data (not-in-school, household chores, etc.).
     """
     tb = tb.reset_index()
 
@@ -128,10 +144,17 @@ def _trends_to_long(tb: Table) -> Table:
 
 
 def _map_disaggregations(tb: Table) -> Table:
-    """Map disaggregation_type and value to standard dimensions (country, sex, age, _source, _sector).
+    """Map disaggregation_type/value to standard dimensions (country, sex, age).
 
-    Each disaggregation type has its own mapping rule. The _source tag lets
-    _build_main_table separate regular trends from special chart-derived rows.
+    Also adds _source and _sector tags used downstream to route rows:
+      - "trends": regular trend data → merged into the main table.
+      - "not_in_school": chart data from pages 8/44 → joined as not-in-school columns.
+      - "household_chores": page 8 chart → joined as household chores column.
+      - "child_labor_share_5_14": page 8 chart → overrides computed 5-14 shares.
+      - "sector_by_region": page 34 chart → added to the sector table.
+
+    Defaults (sex="total", age="5-17") apply to most rows and are overridden
+    only for specific disaggregation types (Sex, Age, household chores, etc.).
     """
     dtype = tb["disaggregation_type"]
     dvalue = tb["disaggregation_value"]
@@ -200,7 +223,11 @@ def _map_disaggregations(tb: Table) -> Table:
 
 
 def _country_from_region(tb: Table) -> Table:
-    """Replace region_type + region with a single country column."""
+    """Replace region_type + region with a single country column.
+
+    Appends a grouping suffix (ILO/SDG/UNICEF) to disambiguate regions that appear
+    under multiple classification systems (e.g. "Sub-Saharan Africa (ILO)").
+    """
     tb = tb.copy()
     tb.loc[tb["region_type"] == "World total", "region"] = "World"
     for label, suffix in _REGION_ACRONYMS.items():
@@ -240,7 +267,11 @@ def _compute_age_5_14(tb: Table) -> Table:
 
 
 def _left_join_extra(tb: Table, extra: Table, src_col: str, dst_col: str) -> Table:
-    """Left-join a single column from extra onto tb, filling NaNs in existing dst_col if present."""
+    """Left-join a single column from extra onto tb, filling NaNs in existing dst_col if present.
+
+    Used to merge chart-derived shares (not-in-school, household chores) into the
+    main table without overwriting values already populated from the annex.
+    """
     extra = extra[_JOIN_COLS + [src_col]].dropna(subset=[src_col]).rename(columns={src_col: dst_col})
     tb = tb.merge(extra, on=_JOIN_COLS, how="left", suffixes=("", "_extra"))
     extra_col = f"{dst_col}_extra"
@@ -254,16 +285,24 @@ def _left_join_extra(tb: Table, extra: Table, src_col: str, dst_col: str) -> Tab
 
 
 def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
-    """Build the main child_labor table by combining region data, trends, and not-in-school.
+    """Build the main child_labor output table.
 
-    Steps:
-      1. Extract not-in-school rows (World-only) — will become extra columns.
-      2. Filter to region rows only, build country names with acronyms.
-      3. Merge child_labor + hazardous_work side-by-side, add year=2024.
-      4. Concat with trends (2016/2020/2024 aggregate rows).
-      5. Left-join not-in-school columns for World/2024 rows.
-      6. Compute 5-14 age bracket.
-      7. Left-join chart-derived not-in-school and household chores shares.
+    Combines three data sources:
+      - Region tables (tb_cl, tb_hw): 2024 cross-sectional data by region × sex × age.
+      - Trends table (tb_trends): time-series data (2000–2024) at aggregate level,
+        plus chart-derived data (not-in-school, household chores, exact 5-14 shares).
+
+    The pipeline:
+      1. Extract not-in-school rows from annex — will become extra columns.
+      2. Filter to region rows, build country names with grouping suffixes.
+      3. Merge child_labor + hazardous_work side-by-side, assign year=2024.
+      4. Separate chart-derived rows from regular trends by _source tag.
+      5. Concat region data with trends; deduplicate (region data takes priority).
+      6. Left-join annex not-in-school columns (World/2024 only).
+      7. Compute 5-14 age bracket (sum numbers, back-calculate shares).
+      8. Left-join chart not-in-school shares (pages 8/44).
+      9. Left-join household chores shares (page 8).
+      10. Harmonize country names.
     """
     tb_cl = tb_cl.copy()
     tb_hw = tb_hw.copy()
@@ -353,11 +392,15 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
 
 
 def _build_sector_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
-    """Build the sector table from sector rows of both region tables.
+    """Build the sector output table with child labor and hazardous work by economic sector.
 
-    Keeps only rows where region_type is "by sector of economic activity",
-    renames region → sector, merges child_labor + hazardous_work side-by-side.
-    Also adds sector-by-SDG-region data from page 34 chart (via trends).
+    Combines two data sources:
+      - Region tables (tb_cl, tb_hw): World-level sector distribution from annex
+        (agriculture, industry, services) for both child labor and hazardous work.
+      - Trends table (tb_trends): SDG-regional sector distribution from page 34 chart
+        (child labor only).
+
+    Share columns are rescaled to sum to exactly 100% per group.
     """
     tables = []
     for tb, prefix in [(tb_cl, "child_labor"), (tb_hw, "hazardous_work")]:
