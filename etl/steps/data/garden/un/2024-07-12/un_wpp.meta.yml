@@ -126,7 +126,7 @@ tables:
           numSignificantFigures: 3
         presentation:
           title_public: |-
-            Population density, {definitions.global.dimensions.title}
+            Population density
           grapher_config:
             subtitle: |-
               Number of people per km² of land area. {definitions.global.projections}
@@ -158,7 +158,7 @@ tables:
           numDecimalPlaces: 1
         presentation:
           title_public: |-
-            Growth rate, {definitions.global.dimensions.title}
+            Population growth rate
           grapher_config:
             subtitle: |-
               Annual population change determined by births, deaths, and migration, expressed as a percentage of the population. {definitions.global.projections}
@@ -175,7 +175,7 @@ tables:
           numDecimalPlaces: 1
         presentation:
           title_public: |-
-            Natural growth rate, {definitions.global.dimensions.title}
+            Natural population growth rate
           grapher_config:
             subtitle: |-
               Annual population change determined by births and deaths. Migration is not included. {definitions.global.projections}
@@ -246,7 +246,7 @@ tables:
           numSignificantFigures: 4
         presentation:
           title_public: |-
-            Net migration, {definitions.global.dimensions.title}
+            Annual net migration
           grapher_config:
             subtitle: |-
               Total number of immigrants minus the number of emigrants. Positive values mean more people moved in than out. {definitions.global.projections}
@@ -261,7 +261,7 @@ tables:
           numSignificantFigures: 2
         presentation:
           title_public: |-
-            Net migration rate, {definitions.global.dimensions.title}
+            Annual net migration rate
           grapher_config:
             subtitle: |-
               Total number of immigrants minus the number of emigrants, per 1,000 people in the population. Positive values mean more people moved in than out. {definitions.global.projections}
@@ -299,7 +299,7 @@ tables:
           numDecimalPlaces: 1
         presentation:
           title_public: |-
-            Death rate, {definitions.global.dimensions.title}
+            Death rate
           grapher_config:
             subtitle: Annual number of deaths per 1,000 people in the total population. {definitions.global.projections}
 
@@ -352,7 +352,7 @@ tables:
           numDecimalPlaces: 1
         presentation:
           title_public: |-
-            Median age, {definitions.global.dimensions.title}
+            Median age
           grapher_config:
             subtitle: |-
               The median age is the age that divides the population into two equal halves — half of the population is younger, and half is older. {definitions.global.projections}
@@ -498,7 +498,7 @@ tables:
               <%- set young = 'boys' %><%- set adult = 'men' %><%- set old = 'men' %>
               <%- endif %>
               <%- if age == "total" %>
-              Number of << young >> aged 0–14 and << old >> aged 65+ per 100 << adult >> aged 15–64.
+              Number of << young >> aged 0–14 and<% if sex != 'all' %> << old >> aged<% endif %> 65+ per 100 << adult >> aged 15–64.
               <%- elif age == "youth" %>
               Number of << young >> aged 0–14 per 100 << adult >> aged 15–64.
               <%- else %>
@@ -534,7 +534,7 @@ tables:
             Infant mortality rate
             <%- else %>
             Child mortality rate
-            <%- endif %>, {definitions.global.dimensions.title}
+            <%- endif %>
           grapher_config:
             subtitle: |-
               <% if age == '0' %>
