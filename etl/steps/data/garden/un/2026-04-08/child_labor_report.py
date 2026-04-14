@@ -295,6 +295,13 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
             )
             tb = tb.drop(columns=["share_child_labor_incl_household_chores_hh"])
 
+    # 10. Harmonize country names
+    tb = paths.regions.harmonize_names(
+        tb=tb,
+        warn_on_unused_countries=False,
+        warn_on_unknown_excluded_countries=False,
+    )
+
     tb = tb.format(["country", "year", "sex", "age"], short_name="child_labor")
 
     return tb
@@ -322,6 +329,13 @@ def _build_sector_table(tb_cl: Table, tb_hw: Table) -> Table:
         tables.append(tb)
 
     tb = tables[0].merge(tables[1], on=["country", "year", "sector", "sex", "age"], how="outer")
+
+    # Harmonize country names
+    tb = paths.regions.harmonize_names(
+        tb=tb,
+        warn_on_unused_countries=False,
+        warn_on_unknown_excluded_countries=False,
+    )
 
     tb = tb.format(["country", "year", "sector", "sex", "age"], short_name="sector")
 
