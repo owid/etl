@@ -83,6 +83,9 @@ _CHART_DATA = {
     ("Age", "5-11 years"):  {2008: (10.7, 91.0, None, None), 2012: (8.5, 73.0, None, None)},
     ("Age", "12-14 years"): {2008: (17.0, 61.8, None, None), 2012: (13.1, 47.5, None, None)},
     ("Age", "15-17 years"): {2008: (16.9, 62.4, None, None), 2012: (13.0, 47.5, None, None)},
+    # By sex — child labour share only (page 30, Fig 14)
+    ("Sex", "Boys"):  {2000: (23.4, None, None, None), 2004: (21.3, None, None, None), 2008: (21.4, None, None, None), 2012: (18.1, None, None, None)},
+    ("Sex", "Girls"): {2000: (22.5, None, None, None), 2004: (19.9, None, None, None), 2008: (16.9, None, None, None), 2012: (15.2, None, None, None)},
 }
 
 # ── Page 8 chart data ─────────────────────────────────────────────────────────
