@@ -10,7 +10,7 @@ definitions:
       tolerance: 0
 
   sex:
-    <% if sex == "total" %>
+    <%- if sex == "total" %>
     children
     <%- else %>
     <<sex>>

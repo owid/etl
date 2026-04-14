@@ -141,6 +141,12 @@ def _trends_to_long(tb: Table) -> Table:
     tb.loc[is_nis, "country"] = "World"
     tb.loc[is_nis, "age"] = tb.loc[is_nis, "disaggregation_value"].str.replace(" years", "", regex=False)
 
+    # Not-in-school by ILO region rows: country from value, sex="total", age="5-14".
+    is_nis_region = tb["disaggregation_type"] == "Not in school by region"
+    tb.loc[is_nis_region, "country"] = tb.loc[is_nis_region, "disaggregation_value"]
+    tb.loc[is_nis_region, "age"] = "5-14"
+    is_nis = is_nis | is_nis_region
+
     # Household chores rows: country="World", parse sex and age from value (e.g. "Girls 5-11").
     is_hh = tb["disaggregation_type"] == "Including household chores"
     tb.loc[is_hh, "country"] = "World"
@@ -276,18 +282,19 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
             tb_5_14.loc[mask, "share_child_labor"] = row["share_child_labor"]
     tb = pr.concat([tb, tb_5_14], ignore_index=True)
 
-    # 8. Left-join not-in-school shares from page 8 chart (for 5-14 and 15-17 age groups).
+    # 8. Left-join not-in-school shares from chart data (pages 8 and 44).
     if len(tb_nis_chart) > 0:
-        nis_shares = tb_nis_chart[["country", "year", "sex", "age", "share_child_labor"]].rename(
-            columns={"share_child_labor": "share_child_labor_not_in_school"}
-        )
-        tb = tb.merge(nis_shares, on=join_cols, how="left", suffixes=("", "_chart"))
-        # Fill in chart values where annex values are missing.
-        if "share_child_labor_not_in_school_chart" in tb.columns:
-            tb["share_child_labor_not_in_school"] = tb["share_child_labor_not_in_school"].fillna(
-                tb["share_child_labor_not_in_school_chart"]
-            )
-            tb = tb.drop(columns=["share_child_labor_not_in_school_chart"])
+        for src_col, dst_col in [
+            ("share_child_labor", "share_child_labor_not_in_school"),
+            ("share_hazardous_work", "share_hazardous_work_not_in_school"),
+        ]:
+            nis_shares = tb_nis_chart[["country", "year", "sex", "age", src_col]].dropna(subset=[src_col])
+            nis_shares = nis_shares.rename(columns={src_col: dst_col})
+            tb = tb.merge(nis_shares, on=join_cols, how="left", suffixes=("", "_chart"))
+            chart_col = f"{dst_col}_chart"
+            if chart_col in tb.columns:
+                tb[dst_col] = tb[dst_col].fillna(tb[chart_col])
+                tb = tb.drop(columns=[chart_col])
 
     # 9. Add household chores column from page 8 chart data.
     tb["share_child_labor_incl_household_chores"] = None

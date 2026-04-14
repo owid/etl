@@ -92,8 +92,13 @@ _CHART_DATA = {
 # Not-in-school shares (page 8, World 2024, sex=total).
 # Can't derive the 5-14 share from 5-11/12-14 sub-age shares without total population data.
 _NOT_IN_SCHOOL_CHART = {
+    # Page 8 (sex=total, World)
     ("Not in school", "5-14 years"): {2024: (31.0, None, None, None)},
     ("Not in school", "15-17 years"): {2024: (59.0, None, None, None)},
+    # Page 44, Fig 24 — by ILO region (sex=total, 5-14, both child labour and hazardous work)
+    ("Not in school by region", "Asia and the Pacific (ILO)"): {2024: (42, None, 61, None)},
+    ("Not in school by region", "Latin America and the Caribbean (ILO)"): {2024: (20, None, 33, None)},
+    ("Not in school by region", "Sub-Saharan Africa (ILO)"): {2024: (29, None, 48, None)},
 }
 
 # Child labour including household chores (page 8, World 2024, ages 5-14 by sex).
