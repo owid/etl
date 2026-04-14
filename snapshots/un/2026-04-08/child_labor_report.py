@@ -1,16 +1,26 @@
-"""Extract statistical annex tables (pages 54–58) and chart data (page 9) from the
-ILO-UNICEF 2024 Global Estimates of Child Labour report and upload as three snapshots:
+"""Extract data from the ILO-UNICEF 2024 Global Estimates of Child Labour report PDF
+and upload as three snapshots:
 
   - child_labor_by_region.csv   (pages 54–55): 2024 child labour by region × sex × age
   - hazardous_work_by_region.csv (pages 56–57): 2024 hazardous work by region × sex × age
-  - child_labor_trends.csv      (page 58 + page 9): trends 2000–2024 for both indicators
+  - child_labor_trends.csv      (page 58 + charts): trends 2000–2024 for both indicators
+
+Sources:
+  - Statistical annex (pages 54–58): formal tables extracted with pdfplumber.
+  - Chart data (pages 8, 9, 30, 34, 44): values read from chart labels via word positions.
+    These are hardcoded as constants below after manual verification.
 
 The first two tables are split horizontally across two PDF pages each:
   - Left page: region_type, region, and Total columns (4 age groups × % + No.)
   - Right page: Boys and Girls columns (8 each, identical row order → positional join)
 
-The trends table from the annex (page 58) only covers 2016–2024. Page 9 has chart data
-extending back to 2000 (global) and 2008 (regional, by age). These are merged in.
+The trends table from the annex (page 58) only covers 2016–2024. Chart data extends it:
+  - Page 9:  Global trends 2000–2012, regional (ILO) and age trends 2008–2012
+  - Page 30: Child labour share by sex 2000–2012
+  - Page 8:  Not-in-school shares for 5-14/15-17, household chores shares, child labour
+             share for 5-14 by sex
+  - Page 34: Sector distribution by SDG region
+  - Page 44: Not-in-school shares by ILO region (child labour + hazardous work)
 """
 
 import tempfile
