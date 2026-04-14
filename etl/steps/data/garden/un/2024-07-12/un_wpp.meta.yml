@@ -84,12 +84,15 @@ tables:
         short_unit: people/km²
         description_short: |-
           Population density in a country, area or region. {definitions.global.dimensions.description_short}
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         presentation:
           title_public: |-
             Population density, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              The number of people per km² of land area. {definitions.global.projections}
+              Number of people per km² of land area. {definitions.global.projections}
 
       # population_doubling_time:
       #   title: Population doubling time
@@ -114,12 +117,14 @@ tables:
         unit: "%"
         description_short: |-
           Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1) where P1 and P2 are the populations on 1 January of subsequent years. {definitions.global.dimensions.description_short}
+        display:
+          numDecimalPlaces: 1
         presentation:
           title_public: |-
             Growth rate, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              The growth rate is the population change determined by births, deaths, and migration flows. {definitions.global.projections}
+              Annual population change determined by births, deaths, and migration, expressed as a percentage of the population. {definitions.global.projections}
 
   natural_change_rate:
     variables:
@@ -129,12 +134,14 @@ tables:
         unit: "%"
         description_short: |-
           Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths. {definitions.global.dimensions.description_short}
+        display:
+          numDecimalPlaces: 1
         presentation:
           title_public: |-
             Natural growth rate, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              The natural growth rate is the population change determined by births and deaths. Migration flows are not taken into account. {definitions.global.projections}
+              Annual population change determined by births and deaths. Migration is not included. {definitions.global.projections}
 
   fertility_rate:
     variables:
@@ -179,28 +186,30 @@ tables:
         unit: migrants
         description_short: |-
           Net number of migrants, that is, the number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country). {definitions.global.dimensions.description_short}
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 4
         presentation:
           title_public: |-
             Net migration, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              <% if sex == "all" %>
-              The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
-              <%- else %>
-              The total number of << sex >> immigrants (people moving into a given country) minus the number of << sex >> emigrants (people moving out of the country).
-              <%- endif %> {definitions.global.projections}
+              Total number of immigrants minus the number of emigrants. Positive values mean more people moved in than out. {definitions.global.projections}
 
       net_migration_rate:
         title: Annual net migration rate
         unit: migrants per 1,000 people
         description_short: |-
           Net number of immigrants minus the number of emigrants, divided by the population of the receiving country over a year. {definitions.global.dimensions.description_short}
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 2
         presentation:
           title_public: |-
-            Net migration, {definitions.global.dimensions.title}
+            Net migration rate, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country), per 1,000 people in the population. {definitions.global.dimensions.description_short}
+              Total number of immigrants minus the number of emigrants, per 1,000 people in the population. Positive values mean more people moved in than out. {definitions.global.projections}
 
   deaths:
     variables:
@@ -218,11 +227,13 @@ tables:
         unit: deaths per 1,000 people
         description_short: |-
           Number of deaths recorded annually, divided by population in that year. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
+        display:
+          numDecimalPlaces: 1
         presentation:
           title_public: |-
             Death rate, {definitions.global.dimensions.title}
           grapher_config:
-            subtitle: The number of deaths occurring during the year, per 1,000 people. {definitions.global.projections}
+            subtitle: Annual number of deaths per 1,000 people in the total population. {definitions.global.projections}
 
   births:
     variables:
@@ -250,7 +261,7 @@ tables:
             Birth rate
           title_variant: "{definitions.global.dimensions.title}"
           grapher_config:
-            subtitle: The number of live births occurring during the year, per 1,000 people. {definitions.global.projections}
+            subtitle: Annual number of live births per 1,000 people in the total population. {definitions.global.projections}
 
   median_age:
     variables:
@@ -260,13 +271,13 @@ tables:
         description_short: |-
           Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median. {definitions.global.dimensions.description_short}
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
         presentation:
           title_public: |-
             Median age, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              The median age divides the population into two parts of equal size; that is, there are as many people with ages above the median age as there are with ages below. {definitions.global.projections}
+              The median age is the age that divides the population into two equal halves — half of the population is younger, and half is older. {definitions.global.projections}
 
   mean_age_childbearing:
     variables:
@@ -399,6 +410,8 @@ tables:
           <%- else %>
           The share of children who die before reaching the age of 5.
           <%- endif %> {definitions.global.projections}
+        display:
+          numDecimalPlaces: 1
         presentation:
           title_public: |-
             <% if age == '0' %>
@@ -408,15 +421,14 @@ tables:
             <%- endif %>, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              The share of <%-if sex != 'all' %><< sex >><%-endif %>
               <% if age == '0' %>
-               children who die before reaching the age of one.
+              Share of newborns who die before reaching the age of 1.
               <%- else %>
-               newborns who die before reaching the age of 5.
+              Share of newborns who die before reaching the age of 5.
               <%- endif %> {definitions.global.projections}
-            note: |-
-              <% if age == '0' %>
-              This is the probability of a child born in a specific year or period dying before reaching the age of one, if subject to age-specific mortality rates of that period. This is given as the share of live births.
-              <%- else %>
-              This is the probability of a child born in a specific year or period dying before reaching the age of 5, if subject to age-specific mortality rates of that period. This is given as the share of live births.
-              <%- endif %> {definitions.global.projections}
+            # note: |-
+            #   <% if age == '0' %>
+            #   This is the probability of a child born in a specific year or period dying before reaching the age of one, if subject to age-specific mortality rates of that period. This is given as the share of live births.
+            #   <%- else %>
+            #   This is the probability of a child born in a specific year or period dying before reaching the age of 5, if subject to age-specific mortality rates of that period. This is given as the share of live births.
+            #   <%- endif %> {definitions.global.projections}

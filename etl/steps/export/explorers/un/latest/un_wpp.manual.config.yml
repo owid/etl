@@ -76,7 +76,7 @@ definitions:
         # sex: all
       config:
         title: Infant mortality rate
-        subtitle: The share of children who die before reaching the age of one.
+
     # Child deaths
     - dimensions:
         indicator: child_deaths
@@ -98,7 +98,6 @@ definitions:
         indicator: child_mortality_rate
       config:
         title: Child mortality rate
-        subtitle: The share of newborns who die before reaching the age of 5.
 
 config:
   explorerTitle: "Population & Demography"
