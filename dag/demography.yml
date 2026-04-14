@@ -192,6 +192,10 @@ steps:
   data://grapher/demography/2025-10-22/life_tables:
     - data://garden/demography/2025-10-22/life_tables
 
+  # England and Wales life expectancy with detailed age groups
+  data://garden/demography/2025-10-22/life_expectancy_england_wales:
+    - data://garden/hmd/2025-10-22/hmd
+
   # OMM: Life Expectancy
   data://garden/demography/2025-10-22/life_expectancy:
     - data://garden/demography/2023-10-10/riley_2005
