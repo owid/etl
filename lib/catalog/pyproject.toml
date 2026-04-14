@@ -62,6 +62,9 @@ dev = [
     "ipykernel>=6.29.0",
 ]
 
+[tool.uv]
+exclude-newer = "3 days"
+
 [tool.uv.sources]
 owid-datautils = { path = "../datautils", editable = true }
 owid-repack = { path = "../repack", editable = true }

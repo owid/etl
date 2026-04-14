@@ -52,6 +52,9 @@ dev = [
     "ruff==0.15.8"
 ]
 
+[tool.uv]
+exclude-newer = "3 days"
+
 [tool.ruff]
 extend = "../../pyproject.toml"
 
