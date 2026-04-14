@@ -4,6 +4,17 @@ definitions:
       <% if (variant is defined) and (variant != 'estimates') -%>
       Future projections are based on the [UN's << variant >> scenario](#dod:un-projection-scenarios).
       <%- endif -%>
+    # Noun for population/deaths titles, based on sex × age.
+    # Outputs e.g. "infants", "girls", "adolescent boys", "adult women", "people".
+    # Use with {definitions.global.pop_noun} — produces extra whitespace that
+    # collapses when the title is rendered (Jinja strips are avoided so that
+    # dynamic_yaml substitution doesn't break spacing).
+    pop_noun: |-
+      <% if age == '0' %><% if sex == 'all' %>infants<% elif sex == 'female' %>infant girls<% else %>infant boys<% endif %><% elif age == '1' %><% if sex == 'all' %>1-year-olds<% elif sex == 'female' %>1-year-old girls<% else %>1-year-old boys<% endif %><% elif age == '18+' %><% if sex == 'all' %>adults<% elif sex == 'female' %>adult women<% else %>adult men<% endif %><% elif age in ('0-4', '0-14', '1-4', '5-9', '10-14') %><% if sex == 'all' %>children<% elif sex == 'female' %>girls<% else %>boys<% endif %><% elif age == '15-19' %><% if sex == 'all' %>adolescents<% elif sex == 'female' %>adolescent girls<% else %>adolescent boys<% endif %><% else %><% if sex == 'all' %>people<% elif sex == 'female' %>women<% else %>men<% endif %><% endif %>
+    # Age label for population titles. Outputs e.g. "under 5", "aged 15 to 19",
+    # "aged 100 and over". Empty for age=all, age=0, age=1, age=18+ (handled specially).
+    pop_age_label: |-
+      <% if age.startswith('0-') and age != '0-24' %>under << age.split('-')[1]|int + 1 >><% elif age == '0-24' %>under 25<% elif '+' in age and age != '18+' %>aged << age.replace('+', '') >> and over<% elif '-' in age %>aged << age.replace('-', ' to ') >><% endif %>
     dimensions:
       title: |-
         <% if sex == 'all' and age == 'all' and variant == 'estimates' %>
@@ -66,9 +77,19 @@ tables:
           numSignificantFigures: 4
         presentation:
           title_public: |-
-            Population, {definitions.global.dimensions.title}
+            <%- if age == 'all' %>
+            <%- if sex == 'all' %>Population<%- elif sex == 'female' %>Female population<%- else %>Male population<%- endif %>
+            <%- else %>
+            Number of {definitions.global.pop_noun} {definitions.global.pop_age_label}
+            <%- endif %>
           grapher_config:
             note: ""
+            subtitle: |-
+              <%- if age == '0' %>
+              <%- if sex == 'all' %>Children under 1 year old.<%- elif sex == 'female' %>Girls under 1 year old.<%- else %>Boys under 1 year old.<%- endif %>
+              <%- elif age == '18+' %>
+              <%- if sex == 'all' %>People aged 18 and over.<%- elif sex == 'female' %>Women aged 18 and over.<%- else %>Men aged 18 and over.<%- endif %>
+              <%- endif %> {definitions.global.projections}
 
       population_change:
         title: Population change
@@ -80,9 +101,19 @@ tables:
           numSignificantFigures: 4
         presentation:
           title_public: |-
-            Population change, {definitions.global.dimensions.title}
+            <%- if age == 'all' %>
+            <%- if sex == 'all' %>Annual change in population<%- elif sex == 'female' %>Annual change in the female population<%- else %>Annual change in the male population<%- endif %>
+            <%- else %>
+            Annual change in the number of {definitions.global.pop_noun} {definitions.global.pop_age_label}
+            <%- endif %>
           grapher_config:
             note: ""
+            subtitle: |-
+              <%- if age == '0' %>
+              <%- if sex == 'all' %>Children under 1 year old.<%- elif sex == 'female' %>Girls under 1 year old.<%- else %>Boys under 1 year old.<%- endif %>
+              <%- elif age == '18+' %>
+              <%- if sex == 'all' %>People aged 18 and over.<%- elif sex == 'female' %>Women aged 18 and over.<%- else %>Men aged 18 and over.<%- endif %>
+              <%- endif %> {definitions.global.projections}
 
       population_density:
         title: Population density
@@ -247,7 +278,17 @@ tables:
           numSignificantFigures: 4
         presentation:
           title_public: |-
-            Number of deaths, {definitions.global.dimensions.title}
+            <%- if age == 'all' %>
+            <%- if sex == 'all' %>Number of deaths<%- elif sex == 'female' %>Number of deaths among women<%- else %>Number of deaths among men<%- endif %>
+            <%- elif age in ('0', '0-4') %>
+            <%- if sex == 'all' %>
+            <%- if age == '0' %>Number of infants who die before age 1<%- else %>Number of children who die before age 5<%- endif %>
+            <%- else %>
+            Number of<%- if sex == 'female' %> girls<%- else %> boys<%- endif %> who die before age <%- if age == '0' %> 1<%- else %> 5<%- endif %>
+            <%- endif %>
+            <%- else %>
+            Number of deaths among {definitions.global.pop_noun} {definitions.global.pop_age_label}
+            <%- endif %>
 
       death_rate:
         title: Death rate
