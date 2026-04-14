@@ -628,17 +628,22 @@ class TestCreateCollectionMultipleTables:
                 assert second_call[1]["indicator_names"] == ["cases"]
 
                 # Verify combine_collections was called
-                mock_combine.assert_called_once_with(
-                    collections=[mock_collection_1, mock_collection_2],
-                    catalog_path=catalog_path,
-                    config=config,
-                    is_explorer=False,
-                )
+                mock_combine.assert_called_once()
+                call_kwargs = mock_combine.call_args[1]
+                assert call_kwargs["collections"] == [mock_collection_1, mock_collection_2]
+                assert call_kwargs["catalog_path"] == catalog_path
+                assert call_kwargs["config"] == config
+                assert call_kwargs["is_explorer"] is False
 
                 assert result == mock_final_collection
 
     def test_create_collection_multiple_tables_with_list_parameters(self):
-        """Test collection creation with multiple tables and list parameters."""
+        """Test collection creation with multiple tables and list parameters.
+
+        When choice_renames is a list, each element is passed to its corresponding
+        sub-collection, and after combining, remapped renames are applied to the
+        final collection.
+        """
         config = create_test_config()
         dependencies = {"test#indicator1", "test#indicator2"}
         catalog_path = "test/latest/data#table"
@@ -659,7 +664,29 @@ class TestCreateCollectionMultipleTables:
                 mock_collection_2 = Mock(spec=Collection)
                 mock_single.side_effect = [mock_collection_1, mock_collection_2]
 
+                # Final collection needs dimensions for _rename_choices
+                sex_choice_male = Mock(spec=DimensionChoice)
+                sex_choice_male.slug = "male"
+                sex_choice_male.name = "male"
+                sex_choice_female = Mock(spec=DimensionChoice)
+                sex_choice_female.slug = "female"
+                sex_choice_female.name = "female"
+                age_choice_young = Mock(spec=DimensionChoice)
+                age_choice_young.slug = "young"
+                age_choice_young.name = "young"
+                age_choice_old = Mock(spec=DimensionChoice)
+                age_choice_old.slug = "old"
+                age_choice_old.name = "old"
+
+                sex_dim = Mock(spec=Dimension)
+                sex_dim.slug = "sex"
+                sex_dim.choices = [sex_choice_male, sex_choice_female]
+                age_dim = Mock(spec=Dimension)
+                age_dim.slug = "age"
+                age_dim.choices = [age_choice_young, age_choice_old]
+
                 mock_final_collection = Mock(spec=Collection)
+                mock_final_collection.dimensions = [sex_dim, age_dim]
                 mock_combine.return_value = mock_final_collection
 
                 result = create_collection(
@@ -673,7 +700,7 @@ class TestCreateCollectionMultipleTables:
                     choice_renames=choice_renames,
                 )
 
-                # Verify create_collection_single_table was called twice with correct parameters
+                # Verify sub-collections received per-table choice_renames
                 assert mock_single.call_count == 2
 
                 first_call = mock_single.call_args_list[0]
@@ -689,6 +716,12 @@ class TestCreateCollectionMultipleTables:
                 assert second_call[1]["dimensions"] == {"age": ["young", "old"]}
                 assert second_call[1]["common_view_config"] == {"chartType": "BarChart"}
                 assert second_call[1]["choice_renames"] == {"age": {"young": "Young", "old": "Old"}}
+
+                # Verify remapped renames were applied to the final collection
+                assert sex_choice_male.name == "Male"
+                assert sex_choice_female.name == "Female"
+                assert age_choice_young.name == "Young"
+                assert age_choice_old.name == "Old"
 
                 assert result == mock_final_collection
 
@@ -763,12 +796,12 @@ class TestCreateCollectionMultipleTables:
                     assert call[1]["explorer"] is True
 
                 # Verify combine_collections was called with explorer flag
-                mock_combine.assert_called_once_with(
-                    collections=[mock_explorer_1, mock_explorer_2],
-                    catalog_path=catalog_path,
-                    config=config,
-                    is_explorer=True,
-                )
+                mock_combine.assert_called_once()
+                call_kwargs = mock_combine.call_args[1]
+                assert call_kwargs["collections"] == [mock_explorer_1, mock_explorer_2]
+                assert call_kwargs["catalog_path"] == catalog_path
+                assert call_kwargs["config"] == config
+                assert call_kwargs["is_explorer"] is True
 
                 assert result == mock_final_explorer
 
@@ -828,5 +861,56 @@ class TestCreateCollectionMultipleTables:
                 second_call = mock_single.call_args_list[1]
                 assert second_call[1]["indicator_names"] == "cases"
                 assert second_call[1]["dimensions"] == {"age": ["young"]}
+
+                assert result == mock_final_collection
+
+    def test_create_collection_multiple_tables_single_dict_choice_renames(self):
+        """When choice_renames is a single dict with multiple tables, it should
+        NOT be passed to sub-collections and should be applied to the final
+        combined collection instead."""
+        config = create_test_config()
+        dependencies = {"test#indicator1", "test#indicator2"}
+        catalog_path = "test/latest/data#table"
+        tables = create_multiple_test_tables()
+
+        choice_renames = {"sex": {"male": "Male", "female": "Female"}}
+
+        with patch("etl.collection.core.create.create_collection_single_table") as mock_single:
+            with patch("etl.collection.core.create.combine_collections") as mock_combine:
+                mock_collection_1 = Mock(spec=Collection)
+                mock_collection_2 = Mock(spec=Collection)
+                mock_single.side_effect = [mock_collection_1, mock_collection_2]
+
+                # Final collection needs dimensions for _rename_choices
+                choice_male = Mock(spec=DimensionChoice)
+                choice_male.slug = "male"
+                choice_male.name = "male"
+                choice_female = Mock(spec=DimensionChoice)
+                choice_female.slug = "female"
+                choice_female.name = "female"
+                sex_dim = Mock(spec=Dimension)
+                sex_dim.slug = "sex"
+                sex_dim.choices = [choice_male, choice_female]
+
+                mock_final_collection = Mock(spec=Collection)
+                mock_final_collection.dimensions = [sex_dim]
+                mock_combine.return_value = mock_final_collection
+
+                result = create_collection(
+                    config_yaml=config,
+                    dependencies=dependencies,
+                    catalog_path=catalog_path,
+                    tb=tables,
+                    indicator_names=[["deaths"], ["cases"]],
+                    choice_renames=choice_renames,
+                )
+
+                # Sub-collections should NOT receive choice_renames
+                for call in mock_single.call_args_list:
+                    assert call[1]["choice_renames"] is None
+
+                # Renames should be applied to the final combined collection
+                assert choice_male.name == "Male"
+                assert choice_female.name == "Female"
 
                 assert result == mock_final_collection

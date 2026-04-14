@@ -171,6 +171,7 @@ def combine_collections(
     collection_dimension_slug: str | None = None,
     collection_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
+    _slug_changes_out: dict | None = None,
 ) -> E: ...
 
 
@@ -186,6 +187,7 @@ def combine_collections(
     collection_dimension_slug: str | None = None,
     collection_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
+    _slug_changes_out: dict | None = None,
 ) -> T: ...
 
 
@@ -201,6 +203,7 @@ def combine_collections(
     collection_dimension_slug: str | None = None,
     collection_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
+    _slug_changes_out: dict | None = None,
 ) -> Collection | Explorer:
     """Combine multiple collections (MDIMs or Explorers) into a single one.
 
@@ -228,6 +231,11 @@ def combine_collections(
             Names for the choices in the source dimension (should match the length of collections)
         is_explorer:
             Force the result to be an Explorer (True) or MDIM (False). If None (default), inferred from the input collections.
+        _slug_changes_out:
+            Internal. When a non-None dict is passed, it is mutated in-place with
+            the slug changes produced by conflict resolution. Structure:
+            ``{collection_id: {dimension_slug: {original_slug: renamed_slug}}}``.
+            Used by ``create_collection`` to remap per-table ``choice_renames``.
 
     Returns:
         A combined Collection or Explorer, matching the type of the input collections
@@ -409,6 +417,11 @@ def combine_collections(
                 record = subgroup[cols_choices].drop_duplicates().to_dict("records")
                 assert len(record) == 1, "Unexpected, please report!"
                 log.warning(f" Collections {collection_names} map to {record[0]}")
+
+    # Expose slug changes to caller if requested (used by create_collection
+    # to remap per-table choice_renames after combining).
+    if _slug_changes_out is not None:
+        _slug_changes_out.update(choice_slug_changes)
 
     return combined
 
