@@ -19,7 +19,7 @@ tables:
 
         description_key:
           # Source: Section 2, p. 2; Section 2.1, p. 2–3; Appendix A, p. 14 | AI-Usage-Technical-Report.pdf
-          - These are modelled estimates, not survey data. They are derived from anonymized usage signals collected automatically by Microsoft's software and services, which log whether users visited any of 19 [generative AI](#dod:generative-ai) platforms, including ChatGPT, Gemini, Claude, DeepSeek, Grok, Midjourney, and Perplexity.
+          - These are modelled estimates, not survey data. They are derived from anonymized usage signals collected automatically by Microsoft's software and services, which log whether users visited any of 19 [generative AI](#dod:generative-ai) platforms, including ChatGPT, Gemini, Claude, DeepSeek, Grok, Midjourney, and others.
 
           # Source: Section 2.2, p. 3–5 | AI-Usage-Technical-Report.pdf
           - Microsoft can directly observe this mainly on Windows desktops and tablets. It then scales these numbers up to estimate total use across desktop, tablet, and mobile devices in each country.
