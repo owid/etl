@@ -73,6 +73,7 @@ def run() -> None:
                     "chartTypes": lambda view: (
                         ["StackedArea", "StackedDiscreteBar"] if view.matches(indicator="share") else ["LineChart"]
                     ),
+                    "hideTotalValueLabel": True,
                     "baseColorScheme": "OwidCategoricalE",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
@@ -108,6 +109,11 @@ def run() -> None:
             # Sort indicators by decile number
             reverse_order = view.matches(indicator="share")
             view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
+
+            # Set sortBy to first indicator in the list
+            view.config = view.config or {}
+            view.config["sortBy"] = "column"
+            view.config["sortColumnSlug"] = view.indicators.y[0].catalogPath
 
             # Set display names
             for ind in view.indicators.y:

@@ -108,6 +108,9 @@ views:
       note: Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
       hasMapTab: false
       chartTypes: ["StackedArea", "StackedDiscreteBar"]
+      hideTotalValueLabel: true
+      sortBy: column
+      sortColumnSlug: incomes#share__ppp_version_2021__welfare_type_income_or_consumption__decile_10__table_income_or_consumption_consolidated__survey_comparability_no_spells
       selectedFacetStrategy: entity
       baseColorScheme: OwidCategoricalE
     metadata:

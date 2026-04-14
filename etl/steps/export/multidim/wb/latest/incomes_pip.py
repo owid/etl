@@ -136,6 +136,7 @@ def run() -> None:
                     "chartTypes": lambda view: (
                         ["StackedArea", "StackedDiscreteBar"] if view.matches(indicator="share") else ["LineChart"]
                     ),
+                    "hideTotalValueLabel": True,
                     "baseColorScheme": "OwidCategoricalE",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
@@ -174,6 +175,11 @@ def run() -> None:
             # For share: richest to poorest; for others: poorest to richest
             reverse_order = view.matches(indicator="share")
             view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
+
+            # Set sortBy to last indicator in the list
+            view.config = view.config or {}
+            view.config["sortBy"] = "column"
+            view.config["sortColumnSlug"] = view.indicators.y[0].catalogPath
 
             # Set display names extracted from original indicator titles
             for ind in view.indicators.y:

@@ -72,6 +72,9 @@ views:
       note: Income is measured before payment of taxes and non-pension benefits, but after the payment of public and private pensions.
       hasMapTab: false
       chartTypes: ["StackedArea", "StackedDiscreteBar"]
+      hideTotalValueLabel: true
+      sortBy: column
+      sortColumnSlug: inequality#share_top_1__welfare_type_before_tax__extrapolated_no
       selectedFacetStrategy: entity
       baseColorScheme: OwidCategoricalE
     metadata:
@@ -100,6 +103,9 @@ views:
       note: ""
       hasMapTab: false
       chartTypes: ["StackedArea", "StackedDiscreteBar"]
+      hideTotalValueLabel: true
+      sortBy: column
+      sortColumnSlug: inequality#share_top_1__welfare_type_after_tax__extrapolated_no
       selectedFacetStrategy: entity
       baseColorScheme: OwidCategoricalE
     metadata:

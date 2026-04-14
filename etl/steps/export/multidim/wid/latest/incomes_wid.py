@@ -71,6 +71,7 @@ def run() -> None:
                     "hasMapTab": False,
                     "tab": "chart",
                     "chartTypes": ["StackedArea", "StackedDiscreteBar"],
+                    "hideTotalValueLabel": True,
                     "baseColorScheme": "OwidCategoricalE",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
@@ -103,6 +104,11 @@ def run() -> None:
         if quantile == "all" and view.indicators.y:
             # Sort indicators by decile number (richest to poorest)
             view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=True)
+
+            # Set sortBy to first indicator in the list
+            view.config = view.config or {}
+            view.config["sortBy"] = "column"
+            view.config["sortColumnSlug"] = view.indicators.y[0].catalogPath
 
             # Set display names extracted from original indicator titles
             for ind in view.indicators.y:
