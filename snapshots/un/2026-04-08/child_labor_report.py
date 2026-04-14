@@ -74,8 +74,8 @@ _RIGHT_COLS = [
 ]
 
 
-# ── Historical chart data (page 9) ─────────────────────────────────────────────
-# Values read from chart labels on page 9. Numbers are in millions; shares in %.
+# ── Historical chart data (page 9, 30) ─────────────────────────────────────────────
+# Values read from chart labels on page 9 and 30. Numbers are in millions; shares in %.
 # Confirmed via spatial analysis of PDF word positions (pdfplumber extract_words).
 _CHART_DATA = {
     # (disaggregation_type, disaggregation_value): {year: (cl_pct, cl_no_millions, hw_pct, hw_no_millions)}
