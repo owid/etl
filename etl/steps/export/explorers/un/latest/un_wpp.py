@@ -27,6 +27,7 @@ paths = PathFinder(__file__)
 # Rename of age dimension choices: We could alternatively specify these in the YAML file, but this can also be programmatically done.
 AGES_POP_LIST = (
     [
+        "15-49",
         "15-64",
         "15+",
         "18+",
