@@ -260,7 +260,11 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     # Overwrite child labor shares for 5-14 with report values (calculated shares have rounding errors).
     if len(tb_cl514) > 0:
         for _, row in tb_cl514.iterrows():
-            mask = (tb_5_14["country"] == row["country"]) & (tb_5_14["year"] == row["year"]) & (tb_5_14["sex"] == row["sex"])
+            mask = (
+                (tb_5_14["country"] == row["country"])
+                & (tb_5_14["year"] == row["year"])
+                & (tb_5_14["sex"] == row["sex"])
+            )
             tb_5_14.loc[mask, "share_child_labor"] = row["share_child_labor"]
     tb = pr.concat([tb, tb_5_14], ignore_index=True)
 

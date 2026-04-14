@@ -9,6 +9,13 @@ definitions:
     display: &common_display
       tolerance: 0
 
+  sex:
+    <% if sex == "total" %>
+    children
+    <%- else %>
+    <<sex>>
+    <%- endif %>
+
   description_key_child_labor: |-
     <% if age == "5-11" %>
     Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services during the reference week.
@@ -66,13 +73,13 @@ tables:
         title: Share of children in child labor (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Proportion of {definitions.sex} aged <<age>> who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Share of children in child labor (<<sex>>, <<age>>)
+          name: Share of <<sex>> in child labor (<<age>>)
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -80,13 +87,13 @@ tables:
         title: Number of children in child labor (<<sex>>, <<age>>)
         unit: "children"
         short_unit: ""
-        description_short: Number of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Number of {definitions.sex} aged <<age>> who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Number of children in child labor (<<sex>>, <<age>>)
+          name: Number of <<sex>> in child labor (<<age>>)
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -94,12 +101,12 @@ tables:
         title: Share of children in hazardous work (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Proportion of {definitions.sex} aged <<age>> who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Share of children in hazardous work (<<sex>>, <<age>>)
+          name: Share of <<sex>> in hazardous work (<<age>>)
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -107,12 +114,12 @@ tables:
         title: Number of children in hazardous work (<<sex>>, <<age>>)
         unit: "children"
         short_unit: ""
-        description_short: Number of children who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Number of {definitions.sex} aged <<age>> who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Number of children in hazardous work (<<sex>>, <<age>>)
+          name: Number of <<sex>> in hazardous work (<<age>>)
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -120,13 +127,13 @@ tables:
         title: Share of children in child labor who are not attending school (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children in child labor who are not attending school.
+        description_short: Proportion of {definitions.sex} aged <<age>> in child labor who are not attending school.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Share of children in child labor who are not attending school (<<sex>>, <<age>>)
+          name: Share of <<sex>> in child labor who are not attending school (<<age>>)
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -134,13 +141,13 @@ tables:
         title: Number of children in child labor who are not attending school (<<sex>>, <<age>>)
         unit: "children"
         short_unit: ""
-        description_short: Number of children in child labor who are not attending school.
+        description_short: Number of {definitions.sex} aged <<age>> in child labor who are not attending school.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Number of children in child labor who are not attending school (<<sex>>, <<age>>)
+          name: Number of <<sex>> in child labor who are not attending school (<<age>>)
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -148,12 +155,12 @@ tables:
         title: Share of children in hazardous work who are not attending school (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children in hazardous work who are not attending school.
+        description_short: Proportion of {definitions.sex} aged <<age>> in hazardous work who are not attending school.
         description_key:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Share of children in hazardous work who are not attending school (<<sex>>, <<age>>)
+          name: Share of <<sex>> in hazardous work who are not attending school (<<age>>)
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -161,12 +168,12 @@ tables:
         title: Number of children in hazardous work who are not attending school (<<sex>>, <<age>>)
         unit: "children"
         short_unit: ""
-        description_short: Number of children in hazardous work who are not attending school.
+        description_short: Number of {definitions.sex} aged <<age>> in hazardous work who are not attending school.
         description_key:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Number of children in hazardous work who are not attending school (<<sex>>, <<age>>)
+          name: Number of <<sex>> in hazardous work who are not attending school (<<age>>)
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -174,13 +181,13 @@ tables:
         title: Share of children in child labor including household chores (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children aged 5-14 in child labor, including household chores performed for 21 or more hours per week.
+        description_short: Proportion of {definitions.sex} aged <<age>> in child labor, including household chores performed for 21 or more hours per week.
         description_key:
           - "{definitions.description_key_child_labor}"
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Share of children in child labor including household chores (<<sex>>, <<age>>)
+          name: Share of <<sex>> in child labor including household chores (<<age>>)
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -190,14 +197,14 @@ tables:
         title: "Share of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children in child labor who are working in the <<sector | lower>> sector.
+        description_short: Proportion of {definitions.sex} aged <<age>> in child labor who are working in the <<sector | lower>> sector.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
         display:
-          name: "Share of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
+          name: "Share of <<sex>> in child labor by sector: <<sector>> (<<age>>)"
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -205,14 +212,14 @@ tables:
         title: "Number of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "children"
         short_unit: ""
-        description_short: Number of children in child labor who are working in the <<sector | lower>> sector.
+        description_short: Number of {definitions.sex} aged <<age>> in child labor who are working in the <<sector | lower>> sector.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
         display:
-          name: "Number of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
+          name: "Number of <<sex>> in child labor in <<sector | lower>> sector (<<age>>)"
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -220,13 +227,13 @@ tables:
         title: "Share of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children in hazardous work who are working in the <<sector | lower>> sector.
+        description_short: Proportion of {definitions.sex} aged <<age>> in hazardous work who are working in the <<sector | lower>> sector.
         description_key:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
         display:
-          name: "Share of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
+          name: "Share of <<sex>> in hazardous work in <<sector | lower>> sector (<<age>>)"
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -234,13 +241,13 @@ tables:
         title: "Number of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "children"
         short_unit: ""
-        description_short: Number of children in hazardous work who are working in the <<sector | lower>> sector.
+        description_short: Number of {definitions.sex} aged <<age>> in hazardous work who are working in the <<sector | lower>> sector.
         description_key:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
         display:
-          name: "Number of children in hazardous work by sector: <<sector>> (<<sex>>, <<age>>)"
+          name: "Number of <<sex>> in hazardous work in <<sector | lower>> sector (<<age>>)"
           numDecimalPlaces: 0
           <<: *common_display
 
