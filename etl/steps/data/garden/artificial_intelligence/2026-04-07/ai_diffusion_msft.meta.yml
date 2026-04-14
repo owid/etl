@@ -12,14 +12,14 @@ tables:
   ai_diffusion_msft:
     variables:
       ai_user_share:
-        title: Share of working-age population using selected generative AI tools
+        title: Share of working-age population using generative AI tools
         unit: "%"
         short_unit: "%"
         description_short: Estimated share of the working-age population (aged 15–64) who used a [generative AI](#dod:generative-ai) website or app, such as ChatGPT or Gemini, in the second half of 2025.
 
         description_key:
           # Source: Section 2, p. 2; Section 2.1, p. 2–3; Appendix A, p. 14 | AI-Usage-Technical-Report.pdf
-          - This is an estimate, not survey data. It is based on anonymized data collected by Microsoft software and services, and measures the share of the working-age population (aged 15–64) who used one of 19 selected [generative AI](#dod:generative-ai) websites and apps.
+          - These are modelled estimates, not survey data. They are derived from anonymized usage signals collected automatically by Microsoft's software and services, which log whether users visited any of 19 [generative AI](#dod:generative-ai) platforms, including ChatGPT, Gemini, Claude, DeepSeek, Grok, Midjourney, and Perplexity.
 
           # Source: Section 2.2, p. 3–5 | AI-Usage-Technical-Report.pdf
           - Microsoft can directly observe this mainly on Windows desktops and tablets. It then scales these numbers up to estimate total use across desktop, tablet, and mobile devices in each country.
