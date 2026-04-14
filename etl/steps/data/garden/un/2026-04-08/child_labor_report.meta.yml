@@ -79,7 +79,7 @@ tables:
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Share of <<sex>> in child labor (<<age>>)
+          name: Share of {definitions.sex} in child labor (<<age>>)
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -93,7 +93,7 @@ tables:
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Number of <<sex>> in child labor (<<age>>)
+          name: Number of {definitions.sex} in child labor (<<age>>)
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -106,7 +106,7 @@ tables:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Share of <<sex>> in hazardous work (<<age>>)
+          name: Share of {definitions.sex} in hazardous work (<<age>>)
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -119,7 +119,7 @@ tables:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Number of <<sex>> in hazardous work (<<age>>)
+          name: Number of {definitions.sex} in hazardous work (<<age>>)
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -133,7 +133,7 @@ tables:
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Share of <<sex>> in child labor who are not attending school (<<age>>)
+          name: Share of {definitions.sex} in child labor who are not attending school (<<age>>)
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -147,7 +147,7 @@ tables:
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Number of <<sex>> in child labor who are not attending school (<<age>>)
+          name: Number of {definitions.sex} in child labor who are not attending school (<<age>>)
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -160,7 +160,7 @@ tables:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Share of <<sex>> in hazardous work who are not attending school (<<age>>)
+          name: Share of {definitions.sex} in hazardous work who are not attending school (<<age>>)
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -173,7 +173,7 @@ tables:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Number of <<sex>> in hazardous work who are not attending school (<<age>>)
+          name: Number of {definitions.sex} in hazardous work who are not attending school (<<age>>)
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -187,7 +187,7 @@ tables:
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
-          name: Share of <<sex>> in child labor including household chores (<<age>>)
+          name: Share of {definitions.sex} in child labor including household chores (<<age>>)
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -204,7 +204,7 @@ tables:
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
         display:
-          name: "Share of <<sex>> in child labor by sector: <<sector>> (<<age>>)"
+          name: "Share of {definitions.sex} in child labor by sector: <<sector>> (<<age>>)"
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -219,7 +219,7 @@ tables:
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
         display:
-          name: "Number of <<sex>> in child labor in <<sector | lower>> sector (<<age>>)"
+          name: "Number of {definitions.sex} in child labor in <<sector | lower>> sector (<<age>>)"
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -233,7 +233,7 @@ tables:
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
         display:
-          name: "Share of <<sex>> in hazardous work in <<sector | lower>> sector (<<age>>)"
+          name: "Share of {definitions.sex} in hazardous work in <<sector | lower>> sector (<<age>>)"
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -247,7 +247,7 @@ tables:
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
         display:
-          name: "Number of <<sex>> in hazardous work in <<sector | lower>> sector (<<age>>)"
+          name: "Number of {definitions.sex} in hazardous work in <<sector | lower>> sector (<<age>>)"
           numDecimalPlaces: 0
           <<: *common_display
 
