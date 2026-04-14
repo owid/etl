@@ -28,7 +28,7 @@ tables:
           - To do this, Microsoft adjusts for how common desktop and tablet devices are in each country, how much internet use happens on mobile rather than desktop, and how many users share data with Microsoft.
 
           # Source: Section 2.1, p. 2–3 | AI-Usage-Technical-Report.pdf
-          - Users with less than 90 minutes of activity per month are excluded, to reduce the influence of one-time or very infrequent users. It is not clearly stated whether this threshold refers to all internet activity seen by Microsoft or only to activity on AI tools.
+          - Users with less than 90 minutes of activity per month are excluded, to reduce the influence of one-time or very infrequent users. It is not clearly stated whether this threshold refers to all internet activity seen by Microsoft or only to activity on AI websites.
 
           # Source: Section 2.4, p. 5; Table 2, p. 14–18 | AI-Usage-Technical-Report.pdf
           - Some countries do not have enough data for their own estimate and are assigned a regional average instead.
