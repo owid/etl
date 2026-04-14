@@ -38,7 +38,7 @@ def run() -> None:
 
     # Build output tables.
     tb_main = _build_main_table(tb_cl, tb_hw, tb_trends)
-    tb_sector = _build_sector_table(tb_cl, tb_hw)
+    tb_sector = _build_sector_table(tb_cl, tb_hw, tb_trends)
 
     # Convert number columns from thousands to actual values.
     for tb in [tb_main, tb_sector]:
@@ -154,11 +154,19 @@ def _trends_to_long(tb: Table) -> Table:
     tb.loc[is_cl514, "age"] = "5-14"
     tb.loc[is_cl514, "sex"] = tb.loc[is_cl514, "disaggregation_value"].str.lower()
 
+    # Sector by SDG region rows: parse sector from disaggregation_type, country from value.
+    is_sector = tb["disaggregation_type"].str.startswith("Sector ", na=False)
+    tb.loc[is_sector, "country"] = tb.loc[is_sector, "disaggregation_value"]
+    tb.loc[is_sector, "sex"] = "total"
+    tb.loc[is_sector, "age"] = "5-17"
+    tb.loc[is_sector, "_sector"] = tb.loc[is_sector, "disaggregation_type"].str.replace("Sector ", "", regex=False)
+
     # Tag source type so _build_main_table can separate special rows.
     tb["_source"] = "trends"
     tb.loc[is_nis, "_source"] = "not_in_school"
     tb.loc[is_hh, "_source"] = "household_chores"
     tb.loc[is_cl514, "_source"] = "child_labor_share_5_14"
+    tb.loc[is_sector, "_source"] = "sector_by_region"
 
     tb = tb.drop(columns=["disaggregation_type", "disaggregation_value"])
     tb["year"] = tb["year"].astype(int)
@@ -213,12 +221,12 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     tb = tb_cl.merge(tb_hw, on=["country", "sex", "age"], how="outer")
     tb["year"] = LATEST_YEAR
 
-    # 4. Separate special rows (page 8 chart data) from regular trends rows.
+    # 4. Separate special rows (page 8/34 chart data) from regular trends rows.
     tb_trends = tb_trends.copy()
-    tb_nis_chart = tb_trends[tb_trends["_source"] == "not_in_school"].drop(columns=["_source"])
-    tb_hh = tb_trends[tb_trends["_source"] == "household_chores"].drop(columns=["_source"])
-    tb_cl514 = tb_trends[tb_trends["_source"] == "child_labor_share_5_14"].drop(columns=["_source"])
-    tb_trends = tb_trends[tb_trends["_source"] == "trends"].drop(columns=["_source"])
+    tb_nis_chart = tb_trends[tb_trends["_source"] == "not_in_school"].drop(columns=["_source", "_sector"])
+    tb_hh = tb_trends[tb_trends["_source"] == "household_chores"].drop(columns=["_source", "_sector"])
+    tb_cl514 = tb_trends[tb_trends["_source"] == "child_labor_share_5_14"].drop(columns=["_source", "_sector"])
+    tb_trends = tb_trends[tb_trends["_source"] == "trends"].drop(columns=["_source", "_sector"])
 
     # 5. Concat with trends (2016, 2020, 2024 aggregate-level rows).
     # Region data goes first so its rows are kept over trends duplicates (region data is more detailed).
@@ -307,11 +315,12 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     return tb
 
 
-def _build_sector_table(tb_cl: Table, tb_hw: Table) -> Table:
+def _build_sector_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     """Build the sector table from sector rows of both region tables.
 
     Keeps only rows where region_type is "by sector of economic activity",
     renames region → sector, merges child_labor + hazardous_work side-by-side.
+    Also adds sector-by-SDG-region data from page 34 chart (via trends).
     """
     tables = []
     for tb, prefix in [(tb_cl, "child_labor"), (tb_hw, "hazardous_work")]:
@@ -329,6 +338,25 @@ def _build_sector_table(tb_cl: Table, tb_hw: Table) -> Table:
         tables.append(tb)
 
     tb = tables[0].merge(tables[1], on=["country", "year", "sector", "sex", "age"], how="outer")
+
+    # Add sector-by-SDG-region data from page 34 chart.
+    tb_sector_chart = tb_trends[tb_trends["_source"] == "sector_by_region"].copy()
+    if len(tb_sector_chart) > 0:
+        tb_sector_chart = tb_sector_chart.rename(
+            columns={"_sector": "sector", "share_child_labor": "share_child_labor"}
+        )
+        tb_sector_chart = tb_sector_chart[["country", "year", "sex", "age", "sector", "share_child_labor"]]
+        # Keep only rows with actual data (chart only has 2024).
+        tb_sector_chart = tb_sector_chart.dropna(subset=["share_child_labor"])
+        tb = pr.concat([tb, tb_sector_chart], ignore_index=True)
+
+    # Rescale share columns so they sum to exactly 100 per (country, year, sex, age) group.
+    share_cols = [c for c in tb.columns if c.startswith("share_")]
+    group_cols = ["country", "year", "sex", "age"]
+    for col in share_cols:
+        totals = tb.groupby(group_cols)[col].transform("sum")
+        mask = totals.notna() & (totals != 0)
+        tb.loc[mask, col] = tb.loc[mask, col] / totals[mask] * 100
 
     # Harmonize country names
     tb = paths.regions.harmonize_names(

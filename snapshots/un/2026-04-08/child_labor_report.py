@@ -110,6 +110,20 @@ _CHILD_LABOR_SHARE_5_14_CHART = {
     ("Child labor share 5-14", "Boys"): {2024: (8.1, None, None, None)},
 }
 
+# Child labour distribution by sector and SDG region from page 34, Fig 17.
+# Percentage distribution of children aged 5-17 in child labour, sex=total.
+_SECTOR_BY_REGION_CHART: dict = {}
+for _region, (_agri, _ind, _serv) in {
+    "Sub-Saharan Africa (SDG)": (70, 8, 22),
+    "Northern Africa and Western Asia (SDG)": (42, 17, 41),
+    "Central and Southern Asia (SDG)": (46, 26, 28),
+    "Eastern and South-Eastern Asia (SDG)": (48, 18, 34),
+    "Latin America and the Caribbean (SDG)": (46, 16, 37),
+}.items():
+    _SECTOR_BY_REGION_CHART[("Sector Agriculture", _region)] = {2024: (_agri, None, None, None)}
+    _SECTOR_BY_REGION_CHART[("Sector Industry", _region)] = {2024: (_ind, None, None, None)}
+    _SECTOR_BY_REGION_CHART[("Sector Services", _region)] = {2024: (_serv, None, None, None)}
+
 
 # ── Extraction helpers ─────────────────────────────────────────────────────────
 
@@ -159,8 +173,8 @@ def _extract_trends_table(pdf: pdfplumber.PDF) -> pd.DataFrame:
 
     df = _clean(df)
 
-    # Merge in chart data from pages 8 and 9.
-    all_chart_data = {**_CHART_DATA, **_NOT_IN_SCHOOL_CHART, **_HOUSEHOLD_CHORES_CHART, **_CHILD_LABOR_SHARE_5_14_CHART}
+    # Merge in chart data from pages 8, 9, and 34.
+    all_chart_data = {**_CHART_DATA, **_NOT_IN_SCHOOL_CHART, **_HOUSEHOLD_CHORES_CHART, **_CHILD_LABOR_SHARE_5_14_CHART, **_SECTOR_BY_REGION_CHART}
     df = _merge_chart_data(df, all_chart_data)
 
     return df
