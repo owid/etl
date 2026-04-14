@@ -18,6 +18,9 @@ _BY_SECTOR = "Children in child labour by sector of economic activity"
 # Define acronyms to disambiguate regions that appear under multiple groupings (e.g. Sub-Saharan Africa appears under both ILO and SDG regions).
 _REGION_ACRONYMS = {"ILO regions": "ILO", "SDG regions": "SDG", "UNICEF regions": "UNICEF"}
 
+# Standard join columns used across table operations.
+_JOIN_COLS = ["country", "year", "sex", "age"]
+
 
 def run() -> None:
     #
@@ -50,6 +53,9 @@ def run() -> None:
     #
     ds_garden = paths.create_dataset(tables=[tb_main, tb_sector], default_metadata=ds_meadow.metadata)
     ds_garden.save()
+
+
+# ── Reshaping ─────────────────────────────────────────────────────────────────
 
 
 def _to_long(tb: Table) -> Table:
@@ -112,82 +118,139 @@ def _trends_to_long(tb: Table) -> Table:
     tb = tb.pivot(index=["disaggregation_type", "disaggregation_value", "year"], columns="col", values="value")
     tb.columns.name = None
     tb = tb.reset_index()
-
-    # Map disaggregation_type/value to country, sex, age.
-    tb["country"] = tb["disaggregation_value"]
-    tb["sex"] = "total"
-    tb["age"] = "5-17"
-
-    # World total: country="World".
-    tb.loc[tb["disaggregation_type"] == "World total", "country"] = "World"
-
-    # Sex rows: country="World", sex from value.
-    is_sex = tb["disaggregation_type"] == "Sex"
-    tb.loc[is_sex, "country"] = "World"
-    tb.loc[is_sex, "sex"] = tb.loc[is_sex, "disaggregation_value"].str.lower()
-
-    # Age rows: country="World", age from value (strip " years").
-    is_age = tb["disaggregation_type"] == "Age"
-    tb.loc[is_age, "country"] = "World"
-    tb.loc[is_age, "age"] = tb.loc[is_age, "disaggregation_value"].str.replace(" years", "", regex=False)
-
-    # Disambiguate regions that appear under multiple groupings (e.g. Sub-Saharan Africa).
-    for label, suffix in _REGION_ACRONYMS.items():
-        mask = tb["disaggregation_type"] == label
-        tb.loc[mask, "country"] = tb.loc[mask, "country"] + f" ({suffix})"
-
-    # Not-in-school rows: country="World", sex="total", age from value (strip " years").
-    is_nis = tb["disaggregation_type"] == "Not in school"
-    tb.loc[is_nis, "country"] = "World"
-    tb.loc[is_nis, "age"] = tb.loc[is_nis, "disaggregation_value"].str.replace(" years", "", regex=False)
-
-    # Not-in-school by ILO region rows: country from value, sex="total", age="5-14".
-    is_nis_region = tb["disaggregation_type"] == "Not in school by region"
-    tb.loc[is_nis_region, "country"] = tb.loc[is_nis_region, "disaggregation_value"]
-    tb.loc[is_nis_region, "age"] = "5-14"
-    is_nis = is_nis | is_nis_region
-
-    # Household chores rows: country="World", parse sex and age from value (e.g. "Girls 5-11").
-    is_hh = tb["disaggregation_type"] == "Including household chores"
-    tb.loc[is_hh, "country"] = "World"
-    parsed_hh = tb.loc[is_hh, "disaggregation_value"].str.extract(r"^(\w+)\s+(.+)$")
-    tb.loc[is_hh, "sex"] = parsed_hh[0].str.lower().values
-    tb.loc[is_hh, "age"] = parsed_hh[1].values
-
-    # Child labor share 5-14 rows: country="World", age="5-14", sex from value.
-    is_cl514 = tb["disaggregation_type"] == "Child labor share 5-14"
-    tb.loc[is_cl514, "country"] = "World"
-    tb.loc[is_cl514, "age"] = "5-14"
-    tb.loc[is_cl514, "sex"] = tb.loc[is_cl514, "disaggregation_value"].str.lower()
-
-    # Sector by SDG region rows: parse sector from disaggregation_type, country from value.
-    is_sector = tb["disaggregation_type"].str.startswith("Sector ", na=False)
-    tb.loc[is_sector, "country"] = tb.loc[is_sector, "disaggregation_value"]
-    tb.loc[is_sector, "sex"] = "total"
-    tb.loc[is_sector, "age"] = "5-17"
-    tb.loc[is_sector, "_sector"] = tb.loc[is_sector, "disaggregation_type"].str.replace("Sector ", "", regex=False)
-
-    # Tag source type so _build_main_table can separate special rows.
-    tb["_source"] = "trends"
-    tb.loc[is_nis, "_source"] = "not_in_school"
-    tb.loc[is_hh, "_source"] = "household_chores"
-    tb.loc[is_cl514, "_source"] = "child_labor_share_5_14"
-    tb.loc[is_sector, "_source"] = "sector_by_region"
-
-    tb = tb.drop(columns=["disaggregation_type", "disaggregation_value"])
     tb["year"] = tb["year"].astype(int)
+
+    # Map disaggregation_type/value to country, sex, age and tag source type.
+    tb = _map_disaggregations(tb)
+    tb = tb.drop(columns=["disaggregation_type", "disaggregation_value"])
 
     return tb
 
 
-def _apply_country_names(tb: Table) -> None:
-    """Replace region_type + region with a single country column (in-place)."""
+def _map_disaggregations(tb: Table) -> Table:
+    """Map disaggregation_type and value to standard dimensions (country, sex, age, _source, _sector).
+
+    Each disaggregation type has its own mapping rule. The _source tag lets
+    _build_main_table separate regular trends from special chart-derived rows.
+    """
+    dtype = tb["disaggregation_type"]
+    dvalue = tb["disaggregation_value"]
+
+    # Defaults: country from value, sex=total, age=5-17, source=trends.
+    tb["country"] = dvalue
+    tb["sex"] = "total"
+    tb["age"] = "5-17"
+    tb["_source"] = "trends"
+    tb["_sector"] = None
+
+    # World total: country="World".
+    m = dtype == "World total"
+    tb.loc[m, "country"] = "World"
+
+    # Sex rows: country="World", sex from value.
+    m = dtype == "Sex"
+    tb.loc[m, "country"] = "World"
+    tb.loc[m, "sex"] = dvalue[m].str.lower()
+
+    # Age rows: country="World", age from value (strip " years").
+    m = dtype == "Age"
+    tb.loc[m, "country"] = "World"
+    tb.loc[m, "age"] = dvalue[m].str.replace(" years", "", regex=False)
+
+    # Disambiguate regions that appear under multiple groupings (e.g. Sub-Saharan Africa).
+    for label, suffix in _REGION_ACRONYMS.items():
+        m = dtype == label
+        tb.loc[m, "country"] = dvalue[m] + f" ({suffix})"
+
+    # Not-in-school rows: country="World", sex="total", age from value (strip " years").
+    m = dtype == "Not in school"
+    tb.loc[m, "country"] = "World"
+    tb.loc[m, "age"] = dvalue[m].str.replace(" years", "", regex=False)
+    tb.loc[m, "_source"] = "not_in_school"
+
+    # Not-in-school by ILO region rows: country from value, sex="total", age="5-14".
+    m_region = dtype == "Not in school by region"
+    tb.loc[m_region, "age"] = "5-14"
+    tb.loc[m_region, "_source"] = "not_in_school"
+
+    # Household chores rows: country="World", parse sex and age from value (e.g. "Girls 5-11").
+    m = dtype == "Including household chores"
+    tb.loc[m, "country"] = "World"
+    tb.loc[m, "_source"] = "household_chores"
+    parsed_hh = dvalue[m].str.extract(r"^(\w+)\s+(.+)$")
+    tb.loc[m, "sex"] = parsed_hh[0].str.lower().values
+    tb.loc[m, "age"] = parsed_hh[1].values
+
+    # Child labor share 5-14 rows: country="World", age="5-14", sex from value.
+    m = dtype == "Child labor share 5-14"
+    tb.loc[m, "country"] = "World"
+    tb.loc[m, "age"] = "5-14"
+    tb.loc[m, "sex"] = dvalue[m].str.lower()
+    tb.loc[m, "_source"] = "child_labor_share_5_14"
+
+    # Sector by SDG region rows: parse sector from disaggregation_type, country from value.
+    m = dtype.str.startswith("Sector ", na=False)
+    tb.loc[m, "_source"] = "sector_by_region"
+    tb.loc[m, "_sector"] = dtype[m].str.replace("Sector ", "", regex=False)
+
+    return tb
+
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+
+def _country_from_region(tb: Table) -> Table:
+    """Replace region_type + region with a single country column."""
+    tb = tb.copy()
     tb.loc[tb["region_type"] == "World total", "region"] = "World"
     for label, suffix in _REGION_ACRONYMS.items():
         mask = tb["region_type"] == label
         tb.loc[mask, "region"] = tb.loc[mask, "region"] + f" ({suffix})"
-    tb.drop(columns=["region_type"], inplace=True)
-    tb.rename(columns={"region": "country"}, inplace=True)
+    return tb.drop(columns=["region_type"]).rename(columns={"region": "country"})
+
+
+def _compute_age_5_14(tb: Table) -> Table:
+    """Compute the 5-14 bracket by summing 5-11 + 12-14 numbers and back-calculating shares.
+
+    Shares are back-calculated as: share_5_14 = number_5_14 / (pop_5_11 + pop_12_14),
+    where pop = number / (share / 100).
+    """
+    tb_5_11 = tb[tb["age"] == "5-11"].sort_values(_JOIN_COLS).reset_index(drop=True)
+    tb_12_14 = tb[tb["age"] == "12-14"].sort_values(_JOIN_COLS).reset_index(drop=True)
+
+    num_cols = [c for c in tb.columns if c.startswith("number_")]
+    share_cols = [c for c in tb.columns if c.startswith("share_")]
+
+    tb_5_14 = tb_5_11[["country", "year", "sex"]].copy()
+
+    # Sum numbers.
+    for col in num_cols:
+        tb_5_14[col] = tb_5_11[col].values + tb_12_14[col].values
+
+    # Compute shares from inferred population.
+    for col in share_cols:
+        num_col = col.replace("share_", "number_")
+        if num_col in num_cols:
+            pop_5_11 = tb_5_11[num_col].values / (tb_5_11[col].values / 100)
+            pop_12_14 = tb_12_14[num_col].values / (tb_12_14[col].values / 100)
+            tb_5_14[col] = tb_5_14[num_col].values / (pop_5_11 + pop_12_14) * 100
+
+    tb_5_14["age"] = "5-14"
+    return tb_5_14
+
+
+def _left_join_extra(tb: Table, extra: Table, src_col: str, dst_col: str) -> Table:
+    """Left-join a single column from extra onto tb, filling NaNs in existing dst_col if present."""
+    extra = extra[_JOIN_COLS + [src_col]].dropna(subset=[src_col]).rename(columns={src_col: dst_col})
+    tb = tb.merge(extra, on=_JOIN_COLS, how="left", suffixes=("", "_extra"))
+    extra_col = f"{dst_col}_extra"
+    if extra_col in tb.columns:
+        tb[dst_col] = tb[dst_col].fillna(tb[extra_col])
+        tb = tb.drop(columns=[extra_col])
+    return tb
+
+
+# ── Table builders ────────────────────────────────────────────────────────────
 
 
 def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
@@ -199,6 +262,8 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
       3. Merge child_labor + hazardous_work side-by-side, add year=2024.
       4. Concat with trends (2016/2020/2024 aggregate rows).
       5. Left-join not-in-school columns for World/2024 rows.
+      6. Compute 5-14 age bracket.
+      7. Left-join chart-derived not-in-school and household chores shares.
     """
     tb_cl = tb_cl.copy()
     tb_hw = tb_hw.copy()
@@ -207,19 +272,18 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     expected_types = {_NOT_IN_SCHOOL, _BY_SECTOR, "World total"} | set(_REGION_ACRONYMS)
     for tb, name in [(tb_cl, "child_labor"), (tb_hw, "hazardous_work")]:
         actual_types = set(tb["region_type"].unique())
-        assert (
-            actual_types == expected_types
-        ), f"{name} has unexpected region_type values: {actual_types - expected_types}"
+        assert actual_types == expected_types, (
+            f"{name} has unexpected region_type values: {actual_types - expected_types}"
+        )
 
     # 1. Extract not-in-school rows.
     cl_nis = tb_cl[tb_cl["region_type"] == _NOT_IN_SCHOOL].drop(columns=["region_type", "region"])
     hw_nis = tb_hw[tb_hw["region_type"] == _NOT_IN_SCHOOL].drop(columns=["region_type", "region"])
 
     # 2. Keep only region rows and build country column.
-    tb_cl = tb_cl[~tb_cl["region_type"].isin([_NOT_IN_SCHOOL, _BY_SECTOR])].copy()
-    tb_hw = tb_hw[~tb_hw["region_type"].isin([_NOT_IN_SCHOOL, _BY_SECTOR])].copy()
-    _apply_country_names(tb_cl)
-    _apply_country_names(tb_hw)
+    keep = ~tb_cl["region_type"].isin([_NOT_IN_SCHOOL, _BY_SECTOR])
+    tb_cl = _country_from_region(tb_cl[keep])
+    tb_hw = _country_from_region(tb_hw[keep])
 
     # 3. Suffix value columns and merge child_labor + hazardous_work.
     tb_cl = tb_cl.rename(columns={"share": "share_child_labor", "number": "number_child_labor"})
@@ -229,19 +293,19 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
 
     # 4. Separate special rows (page 8/34 chart data) from regular trends rows.
     tb_trends = tb_trends.copy()
-    tb_nis_chart = tb_trends[tb_trends["_source"] == "not_in_school"].drop(columns=["_source", "_sector"])
-    tb_hh = tb_trends[tb_trends["_source"] == "household_chores"].drop(columns=["_source", "_sector"])
-    tb_cl514 = tb_trends[tb_trends["_source"] == "child_labor_share_5_14"].drop(columns=["_source", "_sector"])
-    tb_trends = tb_trends[tb_trends["_source"] == "trends"].drop(columns=["_source", "_sector"])
+    source = tb_trends["_source"]
+    tb_nis_chart = tb_trends[source == "not_in_school"].drop(columns=["_source", "_sector"])
+    tb_hh = tb_trends[source == "household_chores"].drop(columns=["_source", "_sector"])
+    tb_cl514 = tb_trends[source == "child_labor_share_5_14"].drop(columns=["_source", "_sector"])
+    tb_trends = tb_trends[source == "trends"].drop(columns=["_source", "_sector"])
 
     # 5. Concat with trends (2016, 2020, 2024 aggregate-level rows).
     # Region data goes first so its rows are kept over trends duplicates (region data is more detailed).
     assert str(LATEST_YEAR) in tb_trends["year"].astype(str).values, f"LATEST_YEAR={LATEST_YEAR} not found in trends"
     tb = pr.concat([tb, tb_trends], ignore_index=True)
-    tb = tb.drop_duplicates(subset=["country", "year", "sex", "age"], keep="first")
+    tb = tb.drop_duplicates(subset=_JOIN_COLS, keep="first")
 
     # 6. Left-join not-in-school columns (only populated for country="World", year=2024).
-    join_cols = ["country", "year", "sex", "age"]
     for nis, prefix in [(cl_nis, "child_labor"), (hw_nis, "hazardous_work")]:
         nis = nis.rename(
             columns={
@@ -251,64 +315,30 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
         )
         nis["country"] = "World"
         nis["year"] = LATEST_YEAR
-        value_cols = [c for c in nis.columns if c not in join_cols]
-        tb = tb.merge(nis[join_cols + value_cols], on=join_cols, how="left")
+        value_cols = [c for c in nis.columns if c not in _JOIN_COLS]
+        tb = tb.merge(nis[_JOIN_COLS + value_cols], on=_JOIN_COLS, how="left")
 
     # 7. Compute 5-14 age bracket by summing 5-11 and 12-14.
-    tb_5_11 = tb[tb["age"] == "5-11"].sort_values(["country", "year", "sex"]).reset_index(drop=True)
-    tb_12_14 = tb[tb["age"] == "12-14"].sort_values(["country", "year", "sex"]).reset_index(drop=True)
-    num_cols = [c for c in tb.columns if c.startswith("number_")]
-    share_cols = [c for c in tb.columns if c.startswith("share_")]
-    tb_5_14 = tb_5_11[["country", "year", "sex"]].copy()
-    # Sum numbers.
-    for col in num_cols:
-        tb_5_14[col] = tb_5_11[col].values + tb_12_14[col].values
-    # Compute shares: share_5_14 = number_5_14 / (pop_5_11 + pop_12_14), where pop = number / (share / 100).
-    for col in share_cols:
-        num_col = col.replace("share_", "number_")
-        if num_col in num_cols:
-            pop_5_11 = tb_5_11[num_col].values / (tb_5_11[col].values / 100)
-            pop_12_14 = tb_12_14[num_col].values / (tb_12_14[col].values / 100)
-            tb_5_14[col] = tb_5_14[num_col].values / (pop_5_11 + pop_12_14) * 100
-    tb_5_14["age"] = "5-14"
+    tb_5_14 = _compute_age_5_14(tb)
     # Overwrite child labor shares for 5-14 with report values (calculated shares have rounding errors).
-    if len(tb_cl514) > 0:
-        for _, row in tb_cl514.iterrows():
-            mask = (
-                (tb_5_14["country"] == row["country"])
-                & (tb_5_14["year"] == row["year"])
-                & (tb_5_14["sex"] == row["sex"])
-            )
-            tb_5_14.loc[mask, "share_child_labor"] = row["share_child_labor"]
+    for _, row in tb_cl514.iterrows():
+        mask = (
+            (tb_5_14["country"] == row["country"]) & (tb_5_14["year"] == row["year"]) & (tb_5_14["sex"] == row["sex"])
+        )
+        tb_5_14.loc[mask, "share_child_labor"] = row["share_child_labor"]
     tb = pr.concat([tb, tb_5_14], ignore_index=True)
 
     # 8. Left-join not-in-school shares from chart data (pages 8 and 44).
-    if len(tb_nis_chart) > 0:
-        for src_col, dst_col in [
-            ("share_child_labor", "share_child_labor_not_in_school"),
-            ("share_hazardous_work", "share_hazardous_work_not_in_school"),
-        ]:
-            nis_shares = tb_nis_chart[["country", "year", "sex", "age", src_col]].dropna(subset=[src_col])
-            nis_shares = nis_shares.rename(columns={src_col: dst_col})
-            tb = tb.merge(nis_shares, on=join_cols, how="left", suffixes=("", "_chart"))
-            chart_col = f"{dst_col}_chart"
-            if chart_col in tb.columns:
-                tb[dst_col] = tb[dst_col].fillna(tb[chart_col])
-                tb = tb.drop(columns=[chart_col])
+    for src_col, dst_col in [
+        ("share_child_labor", "share_child_labor_not_in_school"),
+        ("share_hazardous_work", "share_hazardous_work_not_in_school"),
+    ]:
+        tb = _left_join_extra(tb, tb_nis_chart, src_col, dst_col)
 
     # 9. Add household chores column from page 8 chart data.
     tb["share_child_labor_incl_household_chores"] = None
     tb["share_child_labor_incl_household_chores"].metadata = tb["share_child_labor"].metadata.copy()
-    if len(tb_hh) > 0:
-        hh = tb_hh[["country", "year", "sex", "age", "share_child_labor"]].rename(
-            columns={"share_child_labor": "share_child_labor_incl_household_chores"}
-        )
-        tb = tb.merge(hh, on=join_cols, how="left", suffixes=("", "_hh"))
-        if "share_child_labor_incl_household_chores_hh" in tb.columns:
-            tb["share_child_labor_incl_household_chores"] = tb["share_child_labor_incl_household_chores"].fillna(
-                tb["share_child_labor_incl_household_chores_hh"]
-            )
-            tb = tb.drop(columns=["share_child_labor_incl_household_chores_hh"])
+    tb = _left_join_extra(tb, tb_hh, "share_child_labor", "share_child_labor_incl_household_chores")
 
     # 10. Harmonize country names
     tb = paths.regions.harmonize_names(
@@ -317,7 +347,7 @@ def _build_main_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
         warn_on_unknown_excluded_countries=False,
     )
 
-    tb = tb.format(["country", "year", "sex", "age"], short_name="child_labor")
+    tb = tb.format(_JOIN_COLS, short_name="child_labor")
 
     return tb
 
@@ -349,9 +379,7 @@ def _build_sector_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     # Add sector-by-SDG-region data from page 34 chart.
     tb_sector_chart = tb_trends[tb_trends["_source"] == "sector_by_region"].copy()
     if len(tb_sector_chart) > 0:
-        tb_sector_chart = tb_sector_chart.rename(
-            columns={"_sector": "sector", "share_child_labor": "share_child_labor"}
-        )
+        tb_sector_chart = tb_sector_chart.rename(columns={"_sector": "sector"})
         tb_sector_chart = tb_sector_chart[["country", "year", "sex", "age", "sector", "share_child_labor"]]
         # Keep only rows with actual data (chart only has 2024).
         tb_sector_chart = tb_sector_chart.dropna(subset=["share_child_labor"])
