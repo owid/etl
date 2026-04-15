@@ -5,6 +5,11 @@ from typing import Any, cast
 from etl.collection.explorer import Explorer
 from etl.helpers import PathFinder
 
+# Projection variants in UN WPP. Order matters: it's the order in which y-indicators
+# are concatenated when grouping with estimates. Estimates come first (solid line),
+# projection second (dashed via `isProjection` metadata).
+PROJECTION_VARIANTS = ["medium", "low", "high"]
+
 
 class ExplorerCreator:
     """This class is particular to this step.
@@ -70,3 +75,62 @@ class ExplorerCreator:
         )
 
         return explorer
+
+    def create_with_grouped_projections(
+        self,
+        table_name: str,
+        dimensions: dict[str, list[str] | str],
+        projection_variants: list[str] = PROJECTION_VARIANTS,
+        **kwargs,
+    ) -> Explorer:
+        """Create an explorer where projection views show estimates + projection as two y-indicators.
+
+        This builds views from `un_wpp` alone (no `un_wpp_full`) for all four variants
+        (estimates, medium, low, high), then groups each `[estimates, projection_variant]`
+        pair into a combined view under the projection variant slug. Estimates-only views
+        remain untouched.
+
+        Requires that the `variant` variable-level metadata sets `isProjection` appropriately
+        (e.g. via Jinja template on `variant`). The grapher renders the projection indicator
+        with a dashed line while sharing the same color per entity as the estimates
+        indicator (see `autoDetectSeriesStrategy`). Only works when each view ends up with
+        exactly two y-indicators.
+        """
+        self.paths.log.info(f"Creating explorer (grouped projections) for {table_name}")
+
+        if "config" not in kwargs:
+            raise ValueError("The config is required to create the explorer. Please provide it in the kwargs.")
+
+        if "variant" in dimensions:
+            raise ValueError("`variant` should not be in `dimensions`; it is set by `create_with_grouped_projections`.")
+
+        # Load only the estimates+projections table (has all four variants as separate series)
+        tb = self.table(table_name)
+
+        # Include all four variants as separate single-indicator views
+        dimensions_all = {**dimensions, "variant": ["estimates", *projection_variants]}
+
+        explorer = self.paths.create_collection(
+            tb=tb,
+            dimensions=dimensions_all,
+            indicator_as_dimension=True,
+            explorer=True,
+            **kwargs,
+        )
+
+        # Combine [estimates, projection_variant] → projection_variant (two y-indicators)
+        # overwrite_dimension_choice=True replaces the existing single-indicator projection views.
+        # replace=False (default) keeps the estimates-only views.
+        explorer.group_views(
+            groups=[
+                {
+                    "dimension": "variant",
+                    "choices": ["estimates", v],
+                    "choice_new_slug": v,
+                    "overwrite_dimension_choice": True,
+                }
+                for v in projection_variants
+            ]
+        )
+
+        return cast(Explorer, explorer)

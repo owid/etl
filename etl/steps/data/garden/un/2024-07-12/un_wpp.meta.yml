@@ -52,6 +52,15 @@ definitions:
         subtitle: "{definitions.global.projections}"
         originUrl: "https://ourworldindata.org/population-growth"
 
+  # Used in variable display blocks to mark projection variants so the grapher
+  # renders them with a dashed line. Reference with `isProjection: *projection`.
+  projection: &projection
+    <% if (variant is defined) and (variant != 'estimates') -%>
+    true
+    <%- else -%>
+    false
+    <%- endif -%>
+
 # this metadata file is not used in garden step, but in grapher step
 tables:
   population:
@@ -61,6 +70,8 @@ tables:
         unit: people
         description_short: |-
           De facto total population in a country, area or region as of 1 July of the year indicated. {definitions.global.dimensions.description_short}
+        display:
+          isProjection: *projection
         presentation:
           title_public: |-
             Population, {definitions.global.dimensions.title}
@@ -72,6 +83,8 @@ tables:
         unit: people
         description_short: |-
           Population yearly increment, estimated as the difference between the population on 1st of July of the year indicated and the population a year before. {definitions.global.dimensions.description_short}
+        display:
+          isProjection: *projection
         presentation:
           title_public: |-
             Population change, {definitions.global.dimensions.title}
@@ -84,6 +97,8 @@ tables:
         short_unit: people/km²
         description_short: |-
           Population density in a country, area or region. {definitions.global.dimensions.description_short}
+        display:
+          isProjection: *projection
         presentation:
           title_public: |-
             Population density, {definitions.global.dimensions.title}
