@@ -118,7 +118,13 @@ class ExplorerCreator:
             **kwargs,
         )
 
-        # Combine [estimates, projection_variant] → projection_variant (two y-indicators)
+        # Combine [projection_variant, estimates] → projection_variant (two y-indicators).
+        # The order matters: grapher's default ``map.columnSlug`` is y[0]. With the
+        # projection column at y[0] and ``isProjection=true`` set on it, the grapher's
+        # ``projectionColumnInfoBySlug`` auto-match pairs it with the estimates column at
+        # y[1] and the map tab shows the full 1950–2100 series (historical +
+        # projection combined). Putting estimates first instead would limit the map
+        # to 1950–2023.
         # overwrite_dimension_choice=True replaces the existing single-indicator projection views.
         # replace=False (default) keeps the estimates-only views.
         # drop_dimensions_if_single_choice=False keeps single-valued dimensions such as
@@ -129,7 +135,7 @@ class ExplorerCreator:
             groups=[
                 {
                     "dimension": "variant",
-                    "choices": ["estimates", v],
+                    "choices": [v, "estimates"],
                     "choice_new_slug": v,
                     "overwrite_dimension_choice": True,
                 }

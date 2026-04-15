@@ -16,6 +16,12 @@ import yaml
 
 from etl.collection.explorer import Explorer
 
+# Last year for which UN WPP publishes estimates (projections start the year after).
+# Used as the default `mapTargetTime` on grouped projection views so the map opens
+# on the final estimate rather than deep into the 2024–2100 projection range.
+# Bump this when a new UN WPP edition lands.
+UN_WPP_ESTIMATES_LAST_YEAR = 2023
+
 
 class ViewEditor:
     """Edit views.
@@ -142,38 +148,46 @@ class ViewEditor:
 
         Shared by every ``edit_views_*`` that operates on an explorer produced by
         ``create_with_grouped_projections``. Grouped views have two y-indicators
-        (estimates + projection variant) that disagree on their ``title`` field,
-        which makes the grapher fall back to the dataset origin title (e.g.
-        "World Population Prospects"); and they disagree on ``subtitle``, so the
-        projection-scenario note gets dropped. We fix both by copying:
+        — **projection variant first, estimates second** — that disagree on their
+        ``title`` field (so grapher falls back to the dataset origin like
+        "World Population Prospects") and on their ``subtitle`` (so the
+        projection-scenario note gets dropped). We fix both:
 
-        - ``title`` from the **estimates** indicator's ``title_public`` (same value
-          across variants for every indicator in this dataset, so either would do);
-        - ``subtitle`` from the **projection** indicator's ``grapher_config.subtitle``,
-          which already includes the "Future projections are based on …" sentence
-          plus any indicator-specific base text.
+        - ``title`` copied from the estimates indicator's ``title_public`` (both
+          indicators carry the same value for these explorers);
+        - ``subtitle`` copied from the projection indicator's
+          ``grapher_config.subtitle``, which already includes the "Future
+          projections are based on …" sentence plus any indicator-specific base
+          text.
 
-        No-op when ``ds_grapher`` is ``None`` or the view is not a grouped 2-indicator
-        view. The table name is extracted from the indicator's catalog path, so this
-        works for any un_wpp table (population, births, deaths, ...).
+        The projection-first ordering is load-bearing for the map tab: grapher's
+        default ``map.columnSlug`` is y[0], and when y[0] is a projection column
+        the grapher's ``projectionColumnInfoBySlug`` auto-matches it with the
+        historical column at y[1] and the map shows the full 1950–2100 series
+        (historical + projection combined). Reversing the order would limit the
+        map to 1950–2023.
+
+        No-op when ``ds_grapher`` is ``None`` or the view is not a grouped
+        2-indicator view. The table name is extracted from the indicator's
+        catalog path, so this works for any ``un_wpp`` table.
         """
         if ds_grapher is None or view.indicators.y is None or len(view.indicators.y) != 2:
             return
 
-        estimates_path = view.indicators.y[0].catalogPath
-        projection_path = view.indicators.y[1].catalogPath
+        projection_path = view.indicators.y[0].catalogPath
+        estimates_path = view.indicators.y[1].catalogPath
 
-        estimates_col = estimates_path.split("#")[-1]
         projection_col = projection_path.split("#")[-1]
+        estimates_col = estimates_path.split("#")[-1]
 
-        # Invariant: create_with_grouped_projections concatenates [estimates, variant].
+        # Invariant: create_with_grouped_projections concatenates [variant, estimates].
         # If this ever flips, the subtitle we copy (projection's) would come from the
-        # wrong indicator — fail loudly rather than silently producing wrong charts.
-        assert "variant_estimates" in estimates_col, (
-            f"Expected first y-indicator to be the estimates variant, got {estimates_col!r}"
-        )
+        # wrong indicator, and the map tab would lose its auto-combined full range.
         assert "variant_estimates" not in projection_col, (
-            f"Expected second y-indicator to be a projection variant, got {projection_col!r}"
+            f"Expected first y-indicator to be a projection variant, got {projection_col!r}"
+        )
+        assert "variant_estimates" in estimates_col, (
+            f"Expected second y-indicator to be the estimates variant, got {estimates_col!r}"
         )
 
         # Extract table from "grapher/un/.../un_wpp/<table>#<column>".
@@ -200,6 +214,11 @@ class ViewEditor:
             view.config["title"] = title.strip()
         if subtitle:
             view.config["subtitle"] = subtitle.strip()
+        # Open the map tab at the last estimate year (see `UN_WPP_ESTIMATES_LAST_YEAR`).
+        # Otherwise grapher's default "latest" lands on the far end of the projection
+        # range (2100). `mapTargetTime` is the explorer-grammar keyword that grapher
+        # translates into `config.map.time`.
+        view.config["mapTargetTime"] = UN_WPP_ESTIMATES_LAST_YEAR
 
     def _get_grapher_table(self, ds_grapher, table_name):
         """Cached read of a grapher-channel table (metadata only)."""
