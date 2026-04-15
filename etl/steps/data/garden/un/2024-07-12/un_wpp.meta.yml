@@ -219,6 +219,7 @@ tables:
           - |-
             It is expressed as live births per woman. For age-specific fertility rates, it measures the number of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December.
         display:
+          isProjection: *projection
           numDecimalPlaces: "<% if age == 'all' %>2<%- endif %>"
           roundingMode: "<% if age != 'all' %>significantFigures<%- endif %>"
           numSignificantFigures: "<% if age != 'all' %>2<%- endif %>"
@@ -293,6 +294,7 @@ tables:
         description_short: |-
           Number of deaths recorded annually, based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           roundingMode: significantFigures
           numSignificantFigures: 4
         presentation:
@@ -315,6 +317,7 @@ tables:
         description_short: |-
           Number of deaths recorded annually, divided by population in that year. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -330,6 +333,7 @@ tables:
         description_short: |-
           Number of births recorded annually, based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short_births}
         display:
+          isProjection: *projection
           roundingMode: significantFigures
           numSignificantFigures: 4
           numDecimalPlaces: 0
@@ -352,6 +356,7 @@ tables:
           - |-
             We also have a [long-run indicator](https://ourworldindata.org/grapher/long-run-birth-rate) for birth rate, spanning to earlier years.
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -368,6 +373,7 @@ tables:
         description_short: |-
           Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -407,6 +413,7 @@ tables:
           Period life expectancy for << individuals >> who have reached age << age >>. Estimates are expressed as the expected age at death, not as years left to live.
           <%- endif %> {definitions.global.projections}
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -444,6 +451,7 @@ tables:
           The number of male individuals per 100 female individuals, at age << age >>.
           <%- endif %> {definitions.global.projections}
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -496,6 +504,7 @@ tables:
           The ratio of the elderly << individuals >> (ages 65 and over) to the working-age << individuals >> (ages 15 to 64).
           <%- endif %>
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-

@@ -94,31 +94,30 @@ def run() -> None:
 
     # Save explorer (upsert to DB)
     ########## Dependency ratio explorer
-    explorer_dep = explorer_creator.create(
+    # Projection views combine estimates + projection as two y-indicators for dashed rendering.
+    explorer_dep = explorer_creator.create_with_grouped_projections(
         table_name="dependency_ratio",
         config=config_default,
         indicator_names=["dependency_ratio"],
         dimensions={
             "age": "*",
             "sex": "*",
-            "variant": ["estimates"],
         },
     )
-    view_editor.edit_views_dr(explorer_dep)
+    view_editor.edit_views_dr(explorer_dep, ds_grapher=ds)
 
     ########## Sex ratio explorer
-    explorer_sr = explorer_creator.create(
+    explorer_sr = explorer_creator.create_with_grouped_projections(
         table_name="sex_ratio",
         config=paths.load_collection_config("un_wpp.sex_ratio.config.yml"),
         indicator_names=["sex_ratio"],
         dimensions={
             "age": ["all", "0"] + list(AGES_SR.keys()),
             "sex": "*",
-            "variant": ["estimates"],
         },
         choice_renames={"age": AGES_SR},
     )
-    view_editor.edit_views_sr(explorer_sr)
+    view_editor.edit_views_sr(explorer_sr, ds_grapher=ds)
 
     ########## Migration explorer
     explorer_mig = explorer_creator.create(
@@ -138,56 +137,52 @@ def run() -> None:
     view_editor.edit_views_mig(explorer_mig)
 
     ########## Deaths explorer
-    explorer_deaths = explorer_creator.create(
+    explorer_deaths = explorer_creator.create_with_grouped_projections(
         table_name="deaths",
         config=config_default,
         indicator_names=["deaths", "death_rate"],
         dimensions={
             "age": ["all", "0", "0-4"] + AGES_DEATHS_LIST,
             "sex": "*",
-            "variant": ["estimates"],
         },
         choice_renames={"age": AGES_DEATHS},
     )
-    view_editor.edit_views_deaths(explorer_deaths)
+    view_editor.edit_views_deaths(explorer_deaths, ds_grapher=ds)
 
     ########## Births explorer
-    explorer_b = explorer_creator.create(
+    explorer_b = explorer_creator.create_with_grouped_projections(
         table_name="births",
         config=config_default,
         indicator_names=["births", "birth_rate"],
         dimensions={
             "age": "*",
             "sex": "*",
-            "variant": ["estimates"],
         },
         choice_renames={"age": lambda x: f"Women aged {x} years" if x != "all" else None},
     )
-    view_editor.edit_views_b(explorer_b)
+    view_editor.edit_views_b(explorer_b, ds_grapher=ds)
 
     ########## Median age explorer
-    explorer_ma = explorer_creator.create(
+    explorer_ma = explorer_creator.create_with_grouped_projections(
         table_name="median_age",
         config=config_default,
         indicator_names=["median_age"],
         dimensions={
             "age": ["all"],
             "sex": "*",
-            "variant": ["estimates"],
         },
         choice_renames={"age": lambda x: {"all": "None"}.get(x, None)},
     )
-    view_editor.edit_views_ma(explorer_ma)
+    view_editor.edit_views_ma(explorer_ma, ds_grapher=ds)
 
     ########## Life expectancy explorer
-    explorer_le = explorer_creator.create(
+    explorer_le = explorer_creator.create_with_grouped_projections(
         table_name="life_expectancy",
         config=config_default,
         indicator_names=["life_expectancy"],
         dimensions={
             "age": "*",
             "sex": "*",
-            "variant": ["estimates"],
         },
         choice_renames={
             "age": {
@@ -198,21 +193,20 @@ def run() -> None:
             }
         },
     )
-    view_editor.edit_views_le(explorer_le)
+    view_editor.edit_views_le(explorer_le, ds_grapher=ds)
 
     ########## Fertility rate explorer
-    explorer_fr = explorer_creator.create(
+    explorer_fr = explorer_creator.create_with_grouped_projections(
         table_name="fertility_rate",
         config=config_default,
         indicator_names=["fertility_rate"],
         dimensions={
             "age": "*",
             "sex": "*",
-            "variant": ["estimates"],
         },
         choice_renames={"age": lambda x: f"Women aged {x} years" if x != "all" else None},
     )
-    view_editor.edit_views_fr(explorer_fr)
+    view_editor.edit_views_fr(explorer_fr, ds_grapher=ds)
 
     ########## Manual explorer: views with grouped indicators, and others
     explorer_manual = explorer_creator.create_manual(

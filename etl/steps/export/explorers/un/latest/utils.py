@@ -121,6 +121,10 @@ class ExplorerCreator:
         # Combine [estimates, projection_variant] → projection_variant (two y-indicators)
         # overwrite_dimension_choice=True replaces the existing single-indicator projection views.
         # replace=False (default) keeps the estimates-only views.
+        # drop_dimensions_if_single_choice=False keeps single-valued dimensions such as
+        # `indicator` (when there's a single `indicator_names`) or `age` (e.g. `["all"]`
+        # for median_age). The `edit_views_*` helpers rely on those dimensions being
+        # present on every view.
         explorer.group_views(
             groups=[
                 {
@@ -130,7 +134,8 @@ class ExplorerCreator:
                     "overwrite_dimension_choice": True,
                 }
                 for v in projection_variants
-            ]
+            ],
+            drop_dimensions_if_single_choice=False,
         )
 
         return cast(Explorer, explorer)

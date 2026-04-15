@@ -27,6 +27,9 @@ class ViewEditor:
 
     def __init__(self, map_brackets_yaml: str | Path):
         self.map_brackets = self._load_map_brackets(map_brackets_yaml)
+        # Cache of table_name -> grapher table (metadata only), shared across all
+        # edit_views_* calls that resolve grouped-view title/subtitle.
+        self._grapher_tables: dict[str, Any] = {}
 
     def _load_map_brackets(self, map_brackets_yaml: str | Path):
         """Load map brackets.
@@ -111,27 +114,13 @@ class ViewEditor:
         apply to every indicator in the view.
 
         When ``ds_grapher`` is provided, grouped projection views also get their
-        ``title`` / ``subtitle`` set explicitly from the indicator metadata. Without
-        this override, the grapher falls back to the dataset origin title
-        ("World Population Prospects") because the two y-indicators have different
-        ``title`` fields, and the projection subtitle is dropped because only the
-        first indicator's (estimates, empty) subtitle is considered.
+        ``title`` / ``subtitle`` set explicitly from the indicator metadata — see
+        ``_apply_grouped_view_metadata``.
         """
-        # Cache of table_name -> grapher table (metadata only) to avoid re-reading.
-        tables_cache: dict[str, Any] = {}
-
-        def _tb(table_name: str):
-            if ds_grapher is None:
-                return None
-            if table_name not in tables_cache:
-                tables_cache[table_name] = ds_grapher.read(table_name, load_data=False)
-            return tables_cache[table_name]
-
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
-            variant = v.dimensions.get("variant", "estimates")
 
             # Edit display
             assert v.indicators.y is not None
@@ -146,29 +135,40 @@ class ViewEditor:
                         indicator.display = {}
                     indicator.display["name"] = f"{age} years"
 
-            # Set title/subtitle for grouped projection views (estimates + projection).
-            # The single-indicator estimates views are handled correctly by grapher's
-            # indicator-metadata fallback, so we leave them untouched.
-            if variant != "estimates" and ds_grapher is not None and len(v.indicators.y) == 2:
-                self._set_pop_grouped_view_title_subtitle(v, _tb)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def _set_pop_grouped_view_title_subtitle(self, view, get_table):
-        """Populate view.config title/subtitle from grapher-step indicator metadata.
+    def _apply_grouped_view_metadata(self, view, ds_grapher):
+        """Populate ``view.config`` title/subtitle for grouped projection views.
 
-        Expects ``view.indicators.y`` to be ``[estimates_indicator, projection_indicator]``
-        (the order produced by ``create_with_grouped_projections``). Reads
-        ``title_public`` (identical across variants) and the projection indicator's
-        ``grapher_config.subtitle`` (which already includes the age-specific base text
-        and the "Future projections..." sentence).
+        Shared by every ``edit_views_*`` that operates on an explorer produced by
+        ``create_with_grouped_projections``. Grouped views have two y-indicators
+        (estimates + projection variant) that disagree on their ``title`` field,
+        which makes the grapher fall back to the dataset origin title (e.g.
+        "World Population Prospects"); and they disagree on ``subtitle``, so the
+        projection-scenario note gets dropped. We fix both by copying:
+
+        - ``title`` from the **estimates** indicator's ``title_public`` (same value
+          across variants for every indicator in this dataset, so either would do);
+        - ``subtitle`` from the **projection** indicator's ``grapher_config.subtitle``,
+          which already includes the "Future projections are based on …" sentence
+          plus any indicator-specific base text.
+
+        No-op when ``ds_grapher`` is ``None`` or the view is not a grouped 2-indicator
+        view. The table name is extracted from the indicator's catalog path, so this
+        works for any un_wpp table (population, births, deaths, ...).
         """
-        estimates_col = view.indicators.y[0].catalogPath.split("#")[-1]
-        projection_col = view.indicators.y[1].catalogPath.split("#")[-1]
+        if ds_grapher is None or view.indicators.y is None or len(view.indicators.y) != 2:
+            return
 
-        # Sanity-check the indicator order: y[0] must be the estimates variant
-        # (solid line) and y[1] the projection (dashed). If this invariant breaks,
-        # ``create_with_grouped_projections`` changed its concatenation order and
-        # the subtitle we pick here would be wrong (empty estimates subtitle would
-        # overwrite the projection one).
+        estimates_path = view.indicators.y[0].catalogPath
+        projection_path = view.indicators.y[1].catalogPath
+
+        estimates_col = estimates_path.split("#")[-1]
+        projection_col = projection_path.split("#")[-1]
+
+        # Invariant: create_with_grouped_projections concatenates [estimates, variant].
+        # If this ever flips, the subtitle we copy (projection's) would come from the
+        # wrong indicator — fail loudly rather than silently producing wrong charts.
         assert "variant_estimates" in estimates_col, (
             f"Expected first y-indicator to be the estimates variant, got {estimates_col!r}"
         )
@@ -176,9 +176,9 @@ class ViewEditor:
             f"Expected second y-indicator to be a projection variant, got {projection_col!r}"
         )
 
-        # population, population_change, and population_density all live in the
-        # `population` table in grapher.
-        tb = get_table("population")
+        # Extract table from "grapher/un/.../un_wpp/<table>#<column>".
+        table_name = estimates_path.split("#")[0].split("/")[-1]
+        tb = self._get_grapher_table(ds_grapher, table_name)
         if tb is None or estimates_col not in tb.columns or projection_col not in tb.columns:
             return
 
@@ -200,6 +200,12 @@ class ViewEditor:
             view.config["title"] = title.strip()
         if subtitle:
             view.config["subtitle"] = subtitle.strip()
+
+    def _get_grapher_table(self, ds_grapher, table_name):
+        """Cached read of a grapher-channel table (metadata only)."""
+        if table_name not in self._grapher_tables:
+            self._grapher_tables[table_name] = ds_grapher.read(table_name, load_data=False)
+        return self._grapher_tables[table_name]
 
     def edit_views_manual(self, explorer: Explorer):
         """Edit explorer views of manual explorer."""
@@ -255,7 +261,7 @@ class ViewEditor:
                 # Add map colorscheme
                 self._add_map_brackets_display(age, sex, indicator_name, v.indicators.y[0])
 
-    def edit_views_fr(self, explorer):
+    def edit_views_fr(self, explorer, ds_grapher=None):
         """Edit fertility rate explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
@@ -271,8 +277,9 @@ class ViewEditor:
                         indicator_name,
                         indicator,
                     )
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_b(self, explorer):
+    def edit_views_b(self, explorer, ds_grapher=None):
         """Edit births explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
@@ -288,8 +295,9 @@ class ViewEditor:
                     indicator_name,
                     indicator,
                 )
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_ma(self, explorer):
+    def edit_views_ma(self, explorer, ds_grapher=None):
         """Edit median age explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
@@ -298,6 +306,7 @@ class ViewEditor:
             if indicator_name == "median_age":
                 for indicator in v.indicators.y:
                     self._add_map_brackets_display(age, sex, indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
     def edit_views_mig(self, explorer):
         """Edit migration explorer views."""
@@ -309,7 +318,7 @@ class ViewEditor:
                 for indicator in v.indicators.y:
                     self._add_map_brackets_display(age, sex, indicator_name, indicator)
 
-    def edit_views_deaths(self, explorer):
+    def edit_views_deaths(self, explorer, ds_grapher=None):
         """Edit deaths explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
@@ -318,8 +327,9 @@ class ViewEditor:
 
             for indicator in v.indicators.y:
                 self._add_map_brackets_display(age, sex, indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_le(self, explorer):
+    def edit_views_le(self, explorer, ds_grapher=None):
         """Edit life expectancy explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
@@ -333,8 +343,9 @@ class ViewEditor:
 
             for indicator in v.indicators.y:
                 self._add_map_brackets_display(age, sex, indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_sr(self, explorer):
+    def edit_views_sr(self, explorer, ds_grapher=None):
         """Edit sex ratio explorer views"""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
@@ -342,8 +353,9 @@ class ViewEditor:
             if indicator_name == "sex_ratio":
                 for indicator in v.indicators.y:
                     self._add_map_brackets_display(age, "all", indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_dr(self, explorer):
+    def edit_views_dr(self, explorer, ds_grapher=None):
         """Edit dependency ratio explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
@@ -351,6 +363,7 @@ class ViewEditor:
             age = v.dimensions["age"]
             for indicator in v.indicators.y:
                 self._add_map_brackets_display(age, sex, indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
 
 def _get_brackets_sex(brackets, threshold=None):
