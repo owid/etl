@@ -584,8 +584,16 @@ views:
         - catalogPath: un_wpp/deaths#deaths__sex_male__age_0_4__variant_medium
 
   # Mortality rates
-  - dimensions:
-      indicator: infant_mortality_rate
+  #
+  # NOTE on projection scenarios: `infant_mortality_rate` and `child_mortality_rate`
+  # (and, for the same reason, `life_expectancy`) will look nearly identical across
+  # the Low / Medium / High projection variants. That is NOT a pipeline bug: UN WPP's
+  # low / medium / high scenarios differ only in their *fertility* assumptions, while
+  # the mortality trajectory is shared across all three. The source file
+  # (WPP2024_GEN_F01_DEMOGRAPHIC_INDICATORS_FULL.xlsx) publishes the same mortality
+  # values against each fertility variant. We keep all three variants wired up here
+  # so the explorer honestly reflects what UN WPP publishes, even though the chart
+  # looks unchanged when the user toggles the scenario.
       age: "0"
       sex: all
       variant: estimates
