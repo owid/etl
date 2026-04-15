@@ -115,25 +115,6 @@ steps:
   data://grapher/unicef/2023-06-16/diarrhea:
     - data://garden/unicef/2023-06-16/diarrhea
 
-  # Guinea worm - historical estimates
-  data://meadow/who/2023-06-29/guinea_worm_certification:
-    - snapshot://who/2023-06-29/guinea_worm.csv
-  data://garden/who/2023-06-29/guinea_worm_certification:
-    - data://meadow/who/2023-06-29/guinea_worm_certification
-
-  # Guinea worm - to archive
-  data://garden/who/2024-06-17/guinea_worm:
-    - data://garden/who/2023-06-29/guinea_worm_certification
-    - snapshot://fasttrack/2024-06-17/guinea_worm.csv
-  data://grapher/who/2024-06-17/guinea_worm:
-    - data://garden/who/2024-06-17/guinea_worm
-  # Guinea worm - to update
-  #data://garden/who/2025-04-16/guinea_worm:
-  #  - data://garden/who/2023-06-29/guinea_worm_certification
-  #  - snapshot://fasttrack/2024-06-17/guinea_worm.csv
-  #data://grapher/who/2025-04-16/guinea_worm:
-  #  - data://garden/who/2025-04-16/guinea_worm
-
   # Autopsies WHO-Europe
   data://meadow/who/2023-07-13/autopsy:
     - snapshot://who/2022-09-01/autopsy.csv
@@ -1096,12 +1077,21 @@ steps:
     - snapshot://who/2025-08-01/guinea_worm.csv
   data://garden/who/2025-08-01/guinea_worm_certification:
     - data://meadow/who/2025-08-01/guinea_worm_certification
+
     # Guinea worm cases
   data://garden/who/2025-08-01/guinea_worm:
     - snapshot://fasttrack/latest/guinea_worm_cases.csv
     - data://garden/who/2025-08-01/guinea_worm_certification
   data://grapher/who/2025-08-01/guinea_worm:
     - data://garden/who/2025-08-01/guinea_worm
+
+  # Guinea worm cases and certification - WHO
+  # uses fasttrack snapshot until 2024 and adds data directly in garden step from 2025 onwards
+  data://garden/who/2026-03-17/guinea_worm:
+    - snapshot://fasttrack/latest/guinea_worm_cases.csv
+    - data://garden/who/2025-08-01/guinea_worm_certification
+  data://grapher/who/2026-03-17/guinea_worm:
+    - data://garden/who/2026-03-17/guinea_worm
 
   # WHO Mortality Database - Cancer specific
   data://meadow/who/2025-08-05/mortality_database_cancer:
@@ -1365,3 +1355,4 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_cancer:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_cancer
+

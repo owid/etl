@@ -240,6 +240,19 @@ steps:
   data://grapher/who/2023-06-30/guinea_worm:
     - data://garden/who/2023-06-29/guinea_worm_certification
 
+    # Guinea worm (2024 update)
+  data://garden/who/2024-06-17/guinea_worm:
+    - data://garden/who/2023-06-29/guinea_worm_certification
+    - snapshot://fasttrack/2024-06-17/guinea_worm.csv
+  data://grapher/who/2024-06-17/guinea_worm:
+    - data://garden/who/2024-06-17/guinea_worm
+
+    # Guinea worm - historical estimates
+  data://meadow/who/2023-06-29/guinea_worm_certification:
+    - snapshot://who/2023-06-29/guinea_worm.csv
+  data://garden/who/2023-06-29/guinea_worm_certification:
+    - data://meadow/who/2023-06-29/guinea_worm_certification
+
   # Polio vaccine schedule - to archive
   data://meadow/who/2024-04-22/polio_vaccine_schedule:
     - snapshot://who/2024-04-22/polio_vaccine_schedule.xlsx
