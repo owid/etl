@@ -112,10 +112,6 @@ dimensions:
   - slug: indicator
     name: indicator
     choices:
-      - slug: growth_rate
-        name: Population growth rate
-      - slug: natural_change_rate
-        name: Natural population growth rate
       - slug: infant_deaths
         name: Infant deaths
       - slug: infant_mortality_rate
@@ -176,90 +172,6 @@ dimensions:
       type: radio
 
 views:
-  # Growth rate
-  - dimensions:
-      indicator: growth_rate
-      age: all
-      sex: all
-      variant: estimates
-    indicators:
-      y:
-        - catalogPath: un_wpp/growth_rate#growth_rate__sex_all__age_all__variant_estimates
-          display:
-            type: Percentage
-  - dimensions:
-      indicator: growth_rate
-      age: all
-      sex: all
-      variant: high
-    indicators:
-      y:
-        - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_high
-          display:
-            type: Percentage
-  - dimensions:
-      indicator: growth_rate
-      age: all
-      sex: all
-      variant: low
-    indicators:
-      y:
-        - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_low
-          display:
-            type: Percentage
-  - dimensions:
-      indicator: growth_rate
-      age: all
-      sex: all
-      variant: medium
-    indicators:
-      y:
-        - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_medium
-          display:
-            type: Percentage
-
-  # Natural growth rate
-  - dimensions:
-      indicator: natural_change_rate
-      age: all
-      sex: all
-      variant: estimates
-    indicators:
-      y:
-        - catalogPath: un_wpp/natural_change_rate#natural_change_rate__sex_all__age_all__variant_estimates
-          display:
-            type: Percentage
-  - dimensions:
-      indicator: natural_change_rate
-      age: all
-      sex: all
-      variant: high
-    indicators:
-      y:
-        - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_high
-          display:
-            type: Percentage
-  - dimensions:
-      indicator: natural_change_rate
-      age: all
-      sex: all
-      variant: low
-    indicators:
-      y:
-        - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_low
-          display:
-            type: Percentage
-  - dimensions:
-      indicator: natural_change_rate
-      age: all
-      sex: all
-      variant: medium
-    indicators:
-      y:
-        - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_medium
-          display:
-            type: Percentage
-
   # TODO: Below views present multiple indicators. I think we should come up with some tooling to do this programmatically.
   # Age structure
   - dimensions:
@@ -586,6 +498,9 @@ views:
     indicators:
       y:
         - catalogPath: grapher/un/2024-07-12/un_wpp/deaths#deaths__sex_male__age_0__variant_estimates
+  # Projection views combine estimates + medium variant as two y-indicators so
+  # grapher renders a solid→dashed transition. No low/high entries: UN WPP only
+  # publishes deaths counts for the medium projection scenario.
   - dimensions:
       indicator: infant_deaths
       age: "0"
@@ -593,7 +508,8 @@ views:
       variant: medium
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp_full/deaths#deaths__sex_all__age_0__variant_medium
+        - catalogPath: un_wpp/deaths#deaths__sex_all__age_0__variant_estimates
+        - catalogPath: un_wpp/deaths#deaths__sex_all__age_0__variant_medium
   - dimensions:
       indicator: infant_deaths
       age: "0"
@@ -601,7 +517,8 @@ views:
       variant: medium
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp_full/deaths#deaths__sex_female__age_0__variant_medium
+        - catalogPath: un_wpp/deaths#deaths__sex_female__age_0__variant_estimates
+        - catalogPath: un_wpp/deaths#deaths__sex_female__age_0__variant_medium
   - dimensions:
       indicator: infant_deaths
       age: "0"
@@ -609,7 +526,8 @@ views:
       variant: medium
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp_full/deaths#deaths__sex_male__age_0__variant_medium
+        - catalogPath: un_wpp/deaths#deaths__sex_male__age_0__variant_estimates
+        - catalogPath: un_wpp/deaths#deaths__sex_male__age_0__variant_medium
 
   # Child deaths
   - dimensions:
@@ -636,6 +554,7 @@ views:
     indicators:
       y:
         - catalogPath: un_wpp/deaths#deaths__sex_male__age_0_4__variant_estimates
+  # See note on infant_deaths above: medium-only, grouped with estimates for dashing.
   - dimensions:
       indicator: child_deaths
       age: 0-4
@@ -643,7 +562,8 @@ views:
       variant: medium
     indicators:
       y:
-        - catalogPath: un_wpp_full/deaths#deaths__sex_all__age_0_4__variant_medium
+        - catalogPath: un_wpp/deaths#deaths__sex_all__age_0_4__variant_estimates
+        - catalogPath: un_wpp/deaths#deaths__sex_all__age_0_4__variant_medium
   - dimensions:
       indicator: child_deaths
       age: 0-4
@@ -651,7 +571,8 @@ views:
       variant: medium
     indicators:
       y:
-        - catalogPath: un_wpp_full/deaths#deaths__sex_female__age_0_4__variant_medium
+        - catalogPath: un_wpp/deaths#deaths__sex_female__age_0_4__variant_estimates
+        - catalogPath: un_wpp/deaths#deaths__sex_female__age_0_4__variant_medium
   - dimensions:
       indicator: child_deaths
       age: 0-4
@@ -659,7 +580,8 @@ views:
       variant: medium
     indicators:
       y:
-        - catalogPath: un_wpp_full/deaths#deaths__sex_male__age_0_4__variant_medium
+        - catalogPath: un_wpp/deaths#deaths__sex_male__age_0_4__variant_estimates
+        - catalogPath: un_wpp/deaths#deaths__sex_male__age_0_4__variant_medium
 
   # Mortality rates
   - dimensions:
@@ -681,6 +603,9 @@ views:
         - catalogPath: grapher/un/2024-07-12/un_wpp/mortality_rate#mortality_rate__sex_all__age_0_4__variant_estimates
           <<: *display_mortality_rate
 
+  # Projection views combine estimates + projection variant as two y-indicators so
+  # grapher renders a solid→dashed transition. Data exists for all three projection
+  # scenarios (low/medium/high).
   - dimensions:
       indicator: infant_mortality_rate
       age: "0"
@@ -688,7 +613,9 @@ views:
       variant: low
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0__variant_low
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0__variant_estimates
+          <<: *display_mortality_rate
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0__variant_low
           <<: *display_mortality_rate
 
   - dimensions:
@@ -698,7 +625,9 @@ views:
       variant: low
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0_4__variant_low
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0_4__variant_estimates
+          <<: *display_mortality_rate
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0_4__variant_low
           <<: *display_mortality_rate
 
   - dimensions:
@@ -708,7 +637,9 @@ views:
       variant: medium
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0__variant_medium
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0__variant_estimates
+          <<: *display_mortality_rate
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0__variant_medium
           <<: *display_mortality_rate
 
   - dimensions:
@@ -718,7 +649,9 @@ views:
       variant: medium
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0_4__variant_medium
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0_4__variant_estimates
+          <<: *display_mortality_rate
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0_4__variant_medium
           <<: *display_mortality_rate
 
   - dimensions:
@@ -728,7 +661,9 @@ views:
       variant: high
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0__variant_high
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0__variant_estimates
+          <<: *display_mortality_rate
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0__variant_high
           <<: *display_mortality_rate
 
   - dimensions:
@@ -738,5 +673,7 @@ views:
       variant: high
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0_4__variant_high
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0_4__variant_estimates
+          <<: *display_mortality_rate
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0_4__variant_high
           <<: *display_mortality_rate

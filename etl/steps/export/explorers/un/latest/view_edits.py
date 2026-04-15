@@ -207,14 +207,28 @@ class ViewEditor:
             self._grapher_tables[table_name] = ds_grapher.read(table_name, load_data=False)
         return self._grapher_tables[table_name]
 
-    def edit_views_manual(self, explorer: Explorer):
-        """Edit explorer views of manual explorer."""
+    def edit_views_manual(self, explorer: Explorer, ds_grapher=None):
+        """Edit explorer views of the manual explorer.
+
+        Covers two kinds of view that can't be produced by
+        ``create_with_grouped_projections``:
+          - multi-indicator stacked views (``age_structure``, ``population_broad``),
+            rendered as stacked bar/area with several y-indicators per view;
+          - display-only indicator slugs (``child_deaths`` / ``infant_deaths`` /
+            ``infant_mortality_rate`` / ``child_mortality_rate``) whose projection
+            views are declared directly in the YAML as two y-indicators (estimates
+            + projection variant) so the grapher renders the solid-to-dashed
+            transition.
+        """
         pattern = re.compile(r".*/population#population__sex_(?:[a-z]+)__age_([\d_+(plus)]+)__variant_(?:[a-z]+)$")
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
-
-            # Append projection text to subtitles for non-estimate views
             variant = v.dimensions.get("variant", "estimates")
+
+            # Append projection note for multi-indicator stacked views (age_structure,
+            # population_broad). Those have their subtitle set in the YAML common_views
+            # and are NOT 2-indicator grouped views, so the generic
+            # `_apply_grouped_view_metadata` helper doesn't touch them.
             if variant != "estimates" and v.config and v.config.get("subtitle"):
                 v.config["subtitle"] = (
                     v.config["subtitle"]
@@ -236,30 +250,23 @@ class ViewEditor:
                         indicator.display = display
                     else:
                         indicator.display = {**indicator.display, **display}
-            elif indicator_name in {"growth_rate", "natural_change_rate"}:
-                # Edit display
-                assert v.indicators.y is not None
-                for indicator in v.indicators.y:
-                    self._add_map_brackets_display("all", "all", indicator_name, indicator)
-                    # display = {
-                    #     "colorScaleScheme": "RdBu",
-                    #     "colorScaleNumericBins": "-5;-2;-1;-0.5;0;0.5;1;2;5;1",
-                    # }
-                    # if indicator.display is None:
-                    #     indicator.display = display
-                    # else:
-                    #     indicator.display = {**indicator.display, **display}
             elif indicator_name in {"child_deaths", "infant_deaths"}:
-                # Edit display
+                # Map colorscheme: always target the estimates indicator (y[0]),
+                # which carries the age/sex dims that determine the brackets.
                 assert v.indicators.y is not None
-                assert len(v.indicators.y) == 1
+                assert 1 <= len(v.indicators.y) <= 2, (
+                    f"Expected 1 (estimates-only) or 2 (grouped) y-indicators for {indicator_name}, "
+                    f"got {len(v.indicators.y)}"
+                )
 
-                # Get dimensions
                 sex = v.dimensions["sex"]
                 age = v.dimensions["age"]
-
-                # Add map colorscheme
                 self._add_map_brackets_display(age, sex, indicator_name, v.indicators.y[0])
+
+            # For grouped 2-indicator projection views declared in YAML (infant_deaths,
+            # child_deaths, infant_mortality_rate, child_mortality_rate), copy
+            # title_public + projection subtitle from grapher metadata onto the view.
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
     def edit_views_fr(self, explorer, ds_grapher=None):
         """Edit fertility rate explorer views."""
@@ -308,7 +315,7 @@ class ViewEditor:
                     self._add_map_brackets_display(age, sex, indicator_name, indicator)
             self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_mig(self, explorer):
+    def edit_views_mig(self, explorer, ds_grapher=None):
         """Edit migration explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
@@ -317,6 +324,7 @@ class ViewEditor:
             if indicator_name in {"net_migration", "net_migration_rate"}:
                 for indicator in v.indicators.y:
                     self._add_map_brackets_display(age, sex, indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
     def edit_views_deaths(self, explorer, ds_grapher=None):
         """Edit deaths explorer views."""
@@ -363,6 +371,19 @@ class ViewEditor:
             age = v.dimensions["age"]
             for indicator in v.indicators.y:
                 self._add_map_brackets_display(age, sex, indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
+
+    def edit_views_rates(self, explorer, ds_grapher=None):
+        """Edit views for rate-style explorers with a single (sex=all, age=all) view.
+
+        Used by ``explorer_growth`` (growth_rate) and ``explorer_natchange``
+        (natural_change_rate).
+        """
+        for v in explorer.views:
+            indicator_name = v.dimensions["indicator"]
+            assert v.indicators.y is not None
+            for indicator in v.indicators.y:
+                self._add_map_brackets_display("all", "all", indicator_name, indicator)
             self._apply_grouped_view_metadata(v, ds_grapher)
 
 

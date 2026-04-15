@@ -75,8 +75,6 @@ def run() -> None:
     #################################################################################################
 
     ########## Population explorer
-    # Population projection views combine estimates + projection variant as two y-indicators,
-    # so the grapher renders a solid-to-dashed transition (via isProjection metadata).
     explorer_pop = explorer_creator.create_with_grouped_projections(
         table_name="population",
         config=config_default,
@@ -88,13 +86,11 @@ def run() -> None:
         choice_renames={"age": AGES_POP},
         short_name="population-and-demography",
     )
-    # ds is the grapher-channel dataset (1950-2023 + all variants); used by the view
-    # editor to pull Jinja-expanded title/subtitle for grouped projection views.
+    # `ds_grapher=ds` gives the view editor access to the Jinja-expanded
+    # title_public / subtitle per indicator, which it copies onto the grouped views.
     view_editor.edit_views_pop(explorer_pop, ds_grapher=ds)
 
-    # Save explorer (upsert to DB)
     ########## Dependency ratio explorer
-    # Projection views combine estimates + projection as two y-indicators for dashed rendering.
     explorer_dep = explorer_creator.create_with_grouped_projections(
         table_name="dependency_ratio",
         config=config_default,
@@ -120,34 +116,49 @@ def run() -> None:
     view_editor.edit_views_sr(explorer_sr, ds_grapher=ds)
 
     ########## Migration explorer
-    explorer_mig = explorer_creator.create(
+    explorer_mig = explorer_creator.create_with_grouped_projections(
         table_name="migration",
         config=config_default,
         indicator_names=["net_migration", "net_migration_rate"],
         dimensions={
             "age": "*",
             "sex": "*",
-            "variant": ["estimates"],
-        },
-        dimensions_proj={
-            "variant": ["medium"],
         },
         choice_renames={"age": AGES_SR},
     )
-    view_editor.edit_views_mig(explorer_mig)
+    view_editor.edit_views_mig(explorer_mig, ds_grapher=ds)
 
     ########## Deaths explorer
-    explorer_deaths = explorer_creator.create_with_grouped_projections(
+    # Split into two sub-explorers because the source only has low/high projections for
+    # `death_rate`, not `deaths` (counts). Hiding the empty options for `deaths` avoids
+    # dropdown choices that would render as estimates-only views. `death_rate` is only
+    # available at age=all, so the two explorers use different `age` dimensions.
+    explorer_deaths_counts = explorer_creator.create_with_grouped_projections(
         table_name="deaths",
         config=config_default,
-        indicator_names=["deaths", "death_rate"],
+        indicator_names=["deaths"],
+        projection_variants=["medium"],
+        # age=0 and age=0-4 are intentionally excluded here: those views live under
+        # the `infant_deaths` / `child_deaths` indicator dropdown in the manual
+        # explorer and pointing at the same catalog path from both places makes the
+        # explorer system emit a `_1`-suffixed ySlug for the duplicate (owid-grapher#6362).
         dimensions={
-            "age": ["all", "0", "0-4"] + AGES_DEATHS_LIST,
+            "age": ["all"] + AGES_DEATHS_LIST,
             "sex": "*",
         },
         choice_renames={"age": AGES_DEATHS},
     )
-    view_editor.edit_views_deaths(explorer_deaths, ds_grapher=ds)
+    view_editor.edit_views_deaths(explorer_deaths_counts, ds_grapher=ds)
+    explorer_deaths_rate = explorer_creator.create_with_grouped_projections(
+        table_name="deaths",
+        config=config_default,
+        indicator_names=["death_rate"],
+        dimensions={
+            "age": ["all"],
+            "sex": ["all"],
+        },
+    )
+    view_editor.edit_views_deaths(explorer_deaths_rate, ds_grapher=ds)
 
     ########## Births explorer
     explorer_b = explorer_creator.create_with_grouped_projections(
@@ -208,11 +219,37 @@ def run() -> None:
     )
     view_editor.edit_views_fr(explorer_fr, ds_grapher=ds)
 
+    ########## Growth rate explorer
+    explorer_growth = explorer_creator.create_with_grouped_projections(
+        table_name="growth_rate",
+        config=config_default,
+        indicator_names=["growth_rate"],
+        dimensions={
+            "age": ["all"],
+            "sex": ["all"],
+        },
+        common_view_config={"type": "Percentage"},
+    )
+    view_editor.edit_views_rates(explorer_growth, ds_grapher=ds)
+
+    ########## Natural change rate explorer
+    explorer_natchange = explorer_creator.create_with_grouped_projections(
+        table_name="natural_change_rate",
+        config=config_default,
+        indicator_names=["natural_change_rate"],
+        dimensions={
+            "age": ["all"],
+            "sex": ["all"],
+        },
+        common_view_config={"type": "Percentage"},
+    )
+    view_editor.edit_views_rates(explorer_natchange, ds_grapher=ds)
+
     ########## Manual explorer: views with grouped indicators, and others
     explorer_manual = explorer_creator.create_manual(
         config=paths.load_collection_config("un_wpp.manual.config.yml"),
     )
-    view_editor.edit_views_manual(explorer_manual)
+    view_editor.edit_views_manual(explorer_manual, ds_grapher=ds)
 
     #################################################################################################
     # Combine explorers
@@ -224,11 +261,14 @@ def run() -> None:
         explorer_dep,
         explorer_sr,
         explorer_mig,
-        explorer_deaths,
+        explorer_deaths_counts,
+        explorer_deaths_rate,
         explorer_b,
         explorer_ma,
         explorer_le,
         explorer_fr,
+        explorer_growth,
+        explorer_natchange,
         # manual views explorers
         explorer_manual,
     ]
