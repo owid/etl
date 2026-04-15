@@ -15,6 +15,7 @@ from owid.catalog.meta import VariableMeta
 
 from etl.collection.core.create import (
     _get_expand_path_mode,
+    _remap_choice_renames,
     _rename_choices,
     create_collection,
     create_collection_single_table,
@@ -517,6 +518,155 @@ class TestRenameChoices:
 
         with pytest.raises(ValueError, match="Invalid choice_renames format"):
             _rename_choices(mock_collection, choice_renames)  # ty: ignore[invalid-argument-type]
+
+
+class TestRemapChoiceRenames:
+    """Tests for _remap_choice_renames, which merges per-table choice_renames
+    after combine_collections may have renamed choice slugs to resolve conflicts."""
+
+    def test_no_slug_changes_dict_renames(self):
+        """Disjoint dimensions from two tables should merge without alteration."""
+        result = _remap_choice_renames(
+            [
+                {"sex": {"male": "Male", "female": "Female"}},
+                {"age": {"young": "Young", "old": "Old"}},
+            ],
+            slug_changes={},
+        )
+
+        assert result == {
+            "sex": {"male": "Male", "female": "Female"},
+            "age": {"young": "Young", "old": "Old"},
+        }
+
+    def test_remaps_keys_after_conflict_resolution(self):
+        """Keys in the user's dict should be remapped to the post-combine slugs."""
+        # Table 1 had its "0" choice renamed to "0__1" to resolve a conflict.
+        slug_changes = {"1": {"age": {"0": "0__1"}}}
+
+        result = _remap_choice_renames(
+            [None, {"age": {"0": "At birth", "65": "At 65"}}],
+            slug_changes=slug_changes,
+        )
+
+        # "0" should be remapped to "0__1"; "65" was not in conflict, so kept.
+        assert result == {"age": {"0__1": "At birth", "65": "At 65"}}
+
+    def test_handles_nan_entries_from_unstack(self):
+        """Regression test for Codex P1: _extract_choice_slug_changes uses
+        ``unstack``, which produces NaN placeholders for (collection, dimension)
+        pairs with no conflicts when other collections did have conflicts on the
+        same dimension. Those NaN values must not reach ``.get()`` / ``.items()``.
+        """
+        # Simulate the structure returned by _extract_choice_slug_changes when
+        # collection "0" had a conflict on "sex" but collection "1" did not.
+        # For completeness, "1" had a conflict on "age" but "0" did not, so
+        # slug_changes["0"]["age"] is NaN too.
+        nan = float("nan")
+        slug_changes = {
+            "0": {"sex": {"m": "m__0"}, "age": nan},
+            "1": {"sex": nan, "age": {"0": "0__1"}},
+        }
+
+        # This used to raise ``AttributeError: 'float' object has no attribute 'get'``.
+        result = _remap_choice_renames(
+            [
+                {"sex": {"m": "Male"}, "age": {"0": "At birth"}},
+                {"sex": {"f": "Female"}, "age": {"0": "Newborn"}},
+            ],
+            slug_changes=slug_changes,
+        )
+
+        assert result == {
+            # Table 0's "m" was remapped to "m__0"; table 1's "f" had no conflict.
+            "sex": {"m__0": "Male", "f": "Female"},
+            # Table 0's "0" had no conflict; table 1's "0" was remapped to "0__1".
+            # Table 1 comes last so later-wins for any overlapping key (none here).
+            "age": {"0": "At birth", "0__1": "Newborn"},
+        }
+
+    def test_handles_nan_callable_branch(self):
+        """NaN entries must also be safe on the callable branch (no .items()
+        crash when building the reverse map)."""
+        nan = float("nan")
+        slug_changes = {"0": {"sex": nan}}
+
+        def rename(slug):
+            return slug.upper()
+
+        result = _remap_choice_renames([{"sex": rename}], slug_changes=slug_changes)
+
+        # The wrapped callable should still work on inputs it wasn't reverse-mapped for.
+        assert callable(result["sex"])
+        assert cast(Callable, result["sex"])("male") == "MALE"
+
+    def test_composes_callables_from_multiple_tables(self):
+        """Regression test for Codex P2: when two tables supply callables for
+        the same dimension the earlier one must not be silently dropped."""
+
+        def rename_table_0(slug):
+            return "Zero" if slug == "0" else None
+
+        def rename_table_1(slug):
+            return "OneSixtyFive" if slug == "65" else None
+
+        result = _remap_choice_renames(
+            [{"age": rename_table_0}, {"age": rename_table_1}],
+            slug_changes={},
+        )
+
+        composed = cast(Callable, result["age"])
+        # Table 1 (later) runs first; where it returns None we fall back to table 0.
+        assert composed("0") == "Zero"
+        assert composed("65") == "OneSixtyFive"
+        assert composed("missing") is None
+
+    def test_composes_callable_with_dict(self):
+        """Mixed dict + callable across tables: neither branch should overwrite
+        the other, and later wins where both would rename the same slug."""
+
+        def rename_table_0(slug):
+            # Matches only "a" and "shared".
+            if slug == "a":
+                return "From Table 0 A"
+            if slug == "shared":
+                return "From Table 0 Shared"
+            return None
+
+        # Table 1 is a dict; it should take precedence on overlapping keys but
+        # not swallow non-overlapping behavior from table 0's callable.
+        result = _remap_choice_renames(
+            [{"x": rename_table_0}, {"x": {"b": "From Table 1 B", "shared": "From Table 1 Shared"}}],
+            slug_changes={},
+        )
+
+        composed = cast(Callable, result["x"])
+        assert composed("b") == "From Table 1 B"  # only in dict
+        assert composed("a") == "From Table 0 A"  # only in callable
+        assert composed("shared") == "From Table 1 Shared"  # dict wins
+        assert composed("other") is None
+
+    def test_composes_dicts_from_multiple_tables_with_later_wins(self):
+        """Two dicts targeting overlapping slugs on the same dimension should
+        merge with later-wins semantics (consistent with ``dict.update``)."""
+        result = _remap_choice_renames(
+            [
+                {"age": {"0": "At birth (t0)", "65": "At 65"}},
+                {"age": {"0": "At birth (t1)", "80": "At 80"}},
+            ],
+            slug_changes={},
+        )
+
+        assert result == {"age": {"0": "At birth (t1)", "65": "At 65", "80": "At 80"}}
+
+    def test_skips_none_entries(self):
+        """Tables whose renames are None should be skipped entirely."""
+        result = _remap_choice_renames(
+            [None, {"age": {"0": "At birth"}}, None],
+            slug_changes={},
+        )
+
+        assert result == {"age": {"0": "At birth"}}
 
 
 class TestIntegration:

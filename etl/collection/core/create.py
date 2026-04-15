@@ -416,6 +416,12 @@ def _remap_choice_renames(
 
     ``slug_changes`` has structure
     ``{collection_id: {dimension_slug: {original_slug: renamed_slug}}}``.
+
+    When multiple tables contribute renames for the same dimension the entries
+    are composed with later-tables-win semantics: dict-only contributions are
+    merged with ``dict.update`` and any mix involving a callable falls back to
+    a composed callable that tries the later contribution first and the earlier
+    one on ``None``.
     """
     merged: dict[str, dict[str, str] | Callable] = {}
 
@@ -423,9 +429,14 @@ def _remap_choice_renames(
         if renames is None:
             continue
         collection_id = str(i)
+        table_changes = slug_changes.get(collection_id, {})
         for dim_slug, dim_renames in renames.items():
-            # Slug changes for this collection + dimension (may be empty).
-            changes = slug_changes.get(collection_id, {}).get(dim_slug, {})
+            # Slug changes for this (collection, dimension). After ``unstack``
+            # in ``_extract_choice_slug_changes``, dimensions with conflicts in
+            # some collections but not this one show up as ``NaN``; sanitize to
+            # ``{}`` so downstream lookups stay dict-safe.
+            raw_changes = table_changes.get(dim_slug, {}) if isinstance(table_changes, dict) else {}
+            changes = raw_changes if isinstance(raw_changes, dict) else {}
 
             if isinstance(dim_renames, dict):
                 # Dict renames: remap keys from original → final slug.
@@ -433,26 +444,61 @@ def _remap_choice_renames(
                 for orig_choice_slug, new_name in cast("dict[str, str]", dim_renames).items():
                     final_slug = changes.get(orig_choice_slug, orig_choice_slug)
                     remapped_dict[final_slug] = new_name
-                # Merge into the dimension entry (later tables override for
-                # the same final slug, which is the expected behavior).
                 existing = merged.get(dim_slug)
-                if isinstance(existing, dict):
+                if existing is None:
+                    merged[dim_slug] = remapped_dict
+                elif isinstance(existing, dict):
                     existing.update(remapped_dict)
                 else:
-                    merged[dim_slug] = remapped_dict
+                    # Existing callable + new dict: compose so later dict wins
+                    # but earlier callable still contributes for non-overlapping
+                    # slugs.
+                    merged[dim_slug] = _compose_renames(later=remapped_dict, earlier=existing)
 
             elif inspect.isfunction(dim_renames) or callable(dim_renames):
                 # Callable renames: wrap to reverse-map final slug → original
                 # before calling the user's function.
                 reverse_changes = {v: k for k, v in changes.items()}
-                original_func = dim_renames
-
-                def _make_remapped_func(rev: dict[str, str], fn: Callable) -> Callable:
-                    def remapped(slug: str) -> str | None:
-                        return fn(rev.get(slug, slug))
-
-                    return remapped
-
-                merged[dim_slug] = _make_remapped_func(reverse_changes, original_func)
+                new_func = _wrap_callable_with_reverse(reverse_changes, dim_renames)
+                existing = merged.get(dim_slug)
+                if existing is None:
+                    merged[dim_slug] = new_func
+                else:
+                    merged[dim_slug] = _compose_renames(later=new_func, earlier=existing)
 
     return merged
+
+
+def _wrap_callable_with_reverse(reverse: dict[str, str], fn: Callable) -> Callable:
+    """Return ``fn`` wrapped so it receives the original (pre-conflict) slug."""
+
+    def wrapped(slug: str) -> str | None:
+        return fn(reverse.get(slug, slug))
+
+    return wrapped
+
+
+def _compose_renames(
+    later: dict[str, str] | Callable,
+    earlier: dict[str, str] | Callable,
+) -> Callable:
+    """Compose two rename sources with later-wins semantics.
+
+    Returns a callable that delegates to ``later`` first; on ``None`` (callable)
+    or a missing key (dict) it falls back to ``earlier``. Used when multiple
+    tables contribute a rename for the same dimension slug.
+    """
+
+    def composed(slug: str) -> str | None:
+        if isinstance(later, dict):
+            if slug in later:
+                return cast("str", later[slug])
+        else:
+            result = later(slug)
+            if result is not None:
+                return cast("str", result)
+        if isinstance(earlier, dict):
+            return cast("str | None", earlier.get(slug))
+        return cast("str | None", earlier(slug))
+
+    return composed
