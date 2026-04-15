@@ -89,7 +89,7 @@ tables:
         title: Share of the population that was born in this country but now lives in another country.
         unit: "%"
         short_unit: "%"
-        description_short: The total number of people that have left the country, as a share of the current population.
+        description_short: The total number of people who have left the country, as a share of the current population.
         description_processing: |-
           - We calculated the share of emigrants as the number of emigrants divided by the total population of their home country.
           - {definitions.description_processing.owid_regions}
