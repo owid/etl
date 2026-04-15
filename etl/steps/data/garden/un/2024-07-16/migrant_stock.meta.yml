@@ -31,15 +31,15 @@ tables:
         description_from_producer: "{definitions.description_un.migrant_stock}"
       immigrants_female:
         title: Total number of international immigrants - female
-        description_short: The total number of women living in a given country who were born in another country.
+        description_short: The total number of female people living in a given country who were born in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
       immigrants_male:
         title: Total number of international immigrants - male
-        description_short: The total number of men living in a given country who were born in another country.
+        description_short: The total number of male people living in a given country who were born in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
       # Immigrant share
       immigrant_share_of_dest_population_all:
-        title: Share of the population born in another country
+        title: Share of the population that was born in another country
         unit: "%"
         short_unit: "%"
         description_short: Immigrants as a share of the total population.
@@ -47,7 +47,7 @@ tables:
         display:
           numDecimalPlaces: 1
       immigrant_share_of_dest_population_female:
-        title: Share of the population born in another country - female
+        title: Share of the population that was born in another country - female
         unit: "%"
         short_unit: "%"
         description_short: Female immigrants as a share of the total (female) population.
@@ -55,7 +55,7 @@ tables:
         display:
           numDecimalPlaces: 1
       immigrant_share_of_dest_population_male:
-        title: Share of the population born in another country - male
+        title: Share of the population that was born in another country - male
         unit: "%"
         short_unit: "%"
         description_short: Male immigrants as a share of the total (male) population.
@@ -69,34 +69,34 @@ tables:
         description_from_producer: "{definitions.description_un.migrant_stock}"
       emigrants_female:
         title: Total number of emigrants - female
-        description_short: Women who were born in a country but now live in another country.
+        description_short: Female people that were born in a country but now live in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
       emigrants_male:
         title: Total number of emigrants - male
-        description_short: Men who were born in a country but now live in another country.
+        description_short: Male people that were born in a country but now live in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
       # Emigrant share
       emigrants_share_of_total_population:
         title: Share of the population that was born in this country but now lives in another country.
         unit: "%"
         short_unit: "%"
-        description_short: The total number of people who have left the country, as a share of the current population.
+        description_short: The total number of people that have left the country, as a share of the current population.
         description_processing: We calculated the share of emigrants as the number of emigrants divided by the total population of their home country.
         display:
           numDecimalPlaces: 1
       # Child migrants
       immigrants_under_15:
         title: Total number of child immigrants (<15 years old)
-        description_short: Children under 15 years old born in another country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
+        description_short: Children under 15 years old that were born in another country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
         description_processing: We calculated the number of child migrants by adding all immigrants aged between 0 and 14 years.
       immigrants_under_20:
         title: Total number of child immigrants (<20 years old)
-        description_short: Children under 20 years old born in another country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
+        description_short: Children under 20 years old that were born in another country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
         description_processing: We calculated the number of child migrants by adding all immigrants aged between 0 and 19 years.
       immigrants_under_15_per_1000_people:
         title: Number of child immigrants (<15 years old) per 1,000 people
         unit: per 1,000
-        description_short: Children under 15 years old born in another country, per 1,000 people in the host country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
+        description_short: Children under 15 years old that were born in another country, per 1,000 people in the host country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
         processing_level: major
         description_processing: We calculated the share of child migrants by adding all immigrants aged between 0 and 14 years and then dividing by the total population of the host country, per 1,000 people.
         display:
@@ -104,7 +104,7 @@ tables:
       immigrants_under_20_per_1000_people:
         title: Number of child immigrants (<20 years old) per 1,000 people
         unit: per 1,000
-        description_short: Children under 20 years old born in another country, per 1,000 people in the host country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
+        description_short: Children under 20 years old that were born in another country, per 1,000 people in the host country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
         processing_level: major
         description_processing: We calculated the share of child migrants by adding all immigrants aged between 0 and 19 years and then dividing by the total population of the host country, per 1,000 people.
         display:
@@ -204,132 +204,132 @@ tables:
       # data by age group - females
       female_immigrants_aged_0_to_4:
         title: Total number of female immigrants per region between 0 and 4 years old
-        description_short: The total number of girls living in a given country who were born in another country and are between 0 and 4 years old.
+        description_short: The total number of female people living in a given country who were born in another country and are between 0 and 4 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_5_to_9:
         title: Total number of female immigrants per region between 5 and 9 years old
-        description_short: The total number of girls living in a given country who were born in another country and are between 5 and 9 years old.
+        description_short: The total number of female people living in a given country who were born in another country and are between 5 and 9 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_10_to_14:
         title: Total number of female immigrants per region between 10 and 14 years old
-        description_short: The total number of girls living in a given country who were born in another country and are between 10 and 14 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 10 and 14 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_15_to_19:
         title: Total number of female immigrants per region between 15 and 19 years old
-        description_short: The total number of adolescent girls living in a given country who were born in another country and are between 15 and 19 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 15 and 19 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_20_to_24:
         title: Total number of female immigrants per region between 20 and 24 years old
-        description_short: The total number of women living in a given country who were born in another country and are between 20 and 24 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 20 and 24 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_25_to_29:
         title: Total number of female immigrants per region between 25 and 29 years old
-        description_short: The total number of women living in a given country who were born in another country and are between 25 and 29 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 25 and 29 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_30_to_34:
         title: Total number of female immigrants per region between 30 and 34 years old
-        description_short: The total number of women living in a given country who were born in another country and are between 30 and 34 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 30 and 34 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_35_to_39:
         title: Total number of female immigrants per region between 35 and 39 years old
-        description_short: The total number of women living in a given country who were born in another country and are between 35 and 39 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 35 and 39 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_40_to_44:
         title: Total number of female immigrants per region between 40 and 44 years old
-        description_short: The total number of women living in a given country who were born in another country and are between 40 and 44 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 40 and 44 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_45_to_49:
         title: Total number of female immigrants per region between 45 and 49 years old
-        description_short: The total number of women living in a given country who were born in another country and are between 45 and 49 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 45 and 49 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_50_to_54:
         title: Total number of female immigrants per region between 50 and 54 years old
-        description_short: The total number of women living in a given country who were born in another country and are between 50 and 54 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 50 and 54 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_55_to_59:
         title: Total number of female immigrants per region between 55 and 59 years old
-        description_short: The total number of women living in a given country who were born in another country and are between 55 and 59 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 55 and 59 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_60_to_64:
         title: Total number of female immigrants per region between 60 and 64 years old
-        description_short: The total number of women living in a given country who were born in another country and are between 60 and 64 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 60 and 64 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_65_to_69:
         title: Total number of female immigrants per region between 65 and 69 years old
-        description_short: The total number of women living in a given country who were born in another country and are between 65 and 69 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 65 and 69 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_70_to_74:
         title: Total number of female immigrants per region between 70 and 74 years old
-        description_short: The total number of women living in a given country who were born in another country and are between 70 and 74 years old
+        description_short: The total number of female people living in a given country who were born in another country and are between 70 and 74 years old
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       female_immigrants_aged_75_plus:
         title: Total number of female immigrants per region who are 75 years old or older
-        description_short: The total number of women living in a given country who were born in another country and are 75 years old or older
+        description_short: The total number of female people living in a given country who were born in another country and are 75 years old or older
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       # data by age group - males
       male_immigrants_aged_0_to_4:
         title: Total number of male immigrants per region between 0 and 4 years old
-        description_short: The total number of boys living in a given country who were born in another country and are between 0 and 4 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 0 and 4 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_5_to_9:
         title: Total number of male immigrants per region between 5 and 9 years old
-        description_short: The total number of boys living in a given country who were born in another country and are between 5 and 9 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 5 and 9 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_10_to_14:
         title: Total number of male immigrants per region between 10 and 14 years old
-        description_short: The total number of boys living in a given country who were born in another country and are between 10 and 14 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 10 and 14 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_15_to_19:
         title: Total number of male immigrants per region between 15 and 19 years old
-        description_short: The total number of adolescent boys living in a given country who were born in another country and are between 15 and 19 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 15 and 19 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_20_to_24:
         title: Total number of male immigrants per region between 20 and 24 years old
-        description_short: The total number of men living in a given country who were born in another country and are between 20 and 24 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 20 and 24 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_25_to_29:
         title: Total number of male immigrants per region between 25 and 29 years old
-        description_short: The total number of men living in a given country who were born in another country and are between 25 and 29 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 25 and 29 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_30_to_34:
         title: Total number of male immigrants per region between 30 and 34 years old
-        description_short: The total number of men living in a given country who were born in another country and are between 30 and 34 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 30 and 34 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_35_to_39:
         title: Total number of male immigrants per region between 35 and 39 years old
-        description_short: The total number of men living in a given country who were born in another country and are between 35 and 39 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 35 and 39 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_40_to_44:
         title: Total number of male immigrants per region between 40 and 44 years old
-        description_short: The total number of men living in a given country who were born in another country and are between 40 and 44 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 40 and 44 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_45_to_49:
         title: Total number of male immigrants per region between 45 and 49 years old
-        description_short: The total number of men living in a given country who were born in another country and are between 45 and 49 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 45 and 49 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_50_to_54:
         title: Total number of male immigrants per region between 50 and 54 years old
-        description_short: The total number of men living in a given country who were born in another country and are between 50 and 54 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 50 and 54 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_55_to_59:
         title: Total number of male immigrants per region between 55 and 59 years old
-        description_short: The total number of men living in a given country who were born in another country and are between 55 and 59 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 55 and 59 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_60_to_64:
         title: Total number of male immigrants per region between 60 and 64 years old
-        description_short: The total number of men living in a given country who were born in another country and are between 60 and 64 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 60 and 64 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_65_to_69:
         title: Total number of male immigrants per region between 65 and 69 years old
-        description_short: The total number of men living in a given country who were born in another country and are between 65 and 69 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 65 and 69 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_70_to_74:
         title: Total number of male immigrants per region between 70 and 74 years old
-        description_short: The total number of men living in a given country who were born in another country and are between 70 and 74 years old.
+        description_short: The total number of male people living in a given country who were born in another country and are between 70 and 74 years old.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       male_immigrants_aged_75_plus:
         title: Total number of male immigrants per region who are 75 years old or older
-        description_short: The total number of men living in a given country who were born in another country and are 75 years old or older.
+        description_short: The total number of male people living in a given country who were born in another country and are 75 years old or older.
         description_from_producer: "{definitions.description_un.migrants_per_age}"
       # data on shares of age group
       share_of_all_immigrants_aged_0_to_4:
