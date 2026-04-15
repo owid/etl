@@ -291,6 +291,7 @@ tables:
           title_public: |-
             Number of {definitions.antigen_age_group} {definitions.antigen_title}
           grapher_config:
+            subtitle: ""
             note: |-
               {definitions.antigen_note}
             originUrl: https://ourworldindata.org/vaccination
@@ -324,6 +325,7 @@ tables:
           title_public: |-
             Number of {definitions.antigen_age_group} {definitions.antigen_title_negative}
           grapher_config:
+            subtitle: ""
             note: |-
               {definitions.antigen_note}
             map:

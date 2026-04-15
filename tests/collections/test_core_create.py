@@ -15,6 +15,7 @@ from owid.catalog.meta import VariableMeta
 
 from etl.collection.core.create import (
     _get_expand_path_mode,
+    _remap_choice_renames,
     _rename_choices,
     create_collection,
     create_collection_single_table,
@@ -519,6 +520,155 @@ class TestRenameChoices:
             _rename_choices(mock_collection, choice_renames)  # ty: ignore[invalid-argument-type]
 
 
+class TestRemapChoiceRenames:
+    """Tests for _remap_choice_renames, which merges per-table choice_renames
+    after combine_collections may have renamed choice slugs to resolve conflicts."""
+
+    def test_no_slug_changes_dict_renames(self):
+        """Disjoint dimensions from two tables should merge without alteration."""
+        result = _remap_choice_renames(
+            [
+                {"sex": {"male": "Male", "female": "Female"}},
+                {"age": {"young": "Young", "old": "Old"}},
+            ],
+            slug_changes={},
+        )
+
+        assert result == {
+            "sex": {"male": "Male", "female": "Female"},
+            "age": {"young": "Young", "old": "Old"},
+        }
+
+    def test_remaps_keys_after_conflict_resolution(self):
+        """Keys in the user's dict should be remapped to the post-combine slugs."""
+        # Table 1 had its "0" choice renamed to "0__1" to resolve a conflict.
+        slug_changes = {"1": {"age": {"0": "0__1"}}}
+
+        result = _remap_choice_renames(
+            [None, {"age": {"0": "At birth", "65": "At 65"}}],
+            slug_changes=slug_changes,
+        )
+
+        # "0" should be remapped to "0__1"; "65" was not in conflict, so kept.
+        assert result == {"age": {"0__1": "At birth", "65": "At 65"}}
+
+    def test_handles_nan_entries_from_unstack(self):
+        """Regression test for Codex P1: _extract_choice_slug_changes uses
+        ``unstack``, which produces NaN placeholders for (collection, dimension)
+        pairs with no conflicts when other collections did have conflicts on the
+        same dimension. Those NaN values must not reach ``.get()`` / ``.items()``.
+        """
+        # Simulate the structure returned by _extract_choice_slug_changes when
+        # collection "0" had a conflict on "sex" but collection "1" did not.
+        # For completeness, "1" had a conflict on "age" but "0" did not, so
+        # slug_changes["0"]["age"] is NaN too.
+        nan = float("nan")
+        slug_changes = {
+            "0": {"sex": {"m": "m__0"}, "age": nan},
+            "1": {"sex": nan, "age": {"0": "0__1"}},
+        }
+
+        # This used to raise ``AttributeError: 'float' object has no attribute 'get'``.
+        result = _remap_choice_renames(
+            [
+                {"sex": {"m": "Male"}, "age": {"0": "At birth"}},
+                {"sex": {"f": "Female"}, "age": {"0": "Newborn"}},
+            ],
+            slug_changes=slug_changes,
+        )
+
+        assert result == {
+            # Table 0's "m" was remapped to "m__0"; table 1's "f" had no conflict.
+            "sex": {"m__0": "Male", "f": "Female"},
+            # Table 0's "0" had no conflict; table 1's "0" was remapped to "0__1".
+            # Table 1 comes last so later-wins for any overlapping key (none here).
+            "age": {"0": "At birth", "0__1": "Newborn"},
+        }
+
+    def test_handles_nan_callable_branch(self):
+        """NaN entries must also be safe on the callable branch (no .items()
+        crash when building the reverse map)."""
+        nan = float("nan")
+        slug_changes = {"0": {"sex": nan}}
+
+        def rename(slug):
+            return slug.upper()
+
+        result = _remap_choice_renames([{"sex": rename}], slug_changes=slug_changes)
+
+        # The wrapped callable should still work on inputs it wasn't reverse-mapped for.
+        assert callable(result["sex"])
+        assert cast(Callable, result["sex"])("male") == "MALE"
+
+    def test_composes_callables_from_multiple_tables(self):
+        """Regression test for Codex P2: when two tables supply callables for
+        the same dimension the earlier one must not be silently dropped."""
+
+        def rename_table_0(slug):
+            return "Zero" if slug == "0" else None
+
+        def rename_table_1(slug):
+            return "OneSixtyFive" if slug == "65" else None
+
+        result = _remap_choice_renames(
+            [{"age": rename_table_0}, {"age": rename_table_1}],
+            slug_changes={},
+        )
+
+        composed = cast(Callable, result["age"])
+        # Table 1 (later) runs first; where it returns None we fall back to table 0.
+        assert composed("0") == "Zero"
+        assert composed("65") == "OneSixtyFive"
+        assert composed("missing") is None
+
+    def test_composes_callable_with_dict(self):
+        """Mixed dict + callable across tables: neither branch should overwrite
+        the other, and later wins where both would rename the same slug."""
+
+        def rename_table_0(slug):
+            # Matches only "a" and "shared".
+            if slug == "a":
+                return "From Table 0 A"
+            if slug == "shared":
+                return "From Table 0 Shared"
+            return None
+
+        # Table 1 is a dict; it should take precedence on overlapping keys but
+        # not swallow non-overlapping behavior from table 0's callable.
+        result = _remap_choice_renames(
+            [{"x": rename_table_0}, {"x": {"b": "From Table 1 B", "shared": "From Table 1 Shared"}}],
+            slug_changes={},
+        )
+
+        composed = cast(Callable, result["x"])
+        assert composed("b") == "From Table 1 B"  # only in dict
+        assert composed("a") == "From Table 0 A"  # only in callable
+        assert composed("shared") == "From Table 1 Shared"  # dict wins
+        assert composed("other") is None
+
+    def test_composes_dicts_from_multiple_tables_with_later_wins(self):
+        """Two dicts targeting overlapping slugs on the same dimension should
+        merge with later-wins semantics (consistent with ``dict.update``)."""
+        result = _remap_choice_renames(
+            [
+                {"age": {"0": "At birth (t0)", "65": "At 65"}},
+                {"age": {"0": "At birth (t1)", "80": "At 80"}},
+            ],
+            slug_changes={},
+        )
+
+        assert result == {"age": {"0": "At birth (t1)", "65": "At 65", "80": "At 80"}}
+
+    def test_skips_none_entries(self):
+        """Tables whose renames are None should be skipped entirely."""
+        result = _remap_choice_renames(
+            [None, {"age": {"0": "At birth"}}, None],
+            slug_changes={},
+        )
+
+        assert result == {"age": {"0": "At birth"}}
+
+
 class TestIntegration:
     """Integration tests for create_collection function."""
 
@@ -628,17 +778,22 @@ class TestCreateCollectionMultipleTables:
                 assert second_call[1]["indicator_names"] == ["cases"]
 
                 # Verify combine_collections was called
-                mock_combine.assert_called_once_with(
-                    collections=[mock_collection_1, mock_collection_2],
-                    catalog_path=catalog_path,
-                    config=config,
-                    is_explorer=False,
-                )
+                mock_combine.assert_called_once()
+                call_kwargs = mock_combine.call_args[1]
+                assert call_kwargs["collections"] == [mock_collection_1, mock_collection_2]
+                assert call_kwargs["catalog_path"] == catalog_path
+                assert call_kwargs["config"] == config
+                assert call_kwargs["is_explorer"] is False
 
                 assert result == mock_final_collection
 
     def test_create_collection_multiple_tables_with_list_parameters(self):
-        """Test collection creation with multiple tables and list parameters."""
+        """Test collection creation with multiple tables and list parameters.
+
+        When choice_renames is a list, each element is passed to its corresponding
+        sub-collection, and after combining, remapped renames are applied to the
+        final collection.
+        """
         config = create_test_config()
         dependencies = {"test#indicator1", "test#indicator2"}
         catalog_path = "test/latest/data#table"
@@ -659,7 +814,29 @@ class TestCreateCollectionMultipleTables:
                 mock_collection_2 = Mock(spec=Collection)
                 mock_single.side_effect = [mock_collection_1, mock_collection_2]
 
+                # Final collection needs dimensions for _rename_choices
+                sex_choice_male = Mock(spec=DimensionChoice)
+                sex_choice_male.slug = "male"
+                sex_choice_male.name = "male"
+                sex_choice_female = Mock(spec=DimensionChoice)
+                sex_choice_female.slug = "female"
+                sex_choice_female.name = "female"
+                age_choice_young = Mock(spec=DimensionChoice)
+                age_choice_young.slug = "young"
+                age_choice_young.name = "young"
+                age_choice_old = Mock(spec=DimensionChoice)
+                age_choice_old.slug = "old"
+                age_choice_old.name = "old"
+
+                sex_dim = Mock(spec=Dimension)
+                sex_dim.slug = "sex"
+                sex_dim.choices = [sex_choice_male, sex_choice_female]
+                age_dim = Mock(spec=Dimension)
+                age_dim.slug = "age"
+                age_dim.choices = [age_choice_young, age_choice_old]
+
                 mock_final_collection = Mock(spec=Collection)
+                mock_final_collection.dimensions = [sex_dim, age_dim]
                 mock_combine.return_value = mock_final_collection
 
                 result = create_collection(
@@ -673,7 +850,7 @@ class TestCreateCollectionMultipleTables:
                     choice_renames=choice_renames,
                 )
 
-                # Verify create_collection_single_table was called twice with correct parameters
+                # Verify sub-collections received per-table choice_renames
                 assert mock_single.call_count == 2
 
                 first_call = mock_single.call_args_list[0]
@@ -689,6 +866,12 @@ class TestCreateCollectionMultipleTables:
                 assert second_call[1]["dimensions"] == {"age": ["young", "old"]}
                 assert second_call[1]["common_view_config"] == {"chartType": "BarChart"}
                 assert second_call[1]["choice_renames"] == {"age": {"young": "Young", "old": "Old"}}
+
+                # Verify remapped renames were applied to the final collection
+                assert sex_choice_male.name == "Male"
+                assert sex_choice_female.name == "Female"
+                assert age_choice_young.name == "Young"
+                assert age_choice_old.name == "Old"
 
                 assert result == mock_final_collection
 
@@ -763,12 +946,12 @@ class TestCreateCollectionMultipleTables:
                     assert call[1]["explorer"] is True
 
                 # Verify combine_collections was called with explorer flag
-                mock_combine.assert_called_once_with(
-                    collections=[mock_explorer_1, mock_explorer_2],
-                    catalog_path=catalog_path,
-                    config=config,
-                    is_explorer=True,
-                )
+                mock_combine.assert_called_once()
+                call_kwargs = mock_combine.call_args[1]
+                assert call_kwargs["collections"] == [mock_explorer_1, mock_explorer_2]
+                assert call_kwargs["catalog_path"] == catalog_path
+                assert call_kwargs["config"] == config
+                assert call_kwargs["is_explorer"] is True
 
                 assert result == mock_final_explorer
 
@@ -828,5 +1011,56 @@ class TestCreateCollectionMultipleTables:
                 second_call = mock_single.call_args_list[1]
                 assert second_call[1]["indicator_names"] == "cases"
                 assert second_call[1]["dimensions"] == {"age": ["young"]}
+
+                assert result == mock_final_collection
+
+    def test_create_collection_multiple_tables_single_dict_choice_renames(self):
+        """When choice_renames is a single dict with multiple tables, it should
+        NOT be passed to sub-collections and should be applied to the final
+        combined collection instead."""
+        config = create_test_config()
+        dependencies = {"test#indicator1", "test#indicator2"}
+        catalog_path = "test/latest/data#table"
+        tables = create_multiple_test_tables()
+
+        choice_renames = {"sex": {"male": "Male", "female": "Female"}}
+
+        with patch("etl.collection.core.create.create_collection_single_table") as mock_single:
+            with patch("etl.collection.core.create.combine_collections") as mock_combine:
+                mock_collection_1 = Mock(spec=Collection)
+                mock_collection_2 = Mock(spec=Collection)
+                mock_single.side_effect = [mock_collection_1, mock_collection_2]
+
+                # Final collection needs dimensions for _rename_choices
+                choice_male = Mock(spec=DimensionChoice)
+                choice_male.slug = "male"
+                choice_male.name = "male"
+                choice_female = Mock(spec=DimensionChoice)
+                choice_female.slug = "female"
+                choice_female.name = "female"
+                sex_dim = Mock(spec=Dimension)
+                sex_dim.slug = "sex"
+                sex_dim.choices = [choice_male, choice_female]
+
+                mock_final_collection = Mock(spec=Collection)
+                mock_final_collection.dimensions = [sex_dim]
+                mock_combine.return_value = mock_final_collection
+
+                result = create_collection(
+                    config_yaml=config,
+                    dependencies=dependencies,
+                    catalog_path=catalog_path,
+                    tb=tables,
+                    indicator_names=[["deaths"], ["cases"]],
+                    choice_renames=choice_renames,
+                )
+
+                # Sub-collections should NOT receive choice_renames
+                for call in mock_single.call_args_list:
+                    assert call[1]["choice_renames"] is None
+
+                # Renames should be applied to the final combined collection
+                assert choice_male.name == "Male"
+                assert choice_female.name == "Female"
 
                 assert result == mock_final_collection
