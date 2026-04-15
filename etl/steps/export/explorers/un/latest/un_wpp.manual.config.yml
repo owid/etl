@@ -186,7 +186,7 @@ views:
       y:
         - catalogPath: un_wpp/growth_rate#growth_rate__sex_all__age_all__variant_estimates
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: growth_rate
       age: all
@@ -196,7 +196,7 @@ views:
       y:
         - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_high
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: growth_rate
       age: all
@@ -206,7 +206,7 @@ views:
       y:
         - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_low
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: growth_rate
       age: all
@@ -216,7 +216,7 @@ views:
       y:
         - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_medium
           display:
-            type: PercentChangeOverTime
+            type: Percentage
 
   # Natural growth rate
   - dimensions:
@@ -228,7 +228,7 @@ views:
       y:
         - catalogPath: un_wpp/natural_change_rate#natural_change_rate__sex_all__age_all__variant_estimates
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: natural_change_rate
       age: all
@@ -238,7 +238,7 @@ views:
       y:
         - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_high
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: natural_change_rate
       age: all
@@ -248,7 +248,7 @@ views:
       y:
         - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_low
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: natural_change_rate
       age: all
@@ -258,7 +258,7 @@ views:
       y:
         - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_medium
           display:
-            type: PercentChangeOverTime
+            type: Percentage
 
   # TODO: Below views present multiple indicators. I think we should come up with some tooling to do this programmatically.
   # Age structure
