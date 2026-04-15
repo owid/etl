@@ -1,6 +1,7 @@
 import hashlib
 import json
 import random
+import re
 import urllib.parse
 from collections.abc import Callable
 from contextlib import contextmanager
@@ -485,6 +486,154 @@ def st_title_with_expert(title: str, icon: str | None = None, **kwargs):
             width="content",
             border=False,
         )
+
+
+# ---------------------------------------------------------------------------
+# st_wizard_card — native replacement for the legacy `streamlit_card` component.
+# Renders a clickable card (background image + dark overlay + centered label and
+# optional caption) using only st.container + st.page_link, styled via CSS
+# targeting the container's `st-key-wcard-<slug>` class. Used on the Wizard
+# home page and any other page that needs image-tile navigation.
+#
+# `!important` is kept only where Streamlit's own themed styles would otherwise
+# win on specificity (background, color, border, text-decoration).
+# The whole card is clickable: `a::after` stretches an invisible overlay over
+# the card; the caption sits above it with `pointer-events: none` so clicks on
+# the caption fall through to the anchor below.
+# ---------------------------------------------------------------------------
+_WIZARD_CARD_CSS = """
+<style>
+div[class*="st-key-wcard-"] {
+    position: relative;
+    min-height: var(--card-h, 80px);
+    border-radius: 8px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: filter 120ms ease, transform 120ms ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+}
+div[class*="st-key-wcard-"]:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+}
+/* Inner Streamlit wrappers: transparent, full width */
+div[class*="st-key-wcard-"] [data-testid="stVerticalBlock"],
+div[class*="st-key-wcard-"] [data-testid="stElementContainer"],
+div[class*="st-key-wcard-"] [data-testid="stPageLink"],
+div[class*="st-key-wcard-"] .stPageLink {
+    background: transparent !important;
+    border: none !important;
+    width: 100%;
+    gap: 0.1rem;
+}
+/* The page_link anchor: content sits naturally; ::after is the whole-card
+   invisible hit target so clicks anywhere navigate. */
+div[class*="st-key-wcard-"] a {
+    background: transparent !important;
+    border: none !important;
+    text-decoration: none !important;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0.15rem 0.75rem;
+}
+div[class*="st-key-wcard-"] a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+/* All text inside the card → white, centered */
+div[class*="st-key-wcard-"] a,
+div[class*="st-key-wcard-"] a *,
+div[class*="st-key-wcard-"] [data-testid="stCaptionContainer"] * {
+    color: #fff !important;
+    text-align: center;
+    margin: 0;
+}
+div[class*="st-key-wcard-"] a p,
+div[class*="st-key-wcard-"] a strong {
+    font-weight: 700;
+    font-size: 1.3rem;
+    line-height: 1.2;
+}
+/* Caption stays visible above the hit overlay, but clicks pass through */
+div[class*="st-key-wcard-"] [data-testid="stCaptionContainer"] {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+    padding: 0 0.75rem;
+}
+div[class*="st-key-wcard-"] [data-testid="stCaptionContainer"] * {
+    font-weight: 600;
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+</style>
+"""
+
+
+def _wizard_card_slug(s: str) -> str:
+    """Turn an entrypoint path into a stable CSS-safe key suffix."""
+    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
+
+
+def _wizard_card_css_url(image_url: str) -> str:
+    """Escape a URL for use inside a CSS ``url('...')`` expression."""
+    return image_url.replace("\\", "\\\\").replace("'", "%27")
+
+
+def st_wizard_card(
+    entrypoint: str,
+    title: str,
+    image_url: str,
+    caption: str = "",
+    height: int = 80,
+) -> None:
+    """Render a clickable image-tile card that links to ``entrypoint``.
+
+    A native replacement for ``streamlit_card.card`` — no React iframe, uses
+    ``st.page_link`` for real multi-page navigation, styled with CSS. The
+    entire card is clickable, not just the title.
+
+    Parameters
+    ----------
+    entrypoint
+        Page path accepted by ``st.page_link`` (e.g. ``"apps/wizard/etl_steps/snapshot.py"``).
+    title
+        Card title (rendered as a bold white label).
+    image_url
+        URL used as the card's background image (a dark overlay is blended on top).
+    caption
+        Optional caption rendered below the title.
+    height
+        Minimum card height in pixels.
+    """
+    # Shared CSS is idempotent; emit on every call so it is present on every rerun.
+    st.markdown(_WIZARD_CARD_CSS, unsafe_allow_html=True)
+    key = f"wcard-{_wizard_card_slug(entrypoint)}"
+    overlay = "linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55))"
+    bg = f"{overlay}, url('{_wizard_card_css_url(image_url)}')" if image_url else overlay
+    st.markdown(
+        f"<style>div.st-key-{key} {{ --card-h: {height}px; background-image: {bg}; }}</style>",
+        unsafe_allow_html=True,
+    )
+    with st.container(border=False, key=key):
+        try:
+            st.page_link(entrypoint, label=f"**{title}**")
+        except streamlit.errors.StreamlitPageNotFoundError:
+            # Not running as a multi-page app (e.g. `streamlit run home.py`).
+            st.markdown(f"**{title}**")
+        if caption:
+            st.caption(caption)
 
 
 def preview_file(
