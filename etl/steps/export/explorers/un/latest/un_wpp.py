@@ -75,14 +75,15 @@ def run() -> None:
     #################################################################################################
 
     ########## Population explorer
-    explorer_pop = explorer_creator.create(
+    # Population projection views combine estimates + projection variant as two y-indicators,
+    # so the grapher renders a solid-to-dashed transition (via isProjection metadata).
+    explorer_pop = explorer_creator.create_with_grouped_projections(
         table_name="population",
         config=config_default,
         indicator_names=["population", "population_change", "population_density"],
         dimensions={
             "age": ["all", "0", "0-4", "0-14", "0-24"] + AGES_POP_LIST,
             "sex": "*",
-            "variant": ["estimates"],
         },
         choice_renames={"age": AGES_POP},
         short_name="population-and-demography",

@@ -103,7 +103,12 @@ class ViewEditor:
             indicator.display = {**indicator.display, **display}
 
     def edit_views_pop(self, explorer: Explorer):
-        """Edit population explorer views."""
+        """Edit population explorer views.
+
+        Views may have one y-indicator (estimates-only) or two (estimates + projection
+        variant, grouped by `create_with_grouped_projections`). The same display edits
+        apply to every indicator in the view.
+        """
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
@@ -111,15 +116,16 @@ class ViewEditor:
 
             # Edit display
             assert v.indicators.y is not None
-            assert len(v.indicators.y) == 1
 
-            # Add map colorscheme
-            self._add_map_brackets_display(age, sex, indicator_name, v.indicators.y[0])
+            for indicator in v.indicators.y:
+                # Add map colorscheme
+                self._add_map_brackets_display(age, sex, indicator_name, indicator)
 
-            # Add legend name
-            if indicator_name != "population_density":
-                assert v.indicators.y[0].display is not None
-                v.indicators.y[0].display["name"] = f"{age} years"
+                # Add legend name
+                if indicator_name != "population_density":
+                    if indicator.display is None:
+                        indicator.display = {}
+                    indicator.display["name"] = f"{age} years"
 
     def edit_views_manual(self, explorer: Explorer):
         """Edit explorer views of manual explorer."""
