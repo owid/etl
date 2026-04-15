@@ -88,7 +88,9 @@ def run() -> None:
         choice_renames={"age": AGES_POP},
         short_name="population-and-demography",
     )
-    view_editor.edit_views_pop(explorer_pop)
+    # ds is the grapher-channel dataset (1950-2023 + all variants); used by the view
+    # editor to pull Jinja-expanded title/subtitle for grouped projection views.
+    view_editor.edit_views_pop(explorer_pop, ds_grapher=ds)
 
     # Save explorer (upsert to DB)
     ########## Dependency ratio explorer

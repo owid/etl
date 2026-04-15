@@ -10,6 +10,7 @@ EXTRA: There is also the file map_brackets.yml, which contains relevant informat
 
 import re
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -102,17 +103,35 @@ class ViewEditor:
         else:
             indicator.display = {**indicator.display, **display}
 
-    def edit_views_pop(self, explorer: Explorer):
+    def edit_views_pop(self, explorer: Explorer, ds_grapher=None):
         """Edit population explorer views.
 
         Views may have one y-indicator (estimates-only) or two (estimates + projection
         variant, grouped by `create_with_grouped_projections`). The same display edits
         apply to every indicator in the view.
+
+        When ``ds_grapher`` is provided, grouped projection views also get their
+        ``title`` / ``subtitle`` set explicitly from the indicator metadata. Without
+        this override, the grapher falls back to the dataset origin title
+        ("World Population Prospects") because the two y-indicators have different
+        ``title`` fields, and the projection subtitle is dropped because only the
+        first indicator's (estimates, empty) subtitle is considered.
         """
+        # Cache of table_name -> grapher table (metadata only) to avoid re-reading.
+        tables_cache: dict[str, Any] = {}
+
+        def _tb(table_name: str):
+            if ds_grapher is None:
+                return None
+            if table_name not in tables_cache:
+                tables_cache[table_name] = ds_grapher.read(table_name, load_data=False)
+            return tables_cache[table_name]
+
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
+            variant = v.dimensions.get("variant", "estimates")
 
             # Edit display
             assert v.indicators.y is not None
@@ -126,6 +145,61 @@ class ViewEditor:
                     if indicator.display is None:
                         indicator.display = {}
                     indicator.display["name"] = f"{age} years"
+
+            # Set title/subtitle for grouped projection views (estimates + projection).
+            # The single-indicator estimates views are handled correctly by grapher's
+            # indicator-metadata fallback, so we leave them untouched.
+            if variant != "estimates" and ds_grapher is not None and len(v.indicators.y) == 2:
+                self._set_pop_grouped_view_title_subtitle(v, _tb)
+
+    def _set_pop_grouped_view_title_subtitle(self, view, get_table):
+        """Populate view.config title/subtitle from grapher-step indicator metadata.
+
+        Expects ``view.indicators.y`` to be ``[estimates_indicator, projection_indicator]``
+        (the order produced by ``create_with_grouped_projections``). Reads
+        ``title_public`` (identical across variants) and the projection indicator's
+        ``grapher_config.subtitle`` (which already includes the age-specific base text
+        and the "Future projections..." sentence).
+        """
+        estimates_col = view.indicators.y[0].catalogPath.split("#")[-1]
+        projection_col = view.indicators.y[1].catalogPath.split("#")[-1]
+
+        # Sanity-check the indicator order: y[0] must be the estimates variant
+        # (solid line) and y[1] the projection (dashed). If this invariant breaks,
+        # ``create_with_grouped_projections`` changed its concatenation order and
+        # the subtitle we pick here would be wrong (empty estimates subtitle would
+        # overwrite the projection one).
+        assert "variant_estimates" in estimates_col, (
+            f"Expected first y-indicator to be the estimates variant, got {estimates_col!r}"
+        )
+        assert "variant_estimates" not in projection_col, (
+            f"Expected second y-indicator to be a projection variant, got {projection_col!r}"
+        )
+
+        # population, population_change, and population_density all live in the
+        # `population` table in grapher.
+        tb = get_table("population")
+        if tb is None or estimates_col not in tb.columns or projection_col not in tb.columns:
+            return
+
+        estimates_meta = tb[estimates_col].metadata
+        projection_meta = tb[projection_col].metadata
+
+        title = (
+            estimates_meta.presentation.title_public
+            if estimates_meta.presentation and estimates_meta.presentation.title_public
+            else None
+        )
+        subtitle = None
+        if projection_meta.presentation and projection_meta.presentation.grapher_config:
+            subtitle = projection_meta.presentation.grapher_config.get("subtitle")
+
+        if view.config is None:
+            view.config = {}
+        if title:
+            view.config["title"] = title.strip()
+        if subtitle:
+            view.config["subtitle"] = subtitle.strip()
 
     def edit_views_manual(self, explorer: Explorer):
         """Edit explorer views of manual explorer."""
