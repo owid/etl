@@ -77,18 +77,22 @@ tables:
           numSignificantFigures: 4
         presentation:
           title_public: |-
+            <%- if (age is defined) and (sex is defined) %>
             <%- if age == 'all' %>
             <%- if sex == 'all' %>Population<%- elif sex == 'female' %>Female population<%- else %>Male population<%- endif %>
             <%- else %>
             Number of {definitions.global.pop_noun} {definitions.global.pop_age_label}
             <%- endif %>
+            <%- endif %>
           grapher_config:
             note: ""
             subtitle: |-
+              <%- if (age is defined) and (sex is defined) %>
               <%- if age == '0' %>
               <%- if sex == 'all' %>Children under 1 year old.<%- elif sex == 'female' %>Girls under 1 year old.<%- else %>Boys under 1 year old.<%- endif %>
               <%- elif age == '18+' %>
               <%- if sex == 'all' %>People aged 18 and over.<%- elif sex == 'female' %>Women aged 18 and over.<%- else %>Men aged 18 and over.<%- endif %>
+              <%- endif %>
               <%- endif %> {definitions.global.projections}
 
       population_change:
@@ -101,18 +105,22 @@ tables:
           numSignificantFigures: 4
         presentation:
           title_public: |-
+            <%- if (age is defined) and (sex is defined) %>
             <%- if age == 'all' %>
             <%- if sex == 'all' %>Annual change in population<%- elif sex == 'female' %>Annual change in the female population<%- else %>Annual change in the male population<%- endif %>
             <%- else %>
             Annual change in the number of {definitions.global.pop_noun} {definitions.global.pop_age_label}
             <%- endif %>
+            <%- endif %>
           grapher_config:
             note: ""
             subtitle: |-
+              <%- if (age is defined) and (sex is defined) %>
               <%- if age == '0' %>
               <%- if sex == 'all' %>Children under 1 year old.<%- elif sex == 'female' %>Girls under 1 year old.<%- else %>Boys under 1 year old.<%- endif %>
               <%- elif age == '18+' %>
               <%- if sex == 'all' %>People aged 18 and over.<%- elif sex == 'female' %>Women aged 18 and over.<%- else %>Men aged 18 and over.<%- endif %>
+              <%- endif %>
               <%- endif %> {definitions.global.projections}
 
       population_density:
