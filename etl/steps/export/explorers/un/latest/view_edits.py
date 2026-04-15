@@ -114,6 +114,7 @@ class ViewEditor:
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
 
+            # Edit display
             assert v.indicators.y is not None
 
             for indicator in v.indicators.y:
