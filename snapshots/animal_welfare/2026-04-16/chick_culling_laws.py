@@ -48,7 +48,7 @@ def run(upload: bool) -> None:
         (
             "Italy",
             "Banned but not yet in effect",
-            2027,
+            2026,
             "Date effective: 2026-12-31.",
             "Legislative Decree 205/2023 (Decreto Legislativo 7 dicembre 2023, n. 205).",
             "https://www.normattiva.it/eli/id/2023/12/23/23G00212/ORIGINAL",
@@ -72,8 +72,8 @@ def run(upload: bool) -> None:
         (
             "Belgium",
             "Partially banned",
-            2025,
-            "Wallonia banned chick culling in 2021 and adopted a ban on gassing in first reading on 3 July 2025. Flanders and Brussels have not enacted bans.",
+            2021,
+            "Regional measures only. Wallonia banned chick grinding in 2021.",
             "Walloon Government communiqué, 3 July 2025 (Communiqué du Gouvernement de Wallonie, 3 juillet 2025).",
             "https://www.wallonie.be/fr/acteurs-et-institutions/wallonie/gouvernement-de-wallonie/communiques-presse/2025-07-03-0",
         ),
@@ -91,32 +91,32 @@ def run(upload: bool) -> None:
             "Not banned",
             np.nan,
             "",
-            "Royal Society for the Prevention of Cruelty to Animals (RSPCA) Australia (2021-09-22).",
-            "https://kb.rspca.org.au/knowledge-base/what-happens-with-male-chicks-in-the-egg-industry/",
+            "Australian Animal Welfare Standards and Guidelines, Department of Agriculture, Fisheries and Forestry (DAFF).",
+            "https://www.agriculture.gov.au/agriculture-land/animal/welfare/standards-guidelines",
         ),
         (
             "Canada",
             "Not banned",
             np.nan,
             "",
-            "Canadian Poultry Magazine (2016-12-19).",
-            "https://www.canadianpoultrymag.com/hypereye-a-game-changer-30033/",
+            "Preventive Control Plan for Hatcheries, Canadian Food Inspection Agency (CFIA).",
+            "https://inspection.canada.ca/en/animal-health/terrestrial-animals/hatcheries/preventive-control-plan-hatcheries",
         ),
         (
             "New Zealand",
             "Not banned",
             np.nan,
             "",
-            "Save Animals From Exploitation (SAFE) New Zealand.",
-            "https://safe.org.nz/our-work/animals-in-aotearoa/hens-2/",
+            "Code of Welfare: Layer Hens, Ministry for Primary Industries (MPI) New Zealand.",
+            "https://www.mpi.govt.nz/animals/animal-welfare/codes/all-animal-welfare-codes/code-of-welfare-layer-hens",
         ),
         (
             "United Kingdom",
             "Not banned",
             np.nan,
             "",
-            "The Humane League (2024-03-21).",
-            "https://thehumaneleague.org.uk/article/what-happens-to-male-chicks-in-the-egg-industry",
+            "The Welfare of Animals at the Time of Killing (England) Regulations 2015 (WATOK).",
+            "https://www.legislation.gov.uk/uksi/2015/1782/schedule/2/paragraph/44/made",
         ),
         (
             "United States",
@@ -165,7 +165,7 @@ def run(upload: bool) -> None:
     tb = snap.read_from_records(data=data, columns=columns)
 
     # Add all individual sources to the full citation in the metadata.
-    sources_text = """Evidence of laws banning chick culling, and evidence of chick culling being practiced without any ban, has been gathered from various sources for different countries.\n Some of those sources were extracted from [a report by the European Institute for Animal Law & Policy](https://animallaweurope.com/wp-content/uploads/2023/01/Animal-Law-Europe-%E2%80%93-Chick-Killing-Report-2023.pdf): "Chick and Duckling Killing: Achieving an EU-Wide Prohibition" (White paper, January 2023) by Alice Di Concetto, Olivier Morice, Matthias Corion, Simão Santos.\n"""
+    sources_text = """Evidence of laws banning chick culling, and evidence of chick culling being practiced without any ban, has been gathered from various sources for different countries.\n Some of those sources were extracted from [a report by the European Institute for Animal Law & Policy](https://animallaweurope.org/wp-content/uploads/Animal-Law-Europe-%E2%80%93-Chick-Killing-Report-2023.pdf): "Chick and Duckling Killing: Achieving an EU-Wide Prohibition" (White paper, January 2023) by Alice Di Concetto, Olivier Morice, Matthias Corion, Simão Santos.\n"""
     for _, row in tb.iterrows():
         sources_text += f"- {row['country']}: {row['status']}. Source: [{row['evidence']}]({row['url']})"
         if len(row["comments"]) > 0:
