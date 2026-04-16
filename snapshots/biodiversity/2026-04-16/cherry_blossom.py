@@ -38,8 +38,8 @@ def create_table_for_recent_years() -> pd.DataFrame:
     """
     Create a table for cherry blossom full flowering dates for recent years not covered in the original downloadable xls dataset.
 
-    This function manually adds data for the years 2016 to 2024. The data for 2016 to 2021 is sourced from the official dataset archived here: https://www.ncei.noaa.gov/access/paleo-search/study/26430`
-    while the data for 2022-2025 comes from personal communication with the dataset author.
+    This function manually adds data for the years 2016 to 2024. The data for 2016 to 2021 is sourced from the official dataset from Prof. Aono's website (not available anymore).
+    Data for 2022-2025 comes from personal communication with the dataset author.
     The 2026 data is sourced from personal communication with Genki Katata. He will share this going forward as well.
     Returns:
         Table: The table with added data for recent years.

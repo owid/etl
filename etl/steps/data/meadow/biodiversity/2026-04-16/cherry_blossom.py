@@ -23,7 +23,7 @@ def run() -> None:
     tb_recent = snap_recent.read()
     # clean and transform data
     tb = clean_data(tb)
-    tb = pr.concat([tb, tb_recent], ignore_index=True)
+    tb = pr.concat([tb_recent, tb], ignore_index=True)
     tb = convert_date(tb)
     tb = tb.format(["country", "year"])
     #
