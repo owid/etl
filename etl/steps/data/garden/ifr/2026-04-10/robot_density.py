@@ -31,7 +31,7 @@ def run() -> None:
     tb_2024 = tb_2024.drop(columns=["robot_density_per_10000_employees"])
 
     # Combine 2023 and 2024 data.
-    tb = pr.concat([tb_2023, tb_2024], ignore_index=True)
+    tb = pr.concat([tb_2024, tb_2023], ignore_index=True)
 
     # Improve table format.
     tb = tb.format(["country", "year"])
