@@ -27,6 +27,7 @@ paths = PathFinder(__file__)
 # Rename of age dimension choices: We could alternatively specify these in the YAML file, but this can also be programmatically done.
 AGES_POP_LIST = (
     [
+        "15-49",
         "15-64",
         "15+",
         "18+",
@@ -157,7 +158,7 @@ def run() -> None:
             "sex": "*",
             "variant": ["estimates"],
         },
-        choice_renames={"age": lambda x: f"Mothers aged {x} years" if x != "all" else None},
+        choice_renames={"age": lambda x: f"Women aged {x} years" if x != "all" else None},
     )
     view_editor.edit_views_b(explorer_b)
 
@@ -206,7 +207,7 @@ def run() -> None:
             "sex": "*",
             "variant": ["estimates"],
         },
-        choice_renames={"age": lambda x: f"Mothers aged {x} years" if x != "all" else None},
+        choice_renames={"age": lambda x: f"Women aged {x} years" if x != "all" else None},
     )
     view_editor.edit_views_fr(explorer_fr)
 

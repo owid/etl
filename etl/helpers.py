@@ -833,13 +833,20 @@ class PathFinder:
             If True, the indicator name is treated as a dimension. This means that the indicator will be included in the dimensions of the collection, allowing it to be used as a filter or in views.
 
         choice_renames : Listable[dict[str, dict[str, str] | Callable] | None], default None
-            Use this to rename the names of the dimension choices. Multiple formats supported:
-                * `None`: No renames are applied (also applies when `tb` is list).
+            Rename the display names of dimension choices. Multiple formats supported:
+                * `None`: No renames are applied.
                 * `dict[str, dict[str, str]]`: Key is the dimension slug, value is a mapping
-                    with original choice slug as key and the new choice name as value.
+                    with choice slug as key and the new choice name as value.
                 * `dict[str, Callable]`: Key is the dimension slug, value is a function that
-                    returns the new name for given slug (returns None to keep original)
-                * For multiple tables: Can be list matching `tb` length with any of the above formats.
+                    returns the new name for given slug (returns None to keep original).
+
+            When ``tb`` is a list:
+                * **Single dict** (common): applied to the final combined collection
+                  after all combining and YAML overrides, so these renames take
+                  precedence. Choice slugs should match the final collection's slugs.
+                * **List of dicts** (per-table): each element corresponds to a table in
+                  ``tb``. Renames are applied per sub-collection (can trigger conflict
+                  detection), then remapped to the final slugs and re-applied.
 
         catalog_path_full : bool, default False
             If True, it uses full catalog path. If False, uses shorter version (e.g., `table#indicator` or `dataset/table#indicator`).

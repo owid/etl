@@ -12,6 +12,7 @@ definitions:
         indicator: age_structure
       config:
         title: Age structure
+        subtitle: Population broken down by age group.
         type: StackedDiscreteBar
         hasMapTab: false
         stackMode: relative
@@ -20,16 +21,18 @@ definitions:
         sex: female
       config:
         title: Female age structure
+        subtitle: Female population broken down by age group.
     - dimensions:
         indicator: age_structure
         sex: male
       config:
         title: Male age structure
-    # Population by broad age group
+        subtitle: Male population broken down by age group.
+    # Population by age group
     - dimensions:
         indicator: population_broad
       config:
-        title: Population by broad age group
+        title: Population by age group
         type: StackedArea
         hasMapTab: false
         selectedFacetStrategy: entity
@@ -38,12 +41,12 @@ definitions:
         indicator: population_broad
         sex: female
       config:
-        title: Female population by broad age group
+        title: Female population by age group
     - dimensions:
         indicator: population_broad
         sex: male
       config:
-        title: Male population by broad age group
+        title: Male population by age group
     # Growth rate
     - dimensions:
         indicator: growth_rate
@@ -58,47 +61,44 @@ definitions:
     - dimensions:
         indicator: infant_deaths
       config:
-        title: Number of infant deaths
-        subtitle: The number of newborns who die before reaching the age of one.
+        title: Number of infants who die before age 1
     - dimensions:
         indicator: infant_deaths
         sex: female
       config:
-        title: Number of female infant deaths
+        title: Number of girls who die before age 1
     - dimensions:
         indicator: infant_deaths
         sex: male
       config:
-        title: Number of male infant deaths
+        title: Number of boys who die before age 1
     # Infant mortality rate
     - dimensions:
         indicator: infant_mortality_rate
         # sex: all
       config:
         title: Infant mortality rate
-        subtitle: The share of children who die before reaching the age of one.
+
     # Child deaths
     - dimensions:
         indicator: child_deaths
       config:
-        title: Number of child deaths
-        subtitle: The number of children who die before reaching the age of 5.
+        title: Number of children who die before age 5
     - dimensions:
         indicator: child_deaths
         sex: female
       config:
-        title: Number of female child deaths
+        title: Number of girls who die before age 5
     - dimensions:
         indicator: child_deaths
         sex: male
       config:
-        title: Number of male child deaths
+        title: Number of boys who die before age 5
     # Child mortality rate
     - dimensions:
         indicator: child_mortality_rate
       config:
         title: Child mortality rate
-        subtitle: The share of newborns who die before reaching the age of 5.
 
 config:
   explorerTitle: "Population & Demography"
@@ -117,17 +117,17 @@ dimensions:
       - slug: natural_change_rate
         name: Natural population growth rate
       - slug: infant_deaths
-        name: Number of infant deaths
+        name: Infant deaths
       - slug: infant_mortality_rate
         name: Infant mortality rate
       - slug: child_deaths
-        name: Number of child deaths
+        name: Child deaths
       - slug: child_mortality_rate
         name: Child mortality rate
       - slug: age_structure
         name: Age structure
       - slug: population_broad
-        name: Population by broad age group
+        name: Population by age group
 
   - slug: sex
     name: Sex
@@ -186,7 +186,7 @@ views:
       y:
         - catalogPath: un_wpp/growth_rate#growth_rate__sex_all__age_all__variant_estimates
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: growth_rate
       age: all
@@ -196,7 +196,7 @@ views:
       y:
         - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_high
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: growth_rate
       age: all
@@ -206,7 +206,7 @@ views:
       y:
         - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_low
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: growth_rate
       age: all
@@ -216,7 +216,7 @@ views:
       y:
         - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_medium
           display:
-            type: PercentChangeOverTime
+            type: Percentage
 
   # Natural growth rate
   - dimensions:
@@ -228,7 +228,7 @@ views:
       y:
         - catalogPath: un_wpp/natural_change_rate#natural_change_rate__sex_all__age_all__variant_estimates
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: natural_change_rate
       age: all
@@ -238,7 +238,7 @@ views:
       y:
         - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_high
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: natural_change_rate
       age: all
@@ -248,7 +248,7 @@ views:
       y:
         - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_low
           display:
-            type: PercentChangeOverTime
+            type: Percentage
   - dimensions:
       indicator: natural_change_rate
       age: all
@@ -258,7 +258,7 @@ views:
       y:
         - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_medium
           display:
-            type: PercentChangeOverTime
+            type: Percentage
 
   # TODO: Below views present multiple indicators. I think we should come up with some tooling to do this programmatically.
   # Age structure
@@ -419,11 +419,11 @@ views:
       variant: estimates
     indicators:
       y:
-        - catalogPath: un_wpp/population#population__sex_all__age_0_4__variant_estimates
-        - catalogPath: un_wpp/population#population__sex_all__age_5_14__variant_estimates
-        - catalogPath: un_wpp/population#population__sex_all__age_15_24__variant_estimates
-        - catalogPath: un_wpp/population#population__sex_all__age_25_64__variant_estimates
         - catalogPath: un_wpp/population#population__sex_all__age_65plus__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_all__age_25_64__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_all__age_15_24__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_all__age_5_14__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_all__age_0_4__variant_estimates
   - dimensions:
       indicator: population_broad
       age: all
@@ -431,11 +431,11 @@ views:
       variant: low
     indicators:
       y:
-        - catalogPath: un_wpp_full/population#population__sex_all__age_0_4__variant_low
-        - catalogPath: un_wpp_full/population#population__sex_all__age_5_14__variant_low
-        - catalogPath: un_wpp_full/population#population__sex_all__age_15_24__variant_low
-        - catalogPath: un_wpp_full/population#population__sex_all__age_25_64__variant_low
         - catalogPath: un_wpp_full/population#population__sex_all__age_65plus__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_all__age_25_64__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_all__age_15_24__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_all__age_5_14__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_all__age_0_4__variant_low
   - dimensions:
       indicator: population_broad
       age: all
@@ -443,11 +443,11 @@ views:
       variant: medium
     indicators:
       y:
-        - catalogPath: un_wpp_full/population#population__sex_all__age_0_4__variant_medium
-        - catalogPath: un_wpp_full/population#population__sex_all__age_5_14__variant_medium
-        - catalogPath: un_wpp_full/population#population__sex_all__age_15_24__variant_medium
-        - catalogPath: un_wpp_full/population#population__sex_all__age_25_64__variant_medium
         - catalogPath: un_wpp_full/population#population__sex_all__age_65plus__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_all__age_25_64__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_all__age_15_24__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_all__age_5_14__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_all__age_0_4__variant_medium
   - dimensions:
       indicator: population_broad
       age: all
@@ -455,11 +455,11 @@ views:
       variant: high
     indicators:
       y:
-        - catalogPath: un_wpp_full/population#population__sex_all__age_0_4__variant_high
-        - catalogPath: un_wpp_full/population#population__sex_all__age_5_14__variant_high
-        - catalogPath: un_wpp_full/population#population__sex_all__age_15_24__variant_high
-        - catalogPath: un_wpp_full/population#population__sex_all__age_25_64__variant_high
         - catalogPath: un_wpp_full/population#population__sex_all__age_65plus__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_all__age_25_64__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_all__age_15_24__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_all__age_5_14__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_all__age_0_4__variant_high
 
   #
   - dimensions:
@@ -469,11 +469,11 @@ views:
       variant: estimates
     indicators:
       y:
-        - catalogPath: un_wpp/population#population__sex_female__age_0_4__variant_estimates
-        - catalogPath: un_wpp/population#population__sex_female__age_5_14__variant_estimates
-        - catalogPath: un_wpp/population#population__sex_female__age_15_24__variant_estimates
-        - catalogPath: un_wpp/population#population__sex_female__age_25_64__variant_estimates
         - catalogPath: un_wpp/population#population__sex_female__age_65plus__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_female__age_25_64__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_female__age_15_24__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_female__age_5_14__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_female__age_0_4__variant_estimates
   - dimensions:
       indicator: population_broad
       age: all
@@ -481,11 +481,11 @@ views:
       variant: low
     indicators:
       y:
-        - catalogPath: un_wpp_full/population#population__sex_female__age_0_4__variant_low
-        - catalogPath: un_wpp_full/population#population__sex_female__age_5_14__variant_low
-        - catalogPath: un_wpp_full/population#population__sex_female__age_15_24__variant_low
-        - catalogPath: un_wpp_full/population#population__sex_female__age_25_64__variant_low
         - catalogPath: un_wpp_full/population#population__sex_female__age_65plus__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_female__age_25_64__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_female__age_15_24__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_female__age_5_14__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_female__age_0_4__variant_low
   - dimensions:
       indicator: population_broad
       age: all
@@ -493,11 +493,11 @@ views:
       variant: medium
     indicators:
       y:
-        - catalogPath: un_wpp_full/population#population__sex_female__age_0_4__variant_medium
-        - catalogPath: un_wpp_full/population#population__sex_female__age_5_14__variant_medium
-        - catalogPath: un_wpp_full/population#population__sex_female__age_15_24__variant_medium
-        - catalogPath: un_wpp_full/population#population__sex_female__age_25_64__variant_medium
         - catalogPath: un_wpp_full/population#population__sex_female__age_65plus__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_female__age_25_64__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_female__age_15_24__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_female__age_5_14__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_female__age_0_4__variant_medium
   - dimensions:
       indicator: population_broad
       age: all
@@ -505,11 +505,11 @@ views:
       variant: high
     indicators:
       y:
-        - catalogPath: un_wpp_full/population#population__sex_female__age_0_4__variant_high
-        - catalogPath: un_wpp_full/population#population__sex_female__age_5_14__variant_high
-        - catalogPath: un_wpp_full/population#population__sex_female__age_15_24__variant_high
-        - catalogPath: un_wpp_full/population#population__sex_female__age_25_64__variant_high
         - catalogPath: un_wpp_full/population#population__sex_female__age_65plus__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_female__age_25_64__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_female__age_15_24__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_female__age_5_14__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_female__age_0_4__variant_high
 
   #
   - dimensions:
@@ -519,11 +519,11 @@ views:
       variant: estimates
     indicators:
       y:
-        - catalogPath: un_wpp/population#population__sex_male__age_0_4__variant_estimates
-        - catalogPath: un_wpp/population#population__sex_male__age_5_14__variant_estimates
-        - catalogPath: un_wpp/population#population__sex_male__age_15_24__variant_estimates
-        - catalogPath: un_wpp/population#population__sex_male__age_25_64__variant_estimates
         - catalogPath: un_wpp/population#population__sex_male__age_65plus__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_male__age_25_64__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_male__age_15_24__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_male__age_5_14__variant_estimates
+        - catalogPath: un_wpp/population#population__sex_male__age_0_4__variant_estimates
   - dimensions:
       indicator: population_broad
       age: all
@@ -531,11 +531,11 @@ views:
       variant: low
     indicators:
       y:
-        - catalogPath: un_wpp_full/population#population__sex_male__age_0_4__variant_low
-        - catalogPath: un_wpp_full/population#population__sex_male__age_5_14__variant_low
-        - catalogPath: un_wpp_full/population#population__sex_male__age_15_24__variant_low
-        - catalogPath: un_wpp_full/population#population__sex_male__age_25_64__variant_low
         - catalogPath: un_wpp_full/population#population__sex_male__age_65plus__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_male__age_25_64__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_male__age_15_24__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_male__age_5_14__variant_low
+        - catalogPath: un_wpp_full/population#population__sex_male__age_0_4__variant_low
   - dimensions:
       indicator: population_broad
       age: all
@@ -543,11 +543,11 @@ views:
       variant: medium
     indicators:
       y:
-        - catalogPath: un_wpp_full/population#population__sex_male__age_0_4__variant_medium
-        - catalogPath: un_wpp_full/population#population__sex_male__age_5_14__variant_medium
-        - catalogPath: un_wpp_full/population#population__sex_male__age_15_24__variant_medium
-        - catalogPath: un_wpp_full/population#population__sex_male__age_25_64__variant_medium
         - catalogPath: un_wpp_full/population#population__sex_male__age_65plus__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_male__age_25_64__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_male__age_15_24__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_male__age_5_14__variant_medium
+        - catalogPath: un_wpp_full/population#population__sex_male__age_0_4__variant_medium
   - dimensions:
       indicator: population_broad
       age: all
@@ -555,11 +555,11 @@ views:
       variant: high
     indicators:
       y:
-        - catalogPath: un_wpp_full/population#population__sex_male__age_0_4__variant_high
-        - catalogPath: un_wpp_full/population#population__sex_male__age_5_14__variant_high
-        - catalogPath: un_wpp_full/population#population__sex_male__age_15_24__variant_high
-        - catalogPath: un_wpp_full/population#population__sex_male__age_25_64__variant_high
         - catalogPath: un_wpp_full/population#population__sex_male__age_65plus__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_male__age_25_64__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_male__age_15_24__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_male__age_5_14__variant_high
+        - catalogPath: un_wpp_full/population#population__sex_male__age_0_4__variant_high
 
   # Infant deaths
   - dimensions:
