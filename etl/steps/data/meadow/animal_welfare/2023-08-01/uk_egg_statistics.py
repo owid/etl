@@ -1,6 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -15,7 +15,7 @@ COLUMNS = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -35,14 +35,14 @@ def run(dest_dir: str) -> None:
     # To achieve that, detect rows where the year column is not a number.
     tb = tb[tb["year"].str.match(r"\d{4}", na=True)].reset_index(drop=True)
 
-    # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    # Improve table format.
+    tb = tb.format(keys=["year"])
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata, check_variables_metadata=True)
+    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

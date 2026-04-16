@@ -5,7 +5,7 @@ definitions:
       - Animal Welfare
 
 dataset:
-  title: "UK egg statistics (Defra, 2023)"
+  title: "UK egg statistics (Defra, 2026)"
 
 tables:
   uk_egg_statistics:
@@ -31,4 +31,4 @@ tables:
         unit: eggs
         short_unit: ''
         description: |
-          The total number of eggs is calculated as the sum of eggs from barns, cages (including enriched cages), and free-range eggs (both non-organic and organic). Since there is no data for organic eggs prior to 2006, and given that they represented a small fraction of the total, we assume there were no organic eggs until that year.
+          The total number of eggs packed in the UK, as reported by Defra. This total is available for all years even when breakdowns by production type are suppressed or unavailable.

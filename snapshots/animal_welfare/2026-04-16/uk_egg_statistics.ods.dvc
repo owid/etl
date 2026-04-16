@@ -9,10 +9,14 @@ meta:
     attribution_short: UK Defra
     url_main: https://www.gov.uk/government/statistics/egg-statistics
     url_download: |-
-      https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1173898/egg-packers-27july23.ods
+      https://assets.publishing.service.gov.uk/media/6970a7d92b64f0e8c32e33e5/Packer_shell_egg_dataset_20260122.ods
     date_accessed: '2026-04-16'
-    date_published: '2023-07-27'
+    date_published: '2026-01-22'
   license:
     name: Public domain
     url: |-
-      https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1173898/egg-packers-27july23.ods
+      https://assets.publishing.service.gov.uk/media/6970a7d92b64f0e8c32e33e5/Packer_shell_egg_dataset_20260122.ods
+outs:
+  - md5: 1f6a877f6b33921caad60d2f1f14ca09
+    size: 37647
+    path: uk_egg_statistics.ods
