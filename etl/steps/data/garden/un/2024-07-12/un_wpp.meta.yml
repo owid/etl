@@ -63,6 +63,14 @@ definitions:
         subtitle: "{definitions.global.projections}"
         originUrl: "https://ourworldindata.org/population-growth"
 
+  # Used in variable display blocks to mark projection variants so the grapher
+  # renders them with a dashed line. Reference with `isProjection: *projection`.
+  projection: &projection <% if (variant is defined) and (variant != 'estimates') -%>
+    true
+    <%- else -%>
+    false
+    <%- endif -%>
+
 # this metadata file is not used in garden step, but in grapher step
 tables:
   population:
@@ -73,6 +81,7 @@ tables:
         description_short: |-
           De facto total population in a country, area or region as of 1 July of the year indicated. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           roundingMode: significantFigures
           numSignificantFigures: 4
         presentation:
@@ -101,6 +110,7 @@ tables:
         description_short: |-
           Population yearly increment, estimated as the difference between the population on 1st of July of the year indicated and the population a year before. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           roundingMode: significantFigures
           numSignificantFigures: 4
         presentation:
@@ -130,6 +140,7 @@ tables:
         description_short: |-
           Population density in a country, area or region. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           roundingMode: significantFigures
           numSignificantFigures: 3
         presentation:
@@ -163,6 +174,7 @@ tables:
         description_short: |-
           Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1) where P1 and P2 are the populations on 1 January of subsequent years. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -180,6 +192,7 @@ tables:
         description_short: |-
           Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -208,6 +221,7 @@ tables:
           - |-
             It is expressed as live births per woman. For age-specific fertility rates, it measures the number of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December.
         display:
+          isProjection: *projection
           numDecimalPlaces: "<% if age == 'all' %>2<%- endif %>"
           roundingMode: "<% if age != 'all' %>significantFigures<%- endif %>"
           numSignificantFigures: "<% if age != 'all' %>2<%- endif %>"
@@ -250,6 +264,7 @@ tables:
         description_short: |-
           Net number of migrants, that is, the number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country). {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           roundingMode: significantFigures
           numSignificantFigures: 4
         presentation:
@@ -265,6 +280,7 @@ tables:
         description_short: |-
           Net number of immigrants minus the number of emigrants, divided by the population of the receiving country over a year. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           roundingMode: significantFigures
           numSignificantFigures: 2
         presentation:
@@ -282,6 +298,7 @@ tables:
         description_short: |-
           Number of deaths recorded annually, based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           roundingMode: significantFigures
           numSignificantFigures: 4
         presentation:
@@ -304,6 +321,7 @@ tables:
         description_short: |-
           Number of deaths recorded annually, divided by population in that year. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -319,6 +337,7 @@ tables:
         description_short: |-
           Number of births recorded annually, based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short_births}
         display:
+          isProjection: *projection
           roundingMode: significantFigures
           numSignificantFigures: 4
           numDecimalPlaces: 0
@@ -341,6 +360,7 @@ tables:
           - |-
             We also have a [long-run indicator](https://ourworldindata.org/grapher/long-run-birth-rate) for birth rate, spanning to earlier years.
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -357,6 +377,7 @@ tables:
         description_short: |-
           Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median. {definitions.global.dimensions.description_short}
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -396,6 +417,7 @@ tables:
           Period life expectancy for << individuals >> who have reached age << age >>. Estimates are expressed as the expected age at death, not as years left to live.
           <%- endif %> {definitions.global.projections}
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -433,6 +455,7 @@ tables:
           The number of male individuals per 100 female individuals, at age << age >>.
           <%- endif %> {definitions.global.projections}
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -485,6 +508,7 @@ tables:
           The ratio of the elderly << individuals >> (ages 65 and over) to the working-age << individuals >> (ages 15 to 64).
           <%- endif %>
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
@@ -535,6 +559,7 @@ tables:
           The share of children who die before reaching the age of 5.
           <%- endif %> {definitions.global.projections}
         display:
+          isProjection: *projection
           numDecimalPlaces: 1
         presentation:
           title_public: |-
