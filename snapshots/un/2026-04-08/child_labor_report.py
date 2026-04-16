@@ -259,7 +259,11 @@ def _clean(df: pd.DataFrame) -> pd.DataFrame:
 def run(upload: bool = True) -> None:
     # Download PDF once
     with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
-        f.write(requests.get(PDF_URL, timeout=60).content)
+        with requests.get(PDF_URL, stream=True, timeout=60) as response:
+            response.raise_for_status()
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
         pdf_path = f.name
 
     try:
