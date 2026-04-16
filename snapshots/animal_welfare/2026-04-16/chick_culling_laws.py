@@ -85,6 +85,14 @@ def run(upload: bool) -> None:
             "White Paper on Animal Welfare, Norwegian Government (Meld. St. 8 (2024-2025) Dyrevelferd, Regjeringen).",
             "https://www.regjeringen.no/no/dokumenter/meld.-st.-8-20242025/id3080297/?ch=7",
         ),
+        (
+            "Netherlands",
+            "Not banned",
+            np.nan,
+            "No binding legislation. Government roadmap targets phasing out chick culling by 2026.",
+            "Parliamentary letter on chick culling roadmap, Dutch Government (Kamerbrief aanbieden roadmap eendagshaantjes).",
+            "https://www.rijksoverheid.nl/documenten/kamerstukken/2025/02/11/kamerbrief-aanbieden-roadmap-eendagshaantjes",
+        ),
         # Add countries for which there is evidence of chick culling with no ban.
         (
             "Australia",
@@ -142,7 +150,6 @@ def run(upload: bool) -> None:
         "Latvia",
         "Lithuania",
         "Malta",
-        "Netherlands",
         "Poland",
         "Portugal",
         "Romania",

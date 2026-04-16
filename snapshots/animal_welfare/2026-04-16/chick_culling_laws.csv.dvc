@@ -15,6 +15,7 @@ meta:
       - Switzerland: Partially banned. Source: [Article 20(g) of the Animal Protection Ordinance (Art. 20 Bst. g Tierschutzverordnung).](https://www.fedlex.admin.ch/eli/cc/2008/416/de) Shredding of live chicks is banned. Killing by gas remains legal.
       - Belgium: Partially banned. Source: [Walloon Government communiqué, 3 July 2025 (Communiqué du Gouvernement de Wallonie, 3 juillet 2025).](https://www.wallonie.be/fr/acteurs-et-institutions/wallonie/gouvernement-de-wallonie/communiques-presse/2025-07-03-0) Regional measures only. Wallonia banned chick grinding in 2021.
       - Norway: Not banned. Source: [White Paper on Animal Welfare, Norwegian Government (Meld. St. 8 (2024-2025) Dyrevelferd, Regjeringen).](https://www.regjeringen.no/no/dokumenter/meld.-st.-8-20242025/id3080297/?ch=7) No binding legislation. The industry pledged to adopt in-ovo sexing by July 2027.
+      - Netherlands: Not banned. Source: [Parliamentary letter on chick culling roadmap, Dutch Government (Kamerbrief aanbieden roadmap eendagshaantjes).](https://www.rijksoverheid.nl/documenten/kamerstukken/2025/02/11/kamerbrief-aanbieden-roadmap-eendagshaantjes) No binding legislation. Government roadmap targets phasing out chick culling by 2026.
       - Australia: Not banned. Source: [Australian Animal Welfare Standards and Guidelines, Department of Agriculture, Fisheries and Forestry (DAFF).](https://www.agriculture.gov.au/agriculture-land/animal/welfare/standards-guidelines)
       - Canada: Not banned. Source: [Preventive Control Plan for Hatcheries, Canadian Food Inspection Agency (CFIA).](https://inspection.canada.ca/en/animal-health/terrestrial-animals/hatcheries/preventive-control-plan-hatcheries)
       - New Zealand: Not banned. Source: [Code of Welfare: Layer Hens, Ministry for Primary Industries (MPI) New Zealand.](https://www.mpi.govt.nz/animals/animal-welfare/codes/all-animal-welfare-codes/code-of-welfare-layer-hens)
@@ -33,7 +34,6 @@ meta:
       - Latvia: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
       - Lithuania: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
       - Malta: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
-      - Netherlands: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
       - Poland: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
       - Portugal: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
       - Romania: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
@@ -47,6 +47,6 @@ meta:
   license:
     name: CC BY 4.0
 outs:
-  - md5: 41c9dbd8af1148bd612d9cde7f7d07f8
-    size: 6353
+  - md5: cf21f36ed5c0fe0d2997e6194b617f4b
+    size: 6519
     path: chick_culling_laws.csv
