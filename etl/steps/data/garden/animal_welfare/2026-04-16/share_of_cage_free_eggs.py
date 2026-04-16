@@ -1,9 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -36,17 +36,17 @@ def run_sanity_checks(tb_us: Table) -> None:
     ).max() < 8, error
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load US egg production dataset and read its table on the share of cage-free hens and eggs.
-    ds_us: Dataset = paths.load_dependency("us_egg_production")
-    tb_us = ds_us["us_egg_production_share_cage_free"].reset_index()
+    ds_us = paths.load_dataset("us_egg_production")
+    tb_us = ds_us.read("us_egg_production_share_cage_free")
 
     # Load UK egg statistics dataset and read its main table.
-    ds_uk: Dataset = paths.load_dependency("uk_egg_statistics")
-    tb_uk = ds_uk["uk_egg_statistics"].reset_index()
+    ds_uk = paths.load_dataset("uk_egg_statistics")
+    tb_uk = ds_uk.read("uk_egg_statistics")
 
     #
     # Process data.
@@ -69,14 +69,14 @@ def run(dest_dir: str) -> None:
     columns = ["country", "year", "share_of_eggs_in_cages", "share_of_eggs_cage_free"]
     tb = pr.concat([tb_uk[columns], tb_us[columns]], ignore_index=True, short_name=paths.short_name)
 
-    # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    # Improve table format.
+    tb = tb.format(keys=["country", "year"])
 
     #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    # Create a new garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb])
 
-    # Save changes in the new garden dataset.
+    # Save new garden dataset.
     ds_garden.save()

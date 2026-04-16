@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -25,17 +25,17 @@ COLUMNS_OLD = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load new meadow dataset.
     ds_meadow = paths.load_dataset("uk_egg_statistics", version="2026-04-16")
-    tb = ds_meadow["uk_egg_statistics"].reset_index()
+    tb = ds_meadow.read("uk_egg_statistics")
 
     # Load old meadow dataset (has barn/organic data for 2006-2011 that is suppressed in the new release).
     ds_meadow_old = paths.load_dataset("uk_egg_statistics", version="2023-08-01")
-    tb_old = ds_meadow_old["uk_egg_statistics"].reset_index()
+    tb_old = ds_meadow_old.read("uk_egg_statistics")
 
     #
     # Process data.
@@ -49,13 +49,11 @@ def run(dest_dir: str) -> None:
     for column in egg_columns:
         tb[column] = tb[column].astype("Float64") * 12e6
 
-    old_egg_columns = [col for col in COLUMNS_OLD.values() if col != "year"]
-    for column in old_egg_columns:
+    egg_columns_old = [col for col in COLUMNS_OLD.values() if col != "year"]
+    for column in egg_columns_old:
         tb_old[column] = tb_old[column].astype("Float64") * 12e6
 
-    # Backfill suppressed barn/organic values from the old release.
-    # The new release marks these as [c] (suppressed for disclosure) for 2006-2011,
-    # but the old release had values that are consistent with surrounding years.
+    # Backfill suppressed barn/organic values from the old release. The new release marks these as [c] (suppressed for disclosure) for 2006-2011, but the old release had values that are consistent with surrounding years.
     backfill_columns = ["number_of_eggs_from_barns", "number_of_eggs_from_organic_free_range_farms"]
     tb = tb.merge(tb_old[["year"] + backfill_columns], on="year", how="left", suffixes=("", "_old"))
     for col in backfill_columns:
@@ -71,10 +69,8 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], default_metadata=ds_meadow.metadata, check_variables_metadata=True
-    )
+    # Create a new garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
 
-    # Save changes in the new garden dataset.
+    # Save new garden dataset.
     ds_garden.save()

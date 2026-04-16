@@ -3,6 +3,8 @@ definitions:
     presentation:
       topic_tags:
       - Animal Welfare
+      grapher_config:
+        note: Defra introduced a methodological change in 2023.
 
 dataset:
   title: "UK egg statistics (Defra, 2026)"
