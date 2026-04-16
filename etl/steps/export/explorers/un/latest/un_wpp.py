@@ -138,15 +138,11 @@ def run() -> None:
         config=config_default,
         indicator_names=["deaths"],
         projection_variants=["medium"],
-        # age=0 and age=0-4 are intentionally excluded here: those views live under
-        # the `infant_deaths` / `child_deaths` indicator dropdown in the manual
-        # explorer and pointing at the same catalog path from both places makes the
-        # explorer system emit a `_1`-suffixed ySlug for the duplicate (owid-grapher#6362).
         dimensions={
-            "age": ["all"] + AGES_DEATHS_LIST,
+            "age": ["all", "0", "0-4"] + AGES_DEATHS_LIST,
             "sex": "*",
         },
-        choice_renames={"age": AGES_DEATHS},
+        choice_renames={"age": {**AGES_DEATHS, "0": "Under 1 year", "0-4": "Under 5 years"}},
     )
     view_editor.edit_views_deaths(explorer_deaths_counts, ds_grapher=ds)
     explorer_deaths_rate = explorer_creator.create_with_grouped_projections(
