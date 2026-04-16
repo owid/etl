@@ -7,7 +7,7 @@ definitions:
     Data for 2006-2011 was suppressed in the 2026 release. Values from the earlier 2023 release were used to fill this gap.
 
 dataset:
-  title: "UK egg statistics (Defra, 2026)"
+  title: "UK egg statistics"
 
 tables:
   uk_egg_statistics:
