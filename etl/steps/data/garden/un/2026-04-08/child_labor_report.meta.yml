@@ -9,8 +9,8 @@ definitions:
     display: &common_display
       tolerance: 0
 
-  sex:
-    <%- if sex == "total" %>
+  sex: |-
+    <% if sex == "total" %>
     children
     <%- else %>
     <<sex>>
