@@ -34,15 +34,6 @@ steps:
   data://grapher/animal_welfare/2023-08-03/share_of_cage_free_eggs:
     - data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs
   #
-  # Chick culling laws (Various sources, 2023).
-  #
-  data://meadow/animal_welfare/2023-09-01/chick_culling_laws:
-    - snapshot://animal_welfare/2023-09-01/chick_culling_laws.csv
-  data://garden/animal_welfare/2023-09-01/chick_culling_laws:
-    - data://meadow/animal_welfare/2023-09-01/chick_culling_laws
-  data://grapher/animal_welfare/2023-09-01/chick_culling_laws:
-    - data://garden/animal_welfare/2023-09-01/chick_culling_laws
-  #
   # Various sources - Bullfighting laws.
   #
   data://meadow/animal_welfare/2024-06-04/bullfighting_laws:
