@@ -790,9 +790,21 @@ def update_variable_metadata(meta: VariableMeta) -> VariableMeta:
     if meta.unit:
         meta.display.setdefault("unit", meta.unit)
 
-    # Convert numDecimalPlaces from string to int if needed
-    if meta.display and isinstance(meta.display.get("numDecimalPlaces"), str):
-        meta.display["numDecimalPlaces"] = int(meta.display["numDecimalPlaces"])
+    # Convert display fields from string to int/None after Jinja expansion.
+    # Jinja renders inside string values, so numeric display fields may arrive
+    # as strings (e.g. "2") or empty strings (when a Jinja conditional evaluates
+    # to nothing).  Empty strings are removed so they don't override other settings.
+    if meta.display:
+        for key in ("numDecimalPlaces", "numSignificantFigures"):
+            val = meta.display.get(key)
+            if isinstance(val, str):
+                if val.strip():
+                    meta.display[key] = int(val)
+                else:
+                    del meta.display[key]
+        # Also clean up roundingMode if it's an empty string
+        if isinstance(meta.display.get("roundingMode"), str) and not meta.display["roundingMode"].strip():
+            del meta.display["roundingMode"]
 
     # Prune empty fields from description_key
     if meta.description_key:

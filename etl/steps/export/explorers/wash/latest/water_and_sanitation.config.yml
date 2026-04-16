@@ -1618,7 +1618,7 @@ views:
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
     config:
-      title: Number of people that rely on limited handwashing facilities
+      title: Number of people who rely on limited handwashing facilities
       subtitle: This measures the availability of a handwashing facility on premises without soap and water.
   - dimensions:
       resource: handwashing_facilities
