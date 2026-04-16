@@ -16,7 +16,7 @@ definitions:
     <<sex>>
     <%- endif %>
 
-  description_key_child_labor: |-
+  description_key_child_labor_household_chores: |-
     <% if age == "5-11" %>
     Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services during the reference week.
     <%- elif age == "12-14" %>
@@ -73,7 +73,7 @@ tables:
         title: Share of children in child labor (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of {definitions.sex} aged <<age>> who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Percentage of {definitions.sex} aged <<age>> who are either working at an age that is too young for them to be employed, or doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
@@ -87,7 +87,7 @@ tables:
         title: Number of children in child labor (<<sex>>, <<age>>)
         unit: "children"
         short_unit: ""
-        description_short: Number of {definitions.sex} aged <<age>> who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Number of {definitions.sex} aged <<age>> who are either working at an age that is too young for them to be employed, or doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
@@ -101,7 +101,7 @@ tables:
         title: Share of children in hazardous work (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of {definitions.sex} aged <<age>> who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Percentage of {definitions.sex} aged <<age>> who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
@@ -114,7 +114,7 @@ tables:
         title: Number of children in hazardous work (<<sex>>, <<age>>)
         unit: "children"
         short_unit: ""
-        description_short: Number of {definitions.sex} aged <<age>> who are doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Number of {definitions.sex} aged <<age>> who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
@@ -183,7 +183,7 @@ tables:
         short_unit: "%"
         description_short: Percentage of {definitions.sex} aged <<age>> in child labor, including household chores performed for 21 or more hours per week.
         description_key:
-          - "{definitions.description_key_child_labor}"
+          - "{definitions.description_key_child_labor_household_chores}"
           - "{definitions.description_key_child_labor_hazardous_work}"
           - "{definitions.description_key_modelled_data}"
         display:
