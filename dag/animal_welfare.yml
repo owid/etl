@@ -143,3 +143,20 @@ steps:
     - data://meadow/animal_welfare/2026-04-16/chick_culling_laws
   data://grapher/animal_welfare/2026-04-16/chick_culling_laws:
     - data://garden/animal_welfare/2026-04-16/chick_culling_laws
+  #
+  # UK egg statistics (Defra, 2023).
+  #
+  data://meadow/animal_welfare/2026-04-16/uk_egg_statistics:
+    - snapshot://animal_welfare/2026-04-16/uk_egg_statistics.ods
+  data://garden/animal_welfare/2026-04-16/uk_egg_statistics:
+    - data://meadow/animal_welfare/2026-04-16/uk_egg_statistics
+  data://grapher/animal_welfare/2026-04-16/uk_egg_statistics:
+    - data://garden/animal_welfare/2026-04-16/uk_egg_statistics
+  #
+  # Share of cage-free eggs (Various sources, 2023).
+  #
+  data://garden/animal_welfare/2026-04-16/share_of_cage_free_eggs:
+    - data://garden/animal_welfare/2026-04-16/uk_egg_statistics
+    - data://garden/animal_welfare/2023-08-03/us_egg_production
+  data://grapher/animal_welfare/2026-04-16/share_of_cage_free_eggs:
+    - data://garden/animal_welfare/2026-04-16/share_of_cage_free_eggs

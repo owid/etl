@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Department for Environment, Food & Rural Affairs of the United Kingdom
+    title: UK egg statistics
+    description: |-
+      The Department for Environment, Food & Rural Affairs of the United Kingdom (Defra) runs a quarterly survey of registered UK egg packing stations. It is a voluntary sample survey of 27 respondents that collects information on throughput by production type and prices of graded eggs and sales of ungraded eggs. The response rate is typically 100 per cent and the survey accounts for 75 per cent of eggs packed in the UK. The survey figures are raised up to give UK estimates using information on the number of commercial laying hens, average egg yields, average mortality rates, the proportion of UK eggs that go through packing stations. Throughput by egg type for packing stations not surveyed is calculated using data provided by packing stations responding to the survey.
+    citation_full: |-
+      Quarterly UK statistics on Egg Packing Station Throughput and Prices, by the Department for Environment, Food & Rural Affairs of the United Kingdom.
+    attribution_short: UK Defra
+    url_main: https://www.gov.uk/government/statistics/egg-statistics
+    url_download: |-
+      https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1173898/egg-packers-27july23.ods
+    date_accessed: '2026-04-16'
+    date_published: '2023-07-27'
+  license:
+    name: Public domain
+    url: |-
+      https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1173898/egg-packers-27july23.ods
