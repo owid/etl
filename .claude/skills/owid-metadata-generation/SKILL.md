@@ -1,6 +1,8 @@
 ---
 name: owid-metadata-generation
 description: Use when creating or enriching metadata for OWID ETL datasets - generates comprehensive YAML metadata from dataset inspection, data exploration, and web research following OWID metadata standards. Trigger when writing or editing *.meta.yml files, when a garden step has empty or minimal metadata, or when user asks to improve/add/enrich metadata.
+metadata:
+  internal: true
 ---
 
 # OWID Metadata Generation

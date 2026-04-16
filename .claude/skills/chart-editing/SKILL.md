@@ -1,6 +1,8 @@
 ---
 name: chart-editing
 description: Edit and preview .chart.yml files for OWID graph steps. Use when user wants to edit chart config, preview charts, change chart appearance, or work with graph step chart files.
+metadata:
+  internal: true
 ---
 
 # Chart Editing
