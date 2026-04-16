@@ -1,6 +1,8 @@
 ---
 name: check-metadata-typos
 description: Check .meta.yml and snapshot .dvc files for spelling typos using codespell. Use when user mentions typos, spelling errors, metadata quality, or wants to check metadata files for mistakes.
+metadata:
+  internal: true
 ---
 
 # Check Metadata Typos

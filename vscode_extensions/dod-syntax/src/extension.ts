@@ -108,49 +108,69 @@ export function activate(context: vscode.ExtensionContext) {
                                 }
                             }
                         } else {
-                            // Handle batch error
+                            // Handle batch error — cache with shorter TTL so hover shows real error
                             for (const key of keysToFetch) {
-                                results.set(key, {
+                                const errorResult = {
                                     success: false,
                                     error: batchResult.error || 'Unknown batch error',
                                     dod_name: key
-                                });
+                                };
+                                results.set(key, errorResult);
+                                if (ENABLE_CACHE) {
+                                    dodCache.set(key, errorResult);
+                                    setTimeout(() => dodCache.delete(key), 30 * 1000);
+                                }
                             }
                         }
                         resolve(results);
                     } else {
-                        // Handle process error for all keys
+                        // Handle process error for all keys — cache with shorter TTL
                         for (const key of keysToFetch) {
-                            results.set(key, {
+                            const errorResult = {
                                 success: false,
                                 error: stderr || `Python process exited with code ${code}`,
                                 dod_name: key
-                            });
+                            };
+                            results.set(key, errorResult);
+                            if (ENABLE_CACHE) {
+                                dodCache.set(key, errorResult);
+                                setTimeout(() => dodCache.delete(key), 30 * 1000);
+                            }
                         }
                         resolve(results);
                     }
                 } catch (parseError) {
-                    // Handle parse error for all keys
+                    // Handle parse error for all keys — cache with shorter TTL
                     for (const key of keysToFetch) {
-                        results.set(key, {
+                        const errorResult = {
                             success: false,
                             error: `Failed to parse JSON response: ${parseError}`,
                             dod_name: key,
                             raw_output: stdout
-                        });
+                        };
+                        results.set(key, errorResult);
+                        if (ENABLE_CACHE) {
+                            dodCache.set(key, errorResult);
+                            setTimeout(() => dodCache.delete(key), 30 * 1000);
+                        }
                     }
                     resolve(results);
                 }
             });
 
             pythonProcess.on('error', (error) => {
-                // Handle spawn error for all keys
+                // Handle spawn error for all keys — cache with shorter TTL
                 for (const key of keysToFetch) {
-                    results.set(key, {
+                    const errorResult = {
                         success: false,
                         error: `Failed to spawn Python process: ${error.message}`,
                         dod_name: key
-                    });
+                    };
+                    results.set(key, errorResult);
+                    if (ENABLE_CACHE) {
+                        dodCache.set(key, errorResult);
+                        setTimeout(() => dodCache.delete(key), 30 * 1000);
+                    }
                 }
                 resolve(results);
             });
@@ -385,57 +405,45 @@ export function activate(context: vscode.ExtensionContext) {
                         matchEnd
                     );
 
-                    // Try to get from cache first
-                    const cachedResult = dodCache.get(key);
-                    if (cachedResult) {
-                        const hoverContent = new vscode.MarkdownString();
-                        hoverContent.appendMarkdown(`**${title}**\n\n`);
-                        hoverContent.appendMarkdown(`*DoD Key:* \`${key}\`\n\n`);
-
-                        // Handle both old single result format and new batch result format
-                        if (cachedResult.success !== false && cachedResult.content) {
-                            // New batch format: DOD data directly in the result
-                            hoverContent.appendMarkdown(`**Definition:**\n\n${cachedResult.content}\n\n`);
-                            if (cachedResult.lastUpdatedBy) {
-                                hoverContent.appendMarkdown(`*Last updated by:* ${cachedResult.lastUpdatedBy}\n`);
-                            }
-                            if (cachedResult.updatedAt) {
-                                const updateDate = new Date(cachedResult.updatedAt).toLocaleDateString();
-                                hoverContent.appendMarkdown(`*Updated:* ${updateDate}\n`);
-                            }
-                        } else if (cachedResult.success && cachedResult.dod) {
-                            // Old single result format: DOD data in nested 'dod' property
-                            const dod = cachedResult.dod;
-                            hoverContent.appendMarkdown(`**Definition:**\n\n${dod.content}\n\n`);
-                            if (dod.lastUpdatedBy) {
-                                hoverContent.appendMarkdown(`*Last updated by:* ${dod.lastUpdatedBy}\n`);
-                            }
-                            if (dod.updatedAt) {
-                                const updateDate = new Date(dod.updatedAt).toLocaleDateString();
-                                hoverContent.appendMarkdown(`*Updated:* ${updateDate}\n`);
-                            }
-                        } else {
-                            hoverContent.appendMarkdown(`**Definition not available**\n\n`);
-                            hoverContent.appendMarkdown('*Database not accessible. The full definition for this DOD key is stored in the OWID database.*');
-                        }
-
-                        return new vscode.Hover(hoverContent, range);
-                    } else {
-                        // If not in cache, start async fetch and show a simple message
-                        const loadingContent = new vscode.MarkdownString();
-                        loadingContent.appendMarkdown(`**${title}**\n\n`);
-                        loadingContent.appendMarkdown(`*DoD Key:* \`${key}\`\n\n`);
-                        loadingContent.appendMarkdown('*Definition not yet loaded. Please try hovering again in a moment.*');
-
-                        // Start async fetch for next time
-                        fetchDodDefinition(key).then(result => {
-                            if (!result.success) {
-                                console.log(`DoD fetch failed for ${key}:`, result.error);
-                            }
-                        });
-
-                        return new vscode.Hover(loadingContent, range);
+                    // Get from cache or fetch on demand
+                    let result = dodCache.get(key);
+                    if (!result) {
+                        result = await fetchDodDefinition(key);
                     }
+
+                    const hoverContent = new vscode.MarkdownString();
+                    hoverContent.appendMarkdown(`**${title}**\n\n`);
+                    hoverContent.appendMarkdown(`*DoD Key:* \`${key}\`\n\n`);
+
+                    // Handle both old single result format and new batch result format
+                    if (result && result.success !== false && result.content) {
+                        // New batch format: DOD data directly in the result
+                        hoverContent.appendMarkdown(`**Definition:**\n\n${result.content}\n\n`);
+                        if (result.lastUpdatedBy) {
+                            hoverContent.appendMarkdown(`*Last updated by:* ${result.lastUpdatedBy}\n`);
+                        }
+                        if (result.updatedAt) {
+                            const updateDate = new Date(result.updatedAt).toLocaleDateString();
+                            hoverContent.appendMarkdown(`*Updated:* ${updateDate}\n`);
+                        }
+                    } else if (result && result.success && result.dod) {
+                        // Old single result format: DOD data in nested 'dod' property
+                        const dod = result.dod;
+                        hoverContent.appendMarkdown(`**Definition:**\n\n${dod.content}\n\n`);
+                        if (dod.lastUpdatedBy) {
+                            hoverContent.appendMarkdown(`*Last updated by:* ${dod.lastUpdatedBy}\n`);
+                        }
+                        if (dod.updatedAt) {
+                            const updateDate = new Date(dod.updatedAt).toLocaleDateString();
+                            hoverContent.appendMarkdown(`*Updated:* ${updateDate}\n`);
+                        }
+                    } else {
+                        hoverContent.appendMarkdown(`**Definition not available**\n\n`);
+                        const errorMsg = result?.error || 'Unknown error';
+                        hoverContent.appendMarkdown(`*Database not accessible:* ${errorMsg}`);
+                    }
+
+                    return new vscode.Hover(hoverContent, range);
                 }
             }
 
