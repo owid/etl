@@ -1,6 +1,8 @@
 ---
 name: fix-dependabot
 description: Resolve Dependabot security alerts on owid/etl by upgrading vulnerable dependencies. Use when the user mentions "dependabot", "security alerts", "vulnerability", "CVE", "security fixes", "dependabot alerts", or wants to fix vulnerable packages. Also trigger when the user pastes a GitHub Dependabot URL or asks about outdated/insecure dependencies.
+metadata:
+  internal: true
 ---
 
 # Fix Dependabot Alerts
