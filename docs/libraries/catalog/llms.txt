@@ -215,7 +215,7 @@ pandas Series with metadata.
 
 Quick access functions for data discovery and retrieval.
 
-### `fetch(path: 'str') -> "'Table | ChartTable'"`
+### `fetch(path: 'str') -> 'Table | ChartTable'`
 
 Fetch data directly by path (auto-detects tables, indicators, or charts).
 
@@ -432,7 +432,7 @@ Example:
 
 #### `init_private_attributes(self: 'BaseModel', context: 'Any', /) -> 'None'`
 
-This function is meant to behave like a BaseModel method to initialise private attributes.
+This function is meant to behave like a BaseModel method to initialize private attributes.
 
 It takes context as an argument since that's what pydantic-core passes when calling it.
 
@@ -620,7 +620,7 @@ Example:
 
 #### `init_private_attributes(self: 'BaseModel', context: 'Any', /) -> 'None'`
 
-This function is meant to behave like a BaseModel method to initialise private attributes.
+This function is meant to behave like a BaseModel method to initialize private attributes.
 
 It takes context as an argument since that's what pydantic-core passes when calling it.
 
@@ -933,7 +933,7 @@ Attributes:
     query: The query that produced these results.
     total_count: Total number of results available (may be more than len(items)).
 
-#### `filter(self, predicate: 'Callable[[T], bool]') -> "'ResponseSet[T]'"`
+#### `filter(self, predicate: 'Callable[[T], bool]') -> 'ResponseSet[T]'`
 
 Filter results by predicate function.
 
@@ -990,11 +990,7 @@ Example:
 
 Set total_count to length of results if not provided.
 
-#### `ResponseSet.results` (property)
-
-Deprecated: use ``.items`` instead.
-
-#### `set_ui_advanced(self) -> "'ResponseSet[T]'"`
+#### `set_ui_advanced(self) -> 'ResponseSet[T]'`
 
 Switch to advanced display showing all fields (type, slug, popularity, etc.).
 
@@ -1006,7 +1002,7 @@ Example:
     >>> results.set_ui_advanced()
     ```
 
-#### `set_ui_basic(self) -> "'ResponseSet[T]'"`
+#### `set_ui_basic(self) -> 'ResponseSet[T]'`
 
 Switch to basic display showing only key fields (title, description, url).
 
@@ -1018,7 +1014,7 @@ Example:
     >>> results.set_ui_basic()
     ```
 
-#### `sort_by(self, key: 'str | Callable[[T], Any]', *, reverse: 'bool' = False) -> "'ResponseSet[T]'"`
+#### `sort_by(self, key: 'str | Callable[[T], Any]', *, reverse: 'bool' = False) -> 'ResponseSet[T]'`
 
 Sort results by attribute name or key function.
 
@@ -1409,7 +1405,7 @@ Example:
     print(var.metadata.title)
     ```
 
-#### `groupby(self, *args: 'Any', observed: 'bool' = True, **kwargs: 'Any') -> "'TableGroupBy'"`
+#### `groupby(self, *args: 'Any', observed: 'bool' = True, **kwargs: 'Any') -> 'TableGroupBy'`
 
 Groupby that preserves metadata. It uses observed=True by default.
 
@@ -1756,7 +1752,7 @@ Example:
     table.reset_index(inplace=True)  # Modify in place
     ```
 
-#### `rolling(self, *args: 'Any', **kwargs: 'Any') -> "'TableRolling'"`
+#### `rolling(self, *args: 'Any', **kwargs: 'Any') -> 'TableRolling'`
 
 Rolling operation that preserves metadata.
 
@@ -2269,7 +2265,6 @@ Example:
 
 #### `Indicator.processing_level` (property)
 
-
 #### `rolling(self, *args: 'Any', **kwargs: 'Any') -> 'IndicatorRolling'`
 
 Create a rolling window operation that preserves metadata.
@@ -2308,9 +2303,13 @@ Example:
 
 Convert Indicator to a Table (single-column table).
 
+When a new name is given, the indicator's metadata is copied to the renamed column
+so that origins are not lost.
+
 #### `Indicator.type` (property)
 
 #### `Indicator.unit` (property)
+
 
 ### Indicator
 
@@ -2444,7 +2443,6 @@ Example:
 
 #### `Indicator.processing_level` (property)
 
-
 #### `rolling(self, *args: 'Any', **kwargs: 'Any') -> 'IndicatorRolling'`
 
 Create a rolling window operation that preserves metadata.
@@ -2483,9 +2481,13 @@ Example:
 
 Convert Indicator to a Table (single-column table).
 
+When a new name is given, the indicator's metadata is copied to the renamed column
+so that origins are not lost.
+
 #### `Indicator.type` (property)
 
 #### `Indicator.unit` (property)
+
 
 ### `copy_metadata(from_variable: 'Indicator', to_variable: 'Indicator', inplace: 'bool' = False) -> 'Indicator | None'`
 
@@ -2827,7 +2829,7 @@ Example:
     print(meta.title)
     ```
 
-#### `save(self, filename: str | pathlib.Path) -> None`
+#### `save(self, filename: str | pathlib._local.Path) -> None`
 
 Save metadata to a JSON file.
 
@@ -3054,7 +3056,7 @@ The number of fields is limited, but should handle everything that we get from
 Snapshot. There is a lot more opportunity to store more metadata at the table and
 the variable level.
 
-#### `update_from_yaml(self, path: pathlib.Path | str, if_source_exists: Literal['fail', 'append', 'replace'] = 'fail') -> None`
+#### `update_from_yaml(self, path: pathlib._local.Path | str, if_source_exists: Literal['fail', 'append', 'replace'] = 'fail') -> None`
 
 The main reason for wanting to do this is to manually override what goes into Grapher before an export.
 
