@@ -57,7 +57,7 @@ def run(upload: bool) -> None:
             "Luxembourg",
             "Banned",
             2018,
-            "First country in Europe to ban the killing of animals for purely economic reasons.",
+            "",
             "Law of 27 June 2018 on animal protection (Loi du 27 juin 2018 sur la protection des animaux).",
             "https://legilux.public.lu/eli/etat/leg/loi/2018/06/27/a537/jo",
         ),
@@ -65,7 +65,7 @@ def run(upload: bool) -> None:
             "Switzerland",
             "Partially banned",
             2020,
-            "Shredding of live chicks is banned. Killing by CO2 gas remains legal.",
+            "Shredding of live chicks is banned. Killing by gas remains legal.",
             "Article 20(g) of the Animal Protection Ordinance (Art. 20 Bst. g Tierschutzverordnung).",
             "https://www.fedlex.admin.ch/eli/cc/2008/416/de",
         ),
@@ -73,8 +73,8 @@ def run(upload: bool) -> None:
             "Belgium",
             "Partially banned",
             2025,
-            "Wallonia banned grinding of chicks in 2021 and adopted a ban on gassing in first reading on 3 July 2025. Flanders and Brussels have not enacted bans.",
-            "Walloon Government decree of 8 July 2021 (Arrêté du Gouvernement wallon du 8 juillet 2021).",
+            "Wallonia banned chick culling in 2021 and adopted a ban on gassing in first reading on 3 July 2025. Flanders and Brussels have not enacted bans.",
+            "Walloon Government communiqué, 3 July 2025 (Communiqué du Gouvernement de Wallonie, 3 juillet 2025).",
             "https://www.wallonie.be/fr/acteurs-et-institutions/wallonie/gouvernement-de-wallonie/communiques-presse/2025-07-03-0",
         ),
         (
@@ -82,8 +82,8 @@ def run(upload: bool) -> None:
             "Not banned",
             np.nan,
             "No binding legislation. The industry pledged to adopt in-ovo sexing by July 2027.",
-            "White Paper on Animal Welfare, Meld. St. 8 (2024-2025), Norwegian Government.",
-            "https://www.regjeringen.no/no/dokumenter/meld.-st.-8-20242025/id3080297/",
+            "White Paper on Animal Welfare, Norwegian Government (Meld. St. 8 (2024-2025) Dyrevelferd, Regjeringen).",
+            "https://www.regjeringen.no/no/dokumenter/meld.-st.-8-20242025/id3080297/?ch=7",
         ),
         # Add countries for which there is evidence of chick culling with no ban.
         (
@@ -115,7 +115,7 @@ def run(upload: bool) -> None:
             "Not banned",
             np.nan,
             "",
-            "The Humane League (2021-07-29).",
+            "The Humane League (2024-03-21).",
             "https://thehumaneleague.org.uk/article/what-happens-to-male-chicks-in-the-egg-industry",
         ),
         (

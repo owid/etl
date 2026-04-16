@@ -11,14 +11,14 @@ meta:
       - France: Banned. Source: [Article R 214-17(II) of the Rural Code (Article R 214-17(II) du Code rural et de la pêche maritime).](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000045129069) Chicks used for animal feed are exempt.
       - Germany: Banned. Source: [Section 4c of the Animal Welfare Act (§ 4c Tierschutzgesetz).](https://www.gesetze-im-internet.de/tierschg/BJNR012770972.html)
       - Italy: Banned but not yet in effect. Source: [Legislative Decree 205/2023 (Decreto Legislativo 7 dicembre 2023, n. 205).](https://www.normattiva.it/eli/id/2023/12/23/23G00212/ORIGINAL) Date effective: 2026-12-31.
-      - Luxembourg: Banned. Source: [Law of 27 June 2018 on animal protection (Loi du 27 juin 2018 sur la protection des animaux).](https://legilux.public.lu/eli/etat/leg/loi/2018/06/27/a537/jo) First country in Europe to ban the killing of animals for purely economic reasons.
-      - Switzerland: Partially banned. Source: [Article 20(g) of the Animal Protection Ordinance (Art. 20 Bst. g Tierschutzverordnung).](https://www.fedlex.admin.ch/eli/cc/2008/416/de) Shredding of live chicks is banned. Killing by CO2 gas remains legal.
-      - Belgium: Partially banned. Source: [Walloon Government decree of 8 July 2021 (Arrêté du Gouvernement wallon du 8 juillet 2021).](https://www.wallonie.be/fr/acteurs-et-institutions/wallonie/gouvernement-de-wallonie/communiques-presse/2025-07-03-0) Wallonia banned grinding of chicks in 2021 and adopted a ban on gassing in first reading on 3 July 2025. Flanders and Brussels have not enacted bans.
-      - Norway: Not banned. Source: [White Paper on Animal Welfare, Meld. St. 8 (2024-2025), Norwegian Government.](https://www.regjeringen.no/no/dokumenter/meld.-st.-8-20242025/id3080297/) No binding legislation. The industry pledged to adopt in-ovo sexing by July 2027.
+      - Luxembourg: Banned. Source: [Law of 27 June 2018 on animal protection (Loi du 27 juin 2018 sur la protection des animaux).](https://legilux.public.lu/eli/etat/leg/loi/2018/06/27/a537/jo)
+      - Switzerland: Partially banned. Source: [Article 20(g) of the Animal Protection Ordinance (Art. 20 Bst. g Tierschutzverordnung).](https://www.fedlex.admin.ch/eli/cc/2008/416/de) Shredding of live chicks is banned. Killing by gas remains legal.
+      - Belgium: Partially banned. Source: [Walloon Government communiqué, 3 July 2025 (Communiqué du Gouvernement de Wallonie, 3 juillet 2025).](https://www.wallonie.be/fr/acteurs-et-institutions/wallonie/gouvernement-de-wallonie/communiques-presse/2025-07-03-0) Wallonia banned chick culling in 2021 and adopted a ban on gassing in first reading on 3 July 2025. Flanders and Brussels have not enacted bans.
+      - Norway: Not banned. Source: [White Paper on Animal Welfare, Norwegian Government (Meld. St. 8 (2024-2025) Dyrevelferd, Regjeringen).](https://www.regjeringen.no/no/dokumenter/meld.-st.-8-20242025/id3080297/?ch=7) No binding legislation. The industry pledged to adopt in-ovo sexing by July 2027.
       - Australia: Not banned. Source: [Royal Society for the Prevention of Cruelty to Animals (RSPCA) Australia (2021-09-22).](https://kb.rspca.org.au/knowledge-base/what-happens-with-male-chicks-in-the-egg-industry/)
       - Canada: Not banned. Source: [Canadian Poultry Magazine (2016-12-19).](https://www.canadianpoultrymag.com/hypereye-a-game-changer-30033/)
       - New Zealand: Not banned. Source: [Save Animals From Exploitation (SAFE) New Zealand.](https://safe.org.nz/our-work/animals-in-aotearoa/hens-2/)
-      - United Kingdom: Not banned. Source: [The Humane League (2021-07-29).](https://thehumaneleague.org.uk/article/what-happens-to-male-chicks-in-the-egg-industry)
+      - United Kingdom: Not banned. Source: [The Humane League (2024-03-21).](https://thehumaneleague.org.uk/article/what-happens-to-male-chicks-in-the-egg-industry)
       - United States: Not banned. Source: [Animal Legal & Historical Center, Michigan State University.](https://www.animallaw.info/article/detailed-discussion-legal-protections-domestic-chicken-united-states-and-europe)
       - Bulgaria: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
       - Croatia: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
@@ -47,6 +47,6 @@ meta:
   license:
     name: CC BY 4.0
 outs:
-  - md5: 1444e3dd6a1ac8181af145840ebdeff1
-    size: 6259
+  - md5: ffbf1d73b9fb1c3d2e80a223b24ec6f1
+    size: 6210
     path: chick_culling_laws.csv
