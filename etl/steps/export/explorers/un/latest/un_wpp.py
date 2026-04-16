@@ -187,24 +187,40 @@ def run() -> None:
     view_editor.edit_views_ma(explorer_ma, ds_grapher=ds)
 
     ########## Life expectancy explorer
-    explorer_le = explorer_creator.create_with_grouped_projections(
+    # At birth: all three projection scenarios (low/medium/high)
+    explorer_le_birth = explorer_creator.create_with_grouped_projections(
         table_name="life_expectancy",
         config=config_default,
         indicator_names=["life_expectancy"],
         dimensions={
-            "age": "*",
+            "age": ["0"],
+            "sex": "*",
+        },
+        choice_renames={"age": {"0": "At birth"}},
+    )
+    view_editor.edit_views_le(explorer_le_birth, ds_grapher=ds)
+
+    # At older ages: medium projections only. UN WPP's low/medium/high scenarios
+    # share identical mortality, but the source only publishes life expectancy
+    # projections at ages 15/65/80 for the medium variant.
+    explorer_le_other = explorer_creator.create_with_grouped_projections(
+        table_name="life_expectancy",
+        config=config_default,
+        indicator_names=["life_expectancy"],
+        projection_variants=["medium"],
+        dimensions={
+            "age": ["15", "65", "80"],
             "sex": "*",
         },
         choice_renames={
             "age": {
-                "0": "At birth",
                 "15": "Aged 15",
                 "65": "Aged 65",
                 "80": "Aged 80",
             }
         },
     )
-    view_editor.edit_views_le(explorer_le, ds_grapher=ds)
+    view_editor.edit_views_le(explorer_le_other, ds_grapher=ds)
 
     ########## Fertility rate explorer
     explorer_fr = explorer_creator.create_with_grouped_projections(
@@ -228,7 +244,6 @@ def run() -> None:
             "age": ["all"],
             "sex": ["all"],
         },
-        common_view_config={"type": "Percentage"},
     )
     view_editor.edit_views_rates(explorer_growth, ds_grapher=ds)
 
@@ -241,7 +256,6 @@ def run() -> None:
             "age": ["all"],
             "sex": ["all"],
         },
-        common_view_config={"type": "Percentage"},
     )
     view_editor.edit_views_rates(explorer_natchange, ds_grapher=ds)
 
@@ -265,7 +279,8 @@ def run() -> None:
         explorer_deaths_rate,
         explorer_b,
         explorer_ma,
-        explorer_le,
+        explorer_le_birth,
+        explorer_le_other,
         explorer_fr,
         explorer_growth,
         explorer_natchange,

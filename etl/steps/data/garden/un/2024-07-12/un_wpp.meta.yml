@@ -267,6 +267,7 @@ tables:
           isProjection: *projection
           roundingMode: significantFigures
           numSignificantFigures: 4
+          numDecimalPlaces: 0
         presentation:
           title_public: |-
             Annual net migration
@@ -301,6 +302,7 @@ tables:
           isProjection: *projection
           roundingMode: significantFigures
           numSignificantFigures: 4
+          numDecimalPlaces: 0
         presentation:
           title_public: |-
             <%- if age == 'all' %>
