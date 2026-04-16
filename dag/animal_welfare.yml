@@ -120,10 +120,10 @@ steps:
   # Animal welfare data explorer.
   #
   export://explorers/animal_welfare/latest/animal_welfare:
+    - data://grapher/animal_welfare/2023-08-01/global_hen_inventory
+    - data://grapher/animal_welfare/2026-04-16/chick_culling_laws
     - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
     - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
-    - data://grapher/animal_welfare/2023-09-01/chick_culling_laws
-    - data://grapher/animal_welfare/2023-08-01/global_hen_inventory
     - data://grapher/animal_welfare/2024-12-17/fur_laws
   #
   # Total number of animals used for food.
@@ -143,3 +143,12 @@ steps:
   #
   data://grapher/animal_welfare/2026-03-03/land_animals_killed_for_food:
     - data://garden/faostat/2026-02-25/faostat_qcl
+  #
+  # Chick culling laws (Various sources).
+  #
+  data://meadow/animal_welfare/2026-04-16/chick_culling_laws:
+    - snapshot://animal_welfare/2026-04-16/chick_culling_laws.csv
+  data://garden/animal_welfare/2026-04-16/chick_culling_laws:
+    - data://meadow/animal_welfare/2026-04-16/chick_culling_laws
+  data://grapher/animal_welfare/2026-04-16/chick_culling_laws:
+    - data://garden/animal_welfare/2026-04-16/chick_culling_laws
