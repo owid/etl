@@ -3,6 +3,8 @@ definitions:
     presentation:
       topic_tags:
       - Animal Welfare
+  description_processing_backfill: &description_processing_backfill
+    Data for 2006-2011 was suppressed in the 2026 release. Values from the earlier 2023 release were used to fill this gap.
 
 dataset:
   title: "UK egg statistics (Defra, 2026)"
@@ -14,6 +16,7 @@ tables:
         title: Number of eggs from hens in barns
         unit: eggs
         short_unit: ''
+        description_processing: *description_processing_backfill
       number_of_eggs_from_enriched_cages:
         title: Number of eggs from hens in (enriched) cages
         unit: eggs
@@ -26,6 +29,7 @@ tables:
         title: Number of eggs from hens in organic, free-range farms
         unit: eggs
         short_unit: ''
+        description_processing: *description_processing_backfill
       number_of_eggs_all:
         title: Total number of eggs produced in the UK
         unit: eggs
