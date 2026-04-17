@@ -143,6 +143,11 @@ steps:
   data://grapher/animal_welfare/2026-04-16/uk_egg_statistics:
     - data://garden/animal_welfare/2026-04-16/uk_egg_statistics
   #
+  # US egg production (USDA).
+  #
+  data://meadow/animal_welfare/2026-04-16/us_egg_production:
+    - snapshot://animal_welfare/2026-04-16/us_egg_production.pdf
+  #
   # Share of cage-free eggs (Various sources).
   #
   data://garden/animal_welfare/2026-04-16/share_of_cage_free_eggs:

@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: USDA
+    title: Egg Markets Overview
+    description: |-
+      A weekly publication of the USDA Agricultural Marketing Service (AMS) Livestock and Poultry Program, Livestock, Poultry, and Grain Market News Division.
+    citation_full: |-
+      United States Department of Agriculture (USDA) - Egg Markets Overview, USDA Agricultural Marketing Service (AMS) Livestock and Poultry Program, Livestock, Poultry, and Grain Market News Division.
+    attribution_short: USDA
+    # NOTE: For upcoming updates, use this page to check the latest version available:
+    url_main: https://esmis.nal.usda.gov/concern/publications/73667q50n
+    url_download: |-
+      https://esmis.nal.usda.gov/sites/default/release-files/73667q50n/j0991c935/8p58rc63m/AMS_3725.PDF
+    date_accessed: '2026-04-16'
+    date_published: '2025-09-26'
+  license:
+    name: Public domain
+    url: https://www.usda.gov/about-usda/policies-and-links
+outs:
+  - md5: cb8eda852f40a651fdd8d918f61e7548
+    size: 1044396
+    path: us_egg_production.pdf
