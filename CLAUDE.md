@@ -13,6 +13,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Always run `make check` before committing**
 - If not told otherwise, save outputs to `ai/` directory.
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
+- **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
 
 
 ## Pipeline Overview
