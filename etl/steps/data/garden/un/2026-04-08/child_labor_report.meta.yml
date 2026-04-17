@@ -45,10 +45,19 @@ definitions:
     The definition of child labor also includes children who are doing hazardous work, those who work in hazardous occupations, hazardous industries (mining, quarrying and construction) or working long hours (more than 43 hours per week). The full list of hazardous occupations can be found in the [Methodology of the ILO-UNICEF Global Estimates of Child Labour documentation](https://www.ilo.org/publications/methodology-2024-ilo-unicef-global-estimates-child-labour).
 
   description_key_hazardous_work: |-
-    Children in hazardous work are those who work in hazardous occupations, hazardous industries (mining, quarrying and construction) or working long hours (more than 43 hours per week). The full list of hazardous occupations can be found in the [Methodology of the ILO-UNICEF Global Estimates of Child Labour documentation](https://www.ilo.org/publications/methodology-2024-ilo-unicef-global-estimates-child-labour).
+    Children in hazardous work are those in child labor who work in hazardous occupations, hazardous industries (mining, quarrying and construction) or working long hours (more than 43 hours per week). The full list of hazardous occupations can be found in the [Methodology of the ILO-UNICEF Global Estimates of Child Labour documentation](https://www.ilo.org/publications/methodology-2024-ilo-unicef-global-estimates-child-labour).
 
   description_key_modelled_data: |-
     This data comes from nationally representative household surveys, covering around 60% of the global population of children. To construct a global series with complete coverage, the [International Labour Organization (ILO)](#dod:ilo) and UNICEF use a statistical model to estimate child labor prevalence in countries with missing data. You can read more about how these estimates are produced in the [Methodology of the ILO-UNICEF Global Estimates of Child Labour documentation](https://www.ilo.org/publications/methodology-2024-ilo-unicef-global-estimates-child-labour).
+
+  description_key_household_chores_definition: |-
+    Unpaid household chores refer to activities such as cooking, cleaning, and childcare performed within a child's own home.
+
+  description_key_household_chores_not_included: |-
+    Unpaid household chores — such as cooking, cleaning, and childcare performed within a child's own home — are not counted as child labor under this definition.
+
+  description_key_worst_forms_not_included: |-
+    The data does not include the worst forms of child labor that cannot be measured through surveys (trafficking, forced labor, etc.).
 
   description_key_sector: |-
     <% if sector == "Agriculture" %>
@@ -58,6 +67,11 @@ definitions:
     <%- elif sector == "Services" %>
     The services sector includes wholesale and retail trade; restaurants and hotels; transport, storage, and communications; financing, insurance, real estate, and business and administrative services; and public administration, community, social, and personal services, as defined by the International Standard Industrial Classification of All Economic Activities (ISIC).
     <%- endif %>
+
+  note_excluding_household_chores: |-
+    Work here refers to economic activities (employment and production of goods). Household chores such as cooking, cleaning, and childcare are not included. Does not include the worst forms of child labor that cannot be measured through surveys (trafficking, forced labor, etc.).
+  note_including_household_chores: |-
+    Work here refers to economic activities (employment and production of goods). Does not include the worst forms of child labor that cannot be measured through surveys (trafficking, forced labor, etc.).
 
 
 # Learn more about the available fields:
@@ -77,7 +91,12 @@ tables:
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: Share of {definitions.sex} in child labor (<<age>>)
           numDecimalPlaces: 1
@@ -91,7 +110,12 @@ tables:
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: Number of {definitions.sex} in child labor (<<age>>)
           numDecimalPlaces: 0
@@ -101,10 +125,15 @@ tables:
         title: Share of children in hazardous work (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of {definitions.sex} aged <<age>> who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
+        description_short: Percentage of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: Share of {definitions.sex} in hazardous work (<<age>>)
           numDecimalPlaces: 1
@@ -114,10 +143,15 @@ tables:
         title: Number of children in hazardous work (<<sex>>, <<age>>)
         unit: "children"
         short_unit: ""
-        description_short: Number of {definitions.sex} aged <<age>> who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
+        description_short: Number of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: Number of {definitions.sex} in hazardous work (<<age>>)
           numDecimalPlaces: 0
@@ -127,11 +161,16 @@ tables:
         title: Share of children in child labor who are not attending school (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of {definitions.sex} aged <<age>> in child labor who are not attending school.
+        description_short: Percentage of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are not attending school.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: Share of {definitions.sex} in child labor who are not attending school (<<age>>)
           numDecimalPlaces: 0
@@ -141,11 +180,16 @@ tables:
         title: Number of children in child labor who are not attending school (<<sex>>, <<age>>)
         unit: "children"
         short_unit: ""
-        description_short: Number of {definitions.sex} aged <<age>> in child labor who are not attending school.
+        description_short: Number of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are not attending school.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: Number of {definitions.sex} in child labor who are not attending school (<<age>>)
           numDecimalPlaces: 0
@@ -158,7 +202,12 @@ tables:
         description_short: Percentage of {definitions.sex} aged <<age>> in hazardous work who are not attending school.
         description_key:
           - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: Share of {definitions.sex} in hazardous work who are not attending school (<<age>>)
           numDecimalPlaces: 1
@@ -171,7 +220,12 @@ tables:
         description_short: Number of {definitions.sex} aged <<age>> in hazardous work who are not attending school.
         description_key:
           - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: Number of {definitions.sex} in hazardous work who are not attending school (<<age>>)
           numDecimalPlaces: 0
@@ -181,11 +235,16 @@ tables:
         title: Share of children in child labor including household chores (<<sex>>, <<age>>)
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of {definitions.sex} aged <<age>> in child labor, including household chores performed for 21 or more hours per week.
+        description_short: Percentage of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor), including household chores performed for 21 or more hours per week.
         description_key:
           - "{definitions.description_key_child_labor_household_chores}"
           - "{definitions.description_key_child_labor_hazardous_work}"
+          - "{definitions.description_key_household_chores_definition}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_including_household_chores}"
         display:
           name: Share of {definitions.sex} in child labor including household chores (<<age>>)
           numDecimalPlaces: 1
@@ -197,12 +256,17 @@ tables:
         title: "Share of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of {definitions.sex} aged <<age>> in child labor who are working in the <<sector | lower>> sector.
+        description_short: Percentage of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are working in the <<sector | lower>> sector.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: "Share of {definitions.sex} in child labor by sector: <<sector>> (<<age>>)"
           numDecimalPlaces: 1
@@ -212,12 +276,17 @@ tables:
         title: "Number of children in child labor by sector: <<sector>> (<<sex>>, <<age>>)"
         unit: "children"
         short_unit: ""
-        description_short: Number of {definitions.sex} aged <<age>> in child labor who are working in the <<sector | lower>> sector.
+        description_short: Number of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are working in the <<sector | lower>> sector.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
           - "{definitions.description_key_child_labor_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: "Number of {definitions.sex} in child labor in <<sector | lower>> sector (<<age>>)"
           numDecimalPlaces: 0
@@ -230,8 +299,13 @@ tables:
         description_short: Percentage of {definitions.sex} aged <<age>> in hazardous work who are working in the <<sector | lower>> sector.
         description_key:
           - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: "Share of {definitions.sex} in hazardous work in <<sector | lower>> sector (<<age>>)"
           numDecimalPlaces: 1
@@ -244,8 +318,13 @@ tables:
         description_short: Number of {definitions.sex} aged <<age>> in hazardous work who are working in the <<sector | lower>> sector.
         description_key:
           - "{definitions.description_key_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
           - "{definitions.description_key_modelled_data}"
           - "{definitions.description_key_sector}"
+        presentation:
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
         display:
           name: "Number of {definitions.sex} in hazardous work in <<sector | lower>> sector (<<age>>)"
           numDecimalPlaces: 0
