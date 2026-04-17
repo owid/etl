@@ -15,7 +15,20 @@ sys.path.insert(0, str(etl_root))
 # Ensure we can import from ETL
 
 try:
-    from etl.config import ENV_FILE_PROD, Config, OWIDEnv
+    from etl.config import OWID_ENV, ENV_FILE_PROD, OWIDEnv
+
+    def get_prod_env() -> OWIDEnv:
+        """Return an OWIDEnv connected to the live_grapher DB.
+
+        Priority:
+        1. ENV_FILE_PROD (chart-diff's dedicated prod env file), if configured and present.
+        2. The default OWID_ENV loaded from `.env` — works for any user whose `.env`
+           is already pointed at live_grapher (e.g. DB_NAME=live_grapher via the bore
+           tunnel on 127.0.0.1:3310), which is the common case for ETL users.
+        """
+        if ENV_FILE_PROD and Path(ENV_FILE_PROD).exists():
+            return OWIDEnv.from_env_file(ENV_FILE_PROD)
+        return OWID_ENV
 
     def fetch_dod_by_names(dod_names: list[str]) -> dict:
         """
@@ -28,20 +41,7 @@ try:
             Dictionary with DOD data or error information for each key
         """
         try:
-            # Try to use production environment file if available, otherwise create production config
-            if ENV_FILE_PROD and Path(ENV_FILE_PROD).exists():
-                prod_env = OWIDEnv.from_env_file(ENV_FILE_PROD)
-            else:
-                # Create production config manually
-                prod_config = Config(
-                    GRAPHER_USER_ID=None,
-                    DB_USER="owid",
-                    DB_NAME="live_grapher",
-                    DB_PASS="",
-                    DB_PORT="3306",
-                    DB_HOST="prod-db",
-                )
-                prod_env = OWIDEnv(prod_config)
+            prod_env = get_prod_env()
 
             if not dod_names:
                 return {"success": True, "dods": {}}
@@ -106,20 +106,7 @@ try:
             Dictionary with list of all DOD names or error information
         """
         try:
-            # Try to use production environment file if available, otherwise create production config
-            if ENV_FILE_PROD and Path(ENV_FILE_PROD).exists():
-                prod_env = OWIDEnv.from_env_file(ENV_FILE_PROD)
-            else:
-                # Create production config manually
-                prod_config = Config(
-                    GRAPHER_USER_ID=None,
-                    DB_USER="owid",
-                    DB_NAME="live_grapher",
-                    DB_PASS="",
-                    DB_PORT="3306",
-                    DB_HOST="prod-db",
-                )
-                prod_env = OWIDEnv(prod_config)
+            prod_env = get_prod_env()
 
             query = """
                 SELECT DISTINCT d.name
