@@ -258,8 +258,16 @@ def main_cli(
             print(f"--- File changed: {changed_file.name} [{mode_label}]", flush=True)
 
             # If a snapshot .py or .dvc file changed, refresh the snapshot before
-            # rebuilding downstream steps.
+            # rebuilding downstream steps — but only when the snapshot is part of
+            # the watched subdag, to avoid running etls for unrelated snapshots.
             if _is_snapshot_source_file(changed_file):
+                dataset_name = _snapshot_dataset_name(changed_file)
+                if dataset_name not in _watched_snapshot_stems(kwargs):
+                    print(
+                        f"--- Skipping snapshot {dataset_name}: not a dependency of the watched steps",
+                        flush=True,
+                    )
+                    continue
                 try:
                     _run_snapshot_for_file(changed_file)
                 except Exception:
@@ -324,6 +332,45 @@ def _run_snapshot_for_file(path: Path) -> None:
     dataset_name = _snapshot_dataset_name(path)
     print(f"--- Running snapshot: {dataset_name}", flush=True)
     snapshot_cli.main(args=[dataset_name], standalone_mode=False)
+
+
+def _watched_snapshot_stems(kwargs: dict) -> set[str]:
+    """Return the `namespace/version/short_name` stems of snapshot dependencies in the watched subdag.
+
+    Used to gate auto-running `etls` during --watch: only snapshots referenced by
+    the currently-watched steps should trigger a snapshot refresh.
+    """
+    dag = load_dag(kwargs["dag_path"])
+    full_dag = construct_full_dag(dag)
+    try:
+        subdag = construct_subdag(
+            full_dag,
+            includes=kwargs["includes"],
+            excludes=kwargs["excludes"],
+            grapher=kwargs["grapher"],
+            export=kwargs["export"],
+            private=kwargs["private"],
+            only=kwargs["only"],
+            exact_match=kwargs["exact_match"],
+        )
+    except SystemExit:
+        # construct_subdag sys.exits on empty includes match; treat as no watched snapshots.
+        return set()
+
+    uris = set(subdag) | {dep for deps in subdag.values() for dep in deps}
+
+    stems: set[str] = set()
+    for uri in uris:
+        for prefix in ("snapshot://", "snapshot-private://"):
+            if uri.startswith(prefix):
+                stem = uri[len(prefix) :]
+                # Strip the data file extension (e.g. .csv, .xlsx) from the last segment
+                last = stem.rsplit("/", 1)[-1]
+                if "." in last:
+                    stem = stem.rsplit(".", 1)[0]
+                stems.add(stem)
+                break
+    return stems
 
 
 def _find_closest_matches(includes_str: str, dag: DAG) -> None:
