@@ -242,6 +242,8 @@ tables:
               The [total fertility rate](#dod:fertility-rate) summarizes the total number of births a woman would have if she experienced the birth rates seen in women of each age group in one particular year across her childbearing years.
               <%- elif age == '10-14' %>
               The [age-specific fertility rate](#dod:age-specific-fertility-rate) for girls aged << age|replace('-', ' to ') >>, measured as the number of live births per 1,000 girls in this age group.
+              <%- elif age == '15-19' %>
+              The [age-specific fertility rate](#dod:age-specific-fertility-rate) for adolescent girls aged 15 to 19, measured as the number of live births per 1,000 girls in this age group.
               <%- else %>
               The [age-specific fertility rate](#dod:age-specific-fertility-rate) for women aged << age|replace('-', ' to ') >>, measured as the number of live births per 1,000 women in this age group.
               <%- endif %> {definitions.global.projections}
