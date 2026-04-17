@@ -3,7 +3,7 @@
   "publisher": "owid",
   "displayName": "DoD Syntax",
   "description": "Syntax highlighting, autocomplete, and hover details for Definition of Data (DoD) references",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "repository": {
     "type": "git",
     "url": "https://github.com/owid/etl"
