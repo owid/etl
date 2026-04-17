@@ -1,0 +1,274 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+
+  desc_key: &desc_key
+    - The [GHSL Urban Centre Database (GHS-UCDB R2024A)](https://human-settlement.emergency.copernicus.eu/ghs_ucdb2024.php) tracks population and land use for 11,422 [cities](#dod:cities-degurba) around the world. Cities are identified using the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php), based on population density and settlement size rather than administrative boundaries. To qualify as a city, an area must have at least 1,500 people per square kilometre and a total population of at least 50,000.
+    - City boundaries are fixed at their 2025 extent and held constant across all years. This means historical values reflect conditions within today's city boundary, not the city as it was defined at the time.
+    - The underlying population figures have been rescaled to match UN World Population Prospects 2022 national totals, so country-level numbers are consistent with UN estimates.
+
+  desc_processing: &desc_processing |-
+    Cities are ranked by population within each country and year. Tier 1 is the single largest city; Tier 2 is the 2nd to 5th largest cities combined; Tier 3 is the 6th largest city and above (up to 50 cities). Regional aggregates pool all cities from member countries before ranking.
+
+  # ── short descriptions ────────────────────────────────────────────────────
+  desc_tier1_pop_est: &desc_tier1_pop_est |-
+    Total population living in the single largest city (historical).
+  desc_tier1_pop_proj: &desc_tier1_pop_proj |-
+    Total population living in the single largest city (projected).
+  desc_tier2_pop_est: &desc_tier2_pop_est |-
+    Total population living in the 2nd to 5th largest cities combined (historical).
+  desc_tier2_pop_proj: &desc_tier2_pop_proj |-
+    Total population living in the 2nd to 5th largest cities combined (projected).
+  desc_tier3_pop_est: &desc_tier3_pop_est |-
+    Total population living in the 6th largest city and above (historical).
+  desc_tier3_pop_proj: &desc_tier3_pop_proj |-
+    Total population living in the 6th largest city and above (projected).
+
+  desc_tier1_share_est: &desc_tier1_share_est |-
+    Share of the total population living in the single largest city (historical).
+  desc_tier1_share_proj: &desc_tier1_share_proj |-
+    Share of the total population living in the single largest city (projected).
+  desc_tier2_share_est: &desc_tier2_share_est |-
+    Share of the total population living in the 2nd to 5th largest cities combined (historical).
+  desc_tier2_share_proj: &desc_tier2_share_proj |-
+    Share of the total population living in the 2nd to 5th largest cities combined (projected).
+  desc_tier3_share_est: &desc_tier3_share_est |-
+    Share of the total population living in the 6th largest city and above (historical).
+  desc_tier3_share_proj: &desc_tier3_share_proj |-
+    Share of the total population living in the 6th largest city and above (projected).
+
+  desc_tier1_urban_est: &desc_tier1_urban_est |-
+    Share of the total tracked city population living in the single largest city (historical).
+  desc_tier1_urban_proj: &desc_tier1_urban_proj |-
+    Share of the total tracked city population living in the single largest city (projected).
+  desc_tier2_urban_est: &desc_tier2_urban_est |-
+    Share of the total tracked city population living in the 2nd to 5th largest cities combined (historical).
+  desc_tier2_urban_proj: &desc_tier2_urban_proj |-
+    Share of the total tracked city population living in the 2nd to 5th largest cities combined (projected).
+  desc_tier3_urban_est: &desc_tier3_urban_est |-
+    Share of the total tracked city population living in the 6th largest city and above (historical).
+  desc_tier3_urban_proj: &desc_tier3_urban_proj |-
+    Share of the total tracked city population living in the 6th largest city and above (projected).
+
+tables:
+  ghsl_city_tiers:
+    variables:
+
+      # ── ESTIMATES ────────────────────────────────────────────────────────────
+
+      tier1_pop_estimates:
+        title: Population in largest city (historical)
+        unit: people
+        short_unit: ""
+        description_short: *desc_tier1_pop_est
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: Largest city
+          numDecimalPlaces: 0
+
+      tier2_pop_estimates:
+        title: Population in 2nd–5th largest cities (historical)
+        unit: people
+        short_unit: ""
+        description_short: *desc_tier2_pop_est
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: 2nd–5th largest cities
+          numDecimalPlaces: 0
+
+      tier3_pop_estimates:
+        title: Population in 6th largest city and above (historical)
+        unit: people
+        short_unit: ""
+        description_short: *desc_tier3_pop_est
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: All other cities
+          numDecimalPlaces: 0
+
+      tier1_pop_share_estimates:
+        title: Share of total population in largest city (historical)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier1_share_est
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: Largest city
+          numDecimalPlaces: 1
+
+      tier2_pop_share_estimates:
+        title: Share of total population in 2nd–5th largest cities (historical)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier2_share_est
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: 2nd–5th largest cities
+          numDecimalPlaces: 1
+
+      tier3_pop_share_estimates:
+        title: Share of total population in 6th largest city and above (historical)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier3_share_est
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: All other cities
+          numDecimalPlaces: 1
+
+      # ── PROJECTIONS ──────────────────────────────────────────────────────────
+
+      tier1_pop_projections:
+        title: Population in largest city (projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_tier1_pop_proj
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: Largest city
+          numDecimalPlaces: 0
+          isProjection: true
+
+      tier2_pop_projections:
+        title: Population in 2nd–5th largest cities (projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_tier2_pop_proj
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: 2nd–5th largest cities
+          numDecimalPlaces: 0
+          isProjection: true
+
+      tier3_pop_projections:
+        title: Population in 6th largest city and above (projected)
+        unit: people
+        short_unit: ""
+        description_short: *desc_tier3_pop_proj
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: All other cities
+          numDecimalPlaces: 0
+          isProjection: true
+
+      tier1_pop_share_projections:
+        title: Share of total population in largest city (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier1_share_proj
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: Largest city
+          numDecimalPlaces: 1
+          isProjection: true
+
+      tier2_pop_share_projections:
+        title: Share of total population in 2nd–5th largest cities (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier2_share_proj
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: 2nd–5th largest cities
+          numDecimalPlaces: 1
+          isProjection: true
+
+      tier3_pop_share_projections:
+        title: Share of total population in 6th largest city and above (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier3_share_proj
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: All other cities
+          numDecimalPlaces: 1
+          isProjection: true
+
+      # ── URBAN SHARE (estimates) ───────────────────────────────────────────────
+
+      tier1_urban_share_estimates:
+        title: Share of city population in largest city (historical)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier1_urban_est
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: Largest city
+          numDecimalPlaces: 1
+
+      tier2_urban_share_estimates:
+        title: Share of city population in 2nd–5th largest cities (historical)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier2_urban_est
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: 2nd–5th largest cities
+          numDecimalPlaces: 1
+
+      tier3_urban_share_estimates:
+        title: Share of city population in 6th largest city and above (historical)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier3_urban_est
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: All other cities
+          numDecimalPlaces: 1
+
+      # ── URBAN SHARE (projections) ─────────────────────────────────────────────
+
+      tier1_urban_share_projections:
+        title: Share of city population in largest city (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier1_urban_proj
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: Largest city
+          numDecimalPlaces: 1
+          isProjection: true
+
+      tier2_urban_share_projections:
+        title: Share of city population in 2nd–5th largest cities (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier2_urban_proj
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: 2nd–5th largest cities
+          numDecimalPlaces: 1
+          isProjection: true
+
+      tier3_urban_share_projections:
+        title: Share of city population in 6th largest city and above (projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_tier3_urban_proj
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          name: All other cities
+          numDecimalPlaces: 1
+          isProjection: true

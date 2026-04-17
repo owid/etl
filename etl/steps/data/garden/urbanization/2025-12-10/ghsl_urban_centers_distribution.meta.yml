@@ -1,0 +1,365 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+
+  desc_key: &desc_key
+    - The [GHSL Urban Centre Database (GHS-UCDB R2024A)](https://human-settlement.emergency.copernicus.eu/ghs_ucdb2024.php) tracks population and land use for 11,422 [cities](#dod:cities-degurba) around the world. Cities are identified using the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php), based on population density and settlement size rather than administrative boundaries. To qualify as a city, an area must have at least 1,500 people per square kilometre and a total population of at least 50,000.
+    - City boundaries are fixed at their 2025 extent and held constant across all years. This means historical values reflect conditions within today's city boundary, not the city as it was defined at the time.
+    - The underlying population figures have been rescaled to match UN World Population Prospects 2022 national totals, so country-level numbers are consistent with UN estimates.
+
+  desc_short_estimates: &desc_short_estimates |-
+    Share of the country's total population living in the Nth-largest city (historical). Rank 1 is the most populous city. Best viewed with a log y-axis.
+
+  desc_short_projections: &desc_short_projections |-
+    Share of the country's total population living in the Nth-largest city (projected). Rank 1 is the most populous city. Best viewed with a log y-axis.
+
+  desc_processing: &desc_processing |-
+    For each country and year, cities are ranked by population in descending order. The top 50 cities are retained. Regional aggregates pool all cities from member countries before ranking.
+
+tables:
+  ghsl_urban_centers_distribution:
+    variables:
+      # ── ESTIMATES (1950–2020) ──────────────────────────────────────────────────
+
+      city_pop_share_1950_estimates:
+        title: City population as a share of total population, by rank (1950)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_1955_estimates:
+        title: City population as a share of total population, by rank (1955)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_1960_estimates:
+        title: City population as a share of total population, by rank (1960)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_1965_estimates:
+        title: City population as a share of total population, by rank (1965)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_1970_estimates:
+        title: City population as a share of total population, by rank (1970)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_1975_estimates:
+        title: City population as a share of total population, by rank (1975)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_1980_estimates:
+        title: City population as a share of total population, by rank (1980)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_1985_estimates:
+        title: City population as a share of total population, by rank (1985)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_1990_estimates:
+        title: City population as a share of total population, by rank (1990)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_1995_estimates:
+        title: City population as a share of total population, by rank (1995)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_2000_estimates:
+        title: City population as a share of total population, by rank (2000)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_2005_estimates:
+        title: City population as a share of total population, by rank (2005)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_2010_estimates:
+        title: City population as a share of total population, by rank (2010)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_2015_estimates:
+        title: City population as a share of total population, by rank (2015)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      city_pop_share_2020_estimates:
+        title: City population as a share of total population, by rank (2020)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_estimates
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+
+      # ── PROJECTIONS (2020–2100) ──────────────────────────────────────────────
+
+      city_pop_share_2020_projections:
+        title: City population as a share of total population, by rank (2020, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2025_projections:
+        title: City population as a share of total population, by rank (2025, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2030_projections:
+        title: City population as a share of total population, by rank (2030, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2035_projections:
+        title: City population as a share of total population, by rank (2035, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2040_projections:
+        title: City population as a share of total population, by rank (2040, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2045_projections:
+        title: City population as a share of total population, by rank (2045, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2050_projections:
+        title: City population as a share of total population, by rank (2050, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2055_projections:
+        title: City population as a share of total population, by rank (2055, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2060_projections:
+        title: City population as a share of total population, by rank (2060, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2065_projections:
+        title: City population as a share of total population, by rank (2065, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2070_projections:
+        title: City population as a share of total population, by rank (2070, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2075_projections:
+        title: City population as a share of total population, by rank (2075, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2080_projections:
+        title: City population as a share of total population, by rank (2080, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2085_projections:
+        title: City population as a share of total population, by rank (2085, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2090_projections:
+        title: City population as a share of total population, by rank (2090, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2095_projections:
+        title: City population as a share of total population, by rank (2095, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      city_pop_share_2100_projections:
+        title: City population as a share of total population, by rank (2100, projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: *desc_short_projections
+        description_key: *desc_key
+        description_processing: *desc_processing
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
