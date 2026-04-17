@@ -439,8 +439,10 @@ tables:
               <%- else %> a << age >>-year-old
               <%- endif %>
               <%- else %>
-              <%- if age|string == '0' %> a << sex >> newborn
-              <%- else %> a << sex >> << age >>-year-old
+              <%- set noun = ('girl' if sex == 'female' else 'boy') if age|int < 18 else ('woman' if sex == 'female' else 'man') %>
+              <%- if age|string == '0' %> a newborn << noun >>
+              <%- elif age|string == '80' %> an << age >>-year-old << noun >>
+              <%- else %> a << age >>-year-old << noun >>
               <%- endif %>
               <%- endif %> can expect to live, if age-specific mortality rates in the current year were to stay the same throughout their life. {definitions.global.projections}
             # note: |-
