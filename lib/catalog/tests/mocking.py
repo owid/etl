@@ -97,9 +97,6 @@ def mock(_type: type) -> Any:
         # all dataclasses
         return _type(**{f.name: mock(f.type) for f in _type.__dataclass_fields__.values()})  # ty: ignore
 
-    elif getattr(_type, "__name__", None) == "ProcessingLog":
-        return _type([])
-
     elif _type is Any:
         return mock(random.choice([str, int, float]))
 
