@@ -31,6 +31,7 @@ Assumptions:
 - [ ] Meadow step: run + fix + diff + summarize
 - [ ] Garden step: run + fix + diff + summarize
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
+- [ ] Check metadata: typos, Jinja spacing, style guide compliance
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Pick 1–3 chart views for the public announcement
@@ -95,6 +96,19 @@ When you do stop, present a concise summary of the issue and what options exist.
 
 6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
    - Skip diff
+
+6b) Metadata quality checks — run after all ETL steps are built
+   Run all three checks on the newly built garden and grapher datasets so every issue surfaces together. Each skill writes results to the terminal; fix what comes up before moving on.
+
+   - **Typos** — `/check-metadata-typos` scoped to the current step. Run on each of the new `.meta.yml` files (garden first, then grapher). Accept or skip each suggested fix.
+   - **Jinja spacing** — `/check-metadata-spacing` on the built garden and grapher datasets. Catches template artifacts like doubled spaces or stray newlines that only appear after Jinja rendering.
+   - **Style guide** — `/check-metadata-style` on the grapher step. Audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide; needs the Notion MCP to be authenticated on first run.
+
+   If any skill rewrites a `.meta.yml`, re-run the affected step so the built catalog reflects the edits:
+   ```bash
+   .venv/bin/etlr <channel>/<namespace>/<new_version>/<short_name> --private --force --only
+   ```
+   Then re-run the relevant check to confirm zero remaining violations.
 
 7) Indicator upgrade (optional, staging only)
    - First upload the new grapher dataset to the staging DB (required before the upgrader can detect it):
