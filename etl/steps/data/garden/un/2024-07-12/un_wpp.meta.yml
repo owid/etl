@@ -231,6 +231,8 @@ tables:
             Fertility rate: births per woman
             <%- elif age == '10-14' %>
             Fertility rate among girls aged 10 to 14
+            <%- elif age == '15-19' %>
+            Fertility rate among adolescent girls aged 15 to 19
             <%- else %>
             Fertility rate among women aged << age|replace('-', ' to ') >>
             <%- endif %>
@@ -240,6 +242,8 @@ tables:
               The [total fertility rate](#dod:fertility-rate) summarizes the total number of births a woman would have if she experienced the birth rates seen in women of each age group in one particular year across her childbearing years.
               <%- elif age == '10-14' %>
               The [age-specific fertility rate](#dod:age-specific-fertility-rate) for girls aged << age|replace('-', ' to ') >>, measured as the number of live births per 1,000 girls in this age group.
+              <%- elif age == '15-19' %>
+              The [age-specific fertility rate](#dod:age-specific-fertility-rate) for adolescent girls aged 15 to 19, measured as the number of live births per 1,000 girls in this age group.
               <%- else %>
               The [age-specific fertility rate](#dod:age-specific-fertility-rate) for women aged << age|replace('-', ' to ') >>, measured as the number of live births per 1,000 women in this age group.
               <%- endif %> {definitions.global.projections}
@@ -349,6 +353,8 @@ tables:
             Number of births
             <%- elif age == '10-14' %>
             Number of births to girls aged 10 to 14
+            <%- elif age == '15-19' %>
+            Number of births to adolescent girls aged 15 to 19
             <%- else %>
             Number of births to women aged << age|replace('-', ' to ') >>
             <%- endif %>
@@ -427,9 +433,17 @@ tables:
           grapher_config:
             subtitle: |-
               The [period life expectancy](#dod:period-life-expectancy) is the age to which
+              <%- if sex == 'all' %>
               <%- if age|string == '0' %> a newborn
               <%- elif age|string == '80' %> an << age >>-year-old
               <%- else %> a << age >>-year-old
+              <%- endif %>
+              <%- else %>
+              <%- set noun = ('girl' if sex == 'female' else 'boy') if age|int < 18 else ('woman' if sex == 'female' else 'man') %>
+              <%- if age|string == '0' %> a newborn << noun >>
+              <%- elif age|string == '80' %> an << age >>-year-old << noun >>
+              <%- else %> a << age >>-year-old << noun >>
+              <%- endif %>
               <%- endif %> can expect to live, if age-specific mortality rates in the current year were to stay the same throughout their life. {definitions.global.projections}
             # note: |-
             #   <% if sex == 'all' %>
