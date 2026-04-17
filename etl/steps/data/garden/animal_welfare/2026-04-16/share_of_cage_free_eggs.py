@@ -25,32 +25,45 @@ def add_share_of_eggs_in_uk(tb_uk: Table) -> Table:
     return tb_uk
 
 
-def add_share_of_eggs_in_us(tb_us: Table) -> Table:
-    tb_us = tb_us.copy()
+def add_share_of_eggs_in_us(tb_usda: Table, tb_thl: Table) -> Table:
+    tb_usda = tb_usda.copy()
 
-    # Compute share of cage-free hens from flock sizes.
+    # Compute share of cage-free hens from USDA flock sizes (2012+).
     # NOTE: Unlike the UK (where we have egg counts), for the US we only have flock sizes,
     # so we use the share of cage-free hens as a proxy for the share of cage-free eggs.
-    total_hens = tb_us["caged"] + tb_us["cage_free"]
-    tb_us["share_of_eggs_cage_free"] = 100 * tb_us["cage_free"] / total_hens
-    tb_us["share_of_eggs_in_cages"] = 100 - tb_us["share_of_eggs_cage_free"]
+    total_hens = tb_usda["caged"] + tb_usda["cage_free"]
+    tb_usda["share_of_eggs_cage_free"] = 100 * tb_usda["cage_free"] / total_hens
+    tb_usda["share_of_eggs_in_cages"] = 100 - tb_usda["share_of_eggs_cage_free"]
 
     # Update their units.
-    tb_us["share_of_eggs_cage_free"].metadata.unit = "%"
-    tb_us["share_of_eggs_cage_free"].metadata.short_unit = "%"
-    tb_us["share_of_eggs_in_cages"].metadata.unit = "%"
-    tb_us["share_of_eggs_in_cages"].metadata.short_unit = "%"
+    tb_usda["share_of_eggs_cage_free"].metadata.unit = "%"
+    tb_usda["share_of_eggs_cage_free"].metadata.short_unit = "%"
+    tb_usda["share_of_eggs_in_cages"].metadata.unit = "%"
+    tb_usda["share_of_eggs_in_cages"].metadata.short_unit = "%"
 
-    return tb_us
+    columns = ["country", "year", "share_of_eggs_in_cages", "share_of_eggs_cage_free"]
+    tb_usda = tb_usda[columns]
+
+    # For 2007-2011, use share of cage-free hens from THL (originally sourced from USDA reports).
+    tb_thl = tb_thl[tb_thl["year"] < 2012][["country", "year", "share_of_hens_cage_free"]].rename(
+        columns={"share_of_hens_cage_free": "share_of_eggs_cage_free"}
+    )
+    tb_thl["share_of_eggs_in_cages"] = 100 - tb_thl["share_of_eggs_cage_free"]
+
+    return pr.concat([tb_thl[columns], tb_usda], ignore_index=True)
 
 
 def run() -> None:
     #
     # Load inputs.
     #
-    # Load US egg production dataset.
-    ds_us = paths.load_dataset("us_egg_production")
-    tb_us = ds_us.read("us_egg_production")
+    # Load new USDA egg production dataset (2012+).
+    ds_usda = paths.load_dataset("us_egg_production", version="2026-04-16")
+    tb_usda = ds_usda.read("us_egg_production")
+
+    # Load old THL egg production dataset for pre-2012 share data.
+    ds_thl = paths.load_dataset("us_egg_production", version="2023-08-03")
+    tb_thl = ds_thl.read("us_egg_production_share_cage_free")
 
     # Load UK egg statistics dataset.
     ds_uk = paths.load_dataset("uk_egg_statistics")
@@ -63,11 +76,11 @@ def run() -> None:
     tb_uk = add_share_of_eggs_in_uk(tb_uk=tb_uk)
 
     # Add the share of US eggs in cages and cage-free.
-    tb_us = add_share_of_eggs_in_us(tb_us=tb_us)
+    tb_usda = add_share_of_eggs_in_us(tb_usda=tb_usda, tb_thl=tb_thl)
 
     # Combine data from different countries.
     columns = ["country", "year", "share_of_eggs_in_cages", "share_of_eggs_cage_free"]
-    tb = pr.concat([tb_uk[columns], tb_us[columns]], ignore_index=True, short_name=paths.short_name)
+    tb = pr.concat([tb_uk[columns], tb_usda[columns]], ignore_index=True, short_name=paths.short_name)
 
     # Improve table format.
     tb = tb.format()

@@ -9,14 +9,6 @@ steps:
   data://grapher/animal_welfare/2023-08-01/global_hen_inventory:
     - data://garden/animal_welfare/2023-08-01/global_hen_inventory
   #
-  # US egg production (The Humane League, 2023).
-  #
-  data://meadow/animal_welfare/2023-08-03/us_egg_production:
-    - snapshot://animal_welfare/2023-08-03/us_egg_production.csv
-    - snapshot://animal_welfare/2023-08-03/us_egg_production_share_cage_free.csv
-  data://garden/animal_welfare/2023-08-03/us_egg_production:
-    - data://meadow/animal_welfare/2023-08-03/us_egg_production
-  #
   # Various sources - Bullfighting laws.
   #
   data://meadow/animal_welfare/2024-06-04/bullfighting_laws:
@@ -143,6 +135,15 @@ steps:
   data://grapher/animal_welfare/2026-04-16/uk_egg_statistics:
     - data://garden/animal_welfare/2026-04-16/uk_egg_statistics
   #
+  # US egg production (The Humane League, 2023).
+  #
+  # NON UPDATEABLE. We need the old data from The Humane League (which comes mostly from an older USDA report) to have US coverage from 2007 to 2011.
+  data://meadow/animal_welfare/2023-08-03/us_egg_production:
+    - snapshot://animal_welfare/2023-08-03/us_egg_production.csv
+    - snapshot://animal_welfare/2023-08-03/us_egg_production_share_cage_free.csv
+  data://garden/animal_welfare/2023-08-03/us_egg_production:
+    - data://meadow/animal_welfare/2023-08-03/us_egg_production
+  #
   # US egg production (USDA).
   #
   data://meadow/animal_welfare/2026-04-16/us_egg_production:
@@ -158,5 +159,6 @@ steps:
   data://garden/animal_welfare/2026-04-16/share_of_cage_free_eggs:
     - data://garden/animal_welfare/2026-04-16/uk_egg_statistics
     - data://garden/animal_welfare/2026-04-16/us_egg_production
+    - data://garden/animal_welfare/2023-08-03/us_egg_production
   data://grapher/animal_welfare/2026-04-16/share_of_cage_free_eggs:
     - data://garden/animal_welfare/2026-04-16/share_of_cage_free_eggs
