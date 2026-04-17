@@ -135,6 +135,11 @@ steps:
   data://grapher/animal_welfare/2026-04-16/uk_egg_statistics:
     - data://garden/animal_welfare/2026-04-16/uk_egg_statistics
   #
+  # EU laying hens by way of keeping (European Commission).
+  #
+  data://meadow/animal_welfare/2026-04-16/laying_hens_keeping_eu:
+    - snapshot://animal_welfare/2026-04-16/laying_hens_keeping_eu.xlsx
+  #
   # US egg production (USDA, 2018).
   #
   # Non updateable.
