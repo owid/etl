@@ -268,14 +268,23 @@ def main_cli(
                         flush=True,
                     )
                     continue
-                try:
-                    _run_snapshot_for_file(changed_file)
-                except Exception:
-                    import traceback
+                if _snapshot_supports_auto_etls(changed_file):
+                    try:
+                        _run_snapshot_for_file(changed_file)
+                    except Exception:
+                        import traceback
 
-                    traceback.print_exc()
-                    print("--- snapshot_failed", flush=True)
-                    continue
+                        traceback.print_exc()
+                        print("--- snapshot_failed", flush=True)
+                        continue
+                else:
+                    # Manual-upload snapshot (no url_download). Skip etls so
+                    # metadata-only edits still rebuild downstream.
+                    print(
+                        f"--- Skipping etls for {dataset_name}: manual-upload snapshot (no url_download); "
+                        "rebuilding downstream only.",
+                        flush=True,
+                    )
 
         if ipdb:
             from ipdb import launch_ipdb_on_exception
@@ -323,6 +332,36 @@ def _snapshot_dataset_name(path: Path) -> str:
     while "." in relative.rsplit("/", 1)[-1]:
         relative = relative.rsplit(".", 1)[0]
     return relative
+
+
+def _snapshot_supports_auto_etls(path: Path) -> bool:
+    """Return True if `etls` can regenerate this snapshot without --path-to-file.
+
+    Looks at the companion .dvc file and checks for a downloadable URL
+    (`origin.url_download` or `source.source_data_url`). Manual-upload snapshots
+    without such a URL require --path-to-file, which watch mode can't supply.
+    """
+    import yaml
+
+    if path.suffix == ".dvc":
+        dvc_path = path
+    else:
+        # .py → find the companion <stem>.*.dvc in the same directory
+        candidates = list(path.parent.glob(f"{path.stem}.*.dvc"))
+        if not candidates:
+            return False
+        dvc_path = candidates[0]
+
+    try:
+        with open(dvc_path) as f:
+            content = yaml.safe_load(f) or {}
+    except Exception:
+        return False
+
+    meta = content.get("meta") or {}
+    origin = meta.get("origin") or {}
+    source = meta.get("source") or {}
+    return bool(origin.get("url_download") or source.get("source_data_url"))
 
 
 def _run_snapshot_for_file(path: Path) -> None:
