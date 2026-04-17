@@ -10,10 +10,17 @@ EXTRA: There is also the file map_brackets.yml, which contains relevant informat
 
 import re
 from pathlib import Path
+from typing import Any
 
 import yaml
 
 from etl.collection.explorer import Explorer
+
+# Last year for which UN WPP publishes estimates (projections start the year after).
+# Used as the default `mapTargetTime` on grouped projection views so the map opens
+# on the final estimate rather than deep into the 2024–2100 projection range.
+# Bump this when a new UN WPP edition lands.
+UN_WPP_ESTIMATES_LAST_YEAR = 2023
 
 
 class ViewEditor:
@@ -26,6 +33,9 @@ class ViewEditor:
 
     def __init__(self, map_brackets_yaml: str | Path):
         self.map_brackets = self._load_map_brackets(map_brackets_yaml)
+        # Cache of table_name -> grapher table (metadata only), shared across all
+        # edit_views_* calls that resolve grouped-view title/subtitle.
+        self._grapher_tables: dict[str, Any] = {}
 
     def _load_map_brackets(self, map_brackets_yaml: str | Path):
         """Load map brackets.
@@ -102,62 +112,148 @@ class ViewEditor:
         else:
             indicator.display = {**indicator.display, **display}
 
-    def edit_views_pop(self, explorer: Explorer):
-        """Edit population explorer views."""
+    def edit_views_pop(self, explorer: Explorer, ds_grapher=None):
+        """Edit population explorer views.
+
+        Views may have one y-indicator (estimates-only) or two (estimates + projection
+        variant, grouped by `create_with_grouped_projections`). The same display edits
+        apply to every indicator in the view.
+
+        When ``ds_grapher`` is provided, grouped projection views also get their
+        ``title`` / ``subtitle`` set explicitly from the indicator metadata — see
+        ``_apply_grouped_view_metadata``.
+        """
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
-            # Edit title
-            if indicator_name != "population_density":
-                if sex == "all":
-                    title = "Population"
-                else:
-                    title = f"{sex.title()} population"
-
-                if age != "all":
-                    if age == "0":
-                        title += " of children under the age of 1"
-                    elif age == "0-4":
-                        title += " of children under the age of 5"
-                    elif age == "0-14":
-                        title += " of children under the age of 15"
-                    elif age == "0-24":
-                        title += " under the age of 25"
-                    elif age == "1":
-                        title += " age 1"
-                    elif "-" in age:
-                        title += f" aged {age.replace('-', ' to ')} years"
-                    elif "+" in age:
-                        title += f" older than {age.replace('+', '')} years"
-                    else:
-                        title += f" at age {age} years"
-
-                if indicator_name == "population_change":
-                    title = f"Annual change in {title.lower()}"
-
-                if v.config is None:
-                    v.config = {"title": title}
-                else:
-                    v.config["title"] = title
 
             # Edit display
             assert v.indicators.y is not None
-            assert len(v.indicators.y) == 1
 
-            # Add map colorscheme
-            self._add_map_brackets_display(age, sex, indicator_name, v.indicators.y[0])
+            for indicator in v.indicators.y:
+                # Add map colorscheme
+                self._add_map_brackets_display(age, sex, indicator_name, indicator)
 
-            # Add legend name
-            if indicator_name != "population_density":
-                assert v.indicators.y[0].display is not None
-                v.indicators.y[0].display["name"] = f"{age} years"
+                # Add legend name
+                if indicator_name != "population_density":
+                    if indicator.display is None:
+                        indicator.display = {}
+                    indicator.display["name"] = f"{age} years"
 
-    def edit_views_manual(self, explorer: Explorer):
-        """Edit explorer views of manual explorer."""
+            self._apply_grouped_view_metadata(v, ds_grapher)
+
+    def _apply_grouped_view_metadata(self, view, ds_grapher):
+        """Populate ``view.config`` title/subtitle for grouped projection views.
+
+        Shared by every ``edit_views_*`` that operates on an explorer produced by
+        ``create_with_grouped_projections``. Grouped views have two y-indicators
+        — **projection variant first, estimates second** — that disagree on their
+        ``title`` field (so grapher falls back to the dataset origin like
+        "World Population Prospects") and on their ``subtitle`` (so the
+        projection-scenario note gets dropped). We fix both:
+
+        - ``title`` copied from the estimates indicator's ``title_public`` (both
+          indicators carry the same value for these explorers);
+        - ``subtitle`` copied from the projection indicator's
+          ``grapher_config.subtitle``, which already includes the "Future
+          projections are based on …" sentence plus any indicator-specific base
+          text.
+
+        The projection-first ordering is load-bearing for the map tab: grapher's
+        default ``map.columnSlug`` is y[0], and when y[0] is a projection column
+        the grapher's ``projectionColumnInfoBySlug`` auto-matches it with the
+        historical column at y[1] and the map shows the full 1950–2100 series
+        (historical + projection combined). Reversing the order would limit the
+        map to 1950–2023.
+
+        No-op when ``ds_grapher`` is ``None`` or the view is not a grouped
+        2-indicator view. The table name is extracted from the indicator's
+        catalog path, so this works for any ``un_wpp`` table.
+        """
+        if ds_grapher is None or view.indicators.y is None or len(view.indicators.y) != 2:
+            return
+
+        projection_path = view.indicators.y[0].catalogPath
+        estimates_path = view.indicators.y[1].catalogPath
+
+        projection_col = projection_path.split("#")[-1]
+        estimates_col = estimates_path.split("#")[-1]
+
+        # Invariant: create_with_grouped_projections concatenates [variant, estimates].
+        # If this ever flips, the subtitle we copy (projection's) would come from the
+        # wrong indicator, and the map tab would lose its auto-combined full range.
+        assert "variant_estimates" not in projection_col, (
+            f"Expected first y-indicator to be a projection variant, got {projection_col!r}"
+        )
+        assert "variant_estimates" in estimates_col, (
+            f"Expected second y-indicator to be the estimates variant, got {estimates_col!r}"
+        )
+
+        # Extract table from "grapher/un/.../un_wpp/<table>#<column>".
+        table_name = estimates_path.split("#")[0].split("/")[-1]
+        tb = self._get_grapher_table(ds_grapher, table_name)
+        if tb is None or estimates_col not in tb.columns or projection_col not in tb.columns:
+            return
+
+        estimates_meta = tb[estimates_col].metadata
+        projection_meta = tb[projection_col].metadata
+
+        title = (
+            estimates_meta.presentation.title_public
+            if estimates_meta.presentation and estimates_meta.presentation.title_public
+            else None
+        )
+        subtitle = None
+        if projection_meta.presentation and projection_meta.presentation.grapher_config:
+            subtitle = projection_meta.presentation.grapher_config.get("subtitle")
+
+        if view.config is None:
+            view.config = {}
+        if title:
+            view.config["title"] = title.strip()
+        if subtitle:
+            view.config["subtitle"] = subtitle.strip()
+        # Open the map tab at the last estimate year (see `UN_WPP_ESTIMATES_LAST_YEAR`).
+        # Otherwise grapher's default "latest" lands on the far end of the projection
+        # range (2100). `mapTargetTime` is the explorer-grammar keyword that grapher
+        # translates into `config.map.time`.
+        view.config["mapTargetTime"] = UN_WPP_ESTIMATES_LAST_YEAR
+
+    def _get_grapher_table(self, ds_grapher, table_name):
+        """Cached read of a grapher-channel table (metadata only)."""
+        if table_name not in self._grapher_tables:
+            self._grapher_tables[table_name] = ds_grapher.read(table_name, load_data=False)
+        return self._grapher_tables[table_name]
+
+    def edit_views_manual(self, explorer: Explorer, ds_grapher=None):
+        """Edit explorer views of the manual explorer.
+
+        Covers two kinds of view that can't be produced by
+        ``create_with_grouped_projections``:
+          - multi-indicator stacked views (``age_structure``, ``population_broad``),
+            rendered as stacked bar/area with several y-indicators per view;
+          - display-only indicator slugs (``child_deaths`` / ``infant_deaths`` /
+            ``infant_mortality_rate`` / ``child_mortality_rate``) whose projection
+            views are declared directly in the YAML as two y-indicators (estimates
+            + projection variant) so the grapher renders the solid-to-dashed
+            transition.
+        """
         pattern = re.compile(r".*/population#population__sex_(?:[a-z]+)__age_([\d_+(plus)]+)__variant_(?:[a-z]+)$")
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
+            variant = v.dimensions.get("variant", "estimates")
+
+            # Append projection note for multi-indicator stacked views (age_structure,
+            # population_broad). Those have their subtitle set in the YAML common_views
+            # and are NOT 2-indicator grouped views, so the generic
+            # `_apply_grouped_view_metadata` helper doesn't touch them.
+            if variant != "estimates" and v.config and v.config.get("subtitle"):
+                v.config["subtitle"] = (
+                    v.config["subtitle"]
+                    + f" Future projections are based on the [UN's {variant} scenario](#dod:un-projection-scenarios)."
+                )
+
             if indicator_name in {"age_structure", "population_broad"}:
                 # Edit display
                 assert v.indicators.y is not None
@@ -168,53 +264,38 @@ class ViewEditor:
                     age = match.group(1).replace("_", "-").replace("plus", "+")
                     display = {
                         "name": f"{age} years",
+                        "roundingMode": "significantFigures",
+                        "numSignificantFigures": 4,
                     }
                     if indicator.display is None:
                         indicator.display = display
                     else:
                         indicator.display = {**indicator.display, **display}
-            elif indicator_name in {"growth_rate", "natural_change_rate"}:
-                # Edit display
-                assert v.indicators.y is not None
-                for indicator in v.indicators.y:
-                    self._add_map_brackets_display("all", "all", indicator_name, indicator)
-                    # display = {
-                    #     "colorScaleScheme": "RdBu",
-                    #     "colorScaleNumericBins": "-5;-2;-1;-0.5;0;0.5;1;2;5;1",
-                    # }
-                    # if indicator.display is None:
-                    #     indicator.display = display
-                    # else:
-                    #     indicator.display = {**indicator.display, **display}
             elif indicator_name in {"child_deaths", "infant_deaths"}:
-                # Edit display
+                # Map colorscheme: always target the estimates indicator (y[0]),
+                # which carries the age/sex dims that determine the brackets.
                 assert v.indicators.y is not None
-                assert len(v.indicators.y) == 1
+                assert 1 <= len(v.indicators.y) <= 2, (
+                    f"Expected 1 (estimates-only) or 2 (grouped) y-indicators for {indicator_name}, "
+                    f"got {len(v.indicators.y)}"
+                )
 
-                # Get dimensions
                 sex = v.dimensions["sex"]
                 age = v.dimensions["age"]
-
-                # Add map colorscheme
                 self._add_map_brackets_display(age, sex, indicator_name, v.indicators.y[0])
 
-    def edit_views_fr(self, explorer):
+            # For grouped 2-indicator projection views declared in YAML (infant_deaths,
+            # child_deaths, infant_mortality_rate, child_mortality_rate), copy
+            # title_public + projection subtitle from grapher metadata onto the view.
+            self._apply_grouped_view_metadata(v, ds_grapher)
+
+    def edit_views_fr(self, explorer, ds_grapher=None):
         """Edit fertility rate explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
             if indicator_name == "fertility_rate":
-                if age == "all":
-                    title = "Fertility rate: children per woman"
-                else:
-                    title = f"Fertility rate from mothers aged {age.capitalize().replace('-', ' to ')}"
-
-                if v.config is None:
-                    v.config = {"title": title}
-                else:
-                    v.config["title"] = title
-
                 # Edit display
                 assert v.indicators.y is not None
                 for indicator in v.indicators.y:
@@ -224,23 +305,14 @@ class ViewEditor:
                         indicator_name,
                         indicator,
                     )
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_b(self, explorer):
+    def edit_views_b(self, explorer, ds_grapher=None):
         """Edit births explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
             age = v.dimensions["age"]
             sex = v.dimensions["sex"]
-            if indicator_name == "births":
-                if age == "all":
-                    title = "Births"
-                else:
-                    title = f"Births from mothers aged {age.capitalize().replace('-', ' to ')}"
-
-                if v.config is None:
-                    v.config = {"title": title}
-                else:
-                    v.config["title"] = title
 
             # Edit display
             assert v.indicators.y is not None
@@ -251,8 +323,9 @@ class ViewEditor:
                     indicator_name,
                     indicator,
                 )
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_ma(self, explorer):
+    def edit_views_ma(self, explorer, ds_grapher=None):
         """Edit median age explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
@@ -261,8 +334,9 @@ class ViewEditor:
             if indicator_name == "median_age":
                 for indicator in v.indicators.y:
                     self._add_map_brackets_display(age, sex, indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_mig(self, explorer):
+    def edit_views_mig(self, explorer, ds_grapher=None):
         """Edit migration explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
@@ -271,123 +345,67 @@ class ViewEditor:
             if indicator_name in {"net_migration", "net_migration_rate"}:
                 for indicator in v.indicators.y:
                     self._add_map_brackets_display(age, sex, indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_deaths(self, explorer):
+    def edit_views_deaths(self, explorer, ds_grapher=None):
         """Edit deaths explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
-            if indicator_name == "deaths":
-                if sex == "all":
-                    title = "Deaths"
-                else:
-                    title = f"{sex.title()} deaths"
-
-                if age != "all":
-                    if age == "0":
-                        title += " of children under the age of 1"
-                    elif age == "0-4":
-                        title += " of children under the age of 5"
-                    elif age == "0-14":
-                        title += " of children under the age of 15"
-                    elif age == "0-24":
-                        title += " under the age of 25"
-                    elif "-" in age:
-                        title += f" aged {age.replace('-', ' to ')} years"
-                    elif "+" in age:
-                        title += f" older than {age.replace('+', '')} years"
-                    else:
-                        title += f" at age {age} years"
-
-                if v.config is None:
-                    v.config = {"title": title}
-                else:
-                    v.config["title"] = title
 
             for indicator in v.indicators.y:
                 self._add_map_brackets_display(age, sex, indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_le(self, explorer):
+    def edit_views_le(self, explorer, ds_grapher=None):
         """Edit life expectancy explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
             if indicator_name == "life_expectancy":
-                if sex == "all":
-                    title = "Life expectancy"
-                else:
-                    title = f"{sex.title()} life expectancy"
-
-                if age == "0":
-                    title += " at birth"
-                else:
-                    title += f" at age {age}"
-
                 if v.config is None:
-                    v.config = {
-                        "title": title,
-                        "yAxisMin": int(age),
-                    }
+                    v.config = {"yAxisMin": int(age)}
                 else:
-                    v.config["title"] = title
                     v.config["yAxisMin"] = int(age)
 
             for indicator in v.indicators.y:
                 self._add_map_brackets_display(age, sex, indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_sr(self, explorer):
+    def edit_views_sr(self, explorer, ds_grapher=None):
         """Edit sex ratio explorer views"""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
             age = v.dimensions["age"]
             if indicator_name == "sex_ratio":
-                title = "Sex ratio"
-
-                if age == "0":
-                    title += " at birth"
-                elif age == "100+":
-                    title += " at age 100 and over"
-                elif age != "all":
-                    title += f" at age {age}"
-
-                if v.config is None:
-                    v.config = {
-                        "title": title,
-                    }
-                else:
-                    v.config["title"] = title
-
                 for indicator in v.indicators.y:
                     self._add_map_brackets_display(age, "all", indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_dr(self, explorer):
+    def edit_views_dr(self, explorer, ds_grapher=None):
         """Edit dependency ratio explorer views."""
         for v in explorer.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
-            if indicator_name == "dependency_ratio":
-                sex_label = sex + " " if sex != "all" else ""
-                if age == "total":
-                    title = f"total {sex_label}dependency ratio"
-                elif age == "youth":
-                    title = f"{sex_label}youth dependency ratio"
-                elif age == "old":
-                    title = f"{sex_label}old-age dependency ratio"
-                else:
-                    raise ValueError(f"Unknown age: {age}")
-
-                if v.config is None:
-                    v.config = {
-                        "title": title.capitalize(),
-                    }
-                else:
-                    v.config["title"] = title.capitalize()
-
             for indicator in v.indicators.y:
                 self._add_map_brackets_display(age, sex, indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
+
+    def edit_views_rates(self, explorer, ds_grapher=None):
+        """Edit views for rate-style explorers with a single (sex=all, age=all) view.
+
+        Used by ``explorer_growth`` (growth_rate) and ``explorer_natchange``
+        (natural_change_rate).
+        """
+        for v in explorer.views:
+            indicator_name = v.dimensions["indicator"]
+            assert v.indicators.y is not None
+            for indicator in v.indicators.y:
+                self._add_map_brackets_display("all", "all", indicator_name, indicator)
+            self._apply_grouped_view_metadata(v, ds_grapher)
 
 
 def _get_brackets_sex(brackets, threshold=None):

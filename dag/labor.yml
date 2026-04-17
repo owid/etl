@@ -49,3 +49,15 @@ steps:
     - data://garden/worldbank_wdi/2026-02-27/wdi
   data://grapher/labor/2026-02-17/female_labor_force_participation_omm:
     - data://garden/labor/2026-02-17/female_labor_force_participation_omm
+
+  #
+  # ILO/UNICEF child labor report
+  #
+  data://meadow/un/2026-04-08/child_labor_report:
+    - snapshot://un/2026-04-08/child_labor_trends.csv
+    - snapshot://un/2026-04-08/child_labor_by_region.csv
+    - snapshot://un/2026-04-08/hazardous_work_by_region.csv
+  data://garden/un/2026-04-08/child_labor_report:
+    - data://meadow/un/2026-04-08/child_labor_report
+  data://grapher/un/2026-04-08/child_labor_report:
+    - data://garden/un/2026-04-08/child_labor_report

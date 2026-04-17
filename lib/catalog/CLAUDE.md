@@ -103,7 +103,6 @@ owid/catalog/
 │   ├── datasets.py         # Dataset container and serialization
 │   ├── meta.py             # Metadata dataclasses
 │   ├── processing.py       # Metadata-preserving pandas operations
-│   ├── processing_log.py   # Processing log for tracking transformations
 │   ├── yaml_metadata.py    # YAML metadata file handling
 │   └── utils.py            # Utility functions
 ├── api/                    # Remote data access APIs
