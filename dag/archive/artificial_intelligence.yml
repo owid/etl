@@ -821,7 +821,7 @@ steps:
   data://grapher/artificial_intelligence/2025-12-09/robotaxis:
     - data://garden/artificial_intelligence/2025-12-09/robotaxis
 
-  # NVIDIA quarterly revenue dataset
+# NVIDIA quarterly revenue dataset
   data://meadow/artificial_intelligence/2025-11-11/nvidia_revenue:
     - snapshot://artificial_intelligence/2025-11-11/nvidia_revenue.csv
   data://garden/artificial_intelligence/2025-11-11/nvidia_revenue:
@@ -829,3 +829,7 @@ steps:
     - data://garden/bls/2026-03-20/us_consumer_prices
   data://grapher/artificial_intelligence/2025-11-11/nvidia_revenue:
     - data://garden/artificial_intelligence/2025-11-11/nvidia_revenue
+
+# Robot density dataset - 2023 grapher step
+  data://grapher/ifr/2026-01-14/robot_density:
+    - data://garden/ifr/2026-01-14/robot_density

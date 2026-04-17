@@ -1,6 +1,8 @@
 ---
 name: update-dataset
 description: End-to-end dataset update workflow with PR creation, snapshot, meadow, garden, and grapher steps. Use when user wants to update a dataset, refresh data, run ETL update, or mentions updating dataset versions.
+metadata:
+  internal: true
 ---
 
 # Update Dataset (PR → snapshot → steps → grapher)
