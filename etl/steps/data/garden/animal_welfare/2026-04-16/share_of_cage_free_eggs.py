@@ -25,26 +25,34 @@ def add_share_of_eggs_in_uk(tb_uk: Table) -> Table:
     return tb_uk
 
 
-def run_sanity_checks(tb_us: Table) -> None:
-    # For the US, we have data from 2007 only on the share of cage-free hens, not eggs (for eggs, data starts in 2016).
-    # Check that those percentages (where there is data for both) are similar
-    error = "Expected less than 8 percent difference between the share of cage-free hens and eggs."
-    assert (
-        100
-        * abs(tb_us["share_of_hens_cage_free"] - tb_us["share_of_eggs_cage_free"])
-        / tb_us["share_of_eggs_cage_free"]
-    ).max() < 8, error
+def add_share_of_eggs_in_us(tb_us: Table) -> Table:
+    tb_us = tb_us.copy()
+
+    # Compute share of cage-free hens from flock sizes.
+    # NOTE: Unlike the UK (where we have egg counts), for the US we only have flock sizes,
+    # so we use the share of cage-free hens as a proxy for the share of cage-free eggs.
+    total_hens = tb_us["caged"] + tb_us["cage_free"]
+    tb_us["share_of_eggs_cage_free"] = 100 * tb_us["cage_free"] / total_hens
+    tb_us["share_of_eggs_in_cages"] = 100 - tb_us["share_of_eggs_cage_free"]
+
+    # Update their units.
+    tb_us["share_of_eggs_cage_free"].metadata.unit = "%"
+    tb_us["share_of_eggs_cage_free"].metadata.short_unit = "%"
+    tb_us["share_of_eggs_in_cages"].metadata.unit = "%"
+    tb_us["share_of_eggs_in_cages"].metadata.short_unit = "%"
+
+    return tb_us
 
 
 def run() -> None:
     #
     # Load inputs.
     #
-    # Load US egg production dataset and read its table on the share of cage-free hens and eggs.
+    # Load US egg production dataset.
     ds_us = paths.load_dataset("us_egg_production")
-    tb_us = ds_us.read("us_egg_production_share_cage_free")
+    tb_us = ds_us.read("us_egg_production")
 
-    # Load UK egg statistics dataset and read its main table.
+    # Load UK egg statistics dataset.
     ds_uk = paths.load_dataset("uk_egg_statistics")
     tb_uk = ds_uk.read("uk_egg_statistics")
 
@@ -54,23 +62,15 @@ def run() -> None:
     # Add the share of UK eggs in cages and cage-free.
     tb_uk = add_share_of_eggs_in_uk(tb_uk=tb_uk)
 
-    # Run sanity checks.
-    run_sanity_checks(tb_us=tb_us)
-
-    # Assume that the share of cage-free eggs is the same as the share of cage-free hens.
-    tb_us = tb_us.drop(columns=["share_of_eggs_cage_free"]).rename(
-        columns={"share_of_hens_cage_free": "share_of_eggs_cage_free"}, errors="raise"
-    )
-
-    # Add the share of US eggs in cages.
-    tb_us["share_of_eggs_in_cages"] = 100 - tb_us["share_of_eggs_cage_free"]
+    # Add the share of US eggs in cages and cage-free.
+    tb_us = add_share_of_eggs_in_us(tb_us=tb_us)
 
     # Combine data from different countries.
     columns = ["country", "year", "share_of_eggs_in_cages", "share_of_eggs_cage_free"]
     tb = pr.concat([tb_uk[columns], tb_us[columns]], ignore_index=True, short_name=paths.short_name)
 
     # Improve table format.
-    tb = tb.format(keys=["country", "year"])
+    tb = tb.format()
 
     #
     # Save outputs.

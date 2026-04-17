@@ -5,7 +5,7 @@ definitions:
       - Animal Welfare
 
 dataset:
-  title: "Share of cage-free eggs (Various sources, 2023)"
+  title: "Share of cage-free eggs"
 
 tables:
   share_of_cage_free_eggs:
@@ -19,7 +19,7 @@ tables:
         description_short: &description |
           Share of all eggs that are produced in cage-free housing systems. This includes barns, pasture and free-range (non-organic and organic) eggs.
         description_processing: &processing |
-          For the United States, we approximate the share of eggs by the share of hens (for which there is more data available); the difference is expected to be smaller than 10%.
+          For the United States, the share of cage-free eggs is approximated by the share of cage-free hens, due to limited data availability.
         presentation:
           grapher_config:
             subtitle: *description
