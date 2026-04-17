@@ -261,30 +261,37 @@ def main_cli(
             # rebuilding downstream steps — but only when the snapshot is part of
             # the watched subdag, to avoid running etls for unrelated snapshots.
             if _is_snapshot_source_file(changed_file):
-                dataset_name = _snapshot_dataset_name(changed_file)
-                if dataset_name not in _watched_snapshot_stems(kwargs):
+                watched_stems = _watched_snapshot_stems(kwargs)
+                if not _is_watched_snapshot_file(changed_file, watched_stems):
                     print(
-                        f"--- Skipping snapshot {dataset_name}: not a dependency of the watched steps",
+                        f"--- Skipping snapshot {_snapshot_dataset_name(changed_file)}: "
+                        "not a dependency of the watched steps",
                         flush=True,
                     )
                     continue
-                if _snapshot_supports_auto_etls(changed_file):
+                # For .dvc metadata-only edits on manual-upload snapshots, skip
+                # etls (it would need --path-to-file); the rebuild still picks
+                # up the .dvc change via checksum.
+                if _is_manual_upload_dvc_edit(changed_file):
+                    print(
+                        f"--- Skipping etls for {_snapshot_dataset_name(changed_file)}: "
+                        "manual-upload snapshot (no url_download); rebuilding downstream only.",
+                        flush=True,
+                    )
+                else:
                     try:
                         _run_snapshot_for_file(changed_file)
                     except Exception:
+                        # etls may legitimately fail (e.g. script requires
+                        # --path-to-file). Log and fall through to the rebuild
+                        # so metadata-only edits still propagate.
                         import traceback
 
                         traceback.print_exc()
-                        print("--- snapshot_failed", flush=True)
-                        continue
-                else:
-                    # Manual-upload snapshot (no url_download). Skip etls so
-                    # metadata-only edits still rebuild downstream.
-                    print(
-                        f"--- Skipping etls for {dataset_name}: manual-upload snapshot (no url_download); "
-                        "rebuilding downstream only.",
-                        flush=True,
-                    )
+                        print(
+                            "--- etls failed; rebuilding downstream only",
+                            flush=True,
+                        )
 
         if ipdb:
             from ipdb import launch_ipdb_on_exception
@@ -334,26 +341,35 @@ def _snapshot_dataset_name(path: Path) -> str:
     return relative
 
 
-def _snapshot_supports_auto_etls(path: Path) -> bool:
-    """Return True if `etls` can regenerate this snapshot without --path-to-file.
+def _is_watched_snapshot_file(path: Path, watched_stems: set[str]) -> bool:
+    """Return True if this snapshot file is tied to any watched snapshot stem.
 
-    Looks at the companion .dvc file and checks for a downloadable URL
-    (`origin.url_download` or `source.source_data_url`). Manual-upload snapshots
-    without such a URL require --path-to-file, which watch mode can't supply.
+    Handles the common case (stem matches directly) and driver scripts — a single
+    .py may produce multiple .dvc files with unrelated names, so if any .dvc in
+    the same directory is in the watched subdag, we consider the .py related.
     """
+    if _snapshot_dataset_name(path) in watched_stems:
+        return True
+    if path.suffix == ".py":
+        for dvc in path.parent.glob("*.dvc"):
+            if _snapshot_dataset_name(dvc) in watched_stems:
+                return True
+    return False
+
+
+def _is_manual_upload_dvc_edit(path: Path) -> bool:
+    """Return True for a .dvc edit on a manual-upload snapshot (no downloadable URL).
+
+    Such snapshots require --path-to-file, which watch mode can't supply, so we
+    skip etls. This check is intentionally scoped to .dvc only: a .py edit might
+    drive the download itself (e.g. fetch a PDF), so we still try etls for .py.
+    """
+    if path.suffix != ".dvc":
+        return False
     import yaml
 
-    if path.suffix == ".dvc":
-        dvc_path = path
-    else:
-        # .py → find the companion <stem>.*.dvc in the same directory
-        candidates = list(path.parent.glob(f"{path.stem}.*.dvc"))
-        if not candidates:
-            return False
-        dvc_path = candidates[0]
-
     try:
-        with open(dvc_path) as f:
+        with open(path) as f:
             content = yaml.safe_load(f) or {}
     except Exception:
         return False
@@ -361,7 +377,7 @@ def _snapshot_supports_auto_etls(path: Path) -> bool:
     meta = content.get("meta") or {}
     origin = meta.get("origin") or {}
     source = meta.get("source") or {}
-    return bool(origin.get("url_download") or source.get("source_data_url"))
+    return not (origin.get("url_download") or source.get("source_data_url"))
 
 
 def _run_snapshot_for_file(path: Path) -> None:
