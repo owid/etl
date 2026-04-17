@@ -44,6 +44,24 @@ def add_share_of_eggs_in_us(tb_usda: Table) -> Table:
     return tb_usda
 
 
+def add_share_of_eggs_in_eu(tb_eu: Table) -> Table:
+    tb_eu = tb_eu.copy()
+
+    # Compute share of cage-free hens from EU flock sizes.
+    # NOTE: Like the US, we use the share of cage-free hens as a proxy for the share of cage-free eggs.
+    cage_free = tb_eu["barn"] + tb_eu["free_range"] + tb_eu["organic"]
+    tb_eu["share_of_eggs_cage_free"] = 100 * cage_free / tb_eu["total"]
+    tb_eu["share_of_eggs_in_cages"] = 100 - tb_eu["share_of_eggs_cage_free"]
+
+    # Update their units.
+    tb_eu["share_of_eggs_cage_free"].metadata.unit = "%"
+    tb_eu["share_of_eggs_cage_free"].metadata.short_unit = "%"
+    tb_eu["share_of_eggs_in_cages"].metadata.unit = "%"
+    tb_eu["share_of_eggs_in_cages"].metadata.short_unit = "%"
+
+    return tb_eu
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -56,6 +74,10 @@ def run() -> None:
     ds_uk = paths.load_dataset("uk_egg_statistics")
     tb_uk = ds_uk.read("uk_egg_statistics")
 
+    # Load EU laying hens dataset.
+    ds_eu = paths.load_dataset("laying_hens_keeping_eu")
+    tb_eu = ds_eu.read("laying_hens_keeping_eu")
+
     #
     # Process data.
     #
@@ -65,9 +87,12 @@ def run() -> None:
     # Add the share of US eggs in cages and cage-free.
     tb_usda = add_share_of_eggs_in_us(tb_usda=tb_usda)
 
+    # Add the share of EU eggs in cages and cage-free.
+    tb_eu = add_share_of_eggs_in_eu(tb_eu=tb_eu)
+
     # Combine data from different countries.
     columns = ["country", "year", "share_of_eggs_in_cages", "share_of_eggs_cage_free"]
-    tb = pr.concat([tb_uk[columns], tb_usda[columns]], ignore_index=True, short_name=paths.short_name)
+    tb = pr.concat([tb_uk[columns], tb_usda[columns], tb_eu[columns]], ignore_index=True, short_name=paths.short_name)
 
     # Improve table format.
     tb = tb.format()
