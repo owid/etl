@@ -429,9 +429,15 @@ tables:
           grapher_config:
             subtitle: |-
               The [period life expectancy](#dod:period-life-expectancy) is the age to which
+              <%- if sex == 'all' %>
               <%- if age|string == '0' %> a newborn
               <%- elif age|string == '80' %> an << age >>-year-old
               <%- else %> a << age >>-year-old
+              <%- endif %>
+              <%- else %>
+              <%- if age|string == '0' %> a << sex >> newborn
+              <%- else %> a << sex >> << age >>-year-old
+              <%- endif %>
               <%- endif %> can expect to live, if age-specific mortality rates in the current year were to stay the same throughout their life. {definitions.global.projections}
             # note: |-
             #   <% if sex == 'all' %>
