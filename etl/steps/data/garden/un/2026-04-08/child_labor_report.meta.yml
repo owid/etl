@@ -134,7 +134,7 @@ tables:
           - "{definitions.description_key_modelled_data}"
         display:
           name: Share of {definitions.sex} in child labor who are not attending school (<<age>>)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *common_display
 
       number_child_labor_not_in_school:
