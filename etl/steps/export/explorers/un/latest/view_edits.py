@@ -262,11 +262,9 @@ class ViewEditor:
                     if not match:
                         raise ValueError(f"Unexpected indicator path: {indicator.catalogPath}")
                     age = match.group(1).replace("_", "-").replace("plus", "+")
-                    display = {
-                        "name": f"{age} years",
-                        "roundingMode": "significantFigures",
-                        "numSignificantFigures": 4,
-                    }
+                    display: dict[str, Any] = {"name": f"{age} years"}
+                    if indicator_name == "age_structure":
+                        display["numDecimalPlaces"] = 1
                     if indicator.display is None:
                         indicator.display = display
                     else:
