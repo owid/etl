@@ -10,7 +10,7 @@ meta:
       To identify compute-intensive AI models, the team at Epoch AI used various resources, estimating compute when not directly reported. They included benchmarks and repositories, such as Papers With Code and Hugging Face, to find models exceeding 10²³ FLOP. They also explored non-English media and specific leaderboards, particularly focusing on Chinese sources.
 
       Additionally, they examined blog posts, press releases from major labs, and scholarly literature to track new models. A separate table was created for models with unconfirmed but plausible compute levels. Despite thorough methods, proprietary and secretive models may have been missed.
-    date_published: '2025'
+    date_published: '2026-04-10'
 
     # Citation
     producer: Epoch AI
@@ -20,13 +20,13 @@ meta:
     # Files
     url_main: https://epoch.ai/blog/tracking-compute-intensive-ai-models
     url_download: https://epoch.ai/data/epochdb/large_scale_ai_models.csv
-    date_accessed: '2026-03-07'
+    date_accessed: '2026-04-17'
 
     # License
     license:
       name: CC BY 4.0
       url: https://epoch.ai/blog/how-much-does-it-cost-to-train-frontier-ai-models
 outs:
-  - md5: 51760e514f03275dde943d0a0f8dc439
-    size: 1045480
+  - md5: 7972a5571ad0e2cf7a255ba68a7b432c
+    size: 1052307
     path: epoch_compute_intensive.csv
