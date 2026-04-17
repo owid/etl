@@ -599,6 +599,8 @@ views:
   # values against each fertility variant. We keep all three variants wired up here
   # so the explorer honestly reflects what UN WPP publishes, even though the chart
   # looks unchanged when the user toggles the scenario.
+  - dimensions:
+      indicator: infant_mortality_rate
       age: "0"
       sex: all
       variant: estimates

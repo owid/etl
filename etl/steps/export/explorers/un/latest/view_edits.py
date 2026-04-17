@@ -264,6 +264,8 @@ class ViewEditor:
                     age = match.group(1).replace("_", "-").replace("plus", "+")
                     display = {
                         "name": f"{age} years",
+                        "roundingMode": "significantFigures",
+                        "numSignificantFigures": 4,
                     }
                     if indicator.display is None:
                         indicator.display = display
