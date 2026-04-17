@@ -294,18 +294,21 @@ def watch_folder(*paths: Path) -> Generator[Path, None, None]:
         current_files = _mtime_mapping(*paths)
 
         # Check for modifications
+        changed: Path | None = None
         for f, mtime in current_files.items():
-            # new file
-            if f not in last_seen:
-                yield f
+            # new file or updated file
+            if f not in last_seen or last_seen[f] != mtime:
+                changed = f
                 break
-            # updated file
-            else:
-                if last_seen[f] != mtime:
-                    yield f
-                    break
 
-        last_seen = current_files
+        if changed is not None:
+            yield changed
+            # Re-scan after the consumer handled the change. This absorbs any
+            # writes that happened during the handler (e.g. `etls` rewriting a
+            # .dvc file), so they don't falsely re-trigger on the next tick.
+            last_seen = _mtime_mapping(*paths)
+        else:
+            last_seen = current_files
 
 
 def upload_file_to_server(local_file_path: Path, target: str) -> None:

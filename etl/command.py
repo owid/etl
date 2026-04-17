@@ -257,6 +257,18 @@ def main_cli(
             mode_label = "instant (metadata only)" if is_yaml else "full"
             print(f"--- File changed: {changed_file.name} [{mode_label}]", flush=True)
 
+            # If a snapshot .py or .dvc file changed, refresh the snapshot before
+            # rebuilding downstream steps.
+            if _is_snapshot_source_file(changed_file):
+                try:
+                    _run_snapshot_for_file(changed_file)
+                except Exception:
+                    import traceback
+
+                    traceback.print_exc()
+                    print("--- snapshot_failed", flush=True)
+                    continue
+
         if ipdb:
             from ipdb import launch_ipdb_on_exception
 
@@ -279,6 +291,39 @@ def main_cli(
                 continue
             if watch:
                 print("--- Dataset rebuild complete", flush=True)
+
+
+def _is_snapshot_source_file(path: Path) -> bool:
+    """Return True if the path is a .py or .dvc file under SNAPSHOTS_DIR."""
+    if path.suffix not in (".py", ".dvc"):
+        return False
+    try:
+        path.resolve().relative_to(paths.SNAPSHOTS_DIR.resolve())
+    except ValueError:
+        return False
+    return True
+
+
+def _snapshot_dataset_name(path: Path) -> str:
+    """Convert a snapshot file path to a dataset name consumable by `etls`.
+
+    E.g. snapshots/foo/2024-01-01/bar.csv.dvc → foo/2024-01-01/bar
+         snapshots/foo/2024-01-01/bar.py      → foo/2024-01-01/bar
+    """
+    relative = path.relative_to(paths.SNAPSHOTS_DIR).as_posix()
+    # Strip all trailing extensions from the final path component.
+    while "." in relative.rsplit("/", 1)[-1]:
+        relative = relative.rsplit(".", 1)[0]
+    return relative
+
+
+def _run_snapshot_for_file(path: Path) -> None:
+    """Invoke the `etls` CLI in-process for the snapshot identified by `path`."""
+    from etl.snapshot_command import snapshot_cli
+
+    dataset_name = _snapshot_dataset_name(path)
+    print(f"--- Running snapshot: {dataset_name}", flush=True)
+    snapshot_cli.main(args=[dataset_name], standalone_mode=False)
 
 
 def _find_closest_matches(includes_str: str, dag: DAG) -> None:
