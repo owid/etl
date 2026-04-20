@@ -142,7 +142,7 @@ tables:
     variables:
       obs_value:
         title: <<indicator>>
-        description_short: <% if 'rate' in indicator | default('') %>Estimated share of children that die before reaching the age of fifteen.<% else %>Estiamted number of children that die before reaching the age of fifteen.<%- endif -%>
+        description_short: <% if 'rate' in indicator | default('') %>Estimated share of children who die before reaching the age of fifteen.<% else %>Estimated number of children who die before reaching the age of fifteen.<%- endif -%>
         description_processing: This indicator is processed by OWID based on the original data source. It is a combination of the under-five mortality rate and the 5-14 mortality rate.
         unit: <<unit_of_measure.lower()>>
         short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
