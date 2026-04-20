@@ -5,6 +5,8 @@ allowed-tools:
 - "WebFetch"
 - "Bash(.venv/bin/etl:*)"
 - "Bash(mkdir:*)"
+metadata:
+  internal: true
 ---
 
 # Creating Multidim Charts

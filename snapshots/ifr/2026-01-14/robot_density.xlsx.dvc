@@ -9,7 +9,7 @@ meta:
     citation_full: |-
       International Federation of Robotics (2024). Robot Density in the manufacturing industry.
 
-      Sources: Operational stock data: IFR, national robot associations; labor market data: OECD short-term labour market statistics, ILO LFS employment by economic activity, Eurostat lfsa_egan2, national statistics offices (Canada: Statistics Canada, China: China Statistical Yearbook, Germany: Statistisches Bundesamt, Korea: Ministry of Employment and Labour, USA: Bureau of Labor Statistics, Singapore: Ministry of Manpower).
+      Sources: Operational stock data: IFR, national robot associations; labor market data: OECD short-term labour market statistics, ILO LFS employment by economic activity, Eurostat, national statistics offices (Canada: Statistics Canada, China: China Statistical Yearbook, Germany: Statistisches Bundesamt, Korea: Ministry of Employment and Labour, USA: Bureau of Labor Statistics, Singapore: Ministry of Manpower).
     attribution: International Federation of Robotics
     attribution_short: IFR
     url_main: https://ifr.org/

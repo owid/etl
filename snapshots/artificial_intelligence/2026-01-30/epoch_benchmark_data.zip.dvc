@@ -8,23 +8,23 @@ meta:
     title: Epoch AI Benchmark Data
     description: |-
       Comprehensive collection of AI benchmark datasets from Epoch AI, including FrontierMath and other performance benchmarks.
-    date_published: '2026-01-26'
+    date_published: '2026-04-17'
 
     # Citation
     producer: Epoch AI
     citation_full: |-
-      Epoch AI, ‘AI Benchmarking Hub’. Published online at epoch.ai. Retrieved from ‘https://epoch.ai/benchmarks’ [online resource]. Accessed 30 Jan 2026.
+      Epoch AI, ‘AI Benchmarking Hub’. Published online at epoch.ai. Retrieved from ‘https://epoch.ai/benchmarks’ [online resource]. Accessed 17 Apr 2026.
 
     # Files
     url_main: https://epoch.ai/benchmarks
     url_download: https://epoch.ai/data/benchmark_data.zip
-    date_accessed: '2026-03-08'
+    date_accessed: '2026-04-17'
 
     # License
     license:
       name: CC BY 4.0
       url: https://epoch.ai/about
 outs:
-  - md5: 23d23743c3b8dc8c05d63659fd34afba
-    size: 315061
+  - md5: 8cc47ae3de826210dd3d6b33c96c29f3
+    size: 323309
     path: epoch_benchmark_data.zip

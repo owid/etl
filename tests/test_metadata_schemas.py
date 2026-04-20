@@ -1,6 +1,8 @@
+import json
 import subprocess
 from pathlib import Path
 
+import requests
 import structlog
 import yaml
 from jsonschema import (
@@ -9,6 +11,7 @@ from jsonschema import (
 from jsonschema.exceptions import ValidationError
 from yaml.loader import SafeLoader
 
+from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.files import read_json_schema
 from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
 
@@ -142,6 +145,13 @@ def test_dataset_schemas():
                 if "$schema" in ind.get("presentation", {}).get("grapher_config", {}):
                     del ind["presentation"]["grapher_config"]
 
+                # Ignore display fields containing Jinja templates (validated after rendering)
+                display = ind.get("display", {})
+                if display:
+                    for key in list(display.keys()):
+                        if isinstance(display[key], str) and "<%" in display[key]:
+                            del display[key]
+
         # Validate the loaded data against the schema
         try:
             validator.validate(data)
@@ -188,3 +198,65 @@ def test_snapshot_schemas():
             validator.validate(data)
         except ValidationError as e:
             raise ValidationError(f"Validation error in file: {meta_file_path}") from e
+
+
+# Properties that only exist in the local dataset schema (not in upstream grapher schema).
+# These are ETL-specific and intentionally absent from upstream.
+LOCAL_ONLY_PROPERTIES = {"data", "includedEntities"}
+
+
+def test_grapher_config_schema_sync():
+    """Verify that our local grapher_config schema stays in sync with the upstream
+    grapher schema. Detects when upstream adds new properties that we're missing,
+    or when property definitions have diverged and may need updating.
+
+    We maintain a local copy of grapher_config properties (rather than using $ref)
+    because our meta.yml files use Jinja templates and {definitions...} references
+    that the strict upstream schema would reject.
+    """
+    # Load local schema
+    with open(SCHEMAS_DIR / "dataset-schema.json") as f:
+        dataset_schema = json.load(f)
+    local_gc = dataset_schema["properties"]["tables"]["additionalProperties"]["properties"]["variables"][
+        "additionalProperties"
+    ]["properties"]["presentation"]["properties"]["grapher_config"]
+    local_props = set(local_gc["properties"].keys())
+
+    # Fetch upstream schema
+    resp = requests.get(DEFAULT_GRAPHER_SCHEMA, timeout=20)
+    resp.raise_for_status()
+    upstream = resp.json()
+    upstream_props = set(upstream["properties"].keys())
+
+    # Check for upstream properties missing locally
+    missing = upstream_props - local_props - LOCAL_ONLY_PROPERTIES
+    if missing:
+        # Build JSON snippets for each missing property so the developer can copy-paste
+        snippets = []
+        for prop in sorted(missing):
+            defn = upstream["properties"][prop]
+            snippet = json.dumps({prop: defn}, indent=2)
+            # Indent to match the nesting level in dataset-schema.json
+            snippet = "\n".join(" " * 24 + line for line in snippet.strip("{}").strip().split("\n"))
+            snippets.append(snippet)
+
+        raise AssertionError(
+            f"Upstream grapher schema ({DEFAULT_GRAPHER_SCHEMA}) has properties missing from\n"
+            f"schemas/dataset-schema.json → grapher_config: {sorted(missing)}\n"
+            f"\n"
+            f"To fix, add these properties inside the 'grapher_config.properties' object in\n"
+            f"schemas/dataset-schema.json (before the 'additionalProperties' key):\n"
+            f"\n" + "\n".join(snippets) + "\n\n"
+            "NOTE: If a property uses a strict type (e.g. enum, array) but our meta.yml files\n"
+            "use Jinja templates in that field, relax the type to 'string' or use\n"
+            "oneOf/anyOf to accept both. If the property is ETL-only and intentionally absent\n"
+            "from upstream, add it to LOCAL_ONLY_PROPERTIES in this test file."
+        )
+
+    # Check for local properties removed from upstream (excluding known local-only ones)
+    removed = (local_props - LOCAL_ONLY_PROPERTIES) - upstream_props
+    if removed:
+        log.warning(
+            "Local grapher_config has properties not in upstream schema (may be deprecated)",
+            properties=sorted(removed),
+        )

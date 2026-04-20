@@ -1281,6 +1281,19 @@
                             ]
                           }
                         },
+                        "focusedSeriesNames": {
+                          "type": "array",
+                          "description": "The initially focused chart elements. Is either a list of entity or variable names. Only works for line and slope charts for now.",
+                          "items": {
+                            "type": [
+                              "string"
+                            ]
+                          }
+                        },
+                        "slug": {
+                          "type": "string",
+                          "description": "Slug of the chart on Our World In Data"
+                        },
                         "baseColorScheme": {
                           "type": "string",
                           "default": "default",
@@ -1393,19 +1406,38 @@
                           "description": "Whether to hide the relative mode UI toggle. Default depends on the chart type"
                         },
                         "comparisonLines": {
-                          "description": "List of vertical comparison lines to draw",
+                          "description": "List of comparison lines to draw",
                           "type": "array",
                           "items": {
-                            "type": "object",
-                            "properties": {
-                              "label": {
-                                "type": "string"
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "description": "Comparison line of arbitrary shape defined by a formula. Defaults to yEquals = x if not specified",
+                                "properties": {
+                                  "label": {
+                                    "type": "string"
+                                  },
+                                  "yEquals": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
                               },
-                              "yEquals": {
-                                "type": "string"
+                              {
+                                "type": "object",
+                                "description": "Vertical comparison line drawn at a specific x-value",
+                                "properties": {
+                                  "label": {
+                                    "type": "string"
+                                  },
+                                  "xEquals": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": ["xEquals"],
+                                "additionalProperties": false
                               }
-                            },
-                            "additionalProperties": false
+                            ]
                           }
                         },
                         "internalNotes": {
@@ -1649,6 +1681,26 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "includedEntityNames": {
+                          "type": "array",
+                          "description": "Entities that should be included (opposite of excludedEntityNames). If empty, all available entities are used.",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "peerCountryStrategy": {
+                          "type": "string",
+                          "description": "Strategy for selecting peer countries for comparison",
+                          "enum": [
+                            "defaultSelection",
+                            "parentRegions",
+                            "gdpPerCapita",
+                            "population",
+                            "dataRange",
+                            "neighbors",
+                            "none"
+                          ]
                         },
                         "xAxis": {
                           "$ref": "#/$defs/axis"

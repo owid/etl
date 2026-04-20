@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: ILO-UNICEF Global Estimates of Child Labour
+    description: |-
+      The ILO-UNICEF 2024 Global Estimates of Child Labour provides an overview of child labour patterns and trends. It also describes the evolving profile of children in child labour, outlines the nature of child labour and where it is concentrated, and explores the impact of child labour on schooling. The report concludes with a discussion of the road ahead.
+    title_snapshot: ILO-UNICEF Global Estimates of Child Labour - Hazardous Work By Region, Sex and Age
+    description_snapshot: |-
+      Percentage and number (in thousands) of children aged 5 to 17 years in hazardous work, disaggregated by ILO regions, SDG regions, and UNICEF regions, broken down by sex (total, boys, girls) and age group (5–11, 12–14, 15–17, 5–17 years). Also includes shares not in school and distribution across economic sectors (agriculture, industry, services). Data are from the statistical annex of the ILO-UNICEF 2024 Global Estimates of Child Labour report.
+    date_published: "2025-06-11"
+    version_producer: '2024'
+
+    # Citation
+    producer: International Labour Organization and UNICEF
+    citation_full: |-
+      International Labour Organization and United Nations Children's Fund, Child Labour: Global estimates 2024, trends and the road forward, ILO and UNICEF, Geneva and New York, 2025. License: CC BY 4.0.
+    attribution_short: ILO and UNICEF
+
+    # Files
+    url_main: https://www.ilo.org/publications/major-publications/child-labour-global-estimates-2024-trends-and-road-forward
+    date_accessed: '2026-04-08'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.ilo.org/sites/default/files/2025-06/2024%20Global%20Estimates%20of%20Child%20Labour%20Report.pdf
+outs:
+  - md5: fd2b5c919a88d7e96ccae448771a872b
+    size: 4712
+    path: hazardous_work_by_region.csv

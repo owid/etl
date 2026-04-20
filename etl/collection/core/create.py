@@ -41,29 +41,47 @@ def create_collection(
     """
     Create a collection that supports multiple tables and corresponding list parameters.
 
-    This is a generalization of create_collection that allows tb, indicator_names,
-    dimensions, common_view_config, and choice_renames to be lists. When tb is a
-    list of tables, it creates multiple collections and combines them.
+    When ``tb`` is a list of tables, one sub-collection is created per table and
+    they are combined via ``combine_collections``. The parameters
+    ``indicator_names``, ``dimensions``, and ``common_view_config`` can also be
+    lists (one element per table); if they are single values they are broadcast.
 
     Args:
-        config_yaml: Configuration dictionary
-        dependencies: Set of dependencies
-        catalog_path: Path to catalog
-        tb: Single table or list of tables
-        indicator_names: Single value/list or list of values/lists
-        dimensions: Single dict or list of dicts
-        common_view_config: Single config dict or list of config dicts
-        indicators_slug: Indicators slug (applies to all)
-        indicator_as_dimension: Whether indicator is dimension (applies to all)
-        choice_renames: Single dict or list of dicts
-        catalog_path_full: Whether to use full catalog path (applies to all)
-        explorer: Whether to enable explorer (applies to all)
+        config_yaml: Configuration dictionary (YAML-based). Provides the base
+            structure including dimensions, views, and explorer settings. In the
+            multi-table path this config is applied twice — once per sub-collection
+            and once after combining — so it acts as the authoritative source for
+            dimension/choice metadata (names, descriptions, ordering).
+        dependencies: Set of dependency URIs for the collection.
+        catalog_path: Catalog path for the collection (e.g. "namespace#short_name").
+        tb: Single table or list of tables. When a list is provided, one
+            sub-collection is created per table and they are combined.
+        indicator_names: Indicator column names to include. A single value is
+            broadcast to all tables; a list must match the number of tables.
+        dimensions: Dimension specification (column names or {col: values} mapping).
+            A single value is broadcast to all tables; a list must match the number
+            of tables.
+        common_view_config: Extra view-level config merged into every generated view.
+            A single value is broadcast to all tables; a list must match the number
+            of tables.
+        indicators_slug: Slug used for the indicators dimension (applies to all tables).
+        indicator_as_dimension: Whether to treat indicators as a dimension (applies to
+            all tables).
+        choice_renames: Rename display names of dimension choices. Maps dimension
+            slugs to either a ``{choice_slug: new_name}`` dict or a
+            ``callable(choice_slug) -> new_name | None``. When ``tb`` is a list,
+            a single dict renames choices in the final collection; a list of dicts
+            renames per table (keys are auto-remapped if slugs change during
+            combining). Always takes precedence over names from ``config_yaml``.
+        catalog_path_full: Whether to use the full catalog path for indicators
+            (applies to all tables).
+        explorer: Whether to create an Explorer (True) or a Collection (False).
 
     Returns:
-        Collection object
+        Collection (or Explorer) object.
 
     Raises:
-        ValueError: If list parameters don't match the number of tables
+        ValueError: If list parameters don't match the number of tables.
     """
     if isinstance(tb, list):
         num_tables = len(tb)
@@ -83,13 +101,20 @@ def create_collection(
             common_view_config=common_view_config,
             num_tables=num_tables,
         )
-        # Build common_view_config
-        choice_renames_ = _get_choice_renames(
-            choice_renames=choice_renames,
-            num_tables=num_tables,
-        )
+        # Determine choice_renames mode: single dict (final) vs list (per-table).
+        is_list_renames = isinstance(choice_renames, list)
 
-        # Create collections for each table
+        if is_list_renames:
+            # Per-table renames: validate and distribute.
+            choice_renames_ = _get_choice_renames(
+                choice_renames=choice_renames,
+                num_tables=num_tables,
+            )
+        else:
+            # Single dict (or None): don't pass to sub-collections.
+            choice_renames_ = [None] * num_tables
+
+        # Create collections for each table.
         collections = []
         indicator_as_dimension_ = False
         for i in range(num_tables):
@@ -113,15 +138,30 @@ def create_collection(
             collections.append(c)
 
         if len(collections) == 1:
+            if not is_list_renames and choice_renames is not None:
+                # Single dict was deferred — apply now.
+                _rename_choices(collections[0], cast("dict[str, dict[str, str] | Callable]", choice_renames))
             return collections[0]
 
-        # Combine all collections
+        # Combine all collections, capturing slug changes for remapping.
+        slug_changes: dict = {}
         c = combine_collections(
             collections=collections,
             catalog_path=catalog_path,
             config=config_yaml,
             is_explorer=explorer,
+            _slug_changes_out=slug_changes,
         )
+
+        # Apply choice_renames to the final combined collection.
+        if is_list_renames:
+            # Per-table renames: remap keys using slug changes, then apply.
+            remapped = _remap_choice_renames(choice_renames_, slug_changes)
+            if remapped:
+                _rename_choices(c, remapped)
+        elif choice_renames is not None:
+            # Single dict: apply directly to the final collection.
+            _rename_choices(c, cast("dict[str, dict[str, str] | Callable]", choice_renames))
     else:
         # Single table case - call original function directly
         c = create_collection_single_table(
@@ -359,9 +399,106 @@ def _rename_choices(coll: Collection, choice_renames: dict[str, dict[str, str] |
                     if isinstance(renames, dict):
                         if choice.slug in renames:
                             choice.name = renames[choice.slug]  # ty: ignore[invalid-assignment]
-                    elif inspect.isfunction(renames):
+                    elif inspect.isfunction(renames) or callable(renames):
                         rename = renames(choice.slug)
                         if rename:
-                            choice.name = renames(choice.slug)
+                            choice.name = rename
                     else:
                         raise ValueError("Invalid choice_renames format.")
+
+
+def _remap_choice_renames(
+    choice_renames_per_table: list[dict[str, dict[str, str] | Callable] | None],
+    slug_changes: dict[str, Any],
+) -> dict[str, dict[str, str] | Callable]:
+    """Merge per-table choice_renames into a single dict, remapping choice slugs
+    to account for conflict-resolution renaming done by ``combine_collections``.
+
+    ``slug_changes`` has structure
+    ``{collection_id: {dimension_slug: {original_slug: renamed_slug}}}``.
+
+    When multiple tables contribute renames for the same dimension the entries
+    are composed with later-tables-win semantics: dict-only contributions are
+    merged with ``dict.update`` and any mix involving a callable falls back to
+    a composed callable that tries the later contribution first and the earlier
+    one on ``None``.
+    """
+    merged: dict[str, dict[str, str] | Callable] = {}
+
+    for i, renames in enumerate(choice_renames_per_table):
+        if renames is None:
+            continue
+        collection_id = str(i)
+        table_changes = slug_changes.get(collection_id, {})
+        for dim_slug, dim_renames in renames.items():
+            # Slug changes for this (collection, dimension). After ``unstack``
+            # in ``_extract_choice_slug_changes``, dimensions with conflicts in
+            # some collections but not this one show up as ``NaN``; sanitize to
+            # ``{}`` so downstream lookups stay dict-safe.
+            raw_changes = table_changes.get(dim_slug, {}) if isinstance(table_changes, dict) else {}
+            changes = raw_changes if isinstance(raw_changes, dict) else {}
+
+            if isinstance(dim_renames, dict):
+                # Dict renames: remap keys from original → final slug.
+                remapped_dict: dict[str, str] = {}
+                for orig_choice_slug, new_name in cast("dict[str, str]", dim_renames).items():
+                    final_slug = changes.get(orig_choice_slug, orig_choice_slug)
+                    remapped_dict[final_slug] = new_name
+                existing = merged.get(dim_slug)
+                if existing is None:
+                    merged[dim_slug] = remapped_dict
+                elif isinstance(existing, dict):
+                    existing.update(remapped_dict)
+                else:
+                    # Existing callable + new dict: compose so later dict wins
+                    # but earlier callable still contributes for non-overlapping
+                    # slugs.
+                    merged[dim_slug] = _compose_renames(later=remapped_dict, earlier=existing)
+
+            elif inspect.isfunction(dim_renames) or callable(dim_renames):
+                # Callable renames: wrap to reverse-map final slug → original
+                # before calling the user's function.
+                reverse_changes = {v: k for k, v in changes.items()}
+                new_func = _wrap_callable_with_reverse(reverse_changes, dim_renames)
+                existing = merged.get(dim_slug)
+                if existing is None:
+                    merged[dim_slug] = new_func
+                else:
+                    merged[dim_slug] = _compose_renames(later=new_func, earlier=existing)
+
+    return merged
+
+
+def _wrap_callable_with_reverse(reverse: dict[str, str], fn: Callable) -> Callable:
+    """Return ``fn`` wrapped so it receives the original (pre-conflict) slug."""
+
+    def wrapped(slug: str) -> str | None:
+        return fn(reverse.get(slug, slug))
+
+    return wrapped
+
+
+def _compose_renames(
+    later: dict[str, str] | Callable,
+    earlier: dict[str, str] | Callable,
+) -> Callable:
+    """Compose two rename sources with later-wins semantics.
+
+    Returns a callable that delegates to ``later`` first; on ``None`` (callable)
+    or a missing key (dict) it falls back to ``earlier``. Used when multiple
+    tables contribute a rename for the same dimension slug.
+    """
+
+    def composed(slug: str) -> str | None:
+        if isinstance(later, dict):
+            if slug in later:
+                return cast("str", later[slug])
+        else:
+            result = later(slug)
+            if result is not None:
+                return cast("str", result)
+        if isinstance(earlier, dict):
+            return cast("str | None", earlier.get(slug))
+        return cast("str | None", earlier(slug))
+
+    return composed

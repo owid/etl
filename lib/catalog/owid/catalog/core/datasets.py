@@ -22,7 +22,6 @@ from owid.repack import to_safe_types
 
 from owid.catalog.core import tables, utils
 from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
-from owid.catalog.core.processing_log import disable_processing_log
 from owid.catalog.core.properties import metadata_property
 
 FileFormat = Literal["csv", "feather", "parquet", "json"]
@@ -370,16 +369,15 @@ class Dataset:
         with open(metadata_path) as istream:
             metadata = yaml.safe_load(istream)
             for table_name in metadata.get("tables", {}).keys():
-                with disable_processing_log():
-                    try:
-                        table = self[table_name]
-                    except KeyError as e:
-                        if errors == "raise":
-                            raise e
-                        else:
-                            if errors == "warn":
-                                warnings.warn(str(e))
-                            continue
+                try:
+                    table = self[table_name]
+                except KeyError as e:
+                    if errors == "raise":
+                        raise e
+                    else:
+                        if errors == "warn":
+                            warnings.warn(str(e))
+                        continue
                 table.update_metadata_from_yaml(
                     metadata_path,
                     table_name,
