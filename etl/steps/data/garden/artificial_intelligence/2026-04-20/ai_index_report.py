@@ -151,25 +151,10 @@ def run() -> None:
     tables.append(tb_ind)
 
     # ── Professional Robots ───────────────────────────────────────────────────────
-    tb_prof_new = read_table(ds_meadow, "ai_robots_professional")
+    tb_prof = read_table(ds_meadow, "ai_robots_professional")
     # Raw CSV is in thousands of robots; convert to actual units
-    tb_prof_new["number_of_professional_robots_installed"] = tb_prof_new["amount"] * 1000
-    tb_prof_new = tb_prof_new.drop(columns=["amount"])
-
-    # Load historical professional robot data from old garden
-    tb_prof_old = ds_old_robots.read("professional_robots").reset_index().drop(columns=["index"], errors="ignore")
-    new_years_prof = set(tb_prof_new["year"].unique())
-    tb_prof_old = tb_prof_old[~tb_prof_old["year"].isin(new_years_prof)]
-
-    # Map old column name if needed
-    if "number_of_professional_robots_installed" not in tb_prof_old.columns:
-        # Old table might use a different column name
-        value_cols = [c for c in tb_prof_old.columns if c not in ("year", "application_area")]
-        if value_cols:
-            tb_prof_old = tb_prof_old.rename(columns={value_cols[0]: "number_of_professional_robots_installed"})
-
-    tb_prof = pr.concat([tb_prof_old, tb_prof_new], ignore_index=True)
-    tb_prof = tb_prof.drop_duplicates(subset=["year", "application_area"])
+    tb_prof["number_of_professional_robots_installed"] = (tb_prof["amount"] * 1000).round().astype("Int64")
+    tb_prof = tb_prof.drop(columns=["amount"])
     tb_prof = tb_prof.format(["year", "application_area"])
     tb_prof.metadata.short_name = "professional_robots"
     tables.append(tb_prof)

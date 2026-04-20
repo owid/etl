@@ -93,7 +93,6 @@ def run() -> None:
         tb_jobs = pr.concat([tb_jobs1, tb_jobs2], ignore_index=True)
         tb_jobs.metadata.short_name = "ai_jobs"
         tb_jobs = tb_jobs.rename(columns={"Year": "year", "Label": "country"})
-        tb_jobs = tb_jobs.drop_duplicates(subset=["year", "country"])
         tb_jobs = tb_jobs.format(["year", "country"])
 
         # Industrial robots: combine installations (4.5.1), stock (4.5.2), by country (4.5.5)
