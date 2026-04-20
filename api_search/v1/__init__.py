@@ -1,7 +1,13 @@
 import structlog
 from fastapi import APIRouter, HTTPException, Query
 
-from api_search.semantic_search import get_model_info, is_ready, search_indicators
+from api_search.semantic_search import (
+    get_initialization_error,
+    get_model_info,
+    is_initialization_complete,
+    is_ready,
+    search_indicators,
+)
 
 from .schemas import (
     INDICATOR_SEARCH_EXAMPLES,
@@ -50,11 +56,19 @@ async def search_indicators_semantic(
 
     # Check if model is ready
     if not is_ready():
-        raise HTTPException(
-            status_code=503,
-            detail="Semantic search model is still initializing. Check /indicators/info for status.",
-            headers={"Retry-After": "5"},
-        )
+        init_error = get_initialization_error()
+        if init_error is not None:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Semantic search initialization failed: {init_error}",
+            )
+        if not is_initialization_complete():
+            raise HTTPException(
+                status_code=503,
+                detail="Semantic search model is still initializing. Check /indicators/info for status.",
+                headers={"Retry-After": "5"},
+            )
+        raise HTTPException(status_code=500, detail="Semantic search model not initialized")
 
     # Cap limit at 100 to match API maximum
     limit = min(limit, 100)
