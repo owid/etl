@@ -7,17 +7,16 @@ from pathlib import Path
 from typing import Generic, TypeVar
 
 import torch
-from joblib import Memory
 from sentence_transformers import SentenceTransformer, util
 from structlog import get_logger
 
 from etl.config import DOCS_BUILD
 from etl.paths import CACHE_DIR
 
-memory = Memory(CACHE_DIR, verbose=0)
-
 # Initialize log.
 log = get_logger()
+
+DEFAULT_MODEL_NAME = "all-MiniLM-L6-v2"
 
 
 def set_device() -> str:
@@ -42,11 +41,16 @@ if "DEVICE" not in os.environ:
 DEVICE = set_device()
 
 
-@memory.cache
-def get_model(model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
-    "Load the pre-trained model"
-    model = SentenceTransformer(model_name)
-    return model
+def get_model(model_name: str = DEFAULT_MODEL_NAME) -> SentenceTransformer:
+    """Load the pre-trained model.
+
+    Uses the HuggingFace on-disk cache (not joblib): first call downloads the model,
+    subsequent calls skip the Hub roundtrip via local_files_only=True (~0.1s).
+    """
+    try:
+        return SentenceTransformer(model_name, local_files_only=True)
+    except OSError:
+        return SentenceTransformer(model_name)
 
 
 @dataclass
@@ -66,14 +70,10 @@ class EmbeddingsModel(Generic[TDoc]):
     embeddings: torch.Tensor
 
     def __init__(self, model: SentenceTransformer, model_name: str | None = None) -> None:
-        # Get model name
-        if model_name is None:
-            # NOTE: this is a bit of a hack, it's better to pass it explicitly
-            # TODO: fix it when we update to the latest version
-            model_name = model.tokenizer.name_or_path.split("/")[-1]  # ty: ignore
-
+        # Derive name from the model so it cannot drift from the embeddings file.
+        # Callers may override to namespace cache files (e.g. "sim_charts_title").
         self.model = model
-        self.model_name = model_name
+        self.model_name = model_name or model.tokenizer.name_or_path.split("/")[-1]
 
     @property
     def cache_file_keys(self) -> Path:
