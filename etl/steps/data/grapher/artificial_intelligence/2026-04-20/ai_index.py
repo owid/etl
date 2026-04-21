@@ -24,6 +24,7 @@ def run() -> None:
     # Rename dimension indexes to "country" for grapher compatibility
     tb_conferences = tb_conferences.rename_index_names({"conference": "country"})
     tb_robots_professional = tb_robots_professional.rename_index_names({"application_area": "country"})
+    tb_corporate = tb_corporate.rename_index_names({"investment_type": "country"})
 
     ds_grapher = paths.create_dataset(
         tables=[

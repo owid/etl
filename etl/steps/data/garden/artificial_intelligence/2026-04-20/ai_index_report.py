@@ -110,26 +110,14 @@ def run() -> None:
 
     # ── Investment: Corporate deals by event type ────────────────────────────────
     tb_corp = read_table(ds_meadow, "ai_investment_corporate")
-    tb_corp = tb_corp.rename(columns={"funding_in_usd__billions": "funding"})
-    # Compute total per year
-    tb_total_per_year = tb_corp.groupby("year", as_index=False)["funding"].sum()
-    tb_total_per_year["event_type"] = "Total"
+    tb_corp = tb_corp.rename(columns={"funding_in_usd__billions": "corporate_investment"})
+    # Add total row per year
+    tb_total_per_year = tb_corp.groupby("year", as_index=False)["corporate_investment"].sum()
+    tb_total_per_year["investment_type"] = "Total"
     tb_corp = pr.concat([tb_corp, tb_total_per_year], ignore_index=True)
-    tb_corp = adjust_for_cpi(tb_corp, "funding", tb_us_cpi)
-    # Pivot to wide: one column per event type
-    tb_corp = tb_corp.pivot(index="year", columns="event_type", values="funding").reset_index()
-    tb_corp.columns.name = None
-    tb_corp = tb_corp.rename(
-        columns={
-            "Merger/Acquisition": "merger_acquisition",
-            "Minority Stake": "minority_stake",
-            "Private Investment": "private_investment",
-            "Public Offering": "public_offering",
-            "Total": "total_corporate_investment",
-        }
-    )
-    tb_corp["country"] = "World"
-    tb_corp = tb_corp.format(["year", "country"])
+    tb_corp = adjust_for_cpi(tb_corp, "corporate_investment", tb_us_cpi)
+    # investment_type becomes the country dimension (like conferences/professional robots)
+    tb_corp = tb_corp.format(["year", "investment_type"])
     tb_corp.metadata.short_name = "ai_corporate_investment"
     tables.append(tb_corp)
 

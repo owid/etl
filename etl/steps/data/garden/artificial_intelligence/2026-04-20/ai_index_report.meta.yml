@@ -13,28 +13,37 @@ definitions:
 
   desc_processing_inflation: &desc_processing_inflation |-
     - Reporting a time series of AI investments in nominal prices would make it difficult to compare observations across time. To make these comparisons possible, one has to take into account that prices change (inflation).
+    - It is not obvious how to adjust this time series for inflation, and our team discussed the best solutions at our disposal.
+    - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services purchased through these investments. This would make it possible to calculate a volume measure of AI investments and tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost of some crucial AI technology has fallen rapidly in price.
     - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. Ultimately, we decided to use the US Consumer Price Index (CPI).
-    - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments.
+    - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments, therefore, lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
 
   desc_short_generative: &desc_short_generative |-
-    Money put into privately held [generative](#dod:generative-ai) AI companies by private investors. This excludes publicly traded companies and companies' own internal spending. Expressed in US dollars, adjusted for inflation.
+    Money put into privately held [generative](#dod:generative-ai) AI companies by private investors. This excludes publicly traded companies (e.g., public Big Tech companies) and companies’ own internal spending, such as R&D, wages, or infrastructure. Expressed in US dollars, adjusted for inflation.
   desc_short_private: &desc_short_private |-
-    Money put into privately held AI companies that raised more than $1.5 million from private investors. This excludes publicly traded companies and companies' own internal spending. Expressed in US dollars, adjusted for inflation.
+    Money put into privately held AI companies that raised more than $1.5 million from private investors. This excludes publicly traded companies (e.g., public Big Tech companies) and companies’ own internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
   desc_short_corporate: &desc_short_corporate |-
-    Annual corporate-finance transactions involving privately held AI companies, broken down by type. Expressed in US dollars, adjusted for inflation.
+    Annual corporate-finance transactions involving privately held AI companies, broken down by type. This excludes publicly traded companies (e.g., public Big Tech companies) and companies’ own internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
+
 
   desc_key_corporate: &desc_key_corporate
-    - This data focuses on transactions involving privately held AI companies.
-    - It does not include internal corporate R&D, capital expenditure (CapEx), or public-sector funding. Publicly traded companies, including large tech firms, are excluded.
-    - Because this data covers only one form of financing, it underestimates total global spending on AI.
-    - Large single deals can cause spikes in specific years. Broader economic conditions (interest rates, investor sentiment) can also drive changes that are not specific to AI.
-    - This data includes four types of corporate deals — mergers/acquisitions, private investment (>$1.5M), public offerings, and minority stakes.
+  - This data focuses on transactions involving privately held AI companies,.
+  - It does not include internal corporate R&D, capital expenditure (CapEx), or public-sector funding. Publicly traded companies, including large tech firms, are excluded.
+  - Because this data covers only one form of financing, it underestimates total global spending on AI.
+  - Large single deals can cause spikes in specific years. Broader economic conditions (interest rates, investor sentiment) can also drive changes that are not specific to AI.
+  - |-
+    This data includes four types of corporate deals:
+      - A merger is a corporate strategy involving two companies joining together to form a new company. An acquisition is a corporate strategy involving one company buying another company.
+      - Private investment is defined as investment in AI companies of more than $1.5 million (in current US dollars).
+      - A public offering is the sale of equity shares or other financial instruments to the public in order to raise capital.
+      - A minority stake is an ownership interest of less than 50% of the total shares of a company.
 
   desc_key_private: &desc_key_private
     - This data focuses on external private-market investment, such as venture-capital and private-equity deals.
     - It does not include internal corporate R&D, capital expenditure (CapEx), or public-sector funding. Publicly traded companies, including large tech firms, are excluded.
     - Because this data covers only one form of financing, it underestimates total global spending on AI.
     - Large single deals can cause spikes in specific years. Broader economic conditions (interest rates, investor sentiment) can also drive changes that are not specific to AI.
+    - AI firms are identified by the source based on keywords and industry tags; some misclassification is possible.
 
   desc_key_generative: &desc_key_generative
     - This data focuses on external private-market investment, such as venture-capital and private-equity deals.
@@ -178,48 +187,8 @@ tables:
 
   ai_corporate_investment:
     variables:
-      merger_acquisition:
-        title: Global corporate investment in AI — Merger/acquisition
-        description_short: *desc_short_corporate
-        description_key: *desc_key_corporate
-        description_processing: *desc_processing_inflation
-        unit: 'constant 2021 US$'
-        short_unit: '$'
-        presentation:
-          grapher_config:
-            note: *note_inflation
-      minority_stake:
-        title: Global corporate investment in AI — Minority stake
-        description_short: *desc_short_corporate
-        description_key: *desc_key_corporate
-        description_processing: *desc_processing_inflation
-        unit: 'constant 2021 US$'
-        short_unit: '$'
-        presentation:
-          grapher_config:
-            note: *note_inflation
-      private_investment:
-        title: Global corporate investment in AI — Private investment
-        description_short: *desc_short_corporate
-        description_key: *desc_key_corporate
-        description_processing: *desc_processing_inflation
-        unit: 'constant 2021 US$'
-        short_unit: '$'
-        presentation:
-          grapher_config:
-            note: *note_inflation
-      public_offering:
-        title: Global corporate investment in AI — Public offering
-        description_short: *desc_short_corporate
-        description_key: *desc_key_corporate
-        description_processing: *desc_processing_inflation
-        unit: 'constant 2021 US$'
-        short_unit: '$'
-        presentation:
-          grapher_config:
-            note: *note_inflation
-      total_corporate_investment:
-        title: Global corporate investment in AI — Total
+      corporate_investment:
+        title: Global corporate investment in AI
         description_short: *desc_short_corporate
         description_key: *desc_key_corporate
         description_processing: *desc_processing_inflation
