@@ -145,7 +145,7 @@ def run() -> None:
     tb_prof = tb_prof.drop(columns=["amount"])
     tb_prof["application_area"] = tb_prof["application_area"].replace(
         {
-            "Medical and Healthcare": "Medical and health care",
+            "Medical and Healthcare": "Medical and healthcare",
             "Professional Cleaning": "Professional cleaning",
         }
     )
