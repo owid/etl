@@ -458,11 +458,13 @@ def check_for_missing_answer(tb_cat, var: str):
     var: the variable name (question)
 
     returns: tb_cat with missing columns (if needed) added"""
+
+    # check actual number for possible cat answers
     p_ans = COLUMNS_MAPPING[var].split("_")[1]  # number of possible answers
     p_ans_ls = [f"{var}_ans_{int(x)}_share" for x in range(1, int(p_ans) + 1)]
     missing_ans = [p_ans for p_ans in p_ans_ls if p_ans not in tb_cat.columns]
     if missing_ans:
-        print(f"Missing answers for {var}: {missing_ans}")
+        log.info("gfs_wave_two.missing_answers", variable=var, missing_answers=missing_ans)
         for ans in missing_ans:
             tb_cat[ans] = 0
     return tb_cat

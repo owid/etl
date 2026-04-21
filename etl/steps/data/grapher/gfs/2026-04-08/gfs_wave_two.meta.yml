@@ -1,13 +1,13 @@
 definitions:
   gfs_general: &gfs_general |-
-    This data comes from the [Global Flourishing Study (GFS)](https://www.globalflourishingstudy.com/), a five-year longitudinal data collection and research collaboration between researchers at Baylor University, Harvard University and the Center for Open Science in cooperation with Gallup. The data covers more then 200,00 participants in more than 20 counties.
+    This data comes from the [Global Flourishing Study (GFS)](https://www.globalflourishingstudy.com/), a five-year longitudinal data collection and research collaboration between researchers at Baylor University, Harvard University and the Center for Open Science in cooperation with Gallup. The data covers more then 200,000 participants in more than 20 countries.
   gfs_waves: &gfs_waves |-
     The GFS collects data annually from the same panel of respondents. While the goal is to survey the same people every year, some people might drop out of the survey and do not respond to later waves. This means the data in 2024 and the following years is from a subset of respondents who enrolled in the first year (2023).
   survey_text:
     exercise: &survey_exercise |-
       The full text of the question was "On how many days did you exercise or engage in vigorous physical activities for 30 minutes or more in the past week?"
     no_answer: &survey_no_answer |-
-      No answer can mean one of three things: the respondent saw and skipped the question, the respondend refused to answer or the respondend answered with "I don't know".
+      No answer can mean one of three things: the respondent saw and skipped the question, the respondent refused to answer or the respondent answered with "I don't know".
     happiness: &survey_happiness |-
       The full text of the question was: "In general, how happy or unhappy do you usually feel? Please use a 0 to 10 scale where 10 means "extremely happy" and 0 means "extremely unhappy.""
     life_sat: &survey_life_sat |-
