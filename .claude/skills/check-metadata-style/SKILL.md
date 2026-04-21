@@ -7,9 +7,9 @@ metadata:
 
 # Check Metadata Style
 
-Audit the user-facing text in a grapher step's metadata against OWID's Writing and Style Guide (Notion). Flags fields that break the rules and offers to rewrite them.
+Audit the user-facing text in a grapher step's metadata against OWID's Writing and Style Guide. Flags fields that break the rules and offers to rewrite them.
 
-Style guide URL: `https://www.notion.so/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c`
+Rules live in [STYLE_GUIDE.md](STYLE_GUIDE.md) next to this file — a committed snapshot of the [OWID Notion page](https://www.notion.so/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c). Keep `STYLE_GUIDE.md` in sync via a PR whenever the Notion page changes.
 
 ## When to use
 
@@ -25,15 +25,11 @@ Style guide URL: `https://www.notion.so/owid/Writing-and-style-guide-d51a3739ff8
 
 ## Implementation
 
-### 1. Fetch the Writing and Style Guide from Notion
+### 1. Read the Writing and Style Guide
 
-The guide lives behind Notion auth, so use the Notion MCP tools.
+Read [STYLE_GUIDE.md](STYLE_GUIDE.md) in this skill's folder. That file is the source of truth the skill evaluates against — do not fall back to memory, and do not invent rules that aren't in the file.
 
-1. Try fetching the page with the Notion MCP fetch/search tool first (names vary — look for `mcp__claude_ai_Notion__*` tools beyond `authenticate` once auth is complete).
-2. If the fetch fails with an authentication error, call `mcp__claude_ai_Notion__authenticate`, tell the user to complete the OAuth flow, wait, then call `mcp__claude_ai_Notion__complete_authentication` and retry the fetch.
-3. Keep the guide content in-conversation for the rest of the skill run — do **not** write it to disk.
-
-If the Notion MCP is not available in this Claude Code session, stop and tell the user: the skill needs Notion access to read the rules. Do not guess at rules from memory.
+If the file is missing, stop and tell the user to restore it from the [Notion page](https://www.notion.so/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c).
 
 ### 2. Collect user-facing strings from the step
 
@@ -117,7 +113,7 @@ If `DATA_DIR / step_path` does not exist, parse the `.meta.yml` directly with `e
 
 ### 3. Evaluate each string against the guide
 
-Claude reads the fetched Notion content and checks every collected string. Keep the evaluation **rule-driven**: cite the specific section/heading of the guide, not a generic "doesn't sound right".
+Claude reads `STYLE_GUIDE.md` and checks every collected string. Keep the evaluation **rule-driven**: cite the specific section/heading of the guide, not a generic "doesn't sound right".
 
 Focus on rules the guide actually states (e.g. sentence case vs. title case, acronym expansion on first use, number/unit formatting, banned phrases, punctuation, tone). Do not invent rules the guide doesn't cover.
 
@@ -169,8 +165,8 @@ After fixes:
 
 ## Notes
 
-- **No persistent files.** All analysis is in-conversation: no report `.md`, no scripts under `scripts/`, no cached copy of the guide on disk.
+- **No persistent output.** Analysis results stay in-conversation: no report `.md`, no scripts under `scripts/`. The only persistent file tied to this skill is `STYLE_GUIDE.md` (the committed rulebook).
 - **Current step only.** If the user asks to audit the whole catalog, say the skill is scoped to one step and suggest running it per dataset.
-- **Fresh rules each run.** The guide can change in Notion; fetching it at invocation time is intentional.
+- **Keep `STYLE_GUIDE.md` in sync with Notion.** If the Notion page changes, update the committed file via a PR — that way guide changes are reviewed and the skill stays deterministic and offline-capable.
 - **Archive-aware.** If the provided step path is under `dag/archive/*.yml`, point that out and confirm the user still wants to check it.
-- **Don't hallucinate rules.** If the guide doesn't say something, don't flag it. Prefer false negatives over false positives.
+- **Don't hallucinate rules.** If `STYLE_GUIDE.md` doesn't say something, don't flag it. Prefer false negatives over false positives.
