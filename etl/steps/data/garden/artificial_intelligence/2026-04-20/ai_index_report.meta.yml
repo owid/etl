@@ -147,19 +147,6 @@ tables:
           grapher_config:
             note: *note_inflation
 
-  ai_total_investment_private:
-    variables:
-      private_investment:
-        title: Global total private investment in AI
-        description_short: *desc_short_private
-        description_key: *desc_key_private
-        description_processing: *desc_processing_inflation
-        unit: 'constant 2021 US$'
-        short_unit: '$'
-        presentation:
-          grapher_config:
-            note: *note_inflation
-
   ai_new_companies:
     variables:
       companies:

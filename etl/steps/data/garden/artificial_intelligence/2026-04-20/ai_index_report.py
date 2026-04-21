@@ -85,14 +85,6 @@ def run() -> None:
     tb_gen.metadata.short_name = "ai_investment_generative"
     tables.append(tb_gen)
 
-    # ── Investment: Total private (World) ────────────────────────────────────────
-    tb_world = read_table(ds_meadow, "ai_investment_world")
-    tb_world = tb_world.rename(columns={"total_investment__in_billions_of_us_dollars": "private_investment"})
-    tb_world = adjust_for_cpi(tb_world, "private_investment", tb_us_cpi)
-    tb_world = tb_world.format(["year", "country"])
-    tb_world.metadata.short_name = "ai_total_investment_private"
-    tables.append(tb_world)
-
     # ── Investment: Newly funded companies ──────────────────────────────────────
     tb_companies = read_table(ds_meadow, "ai_investment_companies")
     tb_companies = tb_companies.rename(columns={"number_of_companies": "companies"})
@@ -100,7 +92,7 @@ def run() -> None:
     tb_companies.metadata.short_name = "ai_new_companies"
     tables.append(tb_companies)
 
-    # ── Investment: Private by region ────────────────────────────────────────────
+    # ── Investment: Private (World + regions) ────────────────────────────────────
     tb_region = read_table(ds_meadow, "ai_investment_by_region")
     tb_region = tb_region.rename(columns={"total_investment__in_billions_of_us_dollars": "private_investment"})
     tb_region = adjust_for_cpi(tb_region, "private_investment", tb_us_cpi)
@@ -153,7 +145,7 @@ def run() -> None:
     tb_prof = tb_prof.drop(columns=["amount"])
     tb_prof["application_area"] = tb_prof["application_area"].replace(
         {
-            "Medical and Healthcare": "Medical and healthcare",
+            "Medical and Healthcare": "Medical and health care",
             "Professional Cleaning": "Professional cleaning",
         }
     )

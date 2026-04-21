@@ -62,13 +62,6 @@ def run() -> None:
         )
         tb_investment_corporate = tb_investment_corporate.format(["year", "investment_type"])
 
-        # Investment: total private World (fig_4.2.2)
-        tb_investment_world = archive.read(fig_path(4, "fig_4.2.2"))
-        tb_investment_world.metadata.short_name = "ai_investment_world"
-        tb_investment_world = tb_investment_world.rename(columns={"Year": "year"})
-        tb_investment_world["country"] = "World"
-        tb_investment_world = tb_investment_world.format(["year", "country"])
-
         # Investment: generative AI (fig_4.2.3)
         tb_investment_generative = archive.read(fig_path(4, "fig_4.2.3"))
         tb_investment_generative.metadata.short_name = "ai_investment_generative"
@@ -86,10 +79,14 @@ def run() -> None:
         tb_investment_companies.metadata.short_name = "ai_investment_companies"
         tb_investment_companies = tb_investment_companies.format(["year", "country"])
 
-        # Investment: by region (fig_4.2.11): Year, Total investment, Label (=region)
-        tb_investment_by_region = archive.read(fig_path(4, "fig_4.2.11"))
+        # Investment: by region — World (fig_4.2.2) + regions (fig_4.2.11)
+        tb_investment_world = archive.read(fig_path(4, "fig_4.2.2"))
+        tb_investment_world = tb_investment_world.rename(columns={"Year": "year"})
+        tb_investment_world["country"] = "World"
+        tb_investment_regions = archive.read(fig_path(4, "fig_4.2.11"))
+        tb_investment_regions = tb_investment_regions.rename(columns={"Year": "year", "Label": "country"})
+        tb_investment_by_region = pr.concat([tb_investment_world, tb_investment_regions], ignore_index=True)
         tb_investment_by_region.metadata.short_name = "ai_investment_by_region"
-        tb_investment_by_region = tb_investment_by_region.rename(columns={"Year": "year", "Label": "country"})
         tb_investment_by_region = tb_investment_by_region.format(["year", "country"])
 
         # Jobs: combine fig_4.4.1 + fig_4.4.2 (Year, AI job postings %, Label=country)
@@ -141,7 +138,6 @@ def run() -> None:
             tb_incidents,
             tb_conferences,
             tb_investment_corporate,
-            tb_investment_world,
             tb_investment_generative,
             tb_investment_companies,
             tb_investment_by_region,

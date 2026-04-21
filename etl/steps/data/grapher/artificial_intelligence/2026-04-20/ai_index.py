@@ -15,7 +15,6 @@ def run() -> None:
     tb_incidents = ds_garden.read("ai_incidents", reset_index=False)
     tb_private_investment = ds_garden.read("ai_private_investment", reset_index=False)
     tb_corporate = ds_garden.read("ai_corporate_investment", reset_index=False)
-    tb_total_private_investment = ds_garden.read("ai_total_investment_private", reset_index=False)
     tb_generative = ds_garden.read("ai_investment_generative", reset_index=False)
     tb_companies = ds_garden.read("ai_new_companies", reset_index=False)
     tb_robots_industrial = ds_garden.read("industrial_robots", reset_index=False)
@@ -39,7 +38,6 @@ def run() -> None:
             tb_corporate,
             tb_generative,
             tb_companies,
-            tb_total_private_investment,
         ],
         check_variables_metadata=True,
     )
