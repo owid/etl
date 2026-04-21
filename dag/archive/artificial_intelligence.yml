@@ -833,3 +833,44 @@ steps:
 # Robot density dataset - 2023 grapher step
   data://grapher/ifr/2026-01-14/robot_density:
     - data://garden/ifr/2026-01-14/robot_density
+
+  # AI Index Report 2025 — superseded by 2026-04-20 unified pipeline
+  # AI Index Report 2025 - Conference Attendance
+  data://garden/artificial_intelligence/2025-04-08/ai_conferences:
+    - snapshot://artificial_intelligence/2025-04-08/ai_conferences.csv
+
+  # AI Index Report 2025 - Incidents
+  data://garden/artificial_intelligence/2025-04-08/ai_incidents:
+    - snapshot://artificial_intelligence/2025-04-08/ai_incidents.csv
+
+  # AI Index Report 2025 - AI job postings
+  data://garden/artificial_intelligence/2025-04-08/ai_jobs:
+    - snapshot://artificial_intelligence/2025-04-08/ai_jobs.csv
+
+  # AI Index Report 2025 - AI bills
+  data://garden/artificial_intelligence/2025-04-08/ai_bills:
+    - snapshot://artificial_intelligence/2025-04-08/ai_bills.csv
+
+  # AI Index Report 2025 - AI robots
+  data://garden/artificial_intelligence/2025-04-08/ai_robots:
+    - snapshot://artificial_intelligence/2025-04-08/ai_robots.csv
+    - data://garden/artificial_intelligence/2024-06-28/ai_robots
+
+  # AI Index Report 2024 - AI robots
+  data://garden/artificial_intelligence/2024-06-28/ai_robots:
+    - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
+
+  # AI Index Report 2025 - AI investment trends
+  data://garden/artificial_intelligence/2025-04-08/ai_investment:
+    - snapshot://artificial_intelligence/2025-04-08/ai_investment.csv
+    - data://garden/bls/2026-03-20/us_consumer_prices
+
+  # AI Index Report grapher step 2025
+  data://grapher/artificial_intelligence/2025-04-08/ai_index:
+    - data://garden/artificial_intelligence/2025-04-08/ai_adoption
+    - data://garden/artificial_intelligence/2025-04-08/ai_conferences
+    - data://garden/artificial_intelligence/2025-04-08/ai_jobs
+    - data://garden/artificial_intelligence/2025-04-08/ai_bills
+    - data://garden/artificial_intelligence/2025-04-08/ai_incidents
+    - data://garden/artificial_intelligence/2025-04-08/ai_robots
+    - data://garden/artificial_intelligence/2025-04-08/ai_investment
