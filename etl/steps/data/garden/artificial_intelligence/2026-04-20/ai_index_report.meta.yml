@@ -1,12 +1,10 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    processing_level: minor
     presentation:
       topic_tags:
         - Artificial Intelligence
-    display:
-      numDecimalPlaces: 0
+
 
   note_inflation: &note_inflation |-
     This data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
@@ -52,8 +50,17 @@ definitions:
     - Large single deals can cause spikes in specific years. Broader economic conditions (interest rates, investor sentiment) can also drive changes that are not specific to AI.
     - Generative AI firms are identified by the source based on keywords and industry tags; some misclassification is possible.
 
-  description_short_industrial: &desc_industrial Industrial robots are automated, reprogrammable machines that perform a variety of tasks in industrial settings.
+  description_short_industrial: &desc_industrial Industrial robots are defined by the source as automatically controlled, reprogrammable, and multipurpose machines that can move in three or more directions and perform a variety of tasks in industrial settings.
   description_short_professional: &desc_professional Professional service robots are semi- or fully autonomous machines that perform useful tasks in a professional setting outside of industrial applications, such as in cleaning or medical surgery. Consumer service robots are not included.
+
+  desc_key_industrial_robots: &desc_key_industrial
+    - Industrial robots are machines used in factories to automate tasks like welding, assembly, and packaging.
+    - They are defined as automatically controlled, reprogrammable, and multipurpose machines that can move in three or more directions.
+    - Reprogrammable means their functions can be changed through software without altering their physical parts.
+    - Multipurpose means they can be adapted for different tasks with mechanical changes.
+    - Robots are becoming easier to install and more flexible, which means even small production runs can be automated.
+    - Companies use robots to improve product quality, increase speed, reduce waste, and cut costs.
+
 
 dataset:
   update_period_days: 365
@@ -71,25 +78,34 @@ tables:
           - The data is adjusted to account for differences in response rates and to ensure that each country's economic contribution to global GDP is properly represented.
         unit: '%'
         short_unit: '%'
+        processing_level: minor
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
         presentation:
+          attribution: McKinsey & Company Survey via AI Index Report
           grapher_config:
             note: Companies represent a range of industries, sizes, functional specialties, and tenures. To adjust for differences in response rates, the data are weighted by the contribution of each respondent's nation to global GDP.
 
   ai_bills:
     variables:
       number_of_ai_related_bills_passed_into_law:
-        title: Cumulative AI-related bills passed into law since 2016, as of 2024
+        title: Cumulative AI-related bills passed into law since 2016, as of 2025
         unit: 'bills'
         short_unit: ''
-        description_short: Total number of bills passed into law by national legislatures that include the term "artificial intelligence" in the title or text, from 2016 to 2024.
+        description_short: The total number of AI-related laws enacted in Group of Twenty (G20) countries between 2016 and 2025.
         description_key:
-          - Some large bills, like the U.S. National Defense Authorization Act (NDAA), include multiple AI-related provisions but are counted as a single law.
-          - The AI Index tracks laws in major geographic areas.
+          - AI-related laws are identified through automated searches of legislative websites, combined with AI-based analysis of legal texts and manual checks.
+          - The system searches for terms such as “artificial intelligence” and “machine learning” to identify relevant laws.
+          - Each law is counted once, even if it includes several AI-related provisions. This means the total may underestimate the extent of policymaking.
+          - Only laws that have been enacted are included. Proposed or pending legislation is not counted.
+          - "The number of laws does not capture their importance: one broad law can be more impactful than many narrower ones."
         presentation:
+          attribution: Digital Policy Alert via AI Index Report
           grapher_config:
-            note: For example, the [Identifying Outputs of Generative Adversarial Networks Act](https://www.govinfo.gov/content/pkg/PLAW-116publ258/pdf/PLAW-116publ258.pdf) passed into law by the US Congress.
+            note: For example, the [TAKE IT DOWN Act](https://www.govinfo.gov/content/pkg/PLAW-119publ12/html/PLAW-119publ12.htm) passed into law by the US Congress.
+        processing_level: minor
+        display:
+            numDecimalPlaces: 0
 
   ai_incidents:
     variables:
@@ -192,12 +208,11 @@ tables:
         unit: 'robots'
         short_unit: ''
         description_short: *desc_industrial
-        description_key:
-          - Industrial robots are machines used in factories to automate tasks like welding, assembly, and packaging.
-          - They are defined as automatically controlled, reprogrammable, and multipurpose machines that can move in three or more directions.
+        description_key: *desc_key_industrial
         presentation:
           grapher_config:
             note: "Example machines that are not classified as robots: software (e.g., voice assistants), remote-controlled drones, self-driving cars, \"smart\" washing machines."
+
       industrial_robot_stock:
         title: Total industrial robots in operation
         unit: 'robots'
