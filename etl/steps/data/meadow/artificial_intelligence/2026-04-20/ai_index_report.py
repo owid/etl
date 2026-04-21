@@ -74,11 +74,14 @@ def run() -> None:
         tb_investment_generative["country"] = "World"
         tb_investment_generative = tb_investment_generative.format(["year", "country"])
 
-        # Investment: newly funded companies (fig_4.2.4)
-        tb_investment_companies = archive.read(fig_path(4, "fig_4.2.4"))
+        # Investment: newly funded companies — World (fig_4.2.4) + by region (fig_4.2.14)
+        tb_companies_world = archive.read(fig_path(4, "fig_4.2.4"))
+        tb_companies_world = tb_companies_world.rename(columns={"Year": "year"})
+        tb_companies_world["country"] = "World"
+        tb_companies_by_region = archive.read(fig_path(4, "fig_4.2.14"))
+        tb_companies_by_region = tb_companies_by_region.rename(columns={"Year": "year", "Label": "country"})
+        tb_investment_companies = pr.concat([tb_companies_world, tb_companies_by_region], ignore_index=True)
         tb_investment_companies.metadata.short_name = "ai_investment_companies"
-        tb_investment_companies = tb_investment_companies.rename(columns={"Year": "year"})
-        tb_investment_companies["country"] = "World"
         tb_investment_companies = tb_investment_companies.format(["year", "country"])
 
         # Investment: by region (fig_4.2.11): Year, Total investment, Label (=region)

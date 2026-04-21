@@ -115,6 +115,14 @@ def run() -> None:
     tb_total_per_year = tb_corp.groupby("year", as_index=False)["corporate_investment"].sum()
     tb_total_per_year["investment_type"] = "Total"
     tb_corp = pr.concat([tb_corp, tb_total_per_year], ignore_index=True)
+    tb_corp["investment_type"] = tb_corp["investment_type"].replace(
+        {
+            "Merger/Acquisition": "Merger/acquisition",
+            "Minority Stake": "Minority stake",
+            "Private Investment": "Private investment",
+            "Public Offering": "Public offering",
+        }
+    )
     tb_corp = adjust_for_cpi(tb_corp, "corporate_investment", tb_us_cpi)
     # investment_type becomes the country dimension (like conferences/professional robots)
     tb_corp = tb_corp.format(["year", "investment_type"])
@@ -143,6 +151,12 @@ def run() -> None:
     # Raw CSV is in thousands of robots; convert to actual units
     tb_prof["number_of_professional_robots_installed"] = (tb_prof["amount"] * 1000).round().astype("Int64")
     tb_prof = tb_prof.drop(columns=["amount"])
+    tb_prof["application_area"] = tb_prof["application_area"].replace(
+        {
+            "Medical and Healthcare": "Medical and healthcare",
+            "Professional Cleaning": "Professional cleaning",
+        }
+    )
     tb_prof = tb_prof.format(["year", "application_area"])
     tb_prof.metadata.short_name = "professional_robots"
     tables.append(tb_prof)
