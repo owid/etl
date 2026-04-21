@@ -1,3 +1,7 @@
+---
+status: new
+---
+
 # Visualizing global inequality
 
 !!! info ""
