@@ -14,8 +14,8 @@ def run() -> None:
     ds_meadow = paths.load_dataset("laying_hens_keeping_eu")
     tb = ds_meadow.read("laying_hens_keeping_eu")
 
-    ds_dashboard = paths.load_dataset("eu_eggs_dashboard_2026_04")
-    tb_dashboard = ds_dashboard.read("eu_eggs_dashboard_2026_04")
+    ds_dashboard = paths.load_dataset("eu_eggs_dashboard")
+    tb_dashboard = ds_dashboard.read("eu_eggs_dashboard")
 
     #
     # Process data.

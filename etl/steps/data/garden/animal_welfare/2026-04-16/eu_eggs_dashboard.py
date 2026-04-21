@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
@@ -9,14 +11,22 @@ def run() -> None:
     #
     # Load inputs.
     #
-    ds_meadow = paths.load_dataset("eu_eggs_dashboard_2026_04")
-    tb = ds_meadow.read("eu_eggs_dashboard_2026_04")
+    ds_2025_01 = paths.load_dataset("eu_eggs_dashboard_2025_01")
+    tb_2025_01 = ds_2025_01.read("eu_eggs_dashboard_2025_01")
+
+    ds_2026_04 = paths.load_dataset("eu_eggs_dashboard_2026_04")
+    tb_2026_04 = ds_2026_04.read("eu_eggs_dashboard_2026_04")
 
     #
     # Process data.
     #
     # Harmonize country names.
-    tb = paths.regions.harmonize_names(tb)
+    tb_2025_01 = paths.regions.harmonize_names(tb_2025_01)
+    tb_2026_04 = paths.regions.harmonize_names(tb_2026_04)
+
+    # Combine both dashboard versions. More recent data takes priority for any duplicate (country, year) pairs.
+    tb = pr.concat([tb_2026_04, tb_2025_01], ignore_index=True, short_name=paths.short_name)
+    tb = tb.drop_duplicates(subset=["country", "year"], keep="first")
 
     # Convert percentage columns into absolute hen counts.
     tb["not_enriched_cage"] = tb["total"] * 0
@@ -32,5 +42,5 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_2026_04.metadata)
     ds_garden.save()
