@@ -27,7 +27,7 @@ from ruamel.yaml import YAML
 from yaml.dumper import Dumper
 
 from etl.config import TLS_VERIFY
-from etl.paths import BASE_DIR
+from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 
 log = structlog.get_logger()
 
@@ -278,10 +278,21 @@ def apply_ruff_formatter_to_files(file_paths: list[str | Path]) -> None:
     )
 
 
+def _is_watched(f: Path) -> bool:
+    if not f.is_file() or "__pycache__" in f.parts:
+        return False
+    # Under snapshots/ only track .dvc files: snapshot .py edits don't propagate
+    # until `etls` rewrites the .dvc checksum, which is what downstream steps
+    # actually depend on.
+    try:
+        f.relative_to(SNAPSHOTS_DIR)
+    except ValueError:
+        return True
+    return f.suffix == ".dvc"
+
+
 def _mtime_mapping(*paths: Path) -> dict[Path, float]:
-    return {
-        f: f.stat().st_mtime for path in paths for f in path.rglob("*") if f.is_file() and "__pycache__" not in f.parts
-    }
+    return {f: f.stat().st_mtime for path in paths for f in path.rglob("*") if _is_watched(f)}
 
 
 def watch_folder(*paths: Path) -> Generator[Path, None, None]:
@@ -294,21 +305,18 @@ def watch_folder(*paths: Path) -> Generator[Path, None, None]:
         current_files = _mtime_mapping(*paths)
 
         # Check for modifications
-        changed: Path | None = None
         for f, mtime in current_files.items():
-            # new file or updated file
-            if f not in last_seen or last_seen[f] != mtime:
-                changed = f
+            # new file
+            if f not in last_seen:
+                yield f
                 break
+            # updated file
+            else:
+                if last_seen[f] != mtime:
+                    yield f
+                    break
 
-        if changed is not None:
-            yield changed
-            # Re-scan after the consumer handled the change. This absorbs any
-            # writes that happened during the handler (e.g. `etls` rewriting a
-            # .dvc file), so they don't falsely re-trigger on the next tick.
-            last_seen = _mtime_mapping(*paths)
-        else:
-            last_seen = current_files
+        last_seen = current_files
 
 
 def upload_file_to_server(local_file_path: Path, target: str) -> None:
