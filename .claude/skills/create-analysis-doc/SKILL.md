@@ -161,15 +161,36 @@ mkdir -p docs/analyses/<short_name>
 cp ai/<short_name>.md docs/analyses/<short_name>/index.md
 ```
 
-Then ask the user whether they also want the two registration steps done now or in a follow-up:
+Then ask the user whether they also want the two registration steps done now or in a follow-up. Both are required for the doc to show up on docs.owid.io; skipping them leaves the file orphaned:
 
-1. **Nav entry in [zensical.toml](../../../zensical.toml)** — add one line to the analyses block (search for the `"analyses/index.md"` entry):
-   ```toml
-   { "<User-facing title>" = "analyses/<short_name>/index.md" },
-   ```
-2. **Landing-page card in [docs/analyses/index.md](../../../docs/analyses/index.md)** — add a `!!! note ""` block following the existing pattern (short blurb, Methodology button linking to the doc).
+1. **Nav entry in [zensical.toml](../../../zensical.toml)** — add one line inside the `"Technical publications"` array (search for the block starting with `"analyses/index.md"`), placed last in the list to keep ordering predictable:
 
-Preview with `make docs.serve` at `http://localhost:9010/analyses/<short_name>/`.
+    ```toml
+    { "<User-facing title>" = "analyses/<short_name>/index.md" },
+    ```
+
+2. **Landing-page card in [docs/analyses/index.md](../../../docs/analyses/index.md)** — append a `!!! note ""` block at the end of the file, using this template:
+
+    ```markdown
+    !!! note ""
+
+        ## <User-facing title>
+        This document is a technical companion to <the article title>](<article URL>), which <one sentence on what the article is about>.
+
+        [:material-book-open-variant: Methodology](<short_name>/index.md){ .md-button }
+    ```
+
+    If the analysis has supporting artefacts (notebook, Colab, data download), add extra buttons following the patterns already used on the landing page — for example:
+
+    ```markdown
+    [:material-notebook: Notebook](<short_name>/<notebook>.html){ .md-button }
+    [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/<short_name>/<notebook>.ipynb){ .md-button }
+    [:material-download: Download data (ZIP)](<zip URL>){ .md-button }
+    ```
+
+    Only include buttons for artefacts that actually exist — don't leave broken links.
+
+Preview with `make docs.serve` at `http://localhost:9010/analyses/<short_name>/` (both the new page and the landing page) to confirm the card and nav entry render correctly before raising the PR.
 
 ## 8. PR workflow
 

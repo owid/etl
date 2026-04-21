@@ -128,6 +128,7 @@ nav = [
         { "Our COVID work" = "api/covid.md" },
         { "Land use for biofuels vs. solar" = "analyses/biofuels_land_use/index.md" },
         { "Tracking historical progress against slavery and forced labor: a long-run data view" = "analyses/slavery_historical_data/index.md" },
+        { "Visualizing global inequality" = "analyses/inequality_visualization/index.md" },
     ] },
 ]
 
