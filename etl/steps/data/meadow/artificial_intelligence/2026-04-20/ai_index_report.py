@@ -57,7 +57,9 @@ def run() -> None:
         # Investment: corporate deals by event type (fig_4.2.1)
         tb_investment_corporate = archive.read(fig_path(4, "fig_4.2.1"))
         tb_investment_corporate.metadata.short_name = "ai_investment_corporate"
-        tb_investment_corporate = tb_investment_corporate.rename(columns={"Year": "year", "Event Type": "investment_type"})
+        tb_investment_corporate = tb_investment_corporate.rename(
+            columns={"Year": "year", "Event Type": "investment_type"}
+        )
         tb_investment_corporate = tb_investment_corporate.format(["year", "investment_type"])
 
         # Investment: total private World (fig_4.2.2)
