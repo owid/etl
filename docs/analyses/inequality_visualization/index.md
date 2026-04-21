@@ -84,7 +84,7 @@ We use a Gaussian [kernel density estimator](https://en.wikipedia.org/wiki/Kerne
 
 After the density is computed, we exponentiate the `x` coordinate labels (`2^x`) so the chart can plot them against income in international dollars on an intuitive axis.
 
-## Share of population below a poverty line
+### Share of population below a poverty line
 
 From the 1000-binned distributions, we compute **the share of the population living below a chosen income line** for any combination of countries, regions, and the world aggregate.
 
@@ -106,17 +106,17 @@ Concretely, for each country in the region, we compute the number of people belo
 !!! note "Approximation"
     Because we only have 1000 bins rather than the full income distribution, we can't know exactly where the line falls *inside* a bin. In the worst case this miscounts about half a bin, i.e. 0.05 percentage points of the entity's population — well below the resolution shown in the chart (whole percentage points). Keeping the computation this simple also makes it fast enough to recompute every time the user drags the poverty-line slider.
 
-## Currency
+### Currency
 
 The chart lets the user switch **which currency** to display income in — international dollars (the default) or any of several local currencies like GBP, EUR, INR, etc.
 
-### What the underlying data is measured in
+#### What the underlying data is measured in
 
 All the stored income values are in **international dollars per day**. International dollars are a synthetic currency, built from Purchasing Power Parity (PPP) adjustments, that make incomes comparable across countries by accounting for the fact that the same nominal dollar buys more in, say, Vietnam than in Switzerland. A person earning $5/day in international dollars has roughly the same material standard of living whether they live in Hanoi or Zurich — which they would not if we simply converted their local income using market exchange rates. You can find more information about international dollars in [our dedicated article](https://ourworldindata.org/international-dollars).
 
 Using international dollars as the base unit also means a fixed poverty line (e.g. the World Bank's $3/day) has a consistent meaning across every country on the chart.
 
-### Converting to a local currency
+#### Converting to a local currency
 
 When the user switches to a different currency, every income value is multiplied by a **conversion factor** specific to that currency. The factor is built upstream by an ETL step — [`int_dollar_conversions.py`](https://github.com/owid/etl/blob/master/etl/steps/data/external/owid_grapher/latest/int_dollar_conversions.py) — and fetched at runtime from the resulting JSON table, [`int_dollar_conversions.json`](https://owid-public.owid.io/marcel-bespoke-data-viz-02-2026/poverty-plots/int_dollar_conversions.json). The factor is the product of two components:
 
@@ -125,7 +125,7 @@ When the user switches to a different currency, every income value is multiplied
 
 Multiplying an international dollar value by `PPP_factor × CPI_factor` therefore gives an amount in local currency at the latest available year's price level.
 
-#### How the PPP factor is chosen
+##### How the PPP factor is chosen
 
 PIP and WDI publish PPP values derived from the same underlying data (the [International Comparison Program](https://www.worldbank.org/en/programs/icp)'s 2021 round), but their numbers don't always match exactly, because they apply different downstream methodologies. The ETL step reconciles the two as follows:
 
@@ -140,7 +140,7 @@ The list of manual overrides lives in the ETL step itself and is validated on ev
 
 The UI uses IP-based country detection (via the [`detect-country.owid.io`](https://detect-country.owid.io/) service) to auto-suggest the user's local currency when the page loads, but the user can freely override it.
 
-## Time interval
+### Time interval
 
 The chart also lets the user pick the time interval displayed. The raw data is per day. Switching to monthly or yearly multiplies every value by a fixed factor:
 
@@ -152,18 +152,18 @@ The chart also lets the user pick the time interval displayed. The raw data is p
 
 Currency and time-interval factors are multiplicative, so they combine into a single `combinedFactor` that is applied once to each value before display.
 
-## Colors
+### Colors
 
 Each country, region, and the world aggregate has a color assigned to it. We use a local copy of Our World in Data's **Distinct Colors** palette, designed so that adjacent items in a chart remain visually separable.
 
-### Fixed colors
+#### Fixed colors
 
 Two assignments are fixed:
 
 - **World** is always shown in **Purple** (`#6d3e91`).
 - The seven World Bank regional aggregates each map to a specific palette color. The mapping is stable so that, for example, Sub-Saharan Africa is always Mauve across the whole tool.
 
-### Country colors
+#### Country colors
 
 For countries — where there are too many entities to pre-assign colors — we rotate through a **palette of seven colors** in the order the countries are received. The world aggregate, if present in the same selection, is always overridden back to Purple, so it stands out visually from any country that happens to land on the same slot.
 
