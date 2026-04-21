@@ -139,8 +139,16 @@ steps:
   #
   data://meadow/animal_welfare/2026-04-16/laying_hens_keeping_eu:
     - snapshot://animal_welfare/2026-04-16/laying_hens_keeping_eu.xlsx
+  #
+  # EU eggs market situation dashboard (European Commission).
+  #
+  data://meadow/animal_welfare/2026-04-16/eu_eggs_dashboard_2026_04:
+    - snapshot://animal_welfare/2026-04-16/eu_eggs_dashboard_2026_04.pdf
+  data://garden/animal_welfare/2026-04-16/eu_eggs_dashboard_2026_04:
+    - data://meadow/animal_welfare/2026-04-16/eu_eggs_dashboard_2026_04
   data://garden/animal_welfare/2026-04-16/laying_hens_keeping_eu:
     - data://meadow/animal_welfare/2026-04-16/laying_hens_keeping_eu
+    - data://garden/animal_welfare/2026-04-16/eu_eggs_dashboard_2026_04
   #
   # US egg production - older data (USDA, 2018).
   #
