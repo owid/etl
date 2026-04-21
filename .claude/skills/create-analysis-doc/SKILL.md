@@ -175,7 +175,7 @@ Then ask the user whether they also want the two registration steps done now or 
     !!! note ""
 
         ## <User-facing title>
-        This document is a technical companion to <the article title>](<article URL>), which <one sentence on what the article is about>.
+        This document is a technical companion to [<the article title>](<article URL>), which <one sentence on what the article is about>.
 
         [:material-book-open-variant: Methodology](<short_name>/index.md){ .md-button }
     ```
