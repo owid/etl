@@ -272,10 +272,11 @@ tables:
         short_unit: ''
         description_short: Estimated number of industrial robots in operation.
         description_key:
-        - The operational stock is the estimated number of industrial robots currently in use.
-        - This covers physical industrial robots as defined by the International Federation of Robotics, rather than other forms of automation such as software bots or autonomous vehicles.
-        - For Japan, the stock is reported by the Japan Robot Association. For most other countries, the IFR estimates it by summing robot installations over the previous 12 years.
-        - This assumes robots are withdrawn after 12 years of service. Studies suggest the true average service life may be closer to 15 years, while tax depreciation schedules in Germany and the United States imply as few as 5 to 6 years, so figures should be interpreted as estimates rather than direct counts.
+          - Industrial robots are automatically controlled, reprogrammable machines used in factories to automate tasks like welding, assembly, and packaging.
+          - The operational stock is the estimated number of industrial robots currently in use.
+          - This covers physical industrial robots as defined by the International Federation of Robotics, rather than other forms of automation such as software bots or autonomous vehicles.
+          - For Japan, the stock is reported by the Japan Robot Association. For most other countries, the IFR estimates it by summing robot installations over the previous 12 years.
+          - This assumes robots are withdrawn after 12 years of service. Studies suggest the true average service life may be closer to 15 years, while tax depreciation schedules in Germany and the United States imply as few as 5 to 6 years, so figures should be interpreted as estimates rather than direct counts.
         display:
           numDecimalPlaces: 0
         presentation:
