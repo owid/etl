@@ -249,7 +249,7 @@ tables:
             note: *note_inflation
   #
   # Robots
-  #
+  # https://ifr.org/img/worldrobotics/Sources___Methods_WR_2024_Industrial_Robots_.pdf - IFR's methodology for industrial robot data
   industrial_robots:
     variables:
       industrial_robot_installations:
