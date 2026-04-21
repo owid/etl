@@ -262,14 +262,14 @@ def _get_grouped_decile_subtitle(view):
 def _get_p10_p50_p90_title(view):
     """Return title for the P10/P50/P90 grouped threshold view."""
     period = view.dimensions.get("period")
-    return f"Threshold income or consumption per {period} at P10, P50 and P90"
+    return f"Threshold income or consumption per {period} marking marking the poorest decile, the median, and the richest decile"
 
 
 def _get_p10_p50_p90_subtitle(view):
     """Return subtitle for the P10/P50/P90 grouped threshold view."""
     period = view.dimensions.get("period")
     return (
-        f"The level of after tax income or consumption per person per {period} at the 10th, 50th and 90th percentiles. "
+        f"The level of after tax income or consumption per person per {period} below which 10%, 50% and 90% of the population falls. "
         f"{PPP_ADJUSTMENT_SUBTITLE}"
     )
 
