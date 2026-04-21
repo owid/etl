@@ -97,7 +97,7 @@ tables:
         presentation:
           attribution: *attribution_bills
           grapher_config:
-            note: For example, the [TAKE IT DOWN Act](https://www.govinfo.gov/content/pkg/PLAW-119publ12/html/PLAW-119publ12.htm) passed into law by the US Congress.
+            note: For example, the [TAKE IT DOWN Act](https://www.govinfo.gov/content/pkg/PLAW-119publ12/html/PLAW-119publ12.htm), signed into law in the United States in 2025, criminalizes the nonconsensual sharing of intimate images, including AI-generated deepfakes.
         processing_level: minor
         display:
             numDecimalPlaces: 0
