@@ -68,7 +68,7 @@ definitions:
   attribution_mckinsey: &attribution_mckinsey |-
     McKinsey & Company via AI Index Report
   attribution_investment: &attribution_investment |-
-    Quid via AI Index Report (2025); U.S. Bureau of Labor Statistics (2026)
+    Quid via AI Index Report (2026); U.S. Bureau of Labor Statistics (2026)
   attribution_robots: &attribution_robots |-
     International Federation of Robotics via AI Index Report (2026)
   attribution_bills: &attribution_bills |-
