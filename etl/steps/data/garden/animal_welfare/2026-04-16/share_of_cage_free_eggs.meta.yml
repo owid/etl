@@ -16,25 +16,17 @@ tables:
         short_unit: '%'
         display:
           numDecimalPlaces: 1
-        description_short: &description |
+        description_short: |-
           Share of all eggs that are produced in cage-free housing systems. This includes barns, pasture and free-range (non-organic and organic) eggs.
-        description_processing: &processing |
-          - For the United States, the share of cage-free eggs is approximated by the share of cage-free hens, due to limited data availability.
-          - US data from 2012 onwards comes directly from the USDA Egg Markets Overview. US data for 2007-2011 comes from The Humane League, which compiled it from an older USDA report.
-        presentation:
-          grapher_config:
-            subtitle: *description
-            note: *processing
+        description_processing: |-
+          For the US and EU member states, the share of cage-free eggs is approximated by the share of cage-free hens, due to limited data availability.
       share_of_eggs_in_cages:
         title: Share of eggs from hens in cages
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
-        description_short: |
+        description_short: |-
           Share of all eggs that are produced by laying hens in cages. This includes conventional as well as enriched cages, which are larger, furnished cages that provide slightly more space.
-        description_processing: *processing
-        presentation:
-          grapher_config:
-            subtitle: *description
-            note: *processing
+        description_processing: |-
+          For the US and EU member states, the share of eggs from hens in cages is approximated by the share of hens in cages, due to limited data availability.
