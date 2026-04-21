@@ -278,6 +278,16 @@ def main_cli(
                         "manual-upload snapshot (no url_download); rebuilding downstream only.",
                         flush=True,
                     )
+                # If the data file already matches the .dvc's recorded md5, the
+                # edit is metadata-only: skip etls to avoid a redundant (and
+                # potentially huge) redownload. The rebuild still picks up the
+                # .dvc change via checksum.
+                elif _dvc_data_is_fresh(changed_file):
+                    print(
+                        f"--- Skipping etls for {_snapshot_dataset_name(changed_file)}: "
+                        "data file already matches .dvc checksum; rebuilding downstream only.",
+                        flush=True,
+                    )
                 else:
                     try:
                         _run_snapshot_for_file(changed_file)
@@ -355,6 +365,46 @@ def _is_watched_snapshot_file(path: Path, watched_stems: set[str]) -> bool:
             if _snapshot_dataset_name(dvc) in watched_stems:
                 return True
     return False
+
+
+def _dvc_data_is_fresh(path: Path) -> bool:
+    """Return True if the data file on disk matches the md5 recorded in the .dvc.
+
+    When only metadata fields change (title, description, etc.) the `outs` md5
+    stays the same and the local data file is still current — no need for `etls`
+    to redownload potentially-huge content; the downstream rebuild picks up the
+    .dvc change via its file checksum.
+    """
+    if path.suffix != ".dvc":
+        return False
+
+    import yaml
+
+    try:
+        with open(path) as f:
+            content = yaml.safe_load(f) or {}
+    except Exception:
+        return False
+
+    outs = content.get("outs") or []
+    if not outs:
+        return False
+    expected_md5 = outs[0].get("md5")
+    data_filename = outs[0].get("path")
+    if not expected_md5 or not data_filename:
+        return False
+
+    try:
+        relative_dir = path.relative_to(paths.SNAPSHOTS_DIR).parent
+    except ValueError:
+        return False
+    data_path = paths.DATA_DIR / "snapshots" / relative_dir / data_filename
+    if not data_path.is_file():
+        return False
+
+    from etl.files import checksum_file
+
+    return checksum_file(data_path) == expected_md5
 
 
 def _is_manual_upload_dvc_edit(path: Path) -> bool:
