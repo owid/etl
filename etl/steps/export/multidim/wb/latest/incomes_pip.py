@@ -134,7 +134,9 @@ def run() -> None:
                     "hasMapTab": False,
                     "tab": "chart",
                     "chartTypes": lambda view: (
-                        ["StackedArea", "StackedDiscreteBar"] if view.matches(indicator="share") else ["LineChart"]
+                        ["StackedArea", "StackedDiscreteBar"]
+                        if view.matches(indicator="share")
+                        else ["LineChart", "DiscreteBar"]
                     ),
                     "hideTotalValueLabel": True,
                     "baseColorScheme": "OwidCategoricalE",
@@ -164,7 +166,7 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
-                    "chartTypes": ["LineChart"],
+                    "chartTypes": ["LineChart", "DiscreteBar"],
                     "hideTotalValueLabel": True,
                     "baseColorScheme": "OwidCategoricalE",
                     "title": "{title}",
