@@ -6,26 +6,27 @@ meta:
     title: AI Index Report
     description: |-
       The AI Index Report tracks, collates, distills, and visualizes data related to artificial intelligence (AI). The mission is to provide unbiased, rigorously vetted, broadly sourced data to enable policymakers, researchers, executives, journalists, and the general public to develop a more thorough and nuanced understanding of the complex field of AI.
-    date_published: "2026"
-    title_snapshot: AI Index Report 2026 - Full Data
+    date_published: "2026-04-13"
 
     # Citation
     producer: AI Index Report
     citation_full: |-
-      Nestor Maslej, Loredana Fattorini, Raymond Perrault, Yolanda Gil, Vanessa Parli, Njenga Kariuki, Emily Capstick, Anka Reuel, Erik
-      Brynjolfsson, John Etchemendy, Katrina Ligett, Terah Lyons, James Manyika, Juan Carlos Niebles, Yoav Shoham, Russell Wald,
-      Tobi Walsh, Armin Hamrah, Lapo Santarlasci, Julia Betts Lotufo, Alexandra Rome, Andrew Shi, Sukrut Oak. "The AI Index 2026
-      Annual Report," AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2026
+      Sha Sajadieh, Loredana Fattorini, Raymond Perrault, Yolanda Gil, Vanessa Parli, Lapo Santarlasci, Juan Pava,
+      Nestor Maslej, Russ Altman, Erik Brynjolfsson, Carla Brodley, Jack Clark, Virginia Dignum, Vipin Kumar,
+      James Landay, Terah Lyons, James Manyika, Juan Carlos Niebles, Yoav Shoham, Elham Tabassi, Russell
+      Wald, Toby Walsh, Dan Weld. “The AI Index 2026 Annual Report,” AI Index Steering Committee, Institute for
+      Human-Centered AI, Stanford University, Stanford, CA, April 2026.
     attribution_short: AI Index Report
 
     # Files
-    url_main: https://aiindex.stanford.edu/report/
+    # Download the full dataset here:  https://drive.google.com/drive/folders/1zJTOg0iR0j5SijCwFutwWvDt143lW277
+    url_main: https://hai.stanford.edu/assets/files/ai_index_report_2026.pdf
     date_accessed: '2026-04-20'
 
     # License
     license:
       name: CC BY-ND 4.0
-      url: https://aiindex.stanford.edu/report/
+      url: https://hai.stanford.edu/assets/files/ai_index_report_2026.pdf
 outs:
   - md5: 3914638054dc0d97f8fe30c42f8ea471
     size: 27281029
