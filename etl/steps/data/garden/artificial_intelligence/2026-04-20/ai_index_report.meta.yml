@@ -16,7 +16,7 @@ definitions:
     - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments, therefore, lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
 
   desc_short_generative: &desc_short_generative |-
-    Money put into privately held [generative](#dod:generative-ai) AI companies by private investors. This excludes publicly traded companies (e.g., Big Tech companies) and companies’ internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
+    Money put into privately held [generative AI](#dod:generative-ai) companies by private investors. This excludes publicly traded companies (e.g., Big Tech companies) and companies’ internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
   desc_short_private: &desc_short_private |-
     Money put into privately held AI companies that raised more than $1.5 million from private investors. This excludes publicly traded companies (e.g., Big Tech companies) and companies’ internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
   desc_short_corporate: &desc_short_corporate |-
@@ -169,7 +169,7 @@ tables:
         title: Share of artificial intelligence jobs among all job postings
         unit: '%'
         short_unit: '%'
-        description_short: Share of job postings that require at least one AI-related skill, such as machine learning, generative AI, or natural language processing.
+        description_short: Share of job postings that require at least one AI-related skill, such as machine learning, [generative AI](#dod:generative-ai), or natural language processing.
         description_key:
           - A job posting is counted as an AI job if it lists at least one AI-related skill identified by Lightcast. The list of skills is updated each year to reflect new developments.
           - The definition is broad, covering technical roles as well as areas such as AI ethics and governance.
