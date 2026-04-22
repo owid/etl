@@ -15,7 +15,14 @@ This skill generalizes the pattern first built for four inequality MDims (`incom
 - `scripts/generate_mdim_text_report.py` — MDim view mode (supports `collapse_dims` and placeholder parametrization).
 - `scripts/grapher_dataset_mode.py` — grapher-dataset mode (iterates every indicator column) and indicator-list mode (`--indicators <cp> <cp> ...` or `--indicators-file <path>`).
 
-Rebuilding the MDim `.config.json` is always done via `etlr <mdim> --export --grapher` — there is no DB-bypass helper. The user works on a staging server where MySQL is up, so the full ETL path runs cleanly and keeps the local config in sync with production.
+Rebuilding the MDim `.config.json` is done via `etlr <mdim> --export --private` — there is no DB-bypass helper. The user works on a staging server where MySQL is up, so `Collection.save()` runs cleanly (validates indicators + upserts the MDim config to the admin API). Change detection handles the common case:
+
+- **Nothing changed** → ~2 s; nothing runs.
+- **Garden `.meta.yml`, garden data, or MDim yaml/py changed** → etlr rebuilds only the affected upstream steps and the MDim export.
+
+Do **not** add `--grapher` unless you specifically need to re-upload indicator data/metadata to MySQL — it triggers a `grapher://grapher/<dataset>` upload step that can take ~50 s per dataset and isn't needed for the FAUST report (the script reads metadata directly from the local grapher-channel feather files).
+
+Do **not** add `--only` when you want garden/MDim edits to take effect — `--only` skips upstream dependency rebuilds by design. Use `--only --force` only when you explicitly want to re-run just the MDim step without touching anything upstream.
 
 The original working copy that produced the reference output also lives at `ai/generate_mdim_text_report.py` and `ai/build_gini_pip_config.py`. Prefer the `scripts/` versions for new work — they import shared helpers from `_common.py` to avoid drift.
 
@@ -90,7 +97,7 @@ Total views: **N**   (for MDims)
 
 1. **Grapher-channel metadata loading**: `Dataset(data/grapher/<ns>/<ver>/<ds>).read(<table>, safe_types=False)[<col>].metadata`.
 
-2. **Rebuilding the MDim `.config.json`**: use `etlr export://multidim/<ns>/<ver>/<name> --export --grapher`. This hits the real DB path (`validate_indicators_in_db` + `upsert_to_db` + `save_config_local`) and matches the staging-server behaviour. If this command errors with a MySQL connection-refused trace, surface that to the user and stop — don't monkey-patch around it (the resulting local config would drift from what the server would actually publish).
+2. **Rebuilding the MDim `.config.json`**: use `etlr export://multidim/<ns>/<ver>/<name> --export --private`. This runs `Collection.save()` (`validate_indicators_in_db` + `save_config_local` + `upsert_to_db` — admin-API upsert, not a big data push) and lets etlr's change detection rebuild any upstream garden/MDim steps whose code or YAML changed. Don't add `--grapher` unless you need to push indicator data to MySQL (it pulls in the slow `grapher://grapher/<dataset>` upload step). If the command errors with a MySQL connection-refused trace, surface that to the user and stop — don't monkey-patch around it.
 
 3. **Description-key dedup with auto slugs**: collect unique bullets into a per-file legend, auto-generate a short slug from the first ~3 non-stopword content words of each bullet (kebab-case), disambiguate collisions with `-2`/`-3` suffixes. Each view references bullets by their slugs, rendered as sub-bullets (not a comma-separated list).
 
@@ -116,11 +123,16 @@ Total views: **N**   (for MDims)
 2. For MDim input, confirm which dimensions (if any) to collapse — `period` is a classic candidate because it usually just changes a unit word in every field.
 3. For MDims, rebuild the `.config.json` exports using `etlr` (the full ETL path). For grapher/garden input, rely on the already-built dataset folder.
 4. Run the appropriate script:
-   - **MDim config rebuild** — one command per MDim (no DB-bypass fallback; if MySQL is unreachable, report the error instead of working around it):
+   - **MDim config rebuild** — one command (etlr's change detection handles garden/MDim edits; drop `--grapher` to skip the slow MySQL data upload — not needed for the FAUST report):
      ```
-     .venv/bin/etlr export://multidim/wb/latest/incomes_pip --export --grapher
-     .venv/bin/etlr export://multidim/wb/latest/gini_pip --export --grapher
+     .venv/bin/etlr \
+         export://multidim/wb/latest/incomes_pip \
+         export://multidim/wb/latest/gini_pip \
+         export://multidim/lis/latest/gini_lis \
+         export://multidim/wid/latest/incomes_wid \
+         --export --private
      ```
+     Only add `--grapher` if you've changed indicator data/metadata that also needs to land in MySQL for live rendering. No DB-bypass fallback: if MySQL is unreachable, report the error and stop.
    - **MDim mode (render the report)** — edit the `MDIMS` list at the top of `scripts/generate_mdim_text_report.py` or pass `--config <json>` with the same shape; then:
      ```
      .venv/bin/python .claude/skills/chart-text-report/scripts/generate_mdim_text_report.py
