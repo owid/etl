@@ -14,7 +14,8 @@ This skill generalizes the pattern first built for four inequality MDims (`incom
 - `scripts/_common.py` — shared helpers: grapher-channel metadata loader, inheritance resolvers, `BulletLibrary`, auto-slugs, preview URL, stopwords.
 - `scripts/generate_mdim_text_report.py` — MDim view mode (supports `collapse_dims` and placeholder parametrization).
 - `scripts/grapher_dataset_mode.py` — grapher-dataset mode (iterates every indicator column) and indicator-list mode (`--indicators <cp> <cp> ...` or `--indicators-file <path>`).
-- `scripts/build_mdim_config_no_db.py` — DB-free rebuild of one or more MDim `.config.json` exports when MySQL isn't running.
+
+Rebuilding the MDim `.config.json` is always done via `etlr <mdim> --export --grapher` — there is no DB-bypass helper. The user works on a staging server where MySQL is up, so the full ETL path runs cleanly and keeps the local config in sync with production.
 
 The original working copy that produced the reference output also lives at `ai/generate_mdim_text_report.py` and `ai/build_gini_pip_config.py`. Prefer the `scripts/` versions for new work — they import shared helpers from `_common.py` to avoid drift.
 
@@ -89,7 +90,7 @@ Total views: **N**   (for MDims)
 
 1. **Grapher-channel metadata loading**: `Dataset(data/grapher/<ns>/<ver>/<ds>).read(<table>, safe_types=False)[<col>].metadata`.
 
-2. **`save_config_local()` workaround for missing MDim exports**: if the MDim's `.config.json` doesn't exist (common if DB isn't running), patch `etl.collection.model.core.validate_indicators_in_db` and `Collection.upsert_to_db` to no-ops, then import the step module and call `run()`. This writes the local JSON without touching MySQL. See `ai/build_gini_pip_config.py` for the pattern.
+2. **Rebuilding the MDim `.config.json`**: use `etlr export://multidim/<ns>/<ver>/<name> --export --grapher`. This hits the real DB path (`validate_indicators_in_db` + `upsert_to_db` + `save_config_local`) and matches the staging-server behaviour. If this command errors with a MySQL connection-refused trace, surface that to the user and stop — don't monkey-patch around it (the resulting local config would drift from what the server would actually publish).
 
 3. **Description-key dedup with auto slugs**: collect unique bullets into a per-file legend, auto-generate a short slug from the first ~3 non-stopword content words of each bullet (kebab-case), disambiguate collisions with `-2`/`-3` suffixes. Each view references bullets by their slugs, rendered as sub-bullets (not a comma-separated list).
 
@@ -113,17 +114,16 @@ Total views: **N**   (for MDims)
 
 1. Confirm the input kind with the user: one MDim, several MDims, a dataset's indicators, or a hand-picked list.
 2. For MDim input, confirm which dimensions (if any) to collapse — `period` is a classic candidate because it usually just changes a unit word in every field.
-3. For MDims, rebuild the `.config.json` exports (with the DB-free patch when MySQL isn't up). For grapher/garden input, rely on the already-built dataset folder.
+3. For MDims, rebuild the `.config.json` exports using `etlr` (the full ETL path). For grapher/garden input, rely on the already-built dataset folder.
 4. Run the appropriate script:
-   - **MDim mode** — edit the `MDIMS` list at the top of `scripts/generate_mdim_text_report.py` or pass `--config <json>` with the same shape; then:
+   - **MDim config rebuild** — one command per MDim (no DB-bypass fallback; if MySQL is unreachable, report the error instead of working around it):
+     ```
+     .venv/bin/etlr export://multidim/wb/latest/incomes_pip --export --grapher
+     .venv/bin/etlr export://multidim/wb/latest/gini_pip --export --grapher
+     ```
+   - **MDim mode (render the report)** — edit the `MDIMS` list at the top of `scripts/generate_mdim_text_report.py` or pass `--config <json>` with the same shape; then:
      ```
      .venv/bin/python .claude/skills/chart-text-report/scripts/generate_mdim_text_report.py
-     ```
-   - **MDim config rebuild (DB-free)** — when the `.config.json` is missing or stale and you can't run `etlr`:
-     ```
-     .venv/bin/python .claude/skills/chart-text-report/scripts/build_mdim_config_no_db.py \
-         etl.steps.export.multidim.wb.latest.incomes_pip \
-         etl.steps.export.multidim.wb.latest.gini_pip
      ```
    - **Dataset mode** — audit every indicator of a grapher dataset:
      ```
@@ -143,7 +143,7 @@ Total views: **N**   (for MDims)
 - Do NOT fall back to `title` / `title_public` / `display.name` / `description_short` when resolving chart Title / Subtitle / Footnote. Use `grapher_config` only (see inheritance rules above).
 - Do NOT report `description_processing`; it's noisy and the user explicitly doesn't care about it for FAUST review.
 - Do NOT load metadata from the garden channel; it exposes pre-template Jinja text and unflattened dimensions. Always use the grapher channel.
-- Do NOT run `.venv/bin/etlr export://...` for the MDim if MySQL is down — it will fail in `validate_indicators_in_db`. Use the `save_config_local()` patch instead.
+- Do NOT monkey-patch around a MySQL outage by calling `Collection.save_config_local()` directly or stubbing out `validate_indicators_in_db` / `upsert_to_db`. The local config would drift from what the server actually publishes. If MySQL is down, stop and tell the user.
 - Do NOT produce HTML `<details>` blocks or tables — the user's preferred format is a flat Markdown outline with bullet fields.
 
 ## Related memories and references
@@ -151,4 +151,3 @@ Total views: **N**   (for MDims)
 - `.claude/projects/-Users-parriagadap-etl/memory/faust_definition.md` — FAUST = Footnote, Axis titles, Units, Subtitle, Title.
 - `.claude/projects/-Users-parriagadap-etl/memory/feedback_chart_faust_inheritance.md` — the inheritance rule, with the caveat about `grapher_config` not being universally populated.
 - `.claude/skills/chart-text-report/scripts/` — the scripts this skill drives.
-- `ai/generate_mdim_text_report.py`, `ai/build_gini_pip_config.py` — original in-repo copies that produced the first set of reports.
