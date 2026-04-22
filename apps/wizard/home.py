@@ -1,13 +1,9 @@
 """Home page of wizard."""
 
-from copy import deepcopy
-from typing import Any
-
 import streamlit as st
-from streamlit_card import card
 
 from apps.wizard.config import WIZARD_CONFIG
-from apps.wizard.utils.components import st_wizard_page_link
+from apps.wizard.utils.components import st_wizard_card, st_wizard_page_link
 
 st.set_page_config(
     page_title="Wizard: Home",
@@ -49,55 +45,6 @@ def st_show_home():
         )
         st.caption(f"streamlit {st.__version__}", width="content")
 
-    # Generic tools
-    ## Default styling for the cards (Wizard apps are presented as cards)
-    default_styles = {
-        "card": {
-            "width": "100%",
-            "height": "80px",
-            "padding": "0px",
-            "margin": "0px",
-            "font-size": ".8rem",
-            "font-family": "Helvetica",
-        },
-        "filter": {
-            "background-color": "rgba(0, 0, 0, 0.55)"  # <- make the image not dimmed anymore
-        },
-        "text": {
-            "font-size": "1rem",
-            # "font-weight": "normal",
-            "margin": "0px",
-            "padding": "0px",
-        },
-    }
-
-    def create_card(
-        entrypoint: str,
-        title: str,
-        image_url: str,
-        text: str | list[str] = "",
-        custom_styles: dict[str, Any] | None = None,
-        small: bool = False,
-    ) -> None:
-        """Create card."""
-        styles = deepcopy(default_styles)
-        if small:
-            styles["card"]["height"] = "50px"
-
-        if custom_styles:
-            styles["card"].update(custom_styles)
-        go_to_page = card(
-            title=title,
-            image=image_url,
-            text=text,
-            # text=f"Press {i + 1}",
-            # text=["This is a test card", "This is a subtext"],
-            styles=styles,
-            on_click=lambda: None,  # ty: ignore[invalid-argument-type]
-        )
-        if go_to_page:
-            st.switch_page(entrypoint)
-
     #########################
     # ETL Steps
     #########################
@@ -105,98 +52,70 @@ def st_show_home():
     st.markdown(WIZARD_CONFIG["etl"]["description"])
     steps = WIZARD_CONFIG["etl"]["steps"]
 
-    # We present two channels to create an ETL step chain:
-    # 1. Classic: Snapshot -> Data
-    # 2. Fast Track
-
-    # 1/ CLASSIC: Snapshot + Data
+    # 1/ CLASSIC: Snapshot -> Data -> Collection (no captions, match original)
     if steps["fasttrack"]["enable"]:
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col1:
-            create_card(
-                entrypoint=steps["snapshot"]["entrypoint"],
-                title=steps["snapshot"]["title"],
-                image_url=steps["snapshot"]["image_url"],
-                custom_styles={"height": "100px"},
-            )
-        with col2:
-            create_card(
-                entrypoint=steps["data"]["entrypoint"],
-                title=steps["data"]["title"],
-                image_url=steps["data"]["image_url"],
-                custom_styles={"height": "100px"},
-            )
-        with col3:
-            create_card(
-                entrypoint=steps["collection"]["entrypoint"],
-                title=steps["collection"]["title"],
-                image_url=steps["collection"]["image_url"],
-                custom_styles={"height": "100px"},
-            )
+        _render_cards_row(
+            [steps["snapshot"], steps["data"], steps["collection"]],
+            height=100,
+            col_widths=[1, 2, 1],
+            show_caption=False,
+        )
 
     # 2/ FAST TRACK
     if steps["fasttrack"]["enable"]:
         col1, _ = st.columns([3, 1])
         with col1:
-            create_card(
-                entrypoint=steps["fasttrack"]["entrypoint"],
-                title=steps["fasttrack"]["title"],
-                image_url=steps["fasttrack"]["image_url"],
-                custom_styles={"height": "50px"},
-            )
+            _render_card(steps["fasttrack"], height=50, show_caption=False)
 
     #########################
     # Sections
     #########################
-    # Determine number of rows
     sections = WIZARD_CONFIG["sections"]
-    num_sections = len(sections)
-    num_rows = num_sections // MAX_COLS_PER_ROW + 1
-
+    num_rows = len(sections) // MAX_COLS_PER_ROW + 1
     for row in range(num_rows):
         cols = st.columns(MAX_COLS_PER_ROW)
         for i, section in enumerate(sections[row * MAX_COLS_PER_ROW : (row + 1) * MAX_COLS_PER_ROW]):
+            apps = [app for app in section["apps"] if app["enable"]]
+            if not apps:
+                continue
             with cols[i]:
-                apps = [app for app in section["apps"] if app["enable"]]
-                if apps:
-                    st.markdown(f"## {section['title']}")
-                    st.markdown(section["description"])
-                    for app in apps:
-                        text = [
-                            app["description"],
-                        ]
-                        create_card(
-                            entrypoint=app["entrypoint"],
-                            title=app["title"],
-                            image_url=app["image_url"],
-                            text=text,
-                        )
+                st.markdown(f"## {section['title']}")
+                st.markdown(section["description"])
+                for app in apps:
+                    _render_card(app)
 
     #########################
     # Legacy
     #########################
-    # st.divider()
-
     if "legacy" in WIZARD_CONFIG:
-        section_legacy = WIZARD_CONFIG["legacy"]
-        apps = [app for app in section_legacy["apps"] if app["enable"]]
-        if apps:
-            st.warning(section_legacy["description"])
-            columns = st.columns(len(apps))
-            for i, app in enumerate(apps):
-                text = [
-                    app["description"],
-                ]
-                # if "maintainer" in app:
-                #     text.append(f"maintainer: {app['maintainer']}")
-                if app["enable"]:
-                    with columns[i]:
-                        create_card(
-                            entrypoint=app["entrypoint"],
-                            title=app["title"],
-                            image_url=app["image_url"],
-                            text=text,
-                        )
+        legacy_apps = [app for app in WIZARD_CONFIG["legacy"]["apps"] if app["enable"]]
+        if legacy_apps:
+            st.warning(WIZARD_CONFIG["legacy"]["description"])
+            _render_cards_row(legacy_apps)
+
+
+def _render_card(item: dict, height: int = 80, show_caption: bool = True) -> None:
+    """Render a single wizard card from a WIZARD_CONFIG app/step dict."""
+    st_wizard_card(
+        entrypoint=item["entrypoint"],
+        title=item["title"],
+        image_url=item["image_url"],
+        caption=item.get("description", "") if show_caption else "",
+        height=height,
+    )
+
+
+def _render_cards_row(
+    items: list[dict],
+    height: int = 80,
+    col_widths: list[int] | None = None,
+    show_caption: bool = True,
+) -> None:
+    """Render a row of wizard cards across Streamlit columns."""
+    cols = st.columns(col_widths or len(items))
+    for col, item in zip(cols, items):
+        with col:
+            _render_card(item, height=height, show_caption=show_caption)
 
 
 # Show the home page

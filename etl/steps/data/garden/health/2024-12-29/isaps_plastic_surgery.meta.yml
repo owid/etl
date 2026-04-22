@@ -42,3 +42,7 @@ tables:
         description_short: |-
           Number of cosmetic procedures performed in a given year divided by the total population.
         unit: procedures
+        presentation:
+          grapher_config:
+            subtitle: ""
+            note: ""

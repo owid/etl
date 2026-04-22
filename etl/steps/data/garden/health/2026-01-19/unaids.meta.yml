@@ -459,7 +459,7 @@ tables:
         description_short: |-
           Share of {definitions.people_dimension} who test positive for HIV at a given time. This is the <<estimate.lower()>> estimate.
         description_key:
-          - Known as "HIV prevalence", it is estimated by dividing the number of people in a given group who tested positive for HIV by all the people that were tested.
+          - Known as "HIV prevalence", it is estimated by dividing the number of people in a given group who tested positive for HIV by all the people who were tested.
         presentation:
           title_public: "Share of the population living with HIV"
 
@@ -1881,7 +1881,7 @@ tables:
 
           More details: https://indicatorregistry.unaids.org/indicator/knowledge-hiv-status-among-key-populations-d
         presentation:
-          title_public: Share of people that tested for HIV who know their status
+          title_public: Share of people who tested for HIV who know their status
           title_variant: |-
             <<group>>
             <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
@@ -1892,7 +1892,7 @@ tables:
             <%- endif %>
           grapher_config:
             title: |-
-              Share of people that tested for HIV who know their status, <<group>>
+              Share of people who tested for HIV who know their status, <<group>>
               <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
               , <<sex>>s
               <%- endif %>

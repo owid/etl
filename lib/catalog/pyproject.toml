@@ -1,6 +1,6 @@
 [project]
 name = "owid-catalog"
-version = "1.0.1"
+version = "1.1.0"
 description = "Core data types used by OWID for managing data."
 readme = "README.md"
 authors = [{ name = "Our World in Data", email = "tech@ourworldindata.org" }]
@@ -61,6 +61,9 @@ dev = [
     "ruff==0.15.8",
     "ipykernel>=6.29.0",
 ]
+
+[tool.uv]
+exclude-newer = "3 days"
 
 [tool.uv.sources]
 owid-datautils = { path = "../datautils", editable = true }

@@ -1,4 +1,4 @@
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 from owid.catalog import api
 from owid.catalog.api import Client, fetch, search

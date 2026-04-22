@@ -1,6 +1,8 @@
 ---
 name: update-dataset
 description: End-to-end dataset update workflow with PR creation, snapshot, meadow, garden, and grapher steps. Use when user wants to update a dataset, refresh data, run ETL update, or mentions updating dataset versions.
+metadata:
+  internal: true
 ---
 
 # Update Dataset (PR → snapshot → steps → grapher)
@@ -32,7 +34,7 @@ Assumptions:
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Pick 1–3 chart views for the public announcement
-- [ ] Draft Slack announcement, add to PR description with `@codex review`, and notify user to post it to #data-updates-comms
+- [ ] Draft Slack announcement, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 
 Persistence:
@@ -70,6 +72,11 @@ When you do stop, present a concise summary of the issue and what options exist.
    - **CRITICAL**: Run `etl update` ONCE for the full step URI (e.g., `data://garden/namespace/old_version/short_name`). Do NOT run it separately per channel (snapshot, meadow, garden, grapher). Running it once ensures all cross-step DAG dependencies are updated together. Running it per-channel leaves stale version references in `dag/main.yml` (e.g., garden pointing to old meadow version).
    - Perform help check, dry run, approval, then real execution; capture summary for later PR notes
    - After running, **always verify `dag/main.yml`**: grep for the old version and confirm all internal references between the new steps point to the new version (e.g., garden depends on new meadow, not old meadow).
+
+1b) Check for outdated practices (check-outdated-practices skill)
+   - After `etl update` creates new step files, run the `/check-outdated-practices` skill on the newly created files
+   - This catches patterns like `if __name__ == "__main__"`, `geo.harmonize_countries()`, `dest_dir`, `paths.load_dependency()`, etc. that were copied from old versions
+   - Fix any findings before proceeding — this avoids propagating legacy patterns into new versions
 
 2) Create PR and integrate update via subagent (etl-pr)
    - Inputs: `<namespace>/<old_version>/<short_name>`
@@ -128,7 +135,10 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Ask user if unsure about any details
    - Save the draft to `workbench/<short_name>/slack-announcement.md`
    - **Add the announcement to the PR description** as a collapsed section titled "Slack Announcement"
-   - **Append `@codex review` as the very last line of the PR description** (outside all collapsed sections) to trigger an automated code review
+   - **Post `@codex review` as a separate PR comment** (not in the PR description) to trigger an automated code review. Use:
+     ```bash
+     gh pr comment <pr_number> --body "@codex review"
+     ```
    - Tell the user: "Slack announcement drafted at `workbench/<short_name>/slack-announcement.md` and added to the PR description. Please review and post it to **#data-updates-comms**."
 
 10) Codex review: address comments and resolve threads
@@ -174,6 +184,16 @@ Filter out the old dataset's own DAG entries (snapshot → meadow → garden →
 If downstream dependents exist:
 - **Tell the user** which datasets depend on the old version and need updating in a follow-up PR
 - **Add a "Downstream dependencies" section to the PR description** (not collapsed — this is important) listing the dependent datasets with a note that they should be updated to point to the new version in a follow-up PR
+
+## DAG archiving
+
+After the ETL update, the old version's DAG entries (snapshot → meadow → garden → grapher) remain in the main DAG file but are no longer referenced by any active step. **Ask the user** if they want to move the old entries to the corresponding archive DAG file (e.g., `dag/archive/poverty_inequality.yml`).
+
+If the user agrees:
+1. Find the old version's entries in the main DAG file (e.g., `dag/poverty_inequality.yml`)
+2. Move them to the **bottom** of the corresponding archive file (`dag/archive/<same_file>.yml`)
+3. Include the original section comment (e.g., `# 1000 Binned Global Distribution (World Bank PIP)`) above the archived entries
+4. Verify no references to the old version remain in the main DAG (excluding the archive)
 
 ## Guardrails and tips
 

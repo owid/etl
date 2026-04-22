@@ -108,3 +108,12 @@ steps:
   #
   data://grapher/animal_welfare/2025-03-26/animals_used_for_food:
     - data://garden/animal_welfare/2025-03-26/animals_used_for_food
+  #
+  # Chick culling laws (Various sources, 2023).
+  #
+  data://meadow/animal_welfare/2023-09-01/chick_culling_laws:
+    - snapshot://animal_welfare/2023-09-01/chick_culling_laws.csv
+  data://garden/animal_welfare/2023-09-01/chick_culling_laws:
+    - data://meadow/animal_welfare/2023-09-01/chick_culling_laws
+  data://grapher/animal_welfare/2023-09-01/chick_culling_laws:
+    - data://garden/animal_welfare/2023-09-01/chick_culling_laws
