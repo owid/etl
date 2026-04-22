@@ -5,6 +5,8 @@ definitions:
       - Animal Welfare
   description_processing_backfill: &description_processing_backfill
     Data for 2006-2011 was suppressed in the 2026 release. Values from the earlier 2023 release were used to fill this gap.
+  description_processing_hens: &description_processing_hens
+    Hen counts by housing type are estimated by multiplying the total number of laying hens (from Defra's June Survey of Agriculture) by the share of eggs produced in each housing type, assuming roughly equal laying rates across housing systems.
 
 dataset:
   title: "UK egg statistics"
@@ -36,3 +38,28 @@ tables:
         short_unit: ''
         description: |
           The total number of eggs packed in the UK, as reported by Defra. This total is available for all years even when breakdowns by production type are suppressed or unavailable.
+      number_of_hens_in_cages:
+        title: Number of hens in (enriched) cages
+        unit: hens
+        short_unit: ''
+        description_processing: *description_processing_hens
+      number_of_hens_in_barns:
+        title: Number of hens in barns
+        unit: hens
+        short_unit: ''
+        description_processing: *description_processing_hens
+      number_of_hens_free_range:
+        title: Number of hens in non-organic, free-range farms
+        unit: hens
+        short_unit: ''
+        description_processing: *description_processing_hens
+      number_of_hens_organic:
+        title: Number of hens in organic, free-range farms
+        unit: hens
+        short_unit: ''
+        description_processing: *description_processing_hens
+      number_of_hens_cage_free:
+        title: Number of cage-free hens
+        unit: hens
+        short_unit: ''
+        description_processing: *description_processing_hens

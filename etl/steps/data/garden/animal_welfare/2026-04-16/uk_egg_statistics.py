@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -25,6 +27,39 @@ COLUMNS_OLD = {
 }
 
 
+def estimate_hens_by_housing_type(tb: Table, tb_hens: Table) -> Table:
+    """Estimate the number of hens in each housing type.
+
+    Uses total laying hens from the June Survey of Agriculture and the share of eggs
+    produced in each housing type as a proxy, assuming equal laying rates across systems.
+    """
+    tb = tb.merge(tb_hens[["year", "total_laying_hens"]], on="year", how="left")
+
+    total_eggs = tb["number_of_eggs_all"]
+    tb["number_of_hens_in_cages"] = (
+        (tb["total_laying_hens"] * tb["number_of_eggs_from_enriched_cages"] / total_eggs).round().astype("Int64")
+    )
+    tb["number_of_hens_in_barns"] = (
+        (tb["total_laying_hens"] * tb["number_of_eggs_from_barns"] / total_eggs).round().astype("Int64")
+    )
+    tb["number_of_hens_free_range"] = (
+        (tb["total_laying_hens"] * tb["number_of_eggs_from_non_organic_free_range_farms"] / total_eggs)
+        .round()
+        .astype("Int64")
+    )
+    tb["number_of_hens_organic"] = (
+        (tb["total_laying_hens"] * tb["number_of_eggs_from_organic_free_range_farms"] / total_eggs)
+        .round()
+        .astype("Int64")
+    )
+    tb["number_of_hens_cage_free"] = (
+        tb["number_of_hens_in_barns"] + tb["number_of_hens_free_range"] + tb["number_of_hens_organic"]
+    )
+    tb = tb.drop(columns=["total_laying_hens"])
+
+    return tb
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -36,6 +71,10 @@ def run() -> None:
     # Load old meadow dataset (has barn/organic data for 2006-2011 that is suppressed in the new release).
     ds_meadow_old = paths.load_dataset("uk_egg_statistics", version="2023-08-01")
     tb_old = ds_meadow_old.read("uk_egg_statistics")
+
+    # Load total laying hen counts from the June Survey of Agriculture.
+    ds_hens = paths.load_dataset("uk_livestock_populations")
+    tb_hens = ds_hens.read("uk_livestock_populations").reset_index()
 
     #
     # Process data.
@@ -62,6 +101,9 @@ def run() -> None:
 
     # Add a country column.
     tb["country"] = "United Kingdom"
+
+    # Estimate hens by housing type from total hen counts and egg share by housing type.
+    tb = estimate_hens_by_housing_type(tb, tb_hens)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format(short_name=paths.short_name)
