@@ -263,6 +263,60 @@ def try_parametrize_field(
     return None
 
 
+def _compute_heading_disambiguators(
+    groups: list[tuple[dict[str, str], list[dict[str, Any]]]],
+    raw_headings: list[str],
+    collapse_dims: list[str],
+    dim_lookup: dict[str, tuple[str, dict[str, str]]],
+    config_dim_order: list[str],
+) -> dict[int, str]:
+    """For each heading shared by >1 groups, return a `{group_idx: suffix}` map.
+
+    The suffix is something like ` (Income measure: After taxes)` built from the
+    non-collapsed dim(s) whose values differ across the colliding groups. The goal
+    is to keep duplicate headings distinguishable in the rendered outline.
+    """
+    from collections import defaultdict
+
+    heading_to_idxs: dict[str, list[int]] = defaultdict(list)
+    for i, h in enumerate(raw_headings):
+        heading_to_idxs[h].append(i)
+
+    out: dict[int, str] = {}
+    for heading, idxs in heading_to_idxs.items():
+        if len(idxs) <= 1:
+            continue
+        # For each colliding group, take the non-collapsed dims of its first variant
+        # (all variants in a group share the non-collapsed dim values by construction).
+        dim_values_per_group: list[dict[str, str]] = []
+        for idx in idxs:
+            variants = groups[idx][1]
+            dims = variants[0].get("dimensions", {}) or {}
+            dim_values_per_group.append({k: v for k, v in dims.items() if k not in collapse_dims})
+
+        # Find dims whose values actually differ across these groups.
+        all_slugs = {s for d in dim_values_per_group for s in d.keys()}
+        discriminating_slugs = [
+            s for s in all_slugs if len({d.get(s) for d in dim_values_per_group}) > 1
+        ]
+        # Preserve dim order from the MDim config for a predictable suffix.
+        discriminating_slugs.sort(
+            key=lambda s: config_dim_order.index(s) if s in config_dim_order else 999
+        )
+
+        for idx, dims in zip(idxs, dim_values_per_group):
+            parts: list[str] = []
+            for slug in discriminating_slugs:
+                dv = dims.get(slug)
+                if dv is None or dv == "nan":
+                    continue
+                name, choice_map = dim_lookup.get(slug, (slug, {}))
+                parts.append(f"{name}: {choice_map.get(dv, dv)}")
+            if parts:
+                out[idx] = f" ({', '.join(parts)})"
+    return out
+
+
 def group_views(
     views: list[dict[str, Any]], collapse_dims: list[str]
 ) -> list[tuple[dict[str, str], list[dict[str, Any]]]]:
@@ -338,8 +392,14 @@ def render_mdim(mdim: dict[str, Any]) -> str:
     groups = group_views(cfg.get("views", []), collapse_dims)
     dim_lookup = build_dim_lookup(cfg)
 
+    # First pass: resolve every group's fields and compute each group's raw heading.
+    # We need the headings up front so that when multiple groups collapse to the same
+    # heading we can append a differentiating dimension selection to each.
+    resolved_per_group: list[list[tuple[dict[str, Any], dict[str, tuple[str, Any]]]]] = []
+    raw_headings: list[str] = []
     for _remaining_dims, variants in groups:
         resolved = [(v, resolve_view_fields(v)) for v in variants]
+        resolved_per_group.append(resolved)
 
         title_entries = [r["Title"] for _, r in resolved]
         unique_titles = list(dict.fromkeys(v for _, v in title_entries))
@@ -348,10 +408,27 @@ def render_mdim(mdim: dict[str, Any]) -> str:
         else:
             parametrized_heading = None
         if parametrized_heading is not None:
-            heading = parametrized_heading[1]
+            raw_headings.append(parametrized_heading[1])
         else:
             first_title_value = title_entries[0][1]
-            heading = first_title_value if first_title_value else format_view_header(resolved[0][0])
+            raw_headings.append(
+                first_title_value if first_title_value else format_view_header(resolved[0][0])
+            )
+
+    # For each heading used by more than one group, find the non-collapsed dim(s) whose
+    # values differ across those groups and build a suffix like " (Dim: Choice)" to
+    # append to each colliding heading.
+    disambiguators = _compute_heading_disambiguators(
+        groups=groups,
+        raw_headings=raw_headings,
+        collapse_dims=collapse_dims,
+        dim_lookup=dim_lookup,
+        config_dim_order=[d.get("slug") for d in cfg.get("dimensions", []) or [] if d.get("slug")],
+    )
+
+    for group_idx, (_remaining_dims, variants) in enumerate(groups):
+        resolved = resolved_per_group[group_idx]
+        heading = raw_headings[group_idx] + disambiguators.get(group_idx, "")
         view_lines.append(f"## {heading}")
         view_lines.append("")
 

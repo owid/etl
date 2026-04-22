@@ -101,6 +101,8 @@ Total views: **N**   (for MDims)
 
 7. **Human-readable dim selections subheader**: directly under each view heading, render the dim selections using the dimension `name` and choice `name` from the MDim config (`**Indicator:** Mean income · **Period:** Per day, Per month, Per year`). Filter out `nan` sentinel values.
 
+7a. **Heading disambiguation when views share a title**: when two or more groups collapse to the same `## <Title>` heading (common when a dim doesn't appear in the rendered Title but does vary between groups — e.g. `survey_comparability` on `incomes_pip`), append `(Dim name: Choice name)` built from the non-collapsed dim(s) whose values differ across the colliding groups. Dim order follows the MDim config. Only the differentiating dim(s) are appended — shared dims are already visible in the selection subheader directly below the heading.
+
 8. **Preview URLs**: main MDim URL is `https://admin.owid.io/admin/grapher/<urlquote(catalog_path)>`. Per-view URL appends `?dim1=slug1&dim2=slug2` from the view's `dimensions` dict.
 
 9. **Override / inherited / missing tagging**: `[override]` = text explicitly set on the view (MDim `config.*` or `metadata.*`); `[inherited]` = resolved from the primary y-indicator's ETL metadata; `[missing]` = absent in both. For grapher-dataset and indicator-list inputs, every tag is `[inherited]` or `[missing]` (no view-level overrides exist).

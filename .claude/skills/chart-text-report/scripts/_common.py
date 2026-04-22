@@ -172,6 +172,9 @@ BULLET_SLUG_OVERRIDES: dict[str, str] = {}
 def _auto_slug(text: str, max_words: int = 3) -> str:
     no_links = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
     cleaned = re.sub(r"[^\w\s-]", " ", no_links)
+    # Treat underscores as whitespace so Markdown italic runs like `_pre-tax_` split
+    # cleanly into `pre-tax` instead of producing slugs like `_pre-tax_`.
+    cleaned = cleaned.replace("_", " ")
     tokens = [t.lower() for t in cleaned.split() if t]
 
     picks: list[str] = []
