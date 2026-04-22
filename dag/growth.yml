@@ -35,6 +35,14 @@ steps:
   data://garden/ggdc/2022-12-23/maddison_database:
     - data://meadow/ggdc/2022-12-23/maddison_database
 
+      # IMF World Economic Outlook
+  data://meadow/imf/2026-04-22/world_economic_outlook:
+    - snapshot://imf/2026-04-22/world_economic_outlook.csv
+  data://garden/imf/2026-04-22/world_economic_outlook:
+    - data://meadow/imf/2026-04-22/world_economic_outlook
+  data://grapher/imf/2026-04-22/world_economic_outlook:
+    - data://garden/imf/2026-04-22/world_economic_outlook
+
   #
   # Average working hours - Huberman and Minns (2007)
   #
@@ -104,10 +112,3 @@ steps:
     - snapshot://bank_of_england/2026-01-21/millennium_macroeconomic_data.xlsx
   data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data:
     - data://meadow/bank_of_england/2026-01-21/millennium_macroeconomic_data
-  # IMF World Economic Outlook
-  data://meadow/imf/2026-04-22/world_economic_outlook:
-    - snapshot://imf/2026-04-22/world_economic_outlook.csv
-  data://garden/imf/2026-04-22/world_economic_outlook:
-    - data://meadow/imf/2026-04-22/world_economic_outlook
-  data://grapher/imf/2026-04-22/world_economic_outlook:
-    - data://garden/imf/2026-04-22/world_economic_outlook
