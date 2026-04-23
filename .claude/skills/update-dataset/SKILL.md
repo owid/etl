@@ -130,7 +130,7 @@ When you do stop, present a concise summary of the issue and what options exist.
      If the count is 0, the upgrade did not run — re-run it.
 
 8) Pick chart views for the public announcement
-   - Query the staging DB for all charts using the new dataset:
+   - Query the staging DB for **published** charts using the new dataset (filter on `c.publishedAt IS NOT NULL`). Draft/unlisted charts must not be counted in the announcement:
      ```sql
      SELECT c.id, cc.slug, cc.full->>'$.title' as title, cc.full->>'$.type' as type, cc.full->>'$.hasMapTab' as hasMapTab
      FROM charts c
@@ -138,8 +138,10 @@ When you do stop, present a concise summary of the issue and what options exist.
      JOIN chart_dimensions cd ON cd.chartId = c.id
      JOIN variables v ON cd.variableId = v.id
      WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'
+       AND c.publishedAt IS NOT NULL
      GROUP BY c.id
      ```
+   - The number reported in the Slack announcement's "How many charts did this update affect?" section must be this **published** count, not the total. It's fine to mention draft remaps separately in the PR description for completeness, but never in the Slack copy.
    - Pick 1–3 views using these criteria (in order of preference):
      - **Map views** — immediately visual, readers can find their own country
      - **Charts with punchy, standalone headlines** — titles that make a clear claim work best for social sharing
