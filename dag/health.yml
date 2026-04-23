@@ -1373,3 +1373,9 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_cancer:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_cancer
+  data://meadow/washu/2026-04-22/pm25_air_pollution:
+    - snapshot://washu/2026-04-22/pm25_air_pollution.csv
+  data://garden/washu/2026-04-22/pm25_air_pollution:
+    - data://meadow/washu/2026-04-22/pm25_air_pollution
+  data://grapher/washu/2026-04-22/pm25_air_pollution:
+    - data://garden/washu/2026-04-22/pm25_air_pollution
