@@ -130,23 +130,23 @@ definitions:
     This indicator shows how the International Labour Organization (ILO) obtains unemployment data for each country. It indicates whether the ILO used a country-reported survey value, filled a missing value with a modeled estimate, or had no data available. This information comes from the “obs_status” (observation status) variable in the ILO Modelled Estimates (ILOEST) dataset. The code “R” identifies country-reported survey data (“Real value”) — we label it as “Survey data (national)”. When no observation status is available but the ILO provides a modeled estimate, we label it “Estimated by ILO models (modeled)”.
 
   description_key_child_labor: |-
-    <% if classif1 == "Age (child labour): 5-11" %>
+    <% if classif1 == "Age (child labor): 5-11" %>
     Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services during the reference week.
-    <%- elif classif1 == "Age (child labour): 12-14" %>
+    <%- elif classif1 == "Age (child labor): 12-14" %>
     Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services during the reference week.
-    <%- elif classif1 == "Age (child labour): 15-17" %>
+    <%- elif classif1 == "Age (child labor): 15-17" %>
     Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
-    <%- elif classif1 == "Age (child labour): 5-17" %>
+    <%- elif classif1 == "Age (child labor): 5-17" %>
     Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
     <%- endif %>
   description_key_child_labor_economic_activity: |-
-    <% if classif1 == "Age (child labour): 5-11" %>
+    <% if classif1 == "Age (child labor): 5-11" %>
     Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity during the reference week.
-    <%- elif classif1 == "Age (child labour): 12-14" %>
+    <%- elif classif1 == "Age (child labor): 12-14" %>
     Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity during the reference week.
-    <%- elif classif1 == "Age (child labour): 15-17" %>
+    <%- elif classif1 == "Age (child labor): 15-17" %>
     Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
-    <%- elif classif1 == "Age (child labour): 5-17" %>
+    <%- elif classif1 == "Age (child labor): 5-17" %>
     Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity; for children aged 12-14, it includes those who did at least 14 hours of economic activity; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
     <%- endif %>
   description_key_low_pay_earners: |-
@@ -416,7 +416,7 @@ tables:
         title: Share of children in child labor - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_child_labor}"
         processing_level: major
@@ -608,7 +608,7 @@ tables:
           <<: *common_display
 
       sdg_8_6_1_youth_neet:
-        title: SDG 8.6.1 Proportion of youth (aged 15-24) not in education, employment or training (NEET) - <<sex>>
+        title: SDG 8.6.1 Proportion of youth (aged 15-24) not in education, employment, or training (NEET) - <<sex>>
         unit: "%"
         short_unit: "%"
         description_short: Percentage of people aged 15–24 who are not in education (formal education or short courses), employment (worked in paid work or self-employment), or training (non-academic skill-building activities). {definitions.note_national_estimates}
@@ -619,7 +619,7 @@ tables:
         processing_level: major
         description_processing: "{definitions.description_processing_unreliable_data}"
         display:
-          name: Proportion of youth (aged 15-24) not in education, employment or training (NEET) - <<sex>>
+          name: Proportion of youth (aged 15-24) not in education, employment, or training (NEET) - <<sex>>
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -627,7 +627,7 @@ tables:
         title: SDG 8.7.1 Proportion of children engaged in economic activity - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_child_labor_economic_activity}"
         processing_level: major
@@ -641,7 +641,7 @@ tables:
         title: SDG 8.7.1 Proportion of children engaged in economic activity and household chores - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
         description_key:
           - "{definitions.description_key_child_labor}"
         processing_level: major
