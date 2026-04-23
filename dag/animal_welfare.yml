@@ -143,3 +143,8 @@ steps:
     - data://meadow/animal_welfare/2026-04-16/chick_culling_laws
   data://grapher/animal_welfare/2026-04-16/chick_culling_laws:
     - data://garden/animal_welfare/2026-04-16/chick_culling_laws
+  #
+  # Single-chart collection replicating chart 7118 (https://admin.owid.io/admin/charts/7118/edit).
+  #
+  export://multidim/animal_welfare/latest/banning_of_chick_culling:
+    - data://grapher/animal_welfare/2026-04-16/chick_culling_laws

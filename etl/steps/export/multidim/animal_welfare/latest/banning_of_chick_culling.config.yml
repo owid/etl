@@ -1,0 +1,38 @@
+# Single-chart collection: `dimensions` is empty, so this is pushed as a regular
+# Grapher chart (not a multi-dim data page). Replicates chart:
+#   https://admin.owid.io/admin/charts/7118/edit
+title:
+  title: "Which countries have banned chick culling?"
+  title_variant: "Chart"
+default_selection:
+  - "World"
+topic_tags:
+  - "Animal Welfare"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - "chick_culling_laws#status"
+    config:
+      $schema: "https://files.ourworldindata.org/schemas/grapher-schema.009.json"
+      title: "Which countries have banned chick culling?"
+      subtitle: "Chick culling is the process of separating and killing unwanted male and unhealthy female chicks that cannot produce eggs in industrialized egg facilities."
+      note: "In Switzerland grinding is banned but gassing is still allowed. Belgium has only a regional ban."
+      originUrl: "/animal-welfare"
+      tab: "map"
+      hasMapTab: true
+      chartTypes: []
+      yAxis:
+        min: "auto"
+      map:
+        hideTimeline: true
+        colorScale:
+          baseColorScheme: "BinaryMapPaletteA"
+          customNumericColorsActive: true
+          customCategoryColors:
+            Banned: "#4881c6"
+            "No laws": "#b6a28c"
+            "Not banned": "#ad9882"
+            "Partially banned": "#a084c1"
+            "Banned but not yet effective": "#3e94a1"

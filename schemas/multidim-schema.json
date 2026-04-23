@@ -327,13 +327,11 @@
         },
         "dimensions": {
             "type": "array",
+            "minItems": 0,
             "title": "Collection dimensions",
             "description": "Array of dimension objects that define the filter dropdowns available to users.",
             "requirement_level": "required",
             "guidelines": [
-                [
-                    "Must contain at least one dimension."
-                ],
                 [
                     "Each dimension creates a dropdown filter in the user interface."
                 ],
@@ -342,6 +340,9 @@
                 ],
                 [
                     "Should be ordered by importance or logical flow."
+                ],
+                [
+                    "May be an empty array (single-chart case): the collection is materialised as a regular Grapher chart instead of a multi-dimensional data page. In that case, `views` must contain exactly one view."
                 ]
             ],
             "items": {

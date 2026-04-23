@@ -1174,11 +1174,30 @@ class ExportStep(DataStep):
                 DataStep._run_py_isolated(self)  # ty: ignore
             else:
                 DataStep._run_py(self)  # ty: ignore
+        elif self._is_multidim_yaml_only():
+            # YAML-only multidim: no .py, just a .config.yml. Run the default
+            # boilerplate (load_collection_config → create_collection → save).
+            self._run_multidim_yaml_only(sp)
 
         # save checksum (only update index.json, don't call ds.save() which iterates
         # table_names and would pick up custom JSON files written by the export script)
         ds.metadata.source_checksum = self.checksum_input()
         ds.metadata.save(ds._index_file)
+
+    def _is_multidim_yaml_only(self) -> bool:
+        """True if this is an `export://multidim/...` step backed only by a `.config.yml`."""
+        if not self.path.startswith("multidim/"):
+            return False
+        return self._search_path.with_suffix(".config.yml").exists()
+
+    def _run_multidim_yaml_only(self, search_path: Path) -> None:
+        from etl.helpers import PathFinder
+
+        # Synthesise the `.py` path PathFinder expects; the file doesn't need to exist,
+        # PathFinder only parses namespace/version/short_name out of the path components.
+        paths_ = PathFinder(str(search_path.with_suffix(".py")))
+        collection = paths_.create_collection(config=paths_.load_collection_config())
+        collection.save()
 
     def checksum_output(self) -> str:
         # output checksum is checksum of all ingredients
