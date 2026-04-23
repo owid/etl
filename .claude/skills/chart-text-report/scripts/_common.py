@@ -58,17 +58,22 @@ def get_indicator_meta(catalog_path: str) -> VariableMeta | None:
     Loads from the GRAPHER channel because grapher flattens multi-dimensional
     indicators into one column per dimension combination and renders Jinja templates
     against the specific dimension values — matching what Grapher actually shows.
+
+    Returns `None` only when the column legitimately isn't in the table (i.e. the
+    specific indicator is absent). Other failures — malformed path, wrong channel,
+    missing dataset, unreadable feather — propagate as exceptions so the caller
+    doesn't silently audit the wrong state.
     """
-    try:
-        _, ns, ver, ds_name, table_name, col = parse_catalog_path(catalog_path)
-    except ValueError:
-        return None
-    try:
-        tb = load_grapher_table(ns, ver, ds_name, table_name)
-    except Exception as e:
-        print(f"  ! Could not load grapher table for {catalog_path}: {e}")
-        return None
+    channel, ns, ver, ds_name, table_name, col = parse_catalog_path(catalog_path)
+    if channel != "grapher":
+        raise ValueError(
+            f"Only 'grapher/...' catalog paths are supported; got channel '{channel}' "
+            f"in {catalog_path}. Metadata must come from the grapher channel so Jinja "
+            f"templates are rendered against the correct dimension values."
+        )
+    tb = load_grapher_table(ns, ver, ds_name, table_name)
     if col not in tb.columns:
+        # Legit "this indicator is absent" case — the report will tag it [missing].
         print(f"  ! Column '{col}' not found in grapher table {ns}/{ver}/{ds_name}/{table_name}")
         return None
     return tb[col].metadata
@@ -105,10 +110,15 @@ def inherited_note(meta: VariableMeta | None) -> str | None:
 
 
 def resolve_field(view_value: Any, inherited_value: Any) -> tuple[str, Any]:
-    """Pick override if set (non-empty for strings), else inherited. Return (source, value)."""
-    if view_value is not None and not (isinstance(view_value, str) and view_value == ""):
+    """Pick override if set, else inherited. Return (source, value).
+
+    An explicit empty string (e.g. `note: ""` in an MDim view to suppress an
+    inherited footnote) counts as an override — Grapher renders that as empty,
+    and the audit should show the same. Only `None` means "not set at this layer".
+    """
+    if view_value is not None:
         return "override", view_value
-    if inherited_value is not None and not (isinstance(inherited_value, str) and inherited_value == ""):
+    if inherited_value is not None:
         return "inherited", inherited_value
     return "missing", None
 
@@ -127,8 +137,14 @@ def render_value(source: str, value: Any) -> str:
     if value is None:
         return f"{tag} _—_"
     if isinstance(value, list):
+        if not value:
+            return f"{tag} _(empty list)_"
         items = [f"  - {md_escape(str(item))}" for item in value]
-        return f"{tag}\n" + "\n".join(items) if items else f"{tag} _—_"
+        return f"{tag}\n" + "\n".join(items)
+    if isinstance(value, str) and value == "":
+        # Explicit empty-string override — Grapher renders this as blank, so surface
+        # it in the report rather than leaving an ambiguous empty line.
+        return f"{tag} _(empty)_"
     return f"{tag} {md_escape(str(value))}"
 
 
