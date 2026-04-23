@@ -56,8 +56,9 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
     const dir = path.join(base, channel, namespace, version);
     const filePaths = [
       path.join(dir, shortName + '.py'),
+      ...(scheme === 'export' ? [path.join(dir, shortName + '.config.yml')] : []),
       path.join(dir, shortName, '__init__.py'),
-      path.join(dir, shortName + '.ipynb')
+      path.join(dir, shortName + '.ipynb'),
     ];
     return { scheme, key, version, fullKey, filePaths };
   }
