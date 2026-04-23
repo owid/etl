@@ -5,6 +5,7 @@ This script is called by the VS Code extension to get DOD definitions.
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -17,38 +18,76 @@ sys.path.insert(0, str(repo_root))
 try:
     from dotenv import dotenv_values
 
-    from etl.config import ENV_FILE_PROD, OWIDEnv
+    from etl.config import OWID_ENV, ENV_FILE_PROD, OWIDEnv
 
-    def get_prod_env() -> OWIDEnv:
-        """Return an OWIDEnv connected to the production live_grapher DB.
+    def dod_env_candidates() -> list[tuple[OWIDEnv, str]]:
+        """Return ordered (env, source_label) candidates for DoD lookups.
+
+        DoDs are edited on staging first and only synced to production
+        periodically, so a developer working on a staging branch should see
+        their own staging DoDs — including edits not yet on live_grapher.
+        Users off staging fall back to production.
 
         Priority:
-        1. ENV_FILE_PROD (explicit), if configured and present.
-        2. `.env.prod` in the repo root, by convention.
-        3. The repo's `.env`, read raw via dotenv_values — used only if it
-           targets `live_grapher` (DB_NAME=live_grapher). Reading raw bypasses
-           any STAGING override that `etl.config` may have applied to
-           `OWID_ENV`, which would otherwise point the DoD query at a staging
-           server instead of production.
+        1. `OWID_ENV` when `STAGING` is set — the developer's staging server,
+           where in-flight DoD edits live.
+        2. ENV_FILE_PROD (explicit prod env file).
+        3. `.env.prod` in the repo root, by convention.
+        4. The repo's `.env`, read raw — only if DB_NAME=live_grapher.
+           Reading raw bypasses the STAGING override applied to OWID_ENV.
+        5. `OWID_ENV` as final fallback (local dev DB, etc.).
 
-        Refuses to silently fall back to a non-prod env so DoD hover never
-        queries the wrong database.
+        The caller tries candidates in order and falls through on connection
+        errors. The source label is surfaced to the extension so the user can
+        tell where the hover content came from — we show it in the hover for
+        anything other than production.
         """
-        if ENV_FILE_PROD and Path(ENV_FILE_PROD).exists():
-            return OWIDEnv.from_env_file(ENV_FILE_PROD)
+        candidates: list[tuple[OWIDEnv, str]] = []
+        owid_conf = OWID_ENV.conf
 
+        # 1. Staging — the working copy for DoD edits.
+        if os.environ.get("STAGING") and owid_conf.DB_NAME == "owid":
+            candidates.append((OWID_ENV, f"staging ({owid_conf.DB_HOST})"))
+
+        # 2. ENV_FILE_PROD
+        if ENV_FILE_PROD and Path(ENV_FILE_PROD).exists():
+            candidates.append((OWIDEnv.from_env_file(ENV_FILE_PROD), "production"))
+
+        # 3. .env.prod
         env_prod = repo_root / ".env.prod"
         if env_prod.exists():
-            return OWIDEnv.from_env_file(str(env_prod))
+            candidates.append((OWIDEnv.from_env_file(str(env_prod)), "production"))
 
+        # 4. .env raw, only if it targets live_grapher
         env_main = repo_root / ".env"
         if env_main.exists() and dotenv_values(env_main).get("DB_NAME") == "live_grapher":
-            return OWIDEnv.from_env_file(str(env_main))
+            candidates.append((OWIDEnv.from_env_file(str(env_main)), "production"))
 
-        raise RuntimeError(
-            "No production DB configured: set ENV_FILE_PROD, create .env.prod, "
-            "or point .env at live_grapher."
-        )
+        # 5. OWID_ENV fallback (local dev DB, etc.) unless already queued above.
+        if not any(c.conf == owid_conf for c, _ in candidates):
+            candidates.append((OWID_ENV, f"{owid_conf.DB_NAME}@{owid_conf.DB_HOST}"))
+
+        return candidates
+
+    def _try_query(query: str, params: tuple | None = None):
+        """Run `query` against the first reachable candidate env. Returns
+        `(dataframe, source_label)`. Raises the last OperationalError if none
+        of the candidates is reachable."""
+        from sqlalchemy.exc import OperationalError
+
+        last_error: Exception | None = None
+        for env, source in dod_env_candidates():
+            try:
+                if params is None:
+                    df = env.read_sql(query)
+                else:
+                    df = env.read_sql(query, params=params)
+                return df, source
+            except OperationalError as e:
+                last_error = e
+                continue
+        assert last_error is not None, "dod_env_candidates() returned no candidates"
+        raise last_error
 
     def fetch_dod_by_names(dod_names: list[str]) -> dict:
         """
@@ -61,10 +100,8 @@ try:
             Dictionary with DOD data or error information for each key
         """
         try:
-            prod_env = get_prod_env()
-
             if not dod_names:
-                return {"success": True, "dods": {}}
+                return {"success": True, "source": "production", "dods": {}}
 
             # Create placeholders for the IN clause
             placeholders = ", ".join(["%s"] * len(dod_names))
@@ -81,10 +118,10 @@ try:
                 WHERE d.name IN ({placeholders})
             """
 
-            df = prod_env.read_sql(query, params=tuple(dod_names))
+            df, source = _try_query(query, params=tuple(dod_names))
 
             # Build result dictionary
-            result = {"success": True, "dods": {}}
+            result = {"success": True, "source": source, "dods": {}}
             found_names = set()
 
             for _, row in df.iterrows():
@@ -97,6 +134,7 @@ try:
                     "createdAt": str(row["createdAt"]) if row["createdAt"] else None,
                     "updatedAt": str(row["updatedAt"]) if row["updatedAt"] else None,
                     "lastUpdatedBy": row["lastUpdatedBy"] if row["lastUpdatedBy"] else None,
+                    "source": source,
                 }
 
             # Add entries for DODs that weren't found
@@ -106,6 +144,7 @@ try:
                         "success": False,
                         "error": f"DOD '{dod_name}' not found in database",
                         "dod_name": dod_name,
+                        "source": source,
                     }
 
             return result
@@ -126,21 +165,19 @@ try:
             Dictionary with list of all DOD names or error information
         """
         try:
-            prod_env = get_prod_env()
-
             query = """
                 SELECT DISTINCT d.name
                 FROM dods d
                 ORDER BY d.name
             """
 
-            df = prod_env.read_sql(query)
+            df, source = _try_query(query)
 
             if df.empty:
-                return {"success": True, "dod_names": []}
+                return {"success": True, "source": source, "dod_names": []}
 
             dod_names = df["name"].tolist()
-            return {"success": True, "dod_names": dod_names}
+            return {"success": True, "source": source, "dod_names": dod_names}
 
         except Exception as e:
             return {
