@@ -39,6 +39,5 @@ def run() -> None:
             tb_generative,
             tb_companies,
         ],
-        check_variables_metadata=True,
     )
     ds_grapher.save()

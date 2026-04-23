@@ -1,6 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: minor
     presentation:
       topic_tags:
         - Artificial Intelligence
@@ -69,6 +70,8 @@ definitions:
     McKinsey & Company via AI Index Report
   attribution_investment: &attribution_investment |-
     Quid via AI Index Report (2026); U.S. Bureau of Labor Statistics (2026)
+  attribution_quid: &attribution_quid |-
+    Quid via AI Index Report (2026)
   attribution_robots: &attribution_robots |-
     International Federation of Robotics via AI Index Report (2026)
   attribution_bills: &attribution_bills |-
@@ -98,7 +101,6 @@ tables:
           attribution: *attribution_bills
           grapher_config:
             note: For example, the [TAKE IT DOWN Act](https://www.govinfo.gov/content/pkg/PLAW-119publ12/html/PLAW-119publ12.htm), signed into law in the United States in 2025, criminalizes the nonconsensual sharing of intimate images, including AI-generated deepfakes.
-        processing_level: minor
         display:
             numDecimalPlaces: 0
 
@@ -118,7 +120,6 @@ tables:
           attribution: *attribution_incidents
           grapher_config:
             note: Reported incidents likely undercount the true number of incidents, especially in earlier years.
-        processing_level: minor
         display:
           numDecimalPlaces: 0
 
@@ -135,12 +136,12 @@ tables:
           - Responses are self-reported and should be interpreted as indicative of trends rather than precise measures of global adoption.
           - Reported use often reflects early-stage adoption, such as experimentation or pilot projects, rather than widespread deployment.
           - To account for differences in response rates, results are weighted by each country’s contribution to global GDP.
+        processing_level: major
         description_processing: *desc_processing_combined
         presentation:
           attribution: *attribution_mckinsey
           grapher_config:
             note: Companies represent a range of industries, sizes, functional specialties, and tenures. To adjust for differences in response rates, the data are weighted by the contribution of each respondent's nation to global GDP.
-        processing_level: minor
         display:
           numDecimalPlaces: 0
 
@@ -156,7 +157,6 @@ tables:
           - Attendance includes people joining in person, online, or in hybrid formats.
           - Many conferences have moved online or to hybrid formats in recent years, which can increase participation and make comparisons over time less straightforward.
           - Figures are based on data reported by conference organizers or published online.
-        processing_level: minor
         display:
           numDecimalPlaces: 0
         presentation:
@@ -174,7 +174,6 @@ tables:
           - A job posting is counted as an AI job if it lists at least one AI-related skill identified by Lightcast. The list of skills is updated each year to reflect new developments.
           - The definition is broad, covering technical roles as well as areas such as AI ethics and governance.
           - The data is based on online job postings and does not include roles that are not advertised online.
-        processing_level: minor
         display:
           numDecimalPlaces: 1
         presentation:
@@ -188,10 +187,10 @@ tables:
         title: Global investment in generative AI
         unit: 'constant 2021 US$'
         short_unit: '$'
+        processing_level: major
         description_short: *desc_short_generative
         description_key: *desc_key_generative
         description_processing: *desc_processing_inflation
-        processing_level: minor
         display:
           numDecimalPlaces: 0
         presentation:
@@ -204,13 +203,12 @@ tables:
       companies:
         title: Newly founded AI companies
         unit: 'companies'
-        processing_level: minor
         description_short: Newly-funded AI companies in each year that received an investment of more than $1.5 million (not adjusted for inflation).
         description_key:
           - AI companies are identified using keyword searches in company descriptions and websites.
           - The data focuses on AI and machine learning companies that raised over $1.5 million (not adjusted for inflation).
         presentation:
-          attribution: *attribution_investment
+          attribution: *attribution_quid
         display:
           numDecimalPlaces: 0
 
@@ -220,10 +218,10 @@ tables:
         title: Private investment in AI by region
         unit: 'constant 2021 US$'
         short_unit: '$'
+        processing_level: major
         description_short: *desc_short_private
         description_key: *desc_key_private
         description_processing: *desc_processing_inflation
-        processing_level: minor
         display:
           numDecimalPlaces: 0
         presentation:
@@ -237,10 +235,10 @@ tables:
         title: Global corporate investment in AI
         unit: 'constant 2021 US$'
         short_unit: '$'
+        processing_level: major
         description_short: *desc_short_corporate
         description_key: *desc_key_corporate
         description_processing: *desc_processing_inflation
-        processing_level: minor
         display:
           numDecimalPlaces: 0
         presentation:
@@ -258,7 +256,6 @@ tables:
         short_unit: ''
         description_short: *desc_industrial
         description_key: *desc_key_industrial
-        processing_level: minor
         display:
           numDecimalPlaces: 0
         presentation:
@@ -297,7 +294,6 @@ tables:
           - Transportation and logistics category includes robots that transport goods and manage inventory in both indoor and outdoor environments. These robots are used in places such as warehouses, hospitals, hotels, and public streets, and they support activities like deliveries, stock counting, and restocking.
           - Medical and healthcare category includes robots used in clinical and care settings for diagnostics, surgery, rehabilitation, and non-invasive therapy. It also includes hospital support robots, wearable exoskeletons, and telepresence robots used specifically in healthcare.
           - Hospitality category includes robots that prepare and serve food or drinks, as well as those that provide information, guidance, or remote presence in customer-facing environments like hotels, restaurants, and museums.
-        processing_level: minor
         display:
           numDecimalPlaces: 0
         presentation:

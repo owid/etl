@@ -278,7 +278,6 @@ steps:
   ########################
   # AI Index Report 2026
   ############################
-  snapshot://artificial_intelligence/2026-04-20/ai_index_report.zip:
   data://meadow/artificial_intelligence/2026-04-20/ai_index_report:
     - snapshot://artificial_intelligence/2026-04-20/ai_index_report.zip
   data://garden/artificial_intelligence/2026-04-20/ai_index_report:
