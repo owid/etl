@@ -426,7 +426,7 @@ export function activate(context: vscode.ExtensionContext) {
                             const updateDate = new Date(result.updatedAt).toLocaleDateString();
                             hoverContent.appendMarkdown(`*Updated:* ${updateDate}\n`);
                         }
-                        if (result.source && result.source !== 'production') {
+                        if (result.source) {
                             hoverContent.appendMarkdown(`\n*Source: \`${result.source}\`*\n`);
                         }
                     } else if (result && result.success && result.dod) {
@@ -440,7 +440,7 @@ export function activate(context: vscode.ExtensionContext) {
                             const updateDate = new Date(dod.updatedAt).toLocaleDateString();
                             hoverContent.appendMarkdown(`*Updated:* ${updateDate}\n`);
                         }
-                        if (dod.source && dod.source !== 'production') {
+                        if (dod.source) {
                             hoverContent.appendMarkdown(`\n*Source: \`${dod.source}\`*\n`);
                         }
                     } else {
