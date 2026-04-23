@@ -8,27 +8,47 @@ import json
 import sys
 from pathlib import Path
 
-# Add the ETL root directory to the Python path
-etl_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(etl_root))
+# Repo root: .../etl (the script lives at .../etl/vscode_extensions/dod-syntax/scripts/fetch_dod.py)
+repo_root = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(repo_root))
 
 # Ensure we can import from ETL
 
 try:
-    from etl.config import OWID_ENV, ENV_FILE_PROD, OWIDEnv
+    from dotenv import dotenv_values
+
+    from etl.config import ENV_FILE_PROD, OWIDEnv
 
     def get_prod_env() -> OWIDEnv:
-        """Return an OWIDEnv connected to the live_grapher DB.
+        """Return an OWIDEnv connected to the production live_grapher DB.
 
         Priority:
-        1. ENV_FILE_PROD (chart-diff's dedicated prod env file), if configured and present.
-        2. The default OWID_ENV loaded from `.env` — works for any user whose `.env`
-           is already pointed at live_grapher (e.g. DB_NAME=live_grapher via the bore
-           tunnel on 127.0.0.1:3310), which is the common case for ETL users.
+        1. ENV_FILE_PROD (explicit), if configured and present.
+        2. `.env.prod` in the repo root, by convention.
+        3. The repo's `.env`, read raw via dotenv_values — used only if it
+           targets `live_grapher` (DB_NAME=live_grapher). Reading raw bypasses
+           any STAGING override that `etl.config` may have applied to
+           `OWID_ENV`, which would otherwise point the DoD query at a staging
+           server instead of production.
+
+        Refuses to silently fall back to a non-prod env so DoD hover never
+        queries the wrong database.
         """
         if ENV_FILE_PROD and Path(ENV_FILE_PROD).exists():
             return OWIDEnv.from_env_file(ENV_FILE_PROD)
-        return OWID_ENV
+
+        env_prod = repo_root / ".env.prod"
+        if env_prod.exists():
+            return OWIDEnv.from_env_file(str(env_prod))
+
+        env_main = repo_root / ".env"
+        if env_main.exists() and dotenv_values(env_main).get("DB_NAME") == "live_grapher":
+            return OWIDEnv.from_env_file(str(env_main))
+
+        raise RuntimeError(
+            "No production DB configured: set ENV_FILE_PROD, create .env.prod, "
+            "or point .env at live_grapher."
+        )
 
     def fetch_dod_by_names(dod_names: list[str]) -> dict:
         """
