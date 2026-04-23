@@ -116,8 +116,10 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 If `DATA_DIR / step_path` does not exist, parse the `.meta.yml` directly with `etl.files.ruamel_load` and pull the same field names from the `tables → <name> → variables → <var>` tree. Warn the user that Jinja templates (`<<var>>`, `{definitions.xxx}`, `<%- ... -%>`) are **not** resolved in this fallback path, so template-generated violations will be missed. Suggest building the step first:
 
 ```bash
-.venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --private --force --only
+.venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --private
 ```
+
+Drop `--only` here on purpose: when the catalog is missing, upstream meadow/garden outputs are usually missing too, and `--only` would skip them and fail on missing inputs.
 
 ### 3. Evaluate each string against the guide
 
@@ -140,7 +142,7 @@ If no violations are found, say so and list the fields that were inspected — t
 
 ### 4. Offer to fix
 
-Match the pattern in [check-metadata-typos](../.claude/skills/check-metadata-typos/SKILL.md) §4–5:
+Match the pattern in [check-metadata-typos](../check-metadata-typos/SKILL.md) §4–5:
 
 - **Fix all** — apply every suggested rewrite.
 - **Review each** — step through one at a time, user confirms/rejects/edits each.
