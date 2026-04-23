@@ -296,6 +296,16 @@ def load_dag(filename: str | Path = paths.DEFAULT_DAG_FILE) -> Graph:
     return _load_dag(filename, {})
 
 
+def load_single_dag_file(filename: str | Path) -> Graph:
+    """Load the steps declared in a single DAG YAML file, without following ``include``.
+
+    Returns the same ``{step: {deps}}`` shape as :func:`load_dag`, but limited
+    to the file at ``filename``. Useful for tooling that needs to attribute
+    each step to the exact DAG file where it lives (e.g. ``version_tracker``).
+    """
+    return _parse_dag_yaml(_load_dag_yaml(str(filename)))
+
+
 def _load_dag(filename: str | Path, prev_dag: dict[str, Any]):
     """
     Recursive helper to 1) load a dag itself, and 2) load any sub-dags

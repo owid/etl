@@ -3,6 +3,7 @@ from pathlib import Path
 
 from etl.dag_helpers import (
     get_comments_above_step_in_dag,
+    load_single_dag_file,
     remove_steps_from_dag_file,
     write_to_dag_file,
 )
@@ -915,3 +916,71 @@ steps:
     _assert_write_to_dag_file(
         old_content, expected_content, dag_part={"meadow_a": ["snapshot_a"], "meadow_b": ["snapshot_b", "snapshot_c"]}
     )
+
+
+def test_load_single_dag_file_returns_all_top_level_steps():
+    content = """\
+steps:
+  data://meadow/un/2022-07-11/un_wpp:
+    - snapshot://un/2022-07-11/un_wpp.zip
+  data://garden/un/2022-07-11/un_wpp:
+    - data://meadow/un/2022-07-11/un_wpp
+
+include:
+  - path/to/another/dag.yml
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(content)
+        graph = load_single_dag_file(p)
+    # Does not follow the ``include`` directive — only the local steps show up.
+    assert set(graph) == {
+        "data://meadow/un/2022-07-11/un_wpp",
+        "data://garden/un/2022-07-11/un_wpp",
+    }
+    assert graph["data://meadow/un/2022-07-11/un_wpp"] == {"snapshot://un/2022-07-11/un_wpp.zip"}
+
+
+def test_add_to_dag_delegates_to_write_to_dag_file():
+    # Preserves the public API of ``apps.utils.files.add_to_dag`` while routing
+    # the actual write through the canonical ``write_to_dag_file``.
+    from apps.utils.files import add_to_dag
+
+    initial = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    - snapshot_a
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(initial)
+        returned = add_to_dag({"meadow_b": ["snapshot_b"]}, dag_path=p)
+        after = p.read_text()
+
+    # Existing comments survive.
+    assert "# Comment for meadow_a." in after
+    assert "meadow_b:" in after
+    assert "- snapshot_b" in after
+    # The return value stays a YAML-formatted fragment describing the subdag.
+    assert "meadow_b" in returned
+
+
+def test_remove_from_dag_delegates_to_remove_steps_from_dag_file():
+    from apps.utils.files import remove_from_dag
+
+    initial = """\
+steps:
+  meadow_a:
+    - snapshot_a
+  meadow_b:
+    - snapshot_b
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(initial)
+        remove_from_dag("meadow_a", dag_path=p)
+        after = p.read_text()
+
+    assert "meadow_a" not in after
+    assert "meadow_b" in after
