@@ -219,3 +219,10 @@ steps:
     - data://garden/wb/2026-03-24/world_bank_pip
     - data://garden/regions/2023-01-01/regions
     - data://garden/worldbank_icp/2024-05-30/icp_2021_currencies
+  # # OECD Income Distribution Database
+  data://meadow/oecd/2026-04-23/income_distribution_database:
+    - snapshot://oecd/2026-04-23/income_distribution_database.csv
+  data://garden/oecd/2026-04-23/income_distribution_database:
+    - data://meadow/oecd/2026-04-23/income_distribution_database
+  data://grapher/oecd/2026-04-23/income_distribution_database:
+    - data://garden/oecd/2026-04-23/income_distribution_database
