@@ -1,0 +1,24 @@
+title:
+  title: Animal Welfare
+  title_variant: slaughter, live animals, and welfare laws
+
+default_selection:
+  - World
+  - United States
+  - China
+  - India
+  - Brazil
+  - United Kingdom
+
+topic_tags:
+  - Animal Welfare
+
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/animal-welfare
+        hasMapTab: true
+
+dimensions: []
+
+views: []
