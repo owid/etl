@@ -13,9 +13,9 @@ definitions:
   gini: |-
     The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
   disposable_income: |-
-    Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received.
+    Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received.
   market_income: |-
-    Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received. However, data for China, Hungary, Mexico, Turkey as well as part of the data for Greece refer to the income post taxes and before transfers.
+    Income is _pre-tax_ — measured before taxes have been paid and most government benefits have been received. However, data for China, Hungary, Mexico, Turkey as well as part of the data for Greece refer to the income post taxes and before transfers.
   gross_income: |-
     Income here is measured before taxes and after benefits.
   equivalization: |-
