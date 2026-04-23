@@ -3,7 +3,7 @@
 #   https://admin.owid.io/admin/charts/7118/edit
 title:
   title: "Which countries have banned chick culling?"
-  title_variant: "Chart"
+  title_variant: ""
 default_selection:
   - "World"
 topic_tags:
