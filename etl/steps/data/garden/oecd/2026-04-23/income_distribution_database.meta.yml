@@ -19,7 +19,7 @@ definitions:
   gross_income: |-
     Income here is measured before taxes and after benefits.
   equivalization: |-
-    Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
+    Income has been equivalized — adjusted to account for the fact that people in the same household can share costs like rent and heating.
   additional_info: |-
     {definitions.age_groups}, and also the income definition is the newest from the OECD since 2012. For more information on the methodology, visit the [OECD Income Distribution Database (IDD)](http://www.oecd.org/social/income-distribution-database.htm).
   covid: |-
@@ -28,11 +28,11 @@ definitions:
   age_groups: |-
     <% if age == "Total" %>
     The entire population of each country is considered
-    <% elif age == "Working population" %>
+    <%- elif age == "Working population" %>
     Only working-age population is considered (from 18 to 65 years old)
-    <% elif age == "Over 65 years" %>
+    <%- elif age == "Over 65 years" %>
     Only population over 65 years old is considered
-    <%- endif -%>
+    <%- endif %>
 
   source_gini: |-
     The Gini coefficient is based on the comparison of cumulative proportions of the population against cumulative proportions of income they receive, and it ranges between 0 in the case of perfect equality and 1 in the case of perfect inequality.
