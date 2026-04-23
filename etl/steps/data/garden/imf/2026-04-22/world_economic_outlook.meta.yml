@@ -14,6 +14,14 @@ definitions:
       tableDisplay:
         hideRelativeChange: True
 
+  description_key_gdp_introduction: "[Gross domestic product](#dod:gdp) (GDP) is a comprehensive measure of a country's total income. It helps compare the size of economies and track how they change over time. It is especially useful for understanding trends in economic growth."
+  description_key_gdp_definition: "The GDP is calculated as the value of all final goods and services produced each year in a country. It represents the total economic output of a country or region."
+  inflation_adjustment: This data is adjusted by inflation.
+  description_processing_gdp: |-
+    We split the IMF's GDP growth series into historical observations and near-term forecasts using the `LATEST_ACTUAL_ANNUAL_DATA` field that the IMF reports for each country: years up to and including that year are classified as observations, and subsequent years as forecasts.
+
+    For countries whose national accounts data the IMF reports on a fiscal-year basis (e.g., India, Egypt), we convert fiscal-year labels such as `FY26` to their closest calendar-year equivalent.
+
 dataset:
   update_period_days: 365
 
@@ -26,7 +34,12 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Annual percent change in gross domestic product. This data is adjusted for inflation."
+        description_key:
+          - "{definitions.description_key_gdp_introduction}"
+          - "{definitions.description_key_gdp_definition}"
+          - "{definitions.inflation_adjustment}"
         description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
+        description_processing: "{definitions.description_processing_gdp}"
         display:
           numDecimalPlaces: 1
           <<: *common-display
@@ -36,7 +49,11 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Near-term projections of the annual percent change in gross domestic product. This data is adjusted for inflation."
+        description_key:
+          - "{definitions.description_key_gdp_introduction}"
+          - "{definitions.description_key_gdp_definition}"
         description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
+        description_processing: "{definitions.description_processing_gdp}"
         display:
           numDecimalPlaces: 1
           isProjection: true
