@@ -35,12 +35,20 @@ If the file is missing, stop and tell the user to restore it from the [Notion pa
 
 Prefer the **rendered** (post-Jinja) metadata from the built catalog, so template artifacts are included in the check.
 
+Accept the step path in any of these forms and normalize it before loading:
+
+- `etl/steps/data/grapher/un/2026-04-08/child_labor_report` (matches the Scope example)
+- `data://grapher/un/2026-04-08/child_labor_report`
+- `grapher/un/2026-04-08/child_labor_report`
+
 ```bash
 .venv/bin/python -c "
 from etl.paths import DATA_DIR
 from owid.catalog import Dataset
 
-step_path = '<channel>/<namespace>/<version>/<dataset>'  # e.g. grapher/un/2026-04-08/child_labor_report
+raw = '<step path as the user gave it>'
+step_path = raw.removeprefix('data://').removeprefix('etl/steps/data/').strip('/')
+# step_path is now '<channel>/<namespace>/<version>/<dataset>', e.g. grapher/un/2026-04-08/child_labor_report
 ds = Dataset(DATA_DIR / step_path)
 
 import json

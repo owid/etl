@@ -104,9 +104,12 @@ When you do stop, present a concise summary of the issue and what options exist.
    - **Jinja spacing** — `/check-metadata-spacing` on the built garden and grapher datasets. Catches template artifacts like doubled spaces or stray newlines that only appear after Jinja rendering.
    - **Style guide** — `/check-metadata-style` on the grapher step. Audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide. Rules live in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`, so no Notion access is needed — but if the guide looks out of date, refresh that file from Notion in a separate PR.
 
-   If any skill rewrites a `.meta.yml`, re-run the affected step so the built catalog reflects the edits:
+   If any skill rewrites a `.meta.yml`, re-run the affected step so the built catalog reflects the edits. **Add `--grapher` when the affected step is on the grapher channel** — without it the local catalog is updated but staging stays stale, so the step 7 indicator upgrade sees the old text.
    ```bash
+   # garden / meadow:
    .venv/bin/etlr <channel>/<namespace>/<new_version>/<short_name> --private --force --only
+   # grapher:
+   .venv/bin/etlr grapher/<namespace>/<new_version>/<short_name> --grapher --private --force --only
    ```
    Then re-run the relevant check to confirm zero remaining violations.
 
