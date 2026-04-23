@@ -79,19 +79,29 @@ def run() -> None:
         )
 
     # Global yearly total (World) should be in a plausible range (200M–600M ha/year)
-    world_yearly = grouped_tb.loc[grouped_tb.index.get_level_values("country") == "World"].groupby("year")[area_cols].sum()
+    world_yearly = (
+        grouped_tb.loc[grouped_tb.index.get_level_values("country") == "World"].groupby("year")[area_cols].sum()
+    )
     plausible_years = world_yearly[world_yearly.index < 2024]
-    assert (plausible_years["all"] > 200_000_000).all(), "World yearly burned area unexpectedly low (< 200M ha) for some year."
-    assert (plausible_years["all"] < 600_000_000).all(), "World yearly burned area unexpectedly high (> 600M ha) for some year."
+    assert (plausible_years["all"] > 200_000_000).all(), (
+        "World yearly burned area unexpectedly low (< 200M ha) for some year."
+    )
+    assert (plausible_years["all"] < 600_000_000).all(), (
+        "World yearly burned area unexpectedly high (> 600M ha) for some year."
+    )
 
     # Savannas should be the dominant land cover globally each year
-    assert (plausible_years["savannas"] > plausible_years["forest"]).all(), "Savannas should exceed forests in global yearly burned area."
+    assert (plausible_years["savannas"] > plausible_years["forest"]).all(), (
+        "Savannas should exceed forests in global yearly burned area."
+    )
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[grouped_tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[grouped_tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
