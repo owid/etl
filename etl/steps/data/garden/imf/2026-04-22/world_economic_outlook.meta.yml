@@ -3,6 +3,7 @@ definitions:
     presentation:
       topic_tags:
         - Economic Growth
+      attribution_short: IMF
     processing_level: minor
     display: &common-display
       tolerance: 0
