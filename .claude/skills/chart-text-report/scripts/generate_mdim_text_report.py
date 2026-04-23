@@ -43,6 +43,7 @@ from urllib.parse import quote  # noqa: E402
 from _common import (  # noqa: E402
     ADMIN_BASE,
     BulletLibrary,
+    collect_used_tags,
     get_indicator_meta,
     how_to_read_block,
     inherited_note,
@@ -385,7 +386,8 @@ def render_mdim(mdim: dict[str, Any]) -> str:
         for dim, vals in global_dim_values.items():
             header_lines.append(f"- `{{{dim}}}` ∈ {{{', '.join(vals)}}}")
     header_lines.append("")
-    header_lines.extend(how_to_read_block(has_overrides=True))
+    # `how_to_read_block` is emitted AFTER the body is built, so we can tailor
+    # the legend to only describe tags that actually appear.
 
     library = BulletLibrary()
     view_lines: list[str] = []
@@ -516,6 +518,8 @@ def render_mdim(mdim: dict[str, Any]) -> str:
         view_lines.append("---")
         view_lines.append("")
 
+    used_tags = collect_used_tags(view_lines)
+    header_lines.extend(how_to_read_block(used_tags))
     return "\n".join(header_lines + library.legend_lines() + view_lines).rstrip() + "\n"
 
 

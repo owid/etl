@@ -40,6 +40,7 @@ from urllib.parse import quote  # noqa: E402
 from _common import (  # noqa: E402
     ADMIN_BASE,
     BulletLibrary,
+    collect_used_tags,
     get_indicator_meta,
     how_to_read_block,
     inherited_note,
@@ -104,7 +105,8 @@ def render_report(
     header_lines.append("")
     header_lines.append(f"Total indicators: **{len(catalog_paths)}**")
     header_lines.append("")
-    header_lines.extend(how_to_read_block(has_overrides=False))
+    # `how_to_read_block` is appended below after the body has been built,
+    # so we only document the source tags that actually occur.
 
     library = BulletLibrary()
     body: list[str] = []
@@ -137,6 +139,8 @@ def render_report(
         body.append("---")
         body.append("")
 
+    used_tags = collect_used_tags(body)
+    header_lines.extend(how_to_read_block(used_tags))
     return "\n".join(header_lines + library.legend_lines() + body).rstrip() + "\n"
 
 

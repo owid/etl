@@ -260,28 +260,34 @@ class BulletLibrary:
 # ---------------------------------------------------------------------------
 
 
-def how_to_read_block(has_overrides: bool) -> list[str]:
+def how_to_read_block(used_tags: set[str]) -> list[str]:
     """Rendered `## How to read this file` explanation.
 
-    `has_overrides=True` for the MDim mode (tags include [override]); False for
-    dataset mode where the only sources are [inherited] and [missing]."""
+    Only emits the legend entries for tags that actually appear in the body
+    (`used_tags` contains a subset of {"override", "inherited", "missing"}),
+    so the file doesn't document distinctions that never occur in practice.
+    """
     lines = ["## How to read this file", ""]
     lines.append("Every field is tagged by where its text came from:")
     lines.append("")
-    if has_overrides:
+    if "override" in used_tags:
         lines.append(
             "- **[override]** — the text is set explicitly on this view in the MDim config "
-            "(`.config.yml` or programmatically in the step's `.py`). Takes precedence."
+            "(`.config.yml` or programmatically in the step's `.py`). Takes precedence. "
+            "A value of `_(empty)_` means the view intentionally cleared the field."
         )
-    lines.append(
-        "- **[inherited]** — the value comes from the indicator's ETL metadata. "
-        "For Title/Subtitle/Footnote the source is `presentation.grapher_config.{title,subtitle,note}`; "
-        "for description_short/description_key the source is the namesake field on the indicator."
-    )
-    lines.append(
-        "- **[missing]** — neither the view nor the indicator defines the field. The chart will "
-        "render without it (or with an admin-DB value that this report cannot see)."
-    )
+    if "inherited" in used_tags:
+        lines.append(
+            "- **[inherited]** — the value comes from the indicator's ETL metadata. "
+            "For Title/Subtitle/Footnote the source is `presentation.grapher_config.{title,subtitle,note}`; "
+            "for description_short/description_key the source is the namesake field on the indicator. "
+            "`_(empty)_` means the indicator explicitly set the field to blank."
+        )
+    if "missing" in used_tags:
+        lines.append(
+            "- **[missing]** — neither the view nor the indicator defines the field. The chart will "
+            "render without it (or with an admin-DB value that this report cannot see)."
+        )
     lines.append("")
     lines.append(
         "Description-key bullets are deduplicated across the file; each unique bullet is "
@@ -291,3 +297,13 @@ def how_to_read_block(has_overrides: bool) -> list[str]:
     lines.append("---")
     lines.append("")
     return lines
+
+
+def collect_used_tags(lines: list[str]) -> set[str]:
+    """Scan already-rendered Markdown lines for which source tags actually appear."""
+    found: set[str] = set()
+    for tag in ("override", "inherited", "missing"):
+        token = f"[{tag}]"
+        if any(token in ln for ln in lines):
+            found.add(tag)
+    return found
