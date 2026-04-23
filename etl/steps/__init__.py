@@ -1159,6 +1159,13 @@ class ExportStep(DataStep):
     def __str__(self) -> str:
         return f"export://{self.path}"
 
+    def can_execute(self, archive_ok: bool = True) -> bool:
+        sp = self._search_path
+        if not archive_ok and "/archive/" in sp.as_posix():
+            return False
+
+        return super().can_execute(archive_ok=archive_ok) or self._is_multidim_yaml_only()
+
     def run(self) -> None:
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
