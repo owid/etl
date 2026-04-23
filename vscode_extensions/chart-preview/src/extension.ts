@@ -136,17 +136,54 @@ async function parseChartYml(filePath: string, wsRoot: string): Promise<{ stepUr
 }
 
 /**
- * Extract export step URI and catalog path from an export/multidim file path.
+ * Extract export step URI / catalog path / chart info from an export/multidim file path.
  * Supports both .config.yml and .py files.
  * Catalog path defaults to namespace/version/name#name (matching PathFinder.create_collection).
+ *
+ * For collections with `dimensions: []` (single-chart case) the ETL pushes to the chart
+ * admin endpoint, not the multi-dim one, so the preview needs the public chart URL
+ * (`grapher/{slug}`) instead of the mdim admin URL.
+ *
+ * We only classify as "chart" when the YAML has `dimensions: []` AND there is no sibling
+ * `.py` file. A sibling `.py` can populate dimensions programmatically (e.g. the
+ * air_pollution step uses `dimensions: []` as a placeholder), so the empty-list alone
+ * isn't a reliable signal.
  */
-function parseExportMultidim(filePath: string, wsRoot: string): { stepUri: string; catalogPath: string } {
+async function parseExportMultidim(
+	filePath: string,
+	wsRoot: string,
+): Promise<{ stepUri: string; catalogPath: string; isChart: boolean; chartSlug: string }> {
 	const exportDir = path.join(wsRoot, 'etl', 'steps', 'export', 'multidim');
 	const rel = path.relative(exportDir, filePath);
 	const stepPath = rel.replace(/\.(config\.yml|py)$/, '');
 	const shortName = path.basename(stepPath);
 	const catalogPath = `${stepPath}#${shortName}`;
-	return { stepUri: `export://multidim/${stepPath}`, catalogPath };
+	// Grapher slugs are dash-separated; the ETL short_name is snake_case.
+	const chartSlug = shortName.replace(/_/g, '-');
+
+	const configPath = filePath.endsWith('.config.yml')
+		? filePath
+		: filePath.replace(/\.py$/, '.config.yml');
+	const pyPath = configPath.replace(/\.config\.yml$/, '.py');
+
+	let hasEmptyDimensions = false;
+	try {
+		const content = await readFile(configPath, 'utf8');
+		hasEmptyDimensions = /^dimensions:\s*\[\s*\]\s*(#.*)?$/m.test(content);
+	} catch {
+		// No sibling .config.yml — can't classify, fall back to mdim.
+	}
+
+	let hasPy = false;
+	try {
+		await readFile(pyPath, 'utf8');
+		hasPy = true;
+	} catch {
+		// No sibling .py — fully-declarative step.
+	}
+
+	const isChart = hasEmptyDimensions && !hasPy;
+	return { stepUri: `export://multidim/${stepPath}`, catalogPath, isChart, chartSlug };
 }
 
 /**
@@ -263,10 +300,16 @@ const chartStrategy: PreviewStrategy = {
 		let fileName: string;
 
 		if (filePath.includes('/export/multidim/')) {
-			const parsed = parseExportMultidim(filePath, wsRoot);
+			const parsed = await parseExportMultidim(filePath, wsRoot);
 			stepUri = parsed.stepUri;
-			stagingUrl = `http://${containerName}/admin/grapher/${encodeURIComponent(parsed.catalogPath)}`;
-			isMdim = true;
+			if (parsed.isChart) {
+				// Zero-dim collection → ETL pushed a regular chart; preview at the public chart URL.
+				stagingUrl = `http://${containerName}/grapher/${parsed.chartSlug}`;
+				isMdim = false;
+			} else {
+				stagingUrl = `http://${containerName}/admin/grapher/${encodeURIComponent(parsed.catalogPath)}`;
+				isMdim = true;
+			}
 			etlArgs = [stepUri, '--export', '--watch', '--private'];
 			fileName = path.basename(filePath).replace(/\.(config\.yml|py)$/, '');
 		} else {
