@@ -3,6 +3,8 @@
 from copy import deepcopy
 from typing import Any
 
+from owid.catalog.utils import underscore
+
 from etl.collection import expand_config
 from etl.helpers import PathFinder
 
@@ -42,13 +44,11 @@ def improve_config_names(config: dict[str, Any], transformation=None, replacemen
     return config_new
 
 
-def set_default_view(config: dict[str, Any], default_view: dict[str, str]):
+def set_default_dimensions(config: dict[str, Any], default_dimensions: dict[str, str]) -> dict[str, Any]:
     config_new = deepcopy(config)
     error = "Default view not found"
-    assert sum([default_view == view["dimensions"] for view in config_new["views"]]) == 1, error
-    for view in config_new["views"]:
-        if view["dimensions"] == default_view:
-            view["default_view"] = True
+    assert sum([default_dimensions == view["dimensions"] for view in config_new["views"]]) == 1, error
+    config_new["default_dimensions"] = default_dimensions
 
     return config_new
 
@@ -65,6 +65,44 @@ def replace_empty_dimension_slugs(config: dict[str, Any]) -> dict[str, Any]:
         for dimension, choice in view["dimensions"].items():
             if choice == EMPTY_DIMENSION_LABEL:
                 view["dimensions"][dimension] = IRRELEVANT_DIMENSION_SLUG
+
+    return config_new
+
+
+def snake_case_dimension_slugs(config: dict[str, Any]) -> dict[str, Any]:
+    """Convert dimension and choice slugs before collection creation.
+
+    Doing this here lets `default_dimensions` use the same slugs that are saved
+    and uploaded, instead of the pre-normalized values from the source metadata.
+    """
+    config_new = deepcopy(config)
+    choice_mappings = {}
+    dimension_mapping = {}
+
+    for dimension in config_new["dimensions"]:
+        original_dimension_slug = dimension["slug"]
+        new_dimension_slug = underscore(original_dimension_slug)
+        dimension_mapping[original_dimension_slug] = new_dimension_slug
+        choice_mappings[original_dimension_slug] = {}
+
+        for choice in dimension["choices"]:
+            original_choice_slug = choice["slug"]
+            new_choice_slug = underscore(original_choice_slug)
+            choice_mappings[original_dimension_slug][original_choice_slug] = new_choice_slug
+            choice["slug"] = new_choice_slug
+
+        if dimension.get("presentation", {}).get("choice_slug_true"):
+            dimension["presentation"]["choice_slug_true"] = choice_mappings[original_dimension_slug][
+                dimension["presentation"]["choice_slug_true"]
+            ]
+
+        dimension["slug"] = new_dimension_slug
+
+    for view in config_new["views"]:
+        view["dimensions"] = {
+            dimension_mapping[dimension_slug]: choice_mappings[dimension_slug][choice_slug]
+            for dimension_slug, choice_slug in view["dimensions"].items()
+        }
 
     return config_new
 
@@ -271,15 +309,15 @@ def build_config(config: dict[str, Any], tb) -> dict[str, Any]:
         ]
     )
 
-    config = replace_empty_dimension_slugs(config)
+    config = snake_case_dimension_slugs(replace_empty_dimension_slugs(config))
 
-    return set_default_view(
+    return set_default_dimensions(
         config=config,
-        default_view={
+        default_dimensions={
             "metric": "animals_killed",
-            "animal": "all land animals",
+            "animal": "all_land_animals",
             "estimate": IRRELEVANT_DIMENSION_SLUG,
-            "per_capita": "False",
+            "per_capita": "false",
         },
     )
 
