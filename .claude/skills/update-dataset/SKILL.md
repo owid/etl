@@ -36,6 +36,7 @@ Assumptions:
 - [ ] Pick 1–3 chart views for the public announcement
 - [ ] Draft Slack announcement, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
+- [ ] Ask the user whether to archive the old DAG entries; if yes, move them to `dag/archive/` AND relocate the new entries into the old slot (see "DAG archiving & reordering") — don't forget this step
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
@@ -185,15 +186,17 @@ If downstream dependents exist:
 - **Tell the user** which datasets depend on the old version and need updating in a follow-up PR
 - **Add a "Downstream dependencies" section to the PR description** (not collapsed — this is important) listing the dependent datasets with a note that they should be updated to point to the new version in a follow-up PR
 
-## DAG archiving
+## DAG archiving & reordering
 
-After the ETL update, the old version's DAG entries (snapshot → meadow → garden → grapher) remain in the main DAG file but are no longer referenced by any active step. **Ask the user** if they want to move the old entries to the corresponding archive DAG file (e.g., `dag/archive/poverty_inequality.yml`).
+After the ETL update, `etl update` appends the new version entries to the **bottom** of the main DAG file while the old version's entries stay in their original slot. **Always ask the user** whether to archive — but never skip this checklist item, and when the user agrees, always do the reorder too (not just the archive).
 
-If the user agrees:
-1. Find the old version's entries in the main DAG file (e.g., `dag/poverty_inequality.yml`)
-2. Move them to the **bottom** of the corresponding archive file (`dag/archive/<same_file>.yml`)
-3. Include the original section comment (e.g., `# 1000 Binned Global Distribution (World Bank PIP)`) above the archived entries
-4. Verify no references to the old version remain in the main DAG (excluding the archive)
+Workflow when the user agrees:
+
+1. **Archive the old version.** Move its entries (snapshot → meadow → garden → grapher) from the main DAG file (e.g., `dag/poverty_inequality.yml`) to the **bottom** of the corresponding archive file (`dag/archive/<same_file>.yml`). Include the original section comment (e.g., `# 1000 Binned Global Distribution (World Bank PIP)`) above the archived entries.
+2. **Move the new entries into the old slot** so the dataset stays grouped with its neighbours and section comment. The new entries should not remain at the bottom of the main DAG.
+3. Preserve the original section comment (same indentation as the old block) above the new entries.
+4. Verify: `rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"` returns nothing, and `rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml"` shows the entries only in the main file (under the section comment), not at the bottom.
+5. Run `make check` and commit with `🔨🤖 Archive old <name> entries and reorder DAG`.
 
 ## Guardrails and tips
 

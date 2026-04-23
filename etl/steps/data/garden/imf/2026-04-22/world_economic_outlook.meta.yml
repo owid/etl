@@ -1,0 +1,88 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+      attribution_short: IMF
+    processing_level: minor
+    display: &common-display
+      tolerance: 0
+      entityAnnotationsMap: |-
+        G7 (IMF): Canada, France, Germany, Italy, Japan, UK, US
+        ASEAN-5 (IMF): Indonesia, Malaysia, Philippines, Singapore, Thailand
+        Euro area (IMF): EU countries that have adopted the euro as their currency
+        Advanced economies (IMF): i.e. US, Euro area, Japan, UK, Canada, Australia, among others
+      tableDisplay:
+        hideRelativeChange: True
+
+  description_key_gdp_introduction: "[Gross domestic product](#dod:gdp) (GDP) is a comprehensive measure of a country's total income. It helps compare the size of economies and track how they change over time. It is especially useful for understanding trends in economic growth."
+  description_key_gdp_definition: "The GDP is calculated as the value of all final goods and services produced each year in a country. It represents the total economic output of a country or region."
+  description_key_gdp_growth_calculation: "Growth is calculated as the year-on-year percent change in inflation-adjusted (real) GDP: if a country's real GDP in one year is 2% higher than in the previous year, growth is 2%."
+  description_key_imf_projections: "The International Monetary Fund's projections are produced country by country by its desk officers, in consultation with national authorities, using shared global assumptions about exchange rates, commodity prices, and the policy stance of major economies. The IMF revises them at each World Economic Outlook release (April and October), and they can change substantially as new data and shocks emerge — they are central estimates, not firm predictions."
+  description_processing_gdp: |-
+    We split the IMF's GDP growth series into historical observations and near-term forecasts using the `LATEST_ACTUAL_ANNUAL_DATA` field that the IMF reports for each country: years up to and including that year are classified as observations, and subsequent years as forecasts.
+
+    For countries whose national accounts data the IMF reports on a fiscal-year basis (e.g., India, Egypt), we convert fiscal-year labels such as `FY26` to their closest calendar-year equivalent.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  world_economic_outlook:
+    variables:
+      # GDP growth
+      gross_domestic_product__gdp__constant_prices__percent_change_observation:
+        title: Gross domestic product, constant prices - Percent change - Observations
+        unit: "%"
+        short_unit: "%"
+        description_short: "Annual percent change in gross domestic product. This data is adjusted for inflation."
+        description_key:
+          - "{definitions.description_key_gdp_introduction}"
+          - "{definitions.description_key_gdp_definition}"
+          - "{definitions.description_key_gdp_growth_calculation}"
+          - "{definitions.description_key_imf_projections}"
+        description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
+        description_processing: "{definitions.description_processing_gdp}"
+        display:
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      gross_domestic_product__gdp__constant_prices__percent_change_forecast:
+        title: Gross domestic product, constant prices - Percent change - Forecasts
+        unit: "%"
+        short_unit: "%"
+        description_short: "Near-term projections of the annual percent change in gross domestic product. This data is adjusted for inflation."
+        description_key:
+          - "{definitions.description_key_gdp_introduction}"
+          - "{definitions.description_key_gdp_definition}"
+          - "{definitions.description_key_gdp_growth_calculation}"
+          - "{definitions.description_key_imf_projections}"
+        description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
+        description_processing: "{definitions.description_processing_gdp}"
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+          <<: *common-display
+
+      # Unemployment rate
+      unemployment_rate_observation:
+        title: Unemployment rate - Percent of total labor force - Observations
+        unit: "%"
+        short_unit: "%"
+        description_short: "Unemployment refers to the share of the labor force that is without work but available for and seeking employment."
+        description_from_producer: "Unemployment rate can be defined by either the national definition, the ILO harmonized definition, or the OECD harmonized definition. The OECD harmonized unemployment rate gives the number of unemployed persons as a percentage of the labor force (the total number of people employed plus unemployed). [OECD Main Economic Indicators, OECD, monthly] As defined by the International Labour Organization, unemployed workers are those who are currently not working but are willing and able to work for pay, currently available to work, and have actively searched for work. [ILO, http://www.ilo.org/public/english/bureau/stat/res/index.htm]"
+        display:
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      unemployment_rate_forecast:
+        title: Unemployment rate - Percent of total labor force - Forecasts
+        unit: "%"
+        short_unit: "%"
+        description_short: "Near-term projections. Unemployment refers to the share of the labor force that is without work but available for and seeking employment."
+        description_from_producer: "Unemployment rate can be defined by either the national definition, the ILO harmonized definition, or the OECD harmonized definition. The OECD harmonized unemployment rate gives the number of unemployed persons as a percentage of the labor force (the total number of people employed plus unemployed). [OECD Main Economic Indicators, OECD, monthly] As defined by the International Labour Organization, unemployed workers are those who are currently not working but are willing and able to work for pay, currently available to work, and have actively searched for work. [ILO, http://www.ilo.org/public/english/bureau/stat/res/index.htm]"
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+          <<: *common-display
+
