@@ -141,8 +141,9 @@ async function parseChartYml(filePath: string, wsRoot: string): Promise<{ stepUr
  * Catalog path defaults to namespace/version/name#name (matching PathFinder.create_collection).
  *
  * For collections with `dimensions: []` (single-chart case) the ETL pushes to the chart
- * admin endpoint, not the multi-dim one, so the preview needs the public chart URL
- * (`grapher/{slug}`) instead of the mdim admin URL.
+ * admin endpoint, not the multi-dim one. New charts are created as unpublished drafts,
+ * so preview them through the admin Grapher route (`admin/grapher/{slug}`), which can
+ * render unpublished charts.
  *
  * We only classify as "chart" when the YAML has `dimensions: []` AND there is no sibling
  * `.py` file. A sibling `.py` can populate dimensions programmatically (e.g. the
@@ -303,9 +304,10 @@ const chartStrategy: PreviewStrategy = {
 			const parsed = await parseExportMultidim(filePath, wsRoot);
 			stepUri = parsed.stepUri;
 			if (parsed.isChart) {
-				// Zero-dim collection → ETL pushed a regular chart; preview at the public chart URL.
-				stagingUrl = `http://${containerName}/grapher/${parsed.chartSlug}`;
-				isMdim = false;
+				// Zero-dim collection → ETL pushed a regular chart. Use the admin preview
+				// route so newly-created unpublished charts render too.
+				stagingUrl = `http://${containerName}/admin/grapher/${parsed.chartSlug}`;
+				isMdim = true;
 			} else {
 				stagingUrl = `http://${containerName}/admin/grapher/${encodeURIComponent(parsed.catalogPath)}`;
 				isMdim = true;
