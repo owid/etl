@@ -1,6 +1,7 @@
 """Single garden step for AI Index Report 2026 - consolidates all AI index datasets."""
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 
 from etl.helpers import PathFinder
 
