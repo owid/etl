@@ -198,7 +198,18 @@ class StepUpdater:
         elif (folder / step_info["name"]).is_dir():
             # Gather all relevant files from this folder.
             step_files = [file_name for file_name in list(folder.glob(f"{step_info['name']}/*")) if file_name.is_file()]
+        elif step_info["step_type"] == "export":
+            # Some export steps, such as YAML-only multidim charts, do not have a Python script.
+            step_files = [
+                file_name
+                for file_name in list(folder.glob("*"))
+                if file_name.is_file() and str(file_name.stem).split(".")[0] in [step_info["name"], "shared"]
+            ]
         else:
+            log.error(f"No step files found for step {step}.")
+            return 1
+
+        if not step_files:
             log.error(f"No step files found for step {step}.")
             return 1
 
