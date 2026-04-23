@@ -39,6 +39,7 @@ tables:
           - "{definitions.description_key_gdp_introduction}"
           - "{definitions.description_key_gdp_definition}"
           - "{definitions.description_key_gdp_growth_calculation}"
+          - "{definitions.description_key_imf_projections}"
         description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
         description_processing: "{definitions.description_processing_gdp}"
         display:
