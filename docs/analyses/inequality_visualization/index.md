@@ -147,10 +147,10 @@ For each country, we find the highest bin in the 1000 bin distribution whose ave
 
 For regions and the world aggregate, we weight by population. We sum the number of people below the line across all constituent countries and divide by the total population of the group.
 
-!!! note "How accurate is this?"
+!!! info "How accurate is this?"
     Because we have 1000 bins rather than the full income distribution, we can't know exactly where the line falls inside a bin — each bin is assigned entirely above or below the line based on its average income. A bin whose average is just below the line might contain some people who are above it, and vice versa. In the worst case, this is off by half a bin, i.e. 0.05 percentage points of the population. Keeping the computation this simple also makes it fast enough to recompute every time the user chooses a different line.
 
-    We cross-checked the method against PIP's own extrapolated poverty series at 2021 international dollars, for seven lines between $3 and $40 / day. At the country, regional, and global level, every comparison agrees with PIP to within 0.1 percentage points — the full precision the 1000-bin discretization allows. Since the visualization shows poverty shares without decimal points, these differences are not visible on the chart.
+    We cross-checked the method against PIP's own extrapolated poverty series at 2021 international dollars, for seven lines between $3 and $40 / day. At the country, regional, and global level, every comparison agrees with PIP to within 0.1 percentage points — the full precision the 1000-bin discretization allows. Since the visualization shows poverty shares without decimal points, these minor differences are not visible on the chart.
 
 ## Currency conversions
 
@@ -160,7 +160,7 @@ International dollars are a synthetic currency that adjusts for differences in l
 
 To let users view values and explore the chart in their local currency (for example, British pounds, US dollars, or Euros), we compute a conversion factor for each country that converts 2021 international dollars into local currency units at recent prices.
 
-!!! note "What changes when you switch currency, and what doesn't?"
+!!! info "What changes when you switch currency, and what doesn't?"
     Switching currency multiplies every income value by the same conversion factor — it rescales the axis, but doesn't change the shape of any distribution or the relative position of countries. The underlying PPP adjustment remains unchanged. The data is already adjusted for living costs between countries, so switching the view to euros or pounds doesn't undo that — the chart just shows you values in a different currency.
 
 #### Data sources
