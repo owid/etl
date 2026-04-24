@@ -57,33 +57,33 @@ Use this **document structure** as a starting skeleton. Adapt sections for the s
 
 (2–3 short paragraphs. First: what the analysis/visualization is and what article it accompanies. Second: what this document covers and how it relates to the article. Third: a one-line summary of the data sources — this acts as a bridge to the next section.)
 
-## Data sources
+## Data source: <provider + short description of what we use it for>
 
-### <Source 1>
+(One H2 per primary provider. The heading names the provider, not the dataset — e.g. "Data source: Global incomes data from the World Bank". Open with one or two sentences naming the provider and the role its data plays in the analysis.)
 
-(Prose intro. Then sub-subsections for specific datasets within that source.)
+### <Specific dataset from this provider>
 
-#### <Specific dataset>
-- What the file contains, at what granularity, in what units.
+(Prose describing what the file contains, at what granularity, in what units. Use bold lead-ins like `**Where does the data come from?**` to structure sub-topics without creating extra headings.)
+
 - How the source builds it (e.g. survey methodology, interpolation rules).
 - Release cadence and coverage.
-- Any caveats about the raw data (top-income coverage, welfare concept differences, etc.). Use `!!! warning "Title"` for hard caveats.
-- File structure (columns) if relevant.
+- Welfare-concept, unit, or methodological caveats.
+- Use `!!! warning "Title"` for hard caveats (e.g. top-income undercoverage, known measurement gaps).
 - Collapse long lists (country enumerations, indicator lists) into `??? quote "..."` blocks.
 
-### <Source 2>
+### Data processing
 
-(Same pattern.)
+(What our ETL does with the raw file — harmonization, unit conversions, sanity checks, manual overrides. Include this sub-section only if the processing is non-trivial enough that a reader benefits from seeing it described. If a short ETL function directly illustrates a methodological claim the reader might want to verify, paste it inside a fenced code block; if the processing is routine, a prose sentence and a GitHub link are enough.)
 
-## Methodology
+(Repeat the `## Data source: ...` pattern once per primary provider.)
 
-### <Processing step 1>
+## <Name this after what the analysis produces — e.g. "Plotting income distributions", "Estimating historical emissions", "Ranking cities by X">
 
-(What the ETL step does. Link directly to the garden/meadow/external step file on GitHub.)
+(Name the section after what the analysis *does*, not "Methodology" in the abstract. Group related method steps together under one H2 named by the analysis output. Fall back to "Methodology" only when the analysis is genuinely generic.)
 
-### <Analytical method 1 — e.g. KDE, smoothing, aggregation>
+### <Method step — e.g. "Estimating the shape of the distributions">
 
-(Explain the method. Lead with intuition, then the arithmetic. Include a parameter table if relevant. Use `!!! info "Why X?"` to answer obvious "why did you choose this?" questions inline.)
+(Explain the method. Lead with intuition, then the arithmetic. Use `!!! info "Why X?"` to answer obvious "why did you choose this?" questions inline (e.g. "Why a log scale?"). If a short code snippet from the actual implementation would clarify the method, paste it in a fenced code block — otherwise don't.)
 
 ## <Additional H2 sections — only as needed>
 
@@ -91,7 +91,13 @@ Use this **document structure** as a starting skeleton. Adapt sections for the s
 
 ## Limitations
 
-(Bullet list. Each point leads with a **bold term** and then a short paragraph. Prefer to include every limitation the user or the source materials have flagged.)
+(Pick the structure that fits the length and complexity of the analysis.)
+
+**Option A — flat bullet list.** Works for short docs or when all limitations are at the same conceptual level. Each bullet leads with a **bold term** and then a short paragraph.
+
+**Option B — two-tier, prose then bullets.** Works for longer docs where data-source limitations and visualization-level decisions are both worth discussing. Open with narrative paragraphs on the data-source limitations (inheritable from the source — survey coverage, interpolation, top-income bias, etc.), connected by transitions like *"First, ... Second, ... In addition to this, ..."*. Then introduce a bulleted list of visualization-level decisions with a sentence like *"Beyond these data limitations, there are decisions we made that affect the visualization:"* and list the choices as bullets.
+
+Always include every limitation the user or the source materials have flagged — prefer overinclusion to quiet omissions.
 
 ## References
 
@@ -116,6 +122,7 @@ The canonical skeleton above (Introduction, Data sources, Methodology, Limitatio
 - **The visualization lets the user toggle units, currencies, or time intervals, and those toggles involve non-obvious conversion logic.** Describe the base unit, the conversion factor, and where any manual decisions live.
 - **A representation choice (log/linear axis, smoothing parameters, color palette, binning strategy) is substantive enough to affect interpretation.** Explain what the choice is and why it was made — but only if the reasoning is non-obvious.
 - **There is an analysis-specific workflow that doesn't fit under "Methodology"** — e.g. query construction rules, sampling design, manual adjudication lists, validation procedures.
+- **The method has tunable parameters that readers might question** (KDE bandwidth/extent/bins, smoothing windows, clustering thresholds, etc.). Add a nested `#### How sensitive are the results to the choice of parameters?` subsection under the method description. Briefly list each parameter and say whether the visible results would change meaningfully if it were set differently. Skip this subsection entirely for methods without tunable parameters.
 
 If the analysis is simple enough to cover in the canonical four sections, leave it at four.
 
@@ -132,6 +139,8 @@ Consistency with the existing analyses docs is important — they deploy through
 - **Mathematical typography**: use subscripts (log₂, not log2), proper minus signs, and Unicode for fractions only when they'd aid readability.
 - **Links in markdown `[text](url)` syntax** — no bare URLs. Link GitHub files to their `owid/<repo>/blob/master/...` path so they stay valid as code changes.
 - **Prefer prose over deeply nested bullets** — if a bullet list has three levels of nesting, rewrite as paragraphs with a short concluding list.
+- **Use first-person plural voice** ("we rely on", "we import", "we harmonize") throughout the prose — the doc is a team walkthrough, not a neutral reference manual.
+- **Source-code excerpts are optional, not required.** Paste a short function (≤ ~30 lines) inside a fenced code block only when it directly illustrates a methodological claim a reader might want to verify against the actual implementation. For docs whose methodology is purely conceptual, skip code blocks entirely and rely on the GitHub links in the References section.
 
 ## 5. Writing principles (lessons from past sessions)
 
@@ -141,6 +150,8 @@ Consistency with the existing analyses docs is important — they deploy through
 - **Separate the upstream decision from the downstream display.** When a module only formats pre-processed data (like `incomePlotUtils.ts` only formatting pre-converted currency values), call that out — readers shouldn't have to guess where the transformation happens.
 - **Collapse long lists.** A 218-country enumeration in the body destroys readability. A `??? quote` block keeps the content available without forcing it on every reader.
 - **Keep the References section structured.** Group OWID source code separately from external datasets — readers who want to inspect the code have different needs from those who want the upstream source.
+- **If the computation involves an approximation, pair it with a validation.** When the doc states "this method is off by at most X", follow that paragraph inside the same `!!! note` callout with a quantified cross-check against an authoritative source (PIP's own published numbers, a peer-reviewed paper, the source dataset's own headline series). Format: paragraph 1 = theoretical bound, paragraph 2 = empirical check. Skip this for docs that don't make approximation claims.
+- **If the visualization has user-facing toggles** (currency switch, unit toggle, time-interval, log/linear scale, regional-vs-country view), add a short `!!! note "What changes when you switch X, and what doesn't?"` callout inside the relevant section. Spell out what stays the same (shape of curves, rankings, shares) and what changes (axis labels, displayed values). Skip this for static charts or charts without meaningful toggles.
 
 ## 6. Review with the user
 
