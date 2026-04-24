@@ -49,7 +49,7 @@ The raw file is organized with columns identifying the country, the [World Bank 
 
 This data covers **218 economies** across seven World Bank regions.
 
-??? quote "Full list of 218 economies included (by World Bank region)"
+??? note "Full list of 218 economies included (by World Bank region)"
 
     - **East Asia and Pacific**: American Samoa; Australia; Brunei Darussalam; Cambodia; China; Fiji; French Polynesia; Guam; Hong Kong SAR, China; Indonesia; Japan; Kiribati; Korea, Dem. Rep.; Korea, Rep.; Lao PDR; Macao SAR, China; Malaysia; Marshall Islands; Micronesia, Fed. Sts.; Mongolia; Myanmar; Nauru; New Caledonia; New Zealand; Northern Mariana Islands; Palau; Papua New Guinea; Philippines; Samoa; Singapore; Solomon Islands; Taiwan, China; Thailand; Timor-Leste; Tonga; Tuvalu; Vanuatu; Viet Nam.
     - **Europe and Central Asia**: Albania; Andorra; Armenia; Austria; Azerbaijan; Belarus; Belgium; Bosnia and Herzegovina; Bulgaria; Channel Islands; Croatia; Cyprus; Czechia; Denmark; Estonia; Faeroe Islands; Finland; France; Georgia; Germany; Gibraltar; Greece; Greenland; Hungary; Iceland; Ireland; Isle of Man; Italy; Kazakhstan; Kosovo; Kyrgyz Republic; Latvia; Liechtenstein; Lithuania; Luxembourg; Moldova; Monaco; Montenegro; Netherlands; North Macedonia; Norway; Poland; Portugal; Romania; Russian Federation; San Marino; Serbia; Slovak Republic; Slovenia; Spain; Sweden; Switzerland; Tajikistan; Turkmenistan; Türkiye; Ukraine; United Kingdom; Uzbekistan.
