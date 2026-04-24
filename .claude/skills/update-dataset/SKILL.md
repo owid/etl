@@ -27,10 +27,12 @@ Assumptions:
 - [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
 - [ ] Run ETL update workflow via `etl-update` subagent (help → dry run → approval → real run)
 - [ ] Catalog `# NOTE:` / `# TODO:` comments carried over from the old step files into `notes_to_check.md`
+- [ ] Detect any `sanity_checks` functions and their log-control flags; append to `notes_to_check.md`
 - [ ] Create or reuse draft PR and work branch
 - [ ] Update snapshot and compare to previous version; capture summary
 - [ ] Meadow step: run + fix + diff + summarize
 - [ ] Garden step: run + fix + diff + summarize
+- [ ] Review `sanity_checks` output (enable log flag, re-run, scan log, revert flag) — skip if none found
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
@@ -88,6 +90,13 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Save the remaining actionable items to `workbench/<short_name>/notes_to_check.md` — one entry per annotation, recording file path, line number, which step it lives in (meadow/garden/grapher), and what the workaround does.
    - Don't act on them yet. Resolution requires fresh data and happens **after** each step's run — see step 6a.
 
+1d) Detect `sanity_checks` functions in the copied step files
+   - Run `rg -n "def sanity_check|sanity_check\(" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/` to find any sanity-check routines (most live in garden).
+   - For each hit, also look for a module-level boolean flag that gates logging/verbosity. Common names observed in the codebase: `DEBUG`, `SHOW_SANITY_CHECK_LOGS`, `LONG_FORMAT`. Flags usually default to `False` to keep normal runs quiet.
+   - Append a "Sanity checks" section to `workbench/<short_name>/notes_to_check.md` listing each function, its file, and the name of any log-control flag. This is important because assertion failures / silent filters inside these functions are the most common way an update corrupts data — the flag is usually the only way to make them visible.
+   - Examples of the pattern to recognize: `etl/steps/data/garden/wb/.../world_bank_pip.py` (`SHOW_SANITY_CHECK_LOGS`), `etl/steps/data/garden/wid/.../world_inequality_database.py` (`DEBUG` + `LONG_FORMAT`), `etl/steps/data/garden/lis/.../luxembourg_income_study.py` (no flag; prints unconditionally via `tabulate`).
+   - Don't act yet — the review happens in step 5b once the garden step has been run on the new data.
+
 2) Create PR and integrate update via subagent (etl-pr)
    - Inputs: `<namespace>/<old_version>/<short_name>`
    - Create or reuse draft PR, set up work branch, and incorporate the ETL update outputs
@@ -102,6 +111,21 @@ When you do stop, present a concise summary of the issue and what options exist.
 5) Garden step repair/verify (step-fixer subagent, channel=garden)
    - Run, fix, re-run; produce diffs
    - Save diffs and summaries
+
+5b) Review sanity-checks output (only if step 1d catalogued any)
+   For each sanity_checks function found in step 1d:
+
+   1. **Turn on verbose logging.** Edit the log-control flag (e.g. `SHOW_SANITY_CHECK_LOGS = True`, `DEBUG = True`) at the top of the garden step file. If there's no flag, the function already prints unconditionally — skip this sub-step.
+   2. **Re-run the garden step capturing output**:
+      ```bash
+      .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
+          > workbench/<short_name>/sanity_checks.log 2>&1
+      ```
+   3. **Review the log.** Scan for `AssertionError`, `error`, `warning`, `dropped`, countries/years flagged as outliers, unexpected totals, etc. Anything that looks actionable goes into the PR description under "Sanity-check findings" (new collapsed section).
+   4. **Revert the flag to `False`** (or its original value) before committing. Verify with `git diff` that no unintended code was left in the garden file.
+   5. Leave `workbench/<short_name>/sanity_checks.log` as an artifact for reviewers.
+
+   If sanity_checks raise `AssertionError` on the new data (not just log warnings), stop and decide with the user whether the assertion needs a threshold bump, whether upstream data genuinely broke, or whether the workaround it enforces is obsolete.
 
 6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
    - Skip diff
@@ -248,7 +272,8 @@ Workflow when the user agrees:
 
 - `workbench/<short_name>/snapshot-runner.md`
 - `workbench/<short_name>/progress.md`
-- `workbench/<short_name>/notes_to_check.md` (one entry per carried-over `# NOTE:` / `# TODO:`)
+- `workbench/<short_name>/notes_to_check.md` (one entry per carried-over `# NOTE:` / `# TODO:`, plus detected `sanity_checks` functions and their log-control flags)
+- `workbench/<short_name>/sanity_checks.log` (only if step 5b ran)
 - `workbench/<short_name>/meadow_diff_raw.txt` and `meadow_diff.md`
 - `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`
 - `workbench/<short_name>/indicator_upgrade.json` (if indicator-upgrader was used)
