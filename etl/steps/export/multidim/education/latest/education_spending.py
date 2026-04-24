@@ -39,7 +39,7 @@ SPENDING_PATTERNS = {
         "government_expenditure_on_lower_secondary_education_as_a_percentage_of_gdp__pct",
         "government_expenditure_on_upper_secondary_education_as_a_percentage_of_gdp__pct",
         "government_expenditure_on_tertiary_education_as_a_percentage_of_gdp__pct",
-        "government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov",
+        "combined_expenditure_share_gdp",
     ],
     "constant_ppp": [
         "government_expenditure_on_pre_primary_education__constant_pppdollar__millions",
@@ -138,6 +138,7 @@ def adjust_dimensions(tb):
         "upper_secondary": "upper_secondary",
         "tertiary": "tertiary",
         "on_education_as_a_percentage_of_gdp": "all",
+        "combined_expenditure_share_gdp": "all",
     }
 
     SPENDING_TYPE_KEYWORDS = {
@@ -146,6 +147,7 @@ def adjust_dimensions(tb):
         "total_government_expenditure": "total_government",
         "per_student": "per_student",
         "initial_government_funding": "per_student",
+        "combined_expenditure_share_gdp": "gdp_share",
     }
 
     # Process each column
