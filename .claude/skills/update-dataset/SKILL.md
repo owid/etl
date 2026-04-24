@@ -26,11 +26,13 @@ Assumptions:
 - [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
 - [ ] Run ETL update workflow via `etl-update` subagent (help → dry run → approval → real run)
+- [ ] Catalog `# NOTE:` / `# TODO:` comments carried over from the old step files into `notes_to_check.md`
 - [ ] Create or reuse draft PR and work branch
 - [ ] Update snapshot and compare to previous version; capture summary
 - [ ] Meadow step: run + fix + diff + summarize
 - [ ] Garden step: run + fix + diff + summarize
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
+- [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
@@ -80,6 +82,12 @@ When you do stop, present a concise summary of the issue and what options exist.
    - This catches patterns like `if __name__ == "__main__"`, `geo.harmonize_countries()`, `dest_dir`, `paths.load_dependency()`, etc. that were copied from old versions
    - Fix any findings before proceeding — this avoids propagating legacy patterns into new versions
 
+1c) Catalog `# NOTE:` / `# TODO:` comments in the copied step files (don't resolve yet)
+   - Run `rg -n "#\s*(NOTE|TODO|FIXME|HACK|XXX):" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/`.
+   - Filter out generic boilerplate (e.g. `# NOTE: To learn more about the fields, hover over their names.` at the top of `.meta.yml`).
+   - Save the remaining actionable items to `workbench/<short_name>/notes_to_check.md` — one entry per annotation, recording file path, line number, which step it lives in (meadow/garden/grapher), and what the workaround does.
+   - Don't act on them yet. Resolution requires fresh data and happens **after** each step's run — see step 6a.
+
 2) Create PR and integrate update via subagent (etl-pr)
    - Inputs: `<namespace>/<old_version>/<short_name>`
    - Create or reuse draft PR, set up work branch, and incorporate the ETL update outputs
@@ -97,6 +105,17 @@ When you do stop, present a concise summary of the issue and what options exist.
 
 6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
    - Skip diff
+
+6a) Re-evaluate `# NOTE:` / `# TODO:` items from step 1c against fresh data
+   Now that meadow, garden, and grapher have run on the **new** data, go back to `workbench/<short_name>/notes_to_check.md` and decide each item's fate. For each entry:
+
+   - Identify what the workaround does (read the surrounding code).
+   - Load the affected step's output with `owid.catalog.Dataset` (or inspect the raw snapshot) and compare **corrected vs. uncorrected** values. Cross-check the producer's release notes / changelog if available.
+   - If the upstream issue is fixed → delete the workaround **and** its `# NOTE:` / `# TODO:` comments **in the same commit**, then re-run the affected step (use `--force --only`, add `--grapher` for grapher) so downstream artifacts pick up the change.
+   - If the workaround is still needed → leave it and add a one-line status under "Phase 2 TODOs" in the PR description (e.g. "Sierra Leone ×1000 correction still required — raw value in the 2026 file is still ~1/1000 of plausible").
+   - If you're uncertain → keep it, flag it in the PR description, and ask the user.
+
+   Do this **before** step 6b (metadata checks) so any re-runs triggered by comment-removal happen before the metadata sweep, not after.
 
 6b) Metadata quality checks — run after all ETL steps are built
    Run all three checks on the newly built garden and grapher datasets so every issue surfaces together. Each skill writes results to the terminal; fix what comes up before moving on.
@@ -229,6 +248,7 @@ Workflow when the user agrees:
 
 - `workbench/<short_name>/snapshot-runner.md`
 - `workbench/<short_name>/progress.md`
+- `workbench/<short_name>/notes_to_check.md` (one entry per carried-over `# NOTE:` / `# TODO:`)
 - `workbench/<short_name>/meadow_diff_raw.txt` and `meadow_diff.md`
 - `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`
 - `workbench/<short_name>/indicator_upgrade.json` (if indicator-upgrader was used)
