@@ -136,11 +136,12 @@ When you do stop, present a concise summary of the issue and what options exist.
    4. **Revert the flag to its original value** (usually `False`) before committing. Verify with `git diff` that the garden file has no unintended changes.
 
    **Function form with no flag, or inline `# Sanity check(s)` comment blocks**:
-   1. Since the checks always run, any `AssertionError` would have already blown up the step — so the fact that step 5 passed means all assertions held. Focus on *interpreting* what the checks cover.
-   2. Read each catalogued block (pull 5–15 lines of context around the hit) and, for the ones that look non-trivial, verify the invariant still holds qualitatively on the new data. Examples: "asserts that no country has > 2× last year's value" — spot-check via `.venv/bin/python` against the fresh garden output.
-   3. Record any anomalies under "Sanity-check findings" in the PR description. No log artifact to keep here since the step's own output is the evidence.
+   1. Read each catalogued block (pull 5–15 lines of context around the hit) to understand what invariant is being tested.
+   2. Important: a sanity check can enforce its finding either by **raising** (`assert`, `raise`) or by **logging** (`paths.log.warning`, `.critical`, even `.fatal`). Logging variants do NOT fail the step — so "step 5 passed" is not proof that every invariant held. If the block uses logging, re-run the step and scan stdout/stderr for the relevant keywords; don't trust the exit code alone.
+   3. For non-trivial invariants (monotonicity, totals, bounds), also spot-check qualitatively against the fresh garden output via a short `.venv/bin/python` snippet.
+   4. Record any anomalies under "Sanity-check findings" in the PR description. No log artifact to keep here since the step's own output is the evidence.
 
-   In either form: if sanity_checks raise `AssertionError` on the new data (not just log warnings), stop and decide with the user whether the assertion needs a threshold bump, whether upstream data genuinely broke, or whether the invariant being enforced is obsolete.
+   In either form: if sanity_checks raise `AssertionError` on the new data, stop and decide with the user whether the assertion needs a threshold bump, whether upstream data genuinely broke, or whether the invariant is obsolete. If the check only *logs*, treat a new/expanding set of warnings the same way — they're the signal the sanity check was written to produce.
 
 6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
    - Skip diff
