@@ -90,12 +90,22 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Save the remaining actionable items to `workbench/<short_name>/notes_to_check.md` — one entry per annotation, recording file path, line number, which step it lives in (meadow/garden/grapher), and what the workaround does.
    - Don't act on them yet. Resolution requires fresh data and happens **after** each step's run — see step 6a.
 
-1d) Detect `sanity_checks` functions in the copied step files
-   - Run `rg -n "def sanity_check|sanity_check\(" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/` to find any sanity-check routines (most live in garden).
-   - For each hit, also look for a module-level boolean flag that gates logging/verbosity. Common names observed in the codebase: `DEBUG`, `SHOW_SANITY_CHECK_LOGS`, `LONG_FORMAT`. Flags usually default to `False` to keep normal runs quiet.
-   - Append a "Sanity checks" section to `workbench/<short_name>/notes_to_check.md` listing each function, its file, and the name of any log-control flag. This is important because assertion failures / silent filters inside these functions are the most common way an update corrupts data — the flag is usually the only way to make them visible.
-   - Examples of the pattern to recognize: `etl/steps/data/garden/wb/.../world_bank_pip.py` (`SHOW_SANITY_CHECK_LOGS`), `etl/steps/data/garden/wid/.../world_inequality_database.py` (`DEBUG` + `LONG_FORMAT`), `etl/steps/data/garden/lis/.../luxembourg_income_study.py` (no flag; prints unconditionally via `tabulate`).
-   - Don't act yet — the review happens in step 5b once the garden step has been run on the new data.
+1d) Detect sanity-check logic in the copied step files
+   Sanity checks live in two different forms — detect **both**:
+
+   - **Function form** — `def sanity_check…` / `sanity_check…(` call sites. Often gated by a module-level boolean flag (`DEBUG`, `SHOW_SANITY_CHECK_LOGS`, `LONG_FORMAT`) that defaults to `False` to keep normal runs quiet. Examples: `etl/steps/data/garden/wb/.../world_bank_pip.py` (`SHOW_SANITY_CHECK_LOGS`), `etl/steps/data/garden/wid/.../world_inequality_database.py` (`DEBUG` + `LONG_FORMAT`), `etl/steps/data/garden/lis/.../luxembourg_income_study.py` (no flag; prints unconditionally via `tabulate`).
+   - **Inline comment form** — `# Sanity check` / `# Sanity checks` / `# sanity check` marking an inline assertion block that isn't wrapped in a dedicated function. Very common: `etl/steps/data/garden/emdat/.../natural_disasters.py`, `etl/steps/data/garden/emissions/.../national_contributions.py`, `etl/steps/data/garden/irena/.../renewable_capacity_statistics.py`. These usually have no log flag — the block simply runs on every step execution and either passes or raises.
+
+   Run a combined sweep:
+   ```bash
+   rg -n -i "def sanity_check|sanity_check\(|#\s*sanity check" \
+       snapshots/<namespace>/<new_version>/ \
+       etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/
+   ```
+
+   Append a "Sanity checks" section to `workbench/<short_name>/notes_to_check.md` listing each hit — for each, record: file path + line number, which form (function vs. inline comment), the name of any log-control flag (function form only), and a one-line description of what's being asserted (read the surrounding 5–10 lines).
+
+   Don't act yet — the review happens in step 5b once the garden step has been run on the new data.
 
 2) Create PR and integrate update via subagent (etl-pr)
    - Inputs: `<namespace>/<old_version>/<short_name>`
@@ -113,19 +123,24 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Save diffs and summaries
 
 5b) Review sanity-checks output (only if step 1d catalogued any)
-   For each sanity_checks function found in step 1d:
+   Handling depends on the form catalogued in step 1d.
 
-   1. **Turn on verbose logging.** Edit the log-control flag (e.g. `SHOW_SANITY_CHECK_LOGS = True`, `DEBUG = True`) at the top of the garden step file. If there's no flag, the function already prints unconditionally — skip this sub-step.
-   2. **Re-run the garden step capturing output**:
+   **Function form with a log-control flag** (e.g. `SHOW_SANITY_CHECK_LOGS`, `DEBUG`):
+   1. Flip the flag to `True` at the top of the garden step file.
+   2. Re-run the garden step, capturing output:
       ```bash
       .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
           > workbench/<short_name>/sanity_checks.log 2>&1
       ```
-   3. **Review the log.** Scan for `AssertionError`, `error`, `warning`, `dropped`, countries/years flagged as outliers, unexpected totals, etc. Anything that looks actionable goes into the PR description under "Sanity-check findings" (new collapsed section).
-   4. **Revert the flag to `False`** (or its original value) before committing. Verify with `git diff` that no unintended code was left in the garden file.
-   5. Leave `workbench/<short_name>/sanity_checks.log` as an artifact for reviewers.
+   3. Review the log: scan for `AssertionError`, `error`, `warning`, `dropped`, outliers flagged by country/year, unexpected totals. Surface actionable findings in the PR description under a "Sanity-check findings" collapsed section.
+   4. **Revert the flag to its original value** (usually `False`) before committing. Verify with `git diff` that the garden file has no unintended changes.
 
-   If sanity_checks raise `AssertionError` on the new data (not just log warnings), stop and decide with the user whether the assertion needs a threshold bump, whether upstream data genuinely broke, or whether the workaround it enforces is obsolete.
+   **Function form with no flag, or inline `# Sanity check(s)` comment blocks**:
+   1. Since the checks always run, any `AssertionError` would have already blown up the step — so the fact that step 5 passed means all assertions held. Focus on *interpreting* what the checks cover.
+   2. Read each catalogued block (pull 5–15 lines of context around the hit) and, for the ones that look non-trivial, verify the invariant still holds qualitatively on the new data. Examples: "asserts that no country has > 2× last year's value" — spot-check via `.venv/bin/python` against the fresh garden output.
+   3. Record any anomalies under "Sanity-check findings" in the PR description. No log artifact to keep here since the step's own output is the evidence.
+
+   In either form: if sanity_checks raise `AssertionError` on the new data (not just log warnings), stop and decide with the user whether the assertion needs a threshold bump, whether upstream data genuinely broke, or whether the invariant being enforced is obsolete.
 
 6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
    - Skip diff
