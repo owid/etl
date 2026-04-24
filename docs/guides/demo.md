@@ -415,7 +415,7 @@ The ETL pipeline[^1] processes data from multiple international organizations[^2
 
 ### Inline Math
 
-The growth rate can be calculated as $r = \frac{P_t - P_{t-1}}{P_{t-1}} \times 100$, where $P_t$ is the current population.
+The growth rate can be calculated as \(r = \frac{P_t - P_{t-1}}{P_{t-1}} \times 100\), where \(P_t\) is the current population.
 
 ### Block Math
 

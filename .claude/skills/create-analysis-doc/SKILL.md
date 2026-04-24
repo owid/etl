@@ -137,7 +137,7 @@ Consistency with the existing analyses docs is important — they deploy through
 - **Worked examples with concrete numbers** — prefer "Brazil has 250 bins below the line, which is 25%" over abstract algebra.
 - **Bold on first mention** for key terms (e.g. **International Dollars**, **PPP factor**, **bin**).
 - **Mathematical typography**: use subscripts (log₂, not log2), proper minus signs, and Unicode for fractions only when they'd aid readability.
-- **Escape dollar signs in body text** (`\$3 / day`, `\$1,000`). Zensical/mkdocs-material interprets unescaped `$...$` pairs as inline math, so a sentence like "from $0.25 to $1,000" will render as a math expression. Dollar signs inside fenced code blocks don't need escaping.
+- **Dollar signs in body text render as plain `$`** on this site. The project's KaTeX config intentionally omits `$...$` as an inline-math delimiter (in [docs/javascripts/katex.js](../../../docs/javascripts/katex.js)), precisely so sentences like "from $0.25 to $1,000" don't get swept up as math. Use `\(...\)` for inline math when it's actually needed, and `$$...$$` for display math. Don't escape monetary dollar signs with a backslash — the backslash is consumed during Markdown→HTML and doesn't do anything useful here.
 - **Links in markdown `[text](url)` syntax** — no bare URLs. Link GitHub files to their `owid/<repo>/blob/master/...` path so they stay valid as code changes.
 - **Prefer prose over deeply nested bullets** — if a bullet list has three levels of nesting, rewrite as paragraphs with a short concluding list.
 - **Use first-person plural voice** ("we rely on", "we import", "we harmonize") throughout the prose — the doc is a team walkthrough, not a neutral reference manual.
