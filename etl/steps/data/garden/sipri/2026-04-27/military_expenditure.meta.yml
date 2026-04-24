@@ -1,0 +1,167 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Military Personnel & Spending
+
+  description_short_constant_usd: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries.
+
+  description_short_current_usd: This data is expressed in US dollars. It is not adjusted for inflation or differences in the cost of living between countries.
+
+  description_key_includes: This data includes military and civil personnel, operation and maintenance, procurement, military research and development, infrastructure, and aid. Civil defense and current expenditures for previous military activities are excluded.
+
+  description_from_producer_military_expenditure:
+    "Although the lack of sufficiently detailed data makes it difficult to apply a common definition of military expenditure on a worldwide basis, SIPRI has adopted a definition as a guideline. Where possible, SIPRI military expenditure data include all current and capital expenditure on:
+
+    (a) the armed forces, including peacekeeping forces;
+
+    (b) defence ministries and other government agencies engaged in defence projects;
+
+    (c) paramilitary forces, when judged to be trained and equipped for military operations; and
+
+    (d) military space activities.
+
+    This should include expenditure on:
+
+    i. personnel, including:
+
+            a. salaries of military and civil personnel;
+
+            b. retirement pensions of military personnel, and;
+
+            c. social services for personnel;
+
+    ii. operations and maintenance;
+
+    iii. procurement;
+
+    iv. military research and development;
+
+    v. military infrastructure spending, including military bases. and;
+
+    vi. military aid (in the military expenditure of the donor country).
+
+    SIPRI’s estimate of military aid includes financial contributions, training and operational costs, replacement costs of the military equipment stocks donated to recipients and payments to procure additional military equipment for the recipient. However, it does not include the estimated value of military equipment stocks donated.
+
+    Civil defence and current expenditures on previous military activities, such as veterans' benefits, demobilization, conversion and weapon destruction are excluded.
+
+    In practice it is not possible to apply this definition for all countries, and in many cases SIPRI is confined to using the national data provided. Priority is then given to the choice of a uniform definition over time for each country in order to achieve consistency over time, rather than to adjusting the figures for single years according to a common definition. In the light of these difficulties, military expenditure data is most appropriately used for comparisons over time, and may be less suitable for close comparison between individual countries. Reference should always be made, when comparing data for different countries, to the footnotes and special notes attached to the data for these countries, which indicate deviations from the SIPRI definition, where these are known."
+
+  description_from_producer_constant_usd: |-
+    Military expenditure by country, in constant (2023) US$, 1949-2024
+    Figures are in US, at constant 2023 prices and exchange rates
+
+    {definitions.description_from_producer_military_expenditure}
+
+    _Regional estimates_
+
+    Figures do not always add up to totals because of the conventions of rounding.
+
+    Notes regarding estimates and regional coverage
+    1) The temporal coverage varies by region, based on data availability. A meaningful world total is not possible before 1988 due to the lack of data for the USSR.
+    2) All world totals and most regional totals include estimates for at least one country.
+    3) The estimates exclude certain countries due either to data being missing for too many years to make meaningful estimates, or to an absence of economic data to enable conversion to constant (2023) US$. These are shown in the column to the right of the data for each region.
+    4) The set of countries excluded from the totals for Africa has changed compared to the previous SIPRI data release in April 2016. Therefore, the estimates for World, Africa and Sub-Saharan Africa have changed.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  military_expenditure:
+    variables:
+      constant_usd:
+        title: Military expenditure (constant US$)
+        unit: "constant 2023 US$"
+        short_unit: "$"
+        description_short: |-
+          {definitions.description_short_constant_usd}
+        description_key:
+          - "{definitions.description_key_includes}"
+        description_from_producer: |-
+          {definitions.description_from_producer_constant_usd}
+        display:
+          name: Military expenditure
+          numDecimalPlaces: 0
+          tolerance: 5
+
+      share_gdp:
+        title: Military expenditure (% of GDP)
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: |-
+          Total military expenditure divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+        description_key:
+          - "{definitions.description_key_includes}"
+        description_from_producer: |-
+          {definitions.description_from_producer_military_expenditure}
+        display:
+          name: Military expenditure (% of GDP)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      per_capita:
+        title: Military expenditure per capita (current US$)
+        unit: "current US$"
+        short_unit: "$"
+        description_short: |-
+          Total military expenditure divided by population. {definitions.description_short_current_usd}
+        description_key:
+          - "{definitions.description_key_includes}"
+        description_from_producer: |-
+          Figures are in current US$.
+
+          {definitions.description_from_producer_military_expenditure}
+        display:
+          name: Military expenditure per capita
+          numDecimalPlaces: 0
+          tolerance: 5
+
+      share_govt_spending:
+        title: Military expenditure (% of government spending)
+        unit: "% of government spending"
+        short_unit: "%"
+        description_short: |-
+          Total military expenditure divided by government spending.
+        description_key:
+          - "{definitions.description_key_includes}"
+        description_from_producer: |-
+          {definitions.description_from_producer_military_expenditure}
+        display:
+          name: Military expenditure (% of government spending)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      milex_per_mil_personnel:
+        title: Military expenditure per armed forces personnel (constant US$)
+        unit: "constant 2023 US$"
+        short_unit: "$"
+        description_short: |-
+          Total military expenditure divided by armed forces personnel. {definitions.description_short_constant_usd}
+        description_key:
+          - "{definitions.description_key_includes}"
+          - Armed forces personnel are active duty military personnel, including paramilitary forces if the training, organization, equipment, and control suggest they may be used to support or replace regular military forces.
+        description_from_producer: |-
+          {definitions.description_from_producer_constant_usd}
+
+          _Armed forces personnel_
+          Armed forces personnel are active duty military personnel, including paramilitary forces if the training, organization, equipment, and control suggest they may be used to support or replace regular military forces.
+
+          Limitations and exceptions: Data excludes personnel not on active duty, therefore it underestimates the share of the labor force working for the defense establishment. The cooperation of governments of all countries listed in “The Military Balance” has been sought by IISS and, in many cases, received. However, some data in “The Military Balance” is estimated.
+
+          Statistical concept and methodology: Military data on manpower represent quantitative assessment of the personnel strengths of the world's armed forces. The IISS collects the data from a wide variety of sources. The numbers are based on the most accurate data available to, or on the best estimate that can be made by the International Institute for Strategic Studies (IISS) at the time of its annual publication. The current WDI indicator includes active armed forces and active paramilitary (but not reservists). Armed forces personnel comprise all servicemen and women on full-time duty, including conscripts and long-term assignments from the Reserves (“Reserve” describes formations and units not fully manned or operational in peacetime, but which can be mobilized by recalling reservists in an emergency). The indicator includes paramilitary forces. The source of the data (IISS) reports armed forces and paramilitary forces separately, however these figures are added for the purpose of computing this series. Home Guard units are counted as paramilitary. The data are collected from the IISS publication “The Military Balance” and from the World Bank's World Development Indicators.
+        processing_level: major
+        description_processing: |-
+          We calculated this indicator by dividing the military expenditure provided by SIPRI (in constant US$) by the [armed forces personnel](https://ourworldindata.org/grapher/armed-forces-personnel) estimated by the International Institute for Strategic Studies (IISS) and published by the World Bank's World Development Indicators.
+        display:
+          name: Military expenditure per armed forces personnel
+          numDecimalPlaces: 0
+          numSignificantFigures: 3
+          tolerance: 5
+
+
