@@ -286,3 +286,9 @@ steps:
     - data://garden/bls/2026-03-20/us_consumer_prices
   data://grapher/artificial_intelligence/2026-04-20/ai_index:
     - data://garden/artificial_intelligence/2026-04-20/ai_index_report
+  data://garden/artificial_intelligence/2026-04-24/energy_ai:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/artificial_intelligence/2025-11-07/energy_ai
+    - data://garden/energy/2026-04-24/electricity_mix
+  data://grapher/artificial_intelligence/2026-04-24/energy_ai:
+    - data://garden/artificial_intelligence/2026-04-24/energy_ai
