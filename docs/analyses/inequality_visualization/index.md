@@ -99,7 +99,7 @@ The data for each country is a list of 1000 average daily income values (for eac
 The curve is produced by feeding the 1000 averages for a given country-year through a KDE function, with all incomes first converted to a logarithmic scale.
 
 !!! info "Working in log scale"
-    Income data spans several orders of magnitude — from less than a dollar a day to thousands. To handle this range, we work with the logarithm (base 2) of each income value. In log space, the distance between $1 and $2 is the same as between $50 and $100, which gives the lower end of the distribution the same visual resolution as the upper end.
+    Income data spans several orders of magnitude — from less than a dollar a day to thousands. To handle this range, we work with the logarithm (base 2) of each income value. In log space, the distance between \$1 and \$2 is the same as between \$50 and \$100, which gives the lower end of the distribution the same visual resolution as the upper end.
 
 Three parameters control the shape of this curve: the smoothness of the estimate (**bandwidth**), the income range it covers (**extent**), and the resolution of the output (**bins**).
 
@@ -150,7 +150,7 @@ For regions and the world aggregate, we weight by population. We sum the number 
 !!! note "How accurate is this?"
     Because we have 1000 bins rather than the full income distribution, we can't know exactly where the line falls inside a bin — each bin is assigned entirely above or below the line based on its average income. A bin whose average is just below the line might contain some people who are above it, and vice versa. In the worst case, this is off by half a bin, i.e. 0.05 percentage points of the population. Keeping the computation this simple also makes it fast enough to recompute every time the user chooses a different line.
 
-    We cross-checked the method against PIP's own extrapolated poverty series at 2021 international dollars, for seven lines between $3 and $40 / day. At the country, regional, and global level, every comparison agrees with PIP to within 0.1 percentage points — the full precision the 1000-bin discretization allows. Since the visualization shows poverty shares without decimal points, these differences are not visible on the chart.
+    We cross-checked the method against PIP's own extrapolated poverty series at 2021 international dollars, for seven lines between \$3 and \$40 / day. At the country, regional, and global level, every comparison agrees with PIP to within 0.1 percentage points — the full precision the 1000-bin discretization allows. Since the visualization shows poverty shares without decimal points, these differences are not visible on the chart.
 
 ## Currency conversions
 
@@ -218,7 +218,7 @@ In addition to this, observations for many countries are estimated, not observed
 
 Beyond these data limitations, there are decisions we made that affect the visualization:
 
-- The KDE curves are smoothed to show the general shape of the income distribution. They should not be used to read off the precise shares. The share of population below a line figures come from the bin data directly, not from the area under the curve. The curves are also evaluated over daily incomes from $0.25 to $1,000. No countries have bins below $0.25, but 30 countries have bins above $1,000 — typically only for the richest 0.1%. For those countries, the very tip of the right tail of the curve is visually trimmed.
+- The KDE curves are smoothed to show the general shape of the income distribution. They should not be used to read off the precise shares. The share of population below a line figures come from the bin data directly, not from the area under the curve. The curves are also evaluated over daily incomes from \$0.25 to \$1,000. No countries have bins below \$0.25, but 30 countries have bins above \$1,000 — typically only for the richest 0.1%. For those countries, the very tip of the right tail of the curve is visually trimmed.
 - As we discussed before, by using bin averages rather than individual-level data, we are missing within-bin inequality. [As the PIP team notes](https://datacatalog.worldbank.org/search/dataset/0064304/1000-binned-global-distribution), this results in a lower level of within-country inequality than the survey data would show.
 - For the inflation adjustment, the CPI indicator lags the current year. The latest available year in WDI's CPI series is typically one or two years behind the present. Values shown in local currency are therefore in prices from one or two years ago, which is still a reasonable approximation of present-day monetary values in most economies, though less so in countries experiencing rapid inflation.
 
