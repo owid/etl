@@ -54,7 +54,7 @@ Name the institution. Mention if data is compiled from multiple underlying sourc
 Give the year range and number of countries. If recent years have lower coverage (common in annual releases), call that out explicitly — users may be confused by sparse recent data.
 
 **Charts affected**
-Give the raw number. A one-line qualifier helps: handful (1–10), moderate (10–50), large (50–200), massive (200+). If changes span multiple datasets, say so.
+Count **published** charts only (`charts.publishedAt IS NOT NULL`). Exclude drafts / unlisted charts from the Slack count, even if they were remapped by `etl indicator-upgrade`. A one-line qualifier helps: handful (1–10), moderate (10–50), large (50–200), massive (200+). If changes span multiple datasets, say so.
 
 **Why we have this data**
 Answer: what question does this dataset help answer that our users care about? Why this source over alternatives? What would be missing from OWID without it?
