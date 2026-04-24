@@ -20,3 +20,7 @@ meta:
     license:
       name: SIPRI Terms and Conditions
       url: https://www.sipri.org/about/terms-and-conditions
+outs:
+  - md5: 2ff985a3f6b86eb558892ebfa900ee5b
+    size: 872274
+    path: military_expenditure.xlsx

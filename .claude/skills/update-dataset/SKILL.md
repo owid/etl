@@ -184,7 +184,7 @@ When you do stop, present a concise summary of the issue and what options exist.
 
 ## Committing and pushing
 
-Commit and push incrementally as you go — after each step that produces code changes. Don't wait until the end. Use descriptive commit messages with appropriate emojis (📊🤖 for data updates).
+Commit and push incrementally as you go — after each step that produces code changes. Don't wait until the end. Use descriptive commit messages with appropriate emojis (the one auto-prepended by `etl pr` for the chosen category + 🤖 for AI-written code).
 
 At the end of the workflow, update the PR description with:
 - A summary of key changes at the top
