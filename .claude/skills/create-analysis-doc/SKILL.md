@@ -143,6 +143,20 @@ Consistency with the existing analyses docs is important — they deploy through
 - **Use first-person plural voice** ("we rely on", "we import", "we harmonize") throughout the prose — the doc is a team walkthrough, not a neutral reference manual.
 - **Source-code excerpts are optional, not required.** Paste a short function (≤ ~30 lines) inside a fenced code block only when it directly illustrates a methodological claim a reader might want to verify against the actual implementation. For docs whose methodology is purely conceptual, skip code blocks entirely and rely on the GitHub links in the References section.
 
+### If the content came from Google Docs
+
+Docs drafted in Google Docs and exported to Markdown consistently arrive with a fixed set of artefacts. This happens whenever the author iterates in GDocs and re-pastes; expect to see the same problems every time. Rewrite the affected file in one pass to clean them up:
+
+- **Escaped admonition markers** — `\!\!\! info ""` → `!!! info ""`. The exported form also crams the title and first paragraph onto a single line (`\!\!\! info "Title" Body text...`) — split it so the `!!!` line has only the type and title, and the body is indented on the next line with 4 spaces.
+- **Headings wrapped in bold** — `## **Text**` → `## Text`. Exported on every heading level (H1, H2, H3, H4).
+- **Escaped brackets in links** — `\["Title"\](url)` → `"Title" (url)` or a real Markdown link `[Title](url)`.
+- **Escaped characters where none are needed** — `\[`, `\]`, `\.`, `\=`, `\~`, `\-`, `\_`, `\)` around numbers, units, or file names (`1990\.`, `2010 \= 100`, `int\_dollar\_conversions.py`, `(base 2\)`, `\~592M`). Remove the backslashes.
+- **Collapsible block content inside a fenced code block** — the `??? note "..."` or `??? quote "..."` exports with its contents in a ```` ``` ```` fence below it, which makes mkdocs render the list as code instead of as the admonition body. Remove the fences and indent each line of content with 4 spaces so it's nested inside the admonition.
+- **Curly quotes in admonition titles** — `"Title"` (Unicode `"`/`"`) → `"Title"` (straight ASCII). Curly quotes in admonition titles can break the title parser; elsewhere in prose they're harmless.
+- **Sub-bullets indented with 2 spaces** — Python-Markdown wants 4-space indentation for nested bullets. If a nested list renders flat, check the indentation.
+
+Smart quotes, em dashes, and other typographic characters *inside* prose are fine to leave alone — mkdocs-material renders them correctly.
+
 ## 5. Writing principles (lessons from past sessions)
 
 - **Lead with intuition, not implementation.** Readers want to understand the *idea* before the code. For a computation like "share below the line", first explain "each bin represents 1/1000 of the population; count bins below, divide by 1000" — then mention the `(k / 10) * pop` expression and *why* it collapses that way.

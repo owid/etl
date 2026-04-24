@@ -22,13 +22,11 @@ Here, we cover the data sources, data processing, the key methodological choices
 
 The data comes from the World Bank. More specifically, we rely on the following dataset:
 
-* [1000 binned global distribution](https://datacatalog.worldbank.org/search/dataset/0064304/1000-binned-global-distribution) from the [Poverty and Inequality Platform (PIP)](https://pip.worldbank.org/) — contains data on the global income distribution from 1990 to the present, which is the backbone of the visualization. For each year, it contains 1000 bins of income or consumption per country.
+* [1000 binned global distribution](https://datacatalog.worldbank.org/search/dataset/0064304/1000-binned-global-distribution) from the [Poverty and Inequality Platform (PIP)](https://pip.worldbank.org/) — contains data on the global income distribution from 1990 to the present, which is the backbone of the visualization.
 
-### 1000 binned global distribution
+The [1000 binned global distribution](https://datacatalog.worldbank.org/search/dataset/0064304/1000-binned-global-distribution) file contains, for each country and year, 1000 quantile groups (or "bins") of the average income (or consumption) per capita of the population. Each bin represents one thousandth of the country's population, ordered from bin number 1 (the poorest 0.1%) to bin number 1000 (the richest 0.1%).
 
-The [1000 binned global distribution](https://datacatalog.worldbank.org/search/dataset/0064304/1000-binned-global-distribution) file contains, for each country and year, **1000 quantile groups** (or "bins") of the average income (or consumption) per capita of the population. Each bin represents one thousandth of the country's population, ordered from bin number 1 (the poorest 0.1%) to bin number 1000 (the richest 0.1%).
-
-Income is expressed in **2021 [international dollars](https://ourworldindata.org/international-dollars)**, and is adjusted for inflation and differences in living costs between countries.
+Income is expressed in 2021 [international dollars](https://ourworldindata.org/international-dollars), and is adjusted for inflation and differences in living costs between countries.
 
 The data is available from 1990 until the year of the latest data release.
 
@@ -36,8 +34,8 @@ The data is available from 1990 until the year of the latest data release.
 
 Some technical aspects of the data are worth highlighting:
 
-* Because not all countries run household surveys every year, PIP fills the gaps: it interpolates between survey years and extrapolates to the present. These projections are based on the assumption that incomes or consumption expenditures grow in line with the growth rates observed in national accounts data. For more details, see Chapter 5 of the Poverty and Inequality Platform [Methodology Handbook](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html).
-* The dataset combines income and consumption expenditure surveys because not every country asks about the same welfare concept. In high-income countries, the surveys typically capture people's incomes, while in low- and middle-income countries, they measure consumption expenditure — what households spend on goods and services. A small number of countries report both. The two concepts are closely related but not the same: income equals consumption plus savings. Therefore, the global data is a mix of income and consumption expenditure data, making inequality estimates less comparable across countries that use different measures. The 1000-binned file itself does not label each country-year series as income or consumption, although that information is available in [PIP's country profiles](https://pip.worldbank.org/country-profiles) under "Data sources".
+* Because not all countries run household surveys every year, PIP fills the gaps: it interpolates between survey years and extrapolates to the present. These estimates are based on the assumption that incomes or consumption expenditures grow in line with the growth rates observed in national accounts data. For more details, see Chapter 5 of the Poverty and Inequality Platform [Methodology Handbook](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html).
+* The dataset combines income and consumption expenditure surveys because not every country asks about the same welfare concept. In high-income countries, the surveys typically capture people's incomes, while in low- and middle-income countries, they measure consumption expenditure — what households spend on goods and services. A small number of countries report both. The two concepts are closely related but not the same: income equals consumption plus savings. Therefore, the global data is a mix of income and consumption expenditure data, making inequality estimates less comparable across countries that use different measures. The 1000 binned file itself does not label each country-year series as income or consumption, although that information is available in [PIP's country profiles](https://pip.worldbank.org/country-profiles) under "Data sources".
 * In many poorer countries, a large share of people don't have any monetary income — they grow food for their own use or trade goods and services outside of markets. This data accounts for that by adding the estimated value of non-monetary income and home production.
 
 !!! warning "Top-income coverage"
@@ -101,7 +99,7 @@ The curve is produced by feeding the 1000 averages for a given country-year thro
 !!! info "Working in log scale"
     Income data spans several orders of magnitude — from less than a dollar a day to thousands. To handle this range, we work with the logarithm (base 2) of each income value. In log space, the distance between $1 and $2 is the same as between $50 and $100, which gives the lower end of the distribution the same visual resolution as the upper end.
 
-Three parameters control the shape of this curve: the smoothness of the estimate (**bandwidth**), the income range it covers (**extent**), and the resolution of the output (**bins**).
+Three parameters control the shape of this curve: the smoothness of the estimate (**bandwidth**), the income range it covers (**extent**), and the resolution of the output (**bins**). They are defined as follows:
 
 ```ts
 // KDE_BANDWIDTH controls how smooth the resulting curve is. Smaller values follow the data more closely.
@@ -112,7 +110,7 @@ export const KDE_EXTENT = [0.25, 1000].map(Math.log2) as [number, number]
 export const KDE_NUM_BINS = 200
 ```
 
-We then use the [`fast-kde`](https://github.com/uwdata/fast-kde) JavaScript library with the following parameters (for all countries in the data):
+We then use the [`fast-kde`](https://github.com/uwdata/fast-kde) JavaScript library with the same parameters (for all countries in the data):
 
 ```ts
 export function kdeLog(pointsLog2: number[]) {
@@ -130,7 +128,7 @@ export function kdeLog(pointsLog2: number[]) {
 
 After the density is computed in log space, the x-values are converted back to dollar amounts (by computing 2^x), so the curve can be plotted directly against income in international dollars.
 
-#### How sensitive are the results to the choice of parameters?
+#### How sensitive are the results to the choice of parameters? [in progress]
 
 * Bandwidth: (TBC with Marcel)
 * Extent:
@@ -143,14 +141,14 @@ After the density is computed in log space, the x-values are converted back to d
 
 We can now compute the share of the population living below a chosen poverty line (or any income threshold) for any combination of countries, regions, and the world.
 
-For each country, we find the highest bin in the 1000 bin distribution whose average income falls (strictly) below the chosen line. That position tells us how many bins — and therefore how many people — are below it. Dividing by the country's total population gives the share of the population below that line. For example, if 250 of the 1000 bins in Brazil fall below a chosen line, then 25% of Brazilians are estimated to live below it.
+For each country, we find the highest bin in the 1000-bin distribution whose average income falls (strictly) below the chosen line. That position tells us how many bins — and therefore how many people — are below it. Dividing by the country's total population gives the share of the population below that line. For example, if 250 of the 1000 bins in Brazil fall below a chosen line, then 25% of Brazilians are estimated to live below it.
 
 For regions and the world aggregate, we weight by population. We sum the number of people below the line across all constituent countries and divide by the total population of the group.
 
 !!! info "How accurate is this?"
-    Because we have 1000 bins rather than the full income distribution, we can't know exactly where the line falls inside a bin — each bin is assigned entirely above or below the line based on its average income. A bin whose average is just below the line might contain some people who are above it, and vice versa. In the worst case, this is off by half a bin, i.e. 0.05 percentage points of the population. Keeping the computation this simple also makes it fast enough to recompute every time the user chooses a different line.
+    Because we have 1000 bins rather than the full income distribution, we can't know exactly where the line falls inside a bin — each bin is assigned entirely above or below the line based on its average income. A bin whose average is just below the line might contain some people who are above it, and vice versa. In the worst case, this is off by half a bin, i.e., 0.05 percentage points of the population. Keeping the computation this simple also makes it fast enough to recompute every time the user chooses a different line.
 
-    We cross-checked the method against PIP's own extrapolated poverty series at 2021 international dollars, for seven lines between $3 and $40 / day. At the country, regional, and global level, every comparison agrees with PIP to within 0.1 percentage points — the full precision the 1000-bin discretization allows. Since the visualization shows poverty shares without decimal points, these minor differences are not visible on the chart.
+    We cross-checked the shares shown here against PIP's own extrapolated poverty series at 2021 international dollars for the most recent year available, for seven lines between $3 and $40 / day. At the country, regional, and global levels, every comparison agrees with PIP to within 0.1 percentage points — the full precision the 1000-bin data allows. Since the visualization shows poverty shares without decimal points, these minor differences are not visible on the chart.
 
 ## Currency conversions
 
@@ -210,16 +208,16 @@ The raw data is expressed as daily values. When the user switches to a monthly o
 
 The big strength of the World Bank dataset we are using here is that it is one of the few sources that can give us this global perspective on income inequality. But the data comes with important caveats.
 
-First, there are some comparability issues across countries. As we discussed earlier, the PIP collects household survey data from national statistics offices and works to make that data as comparable across countries as possible. But countries don't all measure the same thing, with some surveys focusing on capturing income, and others on consumption expenditure. These two concepts are related (income equals consumption plus savings) but they are not the same. Income tends to be more unequally distributed than consumption, so when comparing distributions across countries, we should pay attention to this — part of the visible difference can reflect the welfare concept rather than a real gap.
+First, not all countries measure the same thing. As we discussed earlier, the PIP collects household survey data from national statistics offices and works to make that data as comparable across countries as possible. But countries don't all measure the same thing, with some surveys focusing on capturing income, and others on consumption expenditure. These two concepts are related (income equals consumption plus savings), but they are not the same. Income tends to be more unequally distributed than consumption, so when comparing distributions across countries, we should pay attention to this — part of the visible difference can reflect the welfare concept rather than a real gap.
 
 Second, incomes at the top of the distribution are often missed or underreported in surveys. The very wealthy are few, hard to reach, and less likely to participate — and even when they do, surveys tend to miss income from capital, business ownership, and complex financial arrangements. The right tail of every distribution shown here is likely compressed relative to reality.
 
-In addition to this, observations for many countries are estimated, not observed. The 1000 bins dataset is constructed to have one observation for every country and year since 1990. To do this, the World Bank team interpolates between survey years and also extrapolate from the last survey year to the present year. There are many assumptions involved in this, in particular, the extrapolations. In those years, the distribution and poverty estimates may not fully reflect the reality of the country. They are best read as approximate levels of income relative to other countries, rather than as precise point estimates. The PIP team recommends care when looking at specific filled values for individual countries. The poverty and inequality statistics published directly by PIP are estimated from the actual survey data, not from this filled dataset.
+In addition to this, observations for many countries are estimated, not observed. The 1000 bins dataset is constructed to have one observation for every country and year since 1990. To do this, the World Bank team interpolates between survey years and also extrapolates from the last survey year to the present year. There are many assumptions involved in this, in particular, the extrapolations. In those years, the distribution and poverty estimates may not fully reflect the reality of the country. They are best read as approximate levels of income relative to other countries, rather than as precise point estimates. The PIP team recommends care when looking at specific filled values for individual countries. The poverty and inequality statistics published directly by PIP are estimated from the actual survey data, not from this filled dataset.
 
 Beyond these data limitations, there are decisions we made that affect the visualization:
 
-- The KDE curves are smoothed to show the general shape of the income distribution. They should not be used to read off the precise shares. The share of population below a line figures come from the bin data directly, not from the area under the curve. The curves are also evaluated over daily incomes from $0.25 to $1,000. No countries have bins below $0.25, but 30 countries have bins above $1,000 — typically only for the richest 0.1%. For those countries, the very tip of the right tail of the curve is visually trimmed.
-- As we discussed before, by using bin averages rather than individual-level data, we are missing within-bin inequality. [As the PIP team notes](https://datacatalog.worldbank.org/search/dataset/0064304/1000-binned-global-distribution), this results in a lower level of within-country inequality than the survey data would show.
+- The KDE curves are smoothed to show the general shape of the income distribution. They should not be used to read off the precise shares. The share of the population below a line comes from the bin data directly, not from the area under the curve. The curves are also evaluated over daily incomes from $0.25 to $1,000. No countries have bins below $0.25, but 30 countries have bins above $1,000 — typically only for the richest 0.1%. For those countries, the very tip of the right tail of the curve is visually trimmed.
+- As we discussed before, by using bin averages rather than individual-level data, we are missing within-bin inequality.
 - For the inflation adjustment, the CPI indicator lags the current year. The latest available year in WDI's CPI series is typically one or two years behind the present. Values shown in local currency are therefore in prices from one or two years ago, which is still a reasonable approximation of present-day monetary values in most economies, though less so in countries experiencing rapid inflation.
 
 ## References
@@ -232,9 +230,10 @@ Beyond these data limitations, there are decisions we made that affect the visua
 
 **External datasets and references**
 
-- [World Bank Poverty and Inequality Platform (PIP)](https://pip.worldbank.org/)
-- [PIP methodology](https://datanalytics.worldbank.org/PIP-Methodology/)
-- [1000-binned global distribution dataset catalog](https://datacatalog.worldbank.org/search/dataset/0064304/1000-binned-global-distribution)
+- World Bank. Poverty and Inequality Platform [Data set]. World Bank Group. [https://pip.worldbank.org](https://pip.worldbank.org/)
+- Mahler, Daniel Gerszon; Yonzan, Nishant; Lakner, Christoph (2022). The Impact of COVID-19 on Global Inequality and Poverty. Policy Research Working Papers; 10198. © World Bank, Washington, DC. [https://openknowledge.worldbank.org/entities/publication/54fae299-8800-585f-9f18-a42514f8d83b](https://openknowledge.worldbank.org/entities/publication/54fae299-8800-585f-9f18-a42514f8d83b) updated with Poverty and Inequality Platform.
+- [1000-binned global distribution dataset](https://datacatalog.worldbank.org/search/dataset/0064304/1000-binned-global-distribution), the updated link to the dataset above.
+- [Poverty and Inequality Platform Methodology Handbook](https://datanalytics.worldbank.org/PIP-Methodology/)
 - [PPP conversion factor, households (WDI, `PA.NUS.PRVT.PP`)](https://data.worldbank.org/indicator/PA.NUS.PRVT.PP)
 - [Consumer price index, 2010 = 100 (WDI, `FP.CPI.TOTL`)](https://data.worldbank.org/indicator/FP.CPI.TOTL)
 - [International Comparison Program (ICP)](https://www.worldbank.org/en/programs/icp)
