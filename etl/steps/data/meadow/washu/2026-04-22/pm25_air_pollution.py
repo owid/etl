@@ -16,13 +16,13 @@ def run() -> None:
     # Load data from snapshot.
     tb = snap.read()
 
+    tb = tb.rename(columns={"Region": "country", "Year": "year"})
+
     #
     # Process data.
     #
     # Improve tables format.
-    tables = [
-        tb.format(["country", "year"])
-    ]
+    tables = [tb.format(["country", "year"])]
 
     #
     # Save outputs.

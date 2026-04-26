@@ -36,8 +36,8 @@ tables:
   air_quality_life_index:
     variables:
       pm:
-        title: Exposure to particulate matter air pollution
-        description_short: Annual population-weighted average concentration of [fine particulate matter (PM2.5)](#dod:particulate_matter_pollution) in the air, measured in micrograms per cubic meter (µg/m³). Fine particulate matter (PM2.5) consists of tiny particles with a diameter of 2.5 micrometers or less, which can pose significant health risks.
+        title: Exposure to human-caused particulate matter air pollution
+        description_short: Annual population-weighted average concentration of [fine particulate matter (PM2.5)](#dod:particulate_matter_pollution) in the air, measured in micrograms per cubic meter (µg/m³). Fine particulate matter (PM2.5) are particles with a diameter of 2.5 micrometers or less, which can pose significant health risks. This data excludes natural sources of PM2.5, such as dust and sea salt, to focus on human-caused pollution.
         description_key:
           - Outdoor air pollution, specifically PM2.5, is a major environmental risk factor for health issues such as respiratory and cardiovascular diseases. It is estimated to contribute to millions of premature deaths globally each year.
           - The World Health Organization (WHO) recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
