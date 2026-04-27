@@ -6,6 +6,8 @@ definitions:
       topic_tags:
         - Military Personnel & Spending
 
+  prices_year: 2024
+
   description_short_constant_usd: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries.
 
   description_short_current_usd: This data is expressed in US dollars. It is not adjusted for inflation or differences in the cost of living between countries.
@@ -13,7 +15,7 @@ definitions:
   description_key_includes: This data includes military and civil personnel, operation and maintenance, procurement, military research and development, infrastructure, and aid. Civil defense and current expenditures for previous military activities are excluded.
 
   description_from_producer_military_expenditure:
-    "Although the lack of sufficiently detailed data makes it difficult to apply a common definition of military expenditure on a worldwide basis, SIPRI has adopted a definition as a guideline. Where possible, SIPRI military expenditure data include all current and capital expenditure on:
+    "Although the lack of sufficiently detailed data makes it difficult to apply a common definition of military expenditure on a worldwide basis, SIPRI has adopted a definition as a guideline. Where possible, SIPRI military expenditure data includes all current and capital expenditure on:
 
     (a) the armed forces, including peacekeeping forces;
 
@@ -37,9 +39,9 @@ definitions:
 
     iii. procurement;
 
-    iv. military research and development;
+    iv. military research and development (R&D);
 
-    v. military infrastructure spending, including military bases. and;
+    v. military infrastructure spending, including military bases; and
 
     vi. military aid (in the military expenditure of the donor country).
 
@@ -50,8 +52,8 @@ definitions:
     In practice it is not possible to apply this definition for all countries, and in many cases SIPRI is confined to using the national data provided. Priority is then given to the choice of a uniform definition over time for each country in order to achieve consistency over time, rather than to adjusting the figures for single years according to a common definition. In the light of these difficulties, military expenditure data is most appropriately used for comparisons over time, and may be less suitable for close comparison between individual countries. Reference should always be made, when comparing data for different countries, to the footnotes and special notes attached to the data for these countries, which indicate deviations from the SIPRI definition, where these are known."
 
   description_from_producer_constant_usd: |-
-    Military expenditure by country, in constant (2023) US$, 1949-2024
-    Figures are in US, at constant 2023 prices and exchange rates
+    Military expenditure by country, in constant (2024) US$ m., 1949–2025   © SIPRI 2026
+    Figures are in US $m., at constant 2024 prices and exchange rates.
 
     {definitions.description_from_producer_military_expenditure}
 
@@ -62,7 +64,7 @@ definitions:
     Notes regarding estimates and regional coverage
     1) The temporal coverage varies by region, based on data availability. A meaningful world total is not possible before 1988 due to the lack of data for the USSR.
     2) All world totals and most regional totals include estimates for at least one country.
-    3) The estimates exclude certain countries due either to data being missing for too many years to make meaningful estimates, or to an absence of economic data to enable conversion to constant (2023) US$. These are shown in the column to the right of the data for each region.
+    3) The estimates exclude certain countries due either to data being missing for too many years to make meaningful estimates, or to an absence of economic data to enable conversion to constant (2024) US$. These are shown in the column to the right of the data for each region
     4) The set of countries excluded from the totals for Africa has changed compared to the previous SIPRI data release in April 2016. Therefore, the estimates for World, Africa and Sub-Saharan Africa have changed.
 
 
@@ -77,7 +79,7 @@ tables:
     variables:
       constant_usd:
         title: Military expenditure (constant US$)
-        unit: "constant 2023 US$"
+        unit: "constant {definitions.prices_year} US$"
         short_unit: "$"
         description_short: |-
           {definitions.description_short_constant_usd}
@@ -139,7 +141,7 @@ tables:
 
       milex_per_mil_personnel:
         title: Military expenditure per armed forces personnel (constant US$)
-        unit: "constant 2023 US$"
+        unit: "constant {definitions.prices_year} US$"
         short_unit: "$"
         description_short: |-
           Total military expenditure divided by armed forces personnel. {definitions.description_short_constant_usd}
