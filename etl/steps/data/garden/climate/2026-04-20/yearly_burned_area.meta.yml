@@ -5,6 +5,8 @@ definitions:
       topic_tags:
         - Climate Change
         - Wildfires
+      grapher_config:
+        note: For these historical estimates, we rely on data based on the NASA MCD64 MODIS sensor, which, according to the data provider, might underestimate burnt areas and fire occurrences.
     display:
       numDecimalPlaces: 0
     short_unit: ha
@@ -25,22 +27,42 @@ tables:
     variables:
       forest:
         title: Yearly burned area in forests
+        display:
+          name: Forests
+        presentation:
+          title_public: Yearly burned area in forests
         description_short: Area of forest land burnt by [wildfires](#dod:wildfires) each year, in hectares. Includes all tree-covered land such as tropical rainforests, boreal forests, and mixed woodlands.
 
       savannas:
         title: Yearly burned area in savannas
+        display:
+          name: Savannas
+        presentation:
+          title_public: Yearly burned area in savannas
         description_short: Area of savanna land burnt by [wildfires](#dod:wildfires) each year, in hectares. Savannas are tropical and subtropical grasslands with scattered trees and shrubs, and are the most fire-prone land type globally.
 
       shrublands_grasslands:
         title: Yearly burned area in shrublands and grasslands
+        display:
+          name: Shrublands and grasslands
+        presentation:
+          title_public: Yearly burned area in shrublands and grasslands
         description_short: Area of shrubland and grassland burnt by [wildfires](#dod:wildfires) each year, in hectares. Includes open and closed shrublands and grasslands without a significant tree cover.
 
       croplands:
         title: Yearly burned area in croplands
+        display:
+          name: Croplands
+        presentation:
+          title_public: Yearly burned area in croplands
         description_short: Area of agricultural land burnt by [wildfires](#dod:wildfires) each year, in hectares. Includes fields used for crops, as well as mixed cropland and natural vegetation areas.
 
       other:
         title: Yearly burned area in other land types
+        display:
+          name: Other land
+        presentation:
+          title_public: Yearly burned area in other land types
         description_short: Area of other land types burnt by [wildfires](#dod:wildfires) each year, in hectares. Includes wetlands, urban areas, snow and ice, bare ground, and water bodies.
 
       all:
