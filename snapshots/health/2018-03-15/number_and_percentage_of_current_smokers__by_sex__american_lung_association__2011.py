@@ -24,7 +24,9 @@ def main(upload: bool) -> None:
     )
     snap_values.pull()
     # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
-    snap = Snapshot("health/2018-03-15/number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011.feather")
+    snap = Snapshot(
+        "health/2018-03-15/number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011.feather"
+    )
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))

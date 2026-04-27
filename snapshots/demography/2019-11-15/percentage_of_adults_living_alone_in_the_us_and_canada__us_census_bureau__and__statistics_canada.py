@@ -24,7 +24,9 @@ def main(upload: bool) -> None:
     )
     snap_values.pull()
     # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
-    snap = Snapshot("demography/2019-11-15/percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada.feather")
+    snap = Snapshot(
+        "demography/2019-11-15/percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada.feather"
+    )
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))

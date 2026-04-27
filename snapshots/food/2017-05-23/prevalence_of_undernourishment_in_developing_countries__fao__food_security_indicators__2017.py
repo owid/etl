@@ -24,7 +24,9 @@ def main(upload: bool) -> None:
     )
     snap_values.pull()
     # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
-    snap = Snapshot("food/2017-05-23/prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017.feather")
+    snap = Snapshot(
+        "food/2017-05-23/prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017.feather"
+    )
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))

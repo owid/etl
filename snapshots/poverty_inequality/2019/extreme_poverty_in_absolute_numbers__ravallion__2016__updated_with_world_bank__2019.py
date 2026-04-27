@@ -24,7 +24,9 @@ def main(upload: bool) -> None:
     )
     snap_values.pull()
     # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
-    snap = Snapshot("poverty_inequality/2019/extreme_poverty_in_absolute_numbers__ravallion__2016__updated_with_world_bank__2019.feather")
+    snap = Snapshot(
+        "poverty_inequality/2019/extreme_poverty_in_absolute_numbers__ravallion__2016__updated_with_world_bank__2019.feather"
+    )
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))

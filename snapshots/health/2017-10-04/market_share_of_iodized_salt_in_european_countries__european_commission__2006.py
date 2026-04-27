@@ -24,7 +24,9 @@ def main(upload: bool) -> None:
     )
     snap_values.pull()
     # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
-    snap = Snapshot("health/2017-10-04/market_share_of_iodized_salt_in_european_countries__european_commission__2006.feather")
+    snap = Snapshot(
+        "health/2017-10-04/market_share_of_iodized_salt_in_european_countries__european_commission__2006.feather"
+    )
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))
