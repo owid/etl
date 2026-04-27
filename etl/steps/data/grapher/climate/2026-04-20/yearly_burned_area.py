@@ -18,31 +18,12 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = tb.reset_index()
-    tb = tb.drop(columns=["days_since_2000"])
-
-    # Sum the burned area by country and year
-    grouped_tb = (
-        tb.groupby(
-            [
-                "country",
-                "year",
-            ],
-            observed=True,
-        )[["forest", "savannas", "shrublands_grasslands", "croplands", "other", "all"]]
-        .sum()
-        .reset_index()
-    )
-
-    grouped_tb = grouped_tb.format(["country", "year"])
+    # Data is already aggregated by country and year in garden.
 
     #
     # Save outputs.
     #
-    # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = paths.create_dataset(
-        tables=[grouped_tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
-
-    # Save changes in the new grapher dataset.
     ds_grapher.save()

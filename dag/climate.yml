@@ -254,7 +254,7 @@ steps:
   # Global Wildfire Information System - Monthly burned area.
   #
   data://meadow/climate/2026-04-20/monthly_burned_area:
-    - snapshot://climate/2026-04-20/monthly_burned_area.zip
+    - snapshot://climate/2026-04-20/monthly_burned_area.csv
   data://garden/climate/2026-04-20/monthly_burned_area:
     - data://garden/wb/2025-07-01/income_groups
     - data://meadow/climate/2026-04-20/monthly_burned_area
