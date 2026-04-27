@@ -42,6 +42,7 @@ Assumptions:
 - [ ] Draft Slack announcement, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Ask the user whether to archive the old DAG entries; if yes, move them to `dag/archive/` AND relocate the new entries into the old slot (see "DAG archiving & reordering") — don't forget this step
+- [ ] Hand off Wizard QA links to the user (Anomalist + Chart Diff on the staging branch) — this is the final step
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
@@ -277,6 +278,23 @@ Workflow when the user agrees:
 3. Preserve the original section comment (same indentation as the old block) above the new entries.
 4. Verify: `rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"` returns nothing, and `rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml"` shows the entries only in the main file (under the section comment), not at the bottom.
 5. Run `make check` and commit with `🔨🤖 Archive old <name> entries and reorder DAG`.
+
+## Final QA hand-off — Anomalist + Chart Diff in Wizard
+
+This is the **last step**, after the DAG archive has been committed. Don't auto-run these — they're human-judgment tools. Hand off the two staging links so the user can review and click through:
+
+- **Anomalist** — flags variables whose new values diverge from the old version beyond statistical thresholds. Catches accidental scale changes, base-year rebases that propagated the wrong way, and silent drops.
+  ```
+  http://staging-site-<branch>/etl/wizard/anomalist
+  ```
+- **Chart Diff** — shows side-by-side before/after thumbnails for every chart that uses an upgraded indicator. Catches visual regressions the schema-level checks miss (axis ranges, color steps, legend changes).
+  ```
+  http://staging-site-<branch>/etl/wizard/chart-diff
+  ```
+
+Tell the user something like: "Final QA: please review **[Anomalist](http://staging-site-<branch>/etl/wizard/anomalist)** and **[Chart Diff](http://staging-site-<branch>/etl/wizard/chart-diff)** in the Wizard. If anything looks off, let me know and I'll investigate."
+
+Replace `<branch>` with the actual work branch name (e.g. `data-military-expenditure-2026`). These pages need a fresh staging build, so they're only meaningful after the PR's grapher upload to staging has completed and the staging server has rebuilt.
 
 ## Guardrails and tips
 
