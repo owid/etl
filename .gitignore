@@ -60,6 +60,8 @@ notebooks/
 zpop/
 node_modules/
 dist/
+vscode_extensions/*/.vscode-test/
+vscode_extensions/*/out/
 
 .claude/settings.local.json
 CLAUDE.local.md
