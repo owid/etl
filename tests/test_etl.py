@@ -15,12 +15,12 @@ from etl.dag_helpers import load_dag
 from etl.steps import DataStep, Step, compile_steps, filter_to_subgraph
 
 
-def test_all_data_steps_have_code():
+def test_all_data_steps_can_execute():
     # find all data steps
     steps = [s for s in get_all_steps() if isinstance(s, DataStep)]
 
     for s in steps:
-        assert s.can_execute(), f'no code found for step "data://{s.path}"'
+        assert s.can_execute(), f'no executable step definition found for "{s}"'
 
 
 def test_sub_dag_import():

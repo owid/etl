@@ -243,6 +243,14 @@ class Collection(MDIMBase):
         self.upsert_to_db(owid_env)
 
     def upsert_to_db(self, owid_env: OWIDEnv):
+        # Degenerate "single chart" case: no dimensions means no multi-dim page — push to the
+        # charts table via the chart admin endpoint instead of `/multi-dims/`.
+        if len(self.dimensions) == 0:
+            from etl.collection.chart_upsert import upsert_collection_as_chart
+
+            upsert_collection_as_chart(self, owid_env)
+            return
+
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
         config = replace_catalog_paths_with_ids(self.to_dict())
