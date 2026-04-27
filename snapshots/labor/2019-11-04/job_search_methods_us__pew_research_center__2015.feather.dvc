@@ -1,17 +1,13 @@
 meta:
   origin:
-    title: Pew Research Center (2015)
     producer: Pew Research Center
-    description: |-
-      Among Americans who have looked for a new job in the last two years, the percentage who say they used a certain method in their most recent search for a job.
-
-      Note: based on the 34% of Americans who have looked for a job in the last two years.
-
-      The survey was conducted June 10 - July 12, 2015. Sample size = 2,001.
+    title: Searching for Work in the Digital Era
+    description: This report examines the methods Americans use when searching for jobs. Among Americans who have looked for a new job in the last two years, the data captures the percentage who used a certain method in their most recent job search. The survey was conducted June 10 – July 12, 2015, with a sample size of 2,001 respondents. Results are based on the 34% of Americans who have looked for a job in the last two years.
+    title_snapshot: Searching for Work in the Digital Era - Job search methods in the US
+    citation_full: Pew Research Center. "Searching for Work in the Digital Era." November 19, 2015. https://www.pewresearch.org/internet/2015/11/19/searching-for-work-in-the-digital-era/pi_2015-11-19_internet-and-job-seeking_0-01/.
     url_main: https://www.pewresearch.org/internet/2015/11/19/searching-for-work-in-the-digital-era/pi_2015-11-19_internet-and-job-seeking_0-01/
     date_accessed: '2019-11-04'
-    date_published: '2015'
-    citation_full: Pew Research Center (2015). Pew Research Center (2015).
+    date_published: '2015-11-19'
 outs:
   - md5: 3d0a19eb8b38b75092329d2a2eb7f786
     size: 7290

@@ -1,12 +1,15 @@
 meta:
   origin:
-    title: International Historical Statistics - Brian Mitchell (2015)
-    producer: International Historical Statistics
-    description: National accounts and trade (GDP, imports and exports). The ratio is computed as the sum of imports and exports divided by GDP.
+    producer: Brian Mitchell
+    title: International Historical Statistics
+    description: International Historical Statistics, compiled by Brian Mitchell, is a comprehensive reference work covering long-run statistical data on a wide range of economic and social topics across countries and regions. The dataset includes national accounts and trade data such as GDP, imports, and exports, enabling the construction of historical trade-to-GDP ratios and other macroeconomic indicators spanning multiple centuries.
+    title_snapshot: International Historical Statistics - European trade
+    description_snapshot: This snapshot covers the ratio of exports and imports to GDP in current values for the seven largest European economies. Note that Germany uses NNP as a measure of output instead of GDP until 1945.
+    citation_full: 'International Historical Statistics. Palgrave Macmillan, 2015. Available at: http://www.palgraveconnect.com/pc/doifinder/10.1057/9781137305688.'
+    version_producer: '2015'
     url_main: http://www.palgraveconnect.com/pc/doifinder/10.1057/9781137305688
     date_accessed: '2015-07-07'
     date_published: '2015'
-    citation_full: International Historical Statistics (2015). International Historical Statistics - Brian Mitchell (2015).
 outs:
   - md5: d1051ad3ba7a506752e1a69a38a6fdd3
     size: 5674

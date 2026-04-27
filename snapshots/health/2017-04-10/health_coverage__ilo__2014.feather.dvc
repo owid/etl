@@ -1,23 +1,15 @@
 meta:
   origin:
-    title: OWID based on ILO (2014) and OECD (2017)
-    producer: 'Scheil-Adlung, Xenia (2014), Universal Health Protection: Progress to Date and the Way Forward, International Labour Organization. OECD.Stat'
+    producer: ILO and OECD
+    title: Health Coverage
     description: |-
-      Share of population covered by health insurance:
-
-      Estimate of health coverage as a percentage of total population. Coverage includes affiliated members of health insurance or estimation of the population having free access to health care services provided by the State. Consult detailed data and sources available from the original tables (http://www.social-protection.org/gimi/gess/RessourceDownload.action?ressource.ressourceId=37218) and the discussion paper (https://www.ilo.org/wcmsp5/groups/public/---ed_protect/---soc_sec/documents/publication/wcms_305947.pdf)
-
-      ---
-
-      Total health care coverage:
+      Estimate of health coverage as a percentage of total population. Coverage includes affiliated members of health insurance or estimation of the population having free access to health care services provided by the State.
 
       This dataset combines observations for OECD countries from the 1960s, with observations for non-OECD countries from the 2000s. If you are interested in complete series please visit the underlying sources.
-
-      Estimate of health coverage as a percentage of total population. Coverage includes affiliated members of health insurance or estimation of the population having free access to health care services provided by the State. Consult detailed data and sources available from the original tables (http://www.social-protection.org/gimi/gess/RessourceDownload.action?ressource.ressourceId=37218) and the discussion paper (https://www.ilo.org/wcmsp5/groups/public/---ed_protect/---soc_sec/documents/publication/wcms_305947.pdf)
+    citation_full: 'Scheil-Adlung, Xenia (2014), Universal Health Protection: Progress to Date and the Way Forward, International Labour Organization. OECD.Stat.'
     url_main: https://www.ilo.org/wcmsp5/groups/public/---ed_protect/---soc_sec/documents/publication/wcms_305947.pdf
     date_accessed: '2017-04-10'
     date_published: '2014'
-    citation_full: 'Scheil-Adlung, Xenia (2014), Universal Health Protection: Progress to Date and the Way Forward, International Labour Organization. OECD.Stat (2014). OWID based on ILO (2014) and OECD (2017).'
 outs:
   - md5: 6e4065f2208763df670236a345c21a74
     size: 6066

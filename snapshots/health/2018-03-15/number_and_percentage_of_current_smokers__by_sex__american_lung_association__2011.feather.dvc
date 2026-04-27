@@ -1,12 +1,13 @@
 meta:
   origin:
-    title: Trends in Tobacco Use, American Lung Association (2011)
     producer: American Lung Association
-    description: 'For the original data, please see Table 3: Number of Adults Who Were Current Smokers By Sex, Race and Age, Selected Years, 1965-2009. Due to the redesign of the NHIS survey in 1997, comparisons with data from prior years must be conducted with caution.'
+    title: Trends in Tobacco Use
+    description: This report tracks trends in tobacco use in the United States, drawing on data from the National Health Interview Survey (NHIS) and other sources. It covers statistics on adult current smokers broken down by sex, race, and age over selected years. Due to the redesign of the NHIS survey in 1997, comparisons with data from prior years must be conducted with caution.
+    title_snapshot: Trends in Tobacco Use - Number and percentage of current smokers, by sex
+    citation_full: 'American Lung Association. Trends in Tobacco Use. 2011. Available at: http://www.lung.org/assets/documents/research/tobacco-trend-report.pdf.'
     url_main: http://www.lung.org/assets/documents/research/tobacco-trend-report.pdf
     date_accessed: '2018-03-15'
     date_published: '2011'
-    citation_full: American Lung Association (2011). Trends in Tobacco Use, American Lung Association (2011).
 outs:
   - md5: d0fa758a6a7e70f44709e7b59a2e21ab
     size: 6362

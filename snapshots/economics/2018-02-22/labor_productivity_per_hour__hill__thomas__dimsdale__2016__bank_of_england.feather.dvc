@@ -1,12 +1,13 @@
 meta:
   origin:
-    title: Hill, Thomas, Dimsdale (2016), A Millennium of UK Data (2016), Bank of England
-    producer: Hill, S, Thomas, R and Dimsdale, N (2017) "A Millennium of UK Data", Bank of England OBRA dataset, https://www.bankofengland.co.uk/statistics/research-datasets
-    description: Uses GDP at factor cost.  Great Britain growth rates prior to 1855.
+    producer: Hill, Thomas, and Dimsdale
+    title: A Millennium of UK Data
+    description: A Millennium of UK Data is a long-run historical dataset compiled for the Bank of England's One Bank Research Agenda (OBRA). It brings together a wide range of macroeconomic and financial time series for the United Kingdom spanning approximately one thousand years, covering variables such as GDP, inflation, interest rates, money supply, and labor productivity. GDP figures use factor cost as the basis of measurement, with Great Britain growth rates applied prior to 1855.
+    title_snapshot: A Millennium of UK Data - Labor productivity per hour
+    citation_full: Hill, S, Thomas, R and Dimsdale, N (2017) "A Millennium of UK Data", Bank of England OBRA dataset, https://www.bankofengland.co.uk/statistics/research-datasets.
     url_main: https://www.bankofengland.co.uk/statistics/research-datasets#
     date_accessed: '2018-02-22'
-    date_published: '2017'
-    citation_full: Hill, S, Thomas, R and Dimsdale, N (2017) "A Millennium of UK Data", Bank of England OBRA dataset, https://www.bankofengland.co.uk/statistics/research-datasets (2017). Hill, Thomas, Dimsdale (2016), A Millennium of UK Data (2016), Bank of England.
+    date_published: '2016'
 outs:
   - md5: 2d60a6b2c58eede598de52c6a6afba2d
     size: 6090

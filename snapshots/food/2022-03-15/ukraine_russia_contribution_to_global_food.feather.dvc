@@ -1,11 +1,14 @@
 meta:
   origin:
-    title: Calculated by Our World in Data based on the Food and Agriculture Organization of the United Nations
-    producer: Calculated by Our World in Data based on the Food and Agriculture Organization of the United Nations
+    producer: Food and Agriculture Organization of the United Nations
+    title: Food Balances
+    description: The Food Balances dataset from FAOSTAT provides comprehensive data on the food supply available in countries and regions, covering production, imports, exports, and domestic utilization. It allows for the analysis of food availability and per capita supply across a wide range of food commodities. The data is compiled by the Food and Agriculture Organization of the United Nations (FAO) and updated periodically.
+    title_snapshot: Food Balances - Ukraine-Russia contribution to global food
+    citation_full: Food and Agriculture Organization of the United Nations. Food Balances. Accessed via FAOSTAT, 2022.
+    attribution_short: FAO
     url_main: https://www.fao.org/faostat/en/#data/FBS
     date_accessed: '2022-03-15'
     date_published: '2022'
-    citation_full: Calculated by Our World in Data based on the Food and Agriculture Organization of the United Nations (2022). Calculated by Our World in Data based on the Food and Agriculture Organization of the United Nations.
 outs:
   - md5: 8ad4bc767528a4ffa15b64907f6b5f59
     size: 6650

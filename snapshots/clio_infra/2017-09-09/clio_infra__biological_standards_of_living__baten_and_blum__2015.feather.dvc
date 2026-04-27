@@ -1,15 +1,16 @@
 meta:
   origin:
-    title: Height Gini (Baten and Blum 2015)
-    producer: Jörg Baten and Matthias Blum, “Anthropometric within-country Inequality and the Estimation of Skill Premia with Anthropometric Indicators”, Review of Economics -- Jahrbuch fuer Wirtschaftswissenschaften (2011)
+    producer: Baten and Blum
+    title: Clio-Infra - Biological Standards of Living
     description: |-
-      Additional information: Methodologies used for data collection and processing. Reconstruction of height ginis by birth decade using a variety of different sources. The height gini is a transformation of the coefficient of height inequality, based on Moradi and Baten’s formula: g htgini=-33.5 + 20.5*cv.
+      This dataset provides reconstructions of height Ginis by birth decade using a variety of different sources. The height Gini is a transformation of the coefficient of height inequality, based on Moradi and Baten's formula: g htgini = -33.5 + 20.5*cv.
 
-      Data quality: As good as possible, but counter-checking and improvement welcome. Interpretations on individual country level should be done with careful checking.  An important caveat is many individual countries cannot be measured without a substantial amount of measurement error. The tendencies of anthropometric inequality by world region (in which country-specific measurement error tends to average out) is probably informative.
+      Data quality is as good as possible, though counter-checking and improvement are welcome. Interpretations at the individual country level should be done with careful checking, as many individual countries cannot be measured without a substantial amount of measurement error. The tendencies of anthropometric inequality by world region — in which country-specific measurement error tends to average out — is probably informative.
+    title_snapshot: Clio-Infra - Biological Standards of Living - Height Gini
+    citation_full: Jörg Baten and Matthias Blum, "Anthropometric within-country Inequality and the Estimation of Skill Premia with Anthropometric Indicators", Review of Economics — Jahrbuch fuer Wirtschaftswissenschaften (2011).
     url_main: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/HKZPR9
     date_accessed: '2017-09-09'
-    date_published: '2011'
-    citation_full: Jörg Baten and Matthias Blum, “Anthropometric within-country Inequality and the Estimation of Skill Premia with Anthropometric Indicators”, Review of Economics -- Jahrbuch fuer Wirtschaftswissenschaften (2011) (2011). Height Gini (Baten and Blum 2015).
+    date_published: '2015'
 outs:
   - md5: ed58540cdefeb5d87987b51e5f304127
     size: 19378

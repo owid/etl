@@ -1,12 +1,14 @@
 meta:
   origin:
-    title: Universities founded (Foldvari 2015)
-    producer: Clio-Infra
-    description: "Additional information: Author's note: The quantity and quality of available information on universities vary by period and geographical area. Even the definition of university is not universal: in some countries even colleges offering undergradute programmes can be named universities (Latin America, Japan, Near East). Please see source for further information."
+    producer: Foldvari
+    title: Universities founded
+    description: 'This dataset provides historical data on universities founded across countries and regions over time. The quantity and quality of available information on universities vary by period and geographical area. Even the definition of "university" is not universal: in some countries even colleges offering undergraduate programs can be named universities (Latin America, Japan, Near East). The data is part of the Clio-Infra collaborative platform, which aims to reconstruct global historical datasets on human well-being and development.'
+    title_snapshot: Clio-Infra - Universities founded
+    citation_full: 'Foldvari (2015). Universities founded. Clio-Infra. Available at: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/KVRJPW.'
+    attribution_short: Clio-Infra
     url_main: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/KVRJPW
     date_accessed: '2017-09-09'
     date_published: '2015'
-    citation_full: Clio-Infra (2015). Universities founded (Foldvari 2015).
 outs:
   - md5: c163e93ca9f1cfd5046e9c10ee4bcebd
     size: 262122

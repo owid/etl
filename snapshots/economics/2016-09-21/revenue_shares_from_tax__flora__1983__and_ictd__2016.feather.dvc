@@ -1,12 +1,13 @@
 meta:
   origin:
-    title: Flora (1983) and ICTD (2016)
-    producer: 'Data up to 1975 from Flora, Peter et al. 1983. State, Economy and Society in Western Europe, 1815-1975. Frankfurt: Campus Verlag. Data after 1975 from International Centre for Tax and Development'
-    description: 'Data from the ICTD corresponds to estimates from OECD. More details in Prichard, W. (2016). Reassessing Tax and Development Research: A New Dataset, New Findings, and Lessons for Research. World Development, 80, 48-60.'
-    url_main: Data from Flora (1983) available from http://gpih.ucdavis.edu/Government.htm Data from ICTD available from http://www.ictd.ac/datasets/the-ictd-government-revenue-dataset
+    producer: Flora et al. and International Centre for Tax and Development
+    title: Revenue shares from tax – Flora (1983) and ICTD (2016)
+    description: "This dataset combines two sources of tax revenue data for European countries. Data up to 1975 comes from Flora et al.'s \"State, Economy and Society in Western Europe, 1815–1975,\" a landmark historical compilation of government finance statistics. Data after 1975 comes from the International Centre for Tax and Development (ICTD) Government Revenue Dataset, with estimates corresponding to OECD data.\\n\\nFurther methodological details are available in Prichard, W. (2016). Reassessing Tax and Development Research: A New Dataset, New Findings, and Lessons for Research. World Development, 80, 48–60."
+    description_snapshot: This snapshot covers European countries and combines Flora et al. (1983) data up to 1975 with ICTD (2016) data thereafter. The Flora source is available from http://gpih.ucdavis.edu/Government.htm.
+    citation_full: 'Flora, Peter et al. 1983. State, Economy and Society in Western Europe, 1815–1975. Frankfurt: Campus Verlag. Data after 1975 from International Centre for Tax and Development (ICTD), Government Revenue Dataset, 2016. See also: Prichard, W. (2016). Reassessing Tax and Development Research: A New Dataset, New Findings, and Lessons for Research. World Development, 80, 48–60.'
+    url_main: http://www.ictd.ac/datasets/the-ictd-government-revenue-dataset
     date_accessed: '2016-09-21'
-    date_published: '1983'
-    citation_full: 'Data up to 1975 from Flora, Peter et al. 1983. State, Economy and Society in Western Europe, 1815-1975. Frankfurt: Campus Verlag. Data after 1975 from International Centre for Tax and Development (1983). Flora (1983) and ICTD (2016).'
+    date_published: '2016'
 outs:
   - md5: 47da8d8f5b75baf33aa3ace6728cbfc8
     size: 7970

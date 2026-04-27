@@ -1,11 +1,12 @@
 meta:
   origin:
-    title: US Census and WDI (2013)
-    producer: (a) Historical Statistics of the United States Colonial Times to 1970 (1929-1970), (b) US Census Statistical Abstract 1990 (1970-1990), (c) World Bank WDI (1990-2013)
-    url_main: (a) and (b) https://www.census.gov/, (c) http://apps.who.int/nha/database
+    producer: US Census Bureau and World Bank
+    title: Health Expenditure US 1929–2013 Private
+    description: This dataset compiles historical private health expenditure data for the United States from 1929 to 2013, drawing from multiple sources. Data for 1929–1970 comes from the Historical Statistics of the United States Colonial Times to 1970, data for 1970–1990 comes from the US Census Statistical Abstract 1990, and data for 1990–2013 comes from the World Bank's World Development Indicators (WDI).
+    citation_full: (a) Historical Statistics of the United States Colonial Times to 1970 (1929–1970), (b) US Census Statistical Abstract 1990 (1970–1990), (c) World Bank WDI (1990–2013).
+    url_main: https://www.census.gov/
     date_accessed: '2017-11-15'
     date_published: '2013'
-    citation_full: (a) Historical Statistics of the United States Colonial Times to 1970 (1929-1970), (b) US Census Statistical Abstract 1990 (1970-1990), (c) World Bank WDI (1990-2013) (2013). US Census and WDI (2013).
 outs:
   - md5: 8a66bfad64431c71a8c9bfbacf34a870
     size: 3314

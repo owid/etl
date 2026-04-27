@@ -1,19 +1,17 @@
 meta:
   origin:
-    title: Morales-Caselles et al. (2021). An inshore–offshore sorting system revealed from global classification of ocean litter.
-    producer: Morales-Caselles et al. (2021). An inshore–offshore sorting system revealed from global classification of ocean litter.
+    producer: Morales-Caselles et al.
+    title: An inshore–offshore sorting system revealed from global classification of ocean litter
     description: |-
-      This study included samples more than 12 million litter items retrieved from 7 major river and ocean environments globally. To build such a large inventories of macro-litter items, the authors compiled a total of 36 datasets providing counts of litter by item typology in river waters and riverbed, shoreline, nearshore waters (<100 km from shoreline) and nearshore seafloor (<100 m depth, <100 km from shoreline), open waters (>100 km from shoreline) and deep seafloor (>100 m depth, >100 km from shoreline).
+      This study included samples of more than 12 million litter items retrieved from seven major river and ocean environments globally. To build such large inventories of macro-litter items, the authors compiled a total of 36 datasets providing counts of litter by item typology in river waters and riverbeds, shorelines, nearshore waters (less than 100 km from shoreline) and nearshore seafloor (less than 100 m depth, less than 100 km from shoreline), open waters (more than 100 km from shoreline), and deep seafloor (more than 100 m depth, more than 100 km from shoreline).
 
-      These litter items were classified according to their material composition, type of product and probable origin.
-
-      On average, 80% of the items were made of plastic, followed by metal (7% ± 7%), glass (5% ± 6%) and fabric (3% ± 3%).
-
-      This data by region is shown as the share of items in nearshore waters (<100 km from the shoreline).
+      Litter items were classified according to their material composition, type of product, and probable origin. On average, 80% of the items were made of plastic, followed by metal (7% ± 7%), glass (5% ± 6%), and fabric (3% ± 3%).
+    title_snapshot: An inshore–offshore sorting system revealed from global classification of ocean litter - Ocean waste items by region
+    description_snapshot: This snapshot presents data by region shown as the share of items found in nearshore waters (less than 100 km from the shoreline).
+    citation_full: Morales-Caselles, C., Viejo, J., Martí, E., González-Fernández, D., Pragnell-Raasch, H., González-Gordillo, J. I., ... & Cózar, A. (2021). An inshore–offshore sorting system revealed from global classification of ocean litter. Nature Sustainability, 4(6), 484–493.
     url_main: https://www.nature.com/articles/s41893-021-00720-8
     date_accessed: '2026-03-10'
     date_published: '2021'
-    citation_full: Morales-Caselles, C., Viejo, J., Martí, E., González-Fernández, D., Pragnell-Raasch, H., González-Gordillo, J. I., ... & Cózar, A. (2021). An inshore–offshore sorting system revealed from global classification of ocean litter. Nature Sustainability, 4(6), 484-493.
 outs:
   - md5: d422cf979d7a1bee57d58988d77bb66d
     size: 6890

@@ -1,12 +1,13 @@
 meta:
   origin:
-    title: Wellcome Global Monitor (2020)
-    producer: Wellcome Global Monitor (2020)
+    producer: Wellcome Global Monitor
+    title: Wellcome Global Monitor
     description: The Wellcome Global Monitor is a large global study into how people think and feel about science and health challenges. It surveys over 140,000 people from more than 140 countries.
+    citation_full: 'Wellcome Global Monitor (2020). Wellcome Global Monitor 2020: Covid-19. Wellcome Trust. Available at: https://wellcome.org/reports/wellcome-global-monitor-covid-19/2020.'
+    version_producer: '2020'
     url_main: https://wellcome.org/reports/wellcome-global-monitor-covid-19/2020
     date_accessed: '2023-11-04'
     date_published: '2020'
-    citation_full: Wellcome Global Monitor (2020) (2020). Wellcome Global Monitor (2020).
 outs:
   - md5: 8995adc31a7ffb36e139a8e8820a84b7
     size: 15234

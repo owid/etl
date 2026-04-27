@@ -1,15 +1,13 @@
 meta:
   origin:
-    title: Our World in Data based on ACA (2022), NTI (2022), CNS (2008), UN (2022)
-    producer: Our World in Data based on ACA (2022), NTI (2022), CNS (2008), UN (2022)
-    description: |-
-      This dataset provides information on countries activities' on biological and chemical weapons, using information from Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008), the UN (2022), and a few supplementary sources.
-
-      You can download the code and complete dataset, including supplementary variables and country profiles with additional information, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/biological_chemical_weapons
-    url_main: https://www.armscontrol.org/factsheets/cbwprolif; https://www.nti.org/countries/; https://nonproliferation.org/wp-content/uploads/2016/03/2008-Chemical-and-Biological-Weapons_-Possession-and-Programs-Past-and-Present.pdf; https://treaties.unoda.org/t/bwc; https://treaties.unoda.org/t/cwc
+    producer: Arms Control Association, Nuclear Threat Initiative, Center for Nonproliferation Studies, and the UN
+    title: Biological and chemical weapons proliferation
+    description: This dataset provides information on countries' activities on biological and chemical weapons. It draws on data from the Arms Control Association (ACA), the Nuclear Threat Initiative (NTI), the Center for Nonproliferation Studies (CNS), the United Nations (UN), and a few supplementary sources.
+    citation_full: Our World in Data based on Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008), and the UN (2022).
+    attribution: ACA, NTI, CNS, and the UN (2022)
+    url_main: https://www.armscontrol.org/factsheets/cbwprolif
     date_accessed: '2022-05-09'
     date_published: '2022'
-    citation_full: Our World in Data based on ACA (2022), NTI (2022), CNS (2008), UN (2022) (2022). Our World in Data based on ACA (2022), NTI (2022), CNS (2008), UN (2022).
 outs:
   - md5: 7d084e4f3ff0446661d0a09a298ceb46
     size: 34274

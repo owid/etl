@@ -1,14 +1,21 @@
 meta:
   origin:
-    title: Forestry area - FAO (2017)
-    producer: UN Food and Agricultural Organization (FAO)(2017)
+    producer: Food and Agriculture Organization of the United Nations
+    title: FAOSTAT
     description: |-
-      Data on global forestry area from 1990 onwards is based on data from the UN Food and Agricultural Organization (FAO) database.
-      Data on global forestry prior to 1990 is less certain, and often prone to changes in definitions concerning forestry cover and density. We have extended this dataset to 1958 using reported data from the FAO World Forestry Inventory 1958 (published in 1960). Available at: http://www.fao.org/3/a-ad906t.pdf [accessed 18th August 2017].
+      FAOSTAT provides free access to food and agriculture data for over 245 countries and territories, covering all FAO regional groupings from 1961 to the most recent year available. The database includes statistics on land use, agricultural production, trade, food supply, and more.
+
+      Data on global forestry area from 1990 onwards is based on the FAO database. Data on global forestry prior to 1990 is less certain, and often prone to changes in definitions concerning forestry cover and density. The dataset has been extended to 1958 using reported data from the FAO World Forestry Inventory 1958 (published in 1960), available at: http://www.fao.org/3/a-ad906t.pdf.
+    title_snapshot: FAOSTAT - Forestry area
+    citation_full: 'Food and Agriculture Organization of the United Nations (FAO) (2017). FAOSTAT. Available at: http://www.fao.org/faostat/en/#home.'
+    attribution_short: FAO
+    version_producer: '2017'
     url_main: http://www.fao.org/faostat/en/#home
     date_accessed: '2026-03-05'
     date_published: '2017'
-    citation_full: UN Food and Agricultural Organization (FAO)(2017) (2017). Forestry area - FAO (2017).
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.fao.org/contact-us/terms/db-terms-of-use/en
 outs:
   - md5: 3a6da8da2d9aa35bc1e3a171819a4bcf
     size: 3186

@@ -1,12 +1,12 @@
 meta:
   origin:
-    title: Our World In Data based on Wrigley and Schofield (1981), Mitchell (2010), and UK ONS (2016)
-    producer: 'Wrigley and Schofield (1981) "The Population History of England: A Reconstruction"; Brian Mitchell - International Historical Statistics (2010); UK ONS (2016)'
-    description: '*Note: Our World In Data compiled the data from the above sources as follows: for the years 1541-1861: Wrigley and Schofield (1981); for the years 1862-2003: Brian Mitchell (2010); for the years 2004-2015: UK Office for National Statistics (2016).'
-    url_main: 'Brian Mitchell: http://www.eui.eu/Research/Library/ResearchGuides/Economics/Statistics/DataPortal/IHS.aspx#Access; UK ONS: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/'
+    producer: Wrigley and Schofield, Mitchell, and UK ONS
+    title: Crude birth and death rates (per 1,000), England and Wales 1541–2015
+    description: "This dataset contains crude birth and death rates per 1,000 population for England and Wales spanning 1541 to 2015, compiled from three sources. For the years 1541–1861, data are drawn from Wrigley and Schofield (1981), \"The Population History of England: A Reconstruction.\" For 1862–2003, data come from Brian Mitchell's International Historical Statistics (2010). For 2004–2015, data are sourced from the UK Office for National Statistics (2016)."
+    citation_full: 'Wrigley, E.A. and Schofield, R.S. (1981). "The Population History of England: A Reconstruction." Mitchell, B. (2010). International Historical Statistics. UK Office for National Statistics (2016). Births and deaths, England and Wales.'
+    url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/
     date_accessed: '2017-06-01'
     date_published: '2016'
-    citation_full: 'Wrigley and Schofield (1981) "The Population History of England: A Reconstruction"; Brian Mitchell - International Historical Statistics (2010); UK ONS (2016) (2016). Our World In Data based on Wrigley and Schofield (1981), Mitchell (2010), and UK ONS (2016).'
 outs:
   - md5: 882032ce41ce5888c48657b403896d1a
     size: 7074

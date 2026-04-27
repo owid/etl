@@ -1,12 +1,14 @@
 meta:
   origin:
-    title: Output of key industrial sectors in England - Bank of England (2017)
-    producer: Bank of England (BoE) (2017)
-    description: This dataset is produced using 'A4. Ind Production 1270-1870' sheet in BoE dataset. For each variables, output figures are indexed those in year 1700 (i.e. 1700 = 100), and they are measured on a log scale.
+    producer: Bank of England
+    title: A Millennium of Macroeconomic Data
+    description: This dataset provides measures of output in key industrial sectors in England covering the period 1270–1870. It is drawn from the Bank of England's "A Millennium of Macroeconomic Data" collection, specifically the industrial production sheet (A4. Ind Production 1270–1870). Output figures are indexed to the year 1700 (i.e., 1700 = 100) and are measured on a log scale.
+    title_snapshot: A Millennium of Macroeconomic Data - Output of key industrial sectors in England
+    citation_full: 'Bank of England (BoE) (2017). A Millennium of Macroeconomic Data. Available at: http://www.bankofengland.co.uk/research/Pages/datasets/default.aspx#threecenturies.'
+    version_producer: '2017'
     url_main: http://www.bankofengland.co.uk/research/Pages/datasets/default.aspx#threecenturies
     date_accessed: '2017-08-25'
     date_published: '2017'
-    citation_full: Bank of England (BoE) (2017) (2017). Output of key industrial sectors in England - Bank of England (2017).
 outs:
   - md5: 146eda954c92c0a838ffe9b6f7d3fe27
     size: 26226

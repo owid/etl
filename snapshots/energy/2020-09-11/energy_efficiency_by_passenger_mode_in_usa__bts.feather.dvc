@@ -1,18 +1,18 @@
 meta:
   origin:
-    title: United States Department of Transportation, Bureau of Transportation Statistics (BTS)
-    producer: United States Department of Transportation. Bureau of Transportation Statistics (BTS).
+    producer: United States Department of Transportation, Bureau of Transportation Statistics
+    title: Energy intensity of passenger modes
     description: |-
-      Energy intensity of transport is measured by the US Bureau of Transport Statistics (BTS) in btu per passenger-mile. We have converted this data to kilowatt-hours per passenger-kilometer using the following conversion factors:
-      – BTU to kWH = 0.000293071
-      – mile to km = 1.60934
+      The Bureau of Transportation Statistics (BTS) measures the energy intensity of transport in BTU per passenger-mile across various passenger modes in the United States. Transport categories include small passenger vehicles (passenger cars, light trucks, vans, and sport utility vehicles with a wheelbase equal to or less than 121 inches) and large road vehicles (large passenger cars, vans, pickup trucks, and sport/utility vehicles with wheelbases larger than 121 inches), among others.
 
-      The US BTS notes the following about transport categories:
-      "Data from 2007 were calculated using a new methodology developed by FHWA. Data for these years are based on new categories and are not comparable to previous years. The new category [Small passenger vehicles] replaces the old category Passenger car and includes passenger cars, light trucks, vans and sport utility vehicles with a wheelbase (WB) equal to or less than 121 inches. The new category [Large road vehicles] replaces Other 2-axle, 4-tire vehicle and includes large passenger cars, vans, pickup trucks, and sport/utility vehicles with wheelbases (WB) larger than 121 inches. This edition of 4-20 is not comparable to those before the 2019 edition."
+      Data from 2007 onward were calculated using a new methodology developed by the Federal Highway Administration (FHWA), based on new vehicle categories that are not comparable to those from previous years.
+    title_snapshot: Energy intensity of passenger modes - Energy efficiency by passenger mode in USA
+    description_snapshot: 'Energy intensity data (originally in BTU per passenger-mile) has been converted to kilowatt-hours per passenger-kilometer using the following conversion factors: BTU to kWh = 0.000293071; mile to km = 1.60934.'
+    citation_full: United States Department of Transportation. Bureau of Transportation Statistics (BTS).
+    attribution_short: BTS
     url_main: https://www.bts.gov/content/energy-intensity-passenger-modes
     date_accessed: '2020-09-11'
     date_published: '2020'
-    citation_full: United States Department of Transportation. Bureau of Transportation Statistics (BTS). (2020). United States Department of Transportation, Bureau of Transportation Statistics (BTS).
 outs:
   - md5: 61137318f38e37e3ea38e1161ee10195
     size: 5714
