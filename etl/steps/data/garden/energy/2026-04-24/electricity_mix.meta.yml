@@ -5,7 +5,7 @@ definitions:
     Measured as a percentage of total electricity produced in the country or region.
   description_short_per_capita: &description_short_per_capita |-
     Measured in [kilowatt-hours](#dod:watt-hours) per person.
-  # Processing description for indicators that combine Ember and EI data, proritizing Ember (most indicators).
+  # Processing description for indicators that combine Ember and EI data, prioritizing Ember (most indicators).
   description_processing_electricity_generation_origins: |-
     - Electricity data from 2000 onwards (and from 1990 onwards for European countries, including Turkey) comes from Ember. Earlier data comes from the Energy Institute.
   # Processing description for indicators that only use Ember data.

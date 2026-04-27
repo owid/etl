@@ -515,7 +515,7 @@ def replicate_ember_lifecycle_emissions(tb: Table) -> None:
     # Let's take the lifecycle emission factors from Ember's methodology:
     # https://files.ember-energy.org/public-downloads/ember_electricity_data_methodology.pdf
     lifecycle_factors = {"Bioenergy": 230, "Hydro": 24, "Solar": 48, "Other renewables": 38, "Other fossil": 700}
-    # In principle, most of them come from the median valeus of Table A.III.2 of
+    # In principle, most of them come from the median values of Table A.III.2 of
     # https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_annex-iii.pdf
     # Indeed, the numbers for hydro and solar come from this table; hydro seems to be the sum of (infrastructure & supply chain emissions) + (biogenic CO2 emissions and albedo effect), rounded to two significant figures.
     # The value for "Other renewables" corresponds to the median value of geothermal.
@@ -538,7 +538,7 @@ def replicate_ember_lifecycle_emissions(tb: Table) -> None:
                 suffixes=("_true", "_pred"),
             )
         )
-        # The true values seem to be rounded to 2 decimals. I'll check that there are no instances where the true value of emissions differs from the predicted one by more than 2% and 0.02 in absolute value.
+        # The true values seem to be rounded to 2 decimals. I'll check that there are no instances where the true value of emissions differs from the predicted one by more than 15% and 0.02 in absolute value.
         error = f"Unable to reproduce Ember's lifecycle emissions for {source}"
         assert _tb[
             ((100 * abs(_tb["value_true"].round(2) - _tb["value_pred"].round(2)) / (_tb["value_true"].round(2))) > 15)
