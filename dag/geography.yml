@@ -1,30 +1,24 @@
 steps:
-  # Map (Natural Earth)
-  data://meadow/geography/2023-11-28/nat_earth_110:
-    - snapshot://geography/2023-11-28/nat_earth_110.zip
-  data://garden/geography/2023-11-28/nat_earth_110:
-    - data://meadow/geography/2023-11-28/nat_earth_110
-
     # Country borders (WB)
-  data://meadow/geography/2025-06-26/wb_admin_boundaries:
-    - snapshot://geography/2025-06-26/wb_admin_boundaries.zip
   data://garden/geography/2025-06-26/wb_admin_boundaries:
-    - data://meadow/geography/2025-06-26/wb_admin_boundaries
+    - data://meadow/geography/2025-06-26/wb_admin_boundaries:
+      - snapshot://geography/2025-06-26/wb_admin_boundaries.zip
+  # Map (Natural Earth)
 
     # Latitude
   data://grapher/geography/2024-07-18/latitude:
-    - data://garden/geography/2023-11-28/nat_earth_110
+    - data://garden/geography/2023-11-28/nat_earth_110:
+      - data://meadow/geography/2023-11-28/nat_earth_110:
+        - snapshot://geography/2023-11-28/nat_earth_110.zip
 
     # geoBoundaries
-  data://meadow/geography/2025-06-26/geoboundaries_cgaz:
-    - snapshot://geography/2025-06-26/geoboundaries_cgaz.zip
   data://garden/geography/2025-06-26/geoboundaries_cgaz:
-    - data://meadow/geography/2025-06-26/geoboundaries_cgaz
+    - data://meadow/geography/2025-06-26/geoboundaries_cgaz:
+      - snapshot://geography/2025-06-26/geoboundaries_cgaz.zip
 
     # Neighbouring countries
-  data://garden/geography/2026-01-27/neighbours:
-    - data://garden/geography/2025-06-26/geoboundaries_cgaz
-    - data://garden/demography/2024-07-15/population
-    - data://garden/regions/2023-01-01/regions
   data://external/owid_grapher/latest/neighbours:
-    - data://garden/geography/2026-01-27/neighbours
+    - data://garden/geography/2026-01-27/neighbours:
+      - data://garden/geography/2025-06-26/geoboundaries_cgaz
+      - data://garden/demography/2024-07-15/population
+      - data://garden/regions/2023-01-01/regions

@@ -2,79 +2,66 @@ steps:
   #
   # Farmer & Lafond (2016).
   #
-  data://meadow/papers/2023-12-12/farmer_lafond_2016:
-    - snapshot://papers/2023-12-12/farmer_lafond_2016.csv
   data://garden/papers/2023-12-12/farmer_lafond_2016:
-    - data://meadow/papers/2023-12-12/farmer_lafond_2016
+    - data://meadow/papers/2023-12-12/farmer_lafond_2016:
+      - snapshot://papers/2023-12-12/farmer_lafond_2016.csv
   data://grapher/papers/2023-12-12/farmer_lafond_2016:
     - data://garden/papers/2023-12-12/farmer_lafond_2016
   #
   # Nemet (2009).
   #
-  data://meadow/papers/2023-12-12/nemet_2009:
-    - snapshot://papers/2023-12-12/nemet_2009.csv
   data://garden/papers/2023-12-12/nemet_2009:
-    - data://meadow/papers/2023-12-12/nemet_2009
+    - data://meadow/papers/2023-12-12/nemet_2009:
+      - snapshot://papers/2023-12-12/nemet_2009.csv
   #
   # GBD Snake Envenoming Collaborators (2022). Global mortality of snakebite envenoming between 1990 and 2019.
   # https://www.nature.com/articles/s41467-022-33627-9
   #
-  data://meadow/papers/2023-11-21/snakebite:
-    - snapshot://papers/2023-11-21/snakebite.xlsx
-  data://garden/papers/2023-11-21/snakebite:
-    - data://meadow/papers/2023-11-21/snakebite
   data://grapher/papers/2023-11-21/snakebite:
-    - data://garden/papers/2023-11-21/snakebite
+    - data://garden/papers/2023-11-21/snakebite:
+      - data://meadow/papers/2023-11-21/snakebite:
+        - snapshot://papers/2023-11-21/snakebite.xlsx
   #
   # Bayliss-Smith & Wanmali (1984). Data on long-term wheat yields.
   #
-  data://meadow/papers/2024-03-26/bayliss_smith_wanmali_1984:
-    - snapshot://papers/2024-03-26/bayliss_smith_wanmali_1984.csv
   data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984:
-    - data://meadow/papers/2024-03-26/bayliss_smith_wanmali_1984
+    - data://meadow/papers/2024-03-26/bayliss_smith_wanmali_1984:
+      - snapshot://papers/2024-03-26/bayliss_smith_wanmali_1984.csv
   #
   # Broadberry et al. (2015). Data on long-term yields in United Kingdom.
   #
-  data://meadow/papers/2024-03-26/broadberry_et_al_2015:
-    - snapshot://papers/2024-03-26/broadberry_et_al_2015.csv
   data://garden/papers/2024-03-26/broadberry_et_al_2015:
-    - data://meadow/papers/2024-03-26/broadberry_et_al_2015
+    - data://meadow/papers/2024-03-26/broadberry_et_al_2015:
+      - snapshot://papers/2024-03-26/broadberry_et_al_2015.csv
   #
   # Brassley et al. (2000). Data on long-term yields in United Kingdom.
   #
-  data://meadow/papers/2024-03-26/brassley_2000:
-    - snapshot://papers/2024-03-26/brassley_2000.csv
   data://garden/papers/2024-03-26/brassley_2000:
-    - data://meadow/papers/2024-03-26/brassley_2000
+    - data://meadow/papers/2024-03-26/brassley_2000:
+      - snapshot://papers/2024-03-26/brassley_2000.csv
   #
   # Wuepper et al. (2020). Data on crop yields and nitrogen pollution.
   #
-  data://meadow/papers/2024-03-26/wuepper_et_al_2020:
-    - snapshot://papers/2024-03-26/wuepper_et_al_2020.xlsx
-  data://garden/papers/2024-03-26/wuepper_et_al_2020:
-    - data://meadow/papers/2024-03-26/wuepper_et_al_2020
   data://grapher/papers/2024-03-26/wuepper_et_al_2020:
-    - data://garden/papers/2024-03-26/wuepper_et_al_2020
+    - data://garden/papers/2024-03-26/wuepper_et_al_2020:
+      - data://meadow/papers/2024-03-26/wuepper_et_al_2020:
+        - snapshot://papers/2024-03-26/wuepper_et_al_2020.xlsx
   #
   # Mueller et al. (2012). Attainable yields.
   #
-  data://meadow/papers/2024-03-26/mueller_et_al_2012:
-    - snapshot://papers/2024-03-26/mueller_et_al_2012.xls
   data://garden/papers/2024-03-26/mueller_et_al_2012:
-    - data://meadow/papers/2024-03-26/mueller_et_al_2012
+    - data://meadow/papers/2024-03-26/mueller_et_al_2012:
+      - snapshot://papers/2024-03-26/mueller_et_al_2012.xls
 
   #
   # Ellis et al. (2021), Anthromes
   #
-  data://meadow/papers/2023-10-20/anthromes_input:
-    - snapshot://papers/2023-10-20/anthromes_input.zip
-  data://meadow/papers/2023-10-20/anthromes:
-    - snapshot://papers/2023-10-20/anthromes.csv
-  data://garden/papers/2023-10-20/anthromes:
-    - data://meadow/papers/2023-10-20/anthromes
-    - data://meadow/papers/2023-10-20/anthromes_input
   data://grapher/papers/2024-01-05/anthromes:
-    - data://garden/papers/2023-10-20/anthromes
+    - data://garden/papers/2023-10-20/anthromes:
+      - data://meadow/papers/2023-10-20/anthromes:
+        - snapshot://papers/2023-10-20/anthromes.csv
+      - data://meadow/papers/2023-10-20/anthromes_input:
+        - snapshot://papers/2023-10-20/anthromes_input.zip
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -83,40 +70,32 @@ steps:
   #
   # TODO: add step name (just something recognizable)
   #
-  data://meadow/papers/2025-05-14/davenport_2021:
-    - snapshot://papers/2025-05-14/davenport_2021.xlsx
-  data://garden/papers/2025-05-14/davenport_2021:
-    - data://meadow/papers/2025-05-14/davenport_2021
   data://grapher/papers/2025-05-14/davenport_2021:
-    - data://garden/papers/2025-05-14/davenport_2021
+    - data://garden/papers/2025-05-14/davenport_2021:
+      - data://meadow/papers/2025-05-14/davenport_2021:
+        - snapshot://papers/2025-05-14/davenport_2021.xlsx
 
 
   #
   # Municipal solid waste management (Anshassi & Townsend, 2025)
   #
-  data://meadow/papers/2026-01-20/anshassi_waste_management:
-    - snapshot://papers/2026-01-20/anshassi_waste_management.xlsx
-  data://garden/papers/2026-01-20/anshassi_waste_management:
-    - data://meadow/papers/2026-01-20/anshassi_waste_management
   data://grapher/papers/2026-01-20/anshassi_waste_management:
-    - data://garden/papers/2026-01-20/anshassi_waste_management
+    - data://garden/papers/2026-01-20/anshassi_waste_management:
+      - data://meadow/papers/2026-01-20/anshassi_waste_management:
+        - snapshot://papers/2026-01-20/anshassi_waste_management.xlsx
 
   #
   # Meijer et al. (2021) - Riverine plastic emissions
   #
-  data://meadow/papers/2026-01-27/meijer_2021:
-    - snapshot://papers/2026-01-27/meijer_2021.pdf
-  data://garden/papers/2026-01-27/meijer_2021:
-    - data://meadow/papers/2026-01-27/meijer_2021
-    - data://garden/demography/2024-07-15/population
-  data://grapher/papers/2026-01-27/meijer_2021:
-    - data://garden/papers/2026-01-27/meijer_2021
   export://multidim/plastic_waste/latest/plastic_emissions_oceans:
-    - data://grapher/papers/2026-01-27/meijer_2021
+    - data://grapher/papers/2026-01-27/meijer_2021:
+      - data://garden/papers/2026-01-27/meijer_2021:
+        - data://meadow/papers/2026-01-27/meijer_2021:
+          - snapshot://papers/2026-01-27/meijer_2021.pdf
+        - data://garden/demography/2024-07-15/population
   #
   # Schneider et al. (2026) - Long-run child stunting
   #
-  data://garden/papers/2026-03-27/long_run_stunting:
-    - snapshot://papers/2026-03-27/long_run_stunting.xlsx
   data://grapher/papers/2026-03-27/long_run_stunting:
-    - data://garden/papers/2026-03-27/long_run_stunting
+    - data://garden/papers/2026-03-27/long_run_stunting:
+      - snapshot://papers/2026-03-27/long_run_stunting.xlsx

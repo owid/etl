@@ -1,66 +1,41 @@
 steps:
   #
-  # Global hen inventory (Welfare Footprint Project, 2022).
-  #
-  data://meadow/animal_welfare/2023-08-01/global_hen_inventory:
-    - snapshot://animal_welfare/2023-08-01/global_hen_inventory.csv
-  data://garden/animal_welfare/2023-08-01/global_hen_inventory:
-    - data://meadow/animal_welfare/2023-08-01/global_hen_inventory
-  data://grapher/animal_welfare/2023-08-01/global_hen_inventory:
-    - data://garden/animal_welfare/2023-08-01/global_hen_inventory
-  #
   # UK egg statistics (Defra, 2023).
   #
-  data://meadow/animal_welfare/2023-08-01/uk_egg_statistics:
-    - snapshot://animal_welfare/2023-08-01/uk_egg_statistics.ods
   data://garden/animal_welfare/2023-08-01/uk_egg_statistics:
-    - data://meadow/animal_welfare/2023-08-01/uk_egg_statistics
+    - data://meadow/animal_welfare/2023-08-01/uk_egg_statistics:
+      - snapshot://animal_welfare/2023-08-01/uk_egg_statistics.ods
   data://grapher/animal_welfare/2023-08-01/uk_egg_statistics:
     - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
   #
-  # US egg production (The Humane League, 2023).
-  #
-  data://meadow/animal_welfare/2023-08-03/us_egg_production:
-    - snapshot://animal_welfare/2023-08-03/us_egg_production.csv
-    - snapshot://animal_welfare/2023-08-03/us_egg_production_share_cage_free.csv
-  data://garden/animal_welfare/2023-08-03/us_egg_production:
-    - data://meadow/animal_welfare/2023-08-03/us_egg_production
-  #
   # Share of cage-free eggs (Various sources, 2023).
   #
-  data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs:
-    - data://garden/animal_welfare/2023-08-03/us_egg_production
-    - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
+  #
+  # US egg production (The Humane League, 2023).
+  #
   data://grapher/animal_welfare/2023-08-03/share_of_cage_free_eggs:
-    - data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs
-  #
-  # Various sources - Bullfighting laws.
-  #
-  data://meadow/animal_welfare/2024-06-04/bullfighting_laws:
-    - snapshot://animal_welfare/2024-06-04/bullfighting_laws.csv
-  data://garden/animal_welfare/2024-06-04/bullfighting_laws:
-    - data://meadow/animal_welfare/2024-06-04/bullfighting_laws
-  data://grapher/animal_welfare/2024-06-04/bullfighting_laws:
-    - data://garden/animal_welfare/2024-06-04/bullfighting_laws
-  #
-  # Mood et al. 2023 - Farmed finfishes used for food.
-  #
-  data://meadow/animal_welfare/2024-12-12/farmed_finfishes_used_for_food:
-    - snapshot://animal_welfare/2024-12-12/farmed_finfishes_used_for_food.zip
-  data://garden/animal_welfare/2024-12-12/farmed_finfishes_used_for_food:
-    - data://meadow/animal_welfare/2024-12-12/farmed_finfishes_used_for_food
-    - data://garden/demography/2024-07-15/population
+    - data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs:
+      - data://garden/animal_welfare/2023-08-03/us_egg_production:
+        - data://meadow/animal_welfare/2023-08-03/us_egg_production:
+          - snapshot://animal_welfare/2023-08-03/us_egg_production.csv
+          - snapshot://animal_welfare/2023-08-03/us_egg_production_share_cage_free.csv
+      - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
   #
   # Fishcount - Number of farmed fish.
   #
-  data://meadow/animal_welfare/2024-12-12/number_of_farmed_fish:
-    - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2015.xlsx
-    - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2016.xlsx
-    - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2017.xlsx
-    - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_from_2020.csv
+  #
+  # Mood et al. 2023 - Farmed finfishes used for food.
+  #
   data://garden/animal_welfare/2024-12-12/number_of_farmed_fish:
-    - data://meadow/animal_welfare/2024-12-12/number_of_farmed_fish
-    - data://garden/animal_welfare/2024-12-12/farmed_finfishes_used_for_food
+    - data://meadow/animal_welfare/2024-12-12/number_of_farmed_fish:
+      - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2015.xlsx
+      - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2016.xlsx
+      - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2017.xlsx
+      - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_from_2020.csv
+    - data://garden/animal_welfare/2024-12-12/farmed_finfishes_used_for_food:
+      - data://meadow/animal_welfare/2024-12-12/farmed_finfishes_used_for_food:
+        - snapshot://animal_welfare/2024-12-12/farmed_finfishes_used_for_food.zip
+      - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
@@ -69,11 +44,10 @@ steps:
   #
   # Number of wild-caught fish killed for food.
   #
-  data://meadow/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
-    - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_global.pdf
-    - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_by_country.pdf
   data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
-    - data://meadow/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+    - data://meadow/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
+      - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_global.pdf
+      - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_by_country.pdf
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
@@ -82,64 +56,67 @@ steps:
   #
   # Fishcount - Number of farmed crustaceans killed for food.
   #
-  data://meadow/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
-    - snapshot://animal_welfare/2025-01-23/number_of_farmed_crustaceans.csv
   data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
-    - data://meadow/animal_welfare/2025-01-23/number_of_farmed_crustaceans
+    - data://meadow/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
+      - snapshot://animal_welfare/2025-01-23/number_of_farmed_crustaceans.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
   data://grapher/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
     - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
   #
-  # Fur laws (Fur Free Alliance).
+  # Chick culling laws (Various sources).
   #
-  data://meadow/animal_welfare/2024-12-17/fur_laws:
-    - snapshot://animal_welfare/2024-12-17/fur_laws.csv
   #
-  # Fur laws (Fur Free Alliance).
+  # Total number of animals used for food.
   #
-  data://garden/animal_welfare/2024-12-17/fur_laws:
-    - data://meadow/animal_welfare/2024-12-17/fur_laws
-    - data://garden/regions/2023-01-01/regions
+  #
+  # Total number of animals used for food.
+  #
   #
   # Fur laws (Fur Free Alliance).
   #
-  data://grapher/animal_welfare/2024-12-17/fur_laws:
-    - data://garden/animal_welfare/2024-12-17/fur_laws
+  #
+  # Fur laws (Fur Free Alliance).
+  #
+  #
+  # Fur laws (Fur Free Alliance).
+  #
+  #
+  # Various sources - Bullfighting laws.
+  #
+  #
+  # Global hen inventory (Welfare Footprint Project, 2022).
+  #
   #
   # Animal welfare data explorer.
   #
   export://explorers/animal_welfare/latest/animal_welfare:
-    - data://grapher/animal_welfare/2023-08-01/global_hen_inventory
-    - data://grapher/animal_welfare/2026-04-16/chick_culling_laws
-    - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
-    - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
-    - data://grapher/animal_welfare/2024-12-17/fur_laws
-  #
-  # Total number of animals used for food.
-  #
-  data://garden/animal_welfare/2026-03-03/animals_used_for_food:
-    - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
-    - data://garden/faostat/2026-02-25/faostat_qcl
-    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
-    - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
-  #
-  # Total number of animals used for food.
-  #
-  data://grapher/animal_welfare/2026-03-03/animals_used_for_food:
-    - data://garden/animal_welfare/2026-03-03/animals_used_for_food
+    - data://grapher/animal_welfare/2023-08-01/global_hen_inventory:
+      - data://garden/animal_welfare/2023-08-01/global_hen_inventory:
+        - data://meadow/animal_welfare/2023-08-01/global_hen_inventory:
+          - snapshot://animal_welfare/2023-08-01/global_hen_inventory.csv
+    - data://grapher/animal_welfare/2026-04-16/chick_culling_laws:
+      - data://garden/animal_welfare/2026-04-16/chick_culling_laws:
+        - data://meadow/animal_welfare/2026-04-16/chick_culling_laws:
+          - snapshot://animal_welfare/2026-04-16/chick_culling_laws.csv
+    - data://grapher/animal_welfare/2026-03-03/animals_used_for_food:
+      - data://garden/animal_welfare/2026-03-03/animals_used_for_food:
+        - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
+        - data://garden/faostat/2026-02-25/faostat_qcl
+        - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+        - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
+    - data://grapher/animal_welfare/2024-06-04/bullfighting_laws:
+      - data://garden/animal_welfare/2024-06-04/bullfighting_laws:
+        - data://meadow/animal_welfare/2024-06-04/bullfighting_laws:
+          - snapshot://animal_welfare/2024-06-04/bullfighting_laws.csv
+    - data://grapher/animal_welfare/2024-12-17/fur_laws:
+      - data://garden/animal_welfare/2024-12-17/fur_laws:
+        - data://meadow/animal_welfare/2024-12-17/fur_laws:
+          - snapshot://animal_welfare/2024-12-17/fur_laws.csv
+        - data://garden/regions/2023-01-01/regions
   #
   # Land animals killed for food (grouped into main animals and "other").
   #
   data://grapher/animal_welfare/2026-03-03/land_animals_killed_for_food:
     - data://garden/faostat/2026-02-25/faostat_qcl
-  #
-  # Chick culling laws (Various sources).
-  #
-  data://meadow/animal_welfare/2026-04-16/chick_culling_laws:
-    - snapshot://animal_welfare/2026-04-16/chick_culling_laws.csv
-  data://garden/animal_welfare/2026-04-16/chick_culling_laws:
-    - data://meadow/animal_welfare/2026-04-16/chick_culling_laws
-  data://grapher/animal_welfare/2026-04-16/chick_culling_laws:
-    - data://garden/animal_welfare/2026-04-16/chick_culling_laws

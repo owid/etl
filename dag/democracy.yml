@@ -2,91 +2,74 @@ steps:
   # VDEM (2026)
   data://garden/democracy/2026-03-17/vdem:
     - data://garden/regions/2023-01-01/regions
-    - data://meadow/democracy/2026-03-17/vdem
+    - data://meadow/democracy/2026-03-17/vdem:
+      - snapshot://democracy/2026-03-17/vdem.zip
     - data://garden/demography/2024-07-15/population
   data://grapher/democracy/2026-03-17/vdem:
     - data://garden/democracy/2026-03-17/vdem
-  data://meadow/democracy/2026-03-17/vdem:
-    - snapshot://democracy/2026-03-17/vdem.zip
 
   # Episodes of Regime Transition (2026)
-  data://meadow/democracy/2026-03-18/ert:
-    - snapshot://democracy/2026-03-18/ert.csv
-  data://garden/democracy/2026-03-18/ert:
-    - data://garden/demography/2024-07-15/population
-    - data://meadow/democracy/2026-03-18/ert
-    - data://garden/regions/2023-01-01/regions
   data://grapher/democracy/2026-03-18/ert:
-    - data://garden/democracy/2026-03-18/ert
+    - data://garden/democracy/2026-03-18/ert:
+      - data://garden/demography/2024-07-15/population
+      - data://meadow/democracy/2026-03-18/ert:
+        - snapshot://democracy/2026-03-18/ert.csv
+      - data://garden/regions/2023-01-01/regions
 
   # Freedom House (2026)
-  data://meadow/democracy/2026-03-23/fh:
-    - snapshot://democracy/2026-03-23/fh_ratings.xlsx
-    - snapshot://democracy/2024-05-16/fh_scores.xlsx
-    - snapshot://democracy/2026-03-23/fh.xlsx
-  data://garden/democracy/2026-03-23/fh:
-    - data://garden/demography/2024-07-15/population
-    - data://meadow/democracy/2026-03-23/fh
-    - data://garden/regions/2023-01-01/regions
   data://grapher/democracy/2026-03-23/fh:
-    - data://garden/democracy/2026-03-23/fh
+    - data://garden/democracy/2026-03-23/fh:
+      - data://garden/demography/2024-07-15/population
+      - data://meadow/democracy/2026-03-23/fh:
+        - snapshot://democracy/2026-03-23/fh_ratings.xlsx
+        - snapshot://democracy/2024-05-16/fh_scores.xlsx
+        - snapshot://democracy/2026-03-23/fh.xlsx
+      - data://garden/regions/2023-01-01/regions
 
   # Bertelsmann Transformation Index (2026)
-  data://meadow/democracy/2026-03-27/bti:
-    - snapshot://democracy/2026-03-27/bti.xlsx
-  data://garden/democracy/2026-03-27/bti:
-    - data://meadow/democracy/2026-03-27/bti
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
   data://grapher/democracy/2026-03-27/bti:
-    - data://garden/democracy/2026-03-27/bti
+    - data://garden/democracy/2026-03-27/bti:
+      - data://meadow/democracy/2026-03-27/bti:
+        - snapshot://democracy/2026-03-27/bti.xlsx
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/demography/2024-07-15/population
 
   # Lexical Index (2026)
-  data://meadow/democracy/2026-04-02/lexical_index:
-    - snapshot://democracy/2026-04-02/lexical_index.xlsx
-  data://garden/democracy/2026-04-02/lexical_index:
-    - data://garden/regions/2023-01-01/regions
-    - data://meadow/democracy/2026-04-02/lexical_index
-    - data://garden/demography/2024-07-15/population
   data://grapher/democracy/2026-04-02/lexical_index:
-    - data://garden/democracy/2026-04-02/lexical_index
+    - data://garden/democracy/2026-04-02/lexical_index:
+      - data://garden/regions/2023-01-01/regions
+      - data://meadow/democracy/2026-04-02/lexical_index:
+        - snapshot://democracy/2026-04-02/lexical_index.xlsx
+      - data://garden/demography/2024-07-15/population
 
   # EIU (2025)
-  data://meadow/democracy/2025-03-05/eiu:
-    - snapshot://democracy/2024-05-22/eiu_gapminder.csv
-    - snapshot://democracy/2024-05-22/eiu_2021.csv
-    - snapshot://democracy/2024-05-22/eiu_2022.csv
-    - snapshot://democracy/2024-05-22/eiu_2023.csv
-    - snapshot://democracy/2025-03-05/eiu_2024.csv
-  data://garden/democracy/2025-03-05/eiu:
-    - data://meadow/democracy/2025-03-05/eiu
-    - data://garden/demography/2024-07-15/population
-    - data://garden/regions/2023-01-01/regions
   data://grapher/democracy/2025-03-05/eiu:
-    - data://garden/democracy/2025-03-05/eiu
+    - data://garden/democracy/2025-03-05/eiu:
+      - data://meadow/democracy/2025-03-05/eiu:
+        - snapshot://democracy/2024-05-22/eiu_gapminder.csv
+        - snapshot://democracy/2024-05-22/eiu_2021.csv
+        - snapshot://democracy/2024-05-22/eiu_2022.csv
+        - snapshot://democracy/2024-05-22/eiu_2023.csv
+        - snapshot://democracy/2025-03-05/eiu_2024.csv
+      - data://garden/demography/2024-07-15/population
+      - data://garden/regions/2023-01-01/regions
 
   # Polity (2020)
-  data://meadow/democracy/2024-05-13/polity:
-    - snapshot://democracy/2024-05-13/polity.xlsx
-  data://garden/democracy/2024-03-07/polity:
-    - data://meadow/democracy/2024-05-13/polity
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
   data://grapher/democracy/2024-05-13/polity:
-    - data://garden/democracy/2024-03-07/polity
+    - data://garden/democracy/2024-03-07/polity:
+      - data://meadow/democracy/2024-05-13/polity:
+        - snapshot://democracy/2024-05-13/polity.xlsx
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/demography/2023-03-31/population
 
   # Claassen Mood (2022)
-  data://meadow/democracy/2024-05-22/claassen_mood:
-    - snapshot://democracy/2024-05-22/claassen_mood.csv
-  data://garden/democracy/2024-03-07/claassen_mood:
-    - data://meadow/democracy/2024-05-22/claassen_mood
   data://grapher/democracy/2024-05-22/claassen_mood:
-    - data://garden/democracy/2024-03-07/claassen_mood
+    - data://garden/democracy/2024-03-07/claassen_mood:
+      - data://meadow/democracy/2024-05-22/claassen_mood:
+        - snapshot://democracy/2024-05-22/claassen_mood.csv
 
   # Claassen Satisfaction (2022)
-  data://meadow/democracy/2024-05-22/claassen_satisfaction:
-    - snapshot://democracy/2024-05-22/claassen_satisfaction.csv
-  data://garden/democracy/2024-03-07/claassen_satisfaction:
-    - data://meadow/democracy/2024-05-22/claassen_satisfaction
   data://grapher/democracy/2024-05-22/claassen_satisfaction:
-    - data://garden/democracy/2024-03-07/claassen_satisfaction
+    - data://garden/democracy/2024-03-07/claassen_satisfaction:
+      - data://meadow/democracy/2024-05-22/claassen_satisfaction:
+        - snapshot://democracy/2024-05-22/claassen_satisfaction.csv
