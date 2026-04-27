@@ -1,0 +1,24 @@
+# Source files
+src/**
+*.ts
+
+# Development files
+node_modules/**
+.vscode/**
+*.map
+
+# Build files
+esbuild.js
+eslint.config.mjs
+tsconfig.json
+
+# Package files
+package-lock.json
+README.md
+
+# Install files
+install/**
+
+# Temporary files
+*.log
+.DS_Store
