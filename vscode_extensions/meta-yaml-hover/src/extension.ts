@@ -5,8 +5,6 @@ const PLACEHOLDER_RE = /\{([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\
 const ALIAS_RE = /\*([A-Za-z_][A-Za-z0-9_]*)/g;
 const REVEAL_LINE_CMD = 'meta-yaml-hover.revealLine';
 
-type RefKind = 'placeholder' | 'alias';
-
 function isMetaYamlFile(fileName: string): boolean {
     return fileName.endsWith('.meta.yml') || fileName.endsWith('.meta.yaml');
 }
@@ -189,12 +187,6 @@ function findAnchorDeclLine(docText: string, anchorName: string): number | undef
     return undefined;
 }
 
-function findRefDeclLine(docText: string, name: string, kind: RefKind): number | undefined {
-    return kind === 'placeholder'
-        ? findKeyDeclLine(docText, name)
-        : findAnchorDeclLine(docText, name);
-}
-
 function findHoverMatch(
     lineText: string,
     character: number,
@@ -212,50 +204,45 @@ function findHoverMatch(
     return undefined;
 }
 
-function findRefsInText(text: string): Array<{ name: string; kind: RefKind }> {
-    const out: Array<{ name: string; kind: RefKind }> = [];
-    const seen = new Set<string>();
-    const collect = (re: RegExp, kind: RefKind) => {
-        re.lastIndex = 0;
-        let m: RegExpExecArray | null;
-        while ((m = re.exec(text)) !== null) {
-            const k = `${kind}:${m[1]}`;
-            if (!seen.has(k)) {
-                seen.add(k);
-                out.push({ name: m[1], kind });
-            }
-        }
-    };
-    collect(PLACEHOLDER_RE, 'placeholder');
-    collect(ALIAS_RE, 'alias');
-    return out;
-}
-
 function buildRevealUri(docUri: vscode.Uri, line: number): string {
     const args = encodeURIComponent(JSON.stringify([docUri.toString(), line]));
     return `command:${REVEAL_LINE_CMD}?${args}`;
 }
 
-function appendDrillLinks(
-    md: vscode.MarkdownString,
+function escapeHtml(s: string): string {
+    return s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function renderResolvedWithLinks(
+    resolved: string,
     docUri: vscode.Uri,
     docText: string,
-    resolved: string,
-): void {
-    const refs = findRefsInText(resolved);
-    if (refs.length === 0) {
-        return;
-    }
-    md.appendMarkdown('\n**Drill into:**\n\n');
-    for (const ref of refs) {
-        const token = ref.kind === 'placeholder' ? `{${ref.name}}` : `*${ref.name}`;
-        const line = findRefDeclLine(docText, ref.name, ref.kind);
-        if (line !== undefined) {
-            md.appendMarkdown(`- [\`${token}\`](${buildRevealUri(docUri, line)}) — line ${line + 1}\n`);
-        } else {
-            md.appendMarkdown(`- \`${token}\` — _not defined in this file_\n`);
+): string {
+    let html = escapeHtml(resolved);
+
+    html = html.replace(PLACEHOLDER_RE, (match, name) => {
+        const line = findKeyDeclLine(docText, name);
+        if (line === undefined) {
+            return match;
         }
-    }
+        const uri = buildRevealUri(docUri, line);
+        return `<a href="${uri}" title="line ${line + 1}">${match}</a>`;
+    });
+
+    html = html.replace(ALIAS_RE, (match, name) => {
+        const line = findAnchorDeclLine(docText, name);
+        if (line === undefined) {
+            return match;
+        }
+        const uri = buildRevealUri(docUri, line);
+        return `<a href="${uri}" title="line ${line + 1}">${match}</a>`;
+    });
+
+    return `<pre>${html}</pre>`;
 }
 
 const hoverProvider: vscode.HoverProvider = {
@@ -272,12 +259,12 @@ const hoverProvider: vscode.HoverProvider = {
             const resolved = resolvePlaceholder(docText, placeholder.name);
             const md = new vscode.MarkdownString();
             md.isTrusted = { enabledCommands: [REVEAL_LINE_CMD] };
+            md.supportHtml = true;
             md.appendMarkdown(`**\`{${placeholder.name}}\`**\n\n`);
             if (resolved === undefined) {
                 md.appendMarkdown('_Not defined in this file._');
             } else {
-                md.appendCodeblock(resolved, 'yaml');
-                appendDrillLinks(md, document.uri, docText, resolved);
+                md.appendMarkdown(renderResolvedWithLinks(resolved, document.uri, docText));
             }
             return new vscode.Hover(md, new vscode.Range(
                 position.line, placeholder.start,
@@ -290,12 +277,12 @@ const hoverProvider: vscode.HoverProvider = {
             const resolved = resolveAnchor(docText, alias.name);
             const md = new vscode.MarkdownString();
             md.isTrusted = { enabledCommands: [REVEAL_LINE_CMD] };
+            md.supportHtml = true;
             md.appendMarkdown(`**\`*${alias.name}\`** _(YAML anchor)_\n\n`);
             if (resolved === undefined) {
                 md.appendMarkdown('_Anchor not defined in this file._');
             } else {
-                md.appendCodeblock(resolved, 'yaml');
-                appendDrillLinks(md, document.uri, docText, resolved);
+                md.appendMarkdown(renderResolvedWithLinks(resolved, document.uri, docText));
             }
             return new vscode.Hover(md, new vscode.Range(
                 position.line, alias.start,
