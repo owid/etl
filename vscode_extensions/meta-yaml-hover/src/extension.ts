@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as yaml from 'js-yaml';
 
-const PLACEHOLDER_RE = /\{(definitions(?:\.[A-Za-z_][A-Za-z0-9_]*)+|macros)\}/g;
+const PLACEHOLDER_RE = /\{([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\}/g;
 const ALIAS_RE = /\*([A-Za-z_][A-Za-z0-9_]*)/g;
 
 function isMetaYamlFile(fileName: string): boolean {
@@ -45,7 +45,7 @@ function extractTopLevelBlock(docText: string, key: string): string | undefined 
     return captured.length > 0 ? captured.join('\n') : undefined;
 }
 
-function resolveDefinitionsPath(docText: string, segments: string[]): string | undefined {
+function resolveYamlPath(docText: string, segments: string[]): string | undefined {
     let parsed: unknown;
     try {
         parsed = yaml.load(docText);
@@ -56,7 +56,7 @@ function resolveDefinitionsPath(docText: string, segments: string[]): string | u
         return undefined;
     }
 
-    let node: unknown = (parsed as Record<string, unknown>)['definitions'];
+    let node: unknown = parsed;
     for (const seg of segments) {
         if (node === null || typeof node !== 'object') {
             return undefined;
@@ -80,11 +80,11 @@ function resolvePlaceholder(docText: string, dottedPath: string): string | undef
     if (dottedPath === 'macros') {
         return extractTopLevelBlock(docText, 'macros');
     }
-    const segments = dottedPath.split('.').slice(1);
+    const segments = dottedPath.split('.');
     if (segments.length === 0) {
         return undefined;
     }
-    return resolveDefinitionsPath(docText, segments);
+    return resolveYamlPath(docText, segments);
 }
 
 function resolveAnchor(docText: string, anchorName: string): string | undefined {

@@ -8,13 +8,18 @@ When you hover over a placeholder like `{definitions.poverty_line_per_day}` or `
 
 ## Supported patterns
 
-- `{definitions.<key>}` — simple Jinja reference, e.g. `{definitions.gdoc_id}`
-- `{definitions.<key>.<subkey>...}` — arbitrarily nested dot-paths
-- `{macros}` — top-level `macros:` literal block
+- `{<dotted.path>}` — any dot-path resolved against the YAML root, e.g.
+  - `{definitions.gdoc_id}`
+  - `{definitions.poverty_line_per_day}`
+  - `{tables.population.variables.population.title}`
+  - `{descriptions.gini}`, `{source_common.date_accessed}`
+- `{macros}` — top-level `macros:` literal block (text-extracted, preserves Jinja syntax)
 - `*<anchor>` — YAML alias, e.g. `customNumericValues: *map_brackets_headcount_ratio`
 - `<<: *<anchor>` — YAML merge alias (hover the `*<anchor>` part)
 
 Nested placeholders or aliases inside a resolved value are shown as-is — the extension does not recursively expand them.
+
+Runtime placeholders like `<<welfare_type>>`, `{TODAY}`, `{LATEST_YEAR}`, `{date_accessed}`, `{year}` are **not** resolved — their values come from the Python step's `yaml_params=...` at render time, not from the YAML.
 
 ## Scope
 
