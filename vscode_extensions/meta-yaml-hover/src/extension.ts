@@ -3,6 +3,9 @@ import * as yaml from 'js-yaml';
 
 const PLACEHOLDER_RE = /\{([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\}/g;
 const ALIAS_RE = /\*([A-Za-z_][A-Za-z0-9_]*)/g;
+const REVEAL_LINE_CMD = 'meta-yaml-hover.revealLine';
+
+type RefKind = 'placeholder' | 'alias';
 
 function isMetaYamlFile(fileName: string): boolean {
     return fileName.endsWith('.meta.yml') || fileName.endsWith('.meta.yaml');
@@ -133,10 +136,69 @@ function resolveAnchor(docText: string, anchorName: string): string | undefined 
     return captured.length > 0 ? captured.join('\n') : undefined;
 }
 
+function findKeyDeclLine(docText: string, dottedPath: string): number | undefined {
+    const segments = dottedPath.split('.');
+    if (segments.length === 0) {
+        return undefined;
+    }
+    const lines = docText.split(/\r?\n/);
+    let segIdx = 0;
+    let parentIndent = -1;
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const m = line.match(/^(\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:/);
+        if (!m) {
+            continue;
+        }
+        const indent = m[1].length;
+        const key = m[2];
+
+        if (segIdx === 0) {
+            if (indent === 0 && key === segments[0]) {
+                if (segments.length === 1) {
+                    return i;
+                }
+                segIdx = 1;
+                parentIndent = indent;
+            }
+            continue;
+        }
+
+        if (indent <= parentIndent) {
+            return undefined;
+        }
+        if (key === segments[segIdx]) {
+            if (segIdx === segments.length - 1) {
+                return i;
+            }
+            segIdx++;
+            parentIndent = indent;
+        }
+    }
+    return undefined;
+}
+
+function findAnchorDeclLine(docText: string, anchorName: string): number | undefined {
+    const lines = docText.split(/\r?\n/);
+    const re = new RegExp(`&${escapeRegex(anchorName)}\\b`);
+    for (let i = 0; i < lines.length; i++) {
+        if (re.test(lines[i])) {
+            return i;
+        }
+    }
+    return undefined;
+}
+
+function findRefDeclLine(docText: string, name: string, kind: RefKind): number | undefined {
+    return kind === 'placeholder'
+        ? findKeyDeclLine(docText, name)
+        : findAnchorDeclLine(docText, name);
+}
+
 function findHoverMatch(
     lineText: string,
     character: number,
-    re: RegExp
+    re: RegExp,
 ): { start: number; end: number; name: string } | undefined {
     re.lastIndex = 0;
     let match: RegExpExecArray | null;
@@ -150,6 +212,52 @@ function findHoverMatch(
     return undefined;
 }
 
+function findRefsInText(text: string): Array<{ name: string; kind: RefKind }> {
+    const out: Array<{ name: string; kind: RefKind }> = [];
+    const seen = new Set<string>();
+    const collect = (re: RegExp, kind: RefKind) => {
+        re.lastIndex = 0;
+        let m: RegExpExecArray | null;
+        while ((m = re.exec(text)) !== null) {
+            const k = `${kind}:${m[1]}`;
+            if (!seen.has(k)) {
+                seen.add(k);
+                out.push({ name: m[1], kind });
+            }
+        }
+    };
+    collect(PLACEHOLDER_RE, 'placeholder');
+    collect(ALIAS_RE, 'alias');
+    return out;
+}
+
+function buildRevealUri(docUri: vscode.Uri, line: number): string {
+    const args = encodeURIComponent(JSON.stringify([docUri.toString(), line]));
+    return `command:${REVEAL_LINE_CMD}?${args}`;
+}
+
+function appendDrillLinks(
+    md: vscode.MarkdownString,
+    docUri: vscode.Uri,
+    docText: string,
+    resolved: string,
+): void {
+    const refs = findRefsInText(resolved);
+    if (refs.length === 0) {
+        return;
+    }
+    md.appendMarkdown('\n**Drill into:**\n\n');
+    for (const ref of refs) {
+        const token = ref.kind === 'placeholder' ? `{${ref.name}}` : `*${ref.name}`;
+        const line = findRefDeclLine(docText, ref.name, ref.kind);
+        if (line !== undefined) {
+            md.appendMarkdown(`- [\`${token}\`](${buildRevealUri(docUri, line)}) — line ${line + 1}\n`);
+        } else {
+            md.appendMarkdown(`- \`${token}\` — _not defined in this file_\n`);
+        }
+    }
+}
+
 const hoverProvider: vscode.HoverProvider = {
     provideHover(document, position) {
         if (document.languageId !== 'yaml' || !isMetaYamlFile(document.fileName)) {
@@ -157,37 +265,71 @@ const hoverProvider: vscode.HoverProvider = {
         }
 
         const lineText = document.lineAt(position.line).text;
+        const docText = document.getText();
 
         const placeholder = findHoverMatch(lineText, position.character, PLACEHOLDER_RE);
         if (placeholder) {
-            const resolved = resolvePlaceholder(document.getText(), placeholder.name);
+            const resolved = resolvePlaceholder(docText, placeholder.name);
             const md = new vscode.MarkdownString();
+            md.isTrusted = { enabledCommands: [REVEAL_LINE_CMD] };
             md.appendMarkdown(`**\`{${placeholder.name}}\`**\n\n`);
             if (resolved === undefined) {
                 md.appendMarkdown('_Not defined in this file._');
             } else {
                 md.appendCodeblock(resolved, 'yaml');
+                appendDrillLinks(md, document.uri, docText, resolved);
             }
             return new vscode.Hover(md, new vscode.Range(
                 position.line, placeholder.start,
-                position.line, placeholder.end
+                position.line, placeholder.end,
             ));
         }
 
         const alias = findHoverMatch(lineText, position.character, ALIAS_RE);
         if (alias) {
-            const resolved = resolveAnchor(document.getText(), alias.name);
+            const resolved = resolveAnchor(docText, alias.name);
             const md = new vscode.MarkdownString();
+            md.isTrusted = { enabledCommands: [REVEAL_LINE_CMD] };
             md.appendMarkdown(`**\`*${alias.name}\`** _(YAML anchor)_\n\n`);
             if (resolved === undefined) {
                 md.appendMarkdown('_Anchor not defined in this file._');
             } else {
                 md.appendCodeblock(resolved, 'yaml');
+                appendDrillLinks(md, document.uri, docText, resolved);
             }
             return new vscode.Hover(md, new vscode.Range(
                 position.line, alias.start,
-                position.line, alias.end
+                position.line, alias.end,
             ));
+        }
+
+        return undefined;
+    },
+};
+
+const definitionProvider: vscode.DefinitionProvider = {
+    provideDefinition(document, position) {
+        if (document.languageId !== 'yaml' || !isMetaYamlFile(document.fileName)) {
+            return undefined;
+        }
+
+        const lineText = document.lineAt(position.line).text;
+        const docText = document.getText();
+
+        const placeholder = findHoverMatch(lineText, position.character, PLACEHOLDER_RE);
+        if (placeholder) {
+            const line = findKeyDeclLine(docText, placeholder.name);
+            if (line !== undefined) {
+                return new vscode.Location(document.uri, new vscode.Position(line, 0));
+            }
+        }
+
+        const alias = findHoverMatch(lineText, position.character, ALIAS_RE);
+        if (alias) {
+            const line = findAnchorDeclLine(docText, alias.name);
+            if (line !== undefined) {
+                return new vscode.Location(document.uri, new vscode.Position(line, 0));
+            }
         }
 
         return undefined;
@@ -196,7 +338,15 @@ const hoverProvider: vscode.HoverProvider = {
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
-        vscode.languages.registerHoverProvider({ language: 'yaml' }, hoverProvider)
+        vscode.languages.registerHoverProvider({ language: 'yaml' }, hoverProvider),
+        vscode.languages.registerDefinitionProvider({ language: 'yaml' }, definitionProvider),
+        vscode.commands.registerCommand(REVEAL_LINE_CMD, async (uri: string, line: number) => {
+            const target = vscode.Uri.parse(uri);
+            const editor = await vscode.window.showTextDocument(target, { preserveFocus: false });
+            const pos = new vscode.Position(line, 0);
+            editor.selection = new vscode.Selection(pos, pos);
+            editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
+        }),
     );
 }
 

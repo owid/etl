@@ -17,7 +17,7 @@ When you hover over a placeholder like `{definitions.poverty_line_per_day}` or `
 - `*<anchor>` — YAML alias, e.g. `customNumericValues: *map_brackets_headcount_ratio`
 - `<<: *<anchor>` — YAML merge alias (hover the `*<anchor>` part)
 
-Nested placeholders or aliases inside a resolved value are shown as-is — the extension does not recursively expand them.
+The hover lists every nested `{...}` / `*anchor` reference found in the resolved value as a clickable **Drill into** link that jumps to the declaration line. `Cmd+Click` (or `F12`) on a reference in the document also jumps to its declaration via Go-to-Definition.
 
 Runtime placeholders like `<<welfare_type>>`, `{TODAY}`, `{LATEST_YEAR}`, `{date_accessed}`, `{year}` are **not** resolved — their values come from the Python step's `yaml_params=...` at render time, not from the YAML.
 
