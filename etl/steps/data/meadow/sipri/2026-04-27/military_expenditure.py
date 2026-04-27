@@ -10,7 +10,7 @@ paths = PathFinder(__file__)
 # Define columns to drop.
 COLUMNS_TO_DROP = {
     "constant_usd": ["Notes", "Unnamed: 1"],
-    "constant_usd_regions": ["2024 (current prices)", "Unnamed: 39", "Omitted countries"],
+    "constant_usd_regions": ["2025 (current prices)", "Unnamed: 40", "Omitted countries"],
     "share_gdp": ["Notes"],
     "per_capita": ["Notes"],
     "share_govt_spending": ["Notes", "Reporting year"],
@@ -24,17 +24,18 @@ def run() -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("military_expenditure.xlsx")
 
+    # Missing-data sentinels: "..." (three ASCII dots), "…" (Unicode ellipsis U+2026), and "xxx".
+    na_values = ["...", "…", "xxx"]
+
     # Load data from snapshot.
-    tb_constant_usd = snap.read(
-        safe_types=False, sheet_name="Constant (2023) US$", skiprows=5, na_values=["...", "xxx"]
-    )
+    tb_constant_usd = snap.read(safe_types=False, sheet_name="Constant (2024) US$", skiprows=5, na_values=na_values)
     tb_constant_usd_regions = snap.read(
-        safe_types=False, sheet_name="Regional totals", skiprows=13, na_values=["...", "xxx"]
+        safe_types=False, sheet_name="Regional totals", skiprows=13, na_values=na_values
     )
-    tb_share_gdp = snap.read(safe_types=False, sheet_name="Share of GDP", skiprows=5, na_values=["...", "xxx"])
-    tb_per_capita = snap.read(safe_types=False, sheet_name="Per capita", skiprows=6, na_values=["...", "xxx"])
+    tb_share_gdp = snap.read(safe_types=False, sheet_name="Share of GDP", skiprows=5, na_values=na_values)
+    tb_per_capita = snap.read(safe_types=False, sheet_name="Per capita", skiprows=6, na_values=na_values)
     tb_share_govt_spending = snap.read(
-        safe_types=False, sheet_name="Share of Govt. spending", skiprows=7, na_values=["...", "xxx"]
+        safe_types=False, sheet_name="Share of Govt. spending", skiprows=7, na_values=na_values
     )
 
     #
