@@ -6,7 +6,7 @@ from typing import Any
 
 from cookiecutter.main import cookiecutter
 
-from etl.dag_helpers import remove_steps_from_dag_file, write_to_dag_file
+from etl.dag_helpers import write_to_dag_file
 from etl.files import apply_ruff_formatter_to_files, ruamel_dump
 from etl.paths import DAG_DIR, STEP_DIR
 from etl.steps import DAG
@@ -24,11 +24,6 @@ def add_to_dag(dag: DAG, dag_path: Path = DAG_WIZARD_PATH) -> str:
     """
     write_to_dag_file(dag_path, dag)
     return ruamel_dump({"steps": dag})
-
-
-def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
-    """Remove ``step`` from ``dag_path`` via the canonical DAG writer."""
-    remove_steps_from_dag_file(dag_path, [step])
 
 
 def generate_step(cookiecutter_path: Path, data: dict[str, Any], target_dir: Path) -> None:

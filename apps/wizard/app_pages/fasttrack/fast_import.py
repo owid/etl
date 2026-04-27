@@ -14,9 +14,9 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.utils.files import add_to_dag
-from apps.wizard import utils as wizard_utils
 from apps.wizard.app_pages.fasttrack.utils import _encrypt
 from etl.compare import diff_print
+from etl.dag_helpers import remove_steps_from_dag_file
 from etl.db import get_engine
 from etl.files import apply_ruff_formatter_to_files, yaml_dump
 from etl.grapher import model as gm
@@ -276,7 +276,7 @@ class FasttrackImport:
             to_add = {private_data_step: [f"snapshot-private://{snapshot_uri}.csv"]}
 
         # Remove the step from the DAG
-        wizard_utils.remove_from_dag(to_remove, DAG_FASTTRACK_PATH)
+        remove_steps_from_dag_file(DAG_FASTTRACK_PATH, [to_remove])
 
         # Add the step to the DAG
         return add_to_dag(to_add, DAG_FASTTRACK_PATH)

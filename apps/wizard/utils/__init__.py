@@ -32,7 +32,6 @@ from structlog import get_logger
 from typing_extensions import Self
 from wfork_streamlit_profiler import Profiler
 
-from apps.utils.files import remove_from_dag
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
 from apps.wizard.utils.step_form import StepForm
 from etl.config import OWID_ENV, SENTRY_DSN, enable_sentry
@@ -51,7 +50,6 @@ from etl.paths import (
 
 __all__ = [
     "load_wizard_defaults",
-    "remove_from_dag",
     "update_wizard_defaults_from_form",
     "StepForm",
 ]

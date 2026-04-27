@@ -964,23 +964,3 @@ steps:
     assert "- snapshot_b" in after
     # The return value stays a YAML-formatted fragment describing the subdag.
     assert "meadow_b" in returned
-
-
-def test_remove_from_dag_delegates_to_remove_steps_from_dag_file():
-    from apps.utils.files import remove_from_dag
-
-    initial = """\
-steps:
-  meadow_a:
-    - snapshot_a
-  meadow_b:
-    - snapshot_b
-"""
-    with tempfile.TemporaryDirectory() as d:
-        p = Path(d) / "dag.yml"
-        p.write_text(initial)
-        remove_from_dag("meadow_a", dag_path=p)
-        after = p.read_text()
-
-    assert "meadow_a" not in after
-    assert "meadow_b" in after
