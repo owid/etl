@@ -116,12 +116,30 @@ def correct_belarus(tb: Table) -> Table:
     return tb
 
 
+KNOWN_SHARE_OUTLIERS = {
+    # (country, year, indicator) — documented legitimate values outside [0, 100]
+    (
+        "Kuwait",
+        1991,
+        "share_gdp",
+    ),  # Post-Iraqi-liberation defense spending against collapsed wartime GDP — SIPRI publishes ~117% consistently.
+}
+
+
 def sanity_checks(tb: Table) -> None:
     """
     Verify that the share indicators (`share_gdp`, `share_govt_spending`) are within the expected [0, 100] percentage range.
-    Logs a warning for each offending country-year — does not raise, so the step still produces output.
+    Raises if any country-year violates the bound and is not in `KNOWN_SHARE_OUTLIERS`. The whitelist exists so a single
+    well-documented edge case (e.g. Kuwait 1991) doesn't block the build, while genuine new regressions still fail loudly.
     """
+    violations = []
     for col in ["share_gdp", "share_govt_spending"]:
         offenders = tb[(tb[col] < 0) | (tb[col] > 100)][["country", "year", col]].dropna()
-        if not offenders.empty:
-            paths.log.warning(f"{len(offenders)} {col} values outside [0, 100]:\n{offenders.to_string(index=False)}")
+        for _, row in offenders.iterrows():
+            key = (row["country"], int(row["year"]), col)
+            if key not in KNOWN_SHARE_OUTLIERS:
+                violations.append(f"{row['country']} {int(row['year'])} {col}={row[col]:.4f}")
+    if violations:
+        raise ValueError(
+            "Share indicators outside [0, 100] (and not in KNOWN_SHARE_OUTLIERS):\n  " + "\n  ".join(violations)
+        )
