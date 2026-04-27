@@ -1,7 +1,7 @@
 meta:
   origin:
     title: Lelieveld et al. (2019). Effects of fossil fuel and total anthropogenic emission removal on public health and climate. PNAS.
-    producer: Lelieveld, J., Klingmüller, K., Pozzer, A., Burnett, R. T., Haines, A., & Ramanathan, V. (2019). Effects of fossil fuel and total anthropogenic emission removal on public health and climate. Proceedings of the National Academy of Sciences, 116(15), 7192-7197.
+    producer: Lelieveld et al. (2019). Effects of fossil fuel and total anthropogenic emission removal on public health and climate. PNAS.
     description: |-
       Lelieveld et al. (2019) quantify excess mortality and years of life lost (YLL) from air pollution.
 
@@ -17,7 +17,7 @@ meta:
     url_main: https://www.pnas.org/content/116/15/7192
     date_accessed: '2020-11-17'
     date_published: '2019'
-    citation_full: Lelieveld, J., Klingmüller, K., Pozzer, A., Burnett, R. T., Haines, A., & Ramanathan, V. (2019). Effects of fossil fuel and total anthropogenic emission removal on public health and climate. Proceedings of the National Academy of Sciences, 116(15), 7192-7197. (2019). Lelieveld et al. (2019). Effects of fossil fuel and total anthropogenic emission removal on public health and climate. PNAS..
+    citation_full: Lelieveld, J., Klingmüller, K., Pozzer, A., Burnett, R. T., Haines, A., & Ramanathan, V. (2019). Effects of fossil fuel and total anthropogenic emission removal on public health and climate. Proceedings of the National Academy of Sciences, 116(15), 7192-7197.
 outs:
   - md5: 1f8be7d389940b741982eb2e5b898c38
     size: 35330
