@@ -185,7 +185,7 @@ def build_origin(source: dict[str, Any], meta: dict[str, Any], snapshot_path: Pa
     origin["title"] = title
     origin["producer"] = producer
 
-    description = as_str(source.get("description"))
+    description = as_str(source.get("description")) or as_str(meta.get("description"))
     if description:
         origin["description"] = LiteralScalarString(description) if "\n" in description else description
 

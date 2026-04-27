@@ -6,6 +6,7 @@ meta:
     date_accessed: '2017-11-14'
     date_published: '2017'
     citation_full: 'World Bank SE4ALL database, IEA (2017). World Bank SE4ALL database: Divisia Decomposition Analysis - Activity component Index.'
+    description: This is a dataset imported by the automated fetcher
 outs:
   - md5: 3191adc264d367d575687bc26f38cd80
     size: 547562

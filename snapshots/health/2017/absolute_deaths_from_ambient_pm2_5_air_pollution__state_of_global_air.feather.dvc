@@ -6,6 +6,7 @@ meta:
     date_accessed: '2017-04-07'
     date_published: '2017'
     citation_full: Health Effects Institute, State of Global Air 2017 (2017). Absolute deaths from ambient PM2.5 air pollution.
+    description: Absolute number of deaths per year from ambient particulate matter air pollution- State of Global Air
 outs:
   - md5: 6064ae893a597f84369d54230e5785a1
     size: 9234

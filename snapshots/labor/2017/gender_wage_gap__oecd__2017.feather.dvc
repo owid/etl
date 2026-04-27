@@ -6,6 +6,7 @@ meta:
     date_accessed: '2017-10-17'
     date_published: '2017'
     citation_full: OECD (2017). OECD, Gender Wage Gap (2017).
+    description: The difference between male and female median wages divided by the male median wages.
 outs:
   - md5: 784ae7e658efc2f33ba0cf206342ebe2
     size: 6458
