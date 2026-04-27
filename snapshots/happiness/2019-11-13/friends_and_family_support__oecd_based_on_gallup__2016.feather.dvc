@@ -6,6 +6,7 @@ meta:
     date_accessed: '2019-11-13'
     date_published: '2017'
     citation_full: OECD (2017). How's Life? 2017 Measuring Well-being. Online data annex, Figure A.30, Social support. (2017). Friends and family support – OECD based on Gallup (2016).
+    description: The OECD average is population-weighted.
 outs:
   - md5: 6c12dbb1fe351e7514c7b77365151ccb
     size: 3858

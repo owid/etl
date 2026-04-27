@@ -5,6 +5,7 @@ meta:
     date_accessed: '2026-03-06'
     date_published: '2017'
     citation_full: World Bank (2017). World Bank (2017).
+    description: Wealth is the value of an economy's capital stocks. GDP is seen as the return on wealth. The World Bank calculates wealth as the sum of produced capital, natural capital, human capital, net foreign assets.
 outs:
   - md5: 6eff49a52d6f7bd6bd8eb22a5e25dae6
     size: 17338
