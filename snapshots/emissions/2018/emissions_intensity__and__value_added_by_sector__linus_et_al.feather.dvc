@@ -1,14 +1,15 @@
 meta:
   origin:
-    title: Emissions intensity & value added by sector - World Input-Output Tables
-    producer: Emissions intensity & value added by sector - World Input-Output Tables
+    producer: Timmer et al.
+    title: World Input-Output Database
     description: |-
-      Figures are derived from authors based on data from the (WIOD) World Input-Output Dataset.
-
-      World Input-Output Database 2013 release [Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R. and de Vries, G. J. (2015),"An Illustrated User Guide to the World Input–Output Database: the Case of Global Automotive Production", Review of International Economics., 23: 575–605]. Year 2009 in basic prices, value added computed as net sectoral output (gross sectoral output less sectoral input).
+      The World Input-Output Database (WIOD) provides time-series of world input-output tables for forty countries and a model for the rest of the world, covering the period 1995-2011.
+    description_snapshot: |-
+      Emissions intensity and value added by sector are derived from the WIOD 2013 release. Year 2009 figures are reported in basic prices; value added is computed as net sectoral output (gross sectoral output less sectoral input).
+    citation_full: 'Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., and de Vries, G. J. (2015). An Illustrated User Guide to the World Input–Output Database: the Case of Global Automotive Production. Review of International Economics, 23: 575–605.'
+    version_producer: 2013 release
     date_accessed: '2026-03-05'
-    date_published: '2018'
-    citation_full: Emissions intensity & value added by sector - World Input-Output Tables (2018). Emissions intensity & value added by sector - World Input-Output Tables.
+    date_published: '2013'
 outs:
   - md5: d773b51364c7caa2b77975a575b63c61
     size: 11922
