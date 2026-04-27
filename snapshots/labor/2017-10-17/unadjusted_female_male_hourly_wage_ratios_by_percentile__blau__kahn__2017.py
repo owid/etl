@@ -24,7 +24,9 @@ def main(upload: bool) -> None:
     )
     snap_values.pull()
     # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
-    snap = Snapshot("labor/2017-10-17/unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017.feather")
+    snap = Snapshot(
+        "labor/2017-10-17/unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017.feather"
+    )
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))

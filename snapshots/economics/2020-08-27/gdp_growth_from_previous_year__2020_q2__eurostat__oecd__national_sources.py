@@ -24,7 +24,9 @@ def main(upload: bool) -> None:
     )
     snap_values.pull()
     # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
-    snap = Snapshot("economics/2020-08-27/gdp_growth_from_previous_year__2020_q2__eurostat__oecd__national_sources.feather")
+    snap = Snapshot(
+        "economics/2020-08-27/gdp_growth_from_previous_year__2020_q2__eurostat__oecd__national_sources.feather"
+    )
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))
