@@ -2,14 +2,13 @@ steps:
   #
   # EM-DAT Natural disasters.
   #
-  data://meadow/emdat/2025-10-29/natural_disasters:
-    - snapshot://emdat/2025-10-29/natural_disasters.xlsx
   #
   # EM-DAT Natural disasters.
   #
   # The following dataset has a table for yearly data and another for decadal data.
   data://garden/emdat/2025-10-29/natural_disasters:
-    - data://meadow/emdat/2025-10-29/natural_disasters
+    - data://meadow/emdat/2025-10-29/natural_disasters:
+      - snapshot://emdat/2025-10-29/natural_disasters.xlsx
     - data://garden/worldbank_wdi/2025-09-08/wdi
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
@@ -47,19 +46,17 @@ steps:
   #
   # NOAA/NCEI Natural Hazards Data
   #
-  data://meadow/noaa_ncei/2025-10-30/natural_hazards:
-    - snapshot://noaa_ncei/2025-10-30/natural_hazards_tsunamis.csv
-    - snapshot://noaa_ncei/2025-10-30/natural_hazards_volcanoes.csv
-    - snapshot://noaa_ncei/2025-10-30/natural_hazards_earthquakes.csv
   #
   # NOAA/NCEI Natural Hazards Data
   #
-  data://garden/noaa_ncei/2025-10-30/natural_hazards:
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
-    - data://meadow/noaa_ncei/2025-10-30/natural_hazards
   #
   # NOAA/NCEI Natural Hazards Data
   #
   data://grapher/noaa_ncei/2025-10-30/natural_hazards:
-    - data://garden/noaa_ncei/2025-10-30/natural_hazards
+    - data://garden/noaa_ncei/2025-10-30/natural_hazards:
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2025-07-01/income_groups
+      - data://meadow/noaa_ncei/2025-10-30/natural_hazards:
+        - snapshot://noaa_ncei/2025-10-30/natural_hazards_tsunamis.csv
+        - snapshot://noaa_ncei/2025-10-30/natural_hazards_volcanoes.csv
+        - snapshot://noaa_ncei/2025-10-30/natural_hazards_earthquakes.csv

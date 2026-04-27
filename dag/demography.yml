@@ -58,60 +58,52 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/un/2024-07-12/un_wpp:
     - data://garden/un/2024-07-12/un_wpp
-  data://grapher/un/2024-07-12/un_wpp_full:
-    - data://garden/un/2024-07-12/un_wpp
   export://explorers/un/latest/un_wpp:
     - data://grapher/un/2024-07-12/un_wpp
-    - data://grapher/un/2024-07-12/un_wpp_full
+    - data://grapher/un/2024-07-12/un_wpp_full:
+      - data://garden/un/2024-07-12/un_wpp
 
   # UN WPP (2022)
-  data://meadow/un/2022-07-11/un_wpp:
-    - snapshot://un/2022-07-11/un_wpp.zip
   data://garden/un/2022-07-11/un_wpp:
-    - data://meadow/un/2022-07-11/un_wpp
+    - data://meadow/un/2022-07-11/un_wpp:
+      - snapshot://un/2022-07-11/un_wpp.zip
   data://grapher/un/2022-07-11/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
 
   # WPP Historical comparison
-  data://garden/demography/2024-07-12/un_wpp_historical:
-    - snapshot://fasttrack/latest/un_wpp_historical.csv
-    - data://garden/un/2024-07-12/un_wpp
-    - data://garden/un/2022-07-11/un_wpp
   data://grapher/demography/2024-07-12/un_wpp_historical:
-    - data://garden/demography/2024-07-12/un_wpp_historical
+    - data://garden/demography/2024-07-12/un_wpp_historical:
+      - snapshot://fasttrack/latest/un_wpp_historical.csv
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/un/2022-07-11/un_wpp
 
   # UN WPP largest age-group per country
-  data://garden/un/2024-03-14/un_wpp_most:
-    - data://garden/un/2024-07-12/un_wpp
   data://grapher/un/2024-03-14/un_wpp_most:
-    - data://garden/un/2024-03-14/un_wpp_most
+    - data://garden/un/2024-03-14/un_wpp_most:
+      - data://garden/un/2024-07-12/un_wpp
 
   # HYDE ########################################
   # HYDE 3.3
-  data://meadow/hyde/2024-01-02/all_indicators:
-    - snapshot://hyde/2024-01-02/all_indicators.zip
-    - snapshot://hyde/2024-01-02/general_files.zip
   data://garden/hyde/2024-01-02/all_indicators:
-    - data://meadow/hyde/2024-01-02/all_indicators
+    - data://meadow/hyde/2024-01-02/all_indicators:
+      - snapshot://hyde/2024-01-02/all_indicators.zip
+      - snapshot://hyde/2024-01-02/general_files.zip
     - data://garden/regions/2023-01-01/regions
   data://grapher/hyde/2024-01-02/all_indicators:
     - data://garden/hyde/2024-01-02/all_indicators
 
   # HYDE (2017)
-  data://meadow/hyde/2017/baseline:
-    - snapshot://hyde/2017/baseline.zip
-    - data://meadow/hyde/2017/general_files
-  data://meadow/hyde/2017/general_files:
-    - snapshot://hyde/2017/general_files.zip
   data://garden/hyde/2017/baseline:
-    - data://meadow/hyde/2017/baseline
+    - data://meadow/hyde/2017/baseline:
+      - snapshot://hyde/2017/baseline.zip
+      - data://meadow/hyde/2017/general_files:
+        - snapshot://hyde/2017/general_files.zip
 
   # others #######################################
   # Population (Fariss et al.)
-  data://meadow/demography/2023-12-20/population_fariss:
-    - snapshot://demography/2023-12-20/population_fariss.rds
   data://garden/demography/2023-12-20/population_fariss:
-    - data://meadow/demography/2023-12-20/population_fariss
+    - data://meadow/demography/2023-12-20/population_fariss:
+      - snapshot://demography/2023-12-20/population_fariss.rds
     - data://garden/countries/2024-01-08/gleditsch_no_population
 
   ## Population doubling times
@@ -121,69 +113,61 @@ steps:
     - data://garden/demography/2024-07-18/population_doubling_times
 
   ## Population comparison
-  data://garden/demography/2023-06-27/world_population_comparison:
-    - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
-    - data://garden/demography/2023-03-31/population
-    - data://garden/hyde/2017/baseline
-    - data://garden/gapminder/2023-03-31/population
-    - data://garden/un/2022-07-11/un_wpp
   data://grapher/demography/2023-07-03/world_population_comparison:
-    - data://garden/demography/2023-06-27/world_population_comparison
+    - data://garden/demography/2023-06-27/world_population_comparison:
+      - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
+      - data://garden/demography/2023-03-31/population
+      - data://garden/hyde/2017/baseline
+      - data://garden/gapminder/2023-03-31/population
+      - data://garden/un/2022-07-11/un_wpp
 
   # Maddison working paper (2022)
-  data://meadow/ggdc/2024-01-19/maddison_federico_paper:
-    - snapshot://ggdc/2024-01-19/maddison_federico_paper.xlsx
   data://garden/ggdc/2024-01-19/maddison_federico_paper:
-    - data://meadow/ggdc/2024-01-19/maddison_federico_paper
+    - data://meadow/ggdc/2024-01-19/maddison_federico_paper:
+      - snapshot://ggdc/2024-01-19/maddison_federico_paper.xlsx
 
   #
   # Population of the Republic of Ireland territory between 1841 and 2006 (Central Statistics Office of Ireland)
   #
-  data://meadow/demography/2025-12-10/population_ireland:
-    - snapshot://demography/2025-12-10/population_ireland.csv
   data://garden/demography/2025-12-10/population_ireland:
-    - data://meadow/demography/2025-12-10/population_ireland
+    - data://meadow/demography/2025-12-10/population_ireland:
+      - snapshot://demography/2025-12-10/population_ireland.csv
 
   ########################################################################
   # Life expectancy                                                      #
   ########################################################################
 
   # Zijdeman et al
-  data://meadow/demography/2023-10-10/zijdeman_et_al_2015:
-    - snapshot://demography/2023-10-10/zijdeman_et_al_2015.xlsx
   data://garden/demography/2023-10-10/zijdeman_et_al_2015:
-    - data://meadow/demography/2023-10-10/zijdeman_et_al_2015
+    - data://meadow/demography/2023-10-10/zijdeman_et_al_2015:
+      - snapshot://demography/2023-10-10/zijdeman_et_al_2015.xlsx
 
   # Riley
-  data://meadow/demography/2023-10-10/riley_2005:
-    - snapshot://demography/2023-10-10/riley_2005.pdf
   data://garden/demography/2023-10-10/riley_2005:
-    - data://meadow/demography/2023-10-10/riley_2005
+    - data://meadow/demography/2023-10-10/riley_2005:
+      - snapshot://demography/2023-10-10/riley_2005.pdf
 
   # Human Mortality Database
-  data://meadow/hmd/2025-10-22/hmd:
-    - snapshot://hmd/2025-10-22/hmd.zip
   data://garden/hmd/2025-10-22/hmd:
-    - data://meadow/hmd/2025-10-22/hmd
+    - data://meadow/hmd/2025-10-22/hmd:
+      - snapshot://hmd/2025-10-22/hmd.zip
   data://grapher/hmd/2025-10-22/hmd:
     - data://garden/hmd/2025-10-22/hmd
 
   # UN WPP Life Tables
-  data://meadow/un/2024-12-02/un_wpp_lt:
-    - snapshot://un/2024-12-02/un_wpp_lt_m.csv
-    - snapshot://un/2024-12-02/un_wpp_lt_all.csv
-    - snapshot://un/2024-12-02/un_wpp_lt_f.csv
-    - snapshot://un/2024-12-02/un_wpp_lt_proj_m.csv
-    - snapshot://un/2024-12-02/un_wpp_lt_proj_all.csv
-    - snapshot://un/2024-12-02/un_wpp_lt_proj_f.csv
   data://garden/un/2024-12-02/un_wpp_lt:
-    - data://meadow/un/2024-12-02/un_wpp_lt
+    - data://meadow/un/2024-12-02/un_wpp_lt:
+      - snapshot://un/2024-12-02/un_wpp_lt_m.csv
+      - snapshot://un/2024-12-02/un_wpp_lt_all.csv
+      - snapshot://un/2024-12-02/un_wpp_lt_f.csv
+      - snapshot://un/2024-12-02/un_wpp_lt_proj_m.csv
+      - snapshot://un/2024-12-02/un_wpp_lt_proj_all.csv
+      - snapshot://un/2024-12-02/un_wpp_lt_proj_f.csv
 
   # Survivorship ages (HMD-derived)
-  data://garden/demography/2025-10-22/survivor_percentiles:
-    - data://garden/hmd/2025-10-22/hmd
   data://grapher/demography/2025-10-22/survivor_percentiles:
-    - data://garden/demography/2025-10-22/survivor_percentiles
+    - data://garden/demography/2025-10-22/survivor_percentiles:
+      - data://garden/hmd/2025-10-22/hmd
 
   # UN WPP + HMD Life Tables
   data://garden/demography/2025-10-22/life_tables:
@@ -193,174 +177,145 @@ steps:
     - data://garden/demography/2025-10-22/life_tables
 
   # OMM: Life Expectancy
-  data://garden/demography/2025-10-22/life_expectancy:
-    - data://garden/demography/2023-10-10/riley_2005
-    - data://garden/demography/2023-10-10/zijdeman_et_al_2015
-    - data://garden/demography/2025-10-22/life_tables
-    - data://garden/un/2024-07-12/un_wpp
   data://grapher/demography/2025-10-22/life_expectancy:
-    - data://garden/demography/2025-10-22/life_expectancy
+    - data://garden/demography/2025-10-22/life_expectancy:
+      - data://garden/demography/2023-10-10/riley_2005
+      - data://garden/demography/2023-10-10/zijdeman_et_al_2015
+      - data://garden/demography/2025-10-22/life_tables
+      - data://garden/un/2024-07-12/un_wpp
 
   # Broken limits of Life Expectancy
-  data://garden/demography/2025-10-22/broken_limits_le:
-    - data://garden/hmd/2025-10-22/hmd
-    - data://garden/demography/2025-10-22/life_tables
   data://grapher/demography/2025-10-22/broken_limits_le:
-    - data://garden/demography/2025-10-22/broken_limits_le
+    - data://garden/demography/2025-10-22/broken_limits_le:
+      - data://garden/hmd/2025-10-22/hmd
+      - data://garden/demography/2025-10-22/life_tables
 
   # Phi-gender life expectancy inequality
-  data://garden/demography/2025-10-22/phi_gender_le:
-    - data://garden/demography/2025-10-22/life_tables
   data://grapher/demography/2025-10-22/phi_gender_le:
-    - data://garden/demography/2025-10-22/phi_gender_le
+    - data://garden/demography/2025-10-22/phi_gender_le:
+      - data://garden/demography/2025-10-22/life_tables
 
   # Gini Life Expectancy Inequality
-  data://garden/demography/2025-10-22/gini_le:
-    - data://garden/demography/2025-10-22/life_tables
   data://grapher/demography/2025-10-22/gini_le:
-    - data://garden/demography/2025-10-22/gini_le
+    - data://garden/demography/2025-10-22/gini_le:
+      - data://garden/demography/2025-10-22/life_tables
 
   # Life Expectancy OECD
-  data://meadow/oecd/2023-10-11/life_expectancy_birth:
-    - snapshot://oecd/2023-10-11/life_expectancy_birth.csv
-  data://garden/oecd/2023-10-11/life_expectancy_birth:
-    - data://meadow/oecd/2023-10-11/life_expectancy_birth
   data://grapher/oecd/2023-10-11/life_expectancy_birth:
-    - data://garden/oecd/2023-10-11/life_expectancy_birth
+    - data://garden/oecd/2023-10-11/life_expectancy_birth:
+      - data://meadow/oecd/2023-10-11/life_expectancy_birth:
+        - snapshot://oecd/2023-10-11/life_expectancy_birth.csv
 
   # Contribution to sex gap in Life Expectancy
-  data://meadow/demography/2023-11-08/le_sex_gap_age_contribution:
-    - snapshot://demography/2023-11-08/le_sex_gap_age_contribution.zip
-  data://garden/demography/2023-11-08/le_sex_gap_age_contribution:
-    - data://meadow/demography/2023-11-08/le_sex_gap_age_contribution
   data://grapher/demography/2023-11-08/le_sex_gap_age_contribution:
-    - data://garden/demography/2023-11-08/le_sex_gap_age_contribution
+    - data://garden/demography/2023-11-08/le_sex_gap_age_contribution:
+      - data://meadow/demography/2023-11-08/le_sex_gap_age_contribution:
+        - snapshot://demography/2023-11-08/le_sex_gap_age_contribution.zip
 
   # Modal age at death
-  data://meadow/demography/2023-11-08/modal_age_death:
-    - snapshot://demography/2023-11-08/modal_age_death.xlsx
-  data://garden/demography/2023-11-08/modal_age_death:
-    - data://meadow/demography/2023-11-08/modal_age_death
   data://grapher/demography/2023-11-08/modal_age_death:
-    - data://garden/demography/2023-11-08/modal_age_death
+    - data://garden/demography/2023-11-08/modal_age_death:
+      - data://meadow/demography/2023-11-08/modal_age_death:
+        - snapshot://demography/2023-11-08/modal_age_death.xlsx
 
   ########################################################################
   # Fertility                                                            #
   ########################################################################
 
   # Mothers by decadal age-group
-  data://garden/un/2024-10-01/births_by_age:
-    - data://garden/un/2024-07-12/un_wpp
   data://grapher/un/2024-10-01/births_by_age:
-    - data://garden/un/2024-10-01/births_by_age
+    - data://garden/un/2024-10-01/births_by_age:
+      - data://garden/un/2024-07-12/un_wpp
 
   # Human Fertility Database
-  data://meadow/hmd/2025-10-22/hfd:
-    - snapshot://hmd/2025-10-22/hfd.zip
   data://garden/hmd/2025-10-22/hfd:
-    - data://meadow/hmd/2025-10-22/hfd
+    - data://meadow/hmd/2025-10-22/hfd:
+      - snapshot://hmd/2025-10-22/hfd.zip
   data://grapher/hmd/2025-10-22/hfd:
     - data://garden/hmd/2025-10-22/hfd
 
   # Multiple births
-  data://meadow/demography/2024-11-26/multiple_births:
-    - snapshot://demography/2024-11-26/multiple_births.7z
-  data://garden/demography/2024-11-26/multiple_births:
-    - data://meadow/demography/2024-11-26/multiple_births
   data://grapher/demography/2024-11-26/multiple_births:
-    - data://garden/demography/2024-11-26/multiple_births
+    - data://garden/demography/2024-11-26/multiple_births:
+      - data://meadow/demography/2024-11-26/multiple_births:
+        - snapshot://demography/2024-11-26/multiple_births.7z
 
   # OMM: Fertility Rate -- HFD + UN WPP
-  data://garden/demography/2025-10-22/fertility_rate:
-    - data://garden/hmd/2025-10-22/hfd
-    - data://garden/un/2024-07-12/un_wpp
   data://grapher/demography/2025-10-22/fertility_rate:
-    - data://garden/demography/2025-10-22/fertility_rate
+    - data://garden/demography/2025-10-22/fertility_rate:
+      - data://garden/hmd/2025-10-22/hfd
+      - data://garden/un/2024-07-12/un_wpp
 
   # OMM: Birth rate -- HMD + UN WPP
-  data://garden/demography/2025-10-22/birth_rate:
-    - data://garden/hmd/2025-10-22/hmd
-    - data://garden/un/2024-07-12/un_wpp
   data://grapher/demography/2025-10-22/birth_rate:
-    - data://garden/demography/2025-10-22/birth_rate
+    - data://garden/demography/2025-10-22/birth_rate:
+      - data://garden/hmd/2025-10-22/hmd
+      - data://garden/un/2024-07-12/un_wpp
 
   # HMD country data
-  data://meadow/hmd/2025-10-22/hmd_country:
-    - snapshot://hmd/2025-10-22/hmd_country.zip
-  data://garden/hmd/2025-10-22/hmd_country:
-    - data://meadow/hmd/2025-10-22/hmd_country
-    - data://garden/hmd/2025-10-22/hmd
   data://grapher/hmd/2025-10-22/hmd_country:
-    - data://garden/hmd/2025-10-22/hmd_country
+    - data://garden/hmd/2025-10-22/hmd_country:
+      - data://meadow/hmd/2025-10-22/hmd_country:
+        - snapshot://hmd/2025-10-22/hmd_country.zip
+      - data://garden/hmd/2025-10-22/hmd
 
   # Patternal ages (Kai & Klüssner)
-  data://meadow/demography/2024-12-05/paternal_ages:
-    - snapshot://demography/2024-12-04/paternal_ages.rdata
-  data://garden/demography/2024-12-05/paternal_ages:
-    - data://meadow/demography/2024-12-05/paternal_ages
   data://grapher/demography/2024-12-05/paternal_ages:
-    - data://garden/demography/2024-12-05/paternal_ages
+    - data://garden/demography/2024-12-05/paternal_ages:
+      - data://meadow/demography/2024-12-05/paternal_ages:
+        - snapshot://demography/2024-12-04/paternal_ages.rdata
 
   #
   # Effective Fertility Rate (Malani & Jacob)
   #
-  data://garden/demography/2025-10-22/efr_malani_jacob:
-    - data://garden/un/2024-12-02/un_wpp_lt
-    - data://garden/un/2024-07-12/un_wpp
-    - data://garden/hmd/2025-10-22/hmd
   data://grapher/demography/2025-10-22/efr_malani_jacob:
-    - data://garden/demography/2025-10-22/efr_malani_jacob
+    - data://garden/demography/2025-10-22/efr_malani_jacob:
+      - data://garden/un/2024-12-02/un_wpp_lt
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/hmd/2025-10-22/hmd
 
   # Mean Age at childbirth (HFD + UN WPP)
-  data://garden/demography/2025-10-22/mean_age_childbearing:
-    - data://garden/un/2024-07-12/un_wpp
-    - data://garden/hmd/2025-10-22/hfd
   data://grapher/demography/2025-10-22/mean_age_childbearing:
-    - data://garden/demography/2025-10-22/mean_age_childbearing
+    - data://garden/demography/2025-10-22/mean_age_childbearing:
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/hmd/2025-10-22/hfd
 
   ########################################################################
   # Mortality                                                            #
   ########################################################################
 
   # Death rate
-  data://garden/demography/2025-10-22/deaths:
-    - data://garden/un/2024-07-12/un_wpp
-    - data://garden/un/2024-12-02/un_wpp_lt
-    - data://garden/hmd/2025-10-22/hmd
   data://grapher/demography/2025-10-22/deaths:
-    - data://garden/demography/2025-10-22/deaths
+    - data://garden/demography/2025-10-22/deaths:
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/un/2024-12-02/un_wpp_lt
+      - data://garden/hmd/2025-10-22/hmd
+
+  # Wittgenstein Centre (Projections + Historical)
+
+  # Wittgenstein Centre (Historical)
 
   ########################################################################
   # OTHERS
   ########################################################################
   # Wittgenstein Centre (Projections)
-  data://meadow/demography/2026-02-11/wittgenstein_human_capital_proj:
-    - snapshot://demography/2026-02-11/wittgenstein_human_capital.zip
-  data://garden/demography/2026-02-11/wittgenstein_human_capital_proj:
-    - data://meadow/demography/2026-02-11/wittgenstein_human_capital_proj
-
-  # Wittgenstein Centre (Historical)
-  data://meadow/demography/2026-02-11/wittgenstein_human_capital_historical:
-    - snapshot://demography/2026-02-11/wittgenstein_human_capital_historical.zip
-  data://garden/demography/2026-02-11/wittgenstein_human_capital_historical:
-    - data://meadow/demography/2026-02-11/wittgenstein_human_capital_historical
-
-  # Wittgenstein Centre (Projections + Historical)
-  data://garden/demography/2026-02-11/wittgenstein_human_capital:
-    - data://garden/demography/2026-02-11/wittgenstein_human_capital_historical
-    - data://garden/demography/2026-02-11/wittgenstein_human_capital_proj
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
   data://grapher/demography/2026-02-11/wittgenstein_human_capital:
-    - data://garden/demography/2026-02-11/wittgenstein_human_capital
+    - data://garden/demography/2026-02-11/wittgenstein_human_capital:
+      - data://garden/demography/2026-02-11/wittgenstein_human_capital_historical:
+        - data://meadow/demography/2026-02-11/wittgenstein_human_capital_historical:
+          - snapshot://demography/2026-02-11/wittgenstein_human_capital_historical.zip
+      - data://garden/demography/2026-02-11/wittgenstein_human_capital_proj:
+        - data://meadow/demography/2026-02-11/wittgenstein_human_capital_proj:
+          - snapshot://demography/2026-02-11/wittgenstein_human_capital.zip
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2025-07-01/income_groups
 
   #
   # US State Population
   #
-  data://meadow/demography/2025-01-23/us_state_population:
-    - snapshot://demography/2025-01-23/us_state_population.csv
   data://garden/demography/2025-01-23/us_state_population:
-    - data://meadow/demography/2025-01-23/us_state_population
+    - data://meadow/demography/2025-01-23/us_state_population:
+      - snapshot://demography/2025-01-23/us_state_population.csv
 
   # UN WPP data for Cologne
   data://external/demography/latest/un_wpp_subset:
@@ -369,67 +324,56 @@ steps:
   #
   # PEW: Global Religious Composition
   #
-  data://meadow/pew/2025-10-31/religious_composition:
-    - snapshot://pew/2025-10-31/religious_composition.zip
-  data://garden/pew/2025-10-31/religious_composition:
-    - data://meadow/pew/2025-10-31/religious_composition
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/pew/2025-10-31/religious_composition:
-    - data://garden/pew/2025-10-31/religious_composition
   export://multidim/pew/latest/religious_composition:
-    - data://grapher/pew/2025-10-31/religious_composition
+    - data://grapher/pew/2025-10-31/religious_composition:
+      - data://garden/pew/2025-10-31/religious_composition:
+        - data://meadow/pew/2025-10-31/religious_composition:
+          - snapshot://pew/2025-10-31/religious_composition.zip
+        - data://garden/regions/2023-01-01/regions
+        - data://garden/demography/2024-07-15/population
 
   #
   # International Database (US Census Bureau)
   #
-  data://meadow/demography/2026-02-04/census_us_idb:
-    - snapshot://demography/2026-02-04/census_us_idb.zip
-  data://garden/demography/2026-02-04/census_us_idb:
-    - data://meadow/demography/2026-02-04/census_us_idb
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
   data://grapher/demography/2026-02-04/census_us_idb:
-    - data://garden/demography/2026-02-04/census_us_idb
+    - data://garden/demography/2026-02-04/census_us_idb:
+      - data://meadow/demography/2026-02-04/census_us_idb:
+        - snapshot://demography/2026-02-04/census_us_idb.zip
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2025-07-01/income_groups
 
   #
   # TODO: add step name (just something recognizable)
   #
-  data://meadow/demography/2026-02-05/ihme_2020:
-    - snapshot://demography/2026-02-05/ihme_2020_fertility.zip
-    - snapshot://demography/2026-02-05/ihme_2020_migration.zip
-    - snapshot://demography/2026-02-05/ihme_2020_population.zip
-    - snapshot://demography/2026-02-05/ihme_2020_life_expectancy.zip
-    - snapshot://demography/2026-02-05/ihme_2020_population_retro.zip
-    - snapshot://demography/2026-02-05/ihme_2020_population_retro.zip
-    - snapshot://demography/2026-02-05/ihme_2020_live_births.zip
-    - snapshot://demography/2026-02-05/ihme_2020_population_ref.zip
-  data://garden/demography/2026-02-05/ihme_2020:
-    - data://meadow/demography/2026-02-05/ihme_2020
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
   data://grapher/demography/2026-02-05/ihme_2020:
-    - data://garden/demography/2026-02-05/ihme_2020
+    - data://garden/demography/2026-02-05/ihme_2020:
+      - data://meadow/demography/2026-02-05/ihme_2020:
+        - snapshot://demography/2026-02-05/ihme_2020_fertility.zip
+        - snapshot://demography/2026-02-05/ihme_2020_migration.zip
+        - snapshot://demography/2026-02-05/ihme_2020_population.zip
+        - snapshot://demography/2026-02-05/ihme_2020_life_expectancy.zip
+        - snapshot://demography/2026-02-05/ihme_2020_population_retro.zip
+        - snapshot://demography/2026-02-05/ihme_2020_population_retro.zip
+        - snapshot://demography/2026-02-05/ihme_2020_live_births.zip
+        - snapshot://demography/2026-02-05/ihme_2020_population_ref.zip
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2025-07-01/income_groups
+
+  # Wittgenstein Centre (Historical)
 
   ########################################################################
   # OTHERS (legacy, used downstream -- regularly check)
   ########################################################################
   # Wittgenstein Centre (Projections)
-  data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj:
-    - snapshot://demography/2024-12-06/wittgenstein_human_capital.zip
-  data://garden/demography/2024-12-06/wittgenstein_human_capital_proj:
-    - data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj
-
-  # Wittgenstein Centre (Historical)
-  data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical:
-    - snapshot://demography/2024-12-06/wittgenstein_human_capital_historical.zip
-  data://garden/demography/2024-12-06/wittgenstein_human_capital_historical:
-    - data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical
 
   # Wittgenstein Centre (Projections + Historical)
   data://garden/demography/2024-12-06/wittgenstein_human_capital:
-    - data://garden/demography/2024-12-06/wittgenstein_human_capital_historical
-    - data://garden/demography/2024-12-06/wittgenstein_human_capital_proj
+    - data://garden/demography/2024-12-06/wittgenstein_human_capital_historical:
+      - data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical:
+        - snapshot://demography/2024-12-06/wittgenstein_human_capital_historical.zip
+    - data://garden/demography/2024-12-06/wittgenstein_human_capital_proj:
+      - data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj:
+        - snapshot://demography/2024-12-06/wittgenstein_human_capital.zip
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/demography/2024-12-06/wittgenstein_human_capital:

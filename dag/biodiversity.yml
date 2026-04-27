@@ -1,85 +1,66 @@
 # Biodiversity - cherry blossom dataset
 steps:
 # Cherry blossom dataset (2026 update)
-  data://meadow/biodiversity/2026-04-16/cherry_blossom:
-    - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
-    - snapshot://biodiversity/2026-04-16/cherry_blossom.csv
-  data://garden/biodiversity/2026-04-16/cherry_blossom:
-    - data://meadow/biodiversity/2026-04-16/cherry_blossom
   data://grapher/biodiversity/2026-04-16/cherry_blossom:
-    - data://garden/biodiversity/2026-04-16/cherry_blossom
+    - data://garden/biodiversity/2026-04-16/cherry_blossom:
+      - data://meadow/biodiversity/2026-04-16/cherry_blossom:
+        - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
+        - snapshot://biodiversity/2026-04-16/cherry_blossom.csv
 
   # Invasive species -  Seebens et al
-  data://meadow/biodiversity/2024-08-12/invasive_species:
-    - snapshot://biodiversity/2024-08-12/invasive_species.xlsx
-  data://garden/biodiversity/2024-08-12/invasive_species:
-    - data://meadow/biodiversity/2024-08-12/invasive_species
   data://grapher/biodiversity/2024-08-12/invasive_species:
-    - data://garden/biodiversity/2024-08-12/invasive_species
+    - data://garden/biodiversity/2024-08-12/invasive_species:
+      - data://meadow/biodiversity/2024-08-12/invasive_species:
+        - snapshot://biodiversity/2024-08-12/invasive_species.xlsx
 
   # Living Planet Index
-  data://meadow/biodiversity/2024-09-30/living_planet_index:
-    - snapshot://biodiversity/2024-09-30/living_planet_index.xlsx
-  data://garden/biodiversity/2024-09-30/living_planet_index:
-    - data://meadow/biodiversity/2024-09-30/living_planet_index
   data://grapher/biodiversity/2024-09-30/living_planet_index:
-    - data://garden/biodiversity/2024-09-30/living_planet_index
+    - data://garden/biodiversity/2024-09-30/living_planet_index:
+      - data://meadow/biodiversity/2024-09-30/living_planet_index:
+        - snapshot://biodiversity/2024-09-30/living_planet_index.xlsx
 
   # LPI - Share of populations increasing or decreasing
-  data://garden/biodiversity/2024-09-30/living_planet_index_share:
-    - snapshot://biodiversity/2024-09-30/living_planet_index_share.csv
   data://grapher/biodiversity/2024-09-30/living_planet_index_share:
-    - data://garden/biodiversity/2024-09-30/living_planet_index_share
+    - data://garden/biodiversity/2024-09-30/living_planet_index_share:
+      - snapshot://biodiversity/2024-09-30/living_planet_index_share.csv
 
   # LPI - Share of populations increasing or decreasing
-  data://garden/biodiversity/2024-09-30/living_planet_index_completeness:
-    - snapshot://biodiversity/2024-09-30/living_planet_index_completeness.csv
   data://grapher/biodiversity/2024-09-30/living_planet_index_completeness:
-    - data://garden/biodiversity/2024-09-30/living_planet_index_completeness
+    - data://garden/biodiversity/2024-09-30/living_planet_index_completeness:
+      - snapshot://biodiversity/2024-09-30/living_planet_index_completeness.csv
 
   #
 
   #
   # Habitat loss
   #
-  data://garden/biodiversity/2021-01-01/habitat_loss:
-    - snapshot://biodiversity/2021-01-01/habitat_loss.feather
-  data://grapher/biodiversity/2021-01-01/habitat_loss:
-    - data://garden/biodiversity/2021-01-01/habitat_loss
   export://explorers/biodiversity/latest/habitat_loss:
-    - data://grapher/biodiversity/2021-01-01/habitat_loss
+    - data://grapher/biodiversity/2021-01-01/habitat_loss:
+      - data://garden/biodiversity/2021-01-01/habitat_loss:
+        - snapshot://biodiversity/2021-01-01/habitat_loss.feather
 
   # IUCN Threatened and Evaluated species
-  data://meadow/iucn/2026-01-05/threatened_and_evaluated_species:
-    - snapshot://iucn/2026-01-05/threatened_and_evaluated_species.csv
-  data://garden/iucn/2026-01-05/threatened_and_evaluated_species:
-    - data://meadow/iucn/2026-01-05/threatened_and_evaluated_species
   data://grapher/iucn/2026-01-05/threatened_and_evaluated_species:
-    - data://garden/iucn/2026-01-05/threatened_and_evaluated_species
-  # Endemic fish species
-  data://meadow/iucn/2026-01-05/endemic_fish:
-    - snapshot://iucn/2026-01-05/endemic_fish.csv
+    - data://garden/iucn/2026-01-05/threatened_and_evaluated_species:
+      - data://meadow/iucn/2026-01-05/threatened_and_evaluated_species:
+        - snapshot://iucn/2026-01-05/threatened_and_evaluated_species.csv
   # IUCN Endemic vertebrate species
-  data://meadow/iucn/2026-01-05/endemic_vertebrates:
-    - snapshot://iucn/2026-01-05/endemic_vertebrates.csv
-  data://garden/iucn/2026-01-05/endemic_vertebrates:
-    - data://meadow/iucn/2026-01-05/endemic_fish
-    - data://meadow/iucn/2026-01-05/endemic_vertebrates
+  # Endemic fish species
   data://grapher/iucn/2026-01-05/endemic_vertebrates:
-    - data://garden/iucn/2026-01-05/endemic_vertebrates
+    - data://garden/iucn/2026-01-05/endemic_vertebrates:
+      - data://meadow/iucn/2026-01-05/endemic_fish:
+        - snapshot://iucn/2026-01-05/endemic_fish.csv
+      - data://meadow/iucn/2026-01-05/endemic_vertebrates:
+        - snapshot://iucn/2026-01-05/endemic_vertebrates.csv
   # IUCN Endemic invertebrate species
-  data://meadow/iucn/2026-01-05/endemic_invertebrates:
-    - snapshot://iucn/2026-01-05/endemic_invertebrates.csv
-  data://garden/iucn/2026-01-05/endemic_invertebrates:
-    - data://meadow/iucn/2026-01-05/endemic_invertebrates
   data://grapher/iucn/2026-01-05/endemic_invertebrates:
-    - data://garden/iucn/2026-01-05/endemic_invertebrates
+    - data://garden/iucn/2026-01-05/endemic_invertebrates:
+      - data://meadow/iucn/2026-01-05/endemic_invertebrates:
+        - snapshot://iucn/2026-01-05/endemic_invertebrates.csv
   #
   # IUCN Number of species in each extinction risk category
   #
-  data://meadow/iucn/2026-01-05/iucn_number_each_status:
-    - snapshot://iucn/2026-01-05/iucn_number_each_status.csv
-  data://garden/iucn/2026-01-05/iucn_number_each_status:
-    - data://meadow/iucn/2026-01-05/iucn_number_each_status
   data://grapher/iucn/2026-01-05/iucn_number_each_status:
-    - data://garden/iucn/2026-01-05/iucn_number_each_status
+    - data://garden/iucn/2026-01-05/iucn_number_each_status:
+      - data://meadow/iucn/2026-01-05/iucn_number_each_status:
+        - snapshot://iucn/2026-01-05/iucn_number_each_status.csv

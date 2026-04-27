@@ -1,66 +1,55 @@
 steps:
   # Maddison Project Database
-  data://meadow/ggdc/2024-04-26/maddison_project_database:
-    - snapshot://ggdc/2024-04-26/maddison_project_database.xlsx
   data://garden/ggdc/2024-04-26/maddison_project_database:
-    - data://meadow/ggdc/2024-04-26/maddison_project_database
+    - data://meadow/ggdc/2024-04-26/maddison_project_database:
+      - snapshot://ggdc/2024-04-26/maddison_project_database.xlsx
   data://grapher/ggdc/2024-04-26/maddison_project_database:
     - data://garden/ggdc/2024-04-26/maddison_project_database
 
+    # Maddison Database 2010
+
   # Global GDP in the long run (with WDI)
-  data://garden/growth/2024-05-16/gdp_historical:
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/ggdc/2022-12-23/maddison_database
-    - data://grapher/worldbank_wdi/2026-02-27/wdi
   data://grapher/growth/2024-05-16/gdp_historical:
-    - data://garden/growth/2024-05-16/gdp_historical
+    - data://garden/growth/2024-05-16/gdp_historical:
+      - data://garden/ggdc/2024-04-26/maddison_project_database
+      - data://garden/ggdc/2022-12-23/maddison_database:
+        - data://meadow/ggdc/2022-12-23/maddison_database:
+          - snapshot://ggdc/2022-12-23/maddison_database.xlsx
+      - data://grapher/worldbank_wdi/2026-02-27/wdi
 
   # Penn World Table
-  data://meadow/ggdc/2025-10-09/penn_world_table:
-    - snapshot://ggdc/2025-10-09/penn_world_table.xlsx
-  data://meadow/ggdc/2025-10-09/penn_world_table_national_accounts:
-    - snapshot://ggdc/2025-10-09/penn_world_table_national_accounts.xlsx
-    - data://garden/regions/2023-01-01/regions
-  data://garden/ggdc/2025-10-09/penn_world_table_national_accounts:
-    - data://meadow/ggdc/2025-10-09/penn_world_table_national_accounts
   data://garden/ggdc/2025-10-09/penn_world_table:
-    - data://meadow/ggdc/2025-10-09/penn_world_table
-    - data://garden/ggdc/2025-10-09/penn_world_table_national_accounts
+    - data://meadow/ggdc/2025-10-09/penn_world_table:
+      - snapshot://ggdc/2025-10-09/penn_world_table.xlsx
+    - data://garden/ggdc/2025-10-09/penn_world_table_national_accounts:
+      - data://meadow/ggdc/2025-10-09/penn_world_table_national_accounts:
+        - snapshot://ggdc/2025-10-09/penn_world_table_national_accounts.xlsx
+        - data://garden/regions/2023-01-01/regions
   data://grapher/ggdc/2025-10-09/penn_world_table:
     - data://garden/ggdc/2025-10-09/penn_world_table
 
-    # Maddison Database 2010
-  data://meadow/ggdc/2022-12-23/maddison_database:
-    - snapshot://ggdc/2022-12-23/maddison_database.xlsx
-  data://garden/ggdc/2022-12-23/maddison_database:
-    - data://meadow/ggdc/2022-12-23/maddison_database
-
       # IMF World Economic Outlook
-  data://meadow/imf/2026-04-22/world_economic_outlook:
-    - snapshot://imf/2026-04-22/world_economic_outlook.csv
-  data://garden/imf/2026-04-22/world_economic_outlook:
-    - data://meadow/imf/2026-04-22/world_economic_outlook
   data://grapher/imf/2026-04-22/world_economic_outlook:
-    - data://garden/imf/2026-04-22/world_economic_outlook
+    - data://garden/imf/2026-04-22/world_economic_outlook:
+      - data://meadow/imf/2026-04-22/world_economic_outlook:
+        - snapshot://imf/2026-04-22/world_economic_outlook.csv
 
   #
   # Average working hours - Huberman and Minns (2007)
   #
-  data://meadow/working_hours/2025-08-05/huberman_minns:
-    - snapshot://working_hours/2025-08-05/huberman_minns.csv
   data://garden/working_hours/2025-08-05/huberman_minns:
-    - data://meadow/working_hours/2025-08-05/huberman_minns
+    - data://meadow/working_hours/2025-08-05/huberman_minns:
+      - snapshot://working_hours/2025-08-05/huberman_minns.csv
   data://grapher/working_hours/2025-08-05/huberman_minns:
     - data://garden/working_hours/2025-08-05/huberman_minns
 
   #
   # Working hours OMM
   #
-  data://garden/working_hours/2025-08-05/working_hours_omm:
-    - data://garden/ggdc/2025-10-09/penn_world_table
-    - data://garden/working_hours/2025-08-05/huberman_minns
   data://grapher/working_hours/2025-08-05/working_hours_omm:
-    - data://garden/working_hours/2025-08-05/working_hours_omm
+    - data://garden/working_hours/2025-08-05/working_hours_omm:
+      - data://garden/ggdc/2025-10-09/penn_world_table
+      - data://garden/working_hours/2025-08-05/huberman_minns
 
     # GDP per capita vs. living conditions indicators
     # NOTE: Don't forget to run with --private to access the GBD risk factors data
@@ -86,29 +75,25 @@ steps:
   #
   # A millennium of macroeconomic data (Bank of England)
   #
-  data://meadow/bank_of_england/2025-12-29/millennium_macroeconomic_data:
-    - snapshot://bank_of_england/2025-12-29/millennium_macroeconomic_data.xlsx
   data://garden/bank_of_england/2025-12-29/millennium_macroeconomic_data:
-    - data://meadow/bank_of_england/2025-12-29/millennium_macroeconomic_data
+    - data://meadow/bank_of_england/2025-12-29/millennium_macroeconomic_data:
+      - snapshot://bank_of_england/2025-12-29/millennium_macroeconomic_data.xlsx
   #
   # CPI UK (ONS)
   #
-  data://meadow/ons/2025-12-31/cpi_uk:
-    - snapshot://ons/2025-12-31/cpi_uk.csv
   data://garden/ons/2025-12-31/cpi_uk:
-    - data://meadow/ons/2025-12-31/cpi_uk
+    - data://meadow/ons/2025-12-31/cpi_uk:
+      - snapshot://ons/2025-12-31/cpi_uk.csv
 
   #
   # Real average weekly earnings UK (ONS)
   #
-  data://meadow/ons/2025-12-31/average_weekly_earnings_uk:
-    - snapshot://ons/2025-12-31/average_weekly_earnings_uk.xlsx
   data://garden/ons/2025-12-31/average_weekly_earnings_uk:
-    - data://meadow/ons/2025-12-31/average_weekly_earnings_uk
+    - data://meadow/ons/2025-12-31/average_weekly_earnings_uk:
+      - snapshot://ons/2025-12-31/average_weekly_earnings_uk.xlsx
   #
   # A millennium of macroeconomic data (Bank of England) - Version 4 (extract)
   #
-  data://meadow/bank_of_england/2026-01-21/millennium_macroeconomic_data:
-    - snapshot://bank_of_england/2026-01-21/millennium_macroeconomic_data.xlsx
   data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data:
-    - data://meadow/bank_of_england/2026-01-21/millennium_macroeconomic_data
+    - data://meadow/bank_of_england/2026-01-21/millennium_macroeconomic_data:
+      - snapshot://bank_of_england/2026-01-21/millennium_macroeconomic_data.xlsx
