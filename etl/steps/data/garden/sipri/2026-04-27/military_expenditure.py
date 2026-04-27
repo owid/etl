@@ -10,6 +10,16 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define any known outliers for share indicators that are legitimately outside the [0, 100] range. This allows the sanity check to pass without raising errors for these specific cases, while still catching any new unexpected outliers.
+KNOWN_SHARE_OUTLIERS = {
+    # (country, year, indicator) — documented legitimate values outside [0, 100]
+    (
+        "Kuwait",
+        1991,
+        "share_gdp",
+    ),  # Post-Iraqi-liberation defense spending against collapsed wartime GDP — SIPRI publishes ~117% consistently.
+}
+
 
 def run() -> None:
     #
@@ -114,16 +124,6 @@ def correct_belarus(tb: Table) -> Table:
     mask = (tb["country"] == "Belarus") & (tb["year"].between(1992, 2013))
     tb.loc[mask, "share_gdp"] /= 1000
     return tb
-
-
-KNOWN_SHARE_OUTLIERS = {
-    # (country, year, indicator) — documented legitimate values outside [0, 100]
-    (
-        "Kuwait",
-        1991,
-        "share_gdp",
-    ),  # Post-Iraqi-liberation defense spending against collapsed wartime GDP — SIPRI publishes ~117% consistently.
-}
 
 
 def sanity_checks(tb: Table) -> None:
