@@ -285,16 +285,29 @@ This is the **last step**, after the DAG archive has been committed. Don't auto-
 
 - **Anomalist** — flags variables whose new values diverge from the old version beyond statistical thresholds. Catches accidental scale changes, base-year rebases that propagated the wrong way, and silent drops.
   ```
-  http://staging-site-<branch>/etl/wizard/anomalist
+  http://staging-site-<container_branch>/etl/wizard/anomalist
   ```
 - **Chart Diff** — shows side-by-side before/after thumbnails for every chart that uses an upgraded indicator. Catches visual regressions the schema-level checks miss (axis ranges, color steps, legend changes).
   ```
-  http://staging-site-<branch>/etl/wizard/chart-diff
+  http://staging-site-<container_branch>/etl/wizard/chart-diff
   ```
 
-Tell the user something like: "Final QA: please review **[Anomalist](http://staging-site-<branch>/etl/wizard/anomalist)** and **[Chart Diff](http://staging-site-<branch>/etl/wizard/chart-diff)** in the Wizard. If anything looks off, let me know and I'll investigate."
+**Important: derive `<container_branch>` correctly.** The staging hostname is **not** simply `staging-site-<branch>`. The container name is produced by `get_container_name(branch)` in `etl/config.py`:
 
-Replace `<branch>` with the actual work branch name (e.g. `data-military-expenditure-2026`). These pages need a fresh staging build, so they're only meaningful after the PR's grapher upload to staging has completed and the staging server has rebuilt.
+1. Replace `/`, `.`, `_` with `-` in the branch name.
+2. Strip a leading `staging-site-` if present.
+3. **Truncate to the first 28 characters** (Cloudflare DNS limit).
+4. Strip any trailing `-`.
+
+Branches over 28 chars therefore get clipped. Example: `data-military-expenditure-2026` (30 chars) → container `data-military-expenditure-20` → hostname `staging-site-data-military-expenditure-20`. The simplest way to get the correct value is to call the helper:
+
+```bash
+.venv/bin/python -c "from etl.config import get_container_name; print(get_container_name('<branch>'))"
+```
+
+Tell the user something like: "Final QA: please review **[Anomalist](http://<container_name>/etl/wizard/anomalist)** and **[Chart Diff](http://<container_name>/etl/wizard/chart-diff)** in the Wizard. If anything looks off, let me know and I'll investigate."
+
+These pages need a fresh staging build, so they're only meaningful after the PR's grapher upload to staging has completed and the staging server has rebuilt.
 
 ## Guardrails and tips
 
