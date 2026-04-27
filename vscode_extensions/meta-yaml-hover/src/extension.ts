@@ -2,9 +2,14 @@ import * as vscode from 'vscode';
 import * as yaml from 'js-yaml';
 
 const PLACEHOLDER_RE = /\{(definitions(?:\.[A-Za-z_][A-Za-z0-9_]*)+|macros)\}/g;
+const ALIAS_RE = /\*([A-Za-z_][A-Za-z0-9_]*)/g;
 
 function isMetaYamlFile(fileName: string): boolean {
     return fileName.endsWith('.meta.yml') || fileName.endsWith('.meta.yaml');
+}
+
+function escapeRegex(s: string): string {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function extractTopLevelBlock(docText: string, key: string): string | undefined {
@@ -82,6 +87,69 @@ function resolvePlaceholder(docText: string, dottedPath: string): string | undef
     return resolveDefinitionsPath(docText, segments);
 }
 
+function resolveAnchor(docText: string, anchorName: string): string | undefined {
+    const lines = docText.split(/\r?\n/);
+    const anchorRe = new RegExp(`&${escapeRegex(anchorName)}\\b(.*)$`);
+
+    let anchorLineIdx = -1;
+    let inlineRest = '';
+    let anchorIndent = 0;
+    for (let i = 0; i < lines.length; i++) {
+        const m = lines[i].match(anchorRe);
+        if (m) {
+            anchorLineIdx = i;
+            inlineRest = m[1];
+            anchorIndent = (lines[i].match(/^(\s*)/)?.[1] ?? '').length;
+            break;
+        }
+    }
+    if (anchorLineIdx === -1) {
+        return undefined;
+    }
+
+    const captured: string[] = [];
+    const inlineTrimmed = inlineRest.replace(/^\s*([|>][+-]?)?\s*/, '');
+    if (inlineTrimmed.trim() !== '') {
+        captured.push(inlineTrimmed);
+    }
+
+    const stripCount = anchorIndent + 2;
+    for (let i = anchorLineIdx + 1; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trim() === '') {
+            captured.push('');
+            continue;
+        }
+        const lineIndent = (line.match(/^(\s*)/)?.[1] ?? '').length;
+        if (lineIndent > anchorIndent) {
+            captured.push(line.slice(Math.min(stripCount, lineIndent)));
+        } else {
+            break;
+        }
+    }
+    while (captured.length > 0 && captured[captured.length - 1] === '') {
+        captured.pop();
+    }
+    return captured.length > 0 ? captured.join('\n') : undefined;
+}
+
+function findHoverMatch(
+    lineText: string,
+    character: number,
+    re: RegExp
+): { start: number; end: number; name: string } | undefined {
+    re.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(lineText)) !== null) {
+        const start = match.index;
+        const end = start + match[0].length;
+        if (character >= start && character <= end) {
+            return { start, end, name: match[1] };
+        }
+    }
+    return undefined;
+}
+
 const hoverProvider: vscode.HoverProvider = {
     provideHover(document, position) {
         if (document.languageId !== 'yaml' || !isMetaYamlFile(document.fileName)) {
@@ -89,34 +157,39 @@ const hoverProvider: vscode.HoverProvider = {
         }
 
         const lineText = document.lineAt(position.line).text;
-        PLACEHOLDER_RE.lastIndex = 0;
 
-        let match: RegExpExecArray | null;
-        while ((match = PLACEHOLDER_RE.exec(lineText)) !== null) {
-            const start = match.index;
-            const end = start + match[0].length;
-            if (position.character < start || position.character > end) {
-                continue;
-            }
-
-            const path = match[1];
-            const resolved = resolvePlaceholder(document.getText(), path);
-
+        const placeholder = findHoverMatch(lineText, position.character, PLACEHOLDER_RE);
+        if (placeholder) {
+            const resolved = resolvePlaceholder(document.getText(), placeholder.name);
             const md = new vscode.MarkdownString();
-            md.appendMarkdown(`**\`{${path}}\`**\n\n`);
+            md.appendMarkdown(`**\`{${placeholder.name}}\`**\n\n`);
             if (resolved === undefined) {
                 md.appendMarkdown('_Not defined in this file._');
             } else {
                 md.appendCodeblock(resolved, 'yaml');
             }
-            md.isTrusted = false;
-
-            const range = new vscode.Range(
-                position.line, start,
-                position.line, end
-            );
-            return new vscode.Hover(md, range);
+            return new vscode.Hover(md, new vscode.Range(
+                position.line, placeholder.start,
+                position.line, placeholder.end
+            ));
         }
+
+        const alias = findHoverMatch(lineText, position.character, ALIAS_RE);
+        if (alias) {
+            const resolved = resolveAnchor(document.getText(), alias.name);
+            const md = new vscode.MarkdownString();
+            md.appendMarkdown(`**\`*${alias.name}\`** _(YAML anchor)_\n\n`);
+            if (resolved === undefined) {
+                md.appendMarkdown('_Anchor not defined in this file._');
+            } else {
+                md.appendCodeblock(resolved, 'yaml');
+            }
+            return new vscode.Hover(md, new vscode.Range(
+                position.line, alias.start,
+                position.line, alias.end
+            ));
+        }
+
         return undefined;
     },
 };

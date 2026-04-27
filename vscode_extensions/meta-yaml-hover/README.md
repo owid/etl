@@ -8,11 +8,13 @@ When you hover over a placeholder like `{definitions.poverty_line_per_day}` or `
 
 ## Supported patterns
 
-- `{definitions.<key>}` — simple reference, e.g. `{definitions.gdoc_id}`
+- `{definitions.<key>}` — simple Jinja reference, e.g. `{definitions.gdoc_id}`
 - `{definitions.<key>.<subkey>...}` — arbitrarily nested dot-paths
 - `{macros}` — top-level `macros:` literal block
+- `*<anchor>` — YAML alias, e.g. `customNumericValues: *map_brackets_headcount_ratio`
+- `<<: *<anchor>` — YAML merge alias (hover the `*<anchor>` part)
 
-Nested `{definitions.X}` placeholders inside a resolved value are shown as-is — the extension does not recursively expand them.
+Nested placeholders or aliases inside a resolved value are shown as-is — the extension does not recursively expand them.
 
 ## Scope
 
