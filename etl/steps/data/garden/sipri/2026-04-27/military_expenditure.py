@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+# NOTE: Delete correction of Belarus data when fixed
+
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -42,6 +44,12 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb)
 
     tb = calculate_milex_per_military_personnel(tb, tb_wdi)
+    # NOTE: Delete correction of Belarus data when fixed
+    tb = correct_belarus(tb)
+
+    # Sanity checks
+    sanity_checks(tb)
+
     tb = tb.format(["country", "year"])
 
     #
@@ -97,3 +105,23 @@ def calculate_milex_per_military_personnel(tb: Table, tb_wdi: Table) -> Table:
     tb = tb.drop(columns=["ms_mil_totl_p1"])
 
     return tb
+
+
+def correct_belarus(tb: Table) -> Table:
+    """
+    Correct Belarus `share_gdp` for 1992–2013: SIPRI's 2026 release has these values inflated by 1000× relative to prior releases (raw 9.3–18.3 in the new file vs. ~0.0093–0.0183 in 2025-04-28). Cross-checked against the 2025-04-28 published values (1.6–2.8% of GDP) and external sources (World Bank, CIA Factbook), which place Belarus military spending at ~1–2% of GDP throughout this period. Divide by 1000 to restore the correct scale.
+    """
+    mask = (tb["country"] == "Belarus") & (tb["year"].between(1992, 2013))
+    tb.loc[mask, "share_gdp"] /= 1000
+    return tb
+
+
+def sanity_checks(tb: Table) -> None:
+    """
+    Verify that the share indicators (`share_gdp`, `share_govt_spending`) are within the expected [0, 100] percentage range.
+    Logs a warning for each offending country-year — does not raise, so the step still produces output.
+    """
+    for col in ["share_gdp", "share_govt_spending"]:
+        offenders = tb[(tb[col] < 0) | (tb[col] > 100)][["country", "year", col]].dropna()
+        if not offenders.empty:
+            paths.log.warning(f"{len(offenders)} {col} values outside [0, 100]:\n{offenders.to_string(index=False)}")
