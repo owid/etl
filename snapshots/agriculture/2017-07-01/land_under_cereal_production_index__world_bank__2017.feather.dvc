@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Land under cereal production index - World Bank (2017)
+  origin:
+    title: Land under cereal production index - World Bank (2017)
+    producer: Land under cereal production index - World Bank (2017)
     description: |-
       Land under cereal production index was derived by OurWorldinData based on original data sourced from the World Bank's World Development Indicators (WDI).
 
@@ -10,10 +11,9 @@ meta:
       The original dataset from WDI used in this calculation was "Land under cereal production (hectares)", which is defined by the World Bank/FAO as: "Land under cereal production refers to harvested area, although some countries report only sown or cultivated area. Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains. Production data on cereals relate to crops harvested for dry grain only. Cereal crops harvested for hay or harvested green for food, feed, or silage and those used for grazing are excluded."
 
       Data available at: http://data.worldbank.org/data-catalog/world-development-indicators [accessed 18th July 2017]
-    date_accessed: 2026-03-06
-    published_by: Land under cereal production index - World Bank (2017)
-  name: Land under cereal production index - World Bank (2017)
-  description: ''
+    date_accessed: '2026-03-06'
+    date_published: '2017'
+    citation_full: Land under cereal production index - World Bank (2017) (2017). Land under cereal production index - World Bank (2017).
 outs:
   - md5: 41909f4d548b4a4fa05472255c8ecbb2
     size: 38130

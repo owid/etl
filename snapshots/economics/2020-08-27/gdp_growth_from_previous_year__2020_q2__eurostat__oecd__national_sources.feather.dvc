@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Eurostat (2020), OECD (2020) and individual national statistical offices
+  origin:
+    title: Eurostat (2020), OECD (2020) and individual national statistical offices
+    producer: Eurostat (2020), OECD (2020) and individual national statistical offices
     description: |-
       We combined data on year on year GDP growth by quarter from different sources:
 
@@ -13,11 +14,10 @@ meta:
       3) Data or press releases from national statistical agencies for Taiwan, Nigeria, Singapore, Colombia, Philippines, Malaysia, Tunisia and Peru.
 
       Note that estimates of GDP are often subject to revision as more data becomes available to national statistical agencies. The pandemic has impacted agencies' ability to collect information that inform their GDP estimates. Eurostat note that this is likely to have impacted the quality of the data in some cases (see: https://ec.europa.eu/eurostat/documents/24987/725066/Country_specific_metadata_associated_with_national_estimates_2020Q2)
-    url: https://ec.europa.eu/eurostat/documents/2995521/10545332/2-14082020-AP-EN.pdf/7f30c3cf-b2c9-98ad-3451-17fed0230b57
-    date_accessed: 2020-08-27
-    published_by: Eurostat (2020), OECD (2020) and individual national statistical offices
-  name: GDP growth from previous year, 2020 Q2 (Eurostat, OECD, National sources)
-  description: ''
+    url_main: https://ec.europa.eu/eurostat/documents/2995521/10545332/2-14082020-AP-EN.pdf/7f30c3cf-b2c9-98ad-3451-17fed0230b57
+    date_accessed: '2020-08-27'
+    date_published: '2020'
+    citation_full: Eurostat (2020), OECD (2020) and individual national statistical offices (2020). Eurostat (2020), OECD (2020) and individual national statistical offices.
 outs:
   - md5: 8148a420a98d4c32858426f4a6a37edc
     size: 3770

@@ -1,7 +1,7 @@
 meta:
-  source:
-    name: |-
-      Bowles, S. (2009), Gat, A. (2008), Knauft, B. M. et al (1987), Keeley, L. H. (1996), Pinker, S. (2011), and Walker, R. S., & Bailey, D. H. (2013)
+  origin:
+    title: Bowles, S. (2009), Gat, A. (2008), Knauft, B. M. et al (1987), Keeley, L. H. (1996), Pinker, S. (2011), and Walker, R. S., & Bailey, D. H. (2013)
+    producer: Bowles, S. (2009), Gat, A. (2008), Knauft, B. M. et al (1987), Keeley, L. H. (1996), Pinker, S. (2011), and Walker, R. S., & Bailey, D. H. (2013)
     description: |-
       This dataset contains estimates of the frequency of violent deaths due to murder or war in modern and prehistoric state and non-state societies, based on archaeological and ethnographic evidence.
 
@@ -14,11 +14,9 @@ meta:
       - Keeley (1997) – War Before Civilization: The Myth of the Peaceful Savage. Oxford University Press, USA.
       - Pinker (2011) – The Better Angels of Our Nature: Why Violence Has Declined. Viking.
       - Walker and Bailey (2013) – Body counts in lowland South American violence. In Evolution and Human Behavior, 34, 1, 29–34.
-    date_accessed: 2020-01-10
-    published_by: |-
-      Bowles, S. (2009), Gat, A. (2008), Knauft, B. M. et al (1987), Keeley, L. H. (1996), Pinker, S. (2011), and Walker, R. S., & Bailey, D. H. (2013)
-  name: Ethnographic and Archaeological Evidence on Violent Deaths
-  description: ''
+    date_accessed: '2020-01-10'
+    date_published: '2013'
+    citation_full: Bowles, S. (2009), Gat, A. (2008), Knauft, B. M. et al (1987), Keeley, L. H. (1996), Pinker, S. (2011), and Walker, R. S., & Bailey, D. H. (2013) (2013). Bowles, S. (2009), Gat, A. (2008), Knauft, B. M. et al (1987), Keeley, L. H. (1996), Pinker, S. (2011), and Walker, R. S., & Bailey, D. H. (2013).
 outs:
   - md5: 6c016d6b2e459e30967a0d48859635cc
     size: 8938

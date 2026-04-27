@@ -60,6 +60,14 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Only migrate DVC metadata; do not simplify matching snapshot scripts.",
     )
+    parser.add_argument(
+        "--only-easy",
+        action="store_true",
+        help=(
+            "Only migrate rows where the snapshot script matches the standard backport pattern "
+            "and date_published can be inferred from source.name or source.published_by."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -290,10 +298,27 @@ def main() -> None:
 
     results = []
     for snapshot_path in selected_paths:
-        result = migrate_dvc(snapshot_path=snapshot_path, apply=args.apply)
-        if result.status in {"migrated", "would-migrate"} and not args.no_script_update:
-            result.script_status = simplify_snapshot_script(snapshot_path=snapshot_path, apply=args.apply)
-        results.append(result)
+        # Preview first, so --only-easy can skip rows without partially writing DVC files.
+        preview = migrate_dvc(snapshot_path=snapshot_path, apply=False)
+        if preview.status in {"migrated", "would-migrate"} and not args.no_script_update:
+            preview.script_status = simplify_snapshot_script(snapshot_path=snapshot_path, apply=False)
+
+        if args.only_easy:
+            is_easy = preview.script_status == "would-simplify" and preview.date_published_source.startswith(
+                "inferred from source."
+            )
+            if not is_easy:
+                preview.status = "skip-not-easy"
+                results.append(preview)
+                continue
+
+        if args.apply:
+            result = migrate_dvc(snapshot_path=snapshot_path, apply=True)
+            if result.status in {"migrated", "would-migrate"} and not args.no_script_update:
+                result.script_status = simplify_snapshot_script(snapshot_path=snapshot_path, apply=True)
+            results.append(result)
+        else:
+            results.append(preview)
 
     print_report(results)
 

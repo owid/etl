@@ -1,15 +1,15 @@
 meta:
-  source:
-    name: Piketty (2014)
+  origin:
+    title: Piketty (2014)
+    producer: 'Piketty, T. (2014). Capital in the 21st Century. Cambridge: Harvard University Press'
     description: |-
       Data on tax revenues include all taxes, fees, social contributions, and other payments that citizens mush pay under penalty of law.
 
       Data on top marginal tax rates includes general income tax supplements, but excludes all other taxes and social contributions (e.g. NHS in the UK)
-    url: http://piketty.pse.ens.fr/en/capital21c2
-    date_accessed: 2016-09-20
-    published_by: 'Piketty, T. (2014). Capital in the 21st Century. Cambridge: Harvard University Press'
-  name: Tax Revenue – Piketty (2014)
-  description: ''
+    url_main: http://piketty.pse.ens.fr/en/capital21c2
+    date_accessed: '2016-09-20'
+    date_published: '2014'
+    citation_full: 'Piketty, T. (2014). Capital in the 21st Century. Cambridge: Harvard University Press (2014). Piketty (2014).'
 outs:
   - md5: b76df715a90a7bca491d5ee65f913295
     size: 5522

@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Poore, J., & Nemecek, T. (2018). Reducing food’s environmental impacts through producers and consumers. Science.
+  origin:
+    title: Poore, J., & Nemecek, T. (2018). Reducing food’s environmental impacts through producers and consumers. Science.
+    producer: Poore, J., & Nemecek, T. (2018). Reducing food’s environmental impacts through producers and consumers. Science, 360(6392), 987-992.
     description: |-
       Data is based on the largest meta-analysis of food system impact studies to date, from Poore & Nemecek's 2018 study.
 
@@ -27,12 +28,10 @@ meta:
       Footprints expressed per kilogram of food product can be converted to per unit protein or kilocalorie using data on the nutrient density of food products.
 
       Where nutritional footprints are available from Poore & Nemecek (2018), this data has been used. Where there were gaps, this data has been calculated by Our World in Data.
-    url: https://science.sciencemag.org/content/360/6392/987
-    date_accessed: 2019-08-10
-    published_by: |-
-      Poore, J., & Nemecek, T. (2018). Reducing food’s environmental impacts through producers and consumers. Science, 360(6392), 987-992.
-  name: Environmental impacts of food (Poore & Nemecek, 2018)
-  description: ''
+    url_main: https://science.sciencemag.org/content/360/6392/987
+    date_accessed: '2019-08-10'
+    date_published: '2018'
+    citation_full: Poore, J., & Nemecek, T. (2018). Reducing food’s environmental impacts through producers and consumers. Science, 360(6392), 987-992. (2018). Poore, J., & Nemecek, T. (2018). Reducing food’s environmental impacts through producers and consumers. Science..
 outs:
   - md5: 3c7d681b83e1483aa17ec915f5cd9da9
     size: 18266

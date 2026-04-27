@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Prevalence of undernourishment in developing countries - FAO (Food Security Indicators) (2017)
+  origin:
+    title: Prevalence of undernourishment in developing countries - FAO (Food Security Indicators) (2017)
+    producer: FAO (Food Security Indicators)
     description: |-
       The prevalence of undernourishment expresses the probability that a randomly selected individual from the population consumes an amount of calories that is insufficient to cover her/his energy requirement for an active and healthy life. The indicator is computed by comparing a probability distribution of habitual daily dietary energy consumption with a threshold level called the minimum dietary energy requirement. Both are based on the notion of an average individual in the reference population.
 
@@ -19,11 +20,10 @@ meta:
       FAO. 2006. The State of Food Insecurity in the World 2006. Rome. Available at: http://www.fao.org/docrep/009/a0750e/a0750e00.htm
 
       FAO, 2010. The State of Food Insecurity in the World: Addressing food insecurity in protracted crises. Rome. Available at: http://www.fao.org/docrep/016/i3027e/i3027e.pdf
-    url: http://www.fao.org/economic/ess/ess-fs/ess-fadata/en/
-    date_accessed: 2017-05-23
-    published_by: FAO (Food Security Indicators)
-  name: Prevalence of Undernourishment in Developing Countries - FAO (Food Security Indicators) (2017)
-  description: ''
+    url_main: http://www.fao.org/economic/ess/ess-fs/ess-fadata/en/
+    date_accessed: '2017-05-23'
+    date_published: '2017'
+    citation_full: FAO (Food Security Indicators) (2017). Prevalence of undernourishment in developing countries - FAO (Food Security Indicators) (2017).
 outs:
   - md5: 49bd5c3852a40726f824c45c70b83d1b
     size: 3586

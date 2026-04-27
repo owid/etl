@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Projections of peak agricultural land - FAO (2006), OECD (2012), MEA (2005)
+  origin:
+    title: Projections of peak agricultural land - FAO (2006), OECD (2012), MEA (2005)
+    producer: Projections of peak agricultural land - FAO (2006), OECD (2012), MEA (2005)
     description: |-
       This dataset combines actual reported trends in global agricultural land area from the UN Food and Agricultural Organization from 1961-2014, with future projections from various sources.
 
@@ -17,10 +18,9 @@ meta:
       IAASTD = International Assessment of Agricultural Knowledge, Science and Technology for Development (2009). Global report, Island Press, Washington, DC.
 
       MEA = Millennium Ecosystem Assessment (2005), Synthesis report, Island Press, Washington, DC.
-    date_accessed: 2026-03-05
-    published_by: Projections of peak agricultural land - FAO (2006), OECD (2012), MEA (2005)
-  name: Projections of peak agricultural land - FAO (2006), OECD (2012), MEA (2005)
-  description: ''
+    date_accessed: '2026-03-05'
+    date_published: '2012'
+    citation_full: Projections of peak agricultural land - FAO (2006), OECD (2012), MEA (2005) (2012). Projections of peak agricultural land - FAO (2006), OECD (2012), MEA (2005).
 outs:
   - md5: 194e5a6d4259c87abf63f18e7f1372ae
     size: 9538
