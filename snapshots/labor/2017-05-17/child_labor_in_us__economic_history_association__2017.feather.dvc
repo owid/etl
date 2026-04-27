@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Child Labour in US- Economic History Association
+  origin:
+    title: Child Labour in US- Economic History Association
+    producer: Whaples, R. Wake Forest University. Economic History Association.
     description: |-
       Total/all figures on child labour have been calculated as a weighted-average based on male:female ratio of 10-14 year-olds in the US from the United States Census Bureau in each respective year.
 
@@ -11,11 +12,10 @@ meta:
       Carter, Susan and Richard Sutch. “Fixing the Facts: Editing of the 1880 U.S. Census of Occupations with Implications for Long-Term Labor Force Trends and the Sociology of Official Statistics.” Historical Methods 29 (1996): 5-24
 
       Historical Statistics of the United States Colonial Times to 1970 (1790-1970). Available at: https://www.census.gov/library/publications/1975/compendia/hist_stats_colonial-1970.html
-    url: https://eh.net/encyclopedia/child-labor-in-the-united-states/
-    date_accessed: 2017-05-17
-    published_by: Whaples, R. Wake Forest University. Economic History Association.
-  name: Child Labor in US - Economic History Association (2017)
-  description: Incidence of child labor in US - Economic History Association
+    url_main: https://eh.net/encyclopedia/child-labor-in-the-united-states/
+    date_accessed: '2017-05-17'
+    date_published: '2017'
+    citation_full: Whaples, R. Wake Forest University. Economic History Association. (2017). Child Labour in US- Economic History Association.
 outs:
   - md5: 2baefe1a8ecfb00207799872366362f7
     size: 4626

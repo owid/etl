@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Our World In Data based on Short (2002) and OECD (2017)
+  origin:
+    title: Our World In Data based on Short (2002) and OECD (2017)
+    producer: Our World In Data
     description: |-
       The source for the period 1880 to 1990 is Short, Joanna (2002) – “Economic History of Retirement in the United States”. EH.Net Encyclopedia, edited by Robert Whaples. September 30, 2002. URL http://eh.net/encyclopedia/economic-history-of-retirement-in-the-united-states/
 
@@ -12,10 +13,9 @@ meta:
       Data for 2000 to 2015 is from the OECD [OECD.stat web browser – Source: http://stats.oecd.org/viewhtml.aspx?datasetcode=LFS_SEXAGE_I_R&lang=en Labor force participation of men 65 and older from the OECD – http://stats.oecd.org/viewhtml.aspx?datasetcode=LFS_SEXAGE_I_R&lang=en]"
 
       Data for 2000 is available from both sources and the discrepancy is minor so that we decided to merge the data as presented in the sources. Short reports 17.5% while the OECD reports 17.73% for 2000.
-    date_accessed: 2017-04-22
-    published_by: Our World In Data
-  name: Labor Force Participation Rates of Men Age 65 and Over in the US – OWID based on Short (2002) and OECD
-  description: ''
+    date_accessed: '2017-04-22'
+    date_published: '2017'
+    citation_full: Our World In Data (2017). Our World In Data based on Short (2002) and OECD (2017).
 outs:
   - md5: 73940797fff846bc3732a86c3e1a3d8c
     size: 3458

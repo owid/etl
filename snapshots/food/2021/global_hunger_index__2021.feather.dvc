@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Concern Worldwide and Welthungerhilfe
+  origin:
+    title: Concern Worldwide and Welthungerhilfe
+    producer: Concern Worldwide and Welthungerhilfe
     description: |-
       The Global Hunger Index (GHI) is a tool designed to comprehensively measure and track hunger globally, regionally, and by country. To reflect the multidimensional nature of hunger, the GHI combines four component indicators into one index score. An increase in a country's GHI score indicates that the hunger situation is worsening, while a decrease in the score indicates an improvement in the hunger situation.
 
@@ -19,11 +20,10 @@ meta:
       The 2021 GHI has been calculated for 135 countries for which data on the four component indicators are available and where measuring hunger is considered most relevant. GHI scores are not calculated for some higher-income countries where the prevalence of hunger is very low.
 
       Where original source data were unavailable, the GHI was estimated based on the most recent data available. For 19 countries, individual scores could not be calculated owing to lack of data. 12 of those countries (Burundi, Comoros, Guinea, Guinea-Bissau, Moldova, Niger, South Sudan, Syria, Tajikistan, Uganda, Zambia, and Zimbabwe) were provisionally designated by severity. In OWID's dataset, the GHI of these 12 countries corresponds to the mid-point of their group in the severity scale. For example, for the 'moderate' group, with GHI between 10 and 20, we assign 15.
-    url: https://www.globalhungerindex.org/download/all.html
-    date_accessed: 2022-02-24
-    published_by: Concern Worldwide and Welthungerhilfe
-  name: Global Hunger Index (2021)
-  description: ''
+    url_main: https://www.globalhungerindex.org/download/all.html
+    date_accessed: '2022-02-24'
+    date_published: '2021'
+    citation_full: Concern Worldwide and Welthungerhilfe (2021). Concern Worldwide and Welthungerhilfe.
 outs:
   - md5: 6267d68068617faae693258786e8ba9c
     size: 6586

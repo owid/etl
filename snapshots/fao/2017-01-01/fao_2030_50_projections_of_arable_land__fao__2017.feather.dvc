@@ -9,8 +9,8 @@ meta:
 
       Data from 2020-2050 is based on UN FAO projections of arable land and permanent crop area from its report: Alexandratos, N. and J. Bruinsma. 2012. World agriculture towards 2030/2050: the 2012 revision. ESA Working paper No. 12-03. Rome, FAO. Available at: http://www.fao.org/docrep/016/ap106e/ap106e.pdf [accessed 17th August 2017].
     date_accessed: '2026-03-10'
-    date_published: '2030'
-    citation_full: FAO 2030-50 Projections of Arable Land (FAO (2017)) (2030). FAO 2030-50 Projections of Arable Land (FAO (2017)).
+    date_published: '2017'
+    citation_full: FAO (2017). FAO 2030-50 Projections of Arable Land.
 outs:
   - md5: 1cf7ef40e0ccf348bb9219241990d579
     size: 4330
