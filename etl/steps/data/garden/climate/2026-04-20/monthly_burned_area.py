@@ -69,7 +69,5 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(
-        tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
     ds_garden.save()

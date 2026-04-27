@@ -34,11 +34,7 @@ def get_countries() -> list:
 
 
 def get_banf(iso3: str) -> dict | None:
-    url = (
-        f"{BASE_URL}/banf"
-        f"?level=ADM0&value={iso3}"
-        f"&year={YEAR_TO}&yearFrom={YEAR_FROM}&yearTo={YEAR_TO}&env=PROD"
-    )
+    url = f"{BASE_URL}/banf?level=ADM0&value={iso3}&year={YEAR_TO}&yearFrom={YEAR_FROM}&yearTo={YEAR_TO}&env=PROD"
     r = requests.get(url, timeout=30)
     if r.status_code != 200:
         log.warning(f"Unexpected status for {iso3}", status_code=r.status_code)

@@ -23,7 +23,5 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds_grapher = paths.create_dataset(
-        tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
-    )
+    ds_grapher = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
     ds_grapher.save()
