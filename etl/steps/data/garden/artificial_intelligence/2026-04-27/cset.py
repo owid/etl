@@ -8,6 +8,8 @@ paths = PathFinder(__file__)
 REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 PER_CAPITA_COLS = ["num_patent_applications", "num_patent_granted", "num_articles"]
 INVESTMENT_COLS = ["disclosed_investment", "estimated_investment", "estimated_investment_projected"]
+# Variables not used in any chart — dropped to reduce indicator count.
+COLS_TO_DROP = ["disclosed_investment", "num_citations", "num_patent_granted_per_mil"]
 
 
 def run() -> None:
@@ -32,12 +34,30 @@ def run() -> None:
         if col in tb.columns:
             tb[col] = tb[col].where(~africa_mask)
 
+    # Clear projected values for years where actual data exists, except for the
+    # last actual year per country/field which is kept in _projected to connect
+    # the actual and projected lines in Grapher charts.
+    if "estimated_investment_projected" in tb.columns:
+        last_actual_year = (
+            tb[tb["estimated_investment"].notna()]
+            .groupby(["country", "field"])["year"]
+            .max()
+            .rename("last_actual_year")
+        )
+        tb = tb.merge(last_actual_year.reset_index(), on=["country", "field"], how="left")
+        is_last_actual = tb["year"] == tb["last_actual_year"]
+        has_actual = tb["estimated_investment"].notna()
+        tb["estimated_investment_projected"] = tb["estimated_investment_projected"].where(~has_actual | is_last_actual)
+        tb = tb.drop(columns=["last_actual_year"])
+
     tb = adjust_investment_for_inflation(tb, tb_us_cpi)
 
     tb = paths.regions.add_population(tb=tb)
     for col in PER_CAPITA_COLS:
         tb[f"{col}_per_mil"] = tb[col] / (tb["population"] / 1e6)
     tb = tb.drop(columns=["population"])
+
+    tb = tb.drop(columns=[c for c in COLS_TO_DROP if c in tb.columns])
 
     tb = tb.format(["country", "year", "field"], short_name=paths.short_name)
 

@@ -69,12 +69,18 @@ def _handle_estimated_investment(tb: Table) -> Table:
     tb_actual = tb[tb["complete"] == "True"].drop(columns=["complete"])
     tb_actual = tb_actual.dropna(subset=value_cols, how="all")
 
-    # Rows the source has already labelled as projections
+    # Last actual year per country/field — used as baseline projection.
+    last_year = tb_actual.groupby(["country", "field"])["year"].max().rename("last_year")
+
+    # Source rows labelled as projections (complete=False), restricted to years
+    # >= the last actual year to avoid leaking incomplete historical rows.
     tb_projected = (
         tb[tb["complete"] == "False"]
         .drop(columns=["complete"])
-        .rename(columns={c: f"{c}_projected" for c in value_cols})
+        .merge(last_year.reset_index(), on=["country", "field"], how="left")
     )
+    tb_projected = tb_projected[tb_projected["year"] >= tb_projected["last_year"]].drop(columns=["last_year"])
+    tb_projected = tb_projected.rename(columns={c: f"{c}_projected" for c in value_cols})
 
     # Last actual year per country/field used as a baseline projection
     tb_last_actual = tb_actual.loc[tb_actual.groupby(["country", "field"])["year"].idxmax()][
