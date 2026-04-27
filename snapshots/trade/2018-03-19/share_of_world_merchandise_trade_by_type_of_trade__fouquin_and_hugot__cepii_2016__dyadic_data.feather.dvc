@@ -1,7 +1,7 @@
 meta:
   origin:
     title: Fouquin and Hugot (CEPII 2016)
-    producer: 'Michel Fouquin & Jules Hugot , 2016. "Two Centuries of Bilateral Trade and Gravity Data: 1827-2014," CEPII Working Paper 2016- 14 , May 2016 , CEPII'
+    producer: 'Fouquin and Hugot'
     description: |-
       'Non-rich' countries are all countries in the world except: Australia, Austria, Belgium, Canada, Cyprus, Denmark, Finland, France, Germany, Greece, Iceland,Ireland, Israel, Italy, Japan, Luxembourg, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland, United Kingdom, United States.
 
@@ -9,7 +9,7 @@ meta:
     url_main: http://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=32
     date_accessed: '2018-03-19'
     date_published: '2016'
-    citation_full: 'Michel Fouquin & Jules Hugot , 2016. "Two Centuries of Bilateral Trade and Gravity Data: 1827-2014," CEPII Working Paper 2016- 14 , May 2016 , CEPII (2016). Fouquin and Hugot (CEPII 2016).'
+    citation_full: 'Michel Fouquin and Jules Hugot (2016). Two Centuries of Bilateral Trade and Gravity Data: 1827-2014. CEPII Working Paper 2016-14.'
 outs:
   - md5: 44094ba8bb15aa9cf16e494b26b53102
     size: 21522

@@ -162,23 +162,38 @@ def legacy_source_from_meta(meta: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def shorten_producer(producer: str, title: str) -> str:
-    """Keep producer within Grapher DB's 255-character limit.
+def clean_producer_from_title(title: str) -> str:
+    """Create a concise producer label from legacy Source.name.
 
-    Legacy Source.published_by sometimes contains a full citation. Origins store
-    that in citation_full; producer should remain a concise producer/author label.
+    Legacy `Source.published_by` often stores a full citation. For origins,
+    producer is user-facing and should be a short author/institution label with
+    no publication year.
     """
-    if len(producer) <= 255:
-        return producer
-    if len(title) <= 255:
-        return title
-    return producer[:252].rstrip() + "..."
+    producer = title.strip()
+    producer = producer.replace("&", "and").replace("OWID", "Our World in Data")
+
+    # Remove common OWID prefixes; the origin producer should be the underlying source.
+    producer = re.sub(r"^(Calculated by )?Our World (?:in|In) Data based on\s+", "", producer)
+    producer = re.sub(r"^Our World (?:in|In) Data\s+based on\s+", "", producer)
+
+    # Special case: old CEPII trade snapshots use a full paper citation in
+    # Source.published_by, but Source.name gives a concise author label.
+    if "Fouquin" in producer and "Hugot" in producer:
+        return "Fouquin and Hugot"
+
+    # Drop parentheticals that contain publication years or year-bearing acronyms.
+    producer = re.sub(r"\s*\([^)]*\b(?:1[5-9]\d{2}|20\d{2})\b[^)]*\)", "", producer)
+    producer = re.sub(r"\b(?:1[5-9]\d{2}|20\d{2})\b", "", producer)
+    producer = re.sub(r"\s+", " ", producer).strip(" ,:-")
+    if producer.endswith(".") and not producer.endswith("et al."):
+        producer = producer[:-1]
+    return producer or title
 
 
 def build_origin(source: dict[str, Any], meta: dict[str, Any], snapshot_path: Path) -> tuple[CommentedMap, str, str]:
     title = as_str(source.get("name")) or as_str(meta.get("name")) or snapshot_path.stem.split(".", 1)[0]
     producer_raw = as_str(source.get("published_by")) or title
-    producer = shorten_producer(producer_raw, title)
+    producer = clean_producer_from_title(title)
     date_published, date_published_source = infer_date_published(source, snapshot_path)
 
     origin = CommentedMap()
