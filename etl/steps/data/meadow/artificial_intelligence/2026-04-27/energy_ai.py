@@ -36,7 +36,6 @@ ALL_METRIC_HEADERS = {
 
 def run() -> None:
     """Load IEA Energy and AI snapshot and create a meadow dataset."""
-    paths.log.info("energy_ai.start")
 
     #
     # Load inputs.
@@ -51,18 +50,16 @@ def run() -> None:
     tb = read_and_process_regional_data(snap=snap)
 
     # Improve table format.
-    tb = tb.format(["country", "year", "metric", "scenario"], short_name=paths.short_name)
+    tb = tb.format(["country", "year", "metric", "scenario"])
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb])
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
-
-    paths.log.info("energy_ai.end")
 
 
 def read_and_process_regional_data(snap) -> Table:
