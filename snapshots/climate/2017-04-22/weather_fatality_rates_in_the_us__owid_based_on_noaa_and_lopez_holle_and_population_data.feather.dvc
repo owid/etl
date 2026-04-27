@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Our World In Data based on NOAA, Lopez Holle and population data
+  origin:
+    title: Our World In Data based on NOAA, Lopez Holle and population data
+    producer: Our World In Data based on NOAA, Lopez Holle (1997) and population data from the US census and the World Bank
     description: |-
       Data on the annual fatalities (since 1940) to various weather events in the US is from the National Oceanic and Atmospheric Administration (NOAA) National Weather Service. This dataset is online here: http://www.lightningsafety.noaa.gov/victims.shtml
       Data on lightning from lightning earlier than 1991 is not from this dataset from NOAA, but from the Lopez and Holle paper cited below.
@@ -13,10 +14,9 @@ meta:
 
       Data on the lightning fatality rate until 1990 is from Raúl E. Lopez and Ronald L. Holle (1997) – Changes in the Number of Lightning Deaths in the United States during the Twentieth Century. Journal of Climate; Volume 11.
       This fatality rate is not calculated for the entire US since in earlier periods not all US states reported the number of annual fatalities. (In the calculation of the fatality rate Lopez and Holle have taken only the population of the reporting states into account so that the population in the numerator and the denominator refer to the same group of people.)
-    date_accessed: 2017-04-22
-    published_by: Our World In Data based on NOAA, Lopez Holle (1997) and population data from the US census and the World Bank
-  name: Weather fatality rates in the US – OWID based on NOAA and Lopez Holle and population data
-  description: ''
+    date_accessed: '2017-04-22'
+    date_published: '1997'
+    citation_full: Our World In Data based on NOAA, Lopez Holle (1997) and population data from the US census and the World Bank (1997). Our World In Data based on NOAA, Lopez Holle and population data.
 outs:
   - md5: 6a9d86f7be28b517da1089e84ab8dfb9
     size: 10330

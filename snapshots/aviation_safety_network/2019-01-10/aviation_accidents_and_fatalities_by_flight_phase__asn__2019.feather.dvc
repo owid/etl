@@ -1,13 +1,12 @@
 meta:
-  source:
-    name: Aviation accidents and casualties by flight phase (ASN, 2019)
-    description: |-
-      The total number of aviation accidents and fatalities by flight phase (take-off, climbing, en-route, approach and landing). The figures include corporate jet and military transport accidents.
-    url: https://aviation-safety.net/statistics/phase/
-    date_accessed: 2019-01-10
-    published_by: Aviation Safety Network (ASN)
-  name: Aviation accidents and fatalities by flight phase (ASN, 2019)
-  description: ''
+  origin:
+    title: Aviation accidents and casualties by flight phase (ASN, 2019)
+    producer: Aviation Safety Network (ASN)
+    description: The total number of aviation accidents and fatalities by flight phase (take-off, climbing, en-route, approach and landing). The figures include corporate jet and military transport accidents.
+    url_main: https://aviation-safety.net/statistics/phase/
+    date_accessed: '2019-01-10'
+    date_published: '2019'
+    citation_full: Aviation Safety Network (ASN) (2019). Aviation accidents and casualties by flight phase (ASN, 2019).
 outs:
   - md5: d2715533f4d3d6a0efa761de4f713aa2
     size: 10338

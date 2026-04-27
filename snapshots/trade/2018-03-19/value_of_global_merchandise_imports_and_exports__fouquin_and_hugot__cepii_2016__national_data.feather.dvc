@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Fouquin and Hugot (CEPII 2016)
+  origin:
+    title: Fouquin and Hugot (CEPII 2016)
+    producer: 'Michel Fouquin & Jules Hugot , 2016. "Two Centuries of Bilateral Trade and Gravity Data: 1827-2014," CEPII Working Paper 2016- 14 , May 2016 , CEPII'
     description: |-
       To calculate country exports (imports) to (from) the rest of the world, the total value of exports (imports) by country, per year, is divided by the country's GDP. Calculations use Fouquin and Hugot (CEPII 2016) national trade data.
 
@@ -10,12 +11,10 @@ meta:
 
       Germany's time series is comprised of West Germany, and Germany. East Germany has been excluded for the purposes of Germany's calculations.
       Russia's time series comprises Russia and the USSR.
-    url: http://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=32
-    date_accessed: 2018-03-19
-    published_by: |-
-      Michel Fouquin & Jules Hugot , 2016. "Two Centuries of Bilateral Trade and Gravity Data: 1827-2014," CEPII Working Paper 2016- 14 , May 2016 , CEPII
-  name: Value of global merchandise imports and exports - (Fouquin and Hugot (CEPII 2016) National data)
-  description: This dataset uses Fouquin and Hugot (CEPII 2016) national trade data.
+    url_main: http://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=32
+    date_accessed: '2018-03-19'
+    date_published: '2016'
+    citation_full: 'Michel Fouquin & Jules Hugot , 2016. "Two Centuries of Bilateral Trade and Gravity Data: 1827-2014," CEPII Working Paper 2016- 14 , May 2016 , CEPII (2016). Fouquin and Hugot (CEPII 2016).'
 outs:
   - md5: 30d1c4fec8d18fb4dd6bbdf36db58cbc
     size: 218234

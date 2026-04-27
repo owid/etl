@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Rotavirus deaths and cases in under-5s (IHME, 2018)
+  origin:
+    title: Rotavirus deaths and cases in under-5s (IHME, 2018)
+    producer: Troeger, C., Khalil, I. A., Rao, P. C., Cao, S., Blacker, B. F., Ahmed, T., ... & Kang, G. (2018). Rotavirus vaccination and the global burden of rotavirus diarrhea among children younger than 5 years. JAMA Pediatrics, 172(10), 958-965.
     description: |-
       Data is the summary of research published by Troeger et al. (2018) based on statistics from the IHME, Global Burden of Disease study.
 
@@ -9,12 +10,10 @@ meta:
       Rotavirus is a diarrheal disease responsible for an estimated 29% of diarrheal disease deaths in children under five years old.
 
       Estimates of potentially avertable deaths from the rotavirus vaccine take into consideration its efficacy in different regions: whilst efficacy in children in high-income countries is typically greater than 90%, in lower-income countries, particularly in Sub-Saharan Africa, this efficacy rate is closer to 50%.
-    url: https://jamanetwork.com/journals/jamapediatrics/fullarticle/2696431
-    date_accessed: 2019-05-19
-    published_by: |-
-      Troeger, C., Khalil, I. A., Rao, P. C., Cao, S., Blacker, B. F., Ahmed, T., ... & Kang, G. (2018). Rotavirus vaccination and the global burden of rotavirus diarrhea among children younger than 5 years. JAMA Pediatrics, 172(10), 958-965.
-  name: Rotavirus deaths and cases in under-5s (IHME, 2018)
-  description: ''
+    url_main: https://jamanetwork.com/journals/jamapediatrics/fullarticle/2696431
+    date_accessed: '2019-05-19'
+    date_published: '2018'
+    citation_full: Troeger, C., Khalil, I. A., Rao, P. C., Cao, S., Blacker, B. F., Ahmed, T., ... & Kang, G. (2018). Rotavirus vaccination and the global burden of rotavirus diarrhea among children younger than 5 years. JAMA Pediatrics, 172(10), 958-965. (2018). Rotavirus deaths and cases in under-5s (IHME, 2018).
 outs:
   - md5: bb97929d3fe917bc2bdffdc6893b9da3
     size: 14730

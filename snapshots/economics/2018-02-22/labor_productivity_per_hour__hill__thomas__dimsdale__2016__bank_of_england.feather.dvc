@@ -1,13 +1,12 @@
 meta:
-  source:
-    name: Hill, Thomas, Dimsdale (2016), A Millennium of UK Data (2016), Bank of England
+  origin:
+    title: Hill, Thomas, Dimsdale (2016), A Millennium of UK Data (2016), Bank of England
+    producer: Hill, S, Thomas, R and Dimsdale, N (2017) "A Millennium of UK Data", Bank of England OBRA dataset, https://www.bankofengland.co.uk/statistics/research-datasets
     description: Uses GDP at factor cost.  Great Britain growth rates prior to 1855.
-    url: https://www.bankofengland.co.uk/statistics/research-datasets#
-    date_accessed: 2018-02-22
-    published_by: |-
-      Hill, S, Thomas, R and Dimsdale, N (2017) "A Millennium of UK Data", Bank of England OBRA dataset, https://www.bankofengland.co.uk/statistics/research-datasets
-  name: Labor productivity per hour (Hill, Thomas, Dimsdale (2016), Bank of England)
-  description: ''
+    url_main: https://www.bankofengland.co.uk/statistics/research-datasets#
+    date_accessed: '2018-02-22'
+    date_published: '2017'
+    citation_full: Hill, S, Thomas, R and Dimsdale, N (2017) "A Millennium of UK Data", Bank of England OBRA dataset, https://www.bankofengland.co.uk/statistics/research-datasets (2017). Hill, Thomas, Dimsdale (2016), A Millennium of UK Data (2016), Bank of England.
 outs:
   - md5: 2d60a6b2c58eede598de52c6a6afba2d
     size: 6090

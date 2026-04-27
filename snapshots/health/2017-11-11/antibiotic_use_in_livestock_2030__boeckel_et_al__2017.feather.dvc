@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Antibiotic use in livestock 2030 - Boeckel et al. (2017)
+  origin:
+    title: Antibiotic use in livestock 2030 - Boeckel et al. (2017)
+    producer: Van Boeckel, T. P., Glennon, E. E., Chen, D., Gilbert, M., Robinson, T. P., Grenfell, B. T.,Laxminarayan, R. (2017). Reducing antimicrobial use in food animals. Science, 357, 1350-1352.
     description: |-
       Boeker et al. (2017) project global antibiotic use under business-as-usual antibiotic concentrations and projected meat consumption.
 
@@ -11,12 +12,10 @@ meta:
       - global per capita meat consumption of 165 grams per day (the projected EU average in 2030)
 
       Projected global antibiotic use for livestock are shown for each of these potential reduction scenarios.
-    url: https://www.cddep.org/wp-content/uploads/2017/10/science.0929PolicyForum-1.pdf
-    date_accessed: 2017-11-11
-    published_by: |-
-      Van Boeckel, T. P., Glennon, E. E., Chen, D., Gilbert, M., Robinson, T. P., Grenfell, B. T.,Laxminarayan, R. (2017). Reducing antimicrobial use in food animals. Science, 357, 1350-1352.
-  name: Antibiotic use in livestock 2030 - Boeckel et al. (2017)
-  description: ''
+    url_main: https://www.cddep.org/wp-content/uploads/2017/10/science.0929PolicyForum-1.pdf
+    date_accessed: '2017-11-11'
+    date_published: '2017'
+    citation_full: Van Boeckel, T. P., Glennon, E. E., Chen, D., Gilbert, M., Robinson, T. P., Grenfell, B. T.,Laxminarayan, R. (2017). Reducing antimicrobial use in food animals. Science, 357, 1350-1352. (2017). Antibiotic use in livestock 2030 - Boeckel et al. (2017).
 outs:
   - md5: 36cd1673c1ea4171d11c8a078716b20f
     size: 3114

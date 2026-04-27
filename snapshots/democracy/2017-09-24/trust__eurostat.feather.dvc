@@ -1,11 +1,11 @@
 meta:
-  source:
-    name: Eurostat (2015)
-    url: http://appsso.eurostat.ec.europa.eu/nui/show.do?dataset=ilc_pw03&lang=en
-    date_accessed: 2017-09-24
-    published_by: Eurostat (2015)
-  name: Trust – Eurostat
-  description: ''
+  origin:
+    title: Eurostat (2015)
+    producer: Eurostat (2015)
+    url_main: http://appsso.eurostat.ec.europa.eu/nui/show.do?dataset=ilc_pw03&lang=en
+    date_accessed: '2017-09-24'
+    date_published: '2015'
+    citation_full: Eurostat (2015) (2015). Eurostat (2015).
 outs:
   - md5: da1b379535c88728f8a2c5fe6dd31627
     size: 4194

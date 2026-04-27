@@ -1,12 +1,11 @@
 meta:
-  source:
-    name: Eisensee and Strömberg (2007)
-    url: http://perseus.iies.su.se/~dstro/wpdisasters.pdf
-    date_accessed: 2017-06-30
-    published_by: Eisensee and Strömberg (2007)
-  name: Newsworthiness of disasters by disaster type and region - Eisensee and Strömberg (2007)
-  description: |-
-    This data is derived by considering ~5,000 natural disasters occurring between 1968 and 2002 and corresponding news coverage in major US networks. Here, it is controlled for the number killed and affected, country, year, and month.
+  origin:
+    title: Eisensee and Strömberg (2007)
+    producer: Eisensee and Strömberg (2007)
+    url_main: http://perseus.iies.su.se/~dstro/wpdisasters.pdf
+    date_accessed: '2017-06-30'
+    date_published: '2007'
+    citation_full: Eisensee and Strömberg (2007) (2007). Eisensee and Strömberg (2007).
 outs:
   - md5: 316c846c12ea3e7a8a26788520529ad4
     size: 4898

@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Plastic product lifetime, production, waste by source - Geyer et al. (2017)
+  origin:
+    title: Plastic product lifetime, production, waste by source - Geyer et al. (2017)
+    producer: Geyer, R., Jambeck, J. R., & Law, K. L. (2017). Production, use, and fate of all plastics ever made. Science Advances, 3(7), e1700782.
     description: |-
       Data is given as mean product lifetimes of plastic products (measured in years), plastic production, and plastic waste by industrial sector/use (measured in tonnes per year).
 
@@ -15,12 +16,10 @@ meta:
       - PP&A fibres: polyester, polyamide, and acrylic fibres
       - Other polymers
       - Additives
-    url: http://advances.sciencemag.org/content/3/7/e1700782
-    date_accessed: 2026-03-10
-    published_by: |-
-      Geyer, R., Jambeck, J. R., & Law, K. L. (2017). Production, use, and fate of all plastics ever made. Science Advances, 3(7), e1700782.
-  name: Plastic product lifetime, production, waste by source - Geyer et al. (2017)
-  description: ''
+    url_main: http://advances.sciencemag.org/content/3/7/e1700782
+    date_accessed: '2026-03-10'
+    date_published: '2017'
+    citation_full: Geyer, R., Jambeck, J. R., & Law, K. L. (2017). Production, use, and fate of all plastics ever made. Science Advances, 3(7), e1700782. (2017). Plastic product lifetime, production, waste by source - Geyer et al. (2017).
 outs:
   - md5: 172980e80a0941ebf839f422318ce7c4
     size: 4786

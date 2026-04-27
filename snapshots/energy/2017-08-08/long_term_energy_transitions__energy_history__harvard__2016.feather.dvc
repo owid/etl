@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Long-term energy transitions - Energy History, Harvard (2016)
+  origin:
+    title: Long-term energy transitions - Energy History, Harvard (2016)
+    producer: Joint Center for History and Economics, Harvard University and University of Cambridge. Energy History.
     description: |-
       Data published by the Joint Center for History and Economics has been sourced from a range of authors and publications, referenced below.
 
@@ -31,11 +32,10 @@ meta:
       Canada: Richard W. Unger, John Thistle, Energy Consumption in Canada in the 19th and 20th Centuries. A Statistical Outline, (Naples: CNR, 2013)
 
       Uruguay: Adapted from: Bertoni, Reto (2011). Energía y desarrollo: la restricción energética en Uruguay como problema, 1882-2000. Montevideo: Universidad de la República.
-    url: http://www.fas.harvard.edu/~histecon/energyhistory/energydata_beta.html
-    date_accessed: 2017-08-08
-    published_by: Joint Center for History and Economics, Harvard University and University of Cambridge. Energy History.
-  name: Long-term energy transitions - Energy History, Harvard (2016)
-  description: ''
+    url_main: http://www.fas.harvard.edu/~histecon/energyhistory/energydata_beta.html
+    date_accessed: '2017-08-08'
+    date_published: '2016'
+    citation_full: Joint Center for History and Economics, Harvard University and University of Cambridge. Energy History. (2016). Long-term energy transitions - Energy History, Harvard (2016).
 outs:
   - md5: 404b61c4b359c81e8d8c5ee395aaf449
     size: 56018
