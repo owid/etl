@@ -3,10 +3,9 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Global Monthly Burned Area
+    title: Global Yearly Burned Area by Land Cover Type
     description: |-
-      Monthly burned area in hectares by landcover class (2002–2024) for all countries
-      and sub-country administrative units (GADM level 0 and level 1).
+      Yearly burned area in hectares by land cover class (2002–2024) for all countries.
 
       Data is fetched via the GWIS country profile API (cprof.effis.emergency.copernicus.eu).
       Note: the API contains more recent data than the bulk download ZIP on the downloads page,
@@ -31,4 +30,4 @@ meta:
 outs:
   - md5: 8ac1dcee7dd1b5a008716ba4e7b40063
     size: 350796
-    path: monthly_burned_area.csv
+    path: yearly_burned_area.csv

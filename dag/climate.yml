@@ -251,13 +251,13 @@ steps:
   data://grapher/climate/2026-01-14/climate_change_impacts_monthly:
     - data://garden/climate/2026-01-14/climate_change_impacts
   #
-  # Global Wildfire Information System - Monthly burned area.
+  # Global Wildfire Information System - Yearly burned area by type.
   #
-  data://meadow/climate/2026-04-20/monthly_burned_area:
-    - snapshot://climate/2026-04-20/monthly_burned_area.csv
-  data://garden/climate/2026-04-20/monthly_burned_area:
+  data://meadow/climate/2026-04-20/yearly_burned_area:
+    - snapshot://climate/2026-04-20/yearly_burned_area.csv
+  data://garden/climate/2026-04-20/yearly_burned_area:
     - data://garden/wb/2025-07-01/income_groups
-    - data://meadow/climate/2026-04-20/monthly_burned_area
+    - data://meadow/climate/2026-04-20/yearly_burned_area
     - data://garden/regions/2023-01-01/regions
   data://grapher/climate/2026-04-20/yearly_burned_area:
-    - data://garden/climate/2026-04-20/monthly_burned_area
+    - data://garden/climate/2026-04-20/yearly_burned_area

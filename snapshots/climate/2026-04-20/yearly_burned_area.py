@@ -1,9 +1,12 @@
-"""Script to create a snapshot of the GWIS monthly burned area dataset.
+"""Script to create a snapshot of the GWIS yearly burned area dataset.
 
-Data is fetched from the GWIS country profile API, which contains more recent data
-(including 2024) than the bulk download ZIP available on the downloads page.
+Data is fetched from the GWIS country profile API, which returns annual totals by
+land cover type and contains more recent data (including 2024) than the bulk download
+ZIP available on the downloads page.
 
 API base: https://cprof.effis.emergency.copernicus.eu/api/v3/
+
+NOTE: Update YEAR_TO when a new year of data becomes available.
 """
 
 import tempfile
@@ -71,7 +74,7 @@ def main(upload: bool) -> None:
     df = fetch_all()
 
     with tempfile.TemporaryDirectory() as tmp_dir:
-        tmp_path = Path(tmp_dir) / "monthly_burned_area.csv"
+        tmp_path = Path(tmp_dir) / "yearly_burned_area.csv"
         df.to_csv(tmp_path, index=False)
         snap.create_snapshot(filename=str(tmp_path), upload=upload)
 

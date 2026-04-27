@@ -11,10 +11,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("monthly_burned_area")
+    ds_garden = paths.load_dataset("yearly_burned_area")
 
     # Read table from garden dataset.
-    tb = ds_garden["monthly_burned_area"]
+    tb = ds_garden["yearly_burned_area"]
     #
     # Process data.
     #

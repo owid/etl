@@ -12,8 +12,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    ds_meadow = paths.load_dataset("monthly_burned_area")
-    tb = ds_meadow["monthly_burned_area"].reset_index()
+    ds_meadow = paths.load_dataset("yearly_burned_area")
+    tb = ds_meadow.read("yearly_burned_area")
 
     ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
@@ -21,12 +21,9 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb)
 
     area_types = ["forest", "savannas", "shrublands_grasslands", "croplands", "other"]
-
-    # Sum burned area by country and year
-    tb = tb.groupby(["country", "year"], observed=True)[area_types].sum().reset_index()
 
     aggregations = {col: "sum" for col in area_types}
 
@@ -69,5 +66,5 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

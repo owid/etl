@@ -1,5 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+        - Wildfires
+    display:
+      numDecimalPlaces: 0
+    short_unit: ha
+    unit: hectares
+    processing_level: minor
+    description_key:
+      - Burned areas are detected from satellite imagery. NASA's MODIS satellite sensors scan the entire Earth's surface every one to two days, and the burned area product identifies land that shows the characteristic spectral signature of recent fire.
+      - Each area of land is assigned to a land cover type — such as forest, savanna, or cropland — based on annual satellite-derived land cover maps.
+      - Satellite detection of burned areas is known to underestimate the true extent of fire. Small fires and fires obscured by cloud cover or tree canopy are often missed. Despite this, the dataset provides the longest consistent global record available, making it well suited for tracking long-term trends.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
   yearly_burned_area:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
       forest:
         title: Yearly burned area in forests
