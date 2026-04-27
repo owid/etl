@@ -939,28 +939,3 @@ include:
         "data://garden/un/2022-07-11/un_wpp",
     }
     assert graph["data://meadow/un/2022-07-11/un_wpp"] == {"snapshot://un/2022-07-11/un_wpp.zip"}
-
-
-def test_add_to_dag_delegates_to_write_to_dag_file():
-    # Preserves the public API of ``apps.utils.files.add_to_dag`` while routing
-    # the actual write through the canonical ``write_to_dag_file``.
-    from apps.utils.files import add_to_dag
-
-    initial = """\
-steps:
-  # Comment for meadow_a.
-  meadow_a:
-    - snapshot_a
-"""
-    with tempfile.TemporaryDirectory() as d:
-        p = Path(d) / "dag.yml"
-        p.write_text(initial)
-        returned = add_to_dag({"meadow_b": ["snapshot_b"]}, dag_path=p)
-        after = p.read_text()
-
-    # Existing comments survive.
-    assert "# Comment for meadow_a." in after
-    assert "meadow_b:" in after
-    assert "- snapshot_b" in after
-    # The return value stays a YAML-formatted fragment describing the subdag.
-    assert "meadow_b" in returned

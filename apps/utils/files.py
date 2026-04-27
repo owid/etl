@@ -6,24 +6,11 @@ from typing import Any
 
 from cookiecutter.main import cookiecutter
 
-from etl.dag_helpers import write_to_dag_file
-from etl.files import apply_ruff_formatter_to_files, ruamel_dump
+from etl.files import apply_ruff_formatter_to_files
 from etl.paths import DAG_DIR, STEP_DIR
-from etl.steps import DAG
 
 # TODO: Move this to apps/wizard
 DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
-
-
-def add_to_dag(dag: DAG, dag_path: Path = DAG_WIZARD_PATH) -> str:
-    """Add steps to ``dag_path``, returning the added subdag as a YAML string.
-
-    Delegates to :func:`etl.dag_helpers.write_to_dag_file` so comment
-    preservation and formatting are consistent across every DAG-writing code
-    path in the repo.
-    """
-    write_to_dag_file(dag_path, dag)
-    return ruamel_dump({"steps": dag})
 
 
 def generate_step(cookiecutter_path: Path, data: dict[str, Any], target_dir: Path) -> None:

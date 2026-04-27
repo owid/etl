@@ -13,12 +13,11 @@ from rich.console import Console
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from apps.utils.files import add_to_dag
 from apps.wizard.app_pages.fasttrack.utils import _encrypt
 from etl.compare import diff_print
-from etl.dag_helpers import remove_steps_from_dag_file
+from etl.dag_helpers import remove_steps_from_dag_file, write_to_dag_file
 from etl.db import get_engine
-from etl.files import apply_ruff_formatter_to_files, yaml_dump
+from etl.files import apply_ruff_formatter_to_files, ruamel_dump, yaml_dump
 from etl.grapher import model as gm
 from etl.metadata_export import metadata_export
 from etl.paths import BASE_DIR, DAG_DIR, STEP_DIR
@@ -279,7 +278,8 @@ class FasttrackImport:
         remove_steps_from_dag_file(DAG_FASTTRACK_PATH, [to_remove])
 
         # Add the step to the DAG
-        return add_to_dag(to_add, DAG_FASTTRACK_PATH)
+        write_to_dag_file(DAG_FASTTRACK_PATH, to_add)
+        return ruamel_dump({"steps": to_add})
 
     @property
     def dataset_id(self) -> int:
