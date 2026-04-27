@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as yaml from 'js-yaml';
 
 const PLACEHOLDER_RE = /\{([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\}/g;
-const ALIAS_RE = /\*([A-Za-z_][A-Za-z0-9_]*)/g;
+const ALIAS_RE = /(?<![\w-])\*([A-Za-z_][A-Za-z0-9_-]*)(?![\w-])(?!\*)/g;
 const REVEAL_LINE_CMD = 'meta-yaml-hover.revealLine';
 
 function isMetaYamlFile(fileName: string): boolean {
@@ -90,7 +90,7 @@ function resolvePlaceholder(docText: string, dottedPath: string): string | undef
 
 function resolveAnchor(docText: string, anchorName: string): string | undefined {
     const lines = docText.split(/\r?\n/);
-    const anchorRe = new RegExp(`&${escapeRegex(anchorName)}\\b(.*)$`);
+    const anchorRe = new RegExp(`&${escapeRegex(anchorName)}(?![\\w-])(.*)$`);
 
     let anchorLineIdx = -1;
     let inlineRest = '';
@@ -178,7 +178,7 @@ function findKeyDeclLine(docText: string, dottedPath: string): number | undefine
 
 function findAnchorDeclLine(docText: string, anchorName: string): number | undefined {
     const lines = docText.split(/\r?\n/);
-    const re = new RegExp(`&${escapeRegex(anchorName)}\\b`);
+    const re = new RegExp(`&${escapeRegex(anchorName)}(?![\\w-])`);
     for (let i = 0; i < lines.length; i++) {
         if (re.test(lines[i])) {
             return i;
