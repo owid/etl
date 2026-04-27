@@ -162,9 +162,23 @@ def legacy_source_from_meta(meta: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def shorten_producer(producer: str, title: str) -> str:
+    """Keep producer within Grapher DB's 255-character limit.
+
+    Legacy Source.published_by sometimes contains a full citation. Origins store
+    that in citation_full; producer should remain a concise producer/author label.
+    """
+    if len(producer) <= 255:
+        return producer
+    if len(title) <= 255:
+        return title
+    return producer[:252].rstrip() + "..."
+
+
 def build_origin(source: dict[str, Any], meta: dict[str, Any], snapshot_path: Path) -> tuple[CommentedMap, str, str]:
     title = as_str(source.get("name")) or as_str(meta.get("name")) or snapshot_path.stem.split(".", 1)[0]
-    producer = as_str(source.get("published_by")) or title
+    producer_raw = as_str(source.get("published_by")) or title
+    producer = shorten_producer(producer_raw, title)
     date_published, date_published_source = infer_date_published(source, snapshot_path)
 
     origin = CommentedMap()
@@ -188,7 +202,10 @@ def build_origin(source: dict[str, Any], meta: dict[str, Any], snapshot_path: Pa
         origin["date_accessed"] = date_accessed
 
     origin["date_published"] = date_published
-    origin["citation_full"] = f"{producer} ({date_published}). {title}."
+    if len(producer_raw) > 255:
+        origin["citation_full"] = producer_raw if producer_raw.endswith(".") else f"{producer_raw}."
+    else:
+        origin["citation_full"] = f"{producer} ({date_published}). {title}."
 
     return origin, date_published, date_published_source
 
