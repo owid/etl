@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: OECD - Environment - Municipal waste, Generation and Treatment
+  origin:
+    title: OECD - Environment - Municipal waste, Generation and Treatment
+    producer: OECD.Stat
     description: |-
       Contact person/organisation
       ENV.Stat@oecd.org
@@ -10,11 +11,10 @@ meta:
       This dataset presents trends in amounts of municipal (including household waste), and the treatment and disposal method used.The amount of waste generated in each country is related to the rate of urbanisation, the types and pattern of consumption, household revenue and lifestyles.
       Metadata
       http://stats.oecd.org/wbos/fileview2.aspx?IDFile=9bc27df8-1205-468c-b178-ce0d200f2641
-    url: https://stats.oecd.org/Index.aspx?DataSetCode=MUNW
-    date_accessed: 2018-03-16
-    published_by: OECD.Stat
-  name: Environment - Municipal waste, Generation and Treatment
-  description: This is a dataset imported by the automated fetcher
+    url_main: https://stats.oecd.org/Index.aspx?DataSetCode=MUNW
+    date_accessed: '2018-03-16'
+    date_published: '2018'
+    citation_full: OECD.Stat (2018). OECD - Environment - Municipal waste, Generation and Treatment.
 outs:
   - md5: 986efa43c173e97a0e11367966125c5c
     size: 114882

@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Renewable Investment as % of GDP - BNEP and World Bank
+  origin:
+    title: Renewable Investment as % of GDP - BNEP and World Bank
+    producer: Renewable Investment as % of GDP - BNEP and World Bank
     description: |-
       Renewable energy investment as a percentage of GDP was calculated based on renewable energy investment figures (measured in US$, from Bloomberg New Energy Finance) and national GDP figures (measured in current US$ from the World Bank) in 2015 for the world's largest ten investors.
 
@@ -11,10 +12,9 @@ meta:
       Bloomberg New Energy Finance. Global trends in renewable energy finance 2016. Available at: https://www.actu-environnement.com/media/pdf/news-26477-rapport-pnue-enr.pdf (accessed 2017-05-10)
 
       The World Bank. World Development Indicators. Available at: http://databank.worldbank.org/data/home.aspx (accessed 2017-05-10)
-    date_accessed: 2026-03-05
-    published_by: Renewable Investment as % of GDP - BNEP and World Bank
-  name: Renewable Investment as % of GDP - BNEP and World Bank
-  description: Renewable Investment as % of GDP in 2015 - BNEP and World Bank
+    date_accessed: '2026-03-05'
+    date_published: '2017'
+    citation_full: Renewable Investment as % of GDP - BNEP and World Bank (2017). Renewable Investment as % of GDP - BNEP and World Bank.
 outs:
   - md5: 5354f712a364791ca1e9dc3b87786b08
     size: 3242

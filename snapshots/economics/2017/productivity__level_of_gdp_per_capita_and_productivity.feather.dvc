@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: OECD - Productivity - Level of GDP per capita and productivity
+  origin:
+    title: OECD - Productivity - Level of GDP per capita and productivity
+    producer: OECD.Stat
     description: |-
       Abstract
       Productivity is considered a central driver of long-term economic growth and living standards.
@@ -18,11 +19,10 @@ meta:
       * OECD 35 countries; * BRIICS, Colombia and Lithuania; * Geographical / economic zones.
       Sector coverage
       Total economy.
-    url: https://stats.oecd.org/Index.aspx?DataSetCode=PDB_LV
-    date_accessed: 2018-03-16
-    published_by: OECD.Stat
-  name: Productivity - Level of GDP per capita and productivity
-  description: This is a dataset imported by the automated fetcher
+    url_main: https://stats.oecd.org/Index.aspx?DataSetCode=PDB_LV
+    date_accessed: '2018-03-16'
+    date_published: '2017'
+    citation_full: OECD.Stat (2017). OECD - Productivity - Level of GDP per capita and productivity.
 outs:
   - md5: ae840a296658d0e4da2f8d3f19378453
     size: 177538

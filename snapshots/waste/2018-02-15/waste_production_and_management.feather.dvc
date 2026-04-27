@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Participation in Treaties - Rotterdam Convention
+  origin:
+    title: Participation in Treaties - Rotterdam Convention
+    producer: United Nations Environment Programme
     description: |-
       Publication year: 2013-12-01
       Unit: Number of Parties Subscribing each Year
@@ -17,11 +18,10 @@ meta:
       Covered time: 1999 - 2013-12-01
       Geographic extent
       Coverage: World
-    url: http://ede.grid.unep.ch/
-    date_accessed: 2018-02-15
-    published_by: United Nations Environment Programme
-  name: Waste Production and Management
-  description: This is a dataset imported by the automated fetcher
+    url_main: http://ede.grid.unep.ch/
+    date_accessed: '2018-02-15'
+    date_published: '2018'
+    citation_full: United Nations Environment Programme (2018). Participation in Treaties - Rotterdam Convention.
 outs:
   - md5: 16079e19453a5c5b7c1952899f1b3ac5
     size: 33114

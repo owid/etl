@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: DHS Surveys
+  origin:
+    title: DHS Surveys
+    producer: DHS
     description: |-
       The adult literacy rate is defined as the percentage of survey respondents, aged 15 and above, who can read. The 155 literacy variable indicates whether a respondent who attended primary schooling can read a whole or part of a sentence showed. A respondent who attended secondary education or higher are coded 2 as well as respondent who could read a whole sentence. Possible categories include: 0 - cannot read at all; 1 - able to read only parts of sentence; 2 - able to read whole sentence; 3 - no card with required language; 4 - blind/visually impaired. Our estimates exclude those in categories 3 and 4.
 
@@ -19,11 +20,10 @@ meta:
       DHS surveys are conducted approximately every 5 years in phases. The literacy variable (155) is available from phase 4 onward. Hence, Phase 7 corresponds to 2015; phase 6 to 2010; phase 5 to 2005; and phase 4 to 2000.  As this dataset brings together a number of countries across various phases, the year has been assigned according to the survey phase. Note the actual year the survey was conducted in a country may differ to the year assigned, but the survey will have been undertaken within the five year interval between each phase.
 
       For further information on the DHS surveys visit: https://dhsprogram.com/data/
-    url: https://dhsprogram.com/data
-    date_accessed: 2018-05-16
-    published_by: DHS
-  name: Literacy rate (% of total respondents) - DHS Surveys
-  description: ''
+    url_main: https://dhsprogram.com/data
+    date_accessed: '2018-05-16'
+    date_published: '2018'
+    citation_full: DHS (2018). DHS Surveys.
 outs:
   - md5: ee7f1f4e5e52df9b9d223acb48e8d24d
     size: 8474

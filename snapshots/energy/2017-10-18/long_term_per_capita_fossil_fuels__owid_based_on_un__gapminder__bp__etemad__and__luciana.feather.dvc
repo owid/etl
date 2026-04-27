@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Long-term per capita fossil fuels - OWID based on UN, Gapminder, BP, Etemad & Luciana
+  origin:
+    title: Long-term per capita fossil fuels - OWID based on UN, Gapminder, BP, Etemad & Luciana
+    producer: Long-term per capita fossil fuels - OWID based on UN, Gapminder, BP, Etemad & Luciana
     description: |-
       Average per capita fossil fuel production - for coal, oil and gas - was calculated by OWID based on published population and national fossil fuel production data.
 
@@ -17,11 +18,10 @@ meta:
       Data at the national and regional level is sourced from The SHIFT Project Data Portal, who draws upon Etemad & Luciana and US IEA Historical Statistics. Available at: http://www.tsp-data-portal.org/ [accessed 18th October 2017].
 
       Long-run data on UK coal output was sourced from the UK's Department for Energy and Climate Change (DECC). Historical coal data: coal production, availability and consumption 1853 to 2016. Available at: https://www.gov.uk/government/statistical-data-sets/historical-coal-data-coal-production-availability-and-consumption-1853-to-2011 [accessed 18th October 2017].
-    url: http://www.tsp-data-portal.org/
-    date_accessed: 2017-10-18
-    published_by: Long-term per capita fossil fuels - OWID based on UN, Gapminder, BP, Etemad & Luciana
-  name: Long-term per capita fossil fuels - OWID based on UN, Gapminder, BP, Etemad & Luciana
-  description: ''
+    url_main: http://www.tsp-data-portal.org/
+    date_accessed: '2017-10-18'
+    date_published: '2017'
+    citation_full: Long-term per capita fossil fuels - OWID based on UN, Gapminder, BP, Etemad & Luciana (2017). Long-term per capita fossil fuels - OWID based on UN, Gapminder, BP, Etemad & Luciana.
 outs:
   - md5: c2cb13916fcad967881d19e2f29c041e
     size: 164410

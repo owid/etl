@@ -68,6 +68,14 @@ def parse_args() -> argparse.Namespace:
             "and date_published can be inferred from source.name or source.published_by."
         ),
     )
+    parser.add_argument(
+        "--only-fallback-easy",
+        action="store_true",
+        help=(
+            "Only migrate rows where the snapshot script matches the standard backport pattern "
+            "and date_published falls back to the snapshot version."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -91,8 +99,19 @@ def extract_publication_years(text: str) -> list[str]:
     years = []
     for match in YEAR_RE.finditer(text):
         prefix = text[max(0, match.start() - 12) : match.start()].lower()
-        if re.search(r"(since|from|to|until|through)\s+$", prefix):
+        suffix = text[match.end() : min(len(text), match.end() + 12)].lower()
+        char_before = text[match.start() - 1] if match.start() > 0 else ""
+        char_after = text[match.end()] if match.end() < len(text) else ""
+
+        # Skip years that are likely part of data coverage or projection ranges,
+        # e.g. "1970–2050", "2030-50", "from 1961", "to 2050".
+        if re.search(r"(since|from|to|until|through|between)\s+$", prefix):
             continue
+        if re.search(r"^\s*(to|until|through)\b", suffix):
+            continue
+        if char_before in {"-", "–", "—"} or char_after in {"-", "–", "—"}:
+            continue
+
         years.append(match.group(1))
     return years
 
@@ -303,12 +322,16 @@ def main() -> None:
         if preview.status in {"migrated", "would-migrate"} and not args.no_script_update:
             preview.script_status = simplify_snapshot_script(snapshot_path=snapshot_path, apply=False)
 
-        if args.only_easy:
+        if args.only_easy or args.only_fallback_easy:
             is_easy = preview.script_status == "would-simplify" and preview.date_published_source.startswith(
                 "inferred from source."
             )
-            if not is_easy:
-                preview.status = "skip-not-easy"
+            is_fallback_easy = (
+                preview.script_status == "would-simplify"
+                and preview.date_published_source == "fallback to snapshot version"
+            )
+            if (args.only_easy and not is_easy) or (args.only_fallback_easy and not is_fallback_easy):
+                preview.status = "skip-not-selected"
                 results.append(preview)
                 continue
 

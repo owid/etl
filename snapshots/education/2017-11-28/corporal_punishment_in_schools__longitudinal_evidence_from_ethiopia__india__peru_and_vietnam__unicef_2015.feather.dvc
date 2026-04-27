@@ -1,14 +1,12 @@
 meta:
-  source:
-    name: Ogando Portela and Pells (2015)
-    description: |-
-      The data in this chart comes from Figure 2 in the source paper, where there are also estimates of children's self-reports of teacher’s use of physical punishment on other children: https://ourworldindata.org/wp-content/uploads/2017/11/Teacher-violence-UNICEF-2015.png
-    url: https://ideas.repec.org/p/ucf/indipa/indipa788.html
-    date_accessed: 2017-11-28
-    published_by: |-
-      Ogando Portela, María José, and Kirrily Pells. "Corporal punishment in schools: longitudinal evidence from Ethiopia, India Peru and Viet Nam." (2015).
-  name: Corporal Punishment in Schools - Longitudinal Evidence from Ethiopia, India, Peru and Vietnam (UNICEF 2015)
-  description: ''
+  origin:
+    title: Ogando Portela and Pells (2015)
+    producer: 'Ogando Portela, María José, and Kirrily Pells. "Corporal punishment in schools: longitudinal evidence from Ethiopia, India Peru and Viet Nam." (2015).'
+    description: "The data in this chart comes from Figure 2 in the source paper, where there are also estimates of children's self-reports of teacher’s use of physical punishment on other children: https://ourworldindata.org/wp-content/uploads/2017/11/Teacher-violence-UNICEF-2015.png"
+    url_main: https://ideas.repec.org/p/ucf/indipa/indipa788.html
+    date_accessed: '2017-11-28'
+    date_published: '2015'
+    citation_full: 'Ogando Portela, María José, and Kirrily Pells. "Corporal punishment in schools: longitudinal evidence from Ethiopia, India Peru and Viet Nam." (2015). (2015). Ogando Portela and Pells (2015).'
 outs:
   - md5: 9563cf55456af6c1208a1b7a42f25fed
     size: 3898
