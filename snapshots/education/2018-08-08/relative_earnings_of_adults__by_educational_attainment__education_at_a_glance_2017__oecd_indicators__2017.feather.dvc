@@ -1,17 +1,20 @@
 meta:
   origin:
-    title: 'Education at a Glance 2017: OECD Indicators (2017)'
     producer: OECD
+    title: 'Education at a Glance 2017: OECD Indicators'
     description: |-
+      The OECD's annual statistical compilation on education systems across OECD countries and partner economies, covering enrolment, attainment, finance, and outcomes.
+    description_snapshot: |-
       The year of reference is 2015 for all countries except: Denmark (2014), Finland (2014), Belgium (2014), Italy (2013), Canada (2014), Netherlands (2014), Japan (2012), Spain (2014), France (2013), Luxembourg (2014), Poland (2014), and Lithuania (2014).
 
-      Earnings are net of income tax only for: Latvia, Ireland, and Mexico.
+      Earnings are net of income tax only for Latvia, Ireland, and Mexico.
 
-      For further details, see Table A6.1 in the <a href="https://www.oecd-ilibrary.org/docserver/eag-2017-en.pdf?expires=1533729082&id=id&accname=guest&checksum=78D200C9AD96EA2A893AEC34BFB793F8" rel="noopener" target="_blank">Education at a Glance 2017</a> report.
+      For further details, see Table A6.1 in the Education at a Glance 2017 report.
+    citation_full: 'OECD (2017). Education at a Glance 2017: OECD Indicators. OECD Publishing.'
+    attribution_short: OECD
     url_main: https://www.oecd-ilibrary.org/education/education-at-a-glance-2017_eag-2017-en
     date_accessed: '2018-08-08'
     date_published: '2017'
-    citation_full: 'OECD (2017). Education at a Glance 2017: OECD Indicators (2017).'
 outs:
   - md5: b466243237b7f098a984f04ae35359ff
     size: 4234

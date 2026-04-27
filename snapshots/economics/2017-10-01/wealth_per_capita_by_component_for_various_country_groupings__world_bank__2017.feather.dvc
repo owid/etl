@@ -1,11 +1,14 @@
 meta:
   origin:
-    title: World Bank (2017)
     producer: World Bank
+    title: The Changing Wealth of Nations
+    description: |-
+      The Changing Wealth of Nations measures the wealth of nations by aggregating produced capital, natural capital, human capital, and net foreign assets. Wealth is the value of an economy's capital stocks; GDP is seen as the return on wealth.
+    citation_full: 'World Bank (2017). The Changing Wealth of Nations 2018: Building a Sustainable Future. World Bank.'
+    attribution_short: World Bank
+    version_producer: '2018'
     date_accessed: '2026-03-06'
     date_published: '2017'
-    citation_full: World Bank (2017). World Bank (2017).
-    description: Wealth is the value of an economy's capital stocks. GDP is seen as the return on wealth. The World Bank calculates wealth as the sum of produced capital, natural capital, human capital, net foreign assets.
 outs:
   - md5: 6eff49a52d6f7bd6bd8eb22a5e25dae6
     size: 17338
