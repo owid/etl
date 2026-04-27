@@ -246,7 +246,7 @@ def main_cli(
     )
 
     if watch:
-        runs = itertools.chain([None], files.watch_folder(paths.STEP_DIR))
+        runs = itertools.chain([None], files.watch_folder(paths.STEP_DIR, paths.SNAPSHOTS_DIR))
     else:
         runs = [None]
 

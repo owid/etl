@@ -1,0 +1,302 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+  note_inflation: &note_inflation |-
+    This data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
+
+  desc_processing_inflation: &desc_processing_inflation |-
+    - Reporting a time series of AI investments in nominal prices would make it difficult to compare observations across time. To make these comparisons possible, one has to take into account that prices change (inflation).
+    - It is not obvious how to adjust this time series for inflation, and our team discussed the best solutions at our disposal.
+    - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services purchased through these investments. This would make it possible to calculate a volume measure of AI investments and tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost of some crucial AI technology has fallen rapidly in price.
+    - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. Ultimately, we decided to use the US Consumer Price Index (CPI).
+    - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments, therefore, lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
+  desc_short_generative: &desc_short_generative |-
+    Money put into privately held [generative AI](#dod:generative-ai) companies by private investors. This excludes publicly traded companies (e.g., Big Tech companies) and companies’ internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
+  desc_short_private: &desc_short_private |-
+    Money put into privately held AI companies that raised more than $1.5 million from private investors. This excludes publicly traded companies (e.g., Big Tech companies) and companies’ internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
+  desc_short_corporate: &desc_short_corporate |-
+    Annual corporate-finance transactions involving privately held AI companies, broken down by type. This excludes publicly traded companies (e.g., Big Tech companies) and companies’ internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation.
+
+  desc_key_corporate: &desc_key_corporate
+  - This data focuses on transactions involving privately held AI companies,.
+  - It does not include internal corporate R&D, capital expenditure (CapEx), or public-sector funding. Publicly traded companies, including large tech firms, are excluded.
+  - Because this data covers only one form of financing, it underestimates total global spending on AI.
+  - Large single deals can cause spikes in specific years. Broader economic conditions (interest rates, investor sentiment) can also drive changes that are not specific to AI.
+  - |-
+    This data includes four types of corporate deals:
+      - A merger is a corporate strategy involving two companies joining together to form a new company. An acquisition is a corporate strategy involving one company buying another company.
+      - Private investment is defined as investment in AI companies of more than $1.5 million (in current US dollars).
+      - A public offering is the sale of equity shares or other financial instruments to the public in order to raise capital.
+      - A minority stake is an ownership interest of less than 50% of the total shares of a company.
+
+  desc_key_private: &desc_key_private
+    - This data focuses on external private-market investment, such as venture-capital and private-equity deals.
+    - It does not include internal corporate R&D, capital expenditure (CapEx), or public-sector funding. Publicly traded companies, including large tech firms, are excluded.
+    - Because this data covers only one form of financing, it underestimates total global spending on AI.
+    - Large single deals can cause spikes in specific years. Broader economic conditions (interest rates, investor sentiment) can also drive changes that are not specific to AI.
+    - AI firms are identified by the source based on keywords and industry tags; some misclassification is possible.
+
+  desc_key_generative: &desc_key_generative
+    - This data focuses on external private-market investment, such as venture-capital and private-equity deals.
+    - It does not include internal corporate R&D, capital expenditure (CapEx), or public-sector funding. Publicly traded companies, including large tech firms, are excluded.
+    - Because this data covers only one form of financing, it underestimates total global spending on AI.
+    - Large single deals can cause spikes in specific years. Broader economic conditions (interest rates, investor sentiment) can also drive changes that are not specific to AI.
+    - Generative AI firms are identified by the source based on keywords and industry tags; some misclassification is possible.
+
+  description_short_industrial: &desc_industrial Industrial robots are defined by the source as automatically controlled, reprogrammable, and multipurpose machines that can move in three or more directions and perform a variety of tasks in industrial settings.
+  description_short_professional: &desc_professional Professional service robots perform useful tasks outside of industrial manufacturing, such as surgery, logistics, or agriculture. Consumer service robots, such as robotic vacuum cleaners, are not included.
+
+  desc_key_industrial_robots: &desc_key_industrial
+    - Industrial robots are machines used in factories to automate tasks like welding, assembly, and packaging.
+    - They are defined as automatically controlled, reprogrammable, and multipurpose machines that can move in three or more directions.
+    - Reprogrammable means their functions can be changed through software without altering their physical parts.
+    - Multipurpose means they can be adapted for different tasks with mechanical changes.
+    - Robots are becoming easier to install and more flexible, which means even small production runs can be automated.
+    - Companies use robots to improve product quality, increase speed, reduce waste, and cut costs.
+
+  note_robots: &note_robots |-
+    Example machines that are not classified as robots: software (e.g., voice assistants), remote-controlled drones, self-driving cars, “smart” washing machines.
+
+  desc_processing_combined: &desc_processing_combined |-
+    We combine data from multiple releases of the AI Index Report. When the same year appears in more than one release, we use the most recent version.
+
+  attribution_mckinsey: &attribution_mckinsey |-
+    McKinsey & Company via AI Index Report
+  attribution_investment: &attribution_investment |-
+    Quid via AI Index Report (2026); U.S. Bureau of Labor Statistics (2026)
+  attribution_quid: &attribution_quid |-
+    Quid via AI Index Report (2026)
+  attribution_robots: &attribution_robots |-
+    International Federation of Robotics via AI Index Report (2026)
+  attribution_bills: &attribution_bills |-
+    Digital Policy Alert via AI Index Report (2026)
+  attribution_incidents: &attribution_incidents |-
+    AI Incident Database via AI Index Report (2026)
+  attribution_jobs: &attribution_jobs |-
+    Lightcast via AI Index Report (2026)
+
+dataset:
+  update_period_days: 365
+
+tables:
+  ai_bills:
+    variables:
+      number_of_ai_related_bills_passed_into_law:
+        title: Cumulative AI-related bills passed into law since 2016, as of 2025
+        unit: 'bills'
+        description_short: The total number of AI-related laws enacted in Group of Twenty (G20) countries between 2016 and 2025.
+        description_key:
+          - AI-related laws are identified through automated searches of legislative websites, combined with AI-based analysis of legal texts and manual checks.
+          - The system searches for terms such as “artificial intelligence” and “machine learning” to identify relevant laws.
+          - Each law is counted once, even if it includes several AI-related provisions. This means the total may underestimate the extent of policymaking.
+          - Only laws that have been enacted are included. Proposed or pending legislation is not counted.
+          - "The number of laws does not capture their importance: one broad law can be more impactful than many narrower ones."
+        presentation:
+          attribution: *attribution_bills
+          grapher_config:
+            note: For example, the [TAKE IT DOWN Act](https://www.govinfo.gov/content/pkg/PLAW-119publ12/html/PLAW-119publ12.htm), signed into law in the United States in 2025, criminalizes the nonconsensual sharing of intimate images, including AI-generated deepfakes.
+        display:
+            numDecimalPlaces: 0
+
+  ai_incidents:
+    variables:
+      number_of_ai_incidents:
+        title: Annual reported artificial intelligence incidents and controversies
+        unit: 'incidents'
+        description_short: The number of reported incidents where AI systems caused or nearly caused harm.
+        description_key:
+          - The AI Incident Database (AIID) collects reports of cases where AI systems have caused or nearly caused harm.
+          - Incidents include a wide range of harms, such as harmful AI-generated content, deepfake impersonation, biased facial recognition leading to wrongful arrests, and accidents involving AI systems.
+          - Entries are reviewed by human editors based on publicly available sources, including academic research and investigative journalism.
+          - Because reporting relies on publicly available sources, incidents are likely undercounted, especially in regions with less media coverage.
+          - The database is continuously updated, including for past years, so figures may change over time and may not match the latest totals reported by AIID.
+        presentation:
+          attribution: *attribution_incidents
+          grapher_config:
+            note: Reported incidents likely undercount the true number of incidents, especially in earlier years.
+        display:
+          numDecimalPlaces: 0
+
+  ai_adoption:
+    variables:
+      pct_of_respondents:
+        title: Organizations reporting having adopted AI
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of companies using AI technology (e.g., machine learning, computer vision, or natural language processing) in at least one business function.
+        description_key:
+          - Based on McKinsey & Company’s annual [“State of AI” surveys](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai) of organizations across many countries, industries, and company sizes.
+          - Organizations are counted as using AI if they report using it in at least one business function.
+          - Responses are self-reported and should be interpreted as indicative of trends rather than precise measures of global adoption.
+          - Reported use often reflects early-stage adoption, such as experimentation or pilot projects, rather than widespread deployment.
+          - To account for differences in response rates, results are weighted by each country’s contribution to global GDP.
+        processing_level: major
+        description_processing: *desc_processing_combined
+        presentation:
+          attribution: *attribution_mckinsey
+          grapher_config:
+            note: Companies represent a range of industries, sizes, functional specialties, and tenures. To adjust for differences in response rates, the data are weighted by the contribution of each respondent's nation to global GDP.
+        display:
+          numDecimalPlaces: 0
+
+  ai_conferences:
+    variables:
+      attendees:
+        title: Number of attendees
+        unit: 'attendees'
+        description_short: Number of people attending major AI research conferences, including in-person, online, and hybrid participants.
+        description_key:
+          - Covers a set of major AI conferences tracked by the AI Index, including large events such as NeurIPS, ICML, and CVPR.
+          - Conferences are an important way researchers share new work and engage with the wider AI community.
+          - Attendance includes people joining in person, online, or in hybrid formats.
+          - Many conferences have moved online or to hybrid formats in recent years, which can increase participation and make comparisons over time less straightforward.
+          - Figures are based on data reported by conference organizers or published online.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            note: Most conferences in 2020–2021 were held virtually due to the COVID-19 pandemic.
+
+  ai_jobs:
+    variables:
+      ai_job_postings_share:
+        title: Share of artificial intelligence jobs among all job postings
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of job postings that require at least one AI-related skill, such as machine learning, [generative AI](#dod:generative-ai), or natural language processing.
+        description_key:
+          - A job posting is counted as an AI job if it lists at least one AI-related skill identified by Lightcast. The list of skills is updated each year to reflect new developments.
+          - The definition is broad, covering technical roles as well as areas such as AI ethics and governance.
+          - The data is based on online job postings and does not include roles that are not advertised online.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          attribution: *attribution_jobs
+  #
+  # AI investment data
+  #
+  ai_investment_generative:
+    variables:
+      generative_ai:
+        title: Global investment in generative AI
+        unit: 'constant 2021 US$'
+        short_unit: '$'
+        processing_level: major
+        description_short: *desc_short_generative
+        description_key: *desc_key_generative
+        description_processing: *desc_processing_inflation
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution_investment
+          grapher_config:
+            note: *note_inflation
+
+  ai_new_companies:
+    variables:
+      companies:
+        title: Newly founded AI companies
+        unit: 'companies'
+        description_short: Newly-funded AI companies in each year that received an investment of more than $1.5 million (not adjusted for inflation).
+        description_key:
+          - AI companies are identified using keyword searches in company descriptions and websites.
+          - The data focuses on AI and machine learning companies that raised over $1.5 million (not adjusted for inflation).
+        presentation:
+          attribution: *attribution_quid
+        display:
+          numDecimalPlaces: 0
+
+  ai_private_investment:
+    variables:
+      private_investment:
+        title: Private investment in AI by region
+        unit: 'constant 2021 US$'
+        short_unit: '$'
+        processing_level: major
+        description_short: *desc_short_private
+        description_key: *desc_key_private
+        description_processing: *desc_processing_inflation
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution_investment
+          grapher_config:
+            note: *note_inflation
+
+  ai_corporate_investment:
+    variables:
+      corporate_investment:
+        title: Global corporate investment in AI
+        unit: 'constant 2021 US$'
+        short_unit: '$'
+        processing_level: major
+        description_short: *desc_short_corporate
+        description_key: *desc_key_corporate
+        description_processing: *desc_processing_inflation
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution_investment
+          grapher_config:
+            note: *note_inflation
+  #
+  # Robots
+  # https://ifr.org/img/worldrobotics/Sources___Methods_WR_2024_Industrial_Robots_.pdf - IFR's methodology for industrial robot data
+  industrial_robots:
+    variables:
+      industrial_robot_installations:
+        title: Annual industrial robots installed
+        unit: 'robots'
+        short_unit: ''
+        description_short: *desc_industrial
+        description_key: *desc_key_industrial
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution_robots
+          grapher_config:
+            note: *note_robots
+
+      industrial_robot_stock:
+        title: Total industrial robots in operation
+        unit: 'robots'
+        short_unit: ''
+        description_short: Estimated number of industrial robots in operation.
+        description_key:
+          - Industrial robots are automatically controlled, reprogrammable machines used in factories to automate tasks like welding, assembly, and packaging.
+          - The operational stock is the estimated number of industrial robots currently in use.
+          - This covers physical industrial robots as defined by the International Federation of Robotics, rather than other forms of automation such as software bots or autonomous vehicles.
+          - For Japan, the stock is reported by the Japan Robot Association. For most other countries, the IFR estimates it by summing robot installations over the previous 12 years.
+          - This assumes robots are withdrawn after 12 years of service. Studies suggest the true average service life may be closer to 15 years, while tax depreciation schedules in Germany and the United States imply as few as 5 to 6 years, so figures should be interpreted as estimates rather than direct counts.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution_robots
+          grapher_config:
+            note: *note_robots
+
+  professional_robots:
+    variables:
+      number_of_professional_robots_installed:
+        title: Number of professional robots installed
+        unit: 'robots'
+        short_unit: ''
+        description_short: *desc_professional
+        description_key:
+          - Agriculture category includes robots used for tasks such as plowing, seeding, harvesting, weeding, fertilizing, and pesticide spraying—both indoors (e.g. greenhouses) and outdoors (e.g. fields and vineyards). It also covers robots for milking, as well as those used in other livestock activities like feeding and barn cleaning.
+          - Professional cleaning category includes robots designed to clean floors, windows, walls, tanks, pipes, and vehicle hulls in professional environments. This category also includes disinfection robots and others used for specialized or large-scale cleaning tasks.
+          - Transportation and logistics category includes robots that transport goods and manage inventory in both indoor and outdoor environments. These robots are used in places such as warehouses, hospitals, hotels, and public streets, and they support activities like deliveries, stock counting, and restocking.
+          - Medical and healthcare category includes robots used in clinical and care settings for diagnostics, surgery, rehabilitation, and non-invasive therapy. It also includes hospital support robots, wearable exoskeletons, and telepresence robots used specifically in healthcare.
+          - Hospitality category includes robots that prepare and serve food or drinks, as well as those that provide information, guidance, or remote presence in customer-facing environments like hotels, restaurants, and museums.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution_robots
+          grapher_config:
+            note: *note_robots
