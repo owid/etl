@@ -1,11 +1,13 @@
 meta:
   origin:
-    title: Global Entrepreneurship Monitor
     producer: Global Entrepreneurship Monitor
+    title: Global Entrepreneurship Monitor
+    title_snapshot: Share of people who report having intentions to start a business
+    citation_full: Global Entrepreneurship Monitor.
+    attribution_short: GEM
     url_main: http://www.gemconsortium.org/data/key-aps
     date_accessed: '2018-05-07'
     date_published: '2018'
-    citation_full: Global Entrepreneurship Monitor (2018). Global Entrepreneurship Monitor.
 outs:
   - md5: ee4fac61baebc8e8b857332789ae7f18
     size: 9098

@@ -1,25 +1,16 @@
 meta:
   origin:
-    title: Plastic product lifetime, production, waste by source - Geyer et al. (2017)
-    producer: Geyer, R., Jambeck, J. R., & Law, K. L. (2017). Production, use, and fate of all plastics ever made. Science Advances, 3(7), e1700782.
+    producer: Geyer et al.
+    title: Production, use, and fate of all plastics ever made
     description: |-
-      Data is given as mean product lifetimes of plastic products (measured in years), plastic production, and plastic waste by industrial sector/use (measured in tonnes per year).
+      This dataset provides data on plastic production, use, and waste across industrial sectors and polymer types. It includes mean product lifetimes of plastic products (in years), plastic production, and plastic waste by industrial sector and use (in tonnes per year).
 
-      Data is also given for primary production and plastic waste by polymer type. Polymer types are as follows:
-      - LDPE: Low-density polyethylene
-      - HDPE: High-density polyethylene
-      - PP: Polypropylene
-      - PS: Polystyrene
-      - PVC: Polyvinyl chloride
-      - PET: Polyethylene terephthalate
-      - PUT: Polyurethanes
-      - PP&A fibres: polyester, polyamide, and acrylic fibres
-      - Other polymers
-      - Additives
+      Data is also provided for primary production and plastic waste by polymer type, including low-density polyethylene (LDPE), high-density polyethylene (HDPE), polypropylene (PP), polystyrene (PS), polyvinyl chloride (PVC), polyethylene terephthalate (PET), polyurethanes (PUT), polyester/polyamide/acrylic (PP&A) fibres, other polymers, and additives.
+    title_snapshot: Production, use, and fate of all plastics ever made - Plastic product lifetime, production, and waste by source
+    citation_full: Geyer, R., Jambeck, J. R., and Law, K. L. (2017). Production, use, and fate of all plastics ever made. Science Advances, 3(7), e1700782.
     url_main: http://advances.sciencemag.org/content/3/7/e1700782
     date_accessed: '2026-03-10'
     date_published: '2017'
-    citation_full: Geyer, R., Jambeck, J. R., & Law, K. L. (2017). Production, use, and fate of all plastics ever made. Science Advances, 3(7), e1700782. (2017). Plastic product lifetime, production, waste by source - Geyer et al. (2017).
 outs:
   - md5: 172980e80a0941ebf839f422318ce7c4
     size: 4786

@@ -1,11 +1,12 @@
 meta:
   origin:
-    title: Meijer et al. (2021). More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean. Science Advances.
-    producer: Meijer et al. (2021). More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean. Science Advances.
+    producer: Meijer et al.
+    title: More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean
+    description: This dataset provides estimates of riverine plastic emissions into the ocean. The study identifies more than 1,000 rivers that collectively account for 80% of global riverine plastic inputs to the ocean, offering a high-resolution global picture of plastic pollution pathways from land to sea.
+    citation_full: Meijer et al. (2021). More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean. Science Advances.
     url_main: https://advances.sciencemag.org/content/7/18/eaaz5803
     date_accessed: '2021-04-30'
     date_published: '2021'
-    citation_full: Meijer et al. (2021). More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean. Science Advances. (2021). Meijer et al. (2021). More than 1000 rivers account for 80% of global riverine plastic emissions into the ocean. Science Advances..
 outs:
   - md5: 934d621aa11e0be135c2dded7869fec4
     size: 18578

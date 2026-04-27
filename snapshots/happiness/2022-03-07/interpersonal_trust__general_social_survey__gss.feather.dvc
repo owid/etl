@@ -1,12 +1,15 @@
 meta:
   origin:
-    title: US General Social Survey (2022)
-    producer: 'US General Social Survey (2022)'
-    description: The General Social Survey (GSS) is a project of the independent research organization NORC at the University of Chicago, with principal funding from the National Science Foundation.
+    producer: NORC at the University of Chicago
+    title: General Social Survey
+    description: The General Social Survey (GSS) is a project of the independent research organization NORC at the University of Chicago, with principal funding from the National Science Foundation. It is one of the longest-running and most widely used sources of data on American society, tracking social, cultural, and attitudinal trends in the United States since 1972. The survey covers a broad range of topics including civil liberties, crime, intergroup tolerance, morality, national spending priorities, psychological well-being, social mobility, and stress.
+    title_snapshot: General Social Survey - Interpersonal trust
+    description_snapshot: "This snapshot contains data on interpersonal trust extracted from the GSS Data Explorer (variable \"trust\": Can people be trusted). The data is tabulated by year, weighted using WTSSCOMP, with a simple random sample design and missing values excluded. Note: as of March 7, 2022, there is a reported typo in the values on the GSS website — \"Can't trust\" is believed to actually mean \"Can trust\" (the positive response), while \"Can't be too careful\" is the negative response."
+    citation_full: 'Davern, Michael; Bautista, Rene; Freese, Jeremy; Morgan, Stephen L.; and Tom W. Smith. General Social Surveys, 1972–2021 Cross-section [machine-readable data file, 68,846 cases]. Principal Investigator, Michael Davern; Co-Principal Investigators, Rene Bautista, Jeremy Freese, Stephen L. Morgan, and Tom W. Smith; Sponsored by National Science Foundation. – NORC ed. – Chicago: NORC, 2021: NORC at the University of Chicago [producer and distributor]. Data accessed from the GSS Data Explorer website at gssdataexplorer.norc.org.'
+    attribution_short: GSS
     url_main: https://gssdataexplorer.norc.org/variables/441/vshow
     date_accessed: '2022-03-07'
     date_published: '2021'
-    citation_full: 'Davern, Michael; Bautista, Rene; Freese, Jeremy; Morgan, Stephen L.; and Tom W. Smith. General Social Surveys, 1972-2021 Cross-section [machine-readable data file, 68,846 cases]. Principal Investigator, Michael Davern; Co-Principal Investigators, Rene Bautista, Jeremy Freese, Stephen L. Morgan, and Tom W. Smith; Sponsored by National Science Foundation. – NORC ed. – Chicago: NORC, 2021: NORC at the University of Chicago [producer and distributor]. Data accessed from the GSS Data Explorer website at  gssdataexplorer.norc.org.'
 outs:
   - md5: 603359f58acbf7391f69dd836fc0df0f
     size: 3210

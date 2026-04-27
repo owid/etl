@@ -1,15 +1,12 @@
 meta:
   origin:
-    title: Coal production - The SHIFT Project
-    producer: The SHIFT Project Data Portal
-    description: |-
-      Data from 1900-1980 is sourced from Bouda Etemad and Jean Luciani, World Energy Production 1800 – 1985, ISBN 2-600-56007-6.
-
-      Data from 1980 onwards is source from U.S. Energy Information Administration, International Energy Statistics.
+    producer: The SHIFT Project
+    title: Coal production
+    description: Coal production data compiled by The SHIFT Project Data Portal. Data from 1900–1980 is sourced from Bouda Etemad and Jean Luciani, "World Energy Production 1800–1985" (ISBN 2-600-56007-6). Data from 1980 onwards is sourced from the U.S. Energy Information Administration (EIA), International Energy Statistics.
+    citation_full: 'The SHIFT Project Data Portal. Coal production. Available at: http://www.tsp-data-portal.org/.'
     url_main: http://www.tsp-data-portal.org/
     date_accessed: '2017-10-06'
     date_published: '2017'
-    citation_full: The SHIFT Project Data Portal (2017). Coal production - The SHIFT Project.
 outs:
   - md5: d32c8e4118d145624250b9f3bd58b614
     size: 52538

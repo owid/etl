@@ -1,14 +1,14 @@
 meta:
   origin:
-    title: International Council on Clean Transport (ICCT) and European Environment Agency
-    producer: International Council on Clean Transport (ICCT). European Vehicle Market Statistics. European aggregated figures from the European Environment Agency.
-    description: |-
-      Vehicle registrations data by type across specific European countries is sourced from the International Council on Clean Transport (ICCT): http://eupocketbook.org/
-
-      European aggregate figures is sourced from the European Environment Agency: https://www.eea.europa.eu/data-and-maps/indicators/proportion-of-vehicle-fleet-meeting-5/assessment. Here 'Europe' refers to the sum of the EU-27, Iceland, Norway and United Kingdom.
+    producer: International Council on Clean Transport and European Environment Agency
+    title: European Vehicle Market Statistics
+    description: Vehicle registration data by type across specific European countries, covering passenger vehicle sales and fleet composition. Country-level data is sourced from the International Council on Clean Transportation (ICCT), while European aggregate figures are sourced from the European Environment Agency (EEA). In the aggregate figures, "Europe" refers to the sum of the EU-27, Iceland, Norway, and the United Kingdom.
+    title_snapshot: European vehicle passenger sales
+    citation_full: International Council on Clean Transport (ICCT). European Vehicle Market Statistics. European aggregated figures from the European Environment Agency.
+    attribution_short: ICCT and EEA
+    url_main: http://eupocketbook.org/
     date_accessed: '2026-03-10'
     date_published: '2021'
-    citation_full: International Council on Clean Transport (ICCT). European Vehicle Market Statistics. European aggregated figures from the European Environment Agency. (2021). International Council on Clean Transport (ICCT) and European Environment Agency.
 outs:
   - md5: 96201b5344a9e8af770349ef4bd56948
     size: 65274

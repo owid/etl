@@ -1,15 +1,13 @@
 meta:
   origin:
-    title: Fishery catch breakdown - Pauly and Zeller (2016)
-    producer: 'Pauly D, Zeller D (2016) Catch reconstructions reveal that global marine fisheries catches are higher than reported and declining. Nature Communications 7: 10244.'
-    description: |-
-      Data from the Pauly and Zeller (2016) paper is available at the Dryad Digital Repository:
-
-      Pauly D, Zeller D (2016) Data from: Catch reconstructions reveal that global marine fisheries catches are higher than reported and declining. Dryad Digital Repository. https://doi.org/10.5061/dryad.4s4t1
+    producer: Pauly and Zeller
+    title: Catch reconstructions reveal that global marine fisheries catches are higher than reported and declining
+    description: This dataset accompanies the Pauly and Zeller (2016) study published in Nature Communications, which presents reconstructed global marine fisheries catch data. The reconstruction reveals that global catches are substantially higher than those officially reported to the Food and Agriculture Organization (FAO), and that catches have been declining since the 1990s.\n\nThe underlying data is archived at the Dryad Digital Repository and covers catch estimates broken down by fishing sector, fishing country, and other dimensions, enabling a more complete picture of the true scale of global marine fisheries exploitation.
+    citation_full: 'Pauly D, Zeller D (2016) Catch reconstructions reveal that global marine fisheries catches are higher than reported and declining. Nature Communications 7: 10244.'
     url_main: https://doi.org/10.1038/ncomms10244
+    url_download: https://doi.org/10.5061/dryad.4s4t1
     date_accessed: '2018-03-08'
     date_published: '2016'
-    citation_full: 'Pauly D, Zeller D (2016) Catch reconstructions reveal that global marine fisheries catches are higher than reported and declining. Nature Communications 7: 10244. (2016). Fishery catch breakdown - Pauly and Zeller (2016).'
 outs:
   - md5: 93f5f8fcfccca851b24481af5d20f9cc
     size: 6914

@@ -1,20 +1,16 @@
 meta:
   origin:
-    title: Missing plastic budget (Lebreton et al. 2019)
-    producer: Lebreton et al. (2019). A global mass budget for positively buoyant macroplastic debris in the ocean. Nature Scientific Reports.
+    producer: Lebreton et al.
+    title: A global mass budget for positively buoyant macroplastic debris in the ocean
     description: |-
-      Data describes modelled and projected ocean plastic under three 'plastic emissions' scenarios.
+      This dataset provides modelled and projected ocean plastic accumulation under three plastic emissions scenarios. It covers the global accumulation of buoyant macroplastics (>0.5 cm) in the ocean, as well as the accumulation of microplastics (<0.5 cm) derived from degraded plastic material from the ocean surface layer.
 
-      Given is the modelled global accumulation of buoyant macroplastics (>0.5 cm) in the ocean. And the accumulation of microplastics (<0.5 cm), which is degraded plastic material from the ocean surface layer.
-
-      This is given under three scenarios:
-      (1) Emissions of plastic to the world's oceans stopped by 2020;
-      (2) Emissions stagnated at 2020 levels;
-      (3) Increasing emissions of plastic until 2050 in line with the average growth rate of global plastic production from 2005-2015.
+      The three scenarios are: (1) emissions of plastic to the world's oceans stopped by 2020; (2) emissions stagnated at 2020 levels; and (3) increasing emissions of plastic until 2050 in line with the average growth rate of global plastic production from 2005–2015.
+    title_snapshot: Missing plastic budget
+    citation_full: Lebreton et al. (2019). A global mass budget for positively buoyant macroplastic debris in the ocean. Nature Scientific Reports.
     url_main: https://www.nature.com/articles/s41598-019-49413-5
     date_accessed: '2019-09-13'
     date_published: '2019'
-    citation_full: Lebreton et al. (2019). A global mass budget for positively buoyant macroplastic debris in the ocean. Nature Scientific Reports. (2019). Missing plastic budget (Lebreton et al. 2019).
 outs:
   - md5: 7b1b7fd6f0777966e393cc246137311f
     size: 6610

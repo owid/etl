@@ -1,15 +1,14 @@
 meta:
   origin:
-    title: Alcohol expenditure in the USA long-term (USDA, 2018)
-    producer: United States Department of Agriculture (USDA) Economic Research Service (ERS)
-    description: |-
-      Data is sourced from the USDA ERS dataset 'Nominal food expenditures, with taxes and tips, from previously-published estimates', available at: https://www.ers.usda.gov/data-products/food-expenditures.aspx
-
-      Figures are measured in constant 1998 US$. Values also include taxes and tips.
+    producer: USDA Economic Research Service
+    title: Food Expenditures
+    description: The Food Expenditures dataset from the USDA Economic Research Service (ERS) provides data on food spending in the United States. It includes nominal food expenditures with taxes and tips, drawn from previously published estimates, covering a wide range of food and beverage categories including alcoholic beverages. Figures are measured in constant 1998 US dollars.
+    title_snapshot: Food Expenditures - Alcohol expenditure in the USA long-term
+    citation_full: 'United States Department of Agriculture (USDA) Economic Research Service (ERS). Food Expenditures. Available at: https://www.ers.usda.gov/data-products/food-expenditures.aspx (2018).'
+    attribution_short: USDA ERS
     url_main: https://www.ers.usda.gov/data-products/food-expenditures.aspx
     date_accessed: '2018-04-27'
     date_published: '2018'
-    citation_full: United States Department of Agriculture (USDA) Economic Research Service (ERS) (2018). Alcohol expenditure in the USA long-term (USDA, 2018).
 outs:
   - md5: 6b95413b59730a7977bc30d2e287f7be
     size: 12962

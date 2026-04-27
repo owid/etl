@@ -1,15 +1,20 @@
 meta:
   origin:
+    producer: US Energy Information Administration and Cavallo
     title: Hubbert's Peak - Cavallo and EIA
-    producer: EIA
     description: |-
-      Data on actual US oil production is based on reported historical figures from the US Energy Information Administration (EIA). This has been plotted based on its dataset on annual 'US Field Production of Crude Oil'. Available online at: https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=pet&s=mcrfpus1&f=a [accessed 30th July 2017].
+      This dataset combines two sources on US oil production and Hubbert's peak oil theory.
 
-      Data on Hubbert's hypothesised peak oil production in the US is based on distribution analysis discussed and reported in: Cavallo, A. J. (2004). Hubbert’s petroleum production model: an evaluation and implications for world oil production forecasts. Natural Resources Research, 13(4), 211-221.
+      Actual US oil production data is based on reported historical figures from the US Energy Information Administration (EIA), drawn from its dataset on annual US field production of crude oil.
+
+      Data on Hubbert's hypothesized peak oil production in the US is based on distribution analysis discussed and reported in Cavallo (2004), which evaluates Hubbert's petroleum production model and its implications for world oil production forecasts.
+    citation_full: |-
+      US Energy Information Administration (EIA). US Field Production of Crude Oil. Available at: https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=pet&s=mcrfpus1&f=a [accessed 30 July 2017].
+
+      Cavallo, A. J. (2004). Hubbert's petroleum production model: an evaluation and implications for world oil production forecasts. Natural Resources Research, 13(4), 211–221.
     url_main: https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=pet&s=mcrfpus1&f=a
     date_accessed: '2026-03-05'
     date_published: '2017'
-    citation_full: EIA (2017). Hubbert's Peak - Cavallo and EIA.
 outs:
   - md5: 70073630f81025b0eb5a27f8a621c48d
     size: 5802

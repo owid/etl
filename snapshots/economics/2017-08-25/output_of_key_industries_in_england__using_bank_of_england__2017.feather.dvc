@@ -1,12 +1,15 @@
 meta:
   origin:
-    title: Broadberry, S., Campbell, B. M., Klein, A., Overton, M., & Van Leeuwen, B. (2015)
-    producer: Bank of England (BoE) 2017
-    description: This dataset is produced using 'A4. Ind Production 1270-1870' sheet in BoE dataset. For each variables, output figures are indexed those in year 1700 (i.e. 1700 = 100), and they are measured on a log scale.
+    producer: Bank of England
+    title: A Millennium of Macroeconomic Data
+    description: This dataset brings together macroeconomic data for the United Kingdom spanning several centuries. It draws on a wide range of historical sources to compile estimates of output, prices, money, banking, and other economic indicators. The industrial production component covers key industries in England from 1270 to 1870, with output figures indexed to the year 1700 (1700 = 100) and measured on a log scale.
+    title_snapshot: A Millennium of Macroeconomic Data - Output of key industries in England
+    description_snapshot: This snapshot is derived from the "A4. Ind Production 1270–1870" sheet of the Bank of England dataset. Output figures for key industries in England are indexed to the year 1700 (1700 = 100) and measured on a log scale.
+    citation_full: 'Bank of England (2017). A Millennium of Macroeconomic Data. Available at: http://www.bankofengland.co.uk/research/Pages/datasets/default.aspx#threecenturies. Underlying historical estimates based on Broadberry, S., Campbell, B. M., Klein, A., Overton, M., and Van Leeuwen, B. (2015).'
+    version_producer: '2017'
     url_main: http://www.bankofengland.co.uk/research/Pages/datasets/default.aspx#threecenturies
     date_accessed: '2017-08-25'
     date_published: '2017'
-    citation_full: Bank of England (BoE) 2017 (2017). Broadberry, S., Campbell, B. M., Klein, A., Overton, M., & Van Leeuwen, B. (2015).
 outs:
   - md5: a7411b0ce6dd983f2866890ba68c2b52
     size: 27498

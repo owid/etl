@@ -1,11 +1,12 @@
 meta:
   origin:
-    title: Nunn and Puga (2012)
-    producer: 'Nunn, Nathan, and Diego Puga, ‘‘Ruggedness: The Blessing of Bad Geography in Africa,’’ Review of Economics and Statistics, 94, no. 1 (2012), 20–36.'
+    producer: Nunn and Puga
+    title: Terrain Ruggedness Index
+    description: The Terrain Ruggedness Index (TRI) dataset provides country- and cell-level measures of terrain ruggedness derived from elevation data. It was compiled to support research on the geographic determinants of economic development, particularly the role of rugged terrain in shaping historical and contemporary outcomes in Africa and worldwide. The index captures the degree of irregularity in surface elevation and is widely used in cross-country empirical studies in economics and geography.
+    citation_full: 'Nunn, Nathan, and Diego Puga, "Ruggedness: The Blessing of Bad Geography in Africa," Review of Economics and Statistics, 94, no. 1 (2012), 20–36.'
     url_main: https://diegopuga.org/data/rugged/
     date_accessed: '2018-04-15'
     date_published: '2012'
-    citation_full: 'Nunn, Nathan, and Diego Puga, ‘‘Ruggedness: The Blessing of Bad Geography in Africa,’’ Review of Economics and Statistics, 94, no. 1 (2012), 20–36. (2012). Nunn and Puga (2012).'
 outs:
   - md5: 5a47b400e49c908f3fee15d4f9edfd1e
     size: 7714

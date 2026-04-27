@@ -1,21 +1,17 @@
 meta:
   origin:
-    title: Freedom House, Freedom of the Press (2017)
-    producer: Freedom House, Freedom of the Press
+    producer: Freedom House
+    title: Freedom of the Press
     description: |-
-      This dataset provides information on press freedoms, using data from Freedom House's (2017) Freedom of the Press.
+      Freedom of the Press is an annual survey published by Freedom House that assesses the degree of print, broadcast, and internet freedom in countries around the world. Each country is rated on a scale from 0 (most free) to 100 (least free), and is then designated as "Free," "Partly Free," or "Not Free."
 
-      For the years 1979-1987, we use the worse classification across the two dimensions of print and broadcast media.
-
-      For the data covering January 1981 to August 1982 we code the year 1982, and for the data covering August 1982 to November 1983 we code the year 1983.
-
-      We show the data for Czechoslovakia as Czechia, for the USSR as Russia, and for Yugoslavia as Serbia.
-
-      You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/human_rights
+      The survey covers a wide range of factors, including the legal environment for media, political pressures on editorial content, and economic influences on news outlets. The dataset spans from 1980 through 2017.
+    description_snapshot: This snapshot provides press freedom data from Freedom House's Freedom of the Press (2017 edition). For the years 1979–1987, the worse classification across the two dimensions of print and broadcast media is used. Data covering January 1981 to August 1982 is coded as 1982, and data covering August 1982 to November 1983 is coded as 1983. Czechoslovakia is shown as Czechia, the USSR as Russia, and Yugoslavia as Serbia.
+    citation_full: 'Freedom House, Freedom of the Press (2017). Available at: https://freedomhouse.org/sites/default/files/2020-02/FOTP1980-FOTP2017_Public-Data.xlsx.'
+    version_producer: '2017'
     url_main: https://freedomhouse.org/sites/default/files/2020-02/FOTP1980-FOTP2017_Public-Data.xlsx
     date_accessed: '2022-03-08'
     date_published: '2017'
-    citation_full: Freedom House, Freedom of the Press (2017). Freedom House, Freedom of the Press (2017).
 outs:
   - md5: 8aaf9f1d2365cb7b9310928cd3b0c782
     size: 19786

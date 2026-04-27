@@ -1,15 +1,18 @@
 meta:
   origin:
-    title: Ozone concentration-StateofGlobalAir
-    producer: State of Global Air 2017. HEI, 2017
+    producer: Health Effects Institute
+    title: State of Global Air
     description: |-
-      Data is gathered based on a combination of air quality observations from satellites combined with information from global chemical transport models, and available ground measurements. A global chemical transport model was used to calculate a seasonal (summer, when temperatures are highest) average concentration. Variation in the timing of the ozone (summer) season in different parts of the world is accounted for in these datasets. Global exposure to PM2.5 is then systematically estimated based on blocks or grid cells covering 0.1° x 0.1° of longitude and latitude (approximately 11 km x 11 km at the equator).
+      State of Global Air provides data on long-term exposure to air pollution and its health effects for countries around the world. Data on ozone (O3) concentration is gathered based on a combination of air quality observations from satellites, information from global chemical transport models, and available ground measurements. A global chemical transport model is used to calculate a seasonal (summer, when temperatures are highest) average concentration, with variation in the timing of the ozone season in different parts of the world accounted for in the datasets.
 
-      Taking into account the population in each block within a country, this data is then aggregated as estimated exposure concentrations to national-level population-weighted averages for a given year.
+      Global exposure is systematically estimated based on grid cells covering 0.1° × 0.1° of longitude and latitude (approximately 11 km × 11 km at the equator). Taking into account the population in each cell within a country, the data is aggregated as estimated exposure concentrations to national-level population-weighted averages for a given year.
+    title_snapshot: State of Global Air - Ozone concentration
+    citation_full: State of Global Air 2017. Health Effects Institute (HEI), 2017.
+    attribution_short: HEI
+    version_producer: '2017'
     url_main: www.stateofglobalair.org
     date_accessed: '2017-04-12'
     date_published: '2017'
-    citation_full: State of Global Air 2017. HEI, 2017 (2017). Ozone concentration-StateofGlobalAir.
 outs:
   - md5: a4aab8b7a311b3daa63def3a845ecb6f
     size: 9450

@@ -1,15 +1,13 @@
 meta:
   origin:
-    title: Reporters sans Frontieres (2022)
-    producer: Reporters sans Frontieres
-    description: |-
-      This dataset provides information on press freedom, using data from the Reporters sans Frontieres' World Press Freedom Index.
-
-      You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/human_rights
+    producer: Reporters sans Frontières
+    title: World Press Freedom Index
+    description: The World Press Freedom Index is an annual ranking of countries compiled by Reporters sans Frontières (RSF) that evaluates the level of freedom available to journalists. The index measures the degree of freedom journalists, news organizations, and netizens enjoy in each country, as well as the efforts made by each country to respect this freedom. Countries are scored and ranked based on criteria including media pluralism, media independence, legislative framework, transparency, infrastructure, and the safety of journalists.
+    citation_full: Reporters sans Frontières, World Press Freedom Index, 2022.
+    version_producer: '2022'
     url_main: https://rsf.org/en/index
     date_accessed: '2022-03-21'
     date_published: '2022'
-    citation_full: Reporters sans Frontieres (2022). Reporters sans Frontieres (2022).
 outs:
   - md5: 1e611ca9921bea9177a2bdabba8ccffe
     size: 16834

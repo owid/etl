@@ -1,11 +1,13 @@
 meta:
   origin:
-    title: German road deaths and accidents - destatis
     producer: Statistisches Bundesamt
+    title: Road Traffic Accidents
+    title_snapshot: Road Traffic Accidents - German road deaths and accidents
+    citation_full: Statistisches Bundesamt. Road Traffic Accidents. Accessed 2018-03-07.
+    attribution_short: Destatis
     url_main: https://www.destatis.de/EN/FactsFigures/EconomicSectors/TransportTraffic/TrafficAccidents/Tables_/RoadTrafficAccidents.html
     date_accessed: '2018-03-07'
     date_published: '2018'
-    citation_full: Statistisches Bundesamt (2018). German road deaths and accidents - destatis.
 outs:
   - md5: 243bcb1a662162ea9ad0a0f077865180
     size: 4482

@@ -1,15 +1,13 @@
 meta:
   origin:
-    title: Economic losses from disasters as a share of GDP (Pielke, 2018)
-    producer: Pielke, R. (2018). Tracking progress on the economic costs of disasters under the indicators of the sustainable development goals. Environmental Hazards, 1-6.
-    description: |-
-      Data represents absolute global economic losses from disasters (total and weather-related) in 2017 US$ from two sources: Munich Re and Aon Benfield.
-
-      This has been normalized to economic losses from disasters as a share of global gross domestic product (GDP) based on global GDP data derived from the World Bank.
+    producer: Pielke
+    title: Tracking progress on the economic costs of disasters under the indicators of the sustainable development goals
+    description: 'This dataset provides absolute global economic losses from disasters — both total and weather-related — expressed in 2017 US dollars, drawn from two sources: Munich Re and Aon Benfield. The losses are normalized as a share of global gross domestic product (GDP), using global GDP data derived from the World Bank.'
+    title_snapshot: Economic losses from disasters as a share of GDP
+    citation_full: Pielke, R. (2018). Tracking progress on the economic costs of disasters under the indicators of the sustainable development goals. Environmental Hazards, 1–6.
     url_main: https://www.tandfonline.com/doi/full/10.1080/17477891.2018.1540343
     date_accessed: '2018-11-07'
     date_published: '2018'
-    citation_full: Pielke, R. (2018). Tracking progress on the economic costs of disasters under the indicators of the sustainable development goals. Environmental Hazards, 1-6. (2018). Economic losses from disasters as a share of GDP (Pielke, 2018).
 outs:
   - md5: d3f53e06419b3d86df1ec36ea6ea6d4b
     size: 8866

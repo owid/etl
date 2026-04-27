@@ -1,28 +1,17 @@
 meta:
   origin:
-    title: Number of parties to multilateral environmental agreements - UNCTAD
-    producer: 'UNCTAD Development and Globalization: Facts and Figures (2016). United Nations Conference on Trade and Development'
+    producer: UNCTAD
+    title: 'Development and Globalization: Facts and Figures'
     description: |-
-      Data represents the number of parties signed into international, multilateral environmental agreements.
+      Development and Globalization: Facts and Figures is a publication by the United Nations Conference on Trade and Development (UNCTAD) that presents key data and analysis on global trade, investment, and development trends. The dataset includes data on the number of parties signed into international, multilateral environmental agreements.
 
-      Acronyms:
-
-      CBD: Convention on Biological Diversity.
-      CMS: Convention on the Conservation of Migratory Species of Wild Animals
-      UNCCD: United Nations Convention to Combat Desertification
-      UNCLOS: United Nations Convention on the Law of the Sea
-      UNFCCC: United Nations Framework Convention on Climate Change
-      Stockholm: Stockholm Convention on Persistent Organic Pollutants
-      Cartagena: Cartagena Protocol on Biosafety
-      CITES: Convention on International Trade in Endangered Species of Wild Fauna and Flora
-      Heritage: World Heritage Convention. Kyoto: Kyoto Protocol
-      Ozone: Ozone Vienna Convention
-      Ramsar: Ramsar Convention
-      Rotterdam: Rotterdam Convention.
+      Agreements covered include the Convention on Biological Diversity (CBD), the Convention on the Conservation of Migratory Species of Wild Animals (CMS), the United Nations Convention to Combat Desertification (UNCCD), the United Nations Convention on the Law of the Sea (UNCLOS), the United Nations Framework Convention on Climate Change (UNFCCC), the Stockholm Convention on Persistent Organic Pollutants, the Cartagena Protocol on Biosafety, the Convention on International Trade in Endangered Species of Wild Fauna and Flora (CITES), the World Heritage Convention, the Kyoto Protocol, the Ozone Vienna Convention, the Ramsar Convention, and the Rotterdam Convention.
+    title_snapshot: 'Development and Globalization: Facts and Figures - Number of parties to multilateral environmental agreements'
+    citation_full: 'UNCTAD Development and Globalization: Facts and Figures (2016). United Nations Conference on Trade and Development.'
+    version_producer: '2016'
     url_main: http://stats.unctad.org/Dgff2016/index.html
     date_accessed: '2017-10-12'
     date_published: '2016'
-    citation_full: 'UNCTAD Development and Globalization: Facts and Figures (2016). United Nations Conference on Trade and Development (2016). Number of parties to multilateral environmental agreements - UNCTAD.'
 outs:
   - md5: de9f78ef4fe07ac4cf834926e513a2e2
     size: 12994

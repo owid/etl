@@ -1,19 +1,17 @@
 meta:
   origin:
-    title: Calories lost by food group and region (WRI, 2013)
-    producer: 'Lipinski, B. et al. (2013). “Reducing Food Loss and Waste.” Working Paper, Installment 2 of Creating a Sustainable Food Future. Washington, DC: World Resources Institute.'
+    producer: Lipinski et al.
+    title: Reducing Food Loss and Waste
     description: |-
-      Data on food losses and waste includes all supply chain stages, from (and including) on-farm harvesting through to final food waste.
+      This dataset provides figures on food losses and waste across all supply chain stages, from on-farm harvesting through to final food waste. Figures are based only on food intended for direct human consumption — crops diverted for animal feed or industrial uses are not included as losses.
 
-      Figures are based only on food intended for direct human consumption: this means crops diverted for animal feed or industrial uses are not included as losses.
-
-      The original authors of this study – Lipinski et al. (2013) of the World Resources Institute – calculate these figures based on the regional percentage losses expressed in the landmark UN FAO report on food losses: FAO (2011). Global food losses and food waste – Extent, causes and prevention. Rome.
-
-      This data is expressed for the year 2009 due to poor data availability and updated estimates since then. It is likely that, especially when expressed in relative terms (each region or food group's contribution to food losses) remains similar today.
+      The figures are calculated based on regional percentage losses expressed in the UN Food and Agriculture Organization (FAO) report "Global food losses and food waste – Extent, causes and prevention" (Rome, 2011). Data is expressed for the year 2009 due to poor data availability and limited updated estimates since then. It is likely that, especially when expressed in relative terms (each region or food group's contribution to food losses), the figures remain broadly representative today.
+    title_snapshot: Reducing Food Loss and Waste - Calories lost by food group and region
+    citation_full: 'Lipinski, B. et al. (2013). "Reducing Food Loss and Waste." Working Paper, Installment 2 of Creating a Sustainable Food Future. Washington, DC: World Resources Institute.'
+    attribution_short: WRI
     url_main: http://pdf.wri.org/reducing_food_loss_and_waste.pdf
     date_accessed: '2020-02-22'
     date_published: '2013'
-    citation_full: 'Lipinski, B. et al. (2013). “Reducing Food Loss and Waste.” Working Paper, Installment 2 of Creating a Sustainable Food Future. Washington, DC: World Resources Institute. (2013). Calories lost by food group and region (WRI, 2013).'
 outs:
   - md5: 61d9d531a27e6ce8be34fc354f2fb6bf
     size: 5034

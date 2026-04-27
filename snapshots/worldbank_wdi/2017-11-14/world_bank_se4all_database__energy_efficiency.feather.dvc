@@ -1,12 +1,14 @@
 meta:
   origin:
-    title: 'World Bank SE4ALL database: Divisia Decomposition Analysis - Activity component Index'
-    producer: World Bank SE4ALL database, IEA
+    producer: World Bank and IEA
+    title: Sustainable Energy for All (SE4ALL) Database
+    description: The Sustainable Energy for All (SE4ALL) database, compiled by the World Bank and the International Energy Agency (IEA), provides data on access to energy, energy efficiency, and renewable energy. It supports the SE4ALL initiative's goals of ensuring universal access to modern energy services, doubling the global rate of improvement in energy efficiency, and doubling the share of renewable energy in the global energy mix. The dataset includes indicators such as Divisia Decomposition Analysis components, which decompose changes in energy intensity into activity, structural, and intensity effects.
+    title_snapshot: Sustainable Energy for All (SE4ALL) Database - Energy efficiency
+    citation_full: World Bank SE4ALL database, IEA. Sustainable Energy for All (SE4ALL) Database. World Bank, Washington, D.C.
+    attribution_short: World Bank
     url_main: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
     date_accessed: '2017-11-14'
     date_published: '2017'
-    citation_full: 'World Bank SE4ALL database, IEA (2017). World Bank SE4ALL database: Divisia Decomposition Analysis - Activity component Index.'
-    description: This is a dataset imported by the automated fetcher
 outs:
   - md5: 3191adc264d367d575687bc26f38cd80
     size: 547562

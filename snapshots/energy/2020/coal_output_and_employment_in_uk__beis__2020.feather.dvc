@@ -1,19 +1,17 @@
 meta:
   origin:
-    title: UK DECC & Department for Business, Energy & Industrial Strategy (BEIS).
-    producer: Department for Business, Energy & Industrial Strategy (BEIS)
+    producer: Department for Business, Energy and Industrial Strategy
+    title: 'Historical coal data: coal production, availability, and consumption'
     description: |-
-      Data originally published by the UK's Department for Energy and Climate Change (DECC) in 2013. Updated in 2018 by the UK's Department for Business, Energy & Industrial Strategy (BEIS).
+      Data on UK coal production, availability, and consumption, originally published by the UK's Department of Energy and Climate Change (DECC) in 2013 and subsequently updated by the Department for Business, Energy and Industrial Strategy (BEIS).
 
-      Employment figures in the coal industry include contractors, and are sourced by DECC from The Coal Authority.
-
-      Coal production per worker was calculated by dividing total UK coal output by the number employed in any given year.
-
-      The share of the total workforce employed in the coal industry was calculated by dividing by total UK workforce figures available in 'A millennium of macroeconomic data' by the Bank of England. Available at: http://www.bankofengland.co.uk/research/Pages/datasets/default.aspx [accessed 5th October 2017].
+      Employment figures in the coal industry include contractors, and are sourced from The Coal Authority. Coal production per worker is calculated by dividing total UK coal output by the number employed in any given year.
+    title_snapshot: Historical coal data - Coal output and employment in the UK
+    citation_full: 'Department for Business, Energy and Industrial Strategy (BEIS). Historical coal data: coal production, availability and consumption. Updated 2018.'
+    attribution_short: BEIS
     url_main: https://www.gov.uk/government/statistical-data-sets/historical-coal-data-coal-production-availability-and-consumption
     date_accessed: '2020-08-17'
     date_published: '2020'
-    citation_full: Department for Business, Energy & Industrial Strategy (BEIS) (2020). UK DECC & Department for Business, Energy & Industrial Strategy (BEIS)..
 outs:
   - md5: 9f38a27ebe2a702bea634fe413f2adb2
     size: 20522
