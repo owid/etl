@@ -1,3 +1,5 @@
+import datetime
+
 import owid.catalog.processing as pr
 
 from etl.catalog_helpers import last_date_accessed
@@ -64,7 +66,11 @@ def run() -> None:
     ds_garden = paths.create_dataset(
         tables=[tb],
         default_metadata=ds_meadow.metadata,
-        yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
+        yaml_params={
+            "date_accessed": last_date_accessed(tb),
+            "year": last_date_accessed(tb)[-4:],
+            "month": datetime.datetime.strptime(last_date_accessed(tb), "%d %B %Y").strftime("%B"),
+        },
     )
     ds_garden.save()
 
