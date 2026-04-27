@@ -24,7 +24,9 @@ def main(upload: bool) -> None:
     )
     snap_values.pull()
     # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
-    snap = Snapshot("poverty_inequality/2018-02-27/gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017.feather")
+    snap = Snapshot(
+        "poverty_inequality/2018-02-27/gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017.feather"
+    )
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))
