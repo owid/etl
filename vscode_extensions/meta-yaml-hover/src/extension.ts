@@ -1,18 +1,67 @@
+/**
+ * meta-yaml-hover — VSCode extension for OWID `*.meta.yml` files.
+ *
+ * Provides three things on metadata files:
+ *   1. A hover popup that resolves Jinja-style placeholders and YAML aliases:
+ *        - `{<dotted.path>}`  — resolved against the YAML root (e.g. `{definitions.foo}`,
+ *                                `{tables.x.variables.y.title}`).
+ *        - `{macros}`         — extracted as the literal `macros:` block (preserves Jinja).
+ *        - `*<anchor>`         — resolves to the value declared at `&<anchor>` in the same file.
+ *        - `<<: *<anchor>`     — same; the merge prefix is ignored, the alias hovers.
+ *   2. Inline links inside the hover popup. Every reference appearing in the
+ *      resolved value is rendered as a clickable `↗` link that jumps to the
+ *      declaration line via a custom `meta-yaml-hover.revealLine` command.
+ *   3. A `DefinitionProvider` so `Cmd+Click` / `F12` on the same tokens in the
+ *      document jumps to their declaration line — the standard VSCode pattern.
+ *
+ * Runtime placeholders such as `<<welfare_type>>`, `{TODAY}`, `{date_accessed}`,
+ * `{LATEST_YEAR}`, etc. are *not* resolved — their values are injected at
+ * step-execution time via Python's `yaml_params=...`, not declared in the YAML.
+ *
+ * The extension is intentionally same-file: no cross-file or `shared.meta.yml`
+ * traversal in this version.
+ */
+
 import * as vscode from 'vscode';
 import * as yaml from 'js-yaml';
 
+/** Matches `{<dotted.path>}` placeholders. Capture group 1 = the dotted path. */
 const PLACEHOLDER_RE = /\{([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\}/g;
+
+/**
+ * Matches YAML alias references `*<name>`. Capture group 1 = the anchor name.
+ *
+ * The lookbehind/lookahead ensure we don't confuse `*name` with markdown
+ * emphasis (`*all*` → no match) or with `*` inside identifiers/expressions
+ * (`foo*bar` → no match). Hyphens are allowed inside anchor names because
+ * many OWID files use kebab-case anchors (e.g. `*variables-default`).
+ */
 const ALIAS_RE = /(?<![\w-])\*([A-Za-z_][A-Za-z0-9_-]*)(?![\w-])(?!\*)/g;
+
+/** Custom command used by hover-popup links to navigate to a declaration line. */
 const REVEAL_LINE_CMD = 'meta-yaml-hover.revealLine';
 
+/** True iff `fileName` ends in `.meta.yml` / `.meta.yaml`. */
 function isMetaYamlFile(fileName: string): boolean {
     return fileName.endsWith('.meta.yml') || fileName.endsWith('.meta.yaml');
 }
 
+/** Escape regex metacharacters in a literal string so it can be embedded in a `RegExp`. */
 function escapeRegex(s: string): string {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+/**
+ * Pull a top-level YAML block out of `docText` by raw-line scanning.
+ *
+ * Used as a fallback for `{macros}`: the macros block is a literal Jinja
+ * string we want to display verbatim, not a parsed YAML object. We avoid
+ * `yaml.load` here so that any unusual content (Jinja-only, malformed)
+ * doesn't break the resolution.
+ *
+ * Returns the block content with the parent's two-space indent stripped,
+ * or `undefined` if `key:` doesn't appear at column 0.
+ */
 function extractTopLevelBlock(docText: string, key: string): string | undefined {
     const lines = docText.split(/\r?\n/);
     const headerRe = new RegExp(`^${key}\\s*:\\s*(\\|[+-]?|>[+-]?)?\\s*$`);
@@ -46,6 +95,14 @@ function extractTopLevelBlock(docText: string, key: string): string | undefined 
     return captured.length > 0 ? captured.join('\n') : undefined;
 }
 
+/**
+ * Walk a dotted path (`['definitions', 'foo', 'bar']`) through a parsed YAML
+ * document and return the leaf value as a string.
+ *
+ * Strings are returned verbatim. Other values (lists, mappings) are
+ * re-serialised with `yaml.dump` so the hover can show their structure.
+ * Returns `undefined` if any segment is missing or YAML parsing fails.
+ */
 function resolveYamlPath(docText: string, segments: string[]): string | undefined {
     let parsed: unknown;
     try {
@@ -77,6 +134,12 @@ function resolveYamlPath(docText: string, segments: string[]): string | undefine
     }
 }
 
+/**
+ * Resolve a `{<dotted.path>}` placeholder to its value in the same file.
+ *
+ * The `{macros}` placeholder is special-cased to text extraction; everything
+ * else walks the parsed YAML tree from the root.
+ */
 function resolvePlaceholder(docText: string, dottedPath: string): string | undefined {
     if (dottedPath === 'macros') {
         return extractTopLevelBlock(docText, 'macros');
@@ -88,8 +151,18 @@ function resolvePlaceholder(docText: string, dottedPath: string): string | undef
     return resolveYamlPath(docText, segments);
 }
 
+/**
+ * Resolve `*<anchor>` to the body of the matching `&<anchor>` declaration.
+ *
+ * Implemented by raw-line scanning rather than `yaml.load` so that the original
+ * formatting (block scalar markers, Jinja, indentation) is preserved in the
+ * hover. Walks lines after the anchor declaration as long as their indent is
+ * deeper than the anchor's, then strips the anchor's indent + 2 from each.
+ */
 function resolveAnchor(docText: string, anchorName: string): string | undefined {
     const lines = docText.split(/\r?\n/);
+    // The negative lookahead `(?![\w-])` prevents `&foo` from matching the
+    // longer anchor `&foo-bar`.
     const anchorRe = new RegExp(`&${escapeRegex(anchorName)}(?![\\w-])(.*)$`);
 
     let anchorLineIdx = -1;
@@ -109,6 +182,8 @@ function resolveAnchor(docText: string, anchorName: string): string | undefined 
     }
 
     const captured: string[] = [];
+    // Strip leading whitespace and any block scalar indicator (`|`, `|-`, `>`, etc.)
+    // that immediately follows the anchor name on the declaration line.
     const inlineTrimmed = inlineRest.replace(/^\s*([|>][+-]?)?\s*/, '');
     if (inlineTrimmed.trim() !== '') {
         captured.push(inlineTrimmed);
@@ -134,6 +209,15 @@ function resolveAnchor(docText: string, anchorName: string): string | undefined 
     return captured.length > 0 ? captured.join('\n') : undefined;
 }
 
+/**
+ * Find the line where a dotted path is declared in the YAML.
+ *
+ * Walks the file as text rather than parsing, so it can return a raw line
+ * number suitable for "go to definition". Each segment must be a direct child
+ * of the previous one (matching at the same indent as the first child found
+ * after entering the parent's scope) — this prevents a same-named key in an
+ * unrelated nested branch from hijacking the search.
+ */
 function findKeyDeclLine(docText: string, dottedPath: string): number | undefined {
     const segments = dottedPath.split('.');
     if (segments.length === 0) {
@@ -153,6 +237,7 @@ function findKeyDeclLine(docText: string, dottedPath: string): number | undefine
         const key = m[2];
 
         if (segIdx === 0) {
+            // Looking for the first segment as a top-level key.
             if (indent === 0 && key === segments[0]) {
                 if (segments.length === 1) {
                     return i;
@@ -164,12 +249,15 @@ function findKeyDeclLine(docText: string, dottedPath: string): number | undefine
             continue;
         }
 
+        // Encountered a key at or above the parent's indent → left the scope.
         if (indent <= parentIndent) {
             return undefined;
         }
+        // First child seen sets the immediate child indent for this scope.
         if (childIndent === -1) {
             childIndent = indent;
         }
+        // Skip grandchildren (keys at deeper indents than direct children).
         if (indent !== childIndent) {
             continue;
         }
@@ -185,6 +273,7 @@ function findKeyDeclLine(docText: string, dottedPath: string): number | undefine
     return undefined;
 }
 
+/** Find the line where `&<anchorName>` is declared. */
 function findAnchorDeclLine(docText: string, anchorName: string): number | undefined {
     const lines = docText.split(/\r?\n/);
     const re = new RegExp(`&${escapeRegex(anchorName)}(?![\\w-])`);
@@ -196,6 +285,11 @@ function findAnchorDeclLine(docText: string, anchorName: string): number | undef
     return undefined;
 }
 
+/**
+ * Run `re` over `lineText` and return the match (with capture group 1 as
+ * `name`) that contains the cursor at column `character`. Used to detect
+ * whether the cursor sits on a placeholder/alias token.
+ */
 function findHoverMatch(
     lineText: string,
     character: number,
@@ -213,11 +307,16 @@ function findHoverMatch(
     return undefined;
 }
 
+/**
+ * Build a `command:` URI that, when clicked in a trusted hover, fires the
+ * `meta-yaml-hover.revealLine` command and reveals `(uri, line)` in an editor.
+ */
 function buildRevealUri(docUri: vscode.Uri, line: number): string {
     const args = encodeURIComponent(JSON.stringify([docUri.toString(), line]));
     return `command:${REVEAL_LINE_CMD}?${args}`;
 }
 
+/** Escape a string for safe insertion as HTML text or attribute value. */
 function escapeHtml(s: string): string {
     return s
         .replace(/&/g, '&amp;')
@@ -226,6 +325,15 @@ function escapeHtml(s: string): string {
         .replace(/"/g, '&quot;');
 }
 
+/**
+ * Single-pass tokeniser for the resolved hover body. Each alternative is a
+ * separate kind of inline token, identified later by which capture group
+ * matched:
+ *   group 1 — `{<dotted.path>}` placeholder
+ *   group 2 — `*<anchor>` alias
+ *   group 3 — `<% ... %>` Jinja statement OR `<# ... #>` Jinja comment
+ *   (no group) — `<<...>>` Jinja interpolation (matched but not captured)
+ */
 const TOKEN_RE = new RegExp(
     [
         '\\{([A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*)\\}',
@@ -236,6 +344,25 @@ const TOKEN_RE = new RegExp(
     'g',
 );
 
+/**
+ * Render a resolved value as HTML for the hover popup.
+ *
+ * Each token (placeholder, alias, Jinja statement/comment, interpolation)
+ * gets an inline `<code>` wrapper so it stands out from the surrounding prose;
+ * placeholders and aliases additionally become clickable `<a>` links to their
+ * declaration line. Jinja control flow is wrapped in `<i>` only — no
+ * monospace — so it reads as syntax rather than data.
+ *
+ * After tokenising, the rendered string is split per source line:
+ *   - leading whitespace becomes `&nbsp;` so indentation survives in HTML
+ *   - depth tracking through Jinja `<% if %>` / `<%- endif %>` / `<%- elif %>`
+ *     adds two `&nbsp;` per nesting level to the front of every line, so
+ *     conditions read as section headers and the body sits visibly indented
+ *     under them.
+ *   - lines are joined with `<br>` for visual breaks; if the next line starts
+ *     a markdown list item (`- `, `* `, `+ `) we use `\n` instead so markdown
+ *     can recognise the whole block as a bulleted list.
+ */
 function renderResolvedWithLinks(
     resolved: string,
     docUri: vscode.Uri,
@@ -249,6 +376,7 @@ function renderResolvedWithLinks(
         result += escapeHtml(resolved.slice(lastIdx, m.index));
         const escaped = escapeHtml(m[0]);
         if (m[1] !== undefined) {
+            // Placeholder
             const line = findKeyDeclLine(docText, m[1]);
             if (line !== undefined) {
                 const uri = buildRevealUri(docUri, line);
@@ -257,6 +385,7 @@ function renderResolvedWithLinks(
                 result += `<small><code>${escaped}</code></small>`;
             }
         } else if (m[2] !== undefined) {
+            // YAML alias
             const line = findAnchorDeclLine(docText, m[2]);
             if (line !== undefined) {
                 const uri = buildRevealUri(docUri, line);
@@ -265,14 +394,18 @@ function renderResolvedWithLinks(
                 result += `<small><code>${escaped}</code></small>`;
             }
         } else if (m[3] !== undefined) {
+            // Jinja control flow / comment — italic in the body font, no monospace
             result += `<i>${escaped}</i>`;
         } else {
+            // Jinja interpolation `<<var>>` — runtime placeholder we can't resolve
             result += `<small><code>${escaped}</code></small>`;
         }
         lastIdx = m.index + m[0].length;
     }
     result += escapeHtml(resolved.slice(lastIdx));
 
+    // Per-line post-processing: leading whitespace → &nbsp; (HTML collapses
+    // consecutive spaces, so we have to opt out of that explicitly).
     const processedLines = result.split('\n').map((line) => {
         const lm = line.match(/^([ \t]*)(.*)$/);
         if (!lm) {
@@ -281,8 +414,16 @@ function renderResolvedWithLinks(
         const leading = lm[1].replace(/\t/g, '    ').replace(/ /g, '&nbsp;');
         return leading + lm[2];
     });
+
+    /** True iff the post-processed line is *only* a Jinja statement/comment. */
     const isJinjaLine = (line: string): boolean =>
         /^(?:&nbsp;)*<i>[^<>]*<\/i>$/.test(line);
+
+    /**
+     * Classify a Jinja line as opening a scope (`if`, `for`, ...), closing
+     * one (`endif`, ...), continuing one at the same level (`elif`, `else`),
+     * or none of the above (a comment or `<% set %>`-style statement).
+     */
     const jinjaControlKind = (line: string): 'open' | 'close' | 'middle' | 'none' => {
         const m = line.match(/^(?:&nbsp;)*<i>&lt;%-?\s*(\w+)/);
         if (!m) {
@@ -300,6 +441,12 @@ function renderResolvedWithLinks(
         }
         return 'none';
     };
+
+    // Track Jinja nesting depth and prepend two `&nbsp;` per level to each
+    // line. Jinja `if`/`for`/etc. open at the current depth and increment
+    // for everything after; `endif`/`endfor` decrement before placing the
+    // line so the closer aligns with its opener; `elif`/`else` sit at the
+    // outer level but don't change the body depth.
     let depth = 0;
     const indentedLines = processedLines.map((line) => {
         let lineDepth: number;
@@ -321,6 +468,9 @@ function renderResolvedWithLinks(
         }
         return '&nbsp;&nbsp;'.repeat(lineDepth) + line;
     });
+
+    // Join lines with `<br>` for hard breaks; switch to `\n` when entering a
+    // bulleted list so markdown recognises consecutive list items.
     const pieces: string[] = [];
     for (let i = 0; i < indentedLines.length; i++) {
         pieces.push(indentedLines[i]);
@@ -332,6 +482,12 @@ function renderResolvedWithLinks(
     return pieces.join('');
 }
 
+/**
+ * Hover provider: shows the resolved value of `{<dotted.path>}` placeholders
+ * and `*<anchor>` aliases when the cursor is on one. The popup carries an
+ * `isTrusted = { enabledCommands: [REVEAL_LINE_CMD] }` so the inline
+ * drill-down links can fire our command without user prompts.
+ */
 const hoverProvider: vscode.HoverProvider = {
     provideHover(document, position) {
         if (document.languageId !== 'yaml' || !isMetaYamlFile(document.fileName)) {
@@ -381,6 +537,10 @@ const hoverProvider: vscode.HoverProvider = {
     },
 };
 
+/**
+ * Definition provider: powers `Cmd+Click` / `F12` on placeholders and aliases
+ * in the document, jumping the cursor to the declaration line in the same file.
+ */
 const definitionProvider: vscode.DefinitionProvider = {
     provideDefinition(document, position) {
         if (document.languageId !== 'yaml' || !isMetaYamlFile(document.fileName)) {
@@ -410,6 +570,10 @@ const definitionProvider: vscode.DefinitionProvider = {
     },
 };
 
+/**
+ * Extension activation. Registers the hover provider, the definition
+ * provider, and the `revealLine` command used by clickable hover-popup links.
+ */
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.languages.registerHoverProvider({ language: 'yaml' }, hoverProvider),
