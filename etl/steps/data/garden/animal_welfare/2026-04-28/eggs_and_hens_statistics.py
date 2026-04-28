@@ -1,19 +1,4 @@
-"""Combine hen housing-system data from multiple sources to give global coverage.
-
-Modern time series:
-  - UK: derived from Defra egg-throughput statistics, used as a proxy for hen housing shares.
-        UK rows also carry absolute egg counts and estimated hen counts by housing type.
-  - US: derived from USDA flock sizes (caged, barn/aviary, free-range, pastured, organic) — full
-        granular breakdown available from 2012 onwards; binary cage / cage-free only for 2007-2011.
-  - EU member states: derived from European Commission flock data (cages, barn, free-range, organic).
-
-Single-year (~2019) values for ~75 additional countries come from the Welfare Footprint Institute
-(formerly the Welfare Footprint Project) global hen inventory compilation.
-
-For overlapping (country, year) pairs, modern time series values take precedence column-by-column.
-Where a modern source lacks a granular column (e.g. US in 2007-2011), the WFI value falls through
-when WFI has data for that country-year.
-"""
+"""Combine hen housing-system data from multiple sources to give global coverage."""
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -156,10 +141,8 @@ def run() -> None:
     tb_eu = prepare_eu_data(tb_eu)
     tb_wfi = prepare_wfi_data(tb_wfi)
 
-    # Combine sources, taking the first non-null value per column for each (country, year).
-    # Source priority is UK -> US -> EU -> WFI: modern time series win on shared columns,
-    # while WFI fills in granular breakdowns where modern sources don't provide them.
-    tb = pr.concat([tb_uk, tb_us, tb_eu, tb_wfi], ignore_index=True, short_name=paths.short_name)
+    # Combine sources, taking the first non-null value per column for each (country, year). The European Commission data is listed first (so it appears first in inherited origins) because it covers most of the data; UK and US follow; and WFI fills in the rest. None of these sources overlap on (country, year) pairs, so the order only affects the order of origins in metadata, not the values.
+    tb = pr.concat([tb_eu, tb_uk, tb_us, tb_wfi], ignore_index=True, short_name=paths.short_name)
     tb = tb.groupby(["country", "year"], as_index=False, observed=True).first()
 
     # Improve table format.
