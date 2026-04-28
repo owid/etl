@@ -132,23 +132,52 @@ in plain text.
 - If the producer's data product has a well-known name, use that name exactly (typo fixes ok).
 
 ## title_snapshot (optional, default null)
-- DEFAULT TO NULL. Most snapshots ARE the data product, not a subset. Only set this when the
-  snapshot is clearly a named slice of a larger named data product, AND the legacy `meta.name`
-  describes that slice differently from `title`.
+- DEFAULT TO NULL. Most snapshots ARE the data product, not a subset.
+- HARD RULE for papers/books/articles (signals: legacy `published_by` is an academic
+  citation, producer is author surnames such as `Williams`, `Smith and Jones`,
+  `Williams et al.`, or a working-paper/book is the source): `title_snapshot` MUST
+  be null. The snapshot IS the paper's data — there is no "named slice".
+  Examples that should be null: papers by Long (1958), Pielke (2018), Holmes and
+  Anderson (2017), Bowles (2009), Fouquet and Pearson, Aguiar and Hurst, Cunningham
+  and Viazzo, etc.
+- Only set `title_snapshot` when the producer publishes a multi-product database or
+  named report series AND the snapshot picks out a clearly-named slice of it.
+  Examples (real, good): `Maddison Project Database - GDP per capita growth in the UK`,
+  `Luxembourg Income Study (LIS) - Percentile data`, `Global Carbon Budget - Fossil fuels`,
+  `World Bank WDI - <indicator>`.
 - Format: `Data product - Specific slice`.
 - No trailing period, no semicolon.
-- Examples (real, good): `Maddison Project Database - GDP per capita growth in the UK`,
-  `Luxembourg Income Study (LIS) - Percentile data`, `Global Carbon Budget - Fossil fuels`.
 - If you'd be merely re-wording the title, leave it null.
 
-## description (recommended)
-- Description of the data product itself, not the snapshot.
+## description (recommended, default null when not implied by the input)
+- Description of the data product ITSELF (the producer's data), not OWID's snapshot.
 - Start with a capital letter, end with a period.
 - 1-3 paragraphs, succinct. Use the producer's wording where reasonable.
 - Don't mention `producer` or `version_producer`.
+- HARD RULE — DO NOT FABRICATE: if the legacy source has no description of the data
+  product, leave `description` NULL. Do NOT invent one from the paper title or your
+  own knowledge of the source. A book/paper title alone is not a description.
 
-## description_snapshot (optional)
-- Only when the snapshot differs meaningfully from the full data product.
+## description_snapshot (recommended when there is OWID-specific snapshot detail)
+- This is where OWID-specific aggregations, calculations, weightings, exclusions,
+  region groupings, or any "we computed X by Y" notes from the legacy description go.
+- Examples of content that belongs in `description_snapshot`:
+  - "The 'World' time series is the sum of country exports / imports."
+  - "Regional aggregates use the World Bank's income groupings; series start in 1970."
+  - "Germany combines West Germany and Germany; East Germany excluded."
+  - "We weighted gender-specific incidences by the male:female population ratio."
+  - "Russia's series combines Russia and the USSR."
+  - "Estimates for windows of years are reported at the middle year of each window."
+- Style: capital letter at the start, period at the end. Multi-paragraph allowed.
+
+## INFORMATION PRESERVATION (critical)
+- The legacy `source.description` (and any legacy top-level `meta.description`) is the
+  authoritative content. Every meaningful sentence in it MUST appear, in some form, in
+  either `description` (data-product-level) or `description_snapshot` (OWID/snapshot
+  level). Do not silently drop calculation notes, regional definitions, scope
+  exclusions, or methodological caveats.
+- If you cannot tell whether a sentence is data-product-level or snapshot-level, put
+  it in `description_snapshot`. Don't drop it.
 
 ## citation_full (required)
 - Full academic citation per the producer's preferred format. Long is OK.
