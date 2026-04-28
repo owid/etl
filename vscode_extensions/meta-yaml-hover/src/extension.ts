@@ -251,7 +251,18 @@ function renderResolvedWithLinks(
         return `<a href="${uri}" title="line ${line + 1}">${match}</a>`;
     });
 
-    return `<pre>${html}</pre>`;
+    const body = html
+        .split('\n')
+        .map((line) => {
+            const m = line.match(/^([ \t]*)(.*)$/);
+            if (!m) {
+                return line;
+            }
+            const leading = m[1].replace(/\t/g, '    ').replace(/ /g, '&nbsp;');
+            return leading + m[2];
+        })
+        .join('<br>');
+    return `<code>${body}</code>`;
 }
 
 const hoverProvider: vscode.HoverProvider = {
