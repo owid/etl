@@ -5,10 +5,6 @@ from typing import Any
 import pandas as pd
 from owid.catalog import Dataset
 from owid.datautils.dataframes import map_series
-from structlog import get_logger
-
-# Initialize logger.
-log = get_logger()
 
 
 def _parse_age_str(age_str: str) -> tuple[int, float]:
@@ -30,12 +26,18 @@ def _parse_age_str(age_str: str) -> tuple[int, float]:
 
 
 def _select_age_buckets(available_ages: list[str], req_min: int, req_max: float) -> list[str]:
-    """Select the minimal non-overlapping age buckets that cover [req_min, req_max].
+    """Select the minimal non-overlapping age buckets that exactly cover [req_min, req_max].
 
     Strategy:
     1. Try an exact-match bucket first (handles 'all', '15+', '18+', '65+', '0-4', etc.)
     2. Otherwise collect every bucket whose range falls entirely within the request, then
        keep only "atomic" ones — buckets that contain no smaller candidate inside them.
+    3. Verify the selected buckets fully and contiguously cover [req_min, req_max].
+
+    The request range MUST align with the underlying bucket grid (UN WPP 2024 uses
+    5-year buckets 0-4, 5-9, …, 95-99 plus 100+, plus aggregate buckets 'all', '15+',
+    '18+', '65+'). A misaligned request like [2, 9] or [15, 17] raises ValueError —
+    silent under-coverage is worse than a loud failure.
     """
     parsed: dict[str, tuple[int, float]] = {}
     for a in available_ages:
@@ -59,6 +61,30 @@ def _select_age_buckets(available_ages: list[str], req_min: int, req_max: float)
         )
         if not has_sub:
             atomic.append(age_str)
+
+    # 3. Verify coverage: bounds match and ranges are contiguous.
+    if not atomic:
+        raise ValueError(
+            f"No population age buckets found inside requested range [{req_min}, {req_max}]. "
+            f"Available buckets: {sorted(available_ages)}."
+        )
+    atomic.sort(key=lambda a: parsed[a][0])
+    cov_min = parsed[atomic[0]][0]
+    cov_max = parsed[atomic[-1]][1]
+    if cov_min != req_min or cov_max != req_max:
+        raise ValueError(
+            f"Selected age buckets {atomic} cover [{cov_min}, {cov_max}], not the requested "
+            f"[{req_min}, {req_max}]. Adjust `age_group_mapping` to align with the bucket grid."
+        )
+    for i in range(len(atomic) - 1):
+        prev_max = parsed[atomic[i]][1]
+        next_min = parsed[atomic[i + 1]][0]
+        if next_min != prev_max + 1:
+            raise ValueError(
+                f"Selected age buckets {atomic} are not contiguous over [{req_min}, {req_max}] "
+                f"(gap between {atomic[i]} and {atomic[i + 1]}). Adjust `age_group_mapping` to "
+                f"align with the bucket grid."
+            )
 
     return atomic
 
@@ -106,7 +132,11 @@ def add_population(
             "age_group_name_in_input_dataframe": [min_age, max_age],
             ...
         }
-        max_age=None means open-ended (no upper bound).
+        max_age=None means open-ended (no upper bound). Each [min_age, max_age]
+        range must align with the underlying UN WPP bucket grid (5-year buckets
+        0-4, 5-9, …, 95-99 plus 100+, plus aggregate buckets like 'all', '15+',
+        '18+', '65+'). Misaligned ranges raise ValueError to avoid silent
+        under-coverage.
 
     Returns
     -------
@@ -176,12 +206,6 @@ def add_population(
             req_max = float("inf") if age_ranges[1] is None else age_ranges[1]
 
             buckets = _select_age_buckets(available_ages, req_min, req_max)
-            if not buckets:
-                log.warning(
-                    f"No population age buckets found for range [{req_min}, {req_max}] "
-                    f"(age group '{age_group_name}'). Population will be NaN for this group."
-                )
-                continue
 
             pop_g = (
                 pop[pop["age"].isin(buckets)]
