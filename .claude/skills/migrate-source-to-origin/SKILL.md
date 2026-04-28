@@ -1,6 +1,7 @@
 ---
 name: migrate-source-to-origin
 description: Migrate a legacy `meta.source` block to a modern `meta.origin` block in an OWID snapshot DVC file. Use when the user asks to migrate, convert, or rewrite a snapshot's `source:` to `origin:`, or to fix an existing `origin` block per OWID style.
+model: sonnet
 metadata:
   internal: true
 ---
@@ -53,6 +54,12 @@ skill once per file in a loop.
    (whether it was `meta.source` or a prior `meta.origin`) with the new
    `meta.origin`. Leave `outs:` and any other top-level YAML keys untouched.
    See "YAML output conventions" below for shape.
+
+   *Note:* the `Edit` tool drops YAML inline comments. If the legacy file
+   has section comments like `# Data product / Snapshot`, `# Citation`,
+   `# Files` and you want to preserve them, rewrite via `ruamel` in a Bash
+   one-liner instead of `Edit`. Most files don't have such comments, so
+   `Edit` is fine by default.
 
 7. **Validate** the rewritten file:
    ```bash
@@ -116,9 +123,12 @@ Institution or author(s).
 Sentence-case start, no trailing period, no semicolons, no producer/version unless
 they're part of the canonical name (`Education at a Glance 2017`).
 
-Prefer the legacy `source.name` as `title` even when the legacy `published_by`
-contains a different "official" publication title — keep the migration
-predictable and stable.
+Use whichever string is the most informative producer-issued title that passes lint.
+If `source.name` contains the producer name, year, or other lint-violating bits,
+it's an OWID label, not a real title — go to `published_by` for the publication's
+actual title. Strip any year suffix from a clean `source.name` before using it
+(e.g. `Whale populations (Pershing et al. 2010)` → use the paper's actual title from
+`published_by`; `Cherry Blossom Full Bloom Dates in Kyoto, Japan` → use as-is).
 
 ### `title_snapshot` (default omitted)
 Set ONLY when the data product and snapshot differ (STEP 1). Format:
@@ -126,8 +136,14 @@ Set ONLY when the data product and snapshot differ (STEP 1). Format:
 
 ### `description` (default omitted when the legacy source has no data-product description)
 Describes the producer's data. Sentence-case, end with period, 1–3 short paragraphs.
-- DO NOT FABRICATE: a paper/book title alone is not a description. If the legacy
-  has no descriptive content about the data, omit `description`.
+- DO NOT FABRICATE for papers/books/articles: a paper/book title alone is not a
+  description. If the legacy has no descriptive content about the data, omit
+  `description`.
+- **Multi-product database exception**: if the legacy source has no description of
+  the parent data product but the database is widely-known (FAO, World Bank, OECD
+  reports, Sea Around Us, etc.), it is acceptable to write **one short factual
+  sentence** describing what the database is, drawn from common knowledge of what
+  the producer's own landing page would say. Do not extrapolate beyond that.
 - Sentences belonging here: what the data is, who collected it, scope, producer
   methodology, pointers to the producer's own materials ("See the authors' data
   appendix").
@@ -191,9 +207,25 @@ url_main, url_download, date_accessed, date_published, license
 
 - Never invent URLs (no extension swaps, no domain guesses).
 - Never invent dates not implied by the legacy.
-- Never invent a description from your own knowledge of the source.
+- Never invent a description from your own knowledge of the source (with the
+  one-sentence multi-product-database exception above).
 - Placeholders like `<UNKNOWN>`, `N/A`, `TBD` are forbidden — omit the field.
 - When uncertain about an optional field, omit it.
+
+### Minor cleanup is welcome
+
+The following count as cleanup, not fabrication:
+
+- Typo corrections in legacy text (e.g. fix `1980` → `1820` when context makes
+  the intended year obvious).
+- Expanding a clearly-implied institution from a URL clue (e.g. seeing
+  `emp.lbl.gov` and adding `Lawrence Berkeley National Laboratory` to the
+  citation).
+- Curly quotes / smart quotes → straight quotes; non-breaking spaces → spaces.
+- Trimming OWID-attribution prefixes (`Our World in Data based on X` → `X`).
+- Sentence-casing producer-issued titles per OWID style.
+
+Stop short of writing new content that wasn't implied by the legacy.
 
 ## OWID writing style
 
