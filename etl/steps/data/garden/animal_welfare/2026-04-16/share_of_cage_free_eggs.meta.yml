@@ -3,30 +3,28 @@ definitions:
     presentation:
       topic_tags:
       - Animal Welfare
+    description_processing: |-
+      For the UK, the share of hens in each housing type is approximated by the share of eggs produced in that housing type, due to limited data availability.
 
 dataset:
-  title: "Share of cage-free eggs"
+  title: "Share of egg-laying hens in cage-free systems"
 
 tables:
   share_of_cage_free_eggs:
     variables:
       share_of_eggs_cage_free:
-        title: Share of cage-free eggs
+        title: Share of hens laying eggs in cage-free systems
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
         description_short: |-
-          Share of all eggs that are produced in cage-free housing systems. This includes barns, pasture and free-range (non-organic and organic) eggs.
-        description_processing: |-
-          For the US and EU member states, the share of cage-free eggs is approximated by the share of cage-free hens, due to limited data availability.
+          Cage-free housing systems include barns, pasture, and free-range (non-organic and organic) farms.
       share_of_eggs_in_cages:
-        title: Share of eggs from hens in cages
+        title: Share of hens laying eggs in cages
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
         description_short: |-
-          Share of all eggs that are produced by laying hens in cages. This includes conventional as well as enriched cages, which are larger, furnished cages that provide slightly more space.
-        description_processing: |-
-          For the US and EU member states, the share of eggs from hens in cages is approximated by the share of hens in cages, due to limited data availability.
+          Share of egg-laying hens kept in cages. This includes conventional as well as enriched cages, which are larger, furnished cages that provide slightly more space.
