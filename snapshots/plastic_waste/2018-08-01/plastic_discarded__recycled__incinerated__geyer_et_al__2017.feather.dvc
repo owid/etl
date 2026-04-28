@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Geyer et al.
     title: Production, use, and fate of all plastics ever made
-    description_snapshot: |-
+    description: |-
       Estimates of the proportion of plastic waste discarded, recycled, and incinerated based on data in Geyer et al. (2017).
 
       Geyer et al. (2017) note an average linear rate of increase in recycling of 0.7% per year from 1990 onwards, and 0.7% per year for incineration from 1980 onwards.

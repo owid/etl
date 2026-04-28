@@ -1,8 +1,8 @@
 meta:
   origin:
-    producer: Brooks et al.
+    producer: Brooks, Wang, and Jambeck
     title: The Chinese import ban and its impact on global plastic waste trade
-    description_snapshot: |-
+    description: |-
       Data represents two series related to Chinese plastic waste:
 
       - The estimated quantity of domestic waste generation, imported recycled waste, and total plastic waste to manage, measured in tonnes per year (from 2010 to 2016).

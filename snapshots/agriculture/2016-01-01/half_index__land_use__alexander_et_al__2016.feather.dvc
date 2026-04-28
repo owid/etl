@@ -2,12 +2,12 @@ meta:
   origin:
     producer: Alexander et al.
     title: 'Human appropriation of land for food: The role of diet'
-    description_snapshot: |-
-      The HALF (Human appropriation of land for food) index measures the percentage of total land area needed for the global population to consume the average diet of any given country. This is based on population and dietary figures from FAO 2011 data.
+    description: |-
+      The authors calculate the HALF (Human Appropriation of Land for Food) index, which measures the percentage of total land area that would be needed for the global population to consume the average diet of any given country. This is based on population and dietary figures from FAO 2011 data.
 
-      Our World in Data re-calculated these figures as the percentage of habitable land area (rather than total land area). This corrects for land which is either barren or glacial and could not be used for agriculture or other land uses. To correct for this factor, 71% of total land area is assumed to be habitable (with 10% glaciers and 19% barren land); figures based on WWF (2016) Living Planet Report 2016.
+      OWID recalculated these figures as the percentage of habitable land area (rather than total land area), correcting for land that is either barren or glacial and could not be used for agriculture or other land uses. This correction assumes that 71% of total land area is habitable (with 10% glaciers and 19% barren land), based on WWF (2016) Living Planet Report 2016.
 
-      A HALF index value of 100% means that 100% of global habitable land area would be needed as agricultural land to provide for global diets. Values above 100% are not physically possible within global land constraints.
+      A HALF Index value of 100% means that 100% of global habitable land area would be needed as agricultural land to provide for global diets. Values above 100% are not physically possible within global land constraints.
     citation_full: 'Alexander, P., Brown, C., Arneth, A., Finnigan, J., and Rounsevell, M. D. (2016). Human appropriation of land for food: the role of diet. Global Environmental Change, 41, 88–98. Available at: http://www.sciencedirect.com/science/article/pii/S0959378016302370.'
     url_main: http://www.sciencedirect.com/science/article/pii/S0959378016302370
     date_accessed: '2026-03-05'
