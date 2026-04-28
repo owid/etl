@@ -2,8 +2,11 @@ meta:
   origin:
     producer: Brooks et al.
     title: The Chinese import ban and its impact on global plastic waste trade
-    description_snapshot: Quantity of plastic exports to China by the top 10 exporting countries in 2016, given in tonnes of plastic waste imported by China. Data is based on the UN Comtrade Database.
-    citation_full: Brooks, A. L., Wang, S., and Jambeck, J. R. (2018). The Chinese import ban and its impact on global plastic waste trade. Science Advances, 4(6), eaat0131.
+    description: |-
+      Quantity of plastic exports to China by the top 10 exporting countries in 2016. This is given in tonnes of plastic waste imported by China.
+
+      Data is based on the UN Comtrade Database.
+    citation_full: 'Brooks, A. L., Wang, S., and Jambeck, J. R. (2018). The Chinese import ban and its impact on global plastic waste trade. Science Advances, 4(6), eaat0131.'
     url_main: http://advances.sciencemag.org/content/4/6/eaat0131
     date_accessed: '2026-03-05'
     date_published: '2018'

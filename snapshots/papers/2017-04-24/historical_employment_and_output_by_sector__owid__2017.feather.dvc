@@ -1,14 +1,13 @@
 meta:
   origin:
-    producer: Herrendorf et al.
-    title: Growth and Structural Transformation
-    description: This dataset contains data on employment and output by sector, originally published in "Growth and Structural Transformation," a chapter in the Handbook of Economic Growth, Volume 2B (2014).
-    title_snapshot: Historical employment and output by sector
-    description_snapshot: Observations in this dataset correspond to the data published by Herrendorf, Rogerson, and Valentinyi (2014), except in some cases where the data has been updated using new releases of the same underlying data sources. The most important update corresponds to the 2015 release of the Groningen Growth and Development Centre's (GGDC) 10-sector database. Some other country-specific updates were also considered (e.g. US data published by the Bureau of Economic Analysis). Sources and updates are described country by country in the attached documentation (https://assets.ourworldindata.org/uploads/2017/10/Documentation-for-Historical-employment-and-output-by-sector-–-OWID-2017.pdf).
-    citation_full: Herrendorf, B., Rogerson, R., and Valentinyi, A. (2014). "Growth and Structural Transformation." In Handbook of Economic Growth, Vol. 2B. Extended and updated by Our World in Data (Nicolas Lippolis), 2017.
+    producer: Various sources
+    title: Historical employment and output by sector
+    description: |-
+      Observations in this dataset correspond to the data published by Herrendorf, Rogerson, and Valentinyi (2014), except in some cases where we have updated observations using new releases of the same underlying data sources. The most important update corresponds to the 2015 release of the Groningen Growth and Development Centre's (GGDC) 10-sector database. However, some other country-specific updates were also considered (e.g. US data published by the Bureau of Economic Analysis). In the attached documentation (https://assets.ourworldindata.org/uploads/2017/10/Documentation-for-Historical-employment-and-output-by-sector-%E2%80%93-OWID-2017.pdf) we describe sources and updates, country by country.
+    citation_full: 'Herrendorf, Rogerson, and Valentinyi (2014) – "Growth and Structural Transformation", Handbook of Economic Growth, Vol. 2B. OWID compilation by Nicolas Lippolis (2017).'
     url_main: https://drive.google.com/file/d/1Oq02EqNF5AqJDw5FmDRLg5yUHQ5basKR/view
     date_accessed: '2017-04-24'
-    date_published: '2014'
+    date_published: '2017'
 outs:
   - md5: 473049bc716f4136a5c2247462e4cd5c
     size: 45082
