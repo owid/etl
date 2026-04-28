@@ -171,8 +171,6 @@ steps:
     - data://garden/animal_welfare/2026-04-16/uk_egg_statistics
     - data://garden/animal_welfare/2026-04-16/us_egg_production
     - data://garden/animal_welfare/2026-04-16/laying_hens_keeping_eu
-  data://grapher/animal_welfare/2026-04-16/share_of_cage_free_eggs:
-    - data://garden/animal_welfare/2026-04-16/share_of_cage_free_eggs
   #
   # Global hen inventory (Welfare Footprint Institute).
   #
@@ -180,8 +178,6 @@ steps:
     - snapshot://animal_welfare/2026-04-28/global_hen_inventory.csv
   data://garden/animal_welfare/2026-04-28/global_hen_inventory:
     - data://meadow/animal_welfare/2026-04-28/global_hen_inventory
-  data://grapher/animal_welfare/2026-04-28/global_hen_inventory:
-    - data://garden/animal_welfare/2026-04-28/global_hen_inventory
   #
   # Laying hens by housing system (combined from multiple sources).
   #
