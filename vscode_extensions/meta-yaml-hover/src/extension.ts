@@ -252,7 +252,7 @@ function renderResolvedWithLinks(
             const line = findKeyDeclLine(docText, m[1]);
             if (line !== undefined) {
                 const uri = buildRevealUri(docUri, line);
-                result += `<a href="${uri}" title="line ${line + 1}"><code>${escaped}</code>↗</a>`;
+                result += `<a href="${uri}" title="Go to definition (line ${line + 1})"><code>${escaped}</code><small>↗</small></a>`;
             } else {
                 result += `<code>${escaped}</code>`;
             }
@@ -260,12 +260,12 @@ function renderResolvedWithLinks(
             const line = findAnchorDeclLine(docText, m[2]);
             if (line !== undefined) {
                 const uri = buildRevealUri(docUri, line);
-                result += `<a href="${uri}" title="line ${line + 1}"><code>${escaped}</code>↗</a>`;
+                result += `<a href="${uri}" title="Go to definition (line ${line + 1})"><code>${escaped}</code><small>↗</small></a>`;
             } else {
                 result += `<code>${escaped}</code>`;
             }
         } else if (m[3] !== undefined) {
-            result += `<i><code>${escaped}</code></i>`;
+            result += `<i>${escaped}</i>`;
         } else {
             result += `<code>${escaped}</code>`;
         }
