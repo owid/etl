@@ -142,6 +142,7 @@ function findKeyDeclLine(docText: string, dottedPath: string): number | undefine
     const lines = docText.split(/\r?\n/);
     let segIdx = 0;
     let parentIndent = -1;
+    let childIndent = -1;
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const m = line.match(/^(\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:/);
@@ -158,6 +159,7 @@ function findKeyDeclLine(docText: string, dottedPath: string): number | undefine
                 }
                 segIdx = 1;
                 parentIndent = indent;
+                childIndent = -1;
             }
             continue;
         }
@@ -165,12 +167,19 @@ function findKeyDeclLine(docText: string, dottedPath: string): number | undefine
         if (indent <= parentIndent) {
             return undefined;
         }
+        if (childIndent === -1) {
+            childIndent = indent;
+        }
+        if (indent !== childIndent) {
+            continue;
+        }
         if (key === segments[segIdx]) {
             if (segIdx === segments.length - 1) {
                 return i;
             }
             segIdx++;
             parentIndent = indent;
+            childIndent = -1;
         }
     }
     return undefined;
