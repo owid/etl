@@ -469,13 +469,17 @@ function renderResolvedWithLinks(
         return '&nbsp;&nbsp;'.repeat(lineDepth) + line;
     });
 
-    // Join lines with `<br>` for hard breaks; switch to `\n` when entering a
-    // bulleted list so markdown recognises consecutive list items.
+    // Join lines with `<br>` for hard breaks; switch to `\n` only when the
+    // next line starts a *top-level* bulleted list (`- `, `* `, `+ ` at
+    // column 0). Indented list lines carry an `&nbsp;` prefix from the
+    // leading-whitespace pass, which would prevent markdown from recognising
+    // them as list items — for those we keep `<br>` so the line break
+    // survives instead of collapsing into a soft break.
     const pieces: string[] = [];
     for (let i = 0; i < indentedLines.length; i++) {
         pieces.push(indentedLines[i]);
         if (i < indentedLines.length - 1) {
-            const next = indentedLines[i + 1].replace(/^(?:&nbsp;)*/, '');
+            const next = indentedLines[i + 1];
             pieces.push(/^[-*+]\s/.test(next) ? '\n' : '<br>');
         }
     }
