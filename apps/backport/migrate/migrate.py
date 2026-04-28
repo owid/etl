@@ -12,9 +12,10 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from apps.backport.backport import PotentialBackport
-from apps.utils.files import add_to_dag, generate_step
+from apps.utils.files import generate_step
 from etl import config
 from etl.backport_helpers import create_dataset
+from etl.dag_helpers import write_to_dag_file
 from etl.db import get_engine
 from etl.files import yaml_dump
 from etl.metadata_export import metadata_export
@@ -232,21 +233,21 @@ def _run_full_pipeline(old_dataset_id: int, namespace: str, version: str, short_
 
 def _add_to_migrated_dag(namespace: str, version: str, short_name: str, is_public: bool = True):
     private_suffix = "" if is_public else "-private"
-    add_to_dag(
+    write_to_dag_file(
+        DAG_MIGRATED_PATH,
         {
             f"data{private_suffix}://grapher/{namespace}/{version}/{short_name}": [
                 f"data{private_suffix}://garden/{namespace}/{version}/{short_name}"
             ]
         },
-        dag_path=DAG_MIGRATED_PATH,
     )
-    add_to_dag(
+    write_to_dag_file(
+        DAG_MIGRATED_PATH,
         {
             f"data{private_suffix}://garden/{namespace}/{version}/{short_name}": [
                 f"snapshot{private_suffix}://{namespace}/{version}/{short_name}.feather"
             ]
         },
-        dag_path=DAG_MIGRATED_PATH,
     )
 
 

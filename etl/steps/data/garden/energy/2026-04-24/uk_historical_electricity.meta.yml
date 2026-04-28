@@ -1,0 +1,98 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    description_short: |-
+      Measured in terawatt-hours.
+    description_processing: |-
+      All data prior to 1985 (and prior to 1965 in the case of renewables), is sourced from (DUKES).
+      All other data is sourced from the the Energy Institute (EI) Statistical Review of World Energy and Ember's Yearly electricity data. Where data from Ember is available for a given year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  uk_historical_electricity:
+    title: UK historical electricity
+    variables:
+      coal_generation:
+        title: Electricity generation from coal
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Coal
+        presentation:
+          title_public: Electricity generation from coal
+      oil_generation:
+        title: Electricity generation from oil
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Oil
+        presentation:
+          title_public: Electricity generation from oil
+      gas_generation:
+        title: Electricity generation from gas
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Natural gas
+        presentation:
+          title_public: Electricity generation from natural gas
+      nuclear_generation:
+        title: Electricity generation from nuclear
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Nuclear
+        presentation:
+          title_public: Electricity generation from nuclear power
+      hydro_generation:
+        title: Electricity generation from hydropower
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hydropower
+        presentation:
+          title_public: Electricity generation from hydropower
+      solar_generation:
+        title: Electricity generation from solar
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Solar
+        presentation:
+          title_public: Electricity generation from solar power
+      wind_generation:
+        title: Electricity generation from wind
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Wind
+        presentation:
+          title_public: Electricity generation from wind power
+      other_renewables_generation:
+        title: Electricity generation from other renewables
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Other renewables
+        presentation:
+          title_public: Electricity generation from other renewables
+      total_generation:
+        title: Total electricity generation
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total electricity generation
+        presentation:
+          title_public: Total electricity generation
+      net_imports:
+        title: Net electricity imports
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Net electricity imports
+        presentation:
+          title_public: Net electricity imports
