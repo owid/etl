@@ -162,6 +162,8 @@ Describes the producer's data. Sentence-case, end with period, 1–3 short parag
 - Sentences belonging here: what the data is, who collected it, scope, producer
   methodology, pointers to the producer's own materials ("See the authors' data
   appendix").
+- Preserve paragraph structure from the legacy `source.description` — emit real
+  newlines (`\n\n`) between logical groups, not a single collapsed paragraph.
 
 ## description_snapshot (default NULL)
 Set ONLY when the data product and snapshot DIFFER (Step 1).
@@ -189,9 +191,10 @@ IDs, not versions — never use them here.
 pick a year that is part of a coverage range (`1827–2014`) or a projection
 (`2030–2050`).
 
-## url_main (required if it appears in the legacy source)
+## url_main (default NULL when absent from legacy source)
 Landing-page URL. Must appear VERBATIM in the legacy source — never invent one,
-never swap a file extension or domain. If absent in the legacy source, leave null.
+never swap a file extension or domain. Never use placeholders like `<UNKNOWN>`,
+`N/A`, `TBD`, etc. If no URL exists in the legacy source, leave null.
 
 ## url_download (default NULL)
 Direct-download URL. Must appear verbatim in the legacy source (typically
@@ -236,7 +239,10 @@ ORIGIN_TOOL_SCHEMA: dict[str, Any] = {
         "attribution": {"type": ["string", "null"]},
         "attribution_short": {"type": ["string", "null"], "description": "<=512 chars, no year, no trailing period."},
         "version_producer": {"type": ["string", "null"], "description": "<=255 chars."},
-        "url_main": {"type": "string", "description": "Full http(s) URL to landing page."},
+        "url_main": {
+            "type": ["string", "null"],
+            "description": "Full http(s) URL to landing page. Null if none in the legacy source.",
+        },
         "url_download": {"type": ["string", "null"]},
         "date_accessed": {"type": "string", "description": "YYYY-MM-DD."},
         "date_published": {"type": "string", "description": "YYYY-MM-DD or YYYY or 'latest'."},
@@ -250,7 +256,7 @@ ORIGIN_TOOL_SCHEMA: dict[str, Any] = {
         },
         "notes": {"type": ["string", "null"], "description": "Free-form reasoning, not written to DVC."},
     },
-    "required": ["producer", "title", "citation_full", "url_main", "date_accessed", "date_published"],
+    "required": ["producer", "title", "citation_full", "date_accessed", "date_published"],
     "additionalProperties": False,
 }
 
@@ -476,10 +482,14 @@ def lint_origin(origin: dict[str, Any], legacy_text: str = "") -> list[str]:
             "`date_published`, not in titles."
         )
     if title_snapshot and producer and producer.lower() in title_snapshot.lower():
-        issues.append(
-            f"`title_snapshot` includes the producer name ({producer!r}); titles must not "
-            "mention the producer. Either drop the producer from title_snapshot or set null."
-        )
+        # Canonical-name exception: if the producer name also appears in `title`, the
+        # producer is part of the data product's well-known name (e.g.
+        # "Education at a Glance 2017: OECD Indicators") — title_snapshot inherits it.
+        if not (title and producer.lower() in title.lower()):
+            issues.append(
+                f"`title_snapshot` includes the producer name ({producer!r}); titles must "
+                "not mention the producer. Either drop the producer from title_snapshot or set null."
+            )
 
     if legacy_text:
         for url_field in ("url_main", "url_download"):

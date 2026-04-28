@@ -1,18 +1,18 @@
 meta:
-  origin:
-    producer: Barbose and Darghouth
-    title: 'Tracking the Sun IX: The Installed Price of Residential and Non-Residential Photovoltaic Systems in the United States'
-    title_snapshot: Solar PV Systems Costs
-    description_snapshot: |-
-      Data is based on median residential solar photovoltaic (PV) prices in the United States only.
+  source:
+    name: Solar PV Systems Costs - Barbose & Darghouth (2016)
+    description: |-
+      Data is based on median residential solar photovolatic (PV) prices in the United States only.
 
       Installed non-module prices include hardware costs, such as inverters and racking equipment; and the wide assortment of soft costs, including such things as marketing and customer acquisition, system design, installation labor, permitting and inspection costs, and installer margins.
 
       Non-module costs have been assumed to be the total solar PV system price minus the solar module price.
-    citation_full: 'Barbose and Darghouth (2016). Tracking the Sun IX: The Installed Price of Residential and Non-Residential Photovoltaic Systems in the United States.'
-    url_main: https://emp.lbl.gov/sites/default/files/tracking_the_sun_ix_report.pdf
-    date_accessed: '2017-06-19'
-    date_published: '2016'
+    url: https://emp.lbl.gov/sites/default/files/tracking_the_sun_ix_report.pdf
+    date_accessed: 2017-06-19
+    published_by: |-
+      Barbose & Darghouth (2016). Tracking the Sun IX: The Installed Price of Residential and Non-Residential Photovoltaic Systems in the United States
+  name: Solar PV Systems Costs - Barbose & Darghouth (2016)
+  description: ''
 outs:
   - md5: f7c4e2983f03aaac10b71f0308d1980f
     size: 4746
