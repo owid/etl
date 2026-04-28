@@ -80,7 +80,7 @@ steps:
     - data://grapher/animal_welfare/2026-04-16/chick_culling_laws
     - data://grapher/animal_welfare/2024-12-17/fur_laws
     - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
-    - data://grapher/animal_welfare/2026-04-28/hens_by_housing_system
+    - data://grapher/animal_welfare/2026-04-28/eggs_and_hens_statistics
     - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
   #
   # Total number of animals used for food.
@@ -185,10 +185,10 @@ steps:
   #
   # Laying hens by housing system (combined from multiple sources).
   #
-  data://garden/animal_welfare/2026-04-28/hens_by_housing_system:
+  data://garden/animal_welfare/2026-04-28/eggs_and_hens_statistics:
     - data://garden/animal_welfare/2026-04-16/uk_egg_statistics
     - data://garden/animal_welfare/2026-04-16/us_egg_production
     - data://garden/animal_welfare/2026-04-16/laying_hens_keeping_eu
     - data://garden/animal_welfare/2026-04-28/global_hen_inventory
-  data://grapher/animal_welfare/2026-04-28/hens_by_housing_system:
-    - data://garden/animal_welfare/2026-04-28/hens_by_housing_system
+  data://grapher/animal_welfare/2026-04-28/eggs_and_hens_statistics:
+    - data://garden/animal_welfare/2026-04-28/eggs_and_hens_statistics

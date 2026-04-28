@@ -263,13 +263,13 @@ def run() -> None:
             "indicators": {
                 "y": [
                     {
-                        "catalogPath": "hens_by_housing_system#number_of_hens_in_cages",
+                        "catalogPath": "eggs_and_hens_statistics#number_of_hens_in_cages",
                         "display": {
                             "tolerance": 5,
                         },
                     },
                     {
-                        "catalogPath": "hens_by_housing_system#number_of_hens_cage_free",
+                        "catalogPath": "eggs_and_hens_statistics#number_of_hens_cage_free",
                         "display": {
                             "tolerance": 5,
                         },

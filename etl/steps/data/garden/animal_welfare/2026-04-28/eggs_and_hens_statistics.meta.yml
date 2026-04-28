@@ -11,10 +11,10 @@ definitions:
     UK hen counts by housing type are estimated by multiplying the total number of laying hens (from Defra's June Survey of Agriculture) by the share of eggs produced in each housing type, assuming roughly equal laying rates across housing systems.
 
 dataset:
-  title: "Laying hens by housing system"
+  title: "Eggs and hens statistics"
 
 tables:
-  hens_by_housing_system:
+  eggs_and_hens_statistics:
     variables:
       share_of_hens_cage_free:
         title: Share of hens laying eggs in cage-free systems
