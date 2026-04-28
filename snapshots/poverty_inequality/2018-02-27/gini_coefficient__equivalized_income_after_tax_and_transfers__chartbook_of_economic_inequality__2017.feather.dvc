@@ -2,9 +2,9 @@ meta:
   origin:
     producer: Atkinson et al.
     title: Chartbook of Economic Inequality
+    description: The Chartbook of Economic Inequality is a comparative dataset covering long-run trends in economic inequality — including income, earnings, and wealth — across multiple countries.
     title_snapshot: Chartbook of Economic Inequality - Gini coefficient, equivalized income after tax and transfers
-    citation_full: Atkinson, Hasell, Morelli, and Roser (2017), "The Chartbook of Economic Inequality".
-    version_producer: '2017'
+    citation_full: 'Atkinson, Hasell, Morelli, and Roser (2017), "The Chartbook of Economic Inequality".'
     url_main: https://www.chartbookofeconomicinequality.com
     date_accessed: '2018-02-27'
     date_published: '2017'
