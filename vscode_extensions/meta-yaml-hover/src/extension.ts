@@ -265,7 +265,7 @@ function renderResolvedWithLinks(
                 result += `<small><code>${escaped}</code></small>`;
             }
         } else if (m[3] !== undefined) {
-            result += `<small><i>${escaped}</i></small>`;
+            result += `<i>${escaped}</i>`;
         } else {
             result += `<small><code>${escaped}</code></small>`;
         }
@@ -281,11 +281,25 @@ function renderResolvedWithLinks(
         const leading = lm[1].replace(/\t/g, '    ').replace(/ /g, '&nbsp;');
         return leading + lm[2];
     });
+    const isJinjaLine = (line: string): boolean =>
+        /^(?:&nbsp;)*<i>[^<>]*<\/i>$/.test(line);
+    const indentedLines = processedLines.map((line, i) => {
+        if (i === 0) {
+            return line;
+        }
+        if (isJinjaLine(line)) {
+            return line;
+        }
+        if (isJinjaLine(processedLines[i - 1])) {
+            return `&nbsp;&nbsp;${line}`;
+        }
+        return line;
+    });
     const pieces: string[] = [];
-    for (let i = 0; i < processedLines.length; i++) {
-        pieces.push(processedLines[i]);
-        if (i < processedLines.length - 1) {
-            const next = processedLines[i + 1].replace(/^(?:&nbsp;)*/, '');
+    for (let i = 0; i < indentedLines.length; i++) {
+        pieces.push(indentedLines[i]);
+        if (i < indentedLines.length - 1) {
+            const next = indentedLines[i + 1].replace(/^(?:&nbsp;)*/, '');
             pieces.push(/^[-*+]\s/.test(next) ? '\n' : '<br>');
         }
     }
