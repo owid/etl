@@ -1,6 +1,6 @@
 ---
 name: data-updates-comms
-description: Draft answers for OWID's #data-updates-comms Slack template using snapshot DVC + garden metadata + staging DB queries. Use when the user wants to announce a dataset update, fill the "Message about new data update" form, or generate the FAQ-style Slack post after an ETL update. Mechanical fields (producer, dates, coverage, chart count, search URL) are filled directly; editorial fields (why it matters, caveats, what's interesting about this update) get prompts seeded with extracted context for the user to refine.
+description: Draft answers for OWID's data-updates-comms Slack template using snapshot DVC + garden metadata + staging DB queries. Use when the user wants to announce a dataset update, fill the "Message about new data update" form, or generate the FAQ-style Slack post after an ETL update. Mechanical fields (producer, dates, coverage, chart count, search URL) are filled directly; editorial fields (why it matters, caveats, what's interesting about this update) get prompts seeded with extracted context for the user to refine.
 metadata:
   internal: true
 ---
@@ -107,60 +107,150 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
 ## Output format
 
-The draft file should look like:
+**The output file must follow the Slack form's wording verbatim.** Use the exact prompt strings and example strings shown in `slack-form-verbatim.md`. The user copy-pastes from this file directly into the Slack form, so each Slack field gets its own `## <verbatim prompt>` heading, the Slack-provided example sits unchanged underneath as a quoted line ("E.g.: …"), and our drafted answer goes below in a fenced ```text block``` (so the user can copy the answer cleanly without dragging the prompt or example with it).
 
-```markdown
+The verbatim Slack prompts and examples (do **not** rephrase, abbreviate, or change punctuation):
+
+| # | Prompt heading (verbatim) | Example line (verbatim, kept as-is) |
+|---|---|---|
+| 1 | `What dataset(s) did you update?` | `E.g.: UN World Population Prospects.` |
+| 2 | `When was this data released? When is the next scheduled release / our plan for next update?` | `E.g.: released: Jul 2024; next: Jul 2027, and we'll update that month.` |
+| 3 | `Who is the data source(s)? Is there anything our users should know about them?` | `E.g.: Maintained by researchers at the University of California and the Max Planck Institute for Demographic Research.` |
+| 4 | `What's the coverage of the data in terms of years and countries/regions?` | `E.g.: Covers the years 1991–2024, global total only.` |
+| 5 | `How many charts did this update affect?` | `Was this a small update affecting a handful of charts, or a massive one affecting tens or even hundreds?` |
+| 6 | `What does this dataset help our users understand about the world, and why is it important they know that?` | `In other words: Why do we have this data on OWID at all? What is unique about this dataset compared to similar ones?` |
+| 7 | `Any important caveats or pitfalls in interpretation that users should know about this data? (optional)` | `E.g.: note that saying "Country X is more productive than Country Y" is often taken as "people in Country X work harder".` |
+| 8 | `Anything interesting to note about this update, including what you had to do? Anything else you'd like to add? (optional)` | `E.g.: you worked with the data provider to improve the data somehow.` |
+| 9 | `Add 1–3 chart views we might use in the public announcement` | `Pick chart views that represent the whole dataset, rather than, e.g., something very specific about a single country.` |
+| 10 | `Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)` | `E.g.: https://ourworldindata.org/search?datasetProducts=World%20Development%20Indicators.` |
+
+The skill keeps a copy of these strings at `slack-form-verbatim.md` next to `SKILL.md` so future edits don't drift from the live Slack template — read that file at runtime instead of typing them in fresh.
+
+The exact draft file structure:
+
+````markdown
 # Data update comms draft — <dataset name>
 
 Source: `<ns>/<new_version>/<short_name>` · Branch: `<branch>` · Generated: <iso datetime>
 
+> Each section below mirrors the #data-updates-comms Slack form verbatim. Copy the answer block (inside ```text``` fences) into the matching field in the Slack form. `[filled]` answers are mechanical and safe to use as-is. `[prompt — user rewrites]` answers are seeded with snippets — rewrite them in your own voice.
+
 ---
 
 ## What dataset(s) did you update?
-[filled] <Dataset title — Producer>
 
-## When was this data released? When is the next scheduled release?
-[filled] Released: <date_published>.
-[verify] Next: <best-effort guess from url_main, or "unknown">.
+> E.g.: UN World Population Prospects.
 
-## Who is the data source(s)?
-[filled] <producer>. <citation_full or attribution_short, trimmed>.
+[filled]
+```text
+<Dataset title — Producer>
+```
 
-## What's the coverage?
-[filled] Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if applicable>.
-<Sparse-recent-year flag if applicable.>
+## When was this data released? When is the next scheduled release / our plan for next update?
+
+> E.g.: released: Jul 2024; next: Jul 2027, and we'll update that month.
+
+[filled] / [verify]
+```text
+Released: <date_published>. Next: <best-effort guess>.
+```
+
+## Who is the data source(s)? Is there anything our users should know about them?
+
+> E.g.: Maintained by researchers at the University of California and the Max Planck Institute for Demographic Research.
+
+[filled]
+```text
+<producer>. <citation_full or attribution_short, trimmed>.
+```
+
+## What's the coverage of the data in terms of years and countries/regions?
+
+> E.g.: Covers the years 1991–2024, global total only.
+
+[filled]
+```text
+Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if applicable>. <Sparse-recent-year flag if applicable.>
+```
 
 ## How many charts did this update affect?
-[filled] <N> published charts (<size qualifier>).
 
-## What does this dataset help our users understand?
+> Was this a small update affecting a handful of charts, or a massive one affecting tens or even hundreds?
+
+[filled]
+```text
+<N> published charts (<size qualifier>).
+```
+
+## What does this dataset help our users understand about the world, and why is it important they know that?
+
+> In other words: Why do we have this data on OWID at all? What is unique about this dataset compared to similar ones?
+
 [prompt — user rewrites]
-Snippets to draw from:
+
+_Snippets to draw from:_
 - snapshot description: "…"
 - garden description: "…"
 - top indicator description_short: "…"
 
-## Caveats?
-[prompt — user rewrites]
-Candidate caveats from indicator description_key bullets:
-- "…"
-- "…"
-<sanity-check workarounds, if any, from notes_to_check.md>
+```text
+<your draft answer here>
+```
 
-## Anything interesting about this update?
+## Any important caveats or pitfalls in interpretation that users should know about this data? (optional)
+
+> E.g.: note that saying "Country X is more productive than Country Y" is often taken as "people in Country X work harder".
+
 [prompt — user rewrites]
-Context from this PR:
+
+_Candidate caveats from indicator `description_key` bullets, sanity-check workarounds, and methodology notes:_
+- "…"
+- "…"
+
+```text
+<your draft answer here, or leave empty if no caveats>
+```
+
+## Anything interesting to note about this update, including what you had to do? Anything else you'd like to add? (optional)
+
+> E.g.: you worked with the data provider to improve the data somehow.
+
+[prompt — user rewrites]
+
+_Context from this PR:_
 - <commit subject lines unique to this PR>
 - <resolved sanity_checks workarounds, if any>
 - <snapshot row delta vs old version, if available>
 
-## Chart views to feature
-1. **<title>** (`<slug>`) — <rationale>
-2. **<title>** (`<slug>`) — <rationale>
-
-## Search URL
-[filled] https://ourworldindata.org/search?datasetProducts=<urlencoded producer>
+```text
+<your draft answer here, or leave empty if nothing notable>
 ```
+
+## Add 1–3 chart views we might use in the public announcement
+
+> Pick chart views that represent the whole dataset, rather than, e.g., something very specific about a single country.
+
+[filled]
+
+1. **<title>** — `<slug>` — <rationale>
+2. **<title>** — `<slug>` — <rationale>
+
+## Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)
+
+> E.g.: https://ourworldindata.org/search?datasetProducts=World%20Development%20Indicators.
+
+[filled]
+```text
+https://ourworldindata.org/search?datasetProducts=<urlencoded producer or dataset title>
+```
+````
+
+**Strict rules for the verbatim text:**
+- Do not paraphrase the prompt headings — they must match the Slack form character-for-character.
+- Keep the example line as a `> E.g.: …` blockquote directly under each heading. Do not delete it (the user reads it for tone calibration), do not paste it into our answer.
+- Each answer that is meant to be copy-pasted goes in a ```text``` fenced block. Editorial prompts may have unfenced snippet bullets above the fenced block, but the actual draft answer always sits inside fences.
+- Optional sections (#7, #8, #10) keep their `(optional)` suffix.
+- Notes about scope corrections, source-of-truth caveats (e.g. "queried live DB instead of staging"), or branch-version mismatches go **below the form** under a `## Pending mechanical follow-ups` section — never inside the verbatim Slack fields.
 
 ## Critical rules
 
