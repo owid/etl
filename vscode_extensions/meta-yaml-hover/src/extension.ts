@@ -252,38 +252,44 @@ function renderResolvedWithLinks(
             const line = findKeyDeclLine(docText, m[1]);
             if (line !== undefined) {
                 const uri = buildRevealUri(docUri, line);
-                result += `<a href="${uri}" title="Go to definition (line ${line + 1})"><code>${escaped}</code><small>↗</small></a>`;
+                result += `<small><a href="${uri}" title="Go to definition (line ${line + 1})"><code>${escaped}</code>↗</a></small>`;
             } else {
-                result += `<code>${escaped}</code>`;
+                result += `<small><code>${escaped}</code></small>`;
             }
         } else if (m[2] !== undefined) {
             const line = findAnchorDeclLine(docText, m[2]);
             if (line !== undefined) {
                 const uri = buildRevealUri(docUri, line);
-                result += `<a href="${uri}" title="Go to definition (line ${line + 1})"><code>${escaped}</code><small>↗</small></a>`;
+                result += `<small><a href="${uri}" title="Go to definition (line ${line + 1})"><code>${escaped}</code>↗</a></small>`;
             } else {
-                result += `<code>${escaped}</code>`;
+                result += `<small><code>${escaped}</code></small>`;
             }
         } else if (m[3] !== undefined) {
             result += `<i>${escaped}</i>`;
         } else {
-            result += `<code>${escaped}</code>`;
+            result += `<small><code>${escaped}</code></small>`;
         }
         lastIdx = m.index + m[0].length;
     }
     result += escapeHtml(resolved.slice(lastIdx));
 
-    return result
-        .split('\n')
-        .map((line) => {
-            const lm = line.match(/^([ \t]*)(.*)$/);
-            if (!lm) {
-                return line;
-            }
-            const leading = lm[1].replace(/\t/g, '    ').replace(/ /g, '&nbsp;');
-            return leading + lm[2];
-        })
-        .join('<br>');
+    const processedLines = result.split('\n').map((line) => {
+        const lm = line.match(/^([ \t]*)(.*)$/);
+        if (!lm) {
+            return line;
+        }
+        const leading = lm[1].replace(/\t/g, '    ').replace(/ /g, '&nbsp;');
+        return leading + lm[2];
+    });
+    const pieces: string[] = [];
+    for (let i = 0; i < processedLines.length; i++) {
+        pieces.push(processedLines[i]);
+        if (i < processedLines.length - 1) {
+            const next = processedLines[i + 1].replace(/^(?:&nbsp;)*/, '');
+            pieces.push(/^[-*+]\s/.test(next) ? '\n' : '<br>');
+        }
+    }
+    return pieces.join('');
 }
 
 const hoverProvider: vscode.HoverProvider = {
