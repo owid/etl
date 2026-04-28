@@ -1,11 +1,11 @@
 meta:
   origin:
-    producer: Brian Mitchell
+    producer: Mitchell
     title: International Historical Statistics
-    description: International Historical Statistics is a collection of datasets taken from many primary sources, including both official national and international abstracts dating back to 1750. Originally published under the editorial leadership of Brian Mitchell since 1983, the statistics are published in three volumes covering more than 5,000 pages. The dataset spans a wide range of demographic, economic, and social indicators across countries and regions worldwide.
+    description: |-
+      These statistics — originally published under the editorial leadership of Brian Mitchell (since 1983) — are a collection of data sets taken from many primary sources, including both official national and international abstracts dating back to 1750. The books are published in three volumes covering more than 5,000 pages.
     title_snapshot: International Historical Statistics - Births per 1,000
-    citation_full: 'Brian Mitchell – International Historical Statistics. Edited by Palgrave Macmillan Ltd (April 2013). International Historical Statistics [Online]. Available at: http://www.palgrave.com/us/book/9780230005150.'
-    version_producer: '2013'
+    citation_full: 'Mitchell, B. (2013). International Historical Statistics. Palgrave Macmillan.'
     url_main: http://www.palgrave.com/us/book/9780230005150
     date_accessed: '2026-03-05'
     date_published: '2013'
