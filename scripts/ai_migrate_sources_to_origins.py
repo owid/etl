@@ -133,21 +133,34 @@ in plain text.
 
 ## title_snapshot (optional, default null)
 - DEFAULT TO NULL. Most snapshots ARE the data product, not a subset.
-- HARD RULE for papers/books/articles (signals: legacy `published_by` is an academic
-  citation, producer is author surnames such as `Williams`, `Smith and Jones`,
-  `Williams et al.`, or a working-paper/book is the source): `title_snapshot` MUST
-  be null. The snapshot IS the paper's data — there is no "named slice".
-  Examples that should be null: papers by Long (1958), Pielke (2018), Holmes and
-  Anderson (2017), Bowles (2009), Fouquet and Pearson, Aguiar and Hurst, Cunningham
-  and Viazzo, etc.
-- Only set `title_snapshot` when the producer publishes a multi-product database or
-  named report series AND the snapshot picks out a clearly-named slice of it.
-  Examples (real, good): `Maddison Project Database - GDP per capita growth in the UK`,
-  `Luxembourg Income Study (LIS) - Percentile data`, `Global Carbon Budget - Fossil fuels`,
-  `World Bank WDI - <indicator>`.
-- Format: `Data product - Specific slice`.
-- No trailing period, no semicolon.
-- If you'd be merely re-wording the title, leave it null.
+- HARD RULE for papers/books/articles: when the source is a single paper, working
+  paper, journal article, or book (signals: legacy `published_by` is an academic
+  citation; producer is author surnames like `Williams`, `Smith and Jones`,
+  `Williams et al.`), `title_snapshot` MUST be null. The snapshot IS the paper's
+  data — there is no "named slice".
+- Set `title_snapshot` only when ALL of the following are true:
+  1. The producer's data product is a named database, table series, or report
+     (NOT a single paper or book).
+  2. That data product has several distinct named sub-products that the producer
+     (not OWID) distinguishes.
+  3. The text after the dash adds NEW information — a sub-table name, a topic,
+     or a part — and is not just a year, version, producer name, or restatement
+     of `title`.
+- DO (real, good — drawn from existing OWID origins):
+  - `Penn World Table - National Accounts`
+  - `Maddison Project Database - GDP per capita growth in the UK`
+  - `Luxembourg Income Study (LIS) - Percentile data`
+  - `Global Carbon Budget - Fossil fuels`
+  - `War data - Inter-State Wars`
+  - `Statistics Canada low-income statistics - All persons, after tax`
+- DO NOT (anti-patterns):
+  - Appending a year that already lives in `date_published`
+    (BAD: `Number of farmed decapod crustaceans (2016)`)
+  - Appending a version that already lives in `version_producer`
+    (BAD: `Child mortality rate under age five v7`, `War data v4.0`)
+  - Appending the producer's name + year (BAD: `... (Geyer et al., 2017)`)
+  - Restating `title` with no new information.
+- Format: `Data product - Specific slice`. No trailing period, no semicolon.
 
 ## description (recommended, default null when not implied by the input)
 - Description of the data product ITSELF (the producer's data), not OWID's snapshot.

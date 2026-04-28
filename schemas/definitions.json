@@ -567,8 +567,9 @@
         "type": "string",
         "description": "Title of the snapshot (i.e. the subset of data that we extract from the data product).",
         "examples": [
-          "Global Carbon Budget - Fossil fuels",
-          "Neutron star mergers"
+          "Penn World Table - National Accounts",
+          "War data - Inter-State Wars",
+          "Global Carbon Budget - Fossil fuels"
         ],
         "examples_bad": [
           [
@@ -578,10 +579,32 @@
             "Neutron star mergers (NASA, 2023)",
             "Data on neutron star mergers",
             "Neutron star mergers dataset"
+          ],
+          [
+            "Production, use, and fate of all plastics ever made (Geyer et al., 2017)",
+            "Number of farmed decapod crustaceans (2016)",
+            "Child mortality rate under age five v7"
           ]
         ],
-        "requirement_level": "required (if different from `title`)",
+        "requirement_level": "optional (default null)",
         "guidelines": [
+          [
+            "**Default to null.** Most snapshots ARE the data product, in which case `title_snapshot` should be omitted. Only set it when the producer publishes a named data product with several distinct sub-products and the snapshot picks out one specific named slice."
+          ],
+          [
+            "Set `title_snapshot` only when **all** of the following are true:",
+            {
+              "type": "list",
+              "value": [
+                "The producer's data product is a named database, table series, or report (not a single paper or book).",
+                "That data product has several distinct named sub-products that the producer (not OWID) distinguishes.",
+                "The text after the dash adds new information — a sub-table name, a topic, or a part — and is not just a year, version, producer name, or restatement of `title`."
+              ]
+            }
+          ],
+          [
+            "For a single paper, working paper, journal article, or book as the source, `title_snapshot` should be null. The snapshot IS the paper's data."
+          ],
           [
             "Must start with a capital letter."
           ],
@@ -610,7 +633,7 @@
             "Must not include any semicolon `;`."
           ],
           [
-            "Should only be used when the snapshot does not coincide with the entire data product."
+            "Must not be set merely to append a year (use `date_published`), a version (use `version_producer`), or the producer's name (use `producer`) to the title."
           ],
           [
             "Should not include words like `data`, `dataset` or `database`, unless that's part of a well-known name of the origin."
