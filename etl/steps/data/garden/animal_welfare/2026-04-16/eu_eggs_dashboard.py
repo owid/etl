@@ -29,6 +29,7 @@ def run() -> None:
     tb = tb.drop_duplicates(subset=["country", "year"], keep="first")
 
     # Convert percentage columns into absolute hen counts.
+    # Conventional cages have been banned in the EU since 2012; dashboard cage counts are enriched cages.
     tb["not_enriched_cage"] = tb["total"] * 0
     tb["enriched_cage"] = (tb["total"] * tb["pct_enriched_cage"] / 100).round().astype(int)
     tb["barn"] = (tb["total"] * tb["pct_barn"] / 100).round().astype(int)
