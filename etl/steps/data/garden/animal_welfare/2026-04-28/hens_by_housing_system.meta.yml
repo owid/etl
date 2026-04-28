@@ -1,0 +1,97 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+    description_processing: |-
+      Modern time series for the UK, US, and EU member states are sourced from official statistics. Single-year (~2019) values for additional countries are taken from the Welfare Footprint Institute's global compilation (formerly the Welfare Footprint Project), which combines national surveys, industry reports, and the International Egg Commission's annual review. For the UK, the share of hens in each housing type is approximated by the share of eggs produced in that housing type, due to limited data availability.
+  description_processing_backfill: &description_processing_backfill
+    Data for 2006-2011 was suppressed in the 2026 release of UK egg statistics. Values from the earlier 2023 release were used to fill this gap.
+  description_processing_uk_hens: &description_processing_uk_hens
+    UK hen counts by housing type are estimated by multiplying the total number of laying hens (from Defra's June Survey of Agriculture) by the share of eggs produced in each housing type, assuming roughly equal laying rates across housing systems.
+
+dataset:
+  title: "Laying hens by housing system"
+
+tables:
+  hens_by_housing_system:
+    variables:
+      share_of_hens_cage_free:
+        title: Share of hens laying eggs in cage-free systems
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      share_of_hens_in_cages:
+        title: Share of hens laying eggs in cages
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      number_of_hens_in_cages:
+        title: Number of hens in cages
+        unit: hens
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      number_of_hens_cage_free:
+        title: Number of cage-free hens
+        unit: hens
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      number_of_eggs_from_barns:
+        title: Number of eggs from hens in barns
+        unit: eggs
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_backfill
+      number_of_eggs_from_enriched_cages:
+        title: Number of eggs from hens in (enriched) cages
+        unit: eggs
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      number_of_eggs_from_non_organic_free_range_farms:
+        title: Number of eggs from hens in non-organic, free-range farms
+        unit: eggs
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      number_of_eggs_from_organic_free_range_farms:
+        title: Number of eggs from hens in organic, free-range farms
+        unit: eggs
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_backfill
+      number_of_eggs_all:
+        title: Total number of eggs produced in the UK
+        unit: eggs
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: |
+          The total number of eggs packed in the UK, as reported by Defra. This total is available for all years even when breakdowns by production type are suppressed or unavailable.
+      number_of_hens_in_barns:
+        title: Number of hens in barns
+        unit: hens
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_uk_hens
+      number_of_hens_free_range:
+        title: Number of hens in non-organic, free-range farms
+        unit: hens
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_uk_hens
+      number_of_hens_organic:
+        title: Number of hens in organic, free-range farms
+        unit: hens
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_uk_hens
