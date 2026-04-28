@@ -265,7 +265,7 @@ function renderResolvedWithLinks(
                 result += `<small><code>${escaped}</code></small>`;
             }
         } else if (m[3] !== undefined) {
-            result += `<i>${escaped}</i>`;
+            result += `<small><i>${escaped}</i></small>`;
         } else {
             result += `<small><code>${escaped}</code></small>`;
         }
