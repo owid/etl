@@ -72,14 +72,15 @@ def run() -> None:
     # Clean data (remove spurious "%" in the data).
     tb = clean_values(tb=tb)
 
-    # When the WFI compilation has no real housing breakdown for a country-year, it codes the
-    # entire row as 100% "unknown housing". These rows carry no useful information, so drop them
-    # along with the now-pointless unknown column. Assert the all-or-nothing pattern first.
+    # The WFI compilation marks countries without a real housing breakdown as 100% "unknown
+    # housing", with all the granular shares set to 0. The unknown column is therefore an
+    # all-or-nothing flag rather than a real category. Verify that pattern, then drop the column.
+    # The rows are kept because their absolute counts (e.g. number_of_hens_in_cages) are still
+    # meaningful — WFI counts these under cages by default when the housing system is unknown.
     nonzero_unknown = tb[tb["share_of_hens_in_unknown_housing"] > 0]
     assert (nonzero_unknown["share_of_hens_in_unknown_housing"] == 100).all(), (
         "Expected any non-zero share_of_hens_in_unknown_housing to be exactly 100%."
     )
-    tb = tb[tb["share_of_hens_in_unknown_housing"] != 100].copy()
     tb = tb.drop(columns=["share_of_hens_in_unknown_housing"])
 
     # Improve table format.

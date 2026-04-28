@@ -13,7 +13,7 @@ tables:
   share_of_cage_free_eggs:
     variables:
       share_of_eggs_cage_free:
-        title: Share of hens laying eggs in cage-free systems
+        title: Share of egg-laying hens in cage-free systems
         unit: '%'
         short_unit: '%'
         display:
@@ -21,7 +21,7 @@ tables:
         description_short: |-
           Cage-free housing systems include barns, pasture, and free-range (non-organic and organic) farms.
       share_of_eggs_in_cages:
-        title: Share of hens laying eggs in cages
+        title: Share of egg-laying hens in cages
         unit: '%'
         short_unit: '%'
         display:
