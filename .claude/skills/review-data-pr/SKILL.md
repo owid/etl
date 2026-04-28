@@ -192,11 +192,10 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 |---|---|
 | Indicator upgrade ran (§7) | `make query SQL="SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<new_v>/%'"` — non-zero |
 | Chart-diff bot result | PR comments include `<!--chart-diff-start-->` block ✅ |
-| Slack announcement drafted (§9) | `ls workbench/<short_name>/slack-announcement.md` and a "Slack Announcement" section in the PR body |
-| Slack chart count is **published** only (§8) | Confirm the Slack copy used `c.publishedAt IS NOT NULL`, not total chart count |
 | `@codex review` posted (§9) | `gh pr view <num> --json comments` shows the trigger comment + a Codex review |
 | Codex threads resolved (§10) | `gh api graphql -f query='{ repository(owner:"owid", name:"etl") { pullRequest(number:<num>) { reviewThreads(first:20) { nodes { isResolved } } } } }'` — all `isResolved: true` |
-| Anomalist + Chart Diff links handed off (§"Final QA hand-off") | PR body or final message includes both URLs using `get_container_name(branch)` (NOT raw branch — gets truncated at 28 chars) |
+
+**Out of scope for review:** Slack announcement and Anomalist + Chart Diff hand-off are author-side concerns, not reviewer checks.
 
 ### 14. Final report
 
