@@ -229,13 +229,15 @@ When you do stop, present a concise summary of the issue and what options exist.
    ```
    This controls the auto-update cadence. Even when the rest of the `dataset:` block is empty, **never strip `update_period_days`** — leave the block in place with just that field.
 
-   **Link verification.** Run a HEAD request on every URL in the new `.dvc` and `.meta.yml` files. Anything non-2xx is a hard blocker:
+   **Link verification.** Run a HEAD request on every URL in the new `.dvc` and `.meta.yml` files (all channels — meadow `.meta.yml` files matter when they exist). Anything non-2xx is a hard blocker:
    ```bash
-   for url in $(rg -No "https?://[^\"' ]+" snapshots/<namespace>/<new_version>/ etl/steps/data/{garden,grapher}/<namespace>/<new_version>/ | sort -u); do
+   for url in $(rg -No "https?://[^\"' ]+" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/ \
+       | sed -E 's/[).,;:>]+$//' \
+       | sort -u); do
        printf "%s  %s\n" "$(curl -sI -o /dev/null -w '%{http_code}' --max-time 10 "$url")" "$url"
    done
    ```
-   Fix broken `url_main`, `url_download`, `license.url`, or any URL referenced from `description` / `description_key` before continuing.
+   The `sed` strips trailing markdown/punctuation chars (`)`, `.`, `,`, `;`, `:`, `>`) so URLs inside `[text](url)` aren't reported as broken because of a stray closing paren. Fix any non-2xx hit on `url_main`, `url_download`, `license.url`, or URLs referenced from `description` / `description_key` before continuing.
 
    **Verification.** After editing, re-run the affected step (with `--grapher` if grapher) so the catalog reflects the changes. Then confirm `presentation.attribution_short` actually landed:
    ```python
