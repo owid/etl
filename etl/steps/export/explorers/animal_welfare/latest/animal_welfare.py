@@ -265,13 +265,13 @@ def run() -> None:
                     {
                         "catalogPath": "eggs_and_hens_statistics#number_of_hens_in_cages",
                         "display": {
-                            "tolerance": 5,
+                            "tolerance": 10,
                         },
                     },
                     {
                         "catalogPath": "eggs_and_hens_statistics#number_of_hens_cage_free",
                         "display": {
-                            "tolerance": 5,
+                            "tolerance": 10,
                         },
                     },
                 ]

@@ -9,7 +9,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # U.S. Table Egg Layer Flock Estimates — flock size in millions of hens.
-# Manually extracted from page 4 of the USDA Egg Markets Overview PDF (September 26, 2025).
+# Extracted from page 4 of the USDA Egg Markets Overview PDF (September 26, 2025).
 # Data as of September 1, 2025. Past year annual numbers reflect flock as of the end of each year.
 # Rows follow the same order as the original table for easy comparison with the PDF.
 # fmt: off
