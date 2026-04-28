@@ -320,6 +320,8 @@ tables:
             <%- else %>
             Number of deaths among {definitions.global.pop_noun} {definitions.global.pop_age_label}
             <%- endif %>
+          grapher_config:
+            note: Estimates may be uncertain for countries with poor [vital registration systems](#dod:crvs).
 
       death_rate:
         title: Death rate
@@ -334,6 +336,7 @@ tables:
             Death rate
           grapher_config:
             subtitle: Annual number of deaths per 1,000 people in the total population. {definitions.global.projections}
+            note: Estimates may be uncertain for countries with poor [vital registration systems](#dod:crvs).
 
   births:
     variables:
