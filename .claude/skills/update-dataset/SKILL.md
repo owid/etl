@@ -26,11 +26,15 @@ Assumptions:
 - [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
 - [ ] Run ETL update workflow via `etl-update` subagent (help → dry run → approval → real run)
+- [ ] Catalog `# NOTE:` / `# TODO:` comments carried over from the old step files into `notes_to_check.md`
+- [ ] Detect any `sanity_checks` functions and their log-control flags; append to `notes_to_check.md`
 - [ ] Create or reuse draft PR and work branch
 - [ ] Update snapshot and compare to previous version; capture summary
 - [ ] Meadow step: run + fix + diff + summarize
 - [ ] Garden step: run + fix + diff + summarize
+- [ ] Review `sanity_checks` output (enable log flag, re-run, scan log, revert flag) — skip if none found
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
+- [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
@@ -38,6 +42,7 @@ Assumptions:
 - [ ] Draft Slack announcement, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Ask the user whether to archive the old DAG entries; if yes, move them to `dag/archive/` AND relocate the new entries into the old slot (see "DAG archiving & reordering") — don't forget this step
+- [ ] Hand off Wizard QA links to the user (Anomalist + Chart Diff on the staging branch) — this is the final step
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
@@ -80,6 +85,29 @@ When you do stop, present a concise summary of the issue and what options exist.
    - This catches patterns like `if __name__ == "__main__"`, `geo.harmonize_countries()`, `dest_dir`, `paths.load_dependency()`, etc. that were copied from old versions
    - Fix any findings before proceeding — this avoids propagating legacy patterns into new versions
 
+1c) Catalog `# NOTE:` / `# TODO:` comments in the copied step files (don't resolve yet)
+   - Run `rg -n "#\s*(NOTE|TODO|FIXME|HACK|XXX):" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/`.
+   - Filter out generic boilerplate (e.g. `# NOTE: To learn more about the fields, hover over their names.` at the top of `.meta.yml`).
+   - Save the remaining actionable items to `workbench/<short_name>/notes_to_check.md` — one entry per annotation, recording file path, line number, which step it lives in (meadow/garden/grapher), and what the workaround does.
+   - Don't act on them yet. Resolution requires fresh data and happens **after** each step's run — see step 6a.
+
+1d) Detect sanity-check logic in the copied step files
+   Sanity checks live in two different forms — detect **both**:
+
+   - **Function form** — `def sanity_check…` / `sanity_check…(` call sites. Often gated by a module-level boolean flag (`DEBUG`, `SHOW_SANITY_CHECK_LOGS`, `LONG_FORMAT`) that defaults to `False` to keep normal runs quiet. Examples: `etl/steps/data/garden/wb/.../world_bank_pip.py` (`SHOW_SANITY_CHECK_LOGS`), `etl/steps/data/garden/wid/.../world_inequality_database.py` (`DEBUG` + `LONG_FORMAT`), `etl/steps/data/garden/lis/.../luxembourg_income_study.py` (no flag; prints unconditionally via `tabulate`).
+   - **Inline comment form** — `# Sanity check` / `# Sanity checks` / `# sanity check` marking an inline assertion block that isn't wrapped in a dedicated function. Very common: `etl/steps/data/garden/emdat/.../natural_disasters.py`, `etl/steps/data/garden/emissions/.../national_contributions.py`, `etl/steps/data/garden/irena/.../renewable_capacity_statistics.py`. These usually have no log flag — the block simply runs on every step execution and either passes or raises.
+
+   Run a combined sweep:
+   ```bash
+   rg -n -i "def sanity_check|sanity_check\(|#\s*sanity check" \
+       snapshots/<namespace>/<new_version>/ \
+       etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/
+   ```
+
+   Append a "Sanity checks" section to `workbench/<short_name>/notes_to_check.md` listing each hit — for each, record: file path + line number, which form (function vs. inline comment), the name of any log-control flag (function form only), and a one-line description of what's being asserted (read the surrounding 5–10 lines).
+
+   Don't act yet — the review happens in step 5b once the garden step has been run on the new data.
+
 2) Create PR and integrate update via subagent (etl-pr)
    - Inputs: `<namespace>/<old_version>/<short_name>`
    - Create or reuse draft PR, set up work branch, and incorporate the ETL update outputs
@@ -95,8 +123,42 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Run, fix, re-run; produce diffs
    - Save diffs and summaries
 
+5b) Review sanity-checks output (only if step 1d catalogued any)
+   Handling depends on the form catalogued in step 1d.
+
+   **Function form with a log-control flag** (e.g. `SHOW_SANITY_CHECK_LOGS`, `DEBUG`):
+   1. Flip the flag to `True` at the top of the garden step file.
+   2. Re-run the garden step, capturing output:
+      ```bash
+      .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
+          > workbench/<short_name>/sanity_checks.log 2>&1
+      ```
+   3. Review the log: scan for `AssertionError`, `error`, `warning`, `dropped`, outliers flagged by country/year, unexpected totals. Surface actionable findings in the PR description under a "Sanity-check findings" collapsed section.
+   4. **Revert the flag to its original value** (usually `False`) before committing. Verify with `git diff` that the garden file has no unintended changes.
+
+   **Function form with no flag, or inline `# Sanity check(s)` comment blocks**:
+   1. Read each catalogued block (pull 5–15 lines of context around the hit) to understand what invariant is being tested.
+   2. Important: a sanity check can enforce its finding either by **raising** (`assert`, `raise`) or by **logging** (`paths.log.warning`, `.critical`, even `.fatal`). Logging variants do NOT fail the step — so "step 5 passed" is not proof that every invariant held. If the block uses logging, re-run the step and scan stdout/stderr for the relevant keywords; don't trust the exit code alone.
+   3. For non-trivial invariants (monotonicity, totals, bounds), also spot-check qualitatively against the fresh garden output via a short `.venv/bin/python` snippet.
+   4. Record any anomalies under "Sanity-check findings" in the PR description. No log artifact to keep here since the step's own output is the evidence.
+
+   In either form: if sanity_checks raise `AssertionError` on the new data, stop and decide with the user whether the assertion needs a threshold bump, whether upstream data genuinely broke, or whether the invariant is obsolete. If the check only *logs*, treat a new/expanding set of warnings the same way — they're the signal the sanity check was written to produce.
+
+   **Watch for silent-delete patterns.** Some sanity_checks functions also mutate the table — e.g. `world_bank_pip`'s `sanity_checks` drops rows that fail invariants and reports the count via the log-control flag. With the flag off the deletions still happen; the reviewer just never learns which rows disappeared. When reading a sanity_checks function, scan for `drop`, `filter`, `tb = tb[...]` — anything that removes rows — and list every deletion in the PR body, not just the warning counts. If the deletion seems newly applicable to upstream fixes (e.g. the row should no longer be anomalous in the new release), that's a candidate for removing the workaround entirely.
+
 6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
    - Skip diff
+
+6a) Re-evaluate `# NOTE:` / `# TODO:` items from step 1c against fresh data
+   Now that meadow, garden, and grapher have run on the **new** data, go back to `workbench/<short_name>/notes_to_check.md` and decide each item's fate. For each entry:
+
+   - Identify what the workaround does (read the surrounding code).
+   - Load the affected step's output with `owid.catalog.Dataset` (or inspect the raw snapshot) and compare **corrected vs. uncorrected** values. Cross-check the producer's release notes / changelog if available.
+   - If the upstream issue is fixed → delete the workaround **and** its `# NOTE:` / `# TODO:` comments **in the same commit**, then re-run the affected step (use `--force --only`, add `--grapher` for grapher) so downstream artifacts pick up the change.
+   - If the workaround is still needed → leave it and add a one-line status under "Phase 2 TODOs" in the PR description (e.g. "Sierra Leone ×1000 correction still required — raw value in the 2026 file is still ~1/1000 of plausible").
+   - If you're uncertain → keep it, flag it in the PR description, and ask the user.
+
+   Do this **before** step 6b (metadata checks) so any re-runs triggered by comment-removal happen before the metadata sweep, not after.
 
 6b) Metadata quality checks — run after all ETL steps are built
    Run all three checks on the newly built garden and grapher datasets so every issue surfaces together. Each skill writes results to the terminal; fix what comes up before moving on.
@@ -184,7 +246,7 @@ When you do stop, present a concise summary of the issue and what options exist.
 
 ## Committing and pushing
 
-Commit and push incrementally as you go — after each step that produces code changes. Don't wait until the end. Use descriptive commit messages with appropriate emojis (📊🤖 for data updates).
+Commit and push incrementally as you go — after each step that produces code changes. Don't wait until the end. Use descriptive commit messages with appropriate emojis (the one auto-prepended by `etl pr` for the chosen category + 🤖 for AI-written code).
 
 At the end of the workflow, update the PR description with:
 - A summary of key changes at the top
@@ -217,6 +279,36 @@ Workflow when the user agrees:
 4. Verify: `rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"` returns nothing, and `rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml"` shows the entries only in the main file (under the section comment), not at the bottom.
 5. Run `make check` and commit with `🔨🤖 Archive old <name> entries and reorder DAG`.
 
+## Final QA hand-off — Anomalist + Chart Diff in Wizard
+
+This is the **last step**, after the DAG archive has been committed. Don't auto-run these — they're human-judgment tools. Hand off the two staging links so the user can review and click through:
+
+- **Anomalist** — flags variables whose new values diverge from the old version beyond statistical thresholds. Catches accidental scale changes, base-year rebases that propagated the wrong way, and silent drops.
+  ```
+  http://staging-site-<container_branch>/etl/wizard/anomalist
+  ```
+- **Chart Diff** — shows side-by-side before/after thumbnails for every chart that uses an upgraded indicator. Catches visual regressions the schema-level checks miss (axis ranges, color steps, legend changes).
+  ```
+  http://staging-site-<container_branch>/etl/wizard/chart-diff
+  ```
+
+**Important: derive `<container_branch>` correctly.** The staging hostname is **not** simply `staging-site-<branch>`. The container name is produced by `get_container_name(branch)` in `etl/config.py`:
+
+1. Replace `/`, `.`, `_` with `-` in the branch name.
+2. Strip a leading `staging-site-` if present.
+3. **Truncate to the first 28 characters** (Cloudflare DNS limit).
+4. Strip any trailing `-`.
+
+Branches over 28 chars therefore get clipped. Example: `data-military-expenditure-2026` (30 chars) → container `data-military-expenditure-20` → hostname `staging-site-data-military-expenditure-20`. The simplest way to get the correct value is to call the helper:
+
+```bash
+.venv/bin/python -c "from etl.config import get_container_name; print(get_container_name('<branch>'))"
+```
+
+Tell the user something like: "Final QA: please review **[Anomalist](http://<container_name>/etl/wizard/anomalist)** and **[Chart Diff](http://<container_name>/etl/wizard/chart-diff)** in the Wizard. If anything looks off, let me know and I'll investigate."
+
+These pages need a fresh staging build, so they're only meaningful after the PR's grapher upload to staging has completed and the staging server has rebuilt.
+
 ## Guardrails and tips
 
 - **DAG consistency**: After `etl update`, always verify that all new steps in `dag/main.yml` reference each other with the new version. A common bug is garden depending on old meadow or old snapshot — this silently loads stale data.
@@ -229,6 +321,8 @@ Workflow when the user agrees:
 
 - `workbench/<short_name>/snapshot-runner.md`
 - `workbench/<short_name>/progress.md`
+- `workbench/<short_name>/notes_to_check.md` (one entry per carried-over `# NOTE:` / `# TODO:`, plus detected `sanity_checks` functions and their log-control flags)
+- `workbench/<short_name>/sanity_checks.log` (only if step 5b ran)
 - `workbench/<short_name>/meadow_diff_raw.txt` and `meadow_diff.md`
 - `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`
 - `workbench/<short_name>/indicator_upgrade.json` (if indicator-upgrader was used)
