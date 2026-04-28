@@ -67,13 +67,7 @@ Read both `.dvc` files (old and new) and produce a side-by-side table for these 
 
 ### 6. Verify all links
 
-Run a HEAD request on every URL in both `.dvc` and `.meta.yml` files:
-
-```bash
-curl -sI "<url>" -o /dev/null -w "%{http_code}\n"
-```
-
-Anything non-2xx is a blocker.
+Run the HEAD-check loop from `/update-dataset` § 6c on every URL in the new `.dvc` and `.meta.yml` files. Anything non-2xx is a 🔴 blocker.
 
 ### 7. Code clarity & docs
 
@@ -102,59 +96,18 @@ When in doubt, run the `/check-outdated-practices` skill on the new files.
 - **Sanity-check log flags**: grep the diff for `SHOW_SANITY_CHECK_LOGS`, `DEBUG`, `LONG_FORMAT` set to `True`. If a debug flag was left enabled, that's a 🔴 — must be reverted.
 - **Silent deletes**: in any `sanity_checks` function, scan for `drop`, `filter`, `tb = tb[...]` — row removals that the user might miss. Make sure the PR body lists them.
 
-### 9. Indicator metadata coverage (mandatory checklist)
+### 9. Indicator metadata coverage & dataset block
 
-For **every indicator** in the garden `.meta.yml`, confirm these fields are set (either on `definitions.common` or per-indicator):
+The mandatory-fields checklist, the `dataset.update_period_days` requirement, and the `presentation.attribution_short` non-inheritance gotcha all live in `/update-dataset` § 6c. As reviewer, build the indicator × field matrix from that checklist and flag any missing field as 🔴.
 
-| Field | Notes |
-|---|---|
-| `title` | Per-indicator |
-| `unit` | Common is fine |
-| `short_unit` | Common is fine |
-| `description_short` | Per-indicator |
-| `description_key` | At least one bullet; usually common |
-| `processing_level` | `minor` or `major` |
-| `presentation.topic_tags` | At least one tag |
-| `display.numDecimalPlaces` | Common is fine |
-| `display.tolerance` | Common is fine — chart tolerance for missing years |
-| `display.name` | **Per-indicator** — required for legend labels |
-| `presentation.attribution_short` | **Set explicitly** — does NOT inherit from origin's `attribution_short` |
-
-**Conditional:**
-- If `processing_level: major`, then `description_processing` MUST exist on each indicator with that level.
-
-**NOT mandatory** (do not flag as 🔴 if missing):
-- `presentation.title_public`
-- `presentation.title_variant`
-- `presentation.attribution` (long form)
-
-**Important gotcha:** the snapshot's `origin.attribution_short` does NOT propagate to indicator-level `presentation.attribution_short` or to MySQL `variables.attributionShort`. They are independent fields. Always verify on the produced grapher table:
-
-```python
-from owid.catalog import Dataset
-ds = Dataset("data/grapher/<ns>/<v>/<short_name>")
-tb = ds["<table>"]
-print(tb["<col>"].metadata.presentation.attribution_short)  # must NOT be None
-```
-
-Or query staging MySQL:
+Quick verification that `presentation.attribution_short` actually landed on the produced indicators (origin's value does NOT propagate):
 
 ```bash
 make query SQL="SELECT shortName, attributionShort FROM variables WHERE catalogPath LIKE '%<ns>/<v>/<short_name>%'"
 ```
+Any `NULL` row is a 🔴.
 
-### 10. Dataset-level metadata
-
-Garden `.meta.yml` MUST include:
-
-```yaml
-dataset:
-  update_period_days: <N>
-```
-
-Even if the rest of the `dataset:` block is omitted, **never strip `update_period_days`** — it controls the auto-update cadence.
-
-### 10b. Metadata quality skills
+### 10. Metadata quality skills
 
 Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` against the new garden + grapher `.meta.yml` files. See `/update-dataset` § 6b for the full procedure (typos / spacing / style + a manual clarity checklist for general-audience readability — apply that checklist here too). Report findings as 🟡 (or 🔴 if a violation breaks rendering or makes the text outright misleading).
 

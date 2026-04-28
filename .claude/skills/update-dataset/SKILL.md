@@ -36,6 +36,7 @@ Assumptions:
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
+- [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, and that all URLs resolve (HEAD-check)
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Pick 1–3 chart views for the public announcement
@@ -197,6 +198,56 @@ When you do stop, present a concise summary of the issue and what options exist.
    .venv/bin/etlr grapher/<namespace>/<new_version>/<short_name> --grapher --private --force --only
    ```
    Then re-run the relevant check to confirm zero remaining violations.
+
+6c) Indicator metadata coverage, dataset block, and link verification
+   The other quality checks catch *content* issues; this step catches *missing fields* and *broken URLs* before they reach review.
+
+   **Mandatory fields per indicator.** For every indicator in the garden `.meta.yml`, confirm these are set (either on `definitions.common` or per-indicator):
+
+   | Field | Notes |
+   |---|---|
+   | `title` | Per-indicator |
+   | `unit` | Common is fine |
+   | `short_unit` | Common is fine |
+   | `description_short` | Per-indicator |
+   | `description_key` | At least one bullet; usually common |
+   | `processing_level` | `minor` or `major` |
+   | `presentation.topic_tags` | At least one tag |
+   | `display.numDecimalPlaces` | Common is fine |
+   | `display.tolerance` | Common is fine — chart tolerance for missing years |
+   | `display.name` | **Per-indicator** — required for legend labels |
+   | `presentation.attribution_short` | **Set explicitly** — does NOT inherit from the origin's `attribution_short` (verified: MySQL `variables.attributionShort` stays `NULL` if it's only on the origin). Place under `definitions.common.presentation` for the common case. |
+
+   Conditional: if `processing_level: major`, every indicator with that level MUST also have `description_processing`.
+
+   Not mandatory (skip if you don't need them): `presentation.title_public`, `presentation.title_variant`, `presentation.attribution`.
+
+   **Dataset block.** Garden `.meta.yml` MUST include `update_period_days`:
+   ```yaml
+   dataset:
+     update_period_days: <N>
+   ```
+   This controls the auto-update cadence. Even when the rest of the `dataset:` block is empty, **never strip `update_period_days`** — leave the block in place with just that field.
+
+   **Link verification.** Run a HEAD request on every URL in the new `.dvc` and `.meta.yml` files. Anything non-2xx is a hard blocker:
+   ```bash
+   for url in $(rg -No "https?://[^\"' ]+" snapshots/<namespace>/<new_version>/ etl/steps/data/{garden,grapher}/<namespace>/<new_version>/ | sort -u); do
+       printf "%s  %s\n" "$(curl -sI -o /dev/null -w '%{http_code}' --max-time 10 "$url")" "$url"
+   done
+   ```
+   Fix broken `url_main`, `url_download`, `license.url`, or any URL referenced from `description` / `description_key` before continuing.
+
+   **Verification.** After editing, re-run the affected step (with `--grapher` if grapher) so the catalog reflects the changes. Then confirm `presentation.attribution_short` actually landed:
+   ```python
+   from owid.catalog import Dataset
+   ds = Dataset("data/grapher/<ns>/<v>/<short_name>")
+   tb = ds["<table>"]
+   print(tb["<col>"].metadata.presentation.attribution_short)  # must NOT be None
+   ```
+   Or after the staging upload:
+   ```bash
+   make query SQL="SELECT shortName, attributionShort FROM variables WHERE catalogPath LIKE '%<ns>/<v>/<short_name>%'"
+   ```
 
 7) Indicator upgrade (optional, staging only)
    - First upload the new grapher dataset to the staging DB (required before the upgrader can detect it):
