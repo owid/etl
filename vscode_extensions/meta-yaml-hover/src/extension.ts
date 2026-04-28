@@ -230,8 +230,7 @@ const TOKEN_RE = new RegExp(
     [
         '\\{([A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*)\\}',
         '(?<![\\w-])\\*([A-Za-z_][A-Za-z0-9_-]*)(?![\\w-])(?!\\*)',
-        '<%[\\s\\S]*?%>',
-        '<#[\\s\\S]*?#>',
+        '(<%[\\s\\S]*?%>|<#[\\s\\S]*?#>)',
         '<<[^<>]*?>>',
     ].join('|'),
     'g',
@@ -253,7 +252,7 @@ function renderResolvedWithLinks(
             const line = findKeyDeclLine(docText, m[1]);
             if (line !== undefined) {
                 const uri = buildRevealUri(docUri, line);
-                result += `<code><a href="${uri}" title="line ${line + 1}">${escaped}</a></code>`;
+                result += `<a href="${uri}" title="line ${line + 1}"><code>${escaped}</code>↗</a>`;
             } else {
                 result += `<code>${escaped}</code>`;
             }
@@ -261,10 +260,12 @@ function renderResolvedWithLinks(
             const line = findAnchorDeclLine(docText, m[2]);
             if (line !== undefined) {
                 const uri = buildRevealUri(docUri, line);
-                result += `<code><a href="${uri}" title="line ${line + 1}">${escaped}</a></code>`;
+                result += `<a href="${uri}" title="line ${line + 1}"><code>${escaped}</code>↗</a>`;
             } else {
                 result += `<code>${escaped}</code>`;
             }
+        } else if (m[3] !== undefined) {
+            result += `<i><code>${escaped}</code></i>`;
         } else {
             result += `<code>${escaped}</code>`;
         }
@@ -300,7 +301,7 @@ const hoverProvider: vscode.HoverProvider = {
             const md = new vscode.MarkdownString();
             md.isTrusted = { enabledCommands: [REVEAL_LINE_CMD] };
             md.supportHtml = true;
-            md.appendMarkdown(`**\`{${placeholder.name}}\`**\n\n`);
+            md.appendMarkdown(`<small>PLACEHOLDER ·</small> <code>{${placeholder.name}}</code>\n\n---\n\n`);
             if (resolved === undefined) {
                 md.appendMarkdown('_Not defined in this file._');
             } else {
@@ -318,7 +319,7 @@ const hoverProvider: vscode.HoverProvider = {
             const md = new vscode.MarkdownString();
             md.isTrusted = { enabledCommands: [REVEAL_LINE_CMD] };
             md.supportHtml = true;
-            md.appendMarkdown(`**\`*${alias.name}\`** _(YAML anchor)_\n\n`);
+            md.appendMarkdown(`<small>ANCHOR ·</small> <code>*${alias.name}</code>\n\n---\n\n`);
             if (resolved === undefined) {
                 md.appendMarkdown('_Anchor not defined in this file._');
             } else {
