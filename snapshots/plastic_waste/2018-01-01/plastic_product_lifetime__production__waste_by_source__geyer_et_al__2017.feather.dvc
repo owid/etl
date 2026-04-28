@@ -3,10 +3,9 @@ meta:
     producer: Geyer et al.
     title: Production, use, and fate of all plastics ever made
     description: |-
-      This dataset provides data on plastic production, use, and waste across industrial sectors and polymer types. It includes mean product lifetimes of plastic products (in years), plastic production, and plastic waste by industrial sector and use (in tonnes per year).
+      Data is given as mean product lifetimes of plastic products (measured in years), plastic production, and plastic waste by industrial sector/use (measured in tonnes per year).
 
-      Data is also provided for primary production and plastic waste by polymer type, including low-density polyethylene (LDPE), high-density polyethylene (HDPE), polypropylene (PP), polystyrene (PS), polyvinyl chloride (PVC), polyethylene terephthalate (PET), polyurethanes (PUT), polyester/polyamide/acrylic (PP&A) fibres, other polymers, and additives.
-    title_snapshot: Production, use, and fate of all plastics ever made - Plastic product lifetime, production, and waste by source
+      Data is also given for primary production and plastic waste by polymer type. Polymer types are as follows: low-density polyethylene (LDPE), high-density polyethylene (HDPE), polypropylene (PP), polystyrene (PS), polyvinyl chloride (PVC), polyethylene terephthalate (PET), polyurethanes (PUT), polyester/polyamide/acrylic (PP&A) fibres, other polymers, and additives.
     citation_full: Geyer, R., Jambeck, J. R., and Law, K. L. (2017). Production, use, and fate of all plastics ever made. Science Advances, 3(7), e1700782.
     url_main: http://advances.sciencemag.org/content/3/7/e1700782
     date_accessed: '2026-03-10'

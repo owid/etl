@@ -3,10 +3,11 @@ meta:
     producer: Lebreton et al.
     title: A global mass budget for positively buoyant macroplastic debris in the ocean
     description: |-
-      This dataset provides modelled and projected ocean plastic accumulation under three plastic emissions scenarios. It covers the global accumulation of buoyant macroplastics (>0.5 cm) in the ocean, as well as the accumulation of microplastics (<0.5 cm) derived from degraded plastic material from the ocean surface layer.
+      Data describes modelled and projected ocean plastic under three plastic emissions scenarios.
 
-      The three scenarios are: (1) emissions of plastic to the world's oceans stopped by 2020; (2) emissions stagnated at 2020 levels; and (3) increasing emissions of plastic until 2050 in line with the average growth rate of global plastic production from 2005–2015.
-    title_snapshot: Missing plastic budget
+      The modelled global accumulation of buoyant macroplastics (>0.5 cm) in the ocean is given, along with the accumulation of microplastics (<0.5 cm), which is degraded plastic material from the ocean surface layer.
+
+      This is provided under three scenarios: (1) emissions of plastic to the world's oceans stopped by 2020; (2) emissions stagnated at 2020 levels; (3) increasing emissions of plastic until 2050 in line with the average growth rate of global plastic production from 2005–2015.
     citation_full: Lebreton et al. (2019). A global mass budget for positively buoyant macroplastic debris in the ocean. Nature Scientific Reports.
     url_main: https://www.nature.com/articles/s41598-019-49413-5
     date_accessed: '2019-09-13'

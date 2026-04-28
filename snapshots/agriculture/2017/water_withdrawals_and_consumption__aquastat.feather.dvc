@@ -1,13 +1,16 @@
 meta:
   origin:
-    producer: FAO
+    producer: Food and Agriculture Organization of the United Nations
     title: AQUASTAT Database
     description: |-
-      AQUASTAT is the Food and Agriculture Organization's (FAO) global information system on water resources and agricultural water management. It collects, analyzes, and disseminates data on water resources, water use, and agricultural water management across countries and regions worldwide.
+      The AQUASTAT Database, maintained by the Food and Agriculture Organization of the United Nations (FAO), is a global information system on water resources and agricultural water management. It provides data on water withdrawals, water consumption, and irrigation at the country level, covering agricultural, industrial, and municipal uses.
 
-      The database includes data on agricultural, industrial, and municipal water withdrawals and consumption, irrigation water requirements and withdrawals, and other freshwater-related variables. Water sources covered include primary renewable and secondary freshwater resources, over-abstraction of renewable groundwater, fossil groundwater, agricultural drainage water, treated wastewater, and desalinated water.
+      Key variables include agricultural water withdrawal (water used for irrigation, livestock, and aquaculture), industrial water withdrawal (water used by self-supplied industries, including thermoelectric and nuclear power plant cooling), municipal water withdrawal (water withdrawn primarily for direct population use via public distribution networks), irrigation water requirement (the quantity of water exclusive of precipitation and soil moisture required for normal crop production), irrigation water withdrawal (annual quantity of water withdrawn specifically for irrigation), and total water withdrawal (the combined annual quantity of water withdrawn for agricultural, industrial, and municipal purposes).
+
+      Sources of water covered include primary renewable and secondary freshwater resources, over-abstracted renewable groundwater, fossil groundwater, agricultural drainage water, treated wastewater, and desalinated water.
     title_snapshot: AQUASTAT Database - Water withdrawals and consumption
-    citation_full: 'United Nations Food and Agriculture Organization (FAO), AQUASTAT Database. Accessed May 2017. Available at: http://www.fao.org/nr/water/aquastat/data/query/results.html.'
+    citation_full: United Nations Food and Agricultural Organization (UN FAO) AQUASTAT Database.
+    attribution_short: FAO
     url_main: http://www.fao.org/nr/water/aquastat/data/query/results.html
     date_accessed: '2017-05-11'
     date_published: '2017'

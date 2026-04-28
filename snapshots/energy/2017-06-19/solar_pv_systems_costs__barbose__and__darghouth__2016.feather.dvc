@@ -2,12 +2,14 @@ meta:
   origin:
     producer: Barbose and Darghouth
     title: 'Tracking the Sun IX: The Installed Price of Residential and Non-Residential Photovoltaic Systems in the United States'
-    description: |-
-      Tracking the Sun is a recurring report series documenting installed prices of residential and non-residential solar photovoltaic (PV) systems in the United States. The ninth edition draws on data from a large sample of installed systems to analyze trends in total installed prices, module prices, and non-module costs (including inverters, racking equipment, and soft costs such as marketing, customer acquisition, system design, installation labor, permitting and inspection, and installer margins).
+    title_snapshot: Solar PV Systems Costs
+    description_snapshot: |-
+      Data is based on median residential solar photovoltaic (PV) prices in the United States only.
 
-      Data in this edition is based on median residential solar PV prices in the United States. Non-module costs are derived as the difference between total system price and the solar module price.
-    title_snapshot: Tracking the Sun IX - Solar PV systems costs
-    citation_full: 'Barbose, G. and Darghouth, N. (2016). Tracking the Sun IX: The Installed Price of Residential and Non-Residential Photovoltaic Systems in the United States. Lawrence Berkeley National Laboratory. Available at: https://emp.lbl.gov/sites/default/files/tracking_the_sun_ix_report.pdf.'
+      Installed non-module prices include hardware costs, such as inverters and racking equipment; and the wide assortment of soft costs, including such things as marketing and customer acquisition, system design, installation labor, permitting and inspection costs, and installer margins.
+
+      Non-module costs have been assumed to be the total solar PV system price minus the solar module price.
+    citation_full: 'Barbose and Darghouth (2016). Tracking the Sun IX: The Installed Price of Residential and Non-Residential Photovoltaic Systems in the United States.'
     url_main: https://emp.lbl.gov/sites/default/files/tracking_the_sun_ix_report.pdf
     date_accessed: '2017-06-19'
     date_published: '2016'

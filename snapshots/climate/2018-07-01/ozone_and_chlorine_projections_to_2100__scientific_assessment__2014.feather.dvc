@@ -1,13 +1,9 @@
 meta:
   origin:
     producer: Hegglin et al.
-    title: Twenty Questions and Answers About the Ozone Layer
-    description: |-
-      This publication, produced under the Scientific Assessment Panel of the Montreal Protocol, addresses key questions about stratospheric ozone depletion and recovery. It covers historical measurements and future projections of total ozone amounts and effective stratospheric chlorine (ESC), accounting for the effects of ozone-depleting substances (ODSs) and climate change.
-
-      Chemistry-climate models are used to generate regional and global projections of total ozone and ESC for the period 1960–2100, referenced to 1960 values. The projections reflect the combined influence of declining ODS concentrations under the Montreal Protocol and ongoing climate change.
-    title_snapshot: Twenty Questions and Answers About the Ozone Layer - Ozone and chlorine projections to 2100
-    description_snapshot: Data represents stratospheric ozone and effective stratospheric chlorine (ESC) based on historical measurements and future projections from chemistry-climate models, covering 1960–2100 (referenced to 1960 = 0). The data was extracted from the static figure Q20-2 in the publication using the WebPlotDigitizer tool (https://apps.automeris.io/wpd/).
+    title: 'Twenty Questions and Answers about the Ozone Layer: 2014 Update'
+    description: This publication addresses stratospheric ozone science and policy through a question-and-answer format, incorporating historical measurements and future projections from chemistry-climate models. It covers stratospheric ozone and effective stratospheric chlorine (ESC) for the period 1960–2100, accounting for the effects of ozone-depleting substances (ODSs) and climate change. Regional and global projections are referenced to 1960 values (i.e., 1960 = 0).
+    description_snapshot: 'Figures represent stratospheric ozone and effective stratospheric chlorine (ESC) based on historical measurement and future projections from chemistry-climate models. Data is based on those in Q20-2 in "Twenty Questions and Answers about the Ozone Layer: 2014 Update." Data was extracted from the static figure Q0-1 using the extraction tool WebPlotDigitizer (https://apps.automeris.io/wpd/).'
     citation_full: 'Hegglin, M. I., Fahey, D. W., McFarland, M., Montzka, S. A., and Nash, E. R. (2014). Twenty questions and answers about the ozone layer: 2014 update. World Meteorological Organization, UNEP, NOAA, NASA, and European Commission.'
     url_main: https://public.wmo.int/en/resources/library/twenty-questions-and-answers-about-ozone-layer-2014-update
     date_accessed: '2026-03-05'

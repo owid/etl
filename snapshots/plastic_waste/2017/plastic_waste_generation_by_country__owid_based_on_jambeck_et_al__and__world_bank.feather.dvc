@@ -2,12 +2,10 @@ meta:
   origin:
     producer: Jambeck et al.
     title: Plastic waste inputs from land into the ocean
-    description: |-
-      This dataset provides estimates of plastic waste generation at the national level, derived from per capita plastic waste generation data published in Jambeck et al. (2015) combined with total population data from the World Bank's World Development Indicators.
+    description_snapshot: |-
+      Data on total national plastic waste generation was calculated by Our World in Data based on per capita plastic waste generation data published in Jambeck et al. (2015), and total population data published in the World Bank's World Development Indicators (available at: https://datacatalog.worldbank.org/dataset/world-development-indicators).
 
-      Jambeck et al. originally quantified municipal and plastic waste streams from coastal populations in 2010, multiplying per capita estimates by coastal population figures to derive national plastic waste at risk of entering oceans and waterways. Total national plastic waste generation figures are calculated by multiplying the per capita estimates by total population figures instead.
-    title_snapshot: Plastic waste inputs from land into the ocean - Plastic waste generation by country
-    description_snapshot: Total national plastic waste generation figures are calculated by Our World in Data by multiplying per capita plastic waste generation estimates from Jambeck et al. (2015) by total population figures from the World Bank World Development Indicators, rather than by coastal population figures as in the original study.
+      Jambeck et al. quantified municipal and plastic waste streams from coastal populations in 2010. Their estimates were therefore multiplied by coastal population numbers to derive national plastic waste at risk of entering oceans and waterways. Here we calculate the total plastic waste generation by instead multiplying by total population figures.
     citation_full: Jambeck, J. R., Geyer, R., Wilcox, C., Siegler, T. R., Perryman, M., Andrady, A., ... & Law, K. L. (2015). Plastic waste inputs from land into the ocean. Science, 347(6223), 768–771.
     url_main: http://science.sciencemag.org/content/347/6223/768/
     date_accessed: '2026-03-05'

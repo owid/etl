@@ -2,8 +2,7 @@ meta:
   origin:
     producer: Goldin et al.
     title: 'The homecoming of American college women: The reversal of the college gender gap'
-    description: This dataset presents the average male-to-female ratio of students taking mathematics and science subjects in high school education in the United States. The data is drawn from research examining the reversal of the college gender gap and the broader homecoming of American college women.
-    title_snapshot: Male-to-female ratio high school courses in USA
+    description_snapshot: Data represents the average male-to-female ratio of students taking maths and science subjects in high school education in the United States.
     citation_full: 'Goldin, C., Katz, L. F., and Kuziemko, I. (2006). The homecoming of American college women: The reversal of the college gender gap. Journal of Economic Perspectives, 20(4), 133–156.'
     url_main: http://www.jstor.org/stable/30033687
     date_accessed: '2018-02-09'

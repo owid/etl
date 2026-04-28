@@ -2,8 +2,12 @@ meta:
   origin:
     producer: Brooks et al.
     title: The Chinese import ban and its impact on global plastic waste trade
-    description: This dataset contains two series related to Chinese plastic waste management. The first covers estimated quantities of domestic waste generation, imported recycled waste, and total plastic waste to manage, measured in tonnes per year from 2010 to 2016. The second covers projected cumulative quantities of plastic waste displaced as a result of China's ban on plastic waste imports over the period 2018–2030, shown under scenarios of a 100%, 75%, or 50% ban on plastic waste imports.
-    title_snapshot: The Chinese import ban and its impact on global plastic waste trade - Plastic imports by China and impact of ban
+    description_snapshot: |-
+      Data represents two series related to Chinese plastic waste:
+
+      - The estimated quantity of domestic waste generation, imported recycled waste, and total plastic waste to manage, measured in tonnes per year (from 2010 to 2016).
+
+      - The projected cumulative quantity of plastic waste displaced as a result of the Chinese plastic import ban (over the period 2018–2030). This is shown under scenarios of a 100%, 75%, or 50% Chinese ban on plastic waste imports.
     citation_full: Brooks, A. L., Wang, S., and Jambeck, J. R. (2018). The Chinese import ban and its impact on global plastic waste trade. Science Advances, 4(6), eaat0131.
     url_main: http://advances.sciencemag.org/content/4/6/eaat0131
     date_accessed: '2026-03-05'

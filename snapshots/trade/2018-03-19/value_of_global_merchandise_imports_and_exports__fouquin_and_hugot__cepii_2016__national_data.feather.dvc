@@ -1,14 +1,16 @@
 meta:
   origin:
     producer: Fouquin and Hugot
-    title: Two Centuries of Bilateral Trade and Gravity Data
-    description: |-
-      This dataset provides bilateral trade and gravity data spanning two centuries (1827–2014), compiled by Michel Fouquin and Jules Hugot at CEPII. It covers national trade flows including total exports and imports by country and year, enabling long-run analysis of international merchandise trade.
+    title: 'Two Centuries of Bilateral Trade and Gravity Data: 1827–2014'
+    description_snapshot: |-
+      To calculate country exports (imports) to (from) the rest of the world, the total value of exports (imports) by country, per year, is divided by the country's GDP.
 
-      The dataset includes national-level data that can be used to calculate country exports and imports as a share of GDP, as well as aggregated regional and global totals. Germany's time series combines West Germany and Germany (excluding East Germany), and Russia's time series combines Russia and the USSR.
-    title_snapshot: Two Centuries of Bilateral Trade and Gravity Data - Value of global merchandise imports and exports (national data)
+      The time series "World" corresponds to the world's total exports (imports) — i.e. the sum of exports (imports) reported by all countries in the dataset.
+
+      The total export (import) values of regional income aggregates have been calculated using the World Bank's income groupings. These time series begin in 1970, where the number of countries are more representative. Similarly, total export (import) values by continental grouping begin in 1960.
+
+      Germany's time series is comprised of West Germany and Germany. East Germany has been excluded for the purposes of Germany's calculations. Russia's time series comprises Russia and the USSR.
     citation_full: 'Michel Fouquin and Jules Hugot, 2016. "Two Centuries of Bilateral Trade and Gravity Data: 1827–2014," CEPII Working Paper 2016-14, May 2016, CEPII.'
-    attribution_short: CEPII
     url_main: http://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=32
     date_accessed: '2018-03-19'
     date_published: '2016'
