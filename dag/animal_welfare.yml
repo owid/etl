@@ -86,11 +86,11 @@ steps:
   # Animal welfare data explorer.
   #
   export://explorers/animal_welfare/latest/animal_welfare:
-    - data://grapher/animal_welfare/2023-08-01/global_hen_inventory
     - data://grapher/animal_welfare/2026-04-16/chick_culling_laws
-    - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
-    - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
     - data://grapher/animal_welfare/2024-12-17/fur_laws
+    - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
+    - data://grapher/animal_welfare/2026-04-28/global_hen_inventory
+    - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
   #
   # Total number of animals used for food.
   #
@@ -119,7 +119,7 @@ steps:
   data://grapher/animal_welfare/2026-04-16/chick_culling_laws:
     - data://garden/animal_welfare/2026-04-16/chick_culling_laws
   #
-  # UK egg statistics (Defra, 2023).
+  # UK egg statistics (Defra).
   #
   # This step is needed to fill barn/organic data for 2006-2011, missing in the new release.
   data://meadow/animal_welfare/2023-08-01/uk_egg_statistics:
@@ -159,7 +159,7 @@ steps:
     - data://meadow/animal_welfare/2026-04-16/laying_hens_keeping_eu
     - data://garden/animal_welfare/2026-04-16/eu_eggs_dashboard
   #
-  # US egg production - older data (USDA, 2018).
+  # US egg production - older data (USDA).
   #
   # Non updateable.
   data://meadow/animal_welfare/2018-10-19/us_egg_production_2007_2018:
@@ -184,3 +184,12 @@ steps:
     - data://garden/animal_welfare/2026-04-16/laying_hens_keeping_eu
   data://grapher/animal_welfare/2026-04-16/share_of_cage_free_eggs:
     - data://garden/animal_welfare/2026-04-16/share_of_cage_free_eggs
+  #
+  # Global hen inventory (Welfare Footprint Institute).
+  #
+  data://meadow/animal_welfare/2026-04-28/global_hen_inventory:
+    - snapshot://animal_welfare/2026-04-28/global_hen_inventory.csv
+  data://garden/animal_welfare/2026-04-28/global_hen_inventory:
+    - data://meadow/animal_welfare/2026-04-28/global_hen_inventory
+  data://grapher/animal_welfare/2026-04-28/global_hen_inventory:
+    - data://garden/animal_welfare/2026-04-28/global_hen_inventory

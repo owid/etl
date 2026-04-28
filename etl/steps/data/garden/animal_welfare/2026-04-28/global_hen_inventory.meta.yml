@@ -1,0 +1,76 @@
+dataset:
+  title: Global hen inventory (Welfare Footprint Project, 2022)
+
+tables:
+  global_hen_inventory:
+    title: Global hen inventory
+    variables:
+      share_of_hens_in_barns:
+        title: Share of hens housed in a barn or aviary
+        unit: '%'
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      share_of_brown_hens:
+        title: Share of all hens that are brown
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      share_of_hens_in_cages:
+        title: Share of hens in cages
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      number_of_hens_cage_free:
+        title: Number of cage-free hens
+        unit: 'hens'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation: &presentation
+          grapher_config:
+            hideTimeline: true
+            hasMapTab: false
+      number_of_hens_in_cages:
+        title: Number of hens in cages
+        unit: 'hens'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation: *presentation
+      number_of_commercial_egg_farms:
+        title: Number of commercial egg farms
+        unit: 'farms'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      share_of_hens_free_range_not_organic:
+        title: Share of non-organic, free-range hens
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            hideTimeline: true
+            hasMapTab: false
+      share_of_hens_free_range_organic:
+        title: Share of organic, free-range hens
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      number_of_laying_hens:
+        title: Number of laying hens
+        unit: 'hens'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      share_of_hens_in_unknown_housing:
+        title: Share of laying hens in unknown housing
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
