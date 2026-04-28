@@ -226,43 +226,63 @@ function escapeHtml(s: string): string {
         .replace(/"/g, '&quot;');
 }
 
+const TOKEN_RE = new RegExp(
+    [
+        '\\{([A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*)\\}',
+        '(?<![\\w-])\\*([A-Za-z_][A-Za-z0-9_-]*)(?![\\w-])(?!\\*)',
+        '<%[\\s\\S]*?%>',
+        '<#[\\s\\S]*?#>',
+        '<<[^<>]*?>>',
+    ].join('|'),
+    'g',
+);
+
 function renderResolvedWithLinks(
     resolved: string,
     docUri: vscode.Uri,
     docText: string,
 ): string {
-    let html = escapeHtml(resolved);
-
-    html = html.replace(PLACEHOLDER_RE, (match, name) => {
-        const line = findKeyDeclLine(docText, name);
-        if (line === undefined) {
-            return match;
+    let result = '';
+    let lastIdx = 0;
+    TOKEN_RE.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = TOKEN_RE.exec(resolved)) !== null) {
+        result += escapeHtml(resolved.slice(lastIdx, m.index));
+        const escaped = escapeHtml(m[0]);
+        if (m[1] !== undefined) {
+            const line = findKeyDeclLine(docText, m[1]);
+            if (line !== undefined) {
+                const uri = buildRevealUri(docUri, line);
+                result += `<code><a href="${uri}" title="line ${line + 1}">${escaped}</a></code>`;
+            } else {
+                result += `<code>${escaped}</code>`;
+            }
+        } else if (m[2] !== undefined) {
+            const line = findAnchorDeclLine(docText, m[2]);
+            if (line !== undefined) {
+                const uri = buildRevealUri(docUri, line);
+                result += `<code><a href="${uri}" title="line ${line + 1}">${escaped}</a></code>`;
+            } else {
+                result += `<code>${escaped}</code>`;
+            }
+        } else {
+            result += `<code>${escaped}</code>`;
         }
-        const uri = buildRevealUri(docUri, line);
-        return `<a href="${uri}" title="line ${line + 1}">${match}</a>`;
-    });
+        lastIdx = m.index + m[0].length;
+    }
+    result += escapeHtml(resolved.slice(lastIdx));
 
-    html = html.replace(ALIAS_RE, (match, name) => {
-        const line = findAnchorDeclLine(docText, name);
-        if (line === undefined) {
-            return match;
-        }
-        const uri = buildRevealUri(docUri, line);
-        return `<a href="${uri}" title="line ${line + 1}">${match}</a>`;
-    });
-
-    const body = html
+    return result
         .split('\n')
         .map((line) => {
-            const m = line.match(/^([ \t]*)(.*)$/);
-            if (!m) {
+            const lm = line.match(/^([ \t]*)(.*)$/);
+            if (!lm) {
                 return line;
             }
-            const leading = m[1].replace(/\t/g, '    ').replace(/ /g, '&nbsp;');
-            return leading + m[2];
+            const leading = lm[1].replace(/\t/g, '    ').replace(/ /g, '&nbsp;');
+            return leading + lm[2];
         })
         .join('<br>');
-    return `<code>${body}</code>`;
 }
 
 const hoverProvider: vscode.HoverProvider = {
