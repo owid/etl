@@ -124,7 +124,7 @@ The verbatim Slack prompts and examples (do **not** rephrase, abbreviate, or cha
 | 9 | `Add 1–3 chart views we might use in the public announcement` | `Pick chart views that represent the whole dataset, rather than, e.g., something very specific about a single country.` |
 | 10 | `Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)` | `E.g.: https://ourworldindata.org/search?datasetProducts=World%20Development%20Indicators.` |
 
-The skill keeps a copy of these strings at `slack-form-verbatim.md` next to `SKILL.md` so future edits don't drift from the live Slack template — read that file at runtime instead of typing them in fresh.
+The table above is the single source of truth — if the Slack form's wording changes, update it here and nowhere else.
 
 The exact draft file structure:
 
