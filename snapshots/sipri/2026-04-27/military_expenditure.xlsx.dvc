@@ -14,13 +14,13 @@ meta:
       Information from the Stockholm International Peace Research Institute (SIPRI) Military Expenditure Database, https://doi.org/10.55163/CQGC9685
     attribution_short: SIPRI
     url_main: https://www.sipri.org/databases/milex
-    url_download: https://www.sipri.org/sites/default/files/SIPRI-Milex-data-1949-2025.xlsx
+    url_download: https://www.sipri.org/sites/default/files/SIPRI-Milex-data-1949-2025_v1.2.xlsx
     date_accessed: '2026-04-27'
     date_published: '2026-04-27'
     license:
       name: SIPRI Terms and Conditions
       url: https://www.sipri.org/about/terms-and-conditions
 outs:
-  - md5: e026e92113fd9981910edd4608a8ce7d
-    size: 922808
+  - md5: 1b197f8d3c0d803d234870477ce17b64
+    size: 922552
     path: military_expenditure.xlsx
