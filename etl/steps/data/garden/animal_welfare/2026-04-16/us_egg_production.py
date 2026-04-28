@@ -12,7 +12,10 @@ paths = PathFinder(__file__)
 def prepare_old_data(tb_old: Table) -> Table:
     """Extract 2007-2011 rows from the 2018 USDA report, deriving caged hens from the cage-free percentage."""
     tb_old = tb_old[tb_old["year"] < 2012].copy()
-    tb_old["caged"] = tb_old["cage_free"] / (tb_old["cage_free_pct"] / 100) - tb_old["cage_free"]
+    # Use cage-free hens and their share of all hens to infer total hens, then caged hens.
+    cage_free_share = tb_old["cage_free_pct"] / 100
+    total_hens = tb_old["cage_free"] / cage_free_share
+    tb_old["caged"] = total_hens - tb_old["cage_free"]
     for col in ["caged", "cage_free", "organic_cage_free", "non_organic_cage_free"]:
         tb_old[col] = tb_old[col] * 1e6
     return tb_old[["year", "caged", "cage_free", "organic_cage_free", "non_organic_cage_free"]]
