@@ -1,0 +1,56 @@
+{
+  "name": "meta-yaml-hover",
+  "publisher": "owid",
+  "displayName": "Meta YAML Hover",
+  "description": "Hover details for Jinja-style {definitions.*}/{macros} placeholders and YAML aliases (*anchor) in OWID *.meta.yml files",
+  "version": "0.0.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/owid/etl"
+  },
+  "engines": {
+    "vscode": "^1.109.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:yaml"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "yaml",
+        "extensions": [
+          ".yml",
+          ".yaml"
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.19.37",
+    "@types/vscode": "^1.109.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
+    "esbuild": "^0.27.4",
+    "eslint": "^9.39.4",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3"
+  }
+}

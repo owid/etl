@@ -36,12 +36,12 @@ steps:
     - data://meadow/ggdc/2022-12-23/maddison_database
 
       # IMF World Economic Outlook
-  data://meadow/imf/2025-11-06/world_economic_outlook:
-    - snapshot://imf/2025-11-06/world_economic_outlook.csv
-  data://garden/imf/2025-11-06/world_economic_outlook:
-    - data://meadow/imf/2025-11-06/world_economic_outlook
-  data://grapher/imf/2025-11-06/world_economic_outlook:
-    - data://garden/imf/2025-11-06/world_economic_outlook
+  data://meadow/imf/2026-04-22/world_economic_outlook:
+    - snapshot://imf/2026-04-22/world_economic_outlook.csv
+  data://garden/imf/2026-04-22/world_economic_outlook:
+    - data://meadow/imf/2026-04-22/world_economic_outlook
+  data://grapher/imf/2026-04-22/world_economic_outlook:
+    - data://garden/imf/2026-04-22/world_economic_outlook
 
   #
   # Average working hours - Huberman and Minns (2007)

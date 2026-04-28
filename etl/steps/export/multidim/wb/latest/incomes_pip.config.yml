@@ -59,6 +59,8 @@ dimensions:
         name: All deciles
       - slug: "10_40_50"
         name: Poorest 50%, middle 40% and richest 10%
+      - slug: p10_p50_p90
+        name: "Poorest 10%, median, richest 10%"
       - slug: nan
         name: ""
 

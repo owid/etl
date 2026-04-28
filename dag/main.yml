@@ -427,13 +427,13 @@ steps:
   data://grapher/wpf/2025-01-17/famines_by_trigger:
     - data://garden/wpf/2025-01-17/famines_by_trigger
 
-  # Global Flourishing Study
-  data-private://meadow/gfs/2024-11-11/gfs_wave_one:
-    - snapshot-private://gfs/2024-11-11/gfs_wave_one.csv
-  data-private://garden/gfs/2024-11-11/gfs_wave_one:
-    - data-private://meadow/gfs/2024-11-11/gfs_wave_one
-  data-private://grapher/gfs/2024-11-11/gfs_wave_one:
-    - data-private://garden/gfs/2024-11-11/gfs_wave_one
+    ### Global Flourishing Study wave 2
+  data://meadow/gfs/2026-04-08/gfs_wave_two:
+    - snapshot://gfs/2026-04-08/gfs_wave_two.csv
+  data://garden/gfs/2026-04-08/gfs_wave_two:
+    - data://meadow/gfs/2026-04-08/gfs_wave_two
+  data://grapher/gfs/2026-04-08/gfs_wave_two:
+    - data://garden/gfs/2026-04-08/gfs_wave_two
 
   data-private://meadow/owid/latest/ig_countries:
     - snapshot-private://owid/latest/ig_countries.csv
@@ -598,7 +598,7 @@ steps:
   data://meadow/homicide/2025-08-06/who_mort_db:
     - snapshot://homicide/2025-08-06/who_mort_db.csv
   data://garden/homicide/2025-08-06/who_mort_db:
-    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/un/2024-07-12/un_wpp
     - data://meadow/homicide/2025-08-06/who_mort_db
   data://grapher/homicide/2025-08-06/who_mort_db:
     - data://garden/homicide/2025-08-06/who_mort_db
