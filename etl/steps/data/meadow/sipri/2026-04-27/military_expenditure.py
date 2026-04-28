@@ -24,8 +24,8 @@ def run() -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("military_expenditure.xlsx")
 
-    # Missing-data sentinels: "..." (three ASCII dots), "…" (Unicode ellipsis U+2026), and "xxx".
-    na_values = ["...", "…", "xxx"]
+    # Missing-data sentinels: "..." (three ASCII dots), "…" (Unicode ellipsis U+2026), ". ." (period-space-period), and "xxx".
+    na_values = ["...", "…", ". .", "xxx"]
 
     # Load data from snapshot.
     tb_constant_usd = snap.read(safe_types=False, sheet_name="Constant (2024) US$", skiprows=5, na_values=na_values)
