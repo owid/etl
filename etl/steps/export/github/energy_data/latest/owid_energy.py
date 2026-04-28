@@ -129,6 +129,8 @@ Additionally, to construct region aggregates and indicators per capita and per G
 
 ## Changelog
 
+- 2026-04-27:
+  - Update Ember's yearly electricity data, after they updated their Global electricity data.
 - 2026-01-26:
   - Update Ember's yearly electricity data, after they updated their European electricity data.
   - Fixed a few issues in aggregate regions related to how Ember's data is combined with the Energy Institute's Statistical Review of World Energy.
@@ -317,7 +319,7 @@ def run() -> None:
             f"Files committed successfully to branch {branch}. Create a PR here https://github.com/owid/energy-data/compare/master...{branch}."
         )
 
-    # Uncomment to inspect changes (after the new branch has been created).
+    # Uncomment to inspect changes (after the new branch in energy_data repos has been created).
     # from etl.data_helpers.misc import compare_tables
     # old = pd.read_csv("https://raw.githubusercontent.com/owid/energy-data/refs/heads/master/owid-energy-data.csv")
     # new = pd.read_csv(f"https://raw.githubusercontent.com/owid/energy-data/refs/heads/{branch}/owid-energy-data.csv")

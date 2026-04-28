@@ -129,12 +129,14 @@ def run() -> None:
                 "choices": decile_values,
                 "choice_new_slug": "all",
                 "view_config": {
-                    "hideRelativeToggle": True,
+                    "hideRelativeToggle": False,
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
                     "chartTypes": lambda view: (
-                        ["StackedArea", "StackedDiscreteBar"] if view.matches(indicator="share") else ["LineChart"]
+                        ["StackedArea", "StackedDiscreteBar"]
+                        if view.matches(indicator="share")
+                        else ["LineChart", "DiscreteBar"]
                     ),
                     "hideTotalValueLabel": True,
                     "baseColorScheme": "OwidCategoricalE",
@@ -152,6 +154,35 @@ def run() -> None:
         },
     )
 
+    # Group deciles 1, 5, 9 as P10/P50/P90 — only used for thr indicator
+    c.group_views(
+        groups=[
+            {
+                "dimension": "decile",
+                "choices": ["1", "5", "9"],
+                "choice_new_slug": "p10_p50_p90",
+                "view_config": {
+                    "hideRelativeToggle": False,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart", "DiscreteBar"],
+                    "hideTotalValueLabel": True,
+                    "baseColorScheme": "OwidCategoricalE",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
+                },
+                "view_metadata": {
+                    "description_short": "{subtitle}",
+                },
+            },
+        ],
+        params={
+            "title": _get_p10_p50_p90_title,
+            "subtitle": _get_p10_p50_p90_subtitle,
+        },
+    )
+
     # Filter decile views: keep only 1, 10, all for all indicators, plus 5, 9 for thr only
     # Also remove grouped decile views for Spells (we don't want those)
     non_share = [i for i in c.dimension_choices["indicator"] if i != "share"]
@@ -162,6 +193,8 @@ def run() -> None:
             {"decile": ["10_40_50"], "indicator": non_share},
             {"decile": ["5", "9"], "indicator": non_thr},
             {"decile": ["all"], "survey_comparability": "Spells"},
+            {"decile": ["p10_p50_p90"], "indicator": non_thr},
+            {"decile": ["p10_p50_p90"], "survey_comparability": "Spells"},
         ]
     )
 
@@ -170,7 +203,7 @@ def run() -> None:
 
     # Customize grouped decile views: sort indicators and set display names
     for view in c.views:
-        if view.matches(decile="all") and view.indicators.y:
+        if view.matches(decile=["all", "p10_p50_p90"]) and view.indicators.y:
             # Sort indicators by decile number
             # For share: richest to poorest; for others: poorest to richest
             reverse_order = view.matches(indicator="share")
@@ -189,7 +222,9 @@ def run() -> None:
 
     # Add Marimekko as an additional chart type for mean and median views.
     for view in c.views:
-        if view.matches(survey_comparability="No spells") and not view.matches(decile=["all", "10_40_50"]):
+        if view.matches(survey_comparability="No spells") and not view.matches(
+            decile=["all", "10_40_50", "p10_p50_p90"]
+        ):
             view.config = view.config or {}
             view.config["chartTypes"] = ["LineChart", "DiscreteBar", "Marimekko"]
             view.indicators.set_indicator(
@@ -224,6 +259,23 @@ def _get_grouped_decile_subtitle(view):
         "share": "The share of after tax income or consumption received by each decile (tenth of the population).",
     }
     return subtitles.get(view.dimensions.get("indicator"), "")
+
+
+def _get_p10_p50_p90_title(view):
+    """Return title for the P10/P50/P90 grouped threshold view."""
+    period = view.dimensions.get("period")
+    return (
+        f"Threshold income or consumption per {period} marking the poorest decile, the median, and the richest decile"
+    )
+
+
+def _get_p10_p50_p90_subtitle(view):
+    """Return subtitle for the P10/P50/P90 grouped threshold view."""
+    period = view.dimensions.get("period")
+    return (
+        f"The level of after tax income or consumption per person per {period} below which 10%, 50% and 90% of the population falls. "
+        f"{PPP_ADJUSTMENT_SUBTITLE}"
+    )
 
 
 def _build_indicator_display_names(tb):
