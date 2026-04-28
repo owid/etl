@@ -283,17 +283,43 @@ function renderResolvedWithLinks(
     });
     const isJinjaLine = (line: string): boolean =>
         /^(?:&nbsp;)*<i>[^<>]*<\/i>$/.test(line);
-    const indentedLines = processedLines.map((line, i) => {
-        if (i === 0) {
-            return line;
+    const jinjaControlKind = (line: string): 'open' | 'close' | 'middle' | 'none' => {
+        const m = line.match(/^(?:&nbsp;)*<i>&lt;%-?\s*(\w+)/);
+        if (!m) {
+            return 'none';
         }
+        const kw = m[1].toLowerCase();
+        if (/^(?:if|for|with|block|macro)$/.test(kw)) {
+            return 'open';
+        }
+        if (/^(?:endif|endfor|endwith|endblock|endmacro)$/.test(kw)) {
+            return 'close';
+        }
+        if (/^(?:elif|else)$/.test(kw)) {
+            return 'middle';
+        }
+        return 'none';
+    };
+    let depth = 0;
+    const indentedLines = processedLines.map((line) => {
+        let lineDepth: number;
         if (isJinjaLine(line)) {
-            return line;
+            const kind = jinjaControlKind(line);
+            if (kind === 'close') {
+                depth = Math.max(0, depth - 1);
+                lineDepth = depth;
+            } else if (kind === 'middle') {
+                lineDepth = Math.max(0, depth - 1);
+            } else if (kind === 'open') {
+                lineDepth = depth;
+                depth += 1;
+            } else {
+                lineDepth = depth;
+            }
+        } else {
+            lineDepth = depth;
         }
-        if (isJinjaLine(processedLines[i - 1])) {
-            return `&nbsp;&nbsp;${line}`;
-        }
-        return line;
+        return '&nbsp;&nbsp;'.repeat(lineDepth) + line;
     });
     const pieces: string[] = [];
     for (let i = 0; i < indentedLines.length; i++) {
