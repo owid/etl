@@ -11,9 +11,9 @@ meta:
     url_download: https://osf.io/download/hmfn3
     date_published: 2023-04-09
     date_accessed: 2023-08-03
-  license:
-    url: https://osf.io/cmh6v
-    name: Creative Commons Attribution 4.0 International License
+    license:
+      url: https://osf.io/cmh6v
+      name: Creative Commons Attribution 4.0 International License
 wdir: ../../../data/snapshots/animal_welfare/2023-08-03
 outs:
 - md5: 2ba5dde98b4fb527a8d110db4ae75061

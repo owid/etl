@@ -172,7 +172,7 @@ steps:
   data://garden/animal_welfare/2026-04-28/global_hen_inventory:
     - data://meadow/animal_welfare/2026-04-28/global_hen_inventory
   #
-  # Laying hens by housing system (combined from multiple sources).
+  # Eggs and hens statistics (various sources).
   #
   data://garden/animal_welfare/2026-04-28/eggs_and_hens_statistics:
     - data://garden/animal_welfare/2026-04-16/uk_egg_statistics

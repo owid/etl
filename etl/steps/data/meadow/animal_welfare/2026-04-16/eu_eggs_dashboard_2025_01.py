@@ -10,7 +10,7 @@ paths = PathFinder(__file__)
 
 # Number of laying hens by farming method (maximum capacity) according to notifications under
 # Commission Implementing Regulation (EU) 2017/1185, Art. 12(b) - Annex III.9.
-# Manually extracted from page 8 of the EU Eggs Market Situation Dashboard (last update 2025-01-29).
+# Extracted from page 8 of the EU Eggs Market Situation Dashboard.
 # Columns: country (EU MS code), year, total hens, and percentage by housing type (as in PDF).
 # * 2020 data (EL), ** 2021 data (LT), *** 2022 data (SE, HR); all others are 2023 data.
 # fmt: off

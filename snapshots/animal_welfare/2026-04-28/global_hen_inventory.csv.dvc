@@ -103,9 +103,9 @@ meta:
     url_main: https://welfarefootprint.org/research-projects/laying-hens/
     date_accessed: '2026-04-28'
     date_published: '2022-12-06'
-  license:
-    name: CC BY 4.0
-    url: https://welfarefootprint.org/research-projects/laying-hens/
+    license:
+      name: CC BY 4.0
+      url: https://welfarefootprint.org/research-projects/laying-hens/
 outs:
   - md5: 5f8cb302d78da91870da11136e9fdd5a
     size: 41872

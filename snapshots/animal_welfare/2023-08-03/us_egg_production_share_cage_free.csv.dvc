@@ -12,9 +12,9 @@ meta:
     url_download: https://osf.io/download/56xjc/
     date_published: 2023-04-09
     date_accessed: 2023-08-03
-  license:
-    url: https://osf.io/cmh6v
-    name: Creative Commons Attribution 4.0 International License
+    license:
+      url: https://osf.io/cmh6v
+      name: Creative Commons Attribution 4.0 International License
 wdir: ../../../data/snapshots/animal_welfare/2023-08-03
 outs:
 - md5: 1207a6ed636d2ca7ce62c8a2b0cc9a0c
