@@ -85,6 +85,14 @@ make watch
 
 ## Changelog
 
+### `v1.1.0`
+- **Remove processing log feature**
+  - Removed `ProcessingLog` and `processing_log` module from `owid.catalog.core`
+  - Removed `combine_indicators_processing_logs` helper
+  - Removed `update_log` / `amend_log` methods on `Indicator`
+  - Removed processing-log tracking from `Table` arithmetic operations (`__add__`, `__sub__`, `__mul__`, etc.)
+  - Removed `processing_log` field from `VariableMeta`
+
 ### `v1.0.1`
 - **ResponseSet ergonomics**
   - Remove deprecated `ResponseSet.results` property (use `.items` instead)

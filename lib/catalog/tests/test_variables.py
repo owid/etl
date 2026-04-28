@@ -571,7 +571,6 @@ def test_combine_indicators_metadata_uses_all_fields() -> None:
         "short_unit",
         "display",
         "processing_level",
-        "processing_log",
         "presentation",
         "license",
         "type",

@@ -7,11 +7,13 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Always use `.venv/bin/`** for all Python commands (`etl`, `python`, `pytest`)
 - **Never mask problems** - no empty tables, no commented-out code, no silent exceptions
 - **Trace issues upstream**: snapshot → meadow → garden → grapher
+- **Only edit live steps** — when fixing or improving metadata, code, or configs, only touch files that are in the active DAG (`dag/*.yml`), not archived ones (`dag/archive/*.yml`), unless explicitly asked to
 - **Never push/commit** unless explicitly told to
 - **Ask the user** if unsure - don't guess
 - **Always run `make check` before committing**
 - If not told otherwise, save outputs to `ai/` directory.
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
+- **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
 
 
 ## Pipeline Overview

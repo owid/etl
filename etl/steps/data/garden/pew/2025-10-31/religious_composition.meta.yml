@@ -95,7 +95,7 @@ tables:
           <% elif religion == "other_religions" -%>
           Percentage point change in share of people who are affiliated to other religions (2010-2020)
           <% elif religion == "any_religion" %>
-          Percentage point change in share of people that is religious (2010-2020)
+          Percentage point change in share of people who are religious (2010-2020)
           <% else -%>
           Percentage point change in share of people who are <<religion.title()>> (2010-2020)
           <% endif -%>

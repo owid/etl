@@ -45,7 +45,7 @@ tables:
         unit: male immigrants
       # Immigrant share
       immigrant_share_of_dest_population_all:
-        title: Share of the population that was born in another country
+        title: Share of the population born in another country
         unit: "%"
         short_unit: "%"
         description_short: Immigrants as a share of the total population.
@@ -53,7 +53,7 @@ tables:
         display:
           numDecimalPlaces: 1
       immigrant_share_of_dest_population_female:
-        title: Share of the population that was born in another country - female
+        title: Share of the population born in another country - female
         unit: "%"
         short_unit: "%"
         description_short: Female immigrants as a share of the total (female) population.
@@ -61,7 +61,7 @@ tables:
         display:
           numDecimalPlaces: 1
       immigrant_share_of_dest_population_male:
-        title: Share of the population that was born in another country - male
+        title: Share of the population born in another country - male
         unit: "%"
         short_unit: "%"
         description_short: Male immigrants as a share of the total (male) population.
@@ -71,25 +71,25 @@ tables:
       # Emigrant stock
       emigrants_all:
         title: Total number of emigrants
-        description_short: People that were born in a country but now live in another country.
+        description_short: People who were born in a country but now live in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
         unit: emigrants
       emigrants_female:
         title: Total number of emigrants - female
-        description_short: Women that were born in this country but now live in another country.
+        description_short: Women who were born in this country but now live in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
         unit: female emigrants
       emigrants_male:
         title: Total number of emigrants - male
-        description_short: Men that were born in this country but now live in another country.
+        description_short: Men who were born in this country but now live in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
         unit: male emigrants
       # Emigrant share
       emigrants_share_of_total_population:
-        title: Share of the population that was born in this country but now lives in another country.
+        title: Share of the population born in this country but now living in another country
         unit: "%"
         short_unit: "%"
-        description_short: The total number of people that have left the country, as a share of the current population.
+        description_short: The total number of people who have left the country, as a share of the current population.
         description_processing: |-
           - We calculated the share of emigrants as the number of emigrants divided by the total population of their home country.
           - {definitions.description_processing.owid_regions}

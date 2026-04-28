@@ -27,7 +27,7 @@ from ruamel.yaml import YAML
 from yaml.dumper import Dumper
 
 from etl.config import TLS_VERIFY
-from etl.paths import BASE_DIR
+from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 
 log = structlog.get_logger()
 
@@ -278,18 +278,31 @@ def apply_ruff_formatter_to_files(file_paths: list[str | Path]) -> None:
     )
 
 
-def _mtime_mapping(path: Path) -> dict[Path, float]:
-    return {f: f.stat().st_mtime for f in path.rglob("*") if f.is_file() and "__pycache__" not in f.parts}
+def _is_watched(f: Path) -> bool:
+    if not f.is_file() or "__pycache__" in f.parts:
+        return False
+    # Under snapshots/ only track .dvc files: snapshot .py edits don't propagate
+    # until `etls` rewrites the .dvc checksum, which is what downstream steps
+    # actually depend on.
+    try:
+        f.relative_to(SNAPSHOTS_DIR)
+    except ValueError:
+        return True
+    return f.suffix == ".dvc"
 
 
-def watch_folder(path: Path) -> Generator[Path, None, None]:
-    """Watch folder and yield on any changes."""
-    last_seen = _mtime_mapping(path)
+def _mtime_mapping(*paths: Path) -> dict[Path, float]:
+    return {f: f.stat().st_mtime for path in paths for f in path.rglob("*") if _is_watched(f)}
+
+
+def watch_folder(*paths: Path) -> Generator[Path, None, None]:
+    """Watch one or more folders and yield on any changes."""
+    last_seen = _mtime_mapping(*paths)
 
     while True:
         time.sleep(1)
 
-        current_files = _mtime_mapping(path)
+        current_files = _mtime_mapping(*paths)
 
         # Check for modifications
         for f, mtime in current_files.items():

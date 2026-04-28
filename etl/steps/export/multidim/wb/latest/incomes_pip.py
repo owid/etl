@@ -119,9 +119,7 @@ def run() -> None:
         and slug
         not in (
             "all",
-            # "all_bar",
             "10_40_50",
-            # "10_40_50_bar",
         )
     ]
     c.group_views(
@@ -131,11 +129,16 @@ def run() -> None:
                 "choices": decile_values,
                 "choice_new_slug": "all",
                 "view_config": {
-                    "hideRelativeToggle": True,
+                    "hideRelativeToggle": False,
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
-                    "chartTypes": lambda view: ["StackedArea"] if view.matches(indicator="share") else ["LineChart"],
+                    "chartTypes": lambda view: (
+                        ["StackedArea", "StackedDiscreteBar"]
+                        if view.matches(indicator="share")
+                        else ["LineChart", "DiscreteBar"]
+                    ),
+                    "hideTotalValueLabel": True,
                     "baseColorScheme": "OwidCategoricalE",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
@@ -144,29 +147,39 @@ def run() -> None:
                     "description_short": "{subtitle}",
                 },
             },
-            # {
-            #     "dimension": "decile",
-            #     "choices": decile_values,
-            #     "choice_new_slug": "all_bar",
-            #     "view_config": {
-            #         "hideRelativeToggle": True,
-            #         "selectedFacetStrategy": "entity",
-            #         "hasMapTab": False,
-            #         "tab": "chart",
-            #         "chartTypes": ["StackedDiscreteBar"],
-            #         "hideTotalValueLabel": True,
-            #         "baseColorScheme": "OwidCategoricalE",
-            #         "title": "{title}",
-            #         "subtitle": "{subtitle}",
-            #     },
-            #     "view_metadata": {
-            #         "description_short": "{subtitle}",
-            #     },
-            # },
         ],
         params={
             "title": _get_grouped_decile_title,
             "subtitle": _get_grouped_decile_subtitle,
+        },
+    )
+
+    # Group deciles 1, 5, 9 as P10/P50/P90 — only used for thr indicator
+    c.group_views(
+        groups=[
+            {
+                "dimension": "decile",
+                "choices": ["1", "5", "9"],
+                "choice_new_slug": "p10_p50_p90",
+                "view_config": {
+                    "hideRelativeToggle": False,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart", "DiscreteBar"],
+                    "hideTotalValueLabel": True,
+                    "baseColorScheme": "OwidCategoricalE",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
+                },
+                "view_metadata": {
+                    "description_short": "{subtitle}",
+                },
+            },
+        ],
+        params={
+            "title": _get_p10_p50_p90_title,
+            "subtitle": _get_p10_p50_p90_subtitle,
         },
     )
 
@@ -177,22 +190,11 @@ def run() -> None:
     c.drop_views(
         [
             {"decile": ["2", "3", "4", "6", "7", "8"]},
-            {
-                "decile": [
-                    # "all_bar",
-                    "10_40_50",
-                    # "10_40_50_bar",
-                ],
-                "indicator": non_share,
-            },
+            {"decile": ["10_40_50"], "indicator": non_share},
             {"decile": ["5", "9"], "indicator": non_thr},
-            {
-                "decile": [
-                    "all",
-                    # "all_bar",
-                ],
-                "survey_comparability": "Spells",
-            },
+            {"decile": ["all"], "survey_comparability": "Spells"},
+            {"decile": ["p10_p50_p90"], "indicator": non_thr},
+            {"decile": ["p10_p50_p90"], "survey_comparability": "Spells"},
         ]
     )
 
@@ -201,23 +203,16 @@ def run() -> None:
 
     # Customize grouped decile views: sort indicators and set display names
     for view in c.views:
-        if (view.matches(decile="all") or view.matches(decile="all_bar")) and view.indicators.y:
+        if view.matches(decile=["all", "p10_p50_p90"]) and view.indicators.y:
             # Sort indicators by decile number
             # For share: richest to poorest; for others: poorest to richest
-            # For all_bar: inverse order
             reverse_order = view.matches(indicator="share")
-            # if view.matches(decile="all_bar"):
-            #     reverse_order = not reverse_order
             view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
 
-            # For all_bar views, set sortBy to column and sortColumnSlug to decile 10 indicator
-            # if view.matches(decile="all_bar"):
-            #     decile_10_ind = next((ind for ind in view.indicators.y if _get_decile_number(ind) == 10), None)
-            #     if decile_10_ind:
-            #         if view.config is None:
-            #             view.config = {}
-            #         view.config["sortBy"] = "column"
-            #         view.config["sortColumnSlug"] = decile_10_ind.catalogPath
+            # Set sortBy to last indicator in the list
+            view.config = view.config or {}
+            view.config["sortBy"] = "column"
+            view.config["sortColumnSlug"] = view.indicators.y[0].catalogPath
 
             # Set display names extracted from original indicator titles
             for ind in view.indicators.y:
@@ -228,12 +223,7 @@ def run() -> None:
     # Add Marimekko as an additional chart type for mean and median views.
     for view in c.views:
         if view.matches(survey_comparability="No spells") and not view.matches(
-            decile=[
-                "all",
-                # "all_bar",
-                "10_40_50",
-                # "10_40_50_bar",
-            ]
+            decile=["all", "10_40_50", "p10_p50_p90"]
         ):
             view.config = view.config or {}
             view.config["chartTypes"] = ["LineChart", "DiscreteBar", "Marimekko"]
@@ -269,6 +259,23 @@ def _get_grouped_decile_subtitle(view):
         "share": "The share of after tax income or consumption received by each decile (tenth of the population).",
     }
     return subtitles.get(view.dimensions.get("indicator"), "")
+
+
+def _get_p10_p50_p90_title(view):
+    """Return title for the P10/P50/P90 grouped threshold view."""
+    period = view.dimensions.get("period")
+    return (
+        f"Threshold income or consumption per {period} marking the poorest decile, the median, and the richest decile"
+    )
+
+
+def _get_p10_p50_p90_subtitle(view):
+    """Return subtitle for the P10/P50/P90 grouped threshold view."""
+    period = view.dimensions.get("period")
+    return (
+        f"The level of after tax income or consumption per person per {period} below which 10%, 50% and 90% of the population falls. "
+        f"{PPP_ADJUSTMENT_SUBTITLE}"
+    )
 
 
 def _build_indicator_display_names(tb):

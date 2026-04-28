@@ -571,12 +571,10 @@ def harmonize_countries(
         show_full_warning=show_full_warning,
     )
 
-    # Put back metadata and add processing log.
+    # Put back metadata.
     if isinstance(df_harmonized, Table):
         country_harmonized = Variable(
             country_harmonized, name=country_col, metadata=df_harmonized[country_col].metadata
-        ).update_log(
-            operation="harmonize",
         )
 
     df_harmonized[country_col] = country_harmonized

@@ -1,6 +1,8 @@
 ---
 name: update-dataset
 description: End-to-end dataset update workflow with PR creation, snapshot, meadow, garden, and grapher steps. Use when user wants to update a dataset, refresh data, run ETL update, or mentions updating dataset versions.
+metadata:
+  internal: true
 ---
 
 # Update Dataset (PR → snapshot → steps → grapher)
@@ -29,11 +31,13 @@ Assumptions:
 - [ ] Meadow step: run + fix + diff + summarize
 - [ ] Garden step: run + fix + diff + summarize
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
+- [ ] Check metadata: typos, Jinja spacing, style guide compliance
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Pick 1–3 chart views for the public announcement
 - [ ] Draft Slack announcement, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
+- [ ] Ask the user whether to archive the old DAG entries; if yes, move them to `dag/archive/` AND relocate the new entries into the old slot (see "DAG archiving & reordering") — don't forget this step
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
@@ -94,6 +98,22 @@ When you do stop, present a concise summary of the issue and what options exist.
 6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
    - Skip diff
 
+6b) Metadata quality checks — run after all ETL steps are built
+   Run all three checks on the newly built garden and grapher datasets so every issue surfaces together. Each skill writes results to the terminal; fix what comes up before moving on.
+
+   - **Typos** — `/check-metadata-typos` scoped to the current step. Run on each of the new `.meta.yml` files (garden first, then grapher). Accept or skip each suggested fix.
+   - **Jinja spacing** — `/check-metadata-spacing` on the built garden and grapher datasets. Catches template artifacts like doubled spaces or stray newlines that only appear after Jinja rendering.
+   - **Style guide** — `/check-metadata-style` on the grapher step. Audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide. Rules live in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`, so no Notion access is needed — but if the guide looks out of date, refresh that file from Notion in a separate PR.
+
+   If any skill rewrites a `.meta.yml`, re-run the affected step so the built catalog reflects the edits. **Add `--grapher` when the affected step is on the grapher channel** — without it the local catalog is updated but staging stays stale, so the step 7 indicator upgrade sees the old text.
+   ```bash
+   # garden / meadow:
+   .venv/bin/etlr <channel>/<namespace>/<new_version>/<short_name> --private --force --only
+   # grapher:
+   .venv/bin/etlr grapher/<namespace>/<new_version>/<short_name> --grapher --private --force --only
+   ```
+   Then re-run the relevant check to confirm zero remaining violations.
+
 7) Indicator upgrade (optional, staging only)
    - First upload the new grapher dataset to the staging DB (required before the upgrader can detect it):
      ```bash
@@ -110,7 +130,7 @@ When you do stop, present a concise summary of the issue and what options exist.
      If the count is 0, the upgrade did not run — re-run it.
 
 8) Pick chart views for the public announcement
-   - Query the staging DB for all charts using the new dataset:
+   - Query the staging DB for **published** charts using the new dataset (filter on `c.publishedAt IS NOT NULL`). Draft/unlisted charts must not be counted in the announcement:
      ```sql
      SELECT c.id, cc.slug, cc.full->>'$.title' as title, cc.full->>'$.type' as type, cc.full->>'$.hasMapTab' as hasMapTab
      FROM charts c
@@ -118,8 +138,10 @@ When you do stop, present a concise summary of the issue and what options exist.
      JOIN chart_dimensions cd ON cd.chartId = c.id
      JOIN variables v ON cd.variableId = v.id
      WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'
+       AND c.publishedAt IS NOT NULL
      GROUP BY c.id
      ```
+   - The number reported in the Slack announcement's "How many charts did this update affect?" section must be this **published** count, not the total. It's fine to mention draft remaps separately in the PR description for completeness, but never in the Slack copy.
    - Pick 1–3 views using these criteria (in order of preference):
      - **Map views** — immediately visual, readers can find their own country
      - **Charts with punchy, standalone headlines** — titles that make a clear claim work best for social sharing
@@ -183,15 +205,17 @@ If downstream dependents exist:
 - **Tell the user** which datasets depend on the old version and need updating in a follow-up PR
 - **Add a "Downstream dependencies" section to the PR description** (not collapsed — this is important) listing the dependent datasets with a note that they should be updated to point to the new version in a follow-up PR
 
-## DAG archiving
+## DAG archiving & reordering
 
-After the ETL update, the old version's DAG entries (snapshot → meadow → garden → grapher) remain in the main DAG file but are no longer referenced by any active step. **Ask the user** if they want to move the old entries to the corresponding archive DAG file (e.g., `dag/archive/poverty_inequality.yml`).
+After the ETL update, `etl update` appends the new version entries to the **bottom** of the main DAG file while the old version's entries stay in their original slot. **Always ask the user** whether to archive — but never skip this checklist item, and when the user agrees, always do the reorder too (not just the archive).
 
-If the user agrees:
-1. Find the old version's entries in the main DAG file (e.g., `dag/poverty_inequality.yml`)
-2. Move them to the **bottom** of the corresponding archive file (`dag/archive/<same_file>.yml`)
-3. Include the original section comment (e.g., `# 1000 Binned Global Distribution (World Bank PIP)`) above the archived entries
-4. Verify no references to the old version remain in the main DAG (excluding the archive)
+Workflow when the user agrees:
+
+1. **Archive the old version.** Move its entries (snapshot → meadow → garden → grapher) from the main DAG file (e.g., `dag/poverty_inequality.yml`) to the **bottom** of the corresponding archive file (`dag/archive/<same_file>.yml`). Include the original section comment (e.g., `# 1000 Binned Global Distribution (World Bank PIP)`) above the archived entries.
+2. **Move the new entries into the old slot** so the dataset stays grouped with its neighbours and section comment. The new entries should not remain at the bottom of the main DAG.
+3. Preserve the original section comment (same indentation as the old block) above the new entries.
+4. Verify: `rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"` returns nothing, and `rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml"` shows the entries only in the main file (under the section comment), not at the bottom.
+5. Run `make check` and commit with `🔨🤖 Archive old <name> entries and reorder DAG`.
 
 ## Guardrails and tips
 

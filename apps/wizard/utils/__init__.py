@@ -37,7 +37,6 @@ from apps.wizard.utils.step_form import StepForm
 from etl.config import OWID_ENV, SENTRY_DSN, enable_sentry
 from etl.dag_helpers import load_dag
 from etl.db import read_sql
-from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
 from etl.paths import (
     APPS_DIR,
@@ -136,17 +135,6 @@ def get_namespaces(step_type: str) -> list[str]:
             raise ValueError(f"Step {step_type} not in ['meadow', 'garden', 'grapher'].")
     namespaces = sorted(set(folder.name for folder in folders))
     return namespaces
-
-
-def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
-    with open(dag_path) as f:
-        doc = ruamel_load(f)
-
-    doc["steps"].pop(step, None)
-
-    with open(dag_path, "w") as f:
-        # Add new step to DAG
-        f.write(ruamel_dump(doc))
 
 
 class classproperty(property):

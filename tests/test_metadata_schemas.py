@@ -145,6 +145,13 @@ def test_dataset_schemas():
                 if "$schema" in ind.get("presentation", {}).get("grapher_config", {}):
                     del ind["presentation"]["grapher_config"]
 
+                # Ignore display fields containing Jinja templates (validated after rendering)
+                display = ind.get("display", {})
+                if display:
+                    for key in list(display.keys()):
+                        if isinstance(display[key], str) and "<%" in display[key]:
+                            del display[key]
+
         # Validate the loaded data against the schema
         try:
             validator.validate(data)
