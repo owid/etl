@@ -2,15 +2,16 @@ meta:
   origin:
     producer: Wikipedia
     title: Flight distance record
-    description: A compilation of flight distance records, including references to the individual sources for each record.
-    description_snapshot: Only non-commercial powered aircraft are included in this dataset, which contains only those flights taken without mid-flight refueling. Where more than one record was set in any given year, only the highest of the given year has been included.
-    citation_full: '"Flight distance record" on Wikipedia. Accessed 2017-11-07. https://en.wikipedia.org/wiki/Flight_distance_record.'
+    description: |-
+      This data is sourced from the compilation of flight distance records on Wikipedia. References to the individual sources for each record can be found at the linked page.
+
+      Only non-commercial powered aircraft are included in this dataset, which contains only those flights taken without mid-flight refueling.
+
+      Where more than one record was set in any given year, only the highest of the given year has been included.
+    citation_full: 'Wikipedia, "Flight distance record". Available at: https://en.wikipedia.org/wiki/Flight_distance_record (2017).'
     url_main: https://en.wikipedia.org/wiki/Flight_distance_record
     date_accessed: '2017-11-07'
     date_published: '2017'
-    license:
-      name: Creative Commons Attribution-ShareAlike 4.0 International
-      url: https://creativecommons.org/licenses/by-sa/4.0/
 outs:
   - md5: d8188b2d402b7b072ec9368c3eb3b55b
     size: 3282

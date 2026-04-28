@@ -2,12 +2,12 @@ meta:
   origin:
     producer: Fenner et al.
     title: Smallpox and its Eradication
-    description_snapshot: |-
-      The only data not taken from the maps but from the text are the data for Canada, USA, Australia, and New Zealand. For Canada the authors reported that "endemic smallpox was eliminated by 1944"; for the USA only that it was eliminated "the latter half of the 1940s" (1948 was chosen for the visualization). Dates for the last outbreaks of smallpox in Australia (1917) and New Zealand (1914) are reported in the text — in both countries smallpox has always been rare.
+    description: |-
+      This dataset records the year of smallpox eradication by country, drawn primarily from the maps in Chapter 8 of Smallpox and its Eradication (Fenner et al., 1988), published by the World Health Organization.
 
-      The dates for Madagascar and Namibia are not exactly known — the authors only report that smallpox was eradicated in Madagascar before 1918 and for Namibia before 1955 (so these years were chosen for eradication).
+      The only data not taken from the maps but from the text are the data for Canada, USA, Australia, and New Zealand: for Canada the authors reported that "endemic smallpox was eliminated by 1944"; for the USA only that it was eliminated "the latter half of the 1940s" (1948 was chosen for the visualization). Dates for the last outbreaks of smallpox in Australia (1917) and New Zealand (1914) are reported in the text — in both countries smallpox has always been rare.
 
-      Countries are shown in their current borders — successor countries of Yugoslavia, the USSR, and the Sudan are assigned the eradication date of these states: 1925 for Yugoslavia, 1936 for the USSR, and 1972 for the Sudan.
+      The dates for Madagascar and Namibia are not exactly known — the authors only report that smallpox was eradicated in Madagascar before 1918 and for Namibia before 1955 (so these years were chosen for eradication). Countries are shown in their current borders — successor countries of Yugoslavia, the USSR, and Sudan are assigned the eradication date of these states: 1925 for Yugoslavia, 1936 for the USSR, and 1972 for Sudan.
     citation_full: Fenner, F., Henderson, D. A., Arita, I., Jezek, Z., and Ladnyi, I. D. (1988). Smallpox and its Eradication. World Health Organization (WHO).
     url_main: http://whqlibdoc.who.int/smallpox/9241561106.pdf
     date_accessed: '2017-09-11'

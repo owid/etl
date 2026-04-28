@@ -1,13 +1,12 @@
 meta:
   origin:
     producer: UNICEF
-    title: UNICEF Global Databases — Sexual Violence
-    description: |-
-      UNICEF's Global Databases compile internationally comparable indicators on the situation of children and women, drawn from nationally representative household surveys, civil registration systems, and other administrative sources. The Sexual Violence collection covers prevalence and characteristics of sexual violence against children.
-    description_snapshot: |-
-      The source notes that in some instances observations differ from the standard definition or refer to only part of a country.
-    citation_full: UNICEF (2017). Global Databases — Sexual Violence. Data and Analytics Section, Division of Data, Research and Policy. New York.
-    attribution_short: UNICEF
+    title: UNICEF Global Databases
+    description: UNICEF Global Databases compile country-level statistics on key indicators related to child well-being and protection, collected and maintained by UNICEF's Data and Analytics Section, Division of Data, Research and Policy.
+    title_snapshot: Global Databases - Sexual violence
+    description_snapshot: In some instances observations differ from the standard definition or refer to only part of a country.
+    citation_full: 'UNICEF, Data and Analytics Section, Division of Data, Research and Policy. UNICEF Global Databases: Sexual violence. 2017.'
+    version_producer: '2017'
     url_main: https://data.unicef.org/topic/child-protection/violence/sexual-violence/
     date_accessed: '2017-11-28'
     date_published: '2017'

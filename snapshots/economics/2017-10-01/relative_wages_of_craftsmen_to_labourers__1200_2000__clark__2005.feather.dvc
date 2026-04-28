@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Clark
     title: The Condition of the Working Class in England, 1209–2004
-    description_snapshot: Data taken from Table A2.
+    description: Data taken from Table A2.
     citation_full: Clark, G. (2005). The Condition of the Working Class in England, 1209–2004. Journal of Political Economy, Vol. 113, No. 6, pp. 1307–1340.
     url_main: http://www.journals.uchicago.edu/doi/abs/10.1086/498123
     date_accessed: '2017-10-01'

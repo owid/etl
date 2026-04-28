@@ -1,9 +1,9 @@
 meta:
   origin:
     producer: Fenner et al.
-    title: Smallpox and Its Eradication
-    description_snapshot: Data on smallpox cases (as originally reported and as subsequently revised) is taken from page 477 of the volume.
-    citation_full: 'Fenner, F., Henderson, D., Arita, I., Jezek, Z., and Ladnyi, I. (1988). Smallpox and Its Eradication. Geneva: World Health Organization.'
+    title: Smallpox and its eradication
+    title_snapshot: Smallpox and its eradication - Smallpox cases reported and revised
+    citation_full: 'Page 477 of Fenner, F., Henderson, D., Arita, I., Jezek, Z., and Ladnyi, I. (1988). Smallpox and its eradication. Geneva: World Health Organization.'
     url_main: http://apps.who.int/iris/bitstream/10665/39485/1/9241561106.pdf
     date_accessed: '2018-05-13'
     date_published: '1988'
