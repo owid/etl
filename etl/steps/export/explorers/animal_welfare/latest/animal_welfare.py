@@ -265,13 +265,13 @@ def run() -> None:
                     {
                         "catalogPath": "eggs_and_hens_statistics#number_of_hens_in_cages",
                         "display": {
-                            "tolerance": 10,
+                            "tolerance": 5,
                         },
                     },
                     {
                         "catalogPath": "eggs_and_hens_statistics#number_of_hens_cage_free",
                         "display": {
-                            "tolerance": 10,
+                            "tolerance": 5,
                         },
                     },
                 ]
@@ -281,8 +281,8 @@ def run() -> None:
                 "note": "Data may refer to different years for each country, due to limited data availability.",
                 "hasMapTab": False,
                 "type": "StackedDiscreteBar",
-                # TODO: How can I add the Settings button, to allow for relative?
-                # "stackMode": "absolute",
+                "stackMode": "absolute",
+                "hideRelativeToggle": False,
             },
         }
     )
