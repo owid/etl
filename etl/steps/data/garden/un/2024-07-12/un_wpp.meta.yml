@@ -557,11 +557,11 @@ tables:
               <%- set young = 'boys' %><%- set adult = 'men' %><%- set old = 'men' %>
               <%- endif %>
               <%- if age == "total" %>
-              Number of << young >> aged 0–14 and<% if sex != 'all' %> << old >> aged<% endif %> 65+ per 100 << adult >> aged 15–64.
+              Number of << young >> aged 0-14 and<% if sex != 'all' %> << old >> aged<% endif %> 65+ per 100 << adult >> aged 15-64.
               <%- elif age == "youth" %>
-              Number of << young >> aged 0–14 per 100 << adult >> aged 15–64.
+              Number of << young >> aged 0-14 per 100 << adult >> aged 15-64.
               <%- else %>
-              Number of << old >> aged 65+ per 100 << adult >> aged 15–64.
+              Number of << old >> aged 65+ per 100 << adult >> aged 15-64.
               <%- endif %> {definitions.global.projections}
 
   mortality_rate:
