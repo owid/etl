@@ -2,8 +2,7 @@ meta:
   origin:
     producer: Airbus
     title: Global Market Forecast
-    title_snapshot: Global Market Forecast - Air travel trips per capita
-    citation_full: Airbus (2019). Global Market Forecast, 2019–2038.
+    citation_full: 'Airbus (2019). Global Market Forecast, 2019-2018.'
     version_producer: '2019'
     url_main: https://www.airbus.com/aircraft/market/global-market-forecast.html
     date_accessed: '2020-10-05'
