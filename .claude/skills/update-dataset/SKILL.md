@@ -161,11 +161,33 @@ When you do stop, present a concise summary of the issue and what options exist.
    Do this **before** step 6b (metadata checks) so any re-runs triggered by comment-removal happen before the metadata sweep, not after.
 
 6b) Metadata quality checks — run after all ETL steps are built
-   Run all three checks on the newly built garden and grapher datasets so every issue surfaces together. Each skill writes results to the terminal; fix what comes up before moving on.
+   Run all four checks on the newly built garden and grapher datasets so every issue surfaces together. Each skill writes results to the terminal; fix what comes up before moving on.
 
    - **Typos** — `/check-metadata-typos` scoped to the current step. Run on each of the new `.meta.yml` files (garden first, then grapher). Accept or skip each suggested fix.
    - **Jinja spacing** — `/check-metadata-spacing` on the built garden and grapher datasets. Catches template artifacts like doubled spaces or stray newlines that only appear after Jinja rendering.
    - **Style guide** — `/check-metadata-style` on the grapher step. Audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide. Rules live in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`, so no Notion access is needed — but if the guide looks out of date, refresh that file from Notion in a separate PR.
+   - **Clarity for a general audience** — read every user-facing field with non-specialist eyes. The other three skills enforce structure and style; this one judges whether the text is *understandable*.
+
+   ### Clarity checklist (do manually, no skill yet)
+
+   OWID readers are not domain experts. Walk each indicator's user-facing fields and flag anything that requires inside knowledge to parse.
+
+   | Field | Clarity check |
+   |---|---|
+   | `title` / `presentation.title_public` | A non-specialist should know what the indicator measures from the title alone. Expand acronyms unless universally known (skip GDP; expand GWIS, MFI, SDG, IHME). Don't cram units into the title. |
+   | `description_short` | One or two short sentences: what the metric is and what it covers. No jargon without a gloss. Active voice. The chart subtitle is short by design — no run-on or stacked clauses. |
+   | `description_key` | Each bullet should land a distinct, useful fact. Skip filler ("this dataset is widely used"); prefer substantive caveats (coverage gaps, methodology limits, what counts/doesn't count). |
+   | `display.name` | Short legend label. Reads naturally on a chart axis/legend; doesn't restate the title. |
+   | `presentation.grapher_config.note` | Concise footnote, ≤1 sentence ideally. |
+
+   Flag and rewrite when you find:
+   - Acronyms or technical terms that aren't expanded the first time they appear
+   - Sentences that only make sense if you already know the data source
+   - Quantitative claims with no unit context (e.g. "burned area" without "in hectares" surfacing somewhere in the user-facing text)
+   - Inconsistent terminology between indicators in the same dataset (e.g. "wildfires" in one, "vegetation fires" in another)
+   - Domain phrases that have a plain-English equivalent (e.g. "anthropogenic emissions" → "human-caused emissions")
+
+   When a phrasing is ambiguous, propose a concrete rewrite — don't just flag it.
 
    If any skill rewrites a `.meta.yml`, re-run the affected step so the built catalog reflects the edits. **Add `--grapher` when the affected step is on the grapher channel** — without it the local catalog is updated but staging stays stale, so the step 7 indicator upgrade sees the old text.
    ```bash
