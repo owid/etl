@@ -21,13 +21,6 @@ COLUMNS = {
     "organic": "share_of_hens_free_range_organic",
     "total_layers": "number_of_laying_hens",
     "unknown": "share_of_hens_in_unknown_housing",
-    # The following columns were initially used to extract sources and urls, and to then add them to the source
-    # metadata. However, in the end, there were too many fixes, and we manually corrected them in the snapshot metadata.
-    # Afterwards, they will be removed.
-    # "available_at": "available_at",
-    # "source": "source",
-    # "click_placements" : "click_placements",
-    # "number_of_records": "number_of_records",
 }
 
 
@@ -44,7 +37,7 @@ def clean_values(tb: Table) -> Table:
 def run_sanity_checks_on_outputs(tb: Table) -> None:
     assert all([tb[column].min() >= 0 for column in tb.columns]), "All numbers should be >0"
     assert all([tb[column].max() <= 100 for column in tb.columns if "share" in column]), "Percentages should be <100"
-    # Check that the percentages of the different laying hens housings add up to 100%.
+    # Check that the percentages of the different laying hen housings add up to 100%.
     # Note: The share of brown hens is not related to all other shares about housing systems.
     assert (
         tb[
@@ -53,7 +46,6 @@ def run_sanity_checks_on_outputs(tb: Table) -> None:
                 "share_of_hens_free_range_organic",
                 "share_of_hens_in_barns",
                 "share_of_hens_in_cages",
-                "share_of_hens_in_unknown_housing",
             ]
         ].sum(axis=1)
         < 101
@@ -79,6 +71,16 @@ def run() -> None:
 
     # Clean data (remove spurious "%" in the data).
     tb = clean_values(tb=tb)
+
+    # When the WFI compilation has no real housing breakdown for a country-year, it codes the
+    # entire row as 100% "unknown housing". These rows carry no useful information, so drop them
+    # along with the now-pointless unknown column. Assert the all-or-nothing pattern first.
+    nonzero_unknown = tb[tb["share_of_hens_in_unknown_housing"] > 0]
+    assert (nonzero_unknown["share_of_hens_in_unknown_housing"] == 100).all(), (
+        "Expected any non-zero share_of_hens_in_unknown_housing to be exactly 100%."
+    )
+    tb = tb[tb["share_of_hens_in_unknown_housing"] != 100].copy()
+    tb = tb.drop(columns=["share_of_hens_in_unknown_housing"])
 
     # Improve table format.
     tb = tb.format()

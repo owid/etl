@@ -278,6 +278,7 @@ def run() -> None:
             },
             "config": {
                 "title": "Number of laying hens in cages and cage-free housing",
+                "note": "Data may refer to different years for each country, due to limited data availability.",
                 "hasMapTab": False,
                 "type": "StackedDiscreteBar",
                 # TODO: How can I add the Settings button, to allow for relative?

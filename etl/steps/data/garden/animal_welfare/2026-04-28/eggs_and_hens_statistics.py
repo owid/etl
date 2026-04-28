@@ -3,13 +3,16 @@
 Modern time series:
   - UK: derived from Defra egg-throughput statistics, used as a proxy for hen housing shares.
         UK rows also carry absolute egg counts and estimated hen counts by housing type.
-  - US: derived from USDA flock sizes (caged vs cage-free).
+  - US: derived from USDA flock sizes (caged, barn/aviary, free-range, pastured, organic) — full
+        granular breakdown available from 2012 onwards; binary cage / cage-free only for 2007-2011.
   - EU member states: derived from European Commission flock data (cages, barn, free-range, organic).
 
 Single-year (~2019) values for ~75 additional countries come from the Welfare Footprint Institute
 (formerly the Welfare Footprint Project) global hen inventory compilation.
 
-For overlapping (country, year) pairs the modern time series take precedence over the WFI compilation.
+For overlapping (country, year) pairs, modern time series values take precedence column-by-column.
+Where a modern source lacks a granular column (e.g. US in 2007-2011), the WFI value falls through
+when WFI has data for that country-year.
 """
 
 import owid.catalog.processing as pr
@@ -19,6 +22,12 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
+GRANULAR_COLUMNS = [
+    "share_of_hens_in_barns",
+    "share_of_hens_free_range_not_organic",
+    "share_of_hens_free_range_organic",
+]
+
 CORE_COLUMNS = [
     "country",
     "year",
@@ -26,7 +35,7 @@ CORE_COLUMNS = [
     "share_of_hens_cage_free",
     "number_of_hens_in_cages",
     "number_of_hens_cage_free",
-]
+] + GRANULAR_COLUMNS
 
 UK_EXTRA_COLUMNS = [
     "number_of_eggs_from_enriched_cages",
@@ -41,9 +50,10 @@ UK_EXTRA_COLUMNS = [
 
 
 def _set_share_units(tb: Table) -> Table:
-    for col in ["share_of_hens_in_cages", "share_of_hens_cage_free"]:
-        tb[col].metadata.unit = "%"
-        tb[col].metadata.short_unit = "%"
+    for col in ["share_of_hens_in_cages", "share_of_hens_cage_free"] + GRANULAR_COLUMNS:
+        if col in tb.columns:
+            tb[col].metadata.unit = "%"
+            tb[col].metadata.short_unit = "%"
     return tb
 
 
@@ -53,20 +63,42 @@ def prepare_uk_data(tb: Table) -> Table:
     Also keeps the original absolute egg and hen counts by housing type (UK-only columns).
     """
     tb = tb.copy()
-    tb["share_of_hens_in_cages"] = 100 * tb["number_of_eggs_from_enriched_cages"] / tb["number_of_eggs_all"]
+    total = tb["number_of_eggs_all"]
+    tb["share_of_hens_in_cages"] = 100 * tb["number_of_eggs_from_enriched_cages"] / total
+    tb["share_of_hens_in_barns"] = 100 * tb["number_of_eggs_from_barns"] / total
+    tb["share_of_hens_free_range_not_organic"] = 100 * tb["number_of_eggs_from_non_organic_free_range_farms"] / total
+    tb["share_of_hens_free_range_organic"] = 100 * tb["number_of_eggs_from_organic_free_range_farms"] / total
     tb["share_of_hens_cage_free"] = 100 - tb["share_of_hens_in_cages"]
     tb = _set_share_units(tb)
     return tb[CORE_COLUMNS + UK_EXTRA_COLUMNS]
 
 
 def prepare_us_data(tb: Table) -> Table:
-    """US: compute hen-housing shares directly from USDA flock sizes."""
+    """US: compute hen-housing shares from USDA flock sizes.
+
+    USDA reports a full breakdown by housing system from 2012 onwards. We map the USDA categories
+    onto the shared schema as follows:
+      - cages = caged
+      - barn = non_organic_barn_aviary
+      - free-range non-organic = non_organic_free_range + non_organic_pastured
+      - free-range organic = organic_cage_free (all organic, since USDA aggregates barn/free-range/pastured organic)
+
+    For 2007-2011, USDA only reports binary cage vs cage-free, so granular columns are left as NA
+    and fall through to WFI where available.
+    """
     tb = tb.copy()
     tb["number_of_hens_in_cages"] = tb["caged"]
     tb["number_of_hens_cage_free"] = tb["cage_free"]
     total_hens = tb["number_of_hens_in_cages"] + tb["number_of_hens_cage_free"]
-    tb["share_of_hens_cage_free"] = 100 * tb["number_of_hens_cage_free"] / total_hens
-    tb["share_of_hens_in_cages"] = 100 - tb["share_of_hens_cage_free"]
+
+    tb["share_of_hens_in_cages"] = 100 * tb["number_of_hens_in_cages"] / total_hens
+    tb["share_of_hens_cage_free"] = 100 - tb["share_of_hens_in_cages"]
+    tb["share_of_hens_in_barns"] = 100 * tb["non_organic_barn_aviary"] / total_hens
+    tb["share_of_hens_free_range_not_organic"] = (
+        100 * (tb["non_organic_free_range"] + tb["non_organic_pastured"]) / total_hens
+    )
+    tb["share_of_hens_free_range_organic"] = 100 * tb["organic_cage_free"] / total_hens
+
     tb = _set_share_units(tb)
     return tb[CORE_COLUMNS]
 
@@ -81,16 +113,15 @@ def prepare_eu_data(tb: Table) -> Table:
     tb["number_of_hens_cage_free"] = tb["barn"] + tb["free_range"] + tb["organic"]
     tb["share_of_hens_cage_free"] = 100 * tb["number_of_hens_cage_free"] / tb["total"]
     tb["share_of_hens_in_cages"] = 100 - tb["share_of_hens_cage_free"]
+    tb["share_of_hens_in_barns"] = 100 * tb["barn"] / tb["total"]
+    tb["share_of_hens_free_range_not_organic"] = 100 * tb["free_range"] / tb["total"]
+    tb["share_of_hens_free_range_organic"] = 100 * tb["organic"] / tb["total"]
     tb = _set_share_units(tb)
     return tb[CORE_COLUMNS]
 
 
 def prepare_wfi_data(tb: Table) -> Table:
-    """Welfare Footprint Institute: compute the cage-free share from the housing breakdown.
-
-    Sum barn + non-organic free-range + organic free-range, instead of using `100 - cages`,
-    so that the "unknown housing" share is not implicitly counted as cage-free.
-    """
+    """Welfare Footprint Institute: compute the cage-free share from the granular breakdown."""
     tb = tb.copy()
     tb["share_of_hens_cage_free"] = (
         tb["share_of_hens_in_barns"]
@@ -125,9 +156,11 @@ def run() -> None:
     tb_eu = prepare_eu_data(tb_eu)
     tb_wfi = prepare_wfi_data(tb_wfi)
 
-    # Combine sources, preferring modern time series for overlapping (country, year) pairs.
+    # Combine sources, taking the first non-null value per column for each (country, year).
+    # Source priority is UK -> US -> EU -> WFI: modern time series win on shared columns,
+    # while WFI fills in granular breakdowns where modern sources don't provide them.
     tb = pr.concat([tb_uk, tb_us, tb_eu, tb_wfi], ignore_index=True, short_name=paths.short_name)
-    tb = tb.drop_duplicates(subset=["country", "year"], keep="first")
+    tb = tb.groupby(["country", "year"], as_index=False, observed=True).first()
 
     # Improve table format.
     tb = tb.format()

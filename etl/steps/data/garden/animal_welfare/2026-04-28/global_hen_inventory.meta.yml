@@ -68,9 +68,3 @@ tables:
         short_unit: ''
         display:
           numDecimalPlaces: 0
-      share_of_hens_in_unknown_housing:
-        title: Share of laying hens in unknown housing
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 1
