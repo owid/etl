@@ -1,7 +1,11 @@
 # NOTE: To learn more about the fields, hover over their names.
+dataset:
+  update_period_days: 365
+
 definitions:
   common:
     presentation:
+      attribution_short: GWIS
       topic_tags:
         - Climate Change
         - Wildfires

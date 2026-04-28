@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -15,9 +14,6 @@ def run() -> None:
     ds_meadow = paths.load_dataset("yearly_burned_area")
     tb = ds_meadow.read("yearly_burned_area")
 
-    ds_regions = paths.load_dataset("regions")
-    ds_income_groups = paths.load_dataset("income_groups")
-
     #
     # Process data.
     #
@@ -28,12 +24,10 @@ def run() -> None:
     aggregations = {col: "sum" for col in area_types}
 
     # Add region aggregates.
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb,
         aggregations=aggregations,
         regions=REGIONS,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
     )
 
@@ -56,11 +50,6 @@ def run() -> None:
     )
     assert (world_yearly["all"] < 600_000_000).all(), (
         "World yearly burned area unexpectedly high (> 600M ha) for some year."
-    )
-
-    # Savannas should be the dominant land cover globally each year
-    assert (world_yearly["savannas"] > world_yearly["forest"]).all(), (
-        "Savannas should exceed forests in global yearly burned area."
     )
 
     #

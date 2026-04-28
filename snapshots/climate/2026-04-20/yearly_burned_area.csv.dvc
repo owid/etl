@@ -10,7 +10,7 @@ meta:
       Data is fetched via the GWIS country profile API (cprof.effis.emergency.copernicus.eu).
       Note: the API contains more recent data than the bulk download ZIP on the downloads page,
       which currently has all-zero values for 2024.
-    date_published: "2024"
+    date_published: "2026"
 
     # Citation
     producer: Global Wildfire Information System

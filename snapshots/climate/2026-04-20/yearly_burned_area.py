@@ -39,9 +39,7 @@ def get_countries() -> list:
 def get_banf(iso3: str) -> dict | None:
     url = f"{BASE_URL}/banf?level=ADM0&value={iso3}&year={YEAR_TO}&yearFrom={YEAR_FROM}&yearTo={YEAR_TO}&env=PROD"
     r = requests.get(url, timeout=30)
-    if r.status_code != 200:
-        log.warning(f"Unexpected status for {iso3}", status_code=r.status_code)
-        return None
+    r.raise_for_status()
     return r.json()
 
 
@@ -55,7 +53,7 @@ def fetch_all() -> pd.DataFrame:
         name = c["name"]
         log.info(f"Fetching {name}", iso3=iso3, progress=f"{i + 1}/{len(countries)}")
         data = get_banf(iso3)
-        if data:
+        if data and data.get("banfyear"):
             for entry in data.get("banfyear", []):
                 row = {"iso3": iso3, "country": name, "year": entry.get("year")}
                 for lc, col_name in zip(LC_COLS, LC_NAMES):
@@ -79,7 +77,3 @@ def main(upload: bool) -> None:
         snap.create_snapshot(filename=str(tmp_path), upload=upload)
 
     log.info("Snapshot complete", n_rows=len(df))
-
-
-if __name__ == "__main__":
-    main()
