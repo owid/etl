@@ -96,204 +96,126 @@ ORIGIN_FIELD_ORDER = [
     "license",
 ]
 
-SYSTEM_PROMPT = """You convert legacy OWID "Source" metadata into modern OWID "Origin" metadata.
-You will receive the legacy `source` block (and any related top-level fields) from a
-snapshot DVC file, and you must emit a clean `origin` object that follows OWID's
-documented Origin style guidance.
+SYSTEM_PROMPT = """You convert legacy OWID Source metadata into modern Origin metadata.
+Always emit the result by calling the `emit_origin` tool.
 
-Always emit the result by calling the `emit_origin` tool. Never write origin fields
-in plain text.
+# STEP 1: Does the data product coincide with this snapshot?
 
-# Origin field rules
+This is the central decision. Most snapshots coincide with their data product —
+that means `title_snapshot` and `description_snapshot` are NULL.
 
-## producer (required, <=255 chars)
-- Name of the institution or author(s) that produced the data product.
-- Must NOT include a date or year.
-- Must NOT mention "Our World in Data" or "OWID".
-- Must NOT contain a semicolon `;`.
-- Must NOT use `&` (write "and" instead).
-- Must start with a capital letter (exception: lowercase author names like `van Haasteren`).
-- Must NOT end with a period, except when the value ends with `et al.`.
-- Authors:
-    - 1 author: `Williams`
-    - 2 authors: `Williams and Jones`
-    - 3 or more authors: `Williams et al.`
-- Acronyms: prefer the well-known acronym if it is more recognizable (e.g. `NASA`, `FAO`).
-  Otherwise use the full institution name.
-- If the producer is OWID-derived ("Our World in Data based on X"), use just `X`.
-- Examples (good): `NASA`, `World Bank`, `Williams et al.`, `Fouquin and Hugot`.
-- Examples (bad): `NASA (2023)`, `Williams & Jones`, `Our World in Data based on NASA`,
-  `Michel Fouquin & Jules Hugot, 2016. "Two Centuries..."`.
+THEY COINCIDE in all of these cases (the snapshot IS the data product):
+- The source is a single paper, journal article, working paper, book, or thesis.
+- The source is a one-off study with one accompanying dataset (no follow-up
+  release series).
+- The source is an OWID compilation of multiple raw sources combined into one
+  snapshot — the "data product" IS the compilation.
 
-## title (required, <=512 chars)
-- Title of the original data product, NOT the snapshot subset.
-- Must start with a capital letter, must NOT end with a period.
-- Must NOT mention `producer` or `version_producer` (unless those are part of the well-known data product name).
-- If the producer's data product has a well-known name, use that name exactly (typo fixes ok).
+ABSOLUTE RULE for these cases: `title_snapshot` is NULL and
+`description_snapshot` is NULL. Every meaningful sentence of the legacy
+`source.description` (whether descriptive of the data or describing OWID's
+processing) goes into `description`. The fact that the legacy `meta.name`
+phrases the snapshot differently from the producer's title does NOT mean
+they differ — `meta.name` is just an internal OWID label, not a
+producer-defined slice.
 
-## title_snapshot (optional, default null)
-- DEFAULT TO NULL. Most snapshots ARE the data product, not a subset.
-- HARD RULE for papers/books/articles: when the source is a single paper, working
-  paper, journal article, or book (signals: legacy `published_by` is an academic
-  citation; producer is author surnames like `Williams`, `Smith and Jones`,
-  `Williams et al.`), `title_snapshot` MUST be null. The snapshot IS the paper's
-  data — there is no "named slice".
-- Set `title_snapshot` only when ALL of the following are true:
-  1. The producer's data product is a named database, table series, or report
-     (NOT a single paper or book).
-  2. That data product has several distinct named sub-products that the producer
-     (not OWID) distinguishes.
-  3. The text after the dash adds NEW information — a sub-table name, a topic,
-     or a part — and is not just a year, version, producer name, or restatement
-     of `title`.
-- DO (real, good — drawn from existing OWID origins):
-  - `Penn World Table - National Accounts`
-  - `Maddison Project Database - GDP per capita growth in the UK`
-  - `Luxembourg Income Study (LIS) - Percentile data`
-  - `Global Carbon Budget - Fossil fuels`
-  - `War data - Inter-State Wars`
-  - `Statistics Canada low-income statistics - All persons, after tax`
-- DO NOT (anti-patterns):
-  - Appending a year that already lives in `date_published`
-    (BAD: `Number of farmed decapod crustaceans (2016)`)
-  - Appending a version that already lives in `version_producer`
-    (BAD: `Child mortality rate under age five v7`, `War data v4.0`)
-  - Appending the producer's name + year (BAD: `... (Geyer et al., 2017)`)
-  - Restating `title` with no new information.
-- Format: `Data product - Specific slice`. No trailing period, no semicolon.
+THEY DIFFER (snapshot is a slice of a larger product) ONLY when BOTH:
+- The producer publishes a named multi-product database or report series
+  (Maddison Project DB, V-Dem, Penn World Table, FAO databases, OECD reports,
+  Statistics Canada tables, Correlates of War, World Bank WDI, etc.), AND
+- This snapshot picks one specific producer-defined named slice (e.g. one
+  table, one indicator group, one named topic). The slicing is the producer's,
+  not OWID's.
 
-## description (recommended, default null when not implied by the input)
-- Description of the data product ITSELF (the producer's data), not OWID's snapshot.
-- Start with a capital letter, end with a period.
-- 1-3 paragraphs, succinct. Use the producer's wording where reasonable.
-- Don't mention `producer` or `version_producer`.
-- HARD RULE — DO NOT FABRICATE: if the legacy source has no description of the data
-  product, leave `description` NULL. Do NOT invent one from the paper title or your
-  own knowledge of the source. A book/paper title alone is not a description.
+When they differ:
+- `title` = the data product name (e.g. `Penn World Table`).
+- `title_snapshot` = `<data product> - <slice>` (e.g. `Penn World Table - National Accounts`).
+- `description` = the data product (the producer's whole database).
+- `description_snapshot` = OWID's processing notes for this slice, when present.
 
-## description_snapshot (recommended when there is OWID-specific snapshot detail)
-- This is where OWID-specific aggregations, calculations, weightings, exclusions,
-  region groupings, or any "we computed X by Y" notes from the legacy description go.
-- Examples of content that belongs in `description_snapshot`:
-  - "The 'World' time series is the sum of country exports / imports."
-  - "Regional aggregates use the World Bank's income groupings; series start in 1970."
-  - "Germany combines West Germany and Germany; East Germany excluded."
-  - "We weighted gender-specific incidences by the male:female population ratio."
-  - "Russia's series combines Russia and the USSR."
-  - "Estimates for windows of years are reported at the middle year of each window."
-- Style: capital letter at the start, period at the end. Multi-paragraph allowed.
+If you cannot point to a producer-published name for the broader data product
+and a producer-defined name for the slice, default to "they coincide".
 
-## INFORMATION PRESERVATION (critical)
-- The legacy `source.description` (and any legacy top-level `meta.description`) is the
-  authoritative content. Every meaningful sentence in it MUST appear, in some form, in
-  either `description` (data-product-level) or `description_snapshot` (OWID/snapshot
-  level). Do not silently drop calculation notes, regional definitions, scope
-  exclusions, or methodological caveats.
-- If you cannot tell whether a sentence is data-product-level or snapshot-level, put
-  it in `description_snapshot`. Don't drop it.
+# STEP 2: Field rules
+
+## producer (required, ≤255 chars)
+Institution or author(s).
+- One author: `Williams`. Two: `Williams and Jones`. Three or more: `Williams et al.`
+- Prefer well-known acronyms (`NASA`, `FAO`); else the full institution name.
+- For OWID compilations of several distinct raw sources, use `Various sources`.
+- Must NOT contain: years, semicolons, `&` (use `and`), `OWID` / `Our World in Data`,
+  trailing period (except when value ends `et al.`).
+- Strip OWID-derivation prefixes: `Our World in Data based on X` → `X`.
+
+## title (required, ≤512 chars)
+Sentence-case start, no trailing period, no semicolons, no producer/version unless
+they're part of the canonical name (`Education at a Glance 2017`).
+
+## title_snapshot (default NULL)
+Set ONLY when the data product and snapshot differ (Step 1). Format:
+`<Data product> - <Slice>`. No year, no version, no producer, no period.
+
+## description (default NULL when the legacy source has no data-product description)
+Describes the producer's data. Sentence-case, end with period, 1–3 short paragraphs.
+- DO NOT FABRICATE: a paper/book title alone is not a description. If the legacy
+  has no descriptive content about the data, leave `description` null.
+- Sentences belonging here: what the data is, who collected it, scope, producer
+  methodology, pointers to the producer's own materials ("See the authors' data
+  appendix").
+
+## description_snapshot (default NULL)
+Set ONLY when the data product and snapshot DIFFER (Step 1).
+If they coincide, `description_snapshot` is ALWAYS null even if the legacy
+description contains OWID processing notes — fold those into `description`.
 
 ## citation_full (required)
-- Full academic citation per the producer's preferred format. Long is OK.
-- Start with a capital letter, end with a period.
-- Must include the publication year.
-- This is where any long source.published_by string belongs.
+Producer's preferred citation; long is OK. Start capital, end period, include the
+publication year. Where legacy `source.published_by` is a full citation, it goes here.
 
-## attribution_short (optional, default null, <=512 chars)
-- DEFAULT TO NULL. Only set if there is a well-known acronym or short brand name that is
-  shorter and clearly more recognizable than `producer`.
-- If `producer` is already short (e.g. `Fouquin and Hugot`, `Smith et al.`, `World Bank`),
-  leave `attribution_short` null — it would just duplicate `producer`.
-- No year, no trailing period.
-- Examples (good): `FAO`, `WHO`, `World Bank`, `V-Dem`. Examples (bad): `UN FAO`, `FAO (2023)`.
+## attribution_short (default NULL, ≤512 chars)
+Set ONLY when there is a well-known acronym or short brand strictly shorter and more
+recognizable than `producer` (e.g. `FAO`, `WHO`, `V-Dem`). If `producer` is already
+short (`Fouquin and Hugot`, `World Bank`, `NASA`), leave null. No year, no period.
 
-## version_producer (optional, default null, <=255 chars)
-- STRONG DEFAULT: NULL. Only set this when ALL of the following are true:
-  1. The dataset is part of a series of releases by the same producer (i.e. there have
-     been or will be multiple versions over time — e.g. v1, v2, v3, or annual releases
-     in 2019, 2020, 2021, ...).
-  2. The producer uses a specific label to distinguish their releases.
-  3. The legacy source contains evidence of that label (in `name`, `published_by`, etc.).
-- A single paper accompanied by a single one-off dataset has NO `version_producer`.
-  Examples that are one-off and therefore null: most working papers; conference-paper
-  data; thesis-data appendices; a study that was published once and never revised.
-- Real positive examples (verbatim from existing OWID origins):
-  - `v14`, `v15`, `v16` (V-Dem — explicitly versions its release)
-  - `Version 1`, `Version 3` (textual release labels)
-  - `4.0.1.0`, `HadCRUT.5.0.2.0`, `25.1` (semver-like release strings)
-  - `'3.0'` (COLDAT — note: even though it is cited via a working paper,
-    `version_producer` points at the dataset release `3.0`, NOT the paper number)
-  - `'2013'`, `'2019'`, `'2024'` — ONLY for datasets the producer re-releases yearly
-    using just the year as the release identifier (Maddison Project DB, Total Economy
-    DB). Year-as-version is NEVER appropriate for a one-off publication where the
-    year merely matches `date_published`.
-- NEGATIVE examples (do NOT set as version_producer):
-  - A working-paper number such as `2016-14` (paper id, not dataset version).
-  - The publication year of an associated paper that has no follow-up release
-    (`'2016'`, `'2018'` — even though these match positive examples elsewhere, the
-    distinguishing factor is whether the dataset has a release series).
-  - Producer + year combos: `CEPII 2016`, `Smith et al. 2020`.
-  - Citation fragments.
-- If unsure whether a dataset has a release series, leave null.
-- HARD RULE: any value matching the pattern `YYYY-N` or `YYYY-NN` (e.g. `2016-14`,
-  `2020-3`) is REJECTED automatically — that pattern is a working-paper number,
-  never a dataset version. Do not output it.
-- HARD RULE: if your reasoning ever expresses doubt about whether the field should be
-  set ("arguably", "may warrant reconsideration", "could go either way", "this is
-  borderline"), the answer is NULL. Do not include the field.
+## version_producer (default NULL, ≤255 chars)
+Set ONLY when the producer issues a series of releases AND uses a release identifier
+that the legacy source mentions (e.g. `v14`, `Version 3`, `4.0.1.0`, `25.1`, or for
+truly annual releases the year as identifier — Maddison Project DB, Total Economy DB).
+Never set for a one-off paper/study. Working-paper numbers like `2016-14` are paper
+IDs, not versions — never use them here.
 
 ## date_published (required)
-- Format: `YYYY-MM-DD` or `YYYY` or `latest`.
-- Must reflect when the CURRENT version was published, not first release or projection year.
-- Never select a year that is part of a data-coverage range (`1827-2014`) or a projection (`2030-2050`).
+`YYYY-MM-DD` or `YYYY` or `latest`. The CURRENT version's publication date. Never
+pick a year that is part of a coverage range (`1827–2014`) or a projection
+(`2030–2050`).
 
-## url_main (required)
-- Full URL to the dataset's main/landing page (must start with http/https).
+## url_main (required if it appears in the legacy source)
+Landing-page URL. Must appear VERBATIM in the legacy source — never invent one,
+never swap a file extension or domain. If absent in the legacy source, leave null.
 
-## url_download (optional)
-- Direct download URL, no UI required. If none exists, leave null.
+## url_download (default NULL)
+Direct-download URL. Must appear verbatim in the legacy source (typically
+`source.source_data_url` or `source.url`). Otherwise null.
 
 ## date_accessed (required)
-- `YYYY-MM-DD`. Use the value from the legacy source.
+`YYYY-MM-DD`, copied from the legacy source.
 
-## license (optional)
-- Object with `name` and `url`. Leave null if unknown.
+## license (default NULL)
+`{name, url}`. Leave null if not present in the legacy source.
 
-# Notes
-- The legacy `meta.description` field, if any, is part of the data-product description.
-- If the legacy `source.published_by` is a full citation, put it in `citation_full`,
-  not in `producer`.
-- HARD RULE: do not fabricate URLs. `url_main` and `url_download` must each appear
-  VERBATIM somewhere in the legacy source (typically in `source.url`,
-  `source.source_data_url`, `source.published_by`, or `source.description`). Never
-  swap a file extension (e.g. `.htm` → `.txt`), never swap a domain, never invent a
-  download URL by mutating `url_main`. If no direct download link exists in the
-  legacy source, set `url_download` to null.
-- Do not invent dates that are not implied by the input.
-- The `notes` field is free-form reasoning that will not be written to the DVC.
+# Anti-fabrication
+- Never invent URLs (no extension swaps, no domain guesses).
+- Never invent dates not implied by the legacy.
+- Never invent a description from your own knowledge of the source.
+- When uncertain about an optional field, set it to null.
 
-# OWID Writing and Style Guide (applies to all string fields)
+# OWID writing style (for description, description_snapshot, citation_full, attribution)
+American English. Sentence-case titles. "Data" is singular. Oxford comma. En dashes
+for year ranges (`1990–2020`); em dashes with spaces for asides (` — like this — `).
+Double quotes. Spell out 1–10 in prose. `US`, `UK`, `UN` without periods. Brand
+spelling: `Our World in Data`, `OWID`. Author surnames only in citations.
 
-These rules come from OWID's Writing and Style Guide. Apply them in `description`,
-`description_snapshot`, `citation_full`, `attribution`, and any other prose:
-
-- Write in American English (e.g. "analyzed", "program"; not "analysed", "programme").
-- Sentence-case for titles (capitalize only the first word and proper nouns); no trailing period in titles.
-- "Data" is singular: "the data is", not "the data are".
-- Use the Oxford comma in lists.
-- Use en dashes (–), not hyphens (-), for year ranges: `1990–2020`, not `1990-2020`.
-- Use em dashes (—) with spaces on both sides for asides: ` — like this — `.
-- Use double quotes (`"..."`), not single quotes, for quotations and titles.
-- Spell out numbers one to ten in prose; use digits for 11+.
-- Spell out acronyms on first use, followed by the acronym in parentheses
-  (exceptions: `US`, `UK`, `UN`). For `US` and `UK`, no periods.
-- Brand spelling: write `Our World in Data` (lowercase "in") and `OWID` (all caps);
-  never `Our World In Data` or `OWiD`. Note: producer/attribution_short still must NOT
-  contain these — this rule is for descriptions if OWID's own role is mentioned.
-- For author citations on charts: use surnames only.
-  - One author: `Williams`. Two: `Williams and Jones`. Three or more: `Williams et al.`.
-
-These rules are advisory for description text — if the producer's preferred citation
-in `citation_full` uses different conventions, follow the producer."""
+The `notes` field is your free-form reasoning, not written to the DVC."""
 
 
 ORIGIN_TOOL_SCHEMA: dict[str, Any] = {
@@ -532,6 +454,12 @@ def lint_origin(origin: dict[str, Any], legacy_text: str = "") -> list[str]:
         issues.append(
             "`attribution_short` is identical to `producer` and so adds no information. Set null."
         )
+    if attribution_short and YEAR_RE.search(attribution_short):
+        issues.append(
+            f"`attribution_short` contains a year ({attribution_short!r}); years live in `date_published`."
+        )
+    if attribution_short and attribution_short.endswith("."):
+        issues.append("`attribution_short` ends with a period.")
 
     url_main = origin.get("url_main") or ""
     url_download = origin.get("url_download") or ""
@@ -591,10 +519,15 @@ def build_origin_block(origin: dict[str, Any]) -> CommentedMap:
             if lic:
                 block[key] = lic
             continue
-        if isinstance(value, str) and "\n" in value:
-            block[key] = LiteralScalarString(value)
-        else:
-            block[key] = value
+        if isinstance(value, str):
+            # Some model outputs include literal "\n" sequences instead of real newlines;
+            # normalize them so we get a proper YAML literal block.
+            if "\\n" in value and "\n" not in value:
+                value = value.replace("\\n", "\n")
+            if "\n" in value:
+                block[key] = LiteralScalarString(value)
+                continue
+        block[key] = value
     return block
 
 
