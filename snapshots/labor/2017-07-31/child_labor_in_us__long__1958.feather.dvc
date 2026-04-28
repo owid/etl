@@ -2,12 +2,10 @@ meta:
   origin:
     producer: Long
     title: The Labor Force under Changing Income and Employment
-    description: This book examines the labor force in the United States under changing income and employment conditions. It includes historical data on the incidence of child labor among males and females aged 10–13, disaggregated by rural and urban demographics.
-    title_snapshot: The Labor Force under Changing Income and Employment - Child labor in the US
     description_snapshot: |-
       The incidence of child labor in males and females aged 10–13 has been taken directly from the source; this is available for both rural and urban demographics individually.
 
-      To calculate the incidence of child labor across both sexes combined, gender-specific incidences have been weighted based on the male:female ratio in the total population for this age bracket (these are based on reported gender ratios, which may incur rounding errors). The same weighting application of population in rural vs. urban areas has been carried out to provide a combined rural and urban figure of incidence.
+      To calculate the incidence of child labor across both sexes combined, gender-specific incidences have been weighted based on the male:female ratio in the total population for this age bracket (these are based on reported gender ratios, which may incur rounding errors). The same weighting by population in rural vs. urban areas has been applied to provide a combined rural and urban figure of incidence.
     citation_full: 'Long, C. D. (1958). The labor force under changing income and employment. Princeton, N.J.: Princeton University Press.'
     url_main: http://econpapers.repec.org/bookchap/nbrnberbk/long58-1.htm
     date_accessed: '2017-07-31'

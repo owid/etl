@@ -1,17 +1,17 @@
 meta:
   origin:
     producer: Fouquin and Hugot
-    title: Two Centuries of Bilateral Trade and Gravity Data
+    title: 'Two Centuries of Bilateral Trade and Gravity Data: 1827–2014'
     description: |-
-      This dataset compiles two centuries of bilateral trade flows and gravity data covering the period 1827–2014. GDP estimates are drawn from a variety of sources; the top five contributors (accounting for more than a third of observations) are the World Bank (2015), Mitchell (2017a,b,c), Barbieri and Keshik (2012), Smits et al. (2014), and Dincecco and Prado (2013). A comprehensive list of GDP sources and full references can be found in the accompanying working paper (Table 7, page 19).
+      Due to the long-run nature of this dataset's time series, GDP estimates are compiled using a variety of sources. The top five sources, which together make up more than a third of the dataset (approximately 11,864 observations out of 31,541), are: World Bank (2015) (8,513 obs); Mitchell (2017a,b,c) (1,714 obs); Barbieri and Keshik (2012) (1,037 obs); Smits et al. (2014) (335 obs); and Dincecco and Prado (2013) (265 obs). A comprehensive list of GDP sources and full references can be found at http://www.cepii.fr/PDF_PUB/wp/2016/wp2016-14.pdf, Table 7, page 19.
 
-      Exchange rates are expressed as the British pound value of one local currency unit, also compiled from multiple sources. The top five contributors are the International Monetary Fund (2012), Wikipedia, Barbieri and Keshk (2012), Officer (2014), and Denzel (2010). A comprehensive list of exchange rate sources and full references is provided in the working paper (Table 8, page 21).
-
-      The Russia time series is comprised of Russia from 1992–2014 and the USSR from 1827–1991.
-    title_snapshot: Two Centuries of Bilateral Trade and Gravity Data - Current GDP in British pounds
+      The exchange rate variable is set to the British pound value of one local currency unit and draws on a range of sources. The top five are: International Monetary Fund (2012) (4,394 obs); extracted from Wikipedia (2,448 obs); Barbieri and Keshk (2012) (2,005 obs); Officer (2014) (1,752 obs); and Denzel (2010) (1,750 obs). A comprehensive list of exchange rate sources and full references can be found at http://www.cepii.fr/PDF_PUB/wp/2016/wp2016-14.pdf, Table 8, page 21.
+    title_snapshot: Two Centuries of Bilateral Trade and Gravity Data – Current GDP (British pounds)
+    description_snapshot: Russia's time series is comprised of Russia from 1992–2014 and the USSR from 1827–1991.
     citation_full: 'Michel Fouquin and Jules Hugot, 2016. "Two Centuries of Bilateral Trade and Gravity Data: 1827-2014," CEPII Working Paper 2016-14, May 2016, CEPII.'
     attribution_short: CEPII
     url_main: http://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=32
+    url_download: http://www.cepii.fr/PDF_PUB/wp/2016/wp2016-14.pdf
     date_accessed: '2018-03-19'
     date_published: '2016'
 outs:

@@ -2,11 +2,12 @@ meta:
   origin:
     producer: Erisman et al.
     title: How a century of ammonia synthesis changed the world
-    description: |-
-      This dataset provides estimates of the share of the world's population sustained by Haber-Bosch nitrogen fertilizer production. Estimates are derived from Figure 1 in Erisman et al. (2008) and its sources, which track the proportion of global food production dependent on synthetic nitrogen fertilizers over time.
+    description_snapshot: |-
+      Estimates of population sustained with and without the production of Haber-Bosch nitrogen are derived based on Figure 1 in Erisman et al. (2008) and its sources.
 
-      World population figures underlying the estimates were sourced from Gapminder for the years 1900–1949 and from the UN Population Division from 1950 onwards. The share of the world population reliant on Haber-Bosch fertilizer production was approximated from Erisman et al. (2008), coinciding broadly with estimates from Smil (2002) and other published projections.
-    title_snapshot: Population fed by Haber-Bosch fertilizers
+      World population figures were sourced from Gapminder for the years 1900–1949, and from the UN Population Division from 1950 onwards.
+
+      The share of the world's population reliant on Haber-Bosch fertilizer production for food production was estimated based on Figure 1 in Erisman et al. (2008). These figures are based on approximation, although they coincide with several published projections of these estimates. Erisman et al. estimate that by 2000, 44% of the global population were sustained by Haber-Bosch nitrogen, rising to 48% by 2008. This approximately coincides with Smil (2002) estimates of 40% by 2000. Our World in Data extrapolated these estimates to 2015, assuming that approximately 50% (±2%) rely on Haber-Bosch nitrogen.
     citation_full: 'Erisman, J. W., Sutton, M. A., Galloway, J., Klimont, Z., and Winiwarter, W. (2008). How a century of ammonia synthesis changed the world. Nature Geoscience, 1(10), 636–639. Available at: https://www.nature.com/articles/ngeo325.'
     url_main: https://www.nature.com/articles/ngeo325
     date_accessed: '2017-10-24'

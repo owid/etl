@@ -2,8 +2,7 @@ meta:
   origin:
     producer: Blau and Kahn
     title: 'The Gender Wage Gap: Extent, Trends, and Explanations'
-    description: This dataset accompanies the academic paper examining the gender wage gap, including its extent, trends, and explanations. It covers the incidence of managerial or professional jobs and collective-bargaining coverage disaggregated by gender. See the authors' data appendix for more detail on how the data was prepared and analyzed.
-    title_snapshot: 'The Gender Wage Gap: Extent, Trends, and Explanations - Incidence of managerial or professional jobs and collective bargaining by gender'
+    description_snapshot: See the authors' data appendix for more detail on how the data was prepared and analyzed.
     citation_full: 'Blau, Francine D., and Lawrence M. Kahn (2017). "The Gender Wage Gap: Extent, Trends, and Explanations." Journal of Economic Literature, 55(3): 789–865.'
     url_main: http://pubs.aeaweb.org/doi/pdfplus/10.1257/jel.20160995
     date_accessed: '2017-10-17'

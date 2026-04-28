@@ -3,12 +3,13 @@ meta:
     producer: Lipinski et al.
     title: Reducing Food Loss and Waste
     description: |-
-      This dataset provides figures on food losses and waste across all supply chain stages, from on-farm harvesting through to final food waste. Figures are based only on food intended for direct human consumption — crops diverted for animal feed or industrial uses are not included as losses.
+      Data on food losses and waste includes all supply chain stages, from (and including) on-farm harvesting through to final food waste.
 
-      The figures are calculated based on regional percentage losses expressed in the UN Food and Agriculture Organization (FAO) report "Global food losses and food waste – Extent, causes and prevention" (Rome, 2011). Data is expressed for the year 2009 due to poor data availability and limited updated estimates since then. It is likely that, especially when expressed in relative terms (each region or food group's contribution to food losses), the figures remain broadly representative today.
-    title_snapshot: Reducing Food Loss and Waste - Calories lost by food group and region
+      Figures are based only on food intended for direct human consumption: this means crops diverted for animal feed or industrial uses are not included as losses.
+
+      These figures are calculated based on the regional percentage losses expressed in the landmark UN Food and Agriculture Organization (FAO) report on food losses: FAO (2011), "Global food losses and food waste – Extent, causes and prevention," Rome. The data is expressed for the year 2009 due to poor data availability and limited updated estimates since then.
+    description_snapshot: It is likely that, especially when expressed in relative terms (each region or food group's contribution to food losses), the figures remain similar today.
     citation_full: 'Lipinski, B. et al. (2013). "Reducing Food Loss and Waste." Working Paper, Installment 2 of Creating a Sustainable Food Future. Washington, DC: World Resources Institute.'
-    attribution_short: WRI
     url_main: http://pdf.wri.org/reducing_food_loss_and_waste.pdf
     date_accessed: '2020-02-22'
     date_published: '2013'

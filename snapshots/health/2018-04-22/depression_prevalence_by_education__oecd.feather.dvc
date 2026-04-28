@@ -1,10 +1,10 @@
 meta:
   origin:
     producer: OECD
-    title: 'Education at a Glance: Education and Health'
-    description: This dataset provides data on the share of adults (aged 25–64 years) who report having depression in data surveys, disaggregated by highest level of education. The data is further differentiated based on those who are employed, active (those actively looking for work), and the total population (including those unemployed).
-    title_snapshot: 'Education at a Glance: Education and Health - Depression prevalence by education'
-    citation_full: 'Organisation for Economic Co-operation and Development (OECD) Statistics. Education at a Glance: Education and Health. OECD Statistics, 2018.'
+    title: Education at a Glance
+    description: Share of adults (aged 25–64 years) who report having depression in data surveys, disaggregated by highest level of education. This is further differentiated based on those who are employed, active (those actively looking for work), and the total (which is the total population, including those unemployed).
+    title_snapshot: Education at a Glance - Depression prevalence by education
+    citation_full: Organisation for Economic Co-operation and Development (OECD) Statistics. Education at a Glance - Depression prevalence by education. OECD Stats. https://stats.oecd.org/Index.aspx?DataSetCode=EAG_ESO#.
     url_main: https://stats.oecd.org/Index.aspx?DataSetCode=EAG_ESO#
     date_accessed: '2018-04-22'
     date_published: '2018'

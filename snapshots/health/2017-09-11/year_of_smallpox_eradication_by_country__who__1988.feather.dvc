@@ -2,14 +2,13 @@ meta:
   origin:
     producer: Fenner et al.
     title: Smallpox and its Eradication
-    description: |-
-      Smallpox and its Eradication is a comprehensive volume published by the World Health Organization (WHO) in 1988, documenting the global campaign to eradicate smallpox. The book covers the history, epidemiology, and eventual elimination of smallpox country by country, drawing on official records, maps, and narrative accounts compiled by leading experts involved in the eradication effort.
+    description_snapshot: |-
+      The only data not taken from the maps but from the text are the data for Canada, USA, Australia, and New Zealand. For Canada the authors reported that "endemic smallpox was eliminated by 1944"; for the USA only that it was eliminated "the latter half of the 1940s" (1948 was chosen for the visualization). Dates for the last outbreaks of smallpox in Australia (1917) and New Zealand (1914) are reported in the text — in both countries smallpox has always been rare.
 
-      Chapter 8 contains maps and textual accounts detailing the year in which endemic smallpox was eliminated in each country. For some countries — including Canada, the US, Australia, and New Zealand — dates are drawn from narrative text rather than maps. For others, such as Madagascar and Namibia, only approximate upper-bound dates are reported.
-    title_snapshot: Smallpox and its Eradication - Year of smallpox eradication by country
-    description_snapshot: 'The snapshot captures country-level years of smallpox eradication as digitized from Chapter 8 maps and text. Some values are estimates: the US eradication date is approximated as 1948 ("the latter half of the 1940s"), Madagascar as before 1918, and Namibia as before 1955. Countries are shown in their current borders; successor states of Yugoslavia, the USSR, and Sudan inherit the eradication dates of their predecessor states (1925, 1936, and 1972, respectively).'
-    citation_full: F. Fenner, D. A. Henderson, I. Arita, Z. Jezek, I. D. Ladnyi (1988) – Smallpox and its Eradication. World Health Organization (WHO), 1988.
-    attribution_short: WHO
+      The dates for Madagascar and Namibia are not exactly known — the authors only report that smallpox was eradicated in Madagascar before 1918 and for Namibia before 1955 (so these years were chosen for eradication).
+
+      Countries are shown in their current borders — successor countries of Yugoslavia, the USSR, and the Sudan are assigned the eradication date of these states: 1925 for Yugoslavia, 1936 for the USSR, and 1972 for the Sudan.
+    citation_full: Fenner, F., Henderson, D. A., Arita, I., Jezek, Z., and Ladnyi, I. D. (1988). Smallpox and its Eradication. World Health Organization (WHO).
     url_main: http://whqlibdoc.who.int/smallpox/9241561106.pdf
     date_accessed: '2017-09-11'
     date_published: '1988'

@@ -2,11 +2,7 @@ meta:
   origin:
     producer: Bar-On et al.
     title: The Biomass Distribution on Earth
-    description: |-
-      This dataset provides estimates of the global biomass (measured in tonnes of carbon) and abundance (number of individuals) of different taxonomic groups across Earth.
-
-      Due to large uncertainty for some groups, these are used as order-of-magnitude estimates and come with notable error margins.
-    title_snapshot: The Biomass Distribution on Earth - Biomass and taxa abundance
+    description: Estimates of the global biomass (measured in tonnes of carbon) and abundance (number of individuals) of different taxonomic groups. Due to large uncertainty for some groups, these are used as order-of-magnitude estimates and come with notable error margins.
     citation_full: Bar-On, Y. M., Phillips, R., and Milo, R. (2018). The biomass distribution on Earth. Proceedings of the National Academy of Sciences, 201711842.
     url_main: http://www.pnas.org/content/115/25/6506
     date_accessed: '2018-11-16'

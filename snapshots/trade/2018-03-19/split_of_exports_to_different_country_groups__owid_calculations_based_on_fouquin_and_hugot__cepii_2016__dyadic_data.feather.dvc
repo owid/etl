@@ -1,11 +1,19 @@
 meta:
   origin:
     producer: Fouquin and Hugot
-    title: Two Centuries of Bilateral Trade and Gravity Data
-    description: This dataset provides dyadic (bilateral) trade data covering two centuries of international trade flows, spanning 1827–2014. It is produced by the Centre d'Études Prospectives et d'Informations Internationales (CEPII) and enables analysis of bilateral trade relationships and gravity model estimations across a wide range of countries and time periods.
-    title_snapshot: Two Centuries of Bilateral Trade and Gravity Data - Split of exports to different country groups
-    description_snapshot: This snapshot contains OWID calculations based on the CEPII dyadic trade data. Country exports to the rest of the world are calculated by dividing total export values by the country's GDP. Regional and income-group aggregates are derived using World Bank income groupings. Continental groupings follow OWID's classification. Germany's series combines West Germany and Germany (excluding East Germany), and Russia's series combines Russia and the USSR.
-    citation_full: 'Michel Fouquin and Jules Hugot, 2016. "Two Centuries of Bilateral Trade and Gravity Data: 1827–2014," CEPII Working Paper 2016-14, May 2016, CEPII.'
+    title: 'Two Centuries of Bilateral Trade and Gravity Data: 1827–2014'
+    description: This dataset uses CEPII dyadic trade data covering two centuries of bilateral trade and gravity data from 1827 to 2014.
+    description_snapshot: |-
+      To calculate country exports to the rest of the world, the total value of exports by country, per year, is divided by the country's GDP. Calculations use Fouquin and Hugot (CEPII 2016) dyadic trade data.
+
+      The "World" time series corresponds to the world's total exports (i.e. the sum of exports reported by all countries in the dataset).
+
+      The total export values of regional income aggregates have been calculated using the World Bank's income groupings.
+
+      Germany's time series is comprised of West Germany and Germany. East Germany has been excluded for the purposes of Germany's calculations but is included in the World series. Russia's time series comprises Russia and the USSR.
+
+      Continental groupings are defined according to OWID's classification. Europe has been split into Western Europe including: Austria, Belgium, Denmark, Finland, France, Germany, Greece, Hungary, Italy, the Netherlands, Norway, Portugal, Russia, Spain, Sweden, Switzerland, and the United Kingdom. Remaining European countries have been classified as Eastern Europe.
+    citation_full: 'Michel Fouquin and Jules Hugot, 2016. "Two Centuries of Bilateral Trade and Gravity Data: 1827-2014," CEPII Working Paper 2016-14, May 2016, CEPII.'
     attribution_short: CEPII
     url_main: http://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=32
     date_accessed: '2018-03-19'

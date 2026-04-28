@@ -1,10 +1,8 @@
 meta:
   origin:
     producer: Cunningham and Viazzo
-    title: 'Child Labor in Historical Perspective: Case Studies from Europe, Japan and Colombia'
-    description: This publication examines child labor from a historical perspective, covering the period 1800 to 1985 through case studies drawn from Europe, Japan, and Colombia. It was produced under the auspices of UNICEF and provides comparative analysis of child labor trends and conditions across different national and regional contexts over nearly two centuries.
-    title_snapshot: 'Child Labor in Historical Perspective: Case Studies from Europe, Japan and Colombia - UK data'
-    citation_full: 'Cunningham, H. and Viazzo, P.P. (1996), Child labor in historical perspective, 1800-1985: case studies from Europe, Japan and Colombia, Unicef, Firenze.'
+    title: 'Child labor in historical perspective, 1800–1985: case studies from Europe, Japan and Colombia'
+    citation_full: 'Cunningham, H. and Viazzo, P.P. (1996), Child labor in historical perspective, 1800–1985: case studies from Europe, Japan and Colombia, Unicef, Firenze.'
     url_main: http://www.unicef-irc.org/publications/pdf/hisper_childlabour_low.pdf
     date_accessed: '2017-09-27'
     date_published: '1996'

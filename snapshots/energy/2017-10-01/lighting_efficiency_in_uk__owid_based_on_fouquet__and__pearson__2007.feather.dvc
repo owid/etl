@@ -1,13 +1,16 @@
 meta:
   origin:
     producer: Fouquet and Pearson
-    title: 'Seven Centuries of Energy Services: The Price and Use of Light in the United Kingdom (1300–2000)'
-    description: This dataset draws on research by Fouquet and Pearson covering seven centuries of energy services, with a focus on the price and use of light in the United Kingdom from 1300 to 2000. It provides data on the percentage share and efficiency of various lighting sources over time, including candles, whale oil, and kerosene, among others. Efficiency is measured in lumen-hours per kilowatt-hour.
-    title_snapshot: Seven Centuries of Energy Services - Lighting efficiency in the UK
-    description_snapshot: The snapshot contains a weighted-average efficiency of lighting in the United Kingdom, calculated by Our World in Data based on the percentage share and efficiency data of lighting sources from Fouquet and Pearson (2006). The national average efficiency is computed as the sum of (% share × efficiency) for each lighting source.
+    title: 'Seven Centuries of Energy Services: The Price and Use of Light in the United Kingdom (1300-2000)'
+    description_snapshot: |-
+      Data was calculated by Our World in Data based on published figures by Fouquet and Pearson (2006). Calculated as the weighted-average efficiency of lighting in the United Kingdom, based on percentage share and efficiency data of lighting sources. The national average efficiency is calculated as the sum of (% share × efficiency) of each source.
+
+      For example: (share of lighting from candles × efficiency of candles) + (share of lighting from whale oil × efficiency of whale oil) + (share of lighting from kerosene × efficiency of kerosene).
+
+      Efficiency is measured in lumen-hours per kilowatt-hour.
     citation_full: 'Fouquet, R. and Pearson, P. J. G. (2006): "Seven Centuries of Energy Services: The Price and Use of Light in the United Kingdom (1300–2000)", The Energy Journal, 27(1). Available at: http://eprints.lse.ac.uk/50460/.'
     url_main: http://eprints.lse.ac.uk/50460/
-    date_accessed: '2026-03-05'
+    date_accessed: '2017-10-03'
     date_published: '2006'
 outs:
   - md5: 0d9b42f7c4148543e2906c218460b120

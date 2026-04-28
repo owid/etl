@@ -2,8 +2,7 @@ meta:
   origin:
     producer: Reynolds
     title: Marginal Tax Rates
-    description: This entry covers marginal tax rates across countries and over time, with particular attention to top marginal income tax rates. It notes, for example, that Hong Kong's maximum tax (the "standard rate") has normally been 15 percent, effectively capping the marginal rate at high income levels (in exchange for no personal exemptions), and that the highest US tax rate of 39.6 percent after 1993 was reduced to 38.6 percent in 2002 and to 35 percent in 2003.
-    title_snapshot: Marginal Tax Rates - Top marginal income tax rate
+    description_snapshot: Hong Kong's maximum tax (the "standard rate") has normally been 15 percent, effectively capping the marginal rate at high income levels (in exchange for no personal exemptions). The highest US tax rate of 39.6 percent after 1993 was reduced to 38.6 percent in 2002 and to 35 percent in 2003.
     citation_full: 'Alan Reynolds. "Marginal Tax Rates." The Concise Encyclopedia of Economics. 2008. Library of Economics and Liberty. Retrieved September 22, 2016 from the World Wide Web: http://www.econlib.org/library/Enc/MarginalTaxRates.html.'
     url_main: http://www.econlib.org/library/Enc/MarginalTaxRates.html
     date_accessed: '2016-09-22'

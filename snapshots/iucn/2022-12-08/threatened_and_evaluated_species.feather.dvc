@@ -3,16 +3,14 @@ meta:
     producer: IUCN
     title: IUCN Red List of Threatened Species
     description: |-
-      The IUCN Red List of Threatened Species is the world's most comprehensive inventory of the conservation status of plant and animal species. It uses a set of quantitative criteria to evaluate the extinction risk of thousands of species and subspecies, classifying them into categories ranging from "Least Concern" to "Extinct."
+      The IUCN Red List of Threatened Species is the world's most comprehensive inventory of the global conservation status of plant and animal species. It uses a set of quantitative criteria to evaluate the extinction risk of thousands of species and subspecies. "Threatened" species are those categorized as Critically Endangered, Endangered, or Vulnerable.
 
-      The Red List has assessed only a small share of the total known species in the world, meaning the number of species threatened with extinction is likely a significant underestimate of the total number of species at risk. This is particularly true for understudied groups such as insects, plants, and fungi. The share of known species threatened with extinction is only available for a few taxonomic groups where more than 80% of species have been assessed.
-
-      "Threatened" species are those categorized as "Critically Endangered," "Endangered," or "Vulnerable" on the Red List. The "mushrooms" taxonomic group includes brackets, rusts, smuts, and jelly fungi.
-    title_snapshot: Red List of Threatened Species - Threatened and evaluated species
-    citation_full: 'IUCN Red List. Summary statistics — Table 1a: Numbers of threatened species by major groups of organisms. IUCN Red List of Threatened Species, 2022.'
+      The Red List has assessed only a small share of the total known species in the world, meaning the number of species threatened with extinction is likely to be a significant underestimate of the total number of species at risk. This is particularly true for understudied groups such as insects, plants, and fungi. The share of known species threatened with extinction is only available for a few taxonomic groups where more than 80% of species have been assessed.
+    title_snapshot: Red List - Threatened and evaluated species
+    description_snapshot: The "mushrooms" taxonomic group includes brackets, rusts, smuts, and jelly fungi.
+    citation_full: IUCN Red List. (2022). Summary statistics. International Union for Conservation of Nature. Retrieved from https://www.iucnredlist.org/resources/summary-statistics.
     attribution_short: IUCN Red List
     url_main: https://www.iucnredlist.org/resources/summary-statistics
-    url_download: https://nc.iucnredlist.org/redlist/content/attachment_files/2022-1_RL_Stats_Table_1a.pdf
     date_accessed: '2022-12-08'
     date_published: '2022'
 wdir: ../../../data/snapshots/iucn/2022-12-08
