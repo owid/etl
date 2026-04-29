@@ -143,7 +143,7 @@ tables:
         title: AI scholarly publications
         unit: publications
         description_short: |-
-          Scholarly publications on AI topics, including peer-reviewed publications, working papers, and preprints.
+          Scholarly publications on AI, including journal articles, conference papers, working papers, and preprints. The data only covers articles with an English-language title or abstract.
         description_key:
           - *description_key_articles
         presentation:
@@ -183,7 +183,7 @@ tables:
         title: AI scholarly publications per million people
         unit: publications per million people
         description_short: |-
-          Scholarly publications on AI topics, per million people.
+          Scholarly publications on AI per million people, including journal articles, conference papers, working papers, and preprints. The data only covers articles with an English-language title or abstract.
         description_key:
           - *description_key_articles
         presentation:
