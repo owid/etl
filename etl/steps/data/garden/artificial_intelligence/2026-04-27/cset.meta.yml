@@ -3,6 +3,7 @@ definitions:
   common:
     processing_level: minor
     presentation:
+      attribution_short: CSET
       topic_tags:
         - Artificial Intelligence
     display:
@@ -57,7 +58,7 @@ tables:
     variables:
       estimated_investment:
         <<: *processing_investment
-        title: Private investment in AI
+        title: External funding for privately held AI companies
         unit: constant 2021 US dollars
         short_unit: $
         description_short: |-
@@ -67,9 +68,9 @@ tables:
         presentation:
           title_public: |-
               <% if field == "All" -%>
-              Annual private investment in artificial intelligence
+              External funding for privately held AI companies
               <%- else -%>
-              Annual private investment in AI: << field|lower >>
+              External funding for privately held AI companies: << field|lower >>
               <%- endif %>
           grapher_config:
             note: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
@@ -78,7 +79,7 @@ tables:
 
       estimated_investment_projected:
         <<: *processing_investment
-        title: Private investment in AI (projected)
+        title: Projected external funding for privately held AI companies
         unit: constant 2021 US dollars
         short_unit: $
         description_short: |-
@@ -89,14 +90,14 @@ tables:
         presentation:
           title_public: |-
               <% if field == "All" -%>
-              Annual private investment in artificial intelligence (projected)
+              External funding for privately held AI companies
               <%- else -%>
-              Annual private investment in AI: << field|lower >> (projected)
+              External funding for privately held AI companies: << field|lower >>
               <%- endif %>
           grapher_config:
-            note: Adjusted for inflation to constant 2021 US dollars using the US Consumer Price Index.
+            note: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
         display:
-          name: << field >> (projected)
+          name: << field >>
           isProjection: true
 
       num_patent_applications:
