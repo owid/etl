@@ -1,7 +1,7 @@
 /**
  * meta-yaml-hover — VSCode extension for OWID `*.meta.yml` files.
  *
- * Provides three things on metadata files:
+ * Provides four things on metadata files:
  *   1. A hover popup that resolves Jinja-style placeholders and YAML aliases:
  *        - `{<dotted.path>}`  — resolved against the YAML root (e.g. `{definitions.foo}`,
  *                                `{tables.x.variables.y.title}`).
@@ -13,6 +13,11 @@
  *      declaration line via a custom `meta-yaml-hover.revealLine` command.
  *   3. A `DefinitionProvider` so `Cmd+Click` / `F12` on the same tokens in the
  *      document jumps to their declaration line — the standard VSCode pattern.
+ *      As an inverse, `Cmd+Click` on a *declaration* (a YAML key, or `&anchor`)
+ *      returns every reference to it, so VSCode peeks the usages.
+ *   4. A `ReferenceProvider` so `Shift+F12` / right-click → Find All References
+ *      lists every usage of the placeholder or anchor under the cursor — works
+ *      from both reference and declaration sites.
  *
  * Runtime placeholders such as `<<welfare_type>>`, `{TODAY}`, `{date_accessed}`,
  * `{LATEST_YEAR}`, etc. are *not* resolved — their values are injected at
@@ -286,6 +291,103 @@ function findAnchorDeclLine(docText: string, anchorName: string): number | undef
 }
 
 /**
+ * If the cursor sits on a *declaration* token, return what is being declared:
+ * either a placeholder target (a YAML key, identified by its dotted path from
+ * the document root) or a YAML anchor (`&name`). Returns `undefined` when the
+ * cursor is somewhere else (a value, whitespace, a reference token, etc.).
+ *
+ * The dotted path for a YAML key is built by walking *up* from the cursor's
+ * line: every prior line whose `key:` indent is strictly less than the
+ * running minimum becomes the next ancestor segment, until indent 0. List
+ * entries (`- key:`) are not specially handled — they will be picked up as
+ * keys but the resulting path won't have a `[i]` index, which is fine because
+ * `{...}` placeholders can't reference list items by index anyway.
+ */
+function getDeclAtCursor(
+    document: vscode.TextDocument,
+    position: vscode.Position,
+): { kind: 'placeholder'; path: string } | { kind: 'anchor'; name: string } | undefined {
+    const lineText = document.lineAt(position.line).text;
+    const ch = position.character;
+
+    // Anchor declaration: `&name` — match anywhere on the line.
+    const anchorRe = /&([A-Za-z_][A-Za-z0-9_-]*)/g;
+    let am: RegExpExecArray | null;
+    while ((am = anchorRe.exec(lineText)) !== null) {
+        const start = am.index;
+        const end = start + am[0].length;
+        if (ch >= start && ch <= end) {
+            return { kind: 'anchor', name: am[1] };
+        }
+    }
+
+    // YAML key declaration: cursor must be on the key text itself, before the colon.
+    const km = lineText.match(/^(\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:/);
+    if (!km) {
+        return undefined;
+    }
+    const indent = km[1].length;
+    const key = km[2];
+    const keyStart = indent;
+    const keyEnd = indent + key.length;
+    if (ch < keyStart || ch > keyEnd) {
+        return undefined;
+    }
+
+    const segments = [key];
+    let minIndent = indent;
+    for (let i = position.line - 1; i >= 0 && minIndent > 0; i--) {
+        const line = document.lineAt(i).text;
+        const m = line.match(/^(\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:/);
+        if (!m) {
+            continue;
+        }
+        const lineIndent = m[1].length;
+        if (lineIndent < minIndent) {
+            segments.unshift(m[2]);
+            minIndent = lineIndent;
+        }
+    }
+    return { kind: 'placeholder', path: segments.join('.') };
+}
+
+/**
+ * Return every `{<dottedPath>}` occurrence in `document` as a `Location`.
+ * Exact-path match only — sub-path references (e.g. `{definitions.foo.bar}`
+ * for a key `definitions.foo`) are not included.
+ */
+function findPlaceholderRefs(document: vscode.TextDocument, dottedPath: string): vscode.Location[] {
+    const docText = document.getText();
+    const refs: vscode.Location[] = [];
+    const re = new RegExp(PLACEHOLDER_RE.source, 'g');
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(docText)) !== null) {
+        if (m[1] === dottedPath) {
+            const start = document.positionAt(m.index);
+            const end = document.positionAt(m.index + m[0].length);
+            refs.push(new vscode.Location(document.uri, new vscode.Range(start, end)));
+        }
+    }
+    return refs;
+}
+
+/** Return every `*<anchorName>` occurrence in `document` as a `Location`. */
+function findAnchorRefs(document: vscode.TextDocument, anchorName: string): vscode.Location[] {
+    const docText = document.getText();
+    const refs: vscode.Location[] = [];
+    const re = new RegExp(ALIAS_RE.source, 'g');
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(docText)) !== null) {
+        if (m[1] === anchorName) {
+            const start = document.positionAt(m.index);
+            const end = document.positionAt(m.index + m[0].length);
+            refs.push(new vscode.Location(document.uri, new vscode.Range(start, end)));
+        }
+    }
+    return refs;
+}
+
+/**
  * Run `re` over `lineText` and return the match (with capture group 1 as
  * `name`) that contains the cursor at column `character`. Used to detect
  * whether the cursor sits on a placeholder/alias token.
@@ -542,8 +644,10 @@ const hoverProvider: vscode.HoverProvider = {
 };
 
 /**
- * Definition provider: powers `Cmd+Click` / `F12` on placeholders and aliases
- * in the document, jumping the cursor to the declaration line in the same file.
+ * Definition provider: powers `Cmd+Click` / `F12`. From a *reference* token
+ * (`{path}` or `*anchor`) it jumps to the declaration. From a *declaration*
+ * (a YAML key, or `&anchor`) it returns every reference — VSCode shows them
+ * in its peek view, which gives you a full list when there are many usages.
  */
 const definitionProvider: vscode.DefinitionProvider = {
     provideDefinition(document, position) {
@@ -570,18 +674,82 @@ const definitionProvider: vscode.DefinitionProvider = {
             }
         }
 
+        // Reverse direction: cursor on a declaration → return all references.
+        const decl = getDeclAtCursor(document, position);
+        if (decl?.kind === 'placeholder') {
+            const refs = findPlaceholderRefs(document, decl.path);
+            if (refs.length > 0) {
+                return refs;
+            }
+        }
+        if (decl?.kind === 'anchor') {
+            const refs = findAnchorRefs(document, decl.name);
+            if (refs.length > 0) {
+                return refs;
+            }
+        }
+
         return undefined;
     },
 };
 
 /**
- * Extension activation. Registers the hover provider, the definition
- * provider, and the `revealLine` command used by clickable hover-popup links.
+ * Reference provider: powers `Shift+F12` / right-click → Find All References.
+ * Works from both sides — on a declaration it lists every usage; on a usage
+ * it lists every sibling usage. `context.includeDeclaration` is honoured so
+ * VSCode's "include declaration" toggle behaves as expected.
+ */
+const referenceProvider: vscode.ReferenceProvider = {
+    provideReferences(document, position, context) {
+        if (document.languageId !== 'yaml' || !isMetaYamlFile(document.fileName)) {
+            return undefined;
+        }
+
+        const lineText = document.lineAt(position.line).text;
+        const docText = document.getText();
+
+        const appendDecl = (
+            refs: vscode.Location[],
+            declLine: number | undefined,
+        ): vscode.Location[] => {
+            if (context.includeDeclaration && declLine !== undefined) {
+                refs.push(new vscode.Location(document.uri, new vscode.Position(declLine, 0)));
+            }
+            return refs;
+        };
+
+        // Cursor on a declaration → references to it.
+        const decl = getDeclAtCursor(document, position);
+        if (decl?.kind === 'placeholder') {
+            return appendDecl(findPlaceholderRefs(document, decl.path), findKeyDeclLine(docText, decl.path));
+        }
+        if (decl?.kind === 'anchor') {
+            return appendDecl(findAnchorRefs(document, decl.name), findAnchorDeclLine(docText, decl.name));
+        }
+
+        // Cursor on a reference → its sibling references.
+        const placeholder = findHoverMatch(lineText, position.character, PLACEHOLDER_RE);
+        if (placeholder) {
+            return appendDecl(findPlaceholderRefs(document, placeholder.name), findKeyDeclLine(docText, placeholder.name));
+        }
+        const alias = findHoverMatch(lineText, position.character, ALIAS_RE);
+        if (alias) {
+            return appendDecl(findAnchorRefs(document, alias.name), findAnchorDeclLine(docText, alias.name));
+        }
+
+        return undefined;
+    },
+};
+
+/**
+ * Extension activation. Registers the hover, definition, and reference
+ * providers, plus the `revealLine` command used by clickable hover-popup links.
  */
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.languages.registerHoverProvider({ language: 'yaml' }, hoverProvider),
         vscode.languages.registerDefinitionProvider({ language: 'yaml' }, definitionProvider),
+        vscode.languages.registerReferenceProvider({ language: 'yaml' }, referenceProvider),
         vscode.commands.registerCommand(REVEAL_LINE_CMD, async (uri: string, line: number) => {
             const target = vscode.Uri.parse(uri);
             const editor = await vscode.window.showTextDocument(target, { preserveFocus: false });
