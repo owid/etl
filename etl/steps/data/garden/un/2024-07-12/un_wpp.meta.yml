@@ -58,7 +58,15 @@ definitions:
   common:
     presentation:
       attribution_short: UN WPP
-      # title_variant: "{definitions.global.dimensions}"
+      # Inherited by every variable; sets a clean, projection-aware variant
+      # so data pages render "Indicator (UN WPP)" or
+      # "Indicator (UN WPP, medium scenario)".
+      title_variant: |-
+        <% if variant == 'estimates' -%>
+        UN WPP
+        <%- else -%>
+        UN WPP, << variant >> scenario
+        <%- endif -%>
       grapher_config:
         subtitle: "{definitions.global.projections}"
         originUrl: "https://ourworldindata.org/population-growth"
@@ -108,7 +116,10 @@ tables:
         title: Population change
         unit: people
         description_short: |-
-          Population yearly increment, estimated as the difference between the population on 1st of July of the year indicated and the population a year before. {definitions.global.dimensions.description_short}
+          Annual change in population, calculated as the difference between population on 1 July of consecutive years. {definitions.global.dimensions.description_short}
+        description_key:
+          - |-
+            This is the *net* change in population. It reflects births, deaths, and migration combined. To see only the contribution of births and deaths, look at the [natural population growth rate](https://ourworldindata.org/grapher/natural-population-growth).
         display:
           isProjection: *projection
           roundingMode: significantFigures
@@ -173,6 +184,11 @@ tables:
         unit: "%"
         description_short: |-
           Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1) where P1 and P2 are the populations on 1 January of subsequent years. {definitions.global.dimensions.description_short}
+        description_key:
+          - |-
+            The growth rate combines births, deaths, and net migration. The [natural population growth rate](https://ourworldindata.org/grapher/natural-population-growth) instead reflects only the balance of births and deaths.
+          - |-
+            It is expressed as a continuous (exponential) rate rather than a year-on-year percentage change, so values can be aggregated over multiple years by summing them.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
@@ -191,6 +207,9 @@ tables:
         unit: "%"
         description_short: |-
           Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths. {definitions.global.dimensions.description_short}
+        description_key:
+          - |-
+            Migration is *not* included. To see how births, deaths, and migration combine, look at the [overall population growth rate](https://ourworldindata.org/grapher/population-growth-rates).
         display:
           isProjection: *projection
           numDecimalPlaces: 1
@@ -219,7 +238,11 @@ tables:
           <%- endif %>
         description_key:
           - |-
-            It is expressed as live births per woman. For age-specific fertility rates, it measures the number of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December.
+            The [total fertility rate](#dod:fertility-rate) (shown when no age group is selected) is the average number of children a woman would have if she experienced today's age-specific birth rates throughout her childbearing years. It is expressed as live births per woman.
+          - |-
+            The [age-specific fertility rate](#dod:age-specific-fertility-rate) measures births to women in a particular age group per 1,000 women in that age group. The standard age groups used by the UN are 15–19, 20–24, …, 45–49.
+          - |-
+            All figures refer to civil calendar years from 1 January to 31 December.
         display:
           isProjection: *projection
           numDecimalPlaces: "<% if age == 'all' %>2<%- endif %>"
@@ -228,7 +251,7 @@ tables:
         presentation:
           title_public: |-
             <% if age == 'all' %>
-            Fertility rate: births per woman
+            Fertility rate
             <%- elif age == '10-14' %>
             Fertility rate among girls aged 10 to 14
             <%- elif age == '15-19' %>
@@ -267,6 +290,9 @@ tables:
         unit: migrants
         description_short: |-
           Net number of migrants, that is, the number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country). {definitions.global.dimensions.description_short}
+        description_key:
+          - |-
+            Positive values mean more people moved into the country than out of it; negative values mean more people left than arrived.
         display:
           isProjection: *projection
           roundingMode: significantFigures
@@ -284,6 +310,9 @@ tables:
         unit: migrants per 1,000 people
         description_short: |-
           Net number of immigrants minus the number of emigrants, divided by the population of the receiving country over a year. {definitions.global.dimensions.description_short}
+        description_key:
+          - |-
+            Positive values mean more people moved into the country than out of it; negative values mean more people left than arrived. The figure is given per 1,000 people in the receiving population, so it is comparable across countries of different sizes.
         display:
           isProjection: *projection
           roundingMode: significantFigures
@@ -326,6 +355,9 @@ tables:
         unit: deaths per 1,000 people
         description_short: |-
           Number of deaths recorded annually, divided by population in that year. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
+        description_key:
+          - |-
+            This is a *crude* death rate — it is not adjusted for differences in age structure between countries. Two countries with the same age-specific mortality but different age profiles can therefore have very different crude death rates.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
@@ -366,6 +398,8 @@ tables:
           Number of births recorded annually, divided by population in that year. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
         description_key:
           - |-
+            This is a *crude* birth rate — it is not adjusted for differences in the age structure of the population, so countries with younger populations tend to show higher rates even when individual women have the same number of children.
+          - |-
             We also have a [long-run indicator](https://ourworldindata.org/grapher/long-run-birth-rate) for birth rate, spanning to earlier years.
         display:
           isProjection: *projection
@@ -373,7 +407,6 @@ tables:
         presentation:
           title_public: |-
             Birth rate
-          title_variant: "{definitions.global.dimensions.title}"
           grapher_config:
             subtitle: Annual number of live births per 1,000 people in the total population. {definitions.global.projections}
 
@@ -384,6 +417,9 @@ tables:
         unit: years
         description_short: |-
           Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median. {definitions.global.dimensions.description_short}
+        description_key:
+          - |-
+            Median age tends to rise as people live longer and as fewer children are born. It is a common way to describe how "old" or "young" a country's population is.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
@@ -399,13 +435,20 @@ tables:
       mean_age_childbearing:
         title: Mean age at childbearing
         unit: years
-        description_short: &cb_description_short |-
+        description_short: |-
           Mean age of mothers at the birth of their children if women were subject throughout their lives to the age-specific fertility rates observed in a given year. {definitions.global.dimensions.description_short}
+        description_key:
+          - |-
+            This is a synthetic-cohort measure: it summarizes a single year's [age-specific fertility rates](#dod:age-specific-fertility-rate) into one number, rather than tracking real cohorts of women through their lives.
+        display:
+          isProjection: *projection
+          numDecimalPlaces: 1
         presentation:
           title_public: |-
-            Mean age at childbearing, {definitions.global.dimensions.title}
+            Mean age at childbearing
           grapher_config:
-            subtitle: *cb_description_short
+            subtitle: |-
+              Average age of mothers at the birth of their children, calculated under each year's age-specific fertility rates. {definitions.global.projections}
 
   life_expectancy:
     variables:
@@ -424,6 +467,9 @@ tables:
           <%- else %>
           Period life expectancy for << individuals >> who have reached age << age >>. Estimates are expressed as the expected age at death, not as years left to live.
           <%- endif %> {definitions.global.projections}
+        description_key:
+          - |-
+            This is [period life expectancy](#dod:period-life-expectancy) — a snapshot summary of mortality rates in a single year. It does *not* follow a real cohort of people. It tells you how long someone would live if today's age-specific death rates stayed unchanged for the rest of their life.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
@@ -470,6 +516,11 @@ tables:
           <%- else %>
           The number of male individuals per 100 female individuals, at age << age >>.
           <%- endif %> {definitions.global.projections}
+        description_key:
+          - |-
+            The natural sex ratio at birth is around 105 boys per 100 girls. Sustained departures from this — particularly persistent values above 105 — usually indicate sex-selective practices.
+          - |-
+            At older ages, sex ratios fall below 100 because women on average live longer than men. Migration can also pull the ratio in either direction.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
@@ -523,6 +574,11 @@ tables:
           <%- else %>
           The ratio of the elderly << individuals >> (ages 65 and over) to the working-age << individuals >> (ages 15 to 64).
           <%- endif %>
+        description_key:
+          - |-
+            The dependency ratio splits the population by age — those under 15 and those aged 65 and over are treated as "dependents", while those aged 15 to 64 are treated as the "working-age" population.
+          - |-
+            This is a purely demographic measure. It does *not* count who is actually working or financially dependent — many people aged 15–64 are not in the labour force, and many people over 65 still are.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
@@ -574,6 +630,9 @@ tables:
           <%- else %>
           The share of children who die before reaching the age of 5.
           <%- endif %> {definitions.global.projections}
+        description_key:
+          - |-
+            This is the *probability* a newborn would die before reaching the given age if today's age-specific mortality rates stayed unchanged for the rest of their life. It is not the share of an actual cohort that has been observed dying.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
