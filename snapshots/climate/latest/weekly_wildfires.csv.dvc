@@ -5,11 +5,13 @@ meta:
     producer: Global Wildfire Information System
     title: Seasonal wildfire trends
     description: |-
-      The dataset provides a weekly comprehensive overview of fire activity and its environmental impact, incorporating data from the Global Wildfire Information System (GWIS) and satellite imagery from MODIS and VIIRS. It includes metrics such as the area of land burnt, cumulative burnt areas, carbon dioxide emissions from fires, cumulative carbon emissions, the number of fires, and cumulative fire counts.
+      The dataset provides a weekly comprehensive overview of fire activity and its environmental impact, incorporating data from the Global Wildfire Information System (GWIS) and satellite imagery from both MODIS and VIIRS. It includes metrics such as the area of land burnt, cumulative burnt areas, carbon dioxide emissions from fires, cumulative carbon emissions, the number of fires, and cumulative fire counts.
+
+      It draws on two satellite sensors: MODIS (1km resolution, available from the early 2000s) and VIIRS (375m resolution, available from 2012). VIIRS's finer resolution means it picks up smaller fires that MODIS misses. Because the combined record only extends back to 2012, this dataset is best suited for tracking the current fire season and recent trends rather than long-run historical comparisons.
     title_snapshot: Seasonal wildfire trends (2024 and later)
     description_snapshot: This dataset focuses specifically on older data. A separate snapshot will be created to add more recent data.
     citation_full: Global Wildfire Information System
-    attribution_short: GWIS
+    attribution_short: GWIS (MODIS & VIIRS)
     url_main: https://gwis.jrc.ec.europa.eu/apps/gwis.statistics/seasonaltrend
     date_accessed: '2026-04-29'
     date_published: 2026-04-29
