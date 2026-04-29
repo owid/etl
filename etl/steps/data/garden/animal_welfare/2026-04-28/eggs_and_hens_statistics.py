@@ -74,12 +74,11 @@ def prepare_us_data(tb: Table) -> Table:
     USDA reports a full breakdown by housing system from 2012 onwards. We map the USDA categories
     onto the shared schema as follows:
       - cages = caged
-      - barn = non_organic_barn_aviary
+      - barn = non_organic_barn_aviary + organic
       - free-range non-organic = non_organic_free_range + non_organic_pastured
-      - free-range organic = organic_cage_free (all organic, since USDA aggregates barn/free-range/pastured organic)
+      - free-range organic = organic_free_range + organic_pastured
 
-    For 2007-2011, USDA only reports binary cage vs cage-free, so granular columns are left as NA
-    and fall through to WFI where available.
+    For 2007-2011, USDA only reports binary cage vs cage-free, so all granular columns are left as NA.
     """
     tb = tb.copy()
     tb["number_of_hens_in_cages"] = tb["caged"]
@@ -88,14 +87,14 @@ def prepare_us_data(tb: Table) -> Table:
 
     tb["share_of_hens_in_cages"] = 100 * tb["number_of_hens_in_cages"] / tb["number_of_hens_all"]
     tb["share_of_hens_cage_free"] = 100 - tb["share_of_hens_in_cages"]
-    tb["share_of_hens_in_barns"] = 100 * tb["non_organic_barn_aviary"] / tb["number_of_hens_all"]
-    tb["number_of_hens_in_barns"] = tb["non_organic_barn_aviary"]
-    tb["share_of_hens_free_range_not_organic"] = (
-        100 * (tb["non_organic_free_range"] + tb["non_organic_pastured"]) / tb["number_of_hens_all"]
-    )
+    tb["number_of_hens_in_barns"] = tb["non_organic_barn_aviary"] + tb["organic"]
     tb["number_of_hens_free_range_not_organic"] = tb["non_organic_free_range"] + tb["non_organic_pastured"]
-    tb["share_of_hens_free_range_organic"] = 100 * tb["organic_cage_free"] / tb["number_of_hens_all"]
-    tb["number_of_hens_free_range_organic"] = tb["organic_cage_free"]
+    tb["number_of_hens_free_range_organic"] = tb["organic_free_range"] + tb["organic_pastured"]
+    tb["share_of_hens_in_barns"] = 100 * tb["number_of_hens_in_barns"] / tb["number_of_hens_all"]
+    tb["share_of_hens_free_range_not_organic"] = (
+        100 * tb["number_of_hens_free_range_not_organic"] / tb["number_of_hens_all"]
+    )
+    tb["share_of_hens_free_range_organic"] = 100 * tb["number_of_hens_free_range_organic"] / tb["number_of_hens_all"]
 
     tb = _set_share_units(tb)
     return tb[HEN_COLUMNS]

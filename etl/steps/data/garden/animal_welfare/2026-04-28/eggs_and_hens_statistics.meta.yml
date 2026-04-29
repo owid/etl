@@ -6,7 +6,7 @@ definitions:
   description_processing_hens: &description_processing_hens |-
     - Data for the UK, US, and EU member states are sourced from official statistics. Data for other countries are taken from a compilation by the Welfare Footprint Institute, which combines national statistics and industry reports.
     - For the UK, hen housing counts and shares are approximated from the share of eggs produced in each housing type, due to limited data availability.
-    - For the US, non-organic free-range and pastured hens are combined under non-organic free-range; USDA's organic cage-free category is shown under organic housing.
+    - For the US, pastured hens are included under free-range, and organic hens not reported as free-range or pastured are included under barn or aviary.
     - For countries from the Welfare Footprint Institute compilation, detailed hen counts by housing type are calculated from reported shares and total laying hens. For countries marked as having unknown housing systems, housing-system counts and shares are left blank, while total laying-hen counts are retained.
   description_processing_backfill: &description_processing_backfill
     Data for 2006-2011 was suppressed in the 2026 release of UK egg statistics. Values from an earlier 2023 release were used to fill this gap.
