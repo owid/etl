@@ -27,11 +27,12 @@ What Charlie needs from each field is a **reader-centric view**: what work was d
 ## When to use
 
 - The user says "draft the data-update comms post for X", "fill out the Slack form for X", or similar.
-- After an `update-dataset` run finishes (step 9 of that skill should delegate here rather than re-implement).
+- After an `update-dataset` run finishes (step 9 of that skill should delegate here with `workbench/<short_name>/update-context.yml` rather than re-implement).
 - After a manual update where the user wants help drafting the announcement.
 
 ## Inputs
 
+- Preferred after `update-dataset`: `workbench/<short_name>/update-context.yml` — reuse gathered facts first, and only gather missing fields directly.
 - `<namespace>/<new_version>/<short_name>` — the updated dataset (garden path).
 - Optional: `<old_version>` — for "what changed since last release".
 - Optional: branch name — defaults to current branch (used for the staging-site hostname).
@@ -51,12 +52,16 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 | Why this matters | seeded from `meta.origin.description` + dataset `description` + top indicator `description_short` | **prompt** with extracted snippets — user rewrites |
 | Caveats | seeded from indicator `description_key` bullets, sanity-check workarounds (`notes_to_check.md` from update-dataset workbench), `meta.origin.description` paragraphs that mention "limitations" / "caution" | **prompt** with extracted snippets — user rewrites |
 | Anything interesting | seeded from PR commit messages, `notes_to_check.md` resolutions, snapshot diff summary if available in `workbench/<short_name>/` | **prompt** — user rewrites |
-| Chart views (1–3) | reuse update-dataset step 8 picker logic OR query staging directly using the criteria below | filled with rationale, user confirms |
+| Chart views (1–3) | `update-context.yml` candidates OR query staging directly using the criteria below | filled with rationale, user confirms |
 | Search URL | `https://ourworldindata.org/search?datasetProducts=<urlquote(producer)>` | filled |
 
 **The editorial fields are deliberately not auto-prosed.** Slack posts in the editorial voice ("Why we have this dataset on OWID") read flat when LLM-written; the value is in the human framing. The skill's job is to surface the relevant snippets so the user doesn't have to grep for them.
 
 ## Workflow
+
+0. **Reuse update context if available.**
+   - If `workbench/<short_name>/update-context.yml` is provided or exists, read it first and use its values for mechanical fields, chart count/views, and editorial snippets.
+   - Continue with the steps below only for fields missing from that context. This keeps `update-dataset` responsible for gathering context during the update while preserving this skill as a standalone fallback.
 
 1. **Resolve the dataset.**
    - Parse `<namespace>/<new_version>/<short_name>` or infer from git diff.
@@ -100,8 +105,9 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
    - Top indicator `description_short`: "…"
    ```
 
-5. **Pick chart views (reuse update-dataset step 8 logic).**
-   - Query published charts on staging (same SQL as step 3 but selecting `c.id, cc.slug, cc.full->>'$.title', cc.full->>'$.type', cc.full->>'$.hasMapTab'`).
+5. **Pick chart views.**
+   - Reuse `charts.selected_views` from `update-context.yml` if present.
+   - Otherwise query published charts on staging (same SQL as step 3 but selecting `c.id, cc.slug, cc.full->>'$.title', cc.full->>'$.type', cc.full->>'$.hasMapTab'`).
    - Rank by: `hasMapTab=true` > `type=StackedArea` global views > standalone-headline titles. Skip population-weighted variants and country-specific views.
    - Output 1–3 with slug + rationale.
    - Prefer the most-viewed / most-linked charts (e.g. the `analytics_pageviews` table on staging or the equivalent admin endpoint)
@@ -116,7 +122,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
 8. **Write the draft.**
    - Output path: `ai/data-update-comms.md` by default, or `workbench/<short_name>/slack-announcement.md` when invoked from `update-dataset` step 9.
-   - Use the format in `.claude/skills/update-dataset/slack-announcement-template.md`.
+   - Use the canonical format in the Output format section below.
    - Mark each field with one of: `[filled]`, `[prompt — user rewrites]`, `[verify]`, `[missing]`.
 
 9. **Show the user the file path** and stop. Do **not** post to Slack — that's a human action. The user copy-pastes from the Markdown file into the Slack form.
@@ -288,10 +294,9 @@ https://ourworldindata.org/search?datasetProducts=<urlencoded producer or datase
 - Don't auto-write the optional caveats / interesting-notes fields with generic prose ("This dataset offers important insights into…"). Leave them as prompts.
 - Don't query the staging DB without the `publishedAt IS NOT NULL` filter — drafts in the count would mislead.
 - Don't use the producer's homepage URL as the search link. The Slack template specifically wants `ourworldindata.org/search?datasetProducts=…`.
-- Don't fold this skill into `update-dataset` — keep it standalone so users can invoke it after manual updates too. `update-dataset` step 9 should delegate here, not duplicate the logic.
+- Don't fold this skill into `update-dataset` — keep it standalone so users can invoke it after manual updates too. `update-dataset` should gather reusable facts in `update-context.yml` and step 9 should delegate here, not duplicate the Slack rendering logic.
 
 ## Related
 
-- `.claude/skills/update-dataset/slack-announcement-template.md` — the template this skill fills.
 - `.claude/skills/update-dataset/SKILL.md` step 9 — the orchestrator entry point that should call this skill.
 - `.claude/skills/chart-text-report/SKILL.md` — reuses the same grapher-channel metadata patterns for chart-view selection.

@@ -20,6 +20,7 @@ Optional trailing args:
 Assumptions:
 - All artifacts are written to `workbench/<short_name>/`.
 - Persist progress to `workbench/<short_name>/progress.md` and update it after each step.
+- Persist reusable update facts to `workbench/<short_name>/update-context.yml` as they are discovered. This is the canonical context artifact for the PR description, review handoff, and `data-updates-comms`.
 
 ## Progress checklist (maintain, tick live, and persist to progress.md)
 
@@ -39,8 +40,8 @@ Assumptions:
 - [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, and that all URLs resolve (HEAD-check)
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
-- [ ] Pick 1–3 chart views for the public announcement
-- [ ] Draft Slack announcement, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
+- [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
+- [ ] Render Slack announcement via `data-updates-comms`, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Ask the user whether to archive the old DAG entries; if yes, move them to `dag/archive/` AND relocate the new entries into the old slot (see "DAG archiving & reordering") — don't forget this step
 - [ ] Hand off Wizard QA links to the user (Anomalist + Chart Diff on the staging branch) — this is the final step
@@ -50,7 +51,7 @@ Persistence:
 
 ## Checkpoints — when to pause
 
-**Default: keep going.** Run through the full workflow (steps 1–8) without stopping unless one of the conditions below is met.
+**Default: keep going.** Run through the full workflow without stopping unless one of the conditions below is met.
 
 **Stop and ask the user when:**
 - A step fails and the fix is ambiguous (multiple reasonable approaches, or you're unsure of the correct one)
@@ -266,7 +267,47 @@ When you do stop, present a concise summary of the issue and what options exist.
      ```
      If the count is 0, the upgrade did not run — re-run it.
 
-8) Pick chart views for the public announcement
+8) Update context for public announcement
+   - Maintain `workbench/<short_name>/update-context.yml` as the canonical record of facts discovered during the update. Do not wait until the end if a fact is already known; append/update as each step completes.
+   - At minimum, record:
+     ```yaml
+     dataset:
+       namespace: <namespace>
+       old_version: <old_version>
+       new_version: <new_version>
+       short_name: <short_name>
+       title: <public dataset title, if known>
+       producer: <producer, if known>
+     source:
+       release_date: <snapshot origin date_published, if known>
+       next_release: <best-effort, or null>
+       url_main: <source page, if known>
+       citation_full: <citation, if known>
+     coverage:
+       year_min: <garden min year>
+       year_max: <garden max year>
+       countries: <distinct countries/entities>
+       includes_regions: <true/false>
+       sparse_recent_year_note: <note, or null>
+     charts:
+       published_count: <published chart count>
+       size_qualifier: <handful|moderate|large|massive>
+       selected_views:
+         - title: <chart title>
+           slug: <chart slug>
+           rationale: <why this represents the dataset>
+     update_summary:
+       snapshot_diff: <short summary or artifact path>
+       meadow_diff: <short summary or artifact path>
+       garden_diff: <short summary or artifact path>
+       notable_changes: []
+       sanity_check_findings: []
+       resolved_workarounds: []
+     editorial_context:
+       why_it_matters_snippets: []
+       caveat_snippets: []
+       interesting_update_snippets: []
+     ```
    - Query the staging DB for **published** charts using the new dataset (filter on `c.publishedAt IS NOT NULL`). Draft/unlisted charts must not be counted in the announcement:
      ```sql
      SELECT c.id, cc.slug, cc.full->>'$.title' as title, cc.full->>'$.type' as type, cc.full->>'$.hasMapTab' as hasMapTab
@@ -278,20 +319,19 @@ When you do stop, present a concise summary of the issue and what options exist.
        AND c.publishedAt IS NOT NULL
      GROUP BY c.id
      ```
-   - The number reported in the Slack announcement's "How many charts did this update affect?" section must be this **published** count, not the total. It's fine to mention draft remaps separately in the PR description for completeness, but never in the Slack copy.
-   - Pick 1–3 views using these criteria (in order of preference):
+   - Map the published count to `size_qualifier`: 1–10 = `handful`, 10–50 = `moderate`, 50–200 = `large`, 200+ = `massive`.
+   - Pick 1–3 `selected_views` using these criteria (in order of preference):
      - **Map views** — immediately visual, readers can find their own country
      - **Charts with punchy, standalone headlines** — titles that make a clear claim work best for social sharing
      - **Global trend charts** (StackedArea / World) — show the big picture over time
      - **Skip**: population-weighted variants (harder to read quickly), within-regime breakdowns (too niche), country-specific views
-   - Add the selected charts with brief rationale to the Slack announcement draft
+   - Add snippets for the editorial prompts from source metadata, garden/grapher metadata, resolved sanity-check/workaround notes, and non-routine PR changes. Keep these as snippets/facts, not polished Slack prose.
 
 9) Slack announcement & PR update
-   - Fill out the template at `.claude/skills/update-dataset/slack-announcement-template.md` using facts gathered during the update (coverage, chart count, key changes, etc.)
-   - Include the 1–3 selected chart views from step 8
-   - Ask user if unsure about any details
-   - Save the draft to `workbench/<short_name>/slack-announcement.md`
-   - **Add the announcement to the PR description** as a collapsed section titled "Slack Announcement"
+   - Run the `data-updates-comms` skill with `workbench/<short_name>/update-context.yml` as input. `data-updates-comms` is the canonical owner of the Slack form wording, copy-paste format, editorial framing, search URL, and any standalone fallback gathering. Do not duplicate that rendering logic here.
+   - Save the rendered draft to `workbench/<short_name>/slack-announcement.md`.
+   - If `data-updates-comms` reports missing mechanical fields, gather them, update `update-context.yml`, and re-render rather than inventing values. Ask the user if a missing field requires judgment.
+   - **Add the announcement to the PR description** as a collapsed section titled "Slack Announcement".
    - **Post `@codex review` as a separate PR comment** (not in the PR description) to trigger an automated code review. Use:
      ```bash
      gh pr comment <pr_number> --body "@codex review"
@@ -401,6 +441,7 @@ These pages need a fresh staging build, so they're only meaningful after the PR'
 - `workbench/<short_name>/meadow_diff_raw.txt` and `meadow_diff.md`
 - `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`
 - `workbench/<short_name>/indicator_upgrade.json` (if indicator-upgrader was used)
+- `workbench/<short_name>/update-context.yml` (canonical facts gathered during the update; consumed by `data-updates-comms`)
 - `workbench/<short_name>/slack-announcement.md`
 
 ## Example usage
