@@ -10,19 +10,19 @@ definitions:
       numDecimalPlaces: 0
 
   description_key_articles: &description_key_articles
-    - The data comes from the [Merged Academic Corpus (MAC)](https://eto.tech/dataset-docs/mac/), which covers more than 280 million academic articles.
-    - Articles are flagged as AI-related by an automated classifier.
-    - An article counts for a country if at least one of its authors lists an affiliation there. If authors are based in several countries, the article is counted once for each country.
-    - For example, a paper co-authored by researchers in the United States and Japan counts once for the United States and once for Japan.
-    - The source mainly covers English-language publications, so it under-represents research published in Chinese and other languages.
+    - The data covers scholarly publications on AI, including journal articles, conference papers, working papers, and preprints.
+    - Articles are flagged as AI-related using machine learning models trained on subject tags from arXiv, an open repository for scientific papers.
+    - The models only run on articles with English titles or abstracts. Research published only in other languages is missed. Coverage of Chinese research is also limited, since many Chinese journals are not in the underlying sources.
+    - An article counts for a country if at least one of its authors is affiliated with an institution there. If authors are based in different countries, it counts once for each.
+    - Authors are linked to the country of the institution they worked at when the article was published, not their country of origin.
 
   description_key_patents: &description_key_patents
-    - CSET sources the data from 1790 Analytics, PATSTAT, and The Lens.
-    - Patents are counted by patent family — a group of documents that all describe the same invention. Inventors often file the same invention in several countries, so this approach avoids double-counting.
-    - A family is treated as a "granted patent" if any of its documents has been granted, and as a "patent application" if all of its documents are still pending. The dataset includes over 360,000 AI-related families.
-    - Each family is assigned the date and country of its first filing. For example, if a robot patent is filed first at the European Patent Office and later in China, the whole family counts toward the EPO.
-    - The data reflects where patents are filed, not where the inventors are based. Filing location is used as a proxy for innovation and commercial interest.
-    - Patent data has a lag because some offices take years to publish new filings. Recent years are excluded here because they are likely incomplete.
+    - The data covers patents for AI-related inventions filed at patent offices around the world.
+    - Patents are counted by family — a group of documents that describe the same invention. Inventors often file the same invention in several countries, so this avoids double-counting.
+    - A family counts as a granted patent if any of its documents has been granted, and as an application if all are still pending.
+    - Each family is assigned to the country where it was first filed. If an invention is filed at the European Patent Office and then in China, it counts only towards the European Patent Office.
+    - The data shows where patents are filed, not where inventors are based. Filing location is a proxy for where inventors expect to develop, make, or sell their inventions.
+    - Patent data has a lag because some offices take years to publish new filings. Recent years are excluded here.
 
   description_key_investment: &description_key_investment
     - The data covers external private-market investment in AI companies, including venture capital deals, private equity deals, and mergers and acquisitions.
