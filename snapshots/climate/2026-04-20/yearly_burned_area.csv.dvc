@@ -5,17 +5,15 @@ meta:
     # Data product / Snapshot
     title: Global Yearly Burned Area by Land Cover Type
     description: |-
-      Yearly burned area in hectares by land cover class (2002–2024) for all countries.
+      Yearly burned area in hectares by land cover class (2002–2024) for all countries. Data
+      comes from the MODIS satellite sensor (1km resolution), which has been collecting data
+      since the early 2000s. This makes it well-suited for analyzing long-run trends in burned
+      area by land cover type. Because of MODIS's coarser resolution, smaller fires may not
+      be detected.
 
       Data is fetched via the GWIS country profile API (cprof.effis.emergency.copernicus.eu).
       Note: the API contains more recent data than the bulk download ZIP on the downloads page,
       which currently has all-zero values for 2024.
-
-      This dataset is based on MODIS satellite data only (1km resolution). MODIS has been
-      collecting data since the early 2000s, providing a longer and more consistent historical
-      record than newer sensors. It is best suited for analyzing long-run trends in burned area
-      by land cover type. Note that because of MODIS's coarser resolution, smaller fires may
-      not be detected.
     date_published: "2026"
 
     # Citation
