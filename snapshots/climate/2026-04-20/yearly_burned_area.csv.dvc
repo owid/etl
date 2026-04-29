@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Yearly Burned Area by Land Cover Type
+    description: |-
+      Yearly burned area in hectares by land cover class (2002–2024) for all countries.
+
+      Data is fetched via the GWIS country profile API (cprof.effis.emergency.copernicus.eu).
+      Note: the API contains more recent data than the bulk download ZIP on the downloads page,
+      which currently has all-zero values for 2024.
+    date_published: "2026"
+
+    # Citation
+    producer: Global Wildfire Information System
+    citation_full: |-
+      Global Wildfire Information System
+    attribution_short: GWIS
+
+    # Files
+    url_main: https://gwis.jrc.ec.europa.eu/apps/country.profile/downloads
+    date_accessed: "2026-04-20"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://gwis.jrc.ec.europa.eu/about-gwis/data-license
+
+outs:
+  - md5: 8ac1dcee7dd1b5a008716ba4e7b40063
+    size: 350796
+    path: yearly_burned_area.csv
