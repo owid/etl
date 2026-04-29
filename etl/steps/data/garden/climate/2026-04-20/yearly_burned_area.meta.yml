@@ -5,7 +5,7 @@ dataset:
 definitions:
   common:
     presentation:
-      attribution_short: GWIS
+      attribution_short: GWIS (MODIS)
       topic_tags:
         - Climate Change
         - Wildfires

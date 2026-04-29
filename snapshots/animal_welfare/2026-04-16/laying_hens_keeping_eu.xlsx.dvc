@@ -1,0 +1,22 @@
+meta:
+  origin:
+    title: Laying hens by way of keeping
+    description: |-
+      Number of laying hens in EU member states by housing system (enriched cages, furnished cages, barn, free-range, and organic).
+    date_published: "2022-05-10"
+
+    producer: European Commission
+    citation_full: |-
+      European Commission - Laying hens by way of keeping (2022), Directorate-General for Agriculture and Rural Development.
+
+    url_main: https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+    url_download: https://agriculture.ec.europa.eu/document/download/3611ba2e-ad9f-4b39-83db-00be67dc4022_en?filename=laying-hens-keeping-2011-2020_en.xlsx
+    date_accessed: "2026-04-16"
+
+    license:
+      name: CC BY 4.0
+      url: https://commission.europa.eu/legal-notice_en
+outs:
+  - md5: 7c693add48023f2aa7441bd73d4ac388
+    size: 934997
+    path: laying_hens_keeping_eu.xlsx
