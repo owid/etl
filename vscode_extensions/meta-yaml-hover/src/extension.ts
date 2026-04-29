@@ -311,11 +311,15 @@ function getDeclAtCursor(
     const ch = position.character;
 
     // Anchor declaration: `&name` — but only in syntactic anchor positions, not
-    // inside scalar text. A real YAML anchor sits either at the start of a
-    // value (after only whitespace), right after a `:` (mapping value), or
-    // right after a `-` (list item). Anything else (e.g. `R&D` in prose, or
-    // `&foo` inside a quoted string) is rejected so the reverse lookup
-    // doesn't fire on non-anchors.
+    // inside scalar text. A real YAML anchor sits at the start of a value, so
+    // the *entire* text between line start and `&` must match one of:
+    //   - just indentation (anchor on its own value line)
+    //   - `<key>: ` (after a mapping value separator)
+    //   - `- ` (after a list item dash)
+    //   - `- <key>: ` (key inside a list item)
+    // This rejects scalars like `R&D` (no `:` before), `"foo: &bar"` (the
+    // `:` is inside a quoted string so the prefix doesn't match), etc.
+    const VALID_ANCHOR_PREFIX = /^[ \t]*(?:-\s+)?(?:(?:<<|[A-Za-z_][A-Za-z0-9_-]*)\s*:\s+)?$/;
     const anchorRe = /&([A-Za-z_][A-Za-z0-9_-]*)/g;
     let am: RegExpExecArray | null;
     while ((am = anchorRe.exec(lineText)) !== null) {
@@ -324,8 +328,7 @@ function getDeclAtCursor(
         if (ch < start || ch > end) {
             continue;
         }
-        const prefix = lineText.slice(0, start).replace(/\s+$/, '');
-        if (prefix === '' || prefix.endsWith(':') || prefix.endsWith('-')) {
+        if (VALID_ANCHOR_PREFIX.test(lineText.slice(0, start))) {
             return { kind: 'anchor', name: am[1] };
         }
     }
