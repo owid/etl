@@ -78,7 +78,8 @@ def prepare_us_data(tb: Table) -> Table:
       - free-range non-organic = non_organic_free_range + non_organic_pastured
       - free-range organic = organic_free_range + organic_pastured
 
-    For 2007-2011, USDA only reports binary cage vs cage-free, so all granular columns are left as NA.
+    For 2007-2011, USDA reports cage-free subtotals by organic status, but not the barn/free-range/pastured
+    split needed here, so granular housing-system columns are left as NA.
     """
     tb = tb.copy()
     tb["number_of_hens_in_cages"] = tb["caged"]

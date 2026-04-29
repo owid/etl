@@ -151,8 +151,8 @@ steps:
   # US egg production - older data (USDA).
   #
   # Non updateable.
-  data://meadow/animal_welfare/2018-10-19/us_egg_production_2007_2018:
-    - snapshot://animal_welfare/2018-10-19/us_egg_production_2007_2018.pdf
+  data://meadow/animal_welfare/2026-04-16/us_egg_production_2007_2018:
+    - snapshot://animal_welfare/2026-04-16/us_egg_production_2007_2018.pdf
   #
   # US egg production (USDA).
   #
@@ -163,7 +163,7 @@ steps:
   #
   data://garden/animal_welfare/2026-04-16/us_egg_production:
     - data://meadow/animal_welfare/2026-04-16/us_egg_production
-    - data://meadow/animal_welfare/2018-10-19/us_egg_production_2007_2018
+    - data://meadow/animal_welfare/2026-04-16/us_egg_production_2007_2018
   #
   # Global hen inventory (Welfare Footprint Institute).
   #
