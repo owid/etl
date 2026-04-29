@@ -52,6 +52,16 @@ etl pr "some title for the PR" -t --worktree-path /tmp/etl-mybranch
 ```
 
 The new working directory is printed at the end (default: `../etl-BRANCH`); `cd` into it to start working there.
+
+**Custom use case (5)**: Share the original repo's `data/` directory with the new worktree, so ETL steps don't have to recompute population, regions, etc.
+
+```shell
+etl pr "some title for the PR" -t --share-data
+```
+
+This symlinks the new worktree's `data/` to the original repo's `data/`. Caveats:
+- Don't use --share-data if you are planning to work on similar files.
+- Never `rm -rf data/` from the worktree: it deletes the symlink as well as the original data dir.
 """
 
 import hashlib
@@ -166,6 +176,12 @@ MODEL_DEFAULT = "gpt-5-mini"
     default=None,
     help="Override the worktree directory (only with --worktree). Defaults to ../etl-BRANCH.",
 )
+@click.option(
+    "--share-data",
+    "share_data",
+    is_flag=True,
+    help="Symlink the new worktree's data/ to the original repo's data/ (only with --worktree). Avoids recomputing upstream ETL steps. Don't run heavy ETL ops in both worktrees concurrently, and never `rm -rf data/` in the worktree.",
+)
 def cli(
     title: str,
     category: str | None,
@@ -177,6 +193,7 @@ def cli(
     no_llm: bool,
     worktree: bool,
     worktree_path: str | None,
+    share_data: bool,
     # base_branch: Optional[str] = None,
 ) -> None:
     # Check that the user has set up a GitHub token.
@@ -195,6 +212,8 @@ def cli(
         )
     if worktree_path and not worktree:
         raise click.ClickException("--worktree-path requires --worktree.")
+    if share_data and not worktree:
+        raise click.ClickException("--share-data requires --worktree.")
 
     # Get category
     category = ensure_category(category)
@@ -232,6 +251,8 @@ def cli(
         if worktree:
             resolved_worktree_path = resolve_worktree_path(work_branch, worktree_path)
             branch_out_worktree(repo, base_branch, work_branch, resolved_worktree_path)
+            if share_data:
+                symlink_data_dir(resolved_worktree_path)
             # Subsequent git operations (commit, push) must run inside the worktree.
             repo = Repo(resolved_worktree_path)
         else:
@@ -241,7 +262,7 @@ def cli(
     create_pr(repo, work_branch, base_branch, pr_title)
 
     if resolved_worktree_path is not None:
-        print_worktree_hint(resolved_worktree_path)
+        print_worktree_hint(resolved_worktree_path, shared_data=share_data)
 
 
 def check_gh_token():
@@ -394,7 +415,22 @@ def branch_out_worktree(repo, base_branch: str, work_branch: str, worktree_path:
         log.debug(f"No .env found at '{src_env}', skipping copy.")
 
 
-def print_worktree_hint(worktree_path: Path) -> None:
+def symlink_data_dir(worktree_path: Path) -> None:
+    """Symlink the original repo's data dir into the worktree, so ETL steps reuse cached outputs."""
+    src = BASE_DIR / "data"
+    dst = worktree_path / "data"
+    if not src.exists():
+        log.warning(f"Cannot share data: '{src}' does not exist in the original repo.")
+        return
+    if dst.exists() or dst.is_symlink():
+        # `git worktree add` shouldn't have created a `data/` (it's gitignored), but be defensive.
+        log.warning(f"'{dst}' already exists, skipping data symlink.")
+        return
+    os.symlink(src, dst)
+    log.info(f"Symlinked '{dst}' -> '{src}'.")
+
+
+def print_worktree_hint(worktree_path: Path, shared_data: bool = False) -> None:
     """Tell the user how to land in the new worktree.
 
     A child Python process can't change its parent shell's cwd, so we just print a
@@ -413,6 +449,13 @@ def print_worktree_hint(worktree_path: Path) -> None:
     print()
     print("Then set up the env (one-time):")
     print("  uv sync")
+    if shared_data:
+        print()
+        print("data/ is symlinked to the original repo.")
+        print(
+            "  WARNING: Do not run `rm -rf data/`, since this would delete both the symlink and the original data folder. "
+        )
+        print("  To remove only the symlink, use `rm data` (without a trailing slash).")
 
 
 def create_pr(repo, work_branch, base_branch, pr_title):
