@@ -65,11 +65,19 @@ definitions:
 
   # Used in variable display blocks to mark projection variants so the grapher
   # renders them with a dashed line. Reference with `isProjection: *projection`.
-  projection: &projection <% if (variant is defined) and (variant != 'estimates') -%>
-    true
-    <%- else -%>
-    false
-    <%- endif -%>
+  projection: &projection <% if (variant is defined) and (variant != 'estimates') -%> true <%- else -%> false <%- endif -%>
+
+  # Note flagging vital-registration uncertainty. Reference with `note: *crvs_note`.
+  # Used by deaths, death_rate, and mortality_rate.
+  crvs_note: &crvs_note |-
+    Estimates may be uncertain for countries with poor [vital registration systems](#dod:crvs).
+
+  # Note explaining the expected biological sex ratio at birth. Renders only
+  # when age == '0'. Reference with `note: *sex_ratio_birth_note`.
+  sex_ratio_birth_note: &sex_ratio_birth_note |-
+    <% if age == '0' -%>
+    It's considered that 105 is the biologically expected sex ratio at birth.
+    <%- endif %>
 
 # this metadata file is not used in garden step, but in grapher step
 tables:
@@ -149,7 +157,6 @@ tables:
           grapher_config:
             subtitle: |-
               Number of people per km² of land area. {definitions.global.projections}
-
       # population_doubling_time:
       #   title: Population doubling time
       #   unit: years
@@ -320,6 +327,8 @@ tables:
             <%- else %>
             Number of deaths among {definitions.global.pop_noun} {definitions.global.pop_age_label}
             <%- endif %>
+          grapher_config:
+            note: *crvs_note
 
       death_rate:
         title: Death rate
@@ -334,6 +343,7 @@ tables:
             Death rate
           grapher_config:
             subtitle: Annual number of deaths per 1,000 people in the total population. {definitions.global.projections}
+            note: *crvs_note
 
   births:
     variables:
@@ -497,6 +507,7 @@ tables:
               <%- else %>
               Number of men per 100 women at age << age >>. Values above 100 mean there are more men than women.
               <%- endif %> {definitions.global.projections}
+            note: *sex_ratio_birth_note
 
   dependency_ratio:
     variables:
@@ -546,11 +557,11 @@ tables:
               <%- set young = 'boys' %><%- set adult = 'men' %><%- set old = 'men' %>
               <%- endif %>
               <%- if age == "total" %>
-              Number of << young >> aged 0–14 and<% if sex != 'all' %> << old >> aged<% endif %> 65+ per 100 << adult >> aged 15–64.
+              Number of << young >> aged 0-14 and<% if sex != 'all' %> << old >> aged<% endif %> 65+ per 100 << adult >> aged 15-64.
               <%- elif age == "youth" %>
-              Number of << young >> aged 0–14 per 100 << adult >> aged 15–64.
+              Number of << young >> aged 0-14 per 100 << adult >> aged 15-64.
               <%- else %>
-              Number of << old >> aged 65+ per 100 << adult >> aged 15–64.
+              Number of << old >> aged 65+ per 100 << adult >> aged 15-64.
               <%- endif %> {definitions.global.projections}
 
   mortality_rate:
