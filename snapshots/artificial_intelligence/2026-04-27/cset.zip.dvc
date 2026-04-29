@@ -3,20 +3,21 @@ meta:
     producer: Center for Security and Emerging Technology
     title: 'Country Activity Tracker: Artificial Intelligence'
     description: |-
-      The Country AI Activity Metrics dataset, which powers ETO's Country Activity Tracker, brings together national-level metrics on AI research, patents, and private-market investment.
+      ETO's Country AI Activity Metrics dataset includes national-level metrics for AI-related research, patents, and private-market investment.
 
-      Research data comes from ETO's Merged Academic Corpus, a large database of scholarly articles, filtered to AI-related publications. Articles are attributed to countries based on the author organizations listed in each article's metadata, and may count toward multiple countries when authors are affiliated with organizations in different ones. Articles are also classified into AI subfields, including AI safety, computer vision, natural language processing, robotics, and large language models.
+      The metrics are derived from a variety of underlying data sources, including ETO's Merged Academic Corpus for research data; The Lens, PATSTAT, and 1790 Analytics for patents; and Crunchbase for company and investment data.
 
-      Patent data is sourced from 1790 Analytics, PATSTAT, and The Lens, and covers AI-related patent families across patent offices worldwide. Patents are attributed to the "priority country" — the jurisdiction where the inventor first filed — not the inventor's nationality.
+      The dataset focuses on countries, not organizations or individuals, and on AI and its subfields. There are many ways to assess countries' AI activities, and the three types of metrics included here, while meaningful, are not exhaustive. The data also has a lag, making counts incomplete for recent years; the lag is especially significant for patent data.
 
-      Investment data comes from Crunchbase. AI-related companies are identified through keyword matching on business descriptions and Crunchbase industry tags. The data covers equity investment in privately held companies, including venture capital, private equity, and M&A transactions, and excludes non-equity funding such as debt finance, grants, and crowdfunding.
-    citation_full: |-
-      Emerging Technology Observatory [Country AI Activity Metrics](https://eto.tech/dataset-docs/country-ai-activity-metrics/) dataset.
+    citation_full: Emerging Technology Observatory [Country AI Activity Metrics](https://eto.tech/dataset-docs/country-ai-activity-metrics/) dataset.
     attribution_short: CSET
+
     url_main: https://cat.eto.tech/
     url_download: https://zenodo.org/records/19103157/files/cat.zip?download=1
+
     date_accessed: '2026-04-27'
     date_published: '2026-03-19'
+
     license:
       name: CC BY-NC 4.0
       url: https://eto.tech/tou/
