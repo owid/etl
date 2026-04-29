@@ -283,6 +283,7 @@ def run() -> None:
                 "type": "StackedDiscreteBar",
                 "stackMode": "absolute",
                 "hideRelativeToggle": False,
+                "selectedEntityNames": config["config"]["selection"],
             },
         }
     )

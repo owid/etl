@@ -11,6 +11,7 @@ config:
     - India
     - Brazil
     - United Kingdom
+    - Spain
   # subNavId:
   # subNavCurrentId:
   # wpBlockId: "58184"  # TODO: Is this needed?
