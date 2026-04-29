@@ -73,11 +73,7 @@ definitions:
 
   # Used in variable display blocks to mark projection variants so the grapher
   # renders them with a dashed line. Reference with `isProjection: *projection`.
-  projection: &projection <% if (variant is defined) and (variant != 'estimates') -%>
-    true
-    <%- else -%>
-    false
-    <%- endif -%>
+  projection: &projection <% if (variant is defined) and (variant != 'estimates') -%> true <%- else -%> false <%- endif -%>
 
 # this metadata file is not used in garden step, but in grapher step
 tables:
@@ -164,7 +160,6 @@ tables:
           grapher_config:
             subtitle: |-
               Number of people per km² of land area. {definitions.global.projections}
-
       # population_doubling_time:
       #   title: Population doubling time
       #   unit: years
@@ -244,13 +239,15 @@ tables:
           <%- endif %>
         description_key:
           - |-
-            The [total fertility rate](#dod:fertility-rate) (shown when no age group is selected) is the average number of children a woman would have if she experienced today's age-specific birth rates throughout her childbearing years. It is expressed as live births per woman.
-          - |-
-            The [age-specific fertility rate](#dod:age-specific-fertility-rate) measures births to women in a particular age group per 1,000 women in that age group. The standard age groups used by the UN are 15–19, 20–24, …, 45–49.
+            <% if age == 'all' -%>
+            The [total fertility rate](#dod:fertility-rate) is the average number of children a woman would have if she experienced today's age-specific birth rates throughout her childbearing years. It is expressed as live births per woman.
+            <%- else -%>
+            This is an [age-specific fertility rate](#dod:age-specific-fertility-rate): the annual number of live births to women aged << age|replace('-', ' to ') >> per 1,000 women in that age group.
+            <%- endif -%>
           - |-
             All figures refer to civil calendar years from 1 January to 31 December.
           - |-
-            Future fertility is projected with a probabilistic Bayesian model. The medium scenario is the mean of thousands of simulated trajectories. The high and low scenarios run, in steady state, 0.5 births per woman above and below the medium — for example, a country with a medium TFR of 2.1 has a high TFR of 2.6 and a low TFR of 1.6.
+            The UN projects future fertility with a probabilistic Bayesian model. The medium scenario is the mean of thousands of simulated trajectories. The high and low scenarios run, in steady state, 0.5 births per woman above and below the medium — for example, a country with a medium TFR of 2.1 has a high TFR of 2.6 and a low TFR of 1.6.
         description_processing: |-
           The UN reports total fertility rates for individual countries but not for our continental aggregates (Africa, Asia, Europe, North America, South America, Oceania). For these regions we derive the total fertility rate as five times the sum of the age-specific fertility rates across the seven five-year age groups from 15–19 to 45–49, where each rate is the regional sum of births to women in that age group divided by the regional female population in that age group.
         display:
@@ -485,7 +482,7 @@ tables:
           - |-
             This is [period life expectancy](#dod:period-life-expectancy) — a snapshot summary of mortality rates in a single year. It does *not* follow a real cohort of people. It tells you how long someone would live if today's age-specific death rates stayed unchanged for the rest of their life.
           - |-
-            Future values are projected with a probabilistic Bayesian model: the trajectory shown is the mean of thousands of simulated futures. To avoid distorting the long-run trend, life expectancy values for 2020 and 2021 — when COVID-19 caused large temporary drops — were excluded when fitting the projection model.
+            The UN projects future values with a probabilistic Bayesian model: the trajectory shown is the mean of thousands of simulated futures. To avoid distorting the long-run trend, the UN excluded life expectancy values for 2020 and 2021 — when COVID-19 caused large temporary drops — when fitting the projection model.
         description_processing: |-
           For ages above 0, the UN reports life expectancy as the *remaining* number of years a person at that age can expect to live. We add the age value back so the chart shows the *expected age at death* — for example, a person who reaches age 65 with 17 more years left to live is shown as 82, not 17.
         display:
@@ -536,9 +533,13 @@ tables:
           <%- endif %> {definitions.global.projections}
         description_key:
           - |-
+            <% if age == '0' -%>
             The natural sex ratio at birth is around 105 boys per 100 girls. Sustained departures from this — particularly persistent values above 105 — usually indicate sex-selective practices.
-          - |-
-            At older ages, sex ratios fall below 100 because women on average live longer than men. Migration can also pull the ratio in either direction.
+            <%- elif age == 'all' -%>
+            The sex ratio of an entire population reflects two opposing pressures: slightly more boys than girls are born (around 105 to 100), but women on average live longer than men. Migration can pull the ratio in either direction.
+            <%- else -%>
+            Sex ratios fall over the lifespan because women on average live longer than men, so older age groups tend to be below 100. Migration can pull the ratio in either direction at any age.
+            <%- endif -%>
         description_processing: |-
           We compute the sex ratio at each age as the number of males divided by the number of females in the UN's population by sex and single year of age, multiplied by 100.
         display:
@@ -596,7 +597,13 @@ tables:
           <%- endif %>
         description_key:
           - |-
-            The dependency ratio splits the population by age — those under 15 and those aged 65 and over are treated as "dependents", while those aged 15 to 64 are treated as the "working-age" population.
+            <% if age == 'total' -%>
+            The total dependency ratio compares "dependents" — those under 15 and those aged 65 and over — with the "working-age" population aged 15 to 64.
+            <%- elif age == 'youth' -%>
+            The youth dependency ratio compares those under 15 with the working-age population (aged 15 to 64).
+            <%- else -%>
+            The old-age dependency ratio compares those aged 65 and over with the working-age population (aged 15 to 64).
+            <%- endif -%>
           - |-
             This is a purely demographic measure. It does *not* count who is actually working or financially dependent — many people aged 15–64 are not in the labour force, and many people over 65 still are.
         description_processing: |-
@@ -654,7 +661,11 @@ tables:
           <%- endif %> {definitions.global.projections}
         description_key:
           - |-
-            This is the *probability* a newborn would die before reaching the given age if today's age-specific mortality rates stayed unchanged for the rest of their life. It is not the share of an actual cohort that has been observed dying.
+            <% if age == '0' -%>
+            This is the *probability* a newborn would die before reaching the age of one if today's age-specific mortality rates stayed unchanged. It is not the share of an actual cohort that has been observed dying.
+            <%- else -%>
+            This is the *probability* a newborn would die before reaching the age of five if today's age-specific mortality rates stayed unchanged. It is not the share of an actual cohort that has been observed dying.
+            <%- endif -%>
         description_processing: |-
           The UN publishes infant and under-five mortality as deaths per 1,000 live births. We divide by 10 to express the values as a percentage of newborns.
         display:
