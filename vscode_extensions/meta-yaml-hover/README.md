@@ -19,6 +19,10 @@ When you hover over a placeholder like `{definitions.poverty_line_per_day}` or `
 
 The hover lists every nested `{...}` / `*anchor` reference found in the resolved value as a clickable **Drill into** link that jumps to the declaration line. `Cmd+Click` (or `F12`) on a reference in the document also jumps to its declaration via Go-to-Definition.
 
+### Find references (reverse lookup)
+
+`Cmd+Click` on a *declaration* — a YAML key (like `poverty_line_per_day:` under `definitions:`) or an `&anchor` token — peeks every place that references it in the same file. `Shift+F12` (or right-click → **Find All References**) does the same and lists results in the References panel; it also works from a usage site to find sibling usages.
+
 Runtime placeholders like `<<welfare_type>>`, `{TODAY}`, `{LATEST_YEAR}`, `{date_accessed}`, `{year}` are **not** resolved — their values come from the Python step's `yaml_params=...` at render time, not from the YAML.
 
 ## Scope
