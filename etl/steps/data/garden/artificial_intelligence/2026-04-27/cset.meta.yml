@@ -9,7 +9,7 @@ definitions:
       numDecimalPlaces: 0
 
   description_key_articles: &description_key_articles
-    - The data comes from the Merged Academic Corpus (MAC), which covers more than 260 million academic articles.
+    - The data comes from the [Merged Academic Corpus (MAC)](https://eto.tech/dataset-docs/mac/), which covers more than 280 million academic articles.
     - Articles are flagged as AI-related by an automated classifier.
     - An article counts for a country if at least one of its authors lists an affiliation there. If authors are based in several countries, the article is counted once for each country.
     - For example, a paper co-authored by researchers in the United States and Japan counts once for the United States and once for Japan.

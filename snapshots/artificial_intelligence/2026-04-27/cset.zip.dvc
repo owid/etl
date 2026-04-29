@@ -3,13 +3,13 @@ meta:
     producer: Center for Security and Emerging Technology
     title: 'Country Activity Tracker: Artificial Intelligence'
     description: |-
-      The research data in the Country AI Activity Metrics dataset (which powers ETO's Country Activity Tracker, or CAT) is derived from ETO's Merged Academic Corpus (MAC), which contains detailed information on over 260 million scholarly articles worldwide. The dataset uses only AI-related articles from the MAC. Articles are attributed to countries based on the author organizations listed in each article's metadata: an article is attributed to a country if it lists at least one author affiliated with an organization in that country, and may count toward multiple countries if authors are affiliated with organizations in different countries.
+      The Country AI Activity Metrics dataset, which powers ETO's Country Activity Tracker, brings together national-level metrics on AI research, patents, and private-market investment.
 
-      Articles are classified into AI subfields using Merged Academic Corpus subject assignments. The dataset currently covers AI as a whole plus the following subfields: AI safety, computer vision, natural language processing, robotics, and large language models.
+      Research data comes from ETO's Merged Academic Corpus, a large database of scholarly articles, filtered to AI-related publications. Articles are attributed to countries based on the author organizations listed in each article's metadata, and may count toward multiple countries when authors are affiliated with organizations in different ones. Articles are also classified into AI subfields, including AI safety, computer vision, natural language processing, robotics, and large language models.
 
-      The dataset includes patent data from 1790 Analytics, PATSTAT, and The Lens, covering AI-related patent families (including patent applications and granted patents) across 52 patent offices worldwide. Patents are attributed to the "priority country" — the first jurisdiction where the inventor filed — not the inventor's nationality. The dataset also uses Crunchbase data to identify AI-related companies (via keyword matching on business descriptions and Crunchbase industry tags) and includes equity investment metrics for these companies, covering venture capital, private equity, and M&A transactions while excluding non-equity investment such as debt finance, grants, and crowdfunding.
+      Patent data is sourced from 1790 Analytics, PATSTAT, and The Lens, and covers AI-related patent families across patent offices worldwide. Patents are attributed to the "priority country" — the jurisdiction where the inventor first filed — not the inventor's nationality.
 
-      The data is updated through an automated pipeline that normally runs monthly, with occasional pauses to resolve issues from vendor data changes or quality checks.
+      Investment data comes from Crunchbase. AI-related companies are identified through keyword matching on business descriptions and Crunchbase industry tags. The data covers equity investment in privately held companies, including venture capital, private equity, and M&A transactions, and excludes non-equity funding such as debt finance, grants, and crowdfunding.
     citation_full: |-
       Emerging Technology Observatory [Country AI Activity Metrics](https://eto.tech/dataset-docs/country-ai-activity-metrics/) dataset.
     attribution_short: CSET
