@@ -59,13 +59,34 @@ class CannotPublish(Exception):
     default=CHANNEL.__args__,
     help="Publish only selected channel (subfolder of data/), push all by default.",
 )
-def publish_cli(dry_run: bool, private: bool, bucket: str, channel: Iterable[CHANNEL]) -> None:
+@click.option(
+    "--jsonld",
+    is_flag=True,
+    default=False,
+    help="Generate and publish Schema.org Dataset JSON-LD artifacts for eligible catalog datasets.",
+)
+@click.option(
+    "--jsonld-base-url",
+    type=str,
+    default="https://catalog.ourworldindata.org",
+    help="Base URL to use in generated JSON-LD and sitemap URLs.",
+)
+def publish_cli(
+    dry_run: bool,
+    private: bool,
+    bucket: str,
+    channel: Iterable[CHANNEL],
+    jsonld: bool,
+    jsonld_base_url: str,
+) -> None:
     """Publish the generated data catalog to S3."""
     return publish(
         dry_run=dry_run,
         private=private,
         bucket=bucket,
         channel=channel,
+        jsonld=jsonld,
+        jsonld_base_url=jsonld_base_url,
     )
 
 
@@ -74,6 +95,8 @@ def publish(
     private: bool = False,
     bucket: str = config.R2_BUCKET,
     channel: Iterable[CHANNEL] = CHANNEL.__args__,
+    jsonld: bool = False,
+    jsonld_base_url: str = "https://catalog.ourworldindata.org",
 ) -> None:
     catalog = Path(DATA_DIR)
     if not dry_run and not private:
@@ -85,6 +108,19 @@ def publish(
 
     for c in channel:
         sync_catalog_to_s3(bucket, catalog, channel=c, dry_run=dry_run, private_bucket=config.R2_BUCKET_PRIVATE)
+
+    if jsonld:
+        from etl.catalog_jsonld.publish import build_and_publish_catalog_jsonld
+
+        for c in channel:
+            if c == "garden":
+                build_and_publish_catalog_jsonld(
+                    bucket=bucket,
+                    catalog_dir=catalog,
+                    channel=c,
+                    dry_run=dry_run,
+                    base_url=jsonld_base_url,
+                )
 
 
 def sanity_checks(catalog: Path, channel: CHANNEL) -> None:
