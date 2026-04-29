@@ -50,9 +50,10 @@ def _read_csv(archive, file_name: str) -> Table:
     tb["field"] = tb["field"].str[:1] + tb["field"].str[1:].str.lower()
 
     if file_name != "companies_yearly_estimated.csv":
-        numeric_cols = tb.select_dtypes(include=["number"]).columns.tolist()
+        group_keys = ["country", "year", "field"]
+        numeric_cols = [c for c in tb.select_dtypes(include=["number"]).columns if c not in group_keys]
         if numeric_cols:
-            tb = tb.groupby(["country", "year", "field"], as_index=False)[numeric_cols].sum()
+            tb = tb.groupby(group_keys, as_index=False)[numeric_cols].sum()
 
     return tb
 
