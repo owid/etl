@@ -200,17 +200,6 @@ definitions:
   description_key_welfare_type_spells: |-
     The data comes from the World Bank's Poverty and Inequality Platform (PIP), which draws on national household surveys. Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). These are not perfectly comparable — consumption tends to be more evenly distributed than income. This chart shows the data with income and consumption measures separately.
 
-  description_key_welfare_type_poverty: |-
-    <% if survey_comparability == "No spells" %>
-    <% if welfare_type == "income" %>
-    The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
-    <%- elif welfare_type == "consumption" %>
-    The data relates to consumption [per capita](#dod:per-capita).
-    <%- else %>
-    {definitions.description_key_welfare_type_base}
-    <%- endif %>
-    <%- endif %>
-
   description_key_welfare_type: |-
     <% if welfare_type is defined and survey_comparability is defined and survey_comparability == "No spells" %>
     <% if welfare_type == "income" %>
@@ -859,7 +848,7 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type_poverty}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -907,7 +896,7 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type_poverty}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -929,7 +918,7 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type_poverty}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -954,7 +943,7 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type_poverty}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -1002,7 +991,7 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type_poverty}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -1024,7 +1013,7 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type_poverty}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -1731,7 +1720,7 @@ tables:
         description_key:
           - "{definitions.description_key_mean}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type_poverty}"
+          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
         description_processing: |-
@@ -1787,7 +1776,7 @@ tables:
         description_key:
           - "{definitions.description_key_median}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type_poverty}"
+          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
         description_processing: |-
