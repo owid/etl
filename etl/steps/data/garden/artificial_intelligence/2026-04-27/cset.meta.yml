@@ -61,7 +61,7 @@ tables:
         unit: constant 2021 US dollars
         short_unit: $
         description_short: |-
-          Funding raised by privately held AI companies, mainly through venture capital and private equity deals. Adjusted for inflation.
+          Money put into privately held AI companies by private investors. This excludes publicly traded companies (e.g., Big Tech companies) and companies’ internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation. Data for {year} is incomplete and includes investments up to {month} {year}.
         description_key:
           - *description_key_investment
         presentation:
