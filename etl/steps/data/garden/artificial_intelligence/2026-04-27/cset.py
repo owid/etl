@@ -61,6 +61,20 @@ def run() -> None:
 
     tb = tb.drop(columns=[c for c in COLS_TO_DROP if c in tb.columns])
 
+    # Limit investment, articles, and patent applications to field="All" only.
+    # Granted patents keep all field values.
+    field_all_only_cols = [
+        "estimated_investment",
+        "estimated_investment_projected",
+        "num_articles",
+        "num_articles_per_mil",
+        "num_patent_applications",
+        "num_patent_applications_per_mil",
+    ]
+    for col in field_all_only_cols:
+        if col in tb.columns:
+            tb[col] = tb[col].where(tb["field"] == "All")
+
     tb = tb.format(["country", "year", "field"], short_name=paths.short_name)
 
     ds_garden = paths.create_dataset(
