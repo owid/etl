@@ -10,13 +10,19 @@ meta:
       Data is fetched via the GWIS country profile API (cprof.effis.emergency.copernicus.eu).
       Note: the API contains more recent data than the bulk download ZIP on the downloads page,
       which currently has all-zero values for 2024.
+
+      This dataset is based on MODIS satellite data only (1km resolution). MODIS has been
+      collecting data since the early 2000s, providing a longer and more consistent historical
+      record than newer sensors. It is best suited for analyzing long-run trends in burned area
+      by land cover type. Note that because of MODIS's coarser resolution, smaller fires may
+      not be detected.
     date_published: "2026"
 
     # Citation
     producer: Global Wildfire Information System
     citation_full: |-
       Global Wildfire Information System
-    attribution_short: GWIS
+    attribution_short: GWIS (MODIS)
 
     # Files
     url_main: https://gwis.jrc.ec.europa.eu/apps/country.profile/downloads
