@@ -72,7 +72,7 @@ tables:
               Annual private investment in AI: << field|lower >>
               <%- endif %>
           grapher_config:
-            note: Adjusted for inflation to constant 2021 US dollars using the US Consumer Price Index.
+            note: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
         display:
           name: << field >>
 
