@@ -126,11 +126,29 @@ definitions:
     Inequality is measured here in terms of income before taxes and benefits.
     <%- endif %>
 
-  description_key_gini: |-
-    Incomes are distributed very unequally, both between countries and within them. The Gini coefficient is a common measure of inequality, which summarizes the distribution and expresses it in terms of a number from 0 to 1. Higher values indicate higher inequality. We explain how it works in our article [Measuring inequality: what is the Gini coefficient?](https://ourworldindata.org/what-is-the-gini-coefficient), and discuss income inequality more broadly on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+  description_key_inequality: |-
+    Incomes are distributed very unequally, both between countries and within them. This data lets you compare how income is distributed across the population and how those levels have changed over time. We discuss this in more detail on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_lis: |-
     The data comes from the Luxembourg Income Study (LIS), which takes the original microdata from national household surveys and harmonizes it — reconstructing incomes using a common set of definitions across countries. This makes the data more comparable across countries than other sources, but at the cost of covering fewer countries.
+
+  description_key_gini: |-
+    Incomes are distributed very unequally, both between countries and within them. The Gini coefficient is a common measure of inequality, which summarizes the distribution and expresses it in terms of a number from 0 to 1. Higher values indicate higher inequality. We explain how it works in our article [Measuring inequality: what is the Gini coefficient?](https://ourworldindata.org/what-is-the-gini-coefficient), and discuss income inequality more broadly on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_mean: |-
+    This data shows the mean (average) income per person. Because incomes are unevenly distributed, with a small number of people on very high incomes, the mean is typically higher than what most people have. To see the income of a typical person, you can look at the median income instead. We discuss how incomes are distributed in more detail on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_median: |-
+    This data shows the median income per person — the level below which half the population falls. Unlike the mean, the median is not pulled up by the incomes of the richest, so it better reflects what a typical person has. You can switch to mean income using the chart controls. We discuss how incomes are distributed in more detail on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_avg: |-
+    This data shows the mean (average) income per person within decile groups — each representing a tenth of the population, ranked by income. For example, the poorest decile is the poorest 10% of people in a country. We discuss how incomes are distributed in more detail on our page on [Economic Inequality.](https://ourworldindata.org/economic-inequality)
+
+  description_key_thr: |-
+    This data shows the income threshold for a given decile — a tenth of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.
+
+  description_key_share: |-
+    This data shows the share of total income that goes to specific groups of the population. For example, if the poorest decile receives 3% of total income, it means the poorest 10% of people share just 3% of all income between them.
 
   numdecimalplaces_period: |-
     <% if period == "day" %>
@@ -988,8 +1006,10 @@ tables:
         description_short: |-
           Average income {definitions.per_period} of the population.
         description_key:
+          - "{definitions.description_key_mean}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Mean income ({definitions.welfare_type})
@@ -1022,8 +1042,10 @@ tables:
         description_short: |-
           Value of income {definitions.per_period} below which 50% of the population live.
         description_key:
+          - "{definitions.description_key_median}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Median income ({definitions.welfare_type})
@@ -1057,10 +1079,12 @@ tables:
         short_unit: "$"
         description_short: |-
           {macros}
-          The mean income {definitions.per_period} within the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The mean income {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
         description_key:
+          - "{definitions.description_key_avg}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: |-
@@ -1100,9 +1124,12 @@ tables:
         short_unit: "%"
         description_short: |-
           {macros}
-          The share of income received by the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The share of income received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: |-
@@ -1140,8 +1167,11 @@ tables:
           {macros}
           The level of income {definitions.per_period} below which <<decile>>0% of the population falls.
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_thr}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: |-
