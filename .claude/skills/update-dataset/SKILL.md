@@ -319,7 +319,7 @@ When you do stop, present a concise summary of the issue and what options exist.
        AND c.publishedAt IS NOT NULL
      GROUP BY c.id
      ```
-   - Map the published count to `size_qualifier`: 1–10 = `handful`, 10–50 = `moderate`, 50–200 = `large`, 200+ = `massive`.
+   - Map the published count to `size_qualifier`: 1–9 = `handful`, 10–49 = `moderate`, 50–199 = `large`, 200+ = `massive`.
    - Pick 1–3 `selected_views` using these criteria (in order of preference):
      - **Map views** — immediately visual, readers can find their own country
      - **Charts with punchy, standalone headlines** — titles that make a clear claim work best for social sharing

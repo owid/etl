@@ -92,7 +92,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
      WHERE v.catalogPath LIKE '%<ns>/<ver>/<sn>%'
        AND c.publishedAt IS NOT NULL"
    ```
-   - Map the count to a qualifier: 1–10 = "handful", 10–50 = "moderate", 50–200 = "large", 200+ = "massive".
+   - Map the count to a qualifier: 1–9 = "handful", 10–49 = "moderate", 50–199 = "large", 200+ = "massive".
    - **Only count published charts.** Drafts are excluded by design — the Slack audience cares about user-facing impact.
 
 4. **Seed the editorial fields with context.**
