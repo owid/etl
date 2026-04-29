@@ -1833,10 +1833,11 @@ tables:
           The mean income or consumption per day within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
+          - "{definitions.description_key_avg}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
         description_processing: |-
           {definitions.description_processing_avg}
           {definitions.description_processing_main}
@@ -1899,9 +1900,11 @@ tables:
           The share of income or consumption by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
         description_processing: |-
           {definitions.description_processing_main}
         description_from_producer: |-
@@ -1962,10 +1965,12 @@ tables:
           The level of income or consumption {definitions.per_period} below which <<decile>>0% of the population falls.
           <% endif %>
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_thr}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
         description_processing: |-
           {definitions.description_processing_thr}
           {definitions.description_processing_main}
