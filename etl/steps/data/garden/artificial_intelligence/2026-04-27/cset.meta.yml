@@ -24,7 +24,7 @@ definitions:
     - Patent data has a lag because some offices take years to publish new filings. Recent years are excluded here because they are likely incomplete.
 
   description_key_investment: &description_key_investment
-    - The data covers external private-market investment in AI companies, mainly venture capital and private equity deals.
+    - The data covers external private-market investment in AI companies, including venture capital deals, private equity deals, and mergers and acquisitions.
     - It excludes internal corporate R&D, capital spending, and government funding. Publicly traded companies, including large technology firms, are also excluded.
     - Because this is only one type of funding, the data understates total global spending on AI.
     - A small number of very large deals can drive big year-on-year swings. Broader economic conditions, such as interest rates and investor sentiment, also affect totals in ways that are not specific to AI.
@@ -135,7 +135,7 @@ tables:
               AI patents granted: << field|lower >>
               <%- endif %>
           grapher_config:
-            note: Country-level data covers only up to 2021, since recent years are likely incomplete due to publication lags.
+            note: Country-level data covers only up to 2019, since recent years are likely incomplete due to publication lags.
         display:
           name: << field >>
 
@@ -143,7 +143,7 @@ tables:
         title: AI scholarly publications
         unit: publications
         description_short: |-
-          Scholarly publications on AI topics, including journal articles, conference papers, and preprints.
+          Scholarly publications on AI topics, including peer-reviewed publications, working papers, and preprints.
         description_key:
           - *description_key_articles
         presentation:
