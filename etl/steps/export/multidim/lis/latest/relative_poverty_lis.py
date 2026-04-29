@@ -15,6 +15,17 @@ DIMENSIONS_CONFIG = {
     "equivalence_scale": ["square root"],
 }
 
+# Override of description_key_welfare_type (luxembourg_income_study.meta.yml line 108) for the grouped
+# welfare_type=before_vs_after view. The OLD_* constants mirror the garden text verbatim — the assertion
+# in _get_before_vs_after_metadata catches drift in the source.
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI = (
+    "Income is measured after taxes have been paid and most government benefits have been received."
+)
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = (
+    "Income is measured before taxes have been paid and most government benefits have been received."
+)
+NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown separately. In most countries, relative poverty is lower after taxes and benefits than before, but the extent varies widely."
+
 
 def run() -> None:
     config = paths.load_collection_config()
@@ -90,8 +101,11 @@ def _get_before_vs_after_metadata(tb, view):
         subtitle = subtitle.replace(" Income here is measured after taxes and benefits.", "")
 
         description_key = list(meta.description_key) if meta.description_key else []
-        if len(description_key) > 1:
-            description_key.pop(1)
+        old_welfare_keys = {OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI, OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI}
+        assert any(b in old_welfare_keys for b in description_key), (
+            f"Neither OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI nor _MI found in {col_name}.description_key — garden text changed, update the constants."
+        )
+        description_key = [NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER if b in old_welfare_keys else b for b in description_key]
 
         return {"title": title, "subtitle": subtitle, "description_key": description_key}
 
