@@ -296,5 +296,9 @@ def _get_display_name_from_metadata(ind, indicator_titles):
                 if extracted.endswith(suffix):
                     extracted = extracted[: -len(suffix)]
                     break
-            return extracted[0].upper() + extracted[1:] if extracted else extracted
+            name = extracted[0].upper() + extracted[1:] if extracted else extracted
+            # In thr views, annotate the 5th decile as the median.
+            if name and col_name.startswith("thr__") and _get_decile_number(ind) == 5:
+                name = f"{name} (median)"
+            return name
     return None
