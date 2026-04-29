@@ -53,6 +53,11 @@ definitions:
   investment_grapher_note: &investment_grapher_note |-
     Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
 
+  processing_per_mil: &processing_per_mil
+    processing_level: major
+    description_processing: |-
+      We divided the source's country-level figures by population to calculate per-million-people values.
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -127,18 +132,17 @@ tables:
         description_key: *description_key_articles
 
       num_patent_applications_per_mil:
-        processing_level: major
+        <<: *processing_per_mil
         title: AI patent applications per million people
         unit: applications per million people
         description_short: |-
           Patent applications for AI-related inventions per million people, including pending applications that haven't yet been granted. Each invention is counted once and attributed to the country where it was first filed, not the inventor's nationality.
         description_key: *description_key_patents
-        description_processing: *description_processing_patents
         display:
           numDecimalPlaces: 1
 
       num_articles_per_mil:
-        processing_level: major
+        <<: *processing_per_mil
         title: AI scholarly publications per million people
         unit: publications per million people
         description_short: |-
