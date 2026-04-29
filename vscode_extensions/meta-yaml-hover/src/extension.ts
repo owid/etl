@@ -310,13 +310,22 @@ function getDeclAtCursor(
     const lineText = document.lineAt(position.line).text;
     const ch = position.character;
 
-    // Anchor declaration: `&name` — match anywhere on the line.
+    // Anchor declaration: `&name` — but only in syntactic anchor positions, not
+    // inside scalar text. A real YAML anchor sits either at the start of a
+    // value (after only whitespace), right after a `:` (mapping value), or
+    // right after a `-` (list item). Anything else (e.g. `R&D` in prose, or
+    // `&foo` inside a quoted string) is rejected so the reverse lookup
+    // doesn't fire on non-anchors.
     const anchorRe = /&([A-Za-z_][A-Za-z0-9_-]*)/g;
     let am: RegExpExecArray | null;
     while ((am = anchorRe.exec(lineText)) !== null) {
         const start = am.index;
         const end = start + am[0].length;
-        if (ch >= start && ch <= end) {
+        if (ch < start || ch > end) {
+            continue;
+        }
+        const prefix = lineText.slice(0, start).replace(/\s+$/, '');
+        if (prefix === '' || prefix.endsWith(':') || prefix.endsWith('-')) {
             return { kind: 'anchor', name: am[1] };
         }
     }
