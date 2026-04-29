@@ -265,19 +265,24 @@ def run() -> None:
                     {
                         "catalogPath": "eggs_and_hens_statistics#number_of_hens_in_cages",
                         "display": {
+                            "name": "In cages",
+                            "color": "#883039",
                             "tolerance": 5,
                         },
                     },
                     {
                         "catalogPath": "eggs_and_hens_statistics#number_of_hens_cage_free",
                         "display": {
+                            "name": "Cage-free",
+                            "color": "#5D7395",
                             "tolerance": 5,
                         },
                     },
                 ]
             },
             "config": {
-                "title": "Number of laying hens in cages and cage-free housing",
+                "title": "Egg-laying hens in cages and cage-free systems",
+                "subtitle": "Cage-free housing systems include barns and free-range (non-organic and organic) farms. Cages can be conventional (battery cages) or enriched.",
                 "note": "Data may refer to different years for each country, due to limited data availability.",
                 "hasMapTab": False,
                 "type": "StackedDiscreteBar",
