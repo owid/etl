@@ -103,7 +103,7 @@ tables:
         title: AI patent applications
         unit: applications
         description_short: |-
-          AI-related patent families first filed at a country's patent office.
+         Patent applications for AI-related inventions, including pending applications that haven't yet been granted. Each invention is counted once and attributed to the country where it was first filed, not the inventor's nationality.
         description_key:
           - *description_key_patents
         description_processing: *description_processing_patents
@@ -123,7 +123,7 @@ tables:
         title: AI patents granted
         unit: patents
         description_short: |-
-          AI-related patent families first filed at a country's patent office that have since been granted.
+          Patents granted for AI-related inventions. Each invention is counted once and attributed to the country where it was first filed, not the inventor's nationality.
         description_key:
           - *description_key_patents
         description_processing: *description_processing_patents
@@ -161,7 +161,7 @@ tables:
         title: AI patent applications per million people
         unit: applications per million people
         description_short: |-
-          AI-related patent families first filed at a country's patent office, per million people.
+          Patent applications for AI-related inventions per million people, including pending applications that haven't yet been granted. Each invention is counted once and attributed to the country where it was first filed, not the inventor's nationality.
         description_key:
           - *description_key_patents
         description_processing: *description_processing_patents
