@@ -34,7 +34,7 @@ For very large diffs (>1MB) skip `gh pr diff` and read the changed files directl
 ### 3. Locate the new dataset
 
 From the changed files, identify:
-- New snapshot path: `snapshots/<namespace>/<new_version>/<short_name>.<ext>.dvc` and `.py`
+- New snapshot path: `snapshots/<namespace>/<new_version>/<short_name>.<ext>.dvc` (a `.py` upload script is **optional** — `.dvc` + `url_download` or a local file path is enough)
 - New step files: `etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/<short_name>.{py,meta.yml}`
 - Old version (from `dag/archive/*.yml` or by grepping for the same `<short_name>`)
 
@@ -72,7 +72,7 @@ Run the HEAD-check loop from `/update-dataset` § 6c on every URL in the new `.d
 ### 7. Code clarity & docs
 
 For each step file, check:
-- **Snapshot script**: docstring explains source choice; no hidden hardcoded year/date constants without `--cli-flag` parametrization (or at minimum a clear update comment)
+- **Snapshot script (if present)**: docstring explains source choice; no hidden hardcoded year/date constants without `--cli-flag` parametrization (or at minimum a clear update comment). Note: a `.py` upload script is optional — many snapshots ship with only the `.dvc` and a `url_download`. Don't flag the absence of a script.
 - **Meadow / garden / grapher**: clear top-level docstrings; no commented-out code; no silent exception handlers
 - **Garden**: harmonization uses `paths.regions.harmonize_names(tb, ...)` (the new API), not the legacy `geo.harmonize_countries`
 - **Garden assertions**: sanity checks present and not overly brittle (e.g. avoid hard-coded "X must always exceed Y" if it's not a true invariant)
