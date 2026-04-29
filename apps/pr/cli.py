@@ -40,12 +40,26 @@ etl pr "some title for the PR" --direct --base-branch "develop" --work-branch "t
 # Shorter
 etl pr "some title for the PR" --direct -b "develop" -w "this-temporary-branch"
 ```
+
+**Custom use case (4)**: Create the new branch in a sibling git worktree so you can keep editing your current branch in parallel.
+
+```shell
+etl pr "some title for the PR" --worktree
+# Shorter
+etl pr "some title for the PR" -t
+# With a custom path
+etl pr "some title for the PR" -t --worktree-path /tmp/etl-mybranch
+```
+
+The new working directory is printed at the end (default: `../etl-BRANCH`); `cd` into it to start working there.
 """
 
 import hashlib
 import os
 import re
+import shutil
 import uuid
+from pathlib import Path
 from typing import cast
 
 import click
@@ -139,6 +153,19 @@ MODEL_DEFAULT = "gpt-5-mini"
     is_flag=True,
     help="We briefly use LLMs to simplify the title and use it in the branch name. Disable this by using -n flag.",
 )
+@click.option(
+    "--worktree",
+    "-t",
+    is_flag=True,
+    help="Create the new branch in a sibling git worktree (default: ../etl-BRANCH) instead of mutating the current working tree. Useful for working on multiple branches in parallel.",
+)
+@click.option(
+    "--worktree-path",
+    "worktree_path",
+    type=str,
+    default=None,
+    help="Override the worktree directory (only with --worktree). Defaults to ../etl-BRANCH.",
+)
 def cli(
     title: str,
     category: str | None,
@@ -148,6 +175,8 @@ def cli(
     direct: bool,
     private: bool,
     no_llm: bool,
+    worktree: bool,
+    worktree_path: str | None,
     # base_branch: Optional[str] = None,
 ) -> None:
     # Check that the user has set up a GitHub token.
@@ -155,6 +184,17 @@ def cli(
 
     # Validate title
     _validate_title(title)
+
+    # --worktree and --direct don't compose: --direct reuses the current branch in
+    # the current working tree, --worktree creates a new isolated working tree.
+    if worktree and direct:
+        raise click.ClickException(
+            "--worktree and --direct cannot be used together. "
+            "--direct reuses the current branch in the current working tree, "
+            "while --worktree creates a brand-new isolated working tree."
+        )
+    if worktree_path and not worktree:
+        raise click.ClickException("--worktree-path requires --worktree.")
 
     # Get category
     category = ensure_category(category)
@@ -182,15 +222,26 @@ def cli(
     # Check branches main & work make sense!
     check_branches_valid(base_branch, work_branch, remote_branches)
 
+    resolved_worktree_path: Path | None = None
+
     # Auto PR mode: Create a new branch from the base branch.
     if not direct:
         if private:
             if not work_branch.endswith("-private"):
                 work_branch = f"{work_branch}-private"
-        branch_out(repo, base_branch, work_branch)
+        if worktree:
+            resolved_worktree_path = resolve_worktree_path(work_branch, worktree_path)
+            branch_out_worktree(repo, base_branch, work_branch, resolved_worktree_path)
+            # Subsequent git operations (commit, push) must run inside the worktree.
+            repo = Repo(resolved_worktree_path)
+        else:
+            branch_out(repo, base_branch, work_branch)
 
     # Create PR
     create_pr(repo, work_branch, base_branch, pr_title)
+
+    if resolved_worktree_path is not None:
+        print_worktree_hint(resolved_worktree_path)
 
 
 def check_gh_token():
@@ -311,6 +362,57 @@ def branch_out(repo, base_branch, work_branch):
         repo.git.checkout("-b", work_branch)
     except GitCommandError as e:
         raise click.ClickException(f"Failed to create a new branch from '{base_branch}':\n{e}")
+
+
+def resolve_worktree_path(work_branch: str, override: str | None) -> Path:
+    """Resolve the absolute path where the new worktree should be created."""
+    if override:
+        return Path(override).expanduser().resolve()
+    return (BASE_DIR.parent / f"etl-{work_branch}").resolve()
+
+
+def branch_out_worktree(repo, base_branch: str, work_branch: str, worktree_path: Path) -> None:
+    """Create branch 'work_branch' from 'base_branch' inside a new git worktree at 'worktree_path'."""
+    if worktree_path.exists():
+        raise click.ClickException(
+            f"Worktree path '{worktree_path}' already exists. "
+            "Choose a different --worktree-path or remove the existing directory."
+        )
+    try:
+        log.info(f"Creating worktree at '{worktree_path}' with new branch '{work_branch}' from '{base_branch}'.")
+        repo.git.worktree("add", "-b", work_branch, str(worktree_path), base_branch)
+    except GitCommandError as e:
+        raise click.ClickException(f"Failed to create worktree at '{worktree_path}':\n{e}")
+
+    # Copy .env so the new worktree is immediately usable. .venv is intentionally not
+    # copied/symlinked — it's Python-version-specific and best recreated with `uv sync`.
+    src_env = BASE_DIR / ".env"
+    if src_env.exists():
+        shutil.copy2(src_env, worktree_path / ".env")
+        log.info(f"Copied .env to '{worktree_path / '.env'}'.")
+    else:
+        log.debug(f"No .env found at '{src_env}', skipping copy.")
+
+
+def print_worktree_hint(worktree_path: Path) -> None:
+    """Tell the user how to land in the new worktree.
+
+    A child Python process can't change its parent shell's cwd, so we just print a
+    ready-to-paste cd line.
+    """
+    # Prefer a relative path from cwd if it's shorter than the absolute path
+    # (e.g. `../etl-foo` is friendlier than the full /Users/.../etl-foo).
+    rel_path = os.path.relpath(worktree_path)
+    display_path = rel_path if len(rel_path) < len(str(worktree_path)) else str(worktree_path)
+
+    print()
+    print(f"Worktree ready at: {worktree_path}")
+    print()
+    print("To start working there, run:")
+    print(f"  cd {display_path}")
+    print()
+    print("Then set up the env (one-time):")
+    print("  uv sync")
 
 
 def create_pr(repo, work_branch, base_branch, pr_title):
