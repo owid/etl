@@ -88,6 +88,8 @@ tables:
         unit: people
         description_short: |-
           De facto total population in a country, area or region as of 1 July of the year indicated. {definitions.global.dimensions.description_short}
+        description_processing: |-
+          The UN publishes population by single year of age. We aggregate the single-year counts into the broader age groups shown here (such as 0–14, 15–64, 65+, 18+, 15–49). Our continental aggregates (Africa, Asia, Europe, North America, South America, Oceania) are computed by summing the constituent countries; they may differ slightly from regional aggregates the UN publishes directly, which use a different country grouping.
         display:
           isProjection: *projection
           roundingMode: significantFigures
@@ -120,6 +122,8 @@ tables:
         description_key:
           - |-
             This is the *net* change in population. It reflects births, deaths, and migration combined. To see only the contribution of births and deaths, look at the [natural population growth rate](https://ourworldindata.org/grapher/natural-population-growth).
+        description_processing: |-
+          We compute population change as the difference between the population in two consecutive years, using the UN's published population counts.
         display:
           isProjection: *projection
           roundingMode: significantFigures
@@ -210,6 +214,8 @@ tables:
         description_key:
           - |-
             Migration is *not* included. To see how births, deaths, and migration combine, look at the [overall population growth rate](https://ourworldindata.org/grapher/population-growth-rates).
+        description_processing: |-
+          The UN publishes the rate of natural change per 1,000 people. We divide by 10 to express it as a percentage.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
@@ -243,6 +249,10 @@ tables:
             The [age-specific fertility rate](#dod:age-specific-fertility-rate) measures births to women in a particular age group per 1,000 women in that age group. The standard age groups used by the UN are 15–19, 20–24, …, 45–49.
           - |-
             All figures refer to civil calendar years from 1 January to 31 December.
+          - |-
+            Future fertility is projected with a probabilistic Bayesian model. The medium scenario is the mean of thousands of simulated trajectories. The high and low scenarios run, in steady state, 0.5 births per woman above and below the medium — for example, a country with a medium TFR of 2.1 has a high TFR of 2.6 and a low TFR of 1.6.
+        description_processing: |-
+          The UN reports total fertility rates for individual countries but not for our continental aggregates (Africa, Asia, Europe, North America, South America, Oceania). For these regions we derive the total fertility rate as five times the sum of the age-specific fertility rates across the seven five-year age groups from 15–19 to 45–49, where each rate is the regional sum of births to women in that age group divided by the regional female population in that age group.
         display:
           isProjection: *projection
           numDecimalPlaces: "<% if age == 'all' %>2<%- endif %>"
@@ -293,6 +303,10 @@ tables:
         description_key:
           - |-
             Positive values mean more people moved into the country than out of it; negative values mean more people left than arrived.
+          - |-
+            Net migration is the most uncertain component of population change — flows are erratic, and historical data are often sparse. The UN balances each year's totals so they sum to zero across the world.
+        description_processing: |-
+          We compute aggregates for our continental regions (Africa, Asia, Europe, North America, South America, Oceania) by summing net migration across constituent countries. The world total is set to zero — by construction, every immigrant from one country is an emigrant from another.
         display:
           isProjection: *projection
           roundingMode: significantFigures
@@ -470,6 +484,10 @@ tables:
         description_key:
           - |-
             This is [period life expectancy](#dod:period-life-expectancy) — a snapshot summary of mortality rates in a single year. It does *not* follow a real cohort of people. It tells you how long someone would live if today's age-specific death rates stayed unchanged for the rest of their life.
+          - |-
+            Future values are projected with a probabilistic Bayesian model: the trajectory shown is the mean of thousands of simulated futures. To avoid distorting the long-run trend, life expectancy values for 2020 and 2021 — when COVID-19 caused large temporary drops — were excluded when fitting the projection model.
+        description_processing: |-
+          For ages above 0, the UN reports life expectancy as the *remaining* number of years a person at that age can expect to live. We add the age value back so the chart shows the *expected age at death* — for example, a person who reaches age 65 with 17 more years left to live is shown as 82, not 17.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
@@ -521,6 +539,8 @@ tables:
             The natural sex ratio at birth is around 105 boys per 100 girls. Sustained departures from this — particularly persistent values above 105 — usually indicate sex-selective practices.
           - |-
             At older ages, sex ratios fall below 100 because women on average live longer than men. Migration can also pull the ratio in either direction.
+        description_processing: |-
+          We compute the sex ratio at each age as the number of males divided by the number of females in the UN's population by sex and single year of age, multiplied by 100.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
@@ -579,6 +599,8 @@ tables:
             The dependency ratio splits the population by age — those under 15 and those aged 65 and over are treated as "dependents", while those aged 15 to 64 are treated as the "working-age" population.
           - |-
             This is a purely demographic measure. It does *not* count who is actually working or financially dependent — many people aged 15–64 are not in the labour force, and many people over 65 still are.
+        description_processing: |-
+          We compute the dependency ratios from the UN's population by age. The total dependency ratio is (population aged 0–14 plus population aged 65 and over) divided by population aged 15–64, multiplied by 100. The youth and old-age ratios use only the under-15 or 65+ numerators, respectively.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
@@ -633,6 +655,8 @@ tables:
         description_key:
           - |-
             This is the *probability* a newborn would die before reaching the given age if today's age-specific mortality rates stayed unchanged for the rest of their life. It is not the share of an actual cohort that has been observed dying.
+        description_processing: |-
+          The UN publishes infant and under-five mortality as deaths per 1,000 live births. We divide by 10 to express the values as a percentage of newborns.
         display:
           isProjection: *projection
           numDecimalPlaces: 1
