@@ -1,11 +1,27 @@
 """Load a garden dataset and create a grapher dataset."""
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+def copy_variable_metadata(tb: Table, tables: list[Table]) -> Table:
+    """Restore variable metadata after merging tables.
+
+    owid.catalog.processing.merge preserves most metadata, but currently drops
+    description_processing. Copying the original variable metadata keeps the garden
+    metadata intact in the combined Grapher table.
+    """
+    for table in tables:
+        columns = [column for column in table.columns if column in tb.columns]
+        tb_with_metadata = tb[columns].copy_metadata(table[columns])
+        for column in columns:
+            tb[column].metadata = tb_with_metadata[column].metadata.copy()
+    return tb
 
 
 def run() -> None:
@@ -22,6 +38,7 @@ def run() -> None:
     #
     # Combine the two garden tables for Grapher, preserving the existing catalog paths used by explorers.
     tb = pr.merge(tb_hens, tb_eggs, on=["country", "year"], how="outer", validate="one_to_one")
+    tb = copy_variable_metadata(tb, tables=[tb_hens, tb_eggs])
     tb = tb.format(short_name=paths.short_name)
 
     #
