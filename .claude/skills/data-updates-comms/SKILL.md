@@ -9,6 +9,21 @@ metadata:
 
 Generate a draft for the #data-updates-comms Slack form. The skill inspects the **current branch** of the ETL repo to fill the mechanical fields and seeds the editorial fields with context the user then rewrites in their own voice.
 
+## Why this channel exists (read before drafting)
+
+OWID's #data-updates-comms channel is **not** an internal "FYI I did X" log. It gives information to Charlie (OWID's Communications & Outreach Manager), who turns this input into public-facing posts on social media (Instagram, LinkedIn, X) and in newsletters.
+
+So the form's editorial fields are written for Charlie *and indirectly for the general public* — not for the data team. A big mistake is writing them in an internal/engineer voice.
+
+**The reframing that matters most:**
+
+> Don't tell Charlie what you'd say to your colleagues ("I updated all the WDI charts").
+> Tell him what you'd say to a friend who asks what you did this week ("I updated hundreds of our charts to the latest release of the World Bank's largest dataset, called the World Development Indicators. It's a core dataset with hundreds of indicators across global development. This update added new data up to 2025 for dozens of our most-viewed charts…").
+
+What Charlie needs from each field is a **reader-centric view**: what work was done, what it changes or enables, what's interesting about the source, what it helps people understand about the world, and why anyone should care that it's been updated.
+
+**This skill must surface this framing to the user** — both at the top of the output draft file and inside each editorial-field prompt block — so the user has it in front of them when they sit down to write. Do not delete or paraphrase the framing.
+
 ## When to use
 
 - The user says "draft the data-update comms post for X", "fill out the Slack form for X", or similar.
@@ -89,6 +104,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
    - Query published charts on staging (same SQL as step 3 but selecting `c.id, cc.slug, cc.full->>'$.title', cc.full->>'$.type', cc.full->>'$.hasMapTab'`).
    - Rank by: `hasMapTab=true` > `type=StackedArea` global views > standalone-headline titles. Skip population-weighted variants and country-specific views.
    - Output 1–3 with slug + rationale.
+   - Prefer the most-viewed / most-linked charts (e.g. the `analytics_pageviews` table on staging or the equivalent admin endpoint)
 
 6. **Build the search URL.**
    - `producer` from snapshot origin → `urllib.parse.quote_plus(producer)` → `https://ourworldindata.org/search?datasetProducts=<encoded>`.
@@ -134,6 +150,8 @@ The exact draft file structure:
 Source: `<ns>/<new_version>/<short_name>` · Branch: `<branch>` · Generated: <iso datetime>
 
 > Each section below mirrors the #data-updates-comms Slack form verbatim. Copy the answer block (inside ```text``` fences) into the matching field in the Slack form. `[filled]` answers are mechanical and safe to use as-is. `[prompt — user rewrites]` answers are seeded with snippets — rewrite them in your own voice.
+>
+> **Before you write the editorial fields (#6, #7, #8):** these go to Charlie, who turns them into public-facing posts on social media and in newsletters — not into an internal team log. Don't write what you'd say to your colleagues ("I updated all the WDI charts"). Write what you'd say to a friend who asks what you did this week ("I updated hundreds of our charts to the latest release of the World Bank's largest dataset, called the World Development Indicators…"). Try to take a reader-centric view: what work was done, what it changes/enables, what's interesting about the source, what it helps people understand about the world, why anyone should care it's been updated.
 
 ---
 
@@ -188,6 +206,8 @@ Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if a
 
 [prompt — user rewrites]
 
+_This is the most important field. Write it as you'd describe the dataset to a curious friend, not to a colleague. What question does this data help answer? What's unique about this source vs. alternatives? Why should someone outside OWID care?_
+
 _Snippets to draw from:_
 - snapshot description: "…"
 - garden description: "…"
@@ -216,6 +236,8 @@ _Candidate caveats from indicator `description_key` bullets, sanity-check workar
 > E.g.: you worked with the data provider to improve the data somehow.
 
 [prompt — user rewrites]
+
+_Frame this from the reader's perspective, not the engineer's. "We flagged three issues to the source" is too technical and internal. "We spotted several issues with the data on vaccination in Sub-Saharan Africa and emailed the WHO team, who has now corrected them" is much more helpful for Charlie. Skip routine engineering work; lead with anything a non-OWID reader would find genuinely interesting._
 
 _Context from this PR:_
 - <commit subject lines unique to this PR>
