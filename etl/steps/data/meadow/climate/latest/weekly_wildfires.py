@@ -25,6 +25,11 @@ def run(dest_dir: str) -> None:
     #
     tb = pr.concat([tb_latest, tb_2003_2023])
 
+    # After concat, origins from both snapshots are merged — keep only the latest.
+    for col in tb.columns:
+        if col in tb_latest.columns:
+            tb[col].metadata.origins = tb_latest[col].metadata.origins
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["country", "month_day", "year", "indicator"], verify_integrity=True).sort_index()
 
