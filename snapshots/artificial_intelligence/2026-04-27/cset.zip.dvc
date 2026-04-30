@@ -9,7 +9,8 @@ meta:
 
       The dataset focuses on countries, not organizations or individuals, and on AI and its subfields. There are many ways to assess countries' AI activities, and the three types of metrics included here, while meaningful, are not exhaustive. The data also has a lag, making counts incomplete for recent years; the lag is especially significant for patent data.
 
-    citation_full: Emerging Technology Observatory [Country AI Activity Metrics](https://eto.tech/dataset-docs/country-ai-activity-metrics/) dataset.
+    citation_full: "Emerging Technology Observatory [Country Activity Tracker: Artificial Intelligence](https://cat.eto.tech/?expanded=Summary-metrics)"
+
     attribution_short: CSET
 
     url_main: https://cat.eto.tech/

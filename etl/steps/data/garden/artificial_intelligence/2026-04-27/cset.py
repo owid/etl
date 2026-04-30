@@ -10,6 +10,7 @@ paths = PathFinder(__file__)
 REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 PER_CAPITA_COLS = ["num_patent_applications", "num_patent_granted", "num_articles"]
 INVESTMENT_COLS = ["disclosed_investment", "estimated_investment", "estimated_investment_projected"]
+PATENT_COLS = ["num_patent_applications", "num_patent_granted"]
 # Variables not used in any chart — dropped to reduce indicator count.
 COLS_TO_DROP = ["disclosed_investment", "num_citations", "num_patent_granted_per_mil"]
 
@@ -32,7 +33,7 @@ def run() -> None:
         min_num_values_per_year=1,
     )
     africa_mask = tb["country"] == "Africa"
-    for col in INVESTMENT_COLS:
+    for col in INVESTMENT_COLS + PATENT_COLS:
         if col in tb.columns:
             tb[col] = tb[col].where(~africa_mask)
 

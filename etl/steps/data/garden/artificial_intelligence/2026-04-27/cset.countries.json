@@ -188,5 +188,14 @@
   "China (mainland)": "China",
   "São Tomé and Príncipe": "Sao Tome and Principe",
   "Vatican City": "Vatican",
-  "Marshall Islands": "Marshall Islands"
+  "Marshall Islands": "Marshall Islands",
+  "Africa": "Africa (CSET)",
+  "Asia": "Asia (CSET)",
+  "EU": "European Union (CSET)",
+  "Europe": "Europe (CSET)",
+  "European Patent Organization": "European Patent Organization (CSET)",
+  "Eurasian Patent Organization": "Eurasian Patent Organization (CSET)",
+  "North America and the Caribbean": "North America and the Caribbean (CSET)",
+  "Oceania": "Oceania (CSET)",
+  "South and Central America": "South and Central America (CSET)"
 }
