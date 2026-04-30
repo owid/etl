@@ -224,13 +224,6 @@ sections:
         maintainer: "@pablo"
         icon: ":material/map:"
         image_url: "https://upload.wikimedia.org/wikipedia/en/8/8c/Human_Language_Families_Map_%28Wikipedia_Colors_.PNG"
-      - title: "ID to Path"
-        alias: explorer_editor
-        entrypoint: app_pages/explorer_edit.py
-        description: Migrate id-based explorers
-        maintainer: "@lucas"
-        icon: ":material/explore:"
-        image_url: "https://upload.wikimedia.org/wikipedia/en/1/18/Dora_the_Explorer_2004_album_cover.jpg"
 
   - title: "Misc"
     description: |-

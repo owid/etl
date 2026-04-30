@@ -198,14 +198,6 @@ def test_app_producer_analytics():
     assert not at.exception
 
 
-@pytest.mark.integration
-@pytest.mark.usefixtures("set_config")
-def test_app_explorer():
-    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/explorer_edit.py"), default_timeout=DEFAULT_TIMEOUT).run()
-
-    assert not at.exception
-
-
 # @pytest.mark.integration
 # @pytest.mark.usefixtures("set_config")
 # def test_app_insighter():
