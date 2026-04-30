@@ -51,7 +51,7 @@ INDICATOR_BY_IMPACT_METRIC = {
 
 COMMON_VIEW_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-    "chartTypes": ["LineChart"],
+    "chartTypes": ["StackedBar"],
     "hasMapTab": True,
     "tab": "chart",
     "yAxis": {"min": 0},
@@ -59,7 +59,7 @@ COMMON_VIEW_CONFIG = {
 
 STACKED_VIEW_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-    "chartTypes": ["StackedBar", "StackedArea"],
+    "chartTypes": ["StackedBar"],
     "hasMapTab": False,
     "tab": "chart",
     "yAxis": {"min": 0},
