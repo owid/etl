@@ -17,10 +17,8 @@ DIMENSIONS_CONFIG = {
 # Override of description_key_welfare_type (world_inequality_database.meta.yml line 123) for the grouped
 # welfare_type=before_vs_after view. The OLD_* constants mirror the garden text verbatim — the assertion
 # in _get_before_vs_after_metadata catches drift in the source.
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX = "Income is measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public."
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_AFTER_TAX = (
-    "Income is measured after taxes have been paid and most government benefits have been received."
-)
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX = "Income is measured before taxes have been paid and most government benefits have been received. The exception is pensions and other social insurance, such as unemployment insurance. Contributions to social insurance are deducted, and the corresponding benefits are added back and counted as income."
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_AFTER_TAX = "Income is measured after taxes have been paid and most government benefits have been received. Not just cash benefits like social assistance, but also public services like health and education, and collective spending, such as defense and infrastructure. This is a broader concept of income than used by most other sources."
 NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown separately. In most countries, inequality is lower after taxes and benefits than before, but the extent varies widely."
 
 # Sourced from the after_tax indicator's description_key. The before_vs_after view inherits from the
