@@ -52,7 +52,7 @@ definitions:
   definition_dry_mass_movement: &definition-dry-mass-movement |-
     A dry mass movement is defined as any type of downslope movement of earth materials under hydrological dry conditions.
   definition_wet_mass_movement: &definition-wet-mass-movement |-
-    A wet mass movement is defined as a type of mass movement that occur when heavy rain or rapid snow/ice melt send large amounts of vegetation, mud, or rock down a slope driven by gravitational forces.
+    A wet mass movement is defined as a type of mass movement that occurs when heavy rain or rapid snow/ice melt sends large amounts of vegetation, mud, or rock down a slope driven by gravitational forces.
   definition_glacial_lake_outburst_flood: &definition-glacial-lake-outburst-flood |-
     Glacial lake outburst floods are defined as those that occur when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake).
   definition_fog: &definition-fog |-
