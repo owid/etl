@@ -62,7 +62,7 @@ definitions:
       # so data pages render "Indicator (UN WPP)" or
       # "Indicator (UN WPP, medium scenario)".
       title_variant: |-
-        <% if variant != 'estimates' -%>
+        <% if (variant is defined) and (variant != 'estimates') -%>
         with << variant >> scenario projections
         <%- endif -%>
       grapher_config:
