@@ -1591,9 +1591,11 @@ tables:
           The share of income or consumption by the poorest 50% of the population.
           <% endif %>
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1622,9 +1624,11 @@ tables:
           The share of income or consumption by the middle 40% of the population. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.
           <% endif %>
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1653,9 +1657,11 @@ tables:
           The share of income or consumption by the richest 1% of the population.
           <% endif %>
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1684,9 +1690,11 @@ tables:
           The share of income or consumption by the population between the 90th and 99th percentiles.
           <% endif %>
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
         description_processing: |-
           {definitions.description_processing_share_90_99}
           {definitions.description_processing_main}
