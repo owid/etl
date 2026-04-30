@@ -168,6 +168,12 @@ definitions:
   description_key_share: |-
     This data shows the share of total income that goes to specific groups of the population. For example, if the richest decile receives 40% of total income, it means the richest 10% of people share 40% of all income between them.
 
+  description_key_avg: |-
+    This data shows the mean (average) income per person within decile groups — each representing a tenth of the population, ranked by income. For example, the poorest decile is the poorest 10% of people in a country.
+
+  description_key_thr: |-
+    This data shows the income threshold for a given decile — a tenth of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.
+
   description_processing_general: |-
     We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively.
 
@@ -968,6 +974,8 @@ tables:
           {macros}
           The mean {definitions.concept_welfare_type} {definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_avg}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
@@ -1051,6 +1059,8 @@ tables:
           {macros}
           The level of {definitions.concept_welfare_type} {definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_thr}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
