@@ -33,7 +33,6 @@ from typing_extensions import Self
 from wfork_streamlit_profiler import Profiler
 
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
-from apps.wizard.utils.step_form import StepForm
 from etl.config import OWID_ENV, SENTRY_DSN, enable_sentry
 from etl.dag_helpers import load_dag
 from etl.db import read_sql
@@ -51,7 +50,6 @@ from etl.paths import (
 __all__ = [
     "load_wizard_defaults",
     "update_wizard_defaults_from_form",
-    "StepForm",
 ]
 
 # Logger
