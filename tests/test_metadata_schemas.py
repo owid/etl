@@ -43,6 +43,26 @@ def load_yaml_as_string(path):
         return yaml.load(file, Loader=SafeLoader)
 
 
+def _strip_jinja_templated_values(obj):
+    """Recursively remove dict entries whose value is a Jinja-templated string.
+
+    Jinja-templated strings (e.g. ``"<% if age == '0' %>90<% endif %>"``) cannot be
+    validated against typed schema fields (e.g. ``yAxis.min`` requires ``number``).
+    The runtime validates the rendered output instead. This walker drops those
+    placeholder strings so the static-YAML schema check doesn't false-positive.
+    """
+    if isinstance(obj, dict):
+        for key in list(obj.keys()):
+            val = obj[key]
+            if isinstance(val, str) and "<%" in val:
+                del obj[key]
+            else:
+                _strip_jinja_templated_values(val)
+    elif isinstance(obj, list):
+        for item in obj:
+            _strip_jinja_templated_values(item)
+
+
 def _get_changed_files_vs_master(pattern: str) -> set[str] | None:
     """Return set of files changed vs master matching pattern, or None to validate all.
 
@@ -145,12 +165,11 @@ def test_dataset_schemas():
                 if "$schema" in ind.get("presentation", {}).get("grapher_config", {}):
                     del ind["presentation"]["grapher_config"]
 
-                # Ignore display fields containing Jinja templates (validated after rendering)
-                display = ind.get("display", {})
-                if display:
-                    for key in list(display.keys()):
-                        if isinstance(display[key], str) and "<%" in display[key]:
-                            del display[key]
+                # Ignore fields containing Jinja templates anywhere in the variable
+                # metadata (display, grapher_config, etc.). Jinja templates render
+                # at runtime — the runtime validation (etl.grapher.helpers
+                # ._validate_grapher_config) catches type mismatches after rendering.
+                _strip_jinja_templated_values(ind)
 
         # Validate the loaded data against the schema
         try:
