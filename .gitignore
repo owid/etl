@@ -11,13 +11,7 @@
 __pycache__
 .ipynb_checkpoints
 etl/scripts/countries-regions/intermediate
-!data/
-data/*
-!data/reference/
-!data/reference
-!data/garden/
-data/garden/*
-!data/garden/reference/
+/data
 export/*
 .env
 .env.*
