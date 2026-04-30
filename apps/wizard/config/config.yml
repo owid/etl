@@ -259,15 +259,3 @@ sections:
         image_url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
         disable:
           staging: true
-
-legacy:
-  description: |-
-    The pages below are legacy now. They are kept in case the new pages are not working properly.
-  apps:
-    - title: "Similar charts (deprecated)"
-      alias: similar_charts
-      description: "Find similar charts"
-      maintainer: "@mojmir"
-      entrypoint: app_pages/similar_charts/app.py
-      icon: ":material/bar_chart:"
-      image_url: "https://media.istockphoto.com/id/1296381479/vector/set-of-simple-infographic-graphs-and-charts-data-visualization-statistics-and-business.jpg?s=612x612&w=0&k=20&c=JpEoP-6w16OwVC49Sq2PEI8-dHF1CZnm7rHyL5DoxqA="
