@@ -6,7 +6,7 @@ default_selection:
 topic_tags:
   - Natural Disasters
 default_dimensions:
-  type: all_disasters
+  type: all_stacked
   timespan: decadal
   metric: total_damages
 dimensions:

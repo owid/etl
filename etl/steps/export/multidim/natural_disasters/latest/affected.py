@@ -90,6 +90,11 @@ COMMON_VIEW_CONFIG = {
     "tab": "chart",
     "yAxis": {"min": 0},
     "originUrl": "https://ourworldindata.org/natural-disasters",
+    # Default chart timeline starts at 2000, when reporting coverage becomes more complete.
+    "minTime": 2000,
+    # Pin the map to a single year so it doesn't fall back to a "first year vs last year"
+    # comparison view when minTime/maxTime defines a range on the chart.
+    "map": {"time": "latest"},
 }
 
 STACKED_VIEW_CONFIG = {
@@ -99,6 +104,10 @@ STACKED_VIEW_CONFIG = {
     "tab": "chart",
     "yAxis": {"min": 0},
     "originUrl": "https://ourworldindata.org/natural-disasters",
+    "minTime": 2000,
+    # Without this, a year drops out of the stack as soon as one disaster type
+    # has no reported data — even if other types had a non-zero value.
+    "missingDataStrategy": "show",
 }
 
 # Footnote shown on every chart, flagging the limited reporting coverage in earlier decades.
@@ -173,6 +182,14 @@ def run() -> None:
             "title": _title,
             "subtitle": _subtitle,
             "note": NOTE,
+            # The "All disasters" total view is shown only as a world map (no chart tab),
+            # to complement the stacked-by-type view, which only has a chart tab.
+            # Setting chartTypes=[] hides the chart tab; Grapher then auto-switches to the
+            # map tab when the user navigates to this view.
+            "chartTypes": lambda view: (
+                [] if view.dimensions["type"] == "all_disasters" else ["StackedBar"]
+            ),
+            "tab": lambda view: "map" if view.dimensions["type"] == "all_disasters" else "chart",
         }
     )
 
