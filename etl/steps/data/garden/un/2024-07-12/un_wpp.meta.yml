@@ -251,9 +251,15 @@ tables:
           <%- endif %>
         description_key:
           - |-
+            <% if age == 'all' -%>
             The UN's projections come in three scenarios: medium, high, and low. The medium scenario is the central estimate; the high and low scenarios are designed to fully reach 0.5 births per woman above and below the medium from the mid-2030s onward (e.g. medium 2.1 → high 2.6, low 1.6). In the first decade of the projection the gap is narrower (about ±0.25 in 2024–2028, ±0.4 in 2029–2033).
+            <%- else -%>
+            The UN's high and low scenarios for age-specific fertility are derived from the corresponding total-fertility scenario, which runs roughly 0.5 births per woman above or below the medium in the long run.
+            <%- endif -%>
         description_processing: |-
-          The UN doesn't publish a total fertility rate for our continental aggregates (Africa, Asia, Europe, etc.). We derive these by summing the age-specific fertility rates across the reproductive age groups (15–19 to 45–49) and multiplying by 5, where each age-specific rate uses regional totals for births and female population.
+          <% if age == 'all' -%>
+          The UN doesn't publish a total fertility rate for our continental aggregates (Africa, Asia, Europe, North America, South America, Oceania), since its own regional groupings differ. We derive these by summing the age-specific fertility rates across the 5-year reproductive age groups (15–19 to 45–49) and multiplying by 5, where each age-specific rate uses regional totals for births and female population.
+          <%- endif -%>
         display:
           isProjection: *projection
           numDecimalPlaces: "<% if age == 'all' %>2<%- endif %>"
