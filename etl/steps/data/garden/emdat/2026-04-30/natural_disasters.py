@@ -976,15 +976,6 @@ def run() -> None:
     # Prepare input data (prepare time columns, convert cost variables to dollars, and fix some known issues).
     tb = prepare_input_data(tb_meadow=tb_meadow)
 
-    ####################################################################################################################
-    # I already contacted EM-DAT about this issue, but they haven't fixed it yet:
-    # * Even with end date prior to start date: China, Wet mass movement, 10 deaths, starting in 2025-06, ending in 2024-06-04.
-    # The most likely explanation is that the end year is wrong and should be 2025. Also, the day when it starts is missing. I'll assume it's this event:
-    #   https://eos.org/thelandslideblog/muta-1
-    assert tb.loc[(tb["start_year"] > tb["end_year"]) & (tb["country"] == "China"), "end_year"].item() == 2024
-    tb.loc[(tb["start_year"] > tb["end_year"]) & (tb["country"] == "China"), ("start_day", "end_year")] = 1, 2025
-    ####################################################################################################################
-
     # Sanity checks.
     sanity_checks_on_inputs(tb=tb)
 
