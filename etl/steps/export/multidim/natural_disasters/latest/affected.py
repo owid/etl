@@ -89,6 +89,7 @@ COMMON_VIEW_CONFIG = {
     "hasMapTab": True,
     "tab": "chart",
     "yAxis": {"min": 0},
+    "originUrl": "https://ourworldindata.org/natural-disasters",
 }
 
 STACKED_VIEW_CONFIG = {
@@ -97,7 +98,14 @@ STACKED_VIEW_CONFIG = {
     "hasMapTab": False,
     "tab": "chart",
     "yAxis": {"min": 0},
+    "originUrl": "https://ourworldindata.org/natural-disasters",
 }
+
+# Footnote shown on every chart, flagging the limited reporting coverage in earlier decades.
+NOTE = (
+    "Figures are based on reported data, with limited coverage before around 2000, "
+    "so historical trends may partly reflect reporting improvements."
+)
 
 
 def _prepare_table(tb: Table, garden_timespan: str, mdim_timespan: str) -> Table:
@@ -164,6 +172,7 @@ def run() -> None:
         {
             "title": _title,
             "subtitle": _subtitle,
+            "note": NOTE,
         }
     )
 
@@ -190,9 +199,7 @@ def _subtitle(view) -> str:
     if view.dimensions["metric"] == "per_capita":
         parts.append("Rates are measured per 100,000 people.")
     if view.dimensions["timespan"] == "decadal":
-        parts.append(
-            "Decadal figures are measured as the annual average over the subsequent ten-year period."
-        )
+        parts.append("Decadal figures are measured as the annual average over the subsequent ten-year period.")
     parts.append(
         "Disasters include all geophysical, meteorological, and climate events such as earthquakes, "
         "volcanic activity, drought, wildfires, storms, and flooding."
