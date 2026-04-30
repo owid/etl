@@ -41,6 +41,19 @@ AGGREGATE_TO_TOTAL_TYPE = {
     "all_disasters_excluding_extreme_temperature": "all_disasters_excluding_extreme_temperature",
 }
 
+# Stable color per disaster type so the same disaster appears in the same colour
+# across views (single-series, stacked-by-type, and excluding-extreme-temperatures).
+DISASTER_COLORS = {
+    "drought": "#bc8e5a",
+    "earthquake": "#883039",
+    "volcanic_activity": "#a2559c",
+    "flood": "#286BBB",
+    "dry_mass_movement": "#8b5a2b",
+    "extreme_weather": "#5b9460",
+    "wildfire": "#e94e1b",
+    "extreme_temperature": "#d4a017",
+}
+
 # Map (impact_slug, metric_slug) -> garden indicator prefix.
 INDICATOR_BY_IMPACT_METRIC = {
     ("total_affected", "total_number"): "total_affected",
@@ -203,7 +216,38 @@ def run() -> None:
     # Expose the all-disasters total on the map tab of the stacked-by-type views.
     _add_total_indicator_for_map(c)
 
+    # Pin a stable colour to each y-indicator based on its disaster type.
+    _apply_disaster_colors(c)
+
     c.save()
+
+
+def _apply_disaster_colors(c) -> None:
+    """Set display.color on each y-indicator so the same disaster type renders in
+    the same colour across all views (single-series, stacked, etc.)."""
+    for view in c.views:
+        if view.indicators.y is None:
+            continue
+        for indicator in view.indicators.y:
+            disaster_type = _disaster_type_from_path(indicator.catalogPath)
+            if disaster_type is None:
+                continue
+            color = DISASTER_COLORS.get(disaster_type)
+            if color is None:
+                continue
+            display = indicator.display or {}
+            display.setdefault("color", color)
+            indicator.display = display
+
+
+def _disaster_type_from_path(catalog_path: str) -> str | None:
+    """Extract the disaster type slug from an indicator's catalog path."""
+    column = catalog_path.rsplit("#", 1)[-1]
+    padded = f"_{column}_"
+    for type_slug in sorted(DISASTER_COLORS, key=len, reverse=True):
+        if f"_{type_slug}_" in padded:
+            return type_slug
+    return None
 
 
 def _add_total_indicator_for_map(c) -> None:
