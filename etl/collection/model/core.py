@@ -33,6 +33,7 @@ from etl.collection.model.view import CommonView, View, ViewIndicators
 from etl.collection.utils import (
     fill_placeholders,
     get_complete_dimensions_filter,
+    get_tables_by_name_mapping,
     map_indicator_path_to_id,
     unique_records,
     validate_indicators_in_db,
@@ -192,6 +193,13 @@ class Collection(MDIMBase):
         # Ensure we have an environment set
         if owid_env is None:
             owid_env = OWID_ENV
+
+        # Resolve short-form catalog paths ("table#column") to full paths using the DAG.
+        # process_views already did this at create-time; we redo it here to pick up
+        # indicators or map.columnSlug values set afterwards.
+        tables_by_name = get_tables_by_name_mapping(self.dependencies)
+        for view in self.views:
+            view.expand_paths(tables_by_name)
 
         # Prune non-used dimension choices
         if prune_choices:
