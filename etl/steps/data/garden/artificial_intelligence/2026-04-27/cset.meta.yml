@@ -1,0 +1,155 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      attribution_short: CSET
+      topic_tags:
+        - Artificial Intelligence
+    display:
+      numDecimalPlaces: 0
+
+  description_key_articles: &description_key_articles
+    - The data covers scholarly publications on AI, including journal articles, conference papers, working papers, and preprints.
+    - Articles are flagged as AI-related using machine learning models trained on subject tags from arXiv, an open repository for scientific papers.
+    - The models only run on articles with English titles or abstracts. Research published only in other languages is missed. Coverage of Chinese research is also limited, since many Chinese journals are not in the underlying sources.
+    - An article counts for a country if at least one of its authors is affiliated with an institution there. If authors are based in different countries, it counts once for each.
+    - Authors are linked to the country of the institution they worked at when the article was published, not their country of origin.
+
+  description_key_patents: &description_key_patents
+    - The data covers patents for AI-related inventions filed at patent offices around the world.
+    - Patents are counted by family — a group of documents that describe the same invention. Inventors often file the same invention in several countries, so this avoids double-counting.
+    - A family counts as a granted patent if any of its documents has been granted, and as an application if all are still pending.
+    - Each family is assigned to the country where it was first filed. If an invention is filed at the European Patent Office and then in China, it counts only towards the European Patent Office.
+    - The data shows where patents are filed, not where inventors are based. Filing location is a proxy for where inventors expect to develop, make, or sell their inventions.
+    - Patent data has a lag because some offices take years to publish new filings. Recent years are excluded here.
+
+  description_key_investment: &description_key_investment
+    - The data covers external private-market investment in AI companies, including venture capital deals, private equity deals, and mergers and acquisitions.
+    - It excludes internal corporate R&D, capital spending, and government funding. Publicly traded companies, including large technology firms, are also excluded.
+    - Because this is only one type of funding, the data understates total global spending on AI.
+    - A small number of very large deals can drive big year-on-year swings. Broader economic conditions, such as interest rates and investor sentiment, also affect totals in ways that are not specific to AI.
+    - CSET's figure for {year} is preliminary and is likely to rise as more deals are reported. We show it to provide a more current view, but it may change as CSET updates its estimates.
+    - The "World" total only includes countries that are covered by the source, so it understates global activity.
+
+  description_processing_aggregates: &description_processing_aggregates |-
+    We calculate regional and global totals from the country-level data CSET provides, following our [region definitions](https://ourworldindata.org/world-region-map-definitions). Countries that are not covered by the source are excluded from these totals.
+
+  processing_investment: &processing_investment
+    processing_level: major
+    description_processing: |-
+      - We adjust the data for inflation so that values can be compared across years.
+      - Reporting a time series of AI investments in nominal prices would make it difficult to compare observations across time. To make these comparisons possible, one has to take into account that prices change (inflation).
+      - It is not obvious how to adjust this time series for inflation, and our team discussed the best solutions at our disposal.
+      - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services purchased through these investments. This would make it possible to calculate a volume measure of AI investments and tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost of some crucial AI technology has fallen rapidly in price.
+      - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. Ultimately, we decided to use the US Consumer Price Index (CPI).
+      - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments, therefore, lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+      - We calculate regional and global totals from the country-level data CSET provides, following our [region definitions](https://ourworldindata.org/world-region-map-definitions). Countries that are not covered by the source are excluded from these totals. We do not show Africa's regional total. The source covers too few African countries to produce a meaningful aggregate.
+
+  description_processing_patents: &description_processing_patents |-
+    We calculate regional and global totals from the country-level data CSET provides, following our [region definitions](https://ourworldindata.org/world-region-map-definitions). Countries that are not covered by the source are excluded from these totals. We do not show Africa's regional total. The source covers too few African countries to produce a meaningful aggregate.
+
+  investment_description_short: &investment_description_short |-
+    Money put into privately held AI companies by private investors. This excludes publicly traded companies (e.g., Big Tech companies) and companies' internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation. Data for {year} is incomplete and includes investments up to {month} {year}.
+
+  investment_grapher_note: &investment_grapher_note |-
+    Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
+
+  processing_per_mil: &processing_per_mil
+    processing_level: major
+    description_processing: |-
+      We divided the source's country-level figures by population to calculate per-million-people values.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 180
+
+
+tables:
+  cset:
+    variables:
+      estimated_investment:
+        <<: *processing_investment
+        title: External funding for privately held AI companies
+        unit: constant 2021 US dollars
+        short_unit: $
+        description_short: *investment_description_short
+        description_key: *description_key_investment
+        presentation:
+          grapher_config:
+            note: *investment_grapher_note
+
+      estimated_investment_projected:
+        <<: *processing_investment
+        title: Projected external funding for privately held AI companies
+        unit: constant 2021 US dollars
+        short_unit: $
+        description_short: *investment_description_short
+        description_key:
+          - *description_key_investment
+          - The values shown for the most recent year are preliminary estimates based on deals reported so far. The previous complete year is included as a starting point to connect the series on charts.
+        presentation:
+          grapher_config:
+            note: *investment_grapher_note
+        display:
+          isProjection: true
+
+      num_patent_applications:
+        title: AI patent applications
+        unit: applications
+        description_short: |-
+         Patent applications for AI-related inventions, including pending applications that haven't yet been granted. Each invention is counted once and attributed to the country where it was first filed, not the inventor's nationality.
+        description_key: *description_key_patents
+        description_processing: *description_processing_patents
+
+      num_patent_granted:
+        title: AI patents granted
+        unit: patents
+        description_short: |-
+          <% if field == "All" -%>
+          Patents granted for AI-related inventions. Each invention is counted once and attributed to the country where it was first filed, not the inventor's nationality.
+          <%- else -%>
+          Patents granted for AI-related inventions in the << field|lower >> field. Each invention is counted once and attributed to the country where it was first filed, not the inventor's nationality.
+          <%- endif %>
+        description_key: *description_key_patents
+        description_processing: *description_processing_patents
+        presentation:
+          title_public: |-
+              <% if field == "All" -%>
+              AI patents granted
+              <%- else -%>
+              AI patents granted: << field|lower >>
+              <%- endif %>
+          grapher_config:
+            note: According to calculations by CSET, the median time for a patent to be granted is 826 days from its initial filing date, while the average time is 860 days.
+        display:
+          name: << field >>
+
+      num_articles:
+        title: AI scholarly publications
+        unit: publications
+        description_short: |-
+          Scholarly publications on AI, including journal articles, conference papers, working papers, and preprints. The data only covers articles with an English-language title or abstract.
+        description_key: *description_key_articles
+        description_processing: *description_processing_aggregates
+
+      num_patent_applications_per_mil:
+        <<: *processing_per_mil
+        title: AI patent applications per million people
+        unit: applications per million people
+        description_short: |-
+          Patent applications for AI-related inventions per million people, including pending applications that haven't yet been granted. Each invention is counted once and attributed to the country where it was first filed, not the inventor's nationality.
+        description_key: *description_key_patents
+        display:
+          numDecimalPlaces: 1
+
+      num_articles_per_mil:
+        <<: *processing_per_mil
+        title: AI scholarly publications per million people
+        unit: publications per million people
+        description_short: |-
+          Scholarly publications on AI per million people, including journal articles, conference papers, working papers, and preprints. The data only covers articles with an English-language title or abstract.
+        description_key: *description_key_articles
+        display:
+          numDecimalPlaces: 1
