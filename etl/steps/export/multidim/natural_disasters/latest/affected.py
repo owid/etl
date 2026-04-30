@@ -7,14 +7,13 @@ indicator for each combination of choices.
 
 from owid.catalog import Table
 
+from etl.collection.model.view import Indicator
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
 # Disaster types to expose, in the order they appear in the dimension choices.
 DISASTER_TYPES = [
-    "all_disasters",
-    "all_disasters_excluding_extreme_temperature",
     "drought",
     "earthquake",
     "volcanic_activity",
@@ -25,17 +24,22 @@ DISASTER_TYPES = [
     "extreme_temperature",
 ]
 
-# Disaster types stacked together for the "All disasters (by type)" view.
-INDIVIDUAL_DISASTER_TYPES = [
-    "drought",
-    "earthquake",
-    "volcanic_activity",
-    "flood",
-    "dry_mass_movement",
-    "extreme_weather",
-    "wildfire",
-    "extreme_temperature",
-]
+# Same as DISASTER_TYPES; kept as a separate name to make group_views readable.
+INDIVIDUAL_DISASTER_TYPES = list(DISASTER_TYPES)
+
+# Disaster types stacked together for the "All disasters (excluding extreme temperatures)" view.
+DISASTER_TYPES_EXCLUDING_EXTREME_TEMPERATURE = [t for t in INDIVIDUAL_DISASTER_TYPES if t != "extreme_temperature"]
+
+# Aggregate type slugs whose views show a stacked breakdown plus a map tab pointing
+# at the matching precomputed total indicator.
+AGGREGATE_STACKED_TYPES = ("all_stacked", "all_disasters_excluding_extreme_temperature")
+
+# Map aggregate stacked type → underlying garden disaster_type slug, used to build
+# the catalog path of the precomputed total indicator shown on the map.
+AGGREGATE_TO_TOTAL_TYPE = {
+    "all_stacked": "all_disasters",
+    "all_disasters_excluding_extreme_temperature": "all_disasters_excluding_extreme_temperature",
+}
 
 # Map (impact_slug, metric_slug) -> garden indicator prefix.
 INDICATOR_BY_IMPACT_METRIC = {
@@ -70,7 +74,6 @@ IMPACT_PHRASES = {
 
 # Human-readable phrase used in chart titles for each disaster-type choice.
 DISASTER_PHRASES = {
-    "all_disasters": "all disasters",
     "all_disasters_excluding_extreme_temperature": "all disasters excluding extreme temperatures",
     "all_stacked": "disasters",
     "drought": "droughts",
@@ -100,20 +103,26 @@ COMMON_VIEW_CONFIG = {
 STACKED_VIEW_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
     "chartTypes": ["StackedBar"],
-    "hasMapTab": False,
+    # Map tab is enabled and shows the all-disasters total via map.columnSlug;
+    # see _add_total_indicator_for_map below for how the total indicator is
+    # exposed to the map without being plotted on the stacked bar chart.
+    "hasMapTab": True,
     "tab": "chart",
     "yAxis": {"min": 0},
     "originUrl": "https://ourworldindata.org/natural-disasters",
     "minTime": 2000,
-    # Without this, a year drops out of the stack as soon as one disaster type
-    # has no reported data — even if other types had a non-zero value.
+    # Pin map to a single year so it doesn't fall back to a "first vs last year"
+    # comparison view when minTime/maxTime defines a range on the chart.
+    "map": {"time": "latest"},
+    # Without this, a year drops out of the stack as soon as one disaster type has
+    # no reported data — even if other types had a non-zero value.
     "missingDataStrategy": "show",
 }
 
 # Footnote shown on every chart, flagging the limited reporting coverage in earlier decades.
 NOTE = (
-    "Figures are based on reported data, with limited coverage before around 2000, "
-    "so historical trends may partly reflect reporting improvements."
+    "Figures are based on reported data, and coverage is significantly limited before around 2000. "
+    "Historical trends may partly reflect reporting improvements."
 )
 
 
@@ -173,7 +182,13 @@ def run() -> None:
                 "choice_new_slug": "all_stacked",
                 "choices": INDIVIDUAL_DISASTER_TYPES,
                 "view_config": STACKED_VIEW_CONFIG,
-            }
+            },
+            {
+                "dimension": "type",
+                "choice_new_slug": "all_disasters_excluding_extreme_temperature",
+                "choices": DISASTER_TYPES_EXCLUDING_EXTREME_TEMPERATURE,
+                "view_config": STACKED_VIEW_CONFIG,
+            },
         ],
     )
 
@@ -182,18 +197,36 @@ def run() -> None:
             "title": _title,
             "subtitle": _subtitle,
             "note": NOTE,
-            # The "All disasters" total view is shown only as a world map (no chart tab),
-            # to complement the stacked-by-type view, which only has a chart tab.
-            # Setting chartTypes=[] hides the chart tab; Grapher then auto-switches to the
-            # map tab when the user navigates to this view.
-            "chartTypes": lambda view: (
-                [] if view.dimensions["type"] == "all_disasters" else ["StackedBar"]
-            ),
-            "tab": lambda view: "map" if view.dimensions["type"] == "all_disasters" else "chart",
         }
     )
 
+    # Expose the all-disasters total on the map tab of the stacked-by-type views.
+    _add_total_indicator_for_map(c)
+
     c.save()
+
+
+def _add_total_indicator_for_map(c) -> None:
+    """Attach the all-disasters total indicator as a non-rendered "color" dimension on
+    each ``all_stacked`` view, and point ``map.columnSlug`` at it. See deaths.py for
+    the rationale of the ``color``-slot trick. The catalog path is given in short
+    form (``table#column``); the framework's save-time ``expand_paths`` resolves it.
+    """
+    for view in c.views:
+        type_slug = view.dimensions.get("type")
+        if type_slug not in AGGREGATE_STACKED_TYPES:
+            continue
+        impact = view.dimensions["impact"]
+        metric = view.dimensions["metric"]
+        garden_timespan = "yearly" if view.dimensions["timespan"] == "annual" else "decadal"
+        total_type = AGGREGATE_TO_TOTAL_TYPE[type_slug]
+        column = f"{INDICATOR_BY_IMPACT_METRIC[(impact, metric)]}_{total_type}_{garden_timespan}"
+        catalog_path = f"natural_disasters_{garden_timespan}#{column}"
+
+        view.indicators.color = Indicator(catalogPath=catalog_path)
+
+        view.config = view.config or {}
+        view.config["map"] = {**(view.config.get("map") or {}), "columnSlug": catalog_path}
 
 
 def _title(view) -> str:

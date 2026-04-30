@@ -7,18 +7,14 @@ topic_tags:
   - Natural Disasters
 default_dimensions:
   type: all_stacked
-  timespan: decadal
+  timespan: annual
   metric: total_number
 dimensions:
   - slug: type
     name: Disaster type
     choices:
-      - slug: all_disasters
-        name: All disasters
-        description: Deaths caused by all disaster types, combined
-        group: Aggregates
       - slug: all_stacked
-        name: All disasters (by type)
+        name: All disasters
         description: Deaths broken down by the disaster type
         group: Aggregates
       - slug: all_disasters_excluding_extreme_temperature
@@ -61,12 +57,12 @@ dimensions:
     name: Timespan
     description: Decadal average or annual figures
     choices:
-      - slug: decadal
-        name: Decadal average
-        description: Better for comparing trends over time as it's less sensitive to one-off events
       - slug: annual
         name: Annual
         description: Better for seeing rarer events with death tolls in every individual year
+      - slug: decadal
+        name: Decadal average
+        description: Better for comparing trends over time as it's less sensitive to one-off events
   - slug: metric
     name: Metric
     description: Total number of deaths, or adjusted for population

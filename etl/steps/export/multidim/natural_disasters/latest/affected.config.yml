@@ -8,18 +8,14 @@ topic_tags:
 default_dimensions:
   type: all_stacked
   impact: total_affected
-  timespan: decadal
+  timespan: annual
   metric: total_number
 dimensions:
   - slug: type
     name: Disaster type
     choices:
-      - slug: all_disasters
-        name: All disasters
-        description: People affected by all disaster types, combined
-        group: Aggregates
       - slug: all_stacked
-        name: All disasters (by type)
+        name: All disasters
         description: People affected, broken down by disaster type
         group: Aggregates
       - slug: all_disasters_excluding_extreme_temperature
@@ -81,12 +77,12 @@ dimensions:
     name: Timespan
     description: Decadal average or annual figures
     choices:
-      - slug: decadal
-        name: Decadal average
-        description: Better for comparing trends over time as it's less sensitive to one-off events
       - slug: annual
         name: Annual
         description: Better for seeing rarer events with impacts in every individual year
+      - slug: decadal
+        name: Decadal average
+        description: Better for comparing trends over time as it's less sensitive to one-off events
   - slug: metric
     name: Metric
     description: Total number of people affected, or adjusted for population
