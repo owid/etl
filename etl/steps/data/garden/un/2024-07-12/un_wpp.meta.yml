@@ -251,7 +251,7 @@ tables:
           <%- endif %>
         description_key:
           - |-
-            The UN's projections come in three scenarios: medium, high, and low. The medium scenario is the central estimate. The high and low scenarios run 0.5 births per woman above and below the medium — for example, where the medium projects 2.1 children per woman, the high is 2.6 and the low is 1.6.
+            The UN's projections come in three scenarios: medium, high, and low. The medium scenario is the central estimate; the high and low scenarios are designed to fully reach 0.5 births per woman above and below the medium from the mid-2030s onward (e.g. medium 2.1 → high 2.6, low 1.6). In the first decade of the projection the gap is narrower (about ±0.25 in 2024–2028, ±0.4 in 2029–2033).
         description_processing: |-
           The UN doesn't publish a total fertility rate for our continental aggregates (Africa, Asia, Europe, etc.). We derive these by summing the age-specific fertility rates across the reproductive age groups (15–19 to 45–49) and multiplying by 5, where each age-specific rate uses regional totals for births and female population.
         display:
@@ -529,7 +529,7 @@ tables:
         unit: "males per 100 females"
         description_short: |-
           <% if age == '0' %>
-          The number of male births per 100 female births. The biological norm is around 105.
+          The number of male births per 100 female births. The biological norm typically falls in the range 103–107, with small variations across populations.
           <%- elif age == 'all' %>
           The number of males per 100 females in the population.
           <%- else %>
