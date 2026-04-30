@@ -73,7 +73,7 @@ dimensions:
     choices:
       - slug: total_damages
         name: Total damages, in US$
-        description: Estimated damages measured in constant US$ (adjusted for inflation)
+        description: Estimated damages measured in current US$ (not adjusted for inflation)
       - slug: share_of_gdp
         name: Share of GDP
         description: Estimated damages as a share of gross domestic product (GDP)

@@ -30,9 +30,11 @@ INDIVIDUAL_DISASTER_TYPES = [
     "extreme_temperature",
 ]
 
-# Map metric -> garden indicator prefix. Constant US$ uses our own GDP-deflator series.
+# Map metric -> garden indicator prefix.
+# We use damages in current US$ (not adjusted for inflation): the inflation-adjusted
+# series produces unrealistic values for countries that have experienced hyperinflation.
 INDICATOR_BY_METRIC = {
-    "total_damages": "total_damages_constant_usd",
+    "total_damages": "total_damages",
     "share_of_gdp": "total_damages_per_gdp",
 }
 
