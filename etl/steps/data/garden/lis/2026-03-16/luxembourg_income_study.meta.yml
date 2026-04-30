@@ -145,7 +145,7 @@ definitions:
     This data shows the median income per person — the level below which half the population falls. Unlike the mean, the median is not pulled up by the incomes of the richest, so it better reflects what a typical person has. You can switch to mean income using the chart controls. We discuss how incomes are distributed in more detail on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_avg: |-
-    This data shows the mean (average) income per person within decile groups — each representing a tenth of the population, ranked by income. For example, the poorest decile is the poorest 10% of people in a country. We discuss how incomes are distributed in more detail on our page on [Economic Inequality.](https://ourworldindata.org/economic-inequality)
+    This data shows the mean (average) income per person within decile groups — each representing a tenth of the population, ranked by income. For example, the poorest decile is the poorest 10% of people in a country.
 
   description_key_thr: |-
     This data shows the income threshold for a given decile — a tenth of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.
@@ -1090,6 +1090,7 @@ tables:
           {macros}
           The mean income {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
         description_key:
+          - "{definitions.description_key_inequality}"
           - "{definitions.description_key_avg}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"

@@ -240,7 +240,7 @@ definitions:
     This data shows the median income or consumption per person — the level below which half the population falls. Unlike the mean, the median is not pulled up by the incomes of the richest, so it better reflects what a typical person has. We discuss how incomes are distributed in more detail on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_avg: |-
-    This data shows the mean (average) income or consumption per person within decile groups — each representing a tenth of the population, ranked by income. For example, the poorest decile is the poorest 10% of people in a country. We discuss how incomes are distributed in more detail on our page on [Economic Inequality.](https://ourworldindata.org/economic-inequality)
+    This data shows the mean (average) income or consumption per person within decile groups — each representing a tenth of the population, ranked by income. For example, the poorest decile is the poorest 10% of people in a country.
 
   description_key_thr: |-
     This data shows the income or consumption threshold for a given decile — a tenth of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.
@@ -1841,6 +1841,7 @@ tables:
           The mean income or consumption per day within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
+          - "{definitions.description_key_inequality}"
           - "{definitions.description_key_avg}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
