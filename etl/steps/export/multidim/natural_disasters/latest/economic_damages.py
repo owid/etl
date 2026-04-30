@@ -38,6 +38,21 @@ INDICATOR_BY_METRIC = {
     "share_of_gdp": "total_damages_per_gdp",
 }
 
+# Human-readable phrase used in chart titles for each disaster-type choice.
+DISASTER_PHRASES = {
+    "all_disasters": "all disasters",
+    "all_disasters_excluding_extreme_temperature": "all disasters excluding extreme temperatures",
+    "all_stacked": "disasters",
+    "drought": "droughts",
+    "earthquake": "earthquakes",
+    "volcanic_activity": "volcanic activity",
+    "flood": "floods",
+    "dry_mass_movement": "dry mass movements",
+    "extreme_weather": "storms",
+    "wildfire": "wildfires",
+    "extreme_temperature": "extreme temperatures",
+}
+
 COMMON_VIEW_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
     "chartTypes": ["StackedBar"],
@@ -113,4 +128,39 @@ def run() -> None:
         ],
     )
 
+    c.set_global_config(
+        {
+            "title": _title,
+            "subtitle": _subtitle,
+        }
+    )
+
     c.save()
+
+
+def _title(view) -> str:
+    type_phrase = DISASTER_PHRASES[view.dimensions["type"]]
+    if view.dimensions["metric"] == "share_of_gdp":
+        body = f"Annual economic damages from {type_phrase} as a share of GDP"
+    else:
+        body = f"Annual economic damages from {type_phrase}"
+    if view.dimensions["timespan"] == "decadal":
+        return f"Decadal average: {body}"
+    return body
+
+
+def _subtitle(view) -> str:
+    parts = []
+    if view.dimensions["metric"] == "total_damages":
+        parts.append("Estimated damages are reported in current US$ (not adjusted for inflation).")
+    else:
+        parts.append("Damages are expressed as a share of gross domestic product (GDP).")
+    if view.dimensions["timespan"] == "decadal":
+        parts.append(
+            "Decadal figures are measured as the annual average over the subsequent ten-year period."
+        )
+    parts.append(
+        "Disasters include all geophysical, meteorological, and climate events such as earthquakes, "
+        "volcanic activity, drought, wildfires, storms, and flooding."
+    )
+    return " ".join(parts)

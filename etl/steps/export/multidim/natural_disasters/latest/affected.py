@@ -49,6 +49,40 @@ INDICATOR_BY_IMPACT_METRIC = {
     ("homeless", "per_capita"): "homeless_per_100k_people",
 }
 
+# Sentence fragment used in titles for each impact choice.
+# Maps (impact, metric) to the verb-phrase placed between "Annual ... of people" and the disaster.
+IMPACT_PHRASES = {
+    ("total_affected", "total_number"): ("Annual number of people affected by", "from"),
+    ("total_affected", "per_capita"): ("Annual rate of people affected by", "from"),
+    ("injured", "total_number"): ("Annual number of people injured by", "from"),
+    ("injured", "per_capita"): ("Annual rate of people injured by", "from"),
+    ("requiring_assistance", "total_number"): (
+        "Annual number of people requiring immediate assistance during",
+        "from",
+    ),
+    ("requiring_assistance", "per_capita"): (
+        "Annual rate of people requiring immediate assistance during",
+        "from",
+    ),
+    ("homeless", "total_number"): ("Annual number of people left homeless by", "from"),
+    ("homeless", "per_capita"): ("Annual rate of people left homeless by", "from"),
+}
+
+# Human-readable phrase used in chart titles for each disaster-type choice.
+DISASTER_PHRASES = {
+    "all_disasters": "all disasters",
+    "all_disasters_excluding_extreme_temperature": "all disasters excluding extreme temperatures",
+    "all_stacked": "disasters",
+    "drought": "droughts",
+    "earthquake": "earthquakes",
+    "volcanic_activity": "volcanic activity",
+    "flood": "floods",
+    "dry_mass_movement": "dry mass movements",
+    "extreme_weather": "storms",
+    "wildfire": "wildfires",
+    "extreme_temperature": "extreme temperatures",
+}
+
 COMMON_VIEW_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
     "chartTypes": ["StackedBar"],
@@ -126,4 +160,41 @@ def run() -> None:
         ],
     )
 
+    c.set_global_config(
+        {
+            "title": _title,
+            "subtitle": _subtitle,
+        }
+    )
+
     c.save()
+
+
+def _title(view) -> str:
+    impact = view.dimensions["impact"]
+    metric = view.dimensions["metric"]
+    type_phrase = DISASTER_PHRASES[view.dimensions["type"]]
+    body, _ = IMPACT_PHRASES[(impact, metric)]
+    title = f"{body} {type_phrase}"
+    if view.dimensions["timespan"] == "decadal":
+        return f"Decadal average: {title}"
+    return title
+
+
+def _subtitle(view) -> str:
+    parts = []
+    if view.dimensions["impact"] == "total_affected":
+        parts.append(
+            "The total number of people affected is the sum of those injured, requiring assistance, and left homeless."
+        )
+    if view.dimensions["metric"] == "per_capita":
+        parts.append("Rates are measured per 100,000 people.")
+    if view.dimensions["timespan"] == "decadal":
+        parts.append(
+            "Decadal figures are measured as the annual average over the subsequent ten-year period."
+        )
+    parts.append(
+        "Disasters include all geophysical, meteorological, and climate events such as earthquakes, "
+        "volcanic activity, drought, wildfires, storms, and flooding."
+    )
+    return " ".join(parts)
