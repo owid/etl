@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.collection.model.view import Indicator
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -20,6 +19,19 @@ DIMENSIONS_CONFIG = {
 
 # Define if data is extrapolated or not
 EXTRAPOLATED = "no"
+
+# Override of description_key_welfare_type (world_inequality_database.meta.yml line 123) for the grouped
+# welfare_type=before_vs_after views. The OLD_* constants mirror the garden text verbatim — the assertion
+# in _replace_welfare_type_bullet catches drift in the source.
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX = "Income is measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public."
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_AFTER_TAX = (
+    "Income is measured after taxes have been paid and most government benefits have been received."
+)
+NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown separately. Taxes and benefits typically increase the share going to poorer groups and reduce the share going to richer groups."
+
+# Sourced from the after_tax indicator's description_key. The before_vs_after view inherits from the
+# before_tax indicator, so this bullet is otherwise lost; we re-attach it as the last bullet.
+DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY = "Data on income after tax and benefits is less widely available than that before tax. Where it is missing, distributions are constructed from the more widely available pre-tax data, combined with data on tax revenue and government expenditure. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/)."
 
 
 def run() -> None:
@@ -162,71 +174,6 @@ def run() -> None:
                 elif "after_tax" in ind.catalogPath:
                     ind.display = {"name": "After taxes and benefits"}
 
-    # Group welfare_type (before vs after tax) as scatter plot for specific quantiles
-    c.group_views(
-        groups=[
-            {
-                "dimension": "welfare_type",
-                "choices": ["before tax", "after tax"],
-                "choice_new_slug": "before_vs_after_scatter",
-                "view_config": {
-                    "title": "{title}",
-                    "subtitle": "{subtitle}",
-                    "hideRelativeToggle": True,
-                    "hasMapTab": False,
-                    "tab": "chart",
-                    "chartTypes": ["ScatterPlot"],
-                    "comparisonLines": [
-                        {"yEquals": "x"},
-                        {"yEquals": "0.75*x", "label": "25% reduction"},
-                        {"yEquals": "0.5*x", "label": "50% reduction"},
-                    ],
-                    "matchingEntitiesOnly": True,
-                    "minTime": "latest",
-                    "xAxis": lambda view: {"min": _get_scatter_metadata(tb, view)["axis_min"]},
-                    "yAxis": lambda view: {"min": _get_scatter_metadata(tb, view)["axis_min"]},
-                },
-                "view_metadata": {
-                    "description_short": lambda view: _get_scatter_metadata(tb, view)["description_short"],
-                    "description_key": lambda view: _get_scatter_metadata(tb, view)["description_key"],
-                },
-            },
-        ],
-        params={
-            "title": lambda view: _get_scatter_metadata(tb, view)["title"],
-            "subtitle": lambda view: _get_scatter_metadata(tb, view)["subtitle"],
-        },
-    )
-
-    # Remove grouped scatter views for quantiles we don't want (keep only Richest 0.1%, Richest 1%, 10)
-    c.drop_views(
-        {
-            "welfare_type": ["before_vs_after_scatter"],
-            "quantile": ["10_40_50", "all"],
-        }
-    )
-
-    # Customize scatter plot views: move before_tax to x axis, keep after_tax on y
-    for view in c.views:
-        if view.dimensions.get("welfare_type") == "before_vs_after_scatter" and view.indicators.y:
-            before_tax_ind = None
-            after_tax_ind = None
-            for ind in view.indicators.y:
-                if "before_tax" in ind.catalogPath:
-                    before_tax_ind = ind
-                elif "after_tax" in ind.catalogPath:
-                    after_tax_ind = ind
-
-            if before_tax_ind and after_tax_ind:
-                before_tax_ind.display = {"name": "Before taxes and benefits"}
-                after_tax_ind.display = {"name": "After taxes and benefits"}
-                view.indicators.x = before_tax_ind
-                view.indicators.y = [after_tax_ind]
-                view.indicators.size = Indicator(
-                    catalogPath="grapher/demography/2024-07-15/population/historical#population_historical"
-                )
-                view.indicators.color = Indicator(catalogPath="grapher/regions/2023-01-01/regions/regions#owid_region")
-
     #
     # Save garden dataset.
     #
@@ -243,52 +190,6 @@ def _get_grouped_quantile_subtitle(view):
     """Return subtitle for grouped quantile views."""
     welfare_type = view.dimensions.get("welfare_type")
     return f"The share of income received by each decile (tenth of the population). Income here is measured {welfare_type}es and benefits."
-
-
-def _get_scatter_metadata(tb, view):
-    """Extract and transform metadata from grapher_config for scatter views.
-
-    Uses the after_tax indicator to derive title/subtitle/description_short,
-    and the quantile dimension to determine axis_min.
-    """
-    empty = {"title": "", "subtitle": "", "description_short": "", "description_key": [], "axis_min": 0}
-    if not view.indicators.y:
-        return empty
-
-    # Find the after_tax indicator
-    after_tax_ind = next((ind for ind in view.indicators.y if "after_tax" in ind.catalogPath), None)
-    if not after_tax_ind:
-        return empty
-
-    col_name = after_tax_ind.catalogPath.split("#")[-1] if "#" in after_tax_ind.catalogPath else None
-
-    if col_name and col_name in tb.columns:
-        meta = tb[col_name].metadata
-        grapher_config = meta.presentation.grapher_config if meta.presentation else {}
-
-        title = grapher_config.get("title", "")
-        title = title.replace("after tax", "before vs. after tax")
-
-        subtitle = grapher_config.get("subtitle", "")
-        subtitle = subtitle.replace(" Income here is measured after taxes and benefits.", "")
-
-        description_short = meta.description_short or ""
-        description_short = description_short.replace(" Income here is measured after taxes and benefits.", "")
-
-        description_key = list(meta.description_key) if meta.description_key else []
-
-        axis_min_map = {"Richest 0.1%": 0, "Richest 1%": 5, "10": 20}
-        axis_min = axis_min_map.get(view.dimensions.get("quantile"), 0)
-
-        return {
-            "title": title,
-            "subtitle": subtitle,
-            "description_short": description_short,
-            "description_key": description_key,
-            "axis_min": axis_min,
-        }
-
-    return empty
 
 
 def _get_before_vs_after_metadata(tb, view):
@@ -313,6 +214,8 @@ def _get_before_vs_after_metadata(tb, view):
         description_short = description_short.replace(" Income here is measured before taxes and benefits.", "")
 
         description_key = list(meta.description_key) if meta.description_key else []
+        description_key = _replace_welfare_type_bullet(description_key, col_name)
+        description_key = _append_after_tax_availability_bullet(description_key, tb, view)
 
         return {
             "title": title,
@@ -322,6 +225,32 @@ def _get_before_vs_after_metadata(tb, view):
         }
 
     return {"title": "", "subtitle": "", "description_short": "", "description_key": []}
+
+
+def _replace_welfare_type_bullet(description_key, col_name):
+    """Replace the welfare_type bullet (before/after tax variants) with the combined before_vs_after wording."""
+    old_welfare_keys = {OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX, OLD_DESCRIPTION_KEY_WELFARE_TYPE_AFTER_TAX}
+    assert any(b in old_welfare_keys for b in description_key), (
+        f"Neither OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX nor _AFTER_TAX found in {col_name}.description_key — garden text changed, update the constants."
+    )
+    return [NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER if b in old_welfare_keys else b for b in description_key]
+
+
+def _append_after_tax_availability_bullet(description_key, tb, view):
+    """Append the after_tax-only availability caveat (sourced from the after_tax indicator) as the last bullet."""
+    if DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY in description_key:
+        return description_key
+    after_tax_ind = next((i for i in view.indicators.y if "after_tax" in i.catalogPath), None)
+    if after_tax_ind:
+        after_tax_col = after_tax_ind.catalogPath.split("#")[-1]
+        after_tax_description_key = (
+            list(tb[after_tax_col].metadata.description_key or []) if after_tax_col in tb.columns else []
+        )
+        assert DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY in after_tax_description_key, (
+            f"DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY not found in {after_tax_col}.description_key — garden text changed, update the constant."
+        )
+        description_key.append(DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY)
+    return description_key
 
 
 def _build_indicator_display_names(tb):

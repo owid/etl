@@ -156,11 +156,17 @@ definitions:
   description_key_relative_poverty: |-
     This is a measure of _relative_ poverty – it captures the share of people whose {definitions.concept_welfare_type} is low by the standards typical in their own country.
 
+  description_key_top_incomes: |-
+    Incomes are distributed very unequally, both between countries and within them. A large share of total income is concentrated among the very richest, making the top of the distribution important to understand. Read more in our topic page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
   description_key_gini: |-
     Incomes are distributed very unequally, both between countries and within them. The Gini coefficient is a common measure of inequality, which summarizes the distribution and expresses it in terms of a number from 0 to 1. Higher values indicate higher inequality. We explain how it works in our article [Measuring inequality: what is the Gini coefficient?](https://ourworldindata.org/what-is-the-gini-coefficient), and discuss income inequality more broadly on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_palma_ratio: |-
     Incomes are distributed very unequally, both between countries and within them. The Palma ratio captures this by comparing the income share of the richest 10% to that of the poorest 40%. For example, a value of 2 means the richest 10% receive twice as much as the poorest 40%. We discuss income inequality more broadly on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_share: |-
+    This data shows the share of total income that goes to specific groups of the population. For example, if the richest decile receives 40% of total income, it means the richest 10% of people share 40% of all income between them.
 
   description_processing_general: |-
     We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively.
@@ -991,6 +997,8 @@ tables:
           {macros}
           The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
