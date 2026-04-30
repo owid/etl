@@ -178,7 +178,6 @@ GROUPS = (
             "commands": {
                 "metadata-export": "etl.metadata_export.cli",
                 "metadata-migrate": "apps.metadata_migrate.cli.cli",
-                "metadata-upgrade": "apps.metagpt.cli.main",
             },
         },
         {
