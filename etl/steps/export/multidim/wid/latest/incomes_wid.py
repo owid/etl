@@ -202,14 +202,27 @@ def _get_before_vs_after_metadata(tb, view):
         meta = tb[col_name].metadata
         grapher_config = meta.presentation.grapher_config if meta.presentation else {}
 
-        title = grapher_config.get("title", "")
-        title = title.replace("before tax", "before vs. after tax")
-
-        subtitle = grapher_config.get("subtitle", "")
-        subtitle = subtitle.replace(" Income here is measured before taxes and benefits.", "")
-
-        description_short = meta.description_short or ""
-        description_short = description_short.replace(" Income here is measured before taxes and benefits.", "")
+        title = _assert_and_replace(
+            grapher_config.get("title", ""),
+            "before tax",
+            "before vs. after tax",
+            "grapher_config.title",
+            col_name,
+        )
+        subtitle = _assert_and_replace(
+            grapher_config.get("subtitle", ""),
+            " Income here is measured before taxes and benefits.",
+            "",
+            "grapher_config.subtitle",
+            col_name,
+        )
+        description_short = _assert_and_replace(
+            meta.description_short or "",
+            " Income here is measured before taxes and benefits.",
+            "",
+            "description_short",
+            col_name,
+        )
 
         description_key = list(meta.description_key) if meta.description_key else []
         description_key = _replace_welfare_type_bullet(description_key, col_name)
@@ -249,6 +262,12 @@ def _append_after_tax_availability_bullet(description_key, tb, view):
         )
         description_key.append(DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY)
     return description_key
+
+
+def _assert_and_replace(text, old, new, field, col_name):
+    """Replace `old` with `new` in `text`; assert `old` was present so silent drift in the garden meta surfaces as a clear error."""
+    assert old in text, f"'{old}' not found in {col_name}.{field} — garden text changed, update the replacement."
+    return text.replace(old, new)
 
 
 def _build_indicator_display_names(tb):

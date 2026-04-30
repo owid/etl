@@ -94,11 +94,20 @@ def _get_before_vs_after_metadata(tb, view):
         meta = tb[col_name].metadata
         grapher_config = meta.presentation.grapher_config if meta.presentation else {}
 
-        title = grapher_config.get("title", "Gini coefficient")
-        title = title.replace("before tax", "before vs. after tax")
-
-        subtitle = grapher_config.get("subtitle", "")
-        subtitle = subtitle.replace(" Inequality is measured here in terms of income before taxes and benefits.", "")
+        title = _assert_and_replace(
+            grapher_config.get("title", "Gini coefficient"),
+            "before tax",
+            "before vs. after tax",
+            "grapher_config.title",
+            col_name,
+        )
+        subtitle = _assert_and_replace(
+            grapher_config.get("subtitle", ""),
+            " Inequality is measured here in terms of income before taxes and benefits.",
+            "",
+            "grapher_config.subtitle",
+            col_name,
+        )
 
         description_key = list(meta.description_key) if meta.description_key else []
         old_welfare_keys = {OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX, OLD_DESCRIPTION_KEY_WELFARE_TYPE_AFTER_TAX}
@@ -123,3 +132,9 @@ def _get_before_vs_after_metadata(tb, view):
         return {"title": title, "subtitle": subtitle, "description_key": description_key}
 
     return {"title": "", "subtitle": "", "description_key": []}
+
+
+def _assert_and_replace(text, old, new, field, col_name):
+    """Replace `old` with `new` in `text`; assert `old` was present so silent drift in the garden meta surfaces as a clear error."""
+    assert old in text, f"'{old}' not found in {col_name}.{field} — garden text changed, update the replacement."
+    return text.replace(old, new)

@@ -241,11 +241,16 @@ def _get_before_vs_after_metadata(tb, view):
         meta = tb[col_name].metadata
         grapher_config = meta.presentation.grapher_config if meta.presentation else {}
 
-        title = grapher_config.get("title", "")
-        title = title.replace("after tax", "before vs. after tax")
-
-        subtitle = grapher_config.get("subtitle", "")
-        subtitle = subtitle.replace(" Income here is measured after taxes and benefits.", "")
+        title = _assert_and_replace(
+            grapher_config.get("title", ""), "after tax", "before vs. after tax", "grapher_config.title", col_name
+        )
+        subtitle = _assert_and_replace(
+            grapher_config.get("subtitle", ""),
+            " Income here is measured after taxes and benefits.",
+            "",
+            "grapher_config.subtitle",
+            col_name,
+        )
 
         description_key = list(meta.description_key) if meta.description_key else []
         old_welfare_keys = {OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI, OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI}
@@ -302,3 +307,9 @@ def _get_display_name_from_metadata(ind, indicator_titles):
                 name = f"{name} (median)"
             return name
     return None
+
+
+def _assert_and_replace(text, old, new, field, col_name):
+    """Replace `old` with `new` in `text`; assert `old` was present so silent drift in the garden meta surfaces as a clear error."""
+    assert old in text, f"'{old}' not found in {col_name}.{field} — garden text changed, update the replacement."
+    return text.replace(old, new)
