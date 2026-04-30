@@ -43,6 +43,30 @@ INDICATOR_BY_METRIC = {
     "share_of_gdp": "total_damages_per_gdp",
 }
 
+# Subtitle clarification shown for individual disaster types whose scope is
+# non-obvious from the name alone. Types not listed here get no extra clarification.
+DISASTER_DESCRIPTIONS = {
+    "earthquake": "Earthquakes include the impacts of earthquake events, aftershocks, and tsunamis.",
+    "dry_mass_movement": (
+        "A dry mass movement refers to a landslide or rockfall that is not triggered by surface "
+        "or subsurface water flows."
+    ),
+    "extreme_weather": (
+        "Storms include tornadoes, hailstorms, thunderstorms, sandstorms, blizzards, and extreme wind events."
+    ),
+}
+
+ALL_DISASTERS_SUBTITLE = (
+    "Disasters include all geophysical, meteorological, and climate events such as earthquakes, "
+    "volcanic activity, drought, wildfires, storms, and flooding."
+)
+
+ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE = (
+    "Disasters here include geophysical, meteorological, and climate events such as earthquakes, "
+    "volcanic activity, drought, wildfires, storms, and flooding. Extreme temperatures are excluded "
+    "because their reporting coverage is too incomplete to compare across regions and over time."
+)
+
 # Stable color per disaster type so the same disaster appears in the same colour
 # across views (single-series, stacked-by-type, and excluding-extreme-temperatures).
 DISASTER_COLORS = {
@@ -260,8 +284,11 @@ def _subtitle(view) -> str:
         parts.append("Damages are expressed as a share of gross domestic product (GDP).")
     if view.dimensions["timespan"] == "decadal":
         parts.append("Decadal figures are measured as the annual average over the subsequent ten-year period.")
-    parts.append(
-        "Disasters include all geophysical, meteorological, and climate events such as earthquakes, "
-        "volcanic activity, drought, wildfires, storms, and flooding."
-    )
+    type_slug = view.dimensions["type"]
+    if type_slug == "all_stacked":
+        parts.append(ALL_DISASTERS_SUBTITLE)
+    elif type_slug == "all_disasters_excluding_extreme_temperature":
+        parts.append(ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE)
+    elif type_slug in DISASTER_DESCRIPTIONS:
+        parts.append(DISASTER_DESCRIPTIONS[type_slug])
     return " ".join(parts)

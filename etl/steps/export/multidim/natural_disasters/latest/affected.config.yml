@@ -39,7 +39,7 @@ dimensions:
         description: People affected by flooding
         group: Individual disaster types
       - slug: dry_mass_movement
-        name: Mass movement (dry)
+        name: Dry mass movement
         description: People affected by dry mass movements
         group: Individual disaster types
       - slug: extreme_weather
@@ -91,6 +91,6 @@ dimensions:
         name: Total number
         description: The total number of people affected
       - slug: per_capita
-        name: Per capita
-        description: Adjusted for population. Better for comparing rates across countries, and changes over time
+        name: Rate
+        description: Per 100,000 people; better for comparing across countries and changes over time
 views: []
