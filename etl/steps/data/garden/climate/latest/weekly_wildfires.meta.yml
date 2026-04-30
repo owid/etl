@@ -2,6 +2,7 @@
 definitions:
   common:
     presentation:
+      attribution_short: GWIS (MODIS & VIIRS)
       topic_tags:
         - Climate Change
     processing_level: minor

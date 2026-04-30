@@ -1,0 +1,35 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+    unit: hens
+    short_unit: ""
+
+dataset:
+  title: "US egg production"
+
+tables:
+  us_egg_production:
+    variables:
+      caged:
+        title: Number of hens in caged systems
+        description_short: Includes battery and enriched cage systems.
+      cage_free:
+        title: Number of hens in cage-free systems
+      non_organic_cage_free:
+        title: Number of hens in non-organic cage-free systems
+      non_organic_barn_aviary:
+        title: Number of hens in non-organic barn/aviary systems
+      non_organic_free_range:
+        title: Number of hens in non-organic free-range systems
+      non_organic_pastured:
+        title: Number of hens in non-organic pastured systems
+      organic_cage_free:
+        title: Number of hens in organic cage-free systems
+      organic:
+        title: Number of hens in organic systems
+      organic_free_range:
+        title: Number of hens in organic free-range systems
+      organic_pastured:
+        title: Number of hens in organic pastured systems
