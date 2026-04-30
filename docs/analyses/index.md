@@ -48,3 +48,10 @@ This is just a sneak peek into some of our data work. But note that all our code
     This document is a technical companion to the article ["Tracking historical progress against slavery and forced labor: a long-run data view"](https://ourworldindata.org/slavery).
 
     [:material-book-open-variant: Methodology](slavery_historical_data/index.md){ .md-button }
+
+!!! note ""
+
+    ## Visualizing global inequality
+    This document is a technical companion to our [inequality page](https://ourworldindata.org/economic-inequality) and the article "Visualizing global inequality". It describes the World Bank PIP data underlying the income distribution plots, the currency-conversion and kernel density methodology, and the known limitations.
+
+    [:material-book-open-variant: Methodology](inequality_visualization/index.md){ .md-button }
