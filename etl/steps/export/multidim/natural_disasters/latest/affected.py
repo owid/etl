@@ -177,7 +177,7 @@ def _title(view) -> str:
     body, _ = IMPACT_PHRASES[(impact, metric)]
     title = f"{body} {type_phrase}"
     if view.dimensions["timespan"] == "decadal":
-        return f"Decadal average: {title}"
+        return f"{title} (10-year average)"
     return title
 
 
