@@ -696,6 +696,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the poorest 50% of the population. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -727,6 +729,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the middle 40% of the population. The middle 40% is the share of the population whose {definitions.concept_welfare_type} lies between the poorest 50% and the richest 10%. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -742,6 +746,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the population between the 90th and 99th percentiles. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -757,6 +763,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -787,6 +795,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 1% of the population. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -817,6 +827,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 0.1% of the population. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
