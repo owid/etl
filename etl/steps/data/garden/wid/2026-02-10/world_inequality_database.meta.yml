@@ -122,11 +122,11 @@ definitions:
 
   description_key_welfare_type: |-
     <% if welfare_type == "before tax" %>
-    Income is measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.
+    Income is measured before taxes have been paid and most government benefits have been received. The exception is pensions and other social insurance, such as unemployment insurance. Contributions to social insurance are deducted, and the corresponding benefits are added back and counted as income.
     <%- elif welfare_type == "after tax" %>
-    Income is measured after taxes have been paid and most government benefits have been received.
+    Income is measured after taxes have been paid and most government benefits have been received. Not just cash benefits like social assistance, but also public services like health and education, and collective spending, such as defense and infrastructure. This is a broader concept of income than used by most other sources.
     <%- elif welfare_type == "after tax disposable" %>
-    Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received, but does not include in-kind benefits and therefore does not add up to national income.
+    Income is measured after taxes have been paid and most government benefits have been received. It does not include public services like health and education, or collective spending such as defense and infrastructure, so it does not add up to national income.
     <%- elif welfare_type == "wealth" %>
     This measure is related to net national wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.
     <%- endif %>
