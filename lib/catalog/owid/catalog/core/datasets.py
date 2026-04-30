@@ -5,8 +5,8 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import shutil
+import uuid
 import warnings
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -118,8 +118,10 @@ class Dataset:
                 raise Exception(f"refuse to overwrite non-dataset dir at: {path}")
             # Atomically move aside before deletion so a partially failed rmtree
             # (e.g. ENOTEMPTY from concurrent writers) doesn't leave the dataset
-            # path in a half-deleted state without index.json.
-            tmp = path.with_name(f".{path.name}.tmp.{os.getpid()}")
+            # path in a half-deleted state without index.json. The suffix is a
+            # uuid so a leftover temp dir from an earlier partial cleanup never
+            # collides with the next attempt.
+            tmp = path.with_name(f".{path.name}.tmp.{uuid.uuid4().hex}")
             path.rename(tmp)
             shutil.rmtree(tmp, ignore_errors=True)
 

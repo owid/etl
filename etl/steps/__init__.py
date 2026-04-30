@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import uuid
 import warnings
 from collections import defaultdict
 from collections.abc import Generator, Iterable
@@ -442,7 +443,9 @@ class DataStep(Step):
             step=self.path,
             path=str(self._dest_dir),
         )
-        tmp = self._dest_dir.with_name(f".{self._dest_dir.name}.tmp.{os.getpid()}")
+        # Unique suffix per attempt so a leftover temp dir from an earlier
+        # partial cleanup never collides with the next attempt.
+        tmp = self._dest_dir.with_name(f".{self._dest_dir.name}.tmp.{uuid.uuid4().hex}")
         self._dest_dir.rename(tmp)
         shutil.rmtree(tmp, ignore_errors=True)
 
