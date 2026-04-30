@@ -310,6 +310,8 @@ tables:
         description_key:
           - |-
             Net migration is the most uncertain component of population change — flows are volatile and historical data is patchy. The UN adjusts country values so the global net migration each year sums to zero.
+          - |-
+            The 2024 revision is the first to project net migration probabilistically — earlier revisions used deterministic assumptions. Migration uncertainty is now propagated into the population projection alongside fertility and life-expectancy uncertainty.
         description_processing: |-
           We compute continental aggregates (Africa, Asia, Europe, North America, South America, Oceania) by summing across constituent countries. We set the world total to zero — every immigrant in one country is an emigrant from another.
         display:
@@ -330,6 +332,8 @@ tables:
         description_short: |-
           The number of immigrants minus the number of emigrants, per 1,000 people in the population. Positive values mean more people moved into the country than left it. {definitions.global.dimensions.description_short}
         description_key:
+          - |-
+            Net migration is the most uncertain component of population change — flows are volatile and historical data is patchy. The UN balances country values so global net migration each year sums to zero.
           - |-
             Expressing migration per 1,000 people makes it comparable across countries of very different sizes.
         display:
@@ -492,7 +496,7 @@ tables:
           - |-
             This is [period life expectancy](#dod:period-life-expectancy) — a snapshot of mortality rates in a single year. It does *not* follow a real generation of people; it tells you how long someone would live if today's age-specific death rates stayed the same for the rest of their life.
           - |-
-            Future values are the mean of thousands of trajectories simulated by the UN. When fitting its projection model, the UN excluded values for 2020 and 2021 so COVID-19's temporary drop wouldn't distort the long-run trend.
+            Future values are the mean of thousands of trajectories simulated by the UN. When fitting its projection model, the UN excluded observed life expectancies for 2020 to 2023 so COVID-19's temporary impact wouldn't distort the long-run trend.
         description_processing: |-
           For ages above 0, the UN reports life expectancy as the years a person at that age has left to live. We add the starting age back so the chart shows the *expected age at death* — for example, a 65-year-old with 17 years remaining is shown as 82.
         display:
