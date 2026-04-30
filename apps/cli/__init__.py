@@ -177,7 +177,6 @@ GROUPS = (
             "name": "Metadata",
             "commands": {
                 "metadata-export": "etl.metadata_export.cli",
-                "metadata-migrate": "apps.metadata_migrate.cli.cli",
             },
         },
         {
