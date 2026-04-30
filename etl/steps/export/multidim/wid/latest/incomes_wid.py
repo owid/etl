@@ -276,8 +276,6 @@ def _get_scatter_metadata(tb, view):
         description_short = description_short.replace(" Income here is measured after taxes and benefits.", "")
 
         description_key = list(meta.description_key) if meta.description_key else []
-        if description_key:
-            description_key = description_key[1:]
 
         axis_min_map = {"Richest 0.1%": 0, "Richest 1%": 5, "10": 20}
         axis_min = axis_min_map.get(view.dimensions.get("quantile"), 0)
@@ -315,8 +313,6 @@ def _get_before_vs_after_metadata(tb, view):
         description_short = description_short.replace(" Income here is measured before taxes and benefits.", "")
 
         description_key = list(meta.description_key) if meta.description_key else []
-        if description_key:
-            description_key = description_key[1:]
 
         return {
             "title": title,
