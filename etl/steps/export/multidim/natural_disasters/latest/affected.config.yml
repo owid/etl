@@ -75,7 +75,7 @@ dimensions:
         group: Individual impact
   - slug: timespan
     name: Timespan
-    description: Decadal average or annual figures
+    description: Annual figures or decadal average
     choices:
       - slug: annual
         name: Annual

@@ -212,6 +212,14 @@ def run() -> None:
         common_view_config=COMMON_VIEW_CONFIG,
     )
 
+    sample_col = f"total_affected_{INDIVIDUAL_DISASTER_TYPES[0]}_yearly"
+    sample_description_key = list(tb_yearly[sample_col].metadata.description_key or [])
+    grouped_view_metadata = {
+        "presentation": {"title_public": _title},
+        "description_short": _subtitle,
+        "description_key": sample_description_key,
+    }
+
     c.group_views(
         groups=[
             {
@@ -219,12 +227,14 @@ def run() -> None:
                 "choice_new_slug": "all_stacked",
                 "choices": INDIVIDUAL_DISASTER_TYPES,
                 "view_config": STACKED_VIEW_CONFIG,
+                "view_metadata": grouped_view_metadata,
             },
             {
                 "dimension": "type",
                 "choice_new_slug": "all_disasters_excluding_extreme_temperature",
                 "choices": DISASTER_TYPES_EXCLUDING_EXTREME_TEMPERATURE,
                 "view_config": STACKED_VIEW_CONFIG,
+                "view_metadata": grouped_view_metadata,
             },
         ],
     )
