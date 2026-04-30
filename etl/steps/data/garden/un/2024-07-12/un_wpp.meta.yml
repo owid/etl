@@ -62,10 +62,8 @@ definitions:
       # so data pages render "Indicator (UN WPP)" or
       # "Indicator (UN WPP, medium scenario)".
       title_variant: |-
-        <% if variant == 'estimates' -%>
-        UN WPP
-        <%- else -%>
-        UN WPP, << variant >> scenario
+        <% if variant != 'estimates' -%>
+        with << variant >> scenario projections
         <%- endif -%>
       grapher_config:
         subtitle: "{definitions.global.projections}"
@@ -79,13 +77,6 @@ definitions:
   # Used by deaths, death_rate, and mortality_rate.
   crvs_note: &crvs_note |-
     Estimates may be uncertain for countries with poor [vital registration systems](#dod:crvs).
-
-  # Note explaining the expected biological sex ratio at birth. Renders only
-  # when age == '0'. Reference with `note: *sex_ratio_birth_note`.
-  sex_ratio_birth_note: &sex_ratio_birth_note |-
-    <% if age == '0' -%>
-    It's considered that 105 is the biologically expected sex ratio at birth.
-    <%- endif %>
 
 # this metadata file is not used in garden step, but in grapher step
 tables:
@@ -539,13 +530,17 @@ tables:
         unit: "males per 100 females"
         description_short: |-
           <% if age == '0' %>
-          The number of male births per 100 female births. The biological norm typically falls in the range 103–107, with small variations across populations.
+          The number of male births per 100 female births.
           <%- elif age == 'all' %>
           The number of males per 100 females in the population.
           <%- else %>
           The number of males per 100 females at age << age >>.
           <%- endif %> {definitions.global.projections}
         description_key:
+          - |-
+            <% if age == '0' -%>
+            The biological norm typically falls in the range 103-107, with small variations across populations.
+            <%- endif -%>
           - |-
             <% if age == '0' -%>
             Persistent values well above 105 usually indicate sex-selective practices, since the biological ratio at birth is consistent across populations.
@@ -571,11 +566,12 @@ tables:
             Sex ratio at age << age >>
             <%- endif %>
           grapher_config:
+            note: ""
             subtitle: |-
               <% if age == 'all' %>
               Number of men per 100 women. Values above 100 mean there are more men than women.
               <%- elif age == '0' %>
-              Number of boys born per 100 girls. Values above 100 mean more boys are born than girls.
+              Number of boys born per 100 girls. Values above 100 mean more boys are born than girls. The biologically expected ratio at birth is around 105.
               <%- elif age == '100+' %>
               Number of men per 100 women at age 100 and over. Values above 100 mean there are more men than women.
               <%- elif age|int <= 15 %>
@@ -583,7 +579,17 @@ tables:
               <%- else %>
               Number of men per 100 women at age << age >>. Values above 100 mean there are more men than women.
               <%- endif %> {definitions.global.projections}
-            note: *sex_ratio_birth_note
+            yAxis:
+              min: "<% if age == '0' %><< 90 | as_value >><%- endif %>"
+              max: "<% if age == '0' %><< 120 | as_value >><%- endif %>"
+            # Disabled: a horizontal reference line at 105 visually overlapped the
+            # data series for many countries. The "biologically expected ratio
+            # ~105" note now lives in the subtitle (age=='0' branch above).
+            # Re-enable if the visual conflict ever stops mattering.
+            comparisonLines: []
+            # comparisonLines:
+            #   - label: "<% if age == '0' %>105 is about the expected biological ratio<%- endif %>"
+            #     yEquals: "<% if age == '0' %>105<%- endif %>"
 
   dependency_ratio:
     variables:
