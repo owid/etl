@@ -1,0 +1,100 @@
+title:
+  title: People affected by natural disasters
+  title_variant: by disaster type
+default_selection:
+  - World
+topic_tags:
+  - Natural Disasters
+default_dimensions:
+  type: all_disasters
+  impact: total_affected
+  timespan: decadal
+  metric: total_number
+dimensions:
+  - slug: type
+    name: Disaster type
+    choices:
+      - slug: all_disasters
+        name: All disasters
+        description: People affected by all disaster types, combined
+        group: Aggregates
+      - slug: all_stacked
+        name: All disasters (by type)
+        description: People affected, broken down by disaster type
+        group: Aggregates
+      - slug: all_disasters_excluding_extreme_temperature
+        name: All disasters (excluding extreme temperatures)
+        description: Excludes extreme temperature events, which have very incomplete data across regions and time
+        group: Aggregates
+      - slug: drought
+        name: Droughts
+        description: People affected by drought events
+        group: Individual disaster types
+      - slug: earthquake
+        name: Earthquakes
+        description: People affected by earthquakes
+        group: Individual disaster types
+      - slug: volcanic_activity
+        name: Volcanoes
+        description: People affected by volcanic activity
+        group: Individual disaster types
+      - slug: flood
+        name: Floods
+        description: People affected by flooding
+        group: Individual disaster types
+      - slug: dry_mass_movement
+        name: Mass movement (dry)
+        description: People affected by dry mass movements
+        group: Individual disaster types
+      - slug: extreme_weather
+        name: Storms
+        description: People affected by storm and extreme weather events
+        group: Individual disaster types
+      - slug: wildfire
+        name: Wildfires
+        description: People affected by wildfires
+        group: Individual disaster types
+      - slug: extreme_temperature
+        name: Extreme temperatures
+        description: People affected by extreme hot and cold temperatures
+        group: Individual disaster types
+  - slug: impact
+    name: Impact
+    choices:
+      - slug: total_affected
+        name: Total affected
+        description: The number of people injured, requiring assistance, or left homeless
+        group: Aggregate
+      - slug: injured
+        name: Injuries
+        description: People injured
+        group: Individual impact
+      - slug: requiring_assistance
+        name: Requiring assistance
+        description: People requiring immediate assistance
+        group: Individual impact
+      - slug: homeless
+        name: Homeless
+        description: People left homeless
+        group: Individual impact
+  - slug: timespan
+    name: Timespan
+    description: Decadal average or annual figures
+    choices:
+      - slug: decadal
+        name: Decadal average
+        description: Better for comparing trends over time as it's less sensitive to one-off events
+      - slug: annual
+        name: Annual
+        description: Better for seeing rarer events with impacts in every individual year
+  - slug: metric
+    name: Metric
+    description: Total number of people affected, or adjusted for population
+    choices:
+      - slug: total_number
+        name: Total number
+        description: The total number of people affected
+      - slug: per_capita
+        name: Per capita
+        description: Adjusted for population. Better for comparing rates across countries, and changes over time
+views: []
