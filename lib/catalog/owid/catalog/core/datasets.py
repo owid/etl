@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import warnings
 from collections.abc import Iterator
@@ -115,7 +116,12 @@ class Dataset:
         if path.is_dir():
             if not (path / "index.json").exists():
                 raise Exception(f"refuse to overwrite non-dataset dir at: {path}")
-            shutil.rmtree(path)
+            # Atomically move aside before deletion so a partially failed rmtree
+            # (e.g. ENOTEMPTY from concurrent writers) doesn't leave the dataset
+            # path in a half-deleted state without index.json.
+            tmp = path.with_name(f".{path.name}.tmp.{os.getpid()}")
+            path.rename(tmp)
+            shutil.rmtree(tmp, ignore_errors=True)
 
         path.mkdir(parents=True, exist_ok=True)
 
