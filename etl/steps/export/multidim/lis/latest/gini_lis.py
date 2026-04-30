@@ -94,7 +94,11 @@ def _get_before_vs_after_metadata(tb, view):
         grapher_config = meta.presentation.grapher_config if meta.presentation else {}
 
         title = _assert_and_replace(
-            grapher_config.get("title", "Gini coefficient"), "after tax", "before vs. after tax", "grapher_config.title", col_name
+            grapher_config.get("title", "Gini coefficient"),
+            "after tax",
+            "before vs. after tax",
+            "grapher_config.title",
+            col_name,
         )
         subtitle = _assert_and_replace(
             grapher_config.get("subtitle", ""),
