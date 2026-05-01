@@ -44,11 +44,11 @@ IMPACT_PHRASES = {
     ("injured", "total_number"): ("Annual number of people injured by", "from"),
     ("injured", "per_capita"): ("Annual rate of people injured by", "from"),
     ("requiring_assistance", "total_number"): (
-        "Annual number of people requiring immediate assistance during",
+        "Annual number of people requiring immediate assistance due to",
         "from",
     ),
     ("requiring_assistance", "per_capita"): (
-        "Annual rate of people requiring immediate assistance during",
+        "Annual rate of people requiring immediate assistance due to",
         "from",
     ),
     ("homeless", "total_number"): ("Annual number of people left homeless by", "from"),
