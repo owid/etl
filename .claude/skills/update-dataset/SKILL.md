@@ -158,7 +158,7 @@ When you do stop, present a concise summary of the issue and what options exist.
    - `data/garden/regions/2023-01-01/regions` — countries, continents, and OWID-defined aggregates. The runtime authority is `paths.regions.tb_regions["name"]`. This is built from `etl/steps/data/garden/regions/2023-01-01/regions.yml` plus a merge with `regions.codes.csv` and field defaults — **don't parse the YAML in isolation** or you'll miss the legacy entries and produce false positives.
    - `data/garden/wb/<latest>/income_groups` — the four World Bank income-group aggregates (`High-income countries`, `Upper-middle-income countries`, `Lower-middle-income countries`, `Low-income countries`). OWID treats the **latest** version of this dataset as the official one, so the audit must resolve the version dynamically (don't pin a date — it goes stale when WB publishes a refresh). The names live in the `classification` column of the `income_groups_latest` table.
 
-   The audit's "canonical" set is the union of these two — i.e. RHS values from `.countries.json` are valid if they appear in *either*. Anything else is flagged.
+   The audit's "canonical" set is the union of these two. A `.countries.json` entry looks like `"Source name": "Target name"` — the audit checks that every **target name** (the value the source gets harmonized to) appears in *either* dataset. Anything else is flagged.
 
    1. **Capture a fresh garden log:**
       ```bash
@@ -173,7 +173,7 @@ When you do stop, present a concise summary of the issue and what options exist.
       ```
       For each warning, the entity list follows on subsequent lines (because `harmonize_countries()` is called with `show_full_warning=True` by default). Capture them.
 
-   3. **Validate `.countries.json` RHS values against canonical regions + income groups.** For each garden step in this update:
+   3. **Validate `.countries.json` target names against canonical regions + income groups.** Each entry maps a source name (key) to a target / harmonized name (value); this check looks at the values. For each garden step in this update:
       ```python
       import json
       from pathlib import Path
@@ -192,7 +192,7 @@ When you do stop, present a concise summary of the issue and what options exist.
 
       mapping = json.loads(Path("etl/steps/data/garden/<namespace>/<new_version>/<short_name>.countries.json").read_text())
       invalid = sorted({v for v in mapping.values() if v and v not in canonical})
-      print("RHS values not in canonical regions or income groups:", invalid)
+      print("Target names not in canonical regions or income groups:", invalid)
       ```
       Any non-empty `invalid` is a **hard checkpoint** — the mapping points at an entity neither the regions catalog nor the income-groups dataset knows about. Common causes: typo, retired alias used as canonical, casing/whitespace mismatch, or a legitimately custom aggregate the source defines that we have no equivalent for (e.g. ILO's `" (ILO)"`-suffixed regions, BRICS, G7, G20). For typos/casing — fix the JSON. For legitimately custom aggregates — accept and note in the PR description that those entities live outside the canonical system and won't merge with population/regions infrastructure. For a real new historical region — add an entry to `regions.yml` in a separate PR.
 
@@ -215,7 +215,7 @@ When you do stop, present a concise summary of the issue and what options exist.
       - `## Missing in mapping` — countries in source data not in `.countries.json` (from log warning #1)
       - `## Unused mappings` — `.countries.json` entries the data never used (warning #2)
       - `## Unknown excluded entries` — `.excluded_countries.json` entries not present in source data (warning #3)
-      - `## Invalid canonical names` — RHS values not in regions catalog (Python check #3)
+      - `## Invalid canonical names` — target names not in the regions catalog or income-groups dataset (Python check #3)
       - `## Excluded entries matching canonical regions` — possible over-exclusion (Python check #4)
 
    6. **Surface in PR.** If any section was populated, add a collapsed "Harmonization audit" section to the PR description (after the per-step sections, before the Slack announcement). Empty sections can be omitted.
