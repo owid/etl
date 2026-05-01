@@ -190,72 +190,6 @@ def _prepare_table(tb: Table, garden_timespan: str, mdim_timespan: str) -> Table
     return tb
 
 
-def run() -> None:
-    config = paths.load_collection_config()
-
-    ds = paths.load_dataset("natural_disasters")
-    tb_yearly = _prepare_table(
-        ds.read("natural_disasters_yearly", load_data=False),
-        garden_timespan="yearly",
-        mdim_timespan="annual",
-    )
-    tb_decadal = _prepare_table(
-        ds.read("natural_disasters_decadal", load_data=False),
-        garden_timespan="decadal",
-        mdim_timespan="decadal",
-    )
-
-    c = paths.create_collection(
-        config=config,
-        tb=[tb_yearly, tb_decadal],
-        indicator_names="value",
-        common_view_config=COMMON_VIEW_CONFIG,
-    )
-
-    sample_col = f"total_affected_{INDIVIDUAL_DISASTER_TYPES[0]}_yearly"
-    sample_description_key = list(tb_yearly[sample_col].metadata.description_key or [])
-    grouped_view_metadata = {
-        "presentation": {"title_public": _title},
-        "description_short": _subtitle,
-        "description_key": sample_description_key,
-    }
-
-    c.group_views(
-        groups=[
-            {
-                "dimension": "type",
-                "choice_new_slug": "all_stacked",
-                "choices": INDIVIDUAL_DISASTER_TYPES,
-                "view_config": STACKED_VIEW_CONFIG,
-                "view_metadata": grouped_view_metadata,
-            },
-            {
-                "dimension": "type",
-                "choice_new_slug": "all_disasters_excluding_extreme_temperature",
-                "choices": DISASTER_TYPES_EXCLUDING_EXTREME_TEMPERATURE,
-                "view_config": STACKED_VIEW_CONFIG,
-                "view_metadata": grouped_view_metadata,
-            },
-        ],
-    )
-
-    c.set_global_config(
-        {
-            "title": _title,
-            "subtitle": _subtitle,
-            "note": NOTE,
-        }
-    )
-
-    # Expose the all-disasters total on the map tab of the stacked-by-type views.
-    _add_total_indicator_for_map(c)
-
-    # Pin a stable colour to each y-indicator based on its disaster type.
-    _apply_disaster_colors(c)
-
-    c.save()
-
-
 def _apply_disaster_colors(c) -> None:
     """Set display.color on each y-indicator so the same disaster type renders in
     the same colour across all views (single-series, stacked, etc.)."""
@@ -336,3 +270,72 @@ def _subtitle(view) -> str:
     elif type_slug in DISASTER_DESCRIPTIONS:
         parts.append(DISASTER_DESCRIPTIONS[type_slug])
     return " ".join(parts)
+
+
+def run() -> None:
+    #
+    # Load inputs.
+    #
+    config = paths.load_collection_config()
+    ds = paths.load_dataset("natural_disasters")
+    tb_yearly = ds.read("natural_disasters_yearly", load_data=False)
+    tb_decadal = ds.read("natural_disasters_decadal", load_data=False)
+
+    #
+    # Process data.
+    #
+    tb_yearly = _prepare_table(tb_yearly, garden_timespan="yearly", mdim_timespan="annual")
+    tb_decadal = _prepare_table(tb_decadal, garden_timespan="decadal", mdim_timespan="decadal")
+
+    c = paths.create_collection(
+        config=config,
+        tb=[tb_yearly, tb_decadal],
+        indicator_names="value",
+        common_view_config=COMMON_VIEW_CONFIG,
+    )
+
+    sample_col = f"total_affected_{INDIVIDUAL_DISASTER_TYPES[0]}_yearly"
+    sample_description_key = list(tb_yearly[sample_col].metadata.description_key or [])
+    grouped_view_metadata = {
+        "presentation": {"title_public": _title},
+        "description_short": _subtitle,
+        "description_key": sample_description_key,
+    }
+
+    c.group_views(
+        groups=[
+            {
+                "dimension": "type",
+                "choice_new_slug": "all_stacked",
+                "choices": INDIVIDUAL_DISASTER_TYPES,
+                "view_config": STACKED_VIEW_CONFIG,
+                "view_metadata": grouped_view_metadata,
+            },
+            {
+                "dimension": "type",
+                "choice_new_slug": "all_disasters_excluding_extreme_temperature",
+                "choices": DISASTER_TYPES_EXCLUDING_EXTREME_TEMPERATURE,
+                "view_config": STACKED_VIEW_CONFIG,
+                "view_metadata": grouped_view_metadata,
+            },
+        ],
+    )
+
+    c.set_global_config(
+        {
+            "title": _title,
+            "subtitle": _subtitle,
+            "note": NOTE,
+        }
+    )
+
+    # Expose the all-disasters total on the map tab of the stacked-by-type views.
+    _add_total_indicator_for_map(c)
+
+    # Pin a stable colour to each y-indicator based on its disaster type.
+    _apply_disaster_colors(c)
+
+    #
+    # Save outputs.
+    #
+    c.save()
