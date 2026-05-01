@@ -95,20 +95,22 @@ ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE = (
 
 # Stable color per disaster type so the same disaster appears in the same colour
 # across views (single-series, stacked-by-type, and excluding-extreme-temperatures).
+# All values are picked from OWID's 24-color palette `OwidDistinctColors`
+# (owid-grapher: packages/@ourworldindata/grapher/src/color/CustomSchemes.ts).
 DISASTER_COLORS = {
-    "drought": "#bc8e5a",
-    "earthquake": "#883039",
-    "volcanic_activity": "#a2559c",
-    "flood": "#286BBB",
-    "landslide": "#8b5a2b",
-    "extreme_weather": "#5b9460",
-    "wildfire": "#e94e1b",
-    "extreme_temperature": "#d4a017",
+    "drought": "#bc8e5a",  # Camel
+    "earthquake": "#883039",  # Maroon
+    "volcanic_activity": "#a2559c",  # Mauve
+    "flood": "#286bbb",  # Blue
+    "landslide": "#9a5129",  # DarkCopper
+    "extreme_weather": "#578145",  # OliveGreen
+    "wildfire": "#b13507",  # RustyOrange
+    "extreme_temperature": "#e56e5a",  # Peach
     # Folded into other types upstream at the garden step (see DISASTER_TYPES).
-    # "dry_mass_movement": "#8b5a2b",
-    # "wet_mass_movement": "#6b7a8f",
-    # "fog": "#aaaaaa",
-    # "glacial_lake_outburst_flood": "#7fb8d3",
+    # "dry_mass_movement": ...
+    # "wet_mass_movement": ...
+    # "fog": ...
+    # "glacial_lake_outburst_flood": ...
 }
 
 # Human-readable phrase used in chart titles for each disaster-type choice.
