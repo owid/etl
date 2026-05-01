@@ -21,7 +21,7 @@ Recipe:
 
 [Single closing link → one of:
 - One chart focus:        https://ourworldindata.org/grapher/<slug>
-- Multiple charts (default): https://ourworldindata.org/search?datasetProducts=<URL-encoded-producer>
+- Multiple charts (default): https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>
 - Explorer for the topic exists: https://ourworldindata.org/explorers/<name>
 - Curated topic page exists: https://ourworldindata.org/<topic>
 ]
@@ -52,7 +52,7 @@ Many short blurbs skip the lead entirely and dive straight in. Use a lead when t
 **Link choice** — Decide from step 8's chart-pick output:
 
 - `1 published chart` was picked / one chart is the focus ⇒ **grapher URL** `https://ourworldindata.org/grapher/<slug>`.
-- `>1 published charts` were picked / dataset-wide refresh ⇒ **search URL** `https://ourworldindata.org/search?datasetProducts=<URL-encoded-producer>`. This is the same URL the Slack announcement template builds — single source of truth.
+- `>1 published charts` were picked / dataset-wide refresh ⇒ **search URL** `https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>`. The value is the **dataset title** (the `title` field in the snapshot `meta.origin` block, which often includes a parenthetical acronym like `Luxembourg Income Study (LIS)`), **not** the bare `producer` field. This is the same URL the Slack announcement template builds — single source of truth.
 - The producer/topic has an existing OWID **explorer** (e.g. minerals → `/explorers/minerals`, natural disasters → `/explorers/natural-disasters`, CO₂ → `/explorers/co2`) ⇒ prefer the explorer URL over the search URL.
 - The producer/topic has a **curated topic page** (e.g. SDG Tracker → `/sdgs`) ⇒ prefer the topic URL over the search URL.
 
