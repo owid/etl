@@ -34,7 +34,9 @@ EXPECTED_DISASTER_TYPES = {
     "Epidemic": np.nan,
     "Extreme temperature": EXTREME_TEMPERATURE_TYPE,
     "Flood": "Flood",
-    "Fog": "Fog",
+    # Excluded: only one event ever recorded (Great Smog of London 1952), and it's
+    # anthropogenic air pollution rather than a natural disaster.
+    "Fog": np.nan,
     "Glacial lake outburst flood": "Glacial lake outburst flood",
     "Impact": np.nan,
     "Infestation": np.nan,

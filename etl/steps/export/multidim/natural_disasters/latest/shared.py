@@ -41,8 +41,9 @@ DISASTER_TYPES = [
     # Disabled because they add confusion to the visualizations and only have a handful
     # of recorded events at the World level. Uncomment to enable; the colors / phrases
     # / config.yml entries are kept in sync below so the mdim works out of the box.
-    # "fog",                            # 1 event total (Great Smog of London 1952).
     # "glacial_lake_outburst_flood",    # ~5 events total; a rare climate-driven hazard.
+    # "fog" is not listed here: it is excluded upstream at the garden step (only one
+    # event ever, the Great Smog of London 1952, and it's anthropogenic air pollution).
 ]
 
 # Same as DISASTER_TYPES; kept as a separate name to make group_views readable.
@@ -103,7 +104,7 @@ DISASTER_COLORS = {
     "wildfire": "#e94e1b",
     "extreme_temperature": "#d4a017",
     # Defined but unused unless the matching slug above is uncommented in DISASTER_TYPES.
-    "fog": "#aaaaaa",
+    # "fog": "#aaaaaa",  # Fog is excluded entirely from the dataset; see garden step.
     "glacial_lake_outburst_flood": "#7fb8d3",
 }
 
@@ -121,7 +122,7 @@ DISASTER_PHRASES = {
     "wildfire": "wildfires",
     "extreme_temperature": "extreme temperatures",
     # Defined but unused unless the matching slug above is uncommented in DISASTER_TYPES.
-    "fog": "fogs",
+    # "fog": "fogs",  # Fog is excluded entirely from the dataset; see garden step.
     "glacial_lake_outburst_flood": "glacial lake outburst floods",
 }
 

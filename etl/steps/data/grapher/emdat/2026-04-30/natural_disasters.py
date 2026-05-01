@@ -44,7 +44,7 @@ TITLE_PUBLIC_END = {
     "wildfire": "wildfires",
     "wet_mass_movement": "wet mass movements",
     "dry_mass_movement": "dry mass movements",
-    "fog": "fogs",
+    # "fog": "fogs",  # Excluded — see EXPECTED_DISASTER_TYPES in the garden step.
     "drought": "droughts",
     "extreme_temperature": "extreme temperatures",
     "all_disasters_excluding_extreme_temperature": "all disasters excluding extreme temperatures",
@@ -61,7 +61,7 @@ TITLE_DISASTER = {
     "wildfire": "Wildfire",
     "wet_mass_movement": "Wet mass movement",
     "dry_mass_movement": "Dry mass movement",
-    "fog": "Fog",
+    # "fog": "Fog",  # Excluded — see EXPECTED_DISASTER_TYPES in the garden step.
     "drought": "Drought",
     "extreme_temperature": "Extreme temperature",
     "all_disasters_excluding_extreme_temperature": "All disasters excluding extreme temperature",

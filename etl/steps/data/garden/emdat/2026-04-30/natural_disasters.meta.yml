@@ -55,8 +55,11 @@ definitions:
     A wet mass movement is defined as a type of mass movement that occurs when heavy rain or rapid snow/ice melt sends large amounts of vegetation, mud, or rock down a slope driven by gravitational forces.
   definition_glacial_lake_outburst_flood: &definition-glacial-lake-outburst-flood |-
     Glacial lake outburst floods are defined as those that occur when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake).
-  definition_fog: &definition-fog |-
-    Fog is defined as water droplets that are suspended in the air near the Earth's surface. Fog is simply a cloud that is in contact with the ground. Currently, the only fog disaster recorded in EM-DAT is the Great Smog of London in 1952.
+  # Fog is excluded from the dataset (only one event ever recorded — the Great Smog
+  # of London in 1952 — and it's anthropogenic air pollution, not a natural disaster).
+  # Definition kept here, commented out, in case fog is ever re-enabled.
+  # definition_fog: &definition-fog |-
+  #   Fog is defined as water droplets that are suspended in the air near the Earth's surface. Fog is simply a cloud that is in contact with the ground. Currently, the only fog disaster recorded in EM-DAT is the Great Smog of London in 1952.
   # I couldn't find any precise definition of extreme weather in the EM-DAT documentation: https://doc.emdat.be/docs/
   # But I can see the subtype of events that are included for the type "Storm" (which we call "Extreme weather").
   # Do not mention all (there are many and detailed) but a summary of the most important.
@@ -90,8 +93,9 @@ definitions:
       <% if type is not defined or type == 'wet_mass_movement' or type.startswith('all_') %>{definitions.definition_wet_mass_movement}<% endif %>
     - |-
       <% if type is not defined or type == 'glacial_lake_outburst_flood' or type.startswith('all_') %>{definitions.definition_glacial_lake_outburst_flood}<% endif %>
-    - |-
-      <% if type is not defined or type == 'fog' or type.startswith('all_') %>{definitions.definition_fog}<% endif %>
+    # Fog is currently excluded — see comment above on `definition_fog`.
+    # - |-
+    #   <% if type is not defined or type == 'fog' or type.startswith('all_') %>{definitions.definition_fog}<% endif %>
   # Definitions of event sizes, adapted from Guha-Sapir et al. (2004).
   definition_small_event: &definition-small-event |-
     A disaster is considered to have a "small" impact if it results in no more than 5 deaths, affects no more than 1,500 people, and causes economic damages not exceeding 13 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
