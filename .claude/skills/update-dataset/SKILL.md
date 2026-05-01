@@ -191,10 +191,10 @@ When you do stop, present a concise summary of the issue and what options exist.
       canonical = canonical_regions | canonical_income
 
       mapping = json.loads(Path("etl/steps/data/garden/<namespace>/<new_version>/<short_name>.countries.json").read_text())
-      invalid = sorted({v for v in mapping.values() if v and v not in canonical})
-      print("Target names not in canonical regions or income groups:", invalid)
+      not_in_canonical = sorted({v for v in mapping.values() if v and v not in canonical})
+      print("Targets not in OWID's canonical regions or income groups:", not_in_canonical)
       ```
-      A non-empty `invalid` list means the mapping points at an entity neither the regions catalog nor the income-groups dataset knows about. **Stop and decide with the user before proceeding** — same pattern as the global "Checkpoints — when to pause" section at the top of this skill. Common causes: typo, retired alias used as canonical, casing/whitespace mismatch, or a legitimately custom aggregate the source defines that we have no equivalent for (e.g. ILO's `" (ILO)"`-suffixed regions, BRICS, G7, G20). For typos/casing — fix the JSON. For legitimately custom aggregates — accept and note in the PR description that those entities live outside the canonical system and won't merge with population/regions infrastructure. For a real new historical region — add an entry to `regions.yml` in a separate PR.
+      A non-empty `not_in_canonical` list means the mapping points at entities that aren't registered in either the regions catalog or the income-groups dataset. This isn't automatically a bug — it's a heads-up. **Stop and decide with the user before proceeding** — same pattern as the global "Checkpoints — when to pause" section at the top of this skill. Common causes (in order from "fix" to "accept"): typo, retired alias used as canonical, casing/whitespace mismatch, or a legitimately custom aggregate the source defines that OWID has no equivalent for (e.g. ILO's `" (ILO)"`-suffixed regions, World Bank's `" (WB)"`-suffixed sub-Saharan splits, BRICS, G7, G20). For typos/casing — fix the JSON. For legitimately custom aggregates — accept and note in the PR description that those entities live outside the canonical system and won't merge with population/regions infrastructure. For a real new historical region — add an entry to `regions.yml` in a separate PR.
 
    4. **Audit `.excluded_countries.json`.** The file is optional; skip if it doesn't exist:
       ```python
@@ -215,7 +215,7 @@ When you do stop, present a concise summary of the issue and what options exist.
       - `## Missing in mapping` — countries in source data not in `.countries.json` (from log warning #1) — list each missing source name
       - `## Unused mappings` — `.countries.json` entries the data never used (warning #2) — list each unused source→target pair
       - `## Unknown excluded entries` — `.excluded_countries.json` entries not present in source data (warning #3) — list each
-      - `## Invalid canonical names` — target names not in the regions catalog or income-groups dataset (Python check #3) — list each target name and the source names that map to it
+      - `## Targets not in OWID's canonical regions or income groups` — target names from `.countries.json` that aren't registered in either dataset (Python check #3) — list each target name and the source names that map to it
       - `## Excluded entries matching canonical regions` — possible over-exclusion (Python check #4) — list each
 
    6. **Surface in PR.** If any section was populated, add a collapsed "Harmonization audit" section to the PR description (after the per-step sections, before the Slack announcement) **with the same listings**, not just a summary. Empty sections can be omitted.
@@ -223,7 +223,7 @@ When you do stop, present a concise summary of the issue and what options exist.
    **When you report progress to the user during the workflow, never just give a count — always include the list (or grouped categories) so they can judge in one glance.**
 
    **Checkpoint summary:**
-   - "Invalid canonical names" or "Missing in mapping" non-empty ⇒ stop, decide with user.
+   - "Targets not in OWID's canonical regions or income groups" or "Missing in mapping" non-empty ⇒ stop, decide with user.
    - "Excluded entries matching canonical regions" non-empty ⇒ stop, ask whether each exclusion is intentional.
    - "Unused mappings" or "Unknown excluded entries" non-empty ⇒ surface in PR description; not a blocker.
 
