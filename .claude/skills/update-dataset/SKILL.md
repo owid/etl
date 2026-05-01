@@ -42,6 +42,7 @@ Assumptions:
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Pick 1–3 chart views for the public announcement
 - [ ] Draft Slack announcement, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
+- [ ] Draft public-facing "Data update" post for OWID /latest, add to PR description, hand to user for review and publication
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Ask the user whether to archive the old DAG entries; if yes, move them to `dag/archive/` AND relocate the new entries into the old slot (see "DAG archiving & reordering") — don't forget this step
 - [ ] Hand off Wizard QA links to the user (Anomalist + Chart Diff on the staging branch) — this is the final step
@@ -378,6 +379,20 @@ When you do stop, present a concise summary of the issue and what options exist.
      ```
    - Tell the user: "Slack announcement drafted at `workbench/<short_name>/slack-announcement.md` and added to the PR description. Please review and post it to **#data-updates-comms**."
 
+9b) Data update post (for OWID /latest)
+   Draft the short public-facing blurb that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest). This is **separate from the Slack announcement** — that one is a 10-field form for the internal channel; this one is short prose for OWID readers, following the format observed across ~14 examples on the /latest feed (American Time Use Survey, World Bank PIP, UN Tourism Statistics, lithium-ion batteries, self-driving taxis, natural disasters, oil spills, etc.).
+   - Open `.claude/skills/update-dataset/data-update-template.md` and follow it. Pull editorial context from `workbench/<short_name>/slack-announcement.md` (step 9 output) and chart picks from step 8.
+   - Decide which link flavour to use:
+     - `1 published chart` was picked / one chart is the focus ⇒ grapher URL `https://ourworldindata.org/grapher/<slug>`.
+     - `>1 published charts` were picked / dataset-wide refresh ⇒ search URL `https://ourworldindata.org/search?datasetProducts=<URL-encoded-producer>` (the same URL the slack-announcement-template builds — single source of truth).
+     - The producer/topic has an existing OWID **explorer** (e.g. minerals → `/explorers/minerals`, natural disasters → `/explorers/natural-disasters`, CO₂ → `/explorers/co2`) ⇒ prefer the explorer URL over the search URL.
+     - The producer/topic has a **curated topic page** (e.g. SDG Tracker → `/sdgs`) ⇒ prefer the topic URL over the search URL.
+     - **Do not use** custom-collection URLs (`/collection/custom?charts=…`) even though some /latest posts do — current OWID practice is to default to the search URL for multi-chart updates.
+   - Draft the post as flowing prose, **40–100 words by default** (up to ~150 if the dataset has 2–3 notable findings worth surfacing). First-person, conversational, author voice ("I recently updated…", "I've just updated…"). Not corporate.
+   - Save the draft to `workbench/<short_name>/data-update.md`.
+   - **Add a collapsed `<details>` section titled "Data update post (for OWID /latest)"** to the PR description, placed *after* the Slack-announcement section so the PR body order matches the workflow order.
+   - Tell the user: "Data update post drafted at `workbench/<short_name>/data-update.md` and added to the PR description. Please review and publish to the OWID /latest feed."
+
 10) Codex review: address comments and resolve threads
    - Wait ~60 seconds after posting `@codex review`, then poll for inline review comments:
      ```bash
@@ -483,6 +498,7 @@ These pages need a fresh staging build, so they're only meaningful after the PR'
 - `workbench/<short_name>/harmonization.log` and `harmonization_audit.md` (from step 5c)
 - `workbench/<short_name>/indicator_upgrade.json` (if indicator-upgrader was used)
 - `workbench/<short_name>/slack-announcement.md`
+- `workbench/<short_name>/data-update.md` (public-facing post draft for OWID /latest, from step 9b)
 
 ## Example usage
 
