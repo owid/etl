@@ -1588,7 +1588,7 @@ tables:
           <% if survey_comparability == "No spells" %>
           The share of <<welfare_type>> {definitions.welfare_type_verb} by the poorest 50% of the population.
           <% else %>
-          The share of income or consumption by the poorest 50% of the population.
+          The share of income or consumption {definitions.welfare_type_verb} by the poorest 50% of the population.
           <% endif %>
         description_key:
           - "{definitions.description_key_inequality}"
@@ -1621,7 +1621,7 @@ tables:
           <% if survey_comparability == "No spells" %>
           The share of <<welfare_type>> {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose <<welfare_type>> lies between the poorest 50% and the richest 10%.
           <% else %>
-          The share of income or consumption by the middle 40% of the population. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.
+          The share of income or consumption {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.
           <% endif %>
         description_key:
           - "{definitions.description_key_inequality}"
@@ -1654,7 +1654,7 @@ tables:
           <% if survey_comparability == "No spells" %>
           The share of <<welfare_type>> {definitions.welfare_type_verb} by the richest 1% of the population.
           <% else %>
-          The share of income or consumption by the richest 1% of the population.
+          The share of income or consumption {definitions.welfare_type_verb} by the richest 1% of the population.
           <% endif %>
         description_key:
           - "{definitions.description_key_inequality}"
@@ -1687,7 +1687,7 @@ tables:
           <% if survey_comparability == "No spells" %>
           The share of <<welfare_type>> {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
           <% else %>
-          The share of income or consumption by the population between the 90th and 99th percentiles.
+          The share of income or consumption {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
           <% endif %>
         description_key:
           - "{definitions.description_key_inequality}"
@@ -1906,7 +1906,7 @@ tables:
           <% if survey_comparability == "No spells" %>
           The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% else %>
-          The share of income or consumption by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+          The share of income or consumption {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
           - "{definitions.description_key_inequality}"
