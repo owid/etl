@@ -152,7 +152,12 @@ Total views: **N**   (for MDims)
 
 ## Comparing the live config to a target FAUST report
 
-A common workflow: the user shares a FAUST report that represents the **desired** end state (their edited copy of an earlier auto-generated report) and asks "does the live MDim match this?". The report is the source of truth; the live config is what's currently shipped. Drift goes one way — fix the metadata so it matches the report.
+A common workflow: the user shares a FAUST report that represents the **desired** end state (their edited copy of an earlier auto-generated report) and asks "does the live MDim match this?". The report is *usually* the source of truth — but not always. Sometimes the user updated the meta.yml *after* generating the report, in which case the **live config** is the desired target and the report is stale. **Always ask before assuming the direction.**
+
+Two failure modes are common in WID-style MDim audits:
+
+- **Text-content drift in inherited bullets.** The report shows the older shorter wording for welfare_type / methodology bullets while the live config has the new longer wording. This usually means the user rewrote `description_key_welfare_type` (or similar) *after* the FAUST run. Surface the diff side-by-side and ask which is the target — don't quietly revert the meta.yml.
+- **View-count mismatch.** The report has more or fewer sections than the live config (e.g. report has 16 views, live has 13 because scatter views were dropped, or the report still mentions `before_vs_after_scatter` sections that were intentionally removed). When counts differ, list the missing/extra sections explicitly and ask before adding/removing views.
 
 Before doing the field-by-field comparison, refresh everything the live config depends on. Skipping a step leaves a stale catalog, which produces phantom drift that isn't real:
 
