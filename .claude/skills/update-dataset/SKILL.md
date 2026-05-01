@@ -41,6 +41,7 @@ Assumptions:
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Pick 1–3 chart views for the public announcement
+- [ ] Gather editorial context from snapshot DVC + garden `.meta.yml` (and `url_main` via WebFetch if needed) — shared input for the Slack and Data update steps
 - [ ] Draft Slack announcement, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
 - [ ] Draft public-facing "Data update" post for OWID /latest, add to PR description, hand to user for review and publication
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
@@ -367,8 +368,23 @@ When you do stop, present a concise summary of the issue and what options exist.
      - **Skip**: population-weighted variants (harder to read quickly), within-regime breakdowns (too niche), country-specific views
    - Add the selected charts with brief rationale to the Slack announcement draft
 
+8b) Gather editorial context (shared by steps 9 and 9b)
+   Both the Slack announcement (step 9) and the public Data update post (step 9b) need richer framing than the producer name alone. Read the following before drafting either, and keep the extracted material on hand (a short scratch list in the workbench is fine — `workbench/<short_name>/editorial-context.md` is a reasonable spot if it helps):
+
+   - **Snapshot DVC files** at `snapshots/<namespace>/<new_version>/*.dvc` — read every file's `meta.origin` block. The richest fields are:
+     - `description` — multi-paragraph source-level summary, usually the best raw material for "what the dataset shows" / "why it matters".
+     - `description_snapshot` — per-table flavour, often a single sentence that names the specific slice (inequality, poverty, incomes, etc.).
+     - `producer` and `attribution_short` — for the closing line of the public post and for the search URL.
+     - `url_main` — the producer's landing page. **Visit it via WebFetch** when the existing metadata is thin or the post would benefit from a release-notes detail (what changed in this release, coverage extension, methodology change). Don't invent facts; lift them from the producer's page.
+     - `citation_full` — gives the release date/version.
+     - `date_published` — the actual release date for the Slack form's "When was this released?" field.
+   - **Garden `.meta.yml`** at `etl/steps/data/garden/<namespace>/<new_version>/<short_name>.meta.yml` — read `dataset.description` plus per-indicator `description_short`, `description_key`, and `presentation.title_public`. These are OWID's user-facing framing of the same data — pick a phrase or finding from here if it lands more cleanly than the producer's wording.
+   - **Step 8's chart picks** — for the closing-line link choice in step 9b and to anchor any specific finding either announcement highlights.
+
+   Don't dump every field verbatim into the announcements — extract the 2–3 sentences that actually frame the dataset for a reader, then choose voice and format separately for the Slack form (step 9) vs. the public post (step 9b).
+
 9) Slack announcement & PR update
-   - Fill out the template at `.claude/skills/update-dataset/slack-announcement-template.md` using facts gathered during the update (coverage, chart count, key changes, etc.)
+   - Use the editorial context gathered in step 8b (snapshot DVC fields, garden `.meta.yml`, optionally `url_main` via WebFetch) to fill the template at `.claude/skills/update-dataset/slack-announcement-template.md`. Mechanical fields (producer, dates, coverage, chart count, search URL) come straight from the snapshot DVC + garden meta + step 8 count. Editorial fields ("what does this help users understand", caveats, anything interesting) come from the same context, rephrased for a stakeholder audience.
    - Include the 1–3 selected chart views from step 8
    - Ask user if unsure about any details
    - Save the draft to `workbench/<short_name>/slack-announcement.md`
@@ -381,7 +397,7 @@ When you do stop, present a concise summary of the issue and what options exist.
 
 9b) Data update post (for OWID /latest)
    Draft the short public-facing blurb that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest). This is **separate from the Slack announcement** — that one is a 10-field form for the internal channel; this one is short prose for OWID readers, following the format observed across ~14 examples on the /latest feed (American Time Use Survey, World Bank PIP, UN Tourism Statistics, lithium-ion batteries, self-driving taxis, natural disasters, oil spills, etc.).
-   - Open `.claude/skills/update-dataset/data-update-template.md` and follow it. Pull editorial context from `workbench/<short_name>/slack-announcement.md` (step 9 output) and chart picks from step 8.
+   - Open `.claude/skills/update-dataset/data-update-template.md` and follow it. Use the editorial context sources gathered in step 8b (snapshot DVC fields, garden `.meta.yml`, optionally `url_main` via WebFetch). Also pull from `workbench/<short_name>/slack-announcement.md` (step 9 output) — the editorial framing already drafted there is the closest cousin and the post is essentially a polished, prose-shaped distillation of it.
    - Decide which link flavour to use:
      - `1 published chart` was picked / one chart is the focus ⇒ grapher URL `https://ourworldindata.org/grapher/<slug>`.
      - `>1 published charts` were picked / dataset-wide refresh ⇒ search URL `https://ourworldindata.org/search?datasetProducts=<URL-encoded-producer>` (the same URL the slack-announcement-template builds — single source of truth).
