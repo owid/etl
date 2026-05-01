@@ -39,7 +39,7 @@ TITLE_PUBLIC_END = {
     "volcanic_activity": "volcanic activity events",
     "flood": "floods",
     "all_disasters": "all disasters",
-    "glacial_lake_outburst_flood": "glacial lake outburst floods",
+    # "glacial_lake_outburst_flood": ...,  # Folded into "Flood" — see EXPECTED_DISASTER_TYPES.
     "all_disasters_excluding_earthquakes": "all disasters excluding earthquakes",
     "wildfire": "wildfires",
     "wet_mass_movement": "wet mass movements",
@@ -56,7 +56,7 @@ TITLE_DISASTER = {
     "volcanic_activity": "Volcanic activity",
     "flood": "Flood",
     "all_disasters": "All disasters",
-    "glacial_lake_outburst_flood": "Glacial lake outburst flood",
+    # "glacial_lake_outburst_flood": ...,  # Folded into "Flood" — see EXPECTED_DISASTER_TYPES.
     "all_disasters_excluding_earthquakes": "All disasters excluding earthquakes",
     "wildfire": "Wildfire",
     "wet_mass_movement": "Wet mass movement",

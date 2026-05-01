@@ -38,12 +38,10 @@ DISASTER_TYPES = [
     "extreme_weather",
     "wildfire",
     "extreme_temperature",
-    # Disabled because they add confusion to the visualizations and only have a handful
-    # of recorded events at the World level. Uncomment to enable; the colors / phrases
-    # / config.yml entries are kept in sync below so the mdim works out of the box.
-    # "glacial_lake_outburst_flood",    # ~5 events total; a rare climate-driven hazard.
-    # "fog" is not listed here: it is excluded upstream at the garden step (only one
-    # event ever, the Great Smog of London 1952, and it's anthropogenic air pollution).
+    # "fog" and "glacial_lake_outburst_flood" are not listed here: both are folded
+    # upstream at the garden step. Fog is excluded entirely (only one event ever,
+    # the Great Smog of London 1952, and it's anthropogenic air pollution); GLOFs
+    # are bucketed into "Flood" because they're conventionally a flood subtype.
 ]
 
 # Same as DISASTER_TYPES; kept as a separate name to make group_views readable.
@@ -103,9 +101,9 @@ DISASTER_COLORS = {
     "extreme_weather": "#5b9460",
     "wildfire": "#e94e1b",
     "extreme_temperature": "#d4a017",
-    # Defined but unused unless the matching slug above is uncommented in DISASTER_TYPES.
-    # "fog": "#aaaaaa",  # Fog is excluded entirely from the dataset; see garden step.
-    "glacial_lake_outburst_flood": "#7fb8d3",
+    # Both folded into other types upstream at the garden step (see DISASTER_TYPES).
+    # "fog": "#aaaaaa",
+    # "glacial_lake_outburst_flood": "#7fb8d3",
 }
 
 # Human-readable phrase used in chart titles for each disaster-type choice.
@@ -121,9 +119,9 @@ DISASTER_PHRASES = {
     "extreme_weather": "storms",
     "wildfire": "wildfires",
     "extreme_temperature": "extreme temperatures",
-    # Defined but unused unless the matching slug above is uncommented in DISASTER_TYPES.
-    # "fog": "fogs",  # Fog is excluded entirely from the dataset; see garden step.
-    "glacial_lake_outburst_flood": "glacial lake outburst floods",
+    # Both folded into other types upstream at the garden step (see DISASTER_TYPES).
+    # "fog": "fogs",
+    # "glacial_lake_outburst_flood": "glacial lake outburst floods",
 }
 
 # Question link rendered as "Related: <text>" at the bottom of every chart.

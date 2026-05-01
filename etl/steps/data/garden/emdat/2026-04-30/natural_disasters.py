@@ -37,7 +37,9 @@ EXPECTED_DISASTER_TYPES = {
     # Excluded: only one event ever recorded (Great Smog of London 1952), and it's
     # anthropogenic air pollution rather than a natural disaster.
     "Fog": np.nan,
-    "Glacial lake outburst flood": "Glacial lake outburst flood",
+    # GLOF are added into "Flood", as they are conventionally a flood subtype.
+    # It only has a few events recorded, so it's not very convenient to have it as a separate category.
+    "Glacial lake outburst flood": "Flood",
     "Impact": np.nan,
     "Infestation": np.nan,
     # "Landslide (dry)": "Landslide",

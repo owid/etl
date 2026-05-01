@@ -8,7 +8,7 @@ definitions:
 
   # General definitions.
   definition_disaster: &definition-disaster |-
-    EM-DAT defines a disaster as a situation or event which overwhelms local capacity, necessitating a request to the national or international level for external assistance; an unforeseen and often sudden event that causes great damage, destruction, and human suffering. Of all EM-DAT disasters, we select geophysical, meteorological, hydrological, and climatological events, which include droughts, earthquakes, extreme temperatures, floods, glacial lake outburst floods, mass movements, extreme weather events, volcanic activity, and wildfires.
+    EM-DAT defines a disaster as a situation or event which overwhelms local capacity, necessitating a request to the national or international level for external assistance; an unforeseen and often sudden event that causes great damage, destruction, and human suffering. Of all EM-DAT disasters, we select geophysical, meteorological, hydrological, and climatological events, which include droughts, earthquakes, extreme temperatures, floods, mass movements, extreme weather events, volcanic activity, and wildfires.
   # Definitions of impact variables.
   definition_dead: &definition-dead |-
     EM-DAT counts deaths as deceased and missing people combined, as a result of a natural disaster.
@@ -40,7 +40,7 @@ definitions:
   definition_extreme_temperature: &definition-extreme-temperature |-
     Extreme temperature is used as a general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions.
   definition_flood: &definition-flood |-
-    Flood is used as a general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods).
+    Flood is used as a general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods). We also include glacial lake outburst floods in this category.
   # definition_landslide: &definition-landslide |-
   #   EM-DAT defines a landslide as any kind of moderate to rapid soil movement including lahars, mudslides, and debris flows (under dry conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face.
   # definition_storm: &definition-storm |-
@@ -53,8 +53,11 @@ definitions:
     A dry mass movement is defined as any type of downslope movement of earth materials under hydrological dry conditions.
   definition_wet_mass_movement: &definition-wet-mass-movement |-
     A wet mass movement is defined as a type of mass movement that occurs when heavy rain or rapid snow/ice melt sends large amounts of vegetation, mud, or rock down a slope driven by gravitational forces.
-  definition_glacial_lake_outburst_flood: &definition-glacial-lake-outburst-flood |-
-    Glacial lake outburst floods are defined as those that occur when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake).
+  # GLOFs are bucketed into "Flood" in the garden step (only ~5 events ever and
+  # they're conventionally a flood subtype). Definition kept here, commented out,
+  # in case GLOFs are ever split out again.
+  # definition_glacial_lake_outburst_flood: &definition-glacial-lake-outburst-flood |-
+  #   Glacial lake outburst floods are defined as those that occur when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake).
   # Fog is excluded from the dataset (only one event ever recorded — the Great Smog
   # of London in 1952 — and it's anthropogenic air pollution, not a natural disaster).
   # Definition kept here, commented out, in case fog is ever re-enabled.
@@ -91,8 +94,10 @@ definitions:
       <% if type is not defined or type == 'dry_mass_movement' or type.startswith('all_') %>{definitions.definition_dry_mass_movement}<% endif %>
     - |-
       <% if type is not defined or type == 'wet_mass_movement' or type.startswith('all_') %>{definitions.definition_wet_mass_movement}<% endif %>
-    - |-
-      <% if type is not defined or type == 'glacial_lake_outburst_flood' or type.startswith('all_') %>{definitions.definition_glacial_lake_outburst_flood}<% endif %>
+    # GLOFs are now folded into the "Flood" type and bullet — see comment above on
+    # `definition_glacial_lake_outburst_flood`.
+    # - |-
+    #   <% if type is not defined or type == 'glacial_lake_outburst_flood' or type.startswith('all_') %>{definitions.definition_glacial_lake_outburst_flood}<% endif %>
     # Fog is currently excluded — see comment above on `definition_fog`.
     # - |-
     #   <% if type is not defined or type == 'fog' or type.startswith('all_') %>{definitions.definition_fog}<% endif %>
