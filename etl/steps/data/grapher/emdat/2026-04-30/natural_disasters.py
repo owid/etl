@@ -42,8 +42,10 @@ TITLE_PUBLIC_END = {
     # "glacial_lake_outburst_flood": ...,  # Folded into "Flood" — see EXPECTED_DISASTER_TYPES.
     "all_disasters_excluding_earthquakes": "all disasters excluding earthquakes",
     "wildfire": "wildfires",
-    "wet_mass_movement": "wet mass movements",
-    "dry_mass_movement": "dry mass movements",
+    "landslide": "landslides",
+    # Wet/dry mass movements are folded into "landslide" — see EXPECTED_DISASTER_TYPES in the garden step.
+    # "wet_mass_movement": "wet mass movements",
+    # "dry_mass_movement": "dry mass movements",
     # "fog": "fogs",  # Excluded — see EXPECTED_DISASTER_TYPES in the garden step.
     "drought": "droughts",
     "extreme_temperature": "extreme temperatures",
@@ -59,8 +61,10 @@ TITLE_DISASTER = {
     # "glacial_lake_outburst_flood": ...,  # Folded into "Flood" — see EXPECTED_DISASTER_TYPES.
     "all_disasters_excluding_earthquakes": "All disasters excluding earthquakes",
     "wildfire": "Wildfire",
-    "wet_mass_movement": "Wet mass movement",
-    "dry_mass_movement": "Dry mass movement",
+    "landslide": "Landslide",
+    # Wet/dry mass movements are folded into "Landslide" — see EXPECTED_DISASTER_TYPES in the garden step.
+    # "wet_mass_movement": "Wet mass movement",
+    # "dry_mass_movement": "Dry mass movement",
     # "fog": "Fog",  # Excluded — see EXPECTED_DISASTER_TYPES in the garden step.
     "drought": "Drought",
     "extreme_temperature": "Extreme temperature",

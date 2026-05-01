@@ -49,10 +49,16 @@ definitions:
     Volcanic activity is defined as any type of volcanic event near an opening/vent in the Earth's surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material.
   definition_wildfire: &definition-wildfire |-
     A wildfire is defined as any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions.
-  definition_dry_mass_movement: &definition-dry-mass-movement |-
-    A dry mass movement is defined as any type of downslope movement of earth materials under hydrological dry conditions.
-  definition_wet_mass_movement: &definition-wet-mass-movement |-
-    A wet mass movement is defined as a type of mass movement that occurs when heavy rain or rapid snow/ice melt sends large amounts of vegetation, mud, or rock down a slope driven by gravitational forces.
+  # EM-DAT's wet/dry mass-movement split is bucketed into "Landslide" in the
+  # garden step (the wet/dry distinction is a hydrological-trigger flag and not
+  # meaningful for a general audience). The original definitions are kept here,
+  # commented out, in case they're ever split out again.
+  # definition_dry_mass_movement: &definition-dry-mass-movement |-
+  #   A dry mass movement is defined as any type of downslope movement of earth materials under hydrological dry conditions.
+  # definition_wet_mass_movement: &definition-wet-mass-movement |-
+  #   A wet mass movement is defined as a type of mass movement that occurs when heavy rain or rapid snow/ice melt sends large amounts of vegetation, mud, or rock down a slope driven by gravitational forces.
+  definition_landslide: &definition-landslide |-
+    A landslide is the downslope movement of rock, soil, or debris under gravity. This includes both wet mass movements (such as mudflows triggered by heavy rain or snowmelt) and dry mass movements (such as rockfalls).
   # GLOFs are bucketed into "Flood" in the garden step (only ~5 events ever and
   # they're conventionally a flood subtype). Definition kept here, commented out,
   # in case GLOFs are ever split out again.
@@ -91,9 +97,13 @@ definitions:
     - |-
       <% if type is not defined or type == 'wildfire' or type.startswith('all_') %>{definitions.definition_wildfire}<% endif %>
     - |-
-      <% if type is not defined or type == 'dry_mass_movement' or type.startswith('all_') %>{definitions.definition_dry_mass_movement}<% endif %>
-    - |-
-      <% if type is not defined or type == 'wet_mass_movement' or type.startswith('all_') %>{definitions.definition_wet_mass_movement}<% endif %>
+      <% if type is not defined or type == 'landslide' or type.startswith('all_') %>{definitions.definition_landslide}<% endif %>
+    # Wet/dry mass-movement bullets are folded into the "Landslide" bullet above —
+    # see comment on `definition_landslide`.
+    # - |-
+    #   <% if type is not defined or type == 'dry_mass_movement' or type.startswith('all_') %>{definitions.definition_dry_mass_movement}<% endif %>
+    # - |-
+    #   <% if type is not defined or type == 'wet_mass_movement' or type.startswith('all_') %>{definitions.definition_wet_mass_movement}<% endif %>
     # GLOFs are now folded into the "Flood" type and bullet — see comment above on
     # `definition_glacial_lake_outburst_flood`.
     # - |-

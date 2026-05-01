@@ -38,13 +38,9 @@ dimensions:
         name: Floods
         description: People affected by flooding
         group: Individual disaster types
-      - slug: dry_mass_movement
-        name: Dry mass movement
-        description: People affected by dry mass movements
-        group: Individual disaster types
-      - slug: wet_mass_movement
-        name: Wet mass movement
-        description: People affected by wet mass movements
+      - slug: landslide
+        name: Landslide
+        description: People affected by landslides, rockfalls, mudflows, and similar events
         group: Individual disaster types
       # Disabled in shared.py — kept here so the choice is ready if re-enabled.
       # - slug: fog

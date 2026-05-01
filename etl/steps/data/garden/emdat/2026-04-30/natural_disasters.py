@@ -42,9 +42,9 @@ EXPECTED_DISASTER_TYPES = {
     "Glacial lake outburst flood": "Flood",
     "Impact": np.nan,
     "Infestation": np.nan,
-    # "Landslide (dry)": "Landslide",
-    "Mass movement (dry)": "Dry mass movement",
-    "Mass movement (wet)": "Wet mass movement",
+    # We combine wet and dry mass movements into "Landslide", which is the most common umbrella term.
+    "Mass movement (dry)": "Landslide",
+    "Mass movement (wet)": "Landslide",
     "Storm": "Extreme weather",
     "Volcanic activity": "Volcanic activity",
     "Wildfire": "Wildfire",

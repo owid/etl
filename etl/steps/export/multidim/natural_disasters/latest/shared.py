@@ -33,15 +33,19 @@ DISASTER_TYPES = [
     "earthquake",
     "volcanic_activity",
     "flood",
-    "dry_mass_movement",
-    "wet_mass_movement",
+    "landslide",
     "extreme_weather",
     "wildfire",
     "extreme_temperature",
-    # "fog" and "glacial_lake_outburst_flood" are not listed here: both are folded
-    # upstream at the garden step. Fog is excluded entirely (only one event ever,
-    # the Great Smog of London 1952, and it's anthropogenic air pollution); GLOFs
-    # are bucketed into "Flood" because they're conventionally a flood subtype.
+    # The following EM-DAT types are folded upstream at the garden step and so
+    # don't appear here:
+    #   - "fog": excluded entirely (only one event ever, the Great Smog of London
+    #            1952, and it's anthropogenic air pollution).
+    #   - "glacial_lake_outburst_flood": bucketed into "flood" (conventionally a
+    #            flood subtype).
+    #   - "dry_mass_movement" + "wet_mass_movement": bucketed into "landslide"
+    #            (the wet/dry split is a hydrological-trigger flag, not a hazard
+    #            distinction; "landslide" is the public-facing umbrella term).
 ]
 
 # Same as DISASTER_TYPES; kept as a separate name to make group_views readable.
@@ -65,13 +69,13 @@ AGGREGATE_TO_TOTAL_TYPE = {
 # non-obvious from the name alone. Types not listed here get no extra clarification.
 DISASTER_DESCRIPTIONS = {
     "earthquake": "Earthquakes include the impacts of earthquake events, aftershocks, and tsunamis.",
-    "dry_mass_movement": (
-        "A dry mass movement refers to a landslide or rockfall that is not triggered by surface "
-        "or subsurface water flows."
+    "flood": (
+        "Floods include riverine, coastal, and flash floods, as well as glacial lake outburst floods "
+        "(when water held back by a glacier or moraine is suddenly released)."
     ),
-    "wet_mass_movement": (
-        "A wet mass movement refers to a landslide, mudflow, or debris flow triggered by heavy "
-        "rainfall, snowmelt, or other surface or subsurface water flows."
+    "landslide": (
+        "A landslide is a sudden movement of material down a slope. This includes wet mass movements "
+        "(such as mudflows triggered by heavy rain or melting snow) and dry mass movements (such as rockfalls)."
     ),
     "extreme_weather": (
         "Storms include tornadoes, hailstorms, thunderstorms, sandstorms, blizzards, and extreme wind events."
@@ -96,12 +100,13 @@ DISASTER_COLORS = {
     "earthquake": "#883039",
     "volcanic_activity": "#a2559c",
     "flood": "#286BBB",
-    "dry_mass_movement": "#8b5a2b",
-    "wet_mass_movement": "#6b7a8f",
+    "landslide": "#8b5a2b",
     "extreme_weather": "#5b9460",
     "wildfire": "#e94e1b",
     "extreme_temperature": "#d4a017",
-    # Both folded into other types upstream at the garden step (see DISASTER_TYPES).
+    # Folded into other types upstream at the garden step (see DISASTER_TYPES).
+    # "dry_mass_movement": "#8b5a2b",
+    # "wet_mass_movement": "#6b7a8f",
     # "fog": "#aaaaaa",
     # "glacial_lake_outburst_flood": "#7fb8d3",
 }
@@ -114,12 +119,13 @@ DISASTER_PHRASES = {
     "earthquake": "earthquakes",
     "volcanic_activity": "volcanic activity",
     "flood": "floods",
-    "dry_mass_movement": "dry mass movements",
-    "wet_mass_movement": "wet mass movements",
+    "landslide": "landslides",
     "extreme_weather": "storms",
     "wildfire": "wildfires",
     "extreme_temperature": "extreme temperatures",
-    # Both folded into other types upstream at the garden step (see DISASTER_TYPES).
+    # Folded into other types upstream at the garden step (see DISASTER_TYPES).
+    # "dry_mass_movement": "dry mass movements",
+    # "wet_mass_movement": "wet mass movements",
     # "fog": "fogs",
     # "glacial_lake_outburst_flood": "glacial lake outburst floods",
 }
