@@ -13,10 +13,13 @@ from owid.catalog.core.utils import remove_details_on_demand
 # `as_value` Jinja filter below.
 _AS_VALUE_MARKER = "__OWID_AS_VALUE__:"
 
-# Sentinel returned by `_expand_jinja_text` when a Jinja template renders to
-# an empty string. The dict/list walker in `_expand_jinja` drops keys/items
-# carrying this sentinel, which lets metadata authors conditionally suppress
-# fields via `<% if … %>…<% endif %>` (no else branch needed).
+# Sentinel returned by `_expand_jinja_text` when a Jinja template that uses
+# the `| as_value` filter renders to an empty string. The dict/list walker in
+# `_expand_jinja` drops keys/items carrying this sentinel, so authors can
+# conditionally suppress strict-typed fields (e.g. `yAxis.min`,
+# `comparisonLines[].yEquals`) without an `<% else %>` branch. Untyped fields
+# (subtitle, note, description_*, etc.) preserve "" instead — see
+# `_expand_jinja_text` for the split.
 _REMOVE_KEY = object()
 
 jinja_env = jinja2.Environment(
@@ -88,10 +91,17 @@ def _expand_jinja_text(text: str, dim_dict: dict[str, str], remove_dods: bool = 
         try:
             # NOTE: we're stripping the result to avoid trailing newlines
             out = _cached_jinja_template(text).render(dim_dict).strip()
-            # Treat empty Jinja output as "remove the key/item" so authors can
-            # write `<% if cond %>value<% endif %>` without an else branch.
+            # Empty Jinja output: preserve "" by default so authors can force
+            # empty string fields like `subtitle: ""` or `note: ""` via Jinja
+            # (Grapher reads these as "render no subtitle" rather than falling
+            # back to `description_short`). Drop the key/item only when the
+            # template opts in via `| as_value` — those are typed numeric
+            # fields (e.g. `yAxis.min`, `comparisonLines[].yEquals`) where ""
+            # would fail strict-typed schema validation.
             if out == "":
-                return _REMOVE_KEY
+                if "as_value" in text:
+                    return _REMOVE_KEY
+                return ""
             # Convert strings to booleans. Getting boolean directly from Jinja is not possible
             if out in ("false", "False", "FALSE"):
                 return False
@@ -122,20 +132,22 @@ def _expand_jinja(obj: Any, dim_dict: dict[str, str], **kwargs: Any) -> Any:
     elif is_dataclass(obj):
         for k, v in obj.__dict__.items():
             new_v = _expand_jinja(v, dim_dict, **kwargs)
-            # Preserve back-compat for scalar dataclass fields: a templated string
-            # that renders empty stays as "" rather than becoming None. Many
-            # existing metadata files rely on this (e.g. `unit: ""` survives
-            # downstream checks). The drop semantics still apply inside dicts
-            # and lists, where they're needed for schema-typed config fields.
+            # Defensive: a dataclass scalar that opted into drop via `| as_value`
+            # (unusual on a dataclass field) still becomes "" rather than None,
+            # so downstream code that treats `unit: None` as a hard failure
+            # keeps working.
             if new_v is _REMOVE_KEY:
                 new_v = ""
             setattr(obj, k, new_v)
         return obj
     elif isinstance(obj, list):
-        # Drop REMOVE_KEY items, plus dicts that became empty after expansion
-        # (e.g. a comparisonLines entry whose label and yEquals were both
-        # conditionally suppressed). Without this, we'd ship `[{}]` and break
-        # downstream schema validation.
+        # Drop REMOVE_KEY items and dicts that emptied out via `| as_value`.
+        # The latter handles the rare `comparisonLines: [{label: <as_value>,
+        # yEquals: <as_value>}]` pattern where every numeric key in the entry
+        # opts into drop and ends up with `{}`, which would break schema
+        # validation. List items that render to "" via plain Jinja are
+        # preserved (pre-PR behavior — author can add an `<% else %>` branch
+        # if an empty entry isn't desired).
         result = []
         for v in obj:
             new_v = _expand_jinja(v, dim_dict, **kwargs)

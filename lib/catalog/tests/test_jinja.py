@@ -49,8 +49,14 @@ def test_empty_jinja_output_drops_dict_key():
     assert out == {"always": "stays"}
 
 
-def test_empty_jinja_output_drops_list_item():
-    """A Jinja template rendering to empty inside a list element drops that element."""
+def test_empty_jinja_output_in_list_preserves_empty_string():
+    """Plain Jinja that renders empty inside a list keeps "" (pre-PR behavior).
+
+    Authors who want an item dropped should add an `<% else %>` branch with
+    real content, or use `| as_value` (covered separately). Auto-dropping
+    plain empty strings was tried in #5999 but caused collateral damage on
+    fields like `subtitle` where empty is a valid signal to Grapher.
+    """
     out = jinja._expand_jinja(
         [
             "<% if age == '0' %>kept<% endif %>",
@@ -59,22 +65,27 @@ def test_empty_jinja_output_drops_list_item():
         ],
         dim_dict={"age": "10"},
     )
-    assert out == ["always"]
+    assert out == ["", "always", ""]
 
 
-def test_list_item_dict_emptied_by_jinja_is_dropped():
-    """A list of dicts where every key is suppressed by Jinja drops the whole entry."""
+def test_list_item_dict_emptied_by_as_value_is_dropped():
+    """When every numeric key in a dict opts into drop via `as_value`, the `{}` is pruned from the list.
+
+    This guards the `comparisonLines: [{}]` case: an entry whose numeric
+    fields all rendered empty would otherwise survive as `{}` and break
+    Grapher schema validation.
+    """
     out = jinja._expand_jinja(
         [
             {
-                "label": "<% if age == '0' %>at-birth<% endif %>",
-                "yEquals": "<% if age == '0' %>105<% endif %>",
+                "yEquals": "<% if age == '0' %><< 105 | as_value >><% endif %>",
+                "yMin": "<% if age == '0' %><< 100 | as_value >><% endif %>",
             },
-            {"label": "always", "yEquals": "100"},
+            {"yEquals": 100},
         ],
         dim_dict={"age": "10"},
     )
-    assert out == [{"label": "always", "yEquals": "100"}]
+    assert out == [{"yEquals": 100}]
 
 
 def test_dataclass_scalar_empty_jinja_renders_to_empty_string():
@@ -84,6 +95,11 @@ def test_dataclass_scalar_empty_jinja_renders_to_empty_string():
     on top-level fields like `unit`, `title_public`, `description_short`.
     Existing downstream code (e.g. `grapher_checks`) treats `unit: ""` as
     valid but `unit: None` as a hard failure.
+
+    Dict keys also default to preserving "" so authors can force empty fields
+    like `subtitle: ""` via Jinja (Grapher reads "" as "render no subtitle"
+    rather than falling back to `description_short`). Opt into key-drop with
+    the `| as_value` filter — see `test_empty_jinja_output_drops_dict_key`.
     """
     m = meta.VariableMeta(
         unit="<% if foo == 'bar' %>kg<% endif %>",
@@ -93,7 +109,27 @@ def test_dataclass_scalar_empty_jinja_renders_to_empty_string():
     out = jinja._expand_jinja(m, dim_dict={"foo": "other"})
     # Scalar dataclass field: "" preserved.
     assert out.unit == ""
-    # List items still drop empty entries.
-    assert out.description_key == ["always"]
-    # Dict keys still get dropped.
-    assert out.display == {}
+    # List items: "" preserved too (use `<% else %>` for non-empty alternatives).
+    assert out.description_key == ["", "always"]
+    # Dict key without `as_value`: "" preserved (back-compat for `subtitle: ""`).
+    assert out.display == {"numDecimalPlaces": ""}
+
+
+def test_empty_jinja_in_grapher_config_preserves_empty_string():
+    """Force-empty subtitle/note via Jinja must round-trip as "" through dict expansion.
+
+    Regression test for the `subtitle: "{definitions.global.projections}"`
+    pattern in un_wpp.meta.yml: when the inherited Jinja renders empty (e.g.
+    `variant == 'estimates'`), Grapher must see `subtitle: ""` so it renders
+    no subtitle — not a missing key, which would fall back to
+    `description_short`.
+    """
+    out = jinja._expand_jinja(
+        {
+            "subtitle": "<% if variant != 'estimates' %>scenario blurb<% endif %>",
+            "note": "<% if variant != 'estimates' %>note text<% endif %>",
+            "originUrl": "https://example.org",
+        },
+        dim_dict={"variant": "estimates"},
+    )
+    assert out == {"subtitle": "", "note": "", "originUrl": "https://example.org"}
