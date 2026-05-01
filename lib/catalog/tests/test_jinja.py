@@ -75,3 +75,25 @@ def test_list_item_dict_emptied_by_jinja_is_dropped():
         dim_dict={"age": "10"},
     )
     assert out == [{"label": "always", "yEquals": "100"}]
+
+
+def test_dataclass_scalar_empty_jinja_renders_to_empty_string():
+    """Empty Jinja on a scalar dataclass field stays as "" (not None).
+
+    This is back-compat for metadata that uses `<% if cond %>x<% endif %>`
+    on top-level fields like `unit`, `title_public`, `description_short`.
+    Existing downstream code (e.g. `grapher_checks`) treats `unit: ""` as
+    valid but `unit: None` as a hard failure.
+    """
+    m = meta.VariableMeta(
+        unit="<% if foo == 'bar' %>kg<% endif %>",
+        description_key=["<% if foo == 'bar' %>kept<% endif %>", "always"],
+        display={"numDecimalPlaces": "<% if foo == 'bar' %>2<% endif %>"},
+    )
+    out = jinja._expand_jinja(m, dim_dict={"foo": "other"})
+    # Scalar dataclass field: "" preserved.
+    assert out.unit == ""
+    # List items still drop empty entries.
+    assert out.description_key == ["always"]
+    # Dict keys still get dropped.
+    assert out.display == {}

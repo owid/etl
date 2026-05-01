@@ -122,10 +122,14 @@ def _expand_jinja(obj: Any, dim_dict: dict[str, str], **kwargs: Any) -> Any:
     elif is_dataclass(obj):
         for k, v in obj.__dict__.items():
             new_v = _expand_jinja(v, dim_dict, **kwargs)
-            # Treat REMOVE_KEY as "reset to None" — dataclass fields are
-            # declared at class level, so we can't `del` the attribute, but
-            # None is the standard "absent" value across our metadata schemas.
-            setattr(obj, k, None if new_v is _REMOVE_KEY else new_v)
+            # Preserve back-compat for scalar dataclass fields: a templated string
+            # that renders empty stays as "" rather than becoming None. Many
+            # existing metadata files rely on this (e.g. `unit: ""` survives
+            # downstream checks). The drop semantics still apply inside dicts
+            # and lists, where they're needed for schema-typed config fields.
+            if new_v is _REMOVE_KEY:
+                new_v = ""
+            setattr(obj, k, new_v)
         return obj
     elif isinstance(obj, list):
         # Drop REMOVE_KEY items, plus dicts that became empty after expansion
