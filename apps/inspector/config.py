@@ -7,12 +7,11 @@ MODELS_YAML_PATH = BASE_DIR / "apps" / "utils" / "llms" / "models.yml"
 
 # Claude model configuration
 # Choose model based on speed vs quality tradeoff:
-# - Haiku: Fastest, cheapest (18% faster, 72% cheaper), excellent quality for this task
-# - Sonnet: Higher quality but slower and more expensive
-# - Opus: Highest quality but much slower and more expensive
-#
-# Testing showed Haiku finds same semantic issues as Sonnet with minimal quality difference,
-# making it the best choice for large-scale analysis.
+# - Haiku: Fastest and cheapest, but misses too many semantic issues to be the default
+#   (false-negative rate was unacceptable on chart-text reviews).
+# - Sonnet: Balanced — current default. Good ratio of catches to cost.
+# - Opus: Highest quality, noticeably slower and more expensive. Reach for it on
+#   high-stakes audits where you can absorb the cost.
 
 # Mapping from YAML model names to Anthropic API model names
 MODEL_API_NAMES = {
