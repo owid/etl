@@ -396,7 +396,12 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Tell the user: "Slack announcement drafted at `workbench/<short_name>/slack-announcement.md` and added to the PR description. Please review and post it to **#data-updates-comms**."
 
 9b) Data update post (for OWID /latest)
-   Draft the short public-facing blurb that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest). This is **separate from the Slack announcement** — that one is a 10-field form for the internal channel; this one is short prose for OWID readers, following the format observed across ~14 examples on the /latest feed (American Time Use Survey, World Bank PIP, UN Tourism Statistics, lithium-ion batteries, self-driving taxis, natural disasters, oil spills, etc.).
+   Draft the short reader-facing post that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest). This is **separate from the Slack announcement** — that one is a 10-field form for the internal channel; this one is a mini-blog-post for OWID readers. Format observed in recent examples (American Time Use Survey, World Bank PIP):
+   - **Headline title is a punchy finding or claim**, not a noun phrase. "Nearly one in ten people worldwide still live in extreme poverty" — not "World Bank PIP".
+   - **Body opens with a question** that the dataset helps answer (e.g. "How many people live in poverty around the world, and how has that changed over the last decades?").
+   - **2–4 short paragraphs of substance**: source/methodology framing → specific findings with concrete numbers → optional cross-reference to a related OWID article.
+   - **Closing update statement** is brief and first-person ("I recently updated our charts with the latest PIP release from the World Bank.").
+   - **Descriptive link text**, not a bare URL: `[Explore the updated data in our interactive charts](URL)`.
    - Open `.claude/skills/update-dataset/data-update-template.md` and follow it. Use the editorial context sources gathered in step 8b (snapshot DVC fields, garden `.meta.yml`, optionally `url_main` via WebFetch). Also pull from `workbench/<short_name>/slack-announcement.md` (step 9 output) — the editorial framing already drafted there is the closest cousin and the post is essentially a polished, prose-shaped distillation of it.
    - Decide which link flavour to use:
      - `1 published chart` was picked / one chart is the focus ⇒ grapher URL `https://ourworldindata.org/grapher/<slug>`.
@@ -404,7 +409,7 @@ When you do stop, present a concise summary of the issue and what options exist.
      - The producer/topic has an existing OWID **explorer** (e.g. minerals → `/explorers/minerals`, natural disasters → `/explorers/natural-disasters`, CO₂ → `/explorers/co2`) ⇒ prefer the explorer URL over the search URL.
      - The producer/topic has a **curated topic page** (e.g. SDG Tracker → `/sdgs`) ⇒ prefer the topic URL over the search URL.
      - **Do not use** custom-collection URLs (`/collection/custom?charts=…`) even though some /latest posts do — current OWID practice is to default to the search URL for multi-chart updates.
-   - Draft the post as flowing prose, **40–100 words by default** (up to ~150 if the dataset has 2–3 notable findings worth surfacing). First-person, conversational, author voice ("I recently updated…", "I've just updated…"). Not corporate.
+   - Draft the post as flowing prose, **100–200 words is the typical band** (ATUS ~105, NVIDIA ~140, OECD Government at a Glance ~155, World Bank PIP ~190). First-person, conversational, author voice ("I recently updated…", "I've just updated…"). Not corporate. The body should give a reader a reason to care and at least one concrete number — not just "I refreshed our charts".
    - Save the draft to `workbench/<short_name>/data-update.md`.
    - **Add a collapsed `<details>` section titled "Data update post (for OWID /latest)"** to the PR description, placed *after* the Slack-announcement section so the PR body order matches the workflow order.
    - Tell the user: "Data update post drafted at `workbench/<short_name>/data-update.md` and added to the PR description. Please review and publish to the OWID /latest feed."

@@ -1,6 +1,6 @@
 # Data Update Post Template (for OWID /latest)
 
-Use this template to draft the short public-facing "Data update" blurb that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest) when a dataset refresh ships. This is **separate from the Slack announcement** — that one is a 10-field form for the internal #data-updates-comms channel; this one is short prose for OWID readers.
+Use this template to draft the short reader-facing post that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest) when a dataset refresh ships. This is **separate from the Slack announcement** — that one is a 10-field form for the internal #data-updates-comms channel; this one is a mini-blog-post for OWID readers, with a punchy title, 2–4 short paragraphs of substance, and a descriptive trailing link.
 
 Hand the draft to the user for review and publication. The skill does not presume where the post is published — that's the human's call.
 
@@ -9,85 +9,152 @@ Hand the draft to the user for review and publication. The skill does not presum
 ## Template
 
 ```
-[Optional title — short noun phrase, usually the dataset name. Many /latest posts skip the title.]
+[Title — a punchy finding/claim or a question. Examples: "Nearly one in ten people worldwide still live in extreme poverty", "How much do governments spend, and what do they spend it on?", "NVIDIA's data center & AI revenue has grown nearly 15-fold since early 2023". NOT just the dataset name.]
 
-[40–100 words of prose, recipe below. First-person, conversational, author voice.
+[Body — 100–200 words of flowing prose, first-person, conversational. Recipe (mirroring 4 published examples — ATUS, PIP, NVIDIA, OECD Government at a Glance):
 
-Recipe:
-- Optional lead: a "why" clause OR a one-sentence headline finding from the data.
-- First-person update statement ("I recently updated", "I've just updated", etc.) + scope ("our charts", "more than 20 of our charts", "this chart").
-- Source attribution ("with the latest [release | data] from <producer>").
-- Optional one-detail clause about what's new in this release.]
+1. Hook — a question, or a one-sentence framing of why this dataset matters, or a finding that names the chart.
+2. Source/methodology framing — what the dataset is, how it works, why it's the right tool for the question.
+3. Specific finding(s) with concrete numbers — at least one quantitative claim a reader can latch onto. (E.g. "In 1990, 2.3 billion people lived in extreme poverty. Since then the number has fallen by nearly two-thirds, to 826 million." or "In early 2023, data center & AI revenue was around $4 billion per quarter. By late 2025, this had grown to $62 billion".)
+4. Optional cross-reference to a related OWID article ("Our colleague X wrote an article about Y") if there's a natural one.
+5. Brief closing source attribution + first-person update sentence: "This data comes from <producer>. I recently updated [our charts | this chart] with the latest [release | quarterly release]." Add a forward-looking note for recurring updates ("and will continue to do so each quarter").]
 
-[Single closing link → one of:
-- One chart focus:        https://ourworldindata.org/grapher/<slug>
-- Multiple charts (default): https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>
-- Explorer for the topic exists: https://ourworldindata.org/explorers/<name>
-- Curated topic page exists: https://ourworldindata.org/<topic>
+[Descriptive link text — NOT a bare URL. Render as a markdown link:
+[Explore the updated data in our interactive charts](URL)
+or, for single-chart updates with date depth:
+[Explore this data going back to YYYY in our interactive chart](URL)
+or, when the post mentions "all":
+[Explore all of the updated data in our interactive charts](URL)
 ]
 ```
+
+The URL inside the link is one of:
+
+- One chart focus: `https://ourworldindata.org/grapher/<slug>`
+- Multiple charts (default): `https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>` — value is the **dataset title** (the `title` field in the snapshot `meta.origin` block, which often includes a parenthetical acronym like `Luxembourg Income Study (LIS)`), **not** the bare `producer` field.
+- Explorer for the topic exists: `https://ourworldindata.org/explorers/<name>`
+- Curated topic page exists: topic URL (e.g. `/sdgs`)
+
+Do **not** use custom-collection URLs (`/collection/custom?charts=…`) — current OWID practice is to default to the search URL for multi-chart updates.
 
 ---
 
 ## Guidance per section
 
-**Title** — Optional. When used, it's a short noun phrase or topic question, e.g. "American Time Use Survey", "Forest Resource Assessment", "How are forest sizes changing around the world?". Many /latest posts have no explicit title — the body just leads.
+**Title** — A punchy claim, a question, or an action/invitation. The title is the part that pulls readers into the feed; "Luxembourg Income Study" is descriptive but unmemorable. Three observed patterns:
 
-**Tone** — First-person, conversational, author voice. The post reads like the person who did the work telling you about it. **Not** corporate ("OWID has updated…" is wrong); **yes** "I recently updated…", "I've just updated…", "I just updated…". "We've just updated…" appears occasionally and is fine when more than one person was involved.
+- **A finding/claim** (PIP, NVIDIA) — pull the most striking concrete number or trend from the data: "Nearly one in ten people worldwide still live in extreme poverty", "NVIDIA's data center & AI revenue has grown nearly 15-fold since early 2023".
+- **A question** the dataset helps answer (OECD Government at a Glance, US data centers, UNU-WIDER Government Revenue) — "How much do governments spend, and what do they spend it on?", "How much revenue do governments collect, and where does it come from?".
+- **An action/invitation** (H5N1) — "Track confirmed human cases of H5N1 'bird flu' since 1997". Less common, fits surveillance/monitoring datasets.
 
-**Length** — 40–100 words is the typical band on /latest. Aim shorter (~20–50 words) for single-chart refreshes and quarterly cadences; longer (up to ~150 words) when the dataset has 2–3 notable findings worth surfacing in the post itself. If the draft creeps past 150 words, cut — readers scan, they don't read.
+If the dataset doesn't lend itself to a single headline finding, the question form is the safer fallback.
 
-**Lead** — Optional. Two patterns work:
-- A "why" clause: "To help you track this…", "To help you understand the scale of tourism and some of its impacts…"
-- A one-sentence headline finding from the data: "These losses have fallen dramatically since the millennium. Last year, 10,000 tonnes were spilled, less than one-thirtieth of the amount lost in a typical year in the 1970s."
+**Body voice** — First-person, conversational, author voice. The post reads like the person who did the work telling you about it. **Not** corporate ("OWID has updated…" is wrong); **yes** "I recently updated…", "I've just updated…", "I just updated…".
 
-Many short blurbs skip the lead entirely and dive straight in. Use a lead when there's something genuinely interesting to surface; skip it for routine quarterly refreshes.
+**Body length** — 100–200 words. Sample: ATUS ~105, NVIDIA ~140, OECD Government at a Glance ~155, World Bank PIP ~190. Shorter than ~80 words usually means the post lacks a concrete finding or methodology framing — go gather more from `url_main` or the garden metadata before publishing.
 
-**Update statement + scope** — One sentence. Pair the first-person verb with concrete scope: "I recently updated our charts" / "more than 20 of our interactive charts" / "this chart" / "over 400 of them" / "nearly 300 charts". Specificity is better than vague ("our charts").
+**Body shape** — 2–4 short paragraphs. Hook → framing → specific finding(s) with numbers → optional cross-reference → closing source + update statement. Keep paragraphs short (1–3 sentences each); the format reads as a feed entry, not as an article.
 
-**Source attribution** — Name the producer in the same sentence: "with the latest data from the UN Tourism Statistics Database", "with the 2026 European Electricity Review from Ember", "based on multiple sources compiled by Rupert Way at the University of Oxford". Match the producer wording from the dataset's `.meta.yml` for consistency.
+**Closing pattern** — One or two sentences:
 
-**Optional one-detail clause** — One sentence on what's new in this release. "Now goes through 2024", "now include 2025 data for European countries, including Turkey", "We now have a better picture of how social spending changed during the COVID-19 pandemic." Skip if the only thing new is a routine year-rollover.
+1. Source attribution (optional but common): "This data comes from <producer>." Or with a coverage detail: "This data comes from the OECD's Government at a Glance dataset, which covers 47 countries." Sometimes the source intro is folded into the prior paragraph instead (e.g. "The UNU-WIDER Government Revenue Dataset is one of the most comprehensive cross-country datasets…") and the update statement comes after.
+2. Update statement: "I recently updated [our charts | this chart] with the latest [release | quarterly release | data release]." Variants seen: `I recently updated…`, `I've updated…`, `I just updated…`, `I've just updated…`. For datasets that update on a recurring cadence, **add a forward-looking note** in the same line or as a follow-up sentence:
+   - NVIDIA: "…and will continue to do so each quarter."
+   - H5N1: "We update this data quarterly."
+   - US data centers: "I do this quarterly, so our next update will be around June 2026."
 
-**Link choice** — Decide from step 8's chart-pick output:
+For releases that meaningfully extend coverage (new countries, new years), the update statement sometimes folds the coverage detail in: "I recently updated our charts with the latest release, which now covers 198 countries and territories from 1980 to 2023." (UNU-WIDER).
 
-- `1 published chart` was picked / one chart is the focus ⇒ **grapher URL** `https://ourworldindata.org/grapher/<slug>`.
-- `>1 published charts` were picked / dataset-wide refresh ⇒ **search URL** `https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>`. The value is the **dataset title** (the `title` field in the snapshot `meta.origin` block, which often includes a parenthetical acronym like `Luxembourg Income Study (LIS)`), **not** the bare `producer` field. This is the same URL the Slack announcement template builds — single source of truth.
-- The producer/topic has an existing OWID **explorer** (e.g. minerals → `/explorers/minerals`, natural disasters → `/explorers/natural-disasters`, CO₂ → `/explorers/co2`) ⇒ prefer the explorer URL over the search URL.
-- The producer/topic has a **curated topic page** (e.g. SDG Tracker → `/sdgs`) ⇒ prefer the topic URL over the search URL.
+**Optional caveat paragraph** — Add when there's a real interpretation pitfall a reader could trip over. Pattern: "Keep in mind that…" or "It's important to note that…". Examples:
 
-**Do not use** custom-collection URLs (`/collection/custom?charts=…`) even though some /latest posts do — current OWID practice is to default to the search URL for multi-chart updates.
+- H5N1: "Keep in mind that the true burden of infection is not fully known, because only a small fraction of potential cases are tested by labs to confirm whether they have influenza and to identify their strain."
+- US data centers: "It's important to note that this only covers the cost of building the physical structures. Servers and other hardware inside are excluded, and they can make up a large share of the total cost of a data center."
 
-**Don't restate the Slack form.** The Slack draft is form-shaped for stakeholders. The public post is short prose for readers. They share editorial content (why this dataset matters, what's new) but live in different formats — don't paste form fields into the post.
+Skip if the data is straightforward to interpret. Don't manufacture caveats that aren't load-bearing.
+
+**Link text** — Always descriptive, always rendered as a markdown link, never a bare URL. Recurring patterns:
+
+- `[Explore the updated data in our interactive charts](URL)` — the default for dataset-wide refreshes.
+- `[Explore all of the updated data in our interactive charts](URL)` — when the post emphasises broad coverage (PIP).
+- `[Explore this data going back to YYYY in our interactive chart](URL)` — for single-chart updates with date depth (NVIDIA).
+- `[Explore the updated data in our interactive charts, with detailed information on each spending category](URL)` — when the link's destination has a useful additional dimension worth flagging.
+
+**Don't restate the Slack form.** The Slack draft is form-shaped for stakeholders. The public post is a reader-facing mini-blog-post. They share editorial content (why this dataset matters, what's new) but live in different formats — don't paste form fields into the post.
 
 ---
 
-## Worked examples
+## Worked examples (verbatim from /latest)
 
-These are real published examples from the /latest feed. They are models for tone and length, **not** boilerplate to copy-paste.
+These are real published examples. They are models for tone, length, and structure — **not** boilerplate to copy-paste.
 
-### Short single-chart refresh (~20 words, grapher URL)
-
-```
-California's driverless taxis now transport passengers for nearly five million miles per month.
-
-I recently updated this chart based on the latest report, and will do so every quarter going forward.
-
-https://ourworldindata.org/grapher/passenger-miles-traveled-self-driving-taxis
-```
-
-### Medium dataset-wide refresh (~40 words, search URL)
+### Action-titled, with caveat and recurring-update note (H5N1, ~135 words)
 
 ```
-To help you understand the scale of tourism and some of its impacts, I recently updated more than 20 of our interactive charts with the latest data from the UN Tourism Statistics Database.
+Track confirmed human cases of H5N1 "bird flu" since 1997
 
-https://ourworldindata.org/search?datasetProducts=UN%20Tourism%20Statistics%20Database
+Avian influenza A (H5N1), often referred to as "bird flu", is a subtype of influenza virus that infects birds and mammals. In rare cases, humans can also be infected.
+
+Public health experts consider H5N1 a potential pandemic threat and monitor it closely, especially through the WHO Global Influenza Programme (GIP).
+
+Since 2003, the WHO has recorded nearly 1,000 confirmed human infections with H5N1 across 25 countries, causing more than 450 deaths.
+
+Keep in mind that the true burden of infection is not fully known, because only a small fraction of potential cases are tested by labs to confirm whether they have influenza and to identify their strain.
+
+I've updated our chart with the latest data from the WHO GIP (obtained via the US CDC), covering monthly reported cases since 1997. We update this data quarterly.
+
+[Explore the updated data in our interactive chart](https://ourworldindata.org/grapher/h5n1-flu-reported-cases)
 ```
 
-### Explorer-backed refresh (~46 words, explorer URL)
+### Single chart with date depth (NVIDIA, ~140 words)
 
 ```
-I've just updated our charts with the latest data on natural disasters. This data helps us track where disasters are happening; what types of events they are; their human and economic impacts; and how these trends are changing over time.
+NVIDIA's data center & AI revenue has grown nearly 15-fold since early 2023
 
-https://ourworldindata.org/explorers/natural-disasters
+Most of the chips used to train and run AI models come from NVIDIA. This makes NVIDIA's data center & AI revenue one of the clearest public figures available for tracking demand for AI hardware.
+
+The chart here shows how the company's quarterly revenue has changed over the last eight years, split by market segment.
+
+In early 2023, data center & AI revenue was around $4 billion per quarter. By late 2025, this had grown to $62 billion — a more than 15-fold increase in under three years.
+
+This data comes from NVIDIA's financial reports and is not adjusted for inflation. I recently updated this chart with the latest quarterly release and will continue to do so each quarter.
+
+[Explore this data going back to 2014 in our interactive chart](https://ourworldindata.org/grapher/nvidia-quarterly-revenue-segment)
+```
+
+### Question-led, dataset-wide (OECD Government at a Glance, ~155 words)
+
+```
+How much do governments spend, and what do they spend it on?
+
+In the chart, we see total government spending broken down by purpose, such as health, education, and defense, relative to the size of the economy (as measured by GDP). This is shown for a selection of OECD countries.
+
+How much governments spend varies quite a lot across OECD countries: in France it's 57% of GDP, while in Chile it's less than half that (28%).
+
+Keep in mind that these are relative shares, not absolute amounts. GDP itself varies considerably across countries, so the same percentage can represent very different sums depending on the size of a country's economy.
+
+This data comes from the OECD's Government at a Glance dataset, which covers 47 countries. I recently updated our charts with the latest release.
+
+[Explore the updated data in our interactive charts, with detailed information on each spending category](URL)
+```
+
+### Finding-led with cross-reference (World Bank PIP, ~190 words)
+
+```
+Nearly one in ten people worldwide still live in extreme poverty
+
+How many people live in poverty around the world, and how has that changed over the last decades?
+
+The World Bank's Poverty and Inequality Platform (PIP) is one of the primary tools we have for answering these questions.
+
+PIP achieves comprehensive global coverage by combining income and consumption surveys, and also includes non-monetary income. It's the official source used to track the UN's goal of ending poverty.
+
+In recent decades, the world has made remarkable progress against extreme poverty, defined as living below the International Poverty Line of $3 per day.
+
+In 1990, 2.3 billion people lived in extreme poverty. Since then the number has fallen by nearly two-thirds, to 826 million. But progress has slowed recently, and nearly one in ten people worldwide still live in extreme poverty.
+
+Our colleague Max Roser wrote an article about the future of progress against this worst kind of poverty.
+
+I recently updated our charts with the latest PIP release from the World Bank.
+
+[Explore all of the updated data in our interactive charts](https://ourworldindata.org/search?datasetProducts=World+Bank+Poverty+and+Inequality+Platform+%28PIP%29)
 ```
