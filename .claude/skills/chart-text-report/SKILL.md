@@ -150,6 +150,42 @@ Total views: **N**   (for MDims)
      ```
 5. Show the user the output file paths and wait for feedback — the user almost always wants iterative tweaks to format (slug style, which dims to collapse, etc.). Dataset mode has no collapse/parametrization; if the user wants dataset views grouped by a shared dim, fall back to the MDim-style code path.
 
+## Comparing the live config to a target FAUST report
+
+A common workflow: the user shares a FAUST report that represents the **desired** end state (their edited copy of an earlier auto-generated report) and asks "does the live MDim match this?". **Treat the report as the source of truth by default** — when the live config differs, the fix lands in the metadata to make the live match the report.
+
+Two cases warrant a confirmation before silently editing the metadata to match:
+
+- **Text-content drift in inherited bullets.** If the report shows older / shorter wording for welfare_type / methodology bullets while the live config has newer longer wording, surface the diff side-by-side and confirm before reverting — sometimes the user rewrote `description_key_welfare_type` (or similar) *after* generating the report and the live config is the up-to-date target. The report is still usually right; just don't auto-revert recent rewrites.
+- **View-count mismatch.** If the report has more or fewer sections than the live config (e.g. report includes `before_vs_after_scatter` sections that were intentionally removed, or the live has views the report doesn't list), list the missing/extra sections explicitly and confirm before adding/removing views.
+
+Before doing the field-by-field comparison, refresh everything the live config depends on. Skipping a step leaves a stale catalog, which produces phantom drift that isn't real:
+
+```
+.venv/bin/etlr garden/<ns>/<ver>/<ds> grapher/<ns>/<ver>/<ds> --private --force --only
+.venv/bin/etlr multidim/<ns>/<ver>/<mdim> --export --only --private --force
+```
+
+Run both upstream steps — `garden --only` alone does NOT refresh the grapher channel, and the FAUST scripts (and ad-hoc `Dataset(grapher_path).read(...)` queries) read from grapher, not garden. Without the grapher refresh you'll see pre-edit metadata even though the meta.yml was already updated.
+
+Then audit:
+
+1. **Spot-check several view types**, not just one — overrides, `before_vs_after`, single-decile, all-decile (multi-indicator), share-vs-non-share. Different code paths populate different fields.
+2. **Override fields live on the view; inherited fields don't.** A view's `metadata.description_key` in the `.config.json` only contains bullets the MDim explicitly set (via `view.metadata["description_key"] = [...]` or `view_metadata` in `group_views`). Empty array / missing key means the bullets come from the underlying y-indicator — read those via `Dataset(<grapher_path>).read(<table>, load_data=False)[<col>].metadata.description_key`.
+3. **Programmatic display.name overrides on indicators within multi-indicator views** (e.g. `5th decile (median)` annotation on the decile_5 indicator inside a `thr+all` view) live on `view['indicators']['y'][i]['display']['name']`, not on the view's text fields. Inspect them per-indicator.
+4. **Slug collisions in the report (`Income-share-decile` vs `income-share-decile`, `Expressed-constant-international` vs `expressed-constant-international`) are tooling artefacts** — the chart-text-report script can split a single bullet into two slugs because of trailing whitespace or invisible diffs. The actual rendered text is identical. Per the user's feedback, ignore capital/lowercase slug differences during audits.
+5. **Check punctuation around markdown links specifically.** `[Economic Inequality.](url)` (period inside) vs `[Economic Inequality](url).` (period outside) is a common copy-edit issue and easy to miss.
+6. **Common drift you'll see:**
+   - `_post-tax_` / `_pre-tax_` hyphenation removed from welfare_type bullets
+   - "after tax" qualifier removed from subtitle / description_short overrides
+   - `description_key[1:]` drops removed (so leading "inequality" / "gini-coefficient" / etc. bullets are kept on grouped views)
+   - New indicator-specific bullets added (`description_key_avg`, `description_key_thr`, `description_key_top_incomes`, etc.)
+7. **If the live and target diverge, the fix usually lands in one of three places:**
+   - the garden meta.yml `definitions.description_key_*` blocks (text content)
+   - the MDim `.py` (override via `_assert_and_replace`, `_replace_welfare_type_bullet`, or `view.metadata[...] = ...`)
+   - rarely, the indicator's `presentation.grapher_config` block (when the issue is title/subtitle/note rather than description_key)
+8. **After every fix push**, re-run garden + grapher + MDim export and re-verify against the report.
+
 ## Things to avoid
 
 - Do NOT fall back to `title` / `title_public` / `display.name` / `description_short` when resolving chart Title / Subtitle / Footnote. Use `grapher_config` only (see inheritance rules above).
