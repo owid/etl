@@ -8,7 +8,7 @@ definitions:
 
   # General definitions.
   definition_disaster: &definition-disaster |-
-    EM-DAT defines a disaster as a situation or event which overwhelms local capacity, necessitating a request to the national or international level for external assistance; an unforeseen and often sudden event that causes great damage, destruction, and human suffering. Of all EM-DAT disasters, we select geophysical, meteorological, hydrological, and climatological events, which include droughts, earthquakes, extreme temperatures, floods, mass movements, extreme weather events, volcanic activity, and wildfires.
+    EM-DAT defines a disaster as a situation or event which overwhelms local capacity, necessitating a request to the national or international level for external assistance; an unforeseen and often sudden event that causes great damage, destruction, and human suffering. Of all EM-DAT disasters, we select geophysical, meteorological, hydrological, and climatological events, which include droughts, earthquakes, volcanoes, floods, landslides, storms, wildfires, and extreme temperatures."
   # Definitions of impact variables.
   definition_dead: &definition-dead |-
     EM-DAT counts deaths as deceased and missing people combined, as a result of a natural disaster.
@@ -73,7 +73,7 @@ definitions:
   # But I can see the subtype of events that are included for the type "Storm" (which we call "Extreme weather").
   # Do not mention all (there are many and detailed) but a summary of the most important.
   definition_extreme_weather: &definition-extreme-weather |-
-    Extreme weather events include tornadoes, hailstorms, thunderstorms, sandstorms, blizzards, and extreme wind events.
+    Storms include tornadoes, hailstorms, thunderstorms, sandstorms, blizzards, and extreme wind events.
   # Common description key of all disasters.
   # Each disaster-specific bullet is wrapped in a Jinja conditional so that single-
   # disaster wide-form variables (e.g. `total_dead_drought_yearly`) only render the

@@ -35,8 +35,8 @@ TITLE_PUBLIC_START = {
 # Map disaster type to their name at the end of the public title (plural).
 TITLE_PUBLIC_END = {
     "earthquake": "earthquakes",
-    "extreme_weather": "extreme weather events",
-    "volcanic_activity": "volcanic activity events",
+    "extreme_weather": "storms",
+    "volcanic_activity": "volcanoes",
     "flood": "floods",
     "all_disasters": "all disasters",
     # "glacial_lake_outburst_flood": ...,  # Folded into "Flood" — see EXPECTED_DISASTER_TYPES.
@@ -54,8 +54,8 @@ TITLE_PUBLIC_END = {
 # Map disaster type to their name in the title (singular).
 TITLE_DISASTER = {
     "earthquake": "Earthquake",
-    "extreme_weather": "Extreme weather",
-    "volcanic_activity": "Volcanic activity",
+    "extreme_weather": "Storms",
+    "volcanic_activity": "Volcanoes",
     "flood": "Flood",
     "all_disasters": "All disasters",
     # "glacial_lake_outburst_flood": ...,  # Folded into "Flood" — see EXPECTED_DISASTER_TYPES.

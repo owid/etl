@@ -83,13 +83,12 @@ DISASTER_DESCRIPTIONS = {
 }
 
 ALL_DISASTERS_SUBTITLE = (
-    "Disasters include all geophysical, meteorological, and climate events such as earthquakes, "
-    "volcanic activity, drought, wildfires, storms, and flooding."
+    "Natural disasters include all geophysical, meteorological, hydrological, and climatological events."
 )
 
 ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE = (
     "Disasters here include geophysical, meteorological, and climate events such as earthquakes, "
-    "volcanic activity, drought, wildfires, storms, and flooding. Extreme temperatures are excluded "
+    "volcanoes, drought, wildfires, storms, and flooding. Extreme temperatures are excluded "
     "because their reporting coverage is too incomplete to compare across regions and over time."
 )
 
@@ -114,11 +113,11 @@ DISASTER_COLORS = {
 
 # Human-readable phrase used in chart titles for each disaster-type choice.
 DISASTER_PHRASES = {
-    "all_disasters_excluding_extreme_temperature": "all disasters excluding extreme temperatures",
-    "all_stacked": "disasters",
+    "all_disasters_excluding_extreme_temperature": "all natural disasters excluding extreme temperatures",
+    "all_stacked": "all natural disasters",
     "drought": "droughts",
     "earthquake": "earthquakes",
-    "volcanic_activity": "volcanic activity",
+    "volcanic_activity": "volcanoes",
     "flood": "floods",
     "landslide": "landslides",
     "extreme_weather": "storms",

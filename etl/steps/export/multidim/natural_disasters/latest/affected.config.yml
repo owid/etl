@@ -32,7 +32,7 @@ dimensions:
         group: Individual disaster types
       - slug: volcanic_activity
         name: Volcanoes
-        description: People affected by volcanic activity
+        description: People affected by volcanoes
         group: Individual disaster types
       - slug: flood
         name: Floods
@@ -53,7 +53,7 @@ dimensions:
       #   group: Individual disaster types
       - slug: extreme_weather
         name: Storms
-        description: People affected by storm and extreme weather events
+        description: People affected by storms
         group: Individual disaster types
       - slug: wildfire
         name: Wildfires
