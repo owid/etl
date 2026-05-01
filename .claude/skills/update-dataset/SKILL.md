@@ -194,7 +194,7 @@ When you do stop, present a concise summary of the issue and what options exist.
       invalid = sorted({v for v in mapping.values() if v and v not in canonical})
       print("Target names not in canonical regions or income groups:", invalid)
       ```
-      Any non-empty `invalid` is a **hard checkpoint** — the mapping points at an entity neither the regions catalog nor the income-groups dataset knows about. Common causes: typo, retired alias used as canonical, casing/whitespace mismatch, or a legitimately custom aggregate the source defines that we have no equivalent for (e.g. ILO's `" (ILO)"`-suffixed regions, BRICS, G7, G20). For typos/casing — fix the JSON. For legitimately custom aggregates — accept and note in the PR description that those entities live outside the canonical system and won't merge with population/regions infrastructure. For a real new historical region — add an entry to `regions.yml` in a separate PR.
+      A non-empty `invalid` list means the mapping points at an entity neither the regions catalog nor the income-groups dataset knows about. **Stop and decide with the user before proceeding** — same pattern as the global "Checkpoints — when to pause" section at the top of this skill. Common causes: typo, retired alias used as canonical, casing/whitespace mismatch, or a legitimately custom aggregate the source defines that we have no equivalent for (e.g. ILO's `" (ILO)"`-suffixed regions, BRICS, G7, G20). For typos/casing — fix the JSON. For legitimately custom aggregates — accept and note in the PR description that those entities live outside the canonical system and won't merge with population/regions infrastructure. For a real new historical region — add an entry to `regions.yml` in a separate PR.
 
    4. **Audit `.excluded_countries.json`.** The file is optional; skip if it doesn't exist:
       ```python
@@ -211,14 +211,16 @@ When you do stop, present a concise summary of the issue and what options exist.
       ```
       `suspicious_canonical` is the actionable signal: each entry is a known country/region that we are dropping. Sometimes this is intentional (e.g. dropping "World" rows because the source double-counts them) — surface, don't auto-fix. **Pause and ask the user** if the list is non-empty. The full list is dumped so the LLM can also eyeball it for entities that aren't in `canonical` but look like real countries (typos, alternative names) we should be mapping rather than dropping.
 
-   5. **Write findings** to `workbench/<short_name>/harmonization_audit.md` with five sections, populated only when non-empty:
-      - `## Missing in mapping` — countries in source data not in `.countries.json` (from log warning #1)
-      - `## Unused mappings` — `.countries.json` entries the data never used (warning #2)
-      - `## Unknown excluded entries` — `.excluded_countries.json` entries not present in source data (warning #3)
-      - `## Invalid canonical names` — target names not in the regions catalog or income-groups dataset (Python check #3)
-      - `## Excluded entries matching canonical regions` — possible over-exclusion (Python check #4)
+   5. **Write findings** to `workbench/<short_name>/harmonization_audit.md` with five sections, populated only when non-empty. **Each section must list every flagged entity**, not just a count — counts alone aren't actionable, the user (or you) needs to read the actual names to judge whether each is intentional. For long lists (>20 entries) group by pattern when the grouping is obvious (e.g. ILO's `" (ILO)"`-suffixed regions vs. international orgs vs. derived "World ..." aggregates) so the reviewer can scan categories instead of one flat list. Sections:
+      - `## Missing in mapping` — countries in source data not in `.countries.json` (from log warning #1) — list each missing source name
+      - `## Unused mappings` — `.countries.json` entries the data never used (warning #2) — list each unused source→target pair
+      - `## Unknown excluded entries` — `.excluded_countries.json` entries not present in source data (warning #3) — list each
+      - `## Invalid canonical names` — target names not in the regions catalog or income-groups dataset (Python check #3) — list each target name and the source names that map to it
+      - `## Excluded entries matching canonical regions` — possible over-exclusion (Python check #4) — list each
 
-   6. **Surface in PR.** If any section was populated, add a collapsed "Harmonization audit" section to the PR description (after the per-step sections, before the Slack announcement). Empty sections can be omitted.
+   6. **Surface in PR.** If any section was populated, add a collapsed "Harmonization audit" section to the PR description (after the per-step sections, before the Slack announcement) **with the same listings**, not just a summary. Empty sections can be omitted.
+
+   **When you report progress to the user during the workflow, never just give a count — always include the list (or grouped categories) so they can judge in one glance.**
 
    **Checkpoint summary:**
    - "Invalid canonical names" or "Missing in mapping" non-empty ⇒ stop, decide with user.
