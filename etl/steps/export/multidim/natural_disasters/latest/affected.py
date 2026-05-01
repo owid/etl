@@ -99,6 +99,9 @@ def run() -> None:
     #
     # Process data.
     #
+    # Sample the all-disasters aggregate description_key for grouped views (must
+    # run before prepare_table drops the column).
+    sample_description_key = list(tb_yearly["total_affected_all_disasters_yearly"].metadata.description_key or [])
     indicators = [
         ({"impact": impact, "metric": metric}, prefix)
         for (impact, metric), prefix in INDICATOR_BY_IMPACT_METRIC.items()
@@ -113,9 +116,6 @@ def run() -> None:
         indicator_names="value",
         common_view_config=COMMON_VIEW_CONFIG,
     )
-
-    sample_col = f"total_affected_{INDIVIDUAL_DISASTER_TYPES[0]}_yearly"
-    sample_description_key = list(tb_yearly[sample_col].metadata.description_key or [])
     grouped_view_metadata = {
         "presentation": {"title_public": _title},
         "description_short": _subtitle,

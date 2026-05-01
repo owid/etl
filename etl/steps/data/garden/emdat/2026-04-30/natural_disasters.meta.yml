@@ -63,19 +63,35 @@ definitions:
   definition_extreme_weather: &definition-extreme-weather |-
     Extreme weather events include tornadoes, hailstorms, thunderstorms, sandstorms, blizzards, and extreme wind events.
   # Common description key of all disasters.
+  # Each disaster-specific bullet is wrapped in a Jinja conditional so that single-
+  # disaster wide-form variables (e.g. `total_dead_drought_yearly`) only render the
+  # matching definition; aggregate variables whose `type` starts with `all_`
+  # (e.g. `total_dead_all_disasters_yearly`) keep the full set. The `type` dimension
+  # is set per wide-form column in the grapher step.
   description_key_common: &description-key-common
     - *definition-disaster
-    - *definition-drought
-    - *definition-earthquake
-    - *definition-extreme-temperature
-    - *definition-extreme-weather
-    - *definition-flood
-    - *definition-volcanic-eruption
-    - *definition-wildfire
-    - *definition-dry-mass-movement
-    - *definition-wet-mass-movement
-    - *definition-glacial-lake-outburst-flood
-    - *definition-fog
+    - |-
+      <% if type is not defined or type == 'drought' or type.startswith('all_') %>{definitions.definition_drought}<% endif %>
+    - |-
+      <% if type is not defined or type == 'earthquake' or type.startswith('all_') %>{definitions.definition_earthquake}<% endif %>
+    - |-
+      <% if type is not defined or type == 'extreme_temperature' or type.startswith('all_') %>{definitions.definition_extreme_temperature}<% endif %>
+    - |-
+      <% if type is not defined or type == 'extreme_weather' or type.startswith('all_') %>{definitions.definition_extreme_weather}<% endif %>
+    - |-
+      <% if type is not defined or type == 'flood' or type.startswith('all_') %>{definitions.definition_flood}<% endif %>
+    - |-
+      <% if type is not defined or type == 'volcanic_activity' or type.startswith('all_') %>{definitions.definition_volcanic_eruption}<% endif %>
+    - |-
+      <% if type is not defined or type == 'wildfire' or type.startswith('all_') %>{definitions.definition_wildfire}<% endif %>
+    - |-
+      <% if type is not defined or type == 'dry_mass_movement' or type.startswith('all_') %>{definitions.definition_dry_mass_movement}<% endif %>
+    - |-
+      <% if type is not defined or type == 'wet_mass_movement' or type.startswith('all_') %>{definitions.definition_wet_mass_movement}<% endif %>
+    - |-
+      <% if type is not defined or type == 'glacial_lake_outburst_flood' or type.startswith('all_') %>{definitions.definition_glacial_lake_outburst_flood}<% endif %>
+    - |-
+      <% if type is not defined or type == 'fog' or type.startswith('all_') %>{definitions.definition_fog}<% endif %>
   # Definitions of event sizes, adapted from Guha-Sapir et al. (2004).
   definition_small_event: &definition-small-event |-
     A disaster is considered to have a "small" impact if it results in no more than 5 deaths, affects no more than 1,500 people, and causes economic damages not exceeding 13 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.

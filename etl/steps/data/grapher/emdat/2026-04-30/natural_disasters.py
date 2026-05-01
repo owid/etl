@@ -1,5 +1,6 @@
 from owid.catalog import Table
 
+from etl.grapher.helpers import _metadata_for_dimensions
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
@@ -91,6 +92,12 @@ def create_wide_tables(table: Table, is_decade: bool) -> Table:
         table_wide[column].metadata.title = new_title
         table_wide[column].metadata.display = {"name": TITLE_DISASTER[disaster]}
         table_wide[column].metadata.presentation.title_public = new_title_public
+        # Run the framework's per-dimension Jinja expansion so any `<% if type ==
+        # ... %>` templates in description_key (and other fields inherited from
+        # the garden long-form metadata) resolve against this column's disaster.
+        # Manual `Table.pivot` skips the auto-widen path that normally calls this,
+        # so we invoke it explicitly here.
+        table_wide[column].metadata = _metadata_for_dimensions(table_wide[column].metadata, {"type": disaster}, column)
         table_wide = table_wide.rename(
             columns={column: column.replace("-", "_") + variable_name_suffix}, errors="raise"
         )
