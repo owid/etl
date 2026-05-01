@@ -114,8 +114,6 @@ def _get_before_vs_after_metadata(tb, view):
             f"Neither OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI nor _MI found in {col_name}.description_key — garden text changed, update the constants."
         )
         description_key = [NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER if b in old_welfare_keys else b for b in description_key]
-        if description_key:
-            description_key = description_key[1:]
 
         return {"title": title, "subtitle": subtitle, "description_key": description_key}
 
