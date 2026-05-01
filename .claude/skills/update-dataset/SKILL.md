@@ -153,7 +153,12 @@ When you do stop, present a concise summary of the issue and what options exist.
 
    **Modern API.** Garden steps should be calling `paths.regions.harmonize_names(tb, country_col=..., countries_file=..., excluded_countries_file=...)` — the wrapper in `etl/data_helpers/geo.py:1874`. If you find a step still using the deprecated `geo.harmonize_countries(...)` directly, step 1b's `/check-outdated-practices` should already have flagged it; treat that as a separate cleanup. The audit below is API-agnostic — both call sites end up emitting the same three warning strings.
 
-   **Source of truth.** The canonical region names come from the **built `regions` dataset** (`paths.regions.tb_regions["name"]`), not from parsing `etl/steps/data/garden/regions/2023-01-01/regions.yml` directly. The YAML is the editable source, but the runtime list also merges legacy codes from `regions.codes.csv` and applies field defaults — parsing the YAML in isolation will produce false positives.
+   **Source of truth.** Canonical names come from **two** datasets, both consulted by the harmonizer:
+
+   - `data/garden/regions/2023-01-01/regions` — countries, continents, and OWID-defined aggregates. The runtime authority is `paths.regions.tb_regions["name"]`. This is built from `etl/steps/data/garden/regions/2023-01-01/regions.yml` plus a merge with `regions.codes.csv` and field defaults — **don't parse the YAML in isolation** or you'll miss the legacy entries and produce false positives.
+   - `data/garden/wb/<latest>/income_groups` — the four World Bank income-group aggregates (`High-income countries`, `Upper-middle-income countries`, `Lower-middle-income countries`, `Low-income countries`). OWID treats the **latest** version of this dataset as the official one, so the audit must resolve the version dynamically (don't pin a date — it goes stale when WB publishes a refresh). The names live in the `classification` column of the `income_groups_latest` table.
+
+   The audit's "canonical" set is the union of these two — i.e. RHS values from `.countries.json` are valid if they appear in *either*. Anything else is flagged.
 
    1. **Capture a fresh garden log:**
       ```bash
@@ -168,20 +173,28 @@ When you do stop, present a concise summary of the issue and what options exist.
       ```
       For each warning, the entity list follows on subsequent lines (because `harmonize_countries()` is called with `show_full_warning=True` by default). Capture them.
 
-   3. **Validate `.countries.json` RHS values against canonical regions.** For each garden step in this update:
+   3. **Validate `.countries.json` RHS values against canonical regions + income groups.** For each garden step in this update:
       ```python
       import json
       from pathlib import Path
       from owid.catalog import Dataset
 
       tb_regions = Dataset("data/garden/regions/2023-01-01/regions")["regions"]
-      canonical = set(tb_regions["name"].dropna().astype(str))
+      canonical_regions = set(tb_regions["name"].dropna().astype(str))
+
+      # Resolve the latest income_groups dataset dynamically — OWID treats latest as official.
+      ig_dirs = sorted(Path("data/garden/wb").glob("*/income_groups"))
+      assert ig_dirs, "No data/garden/wb/<version>/income_groups dataset built locally"
+      ds_ig = Dataset(str(ig_dirs[-1]))
+      canonical_income = set(ds_ig["income_groups_latest"]["classification"].dropna().astype(str).unique())
+
+      canonical = canonical_regions | canonical_income
 
       mapping = json.loads(Path("etl/steps/data/garden/<namespace>/<new_version>/<short_name>.countries.json").read_text())
       invalid = sorted({v for v in mapping.values() if v and v not in canonical})
-      print("RHS values not in canonical regions:", invalid)
+      print("RHS values not in canonical regions or income groups:", invalid)
       ```
-      Any non-empty `invalid` is a **hard checkpoint** — the mapping points at an entity our regions catalog doesn't know about. Common causes: typo, retired alias used as canonical, casing/whitespace mismatch. Fix the JSON (or, rarely, add an alias to `regions.yml` if the entity is a legitimate new historical region — that's a separate PR).
+      Any non-empty `invalid` is a **hard checkpoint** — the mapping points at an entity neither the regions catalog nor the income-groups dataset knows about. Common causes: typo, retired alias used as canonical, casing/whitespace mismatch, or a legitimately custom aggregate the source defines that we have no equivalent for (e.g. ILO's `" (ILO)"`-suffixed regions, BRICS, G7, G20). For typos/casing — fix the JSON. For legitimately custom aggregates — accept and note in the PR description that those entities live outside the canonical system and won't merge with population/regions infrastructure. For a real new historical region — add an entry to `regions.yml` in a separate PR.
 
    4. **Audit `.excluded_countries.json`.** The file is optional; skip if it doesn't exist:
       ```python
