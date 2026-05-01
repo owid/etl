@@ -1,0 +1,74 @@
+# NOTE: To learn more about the fields, hover over their names.
+dataset:
+  update_period_days: 365
+
+definitions:
+  common:
+    presentation:
+      attribution_short: GWIS (MODIS)
+      topic_tags:
+        - Climate Change
+        - Wildfires
+      grapher_config:
+        note: For these historical estimates, we rely on data based on the NASA MCD64 MODIS sensor, which, according to the data provider, might underestimate burnt areas and fire occurrences.
+    display:
+      numDecimalPlaces: 0
+    short_unit: ha
+    unit: hectares
+    processing_level: minor
+    description_key:
+      - Burned areas are detected from satellite imagery. NASA's MODIS satellite sensors scan the entire Earth's surface every one to two days, and the burned area product identifies land that shows the characteristic spectral signature of recent fire.
+      - Each area of land is assigned to a land cover type — such as forest, savanna, or cropland — based on annual satellite-derived land cover maps.
+      - Satellite detection of burned areas is known to underestimate the true extent of fire. Small fires and fires obscured by cloud cover or tree canopy are often missed. Despite this, the dataset provides the longest consistent global record available, making it well suited for tracking long-term trends.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  yearly_burned_area:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      forest:
+        title: Yearly burned area in forests
+        display:
+          name: Forests
+        presentation:
+          title_public: Yearly burned area in forests
+        description_short: Area of forest land burnt by [wildfires](#dod:wildfires) each year, in hectares. Includes all tree-covered land such as tropical rainforests, boreal forests, and mixed woodlands.
+
+      savannas:
+        title: Yearly burned area in savannas
+        display:
+          name: Savannas
+        presentation:
+          title_public: Yearly burned area in savannas
+        description_short: Area of savanna land burnt by [wildfires](#dod:wildfires) each year, in hectares. Savannas are tropical and subtropical grasslands with scattered trees and shrubs, and are the most fire-prone land type globally.
+
+      shrublands_grasslands:
+        title: Yearly burned area in shrublands and grasslands
+        display:
+          name: Shrublands and grasslands
+        presentation:
+          title_public: Yearly burned area in shrublands and grasslands
+        description_short: Area of shrubland and grassland burnt by [wildfires](#dod:wildfires) each year, in hectares. Includes open and closed shrublands and grasslands without a significant tree cover.
+
+      croplands:
+        title: Yearly burned area in croplands
+        display:
+          name: Croplands
+        presentation:
+          title_public: Yearly burned area in croplands
+        description_short: Area of agricultural land burnt by [wildfires](#dod:wildfires) each year, in hectares. Includes fields used for crops, as well as mixed cropland and natural vegetation areas.
+
+      other:
+        title: Yearly burned area in other land types
+        display:
+          name: Other land
+        presentation:
+          title_public: Yearly burned area in other land types
+        description_short: Area of other land types burnt by [wildfires](#dod:wildfires) each year, in hectares. Includes wetlands, urban areas, snow and ice, bare ground, and water bodies.
+
+      all:
+        title: Yearly burned area across all land types
+        description_short: Total land area burnt by [wildfires](#dod:wildfires) each year, in hectares, across all land cover types.

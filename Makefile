@@ -124,7 +124,7 @@ full: .venv
 
 clean:
 	@echo '==> Cleaning data/ folder'
-	rm -rf data && git checkout data
+	rm -rf data && mkdir data
 
 clobber: clean
 	find . -name .venv | xargs rm -rf
