@@ -152,12 +152,12 @@ Total views: **N**   (for MDims)
 
 ## Comparing the live config to a target FAUST report
 
-A common workflow: the user shares a FAUST report that represents the **desired** end state (their edited copy of an earlier auto-generated report) and asks "does the live MDim match this?". The report is *usually* the source of truth — but not always. Sometimes the user updated the meta.yml *after* generating the report, in which case the **live config** is the desired target and the report is stale. **Always ask before assuming the direction.**
+A common workflow: the user shares a FAUST report that represents the **desired** end state (their edited copy of an earlier auto-generated report) and asks "does the live MDim match this?". **Treat the report as the source of truth by default** — when the live config differs, the fix lands in the metadata to make the live match the report.
 
-Two failure modes are common in WID-style MDim audits:
+Two cases warrant a confirmation before silently editing the metadata to match:
 
-- **Text-content drift in inherited bullets.** The report shows the older shorter wording for welfare_type / methodology bullets while the live config has the new longer wording. This usually means the user rewrote `description_key_welfare_type` (or similar) *after* the FAUST run. Surface the diff side-by-side and ask which is the target — don't quietly revert the meta.yml.
-- **View-count mismatch.** The report has more or fewer sections than the live config (e.g. report has 16 views, live has 13 because scatter views were dropped, or the report still mentions `before_vs_after_scatter` sections that were intentionally removed). When counts differ, list the missing/extra sections explicitly and ask before adding/removing views.
+- **Text-content drift in inherited bullets.** If the report shows older / shorter wording for welfare_type / methodology bullets while the live config has newer longer wording, surface the diff side-by-side and confirm before reverting — sometimes the user rewrote `description_key_welfare_type` (or similar) *after* generating the report and the live config is the up-to-date target. The report is still usually right; just don't auto-revert recent rewrites.
+- **View-count mismatch.** If the report has more or fewer sections than the live config (e.g. report includes `before_vs_after_scatter` sections that were intentionally removed, or the live has views the report doesn't list), list the missing/extra sections explicitly and confirm before adding/removing views.
 
 Before doing the field-by-field comparison, refresh everything the live config depends on. Skipping a step leaves a stale catalog, which produces phantom drift that isn't real:
 
