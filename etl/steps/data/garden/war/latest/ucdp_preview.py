@@ -50,10 +50,10 @@ REGIONS_MAPPING = {
 REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 # Last year of data
 LAST_YEAR = 2024
-LAST_YEAR_PREVIEW = 2025
+LAST_YEAR_PREVIEW = 2026
 
 # Number of events with no location assigned (see function estimate_metrics_locations)
-NUM_MISSING_LOCATIONS = 1248
+NUM_MISSING_LOCATIONS = 1255
 
 # Catalog path of the main UCDP dataset. NOTE: Change this when there is a new UCDP stable (yearly) release.
 VERSION_UCDP_STABLE = "2025-06-13"
