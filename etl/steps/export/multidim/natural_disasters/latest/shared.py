@@ -107,6 +107,16 @@ DISASTER_PHRASES = {
     "extreme_temperature": "extreme temperatures",
 }
 
+# Question link rendered as "Related: <text>" at the bottom of every chart.
+# Points to the OWID page that explains EM-DAT's reporting coverage and
+# comparability limitations.
+RELATED_QUESTIONS = [
+    {
+        "text": "How complete is the data on natural disasters?",
+        "url": "https://ourworldindata.org/disaster-database-limitations",
+    }
+]
+
 COMMON_VIEW_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
     "chartTypes": ["StackedBar"],
@@ -126,6 +136,7 @@ COMMON_VIEW_CONFIG = {
     # Pin the map to a single year so it doesn't fall back to a "first year vs last year"
     # comparison view when minTime/maxTime defines a range on the chart.
     "map": {"time": LAST_FULLY_REPORTED_YEAR},
+    "relatedQuestions": RELATED_QUESTIONS,
 }
 
 STACKED_VIEW_CONFIG = {
@@ -147,6 +158,7 @@ STACKED_VIEW_CONFIG = {
     # Without this, a year drops out of the stack as soon as one disaster type has
     # no reported data — even if other types had a non-zero value.
     "missingDataStrategy": "show",
+    "relatedQuestions": RELATED_QUESTIONS,
 }
 
 # Footnote shown on every chart, flagging the limited reporting coverage in earlier decades.
