@@ -34,9 +34,15 @@ DISASTER_TYPES = [
     "volcanic_activity",
     "flood",
     "dry_mass_movement",
+    "wet_mass_movement",
     "extreme_weather",
     "wildfire",
     "extreme_temperature",
+    # Disabled because they add confusion to the visualizations and only have a handful
+    # of recorded events at the World level. Uncomment to enable; the colors / phrases
+    # / config.yml entries are kept in sync below so the mdim works out of the box.
+    # "fog",                            # 1 event total (Great Smog of London 1952).
+    # "glacial_lake_outburst_flood",    # ~5 events total; a rare climate-driven hazard.
 ]
 
 # Same as DISASTER_TYPES; kept as a separate name to make group_views readable.
@@ -64,6 +70,10 @@ DISASTER_DESCRIPTIONS = {
         "A dry mass movement refers to a landslide or rockfall that is not triggered by surface "
         "or subsurface water flows."
     ),
+    "wet_mass_movement": (
+        "A wet mass movement refers to a landslide, mudflow, or debris flow triggered by heavy "
+        "rainfall, snowmelt, or other surface or subsurface water flows."
+    ),
     "extreme_weather": (
         "Storms include tornadoes, hailstorms, thunderstorms, sandstorms, blizzards, and extreme wind events."
     ),
@@ -88,9 +98,13 @@ DISASTER_COLORS = {
     "volcanic_activity": "#a2559c",
     "flood": "#286BBB",
     "dry_mass_movement": "#8b5a2b",
+    "wet_mass_movement": "#6b7a8f",
     "extreme_weather": "#5b9460",
     "wildfire": "#e94e1b",
     "extreme_temperature": "#d4a017",
+    # Defined but unused unless the matching slug above is uncommented in DISASTER_TYPES.
+    "fog": "#aaaaaa",
+    "glacial_lake_outburst_flood": "#7fb8d3",
 }
 
 # Human-readable phrase used in chart titles for each disaster-type choice.
@@ -102,9 +116,13 @@ DISASTER_PHRASES = {
     "volcanic_activity": "volcanic activity",
     "flood": "floods",
     "dry_mass_movement": "dry mass movements",
+    "wet_mass_movement": "wet mass movements",
     "extreme_weather": "storms",
     "wildfire": "wildfires",
     "extreme_temperature": "extreme temperatures",
+    # Defined but unused unless the matching slug above is uncommented in DISASTER_TYPES.
+    "fog": "fogs",
+    "glacial_lake_outburst_flood": "glacial lake outburst floods",
 }
 
 # Question link rendered as "Related: <text>" at the bottom of every chart.

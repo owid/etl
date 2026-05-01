@@ -42,6 +42,19 @@ dimensions:
         name: Dry mass movement
         description: People affected by dry mass movements
         group: Individual disaster types
+      - slug: wet_mass_movement
+        name: Wet mass movement
+        description: People affected by wet mass movements
+        group: Individual disaster types
+      # Disabled in shared.py — kept here so the choice is ready if re-enabled.
+      # - slug: fog
+      #   name: Fog
+      #   description: People affected by fog events
+      #   group: Individual disaster types
+      # - slug: glacial_lake_outburst_flood
+      #   name: Glacial lake outburst floods
+      #   description: People affected by glacial lake outburst floods
+      #   group: Individual disaster types
       - slug: extreme_weather
         name: Storms
         description: People affected by storm and extreme weather events
