@@ -123,27 +123,57 @@ def aggregate_explorer_views(df: pd.DataFrame) -> pd.DataFrame:
     return agg_df
 
 
+def _multidim_filter_clause(slug_filters: list[str] | None, table_alias: str = "md") -> str:
+    """Build a WHERE clause that matches a multidim by published slug, by short_name
+    (the part after ``#`` in catalogPath), or by namespace path segment.
+
+    Why three matchers:
+    - ``slug`` exact: already-published mdims keyed by their public URL slug.
+    - short_name: drafts have ``slug = NULL`` but always carry a catalogPath with
+      a short_name after ``#`` (e.g. ``natural_disasters/latest/affected#affected``),
+      so ``-s affected`` should still find them.
+    - path segment: lets the user filter by namespace (``-s natural_disasters``)
+      and pick up every mdim under it without listing each short_name.
+    """
+    if not slug_filters:
+        return ""
+    slugs_str = "', '".join(slug_filters)
+    clauses = [
+        f"{table_alias}.slug IN ('{slugs_str}')",
+        f"SUBSTRING_INDEX({table_alias}.catalogPath, '#', -1) IN ('{slugs_str}')",
+    ]
+    # One LIKE per filter for the namespace/path-segment match. ``%%`` so the
+    # literal ``%`` survives pymysql's ``query % args`` formatting at execute time.
+    for f in slug_filters:
+        clauses.append(f"{table_alias}.catalogPath LIKE '%%/{f}/%%'")
+        clauses.append(f"{table_alias}.catalogPath LIKE '{f}/%%'")
+    return f"WHERE ({' OR '.join(clauses)})"
+
+
 def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
     """Fetch multidimensional indicator data from the database.
 
     Args:
-        slug_filters: Optional list of multidim slugs to filter by
+        slug_filters: Optional list of multidim slugs to filter by. Each filter
+            matches against the published slug, the short_name (part after ``#``
+            in catalogPath), or any path segment of the catalogPath, so callers
+            can target drafts by short_name and whole namespaces by name.
 
     Returns:
         DataFrame with columns matching explorer structure: id, explorerSlug, dimensions,
                                 chartConfigId, chart_config, and variable_* columns
     """
-    where_clause = ""
-    if slug_filters:
-        slugs_str = "', '".join(slug_filters)
-        where_clause = f"WHERE md.slug IN ('{slugs_str}')"
+    where_clause = _multidim_filter_clause(slug_filters, table_alias="md")
+    # For drafts, ``slug`` is NULL — fall back to the catalogPath's short_name so
+    # downstream code (grouping, display) has a stable identifier per collection.
+    explorer_slug_expr = "COALESCE(md.slug, SUBSTRING_INDEX(md.catalogPath, '#', -1))"
 
     # Fetch views without configs first
     query = f"""
         SELECT
             mx.id as id,
             'multidim' as view_type,
-            md.slug as explorerSlug,
+            {explorer_slug_expr} as explorerSlug,
             mx.viewId as dimensions,
             md.published as mdim_published,
             md.catalogPath as mdim_catalog_path,
@@ -169,21 +199,18 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
         LEFT JOIN chart_configs cc ON mx.chartConfigId = cc.id
         LEFT JOIN variables v ON mx.variableId = v.id
         {where_clause}
-        ORDER BY md.slug, mx.viewId
+        ORDER BY {explorer_slug_expr}, mx.viewId
     """
 
     log.info("Fetching multidimensional indicator data from database...")
     df = read_sql(query)
     log.info(f"Fetched {len(df)} multidim view records")
 
-    # Fetch multidim configs separately (much more efficient)
-    config_where = ""
-    if slug_filters:
-        slugs_str = "', '".join(slug_filters)
-        config_where = f"WHERE slug IN ('{slugs_str}')"
-
+    # Fetch multidim configs separately (much more efficient). Same filter clause,
+    # and same COALESCE so configs join cleanly to drafts on the synthetic slug.
+    config_where = _multidim_filter_clause(slug_filters, table_alias="multi_dim_data_pages")
     config_query = f"""
-        SELECT slug, config
+        SELECT {explorer_slug_expr.replace("md.", "multi_dim_data_pages.")} as slug, config
         FROM multi_dim_data_pages
         {config_where}
     """
@@ -192,7 +219,6 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
     log.info(f"Fetched {len(configs_df)} multidim config(s)")
 
     # Deduplicate configs by slug (keep first occurrence)
-    # This prevents cartesian product issues with NULL slugs during merge
     configs_df = configs_df.drop_duplicates(subset=["slug"], keep="first")
 
     # Merge configs with views

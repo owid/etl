@@ -17,18 +17,18 @@ MODELS_YAML_PATH = BASE_DIR / "apps" / "utils" / "llms" / "models.yml"
 # Mapping from YAML model names to Anthropic API model names
 MODEL_API_NAMES = {
     "anthropic:claude-haiku-4-5": "claude-haiku-4-5-20251001",
-    "anthropic:claude-sonnet-4-5": "claude-sonnet-4-5-20250929",
-    "anthropic:claude-opus-4": "claude-opus-4-20250514",
+    "anthropic:claude-sonnet-4-6": "claude-sonnet-4-6",
+    "anthropic:claude-opus-4-7": "claude-opus-4-7",
 }
 
 # Model for individual issue detection (used many times - cost matters)
-CLAUDE_MODEL = MODEL_API_NAMES["anthropic:claude-haiku-4-5"]  # Fast: $1/M in, $5/M out (RECOMMENDED)
-# CLAUDE_MODEL = MODEL_API_NAMES["anthropic:claude-sonnet-4-5"]  # Balanced: $3/M in, $15/M out
-# CLAUDE_MODEL = MODEL_API_NAMES["anthropic:claude-opus-4"]  # Quality: $15/M in, $75/M out
+CLAUDE_MODEL = MODEL_API_NAMES["anthropic:claude-sonnet-4-6"]  # Balanced (DEFAULT): $3/M in, $15/M out
+# CLAUDE_MODEL = MODEL_API_NAMES["anthropic:claude-haiku-4-5"]  # Fast: $1/M in, $5/M out
+# CLAUDE_MODEL = MODEL_API_NAMES["anthropic:claude-opus-4-7"]  # Quality: $5/M in, $25/M out
 
 # Model for grouping/pruning (used once per collection - quality matters more than cost)
-GROUPING_MODEL = MODEL_API_NAMES["anthropic:claude-sonnet-4-5"]  # Better reasoning for filtering false positives
-# GROUPING_MODEL = MODEL_API_NAMES["anthropic:claude-opus-4"]  # Best quality if budget allows
+GROUPING_MODEL = MODEL_API_NAMES["anthropic:claude-sonnet-4-6"]  # Better reasoning for filtering false positives
+# GROUPING_MODEL = MODEL_API_NAMES["anthropic:claude-opus-4-7"]  # Best quality if budget allows
 
 # Concurrency limit for API requests
 # Anthropic rate limits: typically 5-50 concurrent requests depending on tier
