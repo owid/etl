@@ -16,6 +16,17 @@ from owid.catalog import Table
 
 from etl.collection.model.view import Indicator
 
+########################################################################################################################
+# Last fully-reported year for which EM-DAT data is complete enough to display.
+# Used as the chart timeline's `maxTime` and the map's pinned `time`. The current
+# snapshot's most recent year is typically partial — showing it as "latest" on the
+# map or extending the bar chart to it would be misleading.
+#
+# When the next EM-DAT release brings a full extra year of data (e.g. all of
+# 2026 reported), bump this to that year.
+LAST_FULLY_REPORTED_YEAR = 2025
+########################################################################################################################
+
 # Disaster types to expose, in the order they appear in the dimension choices.
 DISASTER_TYPES = [
     "drought",
@@ -104,10 +115,17 @@ COMMON_VIEW_CONFIG = {
     "yAxis": {"min": 0},
     "originUrl": "https://ourworldindata.org/natural-disasters",
     # Default chart timeline starts at 2000, when reporting coverage becomes more complete.
+    # The slider lets users drag back further (with the footnote warning about coverage).
     "minTime": 2000,
+    # Hard-stop on the timeline slider — users cannot navigate past this year. The
+    # current snapshot's most recent year is partial; allowing the slider to reach
+    # it would surface incomplete data. See LAST_FULLY_REPORTED_YEAR at the top.
+    "timelineMaxTime": LAST_FULLY_REPORTED_YEAR,
+    # Default endpoint of the displayed range. Same value so the chart opens on it.
+    "maxTime": LAST_FULLY_REPORTED_YEAR,
     # Pin the map to a single year so it doesn't fall back to a "first year vs last year"
     # comparison view when minTime/maxTime defines a range on the chart.
-    "map": {"time": "latest"},
+    "map": {"time": LAST_FULLY_REPORTED_YEAR},
 }
 
 STACKED_VIEW_CONFIG = {
@@ -121,9 +139,11 @@ STACKED_VIEW_CONFIG = {
     "yAxis": {"min": 0},
     "originUrl": "https://ourworldindata.org/natural-disasters",
     "minTime": 2000,
+    "timelineMaxTime": LAST_FULLY_REPORTED_YEAR,
+    "maxTime": LAST_FULLY_REPORTED_YEAR,
     # Pin map to a single year so it doesn't fall back to a "first vs last year"
     # comparison view when minTime/maxTime defines a range on the chart.
-    "map": {"time": "latest"},
+    "map": {"time": LAST_FULLY_REPORTED_YEAR},
     # Without this, a year drops out of the stack as soon as one disaster type has
     # no reported data — even if other types had a non-zero value.
     "missingDataStrategy": "show",
