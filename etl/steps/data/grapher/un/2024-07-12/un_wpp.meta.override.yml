@@ -1,6 +1,0 @@
-tables:
-  dependency_ratio:
-    variables:
-      dependency_ratio:
-        presentation:
-          title_public: Total dependency ratio, age total
