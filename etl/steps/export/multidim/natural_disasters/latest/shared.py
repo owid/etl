@@ -99,14 +99,13 @@ ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE = (
 # (owid-grapher: packages/@ourworldindata/grapher/src/color/CustomSchemes.ts).
 DISASTER_COLORS = {
     "drought": "#bc8e5a",  # Camel
-    "earthquake": "#883039",  # Maroon
+    "earthquake": "#18470f",  # DarkOliveGreen
     "volcanic_activity": "#a2559c",  # Mauve
     "flood": "#286bbb",  # Blue
-    "landslide": "#9a5129",  # DarkCopper
-    "extreme_weather": "#578145",  # OliveGreen
+    "landslide": "#3b8e1d",  # Lime
+    "extreme_weather": "#6d3e91",  # Purple
     "wildfire": "#b13507",  # RustyOrange
-    "extreme_temperature": "#e56e5a",  # Peach
-    # Folded into other types upstream at the garden step (see DISASTER_TYPES).
+    "extreme_temperature": "#883039",  # Maroon
     # "dry_mass_movement": ...
     # "wet_mass_movement": ...
     # "fog": ...
