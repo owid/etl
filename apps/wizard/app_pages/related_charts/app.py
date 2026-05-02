@@ -33,7 +33,7 @@ engine = get_engine()
 
 # Download coviews from R2 if they don't exist
 # NOTE: this is temporary, if it proves to be useful, it should be loaded dynamically
-COVIEWS_PATH = paths.BASE_DIR / "apps/wizard/app_pages/similar_charts/playground_coviews.feather"
+COVIEWS_PATH = paths.BASE_DIR / "apps/wizard/app_pages/related_charts/playground_coviews.feather"
 if not COVIEWS_PATH.exists():
     log.info("Downloading coviews from S3")
     s3_utils.download("s3://owid-private/mojmir/related_charts/playground_coviews.feather", COVIEWS_PATH.as_posix())
