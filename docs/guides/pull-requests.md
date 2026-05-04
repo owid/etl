@@ -58,7 +58,12 @@ cd ../etl-<branch>
 
 Otherwise also run `source .venv/bin/activate`. Or, even better, set up auto-activation once (see below) — then `cd` alone is enough.
 
-Use `git worktree remove ../etl-<branch>` to clean up afterwards.
+When you're done with the worktree (typically after the PR is merged), clean up:
+
+```bash
+git worktree remove ../etl-<branch>
+git branch -D <branch>
+```
 
 ### Optional: auto-activate the venv when you `cd`
 

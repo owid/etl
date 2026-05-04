@@ -268,7 +268,12 @@ def cli(
 
     if resolved_worktree_path is not None:
         venv_ok = install_worktree_venv(resolved_worktree_path)
-        print_worktree_hint(resolved_worktree_path, shared_data=share_data, venv_installed=venv_ok)
+        print_worktree_hint(
+            resolved_worktree_path,
+            work_branch=work_branch,
+            shared_data=share_data,
+            venv_installed=venv_ok,
+        )
 
 
 def check_gh_token():
@@ -459,7 +464,12 @@ def install_worktree_venv(worktree_path: Path) -> bool:
         return False
 
 
-def print_worktree_hint(worktree_path: Path, shared_data: bool = False, venv_installed: bool = False) -> None:
+def print_worktree_hint(
+    worktree_path: Path,
+    work_branch: str,
+    shared_data: bool = False,
+    venv_installed: bool = False,
+) -> None:
     """Tell the user how to land in the new worktree.
 
     A child Python process can't change its parent shell's cwd, so we just print a
@@ -479,15 +489,15 @@ def print_worktree_hint(worktree_path: Path, shared_data: bool = False, venv_ins
         print()
         print("If you have a chpwd hook in ~/.zshrc, the venv activates automatically.")
         print("Otherwise also run: source .venv/bin/activate")
-        print("(Skipping activation will silently use the ORIGINAL repo's source code.)")
     else:
         print("Auto venv setup didn't complete. Inside the worktree, run:")
         print(f"  cd {display_path}")
         print("  make check")
         print("  source .venv/bin/activate")
     print()
-    print("When you're done with this worktree, remove it with:")
+    print("When you're done with this worktree, clean up with:")
     print(f"  git worktree remove {display_path}")
+    print(f"  git branch -D {work_branch}")
     if shared_data:
         print()
         print("WARNING: data/ is a symlink to the original repo's data/, so:")
