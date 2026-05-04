@@ -32,12 +32,12 @@ dimensions:
     presentation:
       type: radio
     choices:
-      - slug: total
-        name: Total
       - slug: relative_to_max_sustainable_yield
         name: Relative to Max Sustainable Yield
       - slug: relative_to_management_target
         name: Relative to management target
+      - slug: total
+        name: Total
 
 views:
   # ---- Fish stocks (biomass) ----
