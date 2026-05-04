@@ -586,7 +586,6 @@ tables:
             # data series for many countries. The "biologically expected ratio
             # ~105" note now lives in the subtitle (age=='0' branch above).
             # Re-enable if the visual conflict ever stops mattering.
-            comparisonLines: []
             # comparisonLines:
             #   - label: "<% if age == '0' %>105 is about the expected biological ratio<%- endif %>"
             #     yEquals: "<% if age == '0' %>105<%- endif %>"
