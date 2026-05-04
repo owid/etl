@@ -16,6 +16,7 @@ from shared import (
     NOTE,
     STACKED_VIEW_CONFIG,
     add_total_indicator_for_map,
+    apply_decadal_time_range,
     apply_disaster_colors,
     prepare_table,
 )
@@ -154,6 +155,9 @@ def run() -> None:
 
     # Pin a stable colour to each y-indicator based on its disaster type.
     apply_disaster_colors(c)
+
+    # Decadal views default to the full 1900-onwards range; annual views stay at 2000.
+    apply_decadal_time_range(c)
 
     #
     # Save outputs.

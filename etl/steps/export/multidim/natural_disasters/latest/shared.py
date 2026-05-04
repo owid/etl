@@ -290,6 +290,18 @@ def add_total_indicator_for_map(
         view.config["map"] = {**(view.config.get("map") or {}), "columnSlug": catalog_path}
 
 
+def apply_decadal_time_range(c) -> None:
+    """Show the full historical series (1900 onwards) by default for decadal views.
+
+    Annual views default to showing data from 2000 onwards; decadal data shows the full timeline.
+    """
+    for view in c.views:
+        if view.dimensions.get("timespan") != "decadal":
+            continue
+        view.config = view.config or {}
+        view.config["minTime"] = 1900
+
+
 def apply_disaster_colors(c) -> None:
     """Set display.color on each y-indicator so the same disaster type renders in
     the same colour across all views (single-series, stacked, etc.)."""

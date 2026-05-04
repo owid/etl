@@ -94,7 +94,11 @@ def create_wide_tables(table: Table, is_decade: bool) -> Table:
         new_title = old_title + " - " + TITLE_DISASTER[disaster] + variable_title_suffix
         new_title_public = f"{variable_title_public_prefix}{TITLE_PUBLIC_START[old_title]}{TITLE_PUBLIC_END[disaster]}"
         table_wide[column].metadata.title = new_title
-        table_wide[column].metadata.display = {"name": TITLE_DISASTER[disaster]}
+        display = {"name": TITLE_DISASTER[disaster]}
+        # Keep decadal averages of people counts without decimals.
+        if is_decade and (table_wide[column].metadata.unit or "").strip().lower() == "people":
+            display["numDecimalPlaces"] = 0
+        table_wide[column].metadata.display = display
         table_wide[column].metadata.presentation.title_public = new_title_public
         # Run the framework's per-dimension Jinja expansion so any `<% if type ==
         # ... %>` templates in description_key (and other fields inherited from
