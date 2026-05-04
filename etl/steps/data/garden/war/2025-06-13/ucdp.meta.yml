@@ -41,6 +41,24 @@ definitions:
       One-sided violence is defined by the {definitions.all.ucdp_linked} as the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
 
       <%- endif -%>
+    # Conflict-type label used in titles/subtitles (e.g. "armed conflicts", "one-sided violence").
+    conflict_label: |-
+      <%- if conflict_type == "all" -%>armed conflicts
+      <%- elif conflict_type == "one-sided violence" -%>one-sided violence
+      <%- else -%><< conflict_type >> conflicts
+      <%- endif -%>
+    # Slug for the matching DoD ("details on demand") definition link.
+    conflict_dod_slug: |-
+      <%- if conflict_type == "all" -%>armed-conflict-ucdp
+      <%- elif conflict_type == "one-sided violence" -%>onesided-ucdp
+      <%- elif conflict_type == "non-state conflict" -%>nonstate-ucdp
+      <%- else -%><< conflict_type >>-ucdp
+      <%- endif -%>
+    # Preposition: "from" for one-sided violence, "in" for everything else.
+    conflict_prep: |-
+      <%- if conflict_type == "one-sided violence" -%>from
+      <%- else -%>in
+      <%- endif -%>
     location_conflicts_method: |-
       UCDP provides geographical coordinates of each conflict event. We have mapped these coordinates to countries by means of the geoBoundaries dataset.
 
@@ -75,53 +93,19 @@ definitions:
 
       <%- endif -%>
     description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.number_deaths.description_short}
-    title: |-
-      <%- if conflict_type == "all" -%>
-      Deaths in armed conflicts based on where they occurred
-      <%- elif conflict_type == "interstate" -%>
-      Deaths in interstate conflicts based on where they occurred
-      <%- elif conflict_type == "intrastate" -%>
-      Deaths in intrastate conflicts based on where they occurred
-      <%- elif conflict_type == "one-sided violence" -%>
-      Deaths from one-sided violence based on where they occurred
-      <%- elif conflict_type == "non-state conflict" -%>
-      Deaths in non-state conflicts based on where they occurred
-      <%- endif -%>
-    title_per_capita: |-
-      <%- if conflict_type == "all" -%>
-      Death rate in armed conflicts based on where they occurred
-      <%- elif conflict_type == "interstate" -%>
-      Death rate in interstate conflicts based on where they occurred
-      <%- elif conflict_type == "intrastate" -%>
-      Death rate in intrastate conflicts based on where they occurred
-      <%- elif conflict_type == "one-sided violence" -%>
-      Death rate from one-sided violence based on where they occurred
-      <%- elif conflict_type == "non-state conflict" -%>
-      Death rate in non-state conflicts based on where they occurred
-      <%- endif -%>
+    title: "Deaths {definitions.all.conflict_prep} {definitions.all.conflict_label} based on where they occurred"
+    title_per_capita: "Death rate {definitions.all.conflict_prep} {definitions.all.conflict_label} based on where they occurred"
     subtitle: |-
-      <%- if conflict_type == "all" -%>
-      Included are deaths of combatants and civilians due to fighting in [armed conflicts](#dod:armed-conflict-ucdp) that were ongoing that year.
-      <%- elif conflict_type == "interstate" -%>
-      Included are deaths of combatants and civilians due to fighting in [interstate conflicts](#dod:interstate-ucdp) that were ongoing that year.
-      <%- elif conflict_type == "intrastate" -%>
-      Included are deaths of combatants and civilians due to fighting in [intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year.
-      <%- elif conflict_type == "one-sided violence" -%>
+      <%- if conflict_type == "one-sided violence" -%>
       Included are deaths of civilians from [one-sided violence](#dod:onesided-ucdp) that was ongoing that year.
-      <%- elif conflict_type == "non-state conflict" -%>
-      Included are deaths of combatants and civilians due to fighting in [non-state conflicts](#dod:nonstate-ucdp) that were ongoing that year.
+      <%- else -%>
+      Included are deaths of combatants and civilians due to fighting in [{definitions.all.conflict_label}](#dod:{definitions.all.conflict_dod_slug}) that were ongoing that year.
       <%- endif -%>
     subtitle_per_capita: |-
-      <%- if conflict_type == "all" -%>
-      Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [armed conflicts](#dod:armed-conflict-ucdp) that were ongoing that year.
-      <%- elif conflict_type == "interstate" -%>
-      Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [interstate conflicts](#dod:interstate-ucdp) that were ongoing that year.
-      <%- elif conflict_type == "intrastate" -%>
-      Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year.
-      <%- elif conflict_type == "one-sided violence" -%>
+      <%- if conflict_type == "one-sided violence" -%>
       Deaths of civilians from [one-sided violence](#dod:onesided-ucdp) that was ongoing that year, per 100,000 people.
-      <%- elif conflict_type == "non-state conflict" -%>
-      Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [non-state conflicts](#dod:nonstate-ucdp) that were ongoing that year.
+      <%- else -%>
+      Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [{definitions.all.conflict_label}](#dod:{definitions.all.conflict_dod_slug}) that were ongoing that year.
       <%- endif -%>
     key_point_1: |-
       This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [non-state conflicts](#dod:nonstate-ucdp), [violence against civilians](#dod:onesided-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
