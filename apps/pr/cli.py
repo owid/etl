@@ -449,6 +449,9 @@ def print_worktree_hint(worktree_path: Path, shared_data: bool = False) -> None:
     print()
     print("Then set up the env (one-time):")
     print("  uv sync")
+    print()
+    print("When you're done with this worktree, remove it with:")
+    print(f"  git worktree remove {display_path}")
     if shared_data:
         print()
         print("WARNING: data/ is a symlink to the original repo's data/, so:")
