@@ -25,12 +25,11 @@ definitions:
     - Patent data has a lag because some offices take years to publish new filings. Recent years are excluded here.
 
   description_key_investment: &description_key_investment
-    - The data covers external private-market investment in AI companies, including venture capital deals, private equity deals, and mergers and acquisitions.
-    - It excludes internal corporate R&D, capital spending, and government funding. Publicly traded companies, including large technology firms, are also excluded.
-    - Because this is only one type of funding, the data understates total global spending on AI.
-    - A small number of very large deals can drive big year-on-year swings. Broader economic conditions, such as interest rates and investor sentiment, also affect totals in ways that are not specific to AI.
-    - CSET's figure for {year} is preliminary and is likely to rise as more deals are reported. We show it to provide a more current view, but it may change as CSET updates its estimates.
-    - The "World" total only includes countries that are covered by the source, so it understates global activity.
+    - This data tracks the flow of external money into private companies. It excludes internal spending on R&D and infrastructure.
+    - On the recipient side, this only includes privately held AI companies. It excludes publicly traded companies like "Big Tech".
+    - On the investor side, this includes any equity investor — venture capital firms, private equity firms, corporate investors (including "Big Tech" companies), and sovereign wealth funds. Only equity transactions are counted; grants, debt finance, and crowdfunding are excluded.
+    - Where deal amounts aren't publicly disclosed — typically around 40% of the total — CSET assigns them an estimated value based on comparable deals.
+    - This data only covers specific types of funding, and doesn't reflect total global spending on AI.
 
   description_processing_aggregates: &description_processing_aggregates |-
     We calculate regional and global totals from the country-level data CSET provides, following our [region definitions](https://ourworldindata.org/world-region-map-definitions). Countries that are not covered by the source are excluded from these totals.
@@ -50,7 +49,10 @@ definitions:
     We calculate regional and global totals from the country-level data CSET provides, following our [region definitions](https://ourworldindata.org/world-region-map-definitions). Countries that are not covered by the source are excluded from these totals. We do not show Africa's regional total. The source covers too few African countries to produce a meaningful aggregate.
 
   investment_description_short: &investment_description_short |-
-    Money put into privately held AI companies by private investors. This excludes publicly traded companies (e.g., Big Tech companies) and companies' internal spending, such as R&D or infrastructure. Expressed in US dollars, adjusted for inflation. Data for {year} is incomplete and includes investments up to {month} {year}.
+    Money raised by privately held AI companies through venture capital, private equity, and mergers and acquisitions. This includes CSET's own estimates for deals where the amount wasn't disclosed. Expressed in US dollars, adjusted for inflation.
+
+  investment_description_short_partial: &investment_description_short_partial |-
+    Money raised by privately held AI companies through venture capital, private equity, and mergers and acquisitions. This includes CSET's own estimates for deals where the amount wasn't disclosed. Expressed in US dollars, adjusted for inflation. Data for {year} is incomplete and includes investments up to {month} {year}.
 
   investment_grapher_note: &investment_grapher_note |-
     Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
@@ -71,7 +73,7 @@ tables:
     variables:
       estimated_investment:
         <<: *processing_investment
-        title: External funding for privately held AI companies
+        title: Estimated funding raised by privately held AI companies
         unit: constant 2021 US dollars
         short_unit: $
         description_short: *investment_description_short
@@ -82,13 +84,13 @@ tables:
 
       estimated_investment_projected:
         <<: *processing_investment
-        title: Projected external funding for privately held AI companies
+        title: Estimated funding raised by privately held AI companies for incomplete years
         unit: constant 2021 US dollars
         short_unit: $
-        description_short: *investment_description_short
+        description_short: *investment_description_short_partial
         description_key:
           - *description_key_investment
-          - The values shown for the most recent year are preliminary estimates based on deals reported so far. The previous complete year is included as a starting point to connect the series on charts.
+          - The values for the most recent year are preliminary estimates based on deals reported so far.
         presentation:
           grapher_config:
             note: *investment_grapher_note
