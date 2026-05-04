@@ -62,6 +62,31 @@ etl pr "some title for the PR" -t --share-data
 This makes the new worktree's `data/` a shortcut (symlink) to the original repo's `data/`, so both worktrees share the same ETL outputs and you don't have to recompute them. Note that data/ is a symlink to the original repo's data/, so:
 - If you run the same steps in both worktrees, they may overwrite each other's output.
 - DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. Instead, use `git worktree remove ../etl-[whatever-branch]` to remove a worktree.
+
+**Tips for working with worktrees**:
+
+- Open each worktree in its own VS Code window (`File > New Window` → open the worktree folder). The Claude Code extension is scoped per workspace, so two windows give you two parallel chats, one per branch.
+
+- Each worktree has its own `.venv/`, so the venv from your original repo is the wrong one once you `cd` into a worktree. To auto-activate the right venv on `cd`, add this to `~/.zshrc`:
+
+```zsh
+autoload -U add-zsh-hook
+load-py-venv() {
+    if [ -f .venv/bin/activate ]; then
+        source .venv/bin/activate
+    elif [ -f env/bin/activate ]; then
+        source env/bin/activate
+    elif [ -f venv/bin/activate ]; then
+        source venv/bin/activate
+    elif [ ! -z "$VIRTUAL_ENV" ] && [ -f poetry.toml -o -f requirements.txt ]; then
+        deactivate
+    fi
+}
+add-zsh-hook chpwd load-py-venv
+load-py-venv
+```
+
+  Without this, you can still call `.venv/bin/etl ...` explicitly from each worktree — but be aware that running the original repo's `etl`/`etlr` from a worktree dir will silently use the *original* repo's source code, DAG, and branch, not the worktree's. The failure mode is silent and confusing.
 """
 
 import hashlib
@@ -406,7 +431,7 @@ def branch_out_worktree(repo, base_branch: str, work_branch: str, worktree_path:
         raise click.ClickException(f"Failed to create worktree at '{worktree_path}':\n{e}")
 
     # Copy .env so the new worktree is immediately usable. .venv is intentionally not
-    # copied/symlinked — it's Python-version-specific and best recreated with `uv sync`.
+    # copied/symlinked — it's Python-version-specific and best recreated with `make check`.
     src_env = BASE_DIR / ".env"
     if src_env.exists():
         shutil.copy2(src_env, worktree_path / ".env")
@@ -447,8 +472,8 @@ def print_worktree_hint(worktree_path: Path, shared_data: bool = False) -> None:
     print("To start working there, run:")
     print(f"  cd {display_path}")
     print()
-    print("Then set up the env (one-time):")
-    print("  uv sync")
+    print("Then set up the env (one-time, takes a minute):")
+    print("  make check")
     print()
     print("When you're done with this worktree, remove it with:")
     print(f"  git worktree remove {display_path}")

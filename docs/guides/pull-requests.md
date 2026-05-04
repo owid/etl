@@ -41,3 +41,36 @@ You can find an example [:fontawesome-brands-github: here](https://github.com/ow
     <img src="../../assets/pr-2.png" alt="Chart Upgrader" style="width:100%;">
     <figcaption>[GitHub action comment](https://github.com/owid/etl/pull/3563#issuecomment-2485414940), as of 19th November 2024</figcaption>
 </figure>
+
+## Working on multiple branches in parallel
+
+If you need several PRs in flight at once (e.g. several agent sessions, one per branch), `etl pr --worktree` creates the new branch in a separate **git worktree** so your current working tree is untouched:
+
+```bash
+etl pr "Update some dataset" data --worktree
+```
+
+The new worktree appears at `../etl-<branch>`. To start working there:
+
+```bash
+cd ../etl-<branch>
+make check   # one-time, sets up this worktree's .venv/
+```
+
+Use `git worktree remove ../etl-<branch>` to clean up afterwards.
+
+A couple of useful tips:
+
+- Open each worktree in its own VS Code window (`File > New Window`). The Claude Code extension is scoped per workspace, so each window gets its own chat.
+- Each worktree has its own `.venv/`. If you forget to activate the right one, the *original* repo's `etl`/`etlr` will silently use the wrong source code. A small `chpwd` hook in `~/.zshrc` that sources `.venv/bin/activate` whenever it exists in the new directory handles this automatically.
+
+### Sharing the data folder (optional)
+
+`--share-data` symlinks the new worktree's `data/` to the original's, so upstream ETL steps don't get recomputed:
+
+```bash
+etl pr "Update dataset" data --worktree --share-data
+```
+
+!!! warning
+    Never run `rm -rf data/` in a shared worktree — the trailing slash makes `rm` follow the symlink and wipe the **original** `data/`. Use `git worktree remove ../etl-<branch>` to clean up instead.
