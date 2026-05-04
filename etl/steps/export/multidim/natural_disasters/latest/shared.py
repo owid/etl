@@ -83,13 +83,13 @@ DISASTER_DESCRIPTIONS = {
 }
 
 ALL_DISASTERS_SUBTITLE = (
-    "Natural disasters include all geophysical, meteorological, hydrological, and climatological events."
+    "Disasters include events such as earthquakes, volcanoes, drought, wildfires, storms, and flooding."
 )
 
 ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE = (
-    "Disasters here include geophysical, meteorological, and climate events such as earthquakes, "
-    "volcanoes, drought, wildfires, storms, and flooding. Extreme temperatures are excluded "
-    "because their reporting coverage is too incomplete to compare across regions and over time."
+    "Disasters include events such as earthquakes, volcanoes, drought, wildfires, storms, and flooding."
+    "Extreme temperatures are not included here because their geographical and time coverage is poor, "
+    "making consistent comparisons difficult."
 )
 
 # Stable color per disaster type so the same disaster appears in the same colour
@@ -186,8 +186,8 @@ STACKED_VIEW_CONFIG = {
 
 # Footnote shown on every chart, flagging the limited reporting coverage in earlier decades.
 NOTE = (
-    "Figures are based on reported data, and coverage is significantly limited before around 2000. "
-    "Historical trends may partly reflect reporting improvements."
+    "Based on recorded events; coverage is more limited before the year 2000. "
+    "Longer historical trends may partly reflect reporting improvements."
 )
 
 

@@ -33,7 +33,7 @@ def _title(view) -> str:
     else:
         body = f"Annual deaths from {type_phrase}"
     if view.dimensions["timespan"] == "decadal":
-        return f"{body} (10-year average)"
+        return f"Decadal average: {body}"
     return body
 
 

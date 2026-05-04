@@ -8,10 +8,10 @@ definitions:
 
   # General definitions.
   definition_disaster: &definition-disaster |-
-    EM-DAT defines a disaster as a situation or event which overwhelms local capacity, necessitating a request to the national or international level for external assistance; an unforeseen and often sudden event that causes great damage, destruction, and human suffering. Of all EM-DAT disasters, we select geophysical, meteorological, hydrological, and climatological events, which include droughts, earthquakes, volcanoes, floods, landslides, storms, wildfires, and extreme temperatures."
+    EM-DAT defines a disaster as a situation or event which overwhelms local capacity, necessitating a request to the national or international level for external assistance; an unforeseen and often sudden event that causes great damage, destruction, and human suffering.
   # Definitions of impact variables.
   definition_dead: &definition-dead |-
-    EM-DAT counts deaths as deceased and missing people combined, as a result of a natural disaster.
+    EM-DAT counts deaths as confirmed deaths, plus missing people.
   definition_injured: &definition-injured |-
     EM-DAT counts injured as people with physical injuries, trauma, or illness requiring immediate medical assistance due to the disaster.
   definition_homeless: &definition-homeless |-
@@ -38,7 +38,7 @@ definitions:
   definition_earthquake: &definition-earthquake |-
     An earthquake is defined as a sudden movement of a block of the Earth's crust along a geological fault and associated ground shaking. The data includes the impacts of earthquake events, aftershocks and tsunamis.
   definition_extreme_temperature: &definition-extreme-temperature |-
-    Extreme temperature is used as a general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions.
+    Extreme temperature is used as a general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions. Deaths from extreme temperatures are often indirect, meaning they are not reported or quantified without additional analysis and modelling. Some countries or regions increasingly do this work, but records are very geographically and temporally incomplete. This makes it hard to discern trends over time, or differences between countries.
   definition_flood: &definition-flood |-
     Flood is used as a general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods). We also include glacial lake outburst floods in this category.
   # definition_landslide: &definition-landslide |-
