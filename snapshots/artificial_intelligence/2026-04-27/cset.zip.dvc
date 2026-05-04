@@ -1,0 +1,28 @@
+meta:
+  origin:
+    producer: Center for Security and Emerging Technology
+    title: 'Country Activity Tracker: Artificial Intelligence'
+    description: |-
+      ETO's Country AI Activity Metrics dataset includes national-level metrics for AI-related research, patents, and private-market investment.
+
+      The metrics are derived from a variety of underlying data sources, including ETO's Merged Academic Corpus for research data; The Lens, PATSTAT, and 1790 Analytics for patents; and Crunchbase for company and investment data.
+
+      The dataset focuses on countries, not organizations or individuals, and on AI and its subfields. There are many ways to assess countries' AI activities, and the three types of metrics included here, while meaningful, are not exhaustive. The data also has a lag, making counts incomplete for recent years; the lag is especially significant for patent data.
+
+    citation_full: "Emerging Technology Observatory [Country Activity Tracker: Artificial Intelligence](https://cat.eto.tech/?expanded=Summary-metrics)"
+
+    attribution_short: CSET
+
+    url_main: https://cat.eto.tech/
+    url_download: https://zenodo.org/records/19103157/files/cat.zip?download=1
+
+    date_accessed: '2026-04-27'
+    date_published: '2026-03-19'
+
+    license:
+      name: CC BY-NC 4.0
+      url: https://eto.tech/tou/
+outs:
+  - md5: 5a0ea931125bf1d5493e680e10e339f2
+    size: 2380418
+    path: cset.zip

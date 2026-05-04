@@ -95,8 +95,6 @@ def to_graphviz(output_file: str, filter: str | None = None, targets: bool = Fal
             link("Garden", "Data catalog")
             link("Grapher", "Data catalog")
             link("Grapher", "Grapher DB")
-        link("data://garden/reference", "Reference")
-        link("Reference", "Data catalog")
 
         for n in nodes:
             if n.startswith("snapshot://"):

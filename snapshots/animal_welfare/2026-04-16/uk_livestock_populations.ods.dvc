@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Livestock populations in the United Kingdom
+    description: |-
+      Annual estimates of livestock populations for the United Kingdom based on the June Survey and Census of Agriculture. Includes total numbers of laying hens and pullets by year.
+    date_published: "2026-03-26"
+
+    # Citation
+    producer: Defra
+    citation_full: |-
+      Department for Environment, Food & Rural Affairs. Livestock populations in the United Kingdom (2026). Defra.
+
+    # Files
+    url_main: https://www.gov.uk/government/statistics/livestock-populations-in-the-united-kingdom
+    url_download: https://assets.publishing.service.gov.uk/media/693819f27a605b2d61cd8f6d/Livestock-populations-uk-june25-11dec25.ods
+    date_accessed: "2026-04-16"
+
+    # License
+    license:
+      name: OGL v3.0
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+
+outs:
+  - md5: 07fcfbb5c68616fb99113a6ab5bd33b5
+    size: 156415
+    path: uk_livestock_populations.ods
