@@ -28,7 +28,7 @@ definitions:
     - This data tracks the flow of external money into private companies. It excludes internal spending on R&D and infrastructure.
     - On the recipient side, this only includes privately held AI companies. It excludes publicly traded companies like "Big Tech".
     - On the investor side, this includes any equity investor — venture capital firms, private equity firms, corporate investors (including "Big Tech" companies), and sovereign wealth funds. Only equity transactions are counted; grants, debt finance, and crowdfunding are excluded.
-    - Where deal amounts aren't publicly disclosed, CSET assigns them an estimated value based on comparable deals — typically around 40% of the total.
+    - Where deal amounts aren't publicly disclosed — typically around 40% of the total — CSET assigns them an estimated value based on comparable deals.
     - This data only covers specific types of funding, and doesn't reflect total global spending on AI.
 
   description_processing_aggregates: &description_processing_aggregates |-
