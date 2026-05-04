@@ -59,9 +59,9 @@ The new working directory is printed at the end (default: `../etl-BRANCH`); `cd`
 etl pr "some title for the PR" -t --share-data
 ```
 
-This symlinks the new worktree's `data/` to the original repo's `data/`. Caveats:
-- Don't use --share-data if you are planning to work on similar files.
-- Never `rm -rf data/` from the worktree: it deletes the symlink as well as the original data dir.
+This makes the new worktree's `data/` a shortcut (symlink) to the original repo's `data/`, so both worktrees share the same ETL outputs and you don't have to recompute them. Note that data/ is a symlink to the original repo's data/, so:
+- If you run the same steps in both worktrees, they may overwrite each other's output.
+- DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. Instead, use `git worktree remove ../etl-[whatever-branch]` to remove a worktree.
 """
 
 import hashlib
@@ -451,11 +451,10 @@ def print_worktree_hint(worktree_path: Path, shared_data: bool = False) -> None:
     print("  uv sync")
     if shared_data:
         print()
-        print("data/ is symlinked to the original repo.")
-        print(
-            "  WARNING: Do not run `rm -rf data/`, since this would delete both the symlink and the original data folder. "
-        )
-        print("  To remove only the symlink, use `rm data` (without a trailing slash).")
+        print("WARNING: data/ is a symlink to the original repo's data/, so:")
+        print("  - If you run the same steps in both worktrees, they may overwrite each other's output.")
+        print("  - DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. ")
+        print("    Instead, use `git worktree remove ../etl-[whatever-branch]` to remove a worktree.")
 
 
 def create_pr(repo, work_branch, base_branch, pr_title):
