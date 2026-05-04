@@ -50,19 +50,40 @@ If you need several PRs in flight at once (e.g. several agent sessions, one per 
 etl pr "Update some dataset" data --worktree
 ```
 
-The new worktree appears at `../etl-<branch>`. To start working there:
+The command creates the worktree at `../etl-<branch>` and runs `uv sync` inside it, so the worktree's `.venv/` is ready to use by the time the command finishes. To start working there:
 
 ```bash
 cd ../etl-<branch>
-make check   # one-time, sets up this worktree's .venv/
 ```
+
+Otherwise also run `source .venv/bin/activate`. Or, even better, set up auto-activation once (see below) — then `cd` alone is enough.
 
 Use `git worktree remove ../etl-<branch>` to clean up afterwards.
 
-A couple of useful tips:
+### Optional: auto-activate the venv when you `cd`
 
-- Open each worktree in its own VS Code window (`File > New Window`). The Claude Code extension is scoped per workspace, so each window gets its own chat.
-- Each worktree has its own `.venv/`. If you forget to activate the right one, the *original* repo's `etl`/`etlr` will silently use the wrong source code. A small `chpwd` hook in `~/.zshrc` that sources `.venv/bin/activate` whenever it exists in the new directory handles this automatically.
+Add this snippet to your `~/.zshrc` so the right `.venv/` activates automatically every time you `cd` into a worktree (or any project folder with a `.venv/`):
+
+```zsh
+autoload -U add-zsh-hook
+load-py-venv() {
+    if [ -f .venv/bin/activate ]; then
+        source .venv/bin/activate
+    elif [ -f env/bin/activate ]; then
+        source env/bin/activate
+    elif [ -f venv/bin/activate ]; then
+        source venv/bin/activate
+    elif [ ! -z "$VIRTUAL_ENV" ] && [ -f poetry.toml -o -f requirements.txt ]; then
+        deactivate
+    fi
+}
+add-zsh-hook chpwd load-py-venv
+load-py-venv
+```
+
+After reloading your shell (`source ~/.zshrc` or open a new terminal), you can `cd` between worktrees and the matching venv will activate on its own.
+
+Tip: open each worktree in its own VS Code window (`File > New Window`). The Claude Code extension is scoped per workspace, so each window gets its own chat.
 
 ### Sharing the data folder (optional)
 

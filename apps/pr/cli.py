@@ -63,36 +63,16 @@ This makes the new worktree's `data/` a shortcut (symlink) to the original repo'
 - If you run the same steps in both worktrees, they may overwrite each other's output.
 - DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. Instead, use `git worktree remove ../etl-[whatever-branch]` to remove a worktree.
 
-**Tips for working with worktrees**:
+After the command finishes, `uv sync` has already run inside the worktree, so its `.venv/` is ready to use. With a `chpwd` hook in your `~/.zshrc` that sources `.venv/bin/activate` whenever present, `cd ../etl-BRANCH` is all that's needed — activation is automatic. Without the hook, also run `source .venv/bin/activate` after the cd. Skipping activation silently routes `etl`/`etlr` to the original repo's source code.
 
-- Open each worktree in its own VS Code window (`File > New Window` → open the worktree folder). The Claude Code extension is scoped per workspace, so two windows give you two parallel chats, one per branch.
-
-- Each worktree has its own `.venv/`, so the venv from your original repo is the wrong one once you `cd` into a worktree. To auto-activate the right venv on `cd`, add this to `~/.zshrc`:
-
-```zsh
-autoload -U add-zsh-hook
-load-py-venv() {
-    if [ -f .venv/bin/activate ]; then
-        source .venv/bin/activate
-    elif [ -f env/bin/activate ]; then
-        source env/bin/activate
-    elif [ -f venv/bin/activate ]; then
-        source venv/bin/activate
-    elif [ ! -z "$VIRTUAL_ENV" ] && [ -f poetry.toml -o -f requirements.txt ]; then
-        deactivate
-    fi
-}
-add-zsh-hook chpwd load-py-venv
-load-py-venv
-```
-
-  Without this, you can still call `.venv/bin/etl ...` explicitly from each worktree — but be aware that running the original repo's `etl`/`etlr` from a worktree dir will silently use the *original* repo's source code, DAG, and branch, not the worktree's. The failure mode is silent and confusing.
+See the docs (`Working on multiple branches in parallel`) for full details and tips.
 """
 
 import hashlib
 import os
 import re
 import shutil
+import subprocess
 import uuid
 from pathlib import Path
 from typing import cast
@@ -287,7 +267,8 @@ def cli(
     create_pr(repo, work_branch, base_branch, pr_title)
 
     if resolved_worktree_path is not None:
-        print_worktree_hint(resolved_worktree_path, shared_data=share_data)
+        venv_ok = install_worktree_venv(resolved_worktree_path)
+        print_worktree_hint(resolved_worktree_path, shared_data=share_data, venv_installed=venv_ok)
 
 
 def check_gh_token():
@@ -455,7 +436,30 @@ def symlink_data_dir(worktree_path: Path) -> None:
     log.info(f"Symlinked '{dst}' -> '{src}'.")
 
 
-def print_worktree_hint(worktree_path: Path, shared_data: bool = False) -> None:
+def install_worktree_venv(worktree_path: Path) -> bool:
+    """Run `uv sync` in the new worktree to set up its `.venv/`. Returns True on success.
+
+    This matches what the project's Makefile does for the `.venv` target — see
+    `default.mk` (`uv sync --all-extras --group dev`). Doing this automatically lets
+    the user just `cd` into the new worktree afterwards (with a chpwd hook the venv
+    activates automatically; without one, only `source .venv/bin/activate` is needed).
+    """
+    log.info(f"Installing dependencies in '{worktree_path}' (one-time, ~1 min)...")
+    try:
+        subprocess.run(
+            ["uv", "sync", "--all-extras", "--group", "dev"],
+            cwd=worktree_path,
+            check=True,
+        )
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError, KeyboardInterrupt) as e:
+        log.warning(
+            f"Could not set up the venv automatically ({e}). You'll need to run `make check` inside the worktree."
+        )
+        return False
+
+
+def print_worktree_hint(worktree_path: Path, shared_data: bool = False, venv_installed: bool = False) -> None:
     """Tell the user how to land in the new worktree.
 
     A child Python process can't change its parent shell's cwd, so we just print a
@@ -469,11 +473,18 @@ def print_worktree_hint(worktree_path: Path, shared_data: bool = False) -> None:
     print()
     print(f"Worktree ready at: {worktree_path}")
     print()
-    print("To start working there, run:")
-    print(f"  cd {display_path}")
-    print()
-    print("Then set up the env (one-time, takes a minute):")
-    print("  make check")
+    if venv_installed:
+        print("To start working there, just run:")
+        print(f"  cd {display_path}")
+        print()
+        print("If you have a chpwd hook in ~/.zshrc, the venv activates automatically.")
+        print("Otherwise also run: source .venv/bin/activate")
+        print("(Skipping activation will silently use the ORIGINAL repo's source code.)")
+    else:
+        print("Auto venv setup didn't complete. Inside the worktree, run:")
+        print(f"  cd {display_path}")
+        print("  make check")
+        print("  source .venv/bin/activate")
     print()
     print("When you're done with this worktree, remove it with:")
     print(f"  git worktree remove {display_path}")
