@@ -2,8 +2,11 @@ meta:
   origin:
     producer: Pretis et al.
     title: Uncertain impacts on economic growth when stabilizing global temperatures at 1.5°C or 2°C warming
-    description: This dataset contains estimates of the economic impacts of limiting global warming to 1.5°C or 2°C above pre-industrial levels. It accompanies a study examining the uncertain effects of temperature stabilization targets on economic growth across countries, using statistical approaches to quantify uncertainty in climate–economy relationships.
-    citation_full: Pretis, F., Schwarz, M., Tang, K., Haustein, K., and Allen, M. 2018. "Uncertain Impacts on Economic Growth When Stabilizing Global Temperatures at 1.5°C or 2°C Warming". Philosophical Transactions of the Royal Society, A. DOI 10.1098/rsta.2016.0460.
+    description: |-
+      Please cite the data as:
+
+      Pretis, Schwarz, Tang, Haustein, and Allen. 2018. "Uncertain Impacts on Economic Growth When Stabilizing Global Temperatures at 1.5°C or 2°C Warming". Philosophical Transactions of the Royal Society, A. DOI 10.1098/rsta.2016.0460.
+    citation_full: Pretis, Schwarz, Tang, Haustein, and Allen. 2018. "Uncertain Impacts on Economic Growth When Stabilizing Global Temperatures at 1.5°C or 2°C Warming". Philosophical Transactions of the Royal Society, A. DOI 10.1098/rsta.2016.0460.
     url_main: https://doi.org/10.1098/rsta.2016.0460
     date_accessed: '2026-03-10'
     date_published: '2018'

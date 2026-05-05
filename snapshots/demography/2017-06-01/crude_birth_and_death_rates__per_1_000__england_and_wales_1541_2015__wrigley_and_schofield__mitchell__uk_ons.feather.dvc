@@ -1,9 +1,12 @@
 meta:
   origin:
-    producer: Wrigley and Schofield, Mitchell, and UK ONS
-    title: Crude birth and death rates (per 1,000), England and Wales 1541–2015
-    description: "This dataset contains crude birth and death rates per 1,000 population for England and Wales spanning 1541 to 2015, compiled from three sources. For the years 1541–1861, data are drawn from Wrigley and Schofield (1981), \"The Population History of England: A Reconstruction.\" For 1862–2003, data come from Brian Mitchell's International Historical Statistics (2010). For 2004–2015, data are sourced from the UK Office for National Statistics (2016)."
-    citation_full: 'Wrigley, E.A. and Schofield, R.S. (1981). "The Population History of England: A Reconstruction." Mitchell, B. (2010). International Historical Statistics. UK Office for National Statistics (2016). Births and deaths, England and Wales.'
+    producer: Various sources
+    title: Crude birth and death rates, England and Wales
+    description: |-
+      *Note: Our World In Data compiled the data from the above sources as follows: for the years 1541-1861: Wrigley and Schofield (1981); for the years 1862-2003: Brian Mitchell (2010); for the years 2004-2015: UK Office for National Statistics (2016).
+
+      For 1541-1861 series: Wrigley and Schofield (1981); for 1862-2003 series: International Historical Statistics, Brian Mitchell (2010); for 2004-2015 series: UK Office for National Statistics (2016)
+    citation_full: 'Wrigley, E. A. and Schofield, R. S. (1981). The Population History of England: A Reconstruction; Mitchell, B. (2010). International Historical Statistics; UK Office for National Statistics (2016).'
     url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/
     date_accessed: '2017-06-01'
     date_published: '2016'

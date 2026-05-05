@@ -1,13 +1,14 @@
 meta:
   origin:
-    producer: OECD, Long, and Heckman and Killingsworth
-    title: Female labor force participation rate
+    producer: Various sources
+    title: Female labor force participation rate (long-run)
     description: |-
-      This dataset combines historical data on female labor force participation rates with recent series from OECD.Stat. Estimates come primarily from OECD.Stat, but for Canada, Germany, Great Britain, and the US, estimates from Long (1958) and Heckman and Killingsworth (1986) are combined to provide a longer historical perspective.
+      This dataset combines historical data with recent series from OECD.stats.
 
-      It is important to note that OECD estimates correspond to population ages 15+, while estimates from the other sources correspond to population ages 14+. For France 1962–1966, missing values are assigned where the OECD.Stat file reports zero.
-    title_snapshot: Female labor force participation rate – OWID combined series
-    citation_full: 'Long, C. D. (1958). The labor force under changing income and employment. Princeton University Press. Heckman, J. and Killingsworth, M. (1986). Female labor supply: A survey. In Handbook of Labor Economics, Volume I, edited by O. Ashenfelter and R. Layard. OECD.Stat.'
+      Estimates in this series come primarily from OECD.stat. However, for Canada, Germany, Great Britain and the US, we combined estimates from Long (1958) and Heckman and Killingsworth (1986), in order to provide a longer perspective. Details on how we combined these sources can be found in this online table (https://ourworldindata.org/wp-content/uploads/2017/07/OECD-historical-female-participation-OWID.xlsx).
+
+      It is important to bear in mind that OECD estimates correspond to population ages 15+, while other estimates correspond to population 14+. Also, for France 1962-1966 we assigned missing values where the OECD.stat file reports zero.
+    citation_full: 'Long, C. D. (1958). The labor force under changing income and employment. Princeton University Press. Heckman J. and Killingsworth M. (1986). Female Labor Supply: A Survey. In Handbook of Labor Economics, Volume I, Edited by O. Ashenfelter and R. Layard. OECD.Stat.'
     url_main: http://stats.oecd.org/
     date_accessed: '2017-07-31'
     date_published: '2017'

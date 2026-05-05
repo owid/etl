@@ -1,19 +1,17 @@
 meta:
   origin:
-    producer: HYDE and FAO
-    title: Livestock counts
+    producer: Various sources
+    title: Livestock counts (HYDE and FAO)
     description: |-
-      This dataset on livestock counts has been compiled based on the combination of data from the HYDE database and UN Food and Agriculture Organization (FAO) statistics.
+      This dataset on livestock counts has been compiled by OWID based on the combination of data from the HYDE database and UN Food and Agricultural Organization (FAO) statistics.
 
-      Data for all livestock from 1890–1950 is sourced from the HYDE Database (History Database of the Global Environment), published by the PBL Netherlands Environmental Assessment Agency.
+      Data for all livestock from 1890-1950 is sourced from the HYDE Database (History Database of the Global Environment), published by the PBL Netherlands Environmental Assessment Agency. Available at: http://themasites.pbl.nl/tridion/en/themasites/hyde/landusedata/livestock/index-2.html [accessed 12th October 2017].
 
-      Data from 1961 onwards is sourced from the UN Food and Agriculture Organization (FAO) statistics.
-    citation_full: |-
-      History Database of the Global Environment (HYDE), PBL Netherlands Environmental Assessment Agency. Available at: http://themasites.pbl.nl/tridion/en/themasites/hyde/landusedata/livestock/index-2.html [accessed 12th October 2017].
-
-      UN Food and Agriculture Organization (FAO), FAOSTAT. Available at: http://www.fao.org/faostat/en/#data/QA [accessed 12th October 2017].
-    url_main: http://www.fao.org/faostat/en/#data/QA
-    date_accessed: '2026-03-05'
+      Data from 1961 onwards is sources from the UN Food and Agricultural Organization (FAO) statistics. Available at: http://www.fao.org/faostat/en/#data/QA [accessed 12th October 2017].
+    citation_full: HYDE Database (PBL Netherlands Environmental Assessment Agency) and UN Food and Agricultural Organization (FAO) (2017). Livestock counts.
+    url_main: http://themasites.pbl.nl/tridion/en/themasites/hyde/landusedata/livestock/index-2.html
+    url_download: http://www.fao.org/faostat/en/#data/QA
+    date_accessed: '2017-10-12'
     date_published: '2017'
 outs:
   - md5: f5d3309823127b5de463863d0a95d24c

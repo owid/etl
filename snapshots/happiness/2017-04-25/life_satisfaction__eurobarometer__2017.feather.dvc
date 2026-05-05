@@ -1,13 +1,10 @@
 meta:
   origin:
-    producer: European Commission
-    title: Eurobarometer
+    producer: Eurobarometer
+    title: Life satisfaction - Eurobarometer
     description: |-
-      The Eurobarometer is a series of public-opinion surveys conducted regularly on behalf of the European Commission since 1973, covering social and political attitudes across European Union member states.
-    description_snapshot: |-
-      The Eurobarometer provides estimates for dated surveys. In some years there are countries with multiple surveys; in those cases yearly averages are reported.
-    citation_full: European Commission (2017). Eurobarometer Interactive. Public Opinion in the European Union.
-    attribution_short: Eurobarometer
+      The Eurobarometer provides estimates for dated surveys. In some years, there are some countries with multiple surveys. In those cases, we provide yearly averages.
+    citation_full: Eurobarometer Interactive (2017).
     url_main: http://ec.europa.eu/commfrontoffice/publicopinion/index.cfm/Chart/index
     date_accessed: '2017-04-25'
     date_published: '2017'

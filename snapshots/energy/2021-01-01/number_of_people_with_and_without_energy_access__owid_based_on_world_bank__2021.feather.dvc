@@ -2,9 +2,11 @@ meta:
   origin:
     producer: World Bank
     title: World Development Indicators
-    description: The World Development Indicators (WDI) is the World Bank's primary collection of development indicators, compiled from officially recognized international sources. It presents the most current and accurate global development data available, and includes national, regional, and global estimates covering topics such as poverty, health, education, energy access, and more.\n\nThis snapshot includes estimates of the share of the population with access to electricity and clean fuels for cooking, which Our World in Data combined with total population estimates from the UN World Population Prospects (UNWPP) to derive the number of people with and without energy access.
-    title_snapshot: World Development Indicators - Number of people with and without energy access
-    citation_full: 'Calculated by Our World in Data based on energy access and population data published in the World Bank World Development Indicators. Available at: http://data.worldbank.org/data-catalog/world-development-indicators.'
+    description: |-
+      This was calculated by Our World in Data based on estimates the share of the population with access to electricity and clean fuels for cooking – published by the World Bank – and total population estimates from the UN World Population Prospects (UNWPP).
+
+      Original metrics of energy access shares and total population can be accessed from the World Bank World Development Indicators (available at: http://data.worldbank.org/data-catalog/world-development-indicators).
+    citation_full: World Bank World Development Indicators. Energy access and population data.
     url_main: http://data.worldbank.org/data-catalog/world-development-indicators
     date_accessed: '2026-03-10'
     date_published: '2021'

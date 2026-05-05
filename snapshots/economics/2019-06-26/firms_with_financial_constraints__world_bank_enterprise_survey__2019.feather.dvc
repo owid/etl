@@ -1,11 +1,11 @@
 meta:
   origin:
     producer: World Bank
-    title: World Bank Enterprise Survey
-    description: The World Bank Enterprise Survey collects data from firms across the world on a wide range of business environment topics, including access to finance, corruption, infrastructure, crime, competition, and performance. Surveys were conducted in different years for different countries, covering the time period of 2009 to 2018.
-    title_snapshot: Enterprise Survey - Firms with financial constraints
-    citation_full: World Bank. World Bank Enterprise Survey (2019). World Bank.
-    version_producer: '2019'
+    title: Enterprise Surveys
+    title_snapshot: Enterprise Surveys - Firms with financial constraints
+    description_snapshot: |-
+      Surveys were conducted in different years for different countries, but all during the time period of 2009 to 2018. The date displayed is standardized to 2018.
+    citation_full: World Bank (2019). Enterprise Surveys.
     url_main: http://www.enterprisesurveys.org/data/exploretopics/finance
     date_accessed: '2019-06-26'
     date_published: '2019'

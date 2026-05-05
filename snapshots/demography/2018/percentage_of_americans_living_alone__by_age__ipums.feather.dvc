@@ -1,15 +1,18 @@
 meta:
   origin:
-    producer: IPUMS
-    title: Percentage of Americans living alone, by age
+    producer: Ruggles et al.
+    title: IPUMS USA
     description: |-
-      Samples of the decennial Census (1900–2000) and the 2018 ACS from IPUMS USA have been used to construct variables on the percentage of Americans living alone, by age and sex.
+      Samples of the decennial Census (1900-2000) and the 2018 ACS from IPUMS-USA has been used to construct variables on the percentage of Americans living alone, by age and sex.
 
-      Only those people who are reported to be living in a one-person household and who do not live in group quarters are included. The IPUMS defines group quarters as "largely institutions and other group living arrangements, such as rooming houses and military barracks. The definitions vary from year to year, but the pre-1940 samples have generally used a definition of group quarters that includes units with 10 or more individuals unrelated to the householder."
+      We include only those people who are reported to be living in a one-person household and who do not live in group quarters.
 
-      Those recorded to be living in institutions, other group quarters, and additional households under the 2000 definition have been excluded.
-    citation_full: 'Ruggles, S., Flood, S., Goeken, R., Grover, J., Meyer, E., Pacas, J., and Sobek, M. IPUMS USA: Version 8.0 [dataset]. Minneapolis, MN: IPUMS, 2018. https://doi.org/10.18128/D010.V8.0.'
-    version_producer: v8.0
+      The IPUMS defines group quarters as "largely institutions and other group living arrangements, such as rooming houses and military barracks. The definitions vary from year to year, but the pre-1940 samples have generally used a definition of group quarters that includes units with 10 or more individuals unrelated to the householder."
+
+      We have excluded those recorded to be living in institutions, other group quarters, and additional households under the 2000 definition.
+    citation_full: 'Steven Ruggles, Sarah Flood, Ronald Goeken, Josiah Grover, Erin Meyer, Jose Pacas, and Matthew Sobek. IPUMS USA: Version 8.0 [dataset]. Minneapolis, MN: IPUMS, 2018. https://doi.org/10.18128/D010.V8.0.'
+    attribution_short: IPUMS
+    version_producer: '8.0'
     url_main: https://usa.ipums.org/usa/
     date_accessed: '2020-11-06'
     date_published: '2018'

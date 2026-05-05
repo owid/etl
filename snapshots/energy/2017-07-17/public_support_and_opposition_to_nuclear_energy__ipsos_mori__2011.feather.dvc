@@ -3,12 +3,11 @@ meta:
     producer: Ipsos MORI
     title: Global Citizen Reaction to the Fukushima Nuclear Plant Disaster
     description: |-
-      The Ipsos MORI survey was conducted in 24 countries. An international sample of 18,787 adults aged 18–64 in the US and Canada, and aged 16–64 in all other countries, were interviewed between May 6 and May 21, 2011 via the Ipsos Online Panel system.
+      The Ipsos MORI survey was conducted in 24 countries. An international sample of 18,787 adults aged 18-64 in the US and Canada, and age 16-64 in all other countries, were interviewed between May 6 and May 21, 2011 via the Ipsos Online Panel system.
 
-      Results presented are in response to the question: "Please indicate whether you strongly support, somewhat support, somewhat oppose, or strongly oppose each way of producing electricity" (results for nuclear electricity production).
+      Results presented here are in response to the question: "Please indicate whether you strongly support, somewhat support, somewhat oppose, or strongly oppose each way of producing electricity" [results for nuclear electricity production].
 
-      Four responses were accepted: "strongly support," "somewhat support," "somewhat oppose," and "strongly oppose." These are simplified to "support" and "oppose" by summing the former and latter two responses, respectively.
-    title_snapshot: Global Citizen Reaction to the Fukushima Nuclear Plant Disaster - Public support and opposition to nuclear energy
+      Four responses were accepted for this question: "strongly support"; "somewhat support"; "somewhat oppose"; and "strongly oppose". We have simplified these results to "support" and "oppose" by summing the former and latter two responses, respectively.
     citation_full: Ipsos MORI (2011). Global Citizen Reaction to the Fukushima Nuclear Plant Disaster.
     url_main: https://www.ipsos.com/ipsos-mori/en-uk/strong-global-opposition-towards-nuclear-power
     date_accessed: '2017-07-17'

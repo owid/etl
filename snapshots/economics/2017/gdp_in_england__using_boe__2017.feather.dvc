@@ -1,12 +1,12 @@
 meta:
   origin:
     producer: Bank of England
-    title: A Millennium of Macroeconomic Data
-    description: This dataset provides long-run macroeconomic data for England and the UK, spanning several centuries. The headline series (A1) includes key variables such as real GDP at market prices and population, enabling the construction of derived indicators such as real GDP per capita.
-    title_snapshot: A Millennium of Macroeconomic Data - GDP in England
-    description_snapshot: This snapshot is derived from the "A1. Headline Series" sheet of the Bank of England dataset. Real GDP (at market prices) and population are taken directly from that sheet; real GDP per capita is calculated by dividing real GDP by population.
-    citation_full: 'Bank of England (2017). A Millennium of Macroeconomic Data. Available at: http://www.bankofengland.co.uk/research/Pages/datasets/default.aspx#threecenturies.'
-    attribution_short: BoE
+    title: A millennium of macroeconomic data
+    description: |-
+      This dataset is produced using "A1. Headline Series" sheet of the BoE dataset. The variables Real GDP (at market prices) and Population are taken directly from BoE. Real GDP per capita is, however, calculated by dividing Real GDP with Population.
+
+      This data uses A1. Headline Series sheet of BoE dataset to get Real GDP and Population figures for England.
+    citation_full: Bank of England (2017). A millennium of macroeconomic data.
     url_main: http://www.bankofengland.co.uk/research/Pages/datasets/default.aspx#threecenturies
     date_accessed: '2017-08-25'
     date_published: '2017'

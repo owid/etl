@@ -1,17 +1,16 @@
 meta:
   origin:
     producer: OECD
-    title: 'Education at a Glance: OECD Indicators'
-    description: Education at a Glance is the authoritative source for information on the state of education around the world. It provides data on the structure, finances, and performance of education systems across OECD and partner countries. The 2017 edition covers indicators on educational attainment, learning outcomes, access and participation, the financial resources invested in education, and the economic and social returns to education.
-    title_snapshot: 'Education at a Glance: OECD Indicators - Relative earnings of adults, by educational attainment'
+    title: 'Education at a Glance 2017: OECD Indicators'
+    title_snapshot: 'Education at a Glance 2017: OECD Indicators - Relative earnings of adults, by educational attainment'
     description_snapshot: |-
       The year of reference is 2015 for all countries except: Denmark (2014), Finland (2014), Belgium (2014), Italy (2013), Canada (2014), Netherlands (2014), Japan (2012), Spain (2014), France (2013), Luxembourg (2014), Poland (2014), and Lithuania (2014).
 
       Earnings are net of income tax only for: Latvia, Ireland, and Mexico.
 
-      For further details, see Table A6.1 in the Education at a Glance 2017 report.
-    citation_full: 'OECD. Education at a Glance 2017: OECD Indicators. OECD Publishing, Paris, 2017.'
-    version_producer: '2017'
+      For further details, see Table A6.1 in the Education at a Glance 2017 report (https://www.oecd-ilibrary.org/docserver/eag-2017-en.pdf?expires=1533729082&id=id&accname=guest&checksum=78D200C9AD96EA2A893AEC34BFB793F8).
+    citation_full: 'OECD (2017). Education at a Glance 2017: OECD Indicators.'
+    attribution_short: OECD
     url_main: https://www.oecd-ilibrary.org/education/education-at-a-glance-2017_eag-2017-en
     date_accessed: '2018-08-08'
     date_published: '2017'

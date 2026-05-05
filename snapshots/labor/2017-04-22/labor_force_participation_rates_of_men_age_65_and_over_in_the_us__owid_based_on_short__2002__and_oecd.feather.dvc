@@ -2,21 +2,20 @@ meta:
   origin:
     producer: Various sources
     title: Labor force participation rates of men age 65 and over in the US
-    description_snapshot: |-
-      The source for the period 1880 to 1990 is Short, Joanna (2002) — "Economic History of Retirement in the United States". EH.Net Encyclopedia, edited by Robert Whaples. September 30, 2002. URL: http://eh.net/encyclopedia/economic-history-of-retirement-in-the-united-states/.
+    description: |-
+      The source for the period 1880 to 1990 is Short, Joanna (2002) – "Economic History of Retirement in the United States". EH.Net Encyclopedia, edited by Robert Whaples. September 30, 2002. URL http://eh.net/encyclopedia/economic-history-of-retirement-in-the-united-states/
 
-      Short (2002) is itself based on these three sources:
-        - Moen, Jon R. (1987). Essays on the Labor Force and Labor Force Participation Rates: The United States from 1860 through 1950. Ph.D. dissertation, University of Chicago.
-        - Costa, Dora L. (1998). The Evolution of Retirement: An American Economic History, 1880–1990. Chicago: University of Chicago Press.
-        - Bureau of Labor Statistics.
+      This data is based on these three sources:
+      – Moen, Jon R. Essays on the Labor Force and Labor Force Participation Rates: The United States from 1860 through 1950. Ph.D. dissertation, University of Chicago, 1987.
+      – Costa, Dora L. The Evolution of Retirement: An American Economic History, 1880-1990. Chicago: University of Chicago Press, 1998.
+      – Bureau of Labor Statistics
 
-      Data for 2000 to 2015 is from the OECD Labour Force Statistics database — labor force participation rate by sex and age group. URL: http://stats.oecd.org/viewhtml.aspx?datasetcode=LFS_SEXAGE_I_R&lang=en.
+      Data for 2000 to 2015 is from the OECD [OECD.stat web browser – Source: http://stats.oecd.org/viewhtml.aspx?datasetcode=LFS_SEXAGE_I_R&lang=en Labor force participation of men 65 and older from the OECD – http://stats.oecd.org/viewhtml.aspx?datasetcode=LFS_SEXAGE_I_R&lang=en]"
 
-      Data for 2000 is available from both sources; the discrepancy is minor (Short reports 17.5% while the OECD reports 17.73%), so the two series have been merged as presented in the original sources.
-    citation_full: |-
-      Short, Joanna (2002). Economic History of Retirement in the United States. EH.Net Encyclopedia, edited by Robert Whaples. http://eh.net/encyclopedia/economic-history-of-retirement-in-the-united-states/
-      OECD (2017). Labour Force Statistics: Labour force participation rate by sex and age group. OECD.Stat. http://stats.oecd.org/viewhtml.aspx?datasetcode=LFS_SEXAGE_I_R&lang=en
-    url_main: http://stats.oecd.org/viewhtml.aspx?datasetcode=LFS_SEXAGE_I_R&lang=en
+      Data for 2000 is available from both sources and the discrepancy is minor so that we decided to merge the data as presented in the sources. Short reports 17.5% while the OECD reports 17.73% for 2000.
+    citation_full: Our World in Data based on Short (2002) and OECD (2017). Labor force participation rates of men age 65 and over in the US.
+    url_main: http://eh.net/encyclopedia/economic-history-of-retirement-in-the-united-states/
+    url_download: http://stats.oecd.org/viewhtml.aspx?datasetcode=LFS_SEXAGE_I_R&lang=en
     date_accessed: '2017-04-22'
     date_published: '2017'
 outs:

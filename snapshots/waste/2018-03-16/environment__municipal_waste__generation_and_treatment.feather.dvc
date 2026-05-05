@@ -1,14 +1,21 @@
 meta:
   origin:
     producer: OECD
-    title: 'Environment: Municipal waste, generation and treatment'
+    title: Environment - Municipal waste, Generation and Treatment
     description: |-
-      This dataset presents trends in amounts of municipal waste (including household waste) and the treatment and disposal methods used. The data is provided by member countries' authorities through the questionnaire on the state of the environment (OECD/Eurostat), and is updated or revised on the basis of data from other national and international sources available to the OECD Secretariat, as well as comments received from national delegates. Selected updates were also made in the context of OECD Environmental Performance Reviews.
+      Contact person/organisation
+      ENV.Stat@oecd.org
 
-      The data is harmonized through the work of the OECD Working Party on Environmental Information (WPEI) and benefits from continued data quality efforts in OECD member countries, the OECD itself, and other international organizations. In many countries, systematic collection of environmental data has a short history; sources are typically spread across a range of agencies and levels of government, and information is often collected for other purposes.
+      Data source(s) used
+      This dataset shows data provided by Member countries' authorities through the questionnaire on the state of the environment (OECD/Eurostat). They were updated or revised on the basis of data from other national and international sources available to the OECD Secretariat, and on the basis of comments received from national Delegates. Selected updates were also done in the context of the OECD Environmental Performance Reviews. The data are harmonised through the work of the OECD Working Party on Environmental Information (WPEI) and benefit from continued data quality efforts in OECD member countries, the OECD itself and other international organisations. In many countries systematic collection of environmental data has a short history; sources are typically spread across a range of agencies and levels of government, and information is often collected for other purposes. When interpreting these data, one should keep in mind that definitions and measurement methods vary among countries, and that inter-country comparisons require careful interpretation. One should also note that data presented here refer to national level and may conceal major subnational differences.
 
-      When interpreting these data, one should keep in mind that definitions and measurement methods vary among countries, and that inter-country comparisons require careful interpretation. Data presented here refer to the national level and may conceal major subnational differences.
-    citation_full: 'OECD.Stat, Environment: Municipal waste, generation and treatment. Accessed via OECD.Stat (https://stats.oecd.org/Index.aspx?DataSetCode=MUNW).'
+      Key statistical concept
+      This dataset presents trends in amounts of municipal (including household waste), and the treatment and disposal method used. The amount of waste generated in each country is related to the rate of urbanisation, the types and pattern of consumption, household revenue and lifestyles.
+
+      Metadata
+      http://stats.oecd.org/wbos/fileview2.aspx?IDFile=9bc27df8-1205-468c-b178-ce0d200f2641
+    citation_full: OECD.Stat (2018). Environment - Municipal waste, Generation and Treatment.
+    attribution_short: OECD
     url_main: https://stats.oecd.org/Index.aspx?DataSetCode=MUNW
     date_accessed: '2018-03-16'
     date_published: '2018'

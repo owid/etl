@@ -1,11 +1,12 @@
 meta:
   origin:
-    producer: U.S. National Park Service, Mote Marine Lab, and National Oceanic and Atmospheric Administration Marine Debris Program
+    producer: Various sources
     title: Decomposition times of marine debris
-    description: Average estimated decomposition times of typical marine debris items. This data covers the time it takes for common materials found as marine litter — such as plastics, metals, and organic matter — to break down in the ocean environment.
-    citation_full: U.S. National Park Service; Mote Marine Lab, Sarasota, FL; National Oceanic and Atmospheric Administration Marine Debris Program. Decomposition times of marine debris.
+    description: |-
+      Average estimated decomposition time of typical marine debris items.
+    citation_full: U.S. National Park Service; Mote Marine Lab, Sarasota, FL; National Oceanic and Atmospheric Administration Marine Debris Program.
     url_main: https://www.des.nh.gov/organization/divisions/water/wmb/coastal/trash/documents/marine_debris.pdf
-    date_accessed: '2026-03-05'
+    date_accessed: '2018-09-01'
     date_published: '2018'
 outs:
   - md5: 91a614734ace88918996a7851e4fb035

@@ -1,9 +1,14 @@
 meta:
   origin:
     producer: Holmes and Anderson
-    title: 'Convergence in National Alcohol Consumption Patterns: New Global Indicators'
-    description: This dataset provides average per capita alcohol consumption in select high-income countries from 1890 to 2014. Estimates are given as the average per capita level of consumption across the total population (not per average adult), and may therefore not be directly comparable with modern statistics of per capita consumption for populations aged 15 and older. Estimates in the original paper are given for particular decades (e.g., "1920s", "1940s"); in this dataset, each figure is allocated to the first year of the corresponding period (e.g., 1920 and 1940).
-    citation_full: 'Holmes, A. J., and Anderson, K. (2017). Convergence in national alcohol consumption patterns: New global indicators. Journal of Wine Economics, 12(2), 117–148.'
+    title: 'Convergence in national alcohol consumption patterns: New global indicators'
+    description: |-
+      Average per capita alcohol consumption in select high-income countries from 1890 to 2014.
+
+      This is given as the average per capita level of consumption (not level per average adult); it may therefore not be directly comparable with modern statistics of per capita consumption for populations 15+ years.
+
+      Estimates in the original paper are given for particular decades e.g. "1920s", "1940s". For this dataset we have allocated this figure to the first year in this period e.g. 1920 and 1940.
+    citation_full: 'Holmes, A. J., & Anderson, K. (2017). Convergence in national alcohol consumption patterns: New global indicators. Journal of Wine Economics, 12(2), 117-148.'
     url_main: https://www.cambridge.org/core/journals/journal-of-wine-economics/article/convergence-in-national-alcohol-consumption-patterns-new-global-indicators/C3E116C7FB7062BA5134E7377E8537DA
     date_accessed: '2019-02-14'
     date_published: '2017'

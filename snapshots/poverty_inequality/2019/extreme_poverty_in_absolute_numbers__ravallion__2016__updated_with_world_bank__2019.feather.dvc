@@ -1,14 +1,20 @@
 meta:
   origin:
-    producer: Ravallion and World Bank
-    title: Extreme Poverty in Absolute Numbers
+    producer: Various sources
+    title: Extreme poverty in absolute numbers
     description: |-
-      This dataset tracks the absolute number of people living in extreme poverty over time, using the International Poverty Line of $1.90 international dollars per day (adjusted for price differences between countries and for inflation over time).
+      According to the 'International Poverty Line' set by the United Nations people are considered to live in extreme poverty when living on less than 1.90 international-$ per day. International $ are adjusted for price differences between countries and for price changes over time (inflation).
 
-      The dataset combines two underlying sources. Historical estimates from 1820 to 1980 are drawn from Bourguignon and Morrisson (2002), "Inequality Among World Citizens: 1820–1992," American Economic Review, 92(4), 727–748, where poverty lines were calibrated so that poverty headcounts in 1992 coincided roughly with estimates from other sources. Data from 1981 onwards are drawn from the World Bank's PovcalNet. The series was originally presented in Ravallion (2016), "The Economics of Poverty: History, Measurement, and Policy," Oxford University Press, and subsequently updated using the same underlying sources.
-    citation_full: 'Ravallion, M. (2016). The Economics of Poverty: History, Measurement, and Policy. Oxford University Press. Updated with World Bank PovcalNet data (downloaded February 2019) from iresearch.worldbank.org/PovcalNet/. Historical data from Bourguignon, F. and Morrisson, C. (2002). Inequality Among World Citizens: 1820–1992. American Economic Review, 92(4), 727–748.'
-    url_main: https://ourworldindata.org/world-population-growth
-    date_accessed: '2016-02-01'
+      This visualization can be found in Ravallion (2016) – The Economics of Poverty: History, Measurement, and Policy. Oxford University Press. 28 January 2016. 736 Pages.
+
+      We have updated the visualization from Ravallion (2016) using the same sources the author relies on: Bourguignon and Morrison (2002) for the historical estimates and the World Bank for data from 1981 onwards.
+
+      All poverty estimates 1981 and later are taken from the World Bank's Povcal Net: iresearch.worldbank.org/PovcalNet/ (downloaded in February 2019).
+      All data from 1980 and earlier is taken from Bourguignon and Morrisson (2002) – Inequality Among World Citizens: 1820–1992. In American Economic Review, 92, 4, 727–748. Bourguignon and Morrisson (2002) state that 'the poverty lines were calibrated so that poverty and extreme poverty headcounts in 1992 coincided roughly with estimates from other sources'; here we rely on the midpoint of the two series published by Bourguignon and Morrison.
+
+      The absolute number of the world population is taken from the OurWorldInData world population data set: https://ourworldindata.org/world-population-growth.
+    citation_full: 'Ravallion (2016) – The Economics of Poverty: History, Measurement, and Policy. Oxford University Press; updated with World Bank PovcalNet (2019) and Bourguignon and Morrisson (2002).'
+    date_accessed: '2019-02-01'
     date_published: '2019'
 outs:
   - md5: 6df0239c475dd711c60ea0827247f450

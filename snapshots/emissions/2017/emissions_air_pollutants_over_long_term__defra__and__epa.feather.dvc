@@ -1,20 +1,19 @@
 meta:
   origin:
-    producer: UK Department for Environment, Food and Rural Affairs and US Environmental Protection Agency
-    title: Emissions of air pollutants over the long term
+    producer: DEFRA and EPA
+    title: Emissions of air pollutants over the long-term
     description: |-
-      Data is presented as total UK and US emissions of air pollutants from all anthropogenic (human) sources, measured in tonnes per year. Also provided is an index of emissions, normalized to emissions in the first year of data (1970 or 1990). Annual emissions in the base year are denoted as equal to 100; values below 100 indicate a fall in emissions, while values above 100 indicate an increase.
+      Data is presented as total UK and US emissions of air pollutants from all anthropogenic/human sources measured in tonnes per year. Also provided is an index of emissions, normalised to emissions in the first year of data (1970/1980 or 1990) 1970. In other words, annual emissions in 1970 are denoted as equal to 100; values below 100 therefore indicate a fall in emissions; values above 100 indicate an increase in emissions.
 
       PM10 and PM2.5 are used to denote emissions of particulate matter (PM) measuring less than 10 microns in diameter (PM10) and 2.5 microns in diameter (PM2.5).
-    title_snapshot: Emissions of air pollutants over the long term - DEFRA and EPA
-    citation_full: |-
-      UK Department for Environment, Food and Rural Affairs (DEFRA). Emissions of Air Pollutants Statistical Release. Available at: https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/681445/Emissions_of_air_pollutants_statistical_release_FINALv4.pdf
 
-      US Environmental Protection Agency (EPA). Air Pollutant Emissions Trends Data. Available at: https://www.epa.gov/air-emissions-inventories/air-pollutant-emissions-trends-data.
-    attribution_short: DEFRA and EPA
-    url_main: https://www.epa.gov/air-emissions-inventories/air-pollutant-emissions-trends-data
+      UK DEFRA Source: https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/681445/Emissions_of_air_pollutants_statistical_release_FINALv4.pdf
+
+      US EPA Source: https://www.epa.gov/air-emissions-inventories/air-pollutant-emissions-trends-data
+    citation_full: UK Department for Environment, Food and Rural Affairs (DEFRA) and US Environmental Protection Agency (EPA) (2018). Emissions of air pollutants over the long-term.
+    url_main: https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/681445/Emissions_of_air_pollutants_statistical_release_FINALv4.pdf
     date_accessed: '2018-02-18'
-    date_published: '2017'
+    date_published: '2018'
 outs:
   - md5: b2c550bbd8234553107c3b2f2868c6c4
     size: 13554

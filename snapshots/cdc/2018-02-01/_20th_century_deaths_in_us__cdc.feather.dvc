@@ -1,13 +1,12 @@
 meta:
   origin:
-    producer: Centers for Disease Control and Prevention
-    title: Leading Causes of Death, 1900–1998
+    producer: CDC
+    title: Leading Causes of Death, 1900-1998
     description: |-
-      This dataset presents the top ten leading causes of death in the United States across the 20th century, compiled by the Centers for Disease Control and Prevention (CDC). Death rates are reported per 100,000 population across both sexes and all ages, and are not age-standardized.
+      Data is compiled based on the list of top 10 causes of death published by the Centre for Diseases Control (CDC). This is measured across both sexes and all ages. Death rates are reported per 100,000 and are not age-standardized.
 
-      Data for specific causes of death may be missing or intermittent where a cause enters or falls out of the top ten reported causes of death in any given year.
-    citation_full: 'Centers for Disease Control and Prevention (CDC). Leading Causes of Death, 1900–1998. Available at: https://www.cdc.gov/nchs/data/dvs/lead1900_98.pdf.'
-    attribution_short: CDC
+      Data for specific causes of death may be missing or intermittent where it enters or falls out of the top 10 reported causes of deaths in any year.
+    citation_full: Centre for Diseases Control (CDC). Leading Causes of Death, 1900-1998.
     url_main: https://www.cdc.gov/nchs/data/dvs/lead1900_98.pdf
     date_accessed: '2018-02-01'
     date_published: '1998'

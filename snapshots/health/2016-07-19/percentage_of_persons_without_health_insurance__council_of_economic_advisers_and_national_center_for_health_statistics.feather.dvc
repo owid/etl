@@ -1,9 +1,10 @@
 meta:
   origin:
-    producer: Council of Economic Advisers and National Center for Health Statistics
+    producer: Various sources
     title: Percentage of persons without health insurance
-    description: For 1978–2015, both the Council of Economic Advisers (CEA) and the National Center for Health Statistics (NCHS) relied on historical data from the National Health Interview Survey (NHIS). For years prior to 1978, the CEA estimated the overall uninsured rate by combining information from the NHIS on trends in private coverage with administrative data on Medicare and Medicaid enrollment during those years.
-    citation_full: (i) 1963–2013, Council of Economic Advisers; (ii) 2014–2015, National Center for Health Statistics.
+    description: |-
+      For 1978-2015, both CEA and NCHS relied on historical data from the National Health Interview Survey (NHIS). For years prior to 1978 CEA estimated the overall uninsured rate by combining information from the NHIS on trends in private coverage, with administrative data on Medicare and Medicaid enrollment during those years. See the links below for further details.
+    citation_full: '(i) 1963-2013, Council of Economic Advisers; (ii) 2014-2015, National Center for Health Statistics.'
     url_main: https://www.whitehouse.gov/sites/default/files/docs/longtermhealthinsuranceseriesmethodologyfinal.pdf
     url_download: http://www.cdc.gov/nchs/data/nhis/earlyrelease/earlyrelease201605_01.pdf
     date_accessed: '2016-07-19'

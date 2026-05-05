@@ -2,8 +2,11 @@ meta:
   origin:
     producer: Pew Research Center
     title: Employment and gender attitudes
-    description: Data on attitudes toward employment and gender, drawn from Pew Research Center's Global Attitudes surveys. Country figures are primarily taken from the Spring 2010 Survey, with the exception of Turkey, Pakistan, Lebanon, Jordan, and Egypt, for which figures are taken from the Spring 2012 Survey. Figures for China and India are non-national samples.
-    citation_full: Pew Research Center, Spring 2010 and Spring 2012 Global Attitudes Surveys.
+    description: |-
+      Figures for China and India are non-national samples.
+
+      Country figures are taken from the Spring 2010 Survey conducted by the Pew Research Centre with the exception of Turkey, Pakistan, Lebanon, Jordan, and Egypt, for which figures are taken from the Spring 2012 Survey.
+    citation_full: Pew Research Center (2012). Employment and gender attitudes.
     url_main: http://www.pewglobal.org/question-search/?keywordtext=when+jobs+are+scarce&btnSubmit=Search&topic=&startdate=1970&enddate=2018&txtAreaCntIDsStndr=&txtAreaStdIDs=
     date_accessed: '2018-03-21'
     date_published: '2012'

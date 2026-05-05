@@ -2,10 +2,11 @@ meta:
   origin:
     producer: Ipsos MORI
     title: Perils of Perception Study
-    description: The Ipsos MORI Perils of Perception Study surveys tens of thousands of people across dozens of countries to measure how accurately the public perceives key social and economic realities in their country. The 2016 edition conducted 27,250 interviews across 50 countries between September and November 2016 via the Ipsos MORI Online Panel system. In the Czech Republic, Montenegro, Netherlands, Norway, and Serbia, interviews were carried out through a combination of the online system and face-to-face methodologies. Data are weighted to match the profile of the population.
-    title_snapshot: Perils of Perception Study - Perceptions of spending on health expenditure
-    citation_full: 'Ipsos MORI Perils of Perception Study 2016. Ipsos MORI. Available at: https://www.ipsos.com/ipsos-mori/en-uk/perceptions-are-not-reality-what-world-gets-wrong.'
-    version_producer: '2016'
+    description: |-
+      Ipsos MORI conducted 27,250 interviews across 50 countries between September-November 2016 via the Ipsos MORI Online Panel system. In the Czech Republic, Montenegro, Netherlands, Norway and Serbia, interviews were carried out through a combination of the online system and face-to-face methodologies.
+
+      Data are weighted to match the profile of the population.
+    citation_full: Ipsos MORI (2016). Perils of Perception Study 2016.
     url_main: https://www.ipsos.com/ipsos-mori/en-uk/perceptions-are-not-reality-what-world-gets-wrong
     date_accessed: '2017-06-15'
     date_published: '2016'

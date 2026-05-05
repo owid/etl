@@ -1,17 +1,19 @@
 meta:
   origin:
-    producer: Bloomberg New Energy Finance and World Bank
+    producer: Various sources
     title: Renewable investment as % of GDP
     description: |-
       Renewable energy investment as a percentage of GDP was calculated based on renewable energy investment figures (measured in US$, from Bloomberg New Energy Finance) and national GDP figures (measured in current US$ from the World Bank) in 2015 for the world's largest ten investors.
 
       This data includes both asset finance and small-scale renewable investments.
-    citation_full: |-
-      Bloomberg New Energy Finance. Global trends in renewable energy finance 2016. Available at: https://www.actu-environnement.com/media/pdf/news-26477-rapport-pnue-enr.pdf (accessed 2017-05-10).
 
-      The World Bank. World Development Indicators. Available at: http://databank.worldbank.org/data/home.aspx (accessed 2017-05-10).
-    url_main: https://www.actu-environnement.com/media/pdf/news-26477-rapport-pnue-enr.pdf
-    date_accessed: '2026-03-05'
+      References:
+
+      Bloomberg New Energy Finance. Global trends in renewable energy finance 2016. Available at: https://www.actu-environnement.com/media/pdf/news-26477-rapport-pnue-enr.pdf (accessed 2017-05-10)
+
+      The World Bank. World Development Indicators. Available at: http://databank.worldbank.org/data/home.aspx (accessed 2017-05-10)
+    citation_full: Bloomberg New Energy Finance (2016) – Global trends in renewable energy finance 2016; and The World Bank – World Development Indicators.
+    date_accessed: '2017-05-10'
     date_published: '2016'
 outs:
   - md5: 5354f712a364791ca1e9dc3b87786b08
