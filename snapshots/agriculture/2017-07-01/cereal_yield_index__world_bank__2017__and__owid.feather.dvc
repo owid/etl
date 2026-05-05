@@ -10,7 +10,7 @@ meta:
       The original dataset from WDI used in this calculation was "Cereal yield (kg per hectare)", which is defined by the World Bank/FAO as: "Cereal yield, measured as kilograms per hectare of harvested land, includes wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains. Production data on cereals relate to crops harvested for dry grain only. Cereal crops harvested for hay or harvested green for food, feed, or silage and those used for grazing are excluded. The FAO allocates production data to the calendar year in which the bulk of the harvest took place. Most of a crop harvested near the end of a year will be used in the following year."
     citation_full: 'World Bank. World Development Indicators. Washington, D.C.: World Bank. Available at: http://data.worldbank.org/data-catalog/world-development-indicators'
     url_main: http://data.worldbank.org/data-catalog/world-development-indicators
-    date_accessed: '2026-03-06'
+    date_accessed: '2017-07-01'
     date_published: '2017'
 outs:
   - md5: 1331c3a4ccd45d77b1d942bf531e1332

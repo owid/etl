@@ -10,7 +10,7 @@ meta:
       Values are given relative to a standard LDPE (Low-density polyethylene) single-use plastic bag, with values indicating the number of reuses a given bag would need to result in an equal environment impact. For example, a value of 5 would indicate a bag would have to be reused 5 times in order to have as low an environmental impact as the LDPE bag.
     citation_full: The Danish Environmental Protection Agency (2018). LCA of grocery carrier bags.
     url_main: https://www2.mst.dk/Udgiv/publications/2018/02/978-87-93614-73-4.pdf
-    date_accessed: '2026-03-05'
+    date_accessed: '2018-01-01'
     date_published: '2018'
 outs:
   - md5: 66c07bccf6891ab4c1eb77dce7ae944a

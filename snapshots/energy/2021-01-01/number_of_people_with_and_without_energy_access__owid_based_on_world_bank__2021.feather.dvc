@@ -8,7 +8,7 @@ meta:
       Original metrics of energy access shares and total population can be accessed from the World Bank World Development Indicators (available at: http://data.worldbank.org/data-catalog/world-development-indicators).
     citation_full: World Bank World Development Indicators. Energy access and population data.
     url_main: http://data.worldbank.org/data-catalog/world-development-indicators
-    date_accessed: '2026-03-10'
+    date_accessed: '2021-01-01'
     date_published: '2021'
 outs:
   - md5: ceee20a2480c26b936413f6ce4c3a56d

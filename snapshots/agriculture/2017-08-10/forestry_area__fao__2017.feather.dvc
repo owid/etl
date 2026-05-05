@@ -11,7 +11,7 @@ meta:
     citation_full: Food and Agriculture Organization of the United Nations (2017). FAOSTAT.
     attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#home
-    date_accessed: '2026-03-05'
+    date_accessed: '2017-08-10'
     date_published: '2017'
 outs:
   - md5: 3a6da8da2d9aa35bc1e3a171819a4bcf

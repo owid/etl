@@ -7,7 +7,7 @@ meta:
 
       European aggregate figures is sourced from the European Environment Agency: https://www.eea.europa.eu/data-and-maps/indicators/proportion-of-vehicle-fleet-meeting-5/assessment. Here "Europe" refers to the sum of the EU-27, Iceland, Norway and United Kingdom.
     citation_full: International Council on Clean Transport (ICCT). European Vehicle Market Statistics. European aggregated figures from the European Environment Agency.
-    date_accessed: '2026-03-10'
+    date_accessed: '2021-01-01'
     date_published: '2021'
 outs:
   - md5: 96201b5344a9e8af770349ef4bd56948

@@ -5,7 +5,7 @@ meta:
     citation_full: United States Department for Agriculture (USDA) Economic Research Service. International Agricultural Productivity.
     attribution_short: USDA ERS
     url_main: https://www.ers.usda.gov/data-products/international-agricultural-productivity
-    date_accessed: '2026-03-05'
+    date_accessed: '2021-01-01'
     date_published: '2021'
 outs:
   - md5: d02cc85fec853cf646c772ab94d234e3
