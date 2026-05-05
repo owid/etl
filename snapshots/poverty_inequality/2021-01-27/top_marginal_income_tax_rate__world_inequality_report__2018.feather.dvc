@@ -1,19 +1,18 @@
 meta:
-  source:
-    name: Top marginal income tax rate - World Inequality Report (2018)
+  is_public: false
+  origin:
+    producer: Alvaredo et al.
+    title: World Inequality Report 2018
     description: |-
       The World Inequality Report 2018 provides a long-term series of the top marginal income tax rates in rich countries including the US, UK, France, Germany, and Japan from 1900 to 2017.
 
       The top marginal income tax rates reported include general income tax supplements (such as surtaxes applying to all incomes above a certain level) but excludes all other taxes and social contributions.
 
-      For more detailed information on the construction of the top marginal income tax rate country-by-country, see page 161 of the World Inequality Report 2018 <a href="http://wid.world/static/technical-notes-for-figures-and-tables.pdf">Technical Notes for Figures and Tables</a>.
-    url: https://wir2018.wid.world/methodology.html
-    date_accessed: 2021-01-27
-    published_by: |-
-      Alvaredo, F., Chancel, L., Piketty, T., Saez, E., & Zucman, G. (Eds.). (2018). World Inequality Report 2018. Belknap Press.
-  name: Top marginal income tax rate - World Inequality Report (2018)
-  description: ''
-  is_public: false
+      For more detailed information on the construction of the top marginal income tax rate country-by-country, see page 161 of the World Inequality Report 2018 Technical Notes for Figures and Tables (http://wid.world/static/technical-notes-for-figures-and-tables.pdf).
+    citation_full: Alvaredo, F., Chancel, L., Piketty, T., Saez, E., and Zucman, G. (Eds.). (2018). World Inequality Report 2018. Belknap Press.
+    url_main: https://wir2018.wid.world/methodology.html
+    date_accessed: '2021-01-27'
+    date_published: '2018'
 outs:
   - md5: 796d8a00201cac8ca061d8ad266ca495
     size: 5026

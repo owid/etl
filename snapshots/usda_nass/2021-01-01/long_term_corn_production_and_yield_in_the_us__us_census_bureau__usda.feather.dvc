@@ -1,6 +1,8 @@
 meta:
-  source:
-    name: Calculated by Our World in Data based on US Census Bureau and USDA
+  is_public: false
+  origin:
+    producer: Various sources
+    title: Long-term corn production and yield in the US
     description: |-
       This dataset was built by Our World in Data based on two sources.
 
@@ -10,12 +12,10 @@ meta:
 
       Production data was converted from bushels to tonnes using a conversion factor of 0.025.
       Land use data was converted from acres to hectares using a conversion factor of 0.45.
-    url: https://quickstats.nass.usda.gov/
+    citation_full: Our World in Data based on United States Department of Agriculture (USDA) and US Census Bureau.
+    url_main: https://quickstats.nass.usda.gov/
     date_accessed: '2021-01-01'
-    published_by: United States Department for Agriculture (USDA); and US Census Bureau
-  name: Long-term corn production and yield in the US (US Census Bureau; USDA)
-  description: ''
-  is_public: false
+    date_published: '2021'
 outs:
   - md5: 36949a00bac07c5a9f2bc4aad9a7d3cb
     size: 8122

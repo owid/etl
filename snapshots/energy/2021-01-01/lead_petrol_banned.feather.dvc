@@ -1,6 +1,8 @@
 meta:
-  source:
-    name: Collected by Our World in Data based on multiple sources
+  is_public: false
+  origin:
+    producer: Various sources
+    title: Year leaded petrol was banned in road vehicles
     description: |-
       This dataset reports the year for which leaded petrol (Tetraethyllead) was banned for use in road vehicles.
 
@@ -14,11 +16,9 @@ meta:
       https://www.un.org/esa/gite/cleanfuels/ifqc-globaloverview.pdf
       https://www.reglugerd.is/reglugerdir/eftir-raduneytum/umhverfisraduneyti/nr/4507
       https://timesofmalta.com/articles/view/leaded-petrol-replacement-to-go-on-sale-from-thursday.159938
+    citation_full: Collected by Our World in Data based on multiple sources.
     date_accessed: '2021-01-01'
-    published_by: Collected by Our World in Data based on multiple sources
-  name: lead_petrol_banned
-  description: ''
-  is_public: false
+    date_published: '2021'
 outs:
   - md5: 264d9d044d6e7286d8109aec50462747
     size: 25250

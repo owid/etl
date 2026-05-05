@@ -1,17 +1,16 @@
 meta:
-  source:
-    name: Amoroso et al. (2018). Bottom trawl fishing footprints on the world’s continental shelves. PNAS.
+  is_public: false
+  origin:
+    producer: Amoroso et al.
+    title: Bottom trawl fishing footprints on the world's continental shelves
     description: |-
       Amoroso et al. (2018) map the extent of bottom trawling – a method used to catch fish and crustaceans at or on the seabed across world regions.
 
       This metric measures the share of the seabed on continental shelves – to a depth of 1000m – that experienced at least one trawling pass over a 3 to 4 year period.
-    url: https://www.pnas.org/content/115/43/e10275
+    citation_full: Amoroso, R. O., Pitcher, C. R., Rijnsdorp, A. D., McConnaughey, R. A., Parma, A. M., Suuronen, P., ... and Jennings, S. (2018). Bottom trawl fishing footprints on the world's continental shelves. Proceedings of the National Academy of Sciences, 115(43), E10275–E10282.
+    url_main: https://www.pnas.org/content/115/43/e10275
     date_accessed: '2021-01-01'
-    published_by: |-
-      Amoroso, R. O., Pitcher, C. R., Rijnsdorp, A. D., McConnaughey, R. A., Parma, A. M., Suuronen, P., ... & Jennings, S. (2018). Bottom trawl fishing footprints on the world’s continental shelves. Proceedings of the National Academy of Sciences, 115(43), E10275-E10282.
-  name: Trawling by region (Amoroso et al. 2018)
-  description: ''
-  is_public: false
+    date_published: '2018'
 outs:
   - md5: a3ca0fffbb088b696ed2bd05b400afeb
     size: 3418

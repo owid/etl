@@ -1,14 +1,14 @@
 meta:
-  source:
-    name: Transaction Costs - OECD Economic Outlook (2007)
-    description: |-
-      Sea fright corresponds to average international freight charges per tonne. Passenger air transport corresponds to average airline revenue per passenger mile until 2000 spliced to US import air passenger fares afterwards. International calls correspond to cost of a three-minute call from New York to London.
-    url: http://www.oecd-ilibrary.org/economics/economic-globalisation_9789264111905-en
-    date_accessed: 2015-08-18
-    published_by: 'OECD Insights - Economic Globalisation: Origins and Consequences'
-  name: Transport and communication costs, OECD Economic Outlook (2007)
-  description: ''
   is_public: false
+  origin:
+    producer: OECD
+    title: 'Economic Globalisation: Origins and Consequences'
+    description: |-
+      Sea fright corresponds to average international freight charges per tonne. Passenger air transport corresponds to average airline revenue per passenger mile until 2000 spliced to US import air passenger fares afterwards. International calls correspond to cost of a three-minute call from New York to London.
+    citation_full: 'OECD (2007). OECD Insights - Economic Globalisation: Origins and Consequences.'
+    url_main: http://www.oecd-ilibrary.org/economics/economic-globalisation_9789264111905-en
+    date_accessed: '2015-08-18'
+    date_published: '2007'
 outs:
   - md5: f5d01f501d84d9986b79dd4756b4b57e
     size: 6458

@@ -1,11 +1,11 @@
 meta:
-  source:
-    name: global_agricultural_productivity
-    date_accessed: '2021-06-01'
-    published_by: global_agricultural_productivity
-  name: global_agricultural_productivity
-  description: ''
   is_public: false
+  origin:
+    producer: Various sources
+    title: Global agricultural productivity
+    citation_full: Global agricultural productivity.
+    date_accessed: '2021-06-01'
+    date_published: '2021'
 outs:
   - md5: 311121625d946923291b3059d70631a5
     size: 4994
