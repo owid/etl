@@ -1,6 +1,18 @@
 ---
 name: migrate-explorer-indicator-legacy
-description: Migrate a legacy ETL explorer step to the modern `export://explorers/<ns>/latest/<short>` shape that uses `paths.create_collection(explorer=True)`. Covers two legacy shapes: (A) `data://explorers/<ns>/<v>/<short>` steps that write wide CSV tables for the legacy explorer infra (e.g. poverty_inequality, lis, wid, wb, emdat, monkeypox); (B) `export://explorers/<ns>/latest/<short>` steps that already exist but build the TSV programmatically via `paths.create_explorer_legacy(df_graphers, df_columns)` (minerals, air_pollution, migration/2024-08-05, minerals_supply_and_demand_prospects). Trigger when the user says "migrate indicator-legacy explorer <short>", "convert create_explorer_legacy to create_collection", or "move data://explorers/... to export://explorers/...".
+description: >-
+  Migrate a legacy ETL explorer step to the modern
+  `export://explorers/<ns>/latest/<short>` shape that uses
+  `paths.create_collection(explorer=True)`. Covers two legacy shapes: (A)
+  `data://explorers/<ns>/<v>/<short>` steps that write wide CSV tables for the
+  legacy explorer infra (e.g. poverty_inequality, lis, wid, wb, emdat,
+  monkeypox); (B) `export://explorers/<ns>/latest/<short>` steps that already
+  exist but build the TSV programmatically via
+  `paths.create_explorer_legacy(df_graphers, df_columns)` (minerals,
+  air_pollution, migration/2024-08-05,
+  minerals_supply_and_demand_prospects). Trigger when the user says "migrate
+  indicator-legacy explorer <short>", "convert create_explorer_legacy to
+  create_collection", or "move data://explorers/... to export://explorers/...".
 metadata:
   internal: true
 ---

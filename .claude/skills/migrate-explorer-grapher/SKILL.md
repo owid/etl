@@ -1,6 +1,13 @@
 ---
 name: migrate-explorer-grapher
-description: Migrate a non-ETL explorer (lives in MySQL `explorers` table; TSV mirrored in `owid-grapher/explorers/`) into an ETL-managed `export://explorers/<ns>/latest/<short>` step. Trigger when the user says "bring <slug> explorer into ETL", "migrate grapher explorer <slug>", or refers to one of: energy, co2, democracy, global-health, food-prices, fertilizers, natural-disasters, food-footprints, plastic-pollution, conflict-data, conflict-data-source, countries-in-conflict-data.
+description: >-
+  Migrate a non-ETL explorer (lives in MySQL `explorers` table; TSV mirrored in
+  `owid-grapher/explorers/`) into an ETL-managed
+  `export://explorers/<ns>/latest/<short>` step. Trigger when the user says
+  "bring <slug> explorer into ETL", "migrate grapher explorer <slug>", or refers
+  to one of: energy, co2, democracy, global-health, food-prices, fertilizers,
+  natural-disasters, food-footprints, plastic-pollution, conflict-data,
+  conflict-data-source, countries-in-conflict-data.
 metadata:
   internal: true
 ---
