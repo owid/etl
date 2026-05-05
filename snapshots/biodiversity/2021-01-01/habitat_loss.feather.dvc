@@ -1,7 +1,7 @@
 meta:
-  source:
-    name: |-
-      Williams, Clark, Buchanan, Ficetola, Rondinini, & Tilman (2021). Proactive conservation to prevent habitat losses to agricultural expansion. Nature Sustainability.
+  origin:
+    producer: Williams et al.
+    title: Proactive conservation to prevent habitat losses to agricultural expansion
     description: |-
       Projected species' habitat loss is projected to 2050 under a business-as-usual, plus five intervention scenarios with changes to diets or agricultural production.
 
@@ -16,12 +16,10 @@ meta:
       Optimize trade: agricultural production and trade is optimized to produce food in the locations with the least risk of habitat loss. Agricultural production shifts from the 25 countries projected to have the greatest mean losses of suitable habitat across all species to countries where less than 10% of species are threatened with extinction.
 
       Combined: all four interventions are combined.
-    url: https://www.nature.com/articles/s41893-020-00656-5
-    date_accessed: 2025-04-10
-    published_by: |-
-      Williams, D. R., Clark, M., Buchanan, G. M., Ficetola, G. F., Rondinini, C., & Tilman, D. (2021). Proactive conservation to prevent habitat losses to agricultural expansion. Nature Sustainability, 4(4), 314-322.
-  name: Biodiversity habitat loss (Williams et al. 2021)
-  description: ''
+    citation_full: Williams, D. R., Clark, M., Buchanan, G. M., Ficetola, G. F., Rondinini, C., and Tilman, D. (2021). Proactive conservation to prevent habitat losses to agricultural expansion. Nature Sustainability, 4(4), 314–322.
+    url_main: https://www.nature.com/articles/s41893-020-00656-5
+    date_accessed: '2025-04-10'
+    date_published: '2021'
 outs:
   - md5: 76f76eaa98796b44f2f3ab0342acfbea
     size: 104690

@@ -1,14 +1,14 @@
 meta:
-  source:
-    name: Vanderslott & Marks (2021). Charting mandatory childhood vaccination policies worldwide. Vaccine.
+  is_public: false
+  origin:
+    producer: Vanderslott and Marks
+    title: Charting mandatory childhood vaccination policies worldwide
     description: |-
       This is a live dataset that relies on crowdsourcing to note policy changes. If you are aware of any new policies or policy changes for any country please do get in touch at: samantha.vanderslott@paediatrics.ox.ac.uk.
-    url: https://www.sciencedirect.com/science/article/pii/S0264410X21005478
+    citation_full: Vanderslott, S., and Marks, T. (2021). Charting mandatory vaccination policies worldwide. Vaccine.
+    url_main: https://www.sciencedirect.com/science/article/pii/S0264410X21005478
     date_accessed: '2021-01-01'
-    published_by: Vanderslott, S., & Marks, T. (2021). Charting mandatory vaccination policies worldwide. <i>Vaccine</i>.
-  name: Childhood vaccination policies (Vanderslott et al. 2021)
-  description: ''
-  is_public: false
+    date_published: '2021'
 outs:
   - md5: 9675e72c3d64db8b2da2eab3c4b2891f
     size: 11306

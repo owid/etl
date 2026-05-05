@@ -1,12 +1,13 @@
 meta:
-  source:
-    name: Global Consumption and Income Project
-    url: gcip.info
-    date_accessed: 2018-12-03
-    published_by: Global Consumption and Income Project
-  name: Gini index in 1980, 1990 & 2015 – GCIP (2018)
-  description: ''
   is_public: false
+  origin:
+    producer: Global Consumption and Income Project
+    title: Gini index
+    citation_full: Global Consumption and Income Project (GCIP) (2018). Gini index.
+    attribution_short: GCIP
+    url_main: http://gcip.info
+    date_accessed: '2018-12-03'
+    date_published: '2018'
 outs:
   - md5: 86f484af29f92e0dfcaa82dab5ba86c0
     size: 30810

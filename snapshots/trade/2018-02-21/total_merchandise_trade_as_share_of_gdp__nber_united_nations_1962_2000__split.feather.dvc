@@ -1,6 +1,8 @@
 meta:
-  source:
-    name: NBER-United Nations Dataset 1962-2000
+  is_public: false
+  origin:
+    producer: Feenstra and Lipsey
+    title: NBER-United Nations Trade Data, 1962–2000
     description: |-
       To calculate merchandise trade as a share of GDP, the NBER-UN data series uses Fouquin and Hugot (CEPII 2016)'s long run GDP series, converted from nominal British pounds to US$, using historical exchange rates sourced from the Bank of England (see 'A millennium of macroeconomic data' dataset, section VII). NBER-UN has national trade statistics of country exports to the world.
 
@@ -13,13 +15,10 @@ meta:
       Russia: the former USSR and Russia.
       France: French Guinea, Guadeloupe, Saint Pierre and Miquelon, and France.
       Yemen: the Yemen Arab Republic, the Yemen People's Republic, and Yemen.
-    url: |-
-      NBER-UN trade data: http://cid.econ.ucdavis.edu/nberus.html BOE Exchange Rate: https://www.bankofengland.co.uk/statistics/research-datasets CEPII (2016) GDP data: http://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=32
-    date_accessed: 2018-02-21
-    published_by: Robert Feenstra and Robert Lipsey, The Center for International Development, UC Davis
-  name: Total merchandise trade as share of GDP (NBER-United Nations 1962-2000) (split)
-  description: ''
-  is_public: false
+    citation_full: Feenstra, R. and Lipsey, R. NBER-United Nations Trade Data, 1962–2000. The Center for International Development, UC Davis.
+    url_main: http://cid.econ.ucdavis.edu/nberus.html
+    date_accessed: '2018-02-21'
+    date_published: latest
 outs:
   - md5: 18f330a53bd2b7ce1995c41105eb4f8d
     size: 44458

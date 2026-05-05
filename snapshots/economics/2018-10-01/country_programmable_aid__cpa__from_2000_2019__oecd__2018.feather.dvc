@@ -1,11 +1,11 @@
 meta:
-  source:
-    name: Country programmable aid (CPA) from 2000-2019 (OECD, 2018)
-    date_accessed: '2018-10-01'
-    published_by: Country programmable aid (CPA) from 2000-2019 (OECD, 2018)
-  name: Country programmable aid (CPA) from 2000-2019 (OECD, 2018)
-  description: ''
   is_public: false
+  origin:
+    producer: OECD
+    title: Country Programmable Aid
+    citation_full: OECD (2018). Country Programmable Aid (CPA), 2000–2019.
+    date_accessed: '2018-10-01'
+    date_published: '2018'
 outs:
   - md5: a06b4821c1066a6ed233e1f06d41e9b1
     size: 27650

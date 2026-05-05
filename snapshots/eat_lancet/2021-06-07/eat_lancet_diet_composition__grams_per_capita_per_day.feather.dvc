@@ -1,6 +1,8 @@
 meta:
-  source:
-    name: Food and Agriculture Organization of the United Nations;  EAT-Lancet Commission
+  is_public: false
+  origin:
+    producer: Various sources
+    title: EAT-Lancet diet composition
     description: |-
       This dataset compares the composition of the EAT-Lancet diet with average diets across the world.
 
@@ -11,11 +13,9 @@ meta:
       The EAT-Lancet diet is a diet recommended to balance the goals of healthy nutrition and environmental sustainability for a global population.
 
       As the report states: "Although the planetary health diet, which is based on health considerations, is consistent with many traditional eating patterns, it does not imply that the global population should eat exactly the same food, nor does it prescribe an exact diet. Instead, the planetary health diet outlines empirical food groups and ranges of food intakes, which combined in a diet, would optimize human health. Local interpretation and adaptation of the universally-applicable planetary health diet is necessary and should reflect the culture, geography and demography of the population and individuals."
-    date_accessed: 2021-06-07
-    published_by: Food and Agriculture Organization of the United Nations;  EAT-Lancet Commission
-  name: eat-lancet-diet-composition (grams per capita per day)
-  description: ''
-  is_public: false
+    citation_full: Food and Agriculture Organization of the United Nations (FAO); EAT-Lancet Commission (2019). FAOSTAT food supply data and EAT-Lancet Commission Summary Report.
+    date_accessed: '2021-06-07'
+    date_published: '2019'
 outs:
   - md5: 02ff3d2d34b5a970e3e4948522002956
     size: 78938

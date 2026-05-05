@@ -1,6 +1,8 @@
 meta:
-  source:
-    name: Gender, Institutions and Development Database (GID-DB) 2019
+  is_public: false
+  origin:
+    producer: OECD
+    title: Gender, Institutions and Development Database
     description: |-
       The Gender, Institutions and Development Database (GID-DB) compiles data on the laws on child marriage, specifically whether women and men have the same legal minimum age of marriage. The child marriage indicator has five categories listed below:
 
@@ -14,13 +16,11 @@ meta:
 
       1: The law allows child marriage for women but not for men.
 
-      For further information see the <a href="https://www.genderindex.org/methodology/">SIGI methodology page</a>.
-    url: https://stats.oecd.org/Index.aspx?DataSetCode=GIDDB2019#
-    date_accessed: 2021-06-14
-    published_by: OECD.Stat
-  name: Laws on child marriage - Gender, Institutions and Development Database (GID-DB, 2019)
-  description: ''
-  is_public: false
+      For further information see the SIGI methodology page (https://www.genderindex.org/methodology/).
+    citation_full: OECD (2019). Gender, Institutions and Development Database (GID-DB).
+    url_main: https://stats.oecd.org/Index.aspx?DataSetCode=GIDDB2019#
+    date_accessed: '2021-06-14'
+    date_published: '2019'
 outs:
   - md5: 1a44ec088d854fa2dde75010118aacf1
     size: 5738

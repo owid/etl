@@ -1,17 +1,18 @@
 meta:
-  source:
-    name: OWID based on Olivetti (2013)
+  is_public: false
+  origin:
+    producer: Olivetti
+    title: Female labor force participation index
     description: |-
       The female labor force participation (FLFP) index was calculated by OWID based on FLFP data compiled from Olivetti (2013). The original data shows FLFP as percentage of the female population that is economically active. Olivetti compiled data from Mitchell (1998) and the International Labor Organization.
 
       For more detail see: http://www.nber.org/papers/w19131.pdf.
+
       The index measures FLFP as an index to 1900. This was calculated by dividing FLFP in each year by FLFP in 1900 (therefore 1900 = 100). Values less than 100 indicate a decrease in FLFP relative to 1900; values greater than 100 indicate an increase in FLFP relative to 1900.
-    url: http://www.nber.org/papers/w19131.pdf
-    date_accessed: 2017-08-01
-    published_by: OWID calculation based on original data by Olivetti (2013)
-  name: Female Labor Force Participation Index (OWID (2017)) (split)
-  description: ''
-  is_public: false
+    citation_full: Our World in Data calculation based on original data by Olivetti, C. (2013). NBER Working Paper.
+    url_main: http://www.nber.org/papers/w19131.pdf
+    date_accessed: '2017-08-01'
+    date_published: '2013'
 outs:
   - md5: 03db02368a6cf3374f1200c0e01eb4f4
     size: 3258

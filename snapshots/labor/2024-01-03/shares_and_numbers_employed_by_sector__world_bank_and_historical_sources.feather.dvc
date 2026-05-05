@@ -1,15 +1,16 @@
 meta:
-  source:
-    name: Our World in Data based on International Labor Organization (via the World Bank) and historical sources
+  is_public: false
+  origin:
+    producer: Various sources
+    title: Shares and numbers employed by sector
     description: |-
       This dataset was constructed by Our World in Data based on the primary dataset on labor force participation, published by the International Labor Organization (via the World Bank). This publishes data on labor statistics since 1991.
 
       Data prior to 1991 has been compiled from various historical reconstructions. The sources for this dataset are described in detail here: https://ourworldindata.org/agri-employment-sources
+    citation_full: Our World in Data based on International Labor Organization (via the World Bank) and historical sources.
+    url_main: https://ourworldindata.org/agri-employment-sources
     date_accessed: '2024-01-03'
-    published_by: Our World in Data based on International Labor Organization (via the World Bank) and historical sources
-  name: Shares and numbers employed by sector (World Bank and historical sources)
-  description: ''
-  is_public: false
+    date_published: '2024'
 outs:
   - md5: 23c4e09e7fecedbc052e347e97ad2dcf
     size: 325442

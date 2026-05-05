@@ -1,6 +1,8 @@
 meta:
-  source:
-    name: Infant Mortality Rates in UK (ONS, 2018)
+  is_public: false
+  origin:
+    producer: UK Office for National Statistics
+    title: Childhood, infant and perinatal mortality in England and Wales
     description: |-
       Infant mortality rates as reported by the UK Office for National Statistics (ONS). Infant mortality rates have be subdivided into categories depending on the age of the infant as follows:
 
@@ -10,13 +12,11 @@ meta:
       - Infant – deaths of those aged under 1 year.
 
       Neonatal and postneonatal are reported as the number of deaths per 1,000 live births. Perinatal and infant mortality is reported as the number of deaths per 1,000 total births (the sum of stillbirths and live births). Note that stillbirths are only recorded for births with 24 weeks of gestation or more (i.e. stillbirths less than 24 weeks gestation are not recorded).
-    url: |-
-      https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/childhoodinfantandperinatalmortalityinenglandandwales/2016
-    date_accessed: 2018-11-19
-    published_by: UK Office for National Statistics (ONS)
-  name: Infant Mortality Rates in UK (ONS, 2018)
-  description: ''
-  is_public: false
+    citation_full: UK Office for National Statistics (ONS) (2018). Childhood, infant and perinatal mortality in England and Wales.
+    attribution_short: ONS
+    url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/childhoodinfantandperinatalmortalityinenglandandwales/2016
+    date_accessed: '2018-11-19'
+    date_published: '2018'
 outs:
   - md5: 868b408885aaa22f164fe870a94253ee
     size: 5378

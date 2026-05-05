@@ -1,24 +1,19 @@
 meta:
-  source:
-    name: Karlinsky and Kobak (2021)
+  origin:
+    producer: Karlinsky and Kobak
+    title: Excess mortality during the COVID-19 pandemic
     description: |-
       The data are sourced from the World Mortality Dataset (https://github.com/akarlinsky/world_mortality). Excess mortality is computed relative to the baseline obtained using linear extrapolation of the 2015–19 trend (different baselines for years since 2020).
-      For more details, refer to https://github.com/dkobak/excess-mortality#excess-mortality-during-the-covid-19-pandemic.
-    url: https://github.com/dkobak/excess-mortality
-    source_data_url: https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-stmf.csv
-    date_accessed: 2026-04-23
-    publication_date: '2021-06-30'
-    publication_year: 2021
-    published_by: |-
-      Karlinsky & Kobak, 2021, Tracking excess mortality across countries during the COVID-19 pandemic with the World Mortality Dataset. eLife 10:e69336. https://elifesciences.org/articles/69336
-  name: Excess mortality during the COVID-19 pandemic
-  description: |-
-    The data are sourced from the World Mortality Dataset (https://github.com/akarlinsky/world_mortality). Excess mortality is computed relative to the baseline obtained using linear extrapolation of the 2015–19 trend (different baselines for years since 2020).
 
-    For more details, refer to https://github.com/dkobak/excess-mortality#excess-mortality-during-the-covid-19-pandemic.
-  license:
-    name: GPL-3.0
-    url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
+      For more details, refer to https://github.com/dkobak/excess-mortality#excess-mortality-during-the-covid-19-pandemic.
+    citation_full: 'Karlinsky, A. and Kobak, D. (2021). Tracking excess mortality across countries during the COVID-19 pandemic with the World Mortality Dataset. eLife, 10:e69336. https://elifesciences.org/articles/69336.'
+    url_main: https://github.com/dkobak/excess-mortality
+    url_download: https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-stmf.csv
+    date_accessed: '2026-04-23'
+    date_published: '2021-06-30'
+    license:
+      name: GPL-3.0
+      url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
   access_notes: Contains data by age.
 outs:
   - md5: 077b2edc78cd9fcdd40c084e07d04477
