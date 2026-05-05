@@ -7,7 +7,7 @@ definitions:
         hasMapTab: false
         yScaleToggle: false
         baseColorScheme: owid-distinct
-        hideAnnotationFieldsInTitle: true
+        hideTimeline: true
 
 config:
   explorerTitle: Impacts of Energy Production
@@ -16,6 +16,7 @@ config:
   entityType: source
   hasMapTab: false
   hideAlertBanner: true
+  hideAnnotationFieldsInTitle: true
   selection:
     - Coal
     - Gas
