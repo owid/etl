@@ -8,7 +8,7 @@ meta:
       Jambeck et al. quantified municipal and plastic waste streams from coastal populations in 2010. Their estimates were therefore multiplied by coastal population numbers to derive national plastic waste at risk of entering oceans and waterways. Here we calculate the total plastic waste generation by instead multiplying by total population figures.
     citation_full: 'Jambeck, J. R., Geyer, R., Wilcox, C., Siegler, T. R., Perryman, M., Andrady, A., ... & Law, K. L. (2015). Plastic waste inputs from land into the ocean. Science, 347(6223), 768-771.'
     url_main: http://science.sciencemag.org/content/347/6223/768/
-    date_accessed: '2026-03-05'
+    date_accessed: '2017-01-01'
     date_published: '2015'
 outs:
   - md5: cd488b6aa8d570b3fb719f552b07e018

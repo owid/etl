@@ -12,7 +12,7 @@ meta:
       Data was extracted from the static figure, Q0-1, using the extraction tool WebPlotDigitizer (https://apps.automeris.io/wpd/).
     citation_full: 'Hegglin, M. I., Fahey, D. W., McFarland, M., Montzka, S. A., and Nash, E. R. (2014). Twenty questions and answers about the ozone layer: 2014 update. World Meteorological Organization, UNEP, NOAA, NASA, and European Commission.'
     url_main: https://public.wmo.int/en/resources/library/twenty-questions-and-answers-about-ozone-layer-2014-update
-    date_accessed: '2026-03-05'
+    date_accessed: '2018-07-01'
     date_published: '2014'
 outs:
   - md5: 7c07f152186c693a7316cd6c816e13a8

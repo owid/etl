@@ -13,7 +13,7 @@ meta:
 
       We estimate death rates from hydropower based on an updated list of historical hydropower accidents, dating back to 1965, sourced primarily from the underlying database included in Sovacool et al. (2016). For more information, see our article: https://ourworldindata.org/safest-sources-of-energy
     citation_full: Sovacool et al. (2016); and Markandya, A., & Wilkinson, P. (2007).
-    date_accessed: '2026-03-05'
+    date_accessed: '2020-01-01'
     date_published: '2016'
 outs:
   - md5: 2aefdb5488786c47fd76f891188def34

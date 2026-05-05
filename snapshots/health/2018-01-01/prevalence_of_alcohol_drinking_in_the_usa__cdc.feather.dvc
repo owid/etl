@@ -9,7 +9,7 @@ meta:
     citation_full: Centers for Disease Control and Prevention (CDC). Prevalence of alcohol drinking in the USA.
     attribution_short: CDC
     url_main: https://www.cdc.gov/alcoholportal/index.html
-    date_accessed: '2026-03-10'
+    date_accessed: '2018-01-01'
     date_published: '2018'
 outs:
   - md5: 36730c558575fcc72c6fa9e7cb5dddbd

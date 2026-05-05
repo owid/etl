@@ -8,7 +8,7 @@ meta:
       Data is based on the UN Comtrade Database.
     citation_full: 'Brooks, A. L., Wang, S., and Jambeck, J. R. (2018). The Chinese import ban and its impact on global plastic waste trade. Science Advances, 4(6), eaat0131.'
     url_main: http://advances.sciencemag.org/content/4/6/eaat0131
-    date_accessed: '2026-03-05'
+    date_accessed: '2018-08-01'
     date_published: '2018'
 outs:
   - md5: a7348fd45c668de078074be8f95b9296

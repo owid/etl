@@ -7,7 +7,7 @@ meta:
     citation_full: US Centers for Disease Control and Prevention WONDER. Drug overdose deaths in the US.
     attribution_short: CDC
     url_main: https://www.drugabuse.gov/related-topics/trends-statistics/overdose-death-rates
-    date_accessed: '2026-03-10'
+    date_accessed: '2024-01-01'
     date_published: '2024'
 outs:
   - md5: d25116350039711c714d8360818c6a62

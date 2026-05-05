@@ -2,7 +2,7 @@ meta:
   source:
     name: OWID based on Maddison Project Database 2020, GCIP and van Zanden et al. (2014))
     description: 'See data appendix:'
-    date_accessed: 2026-03-06
+    date_accessed: '2020-10-01'
     published_by: OWID based on Maddison Project Database 2020, GCIP and van Zanden et al. (2014))
   name: |-
     Historical estimates of number of people living at different income thresholds globally (OWID based on Maddison Project Database 2020, GCIP and van Zanden et al. (2014))

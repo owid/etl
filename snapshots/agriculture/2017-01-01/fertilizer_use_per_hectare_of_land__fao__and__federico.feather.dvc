@@ -10,7 +10,7 @@ meta:
       All data is measured in kilograms of nutrient per hectare of arable land.
     citation_full: 'Food and Agriculture Organization (FAO) via World Bank World Development Indicators (WDI), 2017. Available at: https://data.worldbank.org/. Federico, G. (2008). Feeding the World: An Economic History of Agriculture, 1800–2000. Princeton University Press.'
     url_main: https://data.worldbank.org/
-    date_accessed: '2026-03-10'
+    date_accessed: '2017-01-01'
     date_published: '2017'
 outs:
   - md5: f32c4bc611167efce3341c40da0a1425

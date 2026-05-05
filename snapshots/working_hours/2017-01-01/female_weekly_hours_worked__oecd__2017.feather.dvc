@@ -13,7 +13,7 @@ meta:
     citation_full: OECD (2017). OECD Labor Force Statistics.
     attribution_short: OECD
     url_main: http://stats.oecd.org/Index.aspx?DatasetCode=AVE_HRS
-    date_accessed: '2026-03-10'
+    date_accessed: '2017-01-01'
     date_published: '2017'
 outs:
   - md5: adc9ebf69e416e6ef7157886613d09ce
