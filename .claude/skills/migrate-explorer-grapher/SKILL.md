@@ -71,9 +71,12 @@ For each unique ID, query MySQL to recover the catalog path:
 # yVariableIds (and xVariableId, colorVariableId, sizeVariableId) — direct lookup
 make query SQL="SELECT id, catalogPath FROM variables WHERE id IN (...)"
 
-# grapherId — two-step lookup
-make query SQL="SELECT id, JSON_EXTRACT(config, '\$.dimensions[0].variableId') AS yVarId FROM charts WHERE id IN (...)"
+# grapherId — two-step lookup. The chart config lives in chart_configs (joined via charts.configId).
+make query SQL="SELECT c.id, JSON_EXTRACT(cc.full, '\$.dimensions[0].variableId') AS yVarId FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN (...)"
 # then feed the resulting variable IDs into the variables query above
+
+# Pull the full chart config in one go (variable IDs + title/subtitle/type/map/etc.) for grapher-chart explorers:
+make query SQL="SELECT c.id, cc.full FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN (...)"
 ```
 
 Variables without `catalogPath` are not yet in ETL — their underlying datasets need to be migrated first (use the `migrate-dataset` skill). **Halt and report which datasets are missing rather than guessing.**
@@ -81,6 +84,46 @@ Variables without `catalogPath` are not yet in ETL — their underlying datasets
 ### 3. Identify the upstream grapher datasets
 
 For each catalog path (`<ns>/<v>/<dataset>/<table>#<short>`), the underlying step is `data://grapher/<ns>/<v>/<dataset>`. Collect the unique set — these become DAG dependencies for the new explorer step.
+
+> **Mental model for grapher-chart-based explorers**: each grapherId is just a thin wrapper around an indicator (or a few). The migration "unwraps" the chart, recovers its underlying indicators, and rebuilds the explorer directly from those indicators. Anything the chart has stored — title, subtitle, color scale, map config — either flows from the indicator's garden metadata (preferred for single-indicator views; see step 3.5) or has to be re-stated in the explorer YAML.
+
+### 3.5. Decide the construction style
+
+Two orthogonal choices before scaffolding:
+
+**View construction — full-YAML vs table-driven**
+
+- **Full-YAML** (default for grapher-chart-based migrations): hand-list every view under `views:` in the YAML. Use when views are bespoke (different titles, subtitles, indicators per dimension combination — typical when each grapherId points at a different indicator). Model: `crop_yields.{py,config.yml}`, `countries_in_conflict_data.{py,config.yml}`, the `food_prices` migration above.
+- **Table-driven**: pass `tb=tb, indicator_names=[...], dimensions=[...]` to `create_collection` and let it auto-expand views from the dimensional indicators of an upstream multidim grapher dataset. Use when the explorer's dimensions map cleanly onto the indicator dimensions of one upstream dataset (e.g. metric × gender × age). YAML carries only the static config + dimension definitions; views are generated. Model: `migration/latest/migration_flows.py`.
+
+  ```python
+  ds = paths.load_dataset("<grapher_dataset>")
+  tb = ds.read("<table>", load_data=False)
+  c = paths.create_collection(
+      config=config,
+      tb=tb,
+      indicator_names=["migrants"],
+      dimensions=["country_select", "metric", "gender"],
+      common_view_config={"type": "LineChart DiscreteBar", "hasMapTab": True, "tab": "map"},
+      short_name="<short-with-hyphens>",
+      explorer=True,
+  )
+  c.sort_choices({"country_select": lambda x: sorted(x)})  # optional post-processing
+  c.save()
+  ```
+
+  Most grapher-chart-based migrations don't qualify for table-driven because each grapherId tends to reference a different indicator from a non-dimensional table. Prefer table-driven only when you can verify the upstream is genuinely multidim and the explorer's dimensions match.
+
+**Where FAUST lives — garden metadata vs explorer config**
+
+For **single-indicator views**, prefer pushing the chart text (title, subtitle, note, description_short, …) upstream into the indicator's garden metadata under `presentation.grapher_config` (or the equivalent top-level fields like `title_public`). The explorer view then inherits it automatically — no duplication, and standalone charts on the same indicator pick up the same text.
+
+For **multi-indicator views** (one view, multiple `y[]` entries, or x/y/color/size combos), FAUST cannot live on any single indicator. Put it in the explorer view's `config:` block.
+
+When migrating a grapher-chart-based explorer:
+1. For each chart's `title`/`subtitle`/`note`, first check whether the underlying indicator's garden metadata (`presentation.grapher_config.title`, etc.) already carries it. If yes, leave it off the explorer view — it inherits.
+2. If the chart's text differs from the indicator's metadata and the indicator is otherwise unused elsewhere, consider updating the garden metadata instead of duplicating in the explorer.
+3. Only put FAUST in `view.config` when the view has multiple indicators, or when the indicator metadata is shared across charts that use different text.
 
 ### 4. Scaffold the ETL step
 
@@ -173,10 +216,10 @@ views:
 | `xVariableId` | `view.indicators.x[]` |
 | `colorVariableId` | `view.indicators.color[]` |
 | `sizeVariableId` | `view.indicators.size[]` |
-| Per-view chart settings (`title`, `subtitle`, `type`, `hasMapTab`, `minTime`, `yAxisMin`, …) | `view.config` |
+| Per-view chart settings (`title`, `subtitle`, `type`, `hasMapTab`, `minTime`, `yAxisMin`, …) | `view.config` — but for single-indicator views, prefer pushing `title`/`subtitle`/`note` into the indicator's garden `presentation.grapher_config` (see step 3.5) |
 | `columns` table row | `view.indicators.<axis>[i].display` (color scales, tolerance, units, …) |
 
-For grapher-chart-based explorers, also pull the chart's stored config (`SELECT config FROM charts WHERE id = ?`) and merge `title`/`subtitle`/`type`/`hasMapTab`/`yAxis`/etc. into `view.config`.
+For grapher-chart-based explorers, also pull the chart's stored config (`SELECT cc.full FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id = ?`) and merge `title`/`subtitle`/`type`/`hasMapTab`/`yAxis`/`map.colorScale`/etc. into `view.config` — or, for single-indicator views, into the indicator's garden metadata.
 
 ### 6. Hyphens vs underscores
 
@@ -205,9 +248,14 @@ Hand off to the user:
 
 ## Reference: existing migrations to model after
 
+Full-YAML (each view hand-listed):
 - `etl/steps/export/explorers/agriculture/latest/crop_yields.{py,config.yml}` — large indicator-based explorer with many dimensions.
-- `etl/steps/export/explorers/migration/latest/migration_flows.py` — table-driven (uses `paths.create_collection(tb=tb, indicator_names=..., dimensions=...)` to expand views from a multidim grapher dataset).
+- `etl/steps/export/explorers/agriculture/latest/food_prices.{py,config.yml}` — small grapher-chart-based migration (12 chart IDs unwrapped to 12 single-indicator views).
+- `etl/steps/export/explorers/war/latest/countries_in_conflict_data.{py,config.yml}` — uses `na`-named choices to model conditional dimensions.
 - `etl/steps/export/explorers/emissions/latest/ipcc_scenarios.{py,config.yml}` — moderate-size YAML-driven.
+
+Table-driven (views auto-expanded from a dimensional table):
+- `etl/steps/export/explorers/migration/latest/migration_flows.{py,config.yml}` — passes `tb=tb, indicator_names=[...], dimensions=[...]` to `create_collection`; YAML carries only the static config and dimension presentation.
 
 ## Follow-up
 

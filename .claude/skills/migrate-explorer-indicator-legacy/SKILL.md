@@ -69,6 +69,8 @@ Identify:
 - **Full YAML** when each view is bespoke (different titles, subtitles, configs per dimension combination). Model after `crop_yields.{py,config.yml}`.
 - **Table-driven** when the upstream is a multidim grapher dataset and dimensions map onto its indicator dimensions. Model after `migration/latest/migration_flows.py` — the YAML carries the static config, and `paths.create_collection(tb=tb, indicator_names=[...], dimensions=[...], common_view_config=...)` expands views automatically. Post-process in Python for the residual logic (e.g. per-metric `display` settings via `add_display_settings(c)`).
 
+> **Where FAUST lives** (orthogonal to full-YAML vs table-driven). For **single-indicator** views, prefer pushing chart text (`title`, `subtitle`, `note`, `description_short`, …) upstream into the indicator's garden metadata under `presentation.grapher_config`. The explorer view then inherits it — no duplication, and the same metadata is used by any standalone chart on that indicator. For **multi-indicator** views (multiple `y[]` entries, or x/y/color/size combos), put FAUST in the explorer view's `config:` block — it has no meaningful home on a single indicator. When converting `df_graphers["title"]`/`["subtitle"]` rows, check first whether the underlying indicator's metadata already carries the same text; if yes, drop it from the explorer YAML.
+
 ### 3. Scaffold the new step
 
 ```bash
@@ -126,6 +128,7 @@ def run() -> None:
 | `df_graphers["<Name> Dropdown"]` unique values | one entry under `dimensions:` (slug = snake-case of `<Name>`, presentation type = dropdown/radio/checkbox) |
 | Each row of `df_graphers` | one entry under `views:` with `dimensions:` map and `indicators.y[].catalogPath` |
 | Per-row `hasMapTab`, `minTime`, `yAxisMin`, `defaultView`, `type`, … | `view.config` (or hoist into a `definitions: &common_view_config` if shared) |
+| Per-row `title`/`subtitle`/`note` for single-indicator views | Prefer `presentation.grapher_config` in the indicator's garden metadata; only put in `view.config` if the view has multiple indicators or the text genuinely differs from the indicator's metadata |
 | `df_columns` rows | `view.indicators.y[].display` (per-view, per-indicator) |
 | Loops setting `display` on every "Production" view, etc. | Either fold into YAML (DRY via anchors) or keep as Python post-processing |
 

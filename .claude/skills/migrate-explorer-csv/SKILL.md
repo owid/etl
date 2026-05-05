@@ -75,12 +75,17 @@ def run() -> None:
 - convert types and units to ETL conventions (long format with `country`/`year` index)
 - optionally compute per-capita or per-region aggregates
 - write `*.meta.yml` with origins, descriptions, per-indicator metadata
+- **FAUST for single-indicator explorer views**: while you're authoring the indicator metadata, push `title`/`subtitle`/`note`/`description_short` into `presentation.grapher_config` (or top-level `title_public`, `description_short`, …) of each indicator that the explorer surfaces alone. The explorer view inherits this text without having to duplicate it in `<short>.config.yml`. Only put FAUST in the explorer YAML when a view has multiple indicators (one view → many `y[]` entries, or x/y/color/size combos) or the explorer text genuinely differs from the indicator's metadata.
 
 ### 5. Grapher step
 
 `etl/steps/data/grapher/<ns>/<date>/<short>.py` — read the garden table and save as a grapher dataset (long format `country`/`year`/`value`).
 
 ### 6. Explorer step — leverage the migration helper
+
+Construction style — same orthogonal choice as the other migration skills:
+- **Full-YAML** (one entry per view): use when each view has bespoke title/indicators/config.
+- **Table-driven** (`paths.create_collection(tb=tb, indicator_names=[...], dimensions=[...], common_view_config=..., explorer=True)`): use when the new garden table is dimensional (one row per country/year × dim_a × dim_b) and the explorer's dimension widgets map onto those dimensions. In CSV-explorer migrations this is often achievable because *you control the garden output* — design the table with the dimensions you need and let `create_collection` expand the views. Model: `migration_flows.py`.
 
 Before hand-translating the legacy config, try the programmatic helper in `etl/collection/explorer/migration.py`:
 
