@@ -4,7 +4,7 @@ definitions:
   description_key_land_use: &description-key-land-use
     - *description-key-common
     - The land use of different energy sources can vary significantly, depending on the context of the production site - its location; climate; and choices around the density and spacing of equipment. For example, the spacing of wind turbines and solar panels will affect how much land is needed per unit of electricity output.
-    - Wind energy is not included in these comparisons of average land use figures. This is because the land use of wind energy can be measured in several ways and is distinctly different from the land use of other energy technologies. Land between wind turbines can be used for other purposes (such as farming), which is not the case for other energy sources. The spacing of turbines and the context of the site means that its land use is highly variable. For this reason we don't provide an average land use figure for wind in this data. However, we do included figures for wind in [our article on this topic](https://ourworldindata.org/land-use-per-energy-source).
+    - Wind energy is not included in these comparisons of average land use figures. This is because the land use of wind energy can be measured in several ways and is distinctly different from the land use of other energy technologies. Land between wind turbines can be used for other purposes (such as farming), which is not the case for other energy sources. The spacing of turbines and the context of the site means that its land use is highly variable. For this reason we don't provide an average land use figure for wind in this data. However, we do include figures for wind in [our article on this topic](https://ourworldindata.org/land-use-per-energy-source).
   description_key_metal_mineral_use: &description-key-metal-mineral-use
     - *description-key-common
     - The metal and mineral requirements for each source are based on the requirements of the actual amount of material extracted from the ground, which includes all the losses throughout the extraction, refining and fabrication processes.
@@ -39,7 +39,7 @@ tables:
         title: Freshwater eutrophication per unit of electricity
         unit: grams of phosphorus-equivalents per megawatt-hour
         short_unit: gP-eq/MWh
-        description_short: "Freshwater eutrophication is caused by the emissions of phosphorus compounds to freshwater: either rivers or lakes. This is measured in grams of phosphorous emitted per unit of electricity production."
+        description_short: "Freshwater eutrophication is caused by the emissions of phosphorus compounds to freshwater: either rivers or lakes. This is measured in grams of phosphorus emitted per unit of electricity production."
         description_key:
           - *description-key-common
         display:

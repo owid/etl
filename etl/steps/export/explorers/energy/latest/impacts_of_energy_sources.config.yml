@@ -93,7 +93,7 @@ views:
     config:
       title: Land use per unit of electricity
       subtitle: |-
-        Land use is measured as the total amount of land needed per unit of electricity production. This includes direct land use – the land used by a power plant, or solar farm – plus indirect land use from the mining of fuels and materials. This is measured in per megawatt-hour of electricity production.
+        Land use is measured as the total amount of land needed per unit of electricity production. This includes direct land use - the land used by a power plant, or solar farm - plus indirect land use from the mining of fuels and materials. This is measured per megawatt-hour of electricity production.
       note: |-
         This is shown as the average land use of different energy technologies. There can be significant variability depending on location, materials, and infrastructure decisions. See our related article for the full range of land use comparisons.
       relatedQuestionUrl: https://ourworldindata.org/land-use-per-energy-source
