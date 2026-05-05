@@ -8,7 +8,10 @@ topic_tags:
 default_dimensions:
   type: all_stacked
   timespan: annual
-  metric: share_of_gdp
+  # `metric` intentionally omitted: only `share_of_gdp` is currently active in
+  # economic_damages.py:INDICATOR_BY_METRIC, and the framework collapses single-
+  # choice dimensions out of views, so listing `metric` here would fail to match
+  # any view. Re-add `metric: <choice>` if/when `total_damages` is re-enabled.
 dimensions:
   - slug: type
     name: Disaster type
@@ -74,12 +77,12 @@ dimensions:
         description: Better for comparing trends over time as it's less sensitive to one-off events
   - slug: metric
     name: Metric
-    description: Total estimated damages in US$, or damages as a share of GDP
+    description: Damages as a share of GDP
     choices:
       - slug: share_of_gdp
         name: Share of GDP
         description: Estimated damages as a share of gross domestic product (GDP)
-      - slug: total_damages
-        name: Total damages, in US$
-        description: Estimated damages measured in current US$ (not adjusted for inflation)
+      # - slug: total_damages
+      #   name: Total damages, in US$
+      #   description: Estimated damages measured in current US$ (not adjusted for inflation)
 views: []

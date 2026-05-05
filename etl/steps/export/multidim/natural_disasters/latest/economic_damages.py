@@ -21,17 +21,19 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Map metric -> garden indicator prefix.
-# We use damages in current US$ (not adjusted for inflation): the inflation-adjusted
-# series produces unrealistic values for countries that have experienced hyperinflation.
 INDICATOR_BY_METRIC = {
-    "total_damages": "total_damages",
+    # "total_damages": "total_damages",
     "share_of_gdp": "total_damages_per_gdp",
 }
 
 
 def _title(view) -> str:
     type_phrase = DISASTER_PHRASES[view.dimensions["type"]]
-    if view.dimensions["metric"] == "share_of_gdp":
+    # The framework drops single-choice dimensions from `view.dimensions`, so when
+    # `total_damages` is commented out the `metric` key disappears. Default to the
+    # only remaining metric so the if/else still picks the right wording.
+    metric = view.dimensions.get("metric", next(iter(INDICATOR_BY_METRIC)))
+    if metric == "share_of_gdp":
         body = f"Annual economic damages from {type_phrase} as a share of GDP"
     else:
         body = f"Annual economic damages from {type_phrase}"
@@ -42,7 +44,8 @@ def _title(view) -> str:
 
 def _subtitle(view) -> str:
     parts = []
-    if view.dimensions["metric"] == "total_damages":
+    metric = view.dimensions.get("metric", next(iter(INDICATOR_BY_METRIC)))
+    if metric == "total_damages":
         parts.append("Estimated damages are reported in current US$ (not adjusted for inflation).")
     else:
         parts.append("Damages are expressed as a share of gross domestic product (GDP).")
@@ -117,7 +120,10 @@ def run() -> None:
     )
 
     # Expose the all-disasters total on the map tab of the stacked-by-type views.
-    add_total_indicator_for_map(c, lambda d: INDICATOR_BY_METRIC[d["metric"]])
+    # Like _title/_subtitle above, default to the only remaining metric when the
+    # framework has dropped a single-choice `metric` dimension from view.dimensions.
+    default_metric = next(iter(INDICATOR_BY_METRIC))
+    add_total_indicator_for_map(c, lambda d: INDICATOR_BY_METRIC[d.get("metric", default_metric)])
 
     # Pin a stable colour to each y-indicator based on its disaster type.
     apply_disaster_colors(c)
