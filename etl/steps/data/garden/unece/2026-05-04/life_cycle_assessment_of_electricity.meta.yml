@@ -32,6 +32,7 @@ tables:
         description_short: Lifecycle greenhouse gas emissions per unit of electricity, including emissions from the burning of fuels, mining of materials and production of energy technologies.
         display:
           name: Greenhouse gas emissions
+          shortUnit: kgCO₂e
           numDecimalPlaces: 0
       freshwater_eutrophication:
         title: Freshwater eutrophication per unit of electricity
@@ -40,6 +41,7 @@ tables:
         description_short: Freshwater eutrophication is caused by emissions of phosphorus compounds to rivers or lakes, measured in grams of phosphorus emitted per unit of electricity production.
         display:
           name: Freshwater eutrophication
+          shortUnit: gP-eq
           numDecimalPlaces: 0
       ionising_radiation:
         title: Ionising radiation per unit of electricity
@@ -48,6 +50,7 @@ tables:
         description_short: Ionising radiation impacts per unit of electricity produced, expressed in U-235 equivalents.
         display:
           name: Ionising radiation
+          shortUnit: kg U-235eq
           numDecimalPlaces: 1
       water_use:
         title: Dissipated water use per unit of electricity
@@ -56,6 +59,7 @@ tables:
         description_short: Dissipated water that is not immediately returned to the local environment (e.g. evaporated, or used as an ingredient in a chemical product), measured per megawatt-hour of electricity production.
         display:
           name: Water use
+          shortUnit: m³
           numDecimalPlaces: 0
       metal_mineral_use:
         title: Metal and mineral requirements per unit of electricity
@@ -66,6 +70,7 @@ tables:
           - *metals_note
         display:
           name: Total material use
+          shortUnit: g
           numDecimalPlaces: 2
       noncarcinogenic_toxicity:
         title: Non-carcinogenic toxicity per unit of electricity
@@ -74,6 +79,7 @@ tables:
         description_short: Non-carcinogenic toxicity impacts on human health per terawatt-hour of electricity, expressed in comparative toxic units.
         display:
           name: Non-carcinogenic toxicity
+          shortUnit: CTUh
           numDecimalPlaces: 1
       carcinogenic_toxicity:
         title: Carcinogenic toxicity per unit of electricity
@@ -82,6 +88,7 @@ tables:
         description_short: Carcinogenic toxicity impacts on human health per terawatt-hour of electricity, expressed in comparative toxic units.
         display:
           name: Carcinogenic toxicity
+          shortUnit: CTUh
           numDecimalPlaces: 1
       land_use_energy:
         title: Land use per unit of electricity
@@ -90,6 +97,7 @@ tables:
         description_short: Total land used per unit of electricity production, including direct land use (e.g. the area of a power plant or solar farm) and indirect land use from mining of fuels and materials.
         display:
           name: Land use
+          shortUnit: m²
           numDecimalPlaces: 1
       aluminium_use:
         title: Aluminium requirements per unit of electricity
@@ -100,6 +108,7 @@ tables:
           - *metals_note
         display:
           name: Aluminium
+          shortUnit: g
           numDecimalPlaces: 2
       chromium_use:
         title: Chromium requirements per unit of electricity
@@ -110,6 +119,7 @@ tables:
           - *metals_note
         display:
           name: Chromium
+          shortUnit: g
           numDecimalPlaces: 2
       cobalt_use:
         title: Cobalt requirements per unit of electricity
@@ -120,6 +130,7 @@ tables:
           - *metals_note
         display:
           name: Cobalt
+          shortUnit: g
           numDecimalPlaces: 3
       copper_use:
         title: Copper requirements per unit of electricity
@@ -130,6 +141,7 @@ tables:
           - *metals_note
         display:
           name: Copper
+          shortUnit: g
           numDecimalPlaces: 2
       manganese_use:
         title: Manganese requirements per unit of electricity
@@ -140,6 +152,7 @@ tables:
           - *metals_note
         display:
           name: Manganese
+          shortUnit: g
           numDecimalPlaces: 2
       molybdenum_use:
         title: Molybdenum requirements per unit of electricity
@@ -150,6 +163,7 @@ tables:
           - *metals_note
         display:
           name: Molybdenum
+          shortUnit: g
           numDecimalPlaces: 2
       nickel_use:
         title: Nickel requirements per unit of electricity
@@ -160,6 +174,7 @@ tables:
           - *metals_note
         display:
           name: Nickel
+          shortUnit: g
           numDecimalPlaces: 2
       silicon_use:
         title: Silicon requirements per unit of electricity
@@ -170,6 +185,7 @@ tables:
           - *metals_note
         display:
           name: Silicon
+          shortUnit: g
           numDecimalPlaces: 2
       zinc_use:
         title: Zinc requirements per unit of electricity
@@ -180,6 +196,7 @@ tables:
           - *metals_note
         display:
           name: Zinc
+          shortUnit: g
           numDecimalPlaces: 2
       uranium_use:
         title: Uranium requirements per unit of electricity
@@ -190,4 +207,5 @@ tables:
           - *metals_note
         display:
           name: Uranium
+          shortUnit: g
           numDecimalPlaces: 3
