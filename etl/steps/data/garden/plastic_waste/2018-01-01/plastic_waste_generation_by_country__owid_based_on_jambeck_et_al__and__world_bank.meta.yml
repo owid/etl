@@ -1,3 +1,8 @@
+definitions:
+  common:
+    presentation:
+      attribution: Jambeck et al. (2015)
+
 dataset:
   title: Plastic waste generation by country - OWID based on Jambeck et al. & World Bank
 tables:
