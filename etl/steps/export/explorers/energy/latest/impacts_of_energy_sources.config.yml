@@ -16,7 +16,6 @@ config:
   entityType: source
   hasMapTab: false
   hideAlertBanner: true
-  wpBlockId: "47482"
   selection:
     - Coal
     - Gas
