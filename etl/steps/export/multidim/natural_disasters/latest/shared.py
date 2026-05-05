@@ -290,16 +290,21 @@ def add_total_indicator_for_map(
         view.config["map"] = {**(view.config.get("map") or {}), "columnSlug": catalog_path}
 
 
-def apply_decadal_time_range(c) -> None:
-    """Show the full historical series (1900 onwards) by default for decadal views.
+def apply_decadal_time_range(c, min_year: int = 1900) -> None:
+    """Show the full historical series by default for decadal views.
 
-    Annual views default to showing data from 2000 onwards; decadal data shows the full timeline.
+    Annual views default to showing data from 2000 onwards; decadal data shows
+    the full timeline. ``min_year`` defaults to 1900 (the data start for
+    deaths/affected). For metrics that start later — e.g. economic damages as
+    a share of GDP, where pre-1960 GDP series aren't available — pass the
+    actual start year so the slider doesn't let users wander into a no-data zone.
     """
     for view in c.views:
         if view.dimensions.get("timespan") != "decadal":
             continue
         view.config = view.config or {}
-        view.config["minTime"] = 1900
+        view.config["minTime"] = min_year
+        view.config["timelineMinTime"] = min_year
 
 
 def apply_disaster_colors(c) -> None:

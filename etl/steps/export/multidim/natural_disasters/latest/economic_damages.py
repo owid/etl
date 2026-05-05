@@ -26,6 +26,11 @@ INDICATOR_BY_METRIC = {
     "share_of_gdp": "total_damages_per_gdp",
 }
 
+# Share-of-GDP indicators rely on World Bank GDP data, which only goes back to 1960.
+# Used as the decadal timeline floor so the slider doesn't let users wander into
+# the pre-1960 zone where pre-aggregation upstream fills the share with 0s.
+SHARE_OF_GDP_START_YEAR = 1960
+
 
 def _title(view) -> str:
     type_phrase = DISASTER_PHRASES[view.dimensions["type"]]
@@ -128,8 +133,10 @@ def run() -> None:
     # Pin a stable colour to each y-indicator based on its disaster type.
     apply_disaster_colors(c)
 
-    # Decadal views default to the full 1900-onwards range; annual views stay at 2000.
-    apply_decadal_time_range(c)
+    # Decadal views default to the share-of-GDP data start (1960). The slider
+    # is also clamped at the same year so users can't drag back into the no-data
+    # pre-1960 range. Annual views stay at minTime=2000.
+    apply_decadal_time_range(c, min_year=SHARE_OF_GDP_START_YEAR)
 
     #
     # Save outputs.
