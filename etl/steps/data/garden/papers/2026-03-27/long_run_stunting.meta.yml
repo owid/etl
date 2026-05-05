@@ -27,7 +27,7 @@ tables:
           - Children are considered stunted if their height-for-age is more than two standard deviations below the median of the World Health Organization (WHO) [child growth standards](https://www.who.int/tools/child-growth-standards/standards).
           - This data comes from [an article by Schneider et al. (2026)](https://gh.bmj.com/content/11/2/e018607) that compiles historical studies and the UN Joint Malnutrition Estimates (JME) database to provide a long-term perspective on child stunting rates.
           - Schneider et al. compile stunting rates among children between 2 and 10 years old. This data is therefore not directly comparable to more recent datasets (such as the UN JME database) which provide stunting rates for children under 5 years old.
-          - This chart includes only data points from high-quality studies e.g. studies that are nationally representative and have larger sample sizes. The full dataset includes additional data points and is available via the original paper [here](https://doi.org/10.5281/zenodo.18262234)
+          - This chart includes only data points from high-quality studies e.g. studies have larger sample sizes and are on a national or sub-national level (rather than local or small-scale studies). The full dataset includes additional data points and is available via the original paper [here](https://doi.org/10.5281/zenodo.18262234)
           - The year shown is the birth decade of the children in each study, plotted at the midpoint of that decade. So the 1955 data point includes children born between 1950 and 1959.
         display:
           roundingMode: "significantFigures"
