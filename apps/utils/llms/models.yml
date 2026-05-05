@@ -49,8 +49,22 @@ models:
       out:
         value: [15, 22.50]
         brackets: [0, 200_000]
+  - name: "anthropic:claude-sonnet-4-6"
+    display_name: "Sonnet 4.6 (smarter)"
+    cost:
+      in:
+        value: [3, 6]
+        brackets: [0, 200_000]
+      out:
+        value: [15, 22.50]
+        brackets: [0, 200_000]
   - name: "anthropic:claude-opus-4-5"
     display_name: "Opus 4.5 (smartest)"
+    cost:
+      in: 5.0
+      out: 25.0
+  - name: "anthropic:claude-opus-4-7"
+    display_name: "Opus 4.7 (smartest)"
     cost:
       in: 5.0
       out: 25.0

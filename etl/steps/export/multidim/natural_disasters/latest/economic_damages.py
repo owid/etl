@@ -1,0 +1,144 @@
+"""Multi-dim chart on economic damages from natural disasters."""
+
+from shared import (
+    ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE,
+    ALL_DISASTERS_SUBTITLE,
+    COMMON_VIEW_CONFIG,
+    DISASTER_DESCRIPTIONS,
+    DISASTER_PHRASES,
+    DISASTER_TYPES_EXCLUDING_EXTREME_TEMPERATURE,
+    INDIVIDUAL_DISASTER_TYPES,
+    NOTE,
+    STACKED_VIEW_CONFIG,
+    add_total_indicator_for_map,
+    apply_decadal_time_range,
+    apply_disaster_colors,
+    prepare_table,
+)
+
+from etl.helpers import PathFinder
+
+paths = PathFinder(__file__)
+
+# Map metric -> garden indicator prefix.
+INDICATOR_BY_METRIC = {
+    # "total_damages": "total_damages",
+    "share_of_gdp": "total_damages_per_gdp",
+}
+
+# Share-of-GDP indicators rely on World Bank GDP data, which only goes back to 1960.
+# Used as the decadal timeline floor so the slider doesn't let users wander into
+# the pre-1960 zone where pre-aggregation upstream fills the share with 0s.
+SHARE_OF_GDP_START_YEAR = 1960
+
+
+def _title(view) -> str:
+    type_phrase = DISASTER_PHRASES[view.dimensions["type"]]
+    # The framework drops single-choice dimensions from `view.dimensions`, so when
+    # `total_damages` is commented out the `metric` key disappears. Default to the
+    # only remaining metric so the if/else still picks the right wording.
+    metric = view.dimensions.get("metric", next(iter(INDICATOR_BY_METRIC)))
+    if metric == "share_of_gdp":
+        body = f"Annual economic damages from {type_phrase} as a share of GDP"
+    else:
+        body = f"Annual economic damages from {type_phrase}"
+    if view.dimensions["timespan"] == "decadal":
+        return f"Decadal average: {body}"
+    return body
+
+
+def _subtitle(view) -> str:
+    parts = []
+    metric = view.dimensions.get("metric", next(iter(INDICATOR_BY_METRIC)))
+    if metric == "total_damages":
+        parts.append("Estimated damages are reported in current US$ (not adjusted for inflation).")
+    else:
+        parts.append("Damages are expressed as a share of gross domestic product (GDP).")
+    if view.dimensions["timespan"] == "decadal":
+        parts.append("Decadal figures are measured as the annual average over the subsequent ten-year period.")
+    type_slug = view.dimensions["type"]
+    if type_slug == "all_stacked":
+        parts.append(ALL_DISASTERS_SUBTITLE)
+    elif type_slug == "all_disasters_excluding_extreme_temperature":
+        parts.append(ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE)
+    elif type_slug in DISASTER_DESCRIPTIONS:
+        parts.append(DISASTER_DESCRIPTIONS[type_slug])
+    return " ".join(parts)
+
+
+def run() -> None:
+    #
+    # Load inputs.
+    #
+    config = paths.load_collection_config()
+    ds = paths.load_dataset("natural_disasters")
+    tb_yearly = ds.read("natural_disasters_yearly", load_data=False)
+    tb_decadal = ds.read("natural_disasters_decadal", load_data=False)
+
+    #
+    # Process data.
+    #
+    # Sample the all-disasters aggregate description_key for grouped views (must
+    # run before prepare_table drops the column).
+    sample_description_key = list(tb_yearly["total_damages_all_disasters_yearly"].metadata.description_key or [])
+    indicators = [({"metric": metric}, prefix) for metric, prefix in INDICATOR_BY_METRIC.items()]
+    tb_yearly = prepare_table(tb_yearly, "yearly", "annual", indicators)
+    tb_decadal = prepare_table(tb_decadal, "decadal", "decadal", indicators)
+
+    c = paths.create_collection(
+        config=config,
+        tb=[tb_yearly, tb_decadal],
+        indicator_names="value",
+        common_view_config=COMMON_VIEW_CONFIG,
+    )
+    grouped_view_metadata = {
+        "presentation": {"title_public": _title},
+        "description_short": _subtitle,
+        "description_key": sample_description_key,
+    }
+
+    c.group_views(
+        groups=[
+            {
+                "dimension": "type",
+                "choice_new_slug": "all_stacked",
+                "choices": INDIVIDUAL_DISASTER_TYPES,
+                "view_config": STACKED_VIEW_CONFIG,
+                "view_metadata": grouped_view_metadata,
+            },
+            {
+                "dimension": "type",
+                "choice_new_slug": "all_disasters_excluding_extreme_temperature",
+                "choices": DISASTER_TYPES_EXCLUDING_EXTREME_TEMPERATURE,
+                "view_config": STACKED_VIEW_CONFIG,
+                "view_metadata": grouped_view_metadata,
+            },
+        ],
+    )
+
+    c.set_global_config(
+        {
+            "title": _title,
+            "subtitle": _subtitle,
+            "note": NOTE,
+        }
+    )
+
+    # Expose the all-disasters total on the map tab of the stacked-by-type views.
+    # Like _title/_subtitle above, default to the only remaining metric when the
+    # framework has dropped a single-choice `metric` dimension from view.dimensions.
+    default_metric = next(iter(INDICATOR_BY_METRIC))
+    add_total_indicator_for_map(c, lambda d: INDICATOR_BY_METRIC[d.get("metric", default_metric)])
+
+    # Pin a stable colour to each y-indicator based on its disaster type.
+    apply_disaster_colors(c)
+
+    # Decadal views default to the share-of-GDP data start (1960). The slider
+    # is also clamped at the same year so users can't drag back into the no-data
+    # pre-1960 range. Annual views stay at minTime=2000.
+    apply_decadal_time_range(c, min_year=SHARE_OF_GDP_START_YEAR)
+
+    #
+    # Save outputs.
+    #
+    c.save()

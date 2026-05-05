@@ -43,13 +43,13 @@ def get_model_name(model_choice: str | None) -> str:
         Full API model name
     """
     if model_choice is None:
-        # Default to haiku
-        model_choice = "haiku"
+        # Default to sonnet — haiku misses too many semantic issues to be a useful default.
+        model_choice = "sonnet"
 
     model_map = {
         "haiku": MODEL_API_NAMES["anthropic:claude-haiku-4-5"],
-        "sonnet": MODEL_API_NAMES["anthropic:claude-sonnet-4-5"],
-        "opus": MODEL_API_NAMES["anthropic:claude-opus-4"],
+        "sonnet": MODEL_API_NAMES["anthropic:claude-sonnet-4-6"],
+        "opus": MODEL_API_NAMES["anthropic:claude-opus-4-7"],
     }
 
     return model_map[model_choice.lower()]
@@ -242,7 +242,7 @@ def run_checks(
     "--model",
     "-m",
     type=click.Choice(["haiku", "sonnet", "opus"], case_sensitive=False),
-    help="Claude model to use for issue detection (default: haiku). Haiku is fastest/cheapest, Sonnet is balanced, Opus is highest quality.",
+    help="Claude model to use for issue detection (default: sonnet). Haiku is fastest/cheapest, Sonnet is balanced, Opus is highest quality.",
 )
 @click.option(
     "--skip-typos",
