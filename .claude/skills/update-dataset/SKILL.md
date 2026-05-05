@@ -396,23 +396,29 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Tell the user: "Slack announcement drafted at `workbench/<short_name>/slack-announcement.md` and added to the PR description. Please review and post it to **#data-updates-comms**."
 
 9b) Data update post (for OWID /latest)
-   Draft the short reader-facing post that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest). This is **separate from the Slack announcement** — that one is a 10-field form for the internal channel; this one is a mini-blog-post for OWID readers. Format observed in recent examples (American Time Use Survey, World Bank PIP):
-   - **Headline title is a punchy finding or claim**, not a noun phrase. "Nearly one in ten people worldwide still live in extreme poverty" — not "World Bank PIP".
-   - **Body opens with a question** that the dataset helps answer (e.g. "How many people live in poverty around the world, and how has that changed over the last decades?").
-   - **2–4 short paragraphs of substance**: source/methodology framing → specific findings with concrete numbers → optional cross-reference to a related OWID article.
-   - **Closing update statement** is brief and first-person ("I recently updated our charts with the latest PIP release from the World Bank.").
-   - **Descriptive link text**, not a bare URL: `[Explore the updated data in our interactive charts](URL)`.
-   - Open `.claude/skills/update-dataset/data-update-template.md` and follow it. Use the editorial context sources gathered in step 8b (snapshot DVC fields, garden `.meta.yml`, optionally `url_main` via WebFetch). Also pull from `workbench/<short_name>/slack-announcement.md` (step 9 output) — the editorial framing already drafted there is the closest cousin and the post is essentially a polished, prose-shaped distillation of it.
-   - Decide which link flavour to use:
-     - `1 published chart` was picked / one chart is the focus ⇒ grapher URL `https://ourworldindata.org/grapher/<slug>`.
-     - `>1 published charts` were picked / dataset-wide refresh ⇒ search URL `https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>` — the value is the **dataset title** (the `title` field in the snapshot `meta.origin` block, which often includes a parenthetical acronym like `Luxembourg Income Study (LIS)`), **not** the bare `producer` field. This is the same URL the slack-announcement-template builds — single source of truth.
-     - The producer/topic has an existing OWID **explorer** (e.g. minerals → `/explorers/minerals`, natural disasters → `/explorers/natural-disasters`, CO₂ → `/explorers/co2`) ⇒ prefer the explorer URL over the search URL.
-     - The producer/topic has a **curated topic page** (e.g. SDG Tracker → `/sdgs`) ⇒ prefer the topic URL over the search URL.
-     - **Do not use** custom-collection URLs (`/collection/custom?charts=…`) even though some /latest posts do — current OWID practice is to default to the search URL for multi-chart updates.
-   - Draft the post as flowing prose, **100–200 words is the typical band** (ATUS ~105, NVIDIA ~140, OECD Government at a Glance ~155, World Bank PIP ~190). First-person, conversational, author voice ("I recently updated…", "I've just updated…"). Not corporate. The body should give a reader a reason to care and at least one concrete number — not just "I refreshed our charts".
+   Draft the short reader-facing post that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest). The team drafts these in **Google Docs** in the shared `/Data updates` Drive folder (`https://drive.google.com/drive/folders/1oL0uLHKI6f2qi1rJA6-qFFRYEBw_-rfm`), and OWID's CMS ingests the doc into the published feed.
+
+   **The skill's job is to produce paste-ready Google Doc content** in the exact CMS format the team uses (frontmatter `title` / `excerpt` / `type` / `authors` / `kicker` → `\[+body\]` marker → body prose with inline markdown links → `{.cta}` block → `{.image}` block → `\[\]` end marker). Don't invent your own format — every published post in the Drive folder follows the same shape.
+
+   This is **separate from the Slack announcement** — that one is a 10-field form for the internal channel; this one is a mini-blog-post for OWID readers, and the format is structured for CMS ingestion.
+
+   Steps:
+   - Open `.claude/skills/update-dataset/data-update-template.md` and follow it — the template has the exact paste-ready format plus three worked examples (NVIDIA, H5N1, World Bank PIP) lifted verbatim from the Drive folder.
+   - Use the editorial context sources gathered in step 8b (snapshot DVC fields, garden `.meta.yml`, optionally `url_main` via WebFetch). Also pull from `workbench/<short_name>/slack-announcement.md` (step 9 output) — the editorial framing already drafted there is the closest cousin.
+   - **Title shape** — a punchy finding/claim, a question, or an action/invitation. Not just the dataset name. See the template's "Field-by-field guidance" for examples and decision logic.
+   - **Body** — 100–200 words, first-person, conversational. Sample: ATUS ~105, NVIDIA ~140, robots ~110, OECD Government at a Glance ~155, US data centers ~145, UNU-WIDER ~155, World Bank PIP ~190, ozone ~165, mobile money ~180, fertilizers ~170, H5N1 ~135. The body should give a reader a reason to care and at least one concrete number — not "I refreshed our charts".
+   - **Inline markdown links** throughout the body for the producer's page, methodology pages, and related OWID articles. `*italics*` for emphasis, sparingly.
+   - **CTA URL choice**:
+     - One chart focus ⇒ grapher URL `https://ourworldindata.org/grapher/<slug>`.
+     - Multiple charts (default) ⇒ search URL `https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>` — value is the **dataset title** from the snapshot `meta.origin.title` field (often with a parenthetical acronym like `Luxembourg Income Study (LIS)` or `World Bank Poverty and Inequality Platform (PIP)`), **not** the bare `producer` field.
+     - Topic has an existing OWID explorer ⇒ `https://ourworldindata.org/explorers/<name>`.
+     - Curated topic page exists ⇒ topic URL (e.g. `/sdgs`).
+     - **Do not use** `/collection/custom?charts=…` URLs.
+   - **CTA text** — descriptive: "Explore the updated data in our interactive charts" (default), "Explore all of the updated data in our interactive charts" (broad), "Explore the interactive version of this chart" (single chart), "Explore this data going back to YYYY in our interactive chart" (single chart with date depth).
+   - **Image filename** — `YYYY-MM-data-update-<slug>.png` (e.g. `2026-04-data-update-h5n1-flu.png`). The skill doesn't generate the image; the user adds it to the Doc separately.
    - Save the draft to `workbench/<short_name>/data-update.md`.
-   - **Add a collapsed `<details>` section titled "Data update post (for OWID /latest)"** to the PR description, placed *after* the Slack-announcement section so the PR body order matches the workflow order.
-   - Tell the user: "Data update post drafted at `workbench/<short_name>/data-update.md` and added to the PR description. Please review and publish to the OWID /latest feed."
+   - **Add a collapsed `<details>` section titled "Data update post (for OWID /latest)"** to the PR description, placed *after* the Slack-announcement section.
+   - Tell the user: `"Data update post drafted at workbench/<short_name>/data-update.md in the Google Docs CMS format. Please create a new Google Doc in /Data updates, paste the draft, attach the chart screenshot, and share for review."`
 
 10) Codex review: address comments and resolve threads
    - Wait ~60 seconds after posting `@codex review`, then poll for inline review comments:
