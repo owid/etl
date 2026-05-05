@@ -344,9 +344,7 @@ def create_share_of_electricity_demand(tb, tb_electricity):
     }
 
     # Get all country-level demand from Ember.
-    tb_demand_countries = (
-        tb_electricity[["country", "year", "total_demand__twh"]].dropna().reset_index(drop=True)
-    )
+    tb_demand_countries = tb_electricity[["country", "year", "total_demand__twh"]].dropna().reset_index(drop=True)
 
     # Build demand aggregates for each IEA region by summing available member countries.
     region_demand_tables = []
@@ -385,7 +383,12 @@ def create_share_of_electricity_demand(tb, tb_electricity):
     tb_demand = pr.concat([tb_demand, tb_demand_rest[["country", "year", "total_demand__twh"]]], ignore_index=True)
 
     # All countries/regions for which we compute the share.
-    share_countries = list(IEA_REGION_MEMBERS.keys()) + ["World", "China", "United States", "World excl. United States and China"]
+    share_countries = list(IEA_REGION_MEMBERS.keys()) + [
+        "World",
+        "China",
+        "United States",
+        "World excl. United States and China",
+    ]
 
     # Filter IEA data to historical electricity consumption for those countries/regions.
     tb_share = tb[
