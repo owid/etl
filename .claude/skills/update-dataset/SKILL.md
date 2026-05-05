@@ -410,7 +410,7 @@ When you do stop, present a concise summary of the issue and what options exist.
    - **Inline markdown links** throughout the body for the producer's page, methodology pages, and related OWID articles. `*italics*` for emphasis, sparingly.
    - **CTA URL choice**:
      - One chart focus ⇒ grapher URL `https://ourworldindata.org/grapher/<slug>`.
-     - Multiple charts (default) ⇒ search URL `https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>` — value is the **dataset title** from the snapshot `meta.origin.title` field (often with a parenthetical acronym like `Luxembourg Income Study (LIS)` or `World Bank Poverty and Inequality Platform (PIP)`), **not** the bare `producer` field.
+     - Multiple charts (default) ⇒ search URL `https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>` — value is the **dataset title**, resolved with this priority: (a) the `dataset.title` field in the garden `.meta.yml` if it's set there (an override), otherwise (b) the `meta.origin.title` field in the snapshot `.dvc`. Often includes a parenthetical acronym like `Luxembourg Income Study (LIS)` or `World Bank Poverty and Inequality Platform (PIP)`. **Not** the bare `producer` field.
      - Topic has an existing OWID explorer ⇒ `https://ourworldindata.org/explorers/<name>`.
      - Curated topic page exists ⇒ topic URL (e.g. `/sdgs`).
      - **Do not use** `/collection/custom?charts=…` URLs.

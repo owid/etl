@@ -123,7 +123,7 @@ For releases that meaningfully extend coverage (new countries, new years), the u
 **`{.cta}` block** — The exit link. URL choice:
 
 - **One chart focus** ⇒ `https://ourworldindata.org/grapher/<slug>`
-- **Multiple charts (default)** ⇒ `https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>` — value is the **dataset title** (the `title` field in the snapshot `meta.origin` block, often including a parenthetical acronym like `Luxembourg Income Study (LIS)` or `World Bank Poverty and Inequality Platform (PIP)`), **not** the bare `producer` field. URL-encode parentheses as `%28` and `%29` if the OWID CMS doesn't auto-encode them — recent published posts use both literal `(LIS)` and `%28PIP%29` forms.
+- **Multiple charts (default)** ⇒ `https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>` — value is the **dataset title**, resolved in this order: (a) `dataset.title` from the garden `.meta.yml` when it's set as an override, otherwise (b) `meta.origin.title` from the snapshot `.dvc`. Often includes a parenthetical acronym like `Luxembourg Income Study (LIS)` or `World Bank Poverty and Inequality Platform (PIP)`. **Not** the bare `producer` field. URL-encode parentheses as `%28` and `%29` if the OWID CMS doesn't auto-encode them — recent published posts use both literal `(LIS)` and `%28PIP%29` forms.
 - **Explorer for the topic exists** ⇒ `https://ourworldindata.org/explorers/<name>`
 - **Curated topic page exists** ⇒ topic URL (e.g. `/sdgs`)
 

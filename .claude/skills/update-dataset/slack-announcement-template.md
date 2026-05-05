@@ -69,4 +69,4 @@ Highlight 2–3 notable findings or trends visible in the data. Mention any non-
 Pick 1–3 views that represent the breadth of the dataset. Avoid very country-specific or niche views. Prefer the most-viewed or most-linked charts if possible.
 
 **Link**
-Search result link preferred (e.g. `https://ourworldindata.org/search?datasetProducts=...`). If no good search link exists, use a chart collection link and put it in thread to keep the main post readable.
+Search result link preferred (e.g. `https://ourworldindata.org/search?datasetProducts=...`). The `datasetProducts` value is the **dataset title**, resolved in this order: (a) `dataset.title` from the garden `.meta.yml` when set as an override, otherwise (b) `meta.origin.title` from the snapshot `.dvc`. Often includes a parenthetical acronym (e.g. `Luxembourg Income Study (LIS)`, `World Bank Poverty and Inequality Platform (PIP)`) — keep it. **Not** the bare `producer` field. If no good search link exists, use a chart collection link and put it in thread to keep the main post readable.
