@@ -11,13 +11,14 @@ meta:
 
     date_published: '2026-04-16'
     # Citation
-    producer: Yasuyuki Aono
+    producer: Yasuyuki Aono, Genki Katata
     citation_full: |-
       - Aono and Kazui (2008) International Journal of Climatology, 28, 905-914
       - Aono and Saito (2010) International Journal of Biometeorology, 54, 211-219
       - Aono (2012) Chikyu Kankyo (Global Environment), 17, 21-29
       - Katata (2026) https://cigs.canon/katata_date/260420sakura_katata.html
     attribution_short: Aono, Katata
+    attribution: Aono and Kazui (2008), Aono and Saito (2010), Katata (2026)
     # Files
     url_main: https://www.ncei.noaa.gov/access/paleo-search/study/26430
     date_accessed: '2026-04-16'
