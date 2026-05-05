@@ -69,6 +69,20 @@ skill once per file in a loop.
 
 ---
 
+## Core principle: restructure, don't rewrite
+
+The purpose of this migration is to restructure information, not to
+improve the writing. You're moving the legacy source's content into the
+right fields of the new origin — splitting one description into
+`description` + `description_snapshot`, extracting URLs and citations
+from prose blobs into their own fields, fixing typos. **Not rewriting.**
+
+Every fact, sentence, quoted passage, URL, and date in the legacy
+`meta.source` must survive somewhere in the output. Verbose is fine;
+long descriptions stay long. The only allowed prose changes are the
+"Minor cleanup" list below. If the output is shorter than the legacy or
+contains words you can't trace back, you've summarized.
+
 ## STEP 1: Does the data product coincide with this snapshot?
 
 This is the central decision. Most snapshots coincide with their data product —
@@ -79,8 +93,9 @@ that means `title_snapshot` and `description_snapshot` are NULL (omitted).
 - The source is a single paper, journal article, working paper, book, or thesis.
 - The source is a one-off study with one accompanying dataset (no follow-up
   release series).
-- The source is an OWID compilation of multiple raw sources combined into one
-  snapshot — the "data product" IS the compilation.
+- The source is an OWID compilation of **multiple** raw sources combined into
+  one snapshot — the "data product" IS the compilation. (Single-source-derived
+  metrics are NOT compilations — see "differ" below.)
 
 When they coincide, **`title_snapshot` is NULL and `description_snapshot` is NULL**.
 Every meaningful sentence of the legacy `source.description` (whether descriptive
@@ -102,8 +117,19 @@ When they differ:
 
 - `title` = the data product name (e.g. `Penn World Table`).
 - `title_snapshot` = `<data product> - <slice>` (e.g. `Penn World Table - National Accounts`).
-- `description` = the data product (the producer's whole database).
-- `description_snapshot` = OWID's processing notes for this slice, when present.
+- `description` ← legacy paragraphs about the producer's broader database
+  (what the database is, the producer's overall methodology, scope).
+- `description_snapshot` ← legacy paragraphs about this specific slice
+  (the indicator definition, OWID's processing notes for this slice).
+
+Split the legacy `source.description` at its existing paragraph boundaries
+and bucket each paragraph whole. Do **not** rewrite paragraphs to redistribute
+information cleanly between buckets. If a paragraph straddles both topics,
+leave it intact in whichever bucket fits more closely.
+
+If the legacy has no paragraph describing the broader data product, **omit
+`description`** rather than authoring one (see the strict one-sentence
+exception under `description` below).
 
 If you cannot point to a producer-published name for the broader data product
 and a producer-defined name for the slice, default to "they coincide".
@@ -134,27 +160,19 @@ actual title. Strip any year suffix from a clean `source.name` before using it
 Set ONLY when the data product and snapshot differ (STEP 1). Format:
 `<Data product> - <Slice>`. No year, no version, no producer, no period.
 
-### `description` (default omitted when the legacy source has no data-product description)
-Describes the producer's data. Sentence-case, end with period, 1–3 short paragraphs.
-- DO NOT FABRICATE for papers/books/articles: a paper/book title alone is not a
-  description. If the legacy has no descriptive content about the data, omit
-  `description`.
-- **Multi-product database exception**: if the legacy source has no description of
-  the parent data product but the database is widely-known (FAO, World Bank, OECD
-  reports, Sea Around Us, etc.), it is acceptable to write **one short factual
-  sentence** describing what the database is, drawn from common knowledge of what
-  the producer's own landing page would say. Do not extrapolate beyond that.
-- Sentences belonging here: what the data is, who collected it, scope, producer
-  methodology, pointers to the producer's own materials ("See the authors' data
-  appendix").
-- Preserve paragraph structure from the legacy `source.description` — use real
-  newline-separated paragraphs in a YAML literal block (`|-`), not a single
-  collapsed paragraph and not literal `\n\n` sequences.
+### `description` (default omitted when legacy has no data-product description)
+Verbatim from the legacy `source.description`. 1–3 short paragraphs in a
+`|-` block. If the legacy has no descriptive content about the data,
+omit. The one allowed addition is the **multi-product database
+exception**: when STEP 1 says they differ AND the legacy has no paragraph
+about the parent database AND the database is widely-known (FAO, World
+Bank WDI, OECD reports, etc.), you MAY add one short factual sentence
+identifying what the database is — never two sentences.
 
 ### `description_snapshot` (default omitted)
-Set ONLY when the data product and snapshot DIFFER (STEP 1).
-If they coincide, `description_snapshot` is ALWAYS omitted even if the legacy
-description contains OWID processing notes — fold those into `description`.
+Set ONLY when STEP 1 says they differ. Verbatim from the legacy
+`source.description` — the paragraphs about this specific slice. When
+they coincide, omit and put everything in `description`.
 
 ### `citation_full` (required)
 Producer's preferred citation; long is OK. Start capital, end with a period,
@@ -178,17 +196,19 @@ IDs, not versions — never use them here.
 pick a year that is part of a coverage range (`1827–2014`) or a projection
 (`2030–2050`).
 
-### `url_main` (default omitted when absent from legacy source)
-Landing-page URL. Must appear VERBATIM in the legacy source — never invent one,
-never swap a file extension or domain. Never use placeholders like `<UNKNOWN>`,
-`N/A`, `TBD`. If no URL exists in the legacy source, omit.
-
-### `url_download` (default omitted)
-Direct-download URL. Must appear verbatim in the legacy source (typically
-`source.source_data_url` or `source.url`). Otherwise omit.
+### `url_main` and `url_download` (default omitted when no URLs in legacy)
+URLs the legacy provides — typically in `source.url`,
+`source.source_data_url`, or as inline links in `source.description`.
+Copy them verbatim (never invent, swap extensions, or guess domains). If
+the legacy field is a prose blob with several URLs, extract each: the
+landing-page URL goes to `url_main`, the direct-download URL to
+`url_download`. URLs in the legacy must not be silently dropped.
 
 ### `date_accessed` (required)
-`YYYY-MM-DD`, copied from the legacy source.
+`YYYY-MM-DD`. Use `source.date_accessed` when plausible. If it's
+implausibly later than the snapshot's version directory (a sign the
+legacy migration tool stamped today's date as a default), prefer a date
+in the description prose like `[accessed 18th July 2017]`.
 
 ### `license` (default omitted)
 Object with `name` and `url`. Omit if not present in the legacy source.
@@ -243,28 +263,19 @@ prose fields:
 
 ## Lint rules (self-check before writing)
 
-Walk through these before writing the origin:
-
-1. **`producer`** does not contain: a 4-digit year, `;`, `&`, `OWID` /
-   `Our World in Data`, or a trailing period (unless ends `et al.`).
-2. **`title`** does not end with a period.
-3. **`citation_full`** ends with a period.
-4. **`date_published`** matches `YYYY-MM-DD`, `YYYY`, or `latest`.
-5. **DB lengths**: `producer` ≤ 255, `title` ≤ 512, `attribution_short` ≤ 512,
+1. **`producer`**: no 4-digit year, no `;`, no `&`, no `OWID` /
+   `Our World in Data`, no trailing period (unless ends `et al.`).
+2. **`title`** does not end with a period; **`citation_full`** does.
+3. **`date_published`** matches `YYYY-MM-DD`, `YYYY`, or `latest`.
+4. **DB lengths**: `producer` ≤ 255, `title` ≤ 512, `attribution_short` ≤ 512,
    `version_producer` ≤ 255 chars.
-6. **`attribution_short`** is not identical to `producer`; does not contain a
-   year; does not end with a period.
-7. **`url_download`** is not identical to `url_main`.
-8. **`url_main`** and `url_download`, if present, appear VERBATIM somewhere in
-   the legacy source (in `source.url`, `source.source_data_url`,
-   `source.published_by`, or `source.description`).
-9. **`title_snapshot`** does not contain a 4-digit year. It does not include
-   the producer's name UNLESS the producer is also part of `title`'s canonical
-   name (e.g. `Education at a Glance 2017: OECD Indicators`).
-10. **`version_producer`** does not match the working-paper pattern `YYYY-N`
-    (e.g. `2016-14` is forbidden).
-11. **STEP 1**: if data product = snapshot, `title_snapshot` and
-    `description_snapshot` are both omitted.
+5. **`attribution_short`** ≠ `producer`; no year; no trailing period.
+6. **`url_download`** ≠ `url_main`. Both, if present, appear verbatim
+   somewhere in the legacy source.
+7. **`title_snapshot`** has no 4-digit year and no producer name (unless
+   the producer is part of the canonical title, e.g. `Education at a Glance
+   2017: OECD Indicators`).
+8. **`version_producer`** is not a working-paper ID like `2016-14`.
 
 ## YAML output conventions
 
