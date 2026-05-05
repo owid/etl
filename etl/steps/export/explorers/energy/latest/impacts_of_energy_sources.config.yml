@@ -1,0 +1,232 @@
+definitions:
+  metals_note: &metals_note |-
+    Requirements are based on the actual amount of material extracted from the ground, which includes all the losses throughout the extraction, refining and fabrication processes. These figures will be towards the high end of estimates which measure based on the final amount of materials required per unit of electricity.
+  common_views:
+    - config:
+        type: DiscreteBar
+        hasMapTab: false
+        yScaleToggle: false
+        baseColorScheme: owid-distinct
+        hideTimeline: true
+        originUrl: https://ourworldindata.org/energy
+
+config:
+  explorerTitle: Impacts of Energy Production
+  explorerSubtitle: Explore the environmental and health impacts of electricity sources.
+  isPublished: true
+  entityType: source
+  hasMapTab: false
+  hideAlertBanner: true
+  hideAnnotationFieldsInTitle: true
+  selection:
+    - Coal
+    - Gas
+    - Nuclear
+    - Onshore wind
+    - Offshore wind
+    - Hydropower
+    - Solar PV, silicon (on-ground)
+    - Solar PV, cadmium (on-ground)
+
+dimensions:
+  - slug: impact_metric
+    name: Impact metric
+    choices:
+      - slug: ghg_emissions
+        name: Greenhouse gas emissions
+      - slug: land_use
+        name: Land use
+      - slug: water_use
+        name: Water use
+      - slug: metal_mineral_use
+        name: Metal and mineral use
+      - slug: freshwater_eutrophication
+        name: Freshwater eutrophication
+    presentation:
+      type: dropdown
+  - slug: sub_metric
+    name: Sub-metric
+    choices:
+      - slug: total
+        name: Total material use
+      - slug: aluminium
+        name: Aluminium
+      - slug: chromium
+        name: Chromium
+      - slug: cobalt
+        name: Cobalt
+      - slug: copper
+        name: Copper
+      - slug: manganese
+        name: Manganese
+      - slug: molybdenum
+        name: Molybdenum
+      - slug: nickel
+        name: Nickel
+      - slug: silicon
+        name: Silicon
+      - slug: zinc
+        name: Zinc
+      - slug: uranium
+        name: Uranium
+      - slug: na
+        name: ""
+    presentation:
+      type: dropdown
+
+views:
+  - dimensions:
+      impact_metric: ghg_emissions
+      sub_metric: na
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#ghg_emissions
+    config:
+      title: Greenhouse gas emissions per unit of electricity
+      subtitle: |-
+        Lifecycle greenhouse gas emissions measure amount of total greenhouse gases emitted over a technology's full supply chain. This includes emissions from the burning of fuels, in addition to those generated through the mining of materials, and production of energy technologies. This is measured per megawatt-hour of electricity.
+  - dimensions:
+      impact_metric: land_use
+      sub_metric: na
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#land_use_energy
+    config:
+      title: Land use per unit of electricity
+      subtitle: |-
+        Land use is measured as the total amount of land needed per unit of electricity production. This includes direct land use - the land used by a power plant, or solar farm - plus indirect land use from the mining of fuels and materials. This is measured per megawatt-hour of electricity production.
+      note: |-
+        This is shown as the average land use of different energy technologies. There can be significant variability depending on location, materials, and infrastructure decisions. See our related article for the full range of land use comparisons.
+      relatedQuestionUrl: https://ourworldindata.org/land-use-per-energy-source
+      relatedQuestionText: How does the land use of different energy sources compare?
+  - dimensions:
+      impact_metric: water_use
+      sub_metric: na
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#water_use
+    config:
+      title: Dissipated water use per unit of electricity
+      subtitle: |-
+        Dissipated water is water that is not immediately returned to the local environment. For example, water immediately returned to a river, ocean, or groundwater is not counted, while water used as an ingredient for a chemical product, or evaporated, is. This is measured per megawatt-hour of electricity production.
+  - dimensions:
+      impact_metric: metal_mineral_use
+      sub_metric: total
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#metal_mineral_use
+    config:
+      title: Metal and mineral requirements per unit of electricity
+      subtitle: |-
+        Energy technologies require a range of mineral and metal inputs. Here they are distilled into a single figure of material requirements, which is measured in grams of Sb-equivalents per megawatt-hour of electricity produced.
+      note: *metals_note
+  - dimensions:
+      impact_metric: metal_mineral_use
+      sub_metric: aluminium
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#aluminium_use
+    config:
+      title: Aluminium requirements per unit of electricity
+      subtitle: Material requirements are measured in grams per megawatt-hour of electricity produced.
+      note: *metals_note
+  - dimensions:
+      impact_metric: metal_mineral_use
+      sub_metric: chromium
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#chromium_use
+    config:
+      title: Chromium requirements per unit of electricity
+      subtitle: Material requirements are measured in grams per megawatt-hour of electricity produced.
+      note: *metals_note
+  - dimensions:
+      impact_metric: metal_mineral_use
+      sub_metric: cobalt
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#cobalt_use
+    config:
+      title: Cobalt requirements per unit of electricity
+      subtitle: Material requirements are measured in grams per megawatt-hour of electricity produced.
+      note: *metals_note
+  - dimensions:
+      impact_metric: metal_mineral_use
+      sub_metric: copper
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#copper_use
+    config:
+      title: Copper requirements per unit of electricity
+      subtitle: Material requirements are measured in grams per megawatt-hour of electricity produced.
+      note: *metals_note
+  - dimensions:
+      impact_metric: metal_mineral_use
+      sub_metric: manganese
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#manganese_use
+    config:
+      title: Manganese requirements per unit of electricity
+      subtitle: Material requirements are measured in grams per megawatt-hour of electricity produced.
+      note: *metals_note
+  - dimensions:
+      impact_metric: metal_mineral_use
+      sub_metric: molybdenum
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#molybdenum_use
+    config:
+      title: Molybdenum requirements per unit of electricity
+      subtitle: Material requirements are measured in grams per megawatt-hour of electricity produced.
+      note: *metals_note
+  - dimensions:
+      impact_metric: metal_mineral_use
+      sub_metric: nickel
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#nickel_use
+    config:
+      title: Nickel requirements per unit of electricity
+      subtitle: Material requirements are measured in grams per megawatt-hour of electricity produced.
+      note: *metals_note
+  - dimensions:
+      impact_metric: metal_mineral_use
+      sub_metric: silicon
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#silicon_use
+    config:
+      title: Silicon requirements per unit of electricity
+      subtitle: Material requirements are measured in grams per megawatt-hour of electricity produced.
+      note: *metals_note
+  - dimensions:
+      impact_metric: metal_mineral_use
+      sub_metric: zinc
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#zinc_use
+    config:
+      title: Zinc requirements per unit of electricity
+      subtitle: Material requirements are measured in grams per megawatt-hour of electricity produced.
+      note: *metals_note
+  - dimensions:
+      impact_metric: metal_mineral_use
+      sub_metric: uranium
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#uranium_use
+    config:
+      title: Uranium requirements per unit of electricity
+      subtitle: Material requirements are measured in grams per megawatt-hour of electricity produced.
+      note: *metals_note
+  - dimensions:
+      impact_metric: freshwater_eutrophication
+      sub_metric: na
+    indicators:
+      y:
+        - catalogPath: life_cycle_assessment_of_electricity#freshwater_eutrophication
+    config:
+      title: Freshwater eutrophication per unit of electricity
+      subtitle: |-
+        Freshwater eutrophication is caused by the emissions of phosphorus compounds to freshwater: either rivers or lakes. This is measured in grams of phosphorous emitted per unit of electricity production.
