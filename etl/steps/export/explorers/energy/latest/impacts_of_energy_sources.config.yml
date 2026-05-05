@@ -8,6 +8,7 @@ definitions:
         yScaleToggle: false
         baseColorScheme: owid-distinct
         hideTimeline: true
+        originUrl: https://ourworldindata.org/energy
 
 config:
   explorerTitle: Impacts of Energy Production
