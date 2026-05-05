@@ -12,8 +12,8 @@ tables:
         description: Nitrogen output is measured as the nitrogen produced in the form of crops.
       nitrogen_efficiency:
         title: nitrogen_efficiency
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           conversionFactor: 100
           name: Nitrogen use efficiency
@@ -32,9 +32,16 @@ tables:
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
-                customNumericValues: [0, 20, 40, 60, 80, 100, 650]
-                customNumericColors: [null, null, null, null, null, '#bc8e5a']
-                customNumericLabels: [null, null, null, null, null, 'Nitrogen mining']
+                customNumericValues:
+                  - 0
+                  - 20
+                  - 40
+                  - 60
+                  - 80
+                  - 100
+                  - 650
+                customNumericLabels: [null, null, null, null, null, "Nitrogen mining"]
+                customNumericColors: [null, null, null, null, null, "#bc8e5a"]
                 customNumericColorsActive: true
       nitrogen_input:
         title: nitrogen_input
