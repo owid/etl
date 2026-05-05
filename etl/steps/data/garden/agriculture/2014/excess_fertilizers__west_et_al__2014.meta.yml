@@ -1,3 +1,25 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Fertilizers
+      grapher_config:
+        hasMapTab: true
+        tab: map
+        chartTypes:
+          - DiscreteBar
+        originUrl: https://ourworldindata.org/fertilizers
+
+  # Subtitles shared across the 4 N + P excess indicators (and their share-of-world variants).
+  subtitle_excess_nitrogen: |-
+    "Excess nitrogen" is the difference between nutrient inputs (from fertilizers, manure, and fixation from legumes) and the amount harvested in crop material. This represents nitrogen that is lost to the environment and can create ecological imbalances in ecosystems and water bodies.
+  subtitle_excess_phosphorus: |-
+    "Excess phosphorus" is the difference between nutrient inputs (from fertilizers and manure) and the amount harvested in crop material. This represents phosphorus that is lost to the environment and can create ecological imbalances on ecosystems and in water bodies.
+  subtitle_inputs_nitrogen: |-
+    Annual inputs include nitrogen from the application of synthetic fertilizers alongside organic inputs from manure and crop fixation.
+  subtitle_inputs_phosphorus: |-
+    Annual inputs include phosphorous from the application of synthetic fertilizers alongside organic inputs such as manure.
+
 dataset:
   title: Excess fertilizers (West et al. 2014)
 tables:
@@ -5,7 +27,7 @@ tables:
     variables:
       croparea_kmsq:
         title: croparea_kmsq
-        unit: ''
+        unit: ""
       excess_nitrogen_per_ha:
         title: excess_nitrogen_per_ha
         unit: kilograms per hectare
@@ -14,6 +36,18 @@ tables:
           name: Excess nitrogen per hectare of cropland
         description: |-
           Amount of excess nitrogen per hectare of cropland. This is the difference between nitrogen inputs, and amount harvested in crops.
+        presentation:
+          title_public: Excess nitrogen per hectare of cropland
+          grapher_config:
+            subtitle: "{definitions.subtitle_excess_nitrogen}"
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues: [ -200, 0, 25, 50, 75, 100, 500 ]
+                customNumericColors: [ "#98b3ca", null, null, null, null, null ]
+                customNumericLabels: [ "Nitrogen mining", null, null, null, null, null ]
+                customNumericColorsActive: true
       excess_nitrogen_total:
         title: excess_nitrogen_total
         unit: tonnes
@@ -23,6 +57,18 @@ tables:
           numDecimalPlaces: 0
         description: |-
           Total amount of excess nitrogen from croplands. This is the difference between nitrogen inputs, and amount harvested in crops.
+        presentation:
+          title_public: Excess nitrogen from croplands
+          grapher_config:
+            subtitle: "{definitions.subtitle_excess_nitrogen}"
+            map:
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues: [ -250000, 0, 100000, 250000, 1000000, 10000000, 25000000 ]
+                customNumericColors: [ "#a3c8d8", null, null, null, null, null ]
+                customNumericLabels: [ "Nitrogen mining", null, null, null, null, null ]
+                customNumericColorsActive: true
       excess_phosphorous_per_ha:
         title: excess_phosphorous_per_ha
         unit: kilograms per hectare
@@ -31,33 +77,128 @@ tables:
           name: Excess phosphorous per hectare of cropland
         description: |-
           Amount of excess phosphorous per hectare of cropland. This is the difference between phosphorous inputs, and the amount harvested in crops.
+        presentation:
+          title_public: Excess phosphorus per hectare of cropland
+          grapher_config:
+            subtitle: Amount of excess phosphorus per hectare of cropland. This is the difference between phosphorus inputs, and the amount harvested in crops.
+            map:
+              colorScale:
+                baseColorScheme: RdPu
+                binningStrategy: manual
+                customNumericValues: [ -50, 0, 5, 10, 25, 50, 100 ]
+                customNumericColors: [ "#dabd9e", null, null, null, null, null ]
+                customNumericLabels: [ "Phosphorus mining", null, null, null, null, null ]
+                customNumericColorsActive: true
       excess_phosphorous_total:
         title: excess_phosphorous_total
-        unit: ''
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Excess phosphorus from croplands
+          grapher_config:
+            subtitle: "{definitions.subtitle_excess_phosphorus}"
+            map:
+              colorScale:
+                baseColorScheme: BuPu
+                binningStrategy: manual
+                customNumericValues: [ -250000, 0, 100000, 250000, 500000, 1000000, 5000000 ]
+                customNumericColors: [ "#e2c6a5", null, null, null, null, null ]
+                customNumericLabels: [ "Phosphorus mining", null, null, null, null, null ]
+                customNumericColorsActive: true
       nitrogen_applied_per_ha:
         title: nitrogen_applied_per_ha
-        unit: ''
+        unit: kilograms per hectare
+        short_unit: kg
+        presentation:
+          title_public: Nitrogen inputs per hectare of cropland
+          grapher_config:
+            subtitle: "{definitions.subtitle_inputs_nitrogen}"
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [ 0, 25, 50, 100, 200, 400 ]
       phosphorous_applied_rate:
         title: phosphorous_applied_rate
-        unit: ''
+        unit: kilograms per hectare
+        short_unit: kg
+        display:
+          name: Phosphorous inputs per hectare of cropland
+        presentation:
+          title_public: Phosphorous inputs per hectare of cropland
+          grapher_config:
+            subtitle: "{definitions.subtitle_inputs_phosphorus}"
+            map:
+              colorScale:
+                baseColorScheme: PuBuGn
+                binningStrategy: manual
+                customNumericValues: [ 0, 5, 10, 20, 30, 40, 50, 100 ]
       share_global_applied_nitrogen:
         title: share_global_applied_nitrogen
-        unit: ''
+        unit: ""
       share_global_applied_phosphorous:
         title: share_global_applied_phosphorous
-        unit: ''
+        unit: ""
       share_global_excess_nitrogen:
         title: share_global_excess_nitrogen
-        unit: ''
+        unit: "%"
+        short_unit: "%"
+        presentation:
+          title_public: Share of global excess nitrogen from croplands
+          grapher_config:
+            subtitle: "{definitions.subtitle_excess_nitrogen}"
+            map:
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues: [ -0.5, 0, 0.1, 0.5, 1, 5, 10, 25, 50 ]
+                customNumericColors: [ "#99becc", null, null, null, null, null, null, null ]
+                customNumericLabels: [ "Nitrogen mining", null, null, null, null, null, null, null ]
+                customNumericColorsActive: true
       share_global_excess_phosphorous:
         title: share_global_excess_phosphorous
-        unit: ''
+        unit: "%"
+        short_unit: "%"
+        presentation:
+          title_public: Share of global excess phosphorus from croplands
+          grapher_config:
+            subtitle: "{definitions.subtitle_excess_phosphorus}"
+            map:
+              colorScale:
+                baseColorScheme: BuPu
+                binningStrategy: manual
+                customNumericValues: [ 0, 0.1, 0.5, 1, 5, 10, 25, 50 ]
       total_applied_nitrogen:
         title: total_applied_nitrogen
-        unit: ''
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Total nitrogen inputs to crops
+          grapher_config:
+            subtitle: "{definitions.subtitle_inputs_nitrogen}"
+            map:
+              colorScale:
+                baseColorScheme: YlGn
+                binningStrategy: manual
+                customNumericValues: [ 0, 100000, 500000, 1000000, 5000000, 10000000, 50000000 ]
       total_applied_phosphorous:
         title: total_applied_phosphorous
-        unit: ''
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Total applied phosphorous to crops
+          grapher_config:
+            subtitle: "{definitions.subtitle_inputs_phosphorus}"
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericValues: [ 0, 50000, 100000, 500000, 1000000, 5000000, 595726.0989 ]
     dimensions:
       - name: year
         slug: year
