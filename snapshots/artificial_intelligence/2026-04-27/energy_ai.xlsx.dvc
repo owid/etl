@@ -1,0 +1,31 @@
+meta:
+  origin:
+    producer: International Energy Agency
+    title: Energy and AI
+    description_snapshot: |-
+      This dataset contains world and regional data on energy consumption and infrastructure related to artificial intelligence, including:
+      - Installed capacity
+      - Power usage effectiveness (PUE)
+      - Load factor
+      - Electricity consumption
+
+      The data provides insights into the energy requirements and efficiency of AI infrastructure globally.
+    citation_full: |-
+      International Energy Agency (IEA), 'Key Questions on Energy and AI'. Published online at iea.org. Retrieved from: 'https://www.iea.org/data-and-statistics/data-product/key-questions-on-energy-and-ai#data-set' [online resource]
+
+    # Manual download instructions:
+    # 1. Visit: https://www.iea.org/data-and-statistics/data-product/key-questions-on-energy-and-ai
+    # 2. Create an IEA account or log in if you already have one
+    # 3. Download the Excel file
+    # 4. Run: etls 2026-04-27/energy_ai --path-to-file <path_to_downloaded_file>
+
+    url_main: https://www.iea.org/data-and-statistics/data-product/key-questions-on-energy-and-ai#data-set
+    date_accessed: '2026-04-27'
+    date_published: '2026-04-16'
+    license:
+      name: © OECD/IEA 2024
+      url: https://www.iea.org/terms
+outs:
+  - md5: 716872cc6f1b0cd7045b6278590416ee
+    size: 43357
+    path: energy_ai.xlsx

@@ -20,6 +20,7 @@ Optional trailing args:
 Assumptions:
 - All artifacts are written to `workbench/<short_name>/`.
 - Persist progress to `workbench/<short_name>/progress.md` and update it after each step.
+- Persist reusable update facts to `workbench/<short_name>/update-context.yml` as they are discovered. This is the canonical context artifact for the PR description, review handoff, and `data-updates-comms`.
 
 ## Progress checklist (maintain, tick live, and persist to progress.md)
 
@@ -40,9 +41,8 @@ Assumptions:
 - [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, and that all URLs resolve (HEAD-check)
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
-- [ ] Pick 1–3 chart views for the public announcement
-- [ ] Gather editorial context from snapshot DVC + garden `.meta.yml` (and `url_main` via WebFetch if needed) — shared input for the Slack and Data update steps
-- [ ] Draft Slack announcement, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
+- [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
+- [ ] Render Slack announcement via `data-updates-comms`, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
 - [ ] Draft public-facing "Data update" post for OWID /latest, add to PR description, hand to user for review and publication
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Ask the user whether to archive the old DAG entries; if yes, move them to `dag/archive/` AND relocate the new entries into the old slot (see "DAG archiving & reordering") — don't forget this step
@@ -53,7 +53,7 @@ Persistence:
 
 ## Checkpoints — when to pause
 
-**Default: keep going.** Run through the full workflow (steps 1–8) without stopping unless one of the conditions below is met.
+**Default: keep going.** Run through the full workflow without stopping unless one of the conditions below is met.
 
 **Stop and ask the user when:**
 - A step fails and the fix is ambiguous (multiple reasonable approaches, or you're unsure of the correct one)
@@ -348,7 +348,47 @@ When you do stop, present a concise summary of the issue and what options exist.
      ```
      If the count is 0, the upgrade did not run — re-run it.
 
-8) Pick chart views for the public announcement
+8) Update context for public announcement
+   - Maintain `workbench/<short_name>/update-context.yml` as the canonical record of facts discovered during the update. Do not wait until the end if a fact is already known; append/update as each step completes.
+   - At minimum, record:
+     ```yaml
+     dataset:
+       namespace: <namespace>
+       old_version: <old_version>
+       new_version: <new_version>
+       short_name: <short_name>
+       title: <public dataset title, if known>
+       producer: <producer, if known>
+     source:
+       release_date: <snapshot origin date_published, if known>
+       next_release: <best-effort, or null>
+       url_main: <source page, if known>
+       citation_full: <citation, if known>
+     coverage:
+       year_min: <garden min year>
+       year_max: <garden max year>
+       countries: <distinct countries/entities>
+       includes_regions: <true/false>
+       sparse_recent_year_note: <note, or null>
+     charts:
+       published_count: <published chart count>
+       size_qualifier: <handful|moderate|large|massive>
+       selected_views:
+         - title: <chart title>
+           slug: <chart slug>
+           rationale: <why this represents the dataset>
+     update_summary:
+       snapshot_diff: <short summary or artifact path>
+       meadow_diff: <short summary or artifact path>
+       garden_diff: <short summary or artifact path>
+       notable_changes: []
+       sanity_check_findings: []
+       resolved_workarounds: []
+     editorial_context:
+       why_it_matters_snippets: []
+       caveat_snippets: []
+       interesting_update_snippets: []
+     ```
    - Query the staging DB for **published** charts using the new dataset (filter on `c.publishedAt IS NOT NULL`). Draft/unlisted charts must not be counted in the announcement:
      ```sql
      SELECT c.id, cc.slug, cc.full->>'$.title' as title, cc.full->>'$.type' as type, cc.full->>'$.hasMapTab' as hasMapTab
@@ -360,35 +400,19 @@ When you do stop, present a concise summary of the issue and what options exist.
        AND c.publishedAt IS NOT NULL
      GROUP BY c.id
      ```
-   - The number reported in the Slack announcement's "How many charts did this update affect?" section must be this **published** count, not the total. It's fine to mention draft remaps separately in the PR description for completeness, but never in the Slack copy.
-   - Pick 1–3 views using these criteria (in order of preference):
+   - Map the published count to `size_qualifier`: 1–9 = `handful`, 10–49 = `moderate`, 50–199 = `large`, 200+ = `massive`.
+   - Pick 1–3 `selected_views` using these criteria (in order of preference):
      - **Map views** — immediately visual, readers can find their own country
      - **Charts with punchy, standalone headlines** — titles that make a clear claim work best for social sharing
      - **Global trend charts** (StackedArea / World) — show the big picture over time
      - **Skip**: population-weighted variants (harder to read quickly), within-regime breakdowns (too niche), country-specific views
-   - Add the selected charts with brief rationale to the Slack announcement draft
-
-8b) Gather editorial context (shared by steps 9 and 9b)
-   Both the Slack announcement (step 9) and the public Data update post (step 9b) need richer framing than the producer name alone. Read the following before drafting either, and keep the extracted material on hand (a short scratch list in the workbench is fine — `workbench/<short_name>/editorial-context.md` is a reasonable spot if it helps):
-
-   - **Snapshot DVC files** at `snapshots/<namespace>/<new_version>/*.dvc` — read every file's `meta.origin` block. The richest fields are:
-     - `description` — multi-paragraph source-level summary, usually the best raw material for "what the dataset shows" / "why it matters".
-     - `description_snapshot` — per-table flavour, often a single sentence that names the specific slice (inequality, poverty, incomes, etc.).
-     - `producer` and `attribution_short` — for the closing line of the public post and for the search URL.
-     - `url_main` — the producer's landing page. **Visit it via WebFetch** when the existing metadata is thin or the post would benefit from a release-notes detail (what changed in this release, coverage extension, methodology change). Don't invent facts; lift them from the producer's page.
-     - `citation_full` — gives the release date/version.
-     - `date_published` — the actual release date for the Slack form's "When was this released?" field.
-   - **Garden `.meta.yml`** at `etl/steps/data/garden/<namespace>/<new_version>/<short_name>.meta.yml` — read `dataset.description` plus per-indicator `description_short`, `description_key`, and `presentation.title_public`. These are OWID's user-facing framing of the same data — pick a phrase or finding from here if it lands more cleanly than the producer's wording.
-   - **Step 8's chart picks** — for the closing-line link choice in step 9b and to anchor any specific finding either announcement highlights.
-
-   Don't dump every field verbatim into the announcements — extract the 2–3 sentences that actually frame the dataset for a reader, then choose voice and format separately for the Slack form (step 9) vs. the public post (step 9b).
+   - Add snippets for the editorial prompts from source metadata, garden/grapher metadata, resolved sanity-check/workaround notes, and non-routine PR changes. Keep these as snippets/facts, not polished Slack prose.
 
 9) Slack announcement & PR update
-   - Use the editorial context gathered in step 8b (snapshot DVC fields, garden `.meta.yml`, optionally `url_main` via WebFetch) to fill the template at `.claude/skills/update-dataset/slack-announcement-template.md`. Mechanical fields (producer, dates, coverage, chart count, search URL) come straight from the snapshot DVC + garden meta + step 8 count. Editorial fields ("what does this help users understand", caveats, anything interesting) come from the same context, rephrased for a stakeholder audience.
-   - Include the 1–3 selected chart views from step 8
-   - Ask user if unsure about any details
-   - Save the draft to `workbench/<short_name>/slack-announcement.md`
-   - **Add the announcement to the PR description** as a collapsed section titled "Slack Announcement"
+   - Run the `data-updates-comms` skill with `workbench/<short_name>/update-context.yml` as input. `data-updates-comms` is the canonical owner of the Slack form wording, copy-paste format, editorial framing, search URL, and any standalone fallback gathering. Do not duplicate that rendering logic here.
+   - Save the rendered draft to `workbench/<short_name>/slack-announcement.md`.
+   - If `data-updates-comms` reports missing mechanical fields, gather them, update `update-context.yml`, and re-render rather than inventing values. Ask the user if a missing field requires judgment.
+   - **Add the announcement to the PR description** as a collapsed section titled "Slack Announcement".
    - **Post `@codex review` as a separate PR comment** (not in the PR description) to trigger an automated code review. Use:
      ```bash
      gh pr comment <pr_number> --body "@codex review"
@@ -404,7 +428,7 @@ When you do stop, present a concise summary of the issue and what options exist.
 
    Steps:
    - Open `.claude/skills/update-dataset/data-update-template.md` and follow it — the template has the exact paste-ready format plus three worked examples (NVIDIA, H5N1, World Bank PIP) lifted verbatim from the Drive folder.
-   - Use the editorial context sources gathered in step 8b (snapshot DVC fields, garden `.meta.yml`, optionally `url_main` via WebFetch). Also pull from `workbench/<short_name>/slack-announcement.md` (step 9 output) — the editorial framing already drafted there is the closest cousin.
+   - Use the facts already gathered in `workbench/<short_name>/update-context.yml` (step 8) — `dataset.title`, `dataset.producer`, `source.url_main`, `source.citation_full`, `coverage.*`, `charts.published_count`, `charts.selected_views`, and the `editorial_context.*` snippet lists. Also pull from `workbench/<short_name>/slack-announcement.md` (step 9 output) — the editorial framing already drafted there is the closest cousin. If a field needed for the post isn't yet in `update-context.yml`, gather it (snapshot DVC, garden `.meta.yml`, or `url_main` via WebFetch) **and persist it back** to the YAML so the next consumer doesn't re-do the work.
    - **Title shape** — a punchy finding/claim, a question, or an action/invitation. Not just the dataset name. See the template's "Field-by-field guidance" for examples and decision logic.
    - **Body** — 100–200 words, first-person, conversational. Sample: ATUS ~105, NVIDIA ~140, robots ~110, OECD Government at a Glance ~155, US data centers ~145, UNU-WIDER ~155, World Bank PIP ~190, ozone ~165, mobile money ~180, fertilizers ~170, H5N1 ~135. The body should give a reader a reason to care and at least one concrete number — not "I refreshed our charts".
    - **Inline markdown links** throughout the body for the producer's page, methodology pages, and related OWID articles. `*italics*` for emphasis, sparingly.
@@ -524,6 +548,7 @@ These pages need a fresh staging build, so they're only meaningful after the PR'
 - `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`
 - `workbench/<short_name>/harmonization.log` and `harmonization_audit.md` (from step 5c)
 - `workbench/<short_name>/indicator_upgrade.json` (if indicator-upgrader was used)
+- `workbench/<short_name>/update-context.yml` (canonical facts gathered during the update; consumed by `data-updates-comms`)
 - `workbench/<short_name>/slack-announcement.md`
 - `workbench/<short_name>/data-update.md` (public-facing post draft for OWID /latest, from step 9b)
 

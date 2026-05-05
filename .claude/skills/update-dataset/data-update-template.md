@@ -6,6 +6,8 @@ This is **separate from the Slack announcement** — that one is a 10-field form
 
 Hand the draft to the user for review and publication. The skill does not presume where the post is published — the user creates the Google Doc and pastes the draft into it.
 
+**Inputs come from `workbench/<short_name>/update-context.yml`** (gathered in step 8 of `update-dataset`). The fields you'll most often pull: `dataset.title`, `dataset.producer`, `source.url_main`, `coverage.*`, `charts.published_count`, `charts.selected_views`, and the `editorial_context.*` snippet lists. If something the post needs isn't yet in the YAML, gather it from the snapshot `.dvc` / garden `.meta.yml` / `url_main` (via WebFetch) **and persist it back** so the next run / consumer doesn't redo the work.
+
 ---
 
 ## Template (paste-ready for a new Google Doc)
@@ -92,7 +94,7 @@ If the dataset doesn't lend itself to a single headline finding, the question fo
 
 **Body voice** — First-person, conversational, author voice. The post reads like the person who did the work telling you about it. **Not** corporate ("OWID has updated…" is wrong); **yes** "I recently updated…", "I've just updated…", "I just updated…", or "We recently updated…" / "We've just updated…" for joint work.
 
-**Body length** — 100–200 words. Sample: ATUS ~105, NVIDIA ~140, robots ~110, OECD Government at a Glance ~155, US data centers ~145, UNU-WIDER ~155, World Bank PIP ~190, ozone ~165, mobile money ~180, fertilizers ~170, H5N1 ~135. Shorter than ~80 words usually means the post lacks a concrete finding or methodology framing — go gather more from `url_main` or the garden metadata before publishing.
+**Body length** — 100–200 words. Sample: ATUS ~105, NVIDIA ~140, robots ~110, OECD Government at a Glance ~155, US data centers ~145, UNU-WIDER ~155, World Bank PIP ~190, ozone ~165, mobile money ~180, fertilizers ~170, H5N1 ~135. Shorter than ~80 words usually means the post lacks a concrete finding or methodology framing — check `update-context.yml` first, then gather more from `url_main` or the garden metadata before publishing.
 
 **Body shape** — 3–6 short paragraphs. Hook → framing → specific finding(s) with numbers → optional caveat → optional cross-reference → closing source + update statement. Keep paragraphs short (1–3 sentences); the format reads as a feed entry, not as an article.
 

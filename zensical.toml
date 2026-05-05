@@ -427,3 +427,5 @@ glob = ["ignore/**", "ignore/"]
 tags_file = "tags.md"
 
 [project.plugins.glightbox]
+skip_classes = []
+manual = true
