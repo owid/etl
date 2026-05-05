@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Integrated Life-cycle Assessment of Electricity Sources
+    description: |-
+      Comparative life-cycle assessment of current and future commercial-scale electricity generation technologies (coal, natural gas, hydropower, nuclear, concentrated solar power, photovoltaics, and wind), considering the full life-cycle (extraction of raw materials, manufacturing, construction, operation, and end-of-life management).
+
+      The content of the report was updated with a [corrigendum](https://unece.org/sites/default/files/2022-07/Corrigendum%20to%20UNECE%20LCA%20report%20-%20land%20use.pdf).
+    date_published: "2021-10-29"
+
+    # Citation
+    producer: UNECE
+    citation_full: |-
+      UNECE - Integrated Life-cycle Assessment of Electricity Sources (2022). United Nations Economic Commission for Europe.
+
+    # Files
+    url_main: https://unece.org/sed/documents/2021/10/reports/life-cycle-assessment-electricity-generation-options
+    # The PDF has to be downloaded manually from:
+    # https://unece.org/sites/default/files/2022-04/LCA_3_FINAL%20March%202022.pdf
+    # And then:
+    # etls life_cycle_assessment --path-to-file <path_to_downloaded_file>
+    date_accessed: "2026-05-04"
+
+    # License
+    license:
+      name: © UNECE 2022
+      url: https://unece.org/terms-and-conditions-use-united-nations-websites
+outs:
+  - md5: fc29b2975f251cf7189c3f956371f6eb
+    size: 12167719
+    path: life_cycle_assessment_of_electricity.pdf

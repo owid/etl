@@ -1,0 +1,193 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Energy
+        - Energy Mix
+    description_key:
+      - This dataset is based on a meta-analysis of life-cycle impacts of electricity production carried out by UNECE. It covers not only the direct impacts of an electricity source (for example, the land used for individual power plants) but also any supply-chain inputs (for example, land used upstream in supply chains, such as mining for fuels or raw materials).
+      - The meta-analysis considered measurements across all twelve UNECE regions; here we present the global average across these values.
+      - For some impacts — land use, for example — there can be significant differences between the maximum and minimum values for a given source depending on context, such as the climate of a given location, or choices around spacing and density of electricity sources.
+    description_processing: |-
+      The values were extracted manually from tables in the UNECE Life Cycle Assessment of Electricity Generation Options report (March 2022 final version). UNECE does not publish a CSV or Excel companion file.
+
+      A separate corrigendum to the report on land-use figures was published in July 2022 and is available at https://unece.org/sites/default/files/2022-07/Corrigendum%20to%20UNECE%20LCA%20report%20-%20land%20use.pdf
+
+  metals_note: &metals_note |-
+    Material requirements are based on the actual amount of material extracted from the ground, which includes all the losses throughout the extraction, refining and fabrication processes. These figures are towards the high end of estimates that measure based on the final amount of materials required per unit of electricity.
+
+dataset:
+  update_period_days: 0
+  title: Life-cycle impacts of energy sources (UNECE)
+
+tables:
+  life_cycle_assessment_of_electricity:
+    title: Life-cycle impacts of energy sources (UNECE)
+    variables:
+      ghg_emissions:
+        title: Greenhouse gas emissions per unit of electricity
+        unit: kilograms of CO₂-equivalents per megawatt-hour
+        short_unit: kgCO₂e/MWh
+        description_short: Lifecycle greenhouse gas emissions per unit of electricity, including emissions from the burning of fuels, mining of materials and production of energy technologies.
+        display:
+          name: Greenhouse gas emissions
+          numDecimalPlaces: 0
+      freshwater_eutrophication:
+        title: Freshwater eutrophication per unit of electricity
+        unit: grams of phosphorus-equivalents per megawatt-hour
+        short_unit: gP-eq/MWh
+        description_short: Freshwater eutrophication is caused by emissions of phosphorus compounds to rivers or lakes, measured in grams of phosphorus emitted per unit of electricity production.
+        display:
+          name: Freshwater eutrophication
+          numDecimalPlaces: 0
+      ionising_radiation:
+        title: Ionising radiation per unit of electricity
+        unit: kilograms of U-235-equivalents per megawatt-hour
+        short_unit: kg U-235eq/MWh
+        description_short: Ionising radiation impacts per unit of electricity produced, expressed in U-235 equivalents.
+        display:
+          name: Ionising radiation
+          numDecimalPlaces: 1
+      water_use:
+        title: Dissipated water use per unit of electricity
+        unit: cubic metres per megawatt-hour
+        short_unit: m³/MWh
+        description_short: Dissipated water that is not immediately returned to the local environment (e.g. evaporated, or used as an ingredient in a chemical product), measured per megawatt-hour of electricity production.
+        display:
+          name: Water use
+          numDecimalPlaces: 0
+      metal_mineral_use:
+        title: Metal and mineral requirements per unit of electricity
+        unit: grams of antimony-equivalents per megawatt-hour
+        short_unit: g Sb-eq/MWh
+        description_short: Mineral and metal inputs distilled into a single figure, measured in grams of antimony (Sb) equivalents per megawatt-hour of electricity produced.
+        description_key:
+          - *metals_note
+        display:
+          name: Total material use
+          numDecimalPlaces: 2
+      noncarcinogenic_toxicity:
+        title: Non-carcinogenic toxicity per unit of electricity
+        unit: comparative toxic units per terawatt-hour
+        short_unit: CTUh/TWh
+        description_short: Non-carcinogenic toxicity impacts on human health per terawatt-hour of electricity, expressed in comparative toxic units.
+        display:
+          name: Non-carcinogenic toxicity
+          numDecimalPlaces: 1
+      carcinogenic_toxicity:
+        title: Carcinogenic toxicity per unit of electricity
+        unit: comparative toxic units per terawatt-hour
+        short_unit: CTUh/TWh
+        description_short: Carcinogenic toxicity impacts on human health per terawatt-hour of electricity, expressed in comparative toxic units.
+        display:
+          name: Carcinogenic toxicity
+          numDecimalPlaces: 1
+      land_use_energy:
+        title: Land use per unit of electricity
+        unit: square metres per megawatt-hour
+        short_unit: m²/MWh
+        description_short: Total land used per unit of electricity production, including direct land use (e.g. the area of a power plant or solar farm) and indirect land use from mining of fuels and materials.
+        display:
+          name: Land use
+          numDecimalPlaces: 1
+      aluminium_use:
+        title: Aluminium requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Aluminium required per megawatt-hour of electricity produced.
+        description_key:
+          - *metals_note
+        display:
+          name: Aluminium
+          numDecimalPlaces: 2
+      chromium_use:
+        title: Chromium requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Chromium required per megawatt-hour of electricity produced.
+        description_key:
+          - *metals_note
+        display:
+          name: Chromium
+          numDecimalPlaces: 2
+      cobalt_use:
+        title: Cobalt requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Cobalt required per megawatt-hour of electricity produced.
+        description_key:
+          - *metals_note
+        display:
+          name: Cobalt
+          numDecimalPlaces: 3
+      copper_use:
+        title: Copper requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Copper required per megawatt-hour of electricity produced.
+        description_key:
+          - *metals_note
+        display:
+          name: Copper
+          numDecimalPlaces: 2
+      manganese_use:
+        title: Manganese requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Manganese required per megawatt-hour of electricity produced.
+        description_key:
+          - *metals_note
+        display:
+          name: Manganese
+          numDecimalPlaces: 2
+      molybdenum_use:
+        title: Molybdenum requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Molybdenum required per megawatt-hour of electricity produced.
+        description_key:
+          - *metals_note
+        display:
+          name: Molybdenum
+          numDecimalPlaces: 2
+      nickel_use:
+        title: Nickel requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Nickel required per megawatt-hour of electricity produced.
+        description_key:
+          - *metals_note
+        display:
+          name: Nickel
+          numDecimalPlaces: 2
+      silicon_use:
+        title: Silicon requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Silicon required per megawatt-hour of electricity produced.
+        description_key:
+          - *metals_note
+        display:
+          name: Silicon
+          numDecimalPlaces: 2
+      zinc_use:
+        title: Zinc requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Zinc required per megawatt-hour of electricity produced.
+        description_key:
+          - *metals_note
+        display:
+          name: Zinc
+          numDecimalPlaces: 2
+      uranium_use:
+        title: Uranium requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Uranium required per megawatt-hour of electricity produced.
+        description_key:
+          - *metals_note
+        display:
+          name: Uranium
+          numDecimalPlaces: 3
