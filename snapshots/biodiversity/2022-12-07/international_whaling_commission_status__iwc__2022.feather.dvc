@@ -1,12 +1,13 @@
 meta:
-  source:
-    name: International Whaling Commission (IWC; 2022)
-    url: https://iwc.int/member-map
-    date_accessed: 2022-12-07
-    published_by: International Whaling Commission (IWC)
-  name: International Whaling Commission Status (IWC, 2022)
-  description: ''
   is_public: false
+  origin:
+    producer: International Whaling Commission
+    title: Membership status
+    citation_full: International Whaling Commission (2022). Membership status.
+    attribution_short: IWC
+    url_main: https://iwc.int/member-map
+    date_accessed: '2022-12-07'
+    date_published: '2022'
 outs:
   - md5: 703b72fa3c4831d69d2335bc958b4ac9
     size: 4730

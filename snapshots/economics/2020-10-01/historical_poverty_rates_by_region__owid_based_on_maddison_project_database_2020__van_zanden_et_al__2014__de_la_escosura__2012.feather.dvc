@@ -1,15 +1,15 @@
 meta:
-  source:
-    name: OWID based on Maddison Project Database 2020, van Zanden et al. (2014), de la Escosura (2012)
+  is_public: false
+  origin:
+    producer: Various sources
+    title: Historical poverty rates by region
     description: |-
       See the data appendix describing the source data and methods underlying these estimates: https://ourworldindata.org/history-of-poverty-data-appendix
+    citation_full: |-
+      Our World in Data based on Maddison Project Database, version 2020. Bolt, Jutta and Jan Luiten van Zanden (2020), "Maddison style estimates of the evolution of the world economy. A new 2020 update"; van Zanden, Jan Luiten van, Joerg Baten, Peter Foldvari, and Bas van Leeuwen. 2014. "The Changing Shape of Global Inequality 1820–2000; Exploring a New Dataset." Review of Income and Wealth 60 (2): 279–97; Prados de la Escosura, Leandro. 2012. "Output per head in pre-independence Africa: Quantitative conjectures." Economic History of Developing Regions 27 (2): 1–36.
+    url_main: https://ourworldindata.org/history-of-poverty-data-appendix
     date_accessed: '2020-10-01'
-    published_by: |-
-      OWID based on Maddison Project Database, version 2020. Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update ”; van Zanden, Jan Luiten van, Joerg Baten, Peter Foldvari, and Bas van Leeuwen. 2014. “The Changing Shape of Global Inequality 1820–2000; Exploring a New Dataset.” Review of Income and Wealth 60 (2): 279–97; Prados de la Escosura, Leandro. 2012. “OUTPUT PER HEAD IN PRE-INDEPENDENCE AFRICA: QUANTITATIVE CONJECTURES.” Economic History of Developing Regions 27 (2): 1–36.
-  name: |-
-    Historical poverty rates by region (OWID based on Maddison Project Database 2020, van Zanden et al. (2014), de la Escosura (2012))
-  description: ''
-  is_public: false
+    date_published: '2020'
 outs:
   - md5: 45c5b52113a82930491fc875704fa585
     size: 26586

@@ -1,12 +1,13 @@
 meta:
-  source:
-    name: Organisation for Economic Co-operation and Development, Labour Force Statistics (2020)
-    url: https://stats.oecd.org/Index.aspx?DataSetCode=ANHRS#
-    date_accessed: 2020-09-16
-    published_by: Organisation for Economic Co-operation and Development (2020)
-  name: Working Hours – OECD (2020)
-  description: ''
   is_public: false
+  origin:
+    producer: OECD
+    title: Labour Force Statistics
+    title_snapshot: Labour Force Statistics - Average annual hours actually worked per worker
+    citation_full: OECD (2020). Labour Force Statistics.
+    url_main: https://stats.oecd.org/Index.aspx?DataSetCode=ANHRS#
+    date_accessed: '2020-09-16'
+    date_published: '2020'
 outs:
   - md5: dd5f9d1843e5f9c39ea1ee2557a95bed
     size: 9946

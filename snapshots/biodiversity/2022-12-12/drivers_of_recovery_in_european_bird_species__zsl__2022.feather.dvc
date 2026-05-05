@@ -1,15 +1,13 @@
 meta:
-  source:
-    name: |-
-      Ledger, S.E.H., Rutherford, C.A., Benham, C., Burfield, I.J., Deinet, S., Eaton, M., Freeman, R., Gray, C., Herrando, S., Scott-Gatty, K., Staneva, A. and McRae, L., (2022) Wildlife Comeback in Europe: Opportunities and challenges for species recovery.
-    description: This dataset is taken from Figure 13 on page 249 of the Wildlife Comeback in Europe report (2022).
-    url: https://www.rewildingeurope.com/wp-content/uploads/publications/wildlife-comeback-in-europe-2022/index.html
-    date_accessed: 2022-12-12
-    published_by: |-
-      Ledger, S.E.H, Rutherford, C.A, Benham, C., Burfield, I.J., Deinet, S., Eaton, M., Freeman, R., Gray, C., Herrando, S., Scott-Gatty, K., Staneva, A and McRae, L., (2022) Wildlife Comeback in Europe: Opportunities and challenges for species recovery.
-  name: Drivers of recovery in European bird species (ZSL, 2022)
-  description: ''
   is_public: false
+  origin:
+    producer: Ledger et al.
+    title: 'Wildlife Comeback in Europe: Opportunities and challenges for species recovery'
+    description: This dataset is taken from Figure 13 on page 249 of the Wildlife Comeback in Europe report (2022).
+    citation_full: 'Ledger, S. E. H., Rutherford, C. A., Benham, C., Burfield, I. J., Deinet, S., Eaton, M., Freeman, R., Gray, C., Herrando, S., Scott-Gatty, K., Staneva, A., and McRae, L. (2022). Wildlife Comeback in Europe: Opportunities and challenges for species recovery.'
+    url_main: https://www.rewildingeurope.com/wp-content/uploads/publications/wildlife-comeback-in-europe-2022/index.html
+    date_accessed: '2022-12-12'
+    date_published: '2022'
 outs:
   - md5: a001a63e6ef6648a990a56f9bf6d0e67
     size: 3482

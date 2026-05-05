@@ -1,13 +1,12 @@
 meta:
-  source:
-    name: Bick et al (2019)
-    url: https://onlinelibrary.wiley.com/doi/abs/10.1111/sjoe.12344
-    date_accessed: 2020-09-14
-    published_by: |-
-      Bick, Brüggemann, & Fuchs-Schündeln (2019), "Hours Worked in Europe and the United States: New Data, New Answers." Scandinavian Journal of Economics, 121(4), 1381–1416.
-  name: Working Hours – Bick et al (2019)
-  description: ''
   is_public: false
+  origin:
+    producer: Bick et al.
+    title: 'Hours worked in Europe and the United States: New data, new answers'
+    citation_full: 'Bick, A., Brüggemann, B., and Fuchs-Schündeln, N. (2019). Hours worked in Europe and the United States: New data, new answers. Scandinavian Journal of Economics, 121(4), 1381–1416.'
+    url_main: https://onlinelibrary.wiley.com/doi/abs/10.1111/sjoe.12344
+    date_accessed: '2020-09-14'
+    date_published: '2019'
 outs:
   - md5: d6a1e4252d8f24d7d248a3ec0574e20b
     size: 163818

@@ -1,20 +1,20 @@
 meta:
-  source:
-    name: Correlates of War v4.0 - National (2016)
+  is_public: false
+  origin:
+    producer: Correlates of War Project
+    title: Trade Data Set
     description: |-
       The national COW trade dataset provides estimates of total country exports (i.e. sum of exports to the rest of the world). To calculate trade as a share of GDP, we have used Fouquin and Hugot (CEPII 2016)'s long run historical GDP series (in nominal British pounds), converted to US$ using historical exchange rates from the Bank of England.
 
       Full reference: Barbieri, Katherine and Omar M. G. Omar Keshk. 2016. Correlates of War Project Trade Data Set Codebook, Version 4.0. Online: http://correlatesofwar.org.
 
-      Barbieri, Katherine, Omar M. G. Keshk, and Brian Pollins. 2009. “TRADING DATA: Evaluating our Assumptions and Coding Rules.” Conflict Management and Peace Science. 26(5): 471-491.
-    url: |-
-      Trade data: http://www.correlatesofwar.org/data-sets/bilateral-trade BOE Exchange Rate: http://www.bankofengland.co.uk/research/Pages/datasets/default.aspx; CEPII (2016) GDP data: http://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=32
-    date_accessed: 2018-01-15
-    published_by: |-
-      Barbieri, Katherine and Omar M. G. Omar Keshk. 2016. Correlates of War Project Trade Data Set Codebook, Version 4.0. Online: http://correlatesofwar.org.
-  name: Total merchandise trade as share of GDP (COW v 4.0 National (2016)) (split)
-  description: ''
-  is_public: false
+      Barbieri, Katherine, Omar M. G. Keshk, and Brian Pollins. 2009. "Trading data: Evaluating our assumptions and coding rules." Conflict Management and Peace Science. 26(5): 471–491.
+    citation_full: 'Barbieri, K. and Keshk, O. M. G. (2016). Correlates of War Project Trade Data Set Codebook, Version 4.0. Online: http://correlatesofwar.org.'
+    attribution_short: COW
+    version_producer: v4.0
+    url_main: http://www.correlatesofwar.org/data-sets/bilateral-trade
+    date_accessed: '2018-01-15'
+    date_published: '2016'
 outs:
   - md5: 05eaa415872f4c7b8a3ea7c32ed77571
     size: 92450

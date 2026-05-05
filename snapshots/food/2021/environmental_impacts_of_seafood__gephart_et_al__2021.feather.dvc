@@ -1,19 +1,18 @@
 meta:
-  source:
-    name: Gephart et al. (2021). Environmental performance of blue foods. Nature.
+  is_public: false
+  origin:
+    producer: Gephart et al.
+    title: Environmental performance of blue foods
     description: |-
       This meta-study brings together life cycle inventory data (i.e., material and energy input and farm-level performance data) from studies of the environmental footprint of wild-caught and farmed seafood products. It draws on data from over 1690 farms and 1000 unique fishery records.
 
       These impacts include those on-farm and off-farm, but stops at the farmgate (or landing of fish). This means it does not include impacts such as transport to retail, packaging, processing or cooking.
 
       Impacts are normalised by the fish or seafood's edible weight (rather than their live weight).
-    url: https://www.nature.com/articles/s41586-021-03889-2
+    citation_full: Gephart, J. A., Henriksson, P. J., Parker, R. W., Shepon, A., Gorospe, K. D., Bergman, K., ... and Tyedmers, P. (2021). Environmental performance of blue foods. Nature.
+    url_main: https://www.nature.com/articles/s41586-021-03889-2
     date_accessed: '2021-01-01'
-    published_by: |-
-      Gephart, J. A., Henriksson, P. J., Parker, R. W., Shepon, A., Gorospe, K. D., Bergman, K., ... & Tyedmers, P. (2021). Environmental performance of blue foods. Nature.
-  name: Environmental impacts of seafood (Gephart et al. 2021)
-  description: ''
-  is_public: false
+    date_published: '2021'
 outs:
   - md5: 0f5b963d4fa139f1a11fc128820a87fd
     size: 6562

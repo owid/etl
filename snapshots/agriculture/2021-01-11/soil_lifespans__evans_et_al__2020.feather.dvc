@@ -1,14 +1,12 @@
 meta:
-  source:
-    name: |-
-      Evans, D. L., Quinton, J. N., Davies, J. A. C., Zhao, J., & Govers, G. (2020). Soil lifespans and how they can be extended by land use and management change.
-    url: https://iopscience.iop.org/article/10.1088/1748-9326/aba2fd
-    date_accessed: 2021-01-11
-    published_by: |-
-      Evans, D. L., Quinton, J. N., Davies, J. A. C., Zhao, J., & Govers, G. (2020). Soil lifespans and how they can be extended by land use and management change. Environmental Research Letters, 15(9), 0940b2.
-  name: Soil Lifespans (Evans et al. 2020)
-  description: ''
   is_public: false
+  origin:
+    producer: Evans et al.
+    title: Soil lifespans and how they can be extended by land use and management change
+    citation_full: Evans, D. L., Quinton, J. N., Davies, J. A. C., Zhao, J., and Govers, G. (2020). Soil lifespans and how they can be extended by land use and management change. Environmental Research Letters, 15(9), 0940b2.
+    url_main: https://iopscience.iop.org/article/10.1088/1748-9326/aba2fd
+    date_accessed: '2021-01-11'
+    date_published: '2020'
 outs:
   - md5: 8e458329d5d97d0d89e517319d285a37
     size: 19578
