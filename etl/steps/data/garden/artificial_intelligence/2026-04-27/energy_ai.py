@@ -347,8 +347,12 @@ def create_share_of_electricity_demand(tb, tb_electricity):
     tb_demand_countries = tb_electricity[["country", "year", "total_demand__twh"]].dropna().reset_index(drop=True)
 
     # Build demand aggregates for each IEA region by summing available member countries.
+    ember_countries = set(tb_demand_countries["country"].unique())
     region_demand_tables = []
     for region, members in IEA_REGION_MEMBERS.items():
+        missing = [c for c in members if c not in ember_countries]
+        if missing:
+            paths.log.warning(f"Countries missing from Ember for {region}: {missing}")
         tb_region = (
             tb_demand_countries[tb_demand_countries["country"].isin(members)]
             .groupby(["year"], as_index=False)
