@@ -1,0 +1,22 @@
+meta:
+  origin:
+    title: Fish stocks (RAM Legacy Stock Assessment Database)
+    description: |-
+      The RAM Legacy Stock Assessment Database is a compilation of stock assessment results for commercially exploited marine populations from around the world. It provides data on fish biomass, catch, fishing intensity and other indicators of stock status, used to evaluate the abundance and exploitation of fish populations.
+    producer: RAM Legacy Stock Assessment Database
+    citation_full: |-
+      Ricard, D., Minto, C., Jensen, O.P. and Baum, J.K. (2012) Evaluating the knowledge base and status of commercially exploited marine species with the RAM Legacy Stock Assessment Database. Fish and Fisheries 13 (4) 380-398. DOI: 10.1111/j.1467-2979.2011.00435.x
+
+      RAM Legacy Stock Assessment Database. 2018. Version 4.44-assessment-only. Released 2018-12-22. Retrieved from DOI:10.5281/zenodo.2542919.
+    attribution_short: RAM Legacy
+    url_main: https://www.ramlegacy.org/
+    url_download: https://raw.githubusercontent.com/owid/owid-datasets/master/datasets/Fish%20stocks%20(RAMLegacy)/Fish%20stocks%20(RAMLegacy).csv
+    date_published: "2018-12-22"
+    date_accessed: "2024-10-30"
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 488be7c1d59c1c281786ab491de4fad9
+    size: 7059594
+    path: fish_stocks.csv

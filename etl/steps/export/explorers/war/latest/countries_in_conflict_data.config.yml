@@ -1,0 +1,239 @@
+definitions:
+  deaths_color_scale: &deaths_color_scale
+    colorScaleScheme: OrRd
+    colorScaleNumericBins: "0.99, #E8F4EA, 0;10;100;1000;10000;100000"
+  rate_color_scale: &rate_color_scale
+    colorScaleScheme: OrRd
+    colorScaleNumericBins: "0.1; 0.3; 1; 3; 10; 30; 100"
+
+  common_views:
+    - config:
+        type: LineChart DiscreteBar
+        yAxisMin: 0
+        hasMapTab: true
+        tab: map
+        hideAnnotationFieldsInTitle: true
+        relatedQuestionText: How do different approaches measure armed conflicts and their deaths?
+        relatedQuestionUrl: https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths
+    - dimensions:
+        conflict_sub_type: breakdown
+      config:
+        type: StackedBar
+        yAxisMin: 0
+        hasMapTab: false
+        tab: chart
+        hideAnnotationFieldsInTitle: true
+        hideRelativeToggle: false
+        selectedFacetStrategy: entity
+
+config:
+  explorerTitle: Countries in Conflict
+  explorerSubtitle: Explore conflict deaths and death rates across the world's countries.
+  isPublished: true
+  selection:
+    - Afghanistan
+    - Ethiopia
+    - Syria
+    - Ukraine
+  subNavCurrentId: country-conflict
+
+dimensions:
+  - slug: measure
+    name: Measure
+    presentation:
+      type: dropdown
+    choices:
+      - slug: deaths
+        name: Conflict deaths
+      - slug: death_rate
+        name: Death rate
+  - slug: conflict_type
+    name: Conflict type
+    presentation:
+      type: dropdown
+    choices:
+      - slug: all_armed
+        name: All armed conflicts
+      - slug: interstate
+        name: Interstate conflicts
+      - slug: intrastate
+        name: Intrastate conflicts
+      - slug: non_state
+        name: Non-state conflicts
+      - slug: one_sided
+        name: One-sided violence
+  - slug: conflict_sub_type
+    name: Conflict sub-type
+    presentation:
+      type: dropdown
+    choices:
+      - slug: na
+        name: ""
+      - slug: all
+        name: Across all sub-types
+      - slug: breakdown
+        name: By sub-type
+
+views:
+  # ===== Conflict deaths =====
+  - dimensions:
+      measure: deaths
+      conflict_type: all_armed
+      conflict_sub_type: all
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts__conflict_type_all
+          display:
+            <<: *deaths_color_scale
+
+  - dimensions:
+      measure: deaths
+      conflict_type: all_armed
+      conflict_sub_type: breakdown
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts__conflict_type_one_sided_violence
+          display:
+            name: One-sided violence
+            <<: *deaths_color_scale
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts__conflict_type_non_state_conflict
+          display:
+            name: Non-state
+            <<: *deaths_color_scale
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts__conflict_type_intrastate
+          display:
+            name: Intrastate
+            <<: *deaths_color_scale
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts__conflict_type_interstate
+          display:
+            name: Interstate
+            <<: *deaths_color_scale
+    config:
+
+      title: Deaths in armed conflicts based on where they occurred
+      subtitle: Included are deaths of combatants and civilians due to fighting in [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), [extrasystemic](#dod:extrasystemic-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [one-sided violence](#dod:onesided-ucdp) that were ongoing that year.
+
+  - dimensions:
+      measure: deaths
+      conflict_type: interstate
+      conflict_sub_type: na
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts__conflict_type_interstate
+          display:
+            name: Interstate
+            <<: *deaths_color_scale
+
+  - dimensions:
+      measure: deaths
+      conflict_type: intrastate
+      conflict_sub_type: na
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts__conflict_type_intrastate
+          display:
+            name: Intrastate
+            <<: *deaths_color_scale
+
+  - dimensions:
+      measure: deaths
+      conflict_type: non_state
+      conflict_sub_type: na
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts__conflict_type_non_state_conflict
+          display:
+            name: Non-state
+            <<: *deaths_color_scale
+
+  - dimensions:
+      measure: deaths
+      conflict_type: one_sided
+      conflict_sub_type: na
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts__conflict_type_one_sided_violence
+          display:
+            name: One-sided violence
+            <<: *deaths_color_scale
+
+  # ===== Death rate =====
+  - dimensions:
+      measure: death_rate
+      conflict_type: all_armed
+      conflict_sub_type: all
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_all
+          display:
+            <<: *rate_color_scale
+
+  - dimensions:
+      measure: death_rate
+      conflict_type: all_armed
+      conflict_sub_type: breakdown
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_one_sided_violence
+          display:
+            name: One-sided violence
+            <<: *rate_color_scale
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_non_state_conflict
+          display:
+            name: Non-state
+            <<: *rate_color_scale
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_intrastate
+          display:
+            name: Intrastate
+            <<: *rate_color_scale
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_interstate
+          display:
+            name: Interstate
+            <<: *rate_color_scale
+    config:
+      title: Death rate in armed conflicts based on where they occurred
+      subtitle: Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), [extrasystemic](#dod:extrasystemic-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [one-sided violence](#dod:onesided-ucdp) that were ongoing that year.
+
+  - dimensions:
+      measure: death_rate
+      conflict_type: interstate
+      conflict_sub_type: na
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_interstate
+          display:
+            name: Interstate
+            <<: *rate_color_scale
+
+  - dimensions:
+      measure: death_rate
+      conflict_type: intrastate
+      conflict_sub_type: na
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_intrastate
+          display:
+            name: Intrastate
+            <<: *rate_color_scale
+
+  - dimensions:
+      measure: death_rate
+      conflict_type: non_state
+      conflict_sub_type: na
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_non_state_conflict
+          display:
+            name: Non-state
+            <<: *rate_color_scale
+
+  - dimensions:
+      measure: death_rate
+      conflict_type: one_sided
+      conflict_sub_type: na
+    indicators:
+      y:
+        - catalogPath: ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_one_sided_violence
+          display:
+            name: One-sided violence
+            <<: *rate_color_scale

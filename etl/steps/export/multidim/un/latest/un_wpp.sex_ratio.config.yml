@@ -1,0 +1,63 @@
+title:
+  title: "Population & Demography Explorer"
+  title_variant: ""
+
+default_selection:
+  - China
+  - India
+  - United States
+  - Indonesia
+  - Pakistan
+  - Nigeria
+  - Brazil
+  - Japan
+
+dimensions:
+  - slug: indicator
+    name: Indicator
+    # description: Demographic measures published by the UN World Population Prospects, grouped by topic.
+    choices:
+      - slug: sex_ratio
+        name: Sex ratio
+        description: Number of males per 100 females in the population.
+        group: Age & sex structure
+
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: all
+        name: Both sexes
+        description: null
+    presentation:
+      type: radio
+
+  - slug: age
+    name: Age
+    choices:
+      - slug: all
+        name: Total
+        description: null
+      - slug: "0"
+        name: At birth
+        description: null
+
+  - slug: variant
+    name: Projection scenario
+    description: Projection scenarios share the same mortality and migration assumptions but differ in their fertility assumptions.
+    choices:
+      - slug: estimates
+        name: None
+        description: Historical estimates only, without future projections
+      - slug: low
+        name: Low
+        description: Lower fertility than the medium variant
+      - slug: medium
+        name: Medium
+        description: UN's central projection
+      - slug: high
+        name: High
+        description: Higher fertility than the medium variant
+    presentation:
+      type: radio
+
+views: []
