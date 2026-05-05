@@ -66,10 +66,9 @@ Identify:
 
 ### 2. Decide between full-YAML and table-driven
 
-- **Full YAML** when each view is bespoke (different titles, subtitles, configs per dimension combination). Model after `crop_yields.{py,config.yml}`.
-- **Table-driven** when the upstream is a multidim grapher dataset and dimensions map onto its indicator dimensions. Model after `migration/latest/migration_flows.py` — the YAML carries the static config, and `paths.create_collection(tb=tb, indicator_names=[...], dimensions=[...], common_view_config=...)` expands views automatically. Post-process in Python for the residual logic (e.g. per-metric `display` settings via `add_display_settings(c)`).
+This decision is shared with the other migration skills. **Read `.claude/docs/explorer-programmatic-construction.md`** for the full discussion: when to go programmatic, the API contract for `tb[col].m.dimensions` and `paths.create_collection(tb=tb, ...)`, FAUST migration up to `presentation.grapher_config` in garden metadata, post-processing with `sort_choices` / `group_views`, and pitfalls.
 
-> **Where FAUST lives** (orthogonal to full-YAML vs table-driven). For **single-indicator** views, prefer pushing chart text (`title`, `subtitle`, `note`, `description_short`, …) upstream into the indicator's garden metadata under `presentation.grapher_config`. The explorer view then inherits it — no duplication, and the same metadata is used by any standalone chart on that indicator. For **multi-indicator** views (multiple `y[]` entries, or x/y/color/size combos), put FAUST in the explorer view's `config:` block — it has no meaningful home on a single indicator. When converting `df_graphers["title"]`/`["subtitle"]` rows, check first whether the underlying indicator's metadata already carries the same text; if yes, drop it from the explorer YAML.
+For Pattern B specifically: the legacy `df_graphers`/`df_columns` plumbing maps onto either form, but a legacy step that already builds dimensions from a multidim grapher dataset (rather than hand-stitching variable IDs) is usually a clean fit for table-driven. If many of the legacy views are multi-indicator already, you'll either keep them in YAML or rebuild them via `c.group_views(...)` after the auto-expansion.
 
 ### 3. Scaffold the new step
 

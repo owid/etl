@@ -89,41 +89,11 @@ For each catalog path (`<ns>/<v>/<dataset>/<table>#<short>`), the underlying ste
 
 ### 3.5. Decide the construction style
 
-Two orthogonal choices before scaffolding:
+Two orthogonal choices before scaffolding: **how views are produced** (full-YAML vs table-driven via `paths.create_collection(tb=tb, ...)`) and **where chart text/config lives** (per-view in YAML vs each indicator's `presentation.grapher_config` in garden metadata). Multi-indicator views — including bundling several indicators into one chart via `c.group_views(...)` — are also part of this decision space.
 
-**View construction — full-YAML vs table-driven**
+For grapher-chart-based migrations the default is full-YAML, because each grapherId typically points at a different indicator from a non-dimensional table. Table-driven becomes attractive when the views are mostly single-indicator and the explorer's dimensions happen to match a multidim upstream dataset (or you can build one).
 
-- **Full-YAML** (default for grapher-chart-based migrations): hand-list every view under `views:` in the YAML. Use when views are bespoke (different titles, subtitles, indicators per dimension combination — typical when each grapherId points at a different indicator). Model: `crop_yields.{py,config.yml}`, `countries_in_conflict_data.{py,config.yml}`, the `food_prices` migration above.
-- **Table-driven**: pass `tb=tb, indicator_names=[...], dimensions=[...]` to `create_collection` and let it auto-expand views from the dimensional indicators of an upstream multidim grapher dataset. Use when the explorer's dimensions map cleanly onto the indicator dimensions of one upstream dataset (e.g. metric × gender × age). YAML carries only the static config + dimension definitions; views are generated. Model: `migration/latest/migration_flows.py`.
-
-  ```python
-  ds = paths.load_dataset("<grapher_dataset>")
-  tb = ds.read("<table>", load_data=False)
-  c = paths.create_collection(
-      config=config,
-      tb=tb,
-      indicator_names=["migrants"],
-      dimensions=["country_select", "metric", "gender"],
-      common_view_config={"type": "LineChart DiscreteBar", "hasMapTab": True, "tab": "map"},
-      short_name="<short-with-hyphens>",
-      explorer=True,
-  )
-  c.sort_choices({"country_select": lambda x: sorted(x)})  # optional post-processing
-  c.save()
-  ```
-
-  Most grapher-chart-based migrations don't qualify for table-driven because each grapherId tends to reference a different indicator from a non-dimensional table. Prefer table-driven only when you can verify the upstream is genuinely multidim and the explorer's dimensions match.
-
-**Where FAUST lives — garden metadata vs explorer config**
-
-For **single-indicator views**, prefer pushing the chart text (title, subtitle, note, description_short, …) upstream into the indicator's garden metadata under `presentation.grapher_config` (or the equivalent top-level fields like `title_public`). The explorer view then inherits it automatically — no duplication, and standalone charts on the same indicator pick up the same text.
-
-For **multi-indicator views** (one view, multiple `y[]` entries, or x/y/color/size combos), FAUST cannot live on any single indicator. Put it in the explorer view's `config:` block.
-
-When migrating a grapher-chart-based explorer:
-1. For each chart's `title`/`subtitle`/`note`, first check whether the underlying indicator's garden metadata (`presentation.grapher_config.title`, etc.) already carries it. If yes, leave it off the explorer view — it inherits.
-2. If the chart's text differs from the indicator's metadata and the indicator is otherwise unused elsewhere, consider updating the garden metadata instead of duplicating in the explorer.
-3. Only put FAUST in `view.config` when the view has multiple indicators, or when the indicator metadata is shared across charts that use different text.
+**Read `.claude/docs/explorer-programmatic-construction.md` for the full mechanics**: the API contract for `tb[col].m.dimensions` / `original_short_name` / `indicator_names` / `dimensions=`, FAUST inheritance from indicator metadata, post-processing with `sort_choices` and `group_views`, common pitfalls, and reference examples. The migration steps below assume you've made the choice; what changes between full-YAML and table-driven is mostly the shape of `<short>.py` and `<short>.config.yml`.
 
 ### 4. Scaffold the ETL step
 
