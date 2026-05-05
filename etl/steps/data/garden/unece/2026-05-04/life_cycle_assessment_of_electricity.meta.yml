@@ -4,18 +4,6 @@ definitions:
     presentation:
       topic_tags:
         - Energy
-        - Energy Mix
-    description_key:
-      - This dataset is based on a meta-analysis of life-cycle impacts of electricity production carried out by UNECE. It covers not only the direct impacts of an electricity source (for example, the land used for individual power plants) but also any supply-chain inputs (for example, land used upstream in supply chains, such as mining for fuels or raw materials).
-      - The meta-analysis considered measurements across all twelve UNECE regions; here we present the global average across these values.
-      - For some impacts — land use, for example — there can be significant differences between the maximum and minimum values for a given source depending on context, such as the climate of a given location, or choices around spacing and density of electricity sources.
-    description_processing: |-
-      The values were extracted manually from tables in the UNECE Life Cycle Assessment of Electricity Generation Options report (March 2022 final version). UNECE does not publish a CSV or Excel companion file.
-
-      A separate corrigendum to the report on land-use figures was published in July 2022 and is available at https://unece.org/sites/default/files/2022-07/Corrigendum%20to%20UNECE%20LCA%20report%20-%20land%20use.pdf
-
-  metals_note: &metals_note |-
-    Material requirements are based on the actual amount of material extracted from the ground, which includes all the losses throughout the extraction, refining and fabrication processes. These figures are towards the high end of estimates that measure based on the final amount of materials required per unit of electricity.
 
 dataset:
   update_period_days: 0
@@ -38,7 +26,7 @@ tables:
         title: Freshwater eutrophication per unit of electricity
         unit: grams of phosphorus-equivalents per megawatt-hour
         short_unit: gP-eq/MWh
-        description_short: Freshwater eutrophication is caused by emissions of phosphorus compounds to rivers or lakes, measured in grams of phosphorus emitted per unit of electricity production.
+        description_short: "Freshwater eutrophication is caused by the emissions of phosphorus compounds to freshwater: either rivers or lakes. This is measured in grams of phosphorous emitted per unit of electricity production."
         display:
           name: Freshwater eutrophication
           shortUnit: gP-eq
@@ -56,7 +44,7 @@ tables:
         title: Dissipated water use per unit of electricity
         unit: cubic metres per megawatt-hour
         short_unit: m³/MWh
-        description_short: Dissipated water that is not immediately returned to the local environment (e.g. evaporated, or used as an ingredient in a chemical product), measured per megawatt-hour of electricity production.
+        description_short: Dissipated water includes all uses that immediately deprive the local environment of using water. This therefore gives some indication of local scarcity of a water resource. For example, water immediately returned to the environment (in river, ocean, or groundwater) is not counted, while water used as an ingredient for a chemical product, or evaporated, is counted.
         display:
           name: Water use
           shortUnit: m³
@@ -65,9 +53,7 @@ tables:
         title: Metal and mineral requirements per unit of electricity
         unit: grams of antimony-equivalents per megawatt-hour
         short_unit: g Sb-eq/MWh
-        description_short: Mineral and metal inputs distilled into a single figure, measured in grams of antimony (Sb) equivalents per megawatt-hour of electricity produced.
-        description_key:
-          - *metals_note
+        description_short: Energy technologies require a range of mineral and metal inputs. Here they are distilled into a single figure of material requirements, which is measured in grams of Sb-equivalents per megawatt-hour of electricity produced.
         display:
           name: Total material use
           shortUnit: g
@@ -104,8 +90,6 @@ tables:
         unit: grams per megawatt-hour
         short_unit: g/MWh
         description_short: Aluminium required per megawatt-hour of electricity produced.
-        description_key:
-          - *metals_note
         display:
           name: Aluminium
           shortUnit: g
@@ -115,8 +99,6 @@ tables:
         unit: grams per megawatt-hour
         short_unit: g/MWh
         description_short: Chromium required per megawatt-hour of electricity produced.
-        description_key:
-          - *metals_note
         display:
           name: Chromium
           shortUnit: g
@@ -126,8 +108,6 @@ tables:
         unit: grams per megawatt-hour
         short_unit: g/MWh
         description_short: Cobalt required per megawatt-hour of electricity produced.
-        description_key:
-          - *metals_note
         display:
           name: Cobalt
           shortUnit: g
@@ -137,8 +117,6 @@ tables:
         unit: grams per megawatt-hour
         short_unit: g/MWh
         description_short: Copper required per megawatt-hour of electricity produced.
-        description_key:
-          - *metals_note
         display:
           name: Copper
           shortUnit: g
@@ -148,8 +126,6 @@ tables:
         unit: grams per megawatt-hour
         short_unit: g/MWh
         description_short: Manganese required per megawatt-hour of electricity produced.
-        description_key:
-          - *metals_note
         display:
           name: Manganese
           shortUnit: g
@@ -159,8 +135,6 @@ tables:
         unit: grams per megawatt-hour
         short_unit: g/MWh
         description_short: Molybdenum required per megawatt-hour of electricity produced.
-        description_key:
-          - *metals_note
         display:
           name: Molybdenum
           shortUnit: g
@@ -170,8 +144,6 @@ tables:
         unit: grams per megawatt-hour
         short_unit: g/MWh
         description_short: Nickel required per megawatt-hour of electricity produced.
-        description_key:
-          - *metals_note
         display:
           name: Nickel
           shortUnit: g
@@ -181,8 +153,6 @@ tables:
         unit: grams per megawatt-hour
         short_unit: g/MWh
         description_short: Silicon required per megawatt-hour of electricity produced.
-        description_key:
-          - *metals_note
         display:
           name: Silicon
           shortUnit: g
@@ -192,8 +162,6 @@ tables:
         unit: grams per megawatt-hour
         short_unit: g/MWh
         description_short: Zinc required per megawatt-hour of electricity produced.
-        description_key:
-          - *metals_note
         display:
           name: Zinc
           shortUnit: g
@@ -203,8 +171,6 @@ tables:
         unit: grams per megawatt-hour
         short_unit: g/MWh
         description_short: Uranium required per megawatt-hour of electricity produced.
-        description_key:
-          - *metals_note
         display:
           name: Uranium
           shortUnit: g
