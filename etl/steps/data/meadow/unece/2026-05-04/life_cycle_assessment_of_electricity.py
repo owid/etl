@@ -1,8 +1,4 @@
-"""Meadow step for UNECE's Life Cycle Assessment of Electricity Generation Options.
-
-The values are hardcoded here because UNECE only publishes the report as a PDF (no CSV/Excel companion
-file). Numbers were extracted manually from the report tables.
-"""
+"""Meadow step for UNECE's Life Cycle Assessment of Electricity Generation Options."""
 
 from io import StringIO
 
@@ -51,13 +47,11 @@ def run() -> None:
     # Load the PDF snapshot purely to attach origin metadata to the dataset.
     snap = paths.load_snapshot("life_cycle_assessment_of_electricity.pdf")
 
-    # Read the hardcoded data.
-    df = pd.read_csv(StringIO(DATA_CSV))
-
     #
     # Process data.
     #
-    tb = snap.read_from_df(df)
+    # Create a table with the provided data.
+    tb = snap.read_from_df(pd.read_csv(StringIO(DATA_CSV)))
 
     # Improve table format
     tb = tb.format(["source", "year"])
