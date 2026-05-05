@@ -198,7 +198,7 @@ tables:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericValues: [ 0, 50000, 100000, 500000, 1000000, 5000000, 595726.0989 ]
+                customNumericValues: [ 0, 50000, 100000, 500000, 1000000, 5000000, 1 ]
     dimensions:
       - name: year
         slug: year
