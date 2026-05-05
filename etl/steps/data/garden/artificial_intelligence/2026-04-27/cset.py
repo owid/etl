@@ -2,7 +2,7 @@ import datetime
 
 import owid.catalog.processing as pr
 
-from etl.catalog_helpers import last_date_accessed
+from etl.catalog_helpers import last_date_accessed, last_date_published
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
@@ -83,8 +83,8 @@ def run() -> None:
         default_metadata=ds_meadow.metadata,
         yaml_params={
             "date_accessed": last_date_accessed(tb),
-            "year": last_date_accessed(tb)[-4:],
-            "month": datetime.datetime.strptime(last_date_accessed(tb), "%d %B %Y").strftime("%B"),
+            "year": last_date_published(tb)[-4:],
+            "month": datetime.datetime.strptime(last_date_published(tb), "%d %B %Y").strftime("%B"),
         },
     )
     ds_garden.save()

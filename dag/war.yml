@@ -216,3 +216,7 @@ steps:
     - data://meadow/war/2025-05-15/nuclear_weapons_inventories
   data://grapher/war/2025-05-15/nuclear_weapons_inventories:
     - data://garden/war/2025-05-15/nuclear_weapons_inventories
+
+  # Countries in Conflict explorer.
+  export://explorers/war/latest/countries_in_conflict_data:
+    - data://grapher/war/2025-06-13/ucdp
