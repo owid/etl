@@ -5,6 +5,11 @@ definitions:
       topic_tags:
         - Food Prices
         - Poverty
+      grapher_config:
+        hasMapTab: true
+        tab: map
+        yAxis:
+          min: 0
   description_key_pct_of_population: &description_key_pct_of_population
     # Original description:
     # The indicator expresses the percentage of the total population unable to afford an energy sufficient diet in a given country and year. A diet is considered unaffordable when the diet cost plus expenditures for basic non-food needs exceed income per capita per day. The expenditures for basic non-food needs are calculated as average non-food expenditure shares of low-income consumer multiplied by internaitonal poverty lines set by the World Bank. The non-food expenditure share is 37% and 44% in low-income and lower-middle-income countries for the second quintile of consumers, and 54% in upper-middle-and-high-income countries for the first quintile of consumers, according to household surveys compiled by the World Bank. The international poverty lines are $2.15/day for low-income countries, $3.65/day for lower-middle-income countries, $6.85/day for upper-middle-income countries, and $24.36/day for high-income countries, in 2017PPP$. Countries' income classifications follow the calendar year of 2021 standard (fiscal year of 2023 of the World Bank), which is the base year of the latest ICP cycle. Income data are provided by the World Bank’s Poverty and Inequality Platform. A value of zero indicates a null or a small number rounded down at the current precision level.
@@ -54,6 +59,23 @@ definitions:
   description_key_international_dollars: &description_key_international_dollars |-
     The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
 
+  # Note shared by all three "$ per day" indicators surfaced by the food-prices explorer.
+  ppp_2021_note: &ppp_2021_note |-
+    This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+
+  # Building blocks for the chart subtitles of the 12 explorer-surfaced indicators.
+  # Composed inline via dynamic-yaml interpolation: "{definitions.<diet_prefix>} {definitions.<clause>}".
+  subtitle_healthy_diet: |-
+    The cost of a healthy diet is the lowest-cost set of foods available that would meet requirements in dietary guidelines from governments and public health agencies.
+  subtitle_nutrient_adequate_diet: |-
+    The cost of a nutrient adequate diet is the lowest-cost set of foods available that would meet nutritional requirements of calories, protein, fats and all essential vitamins and minerals.
+  subtitle_calorie_sufficient_diet: |-
+    The cost of an energy sufficient diet is the cheapest way that an individual can meet their calorie requirement using available staple foods in each country.
+  subtitle_unaffordable_clause: |-
+    A diet is defined as unaffordable when its cost, plus basic non-food needs like housing and transportation, exceeds daily income.
+  subtitle_inflation_clause: |-
+    This data is adjusted for inflation and differences in living costs between countries.
+
   description_from_producer_healthy_diet: &description_from_producer_healthy_diet |-
     The Cost of a Healthy Diet indicator provides a globally standardized metric to monitor food environments,  measuring a population's access to sufficient food for an active and healthy life. For this metric, access to healthy diets is measured using the least expensive locally available items in sufficient quantities to meet national governments' food-based dietary guidelines.  For global monitoring, commonalities among those guidelines are represented by a Healthy Diet Basket, specifying a target number and quantity of eleven items balanced across six nutritionally defined food groups. The items selected in each country to meet the global Healthy Diet Basket standard generally also achieve nutrient adequacy, at a similar cost to meeting an individual country's own national dietary guidelines.
 
@@ -89,6 +111,16 @@ tables:
           - *description_key_international_dollars
         display:
           numDecimalPlaces: 2
+        presentation:
+          title_public: Daily cost of a calorie sufficient diet
+          grapher_config:
+            subtitle: "{definitions.subtitle_calorie_sufficient_diet} {definitions.subtitle_inflation_clause}"
+            note: *ppp_2021_note
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues: [0, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]
       affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of an energy sufficient diet: ratio of cost to food expenditures"
         unit: "%"
@@ -99,6 +131,15 @@ tables:
           - *description_energy_sufficient_diet
         display:
           numDecimalPlaces: 1
+        presentation:
+          title_public: Cost of a calorie sufficient diet as a share of average food expenditure
+          grapher_config:
+            subtitle: "{definitions.subtitle_calorie_sufficient_diet}"
+            map:
+              colorScale:
+                baseColorScheme: BuPu
+                binningStrategy: manual
+                customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
       percent_of_the_population_who_cannot_afford_sufficient_calories:
         title: Share of the population who cannot afford sufficient calories
         unit: "%"
@@ -110,6 +151,15 @@ tables:
           - *description_key_pct_of_population
         display:
           numDecimalPlaces: 1
+        presentation:
+          title_public: Share of population that cannot afford a calorie sufficient diet
+          grapher_config:
+            subtitle: "{definitions.subtitle_calorie_sufficient_diet} {definitions.subtitle_unaffordable_clause}"
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100]
       affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_the_food_poverty_line:
         title: "Affordability of an energy sufficient diet: ratio of cost to the food poverty line"
         unit: "%"
@@ -133,6 +183,15 @@ tables:
           - *description_key_number_of_population
         display:
           numDecimalPlaces: 0
+        presentation:
+          title_public: Number of people who cannot afford a calorie sufficient diet
+          grapher_config:
+            subtitle: "{definitions.subtitle_calorie_sufficient_diet} {definitions.subtitle_unaffordable_clause}"
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues: [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000]
       cost_of_a_healthy_diet_in_ppp_dollars:
         title: Cost of a healthy diet
         unit: international-$ in 2021 prices per person per day
@@ -147,6 +206,16 @@ tables:
         description_from_producer: *description_from_producer_healthy_diet
         display:
           numDecimalPlaces: 2
+        presentation:
+          title_public: Daily cost of a healthy diet
+          grapher_config:
+            subtitle: "{definitions.subtitle_healthy_diet} {definitions.subtitle_inflation_clause}"
+            note: *ppp_2021_note
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues: [0, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6]
 
       cost_of_a_healthy_diet_relative_to_the_cost_of_sufficient_energy_from_starchy_staples:
         title: Cost of a healthy diet relative to the cost of sufficient energy from starchy staples
@@ -230,6 +299,15 @@ tables:
           - *description_healthy_diet
         display:
           numDecimalPlaces: 1
+        presentation:
+          title_public: Cost of a healthy diet as a share of average food spending
+          grapher_config:
+            subtitle: "{definitions.subtitle_healthy_diet}"
+            map:
+              colorScale:
+                baseColorScheme: BuPu
+                binningStrategy: manual
+                customNumericValues: [0, 50, 100, 150, 200, 250, 300]
       percent_of_the_population_who_cannot_afford_a_healthy_diet:
         title: Share of the population who cannot afford a healthy diet
         unit: "%"
@@ -241,6 +319,15 @@ tables:
           - *description_key_pct_of_population
         display:
           numDecimalPlaces: 1
+        presentation:
+          title_public: Share of population that cannot afford a healthy diet
+          grapher_config:
+            subtitle: "{definitions.subtitle_healthy_diet} {definitions.subtitle_unaffordable_clause}"
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
       cost_of_legumes__nuts_and_seeds_in_ppp_dollars:
         title: Cost of legumes, nuts and seeds
         unit: international-$ in 2021 prices per person per day
@@ -347,6 +434,15 @@ tables:
           - *description_key_number_of_population
         display:
           numDecimalPlaces: 0
+        presentation:
+          title_public: Number of people who cannot afford a healthy diet
+          grapher_config:
+            subtitle: "{definitions.subtitle_healthy_diet} {definitions.subtitle_unaffordable_clause}"
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues: [0, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000]
       cost_of_vegetables_in_ppp_dollars:
         title: Cost of vegetables
         unit: international-$ in 2021 prices per person per day
@@ -389,6 +485,16 @@ tables:
           - *description_key_international_dollars
         display:
           numDecimalPlaces: 2
+        presentation:
+          title_public: Daily cost of a nutrient adequate diet
+          grapher_config:
+            subtitle: "{definitions.subtitle_nutrient_adequate_diet} {definitions.subtitle_inflation_clause}"
+            note: *ppp_2021_note
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues: [0, 1.5, 2, 2.5, 3, 3.5, 4]
       affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of a nutrient adequate diet: ratio of cost to food expenditures"
         unit: "%"
@@ -399,6 +505,15 @@ tables:
           - *description_nutrient_adequate_diet
         display:
           numDecimalPlaces: 1
+        presentation:
+          title_public: Cost of a nutrient adequate diet as a share of average food expenditure
+          grapher_config:
+            subtitle: "{definitions.subtitle_nutrient_adequate_diet}"
+            map:
+              colorScale:
+                baseColorScheme: BuPu
+                binningStrategy: manual
+                customNumericValues: [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200]
       percent_of_the_population_who_cannot_afford_nutrient_adequacy:
         title: Share of the population who cannot afford nutrient adequacy
         unit: "%"
@@ -410,6 +525,15 @@ tables:
           - *description_key_pct_of_population
         display:
           numDecimalPlaces: 1
+        presentation:
+          title_public: Share of population that cannot afford a nutrient adequate diet
+          grapher_config:
+            subtitle: "{definitions.subtitle_nutrient_adequate_diet} {definitions.subtitle_unaffordable_clause}"
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
       affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_the_food_poverty_line:
         title: "Affordability of a nutrient adequate diet: ratio of cost to the food poverty line"
         unit: "%"
@@ -433,6 +557,15 @@ tables:
           - *description_key_number_of_population
         display:
           numDecimalPlaces: 0
+        presentation:
+          title_public: Number of people who cannot afford a nutrient adequate diet
+          grapher_config:
+            subtitle: "{definitions.subtitle_nutrient_adequate_diet} {definitions.subtitle_unaffordable_clause}"
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues: [0, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000]
       population:
         title: Population according to the World Bank
         unit: people
