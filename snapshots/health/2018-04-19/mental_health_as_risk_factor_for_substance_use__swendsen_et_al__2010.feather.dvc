@@ -2,8 +2,11 @@ meta:
   origin:
     producer: Swendsen et al.
     title: 'Mental disorders as risk factors for substance use, abuse and dependence: results from the 10-year follow-up of the National Comorbidity Survey'
-    description: This dataset presents data on the increased risk of developing a substance use disorder in individuals with a mental health disorder relative to those without. It is based on a study of over 5,000 individuals tracked over a 10-year period as part of the National Comorbidity Survey follow-up. The findings were published in the journal Addiction in 2010.
-    citation_full: 'Swendsen, J., Conway, K. P., Degenhardt, L., Glantz, M., Jin, R., Merikangas, K. R., ... & Kessler, R. C. (2010). Mental disorders as risk factors for substance use, abuse and dependence: results from the 10‐year follow‐up of the National Comorbidity Survey. Addiction, 105(6), 1117–1128.'
+    description: |-
+      Data denotes the increased risk of developing a substance use disorder in individuals with a mental health disorder relative to those without, based on a study on over 5000 individuals over a 10-year period.
+
+      Full data with confidence intervals can be found at: https://ourworldindata.org/mental-health-disorders-as-risk-for-substance-use
+    citation_full: 'Swendsen, J., Conway, K. P., Degenhardt, L., Glantz, M., Jin, R., Merikangas, K. R., ... and Kessler, R. C. (2010). Mental disorders as risk factors for substance use, abuse and dependence: results from the 10-year follow-up of the National Comorbidity Survey. Addiction, 105(6), 1117-1128.'
     url_main: https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1360-0443.2010.02902.x
     date_accessed: '2018-04-19'
     date_published: '2010'

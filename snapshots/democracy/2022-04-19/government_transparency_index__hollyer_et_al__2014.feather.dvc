@@ -1,9 +1,12 @@
 meta:
   origin:
     producer: Hollyer et al.
-    title: Government Transparency Index
-    description: This dataset provides information on government transparency, as measured by the index developed by Hollyer, Rosendorff, and Vreeland (2014). A government is considered more transparent if it provides data on many measures included in the World Governance Indicators to the World Bank, even if other countries do not.
-    citation_full: 'Hollyer, James, Peter Rosendorff, and James Vreeland. 2014. Measuring Transparency. Political Analysis 22(4): 413–434.'
+    title: Measuring Transparency
+    description: |-
+      This dataset provides information on government transparency, as per the index by Hollyer et al. (2014).
+
+      A government is considered more transparent if it provides data on many measures included in the World Governance Indicators to the World Bank, even if other countries do not.
+    citation_full: 'Hollyer, James, Peter Rosendorff, and James Vreeland. 2014. Measuring Transparency. Political Analysis 22(4): 413-434.'
     url_main: http://hrvtransparency.org/
     date_accessed: '2022-04-19'
     date_published: '2014'

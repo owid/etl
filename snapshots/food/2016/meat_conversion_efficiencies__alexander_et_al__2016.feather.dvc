@@ -11,14 +11,14 @@ meta:
 
       Original data sources as used in this paper are as follows:
 
-      Smil (2013). Should We Eat Meat? Evolution and Consequences of Modern Carnivory. Wiley, New York, USA (2013).
+      Smil (2013). Should We Eat Meat? Evolution and Consequences of Modern Carnivory Wiley, New York, USA (2013).
 
-      Opio et al. (2013). Greenhouse Gas Emissions from Ruminant Supply Chains – A Global Life Cycle Assessment. Food and Agriculture Organization of the United Nations (FAO), Rome, Italy (2013).
+      Opio et al. (2013). Greenhouse Gas Emissions from Ruminant Supply Chains–A Global Life Cycle Assessment Food and Agriculture Organization of the United Nations (FAO), Rome, Italy (2013).
 
-      Macleod et al. Greenhouse Gas Emissions from Pig and Chicken Supply Chains – A Global Life Cycle Assessment. Food and Agriculture Organization of the United Nations (FAO), Rome, Italy (2013).
-    citation_full: 'Alexander, P., Brown, C., Arneth, A., Finnigan, J., and Rounsevell, M. D. (2016). Human appropriation of land for food: the role of diet. Global Environmental Change, 41, 88–98.'
+      Macleod et al. Greenhouse Gas Emissions from Pig and Chicken Supply Chains – A Global Life Cycle Assessment Food and Agriculture Organization of the United Nations (FAO), Rome, Italy (2013).
+    citation_full: 'Alexander, P., Brown, C., Arneth, A., Finnigan, J., & Rounsevell, M. D. (2016). Human appropriation of land for food: the role of diet. Global Environmental Change, 41, 88-98.'
     url_main: http://www.sciencedirect.com/science/article/pii/S0959378016302370?via%3Dihub#bib0330
-    date_accessed: '2026-03-05'
+    date_accessed: '2017-08-24'
     date_published: '2016'
 outs:
   - md5: 624129c3a006d5e6c7021e216711c51a

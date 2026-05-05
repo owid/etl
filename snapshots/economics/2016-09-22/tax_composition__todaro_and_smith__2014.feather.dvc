@@ -3,11 +3,8 @@ meta:
     producer: Todaro and Smith
     title: Economic Development
     description: |-
-      A textbook by Michael P. Todaro and Stephen C. Smith covering the theory and practice of development economics, including data and estimates on tax composition across countries.
-    description_snapshot: |-
-      Estimates of tax composition are provided by the source in two windows of time: 1985–1987 and 1995–1997. The values are reported for the middle year of each window (i.e. 1986 and 1996).
-    citation_full: 'Todaro, M. P. and Smith, S. C. (2014). Economic Development, 12th Edition. Pearson. ISBN: 1292002972.'
-    version_producer: 12th Edition
+      Estimates are provided by the source in two windows of time: 1985-1987 and 1995-1997. We report the estimates for the year in the middle of the corresponding estimates (i.e. 1986 and 1996).
+    citation_full: 'Todaro, M. and Smith, S. (2014) Economic Development, 12th Edition. Pearson. ISBN: 1292002972.'
     date_accessed: '2016-09-22'
     date_published: '2014'
 outs:

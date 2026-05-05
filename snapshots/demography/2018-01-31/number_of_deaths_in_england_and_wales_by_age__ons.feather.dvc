@@ -2,7 +2,8 @@ meta:
   origin:
     producer: Office for National Statistics
     title: Number of deaths in England and Wales by age
-    description: Total annual number of deaths by age group in England and Wales across all causes. Data for infants under one year old are not included.
+    description: |-
+      Total annual number of deaths by age group in England and Wales across all causes. Data for infants <1 years old are not included.
     citation_full: Office for National Statistics (ONS). Number of deaths in England and Wales by age.
     attribution_short: ONS
     url_main: https://visual.ons.gov.uk/causes-of-death-over-100-years/

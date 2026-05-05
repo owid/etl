@@ -1,17 +1,17 @@
 meta:
   origin:
-    producer: Food and Agriculture Organization of the United Nations
+    producer: FAO
     title: Global meat projections to 2050
     description: |-
-      This dataset combines historical meat production and consumption data with projections to 2050. Historical data from 1961 to 2013 is drawn from the FAO Statistics database (FAOSTAT). Projections to 2050 are based on FAO's business-as-usual scenarios incorporating UN population projections and forecasted economic growth models.
+      Data extending from 1961-2013 is based on the UN Food and Agriculture (FAO) Statistics database: http://www.fao.org/faostat/en/
 
-      The projections are sourced from Alexandratos and Bruinsma (2012), "World agriculture towards 2030/2050: the 2012 revision," an ESA Working Paper published by FAO in Rome.
-    citation_full: 'Alexandratos, N., and Bruinsma, J. (2012). World agriculture towards 2030/2050: the 2012 revision (Vol. 12, No. 3). FAO, Rome: ESA Working paper. Available at: http://www.fao.org/docrep/016/ap106e/ap106e.pdf.'
-    attribution_short: FAO
+      Projections to 2050 are based on UN FAO projections under business-as-usual population, and forecasted economic growth models. This data is sourced from:
+      Alexandratos, N., & Bruinsma, J. (2012). World agriculture towards 2030/2050: the 2012 revision (Vol. 12, No. 3). FAO, Rome: ESA Working paper. Available at: http://www.fao.org/docrep/016/ap106e/ap106e.pdf
+    citation_full: 'UN Food and Agriculture Organization (FAO) (2018). Global meat projections to 2050; based on Alexandratos, N., and Bruinsma, J. (2012). World agriculture towards 2030/2050: the 2012 revision. FAO, Rome: ESA Working paper.'
     url_main: http://www.fao.org/faostat/en/
     url_download: http://www.fao.org/docrep/016/ap106e/ap106e.pdf
     date_accessed: '2026-03-05'
-    date_published: '2012'
+    date_published: '2018'
 outs:
   - md5: c16f8da102c89a641183ea2b578f5201
     size: 6458

@@ -1,16 +1,17 @@
 meta:
   origin:
-    producer: Food and Agriculture Organization of the United Nations
-    title: 2030/2050 Projections of Arable Land
+    producer: FAO
+    title: Projections of arable land, 1961–2050
     description: |-
-      This dataset combines two sources produced by the Food and Agriculture Organization of the United Nations (FAO).
+      This series is based on the combination of two datasets — both produced by the UN Food and Agricultural Organization (FAO).
 
-      Historical data from 1961 to 2014 is derived from the FAO statistical database (FAOSTAT), given as the variable "Arable land and permanent crops."
+      Data from 1961-2014 is derived from the UN FAO statistical database, and is given as the variable "Arable land and permanent crops". Available at: http://www.fao.org/faostat/en/#data [accessed 17th August 2017].
 
-      Projected data from 2020 to 2050 is based on FAO projections of arable land and permanent crop area from the report: Alexandratos, N. and J. Bruinsma (2012). "World Agriculture Towards 2030/2050: The 2012 Revision." ESA Working Paper No. 12-03. Rome, FAO.
-    citation_full: 'Alexandratos, N. and J. Bruinsma. 2012. World agriculture towards 2030/2050: the 2012 revision. ESA Working paper No. 12-03. Rome, FAO. Available at: http://www.fao.org/docrep/016/ap106e/ap106e.pdf. Historical data from FAOSTAT, available at: http://www.fao.org/faostat/en/#data.'
+      Data from 2020-2050 is based on UN FAO projections of arable land and permanent crop area from its report: Alexandratos, N. and J. Bruinsma. 2012. World agriculture towards 2030/2050: the 2012 revision. ESA Working paper No. 12-03. Rome, FAO. Available at: http://www.fao.org/docrep/016/ap106e/ap106e.pdf [accessed 17th August 2017].
+    citation_full: 'Alexandratos, N. and J. Bruinsma. 2012. World agriculture towards 2030/2050: the 2012 revision. ESA Working paper No. 12-03. Rome, FAO. Combined with FAOSTAT arable land and permanent crops data.'
     attribution_short: FAO
-    url_main: http://www.fao.org/docrep/016/ap106e/ap106e.pdf
+    url_main: http://www.fao.org/faostat/en/#data
+    url_download: http://www.fao.org/docrep/016/ap106e/ap106e.pdf
     date_accessed: '2017-08-17'
     date_published: '2012'
 outs:

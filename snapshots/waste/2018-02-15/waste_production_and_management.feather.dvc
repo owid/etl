@@ -1,19 +1,36 @@
 meta:
   origin:
-    producer: United Nations Environment Programme
+    producer: UNEP
     title: Participation in Treaties - Rotterdam Convention
     description: |-
-      The Rotterdam Convention establishes the principle that export of a chemical covered by the Convention can only take place with the prior informed consent of the importing party. The Convention establishes a "Prior Informed Consent procedure," a means for formally obtaining and disseminating the decisions of importing countries as to whether they wish to receive future shipments of specified chemicals and for ensuring compliance with these decisions by exporting countries.
+      Publication year: 2013-12-01
 
-      The Convention initially covers 22 pesticides (including five severely hazardous pesticide formulations) and five industrial chemicals, but many more are expected to be added in the future. The Conference of the Parties will decide on the inclusion of chemicals.
+      Unit: Number of Parties Subscribing each Year
 
-      This dataset tracks the number of parties subscribing to the Rotterdam Convention each year, with coverage from 1999 to 2013.
-    title_snapshot: Waste Production and Management - Participation in Treaties - Rotterdam Convention
-    citation_full: United Nations Environment Programme. Participation in Treaties - Rotterdam Convention. United Nations Office of Legal Affairs (OLA), 2013.
-    attribution_short: UNEP
+      Abstract
+
+      The Convention establishes the principle that export of a chemical covered by the Convention can only take place with the prior informed consent of the importing party. The Convention establishes a "Prior Informed Consent procedure," a means for formally obtaining and disseminating the decisions of importing countries as to whether they wish to receive future shipments of specified chemicals and for ensuring compliance with these decisions by exporting countries.
+
+      The Convention initially covers 22 pesticides (including five severely hazardous pesticide formulations) and 5 industrial chemicals, but many more are expected to be added in the future. The Conference of the Parties will decide on the inclusion of chemicals.
+
+      Point of contact
+
+      Role: Originator
+      Person: United Nations Office of Legal Affairs (OLA)
+      Organization: ----
+      Email: ----
+
+      Temporal extent
+
+      Covered time: 1999 - 2013-12-01
+
+      Geographic extent
+
+      Coverage: World
+    citation_full: United Nations Environment Programme (2013). Participation in Treaties - Rotterdam Convention.
     url_main: http://ede.grid.unep.ch/
     date_accessed: '2018-02-15'
-    date_published: '2013'
+    date_published: '2013-12-01'
 outs:
   - md5: 16079e19453a5c5b7c1952899f1b3ac5
     size: 33114

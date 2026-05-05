@@ -3,12 +3,23 @@ meta:
     producer: OECD
     title: Productivity - Level of GDP per capita and productivity
     description: |-
-      The OECD Productivity Database provides comprehensive and up-to-date productivity estimates for OECD and selected non-OECD countries. Productivity is considered a central driver of long-term economic growth and living standards.
-
-      The indicators in this dataset are mainly based on GDP, population, and employment statistics from the OECD Annual National Accounts. Hours worked are sourced from the OECD Annual National Accounts, the OECD Employment Outlook, and national sources. The database is updated on a rolling basis, with each variable made publicly available as soon as it is updated in the source databases.
-
-      Geographic coverage includes the 35 OECD countries, BRIICS, Colombia, and Lithuania, as well as various geographical and economic zones. Sector coverage is the total economy.
-    citation_full: 'OECD.Stat, Productivity - Level of GDP per capita and productivity. Last updated: November 2017. OECD, Paris. Available at: https://stats.oecd.org/Index.aspx?DataSetCode=PDB_LV.'
+      Abstract
+      Productivity is considered a central driver of long-term economic growth and living standards.
+      Contact person/organisation
+      productivity.contact@oecd.org  The OECD Compendium of Productivity Indicators provides a comprehensive overview of recent and longer term trends in productivity levels and growth in OECD and selected non-OECD countries. The most recent edition of the Compendium, as well as information on the methodologies used in the OECD Productivity Dtabase, are available on the OECD productivity internet page:
+      OECD productivity internet page
+      http://www.oecd.org/std/productivity-stats/
+      Data source(s) used
+      The indicators presented in this dataset are mainly based on GDP, population and employment statistics from the OECD Annual National Accounts. Hours worked are sourced from the OECD Annual National Accounts, the OECD Employment Outlook and national sources.
+      Date last updated
+      Last updated: November 2017.The OECD Productivity Database aims at providing users with the most comprehensive and the latest productivity estimates.  The update cycle is on a rolling basis, i.e. each variable in the dataset is made publicly available as soon as it is updated in the sources databases. However, timely data issues may arise and affect individual series and/or countries. In particular, annual hours worked estimates from the OECD Employment Outlook are typically updated less frequently (once a year, in the summer) than series of hours worked from the OECD Annual National Accounts.  The current version of the OECD Productivity Database accounts for the new changes which have recently occurred in the OECD National Accounts. For further details on methodological changes in OECD Annual National Accounts, go to the following link.
+      Most countries revised their GDP estimates with the implementation of the 2008 SNA…
+      http://www.oecd.org/std/na/sna-2008-main-changes.htm
+      Geographic coverage
+      * OECD 35 countries; * BRIICS, Colombia and Lithuania; * Geographical / economic zones.
+      Sector coverage
+      Total economy.
+    citation_full: OECD.Stat - Productivity - Level of GDP per capita and productivity. OECD, 2017.
     url_main: https://stats.oecd.org/Index.aspx?DataSetCode=PDB_LV
     date_accessed: '2018-03-16'
     date_published: '2017'

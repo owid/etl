@@ -1,11 +1,13 @@
 meta:
   origin:
-    producer: Fouquet and DPCC
+    producer: Various sources
     title: Air pollution by city
     description: |-
-      This dataset combines long-run trends in urban air pollution from two sources. The first is research by Roger Fouquet on long-run trends in energy-related external costs, which includes historical air pollution data for cities. The second is data from India's Delhi Pollution Control Committee (DPCC), as reported in the Government of India's Economic Survey of Delhi.
+      Raw data and extension of this set to 2016 was generously supplied through personal communication with the author.
 
-      Raw data and an extension of this dataset to 2016 was supplied through personal communication with the author. Data trends for Delhi have shorter coverage and are not available post-2010, as later measurements are reported based on particle size rather than total suspended particulate matter.
+      Data trends for Delhi have a shorter coverage, and are not available post-2010 (later measurements are now reported based on particle size rather than total suspended particulate matter).
+
+      Sources: Fouquet (2011): http://www.sciencedirect.com/science/article/pii/S0921800911002953; Government of India's Economic Survey of Delhi (2012-13): http://delhi.gov.in/DoIT/DoIT_Planning/ES2012-13/EN/ES_chapter8.pdf
     citation_full: Fouquet, R. (2011). Long run trends in energy-related external costs. Ecological Economics 70(12), 2380–2389 and the DPCC.
     url_main: http://www.sciencedirect.com/science/article/pii/S0921800911002953
     date_accessed: '2016-02-15'

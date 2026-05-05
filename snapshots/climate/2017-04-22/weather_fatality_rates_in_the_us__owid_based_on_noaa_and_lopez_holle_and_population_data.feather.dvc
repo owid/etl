@@ -1,16 +1,22 @@
 meta:
   origin:
-    producer: NOAA National Weather Service, Lopez and Holle, US Census, and World Bank
+    producer: Various sources
     title: Weather fatality rates in the US
     description: |-
-      Data on annual fatalities (since 1940) from various weather events in the US is drawn from the National Oceanic and Atmospheric Administration (NOAA) National Weather Service. Data on lightning fatalities prior to 1991 comes from Lopez and Holle (1997), which covers changes in the number of lightning deaths in the United States during the twentieth century and accounts for the fact that not all US states reported fatalities in earlier periods.
+      Data on the annual fatalities (since 1940) to various weather events in the US is from the National Oceanic and Atmospheric Administration (NOAA) National Weather Service. This dataset is online here: http://www.lightningsafety.noaa.gov/victims.shtml
+      Data on lightning from lightning earlier than 1991 is not from this dataset from NOAA, but from the Lopez and Holle paper cited below.
 
-      Fatality rates are calculated using NOAA fatality counts combined with US population estimates. Population estimates are based on US Census data for the period before 1960 and on World Bank data from 1960 onward.
-    description_snapshot: This snapshot combines NOAA weather fatality counts with lightning fatality data from Lopez and Holle (1997) and US population estimates from the US Census Bureau and World Bank to derive annual weather fatality rates in the US since 1940.
-    citation_full: Our World in Data based on NOAA National Weather Service (http://www.lightningsafety.noaa.gov/victims.shtml), Lopez, R. E. and Holle, R. L. (1997) – "Changes in the Number of Lightning Deaths in the United States during the Twentieth Century", Journal of Climate, Volume 11, US Census Bureau population estimates (https://www2.census.gov/programs-surveys/popest/tables/1900-1980/national/totals/popclockest.txt), and World Bank population data (http://data.worldbank.org/indicator/SP.POP.TOTL).
-    url_main: http://www.lightningsafety.noaa.gov/victims.shtml
+      I have calculated the fatality rate based on the NOAA fatality counts and estimates of the US population. These estimates are based on US census data for the period before 1960 and on World Bank data for the period since then.
+
+      The US census data is online here: https://www2.census.gov/programs-surveys/popest/tables/1900-1980/national/totals/popclockest.txt
+      The World Bank estimates are online here: http://data.worldbank.org/indicator/SP.POP.TOTL
+
+
+      Data on the lightning fatality rate until 1990 is from Raúl E. Lopez and Ronald L. Holle (1997) – Changes in the Number of Lightning Deaths in the United States during the Twentieth Century. Journal of Climate; Volume 11.
+      This fatality rate is not calculated for the entire US since in earlier periods not all US states reported the number of annual fatalities. (In the calculation of the fatality rate Lopez and Holle have taken only the population of the reporting states into account so that the population in the numerator and the denominator refer to the same group of people.)
+    citation_full: Compiled based on NOAA National Weather Service data; Lopez, R. E. and Holle, R. L. (1997). Changes in the Number of Lightning Deaths in the United States during the Twentieth Century. Journal of Climate, Volume 11; US Census Bureau population estimates; and World Bank population data.
     date_accessed: '2017-04-22'
-    date_published: '1997'
+    date_published: '2017'
 outs:
   - md5: 6a9d86f7be28b517da1089e84ab8dfb9
     size: 10330

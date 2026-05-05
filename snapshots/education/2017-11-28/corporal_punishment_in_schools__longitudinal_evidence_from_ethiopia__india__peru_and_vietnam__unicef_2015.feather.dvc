@@ -2,8 +2,9 @@ meta:
   origin:
     producer: Ogando Portela and Pells
     title: 'Corporal punishment in schools: longitudinal evidence from Ethiopia, India, Peru and Viet Nam'
-    description: This paper presents longitudinal evidence on corporal punishment in schools across four countries — Ethiopia, India, Peru, and Viet Nam — drawing on children's self-reports. It examines the prevalence of physical punishment by teachers, including punishment directed at the child themselves and witnessed punishment of other children.
-    citation_full: 'Ogando Portela, María José, and Kirrily Pells. "Corporal punishment in schools: longitudinal evidence from Ethiopia, India Peru and Viet Nam." (2015).'
+    description: |-
+      The data in this chart comes from Figure 2 in the source paper, where there are also estimates of children's self-reports of teacher's use of physical punishment on other children: https://ourworldindata.org/wp-content/uploads/2017/11/Teacher-violence-UNICEF-2015.png
+    citation_full: 'Ogando Portela, M. J., and Pells, K. (2015). Corporal punishment in schools: longitudinal evidence from Ethiopia, India, Peru and Viet Nam. UNICEF Office of Research - Innocenti.'
     url_main: https://ideas.repec.org/p/ucf/indipa/indipa788.html
     date_accessed: '2017-11-28'
     date_published: '2015'

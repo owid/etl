@@ -1,16 +1,25 @@
 meta:
   origin:
-    producer: FAO, OECD, and Millennium Ecosystem Assessment
+    producer: Various sources
     title: Projections of peak agricultural land
     description: |-
-      This dataset combines actual reported trends in global agricultural land area from the UN Food and Agriculture Organization (FAO) from 1961–2014, with future projections from various sources.
+      This dataset combines actual reported trends in global agricultural land area from the UN Food and Agricultural Organization from 1961-2014, with future projections from various sources.
 
-      Data for the period 1961–2014 is based on the metric "Agricultural land" from the FAO database. Agricultural land includes arable land, permanent crops, and meadows and pasture land.
+      Data for the period 1961-2014 is based on the metric "Agricultural land" from the FAO Database. Available at: http://www.fao.org/faostat/en/#data/RL [accessed 22nd August 2017].
 
-      Projections to 2050 are based on those reported in the OECD Environmental Outlook to 2050 (2012). The original projection sources include FAO (2006) World Agriculture Towards 2030/2050, the International Assessment of Agricultural Knowledge, Science and Technology for Development (IAASTD, 2009), and the Millennium Ecosystem Assessment (MEA, 2005).
-    citation_full: 'FAO (UN Food and Agriculture Organisation) (2006). World Agriculture Towards 2030/2050. FAO, Rome. OECD (2012). OECD Environmental Outlook to 2050: The Consequences of Inaction. Available at: http://www.oecd.org/environment/indicators-modelling-outlooks/oecdenvironmentaloutlookto2050theconsequencesofinaction.htm. Millennium Ecosystem Assessment (2005). Synthesis Report. Island Press, Washington, DC.'
-    url_main: http://www.fao.org/faostat/en/#data/RL
-    date_accessed: '2026-03-05'
+      Agricultural land includes arable land, permanent crops and meadows and pasture land.
+
+      Projections to 2050 are based on those reported in OECD (2012) – OECD Environmental Outlook to 2050: The Consequences of Inaction. Available at: http://www.oecd.org/environment/indicators-modelling-outlooks/oecdenvironmentaloutlookto2050theconsequencesofinaction.htm [accessed 22nd August 2017].
+
+      The original sources for these projections are as follows:
+
+      FAO/IMAGE = FAO (UN Food and Agriculture Organisation) (2006), World Agriculture Towards 2030/2050, FAO, Rome.
+
+      IAASTD = International Assessment of Agricultural Knowledge, Science and Technology for Development (2009). Global report, Island Press, Washington, DC.
+
+      MEA = Millennium Ecosystem Assessment (2005), Synthesis report, Island Press, Washington, DC.
+    citation_full: 'Compiled from FAO (2006), World Agriculture Towards 2030/2050, FAO, Rome; OECD (2012), OECD Environmental Outlook to 2050: The Consequences of Inaction; and Millennium Ecosystem Assessment (2005), Synthesis report, Island Press, Washington, DC.'
+    date_accessed: '2017-08-22'
     date_published: '2012'
 outs:
   - md5: 194e5a6d4259c87abf63f18e7f1372ae

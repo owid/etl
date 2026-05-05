@@ -2,8 +2,8 @@ meta:
   origin:
     producer: European Commission
     title: Universal Salt Iodization
-    description: This dataset represents the share of household salt sold on the market that has been fortified with iodine, the most efficient solution to iodine deficiency. The data covers select European countries.
-    title_snapshot: Universal Salt Iodization - Market share of iodized salt in European countries
+    description: |-
+      Data represents the share of household salt sold on the market which has been fortified with iodine (the most efficient solution to iodine deficiency). This data is available across select European countries.
     citation_full: European Commission (2006). Universal Salt Iodization.
     url_main: https://ec.europa.eu/food/sites/food/files/safety/docs/labelling_nutrition-supplements-responses-akj_en.pdf
     date_accessed: '2017-10-04'

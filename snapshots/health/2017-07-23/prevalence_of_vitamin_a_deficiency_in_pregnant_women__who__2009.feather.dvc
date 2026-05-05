@@ -1,16 +1,16 @@
 meta:
   origin:
-    producer: World Health Organization
-    title: WHO Global Database on Vitamin A Deficiency
+    producer: WHO
+    title: Global prevalence of vitamin A deficiency in populations at risk 1995–2005
     description: |-
-      The WHO Global Database on Vitamin A Deficiency compiles national and household-level survey data on indicators of vitamin A deficiency (VAD) covering the period 1995–2005. All countries with a GDP per capita of US$15,000 or more were assumed by WHO to be free from VAD of public health significance and were therefore excluded from the dataset.
+      Data on vitamin-A deficiency is based on the reported prevalence of risk by the World Health Organization, which has collated national and household level survey data on indicators extending the period 1995-2005. Note that data on vitamin-A deficiency is typically not measured on an annual basis, therefore the year of measurement will vary by country, but lie within the period 1995-2005.
 
-      Two sets of indicators are commonly used in population surveys: clinically assessed eye signs and biochemically determined concentrations of retinol in plasma or serum. Night blindness indicates moderate-to-severe systemic VAD, and VAD is also identified when serum retinol concentrations fall below a cut-off value of 0.70 µmol/l.
+      All countries with a GDP per capita ≥US$15,000 were assumed by the WHO to be free from vitamin-A deficiency of a public health significance and were therefore excluded.. None of these 37 countries had retinol or night blindness data reported for either preschool-age children or pregnant women.
 
-      Vitamin A deficiency is a major nutritional concern in poor societies, particularly in lower-income countries. Its main underlying cause is a diet chronically insufficient in vitamin A, which can lead to disorders such as xerophthalmia — the leading cause of preventable childhood blindness — anaemia, and weakened resistance to infection.
-    title_snapshot: WHO Global Database on Vitamin A Deficiency - Prevalence of vitamin A deficiency in pregnant women
+      Two sets of indicators of VAD are commonly used for population surveys: clinically assessed eye signs and biochemically determined concentrations of retinol in plasma or serum. The incidence of night blindness in individuals indicates moderate-to-severe systemic VAD. VAD can also be identified when serum retinol concentrations fall below below a cut-off value of 0.70 µmol/l.
+
+      Vitamin A deficiency (VAD) is a major nutritional concern in poor societies, especially in lower income countries. Its presence as a public health problem is assessed by measuring the prevalence of deficiency in a population, represented by specific biochemical and clinical indicators of status. The main underlying cause of VAD as a public health problem is a diet that is chronically insufficient in vitamin A that can lead to lower body stores and fail to meet physiologic needs (e.g. support tissue growth, normal metabolism, resistance to infection). Deficiency of sufficient duration or severity can lead to disorders that are common in vitamin A deficient populations such as xerophthalmia (xeros = dryness; -ophthalmia = pertaining to the eye), the leading cause of preventable childhood blindness, anaemia, and weakened host resistance to infection, which can increase the severity of infectious diseases and risk of death.
     citation_full: WHO. Global prevalence of vitamin A deficiency in populations at risk 1995–2005. WHO Global Database on Vitamin A Deficiency. Geneva, World Health Organization, 2009.
-    attribution_short: WHO
     url_main: http://apps.who.int/iris/bitstream/10665/44110/1/9789241598019_eng.pdf
     date_accessed: '2017-07-23'
     date_published: '2009'

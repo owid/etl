@@ -3,14 +3,13 @@ meta:
     producer: UN Statistics Division
     title: Minimum Set of Gender Indicators
     description: |-
-      The Minimum Set of Gender Indicators is a collection of statistics compiled by the United Nations Statistics Division to monitor gender equality across countries. It covers a wide range of topics including education, health, economic activity, and time use.
+      Average number of hours spent on paid and unpaid domestic work by sex.
 
-      This dataset includes data on average hours spent on unpaid domestic work derived from time-use surveys or time-use modules in multi-purpose household surveys. All statistics are averages based on the total relevant population (not just participants), expressed as an average per day and averaged over seven days of the week (weekdays and weekends are not differentiated).
+      This dataset is an excerpt from the data provided by the United Nations Statistics Division under the Minimum Set of Gended Indicators.
+      Cross-country comparability is limited due to lack of uniform definitions. Importantly, the ages of the relevant population differ from country to country (and in a few instances, they also differ from year to year for the same country). For most low-income countries, the figures include children among the relevant population. For most high-income countries, children below 15 are excluded. Additionally, in some countries the estimates correspond only to specific regions (e.g. urban). This file provides a column with notes explaining the particular reference population in each case.
 
-      Cross-country comparability is limited due to lack of uniform definitions. The ages of the relevant population differ across countries and, in some cases, across years for the same country. For most low-income countries, figures include children among the relevant population, while for most high-income countries children below 15 are excluded. In some countries estimates correspond only to specific regions (e.g. urban areas).
-    title_snapshot: Minimum Set of Gender Indicators - Time spent on domestic work
-    citation_full: 'UN Statistics Division. Minimum Set of Gender Indicators. United Nations Statistics Division, 2017. Available at: https://genderstats.un.org/#/indicators.'
-    version_producer: '2017'
+      Regarding the definitions, the original source notes: "Average number of hours spent on unpaid domestic work derives from time use statistics that is collected through stand-alone time-use surveys or a time-use module in multi-purpose household surveys. Data on time-use may be summarized and presented as either (1) average time spent for participants only or (2) average time spent for all population of certain age. In the former type of averages the total time spent by the individuals who performed an activity is divided by the number of persons who performed it (participants). In the latter type of averages the total time is divided by the total relevant population (or a sub-group thereof) regardless of whether people performed the activity or not. All statistics presented in the Minimum Set on Gender Indicators on time spent in various activities are averages based on all total relevant population. This type of averages can be used to compare groups and assess changes over time. Differences among groups or over time may be due to a difference (or change) in the proportion of those participating in the specific activity or a difference (or change) in the amount of time spent by participants or both. Data presented for this indicator are expressed as an average per day. It is averaged over seven days of the week (weekdays and weekends are not differentiated)."
+    citation_full: UN Statistics Division. Minimum Set of Gender Indicators (2017).
     url_main: https://genderstats.un.org/#/indicators
     date_accessed: '2017-09-19'
     date_published: '2017'

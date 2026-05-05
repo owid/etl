@@ -2,17 +2,17 @@ meta:
   origin:
     producer: OECD
     title: OECD Labor Force Statistics
-    description: The OECD Labor Force Statistics database provides annual data on employment, unemployment, and hours worked across OECD member countries.
     title_snapshot: OECD Labor Force Statistics - Female weekly hours worked
     description_snapshot: |-
+      Original source notes:
       Part-time employment is defined according to a common definition of less than 30-weekly-usual hours worked in the main job.
 
       Full-time employment is defined according to a common definition of more than 30-weekly-usual hours worked in the main job.
 
-      Information for all countries and all LFS subjects may be found at www.oecd.org/els/employmentpoliciesanddata/LFSNOTES_SOURCES.pdf.
-    citation_full: 'OECD (2017). Labor Force Statistics. OECD.stat. http://stats.oecd.org/Index.aspx?DatasetCode=AVE_HRS#)'
-    version_producer: '2017'
-    url_main: 'http://stats.oecd.org/Index.aspx?DatasetCode=AVE_HRS#)'
+      Information for all countries and all LFS subjects may be found in the attached file: www.oecd.org/els/employmentpoliciesanddata/LFSNOTES_SOURCES.pdf.
+    citation_full: OECD (2017). OECD Labor Force Statistics.
+    attribution_short: OECD
+    url_main: http://stats.oecd.org/Index.aspx?DatasetCode=AVE_HRS
     date_accessed: '2026-03-10'
     date_published: '2017'
 outs:

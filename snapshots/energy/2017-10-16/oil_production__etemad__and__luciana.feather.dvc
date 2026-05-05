@@ -1,9 +1,12 @@
 meta:
   origin:
-    producer: The SHIFT Project Data Portal
-    title: Oil production – Etemad and Luciana
-    description: This dataset covers historical oil production data compiled from two sources. Data from 1900–1980 is sourced from Bouda Etemad and Jean Luciani, "World Energy Production 1800–1985" (ISBN 2-600-56007-6). Data from 1980 onward is sourced from the US Energy Information Administration (EIA), International Energy Statistics.
-    citation_full: 'The SHIFT Project Data Portal. Oil production – Etemad and Luciana. Data from 1900–1980: Bouda Etemad and Jean Luciani, World Energy Production 1800–1985, ISBN 2-600-56007-6. Data from 1980 onwards: U.S. Energy Information Administration, International Energy Statistics.'
+    producer: The Shift Project
+    title: Oil production
+    description: |-
+      Data from 1900-1980 is sourced from Bouda Etemad and Jean Luciani, World Energy Production 1800–1985, ISBN 2-600-56007-6.
+
+      Data from 1980 onwards is sourced from U.S. Energy Information Administration, International Energy Statistics.
+    citation_full: The Shift Project Data Portal. Oil production.
     url_main: http://www.tsp-data-portal.org/
     date_accessed: '2017-10-16'
     date_published: '2017'

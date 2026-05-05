@@ -1,9 +1,12 @@
 meta:
   origin:
-    producer: The SHIFT Project Data Portal
-    title: Gas production - Etemad and Luciana
-    description: This dataset provides historical gas production data compiled from two main sources. Data from 1900 to 1980 is drawn from Bouda Etemad and Jean Luciani's "World Energy Production 1800–1985" (ISBN 2-600-56007-6). Data from 1980 onwards is sourced from the U.S. Energy Information Administration (EIA), International Energy Statistics.
-    citation_full: The SHIFT Project Data Portal. Data from 1900–1980 sourced from Bouda Etemad and Jean Luciani, World Energy Production 1800–1985, ISBN 2-600-56007-6. Data from 1980 onwards sourced from U.S. Energy Information Administration, International Energy Statistics.
+    producer: Various sources
+    title: Gas production (long-run)
+    description: |-
+      Data from 1900-1980 is sourced from Bouda Etemad and Jean Luciani, World Energy Production 1800 – 1985, ISBN 2-600-56007-6.
+
+      Data from 1980 onwards is sourced from U.S. Energy Information Administration, International Energy Statistics.
+    citation_full: The SHIFT Project Data Portal.
     url_main: http://www.tsp-data-portal.org/
     date_accessed: '2017-10-16'
     date_published: '2017'
