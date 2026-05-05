@@ -1,4 +1,4 @@
-"""Shared helpers for the chart-text-report skill.
+"""Shared helpers for the faust-metadata-audit skill.
 
 Used by both `generate_mdim_text_report.py` (MDim view mode) and
 `grapher_dataset_mode.py` (dataset / indicator-list mode).
