@@ -12,13 +12,9 @@ Hand the draft to the user for review and publication. The skill does not presum
 
 ```
 title: [Punchy title — a finding/claim, a question, or an action/invitation. Examples: "Nearly one in ten people worldwide still live in extreme poverty", "How much do governments spend, and what do they spend it on?", "Track confirmed human cases of H5N1 'bird flu' since 1997". NOT just the dataset name.]
-
 excerpt: [One short sentence summary that's distinct from the title. Common patterns: "Explore updated data from <producer>." / "Explore updated data on <topic> from <producer>." / "Track <topic descriptor>." / "We've updated <N> charts with the latest data from <producer>." / "We updated nearly N of our charts with the latest data."]
-
 type: announcement
-
 authors: [Author name(s). Comma-separated for co-authors, e.g. "Hannah Ritchie, Edouard Mathieu".]
-
 kicker: Data update
 
 \[+body\]
@@ -37,13 +33,11 @@ Use *italics* with single asterisks for emphasis, sparingly.
 Separate paragraphs with a blank line.]
 
 {.cta}
-
 url: [The exit link URL. One of:
 - Single chart: https://ourworldindata.org/grapher/<slug>
 - Multiple charts (default): https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>
 - Explorer for the topic exists: https://ourworldindata.org/explorers/<name>
 - Curated topic page exists: https://ourworldindata.org/<topic>]
-
 text: [Descriptive link text. One of:
 - "Explore the updated data in our interactive charts" (default for dataset-wide)
 - "Explore the updated data in our interactive chart" (single chart)
@@ -51,19 +45,22 @@ text: [Descriptive link text. One of:
 - "Explore the interactive version of this chart" (single chart)
 - "Explore this data going back to YYYY in our interactive chart" (single chart with date depth)
 - "Explore the data in our new interactive chart" (new chart/MDIM)]
-
 {}
 
 {.image}
-
 filename: [YYYY-MM-data-update-<slug>.png — a chart screenshot the user adds to the Doc separately. The slug is a short, lowercase-hyphenated topic tag, e.g. world-bank-pip, nvidia-revenue, h5n1-flu, govt-revenue, ozone-hole, robots-per-worker.]
-
 {}
 
 \[\]
 ```
 
 The `\[+body\]` and `\[\]` markers use backslash-escaped brackets — that's how they appear in the published Google Docs (the escapes prevent Google Docs' auto-link rendering from collapsing the brackets). Keep the escapes when pasting into the Doc; the OWID CMS strips them on ingest.
+
+**Spacing rules** the team prefers (different from the raw Google Docs export, which inserts paragraph breaks everywhere):
+
+- **Frontmatter section** (`title:` through `kicker:`) — one field per line, **no blank lines** between fields.
+- **Body** — keep blank lines between paragraphs.
+- **`{.cta}` and `{.image}` blocks** — opening tag, fields, closing tag all on consecutive lines with **no blank lines inside**. Keep one blank line between the body and `{.cta}`, and between `{.cta}` and `{.image}`.
 
 ---
 
@@ -145,13 +142,9 @@ These are real published examples. They are models for tone, length, and structu
 
 ```
 title: NVIDIA's data center & AI revenue has grown nearly 15-fold since early 2023
-
 excerpt: Track the rapidly increasing demand for AI hardware.
-
 type: announcement
-
 authors: Veronika Samborska
-
 kicker: Data update
 
 \[+body\]
@@ -165,17 +158,12 @@ In early 2023, data center & AI revenue was around $4 billion per quarter. By la
 This data comes from NVIDIA's financial reports and is not adjusted for inflation. I recently updated this chart with the latest quarterly release and will continue to do so each quarter.
 
 {.cta}
-
 url: https://ourworldindata.org/grapher/nvidia-quarterly-revenue-segment
-
 text: Explore this data going back to 2014 in our interactive chart
-
 {}
 
 {.image}
-
 filename: 2026-04-data-update-nvidia-revenue.png
-
 {}
 
 \[\]
@@ -185,13 +173,9 @@ filename: 2026-04-data-update-nvidia-revenue.png
 
 ```
 title: Track confirmed human cases of H5N1 "bird flu" since 1997
-
 excerpt: Explore updated data from the WHO Global Influenza Programme.
-
 type: announcement
-
 authors: Lucas Rodés-Guirao
-
 kicker: Data update
 
 \[+body\]
@@ -207,17 +191,12 @@ Keep in mind that the true burden of infection is not fully known, because only 
 I've updated our chart with the latest data from the WHO GIP (obtained via the [US CDC](https://www.cdc.gov/bird-flu/php/surveillance/chart-epi-curve-ah5n1.html)), covering monthly reported cases since 1997. We update this data quarterly.
 
 {.cta}
-
 url: https://ourworldindata.org/grapher/h5n1-flu-reported-cases
-
 text: Explore the updated data in our interactive chart
-
 {}
 
 {.image}
-
 filename: 2026-04-data-update-h5n1-flu.png
-
 {}
 
 \[\]
@@ -227,13 +206,9 @@ filename: 2026-04-data-update-h5n1-flu.png
 
 ```
 title: Nearly one in ten people worldwide still live in extreme poverty
-
 excerpt: Explore updated data from the World Bank Poverty and Inequality Platform.
-
 type: announcement
-
 authors: Pablo Arriagada
-
 kicker: Data update
 
 \[+body\]
@@ -253,17 +228,12 @@ Our colleague Max Roser wrote an article about [the future of progress](https://
 I recently updated our charts with the latest PIP release from the World Bank.
 
 {.cta}
-
 url: https://ourworldindata.org/search?datasetProducts=World+Bank+Poverty+and+Inequality+Platform+%28PIP%29
-
 text: Explore all of the updated data in our interactive charts
-
 {}
 
 {.image}
-
 filename: 2026-04-data-update-world-bank-pip.png
-
 {}
 
 \[\]
