@@ -181,14 +181,35 @@ When you do stop, present a concise summary of the issue and what options exist.
       from pathlib import Path
       from owid.catalog import Dataset
 
-      tb_regions = Dataset("data/garden/regions/2023-01-01/regions")["regions"]
+      # Resolve the canonical regions dataset dynamically (latest built version).
+      # Don't pin a date — when the regions step version advances, a hard-coded path
+      # would validate against a stale catalog and flag valid targets as non-canonical.
+      regions_dirs = sorted(Path("data/garden/regions").glob("*/regions"))
+      if not regions_dirs:
+          raise RuntimeError(
+              "No data/garden/regions/<version>/regions built locally — the audit can't "
+              "run without the canonical regions catalog. Build it first with "
+              "`.venv/bin/etlr data://garden/regions/<latest>/regions --private`."
+          )
+      tb_regions = Dataset(str(regions_dirs[-1]))["regions"]
       canonical_regions = set(tb_regions["name"].dropna().astype(str))
 
-      # Resolve the latest income_groups dataset dynamically — OWID treats latest as official.
+      # Add OWID's official income-group aggregates to the canonical set, if available.
+      # OWID treats the latest income_groups version as official. This artifact is
+      # often not built locally during a non-income-groups dataset refresh — degrade
+      # gracefully (warn and skip) rather than aborting the audit.
       ig_dirs = sorted(Path("data/garden/wb").glob("*/income_groups"))
-      assert ig_dirs, "No data/garden/wb/<version>/income_groups dataset built locally"
-      ds_ig = Dataset(str(ig_dirs[-1]))
-      canonical_income = set(ds_ig["income_groups_latest"]["classification"].dropna().astype(str).unique())
+      if ig_dirs:
+          ds_ig = Dataset(str(ig_dirs[-1]))
+          canonical_income = set(ds_ig["income_groups_latest"]["classification"].dropna().astype(str).unique())
+      else:
+          print(
+              "[WARN] No data/garden/wb/<version>/income_groups built locally — "
+              "skipping income-group enrichment. The four WB income-group aggregates "
+              "(High/Upper-middle/Lower-middle/Low-income countries) may surface as "
+              "'not in canonical' until you build that dataset."
+          )
+          canonical_income = set()
 
       canonical = canonical_regions | canonical_income
 
