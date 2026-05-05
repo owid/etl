@@ -230,3 +230,8 @@ steps:
   #
   export://explorers/agriculture/latest/crop_yields:
     - data://grapher/agriculture/2026-03-02/attainable_yields
+  #
+  # Food prices explorer.
+  #
+  export://explorers/agriculture/latest/food_prices:
+    - data://grapher/wb/2025-08-04/food_prices_for_nutrition

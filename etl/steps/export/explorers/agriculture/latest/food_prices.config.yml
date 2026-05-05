@@ -1,0 +1,277 @@
+definitions:
+  share_color_scale: &share_color_scale
+    colorScaleScheme: YlOrRd
+    colorScaleNumericBins: "0;10;20;30;40;50;60;70;80;90;100"
+  cost_per_day_color_scale_healthy: &cost_per_day_color_scale_healthy
+    colorScaleScheme: YlGnBu
+    colorScaleNumericBins: "0;2.5;3;3.5;4;4.5;5;5.5;6"
+  cost_per_day_color_scale_nutrient: &cost_per_day_color_scale_nutrient
+    colorScaleScheme: YlGnBu
+    colorScaleNumericBins: "0;1.5;2;2.5;3;3.5;4"
+  cost_per_day_color_scale_calorie: &cost_per_day_color_scale_calorie
+    colorScaleScheme: YlGnBu
+    colorScaleNumericBins: "0;0.4;0.6;0.8;1;1.2;1.4;1.6;1.8;2"
+  cost_share_color_scale_healthy: &cost_share_color_scale_healthy
+    colorScaleScheme: BuPu
+    colorScaleNumericBins: "0;50;100;150;200;250;300"
+  cost_share_color_scale_nutrient: &cost_share_color_scale_nutrient
+    colorScaleScheme: BuPu
+    colorScaleNumericBins: "0;20;40;60;80;100;120;140;160;180;200"
+  cost_share_color_scale_calorie: &cost_share_color_scale_calorie
+    colorScaleScheme: BuPu
+    colorScaleNumericBins: "0;10;20;30;40;50;60;70;80;90"
+  number_color_scale_healthy: &number_color_scale_healthy
+    colorScaleScheme: YlOrRd
+    colorScaleNumericBins: "0;1000000;3000000;10000000;30000000;100000000;300000000"
+  number_color_scale_nutrient: &number_color_scale_nutrient
+    colorScaleScheme: YlOrRd
+    colorScaleNumericBins: "0;300000;1000000;3000000;10000000;30000000;100000000;300000000"
+  number_color_scale_calorie: &number_color_scale_calorie
+    colorScaleScheme: YlOrRd
+    colorScaleNumericBins: "0;100000;300000;1000000;3000000;10000000;30000000;100000000"
+  share_calorie_color_scale: &share_calorie_color_scale
+    colorScaleScheme: YlOrRd
+    colorScaleNumericBins: "0;1;2;5;10;20;50;100"
+
+  common_views:
+    - config:
+        type: LineChart
+        hasMapTab: true
+        tab: map
+        yAxisMin: 0
+
+config:
+  explorerTitle: Food Prices
+  explorerSubtitle: Explore the cost and affordability of diets across the world.
+  isPublished: true
+  selection:
+    - Nigeria
+    - Bangladesh
+    - India
+    - Ethiopia
+    - Mexico
+    - United States
+    - Brazil
+    - United Kingdom
+  subNavId: explorers
+  subNavCurrentId: food-prices
+
+dimensions:
+  - slug: diet
+    name: Diet
+    presentation:
+      type: radio
+    choices:
+      - slug: healthy
+        name: Healthy diet
+      - slug: nutrient_adequate
+        name: Nutrient adequate diet
+      - slug: calorie_sufficient
+        name: Calorie sufficient diet
+  - slug: type
+    name: Cost or Affordability
+    presentation:
+      type: radio
+    choices:
+      - slug: affordability
+        name: Affordability
+      - slug: cost
+        name: Cost
+  - slug: affordability_metric
+    name: Affordability metric
+    presentation:
+      type: radio
+    choices:
+      - slug: na
+        name: ""
+      - slug: share
+        name: Share that cannot afford
+      - slug: number
+        name: Number that cannot afford
+  - slug: cost_metric
+    name: Cost metric
+    presentation:
+      type: radio
+    choices:
+      - slug: na
+        name: ""
+      - slug: dollars_per_day
+        name: $ per day
+      - slug: share_food_expenditure
+        name: "% of average food expenditure"
+
+views:
+  # ===== Affordability — Share that cannot afford =====
+  - dimensions:
+      diet: healthy
+      type: affordability
+      affordability_metric: share
+      cost_metric: na
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#percent_of_the_population_who_cannot_afford_a_healthy_diet
+          display:
+            <<: *share_color_scale
+    config:
+      title: Share of population that cannot afford a healthy diet
+      subtitle: The cost of a healthy diet is the lowest-cost set of foods available that would meet requirements in dietary guidelines from governments and public health agencies. A diet is defined as unaffordable when its cost, plus basic non-food needs like housing and transportation, exceeds daily income.
+
+  - dimensions:
+      diet: nutrient_adequate
+      type: affordability
+      affordability_metric: share
+      cost_metric: na
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#percent_of_the_population_who_cannot_afford_nutrient_adequacy
+          display:
+            <<: *share_color_scale
+    config:
+      title: Share of population that cannot afford a nutrient adequate diet
+      subtitle: The cost of a nutrient adequate diet is the lowest-cost set of foods available that would meet nutritional requirements of calories, protein, fats and all essential vitamins and minerals.  A diet is defined as unaffordable when its cost, plus basic non-food needs like housing and transportation, exceeds daily income.
+
+  - dimensions:
+      diet: calorie_sufficient
+      type: affordability
+      affordability_metric: share
+      cost_metric: na
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#percent_of_the_population_who_cannot_afford_sufficient_calories
+          display:
+            <<: *share_calorie_color_scale
+    config:
+      title: Share of population that cannot afford a calorie sufficient diet
+      subtitle: The cost of an energy sufficient diet is the cheapest way that an individual can meet their calorie requirement using available staple foods in each country. A diet is defined as unaffordable when its cost, plus basic non-food needs like housing and transportation, exceeds daily income.
+
+  # ===== Affordability — Number that cannot afford =====
+  - dimensions:
+      diet: healthy
+      type: affordability
+      affordability_metric: number
+      cost_metric: na
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#people_who_cannot_afford_a_healthy_diet
+          display:
+            <<: *number_color_scale_healthy
+    config:
+      title: Number of people who cannot afford a healthy diet
+      subtitle: The cost of a healthy diet is the lowest-cost set of foods available that would meet requirements in dietary guidelines from governments and public health agencies. A diet is defined as unaffordable when its cost, plus basic non-food needs like housing and transportation, exceeds daily income.
+
+  - dimensions:
+      diet: nutrient_adequate
+      type: affordability
+      affordability_metric: number
+      cost_metric: na
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#people_who_cannot_afford_nutrient_adequacy
+          display:
+            <<: *number_color_scale_nutrient
+    config:
+      title: Number of people who cannot afford a nutrient adequate diet
+      subtitle: The cost of a nutrient adequate diet is the lowest-cost set of foods available that would meet nutritional requirements of calories, protein, fats and all essential vitamins and minerals.  A diet is defined as unaffordable when its cost, plus basic non-food needs like housing and transportation, exceeds daily income.
+
+  - dimensions:
+      diet: calorie_sufficient
+      type: affordability
+      affordability_metric: number
+      cost_metric: na
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#people_who_cannot_afford_sufficient_calories
+          display:
+            <<: *number_color_scale_calorie
+    config:
+      title: Number of people who cannot afford a calorie sufficient diet
+      subtitle: The cost of an energy sufficient diet is the cheapest way that an individual can meet their calorie requirement using available staple foods in each country.  A diet is defined as unaffordable when its cost, plus basic non-food needs like housing and transportation, exceeds daily income.
+
+  # ===== Cost — $ per day =====
+  - dimensions:
+      diet: healthy
+      type: cost
+      affordability_metric: na
+      cost_metric: dollars_per_day
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#cost_of_a_healthy_diet_in_ppp_dollars
+          display:
+            <<: *cost_per_day_color_scale_healthy
+    config:
+      title: Daily cost of a healthy diet
+      subtitle: The cost of a healthy diet is the lowest-cost set of foods available that would meet requirements in dietary guidelines from governments and public health agencies. This data is adjusted for inflation and differences in living costs between countries.
+      note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+
+  - dimensions:
+      diet: nutrient_adequate
+      type: cost
+      affordability_metric: na
+      cost_metric: dollars_per_day
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#cost_of_a_nutrient_adequate_diet_in_ppp_dollars
+          display:
+            <<: *cost_per_day_color_scale_nutrient
+    config:
+      title: Daily cost of a nutrient adequate diet
+      subtitle: The cost of a nutrient adequate diet is the lowest-cost set of foods available that would meet nutritional requirements of calories, protein, fats and all essential vitamins and minerals. This data is adjusted for inflation and differences in living costs between countries.
+      note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+
+  - dimensions:
+      diet: calorie_sufficient
+      type: cost
+      affordability_metric: na
+      cost_metric: dollars_per_day
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#cost_of_an_energy_sufficient_diet_in_ppp_dollars
+          display:
+            <<: *cost_per_day_color_scale_calorie
+    config:
+      title: Daily cost of a calorie sufficient diet
+      subtitle: The cost of an energy sufficient diet is the cheapest way that an individual can meet their calorie requirement using available staple foods in each country. The data is adjusted for inflation and differences in living costs between countries.
+      note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+
+  # ===== Cost — % of average food expenditure =====
+  - dimensions:
+      diet: healthy
+      type: cost
+      affordability_metric: na
+      cost_metric: share_food_expenditure
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#affordability_of_a_healthy_diet__ratio_of_cost_to_food_expenditures
+          display:
+            <<: *cost_share_color_scale_healthy
+    config:
+      title: Cost of a healthy diet as a share of average food spending
+      subtitle: The cost of a healthy diet is the lowest-cost set of foods available that would meet requirements in dietary guidelines from governments and public health agencies.
+
+  - dimensions:
+      diet: nutrient_adequate
+      type: cost
+      affordability_metric: na
+      cost_metric: share_food_expenditure
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures
+          display:
+            <<: *cost_share_color_scale_nutrient
+    config:
+      title: Cost of a nutrient adequate diet as a share of average food expenditure
+      subtitle: The cost of a nutrient adequate diet is the lowest-cost set of foods available that would meet nutritional requirements of calories, protein, fats and all essential vitamins and minerals.
+
+  - dimensions:
+      diet: calorie_sufficient
+      type: cost
+      affordability_metric: na
+      cost_metric: share_food_expenditure
+    indicators:
+      y:
+        - catalogPath: food_prices_for_nutrition#affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures
+          display:
+            <<: *cost_share_color_scale_calorie
+    config:
+      title: Cost of a calorie sufficient diet as a share of average food expenditure
+      subtitle: The cost of an energy sufficient diet is the cheapest way that an individual can meet their calorie requirement using available staple foods in each country.
