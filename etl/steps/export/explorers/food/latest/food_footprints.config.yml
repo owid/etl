@@ -101,12 +101,30 @@ views:
       unit: per_kg
       by_stage: stages
     indicators:
+      # Per-indicator colors mirror the legacy chart (grapher id 4986). Set per-view
+      # here rather than upstream because the indicators don't carry display.color.
       y:
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_land_use
+          display:
+            color: "#578145"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_farm
+          display:
+            color: "#bc8e5a"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_animal_feed
+          display:
+            color: "#f37104"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_processing
+          display:
+            color: "#004d84"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_transport
+          display:
+            color: "#c45267"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_retail
+          display:
+            color: "#f1dc19"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_packaging
+          display:
+            color: "#939597"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_losses
+          display:
+            color: "#c4b4b6"
