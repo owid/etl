@@ -832,6 +832,16 @@ steps:
   data://grapher/aviation/2026-04-02/air_traffic:
     - data://garden/aviation/2026-04-02/air_traffic
 
+  # Oil Spills
+  data://meadow/itopf/2026-05-06/oil_spills:
+    - snapshot://itopf/2026-05-06/oil_spills.pdf
+
+  data://garden/itopf/2026-05-06/oil_spills:
+    - data://meadow/itopf/2026-05-06/oil_spills
+
+  data://grapher/itopf/2026-05-06/oil_spills:
+    - data://garden/itopf/2026-05-06/oil_spills
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
