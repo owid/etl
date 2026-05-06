@@ -645,36 +645,47 @@ def load_clean_source_mapping() -> dict[str, dict[str, str]]:
     return source_mapping
 
 
+# Sections appended to description_from_producer, in display order. Each entry maps a
+# column from the meadow `wdi_metadata` table to the markdown section header rendered
+# in the producer description. The order follows the WB databank metadata glossary
+# layout. `source_meta`/`topic_meta` come from DDH (legacy `source` and `topic` are
+# kept separately for the wdi.sources.json join).
+_PRODUCER_DESCRIPTION_SECTIONS: list[tuple[str, str]] = [
+    # Source: redundant with `origin.producer` / `origin.citation_full`, which are
+    # already surfaced to the reader. Keeping the column in meadow in case it's needed.
+    # ("source_meta", "Source"),
+    # Topic: WB's internal taxonomy (e.g. "Financial Sector: Exchange rates & prices");
+    # the chart's existing topic context covers this for readers.
+    # ("topic_meta", "Topic"),
+    ("periodicity", "Periodicity"),
+    ("base_period", "Base period"),
+    ("aggregation_method", "Aggregation method"),
+    ("statistical_concept_and_methodology", "Statistical concept and methodology"),
+    ("development_relevance", "Development relevance"),
+    ("limitations_and_exceptions", "Limitations and exceptions"),
+    ("general_comments", "General comments"),
+    ("notes_from_original_source", "Notes from original source"),
+    ("other_notes", "Other notes"),
+    ("related_source_links", "Related source links"),
+    ("other_web_links", "Other web links"),
+    ("related_indicators", "Related indicators"),
+    # License type: ~93% of indicators are "CC BY-4.0"; license is already expressed
+    # at the dataset/origin level, so per-indicator repetition is noise.
+    # ("license_type", "License type"),
+]
+
+
 def create_description_from_producer(var: dict[str, Any]) -> str | None:
     desc = ""
-    if pd.notnull(var["long_definition"]) and len(var["long_definition"].strip()) > 0:
+    if pd.notnull(var.get("long_definition")) and len(var["long_definition"].strip()) > 0:
         desc += var["long_definition"]
-    elif pd.notnull(var["short_definition"]) and len(var["short_definition"].strip()) > 0:
+    elif pd.notnull(var.get("short_definition")) and len(var["short_definition"].strip()) > 0:
         desc += var["short_definition"]
 
-    if pd.notnull(var["limitations_and_exceptions"]) and len(var["limitations_and_exceptions"].strip()) > 0:
-        desc += f"\n\n### Limitations and exceptions:\n{var['limitations_and_exceptions']}"
-
-    if (
-        pd.notnull(var["statistical_concept_and_methodology"])
-        and len(var["statistical_concept_and_methodology"].strip()) > 0
-    ):
-        desc += f"\n\n### Statistical concept and methodology:\n{var['statistical_concept_and_methodology']}"
-
-    ####################################################################################################################
-    # I think that the development relevance could also be an interesting field to add to the description_from_producer.
-    # For now, I'll include it in this specific indicator (access to electricity), but in the future we can consider adding this field for all indicators.
-    if (
-        (var["indicator_code_original"] in ["EG.ELC.ACCS.ZS"])
-        and pd.notnull(var["development_relevance"])
-        and len(var["development_relevance"].strip()) > 0
-    ):
-        desc += f"\n\n### Development relevance:\n{var['development_relevance']}"
-    ####################################################################################################################
-
-    # retrieves additional source info, if it exists.
-    if pd.notnull(var["notes_from_original_source"]) and len(var["notes_from_original_source"].strip()) > 0:
-        desc += f"\n\n### Notes from original source:\n{var['notes_from_original_source']}"
+    for column, header in _PRODUCER_DESCRIPTION_SECTIONS:
+        value = var.get(column)
+        if pd.notnull(value) and len(value.strip()) > 0:
+            desc += f"\n\n### {header}:\n{value}"
 
     desc = re.sub(r" *(\n+) *", r"\1", re.sub(r"[ \t]+", " ", desc)).strip()
 

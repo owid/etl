@@ -22,9 +22,15 @@ def create_metadata_table(legacy_json: dict, new_json: dict) -> Table:
     Legacy JSON (from api.worldbank.org/v2) provides core fields:
     - indicator_code, indicator_name, unit, source, topic
 
-    New JSON (from ddh-openapi.worldbank.org) provides rich descriptions:
-    - long_definition, short_definition, limitations_and_exceptions,
-      statistical_concept_and_methodology, development_relevance, notes_from_original_source
+    New JSON (from ddh-openapi.worldbank.org) provides every metadata-glossary
+    field WB exposes per indicator (long_definition, aggregation_method,
+    periodicity, license_type, statistical_concept_and_methodology,
+    development_relevance, etc.).
+
+    DDH fields whose snake_cased name would collide with a legacy column are
+    stored under a `_meta` suffix (e.g. `Source` -> `source_meta`) so the
+    legacy values stay authoritative — the garden step uses legacy `source`
+    as a join key into wdi.sources.json.
     """
     # Parse legacy metadata (core fields)
     df_legacy = pd.DataFrame(legacy_json["data"])
@@ -55,6 +61,33 @@ def create_metadata_table(legacy_json: dict, new_json: dict) -> Table:
                 indicator_info["development_relevance"] = field_description
             elif field_name == "Notes from original source":
                 indicator_info["notes_from_original_source"] = field_description
+            elif field_name == "Aggregation method":
+                indicator_info["aggregation_method"] = field_description
+            elif field_name == "Periodicity":
+                indicator_info["periodicity"] = field_description
+            elif field_name == "Base Period":
+                indicator_info["base_period"] = field_description
+            elif field_name == "License Type":
+                indicator_info["license_type"] = field_description
+            elif field_name == "General comments":
+                indicator_info["general_comments"] = field_description
+            elif field_name == "Other notes":
+                indicator_info["other_notes"] = field_description
+            elif field_name == "Related source links":
+                indicator_info["related_source_links"] = field_description
+            elif field_name == "Other web links":
+                indicator_info["other_web_links"] = field_description
+            elif field_name == "Related indicators":
+                indicator_info["related_indicators"] = field_description
+            # `Source` and `Topic` collide with legacy columns, so store them under `_meta`.
+            elif field_name == "Source":
+                indicator_info["source_meta"] = field_description
+            elif field_name == "Topic":
+                indicator_info["topic_meta"] = field_description
+            # Skipped: Indicator Name (legacy has it), and the taxonomy fields
+            # (Description, First level, Second level, Unit of measure) which only
+            # appear on the ~130 indicators where a classification entry survived
+            # snapshot dedup instead of the rich-metadata entry.
 
         if indicator_info["series_code"]:
             indicators_data.append(indicator_info)
