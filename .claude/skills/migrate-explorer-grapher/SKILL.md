@@ -125,6 +125,10 @@ def run() -> None:
 
 `<short>.config.yml` skeleton:
 
+> **Always block style.** Mappings and lists in explorer config YAML must use block style (one key per line, list items on their own line with `-`). Never use flow style (`{ key: value, ... }` or `[a, b, c]`) even when a view's dimensions look "small enough to fit on one line." Reason: the user wants every config diffable line-by-line and consistent across explorers; PR review on a 45-view file is unreadable when half the views collapse to a single flow line. The only exception is markdown links inside a quoted-scalar `subtitle:`/`note:` (those `[text](url)` brackets are content, not YAML).
+>
+> The same rule applies to `presentation: { type: dropdown }` and `choices: [...]` — write them as block mappings/lists.
+
 ```yaml
 config:
   # settings rows from the legacy TSV — keys verbatim
@@ -135,17 +139,27 @@ config:
     - <default selected entities>
   hasMapTab: 'true'
   yAxisMin: '0'
-  pickerColumnSlugs: []
+  pickerColumnSlugs: []  # an empty list is OK; non-empty must be block-style
   hideAlertBanner: 'true'
   subNavId: explorers
   subNavCurrentId: <slug>
   # ...
 
 definitions:
-  # Hoist anchors here when many views share config
-  common_chart_config: &common_chart_config
-    type: LineChart DiscreteBar
-    hasMapTab: true
+  # Shared config applied to all views. Use `definitions.common_views` (a list of
+  # entries each with `config:` and an optional `dimensions:` filter) — NOT YAML
+  # anchors and `<<:` merge keys. The framework merges these at expansion time;
+  # the same convention is documented in detail in `/create-multidim`. Per-view
+  # `config:` blocks can still override anything that comes from common_views.
+  common_views:
+    - config:
+        type: DiscreteBar
+        hasMapTab: false
+    # Dimension-filtered overrides apply only to matching views:
+    # - dimensions:
+    #     metric: share
+    #   config:
+    #     note: "Share values sum to 100%"
 
 dimensions:
   # one entry per dropdown/radio/checkbox column in the legacy graphers table
@@ -154,11 +168,14 @@ dimensions:
     presentation:
       type: dropdown                        # or radio / checkbox
     choices:
-      - { slug: <snake>, name: "<as shown in widget>" }
+      - slug: <snake>
+        name: "<as shown in widget>"
 
 views:
   # one entry per row in the legacy graphers table
-  - dimensions: { <dim_slug>: <choice_slug>, ... }
+  - dimensions:
+      <dim_slug>: <choice_slug>
+      # ...
     indicators:
       y:
         - catalogPath: <ns>/<v>/<dataset>/<table>#<short>
@@ -166,10 +183,11 @@ views:
             colorScaleNumericBins: 0;1;2
             colorScaleScheme: PuBu
     config:
-      <<: *common_chart_config              # if shared
       title: ...
       subtitle: ...
       type: <legacy chart type>             # LineChart, DiscreteBar, "LineChart DiscreteBar", StackedArea, …
+      # Anything common to all views lives in definitions.common_views above; only
+      # per-view overrides go here. No `<<:` merge keys, no anchors.
       hasMapTab: ...
       minTime: ...
       # other per-view overrides from the graphers table

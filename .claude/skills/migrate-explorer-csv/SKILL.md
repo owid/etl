@@ -99,29 +99,45 @@ print(yaml.safe_dump(config, sort_keys=False))
 
 The shape it produces (paste into `<short>.config.yml`):
 
+> **Always block style.** Mappings and lists must be written one key/item per line. No flow style (`{ key: value }` or `[a, b, c]`), even for tiny `dimensions:` or `presentation:` blocks. Markdown links inside quoted subtitles (`"[text](url)"`) are fine — those are content, not YAML structure.
+
 ```yaml
 config:
   explorerTitle: ...
   isPublished: true
-  selection: [...]
+  selection:
+    - <entity>
   hasMapTab: true
+
+definitions:
+  # Shared config applied to all views. Use `definitions.common_views` (a list of
+  # entries each with `config:` and an optional `dimensions:` filter) — NOT YAML
+  # anchors and `<<:` merge keys. Per-view `config:` blocks override these.
+  # See `/create-multidim` for the full mechanics.
+  common_views:
+    - config:
+        type: LineChart
+        hasMapTab: true
 
 dimensions:
   - slug: <snake>
     name: ...
-    presentation: { type: dropdown }
+    presentation:
+      type: dropdown
     choices:
-      - { slug: ..., name: ... }
+      - slug: ...
+        name: ...
 
 views:
-  - dimensions: { ... }
+  - dimensions:
+      <dim_slug>: <choice_slug>
     indicators:
       y:
         - catalogPath: <REWRITE THIS to <ns>/<date>/<short>#<indicator>>
           display:
             colorScaleNumericBins: ...
     config:
-      type: LineChart
+      # Only per-view overrides here. Common stuff lives in definitions.common_views.
       title: ...
 ```
 
