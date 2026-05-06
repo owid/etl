@@ -1,0 +1,66 @@
+# ── Snapshot metadata ─────────────────────────────────────────────────
+snapshots:
+  raw_data:
+    origin:
+      producer: NASA Center for Near-Earth Object Studies
+      title: Near-Earth Asteroids
+      description: |-
+        The NASA Center for Near-Earth Objects Studies (CNEOS) maintains a
+        catalog of all Near-Earth Asteroids known to date. A near-Earth
+        asteroid is an asteroid whose orbit brings it into proximity with
+        Earth. By convention, a Solar System body is considered "near Earth"
+        if its closest approach to the Sun is less than 1.3 astronomical
+        units (AU).
+      citation_full: |-
+        CNEOS (2026). Discovery Statistics: Cumulative Totals of Near-Earth
+        Asteroids (NEAs). Center for Near-Earth Object Studies. Jet Propulsion
+        Laboratory, NASA. Retrieved from https://cneos.jpl.nasa.gov/stats/totals.html
+      attribution_short: NASA CNEOS
+      url_main: https://cneos.jpl.nasa.gov/stats/totals.html
+      date_accessed: "2026-01-08"
+      date_published: "2026-01-08"
+      license:
+        name: CC0
+        url: https://science.data.nasa.gov/about/license
+
+# ── Dataset metadata ─────────────────────────────────────────────────
+datasets:
+  near_earth_asteroids:
+    dataset:
+      title: Near-Earth Asteroids
+      description: |-
+        Cumulative count of discovered near-Earth asteroids by size category,
+        based on NASA CNEOS discovery statistics. Updated monthly.
+      source: NASA Center for Near-Earth Object Studies
+      tags:
+        - Space Exploration & Satellites
+    columns:
+      country:
+        title: Country
+        role: entity
+      year:
+        title: Year
+        unit: year
+        role: time
+      larger_than_1km:
+        title: Near-Earth asteroids larger than 1 kilometer
+        description: |-
+          Cumulative number of discovered asteroids with an orbit that brings
+          them into proximity with Earth and a size larger than 1 kilometer.
+        unit: asteroids
+        role: metric
+      between_140m_and_1km:
+        title: Near-Earth asteroids between 140 meters and 1 kilometer
+        description: |-
+          Cumulative number of discovered asteroids with an orbit that brings
+          them into proximity with Earth and a size between 140 meters and
+          1 kilometer.
+        unit: asteroids
+        role: metric
+      smaller_than_140m:
+        title: Near-Earth asteroids smaller than 140 meters
+        description: |-
+          Cumulative number of discovered asteroids with an orbit that brings
+          them into proximity with Earth and a size smaller than 140 meters.
+        unit: asteroids
+        role: metric
