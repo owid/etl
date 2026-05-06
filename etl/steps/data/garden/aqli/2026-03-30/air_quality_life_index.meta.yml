@@ -43,6 +43,7 @@ tables:
           - The World Health Organization (WHO) recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
           - The Air Quality Life Index (AQLI) uses satellite-derived data to estimate PM2.5 levels, which may differ from local ground monitor readings.
           - This data uses population-weighted averages to reflect the exposure of people in a region. It also excludes natural sources of PM2.5, such as dust and sea salt, to focus on human-caused pollution.
+          - This data is not directly comparable to data from the World Bank’s World Development Indicators (WDI) or the WHO’s Global Health Observatory (GHO), which include natural sources of PM2.5.
           - You can learn more about the data and methodology in the [AQLI methodology and research design document](https://aqli.epic.uchicago.edu/about/methodology/).
         description_from_producer: *description_aqli
         display:

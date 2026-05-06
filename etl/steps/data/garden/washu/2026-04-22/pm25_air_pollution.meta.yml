@@ -28,6 +28,7 @@ tables:
             - Outdoor air pollution, specifically PM2.5, is a major environmental risk factor for health issues such as respiratory and cardiovascular diseases. It is estimated to contribute to millions of premature deaths globally each year.
             - The World Health Organization (WHO) recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
             - The geographic mean PM2.5 concentration provides an average level of air pollution across a region, but it may not accurately reflect the exposure of people living in that region, especially if population density varies widely.
+            - This data is based on satellite-derived estimates of PM2.5 levels, which may differ from local ground monitor readings. It is not directly comparable to data from the World Bank’s World Development Indicators (WDI) or the WHO’s Global Health Observatory (GHO), which incorporate ground monitor data as well.
         share_exposure_greater_5_ug_m3:
           title: Share of population exposed to PM2.5 levels greater than 5 µg/m³
           unit: "share of population"
