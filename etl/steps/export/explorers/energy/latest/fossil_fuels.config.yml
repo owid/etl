@@ -1,0 +1,334 @@
+definitions:
+  common_view: &common_view
+    type: LineChart
+    hasMapTab: true
+    yScaleToggle: false
+    hideTitleAnnotation: true
+    baseColorScheme: owid-distinct
+    yAxisMin: 0
+  reserves_subtitle: &reserves_subtitle |-
+    Proved reserves are fuels that are known with reasonable certainty to be recoverable in the future from known reservoirs under existing economic and operating conditions.
+  net_imports_subtitle_gas: &net_imports_subtitle_gas |-
+    Net imports is calculated as total imports minus total exports. This includes all forms of dry natural gas, including liquified natural gas (LNG). Vented and flared gas are not included. A negative value indicates that a country exports more than it imports.
+  net_imports_subtitle_coal: &net_imports_subtitle_coal |-
+    Net imports is calculated as total imports minus total exports. A negative value indicates that a country exports more than it imports.
+  net_imports_subtitle_oil: &net_imports_subtitle_oil |-
+    Net imports is calculated as total imports minus total exports. A negative value indicates that a country exports more than it imports.
+  gas_note: &gas_note |-
+    This includes all forms of dry natural gas, including liquified natural gas (LNG). Vented and flared gas are not included.
+  coal_note: &coal_note |-
+    This includes five coal types: anthracite, metallurgical, bituminous, subbituminous, and lignite.
+  crude_oil_note: &crude_oil_note |-
+    This includes the production of crude oil, including lease condensate.
+
+config:
+  explorerTitle: Fossil Fuels
+  explorerSubtitle: Explore reserves, production, trade, and consumption of fossil fuels.
+  originUrl: https://ourworldindata.org/fossil-fuels
+  isPublished: true
+  hideAlertBanner: true
+  hasMapTab: true
+  yAxisMin: 0
+  hideTitleAnnotation: true
+  tab: map
+  thumbnail: https://assets.ourworldindata.org/uploads/2022/03/Fossil-Fuels-Data-Explorer.png
+  selection:
+    - United States
+    - Russia
+    - Norway
+    - United Kingdom
+    - Germany
+    - Sweden
+    - China
+
+dimensions:
+  - slug: resource
+    name: Resource
+    presentation:
+      type: dropdown
+    choices:
+      - {slug: oil, name: Oil}
+      - {slug: natural_gas, name: Natural gas}
+      - {slug: coal, name: Coal}
+  - slug: metric
+    name: Metric
+    presentation:
+      type: dropdown
+    choices:
+      - {slug: reserves, name: Reserves}
+      - {slug: production, name: Production}
+      - {slug: consumption, name: Consumption}
+      - {slug: imports, name: Imports}
+      - {slug: exports, name: Exports}
+      - {slug: net_imports, name: Net imports}
+  - slug: count
+    name: Count
+    presentation:
+      type: radio
+    choices:
+      - {slug: total, name: Total}
+      - {slug: per_capita, name: Per capita}
+
+views:
+  # ---------- Oil ----------
+  - dimensions: {resource: oil, metric: reserves, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_reserves}]}
+    config:
+      <<: *common_view
+      title: Oil reserves
+      subtitle: *reserves_subtitle
+
+  - dimensions: {resource: oil, metric: reserves, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_reserves_per_capita}]}
+    config:
+      <<: *common_view
+      title: Oil reserves per capita
+      subtitle: *reserves_subtitle
+
+  - dimensions: {resource: oil, metric: production, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_production}]}
+    config:
+      <<: *common_view
+      title: Crude oil production
+      note: *crude_oil_note
+
+  - dimensions: {resource: oil, metric: production, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_production_per_capita}]}
+    config:
+      <<: *common_view
+      title: Crude oil production per capita
+      note: *crude_oil_note
+
+  - dimensions: {resource: oil, metric: consumption, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_consumption}]}
+    config:
+      <<: *common_view
+      title: Oil consumption
+      subtitle: |-
+        Oil consumption measures the consumption of all refined petroleum products – this includes crude oil and its petroleum products after processing.
+
+  - dimensions: {resource: oil, metric: consumption, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_consumption_per_capita}]}
+    config:
+      <<: *common_view
+      title: Oil consumption per capita
+      subtitle: |-
+        Oil consumption measures the consumption of all refined petroleum products – this includes crude oil and its petroleum products after processing.
+
+  - dimensions: {resource: oil, metric: imports, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_imports}]}
+    config:
+      <<: *common_view
+      title: Crude oil imports
+      note: *crude_oil_note
+
+  - dimensions: {resource: oil, metric: imports, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_imports_per_capita}]}
+    config:
+      <<: *common_view
+      title: Crude oil imports per capita
+      note: *crude_oil_note
+
+  - dimensions: {resource: oil, metric: exports, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_exports}]}
+    config:
+      <<: *common_view
+      title: Crude oil exports
+      note: *crude_oil_note
+
+  - dimensions: {resource: oil, metric: exports, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_exports_per_capita}]}
+    config:
+      <<: *common_view
+      title: Crude oil exports per capita
+      note: *crude_oil_note
+
+  - dimensions: {resource: oil, metric: net_imports, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_net_imports}]}
+    config:
+      <<: *common_view
+      title: Net imports of crude oil
+      subtitle: *net_imports_subtitle_oil
+      note: *crude_oil_note
+
+  - dimensions: {resource: oil, metric: net_imports, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#oil_net_imports_per_capita}]}
+    config:
+      <<: *common_view
+      title: Net imports of crude oil per capita
+      subtitle: *net_imports_subtitle_oil
+      note: *crude_oil_note
+
+  # ---------- Natural gas ----------
+  - dimensions: {resource: natural_gas, metric: reserves, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_reserves}]}
+    config:
+      <<: *common_view
+      title: Natural gas reserves
+      subtitle: *reserves_subtitle
+
+  - dimensions: {resource: natural_gas, metric: reserves, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_reserves_per_capita}]}
+    config:
+      <<: *common_view
+      title: Natural gas reserves per capita
+      subtitle: *reserves_subtitle
+
+  - dimensions: {resource: natural_gas, metric: production, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_production}]}
+    config:
+      <<: *common_view
+      title: Natural gas production
+      subtitle: *gas_note
+
+  - dimensions: {resource: natural_gas, metric: production, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_production_per_capita}]}
+    config:
+      <<: *common_view
+      title: Natural gas production per capita
+      subtitle: *gas_note
+
+  - dimensions: {resource: natural_gas, metric: consumption, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_consumption}]}
+    config:
+      <<: *common_view
+      title: Natural gas consumption
+      subtitle: *gas_note
+
+  - dimensions: {resource: natural_gas, metric: consumption, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_consumption_per_capita}]}
+    config:
+      <<: *common_view
+      title: Natural gas consumption per capita
+      subtitle: *gas_note
+
+  - dimensions: {resource: natural_gas, metric: imports, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_imports}]}
+    config:
+      <<: *common_view
+      title: Natural gas imports
+      subtitle: *gas_note
+
+  - dimensions: {resource: natural_gas, metric: imports, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_imports_per_capita}]}
+    config:
+      <<: *common_view
+      title: Natural gas imports per capita
+      subtitle: *gas_note
+
+  - dimensions: {resource: natural_gas, metric: exports, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_exports}]}
+    config:
+      <<: *common_view
+      title: Natural gas exports
+      subtitle: *gas_note
+
+  - dimensions: {resource: natural_gas, metric: exports, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_exports_per_capita}]}
+    config:
+      <<: *common_view
+      title: Natural gas exports per capita
+      subtitle: *gas_note
+
+  - dimensions: {resource: natural_gas, metric: net_imports, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_net_imports}]}
+    config:
+      <<: *common_view
+      title: Net imports of natural gas
+      subtitle: *net_imports_subtitle_gas
+
+  - dimensions: {resource: natural_gas, metric: net_imports, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#natural_gas_net_imports_per_capita}]}
+    config:
+      <<: *common_view
+      title: Net imports of natural gas per capita
+      subtitle: *net_imports_subtitle_gas
+
+  # ---------- Coal ----------
+  - dimensions: {resource: coal, metric: reserves, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_reserves}]}
+    config:
+      <<: *common_view
+      title: Coal reserves
+      subtitle: *reserves_subtitle
+      note: *coal_note
+
+  - dimensions: {resource: coal, metric: reserves, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_reserves_per_capita}]}
+    config:
+      <<: *common_view
+      title: Coal reserves per capita
+      subtitle: *reserves_subtitle
+      note: *coal_note
+
+  - dimensions: {resource: coal, metric: production, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_production}]}
+    config:
+      <<: *common_view
+      title: Coal production
+      note: *coal_note
+
+  - dimensions: {resource: coal, metric: production, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_production_per_capita}]}
+    config:
+      <<: *common_view
+      title: Coal production per capita
+      note: *coal_note
+
+  - dimensions: {resource: coal, metric: consumption, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_consumption}]}
+    config:
+      <<: *common_view
+      title: Coal consumption
+      note: *coal_note
+
+  - dimensions: {resource: coal, metric: consumption, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_consumption_per_capita}]}
+    config:
+      <<: *common_view
+      title: Coal consumption per capita
+      note: *coal_note
+
+  - dimensions: {resource: coal, metric: imports, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_imports}]}
+    config:
+      <<: *common_view
+      title: Coal imports
+      note: *coal_note
+
+  - dimensions: {resource: coal, metric: imports, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_imports_per_capita}]}
+    config:
+      <<: *common_view
+      title: Coal imports per capita
+      note: *coal_note
+
+  - dimensions: {resource: coal, metric: exports, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_exports}]}
+    config:
+      <<: *common_view
+      title: Coal exports
+      note: *coal_note
+
+  - dimensions: {resource: coal, metric: exports, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_exports_per_capita}]}
+    config:
+      <<: *common_view
+      title: Coal exports per capita
+      note: *coal_note
+
+  - dimensions: {resource: coal, metric: net_imports, count: total}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_net_imports}]}
+    config:
+      <<: *common_view
+      title: Net imports of coal
+      subtitle: *net_imports_subtitle_coal
+      note: *coal_note
+
+  - dimensions: {resource: coal, metric: net_imports, count: per_capita}
+    indicators: {y: [{catalogPath: fossil_fuels#coal_net_imports_per_capita}]}
+    config:
+      <<: *common_view
+      title: Net imports of coal per capita
+      subtitle: *net_imports_subtitle_coal
+      note: *coal_note

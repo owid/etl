@@ -170,6 +170,25 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   #
+  # Energy - Fossil fuels (EIA International Energy + Statistical Review reserves).
+  #
+  data://garden/energy/2026-05-05/fossil_fuels:
+    - data://meadow/eia/2026-05-05/international_energy
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Energy - Fossil fuels.
+  #
+  data://grapher/energy/2026-05-05/fossil_fuels:
+    - data://garden/energy/2026-05-05/fossil_fuels
+  #
+  # Energy - Fossil fuels explorer.
+  #
+  export://explorers/energy/latest/fossil_fuels:
+    - data://grapher/energy/2026-05-05/fossil_fuels
+  #
   # Energy - Energy mix.
   #
   data://garden/energy/2025-06-27/energy_mix:

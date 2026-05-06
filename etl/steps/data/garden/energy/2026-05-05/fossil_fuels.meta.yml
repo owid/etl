@@ -1,0 +1,188 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+        - Fossil Fuels
+    processing_level: major
+
+dataset:
+  title: Fossil fuels
+  description: |-
+    Fossil-fuel reserves, production, trade, and consumption by country, combining EIA International Energy Statistics with the Energy Institute Statistical Review of World Energy (the latter contributing natural gas and oil reserves, which are not in the EIA bulk file).
+  update_period_days: 365
+
+tables:
+  fossil_fuels:
+    variables:
+      coal_production:
+        title: Coal production
+        unit: tonnes
+        short_unit: t
+      coal_consumption:
+        title: Coal consumption
+        unit: tonnes
+        short_unit: t
+      coal_imports:
+        title: Coal imports
+        unit: tonnes
+        short_unit: t
+      coal_exports:
+        title: Coal exports
+        unit: tonnes
+        short_unit: t
+      coal_reserves:
+        title: Coal reserves
+        unit: tonnes
+        short_unit: t
+      coal_net_imports:
+        title: Coal net imports
+        unit: tonnes
+        short_unit: t
+      natural_gas_production:
+        title: Natural gas production
+        unit: cubic metres
+        short_unit: m³
+      natural_gas_consumption:
+        title: Natural gas consumption
+        unit: cubic metres
+        short_unit: m³
+      natural_gas_imports:
+        title: Natural gas imports
+        unit: cubic metres
+        short_unit: m³
+      natural_gas_exports:
+        title: Natural gas exports
+        unit: cubic metres
+        short_unit: m³
+      natural_gas_reserves:
+        title: Natural gas reserves
+        unit: cubic metres
+        short_unit: m³
+      natural_gas_net_imports:
+        title: Natural gas net imports
+        unit: cubic metres
+        short_unit: m³
+      oil_production:
+        title: Oil production
+        unit: cubic metres
+        short_unit: m³
+      oil_consumption:
+        title: Oil consumption
+        unit: cubic metres
+        short_unit: m³
+      oil_imports:
+        title: Oil imports
+        unit: cubic metres
+        short_unit: m³
+      oil_exports:
+        title: Oil exports
+        unit: cubic metres
+        short_unit: m³
+      oil_reserves:
+        title: Oil reserves
+        unit: cubic metres
+        short_unit: m³
+      oil_net_imports:
+        title: Oil net imports
+        unit: cubic metres
+        short_unit: m³
+      coal_production_per_capita:
+        title: Coal production per capita
+        unit: tonnes per person
+        short_unit: t
+      coal_consumption_per_capita:
+        title: Coal consumption per capita
+        unit: tonnes per person
+        short_unit: t
+      coal_imports_per_capita:
+        title: Coal imports per capita
+        unit: tonnes per person
+        short_unit: t
+      coal_exports_per_capita:
+        title: Coal exports per capita
+        unit: tonnes per person
+        short_unit: t
+      coal_reserves_per_capita:
+        title: Coal reserves per capita
+        unit: tonnes per person
+        short_unit: t
+      coal_net_imports_per_capita:
+        title: Coal net imports per capita
+        unit: tonnes per person
+        short_unit: t
+      natural_gas_production_per_capita:
+        title: Natural gas production per capita
+        unit: cubic metres per person
+        short_unit: m³
+      natural_gas_consumption_per_capita:
+        title: Natural gas consumption per capita
+        unit: cubic metres per person
+        short_unit: m³
+      natural_gas_imports_per_capita:
+        title: Natural gas imports per capita
+        unit: cubic metres per person
+        short_unit: m³
+      natural_gas_exports_per_capita:
+        title: Natural gas exports per capita
+        unit: cubic metres per person
+        short_unit: m³
+      natural_gas_reserves_per_capita:
+        title: Natural gas reserves per capita
+        unit: cubic metres per person
+        short_unit: m³
+      natural_gas_net_imports_per_capita:
+        title: Natural gas net imports per capita
+        unit: cubic metres per person
+        short_unit: m³
+      oil_production_per_capita:
+        title: Oil production per capita
+        unit: cubic metres per person
+        short_unit: m³
+      oil_consumption_per_capita:
+        title: Oil consumption per capita
+        unit: cubic metres per person
+        short_unit: m³
+      oil_imports_per_capita:
+        title: Oil imports per capita
+        unit: cubic metres per person
+        short_unit: m³
+      oil_exports_per_capita:
+        title: Oil exports per capita
+        unit: cubic metres per person
+        short_unit: m³
+      oil_reserves_per_capita:
+        title: Oil reserves per capita
+        unit: cubic metres per person
+        short_unit: m³
+      oil_net_imports_per_capita:
+        title: Oil net imports per capita
+        unit: cubic metres per person
+        short_unit: m³
+      share_of_coal_consumption_imported:
+        title: Share of coal consumption imported
+        unit: '%'
+        short_unit: '%'
+      share_of_natural_gas_consumption_imported:
+        title: Share of natural gas consumption imported
+        unit: '%'
+        short_unit: '%'
+      share_of_oil_consumption_imported:
+        title: Share of oil consumption imported
+        unit: '%'
+        short_unit: '%'
+      share_of_coal_production_exported:
+        title: Share of coal production exported
+        unit: '%'
+        short_unit: '%'
+      share_of_natural_gas_production_exported:
+        title: Share of natural gas production exported
+        unit: '%'
+        short_unit: '%'
+      share_of_oil_production_exported:
+        title: Share of oil production exported
+        unit: '%'
+        short_unit: '%'
+      population:
+        title: Population
+        unit: people
