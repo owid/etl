@@ -1,13 +1,15 @@
 ---
 name: migrate-explorer-csv
-description: Migrate a non-ETL CSV-based explorer (data lives in a static CSV hosted in `owid-grapher/public/explorers/` or on GitHub; explorer config has `tableSlug`/`table` blocks) into ETL by adding a snapshot → meadow → garden → grapher → export chain. Trigger when the user says "bring CSV explorer <slug> into ETL", or refers to fish-stocks (the only remaining target).
+description: Migrate a non-ETL CSV-based explorer (data lives in a static CSV hosted in `owid-grapher/public/explorers/` or on GitHub; explorer config has `tableSlug`/`table` blocks) into ETL by adding a snapshot → meadow → garden → grapher chain, then handing off to `/create-explorer` for the export step. Trigger when the user says "bring CSV explorer <slug> into ETL", or refers to fish-stocks (the only remaining target).
 metadata:
   internal: true
 ---
 
 # Migrate CSV-based Explorer into ETL
 
-Bring an explorer that today reads from a static CSV (e.g. hosted under `owid-grapher/public/explorers/<slug>/...` or a GitHub raw URL) into ETL. After this skill, the data is snapshot-tracked and flows through the standard ETL stages, and the explorer is published via `export://explorers/<ns>/latest/<short>`.
+Bring an explorer that today reads from a static CSV (e.g. hosted under `owid-grapher/public/explorers/<slug>/...` or a GitHub raw URL) into ETL. After this skill, the data is snapshot-tracked and flows through standard ETL stages, and `/create-explorer` writes the final `export://explorers/<ns>/latest/<short>` step.
+
+> **Scope of this skill:** the data-pipeline half — locating the source CSV and producing the `snapshot → meadow → garden → grapher` chain. The export-step authoring (YAML schema, dimensions/views, full-YAML vs table-driven, FAUST upstream, post-processing, DAG, verification) lives in `/create-explorer` and is shared with the other migrate-explorer-* skills and with `/create-multidim`. Don't duplicate that content here.
 
 ## Inputs
 
@@ -35,9 +37,7 @@ EOF
 
 Block types should include `table` and `tableSlug` should appear in the graphers columns. If you see only `graphers` (with `yVariableIds` or `grapherId`), use `migrate-explorer-grapher` instead. As of mid-2026 the only remaining CSV explorer is **`fish-stocks`** — most of the others (poverty/inequality variants, etc.) are slated for removal per umbrella issue #6014.
 
-## Workflow
-
-### 1. Locate the source CSV
+## Step 1 — Locate the source CSV
 
 Look first in `owid-grapher/public/explorers/<slug>/...` (the live site path). Otherwise fetch from the URL the explorer points at. Record:
 
@@ -45,11 +45,11 @@ Look first in `owid-grapher/public/explorers/<slug>/...` (the live site path). O
 - date last modified — if the CSV is in `owid-grapher`, use `git log -1 --format=%ad path/to/csv` to find the latest update; format as `YYYY-MM-DD` for the snapshot version
 - citation / license / source metadata (often in a sibling README or in the explorer's settings rows)
 
-### 2. Create the snapshot
+## Step 2 — Create the snapshot
 
 Use the `create-snapshot` skill (or hand-write `snapshots/<ns>/<date>/<short>.csv.dvc` plus the matching script). The DVC file should record `url_main`, `url_download`, `date_published`, license, citation. Run `.venv/bin/etls <ns>/<date>/<short>.csv` to fetch and upload.
 
-### 3. Meadow step
+## Step 3 — Meadow step
 
 `etl/steps/data/meadow/<ns>/<date>/<short>.py`:
 
@@ -68,24 +68,26 @@ def run() -> None:
     ds.save()
 ```
 
-### 4. Garden step
+## Step 4 — Garden step
 
 `etl/steps/data/garden/<ns>/<date>/<short>.py`:
-- harmonize country/region names via `paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)`
+
+- harmonize country/region names via `paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)` (skip if entities are non-geographic, e.g. food products)
 - convert types and units to ETL conventions (long format with `country`/`year` index)
 - optionally compute per-capita or per-region aggregates
 - write `*.meta.yml` with origins, descriptions, per-indicator metadata
-- **FAUST for single-indicator explorer views**: while authoring indicator metadata, push chart text/config (`title_public`, `subtitle`, `note`, `map.colorScale`, `hasMapTab`, `tab`, `yAxis`, …) into each indicator's `presentation.{title_public, grapher_config}`. Cross-cutting baselines go under `definitions.common.presentation.grapher_config` (recursive merge). The explorer view inherits this text at chart render time, eliminating duplication with `<short>.config.yml`. See `.claude/docs/explorer-programmatic-construction.md` for the full mechanics and `dynamic-yaml` `"{definitions.<key>}"` interpolation pattern.
 
-### 5. Grapher step
+**FAUST hint.** While authoring indicator metadata, push chart text/config (`title_public`, `subtitle`, `note`, `map.colorScale`, `hasMapTab`, `tab`, `yAxis`, …) into each indicator's `presentation.{title_public, grapher_config}`. Cross-cutting baselines go under `definitions.common.presentation.grapher_config` (recursive merge). The explorer view inherits this text at chart render time, so the `<short>.config.yml` in the next skill stays minimal. See `/create-explorer` Step 5 for the full mechanics and the `dynamic-yaml` `"{definitions.<key>}"` interpolation pattern.
+
+CSV-explorer migrations have a slight advantage: *you control the garden output*, so you can shape the new garden table to be dimensional (one row per country/year × dim_a × dim_b) and the export step in the next skill can use `paths.create_collection(tb=tb, indicator_names=..., dimensions=...)` to expand views directly.
+
+## Step 5 — Grapher step
 
 `etl/steps/data/grapher/<ns>/<date>/<short>.py` — read the garden table and save as a grapher dataset (long format `country`/`year`/`value`).
 
-### 6. Explorer step — leverage the migration helper
+## Step 6 — Optional: pre-fill the explorer YAML from the legacy config
 
-Construction style: same full-YAML vs table-driven choice as the other migration skills — **see `.claude/docs/explorer-programmatic-construction.md`** for the full discussion. Note that CSV-explorer migrations have a slight advantage because *you control the garden output*: you can shape the new garden table to be dimensional (one row per country/year × dim_a × dim_b) so `paths.create_collection(tb=tb, indicator_names=..., dimensions=...)` expands views directly, and reach for `c.group_views(...)` if some explorer views need to bundle multiple indicators.
-
-Before hand-translating the legacy config, try the programmatic helper in `etl/collection/explorer/migration.py`:
+Before invoking `/create-explorer`, you can seed `<short>.config.yml` with a partial config extracted from the legacy MySQL explorer:
 
 ```python
 # In a notebook or one-off script
@@ -95,102 +97,22 @@ import yaml
 print(yaml.safe_dump(config, sort_keys=False))
 ```
 
-`migrate_csv_explorer` only handles CSV-flavored explorers (it raises if the explorer mixes types), and it returns a partial YAML config with `dimensions`, `views`, settings, and per-indicator display overrides already mapped from the TSV blocks. The catch: catalog paths in the output point at the **explorer table URI** in the DB, which usually isn't the grapher dataset path. You need to rewrite each `catalogPath` to match the grapher dataset created in step 5 (e.g. `<ns>/<date>/<short>/<table>#<short>`).
+`migrate_csv_explorer` only handles CSV-flavored explorers (it raises if the explorer mixes types), and it returns a partial YAML config with `dimensions`, `views`, settings, and per-indicator display overrides already mapped from the TSV blocks. **The catch:** catalog paths in the output point at the **explorer table URI** in the DB, which usually isn't the grapher dataset path. Rewrite each `catalogPath` to match the grapher dataset created in step 5 (e.g. `<ns>/<date>/<short>/<table>#<short>`).
 
-The shape it produces (paste into `<short>.config.yml`):
+## Step 7 — Hand off to `/create-explorer`
 
-> **Always block style.** Mappings and lists must be written one key/item per line. No flow style (`{ key: value }` or `[a, b, c]`), even for tiny `dimensions:` or `presentation:` blocks. Markdown links inside quoted subtitles (`"[text](url)"`) are fine — those are content, not YAML structure.
+Invoke `/create-explorer` to author `etl/steps/export/explorers/<ns>/latest/<short>.{py,config.yml}` and the DAG entry. That skill covers:
 
-```yaml
-config:
-  explorerTitle: ...
-  isPublished: true
-  selection:
-    - <entity>
-  hasMapTab: true
+- the Python skeleton (full-YAML or table-driven)
+- the YAML schema (`config:`, `definitions.common_views`, `dimensions:`, `views:`)
+- block-style YAML rule, hyphens vs underscores
+- DAG entry, verification, common pitfalls
 
-definitions:
-  # Shared config applied to all views. Use `definitions.common_views` (a list of
-  # entries each with `config:` and an optional `dimensions:` filter) — NOT YAML
-  # anchors and `<<:` merge keys. Per-view `config:` blocks override these.
-  # See `/create-multidim` for the full mechanics.
-  common_views:
-    - config:
-        type: LineChart
-        hasMapTab: true
-
-dimensions:
-  - slug: <snake>
-    name: ...
-    presentation:
-      type: dropdown
-    choices:
-      - slug: ...
-        name: ...
-
-views:
-  - dimensions:
-      <dim_slug>: <choice_slug>
-    indicators:
-      y:
-        - catalogPath: <REWRITE THIS to <ns>/<date>/<short>#<indicator>>
-          display:
-            colorScaleNumericBins: ...
-    config:
-      # Only per-view overrides here. Common stuff lives in definitions.common_views.
-      title: ...
-```
-
-`<short>.py`:
-
-```python
-"""Load grapher dataset and create an explorer tsv file."""
-
-from etl.helpers import PathFinder
-
-paths = PathFinder(__file__)
-
-
-def run() -> None:
-    config = paths.load_collection_config()
-    c = paths.create_collection(
-        config=config,
-        short_name="<short-with-hyphens>",  # explorer slug; hyphens, not underscores
-        explorer=True,
-    )
-    c.save(tolerate_extra_indicators=True)
-```
-
-### 7. DAG
-
-`dag/<ns>.yml`:
-
-```yaml
-data://meadow/<ns>/<date>/<short>:
-  - snapshot://<ns>/<date>/<short>.csv
-data://garden/<ns>/<date>/<short>:
-  - data://meadow/<ns>/<date>/<short>
-data://grapher/<ns>/<date>/<short>:
-  - data://garden/<ns>/<date>/<short>
-export://explorers/<ns>/latest/<short>:
-  - data://grapher/<ns>/<date>/<short>
-```
-
-### 8. Verify
-
-Hand off to the user:
-1. `.venv/bin/etls <ns>/<date>/<short>.csv` (snapshot — only if not already uploaded).
-2. `.venv/bin/etlr export://explorers/<ns>/latest/<short>` — runs the chain end-to-end.
-3. Diff the resulting TSV against `owid-grapher/explorers/<slug>.explorer.tsv`. Cosmetic differences acceptable; structural ones (missing views, swapped dimension orderings) are not.
-4. Open `http://staging-site-<branch>/explorers/<slug>` and spot-check.
-5. `make check`.
+If `/create-explorer` was already invoked once and you only need to refine the layout, you don't need it again — edit the YAML directly.
 
 ## Reference: existing migrations
 
-There are no fully CSV-backed explorers in ETL today (fish-stocks is the lone remaining target). For the indicator-based pieces of the workflow, model after:
-
-- `etl/steps/export/explorers/agriculture/latest/crop_yields.{py,config.yml}`
-- `etl/steps/export/explorers/migration/latest/migration_flows.py`
+There are no fully CSV-backed explorers in ETL today (fish-stocks is the lone remaining target). For the indicator-based pieces of the workflow that the export step will lean on, see the reference examples listed in `/create-explorer`.
 
 ## Follow-up
 
