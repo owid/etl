@@ -1,0 +1,19 @@
+meta:
+  origin:
+    title: International Energy Data
+    producer: U.S. Energy Information Administration
+    attribution_short: EIA
+    citation_full: |-
+      U.S. Energy Information Administration (EIA) - International Energy Data (2026).
+    date_accessed: '2026-05-05'
+    # The date_published is written at the beginning of the text file that is generated when uncompressing the .zip file, by a field called "last_updated". It may be fair to assume that the dataset is regularly updated, so we could just use date_accessed for it.
+    date_published: '2026-05-05'
+    url_main: https://www.eia.gov/opendata/bulkfiles.php
+    url_download: https://api.eia.gov/bulk/INTL.zip
+    license:
+      name: Public domain
+      url: https://www.eia.gov/about/copyrights_reuse.php
+outs:
+  - md5: 253348bef092875b266bd4bf63a7a75f
+    size: 25331571
+    path: international_energy.zip

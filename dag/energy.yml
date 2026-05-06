@@ -158,6 +158,18 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   #
+  # EIA - International Energy.
+  #
+  data://meadow/eia/2026-05-05/international_energy:
+    - snapshot://eia/2026-05-05/international_energy.zip
+  #
+  # EIA - International Energy.
+  #
+  data://garden/eia/2026-05-05/international_energy:
+    - data://meadow/eia/2026-05-05/international_energy
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+  #
   # Energy - Energy mix.
   #
   data://garden/energy/2025-06-27/energy_mix:
