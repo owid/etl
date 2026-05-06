@@ -170,6 +170,11 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   #
+  # EIA - International Energy archive (frozen 2022 export of indicators EIA no longer publishes).
+  #
+  data://meadow/eia/2026-05-05/international_energy_archive:
+    - snapshot://eia/2026-05-05/international_energy_archive.zip
+  #
   # Energy - Fossil fuels (EIA International Energy + Statistical Review reserves).
   #
   data://garden/energy/2026-05-05/fossil_fuels:
