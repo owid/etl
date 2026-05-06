@@ -2,8 +2,7 @@ meta:
   origin:
     producer: Jambeck et al.
     title: Plastic waste inputs from land into the ocean
-    description: This dataset accompanies the 2015 Science paper by Jambeck et al. on plastic waste inputs from land into the ocean. It provides estimates of plastic waste generated in coastal countries, the proportion of that waste that is mismanaged, and the resulting quantities of plastic entering the ocean. The analysis covers 192 coastal countries and uses data from 2010 as a baseline, offering both historical context and future projections under different waste management scenarios.
-    citation_full: Jambeck, J. R., Geyer, R., Wilcox, C., Siegler, T. R., Perryman, M., Andrady, A., ... & Law, K. L. (2015). Plastic waste inputs from land into the ocean. Science.
+    citation_full: Jambeck, J. R., Geyer, R., Wilcox, C., Siegler, T. R., Perryman, M., Andrady, A., ... and Law, K. L. (2015). Plastic waste inputs from land into the ocean. Science.
     url_main: http://science.sciencemag.org/content/347/6223/768/
     date_accessed: '2017-11-22'
     date_published: '2015'

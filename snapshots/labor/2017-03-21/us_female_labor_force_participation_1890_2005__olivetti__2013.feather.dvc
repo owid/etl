@@ -1,9 +1,8 @@
 meta:
   origin:
     producer: Olivetti
-    title: US Female Labor Force Participation 1890–2005
-    description: This dataset presents estimates of female labor force participation in the United States from 1890 to 2005, compiled as part of research on the long-run development of the female labor force. The data are drawn from Claudia Olivetti's 2013 NBER working paper examining the American experience in comparative perspective.
-    citation_full: 'Claudia Olivetti (2013). "The Female Labor Force and Long-Run Development: The American Experience in Comparative Perspective." NBER Working Paper No. 19131. National Bureau of Economic Research.'
+    title: US female labor force participation, 1890–2005
+    citation_full: Olivetti, C. (2013). NBER Working Paper No. 19131.
     url_main: http://www.nber.org/papers/w19131.pdf
     date_accessed: '2017-03-21'
     date_published: '2013'
