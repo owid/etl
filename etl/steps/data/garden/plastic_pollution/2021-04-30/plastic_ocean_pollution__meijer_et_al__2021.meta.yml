@@ -1,3 +1,8 @@
+definitions:
+  common:
+    presentation:
+      attribution: Meijer et al. (2021)
+
 dataset:
   title: Plastic ocean pollution (Meijer et al. 2021)
 tables:
@@ -29,26 +34,26 @@ tables:
           name: Plastic waste emitted to the ocean
       probability_of_plastic_being_emitted_to_ocean:
         title: Probability of plastic being emitted to ocean
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Probability of mismanaged plastic waste being emitted to ocean
       share_of_global_mismanaged_plastic_waste:
         title: Share of global mismanaged plastic waste
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Share of global mismanaged plastic waste
       share_of_global_plastics_emitted_to_ocean:
         title: Share of global plastics emitted to ocean
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Share of global plastic waste emitted to the ocean
       share_of_mismanaged_plastic_waste_emitted_to_ocean:
         title: Share of mismanaged plastic waste emitted to ocean
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Share of mismanaged plastic waste that is emitted to the ocean
     dimensions:
