@@ -406,7 +406,12 @@ def combine_collections(
         [d.to_dict() for d in dimensions],
         cconfig.get("dimensions", []),
     )
-    cconfig["views"] = views
+    # Hand-listed YAML views (from the user's config) belong here — alongside the views
+    # accumulated from sub-collections. Sub-collection views are View instances; YAML views
+    # are dicts. `create_collection_from_config` (via Explorer.from_dict / Collection.from_dict)
+    # accepts both shapes.
+    yaml_views = cconfig.get("views") or []
+    cconfig["views"] = views + list(yaml_views)
 
     # Create the combined collection
     combined = create_collection_from_config(

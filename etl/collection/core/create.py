@@ -114,6 +114,11 @@ def create_collection(
             # Single dict (or None): don't pass to sub-collections.
             choice_renames_ = [None] * num_tables
 
+        # Hand-listed YAML views belong to the combined collection, not to each sub-collection
+        # — applying them per-table would duplicate them and `combine_collections` would
+        # reject the duplicate. Strip them here and re-attach during combine via `config_yaml`.
+        sub_config = {**config_yaml, "views": []}
+
         # Create collections for each table.
         collections = []
         indicator_as_dimension_ = False
@@ -122,7 +127,7 @@ def create_collection(
                 indicator_as_dimension_ = True
 
             c = create_collection_single_table(
-                config_yaml=config_yaml,
+                config_yaml=sub_config,
                 dependencies=dependencies,
                 catalog_path=catalog_path,
                 tb=tb[i],

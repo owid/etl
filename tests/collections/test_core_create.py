@@ -1064,3 +1064,57 @@ class TestCreateCollectionMultipleTables:
                 assert choice_female.name == "Female"
 
                 assert result == mock_final_collection
+
+    def test_create_collection_multiple_tables_strips_yaml_views(self):
+        """Hand-listed YAML views must be stripped from the config passed to each
+        sub-collection — otherwise they'd be added to every sub-collection and
+        ``combine_collections`` would reject the resulting duplicates. The original
+        YAML config (with views) is still forwarded to ``combine_collections``, where
+        those views are merged into the final combined collection.
+        """
+        config = create_test_config()
+        # Add a hand-listed view in the YAML; the user expects this view to end up
+        # in the *combined* collection only.
+        config["views"] = [
+            {
+                "dimensions": {"country": "usa"},
+                "indicators": {"y": [{"catalogPath": "manual_view#stages"}]},
+            },
+        ]
+        dependencies = {"test#indicator1", "test#indicator2"}
+        catalog_path = "test/latest/data#table"
+        tables = create_multiple_test_tables()
+
+        with patch("etl.collection.core.create.create_collection_single_table") as mock_single:
+            with patch("etl.collection.core.create.combine_collections") as mock_combine:
+                mock_single.side_effect = [Mock(spec=Collection), Mock(spec=Collection)]
+                mock_combine.return_value = Mock(spec=Collection)
+
+                create_collection(
+                    config_yaml=config,
+                    dependencies=dependencies,
+                    catalog_path=catalog_path,
+                    tb=tables,
+                    indicator_names=[["deaths"], ["cases"]],
+                )
+
+                # Each sub-collection received a config with views: []
+                assert mock_single.call_count == 2
+                for call in mock_single.call_args_list:
+                    sub_cfg = call[1]["config_yaml"]
+                    assert sub_cfg["views"] == [], (
+                        f"YAML views were not stripped from sub-collection config: {sub_cfg['views']}"
+                    )
+
+                # The original YAML config (with views populated) was forwarded to
+                # combine_collections so the views can be re-attached to the final
+                # combined collection.
+                combine_call = mock_combine.call_args
+                forwarded_cfg = combine_call[1]["config"]
+                assert forwarded_cfg["views"] == config["views"], (
+                    "combine_collections did not receive the original YAML views"
+                )
+
+                # The user's input config object must not have been mutated.
+                assert len(config["views"]) == 1
+                assert config["views"][0]["indicators"]["y"][0]["catalogPath"] == "manual_view#stages"
