@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Environmental impacts of food
+    description: |-
+      This dataset quantifies the environmental impacts of 57,000 food products across retailers in the UK. It expands on previous analyses which quantify the environmental impacts of individual commodities, to quantify the impacts of products with multiple ingredients.
+
+      To do this, it uses the environmental footprints of commodities from the largest meta-analysis to date (Poore and Nemecek, 2018) and ingredient lists for specific products to calculate the total footprint of each product. For example, calculating the impact of 'Spaghetti Bolognese' would combine the impacts of the ingredients – pasta, minced beef, sauce, and any additional ingredients – in their weighted ratios.
+
+      The raw, underlying dataset has footprint data for 57,000 products. Our World in Data has combined these products into higher-level categories. For example, 'Steak pie' or 'Pizza' or 'Soy milk'. To do this, we have calculated the average across the relevant products that fall into this category.
+    date_published: "2022-08-08"
+    title_snapshot: Environmental impacts of food (curated by Our World in Data)
+    description_snapshot: |-
+      This is the curated 211-product roll-up that Our World in Data publishes from Clark et al. (2022). It groups the underlying ~57,000 retail products into higher-level food categories (e.g. "Steak pie", "Pizza", "Soy milk") by averaging across the products in each category, and reports five environmental impact metrics per product (greenhouse gas emissions, land use, freshwater withdrawals, scarcity-weighted water use, eutrophication, and biodiversity loss) in four functional units (per kilogram, per 1000 kilocalories, per 100 grams of protein, per 100 grams of fat).
+
+    # Citation
+    producer: Clark et al.
+    citation_full: |-
+      Clark, M., Springmann, M., Rayner, M., Scarborough, P., Hill, J., Tilman, D., Macdiarmid, J. I., Fanzo, J., Bandy, L., & Harrington, R. A. (2022). Estimating the environmental impacts of 57,000 food products. Proceedings of the National Academy of Sciences, 119(33), e2120584119.
+    attribution_short: Clark et al. (2022)
+
+    # Files
+    url_main: https://www.pnas.org/doi/full/10.1073/pnas.2120584119
+    url_download: https://raw.githubusercontent.com/owid/owid-datasets/master/datasets/Environmental%20impacts%20of%20food%20%28Clark%20et%20al.%202022%29/Environmental%20impacts%20of%20food%20%28Clark%20et%20al.%202022%29.csv
+    date_accessed: "2026-05-06"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 0e993eb1f17abeab12f9eb8e06cf3b35
+    size: 96191
+    path: environmental_impacts_of_food_clark_et_al_2022.csv

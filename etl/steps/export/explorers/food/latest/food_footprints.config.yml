@@ -1,0 +1,130 @@
+config:
+  explorerTitle: Environmental Impacts of Food
+  explorerSubtitle: Explore the land use, carbon, and water footprints of food products.
+  isPublished: true
+  hasMapTab: false
+  hideAlertBanner: true
+  hideAnnotationFieldsInTitle: true
+  entityType: food
+  thumbnail: https://assets.ourworldindata.org/uploads/2022/08/Env-Impacts-of-Food-Data-Explorer.png
+  wpBlockId: "52428"
+  subNavId: explorers
+  subNavCurrentId: food-footprints
+  selection:
+    - Almonds
+    - Bacon
+    - Bananas
+    - Beans
+    - Beef (beef herd)
+    - Beef (dairy herd)
+    - Beefburger
+    - Cheese
+    - Cow's milk
+    - Eggs
+    - Lamb & Mutton
+    - Maize
+    - Milk
+    - Peas
+    - Penne pasta
+    - Pig Meat
+    - Pizza
+    - Poultry Meat
+    - Prawns (farmed)
+    - Rice
+    - Steak pie
+    - Tofu
+    - Tomatoes
+    - Vegetable lasagne
+    - Wheat & Rye
+
+dimensions:
+  - slug: view_type
+    name: Commodity or Specific Food Product
+    presentation:
+      type: radio
+    choices:
+      - slug: commodity
+        name: Commodity
+      - slug: specific_food_product
+        name: Specific food products
+  - slug: impact
+    name: Environmental Impact
+    presentation:
+      type: dropdown
+    choices:
+      - slug: carbon
+        name: Carbon footprint
+      - slug: land_use
+        name: Land use
+      - slug: water
+        name: Water use
+      - slug: water_scarcity
+        name: Scarcity-weighted water use
+      - slug: eutrophication
+        name: Eutrophication
+      - slug: all_impacts
+        name: All impacts (facet)
+  - slug: unit
+    name: Kilogram / Protein / Calories
+    presentation:
+      type: dropdown
+    choices:
+      - slug: per_kg
+        name: Per kilogram
+      - slug: per_100g_protein
+        name: Per 100 grams of protein
+      - slug: per_1000kcal
+        name: Per 1000 kilocalories
+      - slug: per_100g_fat
+        name: Per 100 grams of fat
+      - slug: compare_units
+        name: Compare nutritional units
+  - slug: by_stage
+    name: By stage of supply chain
+    presentation:
+      type: checkbox
+      choice_slug_true: stages
+    choices:
+      - slug: combined
+        name: ""
+      - slug: stages
+        name: By stage of supply chain
+
+# Most views are produced by `paths.create_collection(tb=[tb_poore, tb_clark], ...)` and
+# `c.group_views(...)` in food_footprints.py. The single hand-listed view below is the
+# 8-indicator lifecycle-stage stacked bar — it draws from a third dataset
+# (food_emissions_by_life_cycle_stage) and doesn't fit the auto-expansion shape.
+views:
+  - dimensions:
+      view_type: commodity
+      impact: carbon
+      unit: per_kg
+      by_stage: stages
+    indicators:
+      # Per-indicator colors mirror the legacy chart (grapher id 4986). Set per-view
+      # here rather than upstream because the indicators don't carry display.color.
+      y:
+        - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_land_use
+          display:
+            color: "#578145"
+        - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_farm
+          display:
+            color: "#bc8e5a"
+        - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_animal_feed
+          display:
+            color: "#f37104"
+        - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_processing
+          display:
+            color: "#004d84"
+        - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_transport
+          display:
+            color: "#c45267"
+        - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_retail
+          display:
+            color: "#f1dc19"
+        - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_packaging
+          display:
+            color: "#939597"
+        - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_losses
+          display:
+            color: "#c4b4b6"

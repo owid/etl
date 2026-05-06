@@ -1,25 +1,28 @@
 ---
 name: migrate-explorer-indicator-legacy
 description: >-
-  Migrate a legacy ETL explorer step to the modern
-  `export://explorers/<ns>/latest/<short>` shape that uses
-  `paths.create_collection(explorer=True)`. Covers two legacy shapes: (A)
-  `data://explorers/<ns>/<v>/<short>` steps that write wide CSV tables for the
-  legacy explorer infra (e.g. poverty_inequality, lis, wid, wb, emdat,
-  monkeypox); (B) `export://explorers/<ns>/latest/<short>` steps that already
-  exist but build the TSV programmatically via
+  Modernize an explorer step that already exists in this repo but doesn't use
+  the YAML-driven `paths.create_collection(explorer=True)` API yet. Covers two
+  legacy shapes: (A) `data://explorers/<ns>/<v>/<short>` steps that write wide
+  CSV tables for the legacy explorer infra (e.g. poverty_inequality, lis, wid,
+  wb, emdat, monkeypox); (B) `export://explorers/<ns>/latest/<short>` steps
+  that already exist but build the TSV programmatically via
   `paths.create_explorer_legacy(df_graphers, df_columns)` (minerals,
-  air_pollution, migration/2024-08-05,
-  minerals_supply_and_demand_prospects). Trigger when the user says "migrate
-  indicator-legacy explorer <short>", "convert create_explorer_legacy to
-  create_collection", or "move data://explorers/... to export://explorers/...".
+  air_pollution, migration/2024-08-05, minerals_supply_and_demand_prospects).
+  This skill extracts the dimensions/views/config from the legacy shape and
+  hands them to `/create-explorer` to write the modern step. Trigger when the
+  user says "migrate indicator-legacy explorer <short>", "convert
+  create_explorer_legacy to create_collection", or "move data://explorers/...
+  to export://explorers/...".
 metadata:
   internal: true
 ---
 
-# Migrate a Legacy ETL Explorer Step to YAML-driven `create_collection`
+# Modernize a Legacy ETL Explorer Step
 
-Modernize an explorer step that already exists in this repo but doesn't use the YAML-driven `paths.create_collection(explorer=True)` API yet. After this skill the step lives at `export://explorers/<ns>/latest/<short>`, is configured by `<short>.config.yml`, and the legacy shape is archived.
+Take an explorer step that already lives in this repo but uses the old DataFrame-driven plumbing, extract the dimensions/views/config, and hand off to `/create-explorer` to write the modern YAML-driven step. Then archive the legacy code.
+
+> **Scope of this skill:** identifying which legacy shape you have, reading the legacy code, mapping its DataFrames into the dimension/view structure that `/create-explorer` consumes, and archiving the old step. The export-step authoring (Python skeleton, YAML schema, full-YAML vs table-driven, FAUST upstream, post-processing, DAG, verification) lives in `/create-explorer`. Don't duplicate that content here.
 
 ## Inputs
 
@@ -27,9 +30,9 @@ Required:
 - The legacy step path. Either:
   - **Pattern A** — `etl/steps/data/explorers/<ns>/<v>/<short>.py` (writes wide CSV tables under `data://explorers/...`); or
   - **Pattern B** — `etl/steps/export/explorers/<ns>/<v>/<short>.py` that calls `paths.create_explorer_legacy(...)`.
-- Target `<ns>` and `<short>` for the new step (Python uses snake_case; explorer slug keeps hyphens).
+- Target `<ns>` and `<short>` for the new step.
 
-> **Not covered:** explorers that don't have any ETL step yet (e.g. `plastic-pollution`, `conflict-data`, `conflict-data-source`, `countries-in-conflict-data` referenced in umbrella issue #6014). For those use `migrate-explorer-grapher` (their TSVs reference indicator IDs and need fresh authoring as YAML, not modernization of an existing step).
+> **Not covered:** explorers that don't have any ETL step yet (e.g. `plastic-pollution`, `conflict-data`, `conflict-data-source`, `countries-in-conflict-data` referenced in umbrella issue #6014). For those use `/migrate-explorer-grapher` (their TSVs reference indicator IDs and need fresh authoring as YAML, not modernization of an existing step).
 
 ## Step 0 — Identify which pattern you have
 
@@ -48,7 +51,7 @@ grep -l create_explorer_legacy etl/steps/export/explorers/ -r
 
 The two patterns share the destination (`export://explorers/<ns>/latest/<short>` with YAML config) but differ in starting state.
 
-## Pattern B workflow (most common today — `create_explorer_legacy` → `create_collection`)
+## Pattern B workflow (most common today)
 
 The legacy step builds two pandas DataFrames programmatically:
 - `df_graphers` — one row per view, with dimension columns (`<Name> Dropdown` / `<Name> Radio` / `<Name> Checkbox`), `yVariableIds` (or catalog-path strings), and per-view chart settings (`hasMapTab`, `minTime`, `yAxisMin`, `defaultView`, …).
@@ -62,86 +65,49 @@ Identify:
 - Static settings that go to `config:` (title, subtitle, selection, isPublished, hasMapTab, …).
 - The list of dimensions and their choices (the columns in `df_graphers` that end with `Dropdown`/`Radio`/`Checkbox`, and the unique values per column).
 - The mapping from (dimension choices) → (catalog path, per-view config). This is the bulk of the legacy code.
-- Any post-processing that's hard to express in YAML (e.g. sorting choices, setting per-metric display defaults, conditional `hasMapTab=False`). Keep this as Python.
+- Any post-processing that's hard to express in YAML (e.g. sorting choices, setting per-metric display defaults, conditional `hasMapTab=False`). Worth noting so it can be ported as Python in the new step.
 
-### 2. Decide between full-YAML and table-driven
+### 2. Map the legacy DataFrames to the explorer YAML structure
 
-This decision is shared with the other migration skills. **Read `.claude/docs/explorer-programmatic-construction.md`** for the full discussion: when to go programmatic, the API contract for `tb[col].m.dimensions` and `paths.create_collection(tb=tb, ...)`, FAUST migration up to `presentation.grapher_config` in garden metadata, post-processing with `sort_choices` / `group_views`, and pitfalls.
-
-For Pattern B specifically: the legacy `df_graphers`/`df_columns` plumbing maps onto either form, but a legacy step that already builds dimensions from a multidim grapher dataset (rather than hand-stitching variable IDs) is usually a clean fit for table-driven. If many of the legacy views are multi-indicator already, you'll either keep them in YAML or rebuild them via `c.group_views(...)` after the auto-expansion.
-
-### 3. Scaffold the new step
-
-```bash
-mkdir -p etl/steps/export/explorers/<ns>/latest
-```
-
-`<short>.py` (full-YAML variant):
-
-```python
-"""Load grapher dataset and create an explorer tsv file."""
-
-from etl.helpers import PathFinder
-
-paths = PathFinder(__file__)
-
-
-def run() -> None:
-    config = paths.load_collection_config()
-    c = paths.create_collection(
-        config=config,
-        short_name="<short-with-hyphens>",
-        explorer=True,
-    )
-    # Optional Python post-processing for things YAML can't express:
-    # - c.sort_choices({"<dim_slug>": lambda x: sorted(x)})
-    # - per-view display tweaks looping over c.views
-    c.save(tolerate_extra_indicators=True)
-```
-
-`<short>.py` (table-driven variant):
-
-```python
-def run() -> None:
-    config = paths.load_collection_config()
-    ds = paths.load_dataset("<grapher_dataset>")
-    tb = ds.read("<table>", load_data=False)
-
-    c = paths.create_collection(
-        config=config,
-        tb=tb,
-        indicator_names=[...],            # restrict to relevant indicators
-        dimensions=["<dim_a>", "<dim_b>"],
-        common_view_config={...},         # shared per-view config
-        short_name="<short-with-hyphens>",
-        explorer=True,
-    )
-    c.save(tolerate_extra_indicators=True)
-```
-
-### 4. Translate the legacy DataFrames to `<short>.config.yml`
-
-| Legacy code | Goes to |
+| Legacy code | Where it goes |
 |---|---|
 | `config = {...}` dict in legacy `run()` | top-level `config:` block in YAML |
 | `df_graphers["<Name> Dropdown"]` unique values | one entry under `dimensions:` (slug = snake-case of `<Name>`, presentation type = dropdown/radio/checkbox) |
 | Each row of `df_graphers` | one entry under `views:` with `dimensions:` map and `indicators.y[].catalogPath` |
-| Per-row `hasMapTab`, `minTime`, `yAxisMin`, `defaultView`, `type`, … | `view.config` (or hoist into a `definitions: &common_view_config` if shared) |
+| Per-row `hasMapTab`, `minTime`, `yAxisMin`, `defaultView`, `type`, … | `view.config` (or factored into `definitions.common_views` if shared across many views) |
 | Per-row `title`/`subtitle`/`note` for single-indicator views | Prefer `presentation.grapher_config` in the indicator's garden metadata; only put in `view.config` if the view has multiple indicators or the text genuinely differs from the indicator's metadata |
 | `df_columns` rows | `view.indicators.y[].display` (per-view, per-indicator) |
-| Loops setting `display` on every "Production" view, etc. | Either fold into YAML (DRY via anchors) or keep as Python post-processing |
+| Loops setting `display` on every "Production" view, etc. | Either fold into `definitions.common_views` (with a dimension filter) or keep as Python post-processing on `c.views` |
 
-### 5. DAG
+A legacy step that already builds dimensions from a multidim grapher dataset (rather than hand-stitching variable IDs) is usually a clean fit for the table-driven variant in `/create-explorer`. If many of the legacy views are multi-indicator already, you'll either keep them in YAML or rebuild them via `c.group_views(...)` after auto-expansion (see `/create-explorer` Step 6).
 
-In `dag/<ns>.yml`, change the existing `export://explorers/<ns>/<v>/<short>:` block to point to the new version (typically `latest/`) — the dependencies (the upstream `data://grapher/...`) usually stay the same.
+### 3. Hand off to `/create-explorer`
 
-If the version is changing (`<v>` → `latest`), move the old block to `dag/archive/<ns>.yml` and update any consumers.
+Invoke `/create-explorer` with:
+- the top-level `config:` settings extracted in step 1
+- the dimensions list (slugs, names, presentation types, choices)
+- the views list (per-view dimension tuples + catalogPaths + per-view config overrides)
+- any post-processing requirements you flagged in step 1 (`sort_choices`, custom display loops)
+- the upstream `data://grapher/...` deps for the DAG entry — same as the legacy step's deps in `dag/<ns>.yml`
 
-### 6. Archive the legacy step
+### 4. DAG
+
+In `dag/<ns>.yml`, the `/create-explorer` skill writes the new `export://explorers/<ns>/latest/<short>:` block. You then need to:
+
+- If a previous `export://explorers/<ns>/<v>/<short>:` block existed (Pattern B with non-`latest` version), move it to `dag/archive/<ns>.yml`.
+- For Pattern A: also remove the legacy `data://explorers/<ns>/<v>/<short>:` block from `dag/<ns>.yml` and move it to `dag/archive/`. Find any consumers (`grep -rn 'data://explorers/<ns>/<v>/<short>' dag/`) and update them.
+
+### 5. Archive the legacy step
 
 ```bash
+# Pattern B
 mkdir -p etl/steps/archive/export/explorers/<ns>/<v>/
 git mv etl/steps/export/explorers/<ns>/<v>/<short>.py etl/steps/archive/export/explorers/<ns>/<v>/
+
+# Pattern A (also archive the wide-CSV writer)
+mkdir -p etl/steps/archive/data/explorers/<ns>/<v>/
+git mv etl/steps/data/explorers/<ns>/<v>/<short>.py etl/steps/archive/data/explorers/<ns>/<v>/
+# plus any sibling YAMLs under that dir
 ```
 
 ## Pattern A workflow (`data://explorers/<ns>/<v>/<short>` writing wide CSVs)
@@ -163,9 +129,9 @@ def run() -> None:
 
 ### 2. Read the live explorer TSV
 
-`owid-grapher/explorers/<short>.explorer.tsv` defines dimensions, views, and per-indicator display configs. Use the same translation strategy as `migrate-explorer-grapher`:
+`owid-grapher/explorers/<short>.explorer.tsv` defines dimensions, views, and per-indicator display configs. Use the same translation strategy as `/migrate-explorer-grapher` step 4:
 
-- Settings rows → top-level `config:` block in the new YAML.
+- Settings rows → top-level `config:` block.
 - `graphers` table → `views:` (one per row).
 - `columns` table → per-view `indicators[*].display`.
 
@@ -175,28 +141,13 @@ Each `tableSlug`/column reference in the live TSV corresponds to one wide-CSV co
 
 If indicators don't exist as separate grapher columns (e.g. the legacy CSV had a custom pivoted shape), you may need to either expose them in the upstream grapher step, or keep a thin "explorer table" grapher dataset.
 
-### 4. Scaffold, configure, and DAG-wire
+### 4. Hand off to `/create-explorer`, then archive
 
-Same as Pattern B steps 3–5, except DAG changes are heavier:
-- **Add** `export://explorers/<ns>/latest/<short>:` with the upstream grapher datasets as deps.
-- **Find consumers** of `data://explorers/<ns>/<v>/<short>` (search `dag/*.yml`). Update them to point at the new export step or remove if no longer needed.
-- **Move** the legacy `data://explorers/<ns>/<v>/<short>` block into `dag/archive/<ns>.yml`.
-
-### 5. Archive
-
-```bash
-mkdir -p etl/steps/archive/data/explorers/<ns>/<v>/
-git mv etl/steps/data/explorers/<ns>/<v>/<short>.py etl/steps/archive/data/explorers/<ns>/<v>/
-# plus any sibling YAMLs
-```
+Same as Pattern B steps 3–5.
 
 ## Verify (both patterns)
 
-Hand off to the user:
-1. `.venv/bin/etlr export://explorers/<ns>/latest/<short>` — runs the new step.
-2. Diff the resulting TSV against the live `owid-grapher/explorers/<short>.explorer.tsv` (Pattern A) or against the previously published TSV in MySQL `explorers.config` (Pattern B). The Wizard's `apps/wizard/app_pages/explorer_diff/` page does this comparison interactively for staging vs production.
-3. Open `http://staging-site-<branch>/explorers/<short>` and spot-check: default view, dimension switches, map tab, picker columns, country selection.
-4. `make check`.
+Hand off to the user the verification commands per `/create-explorer` Step 8. For Pattern A specifically, also confirm the legacy `data://explorers/...` step is no longer being built (DAG-wise) and the live TSV in `owid-grapher/` is no longer being read by the rendered explorer.
 
 ## Reference: existing migrations
 
@@ -206,4 +157,4 @@ Hand off to the user:
 
 ## Follow-up
 
-Once the explorer is on `create_collection(explorer=True)`, it's a candidate for the Track-B port to MDIM (`export://multidim/...`) once feature parity is reached. See umbrella issue #6014.
+Once on `create_collection(explorer=True)`, the explorer is a candidate for the Track-B port to MDIM (`export://multidim/...`) once feature parity is reached. See umbrella issue #6014.
