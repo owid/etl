@@ -106,19 +106,16 @@ IMPACT_TITLE = {
     "land_use": "Land use",
     "water": "Freshwater withdrawals",
     "water_scarcity": "Scarcity-weighted water use",
-    "eutrophication": "Eutrophication",
+    "eutrophication": "Eutrophying emissions",
 }
 
+# carbon and eutrophication subtitles don't vary by unit in production. The other three
+# (land_use, water, water_scarcity) need a per-unit suffix and are templated in `_subtitle`.
 IMPACT_SUBTITLE = {
     "carbon": (
         "[Greenhouse gas emissions](#dod:ghgemissions) are measured in kilograms of "
         "[carbon dioxide-equivalents](#dod:carbondioxideequivalents). Non-CO₂ gases are "
         "weighted by the warming they cause over 100 years."
-    ),
-    "land_use": "Land use is measured in square meters (m²) per year.",
-    "water": "Freshwater withdrawals are measured in liters.",
-    "water_scarcity": (
-        "Scarcity-weighted water use represents freshwater use weighted by local water scarcity. Measured in liters."
     ),
     "eutrophication": (
         "Eutrophying emissions represent runoff of excess nutrients into ecosystems. "
@@ -126,18 +123,12 @@ IMPACT_SUBTITLE = {
     ),
 }
 
-UNIT_PHRASE = {
-    "per_kg": "per kilogram of food",
-    "per_100g_protein": "per 100 grams of protein",
-    "per_1000kcal": "per 1000 kilocalories",
-    "per_100g_fat": "per 100 grams of fat",
+UNIT_NOUN = {
+    "per_kg": "kilogram of food product",
+    "per_100g_protein": "100 grams of protein",
+    "per_1000kcal": "1000 kilocalories",
+    "per_100g_fat": "100 grams of fat",
 }
-
-POORE_CITATION = (
-    "Joseph Poore and Thomas Nemecek (2018). "
-    "Reducing food's environmental impacts through producers and consumers. Science."
-)
-CLARK_CITATION = "Michael Clark et al (2022). Estimating the environmental impacts of 57,000 food products. PNAS."
 
 
 def _dim(view, key):
@@ -155,15 +146,16 @@ def _title(view) -> str:
     if by_stage == "stages":
         return "Food: greenhouse gas emissions across the supply chain"
     if impact == "all_impacts":
-        return f"Environmental impacts of food {UNIT_PHRASE[unit]}"
+        return f"Environmental impacts of food per {UNIT_NOUN[unit]}"
     if unit == "compare_units":
         return f"{IMPACT_TITLE[impact]} of food products"
-    return f"{IMPACT_TITLE[impact]} {UNIT_PHRASE[unit]}"
+    return f"{IMPACT_TITLE[impact]} per {UNIT_NOUN[unit]}"
 
 
 def _subtitle(view) -> str | None:
     by_stage = _dim(view, "by_stage")
     impact = _dim(view, "impact")
+    unit = _dim(view, "unit")
     if by_stage == "stages":
         return (
             "[Greenhouse gas emissions](#dod:ghgemissions) are measured in kilograms of "
@@ -171,17 +163,27 @@ def _subtitle(view) -> str | None:
         )
     if impact == "all_impacts":
         return None
-    return IMPACT_SUBTITLE.get(impact)
+    if impact in IMPACT_SUBTITLE:
+        return IMPACT_SUBTITLE[impact]
+    # land_use, water, water_scarcity vary by unit. compare_units mixes units, so the
+    # per-unit suffix doesn't apply — match prod by leaving these blank.
+    if unit == "compare_units":
+        return None
+    noun = UNIT_NOUN[unit]
+    if impact == "land_use":
+        return f"Land use is measured in meters squared (m²) per year, per {noun}."
+    if impact == "water":
+        return f"Freshwater withdrawals are measured in liters per {noun}."
+    if impact == "water_scarcity":
+        return (
+            "Scarcity-weighted water use represents freshwater use weighted by local water scarcity. "
+            f"This is measured in liters per {noun}."
+        )
+    return None
 
 
 def _chart_type(view) -> str:
     return "StackedDiscreteBar" if _dim(view, "by_stage") == "stages" else "DiscreteBar"
-
-
-def _source_desc(view) -> str:
-    if _dim(view, "by_stage") == "stages":
-        return POORE_CITATION
-    return CLARK_CITATION if _dim(view, "view_type") == "specific_food_product" else POORE_CITATION
 
 
 # ---------------------------------------------------------------------------
@@ -290,10 +292,8 @@ def run() -> None:
     c.set_global_config(
         {
             "type": _chart_type,
-            "baseColorScheme": "owid-distinct",
             "title": _title,
             "subtitle": _subtitle,
-            "sourceDesc": _source_desc,
         }
     )
 
