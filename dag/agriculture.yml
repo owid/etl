@@ -34,12 +34,12 @@ steps:
   # NOTE: Not updateable.
   #
   data://meadow/agriculture/2024-05-23/floud_et_al_2011:
-  - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_europe.csv
-  - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_us.csv
-  #
-  # Harris et al. (2015) - Daily calories in England and Wales, according to various studies.
-  # NOTE: Not updateable.
-  #
+    - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_europe.csv
+    - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_us.csv
+    #
+    # Harris et al. (2015) - Daily calories in England and Wales, according to various studies.
+    # NOTE: Not updateable.
+    #
   data://meadow/agriculture/2024-05-23/harris_et_al_2015:
     - snapshot://agriculture/2024-05-23/harris_et_al_2015.csv
   #
@@ -235,3 +235,11 @@ steps:
   #
   export://explorers/agriculture/latest/food_prices:
     - data://grapher/wb/2025-08-04/food_prices_for_nutrition
+  #
+  # Fertilizers explorer.
+  #
+  export://explorers/agriculture/latest/fertilizers:
+    - data://grapher/faostat/2026-02-25/faostat_rfn
+    - data://grapher/faostat/2026-02-25/additional_variables
+    - data-private://grapher/agriculture/2014/excess_fertilizers__west_et_al__2014
+    - data-private://grapher/agriculture/2014-01-01/nitrogen_efficiency__lassaletta_et_al__2014

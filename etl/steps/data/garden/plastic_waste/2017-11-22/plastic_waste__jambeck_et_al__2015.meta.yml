@@ -1,3 +1,8 @@
+definitions:
+  common:
+    presentation:
+      attribution: Jambeck et al. (2015)
+
 dataset:
   title: Plastic Waste - Jambeck et al. (2015)
 tables:
@@ -5,7 +10,7 @@ tables:
     variables:
       coastal_population:
         title: Coastal population
-        unit: ''
+        unit: ""
       inadequately_managed_plastic_waste:
         title: Inadequately managed plastic waste
         unit: kilograms per day
@@ -34,10 +39,10 @@ tables:
         unit: kilograms per day
       share_of_plastic_inadequately_managed:
         title: Share of plastic inadequately managed
-        unit: '%'
+        unit: "%"
       share_of_plastics_in_waste_stream:
         title: Share of plastics in waste stream
-        unit: '%'
+        unit: "%"
       total_mismanaged_plastic_waste_in_2010:
         title: Total mismanaged plastic waste in 2010
         unit: tonnes
