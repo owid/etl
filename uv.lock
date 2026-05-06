@@ -9,7 +9,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-05-01T23:15:19.598269134Z"
+exclude-newer = "2026-05-03T10:47:57.783579Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -1536,6 +1536,7 @@ dependencies = [
     { name = "openpyxl" },
     { name = "owid-catalog" },
     { name = "owid-datautils" },
+    { name = "owid-owl" },
     { name = "owid-repack" },
     { name = "pandas" },
     { name = "pandas-gbq" },
@@ -1695,6 +1696,7 @@ requires-dist = [
     { name = "openpyxl", specifier = ">=3.0.9" },
     { name = "owid-catalog", editable = "lib/catalog" },
     { name = "owid-datautils", editable = "lib/datautils" },
+    { name = "owid-owl", editable = "lib/owl" },
     { name = "owid-repack", editable = "lib/repack" },
     { name = "pandas", specifier = "==2.2.3" },
     { name = "pandas-gbq", specifier = ">=0.29.2" },
@@ -2435,6 +2437,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/20/18/a746c8344152d368a5aac738d4c857012f2c5d1fd2eac7e17b647a7861bd/googleapis_common_protos-1.74.0.tar.gz", hash = "sha256:57971e4eeeba6aad1163c1f0fc88543f965bb49129b8bb55b2b7b26ecab084f1", size = 151254, upload-time = "2026-04-02T21:23:26.679Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b6/b0/be5d3329badb9230b765de6eea66b73abd5944bdeb5afb3562ddcd80ae84/googleapis_common_protos-1.74.0-py3-none-any.whl", hash = "sha256:702216f78610bb510e3f12ac3cafd281b7ac45cc5d86e90ad87e4d301a3426b5", size = 300743, upload-time = "2026-04-02T21:22:49.108Z" },
+]
+
+[[package]]
+name = "graphviz"
+version = "0.21"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f8/b3/3ac91e9be6b761a4b30d66ff165e54439dcd48b83f4e20d644867215f6ca/graphviz-0.21.tar.gz", hash = "sha256:20743e7183be82aaaa8ad6c93f8893c923bd6658a04c32ee115edb3c8a835f78", size = 200434, upload-time = "2025-06-15T09:35:05.824Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/91/4c/e0ce1ef95d4000ebc1c11801f9b944fa5910ecc15b5e351865763d8657f8/graphviz-0.21-py3-none-any.whl", hash = "sha256:54f33de9f4f911d7e84e4191749cac8cc5653f815b06738c54db9a15ab8b1e42", size = 47300, upload-time = "2025-06-15T09:35:04.433Z" },
 ]
 
 [[package]]
@@ -5432,6 +5443,35 @@ dev = [
     { name = "ty", specifier = "==0.0.26" },
     { name = "watchdog", specifier = ">=2.1.5" },
 ]
+
+[[package]]
+name = "owid-owl"
+version = "0.1.0"
+source = { editable = "lib/owl" }
+dependencies = [
+    { name = "click" },
+    { name = "graphviz" },
+    { name = "owid-catalog" },
+    { name = "pandas" },
+    { name = "pyarrow" },
+    { name = "python-dotenv" },
+    { name = "pyyaml" },
+    { name = "tomli" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "click", specifier = ">=8.0" },
+    { name = "graphviz", specifier = ">=0.21" },
+    { name = "owid-catalog" },
+    { name = "pandas", specifier = ">=2.2" },
+    { name = "prefect", marker = "extra == 'prefect'", specifier = ">=3.0" },
+    { name = "pyarrow", specifier = ">=16.0" },
+    { name = "python-dotenv", specifier = ">=1.0" },
+    { name = "pyyaml", specifier = ">=6.0" },
+    { name = "tomli", specifier = ">=2.0" },
+]
+provides-extras = ["prefect"]
 
 [[package]]
 name = "owid-repack"
