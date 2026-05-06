@@ -244,6 +244,13 @@ The following count as cleanup, not fabrication:
 - Curly quotes / smart quotes → straight quotes; non-breaking spaces → spaces.
 - Trimming OWID-attribution prefixes (`Our World in Data based on X` → `X`).
 - Sentence-casing producer-issued titles per OWID style.
+- Converting HTML in description prose to Markdown — `<a href="URL">text</a>`
+  → `[text](URL)`, `<ul><li>x</li>…</ul>` → `- x` bullet lists, `<br>` → blank
+  line. Grapher renders `origin.description` through a markdown-only path
+  (`SimpleMarkdownText`), so raw HTML survives as escaped text on the chart's
+  Sources tab. The legacy `source.description` flow used a permissive
+  `HtmlOrSimpleMarkdownText` renderer, which is why HTML in legacy descriptions
+  used to render fine — that crutch is gone for origins.
 
 Stop short of writing new content that wasn't implied by the legacy.
 
