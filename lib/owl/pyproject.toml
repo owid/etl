@@ -1,0 +1,29 @@
+[project]
+name = "owid-owl"
+version = "0.1.0"
+description = "A lightweight OWID data pipeline framework that can run alongside the main ETL."
+readme = "owl/README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.0",
+    "graphviz>=0.21",
+    "owid-catalog",
+    "pandas>=2.2",
+    "pyarrow>=16.0",
+    "python-dotenv>=1.0",
+    "pyyaml>=6.0",
+    "tomli>=2.0",
+]
+
+[project.optional-dependencies]
+prefect = ["prefect>=3.0"]
+
+[project.scripts]
+owl = "owl.cli:cli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["owl"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -5,6 +5,7 @@ description = ""
 authors = [{ name = "Our World in Data", email = "tech@ourworldindata.org" }]
 requires-python = ">=3.10, <3.14"
 dependencies = [
+    "owid-owl",
     "click>=8.0.1",
     "PyYAML>=6.0.1",
     "papermill>=2.3.3",
@@ -88,6 +89,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
+owid-owl = { path = "lib/owl", editable = true }
 owid-catalog = { path = "lib/catalog", editable = true }
 owid-datautils = { path = "lib/datautils", editable = true }
 owid-repack = { path = "lib/repack", editable = true }
@@ -161,6 +163,7 @@ wizard = [
 
 [project.scripts]
 etl = 'apps.cli:cli'
+owl = 'owl.cli:cli'
 etlwiz = 'apps.wizard.cli:cli'
 etlr = 'etl.command:main_cli'
 etls = 'etl.snapshot_command:snapshot_cli'
@@ -168,6 +171,12 @@ etlp = 'apps.pr.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 compare = 'etl.compare:cli'
 backport = 'apps.backport.backport:backport_cli'
+
+[tool.owl]
+steps-dir = "owl_steps"
+snapshots-dir = "data/snapshots"
+data-dir = "data"
+default-channel = "garden"
 
 [tool.ruff]
 lint.extend-select = [
