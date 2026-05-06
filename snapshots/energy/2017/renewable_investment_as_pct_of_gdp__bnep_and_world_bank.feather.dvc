@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Various sources
+    producer: Bloomberg New Energy Finance and World Bank
     title: Renewable investment as % of GDP
     description: |-
       Renewable energy investment as a percentage of GDP was calculated based on renewable energy investment figures (measured in US$, from Bloomberg New Energy Finance) and national GDP figures (measured in current US$ from the World Bank) in 2015 for the world's largest ten investors.

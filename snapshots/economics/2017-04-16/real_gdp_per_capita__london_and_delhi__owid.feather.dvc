@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Various sources
+    producer: Maddison Project Database and World Bank
     title: Real GDP per capita, London and Delhi
     description: |-
       The data presented here from 1990 onwards is from the World Bank. It is GDP per capita in 2011 international-$ as published here: http://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD (accessed on April 16, 2017).

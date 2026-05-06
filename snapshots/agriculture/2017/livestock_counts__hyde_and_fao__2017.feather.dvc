@@ -1,7 +1,8 @@
 meta:
   origin:
-    producer: Various sources
+    producer: PBL Netherlands Environmental Assessment Agency and FAO
     title: Livestock counts (HYDE and FAO)
+    attribution_short: HYDE and FAO
     description: |-
       This dataset on livestock counts has been compiled by OWID based on the combination of data from the HYDE database and UN Food and Agricultural Organization (FAO) statistics.
 

@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Various sources
+    producer: Jambeck et al. and World Bank
     title: Plastic waste generation by country
     description: |-
       Data on total national plastic waste generation was calculated by Our World in Data based on per capita plastic waste generation data published in Jambeck et al. (2015), and total population data published in the World Bank, World Development Indicators (available at: https://datacatalog.worldbank.org/dataset/world-development-indicators).

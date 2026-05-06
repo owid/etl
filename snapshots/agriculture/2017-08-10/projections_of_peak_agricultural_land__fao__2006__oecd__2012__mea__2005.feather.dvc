@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Various sources
+    producer: FAO, OECD, and Millennium Ecosystem Assessment
     title: Projections of peak agricultural land
     description: |-
       This dataset combines actual reported trends in global agricultural land area from the UN Food and Agricultural Organization from 1961-2014, with future projections from various sources.

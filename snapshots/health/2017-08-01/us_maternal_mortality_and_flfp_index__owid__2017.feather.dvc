@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Various sources
+    producer: Gapminder and World Bank
     title: US Maternal Mortality and FLFP Index
     description: |-
       The maternal mortality index was calculated by OWID based on maternal mortality data compiled from Gapminder (historical data) and the World Bank (recent data). The original data shows maternal death per 100,000 live births.

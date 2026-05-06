@@ -140,7 +140,13 @@ and a producer-defined name for the slice, default to "they coincide".
 Institution or author(s).
 - One author: `Williams`. Two: `Williams and Jones`. Three or more: `Williams et al.`
 - Prefer well-known acronyms (`NASA`, `FAO`); else the full institution name.
-- For OWID compilations of several distinct raw sources, use `Various sources`.
+- For an OWID compilation, name the producers explicitly when ≤3 are listed in
+  the legacy (e.g. `PBL Netherlands Environmental Assessment Agency and FAO`).
+  Reserve `Various sources` for compilations whose underlying sources are
+  too numerous to enumerate, or where the legacy itself doesn't name them.
+  In either compilation case, consider an `attribution_short` that gives the
+  recognizable shorthand readers see on charts (often the dataset names, e.g.
+  `HYDE and FAO`).
 - Must NOT contain: years, semicolons, `&` (use `and`), `OWID` / `Our World in Data`,
   trailing period (except when value ends `et al.`).
 - Strip OWID-derivation prefixes: `Our World in Data based on X` → `X`.

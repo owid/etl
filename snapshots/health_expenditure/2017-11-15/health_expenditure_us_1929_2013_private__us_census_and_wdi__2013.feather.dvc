@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Various sources
+    producer: US Census Bureau and World Bank
     title: US private health expenditure, 1929–2013
     citation_full: '(a) Historical Statistics of the United States Colonial Times to 1970 (1929–1970); (b) US Census Statistical Abstract 1990 (1970–1990); (c) World Bank WDI (1990–2013).'
     url_main: https://www.census.gov/
