@@ -1,0 +1,88 @@
+title:
+  title: Economic damages from natural disasters
+  title_variant: ""
+default_selection:
+  - World
+topic_tags:
+  - Natural Disasters
+default_dimensions:
+  type: all_stacked
+  timespan: annual
+  # `metric` intentionally omitted: only `share_of_gdp` is currently active in
+  # economic_damages.py:INDICATOR_BY_METRIC, and the framework collapses single-
+  # choice dimensions out of views, so listing `metric` here would fail to match
+  # any view. Re-add `metric: <choice>` if/when `total_damages` is re-enabled.
+dimensions:
+  - slug: type
+    name: Disaster type
+    choices:
+      - slug: all_stacked
+        name: All disasters
+        description: Damages broken down by the disaster type
+        group: Aggregates
+      - slug: all_disasters_excluding_extreme_temperature
+        name: All disasters (excluding extreme temperatures)
+        description: Excludes damages from extreme temperatures, which are very incomplete across regions and over time
+        group: Aggregates
+      - slug: drought
+        name: Droughts
+        description: Damages caused by drought events
+        group: Individual disaster types
+      - slug: earthquake
+        name: Earthquakes
+        description: Damages caused by earthquakes
+        group: Individual disaster types
+      - slug: volcanic_activity
+        name: Volcanoes
+        description: Damages caused by volcanoes
+        group: Individual disaster types
+      - slug: flood
+        name: Floods
+        description: Damages caused by flooding
+        group: Individual disaster types
+      - slug: landslide
+        name: Landslide
+        description: Damages caused by landslides, rockfalls, mudflows, and similar events
+        group: Individual disaster types
+      # Disabled in shared.py — kept here so the choice is ready if re-enabled.
+      # - slug: fog
+      #   name: Fog
+      #   description: Damages caused by fog events
+      #   group: Individual disaster types
+      # - slug: glacial_lake_outburst_flood
+      #   name: Glacial lake outburst floods
+      #   description: Damages caused by glacial lake outburst floods
+      #   group: Individual disaster types
+      - slug: extreme_weather
+        name: Storms
+        description: Damages caused by storms
+        group: Individual disaster types
+      - slug: wildfire
+        name: Wildfires
+        description: Damages caused by wildfires
+        group: Individual disaster types
+      - slug: extreme_temperature
+        name: Extreme temperatures
+        description: Damages caused by extreme hot and cold temperatures
+        group: Individual disaster types
+  - slug: timespan
+    name: Timespan
+    description: Annual figures or decadal average
+    choices:
+      - slug: annual
+        name: Annual
+        description: Better for seeing rarer events with economic damages in every individual year
+      - slug: decadal
+        name: Decadal average
+        description: Better for comparing trends over time as it's less sensitive to one-off events
+  - slug: metric
+    name: Metric
+    description: Damages as a share of GDP
+    choices:
+      - slug: share_of_gdp
+        name: Share of GDP
+        description: Estimated damages as a share of gross domestic product (GDP)
+      # - slug: total_damages
+      #   name: Total damages, in US$
+      #   description: Estimated damages measured in current US$ (not adjusted for inflation)
+views: []

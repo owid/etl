@@ -11,7 +11,9 @@ def process_views(
     combine_metadata_when_mult: bool = False,
 ):
     """Process views in Collection configuration."""
-    # Get table information (table URI) by (i) table name and (ii) dataset_name/table_name
+    # Resolve short-form catalog paths to full paths. Collection.save() does this again
+    # before validation; doing it here too means anything that reads view paths between
+    # create_collection and save sees full paths.
     tables_by_name = get_tables_by_name_mapping(dependencies)
 
     for view in collection.views:

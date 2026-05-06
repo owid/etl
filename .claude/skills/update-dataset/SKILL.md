@@ -34,6 +34,7 @@ Assumptions:
 - [ ] Meadow step: run + fix + diff + summarize
 - [ ] Garden step: run + fix + diff + summarize
 - [ ] Review `sanity_checks` output (enable log flag, re-run, scan log, revert flag) — skip if none found
+- [ ] Country harmonization audit: validate `.countries.json` against canonical regions, audit `.excluded_countries.json`, scan garden log for missing/unused/unknown warnings
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
@@ -42,6 +43,7 @@ Assumptions:
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
 - [ ] Render Slack announcement via `data-updates-comms`, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
+- [ ] Draft public-facing "Data update" post for OWID /latest, add to PR description, hand to user for review and publication
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Ask the user whether to archive the old DAG entries; if yes, move them to `dag/archive/` AND relocate the new entries into the old slot (see "DAG archiving & reordering") — don't forget this step
 - [ ] Hand off Wizard QA links to the user (Anomalist + Chart Diff on the staging branch) — this is the final step
@@ -147,6 +149,106 @@ When you do stop, present a concise summary of the issue and what options exist.
    In either form: if sanity_checks raise `AssertionError` on the new data, stop and decide with the user whether the assertion needs a threshold bump, whether upstream data genuinely broke, or whether the invariant is obsolete. If the check only *logs*, treat a new/expanding set of warnings the same way — they're the signal the sanity check was written to produce.
 
    **Watch for silent-delete patterns.** Some sanity_checks functions also mutate the table — e.g. `world_bank_pip`'s `sanity_checks` drops rows that fail invariants and reports the count via the log-control flag. With the flag off the deletions still happen; the reviewer just never learns which rows disappeared. When reading a sanity_checks function, scan for `drop`, `filter`, `tb = tb[...]` — anything that removes rows — and list every deletion in the PR body, not just the warning counts. If the deletion seems newly applicable to upstream fixes (e.g. the row should no longer be anomalous in the new release), that's a candidate for removing the workaround entirely.
+
+5c) Country harmonization audit
+   Run after the garden step completes (and after 5b if it ran). Verifies that the country mappings consumed by `paths.regions.harmonize_names(...)` are well-formed and surfaces any harmonization warnings the garden run produced. Output: `workbench/<short_name>/harmonization_audit.md`.
+
+   **Modern API.** Garden steps should be calling `paths.regions.harmonize_names(tb, country_col=..., countries_file=..., excluded_countries_file=...)` — the wrapper in `etl/data_helpers/geo.py:1874`. If you find a step still using the deprecated `geo.harmonize_countries(...)` directly, step 1b's `/check-outdated-practices` should already have flagged it; treat that as a separate cleanup. The audit below is API-agnostic — both call sites end up emitting the same three warning strings.
+
+   **Source of truth.** Canonical names come from **two** datasets, both consulted by the harmonizer:
+
+   - `data/garden/regions/2023-01-01/regions` — countries, continents, and OWID-defined aggregates. The runtime authority is `paths.regions.tb_regions["name"]`. This is built from `etl/steps/data/garden/regions/2023-01-01/regions.yml` plus a merge with `regions.codes.csv` and field defaults — **don't parse the YAML in isolation** or you'll miss the legacy entries and produce false positives.
+   - `data/garden/wb/<latest>/income_groups` — the four World Bank income-group aggregates (`High-income countries`, `Upper-middle-income countries`, `Lower-middle-income countries`, `Low-income countries`). OWID treats the **latest** version of this dataset as the official one, so the audit must resolve the version dynamically (don't pin a date — it goes stale when WB publishes a refresh). The names live in the `classification` column of the `income_groups_latest` table.
+
+   The audit's "canonical" set is the union of these two. A `.countries.json` entry looks like `"Source name": "Target name"` — the audit checks that every **target name** (the value the source gets harmonized to) appears in *either* dataset. Anything else is flagged.
+
+   1. **Capture a fresh garden log:**
+      ```bash
+      .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
+          > workbench/<short_name>/harmonization.log 2>&1
+      ```
+
+   2. **Scan the log for the three harmonization warnings.** These are emitted by `etl/data_helpers/geo.py` (excluded list) and `lib/datautils/owid/datautils/dataframes.py` (mapping warnings) — the wording is stable:
+      ```bash
+      rg -n "missing values in mapping\.|unused values in mapping\.|Unknown country names in excluded countries file:" \
+          workbench/<short_name>/harmonization.log
+      ```
+      For each warning, the entity list follows on subsequent lines (because `harmonize_countries()` is called with `show_full_warning=True` by default). Capture them.
+
+   3. **Validate `.countries.json` target names against canonical regions + income groups.** Each entry maps a source name (key) to a target / harmonized name (value); this check looks at the values. For each garden step in this update:
+      ```python
+      import json
+      from pathlib import Path
+      from owid.catalog import Dataset
+
+      # Resolve the canonical regions dataset dynamically (latest built version).
+      # Don't pin a date — when the regions step version advances, a hard-coded path
+      # would validate against a stale catalog and flag valid targets as non-canonical.
+      regions_dirs = sorted(Path("data/garden/regions").glob("*/regions"))
+      if not regions_dirs:
+          raise RuntimeError(
+              "No data/garden/regions/<version>/regions built locally — the audit can't "
+              "run without the canonical regions catalog. Build it first with "
+              "`.venv/bin/etlr data://garden/regions/<latest>/regions --private`."
+          )
+      tb_regions = Dataset(str(regions_dirs[-1]))["regions"]
+      canonical_regions = set(tb_regions["name"].dropna().astype(str))
+
+      # Add OWID's official income-group aggregates to the canonical set, if available.
+      # OWID treats the latest income_groups version as official. This artifact is
+      # often not built locally during a non-income-groups dataset refresh — degrade
+      # gracefully (warn and skip) rather than aborting the audit.
+      ig_dirs = sorted(Path("data/garden/wb").glob("*/income_groups"))
+      if ig_dirs:
+          ds_ig = Dataset(str(ig_dirs[-1]))
+          canonical_income = set(ds_ig["income_groups_latest"]["classification"].dropna().astype(str).unique())
+      else:
+          print(
+              "[WARN] No data/garden/wb/<version>/income_groups built locally — "
+              "skipping income-group enrichment. The four WB income-group aggregates "
+              "(High/Upper-middle/Lower-middle/Low-income countries) may surface as "
+              "'not in canonical' until you build that dataset."
+          )
+          canonical_income = set()
+
+      canonical = canonical_regions | canonical_income
+
+      mapping = json.loads(Path("etl/steps/data/garden/<namespace>/<new_version>/<short_name>.countries.json").read_text())
+      not_in_canonical = sorted({v for v in mapping.values() if v and v not in canonical})
+      print("Targets not in OWID's canonical regions or income groups:", not_in_canonical)
+      ```
+      A non-empty `not_in_canonical` list means the mapping points at entities that aren't registered in either the regions catalog or the income-groups dataset. This isn't automatically a bug — it's a heads-up. **Stop and decide with the user before proceeding** — same pattern as the global "Checkpoints — when to pause" section at the top of this skill. Common causes (in order from "fix" to "accept"): typo, retired alias used as canonical, casing/whitespace mismatch, or a legitimately custom aggregate the source defines that OWID has no equivalent for (e.g. ILO's `" (ILO)"`-suffixed regions, World Bank's `" (WB)"`-suffixed sub-Saharan splits, BRICS, G7, G20). For typos/casing — fix the JSON. For legitimately custom aggregates — accept and note in the PR description that those entities live outside the canonical system and won't merge with population/regions infrastructure. For a real new historical region — add an entry to `regions.yml` in a separate PR.
+
+   4. **Audit `.excluded_countries.json`.** The file is optional; skip if it doesn't exist:
+      ```python
+      excluded_path = Path("etl/steps/data/garden/<namespace>/<new_version>/<short_name>.excluded_countries.json")
+      if excluded_path.exists():
+          excluded = json.loads(excluded_path.read_text())
+          suspicious_canonical = sorted(set(excluded) & canonical)
+          # Also surface continents and aggregates separately for review
+          aggregates = set(tb_regions[tb_regions["region_type"].isin(["continent", "aggregate"])]["name"].dropna().astype(str))
+          suspicious_aggregates = sorted(set(excluded) & aggregates)
+          print("Excluded entries that ARE canonical regions:", suspicious_canonical)
+          print("Excluded entries that are continents/aggregates:", suspicious_aggregates)
+          print("Full excluded list for review:", sorted(excluded))
+      ```
+      `suspicious_canonical` is the actionable signal: each entry is a known country/region that we are dropping. Sometimes this is intentional (e.g. dropping "World" rows because the source double-counts them) — surface, don't auto-fix. **Pause and ask the user** if the list is non-empty. The full list is dumped so the LLM can also eyeball it for entities that aren't in `canonical` but look like real countries (typos, alternative names) we should be mapping rather than dropping.
+
+   5. **Write findings** to `workbench/<short_name>/harmonization_audit.md` with five sections, populated only when non-empty. **Each section must list every flagged entity**, not just a count — counts alone aren't actionable, the user (or you) needs to read the actual names to judge whether each is intentional. For long lists (>20 entries) group by pattern when the grouping is obvious (e.g. ILO's `" (ILO)"`-suffixed regions vs. international orgs vs. derived "World ..." aggregates) so the reviewer can scan categories instead of one flat list. Sections:
+      - `## Missing in mapping` — countries in source data not in `.countries.json` (from log warning #1) — list each missing source name
+      - `## Unused mappings` — `.countries.json` entries the data never used (warning #2) — list each unused source→target pair
+      - `## Unknown excluded entries` — `.excluded_countries.json` entries not present in source data (warning #3) — list each
+      - `## Targets not in OWID's canonical regions or income groups` — target names from `.countries.json` that aren't registered in either dataset (Python check #3) — list each target name and the source names that map to it
+      - `## Excluded entries matching canonical regions` — possible over-exclusion (Python check #4) — list each
+
+   6. **Surface in PR.** If any section was populated, add a collapsed "Harmonization audit" section to the PR description (after the per-step sections, before the Slack announcement) **with the same listings**, not just a summary. Empty sections can be omitted.
+
+   **When you report progress to the user during the workflow, never just give a count — always include the list (or grouped categories) so they can judge in one glance.**
+
+   **Checkpoint summary:**
+   - "Targets not in OWID's canonical regions or income groups" or "Missing in mapping" non-empty ⇒ stop, decide with user.
+   - "Excluded entries matching canonical regions" non-empty ⇒ stop, ask whether each exclusion is intentional.
+   - "Unused mappings" or "Unknown excluded entries" non-empty ⇒ surface in PR description; not a blocker.
 
 6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
    - Skip diff
@@ -336,7 +438,32 @@ When you do stop, present a concise summary of the issue and what options exist.
      ```bash
      gh pr comment <pr_number> --body "@codex review"
      ```
-   - Tell the user: "Slack announcement drafted at `workbench/<short_name>/slack-announcement.md` and added to the PR description. Please review and post it to **#data-updates-comms**."
+   - Tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Slack announcement drafted at [workbench/<short_name>/slack-announcement.md](workbench/<short_name>/slack-announcement.md) and added to the PR description. Please review and post it to #data-updates-comms."` Always render the path as a markdown link `[…](…)`, not as inline-code — the chat UI renders it as clickable that way.
+
+9b) Data update post (for OWID /latest)
+   Draft the short reader-facing post that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest). The team drafts these in **Google Docs** in the shared `/Data updates` Drive folder (`https://drive.google.com/drive/folders/1oL0uLHKI6f2qi1rJA6-qFFRYEBw_-rfm`), and OWID's CMS ingests the doc into the published feed.
+
+   **The skill's job is to produce paste-ready Google Doc content** in the exact CMS format the team uses (frontmatter `title` / `excerpt` / `type` / `authors` / `kicker` → `\[+body\]` marker → body prose with inline markdown links → `{.cta}` block → `{.image}` block → `\[\]` end marker). Don't invent your own format — every published post in the Drive folder follows the same shape.
+
+   This is **separate from the Slack announcement** — that one is a 10-field form for the internal channel; this one is a mini-blog-post for OWID readers, and the format is structured for CMS ingestion.
+
+   Steps:
+   - Open `.claude/skills/update-dataset/data-update-template.md` and follow it — the template has the exact paste-ready format plus three worked examples (NVIDIA, H5N1, World Bank PIP) lifted verbatim from the Drive folder.
+   - Use the facts already gathered in `workbench/<short_name>/update-context.yml` (step 8) — `dataset.title`, `dataset.producer`, `source.url_main`, `source.citation_full`, `coverage.*`, `charts.published_count`, `charts.selected_views`, and the `editorial_context.*` snippet lists. Also pull from `workbench/<short_name>/slack-announcement.md` (step 9 output) — the editorial framing already drafted there is the closest cousin. If a field needed for the post isn't yet in `update-context.yml`, gather it (snapshot DVC, garden `.meta.yml`, or `url_main` via WebFetch) **and persist it back** to the YAML so the next consumer doesn't re-do the work.
+   - **Title shape** — a punchy finding/claim, a question, or an action/invitation. Not just the dataset name. See the template's "Field-by-field guidance" for examples and decision logic.
+   - **Body** — 100–200 words, first-person, conversational. Sample: ATUS ~105, NVIDIA ~140, robots ~110, OECD Government at a Glance ~155, US data centers ~145, UNU-WIDER ~155, World Bank PIP ~190, ozone ~165, mobile money ~180, fertilizers ~170, H5N1 ~135. The body should give a reader a reason to care and at least one concrete number — not "I refreshed our charts".
+   - **Inline markdown links** throughout the body for the producer's page, methodology pages, and related OWID articles. `*italics*` for emphasis, sparingly.
+   - **CTA URL choice**:
+     - One chart focus ⇒ grapher URL `https://ourworldindata.org/grapher/<slug>`.
+     - Multiple charts (default) ⇒ search URL `https://ourworldindata.org/search?datasetProducts=<URL-encoded dataset title>` — value is the **dataset title**, resolved with this priority: (a) the `dataset.title` field in the garden `.meta.yml` if it's set there (an override), otherwise (b) the `meta.origin.title` field in the snapshot `.dvc`. Often includes a parenthetical acronym like `Luxembourg Income Study (LIS)` or `World Bank Poverty and Inequality Platform (PIP)`. **Not** the bare `producer` field.
+     - Topic has an existing OWID explorer ⇒ `https://ourworldindata.org/explorers/<name>`.
+     - Curated topic page exists ⇒ topic URL (e.g. `/sdgs`).
+     - **Do not use** `/collection/custom?charts=…` URLs.
+   - **CTA text** — descriptive: "Explore the updated data in our interactive charts" (default), "Explore all of the updated data in our interactive charts" (broad), "Explore the interactive version of this chart" (single chart), "Explore this data going back to YYYY in our interactive chart" (single chart with date depth).
+   - **Image filename** — `YYYY-MM-data-update-<slug>.png` (e.g. `2026-04-data-update-h5n1-flu.png`). The skill doesn't generate the image; the user adds it to the Doc separately.
+   - Save the draft to `workbench/<short_name>/data-update.md`.
+   - **Add a collapsed `<details>` section titled "Data update post (for OWID /latest)"** to the PR description, placed *after* the Slack-announcement section.
+   - Tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Data update post drafted at [workbench/<short_name>/data-update.md](workbench/<short_name>/data-update.md) in the Google Docs CMS format. Please create a new Google Doc in /Data updates, paste the draft, attach the chart screenshot, and share for review."` Always render `workbench/<short_name>/data-update.md` as a markdown link `[…](…)` rather than as a bare path or inline-code path — the chat UI renders it as clickable that way.
 
 10) Codex review: address comments and resolve threads
    - Wait ~60 seconds after posting `@codex review`, then poll for inline review comments:
@@ -440,9 +567,11 @@ These pages need a fresh staging build, so they're only meaningful after the PR'
 - `workbench/<short_name>/sanity_checks.log` (only if step 5b ran)
 - `workbench/<short_name>/meadow_diff_raw.txt` and `meadow_diff.md`
 - `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`
+- `workbench/<short_name>/harmonization.log` and `harmonization_audit.md` (from step 5c)
 - `workbench/<short_name>/indicator_upgrade.json` (if indicator-upgrader was used)
 - `workbench/<short_name>/update-context.yml` (canonical facts gathered during the update; consumed by `data-updates-comms`)
 - `workbench/<short_name>/slack-announcement.md`
+- `workbench/<short_name>/data-update.md` (public-facing post draft for OWID /latest, from step 9b)
 
 ## Example usage
 

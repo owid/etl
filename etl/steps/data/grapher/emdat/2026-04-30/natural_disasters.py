@@ -1,5 +1,6 @@
 from owid.catalog import Table
 
+from etl.grapher.helpers import _metadata_for_dimensions
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
@@ -8,16 +9,16 @@ paths = PathFinder(__file__)
 TITLE_PUBLIC_START = {
     "Disasters": "Annual number of ",
     "Disasters per 100,000 people": "Annual rate of ",
-    "Requiring assistance": "Annual number of people requiring immediate assistance from ",
-    "Requiring assistance per 100,000 people": "Annual rate of people requiring immediate assistance from ",
+    "Requiring assistance": "Annual number of people requiring immediate assistance due to ",
+    "Requiring assistance per 100,000 people": "Annual rate of people requiring immediate assistance due to ",
     "Deaths": "Annual number of deaths from ",
     "Deaths per 100,000 people": "Annual rate of deaths from ",
-    "Homeless": "Annual number of people left homeless from ",
-    "Homeless per 100,000 people": "Annual rate of people left homeless from ",
-    "Injured": "Annual number of people injured from ",
-    "Injured per 100,000 people": "Annual rate of people injured from ",
-    "Total affected": "Annual number of people affected from ",
-    "Total affected per 100,000 people": "Annual rate of people affected from ",
+    "Homeless": "Annual number of people left homeless by ",
+    "Homeless per 100,000 people": "Annual rate of people left homeless by ",
+    "Injured": "Annual number of people injured by ",
+    "Injured per 100,000 people": "Annual rate of people injured by ",
+    "Total affected": "Annual number of people affected by ",
+    "Total affected per 100,000 people": "Annual rate of people affected by ",
     "Insured damages": "Annual insured damages from ",
     "Insured damages as a share of GDP": "Annual insured damages as a share of GDP from ",
     "Insured damages adjusted for inflation": "Annual insured damages, adjusted for inflation, from ",
@@ -34,16 +35,18 @@ TITLE_PUBLIC_START = {
 # Map disaster type to their name at the end of the public title (plural).
 TITLE_PUBLIC_END = {
     "earthquake": "earthquakes",
-    "extreme_weather": "extreme weather events",
-    "volcanic_activity": "volcanic activity events",
+    "extreme_weather": "storms",
+    "volcanic_activity": "volcanoes",
     "flood": "floods",
     "all_disasters": "all disasters",
-    "glacial_lake_outburst_flood": "glacial lake outburst floods",
+    # "glacial_lake_outburst_flood": ...,  # Folded into "Flood" — see EXPECTED_DISASTER_TYPES.
     "all_disasters_excluding_earthquakes": "all disasters excluding earthquakes",
     "wildfire": "wildfires",
-    "wet_mass_movement": "wet mass movements",
-    "dry_mass_movement": "dry mass movements",
-    "fog": "fogs",
+    "landslide": "landslides",
+    # Wet/dry mass movements are folded into "landslide" — see EXPECTED_DISASTER_TYPES in the garden step.
+    # "wet_mass_movement": "wet mass movements",
+    # "dry_mass_movement": "dry mass movements",
+    # "fog": "fogs",  # Excluded — see EXPECTED_DISASTER_TYPES in the garden step.
     "drought": "droughts",
     "extreme_temperature": "extreme temperatures",
     "all_disasters_excluding_extreme_temperature": "all disasters excluding extreme temperatures",
@@ -51,16 +54,18 @@ TITLE_PUBLIC_END = {
 # Map disaster type to their name in the title (singular).
 TITLE_DISASTER = {
     "earthquake": "Earthquake",
-    "extreme_weather": "Extreme weather",
-    "volcanic_activity": "Volcanic activity",
+    "extreme_weather": "Storms",
+    "volcanic_activity": "Volcanoes",
     "flood": "Flood",
     "all_disasters": "All disasters",
-    "glacial_lake_outburst_flood": "Glacial lake outburst flood",
+    # "glacial_lake_outburst_flood": ...,  # Folded into "Flood" — see EXPECTED_DISASTER_TYPES.
     "all_disasters_excluding_earthquakes": "All disasters excluding earthquakes",
     "wildfire": "Wildfire",
-    "wet_mass_movement": "Wet mass movement",
-    "dry_mass_movement": "Dry mass movement",
-    "fog": "Fog",
+    "landslide": "Landslide",
+    # Wet/dry mass movements are folded into "Landslide" — see EXPECTED_DISASTER_TYPES in the garden step.
+    # "wet_mass_movement": "Wet mass movement",
+    # "dry_mass_movement": "Dry mass movement",
+    # "fog": "Fog",  # Excluded — see EXPECTED_DISASTER_TYPES in the garden step.
     "drought": "Drought",
     "extreme_temperature": "Extreme temperature",
     "all_disasters_excluding_extreme_temperature": "All disasters excluding extreme temperature",
@@ -89,8 +94,18 @@ def create_wide_tables(table: Table, is_decade: bool) -> Table:
         new_title = old_title + " - " + TITLE_DISASTER[disaster] + variable_title_suffix
         new_title_public = f"{variable_title_public_prefix}{TITLE_PUBLIC_START[old_title]}{TITLE_PUBLIC_END[disaster]}"
         table_wide[column].metadata.title = new_title
-        table_wide[column].metadata.display = {"name": TITLE_DISASTER[disaster]}
+        display = {"name": TITLE_DISASTER[disaster]}
+        # Keep decadal averages of people counts without decimals.
+        if is_decade and (table_wide[column].metadata.unit or "").strip().lower() == "people":
+            display["numDecimalPlaces"] = 0
+        table_wide[column].metadata.display = display
         table_wide[column].metadata.presentation.title_public = new_title_public
+        # Run the framework's per-dimension Jinja expansion so any `<% if type ==
+        # ... %>` templates in description_key (and other fields inherited from
+        # the garden long-form metadata) resolve against this column's disaster.
+        # Manual `Table.pivot` skips the auto-widen path that normally calls this,
+        # so we invoke it explicitly here.
+        table_wide[column].metadata = _metadata_for_dimensions(table_wide[column].metadata, {"type": disaster}, column)
         table_wide = table_wide.rename(
             columns={column: column.replace("-", "_") + variable_name_suffix}, errors="raise"
         )

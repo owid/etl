@@ -28,6 +28,10 @@ def run() -> None:
     # drop all columns where both data points are missing
     tb = tb.dropna(subset=["full_flowering_date", "average_last_30_years"], how="all")
 
+    # Trim origins to only the first one.
+    tb["full_flowering_date"].m.origins = [tb["full_flowering_date"].m.origins[0]]
+    tb["average_last_30_years"].m.origins = [tb["average_last_30_years"].m.origins[0]]
+
     #
     # Save outputs.
     #
