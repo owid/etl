@@ -1,0 +1,709 @@
+config:
+  explorerTitle: Environmental Impacts of Food
+  explorerSubtitle: Explore the land use, carbon, and water footprints of food products.
+  isPublished: true
+  hasMapTab: false
+  hideAlertBanner: true
+  hideAnnotationFieldsInTitle: true
+  entityType: food
+  thumbnail: https://assets.ourworldindata.org/uploads/2022/08/Env-Impacts-of-Food-Data-Explorer.png
+  wpBlockId: "52428"
+  subNavId: explorers
+  subNavCurrentId: food-footprints
+  selection:
+    - Almonds
+    - Bacon
+    - Bananas
+    - Beans
+    - Beef (beef herd)
+    - Beef (dairy herd)
+    - Beefburger
+    - Cheese
+    - Cow's milk
+    - Eggs
+    - Lamb & Mutton
+    - Maize
+    - Milk
+    - Peas
+    - Penne pasta
+    - Pig Meat
+    - Pizza
+    - Poultry Meat
+    - Prawns (farmed)
+    - Rice
+    - Steak pie
+    - Tofu
+    - Tomatoes
+    - Vegetable lasagne
+    - Wheat & Rye
+
+definitions:
+  common_views:
+    - config:
+        type: DiscreteBar
+        baseColorScheme: owid-distinct
+    - dimensions:
+        view_type: commodity
+      config:
+        sourceDesc: "Poore and Nemecek (2018). Reducing food’s environmental impacts through producers and consumers. Science."
+    - dimensions:
+        view_type: specific_food_product
+      config:
+        sourceDesc: Michael Clark et al (2022). Estimating the environmental impacts of 57,000 food products. PNAS.
+
+dimensions:
+  - slug: view_type
+    name: Commodity or Specific Food Product
+    presentation:
+      type: radio
+    choices:
+      - slug: commodity
+        name: Commodity
+      - slug: specific_food_product
+        name: Specific food products
+  - slug: impact
+    name: Environmental Impact
+    presentation:
+      type: dropdown
+    choices:
+      - slug: carbon
+        name: Carbon footprint
+      - slug: land_use
+        name: Land use
+      - slug: water
+        name: Water use
+      - slug: water_scarcity
+        name: Scarcity-weighted water use
+      - slug: eutrophication
+        name: Eutrophication
+      - slug: all_impacts
+        name: All impacts (facet)
+  - slug: unit
+    name: Kilogram / Protein / Calories
+    presentation:
+      type: dropdown
+    choices:
+      - slug: per_kg
+        name: Per kilogram
+      - slug: per_100g_protein
+        name: Per 100 grams of protein
+      - slug: per_1000kcal
+        name: Per 1000 kilocalories
+      - slug: per_100g_fat
+        name: Per 100 grams of fat
+      - slug: compare_units
+        name: Compare nutritional units
+  - slug: by_stage
+    name: By stage of supply chain
+    presentation:
+      type: checkbox
+      choice_slug_true: stages
+    choices:
+      - slug: combined
+        name: ""
+      - slug: stages
+        name: By stage of supply chain
+
+views:
+  # ============================================================================
+  # COMMODITY views (Poore & Nemecek 2018) — 16 single/multi-indicator views
+  # ============================================================================
+
+  # ----- Carbon footprint -----
+  - dimensions:
+      view_type: commodity
+      impact: carbon
+      unit: per_kg
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#ghg_emissions_per_kilogram__poore__and__nemecek__2018
+    config:
+      title: Greenhouse gas emissions per kilogram of food product
+      subtitle: "[Greenhouse gas emissions](#dod:ghgemissions) are measured in kilograms of [carbon dioxide-equivalents](#dod:carbondioxideequivalents). This means non-CO₂ gases are weighted by the amount of warming they cause over a 100-year timescale."
+
+  - dimensions:
+      view_type: commodity
+      impact: carbon
+      unit: per_kg
+      by_stage: stages
+    indicators:
+      y:
+        - catalogPath: grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_land_use
+        - catalogPath: grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_farm
+        - catalogPath: grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_animal_feed
+        - catalogPath: grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_processing
+        - catalogPath: grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_transport
+        - catalogPath: grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_retail
+        - catalogPath: grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_packaging
+        - catalogPath: grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_losses
+    config:
+      type: StackedDiscreteBar
+      title: "Food: greenhouse gas emissions across the supply chain"
+      subtitle: "[Greenhouse gas emissions](#dod:ghgemissions) are measured in kilograms of [carbon dioxide-equivalents (CO₂eq)](#dod:carbondioxideequivalents) per kilogram of food."
+
+  - dimensions:
+      view_type: commodity
+      impact: carbon
+      unit: per_100g_protein
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#ghg_emissions_per_100g_protein__poore__and__nemecek__2018
+    config:
+      title: Greenhouse gas emissions per 100 grams of protein
+      subtitle: "[Greenhouse gas emissions](#dod:ghgemissions) are measured in kilograms of [carbon dioxide-equivalents](#dod:carbondioxideequivalents)."
+
+  - dimensions:
+      view_type: commodity
+      impact: carbon
+      unit: per_1000kcal
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#ghg_emissions_per_1000kcal__poore__and__nemecek__2018
+    config:
+      title: Greenhouse gas emissions per 1000 kilocalories
+      subtitle: "[Greenhouse gas emissions](#dod:ghgemissions) are measured in kilograms of [carbon dioxide-equivalents](#dod:carbondioxideequivalents)."
+
+  # ----- Land use -----
+  - dimensions:
+      view_type: commodity
+      impact: land_use
+      unit: per_kg
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#land_use_per_kilogram__poore__and__nemecek__2018
+    config:
+      title: Land use per kilogram of food product
+      subtitle: Land use is measured in meters squared (m²) per year to produce one kilogram of a given food product.
+
+  - dimensions:
+      view_type: commodity
+      impact: land_use
+      unit: per_100g_protein
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#land_use_per_100g_protein__poore__and__nemecek__2018
+    config:
+      title: Land use per 100 grams of protein
+      subtitle: Land use is measured in meters squared (m²) per year to produce 100 grams of protein across various food products.
+
+  - dimensions:
+      view_type: commodity
+      impact: land_use
+      unit: per_1000kcal
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#land_use_per_1000kcal__poore__and__nemecek__2018
+    config:
+      title: Land use of foods per 1000 kilocalories
+      subtitle: Land use is measured in meters squared (m²) per year to produce 1000 kilocalories of a given food product.
+
+  # ----- Water use -----
+  - dimensions:
+      view_type: commodity
+      impact: water
+      unit: per_kg
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#freshwater_withdrawals_per_kilogram__poore__and__nemecek__2018
+    config:
+      title: Freshwater withdrawals per kilogram of food product
+      subtitle: Freshwater withdrawals are measured in liters per kilogram of food product.
+
+  - dimensions:
+      view_type: commodity
+      impact: water
+      unit: per_100g_protein
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#freshwater_withdrawals_per_100g_protein__poore__and__nemecek__2018
+    config:
+      title: Freshwater withdrawals per 100 grams of protein
+      subtitle: Freshwater withdrawals are measured in liters per 100 grams of protein.
+
+  - dimensions:
+      view_type: commodity
+      impact: water
+      unit: per_1000kcal
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#freshwater_withdrawals_per_1000kcal__poore__and__nemecek__2018
+    config:
+      title: Freshwater withdrawals of foods per 1000 kilocalories
+      subtitle: Freshwater withdrawals are measured in liters per 1000 kilocalories for a range of food products.
+
+  # ----- Scarcity-weighted water use -----
+  - dimensions:
+      view_type: commodity
+      impact: water_scarcity
+      unit: per_kg
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#scarcity_weighted_water_use_per_kilogram__poore__and__nemecek__2018
+    config:
+      title: Scarcity-weighted water use per kilogram of food product
+      subtitle: Scarcity-weighted water use represents freshwater use weighted by local water scarcity. This is measured in liters per kilogram of food product.
+
+  - dimensions:
+      view_type: commodity
+      impact: water_scarcity
+      unit: per_100g_protein
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#scarcity_weighted_water_use_per_100g_protein__poore__and__nemecek__2018
+    config:
+      title: Scarcity-weighted water use per 100 grams of protein
+      subtitle: Average scarcity-weighted water use represents freshwater use weighted by local water scarcity. This is measured in liters per 100 grams of protein.
+
+  - dimensions:
+      view_type: commodity
+      impact: water_scarcity
+      unit: per_1000kcal
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#scarcity_weighted_water_use_per_1000kcal__poore__and__nemecek__2018
+    config:
+      title: Scarcity-weighted water use of foods per 1000 kilocalories
+      subtitle: Scarcity-weighted water use represents freshwater use weighted by local water scarcity. This is measured in liters per 1000 kilocalories.
+
+  # ----- Eutrophication -----
+  - dimensions:
+      view_type: commodity
+      impact: eutrophication
+      unit: per_kg
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#eutrophying_emissions_per_kilogram__poore__and__nemecek__2018
+    config:
+      title: Eutrophying emissions per kilogram of food product
+      subtitle: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which affect and pollute ecosystems. They are measured in grams of phosphate equivalents (PO₄eq).
+
+  - dimensions:
+      view_type: commodity
+      impact: eutrophication
+      unit: per_100g_protein
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#eutrophying_emissions_per_100g_protein__poore__and__nemecek__2018
+    config:
+      title: Eutrophying emissions per 100 grams of protein
+      subtitle: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which affect and pollute ecosystems. They are measured in grams of phosphate equivalents (PO₄eq).
+
+  - dimensions:
+      view_type: commodity
+      impact: eutrophication
+      unit: per_1000kcal
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018/environmental_impacts_of_food__poore__and__nemecek__2018#eutrophying_emissions_per_1000kcal__poore__and__nemecek__2018
+    config:
+      title: Eutrophying emissions per 1000 kilocalories
+      subtitle: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which affect and pollute ecosystems. They are measured in grams of phosphate equivalents (PO₄eq).
+
+  # ============================================================================
+  # SPECIFIC FOOD PRODUCTS views (Clark et al. 2022) — 29 views
+  # ============================================================================
+
+  # ----- Single-impact views (5 impacts × 4 units = 20) -----
+  - dimensions:
+      view_type: specific_food_product
+      impact: carbon
+      unit: per_kg
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_kg
+    config:
+      title: Greenhouse gas emissions per kilogram of food
+      subtitle: Emissions are measured in carbon dioxide equivalents (CO2eq). This means non-CO2 gases are weighted by the amount of warming they cause over a 100-year timescale.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: carbon
+      unit: per_100g_protein
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_100gprotein
+    config:
+      title: Greenhouse gas emissions per 100 grams of protein
+      subtitle: Emissions are measured in carbon dioxide equivalents (CO2eq). This means non-CO2 gases are weighted by the amount of warming they cause over a 100-year timescale.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: carbon
+      unit: per_1000kcal
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_1000kcal
+    config:
+      title: Greenhouse gas emissions per 1000 kilocalories
+      subtitle: Emissions are measured in carbon dioxide equivalents (CO2eq). This means non-CO2 gases are weighted by the amount of warming they cause over a 100-year timescale.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: carbon
+      unit: per_100g_fat
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_100gfat
+    config:
+      title: Greenhouse gas emissions per 100 grams of fat
+      subtitle: Emissions are measured in carbon dioxide equivalents (CO2eq). This means non-CO2 gases are weighted by the amount of warming they cause over a 100-year timescale.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: land_use
+      unit: per_kg
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_kg
+    config:
+      title: Land use per kilogram of food
+      subtitle: Land use is measured in meters squared (m²) per kilogram of a given food product.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: land_use
+      unit: per_100g_protein
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_100gprotein
+    config:
+      title: Land use per 100 grams of protein
+      subtitle: Land use is measured in meters squared (m²) per 100 grams of protein in a given food product.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: land_use
+      unit: per_1000kcal
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_1000kcal
+    config:
+      title: Land use per 1000 kilocalories
+      subtitle: Land use is measured in meters squared (m²) per 1000 kilocalories of a given food product.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: land_use
+      unit: per_100g_fat
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_100gfat
+    config:
+      title: Land use per 100 grams of fat
+      subtitle: Land use is measured in meters squared (m²) per 100 grams of fat in a given food product.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: water
+      unit: per_kg
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_kg
+    config:
+      title: Freshwater withdrawals per kilogram of food
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: water
+      unit: per_100g_protein
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_100gprotein
+    config:
+      title: Freshwater withdrawals per 100 grams of protein
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: water
+      unit: per_1000kcal
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_1000kcal
+    config:
+      title: Freshwater withdrawals per 1000 kilocalories
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: water
+      unit: per_100g_fat
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_100gfat
+    config:
+      title: Freshwater withdrawals per 100 grams of fat
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: water_scarcity
+      unit: per_kg
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_kg
+    config:
+      title: Water-scarce withdrawals per kilogram of food
+      subtitle: Scarcity-weighted water use represents freshwater use weighted by local water scarcity.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: water_scarcity
+      unit: per_100g_protein
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_100gprotein
+    config:
+      title: Water-scarce withdrawals per 100 grams of protein
+      subtitle: Scarcity-weighted water use represents freshwater use weighted by local water scarcity.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: water_scarcity
+      unit: per_1000kcal
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_1000kcal
+    config:
+      title: Water-scarce withdrawals per 1000 kilocalories
+      subtitle: Scarcity-weighted water use represents freshwater use weighted by local water scarcity.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: water_scarcity
+      unit: per_100g_fat
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_100gfat
+    config:
+      title: Water-scarce withdrawals per 100 grams of fat
+      subtitle: Scarcity-weighted water use represents freshwater use weighted by local water scarcity.
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: eutrophication
+      unit: per_kg
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_kg
+    config:
+      title: Eutrophication per kilogram of food
+      subtitle: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which affect and pollute ecosystems. They are measured in grams of phosphate equivalents (PO₄eq).
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: eutrophication
+      unit: per_100g_protein
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_100gprotein
+    config:
+      title: Eutrophication per 100 grams of protein
+      subtitle: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which affect and pollute ecosystems. They are measured in grams of phosphate equivalents (PO₄eq).
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: eutrophication
+      unit: per_1000kcal
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_1000kcal
+    config:
+      title: Eutrophication per 1000 kilocalories
+      subtitle: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which affect and pollute ecosystems. They are measured in grams of phosphate equivalents (PO₄eq).
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: eutrophication
+      unit: per_100g_fat
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_100gfat
+    config:
+      title: Eutrophication per 100 grams of fat
+      subtitle: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which affect and pollute ecosystems. They are measured in grams of phosphate equivalents (PO₄eq).
+
+  # ----- All impacts (facet) — 4 multi-indicator views -----
+  - dimensions:
+      view_type: specific_food_product
+      impact: all_impacts
+      unit: per_kg
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_kg
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_kg
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_kg
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_kg
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_kg
+    config:
+      title: Environmental impacts of food per kilogram
+      selectedFacetStrategy: metric
+      facetYDomain: independent
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: all_impacts
+      unit: per_100g_protein
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_100gprotein
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_100gprotein
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_100gprotein
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_100gprotein
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_100gprotein
+    config:
+      title: Environmental impacts of food per 100 grams of protein
+      selectedFacetStrategy: metric
+      facetYDomain: independent
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: all_impacts
+      unit: per_1000kcal
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_1000kcal
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_1000kcal
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_1000kcal
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_1000kcal
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_1000kcal
+    config:
+      title: Environmental impacts of food per 1000 kilocalories
+      selectedFacetStrategy: metric
+      facetYDomain: independent
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: all_impacts
+      unit: per_100g_fat
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_100gfat
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_100gfat
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_100gfat
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_100gfat
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_100gfat
+    config:
+      title: Environmental impacts of food per 100 grams of fat
+      selectedFacetStrategy: metric
+      facetYDomain: independent
+
+  # ----- Compare nutritional units — 5 multi-indicator views (one per impact) -----
+  - dimensions:
+      view_type: specific_food_product
+      impact: carbon
+      unit: compare_units
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_kg
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_100gprotein
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_1000kcal
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#ghg_100gfat
+    config:
+      title: Greenhouse gas emissions of food
+      subtitle: Emissions are measured in carbon dioxide equivalents (CO2eq). This means non-CO2 gases are weighted by the amount of warming they cause over a 100-year timescale.
+      selectedFacetStrategy: metric
+      facetYDomain: independent
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: land_use
+      unit: compare_units
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_kg
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_100gprotein
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_1000kcal
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#land_use_100gfat
+    config:
+      title: Land use of food products
+      selectedFacetStrategy: metric
+      facetYDomain: independent
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: water
+      unit: compare_units
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_kg
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_100gprotein
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_1000kcal
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_100gfat
+    config:
+      title: Water use of food products
+      selectedFacetStrategy: metric
+      facetYDomain: independent
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: water_scarcity
+      unit: compare_units
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_kg
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_100gprotein
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_1000kcal
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#water_scarcity_100gfat
+    config:
+      title: Water-scarcity withdrawals of food products
+      subtitle: Scarcity-weighted water use represents freshwater use weighted by local water scarcity.
+      selectedFacetStrategy: metric
+      facetYDomain: independent
+
+  - dimensions:
+      view_type: specific_food_product
+      impact: eutrophication
+      unit: compare_units
+      by_stage: combined
+    indicators:
+      y:
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_kg
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_100gprotein
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_1000kcal
+        - catalogPath: environmental_impacts_of_food_clark_et_al_2022#eutrophication_100gfat
+    config:
+      title: Eutrophication of food products
+      subtitle: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which affect and pollute ecosystems. They are measured in grams of phosphate equivalents (PO₄eq).
+      selectedFacetStrategy: metric
+      facetYDomain: independent

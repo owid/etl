@@ -1,0 +1,206 @@
+definitions:
+  common:
+    description_key:
+      - This dataset quantifies the environmental impacts of 57,000 food products across retailers in the UK. It expands on previous analyses which quantify the environmental impacts of individual commodities, to quantify the impacts of products with multiple ingredients.
+      - To do this, it uses the environmental footprints of commodities from the largest meta-analysis to date (Poore and Nemecek, 2018) and ingredient lists for specific products to calculate the total footprint of each product. For example, calculating the impact of "Spaghetti Bolognese" would combine the impacts of the ingredients – pasta, minced beef, sauce, and any additional ingredients – in their weighted ratios.
+      - The raw, underlying dataset has footprint data for 57,000 products. Our World in Data has combined these products into higher-level categories. For example, "Steak pie" or "Pizza" or "Soy milk". To do this, we have calculated the average across the relevant products that fall into this category.
+    presentation:
+      topic_tags:
+        - Environmental Impacts of Food Production
+
+tables:
+  environmental_impacts_of_food_clark_et_al_2022:
+    variables:
+      ghg_kg:
+        title: Greenhouse gas emissions per kilogram of food
+        unit: kilograms CO₂-equivalents per kilogram
+        short_unit: kg
+        description_short: Greenhouse gas emissions per kilogram of a given food product. Emissions are measured in carbon dioxide equivalents (CO2eq), which weight non-CO2 gases by the warming they cause over 100 years.
+        display:
+          name: Emissions per kilogram
+          numDecimalPlaces: 1
+      ghg_1000kcal:
+        title: Greenhouse gas emissions per 1000 kilocalories
+        unit: kilograms CO₂-equivalents per 1000 kilocalories
+        short_unit: kg
+        description_short: Greenhouse gas emissions per 1000 kilocalories of a given food product.
+        display:
+          name: Emissions per 1000 kilocalories
+          numDecimalPlaces: 1
+      ghg_100gprotein:
+        title: Greenhouse gas emissions per 100 grams of protein
+        unit: kilograms CO₂-equivalents per 100 grams of protein
+        short_unit: kg
+        description_short: Greenhouse gas emissions per 100 grams of protein of a given food product.
+        display:
+          name: Emissions per 100 grams of protein
+          numDecimalPlaces: 1
+      ghg_100gfat:
+        title: Greenhouse gas emissions per 100 grams of fat
+        unit: kilograms CO₂-equivalents per 100 grams of fat
+        short_unit: kg
+        description_short: Greenhouse gas emissions per 100 grams of fat of a given food product.
+        display:
+          name: Emissions per 100 grams of fat
+          numDecimalPlaces: 1
+
+      land_use_kg:
+        title: Land use per kilogram of food
+        unit: square meters per kilogram
+        short_unit: m²
+        description_short: Land use per kilogram of a given food product.
+        display:
+          name: Land use per kilogram
+          numDecimalPlaces: 1
+      land_use_1000kcal:
+        title: Land use per 1000 kilocalories
+        unit: square meters per 1000 kilocalories
+        short_unit: m²
+        description_short: Land use per 1000 kilocalories of a given food product.
+        display:
+          name: Land use per 1000 kilocalories
+          numDecimalPlaces: 1
+      land_use_100gprotein:
+        title: Land use per 100 grams of protein
+        unit: square meters per 100 grams of protein
+        short_unit: m²
+        description_short: Land use per 100 grams of protein of a given food product.
+        display:
+          name: Land use per 100 grams of protein
+          numDecimalPlaces: 1
+      land_use_100gfat:
+        title: Land use per 100 grams of fat
+        unit: square meters per 100 grams of fat
+        short_unit: m²
+        description_short: Land use per 100 grams of fat of a given food product.
+        display:
+          name: Land use per 100 grams of fat
+          numDecimalPlaces: 1
+
+      water_kg:
+        title: Freshwater withdrawals per kilogram of food
+        unit: liters per kilogram
+        short_unit: L
+        description_short: Freshwater withdrawals per kilogram of a given food product.
+        display:
+          name: Freshwater withdrawals per kilogram
+          numDecimalPlaces: 0
+      water_1000kcal:
+        title: Freshwater withdrawals per 1000 kilocalories
+        unit: liters per 1000 kilocalories
+        short_unit: L
+        description_short: Freshwater withdrawals per 1000 kilocalories of a given food product.
+        display:
+          name: Freshwater withdrawals per 1000 kilocalories
+          numDecimalPlaces: 0
+      water_100gprotein:
+        title: Freshwater withdrawals per 100 grams of protein
+        unit: liters per 100 grams of protein
+        short_unit: L
+        description_short: Freshwater withdrawals per 100 grams of protein of a given food product.
+        display:
+          name: Freshwater withdrawals per 100 grams of protein
+          numDecimalPlaces: 0
+      water_100gfat:
+        title: Freshwater withdrawals per 100 grams of fat
+        unit: liters per 100 grams of fat
+        short_unit: L
+        description_short: Freshwater withdrawals per 100 grams of fat of a given food product.
+        display:
+          name: Freshwater withdrawals per 100 grams of fat
+          numDecimalPlaces: 0
+
+      water_scarcity_kg:
+        title: Scarcity-weighted water use per kilogram of food
+        unit: liters per kilogram
+        short_unit: L
+        description_short: Scarcity-weighted water use represents freshwater use weighted by local water scarcity. Reported per kilogram of food product.
+        display:
+          name: Scarcity-weighted water use per kilogram
+          numDecimalPlaces: 0
+      water_scarcity_1000kcal:
+        title: Scarcity-weighted water use per 1000 kilocalories
+        unit: liters per 1000 kilocalories
+        short_unit: L
+        description_short: Scarcity-weighted water use represents freshwater use weighted by local water scarcity. Reported per 1000 kilocalories.
+        display:
+          name: Scarcity-weighted water use per 1000 kilocalories
+          numDecimalPlaces: 0
+      water_scarcity_100gprotein:
+        title: Scarcity-weighted water use per 100 grams of protein
+        unit: liters per 100 grams of protein
+        short_unit: L
+        description_short: Scarcity-weighted water use represents freshwater use weighted by local water scarcity. Reported per 100 grams of protein.
+        display:
+          name: Scarcity-weighted water use per 100 grams of protein
+          numDecimalPlaces: 0
+      water_scarcity_100gfat:
+        title: Scarcity-weighted water use per 100 grams of fat
+        unit: liters per 100 grams of fat
+        short_unit: L
+        description_short: Scarcity-weighted water use represents freshwater use weighted by local water scarcity. Reported per 100 grams of fat.
+        display:
+          name: Scarcity-weighted water use per 100 grams of fat
+          numDecimalPlaces: 0
+
+      eutrophication_kg:
+        title: Eutrophication per kilogram of food
+        unit: grams of phosphate equivalents per kilogram
+        short_unit: g
+        description_short: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which pollute ecosystems with nutrient imbalances. They are measured in grams of phosphate equivalents (PO₄eq).
+        display:
+          name: Eutrophication per kilogram
+          numDecimalPlaces: 1
+      eutrophication_1000kcal:
+        title: Eutrophication per 1000 kilocalories
+        unit: grams of phosphate equivalents per 1000 kilocalories
+        short_unit: g
+        description_short: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which pollute ecosystems with nutrient imbalances. They are measured in grams of phosphate equivalents (PO₄eq).
+        display:
+          name: Eutrophication per 1000 kilocalories
+          numDecimalPlaces: 1
+      eutrophication_100gprotein:
+        title: Eutrophication per 100 grams of protein
+        unit: grams of phosphate equivalents per 100 grams of protein
+        short_unit: g
+        description_short: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which pollute ecosystems with nutrient imbalances. They are measured in grams of phosphate equivalents (PO₄eq).
+        display:
+          name: Eutrophication per 100 grams of protein
+          numDecimalPlaces: 1
+      eutrophication_100gfat:
+        title: Eutrophication per 100 grams of fat
+        unit: grams of phosphate equivalents per 100 grams of fat
+        short_unit: g
+        description_short: Eutrophying emissions represent runoff of excess nutrients into the surrounding environment and waterways, which pollute ecosystems with nutrient imbalances. They are measured in grams of phosphate equivalents (PO₄eq).
+        display:
+          name: Eutrophication per 100 grams of fat
+          numDecimalPlaces: 1
+
+      biodiversity_kg:
+        title: Biodiversity loss per kilogram of food
+        unit: species lost per kilogram
+        description_short: Biodiversity loss measured in potentially disappeared fraction of species (PDF) per kilogram of food product, accounting for land use and land-use change.
+        display:
+          name: Biodiversity loss per kilogram
+          numDecimalPlaces: 2
+      biodiversity_1000kcal:
+        title: Biodiversity loss per 1000 kilocalories
+        unit: species lost per 1000 kilocalories
+        description_short: Biodiversity loss measured in potentially disappeared fraction of species (PDF) per 1000 kilocalories.
+        display:
+          name: Biodiversity loss per 1000 kilocalories
+          numDecimalPlaces: 2
+      biodiversity_100gprotein:
+        title: Biodiversity loss per 100 grams of protein
+        unit: species lost per 100 grams of protein
+        description_short: Biodiversity loss measured in potentially disappeared fraction of species (PDF) per 100 grams of protein.
+        display:
+          name: Biodiversity loss per 100 grams of protein
+          numDecimalPlaces: 2
+      biodiversity_100gfat:
+        title: Biodiversity loss per 100 grams of fat
+        unit: species lost per 100 grams of fat
+        description_short: Biodiversity loss measured in potentially disappeared fraction of species (PDF) per 100 grams of fat.
+        display:
+          name: Biodiversity loss per 100 grams of fat
+          numDecimalPlaces: 2
