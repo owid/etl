@@ -1,12 +1,12 @@
 meta:
-  source:
-    name: Blum, Ducoing, McLaughlin (2017)
-    url: https://www.st-andrews.ac.uk/media/dept-of-geography-and-sustainable-development/pdf-s/DP%202016-15%20Blum%20et%20al.pdf
-    date_accessed: 2026-03-05
-    published_by: |-
-      Blum, Ducoing, Ruiz, McLaughlin (2017). “A Sustainable Cenury? Genuine Savings in Developing and Developed Countries 1900-2000.” National Wealth: What is Missing, Why it Matters. Eds. Hamilton, K., & Hepburn, C. Oxford University Press.
-  name: Genuine saving estimates by various measures - Blum, Ducoing, McLaughlin (2017)
-  description: ''
+  origin:
+    producer: Blum, Ducoing, Ruiz, and McLaughlin
+    title: Genuine saving estimates by various measures
+    description: This dataset provides genuine saving estimates for developing and developed countries over the period 1900–2000. Genuine saving (also known as adjusted net saving) measures the true rate of savings in an economy after accounting for investments in human capital, depletion of natural resources, and damage caused by pollution. The data offers a long-run perspective on sustainable development across a broad set of countries.
+    citation_full: 'Blum, Ducoing, Ruiz, McLaughlin (2017). "A Sustainable Century? Genuine Savings in Developing and Developed Countries 1900–2000." National Wealth: What is Missing, Why it Matters. Eds. Hamilton, K., and Hepburn, C. Oxford University Press.'
+    url_main: https://www.st-andrews.ac.uk/media/dept-of-geography-and-sustainable-development/pdf-s/DP%202016-15%20Blum%20et%20al.pdf
+    date_accessed: '2017-01-01'
+    date_published: '2017'
 outs:
   - md5: 1fcf69f0da59650cb111c167d27486c0
     size: 39130

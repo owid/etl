@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Agricultural policy support - (Inter-American Development Bank, Agrimonitor, 2017)
+  origin:
+    producer: Inter-American Development Bank
+    title: Agrimonitor
     description: |-
       The IDB Agrimonitor defines these variables as the following.
 
@@ -9,11 +10,11 @@ meta:
       Total Support (%): The annual monetary value of all gross transfers from taxpayers and consumers arising from policy measures that support agriculture, net of associated budgetary receipts, regardless of their objectives and impacts on farm production and income, or consumption of farm products.
 
       General Support Services (%): The annual monetary value of gross transfers to general services provided to agricultural producers collectively (such as research, development, training, inspection, marketing and promotion), arising from policy measures that support agriculture regardless of their nature, objectives and impacts on farm production, income, or consumption. The GSSE does not include any transfers to individual producers.
-    url: https://data.iadb.org/
-    date_accessed: 2018-01-16
-    published_by: Inter-American Development Bank (IDB) Agrimonitor
-  name: Agricultural policy support - (Agrimonitor, 2017)
-  description: ''
+    citation_full: Inter-American Development Bank (IDB) Agrimonitor.
+    attribution_short: IDB Agrimonitor
+    url_main: https://data.iadb.org/
+    date_accessed: '2018-01-16'
+    date_published: '2017'
 outs:
   - md5: 7c4569c7776a387155ee5028da893bce
     size: 5146

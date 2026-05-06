@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Freedom House, Freedom of the Press (2017)
+  origin:
+    producer: Freedom House
+    title: Freedom of the Press
     description: |-
       This dataset provides information on press freedoms, using data from Freedom House's (2017) Freedom of the Press.
 
@@ -11,11 +12,10 @@ meta:
       We show the data for Czechoslovakia as Czechia, for the USSR as Russia, and for Yugoslavia as Serbia.
 
       You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/human_rights
-    url: https://freedomhouse.org/sites/default/files/2020-02/FOTP1980-FOTP2017_Public-Data.xlsx
-    date_accessed: 2022-03-08
-    published_by: Freedom House, Freedom of the Press
-  name: Press freedom - Freedom House (2017)
-  description: ''
+    citation_full: Freedom House (2017). Freedom of the Press.
+    url_download: https://freedomhouse.org/sites/default/files/2020-02/FOTP1980-FOTP2017_Public-Data.xlsx
+    date_accessed: '2022-03-08'
+    date_published: '2017'
 outs:
   - md5: 8aaf9f1d2365cb7b9310928cd3b0c782
     size: 19786

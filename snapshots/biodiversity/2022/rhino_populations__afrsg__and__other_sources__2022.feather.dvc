@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Rhino populations (AfRSG & other sources, 2022)
+  origin:
+    producer: Various sources
+    title: Rhino populations
     description: |-
       Data was compiled by Our World in Data based on a number of historical sources. Data is based on best estimates: there is greater uncertainty in earlier historical data but is provided as the best estimate of the time.
 
@@ -22,11 +23,10 @@ meta:
 
       We also include estimates from the State of the Rhino Report (2020 and 2022)
       2022 - https://rhinos.org/wp-content/uploads/2022/09/IRF-State-of-the-Rhino-2022.pdf
-    url: http://www.rhinoresourcecenter.com/index.php
-    date_accessed: 2022-04-01
-    published_by: IUCN Species Survival Commission (IUCN/SSC) African and Asian Rhino Specialist Groups (AfRSG) & other sources
-  name: Rhino populations (AfRSG & other sources, 2022)
-  description: ''
+    citation_full: IUCN Species Survival Commission (IUCN/SSC) African and Asian Rhino Specialist Groups (AfRSG) and other sources.
+    url_main: http://www.rhinoresourcecenter.com/index.php
+    date_accessed: '2022-04-01'
+    date_published: '2022'
 outs:
   - md5: 2f7f04925821ecb3fa4a55e7f6827383
     size: 12642

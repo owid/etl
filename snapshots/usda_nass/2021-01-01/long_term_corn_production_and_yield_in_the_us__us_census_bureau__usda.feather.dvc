@@ -11,7 +11,7 @@ meta:
       Production data was converted from bushels to tonnes using a conversion factor of 0.025.
       Land use data was converted from acres to hectares using a conversion factor of 0.45.
     url: https://quickstats.nass.usda.gov/
-    date_accessed: 2026-03-10
+    date_accessed: '2021-01-01'
     published_by: United States Department for Agriculture (USDA); and US Census Bureau
   name: Long-term corn production and yield in the US (US Census Bureau; USDA)
   description: ''

@@ -1,10 +1,14 @@
 meta:
-  source:
-    name: World Bank (2017)
-    date_accessed: 2026-03-06
-    published_by: The World Bank
-  name: Wealth per capita by component by country - World Bank (2017)
-  description: ''
+  origin:
+    producer: World Bank
+    title: The Changing Wealth of Nations
+    description: |-
+      The Changing Wealth of Nations measures the wealth of nations by aggregating produced capital, natural capital, human capital, and net foreign assets. Wealth is the value of an economy's capital stocks; GDP is seen as the return on wealth.
+    citation_full: 'World Bank (2017). The Changing Wealth of Nations 2018: Building a Sustainable Future. World Bank.'
+    attribution_short: World Bank
+    version_producer: '2018'
+    date_accessed: '2017-10-01'
+    date_published: '2017'
 outs:
   - md5: 273ce0d81535ec03c303724f0001f293
     size: 56306

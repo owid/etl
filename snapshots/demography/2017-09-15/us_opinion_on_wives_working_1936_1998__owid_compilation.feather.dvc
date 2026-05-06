@@ -1,13 +1,14 @@
 meta:
-  source:
-    name: OWID based on Fogli and Veldkamp (2011) and GSS
+  origin:
+    producer: Various sources
+    title: US opinion on wives working 1936-1998
     description: |-
       The question asked in the Fogli and Veldkamp data varies slightly, see their appendix (B.2 Survey data) for more detail. GSS survey respondents answered the question "Do you approve or disapprove of a married woman earning money in business or industry if she has a husband capable of supporting her?"
-    url: https://www.economicdynamics.org/meetpapers/2009/paper_141.pdf and https://gssdataexplorer.norc.org/variables/589/vshow
-    date_accessed: 2017-09-15
-    published_by: For 1936-1970 we use Fogli and Veldkamp (2011); For 1972-1998 we use GSS data
-  name: US Opinion on wives working 1936-1998 - OWID compilation
-  description: ''
+    citation_full: For 1936-1970 we use Fogli and Veldkamp (2011); For 1972-1998 we use GSS data.
+    url_main: https://www.economicdynamics.org/meetpapers/2009/paper_141.pdf
+    url_download: https://gssdataexplorer.norc.org/variables/589/vshow
+    date_accessed: '2017-09-15'
+    date_published: '2011'
 outs:
   - md5: b81d477e93bb79fcfd886e8fc1573d36
     size: 3322

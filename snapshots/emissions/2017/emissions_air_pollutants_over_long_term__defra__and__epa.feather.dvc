@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Emissions of air pollutants over the long-term - DEFRA & EPA
+  origin:
+    producer: DEFRA and EPA
+    title: Emissions of air pollutants over the long-term
     description: |-
       Data is presented as total UK and US emissions of air pollutants from all anthropogenic/human sources measured in tonnes per year. Also provided is an index of emissions, normalised to emissions in the first year of data (1970/1980 or 1990) 1970. In other words, annual emissions in 1970 are denoted as equal to 100; values below 100 therefore indicate a fall in emissions; values above 100 indicate an increase in emissions.
 
@@ -9,10 +10,10 @@ meta:
       UK DEFRA Source: https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/681445/Emissions_of_air_pollutants_statistical_release_FINALv4.pdf
 
       US EPA Source: https://www.epa.gov/air-emissions-inventories/air-pollutant-emissions-trends-data
-    date_accessed: 2018-02-18
-    published_by: UK Department for Environment, Food & Rural Affairs (DEFRA); US Environmental Protection Agency (EPA)
-  name: Emissions air pollutants over long-term (DEFRA & EPA)
-  description: ''
+    citation_full: UK Department for Environment, Food and Rural Affairs (DEFRA) and US Environmental Protection Agency (EPA) (2018). Emissions of air pollutants over the long-term.
+    url_main: https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/681445/Emissions_of_air_pollutants_statistical_release_FINALv4.pdf
+    date_accessed: '2018-02-18'
+    date_published: '2018'
 outs:
   - md5: b2c550bbd8234553107c3b2f2868c6c4
     size: 13554

@@ -1,11 +1,11 @@
 meta:
-  source:
-    name: Edwardes (1902)
-    url: https://archive.org/details/b21357262
-    date_accessed: 2018-02-07
-    published_by: Edwardes, E. (1902) A concise history of small-pox and vaccination in Europe. H.K. Lewis
-  name: Deaths from smallpox per million population (Edwardes, 1902)
-  description: ''
+  origin:
+    producer: Edwardes
+    title: A Concise History of Small-Pox and Vaccination in Europe
+    citation_full: Edwardes, E. (1902). A concise history of small-pox and vaccination in Europe. H.K. Lewis.
+    url_main: https://archive.org/details/b21357262
+    date_accessed: '2018-02-07'
+    date_published: '1902'
 outs:
   - md5: 1aaf4453225c7def5a2af8c5611d1686
     size: 5850

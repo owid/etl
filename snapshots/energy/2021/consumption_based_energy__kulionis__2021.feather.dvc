@@ -21,7 +21,7 @@ meta:
 
       The EXIOBASE database contains a data error for Australia for 2018 and 2019, which provides erroneous results. We have therefore removed these two data points for Australia only.
     url: https://zenodo.org/record/5589597#.YYf3EdnMK_0
-    date_accessed: 2026-03-05
+    date_accessed: '2021-01-01'
     published_by: Calculated by Viktoras Kulionis, based on the EXIOBASE v3.8.2 database
   name: Consumption-based energy (Kulionis, 2021)
   description: ''

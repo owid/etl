@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Forest Transition Phase (Pendrill et al. 2019)
+  origin:
+    producer: Pendrill et al.
+    title: 'Deforestation displaced: trade in forest-risk commodities and the prospects for a global forest transition'
     description: |-
       The study categorized countries into four categories based on their stage in the forest transition.
 
@@ -13,12 +14,10 @@ meta:
 
       Additional references:
       Hosonuma, N., Herold, M., De Sy, V., De Fries, R. S., Brockhaus, M., Verchot, L., ... & Romijn, E. (2012). An assessment of deforestation and forest degradation drivers in developing countries. Environmental Research Letters, 7(4), 044009.
-    url: https://iopscience.iop.org/article/10.1088/1748-9326/ab0d41
-    date_accessed: 2020-10-28
-    published_by: |-
-      Pendrill, F., Persson, U. M., Godar, J., & Kastner, T. (2019). Deforestation displaced: trade in forest-risk commodities and the prospects for a global forest transition. Environmental Research Letters, 14(5), 055003.
-  name: Forest Transition Phase (Pendrill et al. 2019)
-  description: ''
+    citation_full: 'Pendrill, F., Persson, U. M., Godar, J., and Kastner, T. (2019). Deforestation displaced: trade in forest-risk commodities and the prospects for a global forest transition. Environmental Research Letters, 14(5), 055003.'
+    url_main: https://iopscience.iop.org/article/10.1088/1748-9326/ab0d41
+    date_accessed: '2020-10-28'
+    date_published: '2019'
 outs:
   - md5: 90d192ae04e55f2e0a0936ab2e9d3d16
     size: 6466

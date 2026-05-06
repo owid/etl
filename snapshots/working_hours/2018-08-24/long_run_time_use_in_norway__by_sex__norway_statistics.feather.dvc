@@ -1,13 +1,13 @@
 meta:
-  source:
-    name: Statistics Norway
+  origin:
+    producer: Statistics Norway
+    title: Long run time use in Norway, by sex
     description: |-
       Note: Data are normalized to 1440 minutes per day. In other words, for those countries for which the time use does not sum up to 1440 minutes, the missing minutes are equally distributed across all activities.
-    url: https://www.ssb.no/en/statbank/list/tidsbruk
-    date_accessed: 2018-08-24
-    published_by: Statistics Norway
-  name: Long run time use in Norway, by sex - Norway Statistics
-  description: ''
+    citation_full: Statistics Norway (2018). Time use survey.
+    url_main: https://www.ssb.no/en/statbank/list/tidsbruk
+    date_accessed: '2018-08-24'
+    date_published: '2018'
 outs:
   - md5: 689c5511d80bd1e76dea516611595044
     size: 15410

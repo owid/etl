@@ -1,12 +1,12 @@
 meta:
-  source:
-    name: Toniolo, G., & Vecchi, G. (2007)
-    url: http://www.jstor.org/stable/23248256
-    date_accessed: 2016-02-18
-    published_by: |-
-      Toniolo, Gianni, and Giovanni Vecchi. "ITALIAN CHILDREN AT WORK, 1881—1961." Giornale degli economisti e Annali di economia (2007): 401-427.
-  name: Child Labor Italy (historic) - Toniolo, G., & Vecchi, G. (2007)
-  description: ''
+  origin:
+    producer: Toniolo and Vecchi
+    title: Italian children at work, 1881–1961
+    description: This dataset presents historical data on child labor in Italy from 1881 to 1961, drawing on census records and other primary sources to reconstruct trends in child work participation over eight decades. The data covers the long-run decline of child labor in Italy across different sectors and demographic groups.
+    citation_full: 'Toniolo, Gianni, and Giovanni Vecchi. "Italian children at work, 1881–1961." Giornale degli economisti e Annali di economia (2007): 401–427.'
+    url_main: http://www.jstor.org/stable/23248256
+    date_accessed: '2016-02-18'
+    date_published: '2007'
 outs:
   - md5: 51a8bfaf800761e811649f16d4e5481b
     size: 4906

@@ -69,7 +69,7 @@ git push
 gh pr edit <number> --body "..."
 ```
 
-**Always post `@codex review` as a separate PR comment** (not in the PR description) to trigger a Codex review.
+**Post `@codex review` as a separate PR comment** (not in the PR description) when the PR is ready for a review pass. Do not repost it after every push/update unless the user asks or the changes are substantial enough to warrant a fresh review.
 
 ### Commit Message Emojis
 

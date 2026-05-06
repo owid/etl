@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: International Smoking Statistics (2017)
+  origin:
+    producer: Forey et al.
+    title: International Smoking Statistics
     description: |-
       Total cigarettes include both manufactured and hand-rolled cigarettes. For Latvia, total cigarettes comprise of manufactured cigarettes and Papyrosi cigarettes.
 
@@ -8,12 +9,11 @@ meta:
 
       The 'number of cigarettes smoked per person per day' for both males and females has been averaged across all years in which multiple estimates were provided in the ISS dataset for the United States, to arrive at one estimate for each year.
 
-      The time series for Germany includes West Germany cigarette sales for the 1948-1989 period .
-    url: http://www.pnlee.co.uk/ISS.htm
-    date_accessed: 2018-02-20
-    published_by: Authors Barbara Forey, Jan Hamling, John Hamling, Alison Thornton, Peter Lee
-  name: Smoking cigarette sales (International Smoking Statistics (2017))
-  description: ''
+      The time series for Germany includes West Germany cigarette sales for the 1948–1989 period.
+    citation_full: 'Forey, B., Hamling, J., Hamling, J., Thornton, A., and Lee, P. (2017). International Smoking Statistics. P.N. Lee Statistics and Computing Ltd.'
+    url_main: http://www.pnlee.co.uk/ISS.htm
+    date_accessed: '2018-02-20'
+    date_published: '2017'
 outs:
   - md5: d7d02072fe3f31dc6ef13c36fc5660db
     size: 19258

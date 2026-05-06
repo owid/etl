@@ -1,11 +1,15 @@
 meta:
-  source:
-    name: Absolute deaths from ambient PM2.5 air pollution
-    url: www.stateofglobalair.org
-    date_accessed: 2017-04-07
-    published_by: Health Effects Institute, State of Global Air 2017
-  name: Absolute deaths from ambient PM2.5 air pollution- State of Global Air
-  description: Absolute number of deaths per year from ambient particulate matter air pollution- State of Global Air
+  origin:
+    producer: Health Effects Institute
+    title: State of Global Air
+    description: State of Global Air provides comprehensive data on air quality and its health impacts worldwide. The dataset includes annual estimates of deaths attributable to ambient particulate matter (PM2.5) air pollution across countries and regions, drawing on the latest available evidence on exposure and health outcomes.
+    title_snapshot: State of Global Air - Absolute deaths from ambient PM2.5 air pollution
+    citation_full: Health Effects Institute, State of Global Air 2017.
+    attribution_short: HEI
+    version_producer: '2017'
+    url_main: www.stateofglobalair.org
+    date_accessed: '2017-04-07'
+    date_published: '2017'
 outs:
   - md5: 6064ae893a597f84369d54230e5785a1
     size: 9234

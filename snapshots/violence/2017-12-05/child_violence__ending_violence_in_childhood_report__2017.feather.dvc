@@ -1,12 +1,14 @@
 meta:
-  source:
-    name: Know Violence in Childhood Report (2017)
-    url: http://globalreport.knowviolenceinchildhood.org/the-report/
-    date_accessed: 2017-12-05
-    published_by: Know Violence in Childhood
-  name: Child violence – Ending Violence in Childhood Report (2017)
-  description: |-
-    Key indicators of inter-personal violence in childhood (2015), from Know Violence in Childhood. 2017. Ending Violence in Childhood. Global Report 2017. Know Violence in Childhood. New Delhi, India.
+  origin:
+    producer: Know Violence in Childhood
+    title: Ending Violence in Childhood
+    description: The "Ending Violence in Childhood" Global Report provides a comprehensive assessment of inter-personal violence experienced by children worldwide. It compiles key indicators on the prevalence, drivers, and consequences of violence against children across multiple dimensions, drawing on the latest available data. The 2017 edition presents indicators primarily reflecting the situation as of 2015.
+    title_snapshot: Ending Violence in Childhood - Key indicators of inter-personal violence in childhood
+    citation_full: Know Violence in Childhood. 2017. Ending Violence in Childhood. Global Report 2017. Know Violence in Childhood. New Delhi, India.
+    version_producer: '2017'
+    url_main: http://globalreport.knowviolenceinchildhood.org/the-report/
+    date_accessed: '2017-12-05'
+    date_published: '2017'
 outs:
   - md5: e29da02a78b351a2e45284934b191e00
     size: 14914

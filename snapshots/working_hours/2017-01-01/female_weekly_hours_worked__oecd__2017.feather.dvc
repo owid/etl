@@ -1,19 +1,20 @@
 meta:
-  source:
-    name: OECD Labor Force Statistics (2017)
-    description: |-
+  origin:
+    producer: OECD
+    title: OECD Labor Force Statistics
+    title_snapshot: OECD Labor Force Statistics - Female weekly hours worked
+    description_snapshot: |-
       Original source notes:
       Part-time employment is defined according to a common definition of less than 30-weekly-usual hours worked in the main job.
 
       Full-time employment is defined according to a common definition of more than 30-weekly-usual hours worked in the main job.
 
-      Information for all countries and all LFS subjects may be found in the attached file :
-      www.oecd.org/els/employmentpoliciesanddata/LFSNOTES_SOURCES.pdf.
-    url: http://stats.oecd.org/Index.aspx?DatasetCode=AVE_HRS#)
-    date_accessed: 2026-03-10
-    published_by: OECD.stat
-  name: Female weekly hours worked – OECD (2017)
-  description: ''
+      Information for all countries and all LFS subjects may be found in the attached file: www.oecd.org/els/employmentpoliciesanddata/LFSNOTES_SOURCES.pdf.
+    citation_full: OECD (2017). OECD Labor Force Statistics.
+    attribution_short: OECD
+    url_main: http://stats.oecd.org/Index.aspx?DatasetCode=AVE_HRS
+    date_accessed: '2017-01-01'
+    date_published: '2017'
 outs:
   - md5: adc9ebf69e416e6ef7157886613d09ce
     size: 11970

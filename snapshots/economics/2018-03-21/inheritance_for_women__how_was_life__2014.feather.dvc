@@ -1,17 +1,17 @@
 meta:
-  source:
-    name: How Was Life? - Gender inequality since 1980 (2014)
+  origin:
+    producer: Carmichael et al.
+    title: 'How Was Life? Gender inequality since 1820'
     description: |-
       Gendered inheritance practices for immovables in 1920 are obtained from the Murdock data, while 1980 and 2000 are from the World Bank.
 
-      Information on inheritance practices at the start of the 20th century comes from George Murdock’s Ethnographic Atlas (1969).  To compare Murdock's figures to contemporary data available from the World Bank’s Fifty Years of Women’s Legal Rights database, a dichotomous scheme had to be used where 0 indicates inequality and 1 equality.
+      Information on inheritance practices at the start of the 20th century comes from George Murdock's Ethnographic Atlas (1969). To compare Murdock's figures to contemporary data available from the World Bank's Fifty Years of Women's Legal Rights database, a dichotomous scheme had to be used where 0 indicates inequality and 1 equality.
 
       For further information of these data, see the link above from page 221, under the heading "Historical sources".
-    url: https://dspace.library.uu.nl/bitstream/handle/1874/306236/3014041ec016.pdf?sequence=1
-    date_accessed: 2018-03-21
-    published_by: How Was Life? Gender inequality since 1980 - Carmichael, Dili,and Rijpma
-  name: Inheritance for women - How Was Life? (2014)
-  description: ''
+    citation_full: 'Carmichael, S., Dili, A., and Rijpma, A. How Was Life? Gender inequality since 1820. In van Zanden, J. L. et al. (eds.), How Was Life? Global Well-Being Since 1820. OECD Publishing, 2014.'
+    url_main: https://dspace.library.uu.nl/bitstream/handle/1874/306236/3014041ec016.pdf?sequence=1
+    date_accessed: '2018-03-21'
+    date_published: '2014'
 outs:
   - md5: 12950c32090930a545f55220f89fbcda
     size: 5842

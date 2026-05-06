@@ -4,7 +4,7 @@ import click
 import pandas as pd
 
 from etl.backport_helpers import long_to_wide
-from etl.snapshot import Snapshot, SnapshotMeta
+from etl.snapshot import Snapshot
 
 SNAPSHOT_NAMESPACE = Path(__file__).parent.parent.name
 SNAPSHOT_VERSION = Path(__file__).parent.name
@@ -23,21 +23,8 @@ def main(upload: bool) -> None:
         "backport/latest/dataset_2848_surface_ocean_plastic_by_particle_count__eriksen_et_al__2014_values.feather"
     )
     snap_values.pull()
-    snap_config = Snapshot(
-        "backport/latest/dataset_2848_surface_ocean_plastic_by_particle_count__eriksen_et_al__2014_config.json"
-    )
-    snap_config.pull()
-
-    # Create snapshot metadata for the new file
-    meta = SnapshotMeta(**snap_values.metadata.to_dict())
-    meta.namespace = SNAPSHOT_NAMESPACE
-    meta.version = SNAPSHOT_VERSION
-    meta.short_name = "surface_ocean_plastic_by_particle_count__eriksen_et_al__2014"
-    meta.fill_from_backport_snapshot(snap_config.path)
-    meta.save()
-
-    # Create a new snapshot.
-    snap = Snapshot(meta.uri)
+    # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
+    snap = Snapshot("plastic_waste/2018-01-01/surface_ocean_plastic_by_particle_count__eriksen_et_al__2014.feather")
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))

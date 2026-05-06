@@ -1,11 +1,12 @@
 meta:
-  source:
-    name: 'OECD: Education Statistics (2017)'
-    url: http://www.oecd-ilibrary.org/education/data/education-at-a-glance_eag-data-en
-    date_accessed: 2016-06-29
-    published_by: 'OECD: Education Statistics (2017)'
-  name: 'OECD: Education Statistics (2017)'
-  description: ''
+  origin:
+    producer: OECD
+    title: Education Statistics
+    citation_full: 'OECD: Education Statistics (2017).'
+    version_producer: '2017'
+    url_main: http://www.oecd-ilibrary.org/education/data/education-at-a-glance_eag-data-en
+    date_accessed: '2016-06-29'
+    date_published: '2017'
 outs:
   - md5: 9ecf0ff883b41b7ea0ac60071fc20e25
     size: 9746

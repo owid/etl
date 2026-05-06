@@ -1,13 +1,18 @@
 meta:
-  source:
-    name: US General Social Survey (2017)
+  origin:
+    producer: NORC at the University of Chicago
+    title: General Social Survey
     description: |-
-      The General Social Survey in the US asks: Do you strongly agree, agree, disagree, or strongly disagree that it is sometimes necessary to discipline a child with a good, hard spanking?
-    url: https://gssdataexplorer.norc.org/
-    date_accessed: 2017-12-19
-    published_by: GSS Data Explorer
-  name: Violent discipline in the US (US General Social Survey (2017))
-  description: ''
+      The General Social Survey (GSS) is a nationally representative survey of adults in the United States conducted by NORC at the University of Chicago. It has been tracking social trends and attitudes since 1972, covering a wide range of topics including civil liberties, crime and violence, intergroup relations, morality, national spending priorities, and social mobility.
+
+      One of the survey questions asks respondents: "Do you strongly agree, agree, disagree, or strongly disagree that it is sometimes necessary to discipline a child with a good, hard spanking?" Responses provide a nationally representative measure of attitudes toward the use of physical discipline with children in the US.
+    title_snapshot: General Social Survey - Violent discipline in the US
+    citation_full: 'GSS Data Explorer, NORC at the University of Chicago. General Social Survey, 2017. Available at: https://gssdataexplorer.norc.org/.'
+    attribution_short: GSS
+    version_producer: '2017'
+    url_main: https://gssdataexplorer.norc.org/
+    date_accessed: '2017-12-19'
+    date_published: '2017'
 outs:
   - md5: 9d8072a07f822b81911e26fd8f266555
     size: 9042

@@ -6,7 +6,7 @@ meta:
 
       This metric measures the share of the seabed on continental shelves – to a depth of 1000m – that experienced at least one trawling pass over a 3 to 4 year period.
     url: https://www.pnas.org/content/115/43/e10275
-    date_accessed: 2026-03-10
+    date_accessed: '2021-01-01'
     published_by: |-
       Amoroso, R. O., Pitcher, C. R., Rijnsdorp, A. D., McConnaughey, R. A., Parma, A. M., Suuronen, P., ... & Jennings, S. (2018). Bottom trawl fishing footprints on the world’s continental shelves. Proceedings of the National Academy of Sciences, 115(43), E10275-E10282.
   name: Trawling by region (Amoroso et al. 2018)

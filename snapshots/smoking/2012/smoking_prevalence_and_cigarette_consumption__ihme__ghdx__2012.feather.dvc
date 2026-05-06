@@ -1,17 +1,18 @@
 meta:
-  source:
-    name: Institute for Health Metrics and Evaluation (IHME) (2012)
+  origin:
+    producer: IHME
+    title: Global smoking prevalence and cigarette consumption 1980-2012
     description: |-
       Consumption per smoker per day refers to all ages and both sexes. The unit of measurement is in cigarettes.
 
       Daily smoking prevalence for male, female, and both (male and female) also refers to all ages of each particular category. Daily male smoking prevalence is interpreted as the percentage of men, across all ages, who smoke daily.
 
       The number of daily male smokers refers to the number of men, by country, who smoke cigarettes at least daily.
-    url: http://ghdx.healthdata.org/record/global-smoking-prevalence-and-cigarette-consumption-1980-2012
-    date_accessed: 2018-02-22
-    published_by: IHME, GHDx
-  name: Smoking prevalence and cigarette consumption (IHME, GHDx (2012))
-  description: ''
+    citation_full: Institute for Health Metrics and Evaluation (IHME), Global Health Data Exchange (GHDx) (2012).
+    attribution_short: IHME
+    url_main: http://ghdx.healthdata.org/record/global-smoking-prevalence-and-cigarette-consumption-1980-2012
+    date_accessed: '2018-02-22'
+    date_published: '2012'
 outs:
   - md5: 4d3d4026558caf9eb27b454d8d8ac023
     size: 554994

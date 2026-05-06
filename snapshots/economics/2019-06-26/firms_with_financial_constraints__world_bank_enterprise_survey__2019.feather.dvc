@@ -1,13 +1,14 @@
 meta:
-  source:
-    name: World Bank Enterprise Survey (2019)
-    description: |-
+  origin:
+    producer: World Bank
+    title: Enterprise Surveys
+    title_snapshot: Enterprise Surveys - Firms with financial constraints
+    description_snapshot: |-
       Surveys were conducted in different years for different countries, but all during the time period of 2009 to 2018. The date displayed is standardized to 2018.
-    url: http://www.enterprisesurveys.org/data/exploretopics/finance
-    date_accessed: 2019-06-26
-    published_by: World Bank
-  name: Firms with financial constraints - World Bank Enterprise Survey (2019)
-  description: ''
+    citation_full: World Bank (2019). Enterprise Surveys.
+    url_main: http://www.enterprisesurveys.org/data/exploretopics/finance
+    date_accessed: '2019-06-26'
+    date_published: '2019'
 outs:
   - md5: cb4c5bea34b1698639a13413ed5ee6f4
     size: 3986
