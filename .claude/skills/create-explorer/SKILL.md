@@ -216,8 +216,8 @@ views:
       # ...
     indicators:
       y:
-        - catalogPath: <ns>/<v>/<dataset>/<table>#<short>
-          display:               # per-view, per-indicator overrides
+        - catalogPath: <table>#<short>      # short form — see "catalogPath — short forms accepted" below
+          display:                          # per-view, per-indicator overrides
             colorScaleNumericBins: 0;1;2
             colorScaleScheme: PuBu
     config:
@@ -232,6 +232,20 @@ views:
 ```
 
 For table-driven explorers, `views:` should still be present but is typically `views: []` — the explorer JSON schema requires the key, and `create_collection(tb=tb, ...)` populates the views at runtime.
+
+#### `catalogPath` — short forms accepted
+
+The `Indicator.is_a_valid_path` check (`etl/collection/model/view.py:62`) accepts three forms; pick the shortest one that still unambiguously resolves:
+
+| Form | Example | When to use |
+|---|---|---|
+| `table#indicator` | `global_carbon_budget#emissions_total` | Default. Resolved against the explorer's DAG dependencies via `tables_by_name` — fine as long as no two dependencies expose a table with the same name. |
+| `dataset/table#indicator` | `global_carbon_budget/global_carbon_budget#emissions_total` | When two upstream datasets happen to expose tables with the same `short_name`. |
+| `grapher/<ns>/<v>/<dataset>/<table>#<indicator>` | `grapher/gcp/2025-11-13/global_carbon_budget/global_carbon_budget#emissions_total` | Only when you need to pin a specific dataset version *separate from the one in the DAG* — almost never the right form to write by hand. |
+
+Short forms are expanded at `c.save()` time by `Indicator.expand_path(tables_by_name)`. If the table name doesn't exist in any dependency it raises `Table name '<x>' not found in dependency tables`; if multiple dependencies expose the same table name, it raises and asks you to disambiguate with the medium form.
+
+**Default to `table#indicator`** when authoring YAML. The full path is verbose, drifts when upstream versions bump, and is only needed for genuinely ambiguous cases.
 
 ### Top-level `config:` settings — the most common keys
 
@@ -299,11 +313,13 @@ For single-indicator views, the rendered chart inherits the indicator's stored `
 
 | Per-view config | → indicator garden metadata |
 |---|---|
-| `title` | `presentation.title_public` |
+| `title` | `presentation.grapher_config.title` |
 | `subtitle` | `presentation.grapher_config.subtitle` |
 | `note` | `presentation.grapher_config.note` |
 | `map.colorScale` | `presentation.grapher_config.map.colorScale.{baseColorScheme, binningStrategy, customNumericValues}` |
 | `hasMapTab`, `tab`, `yAxis`, `chartTypes`, `hideRelativeToggle`, `selectedFacetStrategy`, … | `presentation.grapher_config.<field>` |
+
+For the chart-heading flow specifically, the priority is `grapher_config.title > title_public > display.name > title` (see `docs/architecture/metadata/faqs.md`). When migrating a chart-wrapping explorer, the chart's bespoke heading text belongs in `grapher_config.title` — `title_public` is the *human-readable replacement for a dimensional `indicator.title`*, not the chart's heading.
 
 Cross-cutting baselines (e.g. `hasMapTab: true` for every indicator in a dataset) go under `definitions.common.presentation.grapher_config` in the **garden** `.meta.yml`. The catalog merge is recursive on `presentation` and `grapher_config` (`lib/catalog/owid/catalog/core/yaml_metadata.py:_merge_variable_metadata`), so each indicator inherits the common defaults plus its own overrides without manual `<<: *anchor` repetition.
 
