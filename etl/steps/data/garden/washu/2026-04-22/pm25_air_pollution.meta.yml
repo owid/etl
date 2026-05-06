@@ -1,0 +1,129 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  pm25_air_pollution:
+    variables:
+        population_weighted_pm25:
+          title: Outdoor air pollution exposure (population-weighted PM2.5)
+          unit: µg/m³
+          short_unit: µg/m³
+          description_short: Annual population-weighted average concentration of [fine particulate matter (PM2.5)](#dod:particulate_matter_pollution) in the air, measured in micrograms per cubic meter (µg/m³). Fine particulate matter (PM2.5) are particles with a diameter of 2.5 micrometers or less, which can pose significant health risks.
+          description_key:
+            - Outdoor air pollution, specifically PM2.5, is a major environmental risk factor for health issues such as respiratory and cardiovascular diseases. It is estimated to contribute to millions of premature deaths globally each year.
+            - The World Health Organization (WHO) recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+            - The population-weighted mean PM2.5 concentration reflects the average exposure of people in a region, giving more weight to areas where more people live. This can differ from the simple geographic mean, which averages PM2.5 levels across a region without considering population distribution.
+        geographic_mean_pm25:
+          title: Outdoor air pollution levels (geographic mean PM2.5)
+          unit: µg/m³
+          short_unit: µg/m³
+          description_short: Annual geographic mean concentration of [fine particulate matter (PM2.5)](#dod:particulate_matter_pollution) in the air, measured in micrograms per cubic meter (µg/m³). This is a simple average of PM2.5 levels across a region, without weighting for population distribution.
+          description_key:
+            - Outdoor air pollution, specifically PM2.5, is a major environmental risk factor for health issues such as respiratory and cardiovascular diseases. It is estimated to contribute to millions of premature deaths globally each year.
+            - The World Health Organization (WHO) recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+            - The geographic mean PM2.5 concentration provides an average level of air pollution across a region, but it may not accurately reflect the exposure of people living in that region, especially if population density varies widely.
+            - This data is based on satellite-derived estimates of PM2.5 levels, which may differ from local ground monitor readings. It is not directly comparable to data from the World Bank’s World Development Indicators (WDI) or the WHO’s Global Health Observatory (GHO), which incorporate ground monitor data as well.
+        share_exposure_greater_5_ug_m3:
+          title: Share of population exposed to PM2.5 levels greater than 5 µg/m³
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels greater than 5 micrograms per cubic meter (µg/m³), which is the World Health Organization's recommended guideline for minimizing health impacts.
+          description_key:
+            - The World Health Organization (WHO) recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts. This variable indicates the percentage of the population that is exposed to PM2.5 levels above this guideline, which can help identify areas where air pollution poses a significant health risk.
+        share_exposure_greater_10_ug_m3:
+          title: Share of population exposed to PM2.5 levels greater than 10 µg/m³
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels greater than 10 micrograms per cubic meter (µg/m³). The WHO recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+          description_key:
+            - 10 µg/m³ corresponds to the WHO Interim Target 4 (IT-4) for annual average PM2.5 exposure. This variable indicates the percentage of the population living in areas that have not yet achieved this interim target, highlighting regions where further reductions in air pollution are needed.
+        share_exposure_greater_15_ug_m3:
+          title: Share of population exposed to PM2.5 levels greater than 15 µg/m³
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels greater than 15 micrograms per cubic meter (µg/m³). The WHO recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+          description_key:
+            - 15 µg/m³ corresponds to the WHO Interim Target 3 (IT-3) for annual average PM2.5 exposure. This variable indicates the percentage of the population living in areas that have not yet achieved this interim target, highlighting regions where further reductions in air pollution are needed.
+        share_exposure_greater_25_ug_m3:
+          title: Share of population exposed to PM2.5 levels greater than 25 µg/m³
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels greater than 25 micrograms per cubic meter (µg/m³). The WHO recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+          description_key:
+            - 25 µg/m³ corresponds to the WHO Interim Target 2 (IT-2) for annual average PM2.5 exposure. This variable indicates the percentage of the population living in areas that have not yet achieved this interim target, reflecting regions with elevated air pollution risks.
+        share_exposure_greater_30_ug_m3:
+          title: Share of population exposed to PM2.5 levels greater than 30 µg/m³
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels greater than 30 micrograms per cubic meter (µg/m³). The WHO recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+        share_exposure_greater_35_ug_m3:
+          title: Share of population exposed to PM2.5 levels greater than 35 µg/m³
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels greater than 35 micrograms per cubic meter (µg/m³). The WHO recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+          description_key:
+            - 35 µg/m³ corresponds to the WHO Interim Target 1 (IT-1) for annual average PM2.5 exposure — the first and least strict interim target toward the WHO guideline. This variable shows the share of the population exposed to PM2.5 levels above this baseline target.
+          display:
+            name: Does not meet any WHO interim target (>35 µg/m³)
+        share_exposure_greater_45_ug_m3:
+          title: Share of population exposed to PM2.5 levels greater than 45 µg/m³
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels greater than 45 micrograms per cubic meter (µg/m³). The WHO recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+        share_exposure_greater_50_ug_m3:
+          title: Share of population exposed to PM2.5 levels greater than 50 µg/m³
+          unit: "%"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels greater than 50 micrograms per cubic meter (µg/m³). The WHO recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+        share_exposure_greater_55_ug_m3:
+          title: Share of population exposed to PM2.5 levels greater than 55 µg/m³
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels greater than 55 micrograms per cubic meter (µg/m³). The WHO recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+        share_exposure_greater_60_ug_m3:
+          title: Share of population exposed to PM2.5 levels greater than 60 µg/m³
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels greater than 60 micrograms per cubic meter (µg/m³). The WHO recommends that annual average PM2.5 levels should be below 5 µg/m³ to minimize health impacts.
+        share_exposure_under_5_ug_m3:
+          title: Share of population exposed to PM2.5 levels below 5 µg/m³ (WHO AQG)
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels below 5 micrograms per cubic meter (µg/m³), meeting the World Health Organization's Air Quality Guideline (AQG).
+          description_key:
+            - The WHO Air Quality Guideline (AQG) recommends annual average PM2.5 levels below 5 µg/m³. This variable shows the share of the population living in areas that meet this standard — the most protective level for human health.
+          display:
+            name: WHO Air Quality Guideline (<5 µg/m³)
+        share_exposure_under_10_greater_5ug:
+          title: Share of population exposed to PM2.5 levels between 5 and 10 µg/m³ (WHO IT-4)
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels between 5 and 10 micrograms per cubic meter (µg/m³). This range exceeds the WHO Air Quality Guideline (AQG) of 5 µg/m³ but remains below the WHO Interim Target 4 (IT-4) of 10 µg/m³.
+          display:
+            name: WHO Interim Target 4 (5-10 µg/m³)
+        share_exposure_under_15_ug_m3_greater_10ug:
+          title: Share of population exposed to PM2.5 levels between 10 and 15 µg/m³ (WHO IT-3)
+          unit: "share of population"
+          short_unit: "%"
+          display:
+            name: WHO Interim Target 3 (10-15 µg/m³)
+        share_exposure_under_25_greater_15ug:
+          title: Share of population exposed to PM2.5 levels between 15 and 25 µg/m³ (WHO IT-2)
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels between 15 and 25 micrograms per cubic meter (µg/m³). This range falls between the WHO Interim Target 3 (15 µg/m³) and Interim Target 2 (25 µg/m³).
+          display:
+            name: WHO Interim Target 2 (15-25 µg/m³)
+        share_exposure_under_35_greater_25ug:
+          title: Share of population exposed to PM2.5 levels between 25 and 35 µg/m³ (WHO IT-1)
+          unit: "share of population"
+          short_unit: "%"
+          description_short: Percentage of the population exposed to annual average PM2.5 levels between 25 and 35 micrograms per cubic meter (µg/m³). This range falls between the WHO Interim Target 2 (25 µg/m³) and Interim Target 1 (35 µg/m³).
+          display:
+            name: WHO Interim Target 1 (25-35 µg/m³)
