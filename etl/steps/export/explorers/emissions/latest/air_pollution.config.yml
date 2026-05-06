@@ -1,0 +1,85 @@
+config:
+  explorerTitle: Air Pollution
+  explorerSubtitle: Explore historical emissions of air pollutants across the world.
+  isPublished: true
+  selection:
+    - China
+    - India
+    - United Kingdom
+    - United States
+    - World
+  hideAlertBanner: true
+  thumbnail: https://assets.ourworldindata.org/uploads/2022/08/Air-Pollution-Data-Explorer.png
+  wpBlockId: "52429"
+  hasMapTab: true
+  hideAnnotationFieldsInTitle: true
+  yScaleToggle: true
+  originUrl: https://ourworldindata.org/air-pollution
+
+dimensions:
+  - slug: pollutant
+    name: Pollutant
+    presentation:
+      type: dropdown
+    choices:
+      - slug: all_pollutants
+        name: All pollutants
+      - slug: nh3
+        name: Ammonia
+      - slug: bc
+        name: Black carbon
+      - slug: co
+        name: Carbon monoxide
+      - slug: ch4
+        name: Methane
+      - slug: nox
+        name: Nitrogen oxides
+      - slug: n2o
+        name: Nitrous oxide
+      - slug: nmvoc
+        name: Non-methane volatile organic compounds
+      - slug: oc
+        name: Organic carbon
+      - slug: so2
+        name: Sulfur dioxide
+  - slug: sector
+    name: Sector
+    presentation:
+      type: dropdown
+    choices:
+      - slug: all_sectors
+        name: All sectors (total)
+      - slug: breakdown_by_sector
+        name: Breakdown by sector
+      - slug: agriculture
+        name: Agriculture
+      - slug: buildings
+        name: Buildings
+      - slug: domestic_aviation
+        name: Domestic aviation
+      - slug: energy
+        name: Energy
+      - slug: industry
+        name: Industry
+      - slug: international_aviation
+        name: International aviation
+      - slug: international_shipping
+        name: International shipping
+      - slug: solvents
+        name: Solvents
+      - slug: transport
+        name: Transport
+      - slug: waste
+        name: Waste
+  - slug: per_capita
+    name: Per capita
+    presentation:
+      type: checkbox
+      choice_slug_true: per_capita
+    choices:
+      - slug: total
+        name: ""
+      - slug: per_capita
+        name: Per capita
+
+views: []

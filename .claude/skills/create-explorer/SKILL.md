@@ -358,7 +358,7 @@ Place near related explorer entries (or alongside the upstream grapher steps) fo
 Hand off to the user:
 
 1. `.venv/bin/etlr export://explorers/<ns>/latest/<short>` — runs the step and writes the TSV.
-2. Open `http://staging-site-<branch>/explorers/<slug>` and spot-check:
+2. Open `http://staging-site-<branch>/admin/explorers/preview/<slug>` and spot-check:
    - default view (no dimensions toggled)
    - every dimension switch
    - map tab (if applicable)
