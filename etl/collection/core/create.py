@@ -149,11 +149,16 @@ def create_collection(
             return collections[0]
 
         # Combine all collections, capturing slug changes for remapping.
+        # Forward `dependencies` so that `process_views` (called from inside
+        # combine_collections via create_collection_from_config) can expand short-form
+        # `<table>#<indicator>` catalog paths in YAML hand-listed views against the
+        # dependency tables.
         slug_changes: dict = {}
         c = combine_collections(
             collections=collections,
             catalog_path=catalog_path,
             config=config_yaml,
+            dependencies=dependencies,
             is_explorer=explorer,
             _slug_changes_out=slug_changes,
         )
