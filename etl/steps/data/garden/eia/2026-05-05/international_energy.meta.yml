@@ -1,0 +1,71 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    processing_level: major
+
+dataset:
+  update_period_days: 365
+
+tables:
+  international_energy:
+    variables:
+      total_energy_consumption: {}
+      total_energy_production: {}
+      energy_consumption_from_coal: {}
+      energy_consumption_from_natural_gas: {}
+      energy_consumption_from_petroleum: {}
+      energy_consumption_from_nuclear: {}
+      energy_consumption_from_renewables: {}
+      energy_production_from_coal: {}
+      energy_production_from_natural_gas: {}
+      energy_production_from_petroleum: {}
+      energy_production_from_nuclear: {}
+      energy_production_from_renewables: {}
+      coal_consumption: {}
+      coal_production: {}
+      coal_imports: {}
+      coal_exports: {}
+      coal_reserves: {}
+      natural_gas_consumption: {}
+      natural_gas_production: {}
+      natural_gas_imports: {}
+      natural_gas_exports: {}
+      petroleum_consumption: {}
+      petroleum_production: {}
+      crude_oil_production: {}
+      electricity_generation: {}
+      electricity_consumption: {}
+      electricity_imports: {}
+      electricity_exports: {}
+      electricity_net_imports: {}
+      electricity_distribution_losses: {}
+      electricity_installed_capacity: {}
+      electricity_from_hydro: {}
+      electricity_from_nuclear: {}
+      electricity_from_solar: {}
+      electricity_from_wind: {}
+      electricity_from_geothermal: {}
+      electricity_from_biomass: {}
+      electricity_from_tide_and_wave: {}
+      electricity_from_renewables: {}
+      electricity_from_non_hydro_renewables: {}
+      electricity_from_fossil_fuels: {}
+      installed_capacity_hydro: {}
+      installed_capacity_nuclear: {}
+      installed_capacity_solar: {}
+      installed_capacity_wind: {}
+      installed_capacity_geothermal: {}
+      installed_capacity_biomass: {}
+      installed_capacity_renewables: {}
+      installed_capacity_non_hydro_renewables: {}
+      installed_capacity_fossil_fuels: {}
+      co2_emissions: {}
+      co2_emissions_from_coal: {}
+      co2_emissions_from_natural_gas: {}
+      co2_emissions_from_petroleum: {}
+      energy_consumption_per_capita: {}
+      energy_intensity: {}
+      population: {}
+      gdp_ppp: {}

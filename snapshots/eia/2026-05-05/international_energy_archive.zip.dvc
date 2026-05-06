@@ -1,0 +1,20 @@
+meta:
+  origin:
+    title: International Energy (archive)
+    title_snapshot: International Energy Statistics — historical exports
+    description_snapshot: |-
+      Archive dataset of country-level tables extracted from the U.S. Energy Information Administration (EIA) via [its online tool](https://www.eia.gov/international/data/world). Some of the data is no longer publicly available.
+    producer: U.S. Energy Information Administration
+    attribution_short: EIA
+    citation_full: |-
+      U.S. Energy Information Administration (EIA) - International Energy Data (archival data retrieved in 2022).
+    date_accessed: '2022-03-01'
+    date_published: '2022-03-01'
+    url_main: https://www.eia.gov/international/data/world
+    license:
+      name: Public domain
+      url: https://www.eia.gov/about/copyrights_reuse.php
+outs:
+  - md5: 92f66ba11b80af29ddbc7821c405dc4e
+    size: 1382554
+    path: international_energy_archive.zip
