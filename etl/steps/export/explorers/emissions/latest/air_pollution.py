@@ -1,232 +1,224 @@
-"""Load a grapher dataset and create an explorer dataset with its tsv file."""
+"""Build the Air Pollution explorer.
 
-import pandas as pd
-from owid.catalog.utils import underscore
-from structlog import get_logger
+Single upstream table backs the explorer:
+- CEDS air pollutants (`grapher/emissions/2025-02-12/ceds_air_pollutants`) — 198 columns
+  covering 9 pollutants × 11 sectors × 2 metrics (absolute, per capita).
+
+The grapher step already tags each column with `m.dimensions = {pollutant, sector}` using
+display values ("BC" / "Agriculture"). This step rewrites those to URL-friendly slugs and
+adds a `per_capita` slot derived from `original_short_name` (`emissions` vs
+`emissions_per_capita`). `paths.create_collection(...)` then auto-expands 198 single-
+indicator views.
+
+`c.group_views(...)` adds:
+- 2 "All pollutants" facet views (sector=all_sectors × per_capita ∈ {total, per_capita}).
+- 18 "Breakdown by sector" facet views (one per pollutant × per_capita).
+
+`c.drop_views(...)` removes the cross-product all_pollutants × <real sector> views (which
+the legacy explorer doesn't surface) and the all_pollutants × breakdown_by_sector view
+(emitted when the second `group_views` runs over views the first had already produced).
+
+Single-indicator views inherit title/subtitle from the indicator's stored grapher_config;
+multi-indicator (grouped) views set them explicitly via `group_views` view_config callables.
+`c.set_global_config(...)` applies type/yAxisMin/hasMapTab/defaultView across all views,
+using lambdas for the dimension-aware fields.
+"""
 
 from etl.helpers import PathFinder
 
-# Initialize log.
-log = get_logger()
-
-# Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Label to use for the breakdown by sector in the sector dropdown.
-BREAKDOWN_BY_SECTOR_LABEL = "Breakdown by sector"
 
-# Old and new labels the all sectors in the sector dropdown.
-# NOTE: The old label should coincide with the one used in the garden step.
-ALL_SECTORS_LABEL_OLD = "All sectors"
-ALL_SECTORS_LABEL_NEW = "All sectors (total)"
+# ---------------------------------------------------------------------------
+# Slug mappings (upstream display values → URL-friendly slugs)
+# ---------------------------------------------------------------------------
 
-# Label to use for all pollutants in the pollutants dropdown.
-ALL_POLLUTANTS_LABEL = "All pollutants"
-
-POLLUTANT_NAME = {
-    "NH₃": "Ammonia",
-    "BC": "Black carbon",
-    "CO": "Carbon monoxide",
-    "CH₄": "Methane",
-    "NOₓ": "Nitrogen oxides",
-    "N₂O": "Nitrous oxide",
-    "NMVOC": "Non-methane volatile organic compounds",
-    "OC": "Organic carbon",
-    "SO₂": "Sulfur dioxide",
+POLLUTANT_SLUG = {
+    "NH₃": "nh3",
+    "BC": "bc",
+    "CO": "co",
+    "CH₄": "ch4",
+    "NOₓ": "nox",
+    "N₂O": "n2o",
+    "NMVOC": "nmvoc",
+    "OC": "oc",
+    "SO₂": "so2",
 }
+
+SECTOR_SLUG = {
+    "All sectors": "all_sectors",
+    "Agriculture": "agriculture",
+    "Buildings": "buildings",
+    "Domestic aviation": "domestic_aviation",
+    "Energy": "energy",
+    "Industry": "industry",
+    "International aviation": "international_aviation",
+    "International shipping": "international_shipping",
+    "Solvents": "solvents",
+    "Transport": "transport",
+    "Waste": "waste",
+}
+
+POLLUTANTS = list(POLLUTANT_SLUG.values())
+SECTORS_REAL = [v for v in SECTOR_SLUG.values() if v != "all_sectors"]
+
+
+# ---------------------------------------------------------------------------
+# FAUST templates
+# ---------------------------------------------------------------------------
+
+
+def _dim(view, key):
+    """Safe accessor — robust to missing keys (e.g. the auto-added `collection__slug`)."""
+    return view.dimensions.get(key)
+
+
+def _is_per_capita(view) -> bool:
+    return _dim(view, "per_capita") == "per_capita"
+
+
+def _all_pollutants_title(view):
+    return (
+        "Per capita emissions of air pollutants from all sectors"
+        if _is_per_capita(view)
+        else "Emissions of air pollutants from all sectors"
+    )
+
+
+def _all_pollutants_subtitle(view):
+    return (
+        "Measured in kilograms and split by major pollutant."
+        if _is_per_capita(view)
+        else "Measured in tonnes and split by major pollutant."
+    )
+
+
+def _build_breakdown_title(pollutant_name: dict[str, str]):
+    """Build the breakdown-by-sector title callable, closing over the YAML's slug→name map.
+
+    The second `group_views` call also produces an `all_pollutants × breakdown_by_sector`
+    view that's dropped immediately after, but its title callable runs first — so guard.
+    """
+
+    def _breakdown_title(view):
+        name = pollutant_name.get(_dim(view, "pollutant"))
+        if name is None:
+            return None
+        if _is_per_capita(view):
+            return f"Per capita {name.lower()} emissions by sector"
+        return f"{name} emissions by sector"
+
+    return _breakdown_title
+
+
+def _has_map_tab(view) -> bool:
+    return _dim(view, "pollutant") != "all_pollutants" and _dim(view, "sector") != "breakdown_by_sector"
+
+
+def _default_view(view) -> bool:
+    return (
+        _dim(view, "pollutant") == "all_pollutants"
+        and _dim(view, "sector") == "all_sectors"
+        and _dim(view, "per_capita") == "total"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Step
+# ---------------------------------------------------------------------------
 
 
 def run() -> None:
-    #
-    # Load inputs.
-    #
-    # Load air pollutants grapher dataset and read its main table.
+    config = paths.load_collection_config()
+
     ds = paths.load_dataset("ceds_air_pollutants")
-    tb = ds.read("ceds_air_pollutants")
+    tb = ds.read("ceds_air_pollutants", load_data=False)
 
-    #
-    # Process data.
-    #
-    # Prepare graphers table of explorer.
-    variable_ids = []
-    pollutant_dropdown = []
-    sector_dropdown = []
-    per_capita_checkbox = []
-    map_tab = []
-    # Auxiliary list of pollutants as they appear in column names.
-    pollutant_short_names = []
-    for column in tb.drop(columns=["country", "year"]).columns:
-        dimensions = tb[column].metadata.additional_info["dimensions"]
-        if dimensions["originalShortName"] == "emissions":
-            per_capita = False
-        elif dimensions["originalShortName"] == "emissions_per_capita":
-            per_capita = True
-        else:
-            raise ValueError(f"Unknown emissions type for column: {column}")
+    # Translate upstream dimension display values to URL-friendly slugs and add a
+    # `per_capita` slot derived from each column's `original_short_name`.
+    for col in tb.columns:
+        if col in {"country", "year"}:
+            continue
+        d = tb[col].metadata.dimensions
+        if d is None:
+            continue
+        is_per_capita = tb[col].metadata.original_short_name == "emissions_per_capita"
+        tb[col].metadata.original_short_name = "emissions"
+        tb[col].metadata.dimensions = {
+            "pollutant": POLLUTANT_SLUG[d["pollutant"]],
+            "sector": SECTOR_SLUG[d["sector"]],
+            "per_capita": "per_capita" if is_per_capita else "total",
+        }
 
-        for filter in dimensions["filters"]:
-            if filter["name"] == "pollutant":
-                pollutant_short_name = filter["value"]
-                pollutant = POLLUTANT_NAME[pollutant_short_name]
-            elif filter["name"] == "sector":
-                sector = filter["value"]
-            else:
-                raise ValueError(f"Unknown filter type for column: {column}")
-
-        # Append extracted values.
-        variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
-        pollutant_dropdown.append(pollutant)
-        sector_dropdown.append(sector)
-        per_capita_checkbox.append(per_capita)
-        map_tab.append(True)
-        pollutant_short_names.append(pollutant_short_name)
-
-    # Create graphers table.
-    df_graphers = pd.DataFrame()
-    df_graphers["yVariableIds"] = variable_ids
-    df_graphers["Pollutant Dropdown"] = pollutant_dropdown
-    df_graphers["Sector Dropdown"] = sector_dropdown
-    df_graphers["Per capita Checkbox"] = per_capita_checkbox
-    df_graphers["hasMapTab"] = map_tab
-
-    # Create view for all pollutants.
-    # NOTE: Here, we could create a vew not only for "All sectors" but also for each individual sector. But there is a technical problem: The display name of each indicator would be the same, and therefore the faceted view of all pollutants for a given sector would show the same name (the sector name) on top of each small chart. To achieve this, we would probably need to create duplicates of indicators, with a different set of display names.
-    # Also note that having this dropdown with all sectors as options (which doesn't contain a "Breakdown by sector") causes that, for any other pollutant view (e.g. "Agriculture") the Sector dropdown will show "Breakdown by sector" at the bottom. This happens because "All pollutants" is the first option in the Pollutants dropdown, which therefore sets the order of sectors in the sectors dropdown.
-    # So, for now, we'll keep only one option for "Sector Dropdown" when "All pollutants" is selected.
-    # for sector in sorted(set(df_graphers["Sector Dropdown"])):
-    for sector in [ALL_SECTORS_LABEL_OLD]:
-        sector_short_name = sector.lower().replace(" ", "_")
-        for per_capita in [False, True]:
-            _columns = []
-            for pollutant_short_name in [underscore(key) for key in POLLUTANT_NAME.keys()]:
-                column = [
-                    column
-                    for column in tb.columns
-                    if (f"_{pollutant_short_name}_" in column)
-                    and (("per_capita" in column) == per_capita)
-                    and (sector_short_name in column)
-                ]
-                if len(column) == 1:
-                    _columns.append(f"{ds.metadata.uri}/{tb.metadata.short_name}#{column[0]}")
-            df_graphers = pd.concat(
-                [
-                    df_graphers,
-                    pd.DataFrame(
-                        {
-                            "yVariableIds": [_columns],
-                            "title": f"Per capita emissions of air pollutants from {sector.lower()}"
-                            if per_capita
-                            else f"Emissions of air pollutants from {sector.lower()}",
-                            "subtitle": "Measured in kilograms and split by major pollutant."
-                            if per_capita
-                            else "Measured in tonnes and split by major pollutant.",
-                            "Pollutant Dropdown": ALL_POLLUTANTS_LABEL,
-                            "Sector Dropdown": sector,
-                            "Per capita Checkbox": per_capita,
-                            "hasMapTab": False,
-                            "selectedFacetStrategy": "metric",
-                            "facetYDomain": "independent",
-                        }
-                    ),
-                ]
-            )
-
-    # Create breakdown by sector.
-    for pollutant, pollutant_short_name in list(dict.fromkeys(zip(pollutant_dropdown, pollutant_short_names))):
-        for per_capita in [False, True]:
-            _columns_for_pollutant = []
-            _pollutant_title = []
-            _pollutant_subtitle = []
-            for column in tb.drop(columns=["country", "year"]).columns:
-                dimensions = tb[column].metadata.additional_info["dimensions"]
-                if (not per_capita and dimensions["originalShortName"] == "emissions") or (
-                    per_capita and dimensions["originalShortName"] == "emissions_per_capita"
-                ):
-                    for filter in dimensions["filters"]:
-                        if (filter["name"] == "pollutant") and (filter["value"] == pollutant_short_name):
-                            if not column.endswith("all_sectors"):
-                                _columns_for_pollutant.append(f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}")
-                                _pollutant_title.append(POLLUTANT_NAME[pollutant_short_name])
-                                _pollutant_subtitle.append(tb[column].metadata.description_short)
-            if len(_columns_for_pollutant) == 0:
-                continue
-            assert len(set(_pollutant_title)) == 1, "Multiple pollutants with the same title."
-            assert len(set(_pollutant_subtitle)) == 1, "Multiple pollutants with the same description."
-            title = (
-                f"Per capita {_pollutant_title[0].lower()} emissions by sector"
-                if per_capita
-                else f"{_pollutant_title[0]} emissions by sector"
-            )
-            subtitle = _pollutant_subtitle[0]
-            df_graphers = pd.concat(
-                [
-                    df_graphers,
-                    pd.DataFrame(
-                        {
-                            "yVariableIds": [_columns_for_pollutant],
-                            "title": title,
-                            "subtitle": subtitle,
-                            "Pollutant Dropdown": pollutant,
-                            "Sector Dropdown": BREAKDOWN_BY_SECTOR_LABEL,
-                            "Per capita Checkbox": per_capita,
-                            "hasMapTab": False,
-                            "selectedFacetStrategy": "entity",
-                            "facetYDomain": "independent",
-                        }
-                    ),
-                ]
-            )
-
-    # Rename all sectors label in sector dropdown.
-    df_graphers["Sector Dropdown"] = df_graphers["Sector Dropdown"].replace(
-        ALL_SECTORS_LABEL_OLD, ALL_SECTORS_LABEL_NEW
+    c = paths.create_collection(
+        config=config,
+        tb=tb,
+        indicator_names="emissions",
+        dimensions={
+            "pollutant": POLLUTANTS,
+            "sector": list(SECTOR_SLUG.values()),
+            "per_capita": ["total", "per_capita"],
+        },
+        short_name="air-pollution",
+        explorer=True,
     )
 
-    # Sanity check.
-    error = "Duplicated rows in explorer."
-    assert df_graphers[
-        df_graphers.duplicated(subset=["Pollutant Dropdown", "Sector Dropdown", "Per capita Checkbox"], keep=False)
-    ].empty, error
+    # Pull slug→display-name from the collection so titles stay in sync with the
+    # dropdown labels users see in the explorer.
+    breakdown_title = _build_breakdown_title(c.get_choice_names("pollutant"))
 
-    # Impose that all line charts start at zero.
-    df_graphers["yAxisMin"] = 0
-
-    # Choose which indicator to show by default when opening the explorer.
-    df_graphers["defaultView"] = False
-    df_graphers.loc[
-        (df_graphers["Pollutant Dropdown"] == ALL_POLLUTANTS_LABEL)
-        & (df_graphers["Sector Dropdown"] == ALL_SECTORS_LABEL_NEW)
-        & (~df_graphers["Per capita Checkbox"]),
-        "defaultView",
-    ] = True
-
-    # Sort rows conveniently.
-    sector_categories = [ALL_SECTORS_LABEL_NEW, BREAKDOWN_BY_SECTOR_LABEL] + sorted(
-        set(df_graphers["Sector Dropdown"]) - {ALL_SECTORS_LABEL_NEW, BREAKDOWN_BY_SECTOR_LABEL}
+    c.group_views(
+        groups=[
+            # All-pollutants facet: collapse the 9 pollutants into one multi-indicator view per
+            # (sector, per_capita). The cross-product against real sectors is dropped below.
+            {
+                "dimension": "pollutant",
+                "choices": POLLUTANTS,
+                "choice_new_slug": "all_pollutants",
+                "view_config": {
+                    "selectedFacetStrategy": "metric",
+                    "facetYDomain": "independent",
+                    "title": _all_pollutants_title,
+                    "subtitle": _all_pollutants_subtitle,
+                },
+            },
+            # Breakdown-by-sector facet: collapse the real sectors (excluding `all_sectors`) into
+            # one multi-indicator view per (pollutant, per_capita).
+            {
+                "dimension": "sector",
+                "choices": SECTORS_REAL,
+                "choice_new_slug": "breakdown_by_sector",
+                "view_config": {
+                    "selectedFacetStrategy": "entity",
+                    "facetYDomain": "independent",
+                    "title": breakdown_title,
+                },
+            },
+        ],
+        drop_dimensions_if_single_choice=False,
     )
-    df_graphers["Sector Dropdown"] = pd.Categorical(
-        df_graphers["Sector Dropdown"],
-        categories=sector_categories,
-        ordered=True,
-    )
-    df_graphers = df_graphers.sort_values(["Pollutant Dropdown", "Sector Dropdown", "Per capita Checkbox"]).reset_index(
-        drop=True
+
+    # Drop unwanted views:
+    # - all_pollutants × <real sector>: the legacy explorer only shows the all-pollutants
+    #   facet for sector=all_sectors.
+    # - all_pollutants × breakdown_by_sector: created when the second `group_views` runs
+    #   over the views the first one had already produced.
+    c.drop_views(
+        [
+            {"pollutant": "all_pollutants", "sector": "breakdown_by_sector"},
+            *[{"pollutant": "all_pollutants", "sector": s} for s in SECTORS_REAL],
+        ]
     )
 
-    # Prepare explorer metadata.
-    config = {
-        "name": "air-pollution",
-        "originUrl": "https://ourworldindata.org/air-pollution",
-        "explorerTitle": "Air Pollution",
-        "explorerSubtitle": "Explore historical emissions of air pollutants across the world.",
-        "selection": ["China", "India", "United Kingdom", "United States", "World"],
-        "yScaleToggle": True,
-        "isPublished": True,
-    }
+    # Per-view config applied to every view. Lambdas branch on dimensions; single-
+    # indicator title/subtitle remain unset and inherit from the indicator metadata.
+    c.set_global_config(
+        {
+            "type": "LineChart",
+            "yAxisMin": 0,
+            "hasMapTab": _has_map_tab,
+            "defaultView": _default_view,
+        }
+    )
 
-    #
-    # Save outputs.
-    #
-    # Create a new explorers dataset and tsv file.
-    ds_explorer = paths.create_explorer_legacy(config=config, df_graphers=df_graphers)
-    ds_explorer.save()
+    c.save(tolerate_extra_indicators=True)
