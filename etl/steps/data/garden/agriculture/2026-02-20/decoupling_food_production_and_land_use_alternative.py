@@ -30,7 +30,6 @@ FOOD_INCREASE_PCT_MIN = 5
 # Minimum percentage decrease in land use in the latest year with respect to the first year.
 LAND_DECREASE_PCT_MIN = 5
 # Maximum imports as a percentage of domestic supply (applied to the latest year only).
-# TODO: Implement.
 IMPORTS_SHARE_OF_SUPPLY_MAX = 20
 
 # Number of years for the rolling average (1 to not do any rolling average).

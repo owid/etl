@@ -170,8 +170,8 @@ steps:
   # Decoupling of agricultural production and land use (alternative method)
   #
   data://garden/agriculture/2026-02-20/decoupling_food_production_and_land_use_alternative:
-    - data://garden/faostat/2025-03-17/faostat_fbsc
-    - data://garden/faostat/2025-03-17/faostat_rl
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+    - data://garden/faostat/2026-02-25/faostat_rl
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
   #
