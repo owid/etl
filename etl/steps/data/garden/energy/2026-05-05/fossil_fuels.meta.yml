@@ -186,3 +186,13 @@ tables:
       population:
         title: Population
         unit: people
+  fossil_fuels_monthly:
+    variables:
+      oil_production_monthly:
+        title: Monthly oil production
+        unit: cubic metres
+        short_unit: m³
+      oil_production_monthly_per_capita:
+        title: Monthly oil production per capita
+        unit: cubic metres per person
+        short_unit: m³

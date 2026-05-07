@@ -11,9 +11,10 @@ def run() -> None:
     #
     ds_garden = paths.load_dataset("fossil_fuels")
     tb = ds_garden.read("fossil_fuels", reset_index=False)
+    tb_monthly = ds_garden.read("fossil_fuels_monthly", reset_index=False)
 
     #
     # Save outputs.
     #
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(tables=[tb, tb_monthly], default_metadata=ds_garden.metadata)
     ds_grapher.save()

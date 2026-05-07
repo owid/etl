@@ -3,8 +3,18 @@
 Pivots the long-format meadow table to a wide table of curated indicators (energy and electricity
 in TWh, installed capacity in GW, CO2 in million tonnes, etc.), harmonizes country names, and
 adds OWID region aggregates.
+
+Combines two upstream meadow tables:
+
+- ``international_energy`` (current EIA bulk file) — supplies all live, regularly-updated
+  indicators (production, consumption, electricity, etc.).
+- ``international_energy_archive`` (frozen 2022 export from EIA's old international tool) —
+  supplies indicators that EIA has since retired upstream and that don't exist anywhere else,
+  notably **natural gas reserves** and **oil reserves**. These columns are frozen at 2021 and
+  carry that limitation as metadata.
 """
 
+import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -134,11 +144,18 @@ INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
         "TWh",
         "Energy production from renewables and other",
     ),
-    # Coal.
+    # Coal — energy (TWh).
     ("Coal consumption", "terajoules", "coal_consumption", TJ_TO_TWH, "terawatt-hours", "TWh", "Coal consumption"),
     ("Coal production", "terajoules", "coal_production", TJ_TO_TWH, "terawatt-hours", "TWh", "Coal production"),
     ("Coal imports", "terajoules", "coal_imports", TJ_TO_TWH, "terawatt-hours", "TWh", "Coal imports"),
     ("Coal exports", "terajoules", "coal_exports", TJ_TO_TWH, "terawatt-hours", "TWh", "Coal exports"),
+    # Coal — mass (Mt). Provided alongside the energy versions so downstream steps that need
+    # a physical-mass series (e.g. the fossil-fuels explorer) can use them directly without
+    # an approximate energy-density conversion.
+    ("Coal consumption", "1000 metric tons", "coal_consumption_mt", 0.001, "million tonnes", "Mt", "Coal consumption"),
+    ("Coal production", "1000 metric tons", "coal_production_mt", 0.001, "million tonnes", "Mt", "Coal production"),
+    ("Coal imports", "1000 metric tons", "coal_imports_mt", 0.001, "million tonnes", "Mt", "Coal imports"),
+    ("Coal exports", "1000 metric tons", "coal_exports_mt", 0.001, "million tonnes", "Mt", "Coal exports"),
     (
         "Coal reserves",
         "million short tons",
@@ -212,6 +229,27 @@ INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
         "thousand barrels per day",
         "kb/d",
         "Crude oil production (including lease condensate)",
+    ),
+    # Crude oil trade. NOTE: EIA's bulk file stops reporting these broadly after 2018 — full
+    # country coverage is only available through 2018, with sparse data 2019–2020 and nothing
+    # afterwards. They are still the best EIA series for crude trade.
+    (
+        "Crude oil including lease condensate imports",
+        "thousand barrels per day",
+        "crude_oil_imports",
+        1.0,
+        "thousand barrels per day",
+        "kb/d",
+        "Crude oil imports (including lease condensate)",
+    ),
+    (
+        "Crude oil including lease condensate exports",
+        "thousand barrels per day",
+        "crude_oil_exports",
+        1.0,
+        "thousand barrels per day",
+        "kb/d",
+        "Crude oil exports (including lease condensate)",
     ),
     # Electricity flows.
     (
@@ -519,6 +557,48 @@ INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
     ),
 ]
 
+# Indicators sourced from the frozen 2022 archive of EIA's old international tool — these don't
+# exist in the current bulk file because EIA retired the upstream tables.
+# Each tuple: (archive_topic, archive_indicator, archive_unit, output_column, factor, output_unit, output_short_unit, title).
+# 1 trillion cubic feet = 0.0283168 trillion cubic metres (TCM).
+TCF_TO_TCM = 0.0283168
+ARCHIVE_INDICATORS: list[tuple[str, str, str, str, float, str, str, str]] = [
+    (
+        "natural_gas_reserves",
+        "natural gas reserves",
+        "tcf",
+        "natural_gas_reserves",
+        TCF_TO_TCM,
+        "trillion cubic metres",
+        "TCM",
+        "Natural gas reserves",
+    ),
+    (
+        "oil_reserves",
+        "crude oil including lease condensate reserves",
+        "billion b",
+        "oil_reserves",
+        1.0,
+        "billion barrels",
+        "Gbbl",
+        "Oil reserves",
+    ),
+]
+
+# Monthly indicators we keep from the monthly meadow table (date-indexed).
+# Tuple shape matches INDICATORS but the time column is "date" instead of "year".
+MONTHLY_INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
+    (
+        "Crude oil including lease condensate production",
+        "thousand barrels per day",
+        "crude_oil_production_monthly",
+        1.0,
+        "thousand barrels per day",
+        "kb/d",
+        "Crude oil production, monthly (including lease condensate)",
+    ),
+]
+
 # Indicators that are intensive (per capita, per GDP) and shouldn't be summed across countries.
 INTENSIVE_INDICATORS = {"energy_consumption_per_capita", "energy_intensity"}
 
@@ -540,7 +620,10 @@ REGIONS = {
 # Known overlaps between historical regions and successor countries. Aruba's contribution is
 # negligible compared to the Netherlands Antilles aggregate, so the small double counting in
 # Europe-level aggregates does not affect results meaningfully.
-KNOWN_OVERLAPS = [{year: {"Aruba", "Netherlands Antilles"} for year in range(1986, 2030)}]
+# NOTE: The year range must exactly match the years where both entities have data; extra years
+# trigger an "overlaps not found" warning because the function compares the full year-set dict.
+# Bump the upper bound (exclusive) when a new update extends the data past the current year.
+KNOWN_OVERLAPS = [{year: {"Aruba", "Netherlands Antilles"} for year in range(1986, 2025)}]
 
 
 def curate_indicators(tb_meadow: Table) -> Table:
@@ -569,12 +652,61 @@ def curate_indicators(tb_meadow: Table) -> Table:
     return tb[ordered]
 
 
+def curate_monthly_indicators(tb_meadow_monthly: Table) -> Table:
+    """Pivot the monthly meadow table into a wide table with the indicators we keep."""
+    selected_pairs = {(var, unit) for var, unit, *_ in MONTHLY_INDICATORS}
+    keep = [(v, u) in selected_pairs for v, u in zip(tb_meadow_monthly["variable"], tb_meadow_monthly["unit"])]
+    tb = tb_meadow_monthly[keep][["country", "date", "variable", "unit", "value"]].copy()
+    pair_to_output = {(var, unit): (name, factor) for var, unit, name, factor, *_ in MONTHLY_INDICATORS}
+    tb["value"] = tb["value"] * [pair_to_output[(v, u)][1] for v, u in zip(tb["variable"], tb["unit"])]
+    tb["indicator"] = [pair_to_output[(v, u)][0] for v, u in zip(tb["variable"], tb["unit"])]
+    tb = tb.drop(columns=["variable", "unit"])
+    tb = tb.pivot(index=["country", "date"], columns="indicator", values="value").reset_index()
+    tb.columns.name = None
+    return tb
+
+
+def curate_archive_indicators(tb_archive: Table) -> Table:
+    """Pivot the archive's long-format annual table to a wide table with the indicators we keep.
+
+    Rows are selected by (topic, indicator, unit), then the value is multiplied by the per-row
+    conversion factor and stored in the named output column.
+    """
+    selected = {(t, i, u) for t, i, u, *_ in ARCHIVE_INDICATORS}
+    keep = [(t, i, u) in selected for t, i, u in zip(tb_archive["topic"], tb_archive["indicator"], tb_archive["unit"])]
+    tb = tb_archive[keep][["topic", "country", "year", "indicator", "unit", "value"]].copy()
+
+    # Apply per-row factor and rename to output column.
+    triple_to_target = {(t, i, u): (name, factor) for t, i, u, name, factor, *_ in ARCHIVE_INDICATORS}
+    factors = [triple_to_target[(t, i, u)][1] for t, i, u in zip(tb["topic"], tb["indicator"], tb["unit"])]
+    tb["value"] = tb["value"] * factors
+    tb["target"] = [triple_to_target[(t, i, u)][0] for t, i, u in zip(tb["topic"], tb["indicator"], tb["unit"])]
+    tb = tb.drop(columns=["topic", "indicator", "unit"])
+
+    # Pivot wide.
+    tb = tb.pivot(index=["country", "year"], columns="target", values="value").reset_index()
+    tb.columns.name = None
+    return tb
+
+
 def attach_indicator_metadata(tb: Table) -> Table:
     """Set per-indicator title/unit/short_unit on the wide table.
 
     YAML metadata can override these later.
     """
     for _var, _unit, name, _factor, output_unit, output_short_unit, title in INDICATORS:
+        if name not in tb.columns:
+            continue
+        tb[name].metadata.title = title
+        tb[name].metadata.unit = output_unit
+        tb[name].metadata.short_unit = output_short_unit
+    for _topic, _ind, _u, name, _factor, output_unit, output_short_unit, title in ARCHIVE_INDICATORS:
+        if name not in tb.columns:
+            continue
+        tb[name].metadata.title = title
+        tb[name].metadata.unit = output_unit
+        tb[name].metadata.short_unit = output_short_unit
+    for _var, _unit, name, _factor, output_unit, output_short_unit, title in MONTHLY_INDICATORS:
         if name not in tb.columns:
             continue
         tb[name].metadata.title = title
@@ -589,16 +721,28 @@ def run() -> None:
     #
     ds_meadow = paths.load_dataset("international_energy")
     tb_meadow = ds_meadow.read("international_energy", safe_types=False)
+    tb_meadow_monthly = ds_meadow.read("international_energy_monthly", safe_types=False)
+
+    ds_archive = paths.load_dataset("international_energy_archive")
+    tb_archive = ds_archive.read("annual", safe_types=False)
 
     #
     # Process data.
     #
-    # Pivot to wide curated indicators with consistent units.
+    # Pivot bulk-derived indicators to wide.
     tb = curate_indicators(tb_meadow)
+    # Pivot archive-derived indicators to wide.
+    tb_archive_wide = curate_archive_indicators(tb_archive)
 
-    # Harmonize country names. EIA aggregate regions (e.g. "Africa", "OPEC") become suffixed
-    # entities like "Africa (EIA)" and stay alongside individual countries.
+    # Harmonize country names on both sides using the local mapping (covers the EIA-style
+    # regions like "Africa (EIA)" and the country names used in both bulk and archive).
     tb = paths.regions.harmonize_names(tb=tb)
+    tb_archive_wide = paths.regions.harmonize_names(
+        tb=tb_archive_wide, warn_on_missing_countries=False, warn_on_unused_countries=False
+    )
+
+    # Merge bulk and archive on (country, year). Archive only contributes the reserves columns.
+    tb = pr.merge(tb, tb_archive_wide, on=["country", "year"], how="outer", short_name=paths.short_name)
 
     # Attach indicator-level metadata before adding regions, so aggregates inherit it.
     tb = attach_indicator_metadata(tb)
@@ -619,8 +763,21 @@ def run() -> None:
     # Set an appropriate index and sort.
     tb = tb.format(keys=["country", "year"], short_name=paths.short_name)
 
+    # Build a separate monthly table (date-indexed) — the bulk file has monthly oil production
+    # for ~250 countries through the present, useful for the fossil-fuels explorer's "Monthly
+    # production" view. We harmonize country names but skip OWID region aggregation here:
+    # add_aggregates assumes a year column, and EIA's own "World" row is already present in the
+    # source data.
+    tb_monthly = curate_monthly_indicators(tb_meadow_monthly)
+    tb_monthly = paths.regions.harmonize_names(
+        tb=tb_monthly, warn_on_missing_countries=False, warn_on_unused_countries=False
+    )
+    tb_monthly = tb_monthly[~tb_monthly["country"].astype(str).str.endswith(" (EIA)")].reset_index(drop=True)
+    tb_monthly = attach_indicator_metadata(tb_monthly)
+    tb_monthly = tb_monthly.format(keys=["country", "date"], short_name=f"{paths.short_name}_monthly")
+
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb, tb_monthly])
     ds_garden.save()
