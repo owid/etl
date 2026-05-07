@@ -41,7 +41,7 @@ flowchart LR
 
     The computational graph is summarised in our DAG files, which lists all the steps and their dependencies.
 
-    [Read more :octicons-arrow-right-24:](../dag.md)
+    [Read more :octicons-arrow-right-24:](dag.md)
 
 
 ## Why use a graph?
@@ -74,6 +74,6 @@ A node represents a step (or a dataset) in the ETL and is uniquely identified by
     All steps (or nodes) can be uniquely identified throughout the whole ETL. This allows us to reference datasets (and use them) when building a new dataset.
 
 
-    [Read more :octicons-arrow-right-24:](../uri.md)
+    [Read more :octicons-arrow-right-24:](uri.md)
 
 There are different types of steps in our ETL, depending on the level of curation of the dataset. We delve deeper into this in the next sections.

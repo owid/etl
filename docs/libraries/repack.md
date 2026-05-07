@@ -11,5 +11,6 @@ pip install owid-repack
 ::: owid.repack
     options:
       heading_level: 2
-      filters: ["!^_"]
+      filters:
+        - "!^_"
       members_order: alphabetical

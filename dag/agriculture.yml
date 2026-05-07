@@ -89,16 +89,6 @@ steps:
   data://grapher/wb/2025-08-04/food_prices_for_nutrition:
     - data://garden/wb/2025-08-04/food_prices_for_nutrition
   #
-  # Decoupling of agricultural production and land use
-  #
-  data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use:
-    - data://garden/faostat/2025-03-17/faostat_fbsc
-    - data://garden/faostat/2025-03-17/faostat_rl
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/agriculture/2025-08-06/decoupling_food_production_and_land_use:
-    - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use
-  #
   # Lobell Lab: Crop productivity in southern Africa
   # NOTE: Not updateable.
   #
@@ -173,6 +163,35 @@ steps:
   data://garden/agriculture/2026-03-02/corn_yields:
     - data://meadow/agriculture/2026-03-02/corn_yields
     - data://garden/regions/2023-01-01/regions
+  ######################################################################################################################
+  # TODO: The following steps are experiments; clean up once we make a decision on this. For more details:
+  # https://github.com/owid/owid-issues/issues/2057
+  #
+  # Decoupling of food supply and land use
+  #
+  data://garden/agriculture/2026-02-20/decoupling_food_supply_and_land_use:
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+    - data://garden/faostat/2026-02-25/faostat_rl
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  #
+  # Decoupling of food supply and land use
+  #
+  data://grapher/agriculture/2026-02-20/decoupling_food_supply_and_land_use:
+    - data://garden/agriculture/2026-02-20/decoupling_food_supply_and_land_use
+  #
+  # Decoupling of agricultural production and land use (with feed correction)
+  #
+  data://garden/agriculture/2026-02-25/decoupling_food_production_and_land_use:
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+    - data://garden/faostat/2026-02-25/faostat_rl
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Decoupling of agricultural production and land use (with feed correction)
+  #
+  data://grapher/agriculture/2026-02-25/decoupling_food_production_and_land_use:
+    - data://garden/agriculture/2026-02-25/decoupling_food_production_and_land_use
+  ######################################################################################################################
   #
   # USDA/FAS - Corn yields
   #

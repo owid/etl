@@ -19,7 +19,7 @@ def generate_catalog_api_docs():
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Load template
-    with open(DOCS_DIR / "ignore/pre-build/catalog-api.template.md") as f:
+    with open(DOCS_DIR / "ignore/pre-build/catalog-api.template.txt") as f:
         template = f.read()
 
     # Load Python content from catalog README
