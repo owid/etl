@@ -1,0 +1,92 @@
+config:
+  explorerTitle: CO₂ and Greenhouse Gas Emissions
+  explorerSubtitle: Explore data on greenhouse gas emissions.
+  isPublished: true
+  downloadDataLink: https://github.com/owid/co2-data
+  selection:
+    - China
+    - United States
+    - India
+    - United Kingdom
+    - World
+  subNavId: co2
+  subNavCurrentId: co2-data-explorer
+  wpBlockId: "36228"
+  thumbnail: https://assets.ourworldindata.org/uploads/2022/12/CO2-data-explorer-Thumbnail.png
+  tab: chart
+dimensions:
+  - slug: gas
+    name: Gas or warming impact
+    presentation:
+      type: dropdown
+    choices:
+      - slug: co2
+        name: CO₂
+      - slug: all_ghg
+        name: All GHGs (CO₂eq)
+      - slug: methane
+        name: Methane
+      - slug: nitrous_oxide
+        name: Nitrous oxide
+      - slug: warming_impact
+        name: Warming impact
+  - slug: accounting
+    name: Accounting
+    presentation:
+      type: radio
+    choices:
+      - slug: territorial
+        name: Territorial
+      - slug: consumption_based
+        name: Consumption-based
+  - slug: fuel
+    name: Fuel or land use change
+    presentation:
+      type: dropdown
+    choices:
+      - slug: all_fossil
+        name: All fossil emissions
+      - slug: land_use
+        name: Land use change
+      - slug: fossil_plus_land_use
+        name: Fossil + land use change
+      - slug: na
+        name: ''
+      - slug: coal
+        name: Coal
+      - slug: oil
+        name: Oil
+      - slug: fossil_gas
+        name: Gas
+      - slug: cement
+        name: Cement
+      - slug: flaring
+        name: Flaring
+  - slug: count
+    name: Count
+    presentation:
+      type: dropdown
+    choices:
+      - slug: per_capita
+        name: Per capita
+      - slug: per_country
+        name: Per country
+      - slug: cumulative
+        name: Cumulative
+      - slug: per_kwh
+        name: Per kWh of energy
+      - slug: per_gdp
+        name: Per $ of GDP
+      - slug: share_embedded_in_trade
+        name: Share of emissions embedded in trade
+  - slug: relative_to_world
+    name: Relative to world total
+    presentation:
+      type: checkbox
+      choice_slug_true: relative
+    choices:
+      - slug: total
+        name: ''
+      - slug: relative
+        name: Relative to world total
+views: []
