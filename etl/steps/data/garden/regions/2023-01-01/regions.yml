@@ -3526,3 +3526,209 @@
     - UGA
     - ZMB
     - ZWE
+
+##########
+# IEA
+##########
+- code: IEA_ASP
+  name: "Asia Pacific (IEA)"
+  region_type: "aggregate"
+  defined_by: iea
+  members:
+    - AUS
+    - BGD
+    - BRN
+    - KHM
+    - CHN
+    - TWN
+    - HKG
+    - IND
+    - IDN
+    - JPN
+    - KOR
+    - LAO
+    - MYS
+    - MNG
+    - MMR
+    - NPL
+    - NZL
+    - PAK
+    - PHL
+    - SGP
+    - LKA
+    - THA
+    - VNM
+- code: IEA_AFR
+  name: "Africa (IEA)"
+  region_type: "aggregate"
+  defined_by: iea
+  members:
+    - DZA
+    - AGO
+    - BEN
+    - BWA
+    - BFA
+    - BDI
+    - CPV
+    - CMR
+    - CAF
+    - TCD
+    - COM
+    - COG
+    - CIV
+    - COD
+    - DJI
+    - EGY
+    - GNQ
+    - ERI
+    - SWZ
+    - ETH
+    - GAB
+    - GMB
+    - GHA
+    - GIN
+    - GNB
+    - KEN
+    - LSO
+    - LBR
+    - LBY
+    - MDG
+    - MWI
+    - MLI
+    - MRT
+    - MUS
+    - MAR
+    - MOZ
+    - NAM
+    - NER
+    - NGA
+    - RWA
+    - STP
+    - SEN
+    - SYC
+    - SLE
+    - SOM
+    - ZAF
+    - SSD
+    - SDN
+    - TZA
+    - TGO
+    - TUN
+    - UGA
+    - ZMB
+    - ZWE
+- code: IEA_CSA
+  name: "Central and South America (IEA)"
+  region_type: "aggregate"
+  defined_by: iea
+  members:
+    - ARG
+    - BOL
+    - BRA
+    - CHL
+    - COL
+    - CRI
+    - CUB
+    - CUW
+    - DOM
+    - ECU
+    - SLV
+    - GTM
+    - HTI
+    - HND
+    - JAM
+    - NIC
+    - PAN
+    - PRY
+    - PER
+    - SUR
+    - TTO
+    - URY
+    - VEN
+- code: IEA_EUR
+  name: "Europe (IEA)"
+  region_type: "aggregate"
+  defined_by: iea
+  members:
+    - ALB
+    - AUT
+    - BLR
+    - BEL
+    - BIH
+    - BGR
+    - HRV
+    - CYP
+    - CZE
+    - DNK
+    - EST
+    - FIN
+    - FRA
+    - DEU
+    - GIB
+    - GRC
+    - HUN
+    - ISL
+    - IRL
+    - ISR
+    - ITA
+    - OWID_KOS
+    - LVA
+    - LTU
+    - LUX
+    - MLT
+    - MDA
+    - MNE
+    - MKD
+    - NOR
+    - POL
+    - PRT
+    - ROU
+    - SRB
+    - SVK
+    - SVN
+    - ESP
+    - SWE
+    - CHE
+    - NLD
+    - TUR
+    - UKR
+    - GBR
+- code: IEA_MEA
+  name: "Middle East (IEA)"
+  region_type: "aggregate"
+  defined_by: iea
+  members:
+    - BHR
+    - IRN
+    - IRQ
+    - JOR
+    - KWT
+    - LBN
+    - OMN
+    - QAT
+    - SAU
+    - SYR
+    - ARE
+    - YEM
+- code: IEA_NAM
+  name: "North America (IEA)"
+  region_type: "aggregate"
+  defined_by: iea
+  members:
+    - CAN
+    - MEX
+    - USA
+- code: IEA_EUR_ASIA
+  name: "Eurasia (IEA)"
+  region_type: "aggregate"
+  defined_by: iea
+  members:
+    - ARM
+    - AZE
+    - GEO
+    - KAZ
+    - KGZ
+    - RUS
+    - TJK
+    - TKM
+    - UZB
