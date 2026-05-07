@@ -72,6 +72,26 @@ tables:
             subtitle: |-
               Measured in grams of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) emitted per [kilowatt-hour](#dod:watt-hours) of electricity generated. Emissions are estimated on a lifecycle basis, including upstream, supply chain and manufacturing stages, and cover all greenhouse gases.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 300
+                  - 400
+                  - 500
+                  - 600
+                  - 700
+                  - 800
+                  - 900
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+              timeTolerance: 3
       coal_generation__twh:
         title: Electricity from coal - TWh
         short_unit: TWh
@@ -85,6 +105,24 @@ tables:
             title: Electricity generation from coal
             subtitle: Measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Oranges
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 1
+                customNumericColors:
+                  - 
+              timeTolerance: 2
       coal_share_of_electricity__pct:
         title: Coal - % electricity
         short_unit: '%'
@@ -97,6 +135,27 @@ tables:
           grapher_config:
             title: Share of electricity production from coal
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Oranges
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+                customNumericColors:
+                  - 
+                  - 
+                  - 
+              timeTolerance: 2
       fossil_generation__twh:
         title: Electricity from fossil fuels - TWh
         short_unit: TWh
@@ -110,6 +169,29 @@ tables:
           grapher_config:
             title: Electricity generation from fossil fuels
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+              timeTolerance: 2
       fossil_share_of_electricity__pct:
         title: Fossil fuels - % electricity
         short_unit: '%'
@@ -123,6 +205,42 @@ tables:
           grapher_config:
             title: Share of electricity production from fossil fuels
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100.001
+                customNumericColors:
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                customNumericLabels:
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - ''
+                  - ''
+                customCategoryLabels:
+                  No data: ''
+              timeTolerance: 2
       gas_generation__twh:
         title: Electricity from gas - TWh
         short_unit: TWh
@@ -136,6 +254,19 @@ tables:
             title: Electricity generation from gas
             subtitle: Measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Purples
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 30
+                  - 100
+                  - 300
+                  - 1000
+                  - 1
+              timeTolerance: 2
       gas_share_of_electricity__pct:
         title: Gas - % electricity
         short_unit: '%'
@@ -148,6 +279,23 @@ tables:
           grapher_config:
             title: Share of electricity production from gas
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100.001
+              timeTolerance: 2
       hydro_generation__twh:
         title: Electricity from hydro - TWh
         short_unit: TWh
@@ -161,6 +309,22 @@ tables:
             title: Hydropower generation
             subtitle: Annual hydropower generation, measured in terawatt-hours (TWh).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 1
+                legendDescription: Hydropower consumption
+              timeTolerance: 2
       hydro_share_of_electricity__pct:
         title: Hydro - % electricity
         short_unit: '%'
@@ -173,6 +337,23 @@ tables:
           grapher_config:
             title: Share of electricity production from hydropower
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100.00001
+              timeTolerance: 2
       low_carbon_generation__twh:
         title: Low-carbon electricity - TWh
         short_unit: TWh
@@ -186,6 +367,23 @@ tables:
           grapher_config:
             title: Electricity generation from low-carbon sources
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: BuGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 1
+                customNumericColors:
+                  - 
+              timeTolerance: 2
       low_carbon_share_of_electricity__pct:
         title: Low-carbon electricity - % electricity
         short_unit: '%'
@@ -199,6 +397,23 @@ tables:
           grapher_config:
             title: Share of electricity generated by low-carbon sources
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100.001
+              timeTolerance: 2
       net_imports_share_of_demand__pct:
         title: Net electricity imports as a share of demand - %
         short_unit: '%'
@@ -214,6 +429,21 @@ tables:
             subtitle: |-
               Net electricity imports are calculated as electricity imports minus exports. This is given as a share of a country's electricity demand. Countries with positive values are net importers of electricity; negative values are net exporters.
             tab: discrete-bar
+            map:
+              colorScale:
+                baseColorScheme: RdBu
+                binningStrategy: manual
+                customNumericValues:
+                  - -50
+                  - -20
+                  - -10
+                  - -5
+                  - 0
+                  - 5
+                  - 10
+                  - 20
+                  - 50
+              timeTolerance: 2
       nuclear_generation__twh:
         title: Electricity from nuclear - TWh
         short_unit: TWh
@@ -226,6 +456,20 @@ tables:
           grapher_config:
             title: Nuclear power generation
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1
+              timeTolerance: 2
       nuclear_share_of_electricity__pct:
         title: Nuclear - % electricity
         short_unit: '%'
@@ -238,6 +482,40 @@ tables:
           grapher_config:
             title: Share of electricity production from nuclear
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                customNumericColors:
+                  - '#dedede'
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                customNumericColorsActive: true
+                customNumericLabels:
+                  - No nuclear
+                  - ''
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+              timeTolerance: 5
       oil_generation__twh:
         title: Electricity from oil - TWh
         short_unit: TWh
@@ -251,6 +529,20 @@ tables:
             title: Electricity generation from oil
             subtitle: Measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Reds
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 2
+                  - 5
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 1
+              timeTolerance: 2
       oil_share_of_electricity__pct:
         title: Oil - % electricity
         short_unit: '%'
@@ -263,6 +555,23 @@ tables:
           grapher_config:
             title: Share of electricity production from oil
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Oranges
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 5
+                  - 10
+                  - 20
+                  - 50
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+              timeTolerance: 2
       other_renewables_excluding_bioenergy_generation__twh:
         title: Other renewables excluding bioenergy - TWh
         short_unit: TWh
@@ -331,6 +640,20 @@ tables:
             title: Per capita electricity generation from coal
             subtitle: Measured in [kilowatt-hours](#dod:watt-hours) per person.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 1
+              timeTolerance: 2
       per_capita_fossil_generation__kwh:
         title: Fossil fuel electricity per capita - kWh
         short_unit: kWh
@@ -347,6 +670,25 @@ tables:
           grapher_config:
             title: Per capita electricity generation from fossil fuels
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Oranges
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+                  - 
+              timeTolerance: 2
       per_capita_gas_generation__kwh:
         title: Gas electricity per capita - kWh
         short_unit: kWh
@@ -363,6 +705,23 @@ tables:
             title: Per capita electricity generation from gas
             subtitle: Measured in [kilowatt-hours](#dod:watt-hours) per person.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: BuPu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 1
+                customNumericColors:
+                  - 
+              timeTolerance: 2
       per_capita_hydro_generation__kwh:
         title: Hydro electricity per capita - kWh
         short_unit: kWh
@@ -379,6 +738,24 @@ tables:
             title: Per capita electricity generation from hydropower
             subtitle: Measured in [kilowatt-hours](#dod:watt-hours) per person.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 1
+                customNumericColors:
+                  - 
+              timeTolerance: 2
       per_capita_low_carbon_generation__kwh:
         title: Low-carbon electricity per capita - kWh
         short_unit: kWh
@@ -395,6 +772,24 @@ tables:
           grapher_config:
             title: Low-carbon electricity generation per capita
             tab: map
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 50000
+                  - 1
+                customNumericColors:
+                  - 
+              timeTolerance: 2
       per_capita_nuclear_generation__kwh:
         title: Nuclear electricity per capita - kWh
         short_unit: kWh
@@ -411,6 +806,20 @@ tables:
             title: Per capita electricity generation from nuclear
             subtitle: Measured in [kilowatt-hours](#dod:watt-hours) per person.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBuGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 1
+              timeTolerance: 2
       per_capita_oil_generation__kwh:
         title: Oil electricity per capita - kWh
         short_unit: kWh
@@ -427,6 +836,20 @@ tables:
             title: Per capita electricity generation from oil
             subtitle: Measured in [kilowatt-hours](#dod:watt-hours) per person.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 30
+                  - 100
+                  - 300
+                  - 1000
+                  - 3000
+                  - 10000
+              timeTolerance: 2
       per_capita_other_renewables_excluding_bioenergy_generation__kwh:
         title: Other renewable electricity excluding bioenergy per capita - kWh
         short_unit: kWh
@@ -470,6 +893,22 @@ tables:
             subtitle: |-
               Measured in [kilowatt-hours](#dod:watt-hours) per person. Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 50000
+                  - 1
+              timeTolerance: 2
       per_capita_solar_generation__kwh:
         title: Solar electricity per capita - kWh
         short_unit: kWh
@@ -486,6 +925,21 @@ tables:
             title: Per capita electricity generation from solar
             subtitle: Measured in [kilowatt-hours](#dod:watt-hours) per person.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 1
+              timeTolerance: 2
       per_capita_solar_and_wind_generation__kwh:
         title: Solar and wind electricity per capita - kWh
         short_unit: kWh
@@ -502,6 +956,21 @@ tables:
             title: Per capita electricity generation from solar and wind
             subtitle: Measured in [kilowatt-hours](#dod:watt-hours) per person.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 1
+              timeTolerance: 2
       per_capita_total_generation__kwh:
         title: Per capita electricity - kWh
         short_unit: kWh
@@ -519,6 +988,33 @@ tables:
             subtitle: |-
               Annual average electricity generation per person, measured in [kilowatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBuGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 1
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                legendDescription: ''
+              timeTolerance: 2
       per_capita_total_demand__kwh:
         title: Per capita electricity demand - kWh
         short_unit: kWh
@@ -549,6 +1045,24 @@ tables:
             title: Per capita electricity generation from wind
             subtitle: Measured in [kilowatt-hours](#dod:watt-hours) per person.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBuGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 1
+                customNumericColors:
+                  - 
+              timeTolerance: 2
       population:
         title: Population
         short_unit: people
@@ -595,6 +1109,22 @@ tables:
             subtitle: |-
               Measured in [terawatt-hours](#dod:watt-hours). Renewable sources include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 1
+              timeTolerance: 2
       renewable_share_of_electricity__pct:
         title: Renewables - % electricity
         short_unit: '%'
@@ -610,6 +1140,27 @@ tables:
             subtitle: |-
               Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal sources.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: BuGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100.0001
+                customNumericColors:
+                  - 
+                  - 
+                  - 
+              timeTolerance: 2
       solar_generation__twh:
         title: Electricity from solar - TWh
         short_unit: TWh
@@ -624,6 +1175,25 @@ tables:
             subtitle: |-
               Electricity generation from solar, measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 0.1
+                  - 0.3
+                  - 1
+                  - 3
+                  - 10
+                  - 30
+                  - 100
+                  - 300
+                  - 1
+                customNumericColors:
+                  - 
+                legendDescription: Solar PV energy consumption
+              timeTolerance: 2
       solar_and_wind_generation__twh:
         title: Electricity from solar and wind - TWh
         short_unit: TWh
@@ -638,6 +1208,21 @@ tables:
             subtitle: |-
               Electricity generation from solar and wind, measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 0.1
+                  - 0.3
+                  - 1
+                  - 3
+                  - 10
+                  - 30
+                  - 100
+                  - 300
+              timeTolerance: 2
       solar_share_of_electricity__pct:
         title: Solar - % electricity
         short_unit: '%'
@@ -650,6 +1235,21 @@ tables:
           grapher_config:
             title: Share of electricity production from solar
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 5
+                  - 10
+                  - 20
+                  - 1
+                customNumericColors:
+                  - 
+              timeTolerance: 2
       solar_and_wind_share_of_electricity__pct:
         title: Solar and wind - % electricity
         short_unit: '%'
@@ -663,6 +1263,19 @@ tables:
             title: Share of electricity production from solar and wind
             subtitle: Measured as a percentage of total electricity.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Greens
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+              timeTolerance: 2
       total_demand__twh:
         title: Electricity demand - TWh
         short_unit: TWh
@@ -679,6 +1292,20 @@ tables:
             subtitle: |-
               Electricity demand is measured in [terawatt-hours](#dod:watt-hours), as total electricity generation, adjusted for electricity imports and exports.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 1
+              timeTolerance: 2
       total_electricity_share_of_primary_energy__pct:
         title: Electricity generation as share of direct primary energy consumption - %
         short_unit: '%'
@@ -696,6 +1323,19 @@ tables:
             subtitle: |-
               Share of electricity generation as a percentage of total, direct [primary energy](#dod:primaryenergy) consumption.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 1
       total_emissions__mtco2:
         title: Lifecycle emissions - MtCO2
         short_unit: Mt
@@ -720,6 +1360,22 @@ tables:
           grapher_config:
             title: Electricity generation
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 1
+                customNumericColors:
+                  - 
+              timeTolerance: 2
       total_net_imports__twh:
         title: Net imports - TWh
         short_unit: TWh
@@ -737,6 +1393,27 @@ tables:
             subtitle: |-
               Net electricity imports are calculated as electricity imports minus exports. Countries with positive values are net importers of electricity; negative values are net exporters. Measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: RdBu
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericValues:
+                  - -1
+                  - -40
+                  - -30
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+              timeTolerance: 2
       wind_generation__twh:
         title: Electricity from wind - TWh
         short_unit: TWh
@@ -751,6 +1428,23 @@ tables:
             subtitle: |-
               Annual electricity generation from wind is measured in terawatt-hours (TWh) per year. This includes both onshore and offshore wind sources.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 5
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1
+              timeTolerance: 2
       wind_share_of_electricity__pct:
         title: Wind - % electricity
         short_unit: '%'
@@ -763,3 +1457,22 @@ tables:
           grapher_config:
             title: Share of electricity production from wind
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBuGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 5
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                customNumericColors:
+                  - 
+                  - 
+                  - 
+                  - 
+              timeTolerance: 2

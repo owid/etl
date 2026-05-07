@@ -162,6 +162,18 @@ tables:
             subtitle: |-
               [Primary energy](#dod:primaryenergy) is based on the [substitution method](#dod:substitutionmethod) and measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 1
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -180,6 +192,22 @@ tables:
             subtitle: |-
               [Primary energy](#dod:primaryenergy) is measured in [terawatt-hours](#dod:watt-hours), using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: BuPu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 30
+                  - 100
+                  - 300
+                  - 1000
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+                  - 
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -198,6 +226,22 @@ tables:
             subtitle: |-
               [Primary energy](#dod:primaryenergy) is measured in [terawatt-hours](#dod:watt-hours), using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 1
+                customNumericColors:
+                  - 
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -216,6 +260,19 @@ tables:
             subtitle: |-
               [Primary energy](#dod:primaryenergy) is based on the [substitution method](#dod:substitutionmethod) and measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBuGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 1
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -256,6 +313,22 @@ tables:
             title: Fossil fuel consumption
             subtitle: Measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 1
+                customNumericColors:
+                  - 
       renewables__twh__direct:
         title: Renewables (TWh - direct)
         unit: terawatt-hours
@@ -317,6 +390,19 @@ tables:
             subtitle: |-
               [Primary energy](#dod:primaryenergy) is based on the [substitution method](#dod:substitutionmethod) and measured in [terawatt-hours](#dod:watt-hours). Renewables include hydropower, solar, wind, geothermal, wave and tidal, and bioenergy, but not traditional biofuels.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 1
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -335,6 +421,18 @@ tables:
             subtitle: |-
               Measured in [terawatt-hours](#dod:watt-hours) of [primary energy](#dod:primaryenergy), using the [substitution method](#dod:substitutionmethod). Low-carbon energy is the sum of nuclear and renewable sources. Renewables include hydropower, solar, wind, geothermal, wave and tidal and bioenergy, but not traditional biofuels.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 30
+                  - 100
+                  - 300
+                  - 1000
+                  - 3000
+                  - 1
         description_key:
           - *description_key_primary_energy_equivalent
       solar_and_wind__twh__equivalent:
@@ -352,6 +450,23 @@ tables:
             subtitle: |-
               [Primary energy](#dod:primaryenergy) is based on the [substitution method](#dod:substitutionmethod) and measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 1
+                customNumericColors:
+                  - 
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -392,6 +507,22 @@ tables:
             subtitle: |-
               Measured as a percentage of [primary energy](#dod:primaryenergy), using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 1
+                customNumericColors:
+                  - 
       fossil_fuels__pct_direct_primary_energy:
         title: Fossil fuels (% direct primary energy)
         unit: '%'
@@ -417,6 +548,27 @@ tables:
             subtitle: |-
               Measured as a percentage of [primary energy](#dod:primaryenergy), using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+                customNumericColors:
+                  - 
+                  - 
+                  - 
+                  - 
       gas__pct_direct_primary_energy:
         title: Gas (% direct primary energy)
         unit: '%'
@@ -442,6 +594,22 @@ tables:
             subtitle: |-
               Measured as a percentage of the total [primary energy](#dod:primaryenergy) using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Blues
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
       oil__pct_direct_primary_energy:
         title: Oil (% direct primary energy)
         unit: '%'
@@ -469,6 +637,22 @@ tables:
             subtitle: |-
               Measured as a percentage of [primary energy](#dod:primaryenergy) using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
         description_key:
           - *description_key_primary_energy_equivalent
       biofuels__pct_direct_primary_energy:
@@ -525,6 +709,19 @@ tables:
             subtitle: |-
               Measured as a percentage of the total [primary energy](#dod:primaryenergy) using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 5
+                  - 10
+                  - 20
+                  - 50
+                  - 100
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -558,6 +755,24 @@ tables:
             note: |-
               Renewables include hydropower, solar, wind, geothermal, wave, tidal, and bioenergy, but not traditional biofuels.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Greens
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+                  - 
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -589,6 +804,21 @@ tables:
             subtitle: |-
               Measured as a percentage of [primary energy](#dod:primaryenergy) using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: BuPu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 5
+                  - 10
+                  - 15
+                  - 20
+                  - 25
+                  - 30
+                  - 35
+                customNumericColors:
+                  - 
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -646,6 +876,24 @@ tables:
             subtitle: |-
               Measured as a percentage of [primary energy](#dod:primaryenergy) using the [substitution method](#dod:substitutionmethod). Renewables include hydropower, solar, wind, geothermal, bioenergy, wave, and tidal, but not traditional biofuels, which can be a key energy source, especially in lower-income settings.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Greens
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+              timeTolerance: 10
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -677,6 +925,19 @@ tables:
             subtitle: |-
               Measured as a percentage of [primary energy](#dod:primaryenergy), using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 1
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -708,6 +969,19 @@ tables:
             subtitle: |-
               Measured as a percentage of [primary energy](#dod:primaryenergy) using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBuGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 5
+                  - 10
+                  - 15
+                  - 20
+                  - 1
+                customNumericColors:
+                  - 
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -739,6 +1013,18 @@ tables:
             subtitle: |-
               Measured as a percentage of the total [primary energy](#dod:primaryenergy), using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: BuGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 5
+                  - 10
+                  - 15
+                  - 20
+                  - 25
+                  - 1
         description_key:
           - *description_key_gross_generation
           - *description_key_primary_energy_equivalent
@@ -754,6 +1040,21 @@ tables:
             title: Annual percentage change in coal energy consumption
             subtitle: Percentage change in coal energy consumption relative to the previous year.
             tab: discrete-bar
+            map:
+              colorScale:
+                baseColorScheme: BrBG
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericValues:
+                  - -1
+                  - -50
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 1
         description_processing: *description_processing_annual_change
       coal__twh_growth:
         title: Coal (TWh growth)
@@ -768,6 +1069,23 @@ tables:
             subtitle: |-
               Change in coal energy consumption relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: BrBG
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericValues:
+                  - -1
+                  - -100
+                  - -50
+                  - -20
+                  - 0
+                  - 20
+                  - 50
+                  - 100
+                  - 1
+                customNumericColors:
+                  - 
         description_processing: *description_processing_annual_change
       fossil_fuels__pct_growth:
         title: Fossil fuels (% growth)
@@ -782,6 +1100,22 @@ tables:
             subtitle: |-
               Percentage change in fossil energy consumption relative to the previous year. This is the sum of energy from coal, oil and gas.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: BrBG
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericValues:
+                  - -1
+                  - -10
+                  - -5
+                  - 0
+                  - 5
+                  - 10
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
         description_processing: *description_processing_annual_change
       fossil_fuels__twh_growth:
         title: Fossil fuels (TWh growth)
@@ -796,6 +1130,25 @@ tables:
             subtitle: |-
               Change in fossil energy consumption, measured in [terawatt-hours](#dod:watt-hours), relative to the previous year. This is the sum of energy from coal, oil and gas.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: BrBG
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericValues:
+                  - -1
+                  - -200
+                  - -100
+                  - -50
+                  - -20
+                  - 0
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 1
+                customNumericColors:
+                  - 
         description_processing: *description_processing_annual_change
       gas__pct_growth:
         title: Gas (% growth)
@@ -809,6 +1162,24 @@ tables:
             title: Annual percentage change in gas consumption
             subtitle: Percentage change in gas energy consumption relative to the previous year.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PiYG
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericValues:
+                  - -1
+                  - -50
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
         description_processing: *description_processing_annual_change
       gas__twh_growth:
         title: Gas (TWh growth)
@@ -823,6 +1194,23 @@ tables:
             subtitle: |-
               Change in gas energy consumption relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PiYG
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericValues:
+                  - -1
+                  - -50
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 1
+                customNumericColors:
+                  - 
         description_processing: *description_processing_annual_change
       oil__pct_growth:
         title: Oil (% growth)
@@ -849,6 +1237,27 @@ tables:
             title: Annual change in oil consumption
             subtitle: |-
               Change in oil energy consumption relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+            map:
+              colorScale:
+                baseColorScheme: PRGn
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericValues:
+                  - -1
+                  - -100
+                  - -50
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+                  - 
         description_processing: *description_processing_annual_change
       biofuels__pct_growth:
         title: Biofuels (% growth)
@@ -884,6 +1293,22 @@ tables:
             title: Annual percentage change in hydropower generation
             subtitle: Percentage change in hydropower generation relative to the previous year.
             tab: discrete-bar
+            map:
+              colorScale:
+                baseColorScheme: PuOr
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -50
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 1
+                customNumericColors:
+                  - 
         description_processing: *description_processing_annual_change
       hydro__twh_growth__direct:
         title: Hydro (TWh growth - direct)
@@ -911,6 +1336,22 @@ tables:
             subtitle: |-
               Change in energy generation relative to the previous year, using the [substitution method](#dod:substitutionmethod) and measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -30
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 1
+                customNumericColors:
+                  - 
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_annual_change
@@ -927,6 +1368,22 @@ tables:
             subtitle: |-
               Shown is the percentage change in low-carbon energy generation relative to the previous year. This is the sum of nuclear and renewable sources.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: RdBu
+                binningStrategy: manual
+                customNumericValues:
+                  - -50
+                  - -15
+                  - -10
+                  - -5
+                  - 0
+                  - 5
+                  - 10
+                  - 15
+                  - 50
+                customNumericColors:
+                  - 
         description_processing: *description_processing_annual_change
       low_carbon_energy__twh_growth__direct:
         title: Low-carbon energy (TWh growth - direct)
@@ -954,6 +1411,20 @@ tables:
             subtitle: |-
               Change in energy generation relative to the previous year, measured in [terawatt-hours](#dod:watt-hours) and using the [substitution method](#dod:substitutionmethod). Low-carbon energy is defined as the sum of nuclear and renewable sources.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuOr
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -100
+                  - -30
+                  - -10
+                  - 0
+                  - 10
+                  - 30
+                  - 100
+                  - 1
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_annual_change
@@ -969,6 +1440,23 @@ tables:
             title: Annual percentage change in nuclear energy generation
             subtitle: Percentage change in nuclear energy generation relative to the previous year.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: RdBu
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -50
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
         description_processing: *description_processing_annual_change
       nuclear__twh_growth__direct:
         title: Nuclear (TWh growth - direct)
@@ -996,6 +1484,22 @@ tables:
             subtitle: |-
               Change in nuclear energy generation relative to the previous year, measured in [terawatt-hours](#dod:watt-hours) and using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -50
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 1
+                customNumericColors:
+                  - 
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_annual_change
@@ -1045,6 +1549,25 @@ tables:
             subtitle: |-
               Percentage change in renewable energy generation relative to the previous year. It includes energy from hydropower, solar, wind, geothermal, wave and tidal, and bioenergy.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: RdBu
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -20
+                  - -15
+                  - -10
+                  - -5
+                  - 0
+                  - 5
+                  - 10
+                  - 15
+                  - 20
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
         description_processing: *description_processing_annual_change
       renewables__twh_growth__direct:
         title: Renewables (TWh growth - direct)
@@ -1072,6 +1595,25 @@ tables:
             subtitle: |-
               Change in renewable energy generation relative to the previous year, measured in [terawatt-hours](#dod:watt-hours) and using the [substitution method](#dod:substitutionmethod). It includes energy from hydropower, solar, wind, geothermal, wave and tidal, and bioenergy.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: RdBu
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -50
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                customNumericColors:
+                  - 
+                  - 
+                  - 
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_annual_change
@@ -1087,6 +1629,20 @@ tables:
             title: Annual percentage change in solar energy generation
             subtitle: Percentage change in solar energy generation relative to the previous year.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuOr
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -50
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
         description_processing: *description_processing_annual_change
       solar__twh_growth__direct:
         title: Solar (TWh growth - direct)
@@ -1114,6 +1670,27 @@ tables:
             subtitle: |-
               Change in energy generation relative to the previous year, measured in [terawatt-hours](#dod:watt-hours) and using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: RdBu
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -30
+                  - -10
+                  - -3
+                  - -1
+                  - 0
+                  - 1
+                  - 3
+                  - 10
+                  - 30
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+                  - 
+                  - 
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_annual_change
@@ -1129,6 +1706,20 @@ tables:
             title: Annual percentage change in wind energy generation
             subtitle: Percentage change in wind energy generation relative to the previous year.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuOr
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -50
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 1
         description_processing: *description_processing_annual_change
       wind__twh_growth__direct:
         title: Wind (TWh growth - direct)
@@ -1156,6 +1747,20 @@ tables:
             subtitle: |-
               Change in energy generation relative to the previous year, using the [substitution method](#dod:substitutionmethod) and measured in [terawatt-hours](#dod:watt-hours).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PRGn
+                binningStrategy: manual
+                customNumericValues:
+                  - -30
+                  - -10
+                  - -3
+                  - -1
+                  - 0
+                  - 1
+                  - 3
+                  - 10
+                  - 30
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_annual_change
@@ -1171,6 +1776,24 @@ tables:
             title: Annual percentage change in solar and wind energy generation
             subtitle: Change in energy generation relative to the previous year.
             tab: discrete-bar
+            map:
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -50
+                  - -20
+                  - -10
+                  - 0
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                customNumericColors:
+                  - 
+                  - 
+                  - 
         description_processing: *description_processing_annual_change
       solar_and_wind__twh_growth__direct:
         title: Solar and wind (TWh growth - direct)
@@ -1197,6 +1820,22 @@ tables:
             title: Annual change in solar and wind energy generation
             subtitle: |-
               Change in solar and wind energy generation relative to the previous year, measured in [terawatt-hours](#dod:watt-hours) of [primary energy](#dod:primaryenergy) using the [substitution method](#dod:substitutionmethod).
+            map:
+              colorScale:
+                baseColorScheme: RdBu
+                binningStrategy: manual
+                customNumericValues:
+                  - -1
+                  - -30
+                  - -10
+                  - 3
+                  - 0
+                  - 3
+                  - 10
+                  - 30
+                  - 1
+                customNumericColors:
+                  - 
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_annual_change
@@ -1212,6 +1851,20 @@ tables:
           grapher_config:
             title: Per capita energy consumption from coal
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 50000
+                customNumericColors:
+                  - 
         description_processing: *description_processing_per_capita
       fossil_fuels_per_capita__kwh:
         title: Fossil fuels per capita (kWh)
@@ -1227,6 +1880,21 @@ tables:
             subtitle: |-
               Fossil fuel consumption per capita is measured as the average annual consumption of energy from coal, oil and gas, in [kilowatt-hours](#dod:watt-hours) per person.
             tab: discrete-bar
+            map:
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 50000
+                  - 100000
+                  - 1
+                customNumericColors:
+                  - 
         description_processing: *description_processing_per_capita
       gas_per_capita__kwh:
         title: Gas per capita (kWh)
@@ -1242,6 +1910,22 @@ tables:
             subtitle: |-
               Average natural gas consumption per capita, measured in [kilowatt-hours](#dod:watt-hours) per person.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: BuPu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 50000
+                  - 100000
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
         description_processing: *description_processing_per_capita
       oil_per_capita__kwh:
         title: Oil per capita (kWh)
@@ -1257,6 +1941,21 @@ tables:
             subtitle: |-
               Average oil consumption per capita, measured in [kilowatt-hours](#dod:watt-hours) per person.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 1000
+                  - 3000
+                  - 10000
+                  - 30000
+                  - 100000
+                  - 1
+                customNumericColors:
+                  - 
+              timeTolerance: 5
         description_processing: *description_processing_per_capita
       biofuels_per_capita__kwh:
         title: Biofuels per capita (kWh)
@@ -1298,6 +1997,24 @@ tables:
             subtitle: |-
               Measured in [kilowatt-hours](#dod:watt-hours) of [primary energy](#dod:primaryenergy) per person, using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+                  - 
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_per_capita
@@ -1329,6 +2046,20 @@ tables:
             subtitle: |-
               Measured in [kilowatt-hours](#dod:watt-hours) per person. Low-carbon energy is the sum of nuclear and renewable [primary energy](#dod:primaryenergy), using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Purples
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 300
+                  - 1000
+                  - 3000
+                  - 10000
+                  - 30000
+                  - 100000
+                  - 1
+              timeTolerance: 5
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_per_capita
@@ -1360,6 +2091,20 @@ tables:
             subtitle: |-
               Measured in [kilowatt-hours](#dod:watt-hours) of [primary energy](#dod:primaryenergy) per person, using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBuGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 1
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_per_capita
@@ -1419,6 +2164,20 @@ tables:
             note: |-
               Renewables include hydropower, wind, solar, geothermal, wave and tidal, and bioenergy, but not traditional biofuels.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 50000
+                  - 100000
+                  - 1
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_per_capita
@@ -1450,6 +2209,19 @@ tables:
             subtitle: |-
               Measured in [kilowatt-hours](#dod:watt-hours) of [primary energy](#dod:primaryenergy) per person, using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 30
+                  - 100
+                  - 300
+                  - 1000
+                  - 3000
+                  - 1
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_per_capita
@@ -1481,6 +2253,19 @@ tables:
             subtitle: |-
               Measured in [kilowatt-hours](#dod:watt-hours) of [primary energy](#dod:primaryenergy) per person, using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 1
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_per_capita
@@ -1512,6 +2297,19 @@ tables:
             subtitle: |-
               Measured in [kilowatt-hours](#dod:watt-hours) of [primary energy](#dod:primaryenergy) per person, using the [substitution method](#dod:substitutionmethod).
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: BuGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 30
+                  - 100
+                  - 300
+                  - 1000
+                  - 3000
+                  - 1
         description_key:
           - *description_key_primary_energy_equivalent
         description_processing: *description_processing_per_capita
