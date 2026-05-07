@@ -9,7 +9,14 @@ from etl.helpers import PathFinder
 HISTORICAL_SCENARIO = "historical"
 TOTAL_ELEC_CONSUMPTION_METRIC = "Total electricity consumption (TWh)"
 SHARE_METRIC = "Total electricity consumption (share of total electricity demand)"
-
+IEA_REGION_NAMES = [
+    "Asia Pacific (IEA)",
+    "Africa (IEA)",
+    "Central and South America (IEA)",
+    "Europe (IEA)",
+    "Middle East (IEA)",
+    "North America (IEA)",
+]
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
@@ -169,205 +176,19 @@ def add_custom_regions(tb):
 
 
 def create_share_of_electricity_demand(tb, tb_electricity):
-    # Member countries (OWID-harmonized names) for each IEA regional aggregate.
-    IEA_REGION_MEMBERS = {
-        "Asia Pacific (IEA)": [
-            "Australia",
-            "Bangladesh",
-            "Brunei",
-            "Cambodia",
-            "China",
-            "Taiwan",
-            "Hong Kong",
-            "India",
-            "Indonesia",
-            "Japan",
-            "South Korea",
-            "Laos",
-            "Malaysia",
-            "Mongolia",
-            "Myanmar",
-            "Nepal",
-            "New Zealand",
-            "Pakistan",
-            "Philippines",
-            "Singapore",
-            "Sri Lanka",
-            "Thailand",
-            "Vietnam",
-        ],
-        "Africa (IEA)": [
-            "Algeria",
-            "Angola",
-            "Benin",
-            "Botswana",
-            "Burkina Faso",
-            "Burundi",
-            "Cape Verde",
-            "Cameroon",
-            "Central African Republic",
-            "Chad",
-            "Comoros",
-            "Congo",
-            "Cote d'Ivoire",
-            "Democratic Republic of Congo",
-            "Djibouti",
-            "Egypt",
-            "Equatorial Guinea",
-            "Eritrea",
-            "Eswatini",
-            "Ethiopia",
-            "Gabon",
-            "Gambia",
-            "Ghana",
-            "Guinea",
-            "Guinea-Bissau",
-            "Kenya",
-            "Lesotho",
-            "Liberia",
-            "Libya",
-            "Madagascar",
-            "Malawi",
-            "Mali",
-            "Mauritania",
-            "Mauritius",
-            "Morocco",
-            "Mozambique",
-            "Namibia",
-            "Niger",
-            "Nigeria",
-            "Rwanda",
-            "Sao Tome and Principe",
-            "Senegal",
-            "Seychelles",
-            "Sierra Leone",
-            "Somalia",
-            "South Africa",
-            "South Sudan",
-            "Sudan",
-            "Tanzania",
-            "Togo",
-            "Tunisia",
-            "Uganda",
-            "Zambia",
-            "Zimbabwe",
-        ],
-        "Central and South America (IEA)": [
-            "Argentina",
-            "Bolivia",
-            "Brazil",
-            "Chile",
-            "Colombia",
-            "Costa Rica",
-            "Cuba",
-            "Curacao",
-            "Dominican Republic",
-            "Ecuador",
-            "El Salvador",
-            "Guatemala",
-            "Haiti",
-            "Honduras",
-            "Jamaica",
-            "Nicaragua",
-            "Panama",
-            "Paraguay",
-            "Peru",
-            "Suriname",
-            "Trinidad and Tobago",
-            "Uruguay",
-            "Venezuela",
-        ],
-        "Europe (IEA)": [
-            "Albania",
-            "Austria",
-            "Belarus",
-            "Belgium",
-            "Bosnia and Herzegovina",
-            "Bulgaria",
-            "Croatia",
-            "Cyprus",
-            "Czechia",
-            "Denmark",
-            "Estonia",
-            "Finland",
-            "France",
-            "Germany",
-            "Gibraltar",
-            "Greece",
-            "Hungary",
-            "Iceland",
-            "Ireland",
-            "Israel",
-            "Italy",
-            "Kosovo",
-            "Latvia",
-            "Lithuania",
-            "Luxembourg",
-            "Malta",
-            "Moldova",
-            "Montenegro",
-            "North Macedonia",
-            "Norway",
-            "Poland",
-            "Portugal",
-            "Romania",
-            "Serbia",
-            "Slovakia",
-            "Slovenia",
-            "Spain",
-            "Sweden",
-            "Switzerland",
-            "Netherlands",
-            "Turkey",
-            "Ukraine",
-            "United Kingdom",
-        ],
-        "Middle East (IEA)": [
-            "Bahrain",
-            "Iran",
-            "Iraq",
-            "Jordan",
-            "Kuwait",
-            "Lebanon",
-            "Oman",
-            "Qatar",
-            "Saudi Arabia",
-            "Syria",
-            "United Arab Emirates",
-            "Yemen",
-        ],
-        "North America (IEA)": [
-            "Canada",
-            "Mexico",
-            "United States",
-        ],
-    }
 
-    # Get all country-level demand from Ember.
-    tb_demand_countries = tb_electricity[["country", "year", "total_demand__twh"]].dropna().reset_index(drop=True)
-
-    # Build demand aggregates for each IEA region by summing available member countries.
-    ember_countries = set(tb_demand_countries["country"].unique())
-    region_demand_tables = []
-    for region, members in IEA_REGION_MEMBERS.items():
-        missing = [c for c in members if c not in ember_countries]
-        if missing:
-            paths.log.warning(f"Countries missing from Ember for {region}: {missing}")
-        tb_region = (
-            tb_demand_countries[tb_demand_countries["country"].isin(members)]
-            .groupby(["year"], as_index=False)
-            .agg({"total_demand__twh": "sum"})
-        )
-        tb_region["country"] = region
-        region_demand_tables.append(tb_region)
-
-    # Keep World, US, and China demand.
-    tb_demand_world_us_china = tb_demand_countries[
-        tb_demand_countries["country"].isin(["World", "United States", "China"])
-    ]
-    region_demand_tables.append(tb_demand_world_us_china)
-
-    tb_demand = pr.concat(region_demand_tables, ignore_index=True)
+    # Use the regions dataset to aggregate Ember country-level demand into IEA regional totals.
+    # add_aggregates appends regional rows (summed from member countries) to the table.
+    tb_demand = paths.regions.add_aggregates(
+        tb=tb_electricity[["country", "year", "total_demand__twh"]].dropna().reset_index(drop=True),
+        regions=IEA_REGION_NAMES,
+        aggregations={"total_demand__twh": "sum"},
+        check_for_region_overlaps=False,
+    )
+    # Keep only IEA regions plus World, US, China (which already exist in Ember).
+    tb_demand = tb_demand[
+        tb_demand["country"].isin(IEA_REGION_NAMES + ["World", "United States", "China"])
+    ].reset_index(drop=True)
 
     # Derive "World excl. United States and China" demand.
     tb_demand_us_china = (
@@ -387,7 +208,7 @@ def create_share_of_electricity_demand(tb, tb_electricity):
     tb_demand = pr.concat([tb_demand, tb_demand_rest[["country", "year", "total_demand__twh"]]], ignore_index=True)
 
     # All countries/regions for which we compute the share.
-    share_countries = list(IEA_REGION_MEMBERS.keys()) + [
+    share_countries = IEA_REGION_NAMES + [
         "World",
         "China",
         "United States",
