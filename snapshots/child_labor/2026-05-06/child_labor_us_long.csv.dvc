@@ -1,0 +1,33 @@
+# This is a file extracted from Table A.1 in page 285.
+# In case of updating, it needs to be uploaded manually
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "The Labor Force under Changing Income and Employment"
+    description: |-
+      This book by Clarence D. Long examines the historical changes in the size and composition of the United States labor force, analyzing how labor force participation has evolved with income and employment conditions. Appendix A provides detailed decennial enumerations of the labor force and population by sex and age group.
+    date_published: "1958"
+    title_snapshot: "The Labor Force under Changing Income and Employment - Appendix A: The Labor Force and Population by Sex and Age Group, Decennial Enumerations"
+    description_snapshot: |-
+      Table A.1, taken from the appendix on the labor force and population in the United States.
+
+    # Citation
+    producer: Long
+    citation_full: |-
+      Long, C.D. (1958). Appendix A: The Labor Force and Population by Sex and Age Group, Decennial Enumerations. Table A.1 In The Labor Force under Changing Income and Employment (p. 285). National Bureau of Economic Research.
+
+    # Files
+    url_main: https://econpapers.repec.org/bookchap/nbrnberch/2629.htm
+    date_accessed: '2026-05-07'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://econpapers.repec.org/bookchap/nbrnberch/2629.htm
+outs:
+  - md5: 72b37de179ab8cf6e739490b97426dd2
+    size: 718
+    path: child_labor_us_long.csv
