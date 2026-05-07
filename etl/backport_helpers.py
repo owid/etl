@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Optional, cast
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -50,7 +50,12 @@ def load_values(short_name: str) -> pd.DataFrame:
 def load_config(short_name: str) -> GrapherConfig:
     snap = Snapshot(f"backport/latest/{short_name}_config.json")
     with open(snap.path) as f:
-        return GrapherConfig.from_json(f.read())
+        content = f.read()
+    if not content.strip():
+        raise ValueError(
+            f"Empty config.json for backport snapshot '{short_name}' at {snap.path}. Try re-running the backport with --force."
+        )
+    return GrapherConfig.from_json(content)
 
 
 def long_to_wide(df: pd.DataFrame, prune: bool = True) -> pd.DataFrame:
@@ -99,7 +104,7 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
     # add variables metadata
     # NOTE: some datasets such as `dataset_5438_global_health_observatory__world_health_organization__2021_12`
     #   would benefit from compression metadata as it is almost as large as the data itself (uncompressed)
-    variable_dict: Dict[str, Dict[str, Any]] = {v["name"]: v for v in config["variables"]}
+    variable_dict: dict[str, dict[str, Any]] = {v["name"]: v for v in config["variables"]}
     variable_source_dict = {s["id"]: s for s in config["sources"]}
 
     for col, variable in variable_dict.items():
@@ -108,7 +113,9 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
             t[col] = np.nan
 
         assert variable["sourceId"]
-        t[col].metadata = convert_grapher_variable(variable, variable_source_dict[variable["sourceId"]])
+        t[col].metadata = convert_grapher_variable(  # ty: ignore[unresolved-attribute]
+            variable, variable_source_dict[variable["sourceId"]]
+        )
 
     # NOTE: collision happens for dataset 5629 with column names
     # Indicator:On-premise sales restrictions to intoxicated persons (archived) - Beverage Types:Spirits
@@ -116,7 +123,7 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
     return underscore_table(t, collision="rename")
 
 
-def create_dataset(dest_dir: str, short_name: str, new_short_name: Optional[str] = None) -> Dataset:
+def create_dataset(dest_dir: str, short_name: str, new_short_name: str | None = None) -> Dataset:
     """Create Dataset from backported dataset in Snapshot. Convert
     it into wide format and add metadata."""
     new_short_name = new_short_name or short_name

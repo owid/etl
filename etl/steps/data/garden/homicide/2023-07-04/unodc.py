@@ -1,5 +1,5 @@
 import json
-from typing import List, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -41,8 +41,8 @@ def run(dest_dir: str) -> None:
     log.info("unodc.end")
 
 
-def load_excluded_countries() -> List[str]:
-    with open(paths.excluded_countries_path, "r") as f:
+def load_excluded_countries() -> list[str]:
+    with open(paths.excluded_countries_path) as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data

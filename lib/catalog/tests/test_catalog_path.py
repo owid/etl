@@ -414,7 +414,7 @@ class TestAdditionalCoverage:
         """Direct construction validates inputs."""
         with pytest.raises(ValueError, match="Invalid channel"):
             CatalogPath(
-                channel="invalid",  # type: ignore
+                channel="invalid",  # ty: ignore
                 namespace="un",
                 version="2024",
                 dataset="data",
@@ -453,4 +453,4 @@ class TestAdditionalCoverage:
         """CatalogPath is immutable (frozen dataclass)."""
         p = CatalogPath.from_str("grapher/who/2024/gho/table")
         with pytest.raises(Exception):  # FrozenInstanceError
-            p.version = "2025"  # type: ignore
+            p.version = "2025"  # ty: ignore

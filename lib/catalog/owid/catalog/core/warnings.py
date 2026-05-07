@@ -16,7 +16,7 @@ def warn_with_structlog(
 
 
 # Replace the default showwarning with structlog warnings
-warnings.showwarning = warn_with_structlog  # type: ignore
+warnings.showwarning = warn_with_structlog  # ty: ignore
 
 
 class MetadataWarning(Warning):
@@ -53,5 +53,5 @@ def ignore_warnings(ignore_warnings: Iterable[type] = (Warning,)):
     """
     with warnings.catch_warnings():
         for w in ignore_warnings:
-            warnings.filterwarnings("ignore", category=w)  # type: ignore
+            warnings.filterwarnings("ignore", category=w)  # ty: ignore
         yield

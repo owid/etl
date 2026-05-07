@@ -3,8 +3,6 @@ to create the Electricity Mix (BP & Ember) dataset.
 
 """
 
-from typing import Dict, List
-
 import pandas as pd
 from owid import catalog
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
@@ -56,7 +54,7 @@ def process_bp_data(table_bp: catalog.Table) -> pd.DataFrame:
     }
     table_bp = table_bp[list(columns)].rename(columns=columns, errors="raise")
     # New columns to be created by summing other columns.
-    aggregates: Dict[str, List[str]] = {
+    aggregates: dict[str, list[str]] = {
         "fossil_generation__twh": [
             "oil_generation__twh",
             "coal_generation__twh",

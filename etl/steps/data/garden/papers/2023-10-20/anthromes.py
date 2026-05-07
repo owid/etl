@@ -162,9 +162,9 @@ def add_aggregate_land_types(tb: Table) -> Table:
     }
 
     for new_col, cols_to_sum in aggregate_dict.items():
-        assert all(
-            col in tb.columns for col in cols_to_sum
-        ), f"One or more columns from {cols_to_sum} are not in the table"
+        assert all(col in tb.columns for col in cols_to_sum), (
+            f"One or more columns from {cols_to_sum} are not in the table"
+        )
         tb[new_col] = tb[cols_to_sum].sum(axis=1)
 
     return tb

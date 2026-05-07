@@ -1,0 +1,18 @@
+dataset:
+  title: US Opinion on wives working 1936-1998 - OWID compilation
+tables:
+  us_opinion_on_wives_working_1936_1998__owid_compilation:
+    variables:
+      pct_approve_of_wife_working_if_husband_can_support__owid__2017:
+        title: '% Approve of wife working if husband can support (OWID (2017))'
+        unit: '%'
+        description: Of those polled, what percent approve of a wife working if her husband can support her?
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

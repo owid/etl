@@ -1,0 +1,23 @@
+dataset:
+  title: Relative change in maternal mortality ratio (World Bank)
+tables:
+  relative_change_in_maternal_mortality_ratio__world_bank:
+    variables:
+      relative_change_in_maternal_mortality_ratio_since_1990:
+        title: Relative change in maternal mortality ratio since 1990
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Change in maternal mortality ratio since 1990
+          numDecimalPlaces: 0
+        description: |-
+          Maternal mortality ratio is the number of women who die from pregnancy-related causes while pregnant or within 42 days of pregnancy termination per 100,000 live births. This is given as the relative change in ratio from 1990 to 2015.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

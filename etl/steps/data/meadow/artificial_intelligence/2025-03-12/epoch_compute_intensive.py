@@ -56,6 +56,16 @@ def run() -> None:
     #
     # Create a new table.
     #
+    # Gemini 3.1 Pro appears twice with the same publication date but different domain values
+    # ("Multimodal,Language,Vision" vs "Language,Vision"). Drop the less complete entry,
+    # but only if both entries are present.
+    gemini_dup_mask = (tb["Model"] == "Gemini 3.1 Pro") & (tb["Publication date"] == "2026-02-19")
+    if gemini_dup_mask.sum() > 1:
+        assert set(tb.loc[gemini_dup_mask, "Domain"]) == {"Language,Vision", "Multimodal,Language,Vision"}, (
+            "Unexpected domain values for duplicate Gemini 3.1 Pro / 2026-02-19 entries"
+        )
+        tb = tb[~(gemini_dup_mask & (tb["Domain"] == "Language,Vision"))]
+
     tb = tb.format(["model", "publication_date"])
     #
     # Save outputs.

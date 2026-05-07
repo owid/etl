@@ -1,0 +1,18 @@
+dataset:
+  title: Hidden Hunger Index in pre-school children - Muthayya et al. (2013)
+tables:
+  hidden_hunger_index_in_pre_school_children__muthayya_et_al__2013:
+    variables:
+      hidden_hunger_index_in_pre_school_children__muthayya_et_al__2013:
+        title: Hidden Hunger Index in pre-school children (Muthayya et al. (2013))
+        unit: ''
+        description: The HHI-PD score ranged between the best and worst possible scores of 0 and 100, respectively.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

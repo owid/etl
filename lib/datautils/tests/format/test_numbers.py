@@ -37,9 +37,9 @@ class TestIntegerNumberWithSeparators:
         assert not IntegerNumberWithSeparators.is_valid("hola")
 
         with raises(TypeError):
-            assert not IntegerNumberWithSeparators.is_valid(1)  # type: ignore
+            assert not IntegerNumberWithSeparators.is_valid(1)  # ty: ignore
         with raises(TypeError):
-            assert not IntegerNumberWithSeparators.is_valid(1.000)  # type: ignore
+            assert not IntegerNumberWithSeparators.is_valid(1.000)  # ty: ignore
 
     def test_clean_ok(self):
         for num, num_cor in zip(self.numbers_valid, self.numbers_valid_corrected):
@@ -164,7 +164,7 @@ class TestIntegerNumberWithWords:
             },
         }
         for number, number_dix in number_equivalences.items():
-            number_ = IntegerNumberWithWords._build_IntegerNumber(number_dix)  # type: ignore
+            number_ = IntegerNumberWithWords._build_IntegerNumber(number_dix)  # ty: ignore
             assert number == number_
 
 
@@ -191,7 +191,7 @@ class TestNumber:
             "2  cientos": 200,
         }
         for number_raw, number_corrected in numbers.items():
-            number = IntegerNumber(number_raw)  # type: ignore
+            number = IntegerNumber(number_raw)  # ty: ignore
             assert number_corrected == number.clean()
 
     def test_clean_wrong(self):

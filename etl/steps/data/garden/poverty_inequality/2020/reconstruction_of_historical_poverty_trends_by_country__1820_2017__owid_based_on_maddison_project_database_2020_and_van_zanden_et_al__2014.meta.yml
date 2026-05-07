@@ -1,0 +1,82 @@
+dataset:
+  title: |-
+    Reconstruction of historical poverty trends by country, 1820-2017 (OWID based on Maddison Project Database 2020 and van Zanden et al. (2014))
+tables:
+  ? |-
+    reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014
+  : variables:
+      alternative_gini_series__gcip_consumption_plus_van_zanden_et_al__2014:
+        title: Alternative Gini series – GCIP consumption plus van Zanden et al. (2014)
+        unit: ''
+      alternative_gini_series__povcal_plus_van_zanden_et_al__2014:
+        title: Alternative Gini series – Povcal plus van Zanden et al. (2014)
+        unit: ''
+      baseline_gini_series__gcip_income_and_van_zanden_et_al__2014:
+        title: Baseline Gini series (GCIP income and van Zanden et al. (2014))
+        unit: ''
+      gdp_per_capita:
+        title: GDP.per.capita
+        unit: ''
+      gdp_per_capita_source:
+        title: GDP.per.capita_source
+        unit: ''
+      population:
+        title: Population
+        unit: ''
+      population_source:
+        title: Population_source
+        unit: ''
+      region:
+        title: Region
+        unit: ''
+      region_ussr_yugo:
+        title: Region_USSR_Yugo
+        unit: ''
+      share_under_dollar10_per_day:
+        title: Share under $10 per day
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      share_under_dollar2_per_day:
+        title: Share under $2 per day
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      share_under_dollar20_per_day:
+        title: Share under $20 per day
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      share_under_dollar5_per_day:
+        title: Share under $5 per day
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      share_under_dollar5_2_a_day__roughly_equivalent_to_the_international_poverty_line:
+        title: Share under $5.2 a day (roughly equivalent to the international poverty line)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      alt_gcip_consumption_vz_source:
+        title: alt_GCIP_consumption_vZ_source
+        unit: ''
+      alt_povcal_vz_source:
+        title: alt_Povcal_vZ_source
+        unit: ''
+      baseline_gcip_income_vz_source:
+        title: baseline_GCIP_income_vZ_source
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

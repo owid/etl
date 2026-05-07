@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: Pew Research Center (2015)
+    description: |-
+      Among Americans who have looked for a new job in the last two years, the percentage who say they used a certain method in their most recent search for a job.
+
+      Note: based on the 34% of Americans who have looked for a job in the last two years.
+
+      The survey was conducted June 10 - July 12, 2015. Sample size = 2,001.
+    url: |-
+      https://www.pewresearch.org/internet/2015/11/19/searching-for-work-in-the-digital-era/pi_2015-11-19_internet-and-job-seeking_0-01/
+    date_accessed: 2019-11-04
+    published_by: Pew Research Center
+  name: Job search methods US - Pew Research Center (2015)
+  description: ''
+outs:
+  - md5: 3d0a19eb8b38b75092329d2a2eb7f786
+    size: 7290
+    path: job_search_methods_us__pew_research_center__2015.feather

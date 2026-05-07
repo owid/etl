@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4154
-    date_accessed: 2023-08-10 09:40:20.853033
+    url: https://admin.owid.io/admin/datasets/4154
+    date_accessed: 2026-03-05 09:56:09.846003+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4154_wellcome_global_monitor_2020__covid_19__trust_questions
-  description: 
-    https://github.com/owid/notebooks/tree/main/EdouardMathieu/wellcome_global_monitor
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/wellcome_global_monitor
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7d0569b0f28aa75e7c1e197e84ef2eee
-  size: 13412
-  path: dataset_4154_wellcome_global_monitor_2020__covid_19__trust_questions_config.json
+  - md5: 12142b979537f335aadd17ea3ca1ebde
+    size: 14379
+    path: dataset_4154_wellcome_global_monitor_2020__covid_19__trust_questions_config.json

@@ -35,7 +35,7 @@ class ChartDiffConflictResolver:
         self.session = session
         # Compare chart configs
         self.config_compare = compare_chart_configs(
-            self.diff.target_chart.config,  # type: ignore
+            self.diff.target_chart.config,  # ty: ignore
             self.diff.source_chart.config,
         )
         # Resolved values. key -> value, where key is conflicted field and value is the resolution.

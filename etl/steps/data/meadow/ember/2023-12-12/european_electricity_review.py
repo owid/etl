@@ -2,7 +2,6 @@
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict
 from zipfile import ZipFile
 
 import owid.catalog.processing as pr
@@ -33,7 +32,7 @@ TABLE_NAMES = {
 
 def load_tables_from_compressed_folder(
     snap: Snapshot,
-) -> Dict[str, pd.DataFrame]:
+) -> dict[str, pd.DataFrame]:
     # Beginning of the names of csv files inside the raw zip file in walden, and their extension.
     files_name_start = "EER_2022_"
     files_extension = ".csv"
@@ -57,7 +56,7 @@ def load_tables_from_compressed_folder(
     return tables
 
 
-def create_tables(dfs: Dict[str, pd.DataFrame]) -> Dict[str, catalog.Table]:
+def create_tables(dfs: dict[str, pd.DataFrame]) -> dict[str, catalog.Table]:
     tables = {}
     for df_name in list(dfs):
         df = dfs[df_name].set_index(TABLE_INDEXES[df_name], verify_integrity=True)

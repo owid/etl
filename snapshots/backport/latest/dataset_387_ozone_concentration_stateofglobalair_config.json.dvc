@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/387
-    date_accessed: 2023-08-10 10:30:36.112069
+    url: https://admin.owid.io/admin/datasets/387
+    date_accessed: 2026-03-05 12:23:39.758839+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_387_ozone_concentration_stateofglobalair
-  description: Population-weighted ozone (O3) concentration by country (1990-2015)-
-    via StateofGlobalAir
+  description: Population-weighted ozone (O3) concentration by country (1990-2015)- via StateofGlobalAir
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bbaf652714cd49f1188dff1cc6c41019
-  size: 2731
-  path: dataset_387_ozone_concentration_stateofglobalair_config.json
+  - md5: 5c92c4ff1c5ee24d72883f71f8c0cafd
+    size: 2861
+    path: dataset_387_ozone_concentration_stateofglobalair_config.json

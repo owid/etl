@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from owid.catalog.utils import underscore
 from pandas import DataFrame
@@ -18,7 +18,7 @@ INCLUDE_PRICE_COMPONENTS = [
 ]
 
 
-def prepare_annual_data(tb_annual: DataFrame) -> List[str]:
+def prepare_annual_data(tb_annual: DataFrame) -> list[str]:
     """
     Prepare annual energy price data by standardizing dimensions and filtering columns.
     """
@@ -60,7 +60,7 @@ def prepare_monthly_data(tb_monthly: DataFrame) -> None:
     tb_monthly[col].m.original_short_name = "price"
 
 
-def create_stacked_component_views(tb_annual: DataFrame) -> List[Dict[str, Any]]:
+def create_stacked_component_views(tb_annual: DataFrame) -> list[dict[str, Any]]:
     """
     Create stacked bar chart views for energy price components.
     """

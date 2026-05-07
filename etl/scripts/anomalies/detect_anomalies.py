@@ -1,7 +1,5 @@
 """Detect anomalies in a given grapher dataset."""
 
-from typing import Dict, List, Optional, Tuple
-
 import click
 import pandas as pd
 import plotly.express as px
@@ -33,7 +31,7 @@ log = get_logger()
 engine = get_engine()
 
 
-def get_dataset_id_of_previous_version(dataset_id: int) -> Optional[int]:
+def get_dataset_id_of_previous_version(dataset_id: int) -> int | None:
     """Find the previous version of a dataset, if it exists.
 
     NOTE: Archived datasets are also considered.
@@ -63,7 +61,7 @@ def get_dataset_id_of_previous_version(dataset_id: int) -> Optional[int]:
     return dataset_id_previous
 
 
-def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Variable]]:
+def load_data_for_dataset_id(dataset_id: int) -> tuple[pd.DataFrame, list[gm.Variable]]:
     # Get variable ids and names for the current dataset.
     # NOTE: This is necessary to fetch data from S3, but also to be able to map local data column names to variable ids.
     with Session(engine) as session:
@@ -86,7 +84,7 @@ def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Var
     #     log.info(f"Loading data from local ETL file: {etl_file}")
     #     ds_etl = catalog.Dataset(etl_file)
     #     if ds_etl.table_names == [ds.shortName]:
-    #         df = pd.DataFrame(ds_etl.read(ds.shortName))  # type: ignore
+    #         df = pd.DataFrame(ds_etl.read(ds.shortName))  # ty: ignore
     #     # Change column names to variable ids.
     #     df = df.rename(columns={column: ds_variable_ids[column] for column in df.columns if column in ds_variable_ids}, errors="raise").rename(columns={"country": "entity_name"}, errors="raise")
 
@@ -98,10 +96,10 @@ def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Var
         # Load data for all variables from S3.
         df_long = io.variable_data_df_from_s3(
             engine=engine,
-            variable_ids=ds_variable_ids.values(),  # type: ignore
+            variable_ids=ds_variable_ids.values(),  # ty: ignore
             workers=None,
-            value_as_str=False,  # type: ignore
-        )  # type: ignore
+            value_as_str=False,  # ty: ignore
+        )  # ty: ignore
 
         # Switch from long to wide format dataframe.
         df = (
@@ -155,8 +153,8 @@ def get_all_necessary_data(dataset_id: int):
 def inspect_anomalies(
     df: pd.DataFrame,
     df_data: pd.DataFrame,
-    metadata: Dict[int, gm.Variable],
-    variable_mapping: Dict[int, int],
+    metadata: dict[int, gm.Variable],
+    variable_mapping: dict[int, int],
     n_anomalies_max: int = 50,
 ) -> None:
     # Create a temporary dataframe to display.
@@ -178,7 +176,7 @@ def inspect_anomalies(
         anomaly_type = row["anomaly_type"]
         year = row["year"]
         title = f"{variable_title}<br>{variable_name}<br>{country}-{year}<br>"
-        title += f'{anomaly_type} - weighted score: {row["score_weighted"]:.0%} | anomaly: {row["score"]:.0%} | scale: {row["score_scale"]:.0%} | population: {row["score_population"]:.0%} | views: {row["score_analytics"]:.0%}<br>'
+        title += f"{anomaly_type} - weighted score: {row['score_weighted']:.0%} | anomaly: {row['score']:.0%} | scale: {row['score_scale']:.0%} | population: {row['score_population']:.0%} | views: {row['score_analytics']:.0%}<br>"
         new = df_data[df_data["entity_name"] == row["entity_name"]][["entity_name", "year", variable_id]]
         new = new.rename(columns={row["indicator_id"]: variable_name}, errors="raise")
         if anomaly_type in ["upgrade_change", "upgrade_missing"]:

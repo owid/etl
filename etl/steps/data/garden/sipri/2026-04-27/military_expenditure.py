@@ -1,0 +1,132 @@
+"""Load a meadow dataset and create a garden dataset."""
+
+import owid.catalog.processing as pr
+from owid.catalog import Table
+
+from etl.helpers import PathFinder
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
+# Define any known outliers for share indicators that are legitimately outside the [0, 100] range. This allows the sanity check to pass without raising errors for these specific cases, while still catching any new unexpected outliers.
+KNOWN_SHARE_OUTLIERS = {
+    # (country, year, indicator) — documented legitimate values outside [0, 100]
+    (
+        "Kuwait",
+        1991,
+        "share_gdp",
+    ),  # Post-Iraqi-liberation defense spending against collapsed wartime GDP — SIPRI publishes ~117% consistently.
+}
+
+
+def run() -> None:
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset.
+    ds_meadow = paths.load_dataset("military_expenditure")
+    ds_wdi = paths.load_dataset("wdi")
+
+    # Read table from meadow dataset.
+    tb_constant_usd = ds_meadow["constant_usd"].reset_index()
+    tb_constant_usd_regions = ds_meadow["constant_usd_regions"].reset_index()
+    tb_share_gdp = ds_meadow["share_gdp"].reset_index()
+    tb_per_capita = ds_meadow["per_capita"].reset_index()
+    tb_share_govt_spending = ds_meadow["share_govt_spending"].reset_index()
+
+    tb_wdi = ds_wdi["wdi"].reset_index()
+
+    #
+    # Process data.
+    #
+    # Merge all these tables
+    tb = pr.multi_merge(
+        tables=[tb_constant_usd, tb_constant_usd_regions, tb_share_gdp, tb_per_capita, tb_share_govt_spending],
+        on=["country", "year"],
+        how="outer",
+        short_name=paths.short_name,
+    )
+
+    tb = adjust_units(tb)
+    tb = move_regional_data_to_constant_usd(tb)
+    tb = paths.regions.harmonize_names(tb)
+
+    tb = calculate_milex_per_military_personnel(tb, tb_wdi)
+
+    # Sanity checks
+    sanity_checks(tb)
+
+    tb = tb.format(["country", "year"])
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+
+def adjust_units(tb: Table) -> Table:
+    """
+    Adjust units of the table. Multiply percentages by 100, monetary values by 1e6 in the case of constant_usd and bt 1e9 in the case of constant_usd_regions.
+    """
+    tb["share_gdp"] *= 100
+    tb["share_govt_spending"] *= 100
+    tb["constant_usd"] *= 1e6
+    tb["constant_usd_regions"] *= 1e9
+
+    return tb
+
+
+def move_regional_data_to_constant_usd(tb: Table) -> Table:
+    """
+    Move regional data (constant_usd_regions) to the constant_usd column.
+    """
+
+    tb["constant_usd"] = tb["constant_usd"].combine_first(tb["constant_usd_regions"])
+    tb = tb.drop(columns=["constant_usd_regions"])
+
+    return tb
+
+
+def calculate_milex_per_military_personnel(tb: Table, tb_wdi: Table) -> Table:
+    """
+    Calculate military expenditure per military personnel (from WDI).
+    """
+
+    tb_wdi["ms_mil_totl_p1"] = tb_wdi["ms_mil_totl_p1"].astype(float)
+
+    # Merge the two tables
+    tb = pr.merge(tb, tb_wdi[["country", "year", "ms_mil_totl_p1"]], on=["country", "year"], how="left")
+
+    # Calculate military expenditure per military personnel
+    tb["milex_per_mil_personnel"] = tb["constant_usd"] / tb["ms_mil_totl_p1"]
+
+    # Make infinite values missing
+    tb["milex_per_mil_personnel"] = tb["milex_per_mil_personnel"].replace([float("inf"), float("-inf")], float("nan"))
+
+    # Drop columns
+    tb = tb.drop(columns=["ms_mil_totl_p1"])
+
+    return tb
+
+
+def sanity_checks(tb: Table) -> None:
+    """
+    Verify that the share indicators (`share_gdp`, `share_govt_spending`) are within the expected [0, 100] percentage range.
+    Raises if any country-year violates the bound and is not in `KNOWN_SHARE_OUTLIERS`. The whitelist exists so a single
+    well-documented edge case (e.g. Kuwait 1991) doesn't block the build, while genuine new regressions still fail loudly.
+    """
+    violations = []
+    for col in ["share_gdp", "share_govt_spending"]:
+        offenders = tb[(tb[col] < 0) | (tb[col] > 100)][["country", "year", col]].dropna()
+        for _, row in offenders.iterrows():
+            key = (row["country"], int(row["year"]), col)
+            if key not in KNOWN_SHARE_OUTLIERS:
+                violations.append(f"{row['country']} {int(row['year'])} {col}={row[col]:.4f}")
+    if violations:
+        raise ValueError(
+            "Share indicators outside [0, 100] (and not in KNOWN_SHARE_OUTLIERS):\n  " + "\n  ".join(violations)
+        )

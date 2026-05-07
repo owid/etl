@@ -1,0 +1,18 @@
+dataset:
+  title: Forestry area - FAO (2017)
+tables:
+  forestry_area__fao__2017:
+    variables:
+      forest_area__fao__2017:
+        title: Forest area (FAO (2017))
+        unit: hectares
+        description: Measures hectares of forest area. Forested area includes primary, regenerated forestry and woodlands.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

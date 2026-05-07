@@ -1,0 +1,19 @@
+dataset:
+  title: Top marginal income tax rate – Reynolds (2008)
+tables:
+  top_marginal_income_tax_rate__reynolds__2008:
+    variables:
+      top_marginal_income_tax_rate__reynolds__2008:
+        title: Top marginal income tax rate (Reynolds (2008))
+        unit: '%'
+        short_unit: '%'
+        description: 1979; 1990; 2002
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Dict
-
 import owid.catalog.processing as pr
 import pandas as pd
 import plotly.express as px
@@ -735,7 +733,7 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
     return tb
 
 
-def prepare_wide_tables(tb: Table) -> Dict[str, Table]:
+def prepare_wide_tables(tb: Table) -> dict[str, Table]:
     # Table for average prices (in euros) of gas and electricity prices of household and non-household consumers.
     tb_prices_euro = tb[tb["dataset_code"].isin(DATASET_CODES_PRICES)].pivot(
         index=["country", "date"],

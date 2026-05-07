@@ -1,0 +1,20 @@
+dataset:
+  title: Ozone and chlorine projections to 2100 (Scientific Assessment, 2014)
+tables:
+  ozone_and_chlorine_projections_to_2100__scientific_assessment__2014:
+    variables:
+      equivalent_stratospheric_chorine__esc__1960__0:
+        title: Equivalent stratospheric chorine (ESC) (1960 = 0)
+        unit: (1960 = 0)
+      ozone_concentration__1960__0:
+        title: Ozone concentration (1960 = 0)
+        unit: (1960 = 0)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

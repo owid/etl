@@ -153,11 +153,11 @@ def approve_identical_chart_diffs(
                 )
 
                 if diff_lines:
-                    print(f"\n{'='*80}")
+                    print(f"\n{'=' * 80}")
                     print(f"Config differences for chart {chart_id}:")
-                    print(f"{'='*80}")
+                    print(f"{'=' * 80}")
                     print("".join(diff_lines))
-                    print(f"{'='*80}\n")
+                    print(f"{'=' * 80}\n")
 
     # Batch approve all charts at once
     if charts_to_approve:

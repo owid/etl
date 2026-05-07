@@ -1,13 +1,13 @@
 """Semantic search functionality for OWID indicators via API."""
 
-from typing import Any, Dict, List
+from typing import Any
 
 import httpx
 
 from owid_mcp.config import HTTP_TIMEOUT, SEARCH_API_URL
 
 
-async def semantic_search_indicators(query: str, limit: int = 10) -> List[Dict[str, Any]]:
+async def semantic_search_indicators(query: str, limit: int = 10) -> list[dict[str, Any]]:
     """
     Search for indicators using semantic similarity via Search API.
 

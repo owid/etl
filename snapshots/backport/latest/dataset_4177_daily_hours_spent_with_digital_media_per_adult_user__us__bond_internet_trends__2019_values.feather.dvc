@@ -1,17 +1,15 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4177
-    date_accessed: 2023-08-10 07:43:39.583476
+    url: https://admin.owid.io/admin/datasets/4177
+    date_accessed: 2026-03-05 09:51:47.905430+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Daily hours spent with digital media per adult user, US (BOND Internet Trends
-    (2019))
+  name: Daily hours spent with digital media per adult user, US (BOND Internet Trends (2019))
   description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8eca617929b49ab69ef79cb3c5a30ef3
-  size: 6498
-  path: 
-    dataset_4177_daily_hours_spent_with_digital_media_per_adult_user__us__bond_internet_trends__2019_values.feather
+  - md5: d570d363dc791e2d579d22949bebfc9a
+    size: 6538
+    path: dataset_4177_daily_hours_spent_with_digital_media_per_adult_user__us__bond_internet_trends__2019_values.feather

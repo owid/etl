@@ -1,0 +1,98 @@
+dataset:
+  title: Whale catch (Rocha et al.; IWC)
+tables:
+  whale_catch__rocha_et_al__iwc:
+    variables:
+      all_whale_species__rocha_et_al__iwc:
+        title: All whale species (Rocha et al.; IWC)
+        unit: whale catches
+        display:
+          name: All whale species
+          numDecimalPlaces: 0
+        description: The number of whale catches (all species) each year.
+      blue_whale__rocha_et_al__iwc:
+        title: Blue whale (Rocha et al.; IWC)
+        unit: whale catches
+        display:
+          name: Blue whale
+          numDecimalPlaces: 0
+        description: The number of blue whale catches each year.
+      bowhead_whale__rocha_et_al__iwc:
+        title: Bowhead whale (Rocha et al.; IWC)
+        unit: whales caught
+        display:
+          name: Bowhead whale
+          numDecimalPlaces: 0
+        description: The number of Bowhead whale catches each year.
+      brydes_whale__rocha_et_al__iwc:
+        title: Bryde's whale (Rocha et al.; IWC)
+        unit: whale catches
+        display:
+          name: Bryde's whale
+          numDecimalPlaces: 0
+        description: The number of Bryde's whale catches each year.
+      fin_whale__rocha_et_al__iwc:
+        title: Fin whale (Rocha et al.; IWC)
+        unit: whale catches
+        display:
+          name: Fin whale
+          numDecimalPlaces: 0
+        description: The number of fin whale catches each year.
+      gray_whale__rocha_et_al__iwc:
+        title: Gray whale (Rocha et al.; IWC)
+        unit: whale catches
+        display:
+          name: Gray whale
+          numDecimalPlaces: 0
+        description: The number of Gray whale catches each year.
+      humpback_whale__rocha_et_al__iwc:
+        title: Humpback whale (Rocha et al.; IWC)
+        unit: whale catches
+        display:
+          name: Humpback whale
+          numDecimalPlaces: 0
+        description: The number of humpback whale catches each year.
+      minke_whale__rocha_et_al__iwc:
+        title: Minke whale (Rocha et al.; IWC)
+        unit: whale catches
+        display:
+          name: Minke whale
+          numDecimalPlaces: 0
+        description: The number of Minke whale catches each year.
+      right_whale__rocha_et_al__iwc:
+        title: Right whale (Rocha et al.; IWC)
+        unit: whale catches
+        display:
+          name: Right whale
+          numDecimalPlaces: 0
+        description: The number of Right whale catches each year.
+      sei_whale__rocha_et_al__iwc:
+        title: Sei whale (Rocha et al.; IWC)
+        unit: whale catches
+        display:
+          name: Sei whale
+          numDecimalPlaces: 0
+        description: The number of Sei whale catches each year.
+      sperm_whale__rocha_et_al__iwc:
+        title: Sperm whale (Rocha et al.; IWC)
+        unit: whale catches
+        display:
+          name: Sperm whale
+          numDecimalPlaces: 0
+        description: The number of sperm whale catches each year.
+      unspecified_other__rocha_et_al__iwc:
+        title: Unspecified/Other (Rocha et al.; IWC)
+        unit: whale catches
+        display:
+          name: Unspecified/Other species
+          numDecimalPlaces: 0
+        description: The number of unspecified/other whale catches each year.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

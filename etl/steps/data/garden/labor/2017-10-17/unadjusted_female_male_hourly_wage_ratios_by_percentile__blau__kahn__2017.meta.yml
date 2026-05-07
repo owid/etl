@@ -1,0 +1,26 @@
+dataset:
+  title: Unadjusted female-male hourly wage ratios by percentile – Blau, Kahn (2017)
+tables:
+  unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017:
+    variables:
+      fiftieth_percentile__blau__kahn_2017:
+        title: Fiftieth percentile (Blau, Kahn 2017)
+        unit: ''
+        description: Unadjusted female-male log hourly wage ratio, full-time workers
+      ninetieth_percentile__blau__kahn_2017:
+        title: Ninetieth percentile (Blau, Kahn 2017)
+        unit: ''
+        description: Unadjusted female-male log hourly wage ratio, full-time workers
+      tenth_percentile__blau__kahn_2017:
+        title: Tenth percentile (Blau, Kahn 2017)
+        unit: '%'
+        description: Unadjusted female-male log hourly wage ratio, full-time workers
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

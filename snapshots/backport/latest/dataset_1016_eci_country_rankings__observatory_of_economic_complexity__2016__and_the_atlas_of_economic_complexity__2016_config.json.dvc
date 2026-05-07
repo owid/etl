@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/1016
-    date_accessed: 2023-08-10 08:35:11.528866
+    url: https://admin.owid.io/admin/datasets/1016
+    date_accessed: 2026-03-05 09:52:19.205922+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for 
-    dataset_1016_eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016
+  name: Grapher metadata for dataset_1016_eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 05e50e356ea26dbaaa2d28706350757f
-  size: 9185
-  path: 
-    dataset_1016_eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016_config.json
+  - md5: c7daf16f940d89b96ddf0e00f90ad227
+    size: 9687
+    path: dataset_1016_eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016_config.json

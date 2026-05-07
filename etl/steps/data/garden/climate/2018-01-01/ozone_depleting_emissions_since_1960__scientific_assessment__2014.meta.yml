@@ -1,0 +1,17 @@
+dataset:
+  title: Ozone depleting emissions since 1960 (Scientific Assessment, 2014)
+tables:
+  ozone_depleting_emissions_since_1960__scientific_assessment__2014:
+    variables:
+      ozone_depleting_substance_emissions__scientific_assessment_2014:
+        title: Ozone-depleting substance emissions (Scientific Assessment 2014)
+        unit: megatonnes CFC11-equivalent
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/1941
-    date_accessed: 2023-08-10 08:05:46.727528
+    url: https://admin.owid.io/admin/datasets/1941
+    date_accessed: 2026-03-05 12:26:36.362315+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Deaths from smallpox per million population (Edwardes, 1902)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c20ee98cefd644745acef5024df114bf
-  size: 8850
-  path: 
-    dataset_1941_deaths_from_smallpox_per_million_population__edwardes__1902_values.feather
+  - md5: 70c80b892d92a7f60b455ec0e41629a5
+    size: 9250
+    path: dataset_1941_deaths_from_smallpox_per_million_population__edwardes__1902_values.feather

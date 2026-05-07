@@ -3,7 +3,7 @@
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Union, cast
+from typing import cast
 
 from py7zr import SevenZipFile
 
@@ -12,8 +12,8 @@ from owid.datautils.decorators import enable_file_download
 
 @enable_file_download(path_arg_name="input_file")
 def decompress_file(
-    input_file: Union[str, Path],
-    output_folder: Union[str, Path],
+    input_file: str | Path,
+    output_folder: str | Path,
     overwrite: bool = False,
 ) -> None:
     """Extract a zip or tar file.
@@ -41,8 +41,8 @@ def decompress_file(
 
 
 def _decompress_zip_file(
-    input_file: Union[str, Path],
-    output_folder: Union[str, Path],
+    input_file: str | Path,
+    output_folder: str | Path,
     overwrite: bool = False,
 ) -> None:
     """Unpack zip file."""
@@ -61,8 +61,8 @@ def _decompress_zip_file(
 
 
 def _decompress_tar_file(
-    input_file: Union[str, Path],
-    output_folder: Union[str, Path],
+    input_file: str | Path,
+    output_folder: str | Path,
     overwrite: bool = False,
 ) -> None:
     """Unpack tar file."""
@@ -72,7 +72,7 @@ def _decompress_tar_file(
         # Path to new file to be created.
         new_file = Path(output_folder) / Path(tar_file.getnames()[0])
         if new_file.exists() and not overwrite:
-            raise FileExistsError("Output already exists. Either change output_folder or use" " overwrite=True.")
+            raise FileExistsError("Output already exists. Either change output_folder or use overwrite=True.")
 
         # Unzip the file and save it in the local output folder.
         # Note that, if output_folder path does not exist, the following command will create it.

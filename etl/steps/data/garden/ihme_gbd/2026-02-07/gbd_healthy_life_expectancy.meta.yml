@@ -4,6 +4,7 @@ definitions:
       topic_tags:
         - Life Expectancy
         - Global Health
+      attribution_short: IHME
     processing_level: major
     display:
       numDecimalPlaces: 1

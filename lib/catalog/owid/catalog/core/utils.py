@@ -86,11 +86,11 @@ def pruned_json(cls: T) -> T:
         This decorator is commonly used with metadata classes to keep JSON
         output clean by removing None values and private fields.
     """
-    orig = cls.to_dict  # type: ignore
+    orig = cls.to_dict  # ty: ignore
 
     # only keep non-null public variables
     # calling original to_dict returns dictionaries, not objects
-    cls.to_dict = lambda self, **kwargs: prune_dict(orig(self, **kwargs))  # type: ignore
+    cls.to_dict = lambda self, **kwargs: prune_dict(orig(self, **kwargs))  # ty: ignore
 
     return cls
 
@@ -440,7 +440,7 @@ def dataclass_from_dict(cls: type[T] | None, d: dict[str, Any]) -> T:
     speedup). See https://github.com/owid/etl/pull/3517#issuecomment-2468084380 for more details.
     """
     if d is None or not dataclasses.is_dataclass(cls) or not isinstance(d, dict):
-        return d  # type: ignore
+        return d  # ty: ignore
 
     field_types = {f.name: f.type for f in dataclasses.fields(cls)}
 
@@ -482,7 +482,7 @@ def dataclass_from_dict(cls: type[T] | None, d: dict[str, Any]) -> T:
             key_type, value_type = args
             init_args[field_name] = {k: dataclass_from_dict(value_type, item) for k, item in v.items()}
         elif dataclasses.is_dataclass(field_type):
-            init_args[field_name] = field_type.from_dict(v)  # type: ignore
+            init_args[field_name] = field_type.from_dict(v)  # ty: ignore
         elif isinstance(field_type, type) and field_type not in (Any,):
             try:
                 init_args[field_name] = field_type(v)

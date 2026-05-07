@@ -28,6 +28,7 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("gbd_risk", reset_index=True)
     ds_regions = paths.load_dataset("regions")
+    ds_un_wpp = paths.load_dataset("un_wpp")
     #
     # Process data.
     #
@@ -36,6 +37,7 @@ def run(dest_dir: str) -> None:
     tb = add_regional_aggregates(
         tb=tb,
         ds_regions=ds_regions,
+        ds_un_wpp=ds_un_wpp,
         index_cols=["country", "year", "metric", "measure", "rei", "cause", "age"],
         regions=REGIONS,
         age_group_mapping=AGE_GROUPS_RANGES,

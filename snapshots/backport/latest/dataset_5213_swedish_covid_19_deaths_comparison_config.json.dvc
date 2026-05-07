@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5213
-    date_accessed: 2023-08-10 07:51:17.939263
+    url: https://admin.owid.io/admin/datasets/5213
+    date_accessed: 2026-03-05 14:37:25.264130+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5213_swedish_covid_19_deaths_comparison
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 261391f530537a6037b63f75532383ea
-  size: 1521
-  path: dataset_5213_swedish_covid_19_deaths_comparison_config.json
+  - md5: 1a4060df59ef5b67fd83e411b1c1609b
+    size: 1651
+    path: dataset_5213_swedish_covid_19_deaths_comparison_config.json

@@ -38,8 +38,8 @@ def main(upload: bool) -> None:
         snap = Snapshot(f"met_office_hadley_centre/{SNAPSHOT_VERSION}/{data_file}")
 
         # Replace the full citation and description in the metadata.
-        snap.metadata.origin.citation_full = CITATION_FULL  # type: ignore
-        snap.metadata.origin.description = DESCRIPTION  # type: ignore
+        snap.metadata.origin.citation_full = CITATION_FULL  # ty: ignore
+        snap.metadata.origin.description = DESCRIPTION  # ty: ignore
 
         # Rewrite metadata to dvc file.
         snap.metadata.save()

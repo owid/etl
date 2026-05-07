@@ -13,7 +13,6 @@ NOTES: To get the data from EIU, you need to submit a form with few details. The
 """
 
 from pathlib import Path
-from typing import Optional
 
 import click
 
@@ -30,10 +29,10 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file-2022", type=str, help="Path to local data file.")
 @click.option("--path-to-file-2023", type=str, help="Path to local data file.")
 def main(
-    path_to_file_2006_2020: Optional[str],
-    path_to_file_2021: Optional[str],
-    path_to_file_2022: Optional[str],
-    path_to_file_2023: Optional[str],
+    path_to_file_2006_2020: str | None,
+    path_to_file_2021: str | None,
+    path_to_file_2022: str | None,
+    path_to_file_2023: str | None,
     upload: bool,
 ) -> None:
     # Assign short names to each file path

@@ -1,13 +1,13 @@
 # Biodiversity - cherry blossom dataset
 steps:
-  # Cherry blossom
-  data://meadow/biodiversity/2025-04-07/cherry_blossom:
+# Cherry blossom dataset (2026 update)
+  data://meadow/biodiversity/2026-04-16/cherry_blossom:
     - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
-    - snapshot://biodiversity/2025-04-07/cherry_blossom.csv
-  data://garden/biodiversity/2025-04-07/cherry_blossom:
-    - data://meadow/biodiversity/2025-04-07/cherry_blossom
-  data://grapher/biodiversity/2025-04-07/cherry_blossom:
-    - data://garden/biodiversity/2025-04-07/cherry_blossom
+    - snapshot://biodiversity/2026-04-16/cherry_blossom.csv
+  data://garden/biodiversity/2026-04-16/cherry_blossom:
+    - data://meadow/biodiversity/2026-04-16/cherry_blossom
+  data://grapher/biodiversity/2026-04-16/cherry_blossom:
+    - data://garden/biodiversity/2026-04-16/cherry_blossom
 
   # Invasive species -  Seebens et al
   data://meadow/biodiversity/2024-08-12/invasive_species:
@@ -83,3 +83,17 @@ steps:
     - data://meadow/iucn/2026-01-05/iucn_number_each_status
   data://grapher/iucn/2026-01-05/iucn_number_each_status:
     - data://garden/iucn/2026-01-05/iucn_number_each_status
+  #
+  # Fish stocks (RAM Legacy).
+  #
+  data://meadow/biodiversity/2024-10-30/fish_stocks:
+    - snapshot://biodiversity/2024-10-30/fish_stocks.csv
+  data://garden/biodiversity/2024-10-30/fish_stocks:
+    - data://meadow/biodiversity/2024-10-30/fish_stocks
+  data://grapher/biodiversity/2024-10-30/fish_stocks:
+    - data://garden/biodiversity/2024-10-30/fish_stocks
+  #
+  # Fish stocks explorer.
+  #
+  export://explorers/biodiversity/latest/fish_stocks:
+    - data://grapher/biodiversity/2024-10-30/fish_stocks

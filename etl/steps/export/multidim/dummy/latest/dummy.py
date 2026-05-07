@@ -6,7 +6,7 @@ Some of the features include:
 - Combine multiple collections int one. The example below combines two collections into one, and adds a new dimension (dropdown) to it so that one can switch between collections.
 - Tweak the metadata around dimensions (dropdowns). For that, you should use the .config.yml file next to your script, and know the dimension slugs that you want to tweak. See what we have done in dummy.config.yml!
 
-NOTE: Run this step with command `etlr multidim/dummy/latest/dummy --export --private --instant`
+NOTE: Run this step with command `etlr multidim/dummy/latest/dummy --export --private`
 """
 
 from etl.collection import combine_collections

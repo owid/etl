@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/655
-    date_accessed: 2023-08-10 08:53:10.752787
+    url: https://admin.owid.io/admin/datasets/655
+    date_accessed: 2026-03-05 12:23:45.667299+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Child Labor in US - Long (1958)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 87661f6b64a92b47884837eadadfbca4
-  size: 6594
-  path: dataset_655_child_labor_in_us__long__1958_values.feather
+  - md5: a61c74d9fd79fba18dc2ed1f828bb9d9
+    size: 6666
+    path: dataset_655_child_labor_in_us__long__1958_values.feather

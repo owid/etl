@@ -175,8 +175,9 @@ def make_table_diffs_ratios(tb: Table) -> Table:
         .assign(
             life_expectancy_fm_diff=lambda df: df[("life_expectancy", "female")] - df[("life_expectancy", "male")],
             life_expectancy_fm_ratio=lambda df: df[("life_expectancy", "female")] / df[("life_expectancy", "male")],
-            central_death_rate_mf_ratio=lambda df: df[("central_death_rate", "male")]
-            / df[("central_death_rate", "female")],
+            central_death_rate_mf_ratio=lambda df: (
+                df[("central_death_rate", "male")] / df[("central_death_rate", "female")]
+            ),
         )
         .reset_index()
     )

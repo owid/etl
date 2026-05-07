@@ -25,7 +25,7 @@ import pandas as pd
 PARENT_DIR = Path(__file__).parent.absolute()
 
 # Define country list
-with open(PARENT_DIR / "data_dictionary.json", "r") as f:
+with open(PARENT_DIR / "data_dictionary.json") as f:
     DATA_DICT = json.load(f)
 
 # Open dictionary as DataFrame

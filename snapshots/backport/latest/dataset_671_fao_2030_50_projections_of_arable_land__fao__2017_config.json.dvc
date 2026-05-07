@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/671
-    date_accessed: 2023-08-10 08:02:02.202129
+    url: https://admin.owid.io/admin/datasets/671
+    date_accessed: 2026-03-10 08:01:34.879773+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_671_fao_2030_50_projections_of_arable_land__fao__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3574e4103ff02409e51c075494417744
-  size: 3246
-  path: dataset_671_fao_2030_50_projections_of_arable_land__fao__2017_config.json
+  - md5: 854afc3b8b57e7cdf5c6989fa7581d61
+    size: 3469
+    path: dataset_671_fao_2030_50_projections_of_arable_land__fao__2017_config.json

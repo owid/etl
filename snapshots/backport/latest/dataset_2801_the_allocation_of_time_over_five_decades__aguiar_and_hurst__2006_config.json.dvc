@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2801
-    date_accessed: 2023-08-10 08:43:02.441513
+    url: https://admin.owid.io/admin/datasets/2801
+    date_accessed: 2026-03-06 07:49:44.486634+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2801_the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: acc25e4338549394b89e82b8610f06f5
-  size: 7791
-  path: 
-    dataset_2801_the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006_config.json
+  - md5: d7f29d573028bb532b9c283197884808
+    size: 8107
+    path: dataset_2801_the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006_config.json

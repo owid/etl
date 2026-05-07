@@ -160,7 +160,7 @@ tables:
         description_from_producer: "{definitions.description_unhcr_ooc}"
         description_key:
           - Other people of concern can include e.g. people who are at risk of becoming refugees or stateless, people in transit while fleeing their country, victims of trafficking, or specific groups of vulnerable migrants such as Venezuelans displaced abroad.
-      # solutions (return, resettlement, naturalization)
+      # solutions (return)
       returned_refugees:
         title: Returned refugees by country of origin
         description_short: |-

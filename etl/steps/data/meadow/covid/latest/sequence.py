@@ -46,7 +46,7 @@ def read_table(snap: Snapshot) -> Table:
     Income data is a dictionary.
     """
     # Read snapshot dictionary
-    with open(snap.path, "r") as file:
+    with open(snap.path) as file:
         data = json.load(file)
     # Convert to DataFrame (data -> df)
     data = list(filter(lambda x: x["region"] == "World", data["regions"]))[0]["distributions"]

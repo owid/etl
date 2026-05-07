@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Crippa et al. (2021). Food systems are responsible for a third of global anthropogenic GHG emissions. Nature Food.
+    description: |-
+      Crippa et al. (2021) quantify the greenhouse gas emissions of the food system from 1990 to 2015. This includes not only direct emissions from agriculture, but also land use change and supply chain emissions (transport, packaging, food processing, retail, consumer cooking, refrigeration and waste).
+
+      Greenhouse gas emissions are quantified on the basis of their 100-year global warming potential (GWP100) using emission factors from the IPCC 5th Assessment Report (AR5).
+    url: https://www.nature.com/articles/s43016-021-00225-9
+    date_accessed: 2021-03-10
+    published_by: |-
+      Crippa, M., Solazzo, E., Guizzardi, D. et al. Food systems are responsible for a third of global anthropogenic GHG emissions. Nature Food (2021).
+  name: GHG emissions from food by life-cycle stage (Crippa et al. 2021)
+  description: ''
+  is_public: false
+outs:
+  - md5: 72ea4b947689bfde7b344997bd840eb5
+    size: 17370
+    path: ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021.feather

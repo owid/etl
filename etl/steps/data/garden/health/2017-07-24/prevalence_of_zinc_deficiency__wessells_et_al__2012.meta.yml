@@ -1,0 +1,19 @@
+dataset:
+  title: Prevalence of zinc deficiency - Wessells et al. (2012)
+tables:
+  prevalence_of_zinc_deficiency__wessells_et_al__2012:
+    variables:
+      prevalence_of_zinc_deficiency__wessells_et_al__2012:
+        title: Prevalence of zinc deficiency (Wessells et al. (2012))
+        unit: '%'
+        short_unit: '%'
+        description: The share of the total population with intakes below physiological requirements.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

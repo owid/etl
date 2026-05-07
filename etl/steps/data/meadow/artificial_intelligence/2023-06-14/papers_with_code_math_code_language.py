@@ -30,18 +30,18 @@ def run(dest_dir: str) -> None:
     # Loop through each extracted file
     snap_language = cast(Snapshot, paths.load_dependency("papers_with_code_language.html"))
 
-    with open(snap_language.path, "r") as file:
+    with open(snap_language.path) as file:
         html_content = file.read()
     df_lang = language_extract(html_content)
 
     snap_coding = cast(Snapshot, paths.load_dependency("papers_with_code_coding.html"))
-    with open(snap_coding.path, "r") as file:
+    with open(snap_coding.path) as file:
         html_content = file.read()
     df_code = code_extract(html_content)
 
     snap_math = cast(Snapshot, paths.load_dependency("papers_with_code_math.html"))
 
-    with open(snap_math.path, "r") as file:
+    with open(snap_math.path) as file:
         html_content = file.read()
     df_math = extract_math_data_papers_with_code(html_content, "math")
     df_math.drop("additional_data", axis=1, inplace=True)

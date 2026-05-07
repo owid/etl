@@ -4,11 +4,12 @@ import json
 import os
 import re
 from functools import cache
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 import pandas as pd
 import requests
 from owid.catalog import Dataset, Source, Table, VariableMeta
+from owid.catalog.core.warnings import DisplayNameWarning, NoOriginsWarning, ignore_warnings
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
@@ -46,7 +47,7 @@ def run(dest_dir: str) -> None:
             log.warning("un_sdg.skip", table_name=var)
             continue
 
-        log.info("un_sdg.process", table_name=var)
+        log.debug("un_sdg.process", table_name=var)
 
         var_df = create_dataframe_with_variable_name(ds_garden, var)
         var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
@@ -73,11 +74,12 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
-    ds_grapher.save()
+    with ignore_warnings([NoOriginsWarning, DisplayNameWarning]):
+        ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
+        ds_grapher.save()
 
 
-def clean_source_name(raw_source: pd.Series, clean_source_map: Dict[str, str]) -> str:
+def clean_source_name(raw_source: pd.Series, clean_source_map: dict[str, str]) -> str:
     if len(raw_source.drop_duplicates()) > 1:
         clean_source = "Data from multiple sources compiled by the UN"
     else:
@@ -92,9 +94,9 @@ def load_source_description() -> dict:
     """
     Load the existing json which loads a more detailed source description for a selection of sources.
     """
-    with open(paths.directory / "un_sdg.source_description.json", "r") as f:
+    with open(paths.directory / "un_sdg.source_description.json") as f:
         sources = json.load(f)
-        return cast(Dict[str, str], sources)
+        return cast(dict[str, str], sources)
 
 
 def create_metadata_desc(indicator: str, series_code: str, source_desc: dict, series_description: str) -> str:
@@ -109,7 +111,7 @@ def create_metadata_desc(indicator: str, series_code: str, source_desc: dict, se
         if source_url == "no metadata found":
             source_desc_out = series_description
         else:
-            source_desc_out = series_description + "\n\nFurther information available at: %s" % (source_url)
+            source_desc_out = series_description + f"\n\nFurther information available at: {source_url}"
 
     return source_desc_out
 
@@ -209,13 +211,13 @@ def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFr
     return tab_df
 
 
-def load_clean_source_mapping() -> Dict[str, str]:
+def load_clean_source_mapping() -> dict[str, str]:
     """
     Load the existing json which maps the raw sources to a cleaner version of the sources.
     """
-    with open(paths.directory / "un_sdg.sources.json", "r") as f:
+    with open(paths.directory / "un_sdg.sources.json") as f:
         sources = json.load(f)
-        return cast(Dict[str, str], sources)
+        return cast(dict[str, str], sources)
 
 
 @cache

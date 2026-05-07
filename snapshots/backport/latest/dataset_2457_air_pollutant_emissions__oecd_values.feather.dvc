@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2457
-    date_accessed: 2023-08-10 09:05:18.062635
+    url: https://admin.owid.io/admin/datasets/2457
+    date_accessed: 2026-03-10 08:03:03.793230+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Air Pollutant Emissions - OECD
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4c7d497bb9388b383a41b52454d787e8
-  size: 23354
-  path: dataset_2457_air_pollutant_emissions__oecd_values.feather
+  - md5: 6ea88d22229249e7b898b28393c490da
+    size: 22858
+    path: dataset_2457_air_pollutant_emissions__oecd_values.feather

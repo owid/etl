@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: IMF Direction of Trade Statistics (DOTS) (2017)
+    description: |-
+      To calculate total merchandise exports as a share of GDP, the DOTS value of merchandise exports was divided by country GDP (in current US$), with the ratio multiplied by 100. GDP data was taken from the World Bank's WDI available at: https://data.worldbank.org/indicator/NY.GDP.MKTP.CD
+
+      Russia's time series is made up of Russia and the USSR.
+      Yemen's time series is made up of Yemen, the Yemen Arab Republic, and the Yemen People's Republic.
+    url: http://data.imf.org/?sk=9D6028D4-F14A-464C-A2F2-59B2CD424B85&sId=1390030341854
+    date_accessed: 2018-03-14
+    published_by: IMF
+  name: Total merchandise trade as share of GDP (DOTS (2017)) (split)
+  description: ''
+  is_public: false
+outs:
+  - md5: 594f41766bb6f9f3c4d4af467bed3aef
+    size: 62570
+    path: total_merchandise_trade_as_share_of_gdp__dots__2017__split.feather

@@ -6,7 +6,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: Parameter, Compute and Data Trends in Machine Learning
-    date_published: "2025"
+    date_published: "2026-04-10"
     description_snapshot: |
       We update this chart with the latest available data from our source every month.
 
@@ -30,13 +30,13 @@ meta:
     # Files
     url_main: https://epoch.ai/mlinputs/visualization
     url_download: https://epoch.ai/data/epochdb/notable_ai_models.csv
-    date_accessed: '2026-01-26'
+    date_accessed: '2026-04-29'
 
     # License
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
 outs:
-  - md5: 1149d0b75df9f65144cdbe1f881353e1
-    size: 2101444
+  - md5: 7296ea2f1116b020646482551325645e
+    size: 2160557
     path: epoch.csv

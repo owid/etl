@@ -1,7 +1,5 @@
 """Tools for an interactive (ipython) session."""
 
-from typing import List, Optional
-
 import yaml
 from owid.catalog import Table
 
@@ -10,7 +8,7 @@ from etl.harmonize import harmonize_ipython
 __all__ = ["harmonize_ipython"]
 
 
-def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:
+def print_tables_metadata_template(tables: list[Table], fields: list[str] | None = None) -> None:
     # This function is meant to be used when creating code in an interactive window (or a notebook).
     # It prints a template for the metadata of the tables in the list.
     # The template can be copied and pasted into the corresponding yaml file.

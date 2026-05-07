@@ -56,7 +56,7 @@ def main(upload: bool) -> None:
     )
 
     # Add file to DVC and upload to S3.
-    add_snapshot(uri=snap.uri, dataframe=df, upload=upload)  # type: ignore
+    add_snapshot(uri=snap.uri, dataframe=df, upload=upload)  # ty: ignore
 
 
 if __name__ == "__main__":

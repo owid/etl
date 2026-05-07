@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/651
-    date_accessed: 2023-08-10 08:34:00.681349
+    url: https://admin.owid.io/admin/datasets/651
+    date_accessed: 2026-03-05 12:23:43.464648+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_651_hubberts_peak__cavallo__and__eia
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fc4908b0ff3845df7745826f85d0d455
-  size: 3083
-  path: dataset_651_hubberts_peak__cavallo__and__eia_config.json
+  - md5: c9759726f95cb730774b644b725060a7
+    size: 3306
+    path: dataset_651_hubberts_peak__cavallo__and__eia_config.json

@@ -4,7 +4,7 @@
   "publisher": "owid",
   "displayName": "Clickable DAG Steps",
   "description": "Make steps in ETL DAG clickable",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.100.0"
   },

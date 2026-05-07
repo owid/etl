@@ -19,7 +19,7 @@ def run() -> None:
     snap = paths.load_snapshot("measles_cases.json")
     origins = [snap.metadata.origin]
     # Load JSON data from snapshot.
-    with open(snap.path, "r", encoding="utf-8-sig") as f:
+    with open(snap.path, encoding="utf-8-sig") as f:
         data = json.load(f)
         tb = pd.DataFrame(data)
     #

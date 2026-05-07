@@ -1,7 +1,7 @@
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -86,7 +86,7 @@ def run() -> None:
 
     tb_cust = mk_custom_entities(tb)
     assert all([col in tb.columns for col in tb_cust.columns])
-    tb = pd.concat([tb, tb_cust], axis=0).copy_metadata(tb)  # type: ignore
+    tb = pd.concat([tb, tb_cust], axis=0).copy_metadata(tb)  # ty: ignore
 
     tb_garden = tb
 
@@ -103,7 +103,7 @@ def run() -> None:
 
     # validate that all columns have title
     for col in tb_garden.columns:
-        assert tb_garden[col].metadata.title is not None, 'Variable "{}" has no title'.format(col)
+        assert tb_garden[col].metadata.title is not None, f'Variable "{col}" has no title'
 
     # add armed personnel as share of population
     tb_garden = add_armed_personnel_as_share_of_population(tb_garden, ds_population)
@@ -597,7 +597,9 @@ def add_variable_metadata(tb: Table, tb_metadata: Table) -> Table:
 
         # load metadata created from raw source name
         clean_source = clean_source_mapping.get(source_raw_name)
-        assert clean_source, f'{var_code}: `rawName` "{source_raw_name}" not found in wdi.sources.json. Run `python update_wdi_metadata.py update-sources` or check non-breaking spaces.'
+        assert clean_source, (
+            f'{var_code}: `rawName` "{source_raw_name}" not found in wdi.sources.json. Run `python update_wdi_metadata.py update-sources` or check non-breaking spaces.'
+        )
 
         # create an origin with WDI
         assert len(tb[var_code].m.origins) == 1
@@ -634,16 +636,16 @@ def add_variable_metadata(tb: Table, tb_metadata: Table) -> Table:
     return tb
 
 
-def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:
+def load_clean_source_mapping() -> dict[str, dict[str, str]]:
     # The mapping is maintained using update_wdi_metadata.py CLI
-    with open(Path(__file__).parent / "wdi.sources.json", "r") as f:
+    with open(Path(__file__).parent / "wdi.sources.json") as f:
         sources = json.load(f)
         source_mapping = {source["rawName"]: source for source in sources}
         assert len(sources) == len(source_mapping)
     return source_mapping
 
 
-def create_description_from_producer(var: Dict[str, Any]) -> Optional[str]:
+def create_description_from_producer(var: dict[str, Any]) -> str | None:
     desc = ""
     if pd.notnull(var["long_definition"]) and len(var["long_definition"].strip()) > 0:
         desc += var["long_definition"]
@@ -651,13 +653,13 @@ def create_description_from_producer(var: Dict[str, Any]) -> Optional[str]:
         desc += var["short_definition"]
 
     if pd.notnull(var["limitations_and_exceptions"]) and len(var["limitations_and_exceptions"].strip()) > 0:
-        desc += f'\n\n### Limitations and exceptions:\n{var["limitations_and_exceptions"]}'
+        desc += f"\n\n### Limitations and exceptions:\n{var['limitations_and_exceptions']}"
 
     if (
         pd.notnull(var["statistical_concept_and_methodology"])
         and len(var["statistical_concept_and_methodology"].strip()) > 0
     ):
-        desc += f'\n\n### Statistical concept and methodology:\n{var["statistical_concept_and_methodology"]}'
+        desc += f"\n\n### Statistical concept and methodology:\n{var['statistical_concept_and_methodology']}"
 
     ####################################################################################################################
     # I think that the development relevance could also be an interesting field to add to the description_from_producer.
@@ -667,12 +669,12 @@ def create_description_from_producer(var: Dict[str, Any]) -> Optional[str]:
         and pd.notnull(var["development_relevance"])
         and len(var["development_relevance"].strip()) > 0
     ):
-        desc += f'\n\n### Development relevance:\n{var["development_relevance"]}'
+        desc += f"\n\n### Development relevance:\n{var['development_relevance']}"
     ####################################################################################################################
 
     # retrieves additional source info, if it exists.
     if pd.notnull(var["notes_from_original_source"]) and len(var["notes_from_original_source"].strip()) > 0:
-        desc += f'\n\n### Notes from original source:\n{var["notes_from_original_source"]}'
+        desc += f"\n\n### Notes from original source:\n{var['notes_from_original_source']}"
 
     desc = re.sub(r" *(\n+) *", r"\1", re.sub(r"[ \t]+", " ", desc)).strip()
 

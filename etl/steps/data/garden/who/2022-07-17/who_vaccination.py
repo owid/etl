@@ -1,6 +1,6 @@
 import json
 from functools import reduce
-from typing import Any, List, cast
+from typing import Any, cast
 
 import pandas as pd
 from owid import catalog
@@ -56,8 +56,8 @@ def run(dest_dir: str) -> None:
     log.info("who_vaccination.end")
 
 
-def load_excluded_countries() -> List[str]:
-    with open(N.excluded_countries_path, "r") as f:
+def load_excluded_countries() -> list[str]:
+    with open(N.excluded_countries_path) as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data

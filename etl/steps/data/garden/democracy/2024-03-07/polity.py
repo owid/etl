@@ -41,7 +41,7 @@ LABELS
 """
 
 import ast
-from typing import Tuple, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -159,9 +159,9 @@ def run() -> None:
     ##################################################
 
     # Add regions to main table (including population-weighted averages)
-    assert (
-        tb_avg_countries.shape[0] == tb_avg_w_countries.shape[0]
-    ), "Different number of rows in tb_avg_countries and tb_avg_w_countries"
+    assert tb_avg_countries.shape[0] == tb_avg_w_countries.shape[0], (
+        "Different number of rows in tb_avg_countries and tb_avg_w_countries"
+    )
     tb_avg_w_countries["country"] = tb_avg_w_countries["country"] + " (population-weighted)"
     tb = concat([tb, tb_avg_countries, tb_avg_w_countries], ignore_index=True)
 
@@ -238,7 +238,7 @@ def add_age_and_experience(tb: Table) -> Table:
     # Add age and experience counts
     tb = add_count_years_in_regime(
         tb=tb,
-        columns=columns,  # type: ignore
+        columns=columns,  # ty: ignore
         na_is_zero=True,
     )
 
@@ -257,7 +257,7 @@ def add_age_and_experience(tb: Table) -> Table:
     return tb
 
 
-def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
+def get_country_data(tb: Table, ds_regions: Dataset) -> tuple[Table, Table]:
     """Estimate number of countries in each regime, and country-average for some indicators.
 
     Returns two tables:
@@ -342,8 +342,8 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
     tb_avg = add_regions_and_global_aggregates(
         tb=tb_avg,
         ds_regions=ds_regions,
-        aggregations={k: "mean" for k in indicators_avg},  # type: ignore
-        aggregations_world={k: np.mean for k in indicators_avg},  # type: ignore
+        aggregations={k: "mean" for k in indicators_avg},  # ty: ignore
+        aggregations_world={k: np.mean for k in indicators_avg},  # ty: ignore
         regions=REGIONS,
     )
 
@@ -353,7 +353,7 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
     return tb_num, tb_avg
 
 
-def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table]:
+def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table]:
     """Estimate people living in each regime, and population-weighted averages for some indicators.
 
     regime_polity (people living)
@@ -445,7 +445,7 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
     tb_avg = add_regions_and_global_aggregates(
         tb=tb_avg,
         ds_regions=ds_regions,
-        aggregations={k: "sum" for k in indicators_avg} | {"population": "sum"},  # type: ignore
+        aggregations={k: "sum" for k in indicators_avg} | {"population": "sum"},  # ty: ignore
         min_num_values_per_year=1,
     )
 

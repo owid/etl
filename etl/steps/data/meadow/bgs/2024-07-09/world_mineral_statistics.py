@@ -3,7 +3,7 @@
 import json
 import re
 import zipfile
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -28,7 +28,7 @@ def _create_raw_dataframe_from_soup(soup: BeautifulSoup) -> pd.DataFrame:
     # Extract headers with multi-level structure.
     headers = []
     sub_headers = []
-    for th in table.find_all("th"):  # type: ignore
+    for th in table.find_all("th"):  # ty: ignore
         colspan = th.get("colspan")
         if colspan:
             headers.extend([th.text.strip()] * int(colspan))
@@ -39,7 +39,7 @@ def _create_raw_dataframe_from_soup(soup: BeautifulSoup) -> pd.DataFrame:
 
     # Extract rows (skipping the header row).
     rows = []
-    for tr in table.find_all("tr")[1:]:  # type: ignore
+    for tr in table.find_all("tr")[1:]:  # ty: ignore
         row = []
         for td in tr.find_all("td"):
             row.append(td.text.strip())
@@ -59,7 +59,7 @@ def _create_raw_dataframe_from_soup(soup: BeautifulSoup) -> pd.DataFrame:
     return df_raw
 
 
-def _extract_notes_and_footnotes_from_soup(soup: BeautifulSoup) -> Tuple[List[str], Dict[str, str]]:
+def _extract_notes_and_footnotes_from_soup(soup: BeautifulSoup) -> tuple[list[str], dict[str, str]]:
     # Extract notes and footnotes from the soup.
     notes_section = soup.find("h2", string="Notes")
 
@@ -70,17 +70,17 @@ def _extract_notes_and_footnotes_from_soup(soup: BeautifulSoup) -> Tuple[List[st
         notes_heading = notes_section.find_next("h3", string="Table notes")
         if notes_heading:
             for sibling in notes_heading.find_next_siblings():
-                if sibling.name == "h3" and sibling.text == "Footnotes":  # type: ignore
+                if sibling.name == "h3" and sibling.text == "Footnotes":  # ty: ignore
                     break
-                if sibling.name == "p":  # type: ignore
+                if sibling.name == "p":  # ty: ignore
                     notes.append(sibling.text.strip())
 
         footnotes_heading = notes_section.find_next("h3", string="Footnotes")
         if footnotes_heading:
             for sibling in footnotes_heading.find_next_siblings():
-                if sibling.name == "h2" and sibling.text == "Export data":  # type: ignore
+                if sibling.name == "h2" and sibling.text == "Export data":  # ty: ignore
                     break
-                if sibling.name == "p":  # type: ignore
+                if sibling.name == "p":  # ty: ignore
                     footnotes.append(sibling.text.strip())
 
     # Convert footnotes into a dictionary, mapping the mark of the footnote to its corresponding text.
@@ -90,7 +90,7 @@ def _extract_notes_and_footnotes_from_soup(soup: BeautifulSoup) -> Tuple[List[st
     return notes, footnotes
 
 
-def _extract_unit_from_soup(soup) -> Optional[str]:
+def _extract_unit_from_soup(soup) -> str | None:
     # Find the table in the soup.
     table = soup.find("table", class_="bodyTable")
 
@@ -138,7 +138,7 @@ def _clean_raw_dataframe(df_raw: pd.DataFrame) -> pd.DataFrame:
             df_issues = df_issues[df_issues["Category"] == "Production"]
             if len(df_issues) > 0:
                 log.warning(
-                    f'Duplicated entries with different values on Category {set(df_issues["Category"])}, {len(df_issues["Country"].unique())} countries, Commodity {set(df_issues["Commodity"])}, and Sub-commodities: {set(df_issues["Sub-commodity"])}.'
+                    f"Duplicated entries with different values on Category {set(df_issues['Category'])}, {len(df_issues['Country'].unique())} countries, Commodity {set(df_issues['Commodity'])}, and Sub-commodities: {set(df_issues['Sub-commodity'])}."
                 )
         # Drop duplicates.
         df = df.drop_duplicates(
@@ -155,7 +155,7 @@ def _clean_raw_dataframe(df_raw: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_raw_data(data: Dict[str, Any]):
+def process_raw_data(data: dict[str, Any]):
     # Initialize a dataframe that will contain all the combined data.
     df_all = pd.DataFrame(
         columns=["Country", "Commodity", "Sub-commodity", "Year", "Category", "Note", "Value", "Unit", "General notes"]

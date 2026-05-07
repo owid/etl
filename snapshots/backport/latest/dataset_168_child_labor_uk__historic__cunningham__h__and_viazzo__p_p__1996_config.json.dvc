@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/168
-    date_accessed: 2023-08-10 08:59:56.601102
+    url: https://admin.owid.io/admin/datasets/168
+    date_accessed: 2026-03-05 13:11:11.103496+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_168_child_labor_uk__historic__cunningham__h__and_viazzo__p_p__1996
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 09c9b6c840b08b5fec6d085552ce3bd5
-  size: 2875
-  path: 
-    dataset_168_child_labor_uk__historic__cunningham__h__and_viazzo__p_p__1996_config.json
+  - md5: cda9d8c308928261a38bdf23f7edd10b
+    size: 3098
+    path: dataset_168_child_labor_uk__historic__cunningham__h__and_viazzo__p_p__1996_config.json

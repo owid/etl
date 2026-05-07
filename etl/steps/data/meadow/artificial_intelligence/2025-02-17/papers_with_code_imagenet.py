@@ -21,7 +21,7 @@ def run() -> None:
     snap = paths.load_snapshot("papers_with_code_imagenet.html")
 
     # Load data from snapshot.
-    with open(snap.path, "r") as file:
+    with open(snap.path) as file:
         html_content = file.read()
     #
     # Process data.

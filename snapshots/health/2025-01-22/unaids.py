@@ -131,7 +131,7 @@ def safe_request():
 
     # Define requests session
     session = requests.Session()
-    retry = Retry(connect=3, backoff_factor=0.5)  # type: ignore[reportArgumentType]
+    retry = Retry(connect=3, backoff_factor=0.5)  # ty: ignore[invalid-argument-type]
     adapter = HTTPAdapter(max_retries=retry)
     session.mount("http://", adapter)
     session.mount("https://", adapter)

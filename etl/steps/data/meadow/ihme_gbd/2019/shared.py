@@ -1,5 +1,3 @@
-from typing import List
-
 import pandas as pd
 import pyarrow.compute as pc
 from owid.catalog import Dataset, License, Origin, Table, TableMeta
@@ -58,7 +56,7 @@ def read_and_clean_data(local_file: str) -> pd.DataFrame:
         partition = ""
 
     if partition:
-        dfs: List[pd.DataFrame] = []
+        dfs: list[pd.DataFrame] = []
         for partition_name in arrow_table[partition].unique().to_pylist():
             dfs.append(clean_data(arrow_table.filter(pc.equal(arrow_table[partition], partition_name)).to_pandas()))
         return pd.concat(dfs)
@@ -133,7 +131,7 @@ def add_origins_to_global_burden_of_disease(tb_gbd: Table) -> Table:
                 producer="Institute of Health Metrics and Evaluation",
                 url_main="https://vizhub.healthdata.org/gbd-results/",
                 date_accessed="2021-12-01",
-                date_published="2020-10-17",  # type: ignore
+                date_published="2020-10-17",  # ty: ignore
                 citation_full="Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2019 (GBD 2019). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2020.",
                 description="The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries, time, age, and sex. It quantifies health loss from hundreds of diseases, injuries, and risk factors, so that health systems can be improved and disparities eliminated. GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes. With these tools, decision-makers can compare different health issues and their effects.",
                 license=License(

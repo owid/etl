@@ -1,0 +1,29 @@
+dataset:
+  title: Surface ocean plastic by mass - Eriksen et al. (2014)
+tables:
+  surface_ocean_plastic_by_mass__eriksen_et_al__2014:
+    variables:
+      all_sizes__total_mass:
+        title: All sizes (total mass)
+        unit: tonnes
+      large_microplastic_mass__1_01_4_75mm:
+        title: Large microplastic mass (1.01-4.75mm)
+        unit: tonnes
+      macroplastic_mass__gt_200mm:
+        title: Macroplastic mass (>200mm)
+        unit: tonnes
+      mesoplastic_mass__4_76_200mm:
+        title: Mesoplastic mass (4.76-200mm)
+        unit: tonnes
+      small_microplastic_mass__0_33_1mm:
+        title: Small microplastic mass (0.33-1mm)
+        unit: tonnes
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

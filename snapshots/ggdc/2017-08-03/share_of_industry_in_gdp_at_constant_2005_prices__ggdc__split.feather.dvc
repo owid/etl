@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World In Data based on GGDC-10 (2015)
+    description: |-
+      The only changes we applied to the GGDC 10-sector database were: (i) dropping observations for GDP shares in Peru 1950-1985 since these are reported as negative in the original; and (ii) dropping observations for GDP shares in the Netherlands 1949-1959, since these are comparable to the period after 1960, as suggested by a marked jump in levels in the original series.
+    url: http://www.rug.nl/ggdc/productivity/10-sector/
+    date_accessed: 2017-08-03
+    published_by: Our World In Data based on GGDC-10 (2015)
+  name: Share of industry in GDP at constant 2005 prices (GGDC) (split)
+  description: ''
+  is_public: false
+outs:
+  - md5: fe56480d0f33340a4683abf2e767da9f
+    size: 12226
+    path: share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split.feather

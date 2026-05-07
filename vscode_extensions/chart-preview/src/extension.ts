@@ -21,12 +21,12 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		const filePath = editor.document.uri.fsPath;
-		if (filePath.includes('/steps/data/') && filePath.endsWith('.py')) {
-			openDatasetPreview(filePath);
+		if (filePath.includes('/steps/data/') && (filePath.endsWith('.py') || filePath.endsWith('.meta.yml'))) {
+			openPreview(filePath, datasetStrategy);
 		} else if (filePath.endsWith('.chart.yml') || (filePath.includes('/export/multidim/') && (filePath.endsWith('.config.yml') || filePath.endsWith('.py')))) {
-			openPreview(filePath);
+			openPreview(filePath, chartStrategy);
 		} else {
-			vscode.window.showErrorMessage('Not a previewable file (expected a garden .py step or .chart.yml)');
+			vscode.window.showErrorMessage('Not a previewable file (expected a data step .py/.meta.yml or .chart.yml)');
 		}
 	});
 
@@ -43,6 +43,33 @@ export function deactivate() {
 	watchProcesses.clear();
 	for (const [, proc] of previewScriptProcesses) { proc.kill(); }
 	previewScriptProcesses.clear();
+}
+
+// --- Strategy interface ---
+
+interface PreviewConfig {
+	stepUri: string;
+	etlArgs: string[];
+	fileName: string;
+	/** Strategy-specific data passed through to reload callbacks */
+	extra?: unknown;
+}
+
+interface WatchState {
+	command: string;
+	recentOutput: string;
+	firstRunDone: boolean;
+	cycleStart: number;
+	filePath: string;
+	wsRoot: string;
+}
+
+interface PreviewStrategy {
+	parse(filePath: string, wsRoot: string): Promise<PreviewConfig> | PreviewConfig;
+	doReload(panel: vscode.WebviewPanel, state: WatchState, config: PreviewConfig): Promise<void> | void;
+	onDispose?(filePath: string): void;
+	/** Extra per-chunk output handling (e.g. chart's "not found in database" check) */
+	handleOutput?(text: string, state: WatchState, panel: vscode.WebviewPanel): void;
 }
 
 // --- Helpers ---
@@ -122,6 +149,36 @@ function parseExportMultidim(filePath: string, wsRoot: string): { stepUri: strin
 	return { stepUri: `export://multidim/${stepPath}`, catalogPath };
 }
 
+/**
+ * Parse an ETL data step file path into its components.
+ * e.g. /path/to/etl/steps/data/garden/biodiversity/2025-04-07/cherry_blossom.py
+ *   → { channel: "garden", namespace: "biodiversity", version: "2025-04-07", shortName: "cherry_blossom" }
+ */
+function parseDataStepPath(filePath: string, wsRoot: string): {
+	stepUri: string;
+	channel: string;
+	namespace: string;
+	version: string;
+	shortName: string;
+	relStepPath: string;
+} {
+	const dataDir = path.join(wsRoot, 'etl', 'steps', 'data');
+	const rel = path.relative(dataDir, filePath).replace(/\.(py|meta\.yml)$/, '');
+	const parts = rel.split(path.sep);
+	if (parts.length < 4) {
+		throw new Error(`Cannot parse data step path: ${filePath}`);
+	}
+	const [channel, namespace, version, shortName] = parts;
+	return {
+		stepUri: `data://${channel}/${namespace}/${version}/${shortName}`,
+		channel,
+		namespace,
+		version,
+		shortName,
+		relStepPath: `etl/steps/data/${rel}.py`,
+	};
+}
+
 interface InfoBarData {
 	command: string;
 	stagingUrl: string;
@@ -129,6 +186,345 @@ interface InfoBarData {
 	status: string;
 	latency?: string;
 }
+
+// Track in-flight preview script processes so we can kill them on panel close / new run
+const previewScriptProcesses = new Map<string, ChildProcess>();
+
+/**
+ * Run the Python generate_preview.py script and return the JSON payload.
+ * Kills any previous in-flight script for the same filePath.
+ * Times out after 10 minutes to avoid zombies on huge datasets.
+ */
+function runPreviewScript(wsRoot: string, stepPath: string, filePath: string): Promise<string> {
+	// Kill any previous in-flight script for this panel
+	const prev = previewScriptProcesses.get(filePath);
+	if (prev) { prev.kill(); previewScriptProcesses.delete(filePath); }
+
+	return new Promise((resolve, reject) => {
+		const config = vscode.workspace.getConfiguration('chart-preview');
+		const pythonRel = config.get<string>('pythonPath', '.venv/bin/python');
+		const pythonPath = path.resolve(wsRoot, pythonRel);
+		const scriptPath = path.join(wsRoot, 'vscode_extensions', 'chart-preview', 'generate_preview.py');
+
+		const proc = spawn(pythonPath, [scriptPath, stepPath, '--json'], { cwd: wsRoot });
+		previewScriptProcesses.set(filePath, proc);
+
+		const timeout = setTimeout(() => {
+			proc.kill();
+			previewScriptProcesses.delete(filePath);
+			reject(new Error(`Preview script timed out after 10 minutes.\n\nThe dataset may be too large to preview quickly.`));
+		}, 600_000);
+
+		let stdout = '';
+		let stderr = '';
+		proc.stdout.on('data', (d: Buffer) => { stdout += d.toString(); });
+		proc.stderr.on('data', (d: Buffer) => { stderr += d.toString(); });
+		proc.on('close', (code) => {
+			clearTimeout(timeout);
+			previewScriptProcesses.delete(filePath);
+			if (code === 0) {
+				// Strip any leading log/warning lines (e.g. structlog warnings on master branch)
+				// and extract only the JSON line.
+				const jsonLine = stdout.split('\n').find(l => l.trimStart().startsWith('{'));
+				resolve(jsonLine ?? stdout);
+			} else if (code !== null) {  // null = killed intentionally, ignore
+				reject(new Error(`Preview script failed (code ${code}):\n${stderr}`));
+			}
+		});
+		proc.on('error', (err) => { clearTimeout(timeout); reject(err); });
+	});
+}
+
+function killWatchProcess(filePath: string) {
+	const proc = watchProcesses.get(filePath);
+	if (proc) {
+		proc.kill();
+		watchProcesses.delete(filePath);
+	}
+}
+
+// --- Chart strategy ---
+
+interface ChartExtra {
+	stagingUrl: string;
+	containerName: string;
+	isMdim: boolean;
+}
+
+const chartStrategy: PreviewStrategy = {
+	async parse(filePath, wsRoot) {
+		const branch = await getGitBranch(wsRoot);
+		const containerName = getContainerName(branch);
+
+		let stepUri: string;
+		let stagingUrl: string;
+		let isMdim: boolean;
+		let etlArgs: string[];
+		let fileName: string;
+
+		if (filePath.includes('/export/multidim/')) {
+			const parsed = parseExportMultidim(filePath, wsRoot);
+			stepUri = parsed.stepUri;
+			stagingUrl = `http://${containerName}/admin/grapher/${encodeURIComponent(parsed.catalogPath)}`;
+			isMdim = true;
+			etlArgs = [stepUri, '--export', '--watch', '--private'];
+			fileName = path.basename(filePath).replace(/\.(config\.yml|py)$/, '');
+		} else {
+			const parsed = await parseChartYml(filePath, wsRoot);
+			stepUri = parsed.stepUri;
+			const slug = parsed.slug;
+			const catalogPath = parsed.catalogPath;
+			isMdim = slug.includes('#');
+			stagingUrl = isMdim && catalogPath
+				? `http://${containerName}/admin/grapher/${encodeURIComponent(catalogPath)}`
+				: `http://${containerName}/grapher/${slug}`;
+			etlArgs = [stepUri, '--graph', '--graph-push', '--watch', '--private'];
+			fileName = path.basename(filePath).replace('.chart.yml', '');
+		}
+
+		return { stepUri, etlArgs, fileName, extra: { stagingUrl, containerName, isMdim } as ChartExtra };
+	},
+
+	doReload(panel, state, config) {
+		const { stagingUrl, containerName, isMdim } = config.extra as ChartExtra;
+		const elapsed = ((Date.now() - state.cycleStart) / 1000).toFixed(1);
+		const info: InfoBarData = { command: state.command, stagingUrl, stepUri: config.stepUri, status: 'OK', latency: `${elapsed}s` };
+
+		if (!state.firstRunDone) {
+			const bustUrl = `${stagingUrl}?_t=${Date.now()}`;
+			panel.webview.html = generateEmbedHtml(bustUrl, containerName, info, isMdim);
+			state.firstRunDone = true;
+		} else {
+			panel.webview.postMessage({ type: 'status', text: 'OK', cls: 'ok' });
+			panel.webview.postMessage({ type: 'latency', text: `${elapsed}s` });
+			panel.webview.postMessage({ type: 'reload', src: `${stagingUrl}?_t=${Date.now()}` });
+		}
+		outputChannel.appendLine('[chart-preview] Chart updated, refreshing preview.');
+	},
+
+	handleOutput(text, state, panel) {
+		// Helpful message for missing data dependencies
+		if (text.includes('Indicator not found in database') || text.includes('not found in database')) {
+			panel.webview.html = getErrorHtml(
+				'Data dependencies not found on staging server.\n\n'
+				+ 'Run the grapher step for the data dependency first, e.g.:\n'
+				+ '  .venv/bin/etlr <data-dependency> --grapher --private\n\n'
+				+ 'Then re-open the chart preview.\n\n'
+				+ '--- etlr output ---\n' + state.recentOutput,
+				'Preview Error'
+			);
+		}
+	},
+};
+
+// --- Dataset strategy ---
+
+interface DatasetExtra {
+	parsed: ReturnType<typeof parseDataStepPath>;
+	reloadInProgress: boolean;
+	stagingUrl: string;
+}
+
+const datasetStrategy: PreviewStrategy = {
+	async parse(filePath, wsRoot) {
+		const parsed = parseDataStepPath(filePath, wsRoot);
+		const branch = await getGitBranch(wsRoot);
+		const containerName = getContainerName(branch);
+		const isGrapher = parsed.channel === 'grapher';
+		const stagingUrl = isGrapher ? `http://${containerName}/admin/datasets` : '';
+		return {
+			stepUri: parsed.stepUri,
+			etlArgs: [parsed.stepUri, '--watch', '--private'],
+			fileName: parsed.shortName,
+			extra: { parsed, reloadInProgress: false, stagingUrl } as DatasetExtra,
+		};
+	},
+
+	async doReload(panel, state, config) {
+		const extra = config.extra as DatasetExtra;
+		if (extra.reloadInProgress) return;
+		extra.reloadInProgress = true;
+		const elapsed = ((Date.now() - state.cycleStart) / 1000).toFixed(1);
+
+		try {
+			outputChannel.appendLine('[dataset-preview] Rebuild complete, generating preview...');
+			const jsonStr = await runPreviewScript(state.wsRoot, extra.parsed.relStepPath, state.filePath);
+
+			if (!state.firstRunDone) {
+				panel.webview.html = getDatasetPreviewHtml(jsonStr, state.command, elapsed, extra.stagingUrl);
+				state.firstRunDone = true;
+			} else {
+				panel.webview.postMessage({ type: 'updateData', json: jsonStr });
+				panel.webview.postMessage({ type: 'status', text: 'OK', cls: 'ok' });
+				panel.webview.postMessage({ type: 'latency', text: `${elapsed}s` });
+			}
+			outputChannel.appendLine('[dataset-preview] Preview updated.');
+		} catch (err: unknown) {
+			const msg = err instanceof Error ? err.message : String(err);
+			outputChannel.appendLine(`[dataset-preview] Preview script error: ${msg}`);
+			state.firstRunDone = false;
+			panel.webview.html = getErrorHtml(`Failed to generate dataset preview:\n\n${msg}`, 'Preview Error');
+		} finally {
+			extra.reloadInProgress = false;
+		}
+	},
+
+	onDispose(filePath) {
+		const scriptProc = previewScriptProcesses.get(filePath);
+		if (scriptProc) { scriptProc.kill(); previewScriptProcesses.delete(filePath); }
+	},
+};
+
+// --- Unified open + watch ---
+
+async function openPreview(filePath: string, strategy: PreviewStrategy) {
+	const existing = panels.get(filePath);
+	if (existing) {
+		existing.dispose();
+		lastPreviewedFile = undefined;
+		return;
+	}
+	lastPreviewedFile = filePath;
+
+	const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+	if (!workspaceFolder) {
+		vscode.window.showErrorMessage('No workspace folder found');
+		return;
+	}
+
+	const wsRoot = workspaceFolder.uri.fsPath;
+
+	try {
+		const config = await strategy.parse(filePath, wsRoot);
+
+		const vsConfig = vscode.workspace.getConfiguration('chart-preview');
+		const etlrRel = vsConfig.get<string>('etlrPath', '.venv/bin/etlr');
+		const command = `${etlrRel} ${config.etlArgs.join(' ')}`;
+
+		const panel = vscode.window.createWebviewPanel(
+			'chartPreview',
+			`Preview: ${config.fileName}`,
+			vscode.ViewColumn.Beside,
+			{ enableScripts: true, retainContextWhenHidden: true }
+		);
+
+		panels.set(filePath, panel);
+
+		panel.onDidDispose(() => {
+			panels.delete(filePath);
+			killWatchProcess(filePath);
+			strategy.onDispose?.(filePath);
+		});
+
+		panel.webview.html = getLoadingHtml(command);
+
+		startWatchProcess(filePath, panel, wsRoot, config, command, strategy);
+	} catch (err: unknown) {
+		const msg = err instanceof Error ? err.message : String(err);
+		vscode.window.showErrorMessage(`Preview failed: ${msg}`);
+	}
+}
+
+function startWatchProcess(
+	filePath: string,
+	panel: vscode.WebviewPanel,
+	wsRoot: string,
+	config: PreviewConfig,
+	command: string,
+	strategy: PreviewStrategy,
+) {
+	killWatchProcess(filePath);
+
+	const vsConfig = vscode.workspace.getConfiguration('chart-preview');
+	const etlrRel = vsConfig.get<string>('etlrPath', '.venv/bin/etlr');
+	const etlrPath = path.resolve(wsRoot, etlrRel);
+
+	outputChannel.appendLine(`Starting watch: ${etlrPath} ${config.etlArgs.join(' ')}`);
+
+	const proc = spawn(etlrPath, config.etlArgs, {
+		cwd: wsRoot,
+		env: { ...process.env, STAGING: '1', PREFER_DOWNLOAD: '1' },
+	});
+
+	watchProcesses.set(filePath, proc);
+
+	const state: WatchState = {
+		command,
+		recentOutput: '',
+		firstRunDone: false,
+		cycleStart: Date.now(),
+		filePath,
+		wsRoot,
+	};
+
+	const handleOutput = (data: Buffer) => {
+		const text = data.toString();
+
+		// New watch cycle — reset buffer before appending so traceback is preserved
+		if (text.includes('--- Detecting which steps')) {
+			state.recentOutput = '';
+			state.cycleStart = Date.now();
+			if (state.firstRunDone) {
+				panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
+			}
+		}
+
+		state.recentOutput += text;
+		if (state.recentOutput.length > 4000) state.recentOutput = state.recentOutput.slice(-4000);
+		outputChannel.append(text);
+
+		// Stream logs to loading screen before first result
+		if (!state.firstRunDone) {
+			panel.webview.postMessage({ type: 'log', text });
+		}
+
+		if (text.includes('--- Running')) {
+			if (state.firstRunDone) {
+				panel.webview.postMessage({ type: 'status', text: 'Running...', cls: 'running' });
+			}
+		}
+
+		// Universal sentinel printed by etlr after every successful watch cycle
+		if (text.includes('--- Dataset rebuild complete') || text.includes('All datasets up to date!')) {
+			strategy.doReload(panel, state, config);
+		}
+
+		// Detect errors — always replace the full page so we get the traceback + Retry
+		if (text.includes('FAILED') || text.includes('step_failed')) {
+			state.firstRunDone = false;
+			panel.webview.html = getErrorHtml(state.recentOutput, 'Preview Error');
+		}
+
+		// Strategy-specific output handling
+		strategy.handleOutput?.(text, state, panel);
+	};
+
+	proc.stdout.on('data', handleOutput);
+	proc.stderr.on('data', handleOutput);
+
+	proc.on('error', (err: Error) => {
+		watchProcesses.delete(filePath);
+		outputChannel.appendLine(`Watch process error: ${err.message}`);
+		panel.webview.html = getErrorHtml(
+			`Failed to start etlr:\n${err.message}\n\nEnsure ${etlrRel} exists.`,
+			'Preview Error'
+		);
+	});
+
+	proc.on('close', (code: number | null) => {
+		watchProcesses.delete(filePath);
+		outputChannel.appendLine(`Watch process exited with code ${code}`);
+		if (code !== 0 && code !== null) {
+			state.firstRunDone = false;
+			panel.webview.html = getErrorHtml(
+				`etlr exited with code ${code}.\n\n${state.recentOutput}`,
+				'Preview Error'
+			);
+		}
+	});
+}
+
+// --- HTML generators ---
 
 function chartIframeDoc(grapherSrc: string, containerName: string): string {
 	// Separate HTML document for the chart — loaded inside an iframe so each
@@ -166,18 +562,6 @@ function generateEmbedHtml(grapherSrc: string, containerName: string, info: Info
             overflow-x: auto;
         }
         iframe { flex: 1; width: 100%; border: none; min-height: 0; }
-        #error-panel {
-            display: none; flex: 1; padding: 20px; overflow: auto;
-            font-family: var(--vscode-editor-font-family, monospace);
-            font-size: 12px; color: var(--vscode-errorForeground, #f44);
-            background: var(--vscode-editor-background);
-        }
-        #error-panel pre {
-            white-space: pre-wrap; word-wrap: break-word;
-            background: var(--vscode-textBlockQuote-background, #1e1e1e);
-            padding: 12px; border-radius: 4px;
-            color: var(--vscode-editor-foreground);
-        }
         #info-bar .row { display: flex; gap: 8px; white-space: nowrap; }
         #info-bar .label { color: var(--vscode-foreground, #ccc); font-weight: 600; min-width: 70px; }
         #info-bar .status-ok { color: var(--vscode-testing-iconPassed, #4ec94e); }
@@ -195,7 +579,6 @@ function generateEmbedHtml(grapherSrc: string, containerName: string, info: Info
         <div class="row"><span class="label">Latency</span> <span id="latency">${info.latency || '-'}</span></div>
     </div>
     ${iframeTag}
-    <div id="error-panel"><h3>Step Failed</h3><pre id="error-output"></pre></div>
     <script>
         const containerName = '${containerName}';
         const isMdim = ${isMdim};
@@ -209,14 +592,7 @@ function generateEmbedHtml(grapherSrc: string, containerName: string, info: Info
             if (msg.type === 'latency') {
                 document.getElementById('latency').textContent = msg.text;
             }
-            if (msg.type === 'showError') {
-                document.getElementById('chart-frame').style.display = 'none';
-                const ep = document.getElementById('error-panel');
-                ep.style.display = 'block';
-                document.getElementById('error-output').textContent = msg.text;
-            }
             if (msg.type === 'reload') {
-                document.getElementById('error-panel').style.display = 'none';
                 const frame = document.getElementById('chart-frame');
                 frame.style.display = '';
                 if (isMdim) {
@@ -231,6 +607,46 @@ function generateEmbedHtml(grapherSrc: string, containerName: string, info: Info
     </script>
 </body>
 </html>`;
+}
+
+/** Convert raw text with ANSI escape codes to HTML with colored spans (TypeScript side). */
+function ansiToHtml(raw: string): string {
+	let text = raw
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;');
+
+	const colors: Record<string, string> = {
+		'30': '#000', '31': '#cd3131', '32': '#0dbc79', '33': '#e5e510',
+		'34': '#2472c8', '35': '#bc3fbc', '36': '#11a8cd', '37': '#e5e5e5',
+		'90': '#666', '91': '#f14c4c', '92': '#23d18b', '93': '#f5f543',
+		'94': '#3b8eea', '95': '#d670d6', '96': '#29b8db', '97': '#fff',
+	};
+
+	let bold = false;
+	let fg: string | null = null;
+	let spanOpen = false;
+
+	const result = text.replace(/\x1b\[([0-9;]*)m/g, (_match, codes: string) => {
+		const close = spanOpen ? '</span>' : '';
+		for (const c of codes.split(';')) {
+			if (c === '0' || c === '') { bold = false; fg = null; }
+			else if (c === '1') { bold = true; }
+			else if (colors[c]) { fg = colors[c]; }
+		}
+		if (bold || fg) {
+			let style = '';
+			if (bold) { style += 'font-weight:bold;'; }
+			if (fg) { style += 'color:' + fg + ';'; }
+			spanOpen = true;
+			return close + '<span style="' + style + '">';
+		} else {
+			spanOpen = false;
+			return close;
+		}
+	});
+
+	return result + (spanOpen ? '</span>' : '');
 }
 
 function getLoadingHtml(command: string): string {
@@ -275,9 +691,40 @@ body {
 <pre id="log"></pre>
 <script>
 	const log = document.getElementById('log');
+	function ansiToHtml(text) {
+		text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		var colors = {
+			'30': '#000', '31': '#cd3131', '32': '#0dbc79', '33': '#e5e510',
+			'34': '#2472c8', '35': '#bc3fbc', '36': '#11a8cd', '37': '#e5e5e5',
+			'90': '#666', '91': '#f14c4c', '92': '#23d18b', '93': '#f5f543',
+			'94': '#3b8eea', '95': '#d670d6', '96': '#29b8db', '97': '#fff',
+		};
+		var bold = false, fg = null, open = false;
+		var result = text.replace(/\\x1b\\[([0-9;]*)m/g, function(m, codes) {
+			var close = open ? '</span>' : '';
+			codes.split(';').forEach(function(c) {
+				if (c === '0' || c === '') { bold = false; fg = null; }
+				else if (c === '1') { bold = true; }
+				else if (colors[c]) { fg = colors[c]; }
+			});
+			if (bold || fg) {
+				var s = '';
+				if (bold) s += 'font-weight:bold;';
+				if (fg) s += 'color:' + fg + ';';
+				open = true;
+				return close + '<span style="' + s + '">';
+			} else {
+				open = false;
+				return close;
+			}
+		});
+		return result + (open ? '</span>' : '');
+	}
 	window.addEventListener('message', (e) => {
 		if (e.data.type === 'log') {
-			log.textContent += e.data.text;
+			var span = document.createElement('span');
+			span.innerHTML = ansiToHtml(e.data.text);
+			log.appendChild(span);
 			log.scrollTop = log.scrollHeight;
 		}
 	});
@@ -286,11 +733,8 @@ body {
 </html>`;
 }
 
-function getErrorHtml(message: string, title = 'Chart Preview Error', retryable = false): string {
-	const escaped = message
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;');
+function getErrorHtml(message: string, title = 'Preview Error'): string {
+	const escaped = ansiToHtml(message);
 	return `<!DOCTYPE html>
 <html>
 <head>
@@ -306,551 +750,24 @@ pre {
 	padding: 12px; border-radius: 4px;
 	color: var(--vscode-editor-foreground);
 }
-button {
-	margin-top: 12px;
-	padding: 6px 16px;
-	background: var(--vscode-button-background, #0e639c);
-	color: var(--vscode-button-foreground, #fff);
-	border: none; border-radius: 3px; cursor: pointer; font-size: 13px;
-}
-button:hover { background: var(--vscode-button-hoverBackground, #1177bb); }
 </style>
 </head>
 <body>
 <h3>${title}</h3>
 <pre>${escaped}</pre>
-${retryable ? '<button onclick="retry()">Retry</button>' : ''}
 <script>
-${retryable ? `
-const vscode = acquireVsCodeApi();
-function retry() { vscode.postMessage({ type: 'retry' }); }
-` : ''}
+window.addEventListener('message', (e) => {
+    if (e.data.type === 'status' || e.data.type === 'log') {
+        document.querySelector('h3').textContent = 'Rebuilding...';
+        document.querySelector('h3').style.color = 'var(--vscode-foreground)';
+    }
+});
 </script>
 </body>
 </html>`;
 }
 
-// --- Core logic ---
-
-async function openPreview(filePath: string) {
-	const existing = panels.get(filePath);
-	if (existing) {
-		existing.dispose();
-		lastPreviewedFile = undefined;
-		return;
-	}
-	lastPreviewedFile = filePath;
-
-	const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-	if (!workspaceFolder) {
-		vscode.window.showErrorMessage('No workspace folder found');
-		return;
-	}
-
-	const wsRoot = workspaceFolder.uri.fsPath;
-	const fileName = path.basename(filePath).replace(/\.(chart\.yml|config\.yml|py)$/, '');
-
-	try {
-		const branch = await getGitBranch(wsRoot);
-		const containerName = getContainerName(branch);
-
-		let stepUri: string;
-		let stagingUrl: string;
-		let isMdim: boolean;
-		let etlArgs: string[];
-
-		if (filePath.includes('/export/multidim/')) {
-			// Export/multidim step
-			const parsed = parseExportMultidim(filePath, wsRoot);
-			stepUri = parsed.stepUri;
-			stagingUrl = `http://${containerName}/admin/grapher/${encodeURIComponent(parsed.catalogPath)}`;
-			isMdim = true;
-			etlArgs = [stepUri, '--export', '--watch', '--private'];
-		} else {
-			// Graph step (.chart.yml)
-			const parsed = await parseChartYml(filePath, wsRoot);
-			stepUri = parsed.stepUri;
-			const slug = parsed.slug;
-			const catalogPath = parsed.catalogPath;
-			isMdim = slug.includes('#');
-			stagingUrl = isMdim && catalogPath
-				? `http://${containerName}/admin/grapher/${encodeURIComponent(catalogPath)}`
-				: `http://${containerName}/grapher/${slug}`;
-			etlArgs = [stepUri, '--graph', '--graph-push', '--watch', '--private'];
-		}
-
-		const panel = vscode.window.createWebviewPanel(
-			'chartPreview',
-			`Preview: ${fileName}`,
-			vscode.ViewColumn.Beside,
-			{ enableScripts: true, retainContextWhenHidden: true }
-		);
-
-		panels.set(filePath, panel);
-
-		panel.onDidDispose(() => {
-			panels.delete(filePath);
-			killWatchProcess(filePath);
-		});
-
-		const config = vscode.workspace.getConfiguration('chart-preview');
-		const etlrRel = config.get<string>('etlrPath', '.venv/bin/etlr');
-		const command = `${etlrRel} ${etlArgs.join(' ')}`;
-
-		panel.webview.html = getLoadingHtml(command);
-
-		startWatchProcess(filePath, panel, wsRoot, stepUri, stagingUrl, containerName, isMdim, etlArgs);
-	} catch (err: unknown) {
-		const msg = err instanceof Error ? err.message : String(err);
-		vscode.window.showErrorMessage(`Chart preview failed: ${msg}`);
-	}
-}
-
-function startWatchProcess(
-	filePath: string,
-	panel: vscode.WebviewPanel,
-	wsRoot: string,
-	stepUri: string,
-	stagingUrl: string,
-	containerName: string,
-	isMdim: boolean,
-	etlArgs: string[],
-) {
-	killWatchProcess(filePath);
-
-	const config = vscode.workspace.getConfiguration('chart-preview');
-	const etlrRel = config.get<string>('etlrPath', '.venv/bin/etlr');
-	const etlrPath = path.resolve(wsRoot, etlrRel);
-
-	const command = `${etlrRel} ${etlArgs.join(' ')}`;
-
-	outputChannel.appendLine(`Starting watch: ${etlrPath} ${etlArgs.join(' ')}`);
-
-	const proc = spawn(etlrPath, etlArgs, {
-		cwd: wsRoot,
-		env: { ...process.env, STAGING: '1', PREFER_DOWNLOAD: '1' },
-	});
-
-	watchProcesses.set(filePath, proc);
-
-	const info: InfoBarData = { command, stagingUrl, stepUri, status: 'Running...' };
-
-	let recentOutput = '';
-	let firstRunDone = false;
-	let cycleStart = Date.now();
-	let stepsRunning = false;  // true after "--- Running", false after step OK
-	let detectingDirty = false;  // true after "Detecting which steps", false after OK
-	let pendingReloadTimer: ReturnType<typeof setTimeout> | null = null;
-
-	const doReload = () => {
-		const elapsed = ((Date.now() - cycleStart) / 1000).toFixed(1);
-		info.status = 'OK';
-		info.latency = `${elapsed}s`;
-
-		if (!firstRunDone) {
-			const bustUrl = `${stagingUrl}?_t=${Date.now()}`;
-			panel.webview.html = generateEmbedHtml(bustUrl, containerName, info, isMdim);
-			firstRunDone = true;
-		} else {
-			panel.webview.postMessage({ type: 'status', text: 'OK', cls: 'ok' });
-			panel.webview.postMessage({ type: 'latency', text: `${elapsed}s` });
-			panel.webview.postMessage({ type: 'reload', src: `${stagingUrl}?_t=${Date.now()}` });
-		}
-		outputChannel.appendLine('[chart-preview] Chart updated, refreshing preview.');
-	};
-
-	const handleOutput = (data: Buffer) => {
-		const text = data.toString();
-		recentOutput += text;
-		// Keep only the last 4000 chars for error display
-		if (recentOutput.length > 4000) {
-			recentOutput = recentOutput.slice(-4000);
-		}
-		outputChannel.append(text);
-
-		// Stream logs to loading screen before chart is ready
-		if (!firstRunDone) {
-			panel.webview.postMessage({ type: 'log', text });
-		}
-
-		// Track cycle phases:
-		// 1. "--- Detecting which steps need rebuilding..." → dirty check starts
-		// 2. "OK (0.6s)" → dirty check done (ignore this OK)
-		// 3a. "--- Running N steps..." → steps are executing
-		// 3b. "--- All datasets up to date!" → nothing to run
-		// 4. "OK (1.5s)" after "--- Running" → step completed
-
-		if (text.includes('Detecting which steps need rebuilding')) {
-			cycleStart = Date.now();
-			stepsRunning = false;
-			detectingDirty = true;
-			if (firstRunDone) {
-				panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
-			}
-		}
-
-		if (text.includes('--- Running')) {
-			stepsRunning = true;
-			detectingDirty = false;
-			// Cancel pending reload — steps are about to run
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
-			if (firstRunDone) {
-				panel.webview.postMessage({ type: 'status', text: 'Running...', cls: 'running' });
-			}
-		}
-
-		// "All datasets up to date" — nothing changed
-		if (text.includes('All datasets up to date!')) {
-			stepsRunning = false;
-			detectingDirty = false;
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
-			doReload();
-		}
-
-		// OK after dirty detection — might mean "all up to date" (watch mode doesn't
-		// always print "All datasets up to date!"). Schedule a reload after a short
-		// delay; cancel if "--- Running" arrives before the timer fires.
-		if (detectingDirty && !stepsRunning && /OK \(\d/.test(text)) {
-			detectingDirty = false;
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); }
-			pendingReloadTimer = setTimeout(() => { pendingReloadTimer = null; doReload(); }, 500);
-		}
-
-		// OK after steps ran — this is the real completion
-		if (stepsRunning && /OK \(\d/.test(text)) {
-			stepsRunning = false;
-			detectingDirty = false;
-			if (pendingReloadTimer) { clearTimeout(pendingReloadTimer); pendingReloadTimer = null; }
-			doReload();
-		}
-
-		// Detect errors
-		if (text.includes('FAILED') || text.includes('step_failed')) {
-			if (!firstRunDone) {
-				panel.webview.html = getErrorHtml(recentOutput);
-			} else {
-				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
-				panel.webview.postMessage({ type: 'showError', text: recentOutput });
-			}
-		}
-
-		// Helpful message for missing data dependencies
-		if (text.includes('Indicator not found in database') || text.includes('not found in database')) {
-			panel.webview.html = getErrorHtml(
-				'Data dependencies not found on staging server.\n\n'
-				+ 'Run the grapher step for the data dependency first, e.g.:\n'
-				+ '  .venv/bin/etlr <data-dependency> --grapher --private\n\n'
-				+ 'Then re-open the chart preview.\n\n'
-				+ '--- etlr output ---\n' + recentOutput
-			);
-		}
-	};
-
-	proc.stdout.on('data', handleOutput);
-	proc.stderr.on('data', handleOutput);
-
-	proc.on('error', (err: Error) => {
-		watchProcesses.delete(filePath);
-		outputChannel.appendLine(`Watch process error: ${err.message}`);
-		panel.webview.html = getErrorHtml(
-			`Failed to start etlr:\n${err.message}\n\nEnsure ${etlrRel} exists.`
-		);
-	});
-
-	proc.on('close', (code: number | null) => {
-		watchProcesses.delete(filePath);
-		outputChannel.appendLine(`Watch process exited with code ${code}`);
-		if (code !== 0 && code !== null) {
-			if (!firstRunDone) {
-				panel.webview.html = getErrorHtml(
-					`etlr exited with code ${code}.\n\n${recentOutput}`
-				);
-			}
-			// Restart watch after failure — etlr crashes on step errors,
-			// killing the watch loop. Restart so the next file save triggers
-			// a fresh run.
-			outputChannel.appendLine('[chart-preview] Restarting watch in 2s...');
-			setTimeout(() => {
-				if (panels.has(filePath)) {
-					startWatchProcess(filePath, panel, wsRoot, stepUri, stagingUrl, containerName, isMdim, etlArgs);
-				}
-			}, 2000);
-		}
-	});
-}
-
-function killWatchProcess(filePath: string) {
-	const proc = watchProcesses.get(filePath);
-	if (proc) {
-		proc.kill();
-		watchProcesses.delete(filePath);
-	}
-}
-
-// --- Dataset Preview ---
-
-/**
- * Parse an ETL data step file path into its components.
- * e.g. /path/to/etl/steps/data/garden/biodiversity/2025-04-07/cherry_blossom.py
- *   → { channel: "garden", namespace: "biodiversity", version: "2025-04-07", shortName: "cherry_blossom" }
- */
-function parseDataStepPath(filePath: string, wsRoot: string): {
-	stepUri: string;
-	channel: string;
-	namespace: string;
-	version: string;
-	shortName: string;
-	relStepPath: string;
-} {
-	const dataDir = path.join(wsRoot, 'etl', 'steps', 'data');
-	const rel = path.relative(dataDir, filePath).replace(/\.py$/, '');
-	const parts = rel.split(path.sep);
-	if (parts.length < 4) {
-		throw new Error(`Cannot parse data step path: ${filePath}`);
-	}
-	const [channel, namespace, version, shortName] = parts;
-	return {
-		stepUri: `data://${channel}/${namespace}/${version}/${shortName}`,
-		channel,
-		namespace,
-		version,
-		shortName,
-		relStepPath: `etl/steps/data/${rel}.py`,
-	};
-}
-
-// Track in-flight preview script processes so we can kill them on panel close / new run
-const previewScriptProcesses = new Map<string, ChildProcess>();
-
-/**
- * Run the Python generate_preview.py script and return the JSON payload.
- * Kills any previous in-flight script for the same filePath.
- * Times out after 120s to avoid zombies on huge datasets.
- */
-function runPreviewScript(wsRoot: string, stepPath: string, filePath: string): Promise<string> {
-	// Kill any previous in-flight script for this panel
-	const prev = previewScriptProcesses.get(filePath);
-	if (prev) { prev.kill(); previewScriptProcesses.delete(filePath); }
-
-	return new Promise((resolve, reject) => {
-		const config = vscode.workspace.getConfiguration('chart-preview');
-		const pythonRel = config.get<string>('pythonPath', '.venv/bin/python');
-		const pythonPath = path.resolve(wsRoot, pythonRel);
-		const scriptPath = path.join(wsRoot, 'vscode_extensions', 'chart-preview', 'generate_preview.py');
-
-		const proc = spawn(pythonPath, [scriptPath, stepPath, '--json'], { cwd: wsRoot });
-		previewScriptProcesses.set(filePath, proc);
-
-		const timeout = setTimeout(() => {
-			proc.kill();
-			previewScriptProcesses.delete(filePath);
-			reject(new Error(`Preview script timed out after 10 minutes.\n\nThe dataset may be too large to preview quickly.`));
-		}, 600_000);
-
-		let stdout = '';
-		let stderr = '';
-		proc.stdout.on('data', (d: Buffer) => { stdout += d.toString(); });
-		proc.stderr.on('data', (d: Buffer) => { stderr += d.toString(); });
-		proc.on('close', (code) => {
-			clearTimeout(timeout);
-			previewScriptProcesses.delete(filePath);
-			if (code === 0) {
-				// Strip any leading log/warning lines (e.g. structlog warnings on master branch)
-				// and extract only the JSON line.
-				const jsonLine = stdout.split('\n').find(l => l.trimStart().startsWith('{'));
-				resolve(jsonLine ?? stdout);
-			} else if (code !== null) {  // null = killed intentionally, ignore
-				reject(new Error(`Preview script failed (code ${code}):\n${stderr}`));
-			}
-		});
-		proc.on('error', (err) => { clearTimeout(timeout); reject(err); });
-	});
-}
-
-async function openDatasetPreview(filePath: string) {
-	const existing = panels.get(filePath);
-	if (existing) {
-		existing.dispose();
-		lastPreviewedFile = undefined;
-		return;
-	}
-	lastPreviewedFile = filePath;
-
-	const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-	if (!workspaceFolder) {
-		vscode.window.showErrorMessage('No workspace folder found');
-		return;
-	}
-
-	const wsRoot = workspaceFolder.uri.fsPath;
-
-	try {
-		const parsed = parseDataStepPath(filePath, wsRoot);
-		const fileName = parsed.shortName;
-
-		const config = vscode.workspace.getConfiguration('chart-preview');
-		const etlrRel = config.get<string>('etlrPath', '.venv/bin/etlr');
-		const etlArgs = [parsed.stepUri, '--watch', '--private'];
-		const command = `${etlrRel} ${etlArgs.join(' ')}`;
-
-		const panel = vscode.window.createWebviewPanel(
-			'datasetPreview',
-			`Dataset: ${fileName}`,
-			vscode.ViewColumn.Beside,
-			{ enableScripts: true, retainContextWhenHidden: true }
-		);
-
-		panels.set(filePath, panel);
-
-		panel.onDidDispose(() => {
-			panels.delete(filePath);
-			killWatchProcess(filePath);
-			const scriptProc = previewScriptProcesses.get(filePath);
-			if (scriptProc) { scriptProc.kill(); previewScriptProcesses.delete(filePath); }
-		});
-
-		panel.webview.onDidReceiveMessage((msg) => {
-			if (msg.type === 'retry') {
-				panel.webview.html = getLoadingHtml(command);
-				startDatasetWatchProcess(filePath, panel, wsRoot, parsed, etlArgs);
-			}
-		});
-
-		panel.webview.html = getLoadingHtml(command);
-
-		startDatasetWatchProcess(filePath, panel, wsRoot, parsed, etlArgs);
-	} catch (err: unknown) {
-		const msg = err instanceof Error ? err.message : String(err);
-		vscode.window.showErrorMessage(`Dataset preview failed: ${msg}`);
-	}
-}
-
-function startDatasetWatchProcess(
-	filePath: string,
-	panel: vscode.WebviewPanel,
-	wsRoot: string,
-	parsed: ReturnType<typeof parseDataStepPath>,
-	etlArgs: string[],
-) {
-	killWatchProcess(filePath);
-
-	const config = vscode.workspace.getConfiguration('chart-preview');
-	const etlrRel = config.get<string>('etlrPath', '.venv/bin/etlr');
-	const etlrPath = path.resolve(wsRoot, etlrRel);
-
-	const command = `${etlrRel} ${etlArgs.join(' ')}`;
-
-	outputChannel.appendLine(`Starting dataset watch: ${etlrPath} ${etlArgs.join(' ')}`);
-
-	const proc = spawn(etlrPath, etlArgs, {
-		cwd: wsRoot,
-		env: { ...process.env, STAGING: '1', PREFER_DOWNLOAD: '1' },
-	});
-
-	watchProcesses.set(filePath, proc);
-
-	let recentOutput = '';
-	let firstRunDone = false;
-	let reloadInProgress = false;
-	let cycleStart = Date.now();
-
-	const doReload = async () => {
-		if (reloadInProgress) return;
-		reloadInProgress = true;
-		const elapsed = ((Date.now() - cycleStart) / 1000).toFixed(1);
-
-		try {
-			outputChannel.appendLine('[dataset-preview] Rebuild complete, generating preview...');
-			const jsonStr = await runPreviewScript(wsRoot, parsed.relStepPath, filePath);
-
-			if (!firstRunDone) {
-				panel.webview.html = getDatasetPreviewHtml(jsonStr, command, elapsed);
-				firstRunDone = true;
-			} else {
-				panel.webview.postMessage({ type: 'updateData', json: jsonStr });
-				panel.webview.postMessage({ type: 'status', text: 'OK', cls: 'ok' });
-				panel.webview.postMessage({ type: 'latency', text: `${elapsed}s` });
-			}
-			outputChannel.appendLine('[dataset-preview] Preview updated.');
-		} catch (err: unknown) {
-			const msg = err instanceof Error ? err.message : String(err);
-			outputChannel.appendLine(`[dataset-preview] Preview script error: ${msg}`);
-			if (!firstRunDone) {
-				panel.webview.html = getErrorHtml(`Failed to generate dataset preview:\n\n${msg}`, 'Dataset Preview Error', true);
-			} else {
-				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
-				panel.webview.postMessage({ type: 'showError', text: msg });
-			}
-		} finally {
-			reloadInProgress = false;
-		}
-	};
-
-	const handleOutput = (data: Buffer) => {
-		const text = data.toString();
-		recentOutput += text;
-		if (recentOutput.length > 4000) recentOutput = recentOutput.slice(-4000);
-		outputChannel.append(text);
-
-		if (!firstRunDone) {
-			panel.webview.postMessage({ type: 'log', text });
-		}
-
-		if (text.includes('--- Detecting which steps')) {
-			cycleStart = Date.now();
-			recentOutput = '';  // Reset so errors only show the current cycle's output
-			if (firstRunDone) panel.webview.postMessage({ type: 'status', text: 'Checking...', cls: 'running' });
-		}
-
-		if (text.includes('--- Running')) {
-			if (firstRunDone) panel.webview.postMessage({ type: 'status', text: 'Running...', cls: 'running' });
-		}
-
-		// Sentinel printed by etlr after every successful watch cycle (both "up to date" and actual rebuild)
-		if (text.includes('--- Dataset rebuild complete')) {
-			doReload();
-		}
-
-		if (text.includes('FAILED') || text.includes('step_failed')) {
-			if (!firstRunDone) {
-				panel.webview.html = getErrorHtml(recentOutput, 'Dataset Preview Error', true);
-			} else {
-				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
-				panel.webview.postMessage({ type: 'showError', text: recentOutput });
-			}
-		}
-	};
-
-	proc.stdout.on('data', handleOutput);
-	proc.stderr.on('data', handleOutput);
-
-	proc.on('error', (err: Error) => {
-		watchProcesses.delete(filePath);
-		outputChannel.appendLine(`Dataset watch process error: ${err.message}`);
-		panel.webview.html = getErrorHtml(
-			`Failed to start etlr:\n${err.message}\n\nEnsure ${etlrRel} exists.`,
-			'Dataset Preview Error'
-		);
-	});
-
-	proc.on('close', (code: number | null) => {
-		watchProcesses.delete(filePath);
-		outputChannel.appendLine(`Dataset watch process exited with code ${code}`);
-		if (code !== 0 && code !== null) {
-			if (!firstRunDone) {
-				panel.webview.html = getErrorHtml(
-					`etlr exited with code ${code}.\n\n${recentOutput}`,
-					'Dataset Preview Error',
-					true
-				);
-			} else {
-				panel.webview.postMessage({ type: 'status', text: 'FAILED', cls: 'error' });
-			}
-		}
-	});
-}
-
-function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string): string {
+function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string, stagingUrl: string = ''): string {
 	return `<!DOCTYPE html>
 <html>
 <head>
@@ -904,22 +821,29 @@ function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string
     }
     .quality-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
 
-    #entity-bar {
+    #filter-bar {
         flex-shrink: 0; padding: 6px 16px;
         background: var(--vscode-editor-background, #1e1e1e);
         border-bottom: 1px solid var(--vscode-panel-border, #2a2a2a);
-        display: flex; align-items: center; gap: 8px;
+        display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
         font-size: 11px; color: var(--vscode-descriptionForeground, #888);
     }
-    #entity-bar.hidden { display: none; }
-    #entity-select {
+    .filter-group { display: flex; align-items: center; gap: 4px; }
+    #filter-bar select {
         background: var(--vscode-input-background, #333);
         color: var(--vscode-input-foreground, #ccc);
         border: 1px solid var(--vscode-input-border, #555);
         border-radius: 3px; padding: 2px 6px;
         font-size: 11px; font-family: inherit; max-width: 250px;
     }
-    #entity-select:focus { outline: 1px solid var(--vscode-focusBorder, #3794ff); border-color: var(--vscode-focusBorder, #3794ff); }
+    #filter-bar select:focus, #filter-bar input:focus { outline: 1px solid var(--vscode-focusBorder, #3794ff); border-color: var(--vscode-focusBorder, #3794ff); }
+    #search-input {
+        background: var(--vscode-input-background, #333);
+        color: var(--vscode-input-foreground, #ccc);
+        border: 1px solid var(--vscode-input-border, #555);
+        border-radius: 3px; padding: 2px 6px;
+        font-size: 11px; font-family: inherit; min-width: 160px;
+    }
     #random-btn {
         background: var(--vscode-input-background, #333);
         color: var(--vscode-descriptionForeground, #aaa);
@@ -928,19 +852,6 @@ function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string
         font-size: 11px; font-family: inherit; cursor: pointer;
     }
     #random-btn:hover { background: var(--vscode-list-hoverBackground, #3c3c3c); color: var(--vscode-foreground, #ccc); }
-
-    #error-panel {
-        display: none; flex: 1; padding: 20px; overflow: auto;
-        font-family: var(--vscode-editor-font-family, monospace);
-        font-size: 12px; color: var(--vscode-errorForeground, #f44);
-        background: var(--vscode-editor-background);
-    }
-    #error-panel pre {
-        white-space: pre-wrap; word-wrap: break-word;
-        background: var(--vscode-textBlockQuote-background, #1e1e1e);
-        padding: 12px; border-radius: 4px;
-        color: var(--vscode-editor-foreground);
-    }
 
     #cards {
         flex: 1; overflow-y: auto; padding: 16px;
@@ -1012,20 +923,25 @@ function getDatasetPreviewHtml(jsonStr: string, command: string, latency: string
 <div id="info-bar"></div>
 <div id="table-tabs" class="hidden"></div>
 <div id="summary"></div>
-<div id="entity-bar" class="hidden">
-    <label for="entity-select">Entity:</label>
-    <select id="entity-select"></select>
-    <button id="random-btn" onclick="randomizeEntity()">Shuffle</button>
+<div id="filter-bar">
+    <div class="filter-group"><input id="search-input" type="text" placeholder="Filter indicators..." oninput="renderCards(DATA.tables[activeTable])" /></div>
+    <div class="filter-group" id="dim-filters"></div>
+    <div class="filter-group" id="entity-group" style="display:none">
+        <label for="entity-select">Entity:</label>
+        <select id="entity-select"></select>
+        <button id="random-btn" onclick="randomizeEntity()">Shuffle</button>
+    </div>
 </div>
 <div id="cards"></div>
-<div id="error-panel"><h3>Step Failed</h3><pre id="error-output"></pre></div>
 
 <script>
 let DATA = ${jsonStr};
 let activeTable = 0;
 let selectedEntity = null;
+let selectedDimValues = {};  // { dimName: selectedValue }
 const COMMAND = ${JSON.stringify(command)};
 const LATENCY = ${JSON.stringify(latency)};
+const STAGING_URL = ${JSON.stringify(stagingUrl)};
 
 const vscode = acquireVsCodeApi();
 
@@ -1050,12 +966,6 @@ function init() {
             const el = document.getElementById('latency');
             if (el) { el.textContent = msg.text; }
         }
-        if (msg.type === 'showError') {
-            document.getElementById('cards').style.display = 'none';
-            const ep = document.getElementById('error-panel');
-            ep.style.display = 'block';
-            document.getElementById('error-output').textContent = msg.text;
-        }
     });
 }
 
@@ -1068,6 +978,7 @@ function renderInfoBar() {
         '<div class="row"><span class="label">Dataset</span> <span class="value">' + (d.title || d.short_name) + '</span></div>' +
         '<div class="row"><span class="label">Tables</span> <span class="value">' + d.n_tables + ' table' + (d.n_tables > 1 ? 's' : '') + ' \\u00b7 ' + totalIndicators + ' indicator' + (totalIndicators > 1 ? 's' : '') + ' \\u00b7 ' + totalRows.toLocaleString() + ' rows</span></div>' +
         '<div class="row"><span class="label">Command</span> <span class="value">' + COMMAND + '</span></div>' +
+        (STAGING_URL ? '<div class="row"><span class="label">Staging</span> <span><a href="' + STAGING_URL + '" style="color:var(--vscode-textLink-foreground,#3794ff);text-decoration:none">' + STAGING_URL + '</a></span></div>' : '') +
         '<div class="row"><span class="label">Status</span> <span id="status" class="status-ok">OK</span></div>' +
         '<div class="row"><span class="label">Latency</span> <span id="latency">' + LATENCY + 's</span></div>';
 }
@@ -1087,11 +998,19 @@ function switchTab(idx) {
     renderTable(idx);
 }
 
+function getCurrentDimKey(table) {
+    var extraDims = table.extra_dimensions || {};
+    var dimNames = Object.keys(extraDims).sort();
+    if (dimNames.length === 0) return '_';
+    return dimNames.map(function(d) { return String(selectedDimValues[d] || extraDims[d][0]); }).join('|');
+}
+
 function getEntitiesForTable(table) {
+    var dimKey = getCurrentDimKey(table);
     var entities = new Set();
     for (var ind of table.indicators) {
-        if (ind.sparkline_by_entity) {
-            for (var name of Object.keys(ind.sparkline_by_entity)) { entities.add(name); }
+        if (ind.sparkline_by_entity && ind.sparkline_by_entity[dimKey]) {
+            for (var name of Object.keys(ind.sparkline_by_entity[dimKey])) { entities.add(name); }
         }
     }
     return Array.from(entities).sort();
@@ -1105,13 +1024,72 @@ function pickRandomEntity(table) {
     return entities[arr[0] % entities.length];
 }
 
-function renderEntitySelector(table) {
-    var bar = document.getElementById('entity-bar');
-    var select = document.getElementById('entity-select');
+function renderDimensionSelectors(table) {
+    var container = document.getElementById('dim-filters');
+    var extraDims = table.extra_dimensions || {};
+    var dimNames = Object.keys(extraDims).sort();
+    if (dimNames.length === 0) { container.innerHTML = ''; return; }
+
+    // Initialize selectedDimValues with first value for any new dimensions
+    for (var d of dimNames) {
+        if (!selectedDimValues[d] && extraDims[d].length > 0) {
+            selectedDimValues[d] = String(extraDims[d][0]);
+        }
+    }
+
+    var html = '';
+    for (var dim of dimNames) {
+        var label = dim.replace(/_/g, ' ');
+        html += '<label>' + escHtml(label) + ':</label>';
+        html += '<select data-dim="' + escHtml(dim) + '">';
+        for (var val of extraDims[dim]) {
+            var sv = String(val);
+            var sel = sv === String(selectedDimValues[dim]) ? ' selected' : '';
+            html += '<option value="' + escHtml(sv) + '"' + sel + '>' + escHtml(sv) + '</option>';
+        }
+        html += '</select>';
+    }
+    container.innerHTML = html;
+
+    // Wire change handlers
+    container.querySelectorAll('select').forEach(function(sel) {
+        sel.onchange = function() {
+            selectedDimValues[sel.dataset.dim] = sel.value;
+            // Re-pick entity since available entities may differ per dimension combo
+            selectedEntity = pickRandomEntity(DATA.tables[activeTable]);
+            renderEntitySelector(DATA.tables[activeTable]);
+            renderCards(DATA.tables[activeTable]);
+        };
+    });
+}
+
+function renderFilterBar(table) {
+    renderDimensionSelectors(table);
+
     var entities = getEntitiesForTable(table);
-    if (entities.length === 0) { bar.classList.add('hidden'); return; }
-    bar.classList.remove('hidden');
-    if (!selectedEntity) { selectedEntity = pickRandomEntity(table); }
+    var entityGroup = document.getElementById('entity-group');
+    if (entities.length === 0) { entityGroup.style.display = 'none'; return; }
+    entityGroup.style.display = '';
+
+    var select = document.getElementById('entity-select');
+    if (!selectedEntity || entities.indexOf(selectedEntity) < 0) { selectedEntity = pickRandomEntity(table); }
+    var options = '';
+    for (var e of entities) {
+        var sel = e === selectedEntity ? ' selected' : '';
+        options += '<option value="' + escHtml(e) + '"' + sel + '>' + escHtml(e) + '</option>';
+    }
+    select.innerHTML = options;
+    select.onchange = function() { selectedEntity = select.value; renderCards(DATA.tables[activeTable]); };
+}
+
+function renderEntitySelector(table) {
+    // Update just the entity dropdown without re-rendering dimension selectors
+    var entities = getEntitiesForTable(table);
+    var entityGroup = document.getElementById('entity-group');
+    if (entities.length === 0) { entityGroup.style.display = 'none'; return; }
+    entityGroup.style.display = '';
+    var select = document.getElementById('entity-select');
+    if (!selectedEntity || entities.indexOf(selectedEntity) < 0) { selectedEntity = pickRandomEntity(table); }
     var options = '';
     for (var e of entities) {
         var sel = e === selectedEntity ? ' selected' : '';
@@ -1131,9 +1109,6 @@ function randomizeEntity() {
 
 function renderTable(idx) {
     var table = DATA.tables[idx];
-    // Hide error panel and show cards
-    document.getElementById('error-panel').style.display = 'none';
-    document.getElementById('cards').style.display = '';
 
     var flaggedCount = table.indicators.filter(function(ind) { return ind.quality_flags.length > 0; }).length;
     var indLabel = table.truncated
@@ -1148,19 +1123,27 @@ function renderTable(idx) {
         summaryHtml += '<span><span class="quality-dot" style="background:#e8a838"></span>' + flaggedCount + ' with quality issues</span>';
     }
     document.getElementById('summary').innerHTML = summaryHtml;
-    renderEntitySelector(table);
+    renderFilterBar(table);
     renderCards(table);
 }
 
 function renderCards(table) {
-    document.getElementById('cards').innerHTML = table.indicators.map(function(ind) { return renderCard(ind, table, selectedEntity); }).join('');
+    var q = (document.getElementById('search-input').value || '').toLowerCase();
+    var filtered = table.indicators.filter(function(ind) {
+        if (!q) return true;
+        return (ind.title || '').toLowerCase().indexOf(q) >= 0
+            || (ind.short_name || '').toLowerCase().indexOf(q) >= 0;
+    });
+    document.getElementById('cards').innerHTML = filtered.map(function(ind) { return renderCard(ind, table, selectedEntity); }).join('');
 }
 
 function renderCard(ind, table, entity) {
     var flagCount = ind.quality_flags.length;
     var cardClass = flagCount >= 3 ? 'error' : flagCount > 0 ? 'warn' : '';
     var typeClass = getTypeClass(ind.type);
-    var sparklineData = entity && ind.sparkline_by_entity && ind.sparkline_by_entity[entity] ? ind.sparkline_by_entity[entity] : null;
+    var dimKey = getCurrentDimKey(table);
+    var dimGroup = ind.sparkline_by_entity && ind.sparkline_by_entity[dimKey] ? ind.sparkline_by_entity[dimKey] : null;
+    var sparklineData = entity && dimGroup && dimGroup[entity] ? dimGroup[entity] : null;
 
     var html = '<div class="card ' + cardClass + '">';
     var popBadge = (ind.popularity > 0) ? '<span class="pop-badge" title="Popularity score">\u2605 ' + ind.popularity.toFixed(2) + '</span>' : '';
@@ -1200,24 +1183,26 @@ function renderValueDist(valueCounts) {
 }
 
 function renderSparkline(data) {
-    if (!data || data.length < 2) return '<div class="sparkline-placeholder">No sparkline data</div>';
+    // Compact format: {years: [...], values: [...]}
+    if (!data || !data.years || data.years.length < 2) return '<div class="sparkline-placeholder">No sparkline data</div>';
     var W = 280, H = 40, PAD = 2;
-    var values = data.map(function(d) { return d.value; });
+    var years = data.years, values = data.values, n = years.length;
     var min = Math.min.apply(null, values);
     var max = Math.max.apply(null, values);
     var range = max - min || 1;
-    var points = data.map(function(d, i) {
-        var x = PAD + (i / (data.length - 1)) * (W - 2 * PAD);
-        var y = H - PAD - ((d.value - min) / range) * (H - 2 * PAD);
-        return x.toFixed(1) + ',' + y.toFixed(1);
-    });
+    var points = [];
+    for (var i = 0; i < n; i++) {
+        var x = PAD + (i / (n - 1)) * (W - 2 * PAD);
+        var y = H - PAD - ((values[i] - min) / range) * (H - 2 * PAD);
+        points.push(x.toFixed(1) + ',' + y.toFixed(1));
+    }
     var linePoints = points.join(' ');
     var areaPoints = PAD + ',' + H + ' ' + linePoints + ' ' + (W - PAD) + ',' + H;
     return '<svg width="100%" viewBox="0 0 ' + W + ' ' + (H + 12) + '" preserveAspectRatio="none">' +
         '<polygon points="' + areaPoints + '" fill="#3794ff" fill-opacity="0.06"/>' +
         '<polyline points="' + linePoints + '" fill="none" stroke="#3794ff" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>' +
-        '<text x="' + PAD + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace">' + data[0].year + '</text>' +
-        '<text x="' + (W - PAD) + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace" text-anchor="end">' + data[data.length - 1].year + '</text>' +
+        '<text x="' + PAD + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace">' + years[0] + '</text>' +
+        '<text x="' + (W - PAD) + '" y="' + (H + 10) + '" font-size="8" fill="#555" font-family="monospace" text-anchor="end">' + years[n - 1] + '</text>' +
         '<text x="' + PAD + '" y="8" font-size="8" fill="#555" font-family="monospace">' + formatNum(max) + '</text>' +
         '<text x="' + (W - PAD) + '" y="' + (H - 2) + '" font-size="8" fill="#555" font-family="monospace" text-anchor="end">' + formatNum(min) + '</text>' +
         '</svg>';

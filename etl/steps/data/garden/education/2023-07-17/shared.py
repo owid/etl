@@ -1,6 +1,6 @@
 """Custom add regional aggregates function for calculating population weighted averages"""
 
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -28,15 +28,15 @@ NUM_ALLOWED_NANS_PER_YEAR = None
 def add_region_aggregates_education(
     df: pd.DataFrame,
     region: str,
-    countries_in_region: Optional[List[str]] = None,
-    countries_that_must_have_data: Optional[List[str]] = None,
-    num_allowed_nans_per_year: Union[int, None] = NUM_ALLOWED_NANS_PER_YEAR,
-    frac_allowed_nans_per_year: Union[float, None] = FRAC_ALLOWED_NANS_PER_YEAR,
+    countries_in_region: list[str] | None = None,
+    countries_that_must_have_data: list[str] | None = None,
+    num_allowed_nans_per_year: int | None = NUM_ALLOWED_NANS_PER_YEAR,
+    frac_allowed_nans_per_year: float | None = FRAC_ALLOWED_NANS_PER_YEAR,
     country_col: str = "country",
     year_col: str = "year",
-    aggregations: Optional[Dict[str, Any]] = None,
-    keep_original_region_with_suffix: Optional[str] = None,
-    ds_population: Optional[Dataset] = None,
+    aggregations: dict[str, Any] | None = None,
+    keep_original_region_with_suffix: str | None = None,
+    ds_population: Dataset | None = None,
 ) -> pd.DataFrame:
     """Add data for regions (e.g. income groups or continents) to a dataset.
 
@@ -159,7 +159,7 @@ def add_region_aggregates_education(
         else:
             variable_agg = aggregations[variable]
 
-        aggs[variable] = variable_agg  # type: ignore
+        aggs[variable] = variable_agg  # ty: ignore
 
     df_region = groupby_agg(
         df=df_countries,

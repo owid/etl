@@ -1,0 +1,21 @@
+meta:
+  source:
+    name: European Bird Census Council; National BirdLife organisations; RSPB; Czech Society for Ornithology (CSO)) via Eurostat
+    description: |-
+      Bird monitoring in the EU is conducted under the umbrella of the PanEuropean Common Bird Monitoring Scheme. The scheme helps standardize data collection and data analysis practices across countries and produces three indices of the populations of common birds – index for all common birds (including 168 species), index for common farmland birds (39 species) and index for common forest birds (34 species).
+
+      The bird population index is measured relative to population size in the year 2000 (i.e. the value in 2000 = 100).
+
+      More information on this statistic is found here: https://web.archive.org/web/20221102140322/https://ec.europa.eu/eurostat/cache/metadata/EN/env_biodiv_esms.htm
+
+      This dataset was last updated on the 30th November 2022 and is typically updated annually. It will therefore next be updated on Our World in Data from December 2023.
+    url: https://ec.europa.eu/eurostat/web/environment/biodiversity
+    date_accessed: 2022-12-07
+    published_by: European Bird Census Council; National BirdLife organisations; RSPB; Czech Society for Ornithology (CSO)) via Eurostat
+  name: EU Wild Bird Populations (Eurostat, 2022)
+  description: ''
+  is_public: false
+outs:
+  - md5: 804a2fb97cf204afb7a6fa19d24ec52f
+    size: 9770
+    path: eu_wild_bird_populations__eurostat__2022.feather

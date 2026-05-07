@@ -8,12 +8,13 @@ The output table has index columns: country, year, scenario, sex, age, education
 When values are aggregates, dimensions are set to "total".
 """
 
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from functools import reduce
 
 import owid.catalog.processing as pr
 import pyreadr
 from owid.catalog import Table
 from owid.catalog.core.tables import _add_table_and_variables_metadata_to_table
+from owid.datautils.dataframes import rename_categories
 
 from etl.helpers import PathFinder
 
@@ -26,7 +27,7 @@ COLUMNS_RENAME = {
     "period": "year",
 }
 
-# Harmonization of the dimension values
+# Harmonization of the dimension values (applied on categories, not row-by-row)
 REPLACE_AGE = {
     "all": "total",
 }
@@ -34,44 +35,29 @@ REPLACE_SEX = {
     "both": "total",
 }
 
-
-def _process_single_scenario(args):
-    """Process a single scenario. Top-level function for multiprocessing."""
-    scenario, tbs, tables_combine_edu, tables_concat, tables_drop, tables_composition = args
-    result = make_tables_from_scenario(
-        tbs=tbs,
-        scenario_num=scenario,
-        tables_combine_edu=tables_combine_edu,
-        tables_concat=tables_concat,
-        tables_drop=tables_drop,
-        tables_composition=tables_composition,
-    )
-    return (scenario, result)
+# Dimension columns that should always be categorical
+DIM_COLS = ["country", "year", "age", "sex", "education"]
 
 
 def make_scenario_tables(tbs_scenario, tables_combine_edu, tables_concat, tables_drop, tables_composition):
     """Create main table from all scenarios.
 
     Index: country, year, scenario, age, sex, education.
-    Uses parallel processing across scenarios.
     """
-    paths.log.info(f"Processing {len(tbs_scenario)} scenarios in parallel...")
+    paths.log.info(f"Processing {len(tbs_scenario)} scenarios...")
 
-    # Prepare arguments for each scenario
-    scenario_args = [
-        (scenario, tbs, tables_combine_edu, tables_concat, tables_drop, tables_composition)
-        for scenario, tbs in tbs_scenario.items()
-    ]
-
-    # Process scenarios in parallel
     tbs_base = []
-    with ProcessPoolExecutor() as executor:
-        futures = {executor.submit(_process_single_scenario, args): args[0] for args in scenario_args}
-        for future in as_completed(futures):
-            scenario = futures[future]
-            paths.log.info(f"> scenario {scenario} completed")
-            _, result = future.result()
-            tbs_base.append(result)
+    for scenario, tbs in tbs_scenario.items():
+        result = make_tables_from_scenario(
+            tbs=tbs,
+            scenario_num=scenario,
+            tables_combine_edu=tables_combine_edu,
+            tables_concat=tables_concat,
+            tables_drop=tables_drop,
+            tables_composition=tables_composition,
+        )
+        paths.log.info(f"> scenario {scenario} completed")
+        tbs_base.append(result)
 
     # Re-shape table structure
     tbs_ = {group: [] for group in tables_composition}
@@ -118,9 +104,9 @@ def make_tables_from_scenario(tbs, scenario_num, tables_combine_edu, tables_conc
         # Check columns are in tables
         assert ("country" in tb.columns) and ("country_code" in tb.columns), "Missing country or country_code!"
         # Check there is a one-to-one correspondence
-        assert (
-            tb.groupby("country")["country_code"].nunique().max() == 1
-        ), "Multiple country codes for a single country!"
+        assert tb.groupby("country")["country_code"].nunique().max() == 1, (
+            "Multiple country codes for a single country!"
+        )
         # Drop country_code
         tb = tb.drop(columns="country_code")
         tables.append(tb)
@@ -251,10 +237,10 @@ def consolidate_table_all(tables, scenario_num, tables_composition):
                 assert set(cols_index) == set(cols_index_), "Unexpected index columns!"
             tbs_.append(tb_)
         # Merge all tables in list
-        tb = merge_tables_opt(tbs_, on=cols_index, how="outer")
+        tb = merge_tables_seq(tbs_, on=cols_index, how="outer")
         # Add scenario information
         tb["scenario"] = scenario_num
-        tb["scenario"] = tb["scenario"].astype("string")
+        tb["scenario"] = tb["scenario"].astype("category")
         # Add consolidated table in main dictionary
         tables_new[tname_new] = tb
     return tables_new
@@ -266,72 +252,60 @@ def _get_index_columns(tb):
     return cols_index
 
 
-def harmonize_tb(tb):
-    """Harmonizes tables.
+def _to_categories(tb):
+    """Convert dimension columns to categoricals. Called once per file at read time."""
+    # year must be string before converting to category — some files have int years
+    # (1950, 1955...) and others have string ranges ("2020-2025"). Mixing types in a
+    # single categorical causes pyarrow serialization failures.
+    if "year" in tb.columns and tb["year"].dtype != "category":
+        import pandas as pd
 
-    - Dimensions are named differently in different tables. This function ensures that they are consistent.
-    - Makes sure DTypes are set correctly.
-    """
-    if "age" in tb.columns:
-        tb["age"] = (
-            tb["age"]
-            .str.lower()
-            .replace(REPLACE_AGE)
-            .str.replace("––", "-", regex=False)
-            .str.replace("--", "-", regex=False)
-        ).astype("string")
-    if "sex" in tb.columns:
-        tb["sex"] = tb["sex"].str.lower().replace(REPLACE_SEX).astype("string")
-    if "education" in tb.columns:
-        tb["education"] = tb["education"].str.lower().str.replace(" ", "_").astype("string")
-
-    # Set dtype
-    tb = tb.astype(
-        {
-            "country": "string",
-            "year": "string",
-        }
-    )
+        if pd.api.types.is_float_dtype(tb["year"]):
+            tb["year"] = tb["year"].astype(int).astype(str).astype("category")
+        else:
+            tb["year"] = tb["year"].astype(str).astype("category")
+    for col in DIM_COLS:
+        if col == "year":
+            continue
+        if col in tb.columns and tb[col].dtype != "category":
+            tb[col] = tb[col].astype("category")
     return tb
 
 
-def merge_tables_opt(tables, **kwargs):
-    """Optimized & parallelized version of merge_tables."""
+def harmonize_tb(tb):
+    """Harmonize dimension values using category-level operations.
 
-    def _merge_pair(tables):
-        """Merge two tables."""
-        left, right = tables
-        return left.merge(right, **kwargs)
+    Operates on the small set of unique category values instead of
+    millions of rows. Idempotent: safe to call on already-harmonized data.
+    Ensures all dimension columns are categorical on exit.
+    """
+    # Ensure all dimension columns are categorical first
+    # (some operations like .assign() may produce object-dtype columns)
+    tb = _to_categories(tb)
 
-    # Divide tables into pairs to merge in parallel
-    with ThreadPoolExecutor() as executor:
-        while len(tables) > 1:
-            # Pair tables and merge them in parallel
-            future_to_merge = {
-                executor.submit(_merge_pair, (tables[i], tables[i + 1])): i for i in range(0, len(tables) - 1, 2)
-            }
-
-            # Collect merged tables
-            merged_tables = []
-            for future in as_completed(future_to_merge):
-                merged_tables.append(future.result())
-
-            # If odd number of tables, append the last unpaired table
-            if len(tables) % 2 == 1:
-                merged_tables.append(tables[-1])
-
-            # Update tables list with merged results
-            tables = merged_tables
-
-    # Final merged table
-    merged_tb = tables[0]
-    return merged_tb
+    if "age" in tb.columns:
+        age_mapping = {}
+        for cat in tb["age"].cat.categories:
+            new = str(cat).lower().replace("––", "-").replace("--", "-")
+            new = REPLACE_AGE.get(new, new)
+            age_mapping[cat] = new
+        tb["age"] = rename_categories(tb["age"], age_mapping)
+    if "sex" in tb.columns:
+        sex_mapping = {cat: REPLACE_SEX.get(str(cat).lower(), str(cat).lower()) for cat in tb["sex"].cat.categories}
+        tb["sex"] = rename_categories(tb["sex"], sex_mapping)
+    if "education" in tb.columns:
+        edu_mapping = {cat: str(cat).lower().replace(" ", "_") for cat in tb["education"].cat.categories}
+        tb["education"] = rename_categories(tb["education"], edu_mapping)
+    return tb
 
 
-def _read_single_file(args):
-    """Read a single file from the archive. Top-level function for multiprocessing."""
-    file_path, filename, scenario = args
+def merge_tables_seq(tables, **kwargs):
+    """Sequentially merge a list of tables."""
+    return reduce(lambda left, right: left.merge(right, **kwargs), tables)
 
+
+def _read_single_file(file_path, filename, scenario):
+    """Read a single file from the archive and convert to categoricals immediately."""
     if filename.endswith(".rds"):
         data = pyreadr.read_r(file_path)
         assert set(data.keys()) == {None}, "Unexpected keys in RDS file!"
@@ -346,6 +320,10 @@ def _read_single_file(args):
         raise ValueError(f"Unexpected file format: {filename}!")
 
     tb = tb.rename(columns=COLUMNS_RENAME)
+    # TODO: If the snapshot stored dimension columns as categoricals (e.g. parquet/feather
+    #  with dictionary encoding), we could skip this conversion entirely and save ~7s on
+    #  155 files. Consider switching snapshot format from RDS/CSV to feather/parquet.
+    tb = _to_categories(tb)
     return (scenario, short_name, tb)
 
 
@@ -353,7 +331,6 @@ def read_data_from_snap(snap, scenarios_expected):
     """Read snapshot.
 
     Snapshot is a ZIP file that contains numerous RDS files.
-    Uses parallel processing (multiprocessing) for faster loading.
     """
     with snap.extracted() as archive:
         # Filter files to process
@@ -366,25 +343,21 @@ def read_data_from_snap(snap, scenarios_expected):
                 filename = f.split("_")[1]
                 files_to_process.append((file_path, filename, scenario))
 
-        paths.log.info(f"Processing {len(files_to_process)} files in parallel...")
+        paths.log.info(f"Processing {len(files_to_process)} files...")
 
-        # Process files in parallel using ProcessPoolExecutor (bypasses GIL)
         tbs_scenario = {}
-        with ProcessPoolExecutor() as executor:
-            futures = {executor.submit(_read_single_file, args): args for args in files_to_process}
-            for i, future in enumerate(as_completed(futures)):
-                if i % 50 == 0:
-                    paths.log.info(f"Completed {i}/{len(files_to_process)} files")
-                scenario, short_name, tb = future.result()
-                # Add metadata after multiprocessing (metadata objects aren't picklable)
-                tb = _add_table_and_variables_metadata_to_table(
-                    table=tb, metadata=snap.to_table_metadata(), origin=snap.metadata.origin
-                )
-                tb.metadata.short_name = short_name
-                if scenario in tbs_scenario:
-                    tbs_scenario[scenario].append(tb)
-                else:
-                    tbs_scenario[scenario] = [tb]
+        for i, (file_path, filename, scenario) in enumerate(files_to_process):
+            if i % 50 == 0:
+                paths.log.info(f"Completed {i}/{len(files_to_process)} files")
+            scenario, short_name, tb = _read_single_file(file_path, filename, scenario)
+            tb = _add_table_and_variables_metadata_to_table(
+                table=tb, metadata=snap.to_table_metadata(), origin=snap.metadata.origin
+            )
+            tb.metadata.short_name = short_name
+            if scenario in tbs_scenario:
+                tbs_scenario[scenario].append(tb)
+            else:
+                tbs_scenario[scenario] = [tb]
 
         paths.log.info(f"Completed all {len(files_to_process)} files")
 

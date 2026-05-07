@@ -1,0 +1,32 @@
+dataset:
+  title: Corporate income tax (CIT) - Corporate Tax Statistics Database (CTSD) - OECD (2019)
+tables:
+  corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019:
+    variables:
+      combined_corporate_income_tax_rate__ctsd__oecd__2019:
+        title: Combined corporate income tax rate (CTSD, OECD (2019))
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          The combined corporate income tax rate shows the basic combined central and sub-central (statutory) corporate income tax rate given by the central government rate (less deductions for sub-national taxes) plus the sub-central rate.
+      composite_effective_average_tax_rate__ctsd__oecd__2019:
+        title: Composite effective average tax rate (CTSD, OECD (2019))
+        unit: '%'
+        description: |-
+          The composite Effective Average Tax Rate (EATR) is constructed as a weighted average across finance- and asset-specific EATRs. It is a synthetic tax policy indicator reflecting the average tax contribution a firm makes on an investment project earning above-zero economic profits. This indicator is used to analyse discrete investment decisions between two or more alternative projects (along the extensive margin).
+      composite_effective_marginal_tax_rate__ctsd__oecd__2019:
+        title: Composite effective marginal tax rate (CTSD, OECD (2019))
+        unit: '%'
+        description: |-
+          The composite Effective Marginal Tax Rate (EMTR) is constructed as a weighted average across finance- and asset-specific EMTRs. It is a synthetic tax policy indicator measuring the extent to which taxation increases the pre-tax rate of return required by investors to break even. This indicator is used to analyse how taxes affect the incentive to expand existing investments in buildings given a fixed location (along the intensive margin).
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

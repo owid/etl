@@ -35,7 +35,7 @@ def main(upload: bool) -> None:
     snap = modify_metadata(snap)
 
     # Download CSV
-    download_csv(snap.path, snap.m.source.source_data_url)  # type: ignore
+    download_csv(snap.path, snap.m.source.source_data_url)  # ty: ignore
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
@@ -61,7 +61,7 @@ def download_csv(path: Path, csv_url: str) -> None:
     token_input = soup.find("input", {"name": "__RequestVerificationToken"})
     assert token_input is not None, "Could not find the anti-forgery token on the login page."
 
-    token_value = token_input.get("value")  # type: ignore
+    token_value = token_input.get("value")  # ty: ignore
 
     # Step 2: Prepare login form data with the dynamic token.
     login_data = {
@@ -88,11 +88,11 @@ def download_csv(path: Path, csv_url: str) -> None:
 def modify_metadata(snap: Snapshot) -> Snapshot:
     """Modify metadata"""
     # Get access date
-    snap.metadata.source.date_accessed = date.today()  # type: ignore
+    snap.metadata.source.date_accessed = date.today()  # ty: ignore
     # Set publication date
     publication_date = _get_publication_date()
     assert snap.metadata.source
-    snap.metadata.source.publication_date = publication_date  # type: ignore
+    snap.metadata.source.publication_date = publication_date  # ty: ignore
     # Set publication year
     snap.metadata.source.publication_year = publication_date.year
     # Save

@@ -1,0 +1,17 @@
+dataset:
+  title: Total merchandise trade as share of GDP (NBER-United Nations 1962-2000) (split)
+tables:
+  total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split:
+    variables:
+      total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000:
+        title: Total merchandise trade as share of GDP (NBER-United Nations 1962-2000)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

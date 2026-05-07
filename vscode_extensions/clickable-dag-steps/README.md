@@ -17,5 +17,5 @@ Types of issues:
 
 ### Installation
 
-Simply run `make install-vscode-extensions`.
+Simply run `make vsce-sync`.
 

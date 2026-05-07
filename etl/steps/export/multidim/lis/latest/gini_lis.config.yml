@@ -1,6 +1,8 @@
 title:
   title: Gini coefficient
   title_variant: Luxembourg Income Study
+topic_tags:
+  - Economic Inequality
 
 default_selection:
   - United States
@@ -23,10 +25,10 @@ dimensions:
     slug: welfare_type
     choices:
       - slug: dhi
-        name: After tax
+        name: After taxes and benefits
       - slug: mi
-        name: Before tax
+        name: Before taxes and benefits
       - slug: before_vs_after
-        name: Before vs. after tax
+        name: Before vs. after taxes and benefits
 
 views: []

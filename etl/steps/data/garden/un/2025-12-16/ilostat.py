@@ -303,11 +303,9 @@ def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
                 log.warning(f"{message}, and we are dropping them")
 
     # Assert that there is info for every column
-    assert set(
-        tb[column].dropna().unique()
-    ).issubset(
-        set(tb_metadata[column].unique())
-    ), f"Some values are missing in the {column} metadata table: {set(tb[column].dropna().unique()) ^ set(tb_metadata[column].dropna().unique())}"
+    assert set(tb[column].dropna().unique()).issubset(set(tb_metadata[column].unique())), (
+        f"Some values are missing in the {column} metadata table: {set(tb[column].dropna().unique()) ^ set(tb_metadata[column].dropna().unique())}"
+    )
 
     tb = pr.merge(tb, tb_metadata, on=column, how="left")
 
@@ -321,9 +319,9 @@ def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
     tb = tb[tb[column].isin(COLUMN_CATEGORIES[column].keys())].reset_index(drop=True)
 
     # Assert that all renamed columns are the same as COLUMN_CATEGORIES[column].keys()
-    assert (
-        set(tb[column].unique()) == set(COLUMN_CATEGORIES[column].keys())
-    ), f"Some {column} are missing in the column categories mapping: {set(tb[column].unique()) ^ set(COLUMN_CATEGORIES[column].keys())}"
+    assert set(tb[column].unique()) == set(COLUMN_CATEGORIES[column].keys()), (
+        f"Some {column} are missing in the column categories mapping: {set(tb[column].unique()) ^ set(COLUMN_CATEGORIES[column].keys())}"
+    )
 
     if column == "indicator":
         # Multiply observations by 1000 when the indicator is in thousands
@@ -468,11 +466,9 @@ def drop_iloest_projections(tb: Table) -> Table:
     tb = tb.copy()
 
     # Assert that all ILOEST indicators are in the indicator column
-    assert set(
-        ILOEST_INDICATORS
-    ).issubset(
-        set(tb["indicator"].unique())
-    ), f"Some ILOEST indicators are missing in the indicator column: {set(ILOEST_INDICATORS) - set(tb['indicator'].unique())}"
+    assert set(ILOEST_INDICATORS).issubset(set(tb["indicator"].unique())), (
+        f"Some ILOEST indicators are missing in the indicator column: {set(ILOEST_INDICATORS) - set(tb['indicator'].unique())}"
+    )
 
     # For each ILOEST indicator, define the maximum year where obs_status is not null and drop data beyond that year
     for indicator in ILOEST_INDICATORS:

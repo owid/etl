@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Get data (statistics by period and by nature) from Snapshot.
-    snap: Snapshot = paths.load_dependency("aviation_statistics.csv")  # type: ignore
+    snap: Snapshot = paths.load_dependency("aviation_statistics.csv")  # ty: ignore
     df = pd.read_csv(snap.path).rename(columns={"year": "year"})
 
     #

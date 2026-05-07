@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: Atack and Bateman (1992)
+    description: |-
+      See Table 3 and Table 4 for original data.
+
+      Estimates of seasonality are derived from the six winter months (November to May) and the six summer months (May to November).
+    url: |-
+      https://www.cambridge.org/core/services/aop-cambridge-core/content/view/15F272CAB8BD86EDF27D3347284DD60A/S0022050700010299a.pdf/how_long_was_the_workday_in_1880.pdf
+    date_accessed: 2018-08-13
+    published_by: |-
+      Atack, J. and Bateman, F., (1992). How Long was the Workday in 1880?. The Journal of Economic History, 52(1), pp.129-160.
+  name: Length of the workday in 1880 - Atack and Bateman (1992)
+  description: ''
+  is_public: false
+outs:
+  - md5: f859d20559c99fe89493a54d030a4302
+    size: 9810
+    path: length_of_the_workday_in_1880__atack_and_bateman__1992.feather

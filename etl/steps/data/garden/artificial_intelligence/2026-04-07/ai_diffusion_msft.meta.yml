@@ -1,0 +1,35 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+dataset:
+  update_period_days: 183
+
+tables:
+  ai_diffusion_msft:
+    variables:
+      ai_user_share:
+        title: Estimated share of working-age adults who use generative AI
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the population aged 15–64 who used a [generative AI](#dod:generative-ai) website or app in the second half of 2025. Estimated from anonymized usage data on Microsoft platforms, scaled up to represent each country's working-age population.
+
+        description_key:
+          - These are modeled estimates, not survey data. They are derived from anonymized usage signals collected by Microsoft's software and services, which log whether users visited a [generative AI](#dod:generative-ai) platform.
+          - Microsoft can directly observe this mainly on Windows desktops and tablets. It then scales these numbers up to estimate total use across desktop, tablet, and mobile devices in each country.
+          - To do this, Microsoft adjusts for how common desktop and tablet devices are in each country, how much Internet use happens on mobile rather than desktop, and how many users share data with Microsoft.
+          - This indicator counts anyone who visited one of 19 tracked AI tools during the period, from a single visit to daily use. It does not distinguish between occasional and frequent users.
+          - "The 19 tracked platforms are: Alice, ChatGPT, Character.ai, Claude, CLOVA X, DeepSeek, ERNIE Bot (Yiyan.baidu), GigaChat, Google Gemini, Grok, Khanmigo.ai, Meta.ai, Microsoft Copilot, Midjourney, Mistral.ai, NanoSemantics AI Assistant, Perplexity, Tongyi Qianwen, and Xiaowei."
+          - Users with less than 90 minutes of total activity observed through Microsoft telemetry per month are excluded, to reduce the influence of very infrequent users. This threshold applies to overall tracked activity, not to time spent on AI tools.
+          - Some countries do not have enough data for their own estimate and are assigned a regional average instead.
+          - The source notes that coverage is limited in some countries, especially Russia, Iran, and parts of China, so estimates for these places carry greater uncertainty.
+
+        display:
+          numDecimalPlaces: 1
+          name: Estimated share of working-age adults who use generative AI
+
+        presentation:
+          title_public: Estimated share of working-age adults who use generative AI

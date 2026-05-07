@@ -1,0 +1,46 @@
+dataset:
+  title: 'OECD: Education Statistics (2017)'
+tables:
+  oecd__education_statistics__2017:
+    variables:
+      capital_expenditure__oecd_education_statistics__2017:
+        title: Capital Expenditure (OECD Education Statistics (2017))
+        unit: '% of GDP'
+        description: Education Finance and Attainment Indicators (as per analysis and definitions in the OECD's report Education
+          at a Glance)
+      current_expenditure_non_staff__oecd_education_statistics__2017:
+        title: Current Expenditure Non-staff (OECD Education Statistics (2017))
+        unit: '% of GDP'
+        description: Education Finance and Attainment Indicators (as per analysis and definitions in the OECD's report Education
+          at a Glance)
+      current_expenditure_staff__oecd_education_statistics__2017:
+        title: Current Expenditure Staff (OECD Education Statistics (2017))
+        unit: '% of GDP'
+        description: Education Finance and Attainment Indicators (as per analysis and definitions in the OECD's report Education
+          at a Glance)
+      private_expenditure_on_education__oecd_education_statistics__2017:
+        title: Private Expenditure on Education (OECD Education Statistics (2017))
+        unit: '% of GDP'
+        short_unit: '%'
+        description: Education Finance and Attainment Indicators (as per analysis and definitions in the OECD's report Education
+          at a Glance)
+      public_expenditure_on_education__oecd_education_statistics__2017:
+        title: Public Expenditure on Education (OECD Education Statistics (2017))
+        unit: '% of GDP'
+        short_unit: '%'
+        description: Education Finance and Attainment Indicators (as per analysis and definitions in the OECD's report Education
+          at a Glance)
+      share_public_education_expenditure__oecd_education_statistics__2017:
+        title: Share Public Education Expenditure (OECD Education Statistics (2017))
+        unit: '% Education Expenditure'
+        description: Education Finance and Attainment Indicators (as per analysis and definitions in the OECD's report Education
+          at a Glance)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

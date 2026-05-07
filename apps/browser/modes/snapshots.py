@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 from apps.browser.commands import DEFAULT_COMMANDS, Command
 from apps.browser.modes import ModeConfig, ModeResult
@@ -53,7 +54,7 @@ class SnapshotMode(BaseBrowserMode):
 
         return None
 
-    def get_ranker(self) -> "Ranker" | None:
+    def get_ranker(self) -> Ranker | None:
         """Return version-based ranker for snapshots."""
         from apps.browser.snapshots import create_snapshot_ranker
 

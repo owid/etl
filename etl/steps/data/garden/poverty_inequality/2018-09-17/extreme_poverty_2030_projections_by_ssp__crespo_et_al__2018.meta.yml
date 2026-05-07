@@ -1,0 +1,44 @@
+dataset:
+  title: Extreme Poverty 2030 Projections by SSP - Crespo et al. (2018)
+tables:
+  extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018:
+    variables:
+      ssp1__difference_in_number_in_extreme_poverty_to_baseline:
+        title: SSP1 (difference in number in extreme poverty to baseline)
+        unit: people
+      ssp1__number_of_people_in_extreme_poverty:
+        title: SSP1 (number of people in extreme poverty)
+        unit: people in extreme poverty
+      ssp2__number_of_people_in_extreme_poverty:
+        title: SSP2 (number of people in extreme poverty)
+        unit: people in extreme poverty
+        display:
+          name: People in extreme poverty
+          unit: people
+      ssp3__difference_in_number_in_extreme_poverty_to_baseline:
+        title: SSP3 (difference in number in extreme poverty to baseline)
+        unit: people
+      ssp3__number_of_people_in_extreme_poverty:
+        title: SSP3 (number of people in extreme poverty)
+        unit: people in extreme poverty
+      ssp4__difference_in_number_in_extreme_poverty_to_baseline:
+        title: SSP4 (difference in number in extreme poverty to baseline)
+        unit: people
+      ssp4__number_of_people_in_extreme_poverty:
+        title: SSP4 (number of people in extreme poverty)
+        unit: people in extreme poverty
+      ssp5__difference_in_number_in_extreme_poverty_to_baseline:
+        title: SSP5 (difference in number in extreme poverty to baseline)
+        unit: people
+      ssp5__number_of_people_in_extreme_poverty:
+        title: SSP5 (number of people in extreme poverty)
+        unit: people
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

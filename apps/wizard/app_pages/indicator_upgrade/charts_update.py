@@ -1,7 +1,6 @@
 """Handle submission of chart updates."""
 
 from http.client import RemoteDisconnected
-from typing import Dict, List
 from urllib.error import URLError
 
 import pandas as pd
@@ -31,7 +30,7 @@ def trigger_chart_submission():
         st_toast_error("You've changed the indicator mapping. Please submit the form before to update the charts.")
 
 
-def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[gm.Chart]:
+def get_affected_charts_and_preview(indicator_mapping: dict[int, int]) -> list[gm.Chart]:
     """Create submission config."""
     # Get updaters and charts to update
 
@@ -70,8 +69,8 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
                 # Build Series with slugs
                 slugs = pd.DataFrame(
                     {
-                        "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # type: ignore
-                        "url": [OWID_ENV.chart_site(chart.slug) for chart in charts],  # type: ignore
+                        "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # ty: ignore
+                        "url": [OWID_ENV.chart_site(chart.slug) for chart in charts],  # ty: ignore
                     }
                 )
                 st.dataframe(
@@ -180,7 +179,7 @@ def push_new_charts() -> None:
 
 
 def save_variable_mapping(
-    indicator_mapping: Dict[int, int], dataset_id_new: int, dataset_id_old: int, comments: str = ""
+    indicator_mapping: dict[int, int], dataset_id_new: int, dataset_id_old: int, comments: str = ""
 ) -> None:
     WizardDB.add_variable_mapping(
         mapping=indicator_mapping,

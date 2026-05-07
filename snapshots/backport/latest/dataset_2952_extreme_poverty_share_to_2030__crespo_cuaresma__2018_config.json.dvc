@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2952
-    date_accessed: 2023-08-10 09:21:18.574440
+    url: https://admin.owid.io/admin/datasets/2952
+    date_accessed: 2026-03-06 07:49:44.488927+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2952_extreme_poverty_share_to_2030__crespo_cuaresma__2018
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4d2e4bb06499d08108a97bfed8809841
-  size: 4609
-  path: dataset_2952_extreme_poverty_share_to_2030__crespo_cuaresma__2018_config.json
+  - md5: ee69030f375cdb38ba0bb152e2e89f3e
+    size: 4832
+    path: dataset_2952_extreme_poverty_share_to_2030__crespo_cuaresma__2018_config.json

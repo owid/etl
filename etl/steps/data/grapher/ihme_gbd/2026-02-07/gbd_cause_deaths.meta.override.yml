@@ -1,0 +1,6 @@
+tables:
+  gbd_cause_deaths:
+    variables:
+      value:
+        presentation:
+          attribution_short: IHME

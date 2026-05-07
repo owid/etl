@@ -299,7 +299,7 @@ def get_metabase_analytics(prod: bool = False):
     df = pd.concat(dfs, ignore_index=True)
 
     # Sort dataframe
-    df = df.sort_values(by="views", ascending=False).reset_index(drop=True)  # type: ignore
+    df = df.sort_values(by="views", ascending=False).reset_index(drop=True)  # ty: ignore
 
     #########################
     # Anonymous stats

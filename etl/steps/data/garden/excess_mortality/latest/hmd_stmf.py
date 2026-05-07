@@ -5,7 +5,7 @@ from datetime import date
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog.utils import underscore
-from shared import harmonize_countries  # type: ignore
+from shared import harmonize_countries  # ty: ignore
 from structlog import get_logger
 
 from etl.data_helpers.misc import check_values_in_column
@@ -140,9 +140,9 @@ def add_uk(df: pd.DataFrame):
     # NOTE: this used to be
     #     df_uk[[col for col in column_years if col != THIS_YEAR]].isna().sum() < 20
     # but it started failing in 2024
-    assert (
-        df_uk[[col for col in column_years if col <= 2023]].isna().sum() < 20
-    ).all(), "Too many missing values. Check values in year columns!"
+    assert (df_uk[[col for col in column_years if col <= 2023]].isna().sum() < 20).all(), (
+        "Too many missing values. Check values in year columns!"
+    )
     # Group by and get sum
     df_uk = df_uk.groupby(["week", "age"], as_index=False)[column_years].sum(min_count=3)
     # Assign Entity name

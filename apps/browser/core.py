@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING, Any, Callable, Literal, Protocol
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any, Literal, Protocol
 
 from prompt_toolkit import Application
 from prompt_toolkit.document import Document
@@ -231,7 +232,7 @@ def highlight_matches(
 class FilterLexer(Lexer):
     """Lexer that highlights filter tokens and option tokens in the input."""
 
-    def __init__(self, state: "BrowserState") -> None:
+    def __init__(self, state: BrowserState) -> None:
         self.state = state
 
     def _get_option_spans(self, text: str) -> list[tuple[int, int]]:
@@ -345,15 +346,15 @@ class BrowserState:
         self.app: Application[None] | None = None  # Reference to app for invalidation
         # Command mode state
         self.mode: Literal["search", "command", "options", "help"] = "search"
-        self.command_matches: list["Command"] = []
-        self.available_commands: list["Command"] = []
+        self.command_matches: list[Command] = []
+        self.available_commands: list[Command] = []
         # Refresh callback for reload functionality
         self.items_loader: Callable[[], list[str]] | None = None
         self.on_items_loaded: Callable[[list[str]], None] | None = None
         # Filter parsing state
-        self.parsed_input: "ParsedInput" | None = None
+        self.parsed_input: ParsedInput | None = None
         # Filter autocomplete options (cached)
-        self.filter_options: "FilterOptions" | None = None
+        self.filter_options: FilterOptions | None = None
         # History state (shared across browser sessions)
         self.history: list[str] = history if history is not None else []
         self.history_index: int = -1  # -1 means not browsing history
@@ -375,8 +376,8 @@ class BrowserState:
         self.show_help: bool = False
         self._showing_help: bool = False  # Flag to prevent clearing help on programmatic text change
         # Options state (for @ mode)
-        self.options_state: "OptionsState | None" = None
-        self.option_matches: list["BrowserOption"] = []  # Filtered options for display
+        self.options_state: OptionsState | None = None
+        self.option_matches: list[BrowserOption] = []  # Filtered options for display
         self.current_option_token_start: int = 0  # Start position of current token
         self.current_option_token_end: int = 0  # End position of current token
 
@@ -474,12 +475,12 @@ def browse_items(
     cached_items: list[str] | None = None,
     on_items_loaded: Callable[[list[str]], None] | None = None,
     rank_matches: Ranker | None = None,
-    commands: list["Command"] | None = None,
+    commands: list[Command] | None = None,
     history: list[str] | None = None,
     on_mode_switch: ModeSwitchCallback | None = None,
     mode_descriptions: list[tuple[str, str, bool]] | None = None,
     current_mode_name: str = "",
-    options_state: "OptionsState | None" = None,
+    options_state: OptionsState | None = None,
 ) -> tuple[str | None, bool, list[str], str | None, dict[str, Any] | None]:
     """Interactive item browser using prompt_toolkit.
 
@@ -749,7 +750,7 @@ def browse_items(
                         state.matches = []
 
                         def reload_for_mode_switch() -> None:
-                            state.all_items = state.items_loader()  # type: ignore[misc]
+                            state.all_items = state.items_loader()  # ty: ignore
                             state.filter_options = extract_filter_options(state.all_items)
                             state.loading = False
                             if state.on_items_loaded is not None:
@@ -773,7 +774,7 @@ def browse_items(
                     state.matches = []
 
                     def reload_items() -> None:
-                        state.all_items = state.items_loader()  # type: ignore[misc]
+                        state.all_items = state.items_loader()  # ty: ignore
                         state.loading = False
                         if state.on_items_loaded is not None:
                             state.on_items_loaded(state.all_items)
@@ -966,7 +967,7 @@ def browse_items(
             mode_cmds = [cmd for cmd in cmd_matches if cmd.group == "mode"]
             action_cmds = [cmd for cmd in cmd_matches if cmd.group != "mode"]
 
-            def render_command(cmd: "Command") -> None:
+            def render_command(cmd: Command) -> None:
                 idx = cmd_matches.index(cmd)
                 is_selected = idx == state.selected_index
                 prefix_style = "class:item.selected" if is_selected else "class:item"

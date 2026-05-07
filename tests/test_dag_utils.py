@@ -3,6 +3,7 @@ from pathlib import Path
 
 from etl.dag_helpers import (
     get_comments_above_step_in_dag,
+    load_single_dag_file,
     remove_steps_from_dag_file,
     write_to_dag_file,
 )
@@ -61,7 +62,7 @@ def _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_r
             steps_to_remove=steps_to_remove,
         )
         # Assert that the file content is the same as before.
-        with open(temp_file, "r") as updated_file:
+        with open(temp_file) as updated_file:
             new_content = updated_file.read()
     assert new_content == expected_content
 
@@ -580,7 +581,7 @@ def _assert_write_to_dag_file(
             indent_dependency=indent_dependency,
         )
         # Assert that the file content is the same as before.
-        with open(temp_file, "r") as updated_file:
+        with open(temp_file) as updated_file:
             new_content = updated_file.read()
     assert new_content == expected_content
 
@@ -915,3 +916,26 @@ steps:
     _assert_write_to_dag_file(
         old_content, expected_content, dag_part={"meadow_a": ["snapshot_a"], "meadow_b": ["snapshot_b", "snapshot_c"]}
     )
+
+
+def test_load_single_dag_file_returns_all_top_level_steps():
+    content = """\
+steps:
+  data://meadow/un/2022-07-11/un_wpp:
+    - snapshot://un/2022-07-11/un_wpp.zip
+  data://garden/un/2022-07-11/un_wpp:
+    - data://meadow/un/2022-07-11/un_wpp
+
+include:
+  - path/to/another/dag.yml
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(content)
+        graph = load_single_dag_file(p)
+    # Does not follow the ``include`` directive — only the local steps show up.
+    assert set(graph) == {
+        "data://meadow/un/2022-07-11/un_wpp",
+        "data://garden/un/2022-07-11/un_wpp",
+    }
+    assert graph["data://meadow/un/2022-07-11/un_wpp"] == {"snapshot://un/2022-07-11/un_wpp.zip"}

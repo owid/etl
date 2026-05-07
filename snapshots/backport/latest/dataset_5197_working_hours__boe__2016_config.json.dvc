@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5197
-    date_accessed: 2023-08-10 08:28:13.430370
+    url: https://admin.owid.io/admin/datasets/5197
+    date_accessed: 2026-03-10 09:18:05.317879+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5197_working_hours__boe__2016
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 640d818f992bacb8d47ced303b52d9ac
-  size: 5014
-  path: dataset_5197_working_hours__boe__2016_config.json
+  - md5: c609d8a4e112cfacd8ca672a04f0350f
+    size: 5516
+    path: dataset_5197_working_hours__boe__2016_config.json

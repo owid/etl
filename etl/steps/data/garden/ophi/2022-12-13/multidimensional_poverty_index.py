@@ -66,7 +66,7 @@ def run(dest_dir: str) -> None:
     df.columns = [" ".join(col).strip().replace(" ", "_") for col in df.columns.values]
 
     # Format column names, making it all lowercase
-    df.columns = df.columns.str.lower()  # type: ignore
+    df.columns = df.columns.str.lower()  # ty: ignore
 
     log.info("multidimensional_poverty_index.harmonize_countries")
     df = harmonize_countries(df)

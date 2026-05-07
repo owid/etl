@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: US Census Bureau & Statistics Canada
+    description: |-
+      Data for the United States corresponds to population aged 18 and over. Data for Canada corresponds to population aged 15 and over.
+    url: |-
+      US: https://www2.census.gov/programs-surveys/demo/tables/families/time-series/adults/ad3.xlsx and Canada: https://www150.statcan.gc.ca/n1/pub/75-006-x/2019001/article/00003-eng.htm
+    date_accessed: 2019-11-15
+    published_by: US Census Bureau & Tan, Galbraith, and Truong (2019), Statistics Canada
+  name: Percentage of adults living alone in the US and Canada- US Census Bureau & Statistics Canada
+  description: ''
+outs:
+  - md5: 56c8f051326ff5580f2654d70527f24f
+    size: 3434
+    path: percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada.feather

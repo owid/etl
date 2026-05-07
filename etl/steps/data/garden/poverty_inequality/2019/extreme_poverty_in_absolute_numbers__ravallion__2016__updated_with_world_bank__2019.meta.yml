@@ -1,0 +1,22 @@
+dataset:
+  title: Extreme Poverty in absolute numbers - Ravallion (2016) updated with World Bank (2019)
+tables:
+  extreme_poverty_in_absolute_numbers__ravallion__2016__updated_with_world_bank__2019:
+    variables:
+      number_of_people_living_in_extreme_poverty__owid_based_on_world_bank__2016__and_bourguignon_and_morrisson__2002:
+        title: Number of people living in extreme poverty (OWID based on World Bank (2016) and Bourguignon and Morrisson (2002))
+        unit: people
+        description: World population living in extreme poverty
+      number_of_people_not_in_extreme_poverty__owid_based_on_world_bank__2016__and_bourguignon_and_morrisson__2002:
+        title: Number of people not in extreme poverty (OWID based on World Bank (2016) and Bourguignon and Morrisson (2002))
+        unit: people
+        description: World population living in extreme poverty
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

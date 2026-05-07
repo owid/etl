@@ -1,0 +1,17 @@
+dataset:
+  title: Global freshwater use since 1900 - IGB
+tables:
+  global_freshwater_use_since_1900__igb:
+    variables:
+      freshwater_use:
+        title: Freshwater use
+        unit: m³
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

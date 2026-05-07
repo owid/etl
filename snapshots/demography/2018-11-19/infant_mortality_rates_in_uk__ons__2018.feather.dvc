@@ -1,0 +1,23 @@
+meta:
+  source:
+    name: Infant Mortality Rates in UK (ONS, 2018)
+    description: |-
+      Infant mortality rates as reported by the UK Office for National Statistics (ONS). Infant mortality rates have be subdivided into categories depending on the age of the infant as follows:
+
+      - Perinatal – stillbirths and early neonatal deaths.
+      - Neonatal – deaths of those aged under 28 days.
+      - Postneonatal – deaths of those aged between 28 days and 1 year.
+      - Infant – deaths of those aged under 1 year.
+
+      Neonatal and postneonatal are reported as the number of deaths per 1,000 live births. Perinatal and infant mortality is reported as the number of deaths per 1,000 total births (the sum of stillbirths and live births). Note that stillbirths are only recorded for births with 24 weeks of gestation or more (i.e. stillbirths less than 24 weeks gestation are not recorded).
+    url: |-
+      https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/childhoodinfantandperinatalmortalityinenglandandwales/2016
+    date_accessed: 2018-11-19
+    published_by: UK Office for National Statistics (ONS)
+  name: Infant Mortality Rates in UK (ONS, 2018)
+  description: ''
+  is_public: false
+outs:
+  - md5: 868b408885aaa22f164fe870a94253ee
+    size: 5378
+    path: infant_mortality_rates_in_uk__ons__2018.feather

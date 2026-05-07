@@ -1,0 +1,50 @@
+dataset:
+  title: Young people opinions climate change (Hickman et al. 2021)
+tables:
+  young_people_opinions_climate_change__hickman_et_al__2021:
+    variables:
+      failed_care_planet:
+        title: failed_care_planet
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          The share of surveyed young people in each country that responded "yes" to the statement that: "People have failed to care for planet".
+      family_security_threatened:
+        title: family_security_threatened
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          The share of surveyed young people in each country that responded "yes" to the statement that their: "Family security will be threatened due to climate change".
+      future_is_frightening:
+        title: future_is_frightening
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          The share of surveyed young people in each country that responded "yes" to the statement that: "The future is frightening due to climate change".
+      hesitant_to_have_children:
+        title: hesitant_to_have_children
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          The share of surveyed young people in each country that responded "yes" to the statement that they are: "Hesitant to have children due to climate change".
+      humanity_is_doomed:
+        title: humanity_is_doomed
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          The share of surveyed young people in each country that responded "yes" to the statement that: "Humanity is doomed due to climate change".
+      less_opportunity_than_parents:
+        title: less_opportunity_than_parents
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          The share of surveyed young people in each country that responded "yes" to the statement that: "They will have less opportunities in life than their parents due to climate change".
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,92 @@
+dataset:
+  title: Farm size distribution (Lowder et al. 2016)
+tables:
+  farm_size_distribution__lowder_et_al__2016:
+    variables:
+      _1_2ha_area:
+        title: 1-2ha_area
+        unit: ''
+      _1_2ha_number:
+        title: 1-2ha_number
+        unit: ''
+      _10_20ha_area:
+        title: 10-20ha_area
+        unit: ''
+      _10_20ha_number:
+        title: 10-20ha_number
+        unit: ''
+      _100_200ha_area:
+        title: 100-200ha_area
+        unit: ''
+      _100_200ha_number:
+        title: 100-200ha_number
+        unit: ''
+      _2_5ha_area:
+        title: 2-5ha_area
+        unit: ''
+      _2_5ha_number:
+        title: 2-5ha_number
+        unit: ''
+      _20_50ha_area:
+        title: 20-50ha_area
+        unit: ''
+      _20_50ha_number:
+        title: 20-50ha_number
+        unit: ''
+      _200_500ha_area:
+        title: 200-500ha_area
+        unit: ''
+      _200_500ha_number:
+        title: 200-500ha_number
+        unit: ''
+      _5_10ha_area:
+        title: 5-10ha_area
+        unit: ''
+      _5_10ha_number:
+        title: 5-10ha_number
+        unit: ''
+      _50_100ha_area:
+        title: 50-100ha_area
+        unit: ''
+      _50_100ha_number:
+        title: 50-100ha_number
+        unit: ''
+      _500_1000ha_area:
+        title: 500-1000ha_area
+        unit: ''
+      _500_1000ha_number:
+        title: 500-1000ha_number
+        unit: ''
+      all_sizes_area:
+        title: all_sizes_area
+        unit: ''
+      all_sizes_number:
+        title: all_sizes_number
+        unit: ''
+      over_1000ha_area:
+        title: over_1000ha_area
+        unit: ''
+      over_1000ha_number:
+        title: over_1000ha_number
+        unit: ''
+      share_farms_under2ha_area:
+        title: share_farms_under2ha_area
+        unit: ''
+      share_farms_under2ha_number:
+        title: share_farms_under2ha_number
+        unit: ''
+      under_1ha_area:
+        title: under_1ha_area
+        unit: ''
+      under_1ha_number:
+        title: under_1ha_number
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

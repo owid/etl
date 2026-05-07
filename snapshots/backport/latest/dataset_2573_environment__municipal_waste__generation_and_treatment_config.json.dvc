@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2573
-    date_accessed: 2023-08-10 08:32:48.235918
+    url: https://admin.owid.io/admin/datasets/2573
+    date_accessed: 2026-03-05 12:27:48.025438+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2573_environment__municipal_waste__generation_and_treatment
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5283112507e4ffe0eb43e7ad086648fe
-  size: 22932
-  path: dataset_2573_environment__municipal_waste__generation_and_treatment_config.json
+  - md5: 6a91d7265f1f6f767469f6f76380fb88
+    size: 25480
+    path: dataset_2573_environment__municipal_waste__generation_and_treatment_config.json

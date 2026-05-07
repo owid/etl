@@ -2,7 +2,6 @@ import gzip
 import json
 import random
 from pathlib import Path
-from typing import List
 
 import click
 import pandas as pd
@@ -20,7 +19,7 @@ engine = get_engine()
 @click.argument("s3_path")
 @click.argument("baked_path")
 @click.option("--variables", "-v", type=int, multiple=True)
-def data_parity_cli(s3_path: Path, baked_path: Path, variables: List[int]) -> None:
+def data_parity_cli(s3_path: Path, baked_path: Path, variables: list[int]) -> None:
     """Compare two sets of generated data files, typically from S3 and baked files from live
     server. Find all differences between the two sets.
 
@@ -133,7 +132,7 @@ def _parse_metadata(js):
     return x
 
 
-def _variables_in_charts() -> List[int]:
+def _variables_in_charts() -> list[int]:
     q = """
     select distinct vars.varID as varId
     from charts c, json_table(c.config, '$.dimensions[*]' columns (varID integer path '$.variableId') ) as vars

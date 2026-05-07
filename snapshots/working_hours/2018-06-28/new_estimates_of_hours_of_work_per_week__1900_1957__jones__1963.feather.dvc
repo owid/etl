@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Jones (1963)
+    url: https://www.jstor.org/stable/1927922
+    date_accessed: 2018-06-28
+    published_by: |-
+      Jones, E.B., 1963. New estimates of hours of work per week and hourly earnings, 1900-1957. The Review of Economics and Statistics, pp.374-385.
+  name: New estimates of hours of work per week, 1900-1957 - Jones (1963)
+  description: ''
+  is_public: false
+outs:
+  - md5: f4394d3f759af11b9bd6b03bc6b143b0
+    size: 10066
+    path: new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963.feather

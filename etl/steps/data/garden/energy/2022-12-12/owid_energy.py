@@ -8,7 +8,7 @@ Datasets combined:
 
 """
 
-from typing import Dict, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -49,7 +49,7 @@ VARIABLE_MAPPING_FILE = CURRENT_DIR / "owid_energy_variable_mapping.csv"
 
 
 def combine_tables_data_and_metadata(
-    tables: Dict[str, catalog.Table],
+    tables: dict[str, catalog.Table],
     countries_regions: catalog.Table,
     gdp: pd.DataFrame,
     variable_mapping: pd.DataFrame,

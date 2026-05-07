@@ -187,14 +187,14 @@ def extract_cause_data(text):
     name_number_pairs_4 = []
     name_number_pairs_5 = []
     for name in names:
-        pattern = r"({})\s+(\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+)".format(name)
+        pattern = rf"({name})\s+(\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+)"
         match = re.search(pattern, before_table4)
         if match:
             numbers = match.group(2).split()
             name_number_pairs_4.append((name, *numbers))
 
     for name in names:
-        pattern = r"({})\s+(\d+\s+\d+\s+\d+\s+\d+\s+\d+)".format(name)
+        pattern = rf"({name})\s+(\d+\s+\d+\s+\d+\s+\d+\s+\d+)"
         match = re.search(pattern, after_table4)
         if match:
             numbers = match.group(2).split()

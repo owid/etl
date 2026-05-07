@@ -83,12 +83,12 @@ def run() -> None:
 def add_metadata_description(tb: Table, column_name: str, indicators: list) -> None:
     """Adds metadata description to a given column in tb."""
     description = (
-        f"**This indicator is a sum of {len(indicators)} different leave indicators provided by World Bank:**\n\n"
+        f"**This indicator is a sum of {len(indicators)} different leave indicators provided by the World Bank:**\n\n"
     )
     for indicator in indicators:
         if indicator in tb and hasattr(tb[indicator], "metadata"):
             description += (
-                f"The indicator '{tb[indicator].metadata.title}' is described by World Bank as:\n\n"
+                f"The indicator '{tb[indicator].metadata.title}' is described by the World Bank as:\n\n"
                 f"{tb[indicator].metadata.description_from_producer}\n\n"
             )
     tb[column_name].metadata.description_from_producer = description

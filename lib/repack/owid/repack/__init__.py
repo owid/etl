@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -7,8 +7,8 @@ import pandas as pd
 
 def repack_frame(
     df: pd.DataFrame,
-    remap: Optional[Dict[str, str]] = None,
-    dtypes: Optional[Dict[str, Any]] = {},
+    remap: dict[str, str] | None = None,
+    dtypes: dict[str, Any] | None = {},
 ) -> pd.DataFrame:
     """
     Convert the DataFrame's columns to the most compact types possible.
@@ -29,7 +29,7 @@ def repack_frame(
     if len(df.index.names) == 1 and not df.index.names[0]:
         primary_key = []
     else:
-        primary_key = cast(List[str], df.index.names)
+        primary_key = cast(list[str], df.index.names)
         df.reset_index(inplace=True)
 
     # repack each column into the best dtype we can give it

@@ -106,3 +106,5 @@ steps:
     # PIP filled
   data://grapher/fasttrack/latest/world_bank_pip_filled:
     - snapshot://fasttrack/latest/world_bank_pip_filled.csv
+  data://grapher/fasttrack/latest/sentience_institute:
+    - snapshot://fasttrack/latest/sentience_institute.csv

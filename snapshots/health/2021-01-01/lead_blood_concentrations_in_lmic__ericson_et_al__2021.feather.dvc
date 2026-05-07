@@ -1,0 +1,21 @@
+meta:
+  source:
+    name: |-
+      Ericson et al. (2021). Blood lead levels in low-income and middle-income countries: a systematic review. The Lancet Planetary Health.
+    description: |-
+      Ericson et al. (2021) collated studies measuring lead blood concentrations in children and adults between 2010 and 2019. This analysis yielded 520 studies covering 1100 sampled populations with a total population of 1,003,455 people from 49 countries.
+
+      Children are defined as those aged 0 to 14 years.
+
+      Blood level concentrations are measured in µg/dL. There is no defined 'safe' level for lead blood concentrations. The WHO adopts a threshold of 5 µg/dL as an achievable maximum level in children.
+    url: https://www.thelancet.com/journals/lanplh/article/PIIS2542-5196%2820%2930278-3/fulltext
+    date_accessed: 2026-03-10
+    published_by: |-
+      Ericson, B., Hu, H., Nash, E., Ferraro, G., Sinitsky, J., & Taylor, M. P. (2021). Blood lead levels in low-income and middle-income countries: a systematic review. The Lancet Planetary Health, 5(3), e145-e153.
+  name: Lead blood concentrations in LMIC (Ericson et al. 2021)
+  description: ''
+  is_public: false
+outs:
+  - md5: 1531bbf580133d608b3d74675fa4572e
+    size: 6282
+    path: lead_blood_concentrations_in_lmic__ericson_et_al__2021.feather

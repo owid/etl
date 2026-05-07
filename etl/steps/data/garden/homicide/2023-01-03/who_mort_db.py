@@ -1,5 +1,5 @@
 import json
-from typing import List, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -268,8 +268,8 @@ def build_metadata(col: tuple) -> pd.DataFrame:
     return meta
 
 
-def load_excluded_countries() -> List[str]:
-    with open(N.excluded_countries_path, "r") as f:
+def load_excluded_countries() -> list[str]:
+    with open(N.excluded_countries_path) as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data

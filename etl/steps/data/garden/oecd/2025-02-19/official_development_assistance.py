@@ -1,8 +1,6 @@
 # NOTE: After December 2024 update, check the steps in `remove_jumps_in_the_data_and_unneeded_cols`
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
@@ -290,7 +288,7 @@ def run() -> None:
 
 
 def reformat_table_and_make_it_wide(
-    tb: Table, short_name: str, columns_in_current_prices: List[str], recipient_or_donor: str
+    tb: Table, short_name: str, columns_in_current_prices: list[str], recipient_or_donor: str
 ) -> Table:
     """
     Filter the categories we want, reformat the category names, change units and make table wide.
@@ -341,7 +339,7 @@ def reformat_table_and_make_it_wide(
     return tb
 
 
-def create_indicators_per_capita(tb: Table, indicator_list: List[str]) -> Table:
+def create_indicators_per_capita(tb: Table, indicator_list: list[str]) -> Table:
     """
     Create indicators per capita for ODA (flows and grant equivalent).
     This function uses the population data from the OECD Data Explorer.
@@ -356,7 +354,7 @@ def create_indicators_per_capita(tb: Table, indicator_list: List[str]) -> Table:
     return tb
 
 
-def create_indicators_as_share_of_gni(tb: Table, indicator_list: List[str]) -> Table:
+def create_indicators_as_share_of_gni(tb: Table, indicator_list: list[str]) -> Table:
     """
     Create indicators as share of GNI for ODA (flows and grant equivalent).
     I do this because the official figures for net disbursements end in 2017 and the grant equivalents continue from 2018.
@@ -427,16 +425,14 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     tb_recipient = tb_recipient.copy()
 
     # Assert if the donor categories are in the recipient dataset
-    assert set(
-        DONORS_TOTALS.keys()
-    ).issubset(
-        set(tb_recipient["donor"].unique())
-    ), f"There are missing donor categories in the recipient dataset: {set(DONORS_TOTALS) - set(tb_recipient['donor'].unique())}"
+    assert set(DONORS_TOTALS.keys()).issubset(set(tb_recipient["donor"].unique())), (
+        f"There are missing donor categories in the recipient dataset: {set(DONORS_TOTALS) - set(tb_recipient['donor'].unique())}"
+    )
 
     # Assert if the official donors aggregation is in the recipient dataset
-    assert set(OFFICIAL_DONORS.keys()).issubset(
-        set(tb_recipient["donor"].unique())
-    ), f"The official donot aggregate set is not in the recipient dataset: {OFFICIAL_DONORS.keys()}"
+    assert set(OFFICIAL_DONORS.keys()).issubset(set(tb_recipient["donor"].unique())), (
+        f"The official donot aggregate set is not in the recipient dataset: {OFFICIAL_DONORS.keys()}"
+    )
 
     # Rename donor categories set in DONORS_TOTALS and OFFICIAL_DONORS
     tb_recipient["donor"] = tb_recipient["donor"].cat.rename_categories(DONORS_TOTALS)
@@ -491,7 +487,7 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     return tb
 
 
-def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List[str], ds_population: Dataset) -> Table:
+def create_indicators_per_capita_owid_population(tb: Table, indicator_list: list[str], ds_population: Dataset) -> Table:
     """
     Create indicators per capita for the recipient indicators.
     The per capita values available in the OECD Data Explorer are in current prices, so we want to use the constant values.
@@ -520,9 +516,9 @@ def add_aid_by_sector_donor_dataset(tb: Table, tb_sector: Table) -> Table:
     tb_sector = tb_sector.copy()
 
     # Assert if the sectors are in the sector dataset
-    assert set(SECTORS_DAC5.keys()).issubset(
-        set(tb_sector["sector"].unique())
-    ), f"There are missing sectors in the sector dataset: {set(SECTORS_DAC5) - set(tb_sector['sector'].unique())}"
+    assert set(SECTORS_DAC5.keys()).issubset(set(tb_sector["sector"].unique())), (
+        f"There are missing sectors in the sector dataset: {set(SECTORS_DAC5) - set(tb_sector['sector'].unique())}"
+    )
 
     # Filter categories
     tb_sector = tb_sector[tb_sector["sector"].isin(SECTORS_DAC5.keys())].reset_index(drop=True)
@@ -625,7 +621,7 @@ def combine_net_and_grant_equivalents(tb: Table) -> Table:
     return tb
 
 
-def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: List[str]) -> Table:
+def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: list[str]) -> Table:
     """
     Divide some of the ODA components by the total ODA to get the share of each component.
     Add also the total of these components, together with the difference (aid overseas).

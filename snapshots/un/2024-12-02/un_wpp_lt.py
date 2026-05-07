@@ -18,7 +18,6 @@ To download this files:
 """
 
 from pathlib import Path
-from typing import Optional
 
 import click
 
@@ -37,12 +36,12 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file-proj-f", "-pf", type=str, help="Path to local data file (projections, female).")
 @click.option("--path-to-file-proj-m", "-pm", type=str, help="Path to local data file (projections, male).")
 def main(
-    path_to_file_all: Optional[str],
-    path_to_file_f: Optional[str],
-    path_to_file_m: Optional[str],
-    path_to_file_proj_all: Optional[str],
-    path_to_file_proj_f: Optional[str],
-    path_to_file_proj_m: Optional[str],
+    path_to_file_all: str | None,
+    path_to_file_f: str | None,
+    path_to_file_m: str | None,
+    path_to_file_proj_all: str | None,
+    path_to_file_proj_f: str | None,
+    path_to_file_proj_m: str | None,
     upload: bool,
 ) -> None:
     snaps = [

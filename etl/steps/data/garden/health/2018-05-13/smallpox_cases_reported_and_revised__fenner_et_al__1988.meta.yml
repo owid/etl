@@ -1,0 +1,20 @@
+dataset:
+  title: Smallpox cases reported and revised - Fenner et al. (1988)
+tables:
+  smallpox_cases_reported_and_revised__fenner_et_al__1988:
+    variables:
+      smallpox_cases_as_recorded_in_april_1967:
+        title: Smallpox cases as recorded in April 1967
+        unit: ''
+      smallpox_cases_as_revised_in_1987:
+        title: Smallpox cases as revised in 1987
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

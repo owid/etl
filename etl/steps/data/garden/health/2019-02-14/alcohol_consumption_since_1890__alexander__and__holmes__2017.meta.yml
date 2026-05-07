@@ -1,0 +1,26 @@
+dataset:
+  title: Alcohol consumption since 1890 (Alexander & Holmes, 2017)
+tables:
+  alcohol_consumption_since_1890__alexander__and__holmes__2017:
+    variables:
+      alcohol_consumption_since_1890__alexander__and__holmes__2017:
+        title: Alcohol consumption since 1890 (Alexander & Holmes, 2017)
+        unit: liters of pure alcohol
+        short_unit: l
+        display:
+          name: Per capita alcohol consumption per year
+        description: |-
+          Average per capita alcohol consumption in select high-income countries from 1890 to 2014. This is measured in liters of total alcohol per person per year.
+
+          This is given as the average per capita level of consumption (not level per average adult); it may therefore not be directly comparable with modern statistics of per capita consumption for populations 15+ years.
+
+          Estimates in the original paper are given for particular decades e.g. '1920s', '1940s'. For this dataset we have allocated this figure to the first year in this period e.g. 1920 and 1940.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

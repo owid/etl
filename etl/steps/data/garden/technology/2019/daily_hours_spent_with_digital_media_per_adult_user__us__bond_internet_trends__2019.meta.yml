@@ -1,0 +1,27 @@
+dataset:
+  title: Daily hours spent with digital media per adult user, US (BOND Internet Trends (2019))
+tables:
+  daily_hours_spent_with_digital_media_per_adult_user__us__bond_internet_trends__2019:
+    variables:
+      desktop_laptop__bond_internet_trends__2019:
+        title: Desktop/Laptop (BOND Internet Trends (2019))
+        unit: ''
+        description: Hours per day spent with digital media using desktop/laptop.
+      mobile__bond_internet_trends__2019:
+        title: Mobile (BOND Internet Trends (2019))
+        unit: ''
+        description: Hours per day spent with digital media using mobile. Mobile includes smartphone & tablet.
+      other_connected_devices__bond_internet_trends__2019:
+        title: Other Connected Devices (BOND Internet Trends (2019))
+        unit: ''
+        description: |-
+          Hours per day spent with digital media using other connected devices. Other connected devices include over-the-top (OTT) & game consoles. An over-the-top application is any app or service that provides a product over the internet. For example, OTT providers include Netflix and Amazon Video offering video streaming services.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/949
-    date_accessed: 2023-08-10 09:09:55.136328
+    url: https://admin.owid.io/admin/datasets/949
+    date_accessed: 2026-03-05 14:27:56.252996+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_949_lighting_efficiency_in_uk__owid_based_on_fouquet__and__pearson__2007
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6ba12a6f41e00318d6d5fdd2f811df25
-  size: 2947
-  path: 
-    dataset_949_lighting_efficiency_in_uk__owid_based_on_fouquet__and__pearson__2007_config.json
+  - md5: c87a6ba33a1e8cd73bac67d9557923eb
+    size: 3077
+    path: dataset_949_lighting_efficiency_in_uk__owid_based_on_fouquet__and__pearson__2007_config.json

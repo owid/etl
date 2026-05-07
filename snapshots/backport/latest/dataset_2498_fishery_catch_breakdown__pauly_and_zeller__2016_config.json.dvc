@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2498
-    date_accessed: 2023-08-10 07:49:13.489387
+    url: https://admin.owid.io/admin/datasets/2498
+    date_accessed: 2026-03-10 08:03:39.088242+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2498_fishery_catch_breakdown__pauly_and_zeller__2016
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 65bf3cbc7045ec32baf079312bf313da
-  size: 5012
-  path: dataset_2498_fishery_catch_breakdown__pauly_and_zeller__2016_config.json
+  - md5: a9ee6f01b58ee74d5d6ff151423b8c10
+    size: 5514
+    path: dataset_2498_fishery_catch_breakdown__pauly_and_zeller__2016_config.json

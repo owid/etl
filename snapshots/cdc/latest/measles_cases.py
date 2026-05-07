@@ -28,8 +28,8 @@ def main(upload: bool) -> None:
 
 
 def modify_metadata(snap: Snapshot, date: str) -> Snapshot:
-    snap.metadata.origin.date_published = date  # type: ignore
-    snap.metadata.origin.date_accessed = dt.date.today()  # type: ignore
+    snap.metadata.origin.date_published = date  # ty: ignore
+    snap.metadata.origin.date_accessed = dt.date.today()  # ty: ignore
     snap.metadata.save()
     return snap
 

@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import Optional, Union
 
 import pandas as pd
 
@@ -11,8 +10,8 @@ from etl.data_helpers.misc import check_values_in_column
 def harmonize_countries(
     df: pd.DataFrame,
     country_column: str,
-    countries_file: Union[str, Path],
-    countries_exclude_file: Optional[Union[str, Path]] = None,
+    countries_file: str | Path,
+    countries_exclude_file: str | Path | None = None,
 ) -> pd.DataFrame:
     # Load country mapping file
     with open(countries_file) as f:

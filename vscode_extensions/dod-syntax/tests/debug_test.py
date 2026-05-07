@@ -45,7 +45,7 @@ for i, match in enumerate(matches):
     key = match.group(2)
     is_in_string = isInPythonString(test_line, start_pos)
 
-    print(f"  {i+1}. [{title}](#dod:{key}) at position {start_pos}")
+    print(f"  {i + 1}. [{title}](#dod:{key}) at position {start_pos}")
     print(f"     In string: {is_in_string}")
     print(f"     Text before: '{test_line[:start_pos]}'")
 

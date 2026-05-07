@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Mental health as risk factor for substance use - Swendsen et al. (2010)
+    description: |-
+      Data denotes the increased risk of developing a substance use disorder in individuals with a mental health disorder relative to those without, based on a study on over 5000 individuals over a 10-year period.
+
+      Full data with confidence intervals can be found at: https://ourworldindata.org/mental-health-disorders-as-risk-for-substance-use
+    url: https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1360-0443.2010.02902.x
+    date_accessed: 2018-04-19
+    published_by: |-
+      Swendsen, J., Conway, K. P., Degenhardt, L., Glantz, M., Jin, R., Merikangas, K. R., ... & Kessler, R. C. (2010). Mental disorders as risk factors for substance use, abuse and dependence: results from the 10‐year follow‐up of the National Comorbidity Survey. Addiction, 105(6), 1117-1128.
+  name: Mental health as risk factor for substance use - Swendsen et al. (2010)
+  description: ''
+outs:
+  - md5: a7c59bef69242df375e23c6cdb5026c6
+    size: 4850
+    path: mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010.feather

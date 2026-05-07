@@ -34,7 +34,7 @@ def parse_coal_reserves(data: pr.ExcelFile) -> Table:
 
     # The year of the data is written in the header of the sheet.
     # Extract it using a regular expression.
-    _year = re.findall(r"\d{4}", tb.columns[0])  # type: ignore
+    _year = re.findall(r"\d{4}", tb.columns[0])  # ty: ignore
     assert len(_year) == 1, f"Year could not be extracted from the header of the sheet {sheet_name}."
     year = int(_year[0])
 
@@ -92,9 +92,9 @@ def parse_oil_reserves(data: pr.ExcelFile) -> Table:
     tb = data.parse(sheet_name, skiprows=4)
 
     # Check that units are the expected ones.
-    assert (
-        tb.columns[0] == "Thousand million barrels"
-    ), f"Units (or sheet format) may have changed in sheet {sheet_name}"
+    assert tb.columns[0] == "Thousand million barrels", (
+        f"Units (or sheet format) may have changed in sheet {sheet_name}"
+    )
     # Check that zeroth column should correspond to countries.
     assert "Total World" in tb[tb.columns[0]].tolist()
 
@@ -327,9 +327,9 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin, lice
     # Find the row where that table starts.
     table_start_row = tb[tb.iloc[:, 0].astype(str).str.startswith("Year")].index
 
-    assert (
-        len(table_start_row) == 1
-    ), "Table of thermal equivalent efficiency factors not found, format may have changed."
+    assert len(table_start_row) == 1, (
+        "Table of thermal equivalent efficiency factors not found, format may have changed."
+    )
 
     # Select relevant rows and drop empty columns.
     tb = tb.iloc[table_start_row[0] :].dropna(axis=1, how="all").reset_index(drop=True)
@@ -357,15 +357,15 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin, lice
     efficiency = pr.concat([older_efficiency, efficiency], ignore_index=True).dropna().reset_index(drop=True)
 
     # Sanity checks.
-    assert efficiency["year"].diff().dropna().unique().tolist() == [
-        1
-    ], "Year columns for efficiency factors was not well extracted."
-    assert (
-        efficiency["efficiency_factor"].diff().dropna() >= 0
-    ).all(), "Efficiency is expected to be monotonically increasing."
-    assert (efficiency["efficiency_factor"] > 0.35).all() & (
-        efficiency["efficiency_factor"] < 0.5
-    ).all(), "Efficiency out of expected range."
+    assert efficiency["year"].diff().dropna().unique().tolist() == [1], (
+        "Year columns for efficiency factors was not well extracted."
+    )
+    assert (efficiency["efficiency_factor"].diff().dropna() >= 0).all(), (
+        "Efficiency is expected to be monotonically increasing."
+    )
+    assert (efficiency["efficiency_factor"] > 0.35).all() & (efficiency["efficiency_factor"] < 0.5).all(), (
+        "Efficiency out of expected range."
+    )
 
     # Set an appropriate index and sort conveniently.
     efficiency = efficiency.format(keys=["year"], short_name="statistical_review_of_world_energy_efficiency_factors")

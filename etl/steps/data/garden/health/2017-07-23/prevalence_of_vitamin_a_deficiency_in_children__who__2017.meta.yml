@@ -1,0 +1,24 @@
+dataset:
+  title: Prevalence of Vitamin A deficiency in children - WHO (2017)
+tables:
+  prevalence_of_vitamin_a_deficiency_in_children__who__2017:
+    variables:
+      prevalence_of_night_blindness__who__2017:
+        title: Prevalence of night blindness (WHO (2017))
+        unit: '%'
+        short_unit: '%'
+        description: Percentage of children with night blindness during the period 1995-2005.
+      prevalence_of_vitamin_a_deficiency__who__2017:
+        title: Prevalence of vitamin-A deficiency (WHO (2017))
+        unit: '%'
+        short_unit: '%'
+        description: Share of population with serum retinol levels <0.7µmol/l
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

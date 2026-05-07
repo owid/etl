@@ -1,0 +1,42 @@
+dataset:
+  title: Output of key industrial sectors in England - Bank of England (2017)
+tables:
+  output_of_key_industrial_sectors_in_england__bank_of_england__2017:
+    variables:
+      metals_and_mining__bank_of_england__2017:
+        title: Metals and Mining (Bank of England (2017))
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of the metals and mining sector, indexed to the year 1700, in log scale. It shows how much production took place in metal and mining sector relative to that in 1700 when measured on a log scale.
+      other_industries__bank_of_england__2017:
+        title: Other Industries (Bank of England (2017))
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of the industries other than metals, mining, textiles and leather. It is indexed to the year 1700 in log scale. It shows how much production took place in 'other industries' relative to that in 1700 when measured on a log scale.
+      textiles_and_leather__bank_of_england__2017:
+        title: Textiles and Leather (Bank of England (2017))
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total output of the textiles and leather sector, indexed to the year 1700, in log scale. It shows how much production took place in textiles and leather sector relative to that in 1700 when measured on a log scale.
+      total_industry__bank_of_england__2017:
+        title: Total Industry (Bank of England (2017))
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Total industrial output, indexed to the year 1700, in log scale. It shows how much industrial output was produced relative to that in 1700 when measured on a log scale.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

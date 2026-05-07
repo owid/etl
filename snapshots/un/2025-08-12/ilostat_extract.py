@@ -172,7 +172,7 @@ def fetch_file(url: str) -> pd.DataFrame:
 
     # try to get it from cache
     try:
-        obj = r2.get_object(Bucket=r2_bucket, Key=r2_key)  # type: ignore[reportAttributeAccessIssue]
+        obj = r2.get_object(Bucket=r2_bucket, Key=r2_key)  # ty: ignore[unresolved-attribute]
         data = obj["Body"].read()
         # we might have cached invalid responses, in that case fetch it again
         if b"Server Error" not in data:
@@ -189,7 +189,7 @@ def fetch_file(url: str) -> pd.DataFrame:
     # log.info("fetch_file.success", url=url, t=response.elapsed.total_seconds())
 
     # save the result to R2 cache
-    r2.put_object(  # type: ignore[reportAttributeAccessIssue]
+    r2.put_object(  # ty: ignore[unresolved-attribute]
         Body=response.content,
         Bucket=r2_bucket,
         Key=r2_key,

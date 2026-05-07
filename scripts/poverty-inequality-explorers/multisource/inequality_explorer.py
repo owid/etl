@@ -742,4 +742,4 @@ df_graphers.loc[
 # ## Explorer generation
 # Here, the header, tables and graphers dataframes are combined to be shown in for format required for OWID data explorers.
 
-save("inequality", all_the_tables, df_header, df_graphers, df_tables)  # type: ignore
+save("inequality", all_the_tables, df_header, df_graphers, df_tables)  # ty: ignore

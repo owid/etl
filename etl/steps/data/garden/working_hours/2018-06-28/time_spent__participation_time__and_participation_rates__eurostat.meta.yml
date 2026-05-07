@@ -1,0 +1,104 @@
+dataset:
+  title: Time spent, participation time, and participation rates - Eurostat
+tables:
+  time_spent__participation_time__and_participation_rates__eurostat:
+    variables:
+      participation_rate_in_employment__eurostat:
+        title: Participation rate in employment (Eurostat)
+        unit: '%'
+        description: |-
+          The proportion of individuals that spent some time in employment activities. Employment includes time spent in one's main and second job and related travel, and activities related to employment and unspecified employment.
+      participation_rate_in_household_and_family_care__eurostat:
+        title: Participation rate in household and family care (Eurostat)
+        unit: '%'
+        description: |-
+          The proportion of individuals that spent some time in household and family care activities. Household and family care activities include food management, dish washing, cleaning dwelling, household upkeep, laundry, ironing, handicraft and producing textiles and other care for textiles, gardening, tending domestic animals, pet care, walking the dog, construction and repairs, shopping and services, childcare, and helping family members.
+      participation_rate_in_leisure__social__and_associative_life_activities__eurostat:
+        title: Participation rate in leisure, social, and associative life activities (Eurostat)
+        unit: '%'
+        description: |-
+          The proportion of individuals that spent some time in leisure, social, and associative life activities. Activities include organisational work, informal help to other households, participatory activities, visiting and feasts, social life, entertainment and culture, resting, walking and hiking, sport and outdoor activities, computer games, computing, hobbies and games, reading, TV and video, radio and music, and unspecified leisure.
+      participation_rate_in_personal_care__eurostat:
+        title: Participation rate in personal care (Eurostat)
+        unit: '%'
+        description: |-
+          The proportion of individuals that spent some time in personal care activities. Personal care includes sleep, eating, and other unspecified personal care activities.
+      participation_rate_in_study__eurostat:
+        title: Participation rate in study (Eurostat)
+        unit: '%'
+        description: |-
+          The proportion of individuals that spent some time in study activities. Study includes school, university, homework, and free time study.
+      participation_rate_in_travel__eurostat:
+        title: Participation rate in travel (Eurostat)
+        unit: '%'
+        description: |-
+          The proportion of individuals that spent some time in travel activities.  Travel includes travel to and from work, travel related to study, travel related to shopping and services, transporting a child, travel related to other household purposes, travel related to leisure, social, and associative life, unspecified travel, and unspecified time use.
+      participation_time_in_employment__eurostat:
+        title: Participation time in employment (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent in activities by individuals who took part in employment activities. Employment includes time spent in one's main and second job and related travel, and activities related to employment and unspecified employment.
+      participation_time_in_household_and_family_care__eurostat:
+        title: Participation time in household and family care (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent in activities by individuals who took part in household and family care activities. Household and family care activities include food management, dish washing, cleaning dwelling, household upkeep, laundry, ironing, handicraft and producing textiles and other care for textiles, gardening, tending domestic animals, pet care, walking the dog, construction and repairs, shopping and services, childcare, and helping family members.
+      participation_time_in_leisure__social__and_associative_life__eurostat:
+        title: Participation time in leisure, social, and associative life (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent in activities by individuals who took part in leisure, social, and associative life activities. Activities include organisational work, informal help to other households, participatory activities, visiting and feasts, social life, entertainment and culture, resting, walking and hiking, sport and outdoor activities, computer games, computing, hobbies and games, reading, TV and video, radio and music, and unspecified leisure.
+      participation_time_in_personal_care__eurostat:
+        title: Participation time in personal care (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent in activities by individuals who took part in personal care activities. Personal care includes sleep, eating, and other unspecified personal care activities.
+      participation_time_in_study__eurostat:
+        title: Participation time in study (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent in activities by individuals who took part in study activities. Study includes school, university, homework, and free time study.
+      participation_time_in_travel__eurostat:
+        title: Participation time in travel (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent in activities by individuals who took part in travel activities. Travel includes travel to and from work, travel related to study, travel related to shopping and services, transporting a child, travel related to other household purposes, travel related to leisure, social, and associative life, unspecified travel, and unspecified time use.
+      time_spent_in_employment__eurostat:
+        title: Time spent in employment (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent in employment by all individuals. Employment includes time spent in one's main and second job and related travel, and activities related to employment and unspecified employment.
+      time_spent_in_study__eurostat:
+        title: Time spent in study (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent in study by all individuals. Study includes school, university, homework, and free time study.
+      time_spent_on_household_and_family_care__eurostat:
+        title: Time spent on household and family care (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent on household and family care by all individuals. Household and family care activities include food management, dish washing, cleaning dwelling, household upkeep, laundry, ironing, handicraft and producing textiles and other care for textiles, gardening, tending domestic animals, pet care, walking the dog, construction and repairs, shopping and services, childcare, and helping family members.
+      time_spent_on_leisure__social__and_associative_life__eurostat:
+        title: Time spent on leisure, social, and associative life (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent on leisure, social, and associative life by all individuals. Activities include organisational work, informal help to other households, participatory activities, visiting and feasts, social life, entertainment and culture, resting, walking and hiking, sport and outdoor activities, computer games, computing, hobbies and games, reading, TV and video, radio and music, and unspecified leisure.
+      time_spent_on_personal_care__eurostat:
+        title: Time spent on personal care (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent on personal care by all individuals. Personal care includes sleep, eating, and other unspecified personal care activities.
+      time_spent_on_travel__eurostat:
+        title: Time spent on travel (Eurostat)
+        unit: minutes
+        description: |-
+          Measures the average time spent on travel. Travel includes travel to and from work, travel related to study, travel related to shopping and services, transporting a child, travel related to other household purposes, travel related to leisure, social, and associative life, unspecified travel, and unspecified time use.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

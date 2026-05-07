@@ -1,0 +1,29 @@
+dataset:
+  title: Working Hours – BoE (2016)
+tables:
+  working_hours__boe__2016:
+    variables:
+      annual_average_working_hours_1260_1770:
+        title: Annual Average Working Hours 1260-1770
+        unit: ''
+      annual_average_working_hours_1260_1856:
+        title: Annual Average Working Hours 1260-1856
+        unit: ''
+      annual_average_working_hours_1760_1830:
+        title: Annual Average Working Hours 1760-1830
+        unit: ''
+      annual_average_working_hours_adjusted_composite_series:
+        title: Annual Average Working Hours Adjusted Composite Series
+        unit: ''
+      weekly_average_working_hours_adjusted_composite_series:
+        title: Weekly Average Working Hours Adjusted Composite Series
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

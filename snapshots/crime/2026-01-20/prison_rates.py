@@ -3,7 +3,6 @@
 import re
 from datetime import datetime
 from io import StringIO
-from typing import List
 
 import pandas as pd
 import requests
@@ -36,7 +35,7 @@ def run(upload: bool = True) -> None:
     snap.create_snapshot(upload=upload, data=combined_data)
 
 
-def get_country_names() -> List[dict]:
+def get_country_names() -> list[dict]:
     """Get list of countries with both name and slug."""
     url = "https://www.prisonstudies.org/highest-to-lowest/prison-population-total?field_region_taxonomy_tid=All"
 

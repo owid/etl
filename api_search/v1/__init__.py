@@ -1,9 +1,13 @@
-from typing import Optional
-
 import structlog
 from fastapi import APIRouter, HTTPException, Query
 
-from api_search.semantic_search import get_model_info, is_ready, search_indicators
+from api_search.semantic_search import (
+    get_initialization_error,
+    get_model_info,
+    is_initialization_complete,
+    is_ready,
+    search_indicators,
+)
 
 from .schemas import (
     INDICATOR_SEARCH_EXAMPLES,
@@ -32,10 +36,10 @@ def health() -> dict:
     },
 )
 async def search_indicators_semantic(
-    query: Optional[str] = Query(None, description="Search query", examples=["gdp", "population"]),
-    q: Optional[str] = Query(None, description="Search query (alias for 'query')"),
+    query: str | None = Query(None, description="Search query", examples=["gdp", "population"]),
+    q: str | None = Query(None, description="Search query (alias for 'query')"),
     limit: int = Query(10, description="Limit the number of results", le=100),
-    min_popularity: Optional[float] = Query(
+    min_popularity: float | None = Query(
         None, description="Minimum popularity score (0-1) to filter results", ge=0, le=1
     ),
 ) -> SemanticSearchResponse:
@@ -52,11 +56,19 @@ async def search_indicators_semantic(
 
     # Check if model is ready
     if not is_ready():
-        raise HTTPException(
-            status_code=503,
-            detail="Semantic search model is still initializing. Check /indicators/info for status.",
-            headers={"Retry-After": "5"},
-        )
+        init_error = get_initialization_error()
+        if init_error is not None:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Semantic search initialization failed: {init_error}",
+            )
+        if not is_initialization_complete():
+            raise HTTPException(
+                status_code=503,
+                detail="Semantic search model is still initializing. Check /indicators/info for status.",
+                headers={"Retry-After": "5"},
+            )
+        raise HTTPException(status_code=500, detail="Semantic search model not initialized")
 
     # Cap limit at 100 to match API maximum
     limit = min(limit, 100)

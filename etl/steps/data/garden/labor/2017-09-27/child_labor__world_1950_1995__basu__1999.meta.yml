@@ -1,0 +1,22 @@
+dataset:
+  title: Child Labor (World 1950-1995) - Basu (1999)
+tables:
+  child_labor__world_1950_1995__basu__1999:
+    variables:
+      child_labor__world__ilo_epeap__1950_1995:
+        title: Child Labor (World, ILO-EPEAP, 1950-1995)
+        unit: '% children ages 10-14'
+        short_unit: '%'
+        display:
+          shortUnit: '%'
+          unit: '% of GDP'
+        description: Labor force participation rates for children aged between 10-14.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -99,7 +99,7 @@ def get_un_2022() -> Table:
     tb = pd.concat([tb_estimates, tb_proj], ignore_index=True)
 
     # Rename population column
-    tb = tb.rename(columns={"value": "world_population"})  # type: ignore
+    tb = tb.rename(columns={"value": "world_population"})  # ty: ignore
     return tb
 
 

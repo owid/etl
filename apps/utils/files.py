@@ -2,44 +2,18 @@ import json
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from cookiecutter.main import cookiecutter
 
-from etl.files import apply_ruff_formatter_to_files, ruamel_dump, ruamel_load
+from etl.files import apply_ruff_formatter_to_files
 from etl.paths import DAG_DIR, STEP_DIR
-from etl.steps import DAG
 
 # TODO: Move this to apps/wizard
 DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
 
 
-def add_to_dag(dag: DAG, dag_path: Path = DAG_WIZARD_PATH) -> str:
-    """Add dag to dag_path file."""
-    with open(dag_path, "r") as f:
-        doc = ruamel_load(f)
-
-    doc["steps"].update(dag)
-
-    with open(dag_path, "w") as f:
-        f.write(ruamel_dump(doc))
-
-    # Get subdag as string
-    return ruamel_dump({"steps": dag})
-
-
-def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
-    with open(dag_path, "r") as f:
-        doc = ruamel_load(f)
-
-    doc["steps"].pop(step, None)
-
-    with open(dag_path, "w") as f:
-        # Add new step to DAG
-        f.write(ruamel_dump(doc))
-
-
-def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Path) -> None:
+def generate_step(cookiecutter_path: Path, data: dict[str, Any], target_dir: Path) -> None:
     # data["test"] = ["this", "is", "a", "test"]
     print("--- Data Dictionary ---")
     print(data)
@@ -50,7 +24,7 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Pat
             json.dump(data, f, default=str)
 
         # Verify the contents of the JSON file
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             config_data = json.load(f)
             print("--- JSON Config Data ---")
             print(config_data)
@@ -76,7 +50,7 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Pat
         )
 
 
-def generate_step_to_channel(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
+def generate_step_to_channel(cookiecutter_path: Path, data: dict[str, Any]) -> Path:
     assert {"channel", "namespace", "version"} <= data.keys()
 
     target_dir = STEP_DIR / "data" / data["channel"]

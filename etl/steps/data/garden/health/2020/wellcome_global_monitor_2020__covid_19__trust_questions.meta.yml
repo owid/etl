@@ -1,0 +1,98 @@
+dataset:
+  title: 'Wellcome Global Monitor 2020: Covid-19 - Trust questions'
+tables:
+  wellcome_global_monitor_2020__covid_19__trust_questions:
+    variables:
+      trust_doctors_and_nurses_in_this_country:
+        title: Trust doctors and nurses in this country
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Survey respondents were asked, "How much do you trust each of the following: other people in your neighborhood; your national government; scientists; journalists; doctors and nurses; people who work at non-governmental or non-profit organizations; healers? Do you trust them a lot, some, not much, or not at all?"
+
+          The "share of people who trust" is the sum of those who responded "a lot" and "some."
+      trust_journalists_in_this_country:
+        title: Trust journalists in this country
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Survey respondents were asked, "How much do you trust each of the following: other people in your neighborhood; your national government; scientists; journalists; doctors and nurses; people who work at non-governmental or non-profit organizations; healers? Do you trust them a lot, some, not much, or not at all?"
+
+          The "share of people who trust" is the sum of those who responded "a lot" and "some."
+      trust_people_in_neighborhood:
+        title: Trust people in neighborhood
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Survey respondents were asked, "How much do you trust each of the following: other people in your neighborhood; your national government; scientists; journalists; doctors and nurses; people who work at non-governmental or non-profit organizations; healers? Do you trust them a lot, some, not much, or not at all?"
+
+          The "share of people who trust" is the sum of those who responded "a lot" and "some."
+      trust_people_who_work_at_charitable_organizations_or_ngos_in_this_country:
+        title: Trust people who work at charitable organizations or ngos in this country
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Trust people who work at charitable organizations or NGOs in this country
+        description: |-
+          Survey respondents were asked, "How much do you trust each of the following: other people in your neighborhood; your national government; scientists; journalists; doctors and nurses; people who work at non-governmental or non-profit organizations; healers? Do you trust them a lot, some, not much, or not at all?"
+
+          The "share of people who trust" is the sum of those who responded "a lot" and "some."
+      trust_science:
+        title: Trust science
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Survey respondents were asked, "How much do you trust each of the following: other people in your neighborhood; your national government; scientists; journalists; doctors and nurses; people who work at non-governmental or non-profit organizations; healers? Do you trust them a lot, some, not much, or not at all?"
+
+          The "share of people who trust" is the sum of those who responded "a lot" and "some."
+      trust_scientists_in_this_country:
+        title: Trust scientists in this country
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Survey respondents were asked, "How much do you trust each of the following: other people in your neighborhood; your national government; scientists; journalists; doctors and nurses; people who work at non-governmental or non-profit organizations; healers? Do you trust them a lot, some, not much, or not at all?"
+
+          The "share of people who trust" is the sum of those who responded "a lot" and "some."
+      trust_scientists_to_do_work_with_intention_of_benefiting_public:
+        title: Trust scientists to do work with intention of benefiting public
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Survey respondents were asked, "How much do you trust each of the following: other people in your neighborhood; your national government; scientists; journalists; doctors and nurses; people who work at non-governmental or non-profit organizations; healers? Do you trust them a lot, some, not much, or not at all?"
+
+          The "share of people who trust" is the sum of those who responded "a lot" and "some."
+      trust_scientists_to_find_accurate_information_about_the_world:
+        title: Trust scientists to find accurate information about the world
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Survey respondents were asked, "How much do you trust each of the following: other people in your neighborhood; your national government; scientists; journalists; doctors and nurses; people who work at non-governmental or non-profit organizations; healers? Do you trust them a lot, some, not much, or not at all?"
+
+          The "share of people who trust" is the sum of those who responded "a lot" and "some."
+      trust_the_national_government_in_this_country:
+        title: Trust the national government in this country
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          Survey respondents were asked, "How much do you trust each of the following: other people in your neighborhood; your national government; scientists; journalists; doctors and nurses; people who work at non-governmental or non-profit organizations; healers? Do you trust them a lot, some, not much, or not at all?"
+
+          The "share of people who trust" is the sum of those who responded "a lot" and "some."
+      trust_traditional_healers_in_this_country:
+        title: Trust traditional healers in this country
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Survey respondents were asked, "How much do you trust each of the following: other people in your neighborhood; your national government; scientists; journalists; doctors and nurses; people who work at non-governmental or non-profit organizations; healers? Do you trust them a lot, some, not much, or not at all?"
+
+          The "share of people who trust" is the sum of those who responded "a lot" and "some."
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

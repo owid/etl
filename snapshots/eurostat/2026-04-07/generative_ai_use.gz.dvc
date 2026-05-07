@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Use of generative AI tools by individuals
+    # NOTE: The date_published is specified in "last update" on the top of url_main.
+    date_published: "2026-02-25"
+
+    # Citation
+    producer: Eurostat
+    citation_full: |-
+      Eurostat - Use of generative AI tools by individuals (2026).
+
+    # Files
+    url_main: https://ec.europa.eu/eurostat/databrowser/view/isoc_ai_iaiu/default/table?lang=en
+    url_download: https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/isoc_ai_iaiu?format=TSV&compressed=true
+    date_accessed: '2026-04-07'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ec.europa.eu/eurostat/web/main/help/copyright-notice
+outs:
+  - md5: b423c4ef4c2e7b03e4f5a14d14af87b1
+    size: 218000
+    path: generative_ai_use.gz

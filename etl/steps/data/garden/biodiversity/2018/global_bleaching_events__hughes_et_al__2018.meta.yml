@@ -1,0 +1,36 @@
+dataset:
+  title: Global bleaching events (Hughes et al. 2018)
+tables:
+  global_bleaching_events__hughes_et_al__2018:
+    variables:
+      moderate_bleaching_events__1_30pct_bleached:
+        title: Moderate bleaching events (1-30% bleached)
+        unit: events
+        display:
+          name: Moderate bleaching events
+          numDecimalPlaces: 0
+        description: The number of moderate bleaching events (up to 30% of corals) measured at 100 fixed global locations.
+      severe_bleaching_events__gt_30pct_bleached:
+        title: Severe bleaching events (>30% bleached)
+        unit: events
+        display:
+          name: Severe bleaching events
+          numDecimalPlaces: 0
+        description: The number of severe bleaching events (more than 30% corals) measured at 100 fixed global locations.
+      total_bleaching_events:
+        title: Total bleaching events
+        unit: events
+        display:
+          name: Total bleaching events
+          numDecimalPlaces: 0
+        description: |-
+          The number of moderate bleaching events (up to 30% of corals) and severe bleaching events (more than 30% corals) measured at 100 fixed global locations.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

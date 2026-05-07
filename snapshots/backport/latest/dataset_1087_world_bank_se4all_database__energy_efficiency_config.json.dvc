@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/1087
-    date_accessed: 2023-08-10 08:42:33.780542
+    url: https://admin.owid.io/admin/datasets/1087
+    date_accessed: 2026-03-10 07:57:07.172457+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_1087_world_bank_se4all_database__energy_efficiency
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 95ddce57088859647bd25f8f5d695141
-  size: 25860
-  path: dataset_1087_world_bank_se4all_database__energy_efficiency_config.json
+  - md5: 24b11070866ca181449ae28420f06cf5
+    size: 27385
+    path: dataset_1087_world_bank_se4all_database__energy_efficiency_config.json

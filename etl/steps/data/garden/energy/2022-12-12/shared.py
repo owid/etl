@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -15,7 +15,7 @@ VERSION = CURRENT_DIR.name
 # The following decisions are based on the current location of the countries that succeeded the region, and their income
 # group. Continent and income group assigned corresponds to the continent and income group of the majority of the
 # population in the member countries.
-HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
+HISTORIC_TO_CURRENT_REGION: dict[str, dict[str, str | list[str]]] = {
     "Czechoslovakia": {
         "continent": "Europe",
         "income_group": "High-income countries",
@@ -150,8 +150,8 @@ ACCEPTED_OVERLAPS = {
 
 
 def gather_sources_from_tables(
-    tables: List[catalog.Table],
-) -> List[catalog.meta.Source]:
+    tables: list[catalog.Table],
+) -> list[catalog.meta.Source]:
     """Gather unique sources from the metadata.dataset of each table in a list of tables.
 
     Note: To check if a source is already listed, only the name of the source is considered (not the description or any
@@ -169,7 +169,7 @@ def gather_sources_from_tables(
 
     """
     # Initialise list that will gather all unique metadata sources from the tables.
-    known_sources: List[catalog.meta.Source] = []
+    known_sources: list[catalog.meta.Source] = []
     for table in tables:
         # Get list of sources of the dataset of current table.
         table_sources = table.metadata.dataset.sources
@@ -184,8 +184,8 @@ def gather_sources_from_tables(
 
 
 def get_countries_in_region(
-    region: str, region_modifications: Optional[Dict[str, Dict[str, List[str]]]] = None
-) -> List[str]:
+    region: str, region_modifications: dict[str, dict[str, list[str]]] | None = None
+) -> list[str]:
     """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
 
     Parameters
@@ -243,7 +243,7 @@ def get_countries_in_region(
     return countries
 
 
-def load_population(regions: Optional[Dict[Any, Any]] = None) -> pd.DataFrame:
+def load_population(regions: dict[Any, Any] | None = None) -> pd.DataFrame:
     """Load OWID population dataset, and add historical regions to it.
 
     Returns
@@ -318,8 +318,8 @@ def add_population(
     interpolate_missing_population: bool = False,
     warn_on_missing_countries: bool = True,
     show_full_warning: bool = True,
-    regions: Optional[Dict[Any, Any]] = None,
-    expected_countries_without_population: List[str] = [],
+    regions: dict[Any, Any] | None = None,
+    expected_countries_without_population: list[str] = [],
 ) -> pd.DataFrame:
     """Add a column of OWID population to the countries in the data, including population of historical regions.
 
@@ -469,7 +469,7 @@ def detect_overlapping_regions(
             )
             # Concatenate both selections of data, and select duplicated rows.
             combined = pd.concat([region_values, member_values])
-            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
+            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # ty: ignore
             if len(overlaps) > 0:
                 # Add the overlap found to the dictionary of all overlaps.
                 all_overlaps.update({year: set(overlaps[country_col]) for year in overlaps[year_col].unique()})

@@ -1,6 +1,8 @@
 ---
 name: chart-editing
 description: Edit and preview .chart.yml files for OWID graph steps. Use when user wants to edit chart config, preview charts, change chart appearance, or work with graph step chart files.
+metadata:
+  internal: true
 ---
 
 # Chart Editing
@@ -39,7 +41,7 @@ map:
       Banned: '#4881c6'
       No laws: '#b6a28c'
     customNumericColorsActive: true
-$schema: https://files.ourworldindata.org/schemas/grapher-schema.009.json
+$schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
 originUrl: /animal-welfare
 dimensions:
   - property: y

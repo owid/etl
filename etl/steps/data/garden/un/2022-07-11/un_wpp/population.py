@@ -1,6 +1,6 @@
 """Population table."""
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -10,13 +10,13 @@ from owid.catalog import Table
 from .dtypes import optimize_dtypes
 
 # rename columns
-COLUMNS_ID: Dict[str, str] = {
+COLUMNS_ID: dict[str, str] = {
     "location": "location",
     "time": "year",
     "variant": "variant",
     "agegrp": "age",
 }
-COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
+COLUMNS_METRICS: dict[str, dict[str, Any]] = {
     "sex_ratio": {
         "name": "sex_ratio",
         "sex": "none",
@@ -24,20 +24,20 @@ COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
     "popmale": {
         "name": "population",
         "sex": "male",
-        "operation": lambda x: (x * 1000),
+        "operation": lambda x: x * 1000,
     },
     "popfemale": {
         "name": "population",
         "sex": "female",
-        "operation": lambda x: (x * 1000),
+        "operation": lambda x: x * 1000,
     },
     "poptotal": {
         "name": "population",
         "sex": "all",
-        "operation": lambda x: (x * 1000),
+        "operation": lambda x: x * 1000,
     },
 }
-COLUMNS_ORDER: List[str] = [
+COLUMNS_ORDER: list[str] = [
     "location",
     "year",
     "metric",
@@ -76,7 +76,7 @@ def process_base(df: Table, country_std: str) -> Table:
     return df
 
 
-def process(df: Table, country_std: str) -> Tuple[Table, Table]:
+def process(df: Table, country_std: str) -> tuple[Table, Table]:
     """Re-organizes age groups and complements some metrics."""
     df_base = process_base(df, country_std)
     # Add metrics
@@ -147,11 +147,11 @@ def _add_metric_sexratio(df: Table) -> Table:
     return df_sr
 
 
-def _add_metric_population(df: Table) -> Tuple[Table, Table]:
+def _add_metric_population(df: Table) -> tuple[Table, Table]:
     df_p = df.loc[df.metric == "population"]
     # Basic age groups
     age_map = {
-        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
+        **{str(i): f"{i - i % 5}-{i + 4 - i % 5}" for i in range(0, 100)},
         **{"100+": "100+"},
     }
     df_p_granular = df_p.assign(age=df_p.age.map(age_map).astype("category"))
@@ -242,7 +242,7 @@ def _add_metric_population(df: Table) -> Tuple[Table, Table]:
     return df_p_granular, df_p_broad
 
 
-def _add_age_group(df: Table, age_min: int, age_max: int, age_group: Optional[str] = None) -> Table:
+def _add_age_group(df: Table, age_min: int, age_max: int, age_group: str | None = None) -> Table:
     ages_accepted = [str(i) for i in range(age_min, age_max + 1)]
     dfx: Table = df.loc[df.age.isin(ages_accepted)].drop(columns="age").copy()
     dfx = dfx.groupby(
@@ -298,10 +298,10 @@ def _add_metric_sexratio_all(df_p_granular: Table) -> Any:
     # Get M/F values
     df_male = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "male")].rename(
         columns={"value": "value_male"}
-    )  # type: ignore
+    )  # ty: ignore
     df_female = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "female")].rename(
         columns={"value": "value_female"}
-    )  # type: ignore
+    )  # ty: ignore
     # Check
     assert len(df_male) == len(df_female)
     # Build df

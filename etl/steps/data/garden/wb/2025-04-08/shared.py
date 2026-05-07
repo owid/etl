@@ -488,7 +488,7 @@ def add_metadata_vars(tb_garden: Table, ppp_version: int, welfare_type: str) -> 
         for i in range(len(povline_list)):
             if i != 0:
                 # For variables between poverty lines
-                col_name = f"{var}_between_{povline_list[i-1]}_{povline_list[i]}"
+                col_name = f"{var}_between_{povline_list[i - 1]}_{povline_list[i]}"
 
                 if col_name in cols:
                     # Get the origins of the variable
@@ -587,7 +587,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
                 non_market_income_description,
                 nowcast_regions_description,
             ],
-            description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
+            description_processing=f"""{inc_cons_dict[welfare_type]["processing_description"]}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
             origins=origins,
@@ -609,7 +609,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
                 non_market_income_description,
                 nowcast_regions_description,
             ],
-            description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
+            description_processing=f"""{inc_cons_dict[welfare_type]["processing_description"]}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
             origins=origins,
@@ -633,7 +633,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
                 non_market_income_description,
                 nowcast_regions_description,
             ],
-            description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
+            description_processing=f"""{inc_cons_dict[welfare_type]["processing_description"]}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
             origins=origins,
@@ -656,7 +656,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             ],
             description_processing=f"""{processing_description_share_90_99}
 
-{inc_cons_dict[welfare_type]['processing_description']}""",
+{inc_cons_dict[welfare_type]["processing_description"]}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
             origins=origins,
@@ -677,7 +677,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
                 inc_cons_dict[welfare_type]["description"],
                 non_market_income_description,
             ],
-            description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
+            description_processing=f"""{inc_cons_dict[welfare_type]["processing_description"]}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
             origins=origins,
@@ -712,7 +712,7 @@ def var_metadata_absolute_povlines(var, povline, origins, ppp_version, welfare_t
         title=f"{abs_dict[ppp_version][povline]['title']} - {var_dict[var]['title']}",
         description_short=var_dict[var]["description"],
         description_key=description_key_list,
-        description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
+        description_processing=f"""{inc_cons_dict[welfare_type]["processing_description"]}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
         origins=origins,
@@ -741,7 +741,7 @@ def var_metadata_between_absolute_povlines(var, povline1, povline2, origins, ppp
             non_market_income_description,
             nowcast_regions_description,
         ],
-        description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
+        description_processing=f"""{inc_cons_dict[welfare_type]["processing_description"]}""",
         unit=var_dict[var]["unit"].replace("{ppp}", str(ppp_version)),
         short_unit=var_dict[var]["short_unit"],
         origins=origins,
@@ -781,7 +781,7 @@ def var_metadata_relative_povlines(var, rel, origins, welfare_type) -> VariableM
         ],
         description_processing=f"""{processing_description_relative_poverty}
 
-{inc_cons_dict[welfare_type]['processing_description']}""",
+{inc_cons_dict[welfare_type]["processing_description"]}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
         origins=origins,
@@ -813,7 +813,7 @@ def var_metadata_percentiles(var, pct, origins, ppp_version, welfare_type) -> Va
             ],
             description_processing=f"""{processing_description_thr}
 
-{inc_cons_dict[welfare_type]['processing_description']}""",
+{inc_cons_dict[welfare_type]["processing_description"]}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
             origins=origins,
@@ -830,7 +830,7 @@ def var_metadata_percentiles(var, pct, origins, ppp_version, welfare_type) -> Va
             ],
             description_processing=f"""{processing_description_avg}
 
-{inc_cons_dict[welfare_type]['processing_description']}""",
+{inc_cons_dict[welfare_type]["processing_description"]}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
             origins=origins,
@@ -845,7 +845,7 @@ def var_metadata_percentiles(var, pct, origins, ppp_version, welfare_type) -> Va
                 inc_cons_dict[welfare_type]["description"],
                 non_market_income_description,
             ],
-            description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
+            description_processing=f"""{inc_cons_dict[welfare_type]["processing_description"]}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
             origins=origins,

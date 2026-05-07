@@ -36,6 +36,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("gbd_mental_health")
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
+    ds_un_wpp = paths.load_dataset("un_wpp")
     # Read table from meadow dataset.
     tb = ds_meadow["gbd_mental_health"].reset_index()
     tb = tb.drop(columns=["population_group_name"])
@@ -44,6 +45,7 @@ def run() -> None:
     tb = add_regional_aggregates(
         tb,
         ds_regions,
+        ds_un_wpp,
         index_cols=["country", "year", "metric", "cause", "age", "sex"],
         regions=REGIONS,
         age_group_mapping=AGE_GROUPS_RANGES,

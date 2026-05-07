@@ -1,7 +1,6 @@
 """Common definitions used by scripts to create new snapshots and data steps."""
 
 import datetime as dt
-from typing import Dict, List, Tuple
 
 from structlog import get_logger
 
@@ -121,7 +120,7 @@ RUN_FILE_NAME = "shared"
 GLOB_VERSION_PATTERN = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
 # Additional dependencies to add to each dag line of a specific channel, for new datasets (ones not in the dag).
 # Give each dependency as a tuple of (namespace, channel, step_name). The latest version of that step will be assumed.
-ADDITIONAL_DEPENDENCIES: Dict[str, List[Tuple[str, str, str]]] = {
+ADDITIONAL_DEPENDENCIES: dict[str, list[tuple[str, str, str]]] = {
     "meadow": [],
     "garden": [
         (NAMESPACE, "garden", f"{NAMESPACE}_metadata"),

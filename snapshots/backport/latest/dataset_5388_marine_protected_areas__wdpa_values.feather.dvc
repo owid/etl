@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5388
-    date_accessed: 2023-08-10 09:41:01.820021
+    url: https://admin.owid.io/admin/datasets/5388
+    date_accessed: 2026-03-10 08:08:12.936138+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Marine protected areas (WDPA)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a51d8a2dc3af4f309e717548b1e4a1fc
-  size: 6362
-  path: dataset_5388_marine_protected_areas__wdpa_values.feather
+  - md5: 7ab5bbe3d0be57090c007d6d0ba6ade8
+    size: 6402
+    path: dataset_5388_marine_protected_areas__wdpa_values.feather

@@ -20,7 +20,7 @@ def render_selection():
                 key="min_date",
                 format="YYYY-MM-DD",
                 min_value=MIN_DATE,
-            ).strftime(  # type: ignore
+            ).strftime(  # ty: ignore
                 "%Y-%m-%d"
             )
             max_date = st.date_input(
@@ -29,7 +29,7 @@ def render_selection():
                 key="max_date",
                 format="YYYY-MM-DD",
                 min_value=min_date,
-            ).strftime(  # type: ignore
+            ).strftime(  # ty: ignore
                 "%Y-%m-%d"
             )
             exclude_auxiliary_steps = st.checkbox(

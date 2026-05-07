@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Aguiar and Hurst (2006)
+    url: https://www.econstor.eu/bitstream/10419/55560/1/508634636.pdf
+    date_accessed: 2018-06-07
+    published_by: |-
+      Aguiar, M. and Hurst, E., 2006. Measuring trends in leisure: evidence from five decades of time use surveys. Federal Reserve Bank of Boston Working Paper, 2.
+  name: The allocation of time over five decades - Aguiar and Hurst (2006)
+  description: ''
+outs:
+  - md5: 3f8b7f0cf8fbba6687696ec9a51f9824
+    size: 7162
+    path: the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006.feather

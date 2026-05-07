@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3084
-    date_accessed: 2023-08-10 09:18:00.721298
+    url: https://admin.owid.io/admin/datasets/3084
+    date_accessed: 2026-03-05 12:30:26.082925+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3084_gini_index_around_1990_and_2015__povcal__2018__and_chartbook__2017
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 64b8c80c2c538c9b8d95fcae9f3084b5
-  size: 3527
-  path: 
-    dataset_3084_gini_index_around_1990_and_2015__povcal__2018__and_chartbook__2017_config.json
+  - md5: 4cbe99a7002ca17382fa484ab334dbb9
+    size: 3843
+    path: dataset_3084_gini_index_around_1990_and_2015__povcal__2018__and_chartbook__2017_config.json

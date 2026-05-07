@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import Dict
-
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -36,7 +34,7 @@ EXPECTED_COLUMNS = [
 ]
 
 
-def sanity_check_inputs(tables: Dict[str, Table]) -> None:
+def sanity_check_inputs(tables: dict[str, Table]) -> None:
     # Sanity checks.
     error = "Sheet names have changed."
     assert set(tables) == set(EXPECTED_SHEET_NAMES), error

@@ -31,7 +31,7 @@ import tty
 
 import pandas as pd
 from owid.catalog import Dataset
-from shared import INCLUDED_DATASETS_CODES, VERSION  # type: ignore[reportMissingImports]
+from shared import INCLUDED_DATASETS_CODES, VERSION  # ty: ignore[unresolved-import]
 from structlog import get_logger
 from tqdm.auto import tqdm
 

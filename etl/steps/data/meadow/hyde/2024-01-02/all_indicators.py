@@ -50,9 +50,9 @@ def run(dest_dir: str) -> None:
     # Fix bug in ISO 826
     ## Assertion
     assert (tb_codes_countries["ISO-CODE"] == 826).sum() == 3, "There should be three countries with ISO code 826!"
-    assert "United Kingdom" in set(
-        tb_codes_countries[tb_codes_countries["ISO-CODE"] == 826]["Country"]
-    ), "United Kingdom should be in the list of countries with ISO code 826!"
+    assert "United Kingdom" in set(tb_codes_countries[tb_codes_countries["ISO-CODE"] == 826]["Country"]), (
+        "United Kingdom should be in the list of countries with ISO code 826!"
+    )
     ## Filter spurious entries
     mask = (tb_codes_countries["ISO-CODE"] == 826) & (tb_codes_countries["Country"] != "United Kingdom")
     tb_codes_countries = tb_codes_countries[~mask]

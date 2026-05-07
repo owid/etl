@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import ast
-from typing import Dict, List
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -799,9 +798,9 @@ def harmonize_units(tb: Table) -> Table:
     # Check that, for each category-commodity-subcommodity, there is only one unit (or none).
     group = tb.groupby(["category", "commodity", "sub_commodity"], observed=True, as_index=False)
     unit_count = group.agg({"unit": "nunique"})
-    assert unit_count[
-        unit_count["unit"] > 1
-    ].empty, "Multiple units found for the same category-commodity-subcommodity."
+    assert unit_count[unit_count["unit"] > 1].empty, (
+        "Multiple units found for the same category-commodity-subcommodity."
+    )
     # Given that the unit is sometimes given and sometimes not (quite arbitrarily, as mentioned in the meadow step),
     # first attempt to fill empty units from the same category-commodity-subcommodity combination.
     tb["unit"] = group["unit"].transform(lambda x: x.ffill().bfill())
@@ -939,8 +938,8 @@ def clean_notes(notes):
 
 
 def gather_notes(
-    tb: Table, notes_columns: List[str], notes_original: Dict[str, List[str]], notes_edited: Dict[str, List[str]]
-) -> Dict[str, str]:
+    tb: Table, notes_columns: list[str], notes_original: dict[str, list[str]], notes_edited: dict[str, list[str]]
+) -> dict[str, str]:
     # Create another table with the same structure, but containing notes.
     tb_flat_notes = tb.pivot(
         index=["country", "year"],

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Hughes, T. P., et al. (2018). Spatial and temporal patterns of mass bleaching of corals in the Anthropocene. Science.
+    description: |-
+      The number of moderate bleaching events (up to 30% of corals) and severe bleaching events (more than 30% corals) measured at 100 fixed global locations.
+    url: https://science.sciencemag.org/content/359/6371/80
+    date_accessed: 2021-04-06
+    published_by: |-
+      Hughes, T. P., Anderson, K. D., Connolly, S. R., Heron, S. F., Kerry, J. T., Lough, J. M., ... & Wilson, S. K. (2018). Spatial and temporal patterns of mass bleaching of corals in the Anthropocene. Science, 359(6371), 80-83.
+  name: Global bleaching events (Hughes et al. 2018)
+  description: ''
+  is_public: false
+outs:
+  - md5: 459bd4ed0947ecf57dde06c0be25cbd0
+    size: 5890
+    path: global_bleaching_events__hughes_et_al__2018.feather

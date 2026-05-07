@@ -1,0 +1,23 @@
+meta:
+  source:
+    name: Antibiotic use in livestock 2030 - Boeckel et al. (2017)
+    description: |-
+      Boeker et al. (2017) project global antibiotic use under business-as-usual antibiotic concentrations and projected meat consumption.
+
+      The authors also project a number of potential reduction scenarios:
+      - a global limit of 50 milligrams of antibiotic use per kilogram of meat production.
+      - a limit of 50 milligrams of antibiotic use per kilogram of meat production for OECD countries & China.
+      - global per capita meat consumption of 40 grams per day (the equivalent of an average burger patty)
+      - global per capita meat consumption of 165 grams per day (the projected EU average in 2030)
+
+      Projected global antibiotic use for livestock are shown for each of these potential reduction scenarios.
+    url: https://www.cddep.org/wp-content/uploads/2017/10/science.0929PolicyForum-1.pdf
+    date_accessed: 2017-11-11
+    published_by: |-
+      Van Boeckel, T. P., Glennon, E. E., Chen, D., Gilbert, M., Robinson, T. P., Grenfell, B. T.,Laxminarayan, R. (2017). Reducing antimicrobial use in food animals. Science, 357, 1350-1352.
+  name: Antibiotic use in livestock 2030 - Boeckel et al. (2017)
+  description: ''
+outs:
+  - md5: 36cd1673c1ea4171d11c8a078716b20f
+    size: 3114
+    path: antibiotic_use_in_livestock_2030__boeckel_et_al__2017.feather

@@ -10,7 +10,6 @@ Notes:
 """
 
 import json
-from typing import Dict, List, Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -55,6 +54,7 @@ def run() -> None:
     # Load UN WPP dataset.
     ds_un = paths.load_dataset("un_wpp")
     tb_un = ds_un.read("population")
+    tb_un_gr = ds_un.read("growth_rate")
     # Load HYDE dataset.
     ds_hyde = paths.load_dataset("all_indicators")
     tb_hyde = ds_hyde.read("all_indicators")
@@ -81,7 +81,8 @@ def run() -> None:
     # Format tables
     tb_hyde = format_hyde(tb=tb_hyde)
     tb_gapminder = format_gapminder(tb_gapminder)
-    tb_un = format_wpp(tb_un)
+    tb_un = format_wpp(tb_un, "population", "uint64")
+    tb_un_gr = format_wpp(tb_un_gr, "growth_rate", "float32")
     tb_gapminder_sg, tb_gapminder_sg_former = format_gapminder_sg(tb_gapminder_sg)
 
     # Edit data on Ireland
@@ -131,6 +132,7 @@ def run() -> None:
     # Add population growth rate
     tb_growth_rate = make_table_growth_rate(
         tb_population=tb,
+        tb_un_gr=tb_un_gr,
     )
 
     # Add population density
@@ -228,37 +230,37 @@ def format_gapminder(tb: Table) -> Table:
 ######################
 # UN WPP #############
 ######################
-def format_wpp(tb: Table) -> Table:
+def format_wpp(tb: Table, column_indicator: str, indicator_dtype: str) -> Table:
     """Format UN WPP table."""
     # Only keep data for general population (all sexes, all ages, etc.)
     tb = tb.loc[
         ((tb["sex"] == "all") & (tb["age"] == "all") & (tb["variant"].isin(["estimates", "medium"]))),
-        ["country", "year", "variant", "population"],
+        ["country", "year", "variant", column_indicator],
     ]
 
     # Sanity checks IN
-    assert (
-        tb.loc[tb["variant"] == "estimates", "year"].min() == YEAR_START_WPP
-    ), f"Unexpected start year for WPP estimates. Should be {YEAR_START_WPP}!"
-    assert (
-        tb.loc[tb["variant"] == "estimates", "year"].max() == YEAR_START_WPP_PROJ - 1
-    ), f"Unexpected end year for WPP estimates. Should be {YEAR_START_WPP_PROJ-1}!"
-    assert (
-        tb.loc[tb["variant"] == "medium", "year"].min() == YEAR_START_WPP_PROJ
-    ), f"Unexpected start year for WPP projections. Should be {YEAR_START_WPP_PROJ}!"
-    assert (
-        tb.loc[tb["variant"] == "medium", "year"].max() == YEAR_END_WPP
-    ), f"Unexpected end year for WPP projections. Should be {YEAR_END_WPP}!"
+    assert tb.loc[tb["variant"] == "estimates", "year"].min() == YEAR_START_WPP, (
+        f"Unexpected start year for WPP estimates. Should be {YEAR_START_WPP}!"
+    )
+    assert tb.loc[tb["variant"] == "estimates", "year"].max() == YEAR_START_WPP_PROJ - 1, (
+        f"Unexpected end year for WPP estimates. Should be {YEAR_START_WPP_PROJ - 1}!"
+    )
+    assert tb.loc[tb["variant"] == "medium", "year"].min() == YEAR_START_WPP_PROJ, (
+        f"Unexpected start year for WPP projections. Should be {YEAR_START_WPP_PROJ}!"
+    )
+    assert tb.loc[tb["variant"] == "medium", "year"].max() == YEAR_END_WPP, (
+        f"Unexpected end year for WPP projections. Should be {YEAR_END_WPP}!"
+    )
 
     # Rename columns, sort rows
     tb = (
-        tb.loc[:, ["country", "year", "population"]]
+        tb.loc[:, ["country", "year", column_indicator]]
         .assign(source="unwpp")
         .astype(
             {
                 "source": "string",
                 "country": "string",
-                "population": "uint64",
+                column_indicator: indicator_dtype,
                 "year": "uint64",
             }
         )
@@ -286,7 +288,7 @@ def format_wpp(tb: Table) -> Table:
     tb = tb.loc[~tb.country.isin(countries_exclude)]
 
     # Sanity checks OUT
-    assert tb.groupby(["country", "year"])["population"].count().max() == 1
+    assert tb.groupby(["country", "year"])[column_indicator].count().max() == 1
 
     return tb
 
@@ -294,7 +296,7 @@ def format_wpp(tb: Table) -> Table:
 ######################
 # Gapminder SG #######
 ######################
-def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
+def format_gapminder_sg(tb: Table) -> tuple[Table, Table]:
     """Format Gapminder Systema Globalis table."""
     columns_rename = {
         "country": "country",
@@ -302,7 +304,7 @@ def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
         "total_population_with_projections": "population",
     }
 
-    def _core_formatting(tb: Table, country_rename: Dict[str, str]) -> Table:
+    def _core_formatting(tb: Table, country_rename: dict[str, str]) -> Table:
         ## rename countries
         tb["country"] = tb["geo"].map(country_rename)
         ## rename columns
@@ -315,7 +317,7 @@ def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
 
     # Data on former countries
     ## only keep former country data
-    tb_former = tb.loc[tb["geo"].isin(GAPMINDER_SG_COUNTRIES_FORMER)].copy()
+    tb_former: Table = tb.loc[tb["geo"].isin(GAPMINDER_SG_COUNTRIES_FORMER)].copy()
 
     # core formatting: column and country rename, add source, metadata
     tb_former = _core_formatting(
@@ -325,7 +327,7 @@ def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
 
     ## filter years: only keep former countries until they disappear
     for _, data in GAPMINDER_SG_COUNTRIES_FORMER.items():
-        tb_former = tb_former[~((tb_former["country"] == data["name"]) & (tb_former["year"] > data["end"]))]
+        tb_former = tb_former.loc[~((tb_former["country"] == data["name"]) & (tb_former["year"] > data["end"]))]
 
     # Complement
     ## filter countries
@@ -441,7 +443,7 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
         tb_agg = geo.add_regions_to_table(
             tb=tb,
             regions=regions_,
-            aggregations={"population": "sum", "source": lambda x: "; ".join(sorted(set(x)))},  # type: ignore
+            aggregations={"population": "sum", "source": lambda x: "; ".join(sorted(set(x)))},  # ty: ignore
             ds_regions=ds_regions,
             ds_income_groups=ds_income_groups,
             num_allowed_nans_per_year=None,
@@ -500,9 +502,9 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
         (tb_agg["year"] >= YEAR_START_GAPMINDER) & (tb_agg["year"] < YEAR_START_WPP) & tb_agg["source"].isna(), "source"
     ] = SOURCES_NAMES["gapminder"]
     tb_agg.loc[(tb_agg["year"] >= YEAR_START_WPP) & tb_agg["source"].isna(), "source"] = SOURCES_NAMES["unwpp"]
-    assert (
-        tb_agg.notna().all().all()
-    ), f"Some rows still have missing values! Columns without NaN? {tb_agg.notna().all()}"
+    assert tb_agg.notna().all().all(), (
+        f"Some rows still have missing values! Columns without NaN? {tb_agg.notna().all()}"
+    )
     # re-estimate region aggregates
     tb_agg = _aggregate(
         tb=tb_agg,
@@ -515,9 +517,9 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
     # Ensure all rows have source
     assert tb["source"].notna().all(), "Some rows do not have a source!"
     vals = tb.loc[tb["country"].isin(continents) & (tb["year"] < YEAR_START_GAPMINDER), "source"].unique()
-    assert (
-        len(vals) == 1 and vals[0] == SOURCES_NAMES["hyde"]
-    ), f"Unexpected sources for continents before {YEAR_START_GAPMINDER}!"
+    assert len(vals) == 1 and vals[0] == SOURCES_NAMES["hyde"], (
+        f"Unexpected sources for continents before {YEAR_START_GAPMINDER}!"
+    )
     return tb
 
 
@@ -601,9 +603,9 @@ def add_historical_regions(tb: Table, tb_gm: Table, tb_regions: Table) -> Table:
         former_country_name = tb_regions.loc[code, "name"]
         end_year = tb_regions.loc[code, "end_year"]
         # Sanity check: former country not already in table! remember that we are creating it now
-        assert former_country_name not in set(
-            tb["country"]
-        ), f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
+        assert former_country_name not in set(tb["country"]), (
+            f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
+        )
         # Get list of country successors (equivalent of former state with nowadays' countries) and end year (dissolution of former state)
         codes_successors = json.loads(tb_regions.loc[code, "successors"])
         countries_successors = tb_regions.loc[codes_successors, "name"].tolist()
@@ -730,22 +732,58 @@ def make_table_density(
 #########################
 # Population growth rate
 #########################
-def make_table_growth_rate(tb_population: Table) -> Table:
-    """Estimate population growth rate as:
+def make_table_growth_rate(tb_population: Table, tb_un_gr: Table) -> Table:
+    """Build population growth rate table.
 
-    growth_rate = log(population[year]/population[previous_year]) / (year-previous_year)
+    For 1950-2100 (WPP period), we use the UN WPP growth rate directly rather than estimating it
+    from our population series. This avoids minor discrepancies caused by:
+      - Our population values being rounded to integers (uint64), which introduces small errors
+        in the log-ratio calculation.
+      - The UN computing growth rates from more precise mid-year population estimates, not from
+        the rounded annual figures published in their population table.
+
+    For pre-1950, we estimate growth rate from our composite population series using:
+      growth_rate = 100 * ln(P_t / P_{t-1}) / (t - t_{t-1})
     """
-    # Sorting the DataFrame by country and year to ensure the calculations are accurate
-    tb = tb_population.sort_values(by=["country", "year"]).copy()
+    # --- Pre-1950: estimate from population series ---
+    tb_estimated = _estimate_growth_rate(tb_population)
 
-    # PRE-1900: Only keep years that are multiples of 50
-    tb = tb.loc[(tb["year"] >= 1900) | (tb["year"] % 50 == 0)]
+    # --- 1950-2100: use UN WPP growth rate directly ---
+    tb_un = tb_un_gr.loc[:, ["country", "year", "growth_rate"]].copy()
+
+    # For countries/regions present in UN data, use UN values; estimate only for the rest
+    un_countries = set(tb_un["country"])
+    mask_covered_by_un = tb_estimated["country"].isin(un_countries) & (tb_estimated["year"] >= YEAR_START_WPP)
+    tb_estimated = tb_estimated.loc[~mask_covered_by_un]
+
+    # Combine: estimated (pre-1950 + non-UN countries post-1950) with UN WPP (1950-2100)
+    tb = pr.concat([tb_estimated, tb_un], ignore_index=True)
+    tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
+
+    # Remove unnecessary metadata fields to avoid errors
+    tb["growth_rate"].metadata.presentation = None
+    return tb
+
+
+def _estimate_growth_rate(tb_population: Table) -> Table:
+    """Estimate population growth rate from the population series.
+
+    Uses the continuous growth formula: growth_rate = 100 * ln(P_t / P_{t-1}) / (t - t_{t-1})
+
+    Processing:
+    1. Calculate growth rates for all consecutive year pairs from 1700 onwards
+    2. Smooth source-transition years (1800, 1950) by averaging neighbors
+    3. Apply selective display filtering to reduce noise in sparse historical data:
+       - 1700-1800: Only 100-year intervals (1700, 1800)
+       - 1800-1900: Only 100-year intervals (1800, 1900)
+       - 1900-1950: Only 5-year intervals (1900, 1905, 1910, ...)
+       - 1950+: All years (annual data from UN WPP)
+    """
+    tb = tb_population.sort_values(by=["country", "year"]).copy()
 
     # Creating the 'previous_population' and 'previous_year' columns
     tb["previous_population"] = tb.groupby("country")["population"].shift(1)
     tb["previous_year"] = tb.groupby("country")["year"].shift(1)
-    tb["next_population"] = tb.groupby("country")["population"].shift(-1)
-    tb["next_year"] = tb.groupby("country")["year"].shift(-1)
 
     # Only since 1700
     tb = tb.loc[tb["year"] >= 1700]
@@ -753,26 +791,30 @@ def make_table_growth_rate(tb_population: Table) -> Table:
     # Drop rows without previous year
     tb = tb.dropna(subset=["previous_year"])
 
-    # Only estimate popultion growth rate if distance to latest datapoint is lower than 10 years
-    # tb = tb.loc[tb["year"] - tb["previous_year"] <= 10]
-
-    # Estimate population growth rate
+    # Estimate population growth rate for all consecutive years
     tb["growth_rate"] = 100 * (
         np.log(tb["population"] / tb["previous_population"]) / (tb["year"] - tb["previous_year"])
     )
 
-    # Fix 1950 and 1800
+    # Smooth source-transition years (1800: HYDE→Gapminder, 1950: Gapminder→WPP)
+    # The raw log-ratio at these boundaries reflects the discontinuity between sources,
+    # not actual demographic change. We replace with the average of neighbors.
     tb["previous_growth_rate"] = tb.groupby("country")["growth_rate"].shift(1)
     tb["next_growth_rate"] = tb.groupby("country")["growth_rate"].shift(-1)
 
-    mask_1800 = tb["year"] == 1800
-    mask_1950 = tb["year"] == 1950
-    tb.loc[mask_1800, "growth_rate"] = (
-        tb.loc[mask_1800, "previous_growth_rate"] + tb.loc[mask_1800, "next_growth_rate"]
-    ) / 2
-    tb.loc[mask_1950, "growth_rate"] = (
-        tb.loc[mask_1950, "previous_growth_rate"] + tb.loc[mask_1950, "next_growth_rate"]
-    ) / 2
+    for transition_year in [1800, 1950]:
+        mask = tb["year"] == transition_year
+        tb.loc[mask, "growth_rate"] = (tb.loc[mask, "previous_growth_rate"] + tb.loc[mask, "next_growth_rate"]) / 2
+
+    # Apply selective display filtering to reduce noise in sparse historical data
+    # Keep only specific year intervals for pre-1950 data, all years for 1950+
+    filter_mask = (
+        ((tb["year"] >= 1700) & (tb["year"] < 1800) & (tb["year"] % 100 == 0))
+        | ((tb["year"] >= 1800) & (tb["year"] < 1900) & (tb["year"] % 100 == 0))
+        | ((tb["year"] >= 1900) & (tb["year"] < 1950) & (tb["year"] % 5 == 0))
+        | (tb["year"] >= 1950)
+    )
+    tb.loc[~filter_mask, "growth_rate"] = np.nan
 
     # Keep relevant columns
     tb = tb.loc[:, ["country", "year", "growth_rate"]]
@@ -782,7 +824,7 @@ def make_table_growth_rate(tb_population: Table) -> Table:
 ##########################
 # Historical & Projections
 ##########################
-def make_table_historical(tbs: List[Table]) -> Table:
+def make_table_historical(tbs: list[Table]) -> Table:
     """Create a table with historical data."""
     tbs_ = []
     for tb in tbs:
@@ -794,7 +836,7 @@ def make_table_historical(tbs: List[Table]) -> Table:
     return tb
 
 
-def make_table_projection(tbs: List[Table]) -> Table:
+def make_table_projection(tbs: list[Table]) -> Table:
     """Create a table with projection data."""
     tbs_ = []
     for tb in tbs:

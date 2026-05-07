@@ -49,7 +49,7 @@ def display_generated_plots(question_id: str) -> None:
 
                 elif plot_file.suffix.lower() == ".html":
                     try:
-                        with open(plot_file, "r") as f:
+                        with open(plot_file) as f:
                             html_content = f.read()
                         components.html(html_content, height=600, scrolling=True)
                         st.caption(f"Interactive plot: {plot_file.name}")
@@ -60,7 +60,7 @@ def display_generated_plots(question_id: str) -> None:
                 # Display the code in an expandable section
                 if code_file and code_file.exists():
                     try:
-                        with open(code_file, "r") as f:
+                        with open(code_file) as f:
                             code_content = f.read()
 
                         with st.expander(":material/code: View Generated Code", expanded=False):

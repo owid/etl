@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Flora (1983) and ICTD (2016)
+    description: |-
+      Data from the ICTD corresponds to estimates from OECD. More details in Prichard, W. (2016). Reassessing Tax and Development Research: A New Dataset, New Findings, and Lessons for Research. World Development, 80, 48-60.
+    url: |-
+      Data from Flora (1983) available from http://gpih.ucdavis.edu/Government.htm Data from ICTD available from http://www.ictd.ac/datasets/the-ictd-government-revenue-dataset
+    date_accessed: 2016-09-21
+    published_by: |-
+      Data up to 1975 from Flora, Peter et al. 1983. State, Economy and Society in Western Europe, 1815-1975. Frankfurt: Campus Verlag. Data after 1975 from International Centre for Tax and Development
+  name: Revenue shares from tax – Flora (1983) and ICTD (2016)
+  description: Europe
+outs:
+  - md5: 47da8d8f5b75baf33aa3ace6728cbfc8
+    size: 7970
+    path: revenue_shares_from_tax__flora__1983__and_ictd__2016.feather

@@ -77,7 +77,9 @@ def run() -> None:
         ],
         params={
             "answer": lambda view: CHOICE_NAMES.get(view.dimensions["answer"]),
-            "title_public": lambda view: f"How many of the following people do you think are involved in corruption? {view.dimensions['answer']}",
+            "title_public": lambda view: (
+                f"How many of the following people do you think are involved in corruption? {view.dimensions['answer']}"
+            ),
         },
     )
     # Sort choices alphabetically

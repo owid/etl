@@ -52,7 +52,7 @@ def create_dataset_with_combined_metadata(
     dest_dir,
     datasets,
     tables,
-    default_metadata=None,  # type: ignore
+    default_metadata=None,  # ty: ignore
     underscore_table=True,
     formats=DEFAULT_FORMATS,
 ):

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: |-
+      World Bank SE4ALL database: Divisia Decomposition Analysis - Activity component Index
+    description: ''
+    url: https://data.worldbank.org/data-catalog/sustainable-energy-for-all
+    date_accessed: 2017-11-14
+    published_by: World Bank SE4ALL database, IEA
+  name: World Bank SE4ALL database - Energy efficiency
+  description: This is a dataset imported by the automated fetcher
+outs:
+  - md5: 3191adc264d367d575687bc26f38cd80
+    size: 547562
+    path: world_bank_se4all_database__energy_efficiency.feather

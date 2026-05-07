@@ -23,7 +23,8 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("fluid.csv")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
+    # low_memory=False prevents mixed-type inference across CSV chunks (iso_year was inferred as object).
+    df = pd.read_csv(snap.path, low_memory=False)
     #
     # Process data.
     #
@@ -35,6 +36,14 @@ def run(dest_dir: str) -> None:
     # Convert columns with mixed types to string
     tb["trend"] = tb["trend"].astype(str)
     tb["isoyw"] = tb["isoyw"].astype(str)
+    # Source data has a malformed row with a date in iso_year — coerce to numeric and drop it.
+    iso_year_numeric = pd.to_numeric(tb["iso_year"], errors="coerce")
+    invalid_mask = iso_year_numeric.isna() & tb["iso_year"].notna()
+    if invalid_mask.any():
+        for _, row in tb[invalid_mask].iterrows():
+            log.warning(f"Dropping malformed row with non-numeric iso_year: {row.to_dict()}")
+    tb["iso_year"] = iso_year_numeric
+    tb = tb.dropna(subset=["iso_year"])
     tb = tb.rename(columns={"country_area_territory": "country"})
 
     # Convert object columns that should be numeric to numeric

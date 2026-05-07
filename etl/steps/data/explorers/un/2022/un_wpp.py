@@ -1,7 +1,7 @@
 import re
 import sys
 from copy import deepcopy
-from typing import Any, List
+from typing import Any
 
 import pandas as pd
 import structlog
@@ -73,7 +73,7 @@ def _organize_variants(df: pd.DataFrame) -> pd.DataFrame:
             df.loc[df.year < YEAR_SPLIT].assign(variant="high").astype({"variant": "category"}),
             df.loc[df.year >= YEAR_SPLIT],
         ]
-    ).astype({"variant": "category"})  # type: ignore
+    ).astype({"variant": "category"})  # ty: ignore
     return df
 
 
@@ -81,7 +81,7 @@ def _pivot_df(df: pd.DataFrame) -> pd.DataFrame:
     # Pivot
     log.info("Pivoting table...")
 
-    def _build_column_name(mcol: List[str]) -> Any:
+    def _build_column_name(mcol: list[str]) -> Any:
         col = f"{mcol[0]}__{mcol[1]}__{mcol[2]}__{mcol[3]}"
         return catalog.utils.underscore(name=col, validate=True)
 
@@ -99,11 +99,11 @@ def _pivot_df(df: pd.DataFrame) -> pd.DataFrame:
 
 def _extract_dimension_values(
     df: pd.DataFrame, by_metric: bool, by_sex: bool, by_age: bool, by_variant: bool
-) -> List[List[Any]]:
+) -> list[list[Any]]:
     groups_all = []
     regex = r"(.*)__(.*)__(.*)__(.*)"
     for col in df.columns:
-        groups = list(re.search(regex, col).groups())  # type: ignore
+        groups = list(re.search(regex, col).groups())  # ty: ignore
         if not by_metric:
             groups[0] = no_dim_keyword
         if not by_sex:

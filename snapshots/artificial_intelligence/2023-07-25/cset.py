@@ -1,7 +1,6 @@
 """Script to create a snapshot of dataset 'Country Activity Tracker: Artificial Intelligence (Center for Security and Emerging Technology, 2023)'."""
 
 from pathlib import Path
-from typing import List
 
 import click
 import pandas as pd
@@ -60,7 +59,7 @@ def main(upload: bool) -> None:
     snap.dvc_add(upload=upload)
 
 
-def read_and_clean_data(file_ids: List[str], common_path: str, field_name: str) -> pd.DataFrame:
+def read_and_clean_data(file_ids: list[str], common_path: str, field_name: str) -> pd.DataFrame:
     """
     Reads data from a list of CSV files, cleans it, and merges it into a single DataFrame.
 

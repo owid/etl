@@ -273,12 +273,12 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     ## Combine tables
     tb_ongoing = pr.concat(
         [tb_ongoing, tb_ongoing_world, tb_ongoing_alltypes, tb_ongoing_world_alltypes], ignore_index=True
-    ).sort_values(  # type: ignore
+    ).sort_values(  # ty: ignore
         by=["year", "region", "hostility_level"]
     )
 
     ## Rename columns
-    tb_ongoing = tb_ongoing.rename(  # type: ignore
+    tb_ongoing = tb_ongoing.rename(  # ty: ignore
         columns={
             "micnum": "number_ongoing_conflicts",
             "fatalmin": "number_deaths_ongoing_conflicts_low",
@@ -316,12 +316,12 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_world_alltypes["hostility_level"] = "all"
 
     # Combine
-    tb_new = pr.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pr.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # ty: ignore
         by=["styear", "region", "hostility_level"]
     )
 
     # Rename columns
-    tb_new = tb_new.rename(  # type: ignore
+    tb_new = tb_new.rename(  # ty: ignore
         columns={
             "styear": "year",
             "micnum": "number_new_conflicts",

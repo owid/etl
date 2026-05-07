@@ -1,16 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2482
-    date_accessed: 2023-08-10 09:14:48.376098
+    url: https://admin.owid.io/admin/datasets/2482
+    date_accessed: 2026-03-10 09:20:40.988007+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Gini Coefficient, Equivalized Income After Tax and Transfers – Chartbook of
-    Economic Inequality (2017)
+  name: Gini Coefficient, Equivalized Income After Tax and Transfers – Chartbook of Economic Inequality (2017)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4d268e14b72dac435ba9d683a2aaf52a
-  size: 9506
-  path: 
-    dataset_2482_gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017_values.feather
+  - md5: c2e0d9f199c282b5859998d4adc03d48
+    size: 10082
+    path: dataset_2482_gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Atkinson, Casarico and Voitchovsky (2018)
+    description: |-
+      Share of women in pre-tax top income groups. Based on tax data. Income includes earned, self-employment and investment income. Capital gains is in general excluded, but to varying degrees between countries.
+    url: https://doi.org/10.1007/s10888-018-9384-z
+    date_accessed: 2019-04-04
+    published_by: 'Atkinson, A.B., Casarico, A. & Voitchovsky, S. J Econ Inequal (2018) 16: 225. https://doi.org/10.1007/s10888-018-9384-z'
+  name: Share of women in top income groups – Atkinson, Casarico & Voitchovsky (2018)
+  description: ''
+  is_public: false
+outs:
+  - md5: fb2d88c10e6da54196c575d7df3dc045
+    size: 9354
+    path: share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018.feather

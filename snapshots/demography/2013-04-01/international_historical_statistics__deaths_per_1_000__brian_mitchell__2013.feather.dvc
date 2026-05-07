@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: International Historical Statistics, Brian Mitchell (2013)
+    description: |-
+      Edited by Palgrave Macmillan Ltd . (April 2013). International Historical Statistics . [Online] Available at: http://www.palgrave.com/us/book/9780230005150
+      These statistics – orignally published under the editorial leadership of Brian Mitchell (since 1983) – are a collection of data sets taken from many primary sources, including both official national and international abstracts dating back to 1750. The books are published in three volumes covering more than 5000 pages.
+    url: http://www.palgrave.com/us/book/9780230005150
+    date_accessed: 2026-03-05
+    published_by: Brian Mitchell – International Historical Statistics (Births per 1,000)
+  name: International Historical Statistics (Deaths per 1,000) - Brian Mitchell (2013)
+  description: ''
+outs:
+  - md5: e42e1b6ca5fae1c53492c777f7a36a2a
+    size: 60914
+    path: international_historical_statistics__deaths_per_1_000__brian_mitchell__2013.feather

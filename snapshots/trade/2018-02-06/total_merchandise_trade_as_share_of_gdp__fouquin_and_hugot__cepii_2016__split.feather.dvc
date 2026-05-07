@@ -1,0 +1,20 @@
+meta:
+  source:
+    name: Fouquin and Hugot (CEPII 2016)
+    description: |-
+      Fouquin and Hugot (CEPII 2016) have compiled aggregate country-year export trade data. A number of sources are consulted in compiling these figures; the top three sources are the IMF (2002 and 2015) (19,026 observations); Mitchell (2007a,b,c) (11,705 observations); and the World Bank (2015) (3,030 observations). For further information see Table 6, page 18 of Fouquin and Hugot (CEPII 2016)'s working paper at: http://www.cepii.fr/PDF_PUB/wp/2016/wp2016-14.pdf
+
+      To calculate export trade as a share of GDP, aggregate country-year export data (in nominal British pounds) has been divided by Fouquin and Hugot (CEPII 2016) nominal GDP data, and multiplied by 100.
+
+      Andorra has been dropped as it had very sparse coverage; 3 observations for the years 1993,1994,1996.
+    url: http://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=32
+    date_accessed: 2018-02-06
+    published_by: |-
+      Michel Fouquin & Jules Hugot , 2016. "Two Centuries of Bilateral Trade and Gravity Data: 1827-2014," CEPII Working Paper 2016- 14 , May 2016 , CEPII
+  name: Total merchandise trade as share of GDP (Fouquin and Hugot (CEPII 2016)) (split)
+  description: ''
+  is_public: false
+outs:
+  - md5: 1f056789847124a229fb1c4035c51469
+    size: 104866
+    path: total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split.feather

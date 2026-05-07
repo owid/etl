@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import streamlit as st
 from structlog import get_logger
@@ -35,7 +35,7 @@ def render_preview_list(steps_info):
                         _show_step_details(preview_step_info)
 
 
-def _get_selected_steps_info(df, steps_df) -> Dict[str, Any]:
+def _get_selected_steps_info(df, steps_df) -> dict[str, Any]:
     """From given list of selected steps, get details for each step.
 
     df: DataFrame with selected steps. It is usually the grid_response["selected_rows"].

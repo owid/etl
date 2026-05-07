@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Blau and Kahn (2017)
+    description: See the authors' data appendix for more detail on how the data was prepared and analyzed.
+    url: http://pubs.aeaweb.org/doi/pdfplus/10.1257/jel.20160995
+    date_accessed: 2017-10-17
+    published_by: |-
+      Blau, Francine D., and Lawrence M. Kahn (2017). "The Gender Wage Gap: Extent, Trends, and Explanations." Journal of Economic Literature, 55(3): 789-865.
+  name: Incidence of managerial or professional jobs and collective-bargaining by gender - Blau and Kahn (2017)
+  description: ''
+outs:
+  - md5: 21b2a703bd58030da80833d371bb802d
+    size: 5746
+    path: incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017.feather

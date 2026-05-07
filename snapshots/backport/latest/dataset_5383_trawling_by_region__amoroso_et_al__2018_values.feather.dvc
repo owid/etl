@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5383
-    date_accessed: 2023-08-10 09:17:14.732953
+    url: https://admin.owid.io/admin/datasets/5383
+    date_accessed: 2026-03-10 09:24:04.937865+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Trawling by region (Amoroso et al. 2018)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8495331d9d8cf22b340f21baacb90f5a
-  size: 6882
-  path: dataset_5383_trawling_by_region__amoroso_et_al__2018_values.feather
+  - md5: 28cfe34190eba3715f460fd2e1806720
+    size: 6914
+    path: dataset_5383_trawling_by_region__amoroso_et_al__2018_values.feather

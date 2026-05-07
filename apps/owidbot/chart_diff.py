@@ -68,11 +68,9 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
     chart_diff = format_chart_diff(charts_df)
     status = chart_diff_status(charts_df)
 
-    # TODO: Should be using plain /chart-diff instead of query redirect (this is a workaround)
-    # Waiting for https://github.com/streamlit/streamlit/issues/8388#issuecomment-2145524922 to be resolved
     body = f"""
 <details open>
-<summary><a href="http://{container_name}/etl/wizard/?page=chart-diff"><b>chart-diff</b></a>: {status.status_icon}</summary>
+<summary><a href="http://{container_name}/etl/wizard/chart-diff"><b>chart-diff</b></a>: {status.status_icon}</summary>
 {chart_diff}
 </details>
     """.strip()

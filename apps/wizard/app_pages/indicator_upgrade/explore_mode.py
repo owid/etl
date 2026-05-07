@@ -4,7 +4,7 @@ This is currently shown in the indicator upgrader, but might be moved to chart-d
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, Optional, Tuple, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -167,7 +167,7 @@ def get_comparison_table(
     df: pd.DataFrame,
     indicator_old: str,
     indicator_new: str,
-) -> Tuple[pd.DataFrame, bool]:
+) -> tuple[pd.DataFrame, bool]:
     """Create comparison df.
 
     Columns:
@@ -260,7 +260,7 @@ def _add_error_columns(df: pd.DataFrame, indicator_old: str, indicator_new: str)
 
 def get_similarity_score(
     df: pd.DataFrame, column_old: str | None = None, column_new: str | None = None
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Get similarity score between old and new indicators.
 
     - numeric only positive: mean log error, and mean relative error.
@@ -280,10 +280,12 @@ def get_similarity_score(
             score["rel_error"] = round(df.loc[:, COLUMN_ABS_RELATIVE_ERROR].dropna().mean(), N_ROUND_DEC)
     if (COLUMN_LOG_ERROR not in df.columns) and (COLUMN_RELATIVE_ERROR not in df.columns):
         # Categorical values
-        assert (column_old is not None) and (
-            column_new is not None
-        ), "Need to provide column names for categorical values."
-        score["rel_diff_error"] = (100 * ((df.loc[:, column_old] != df.loc[:, column_new]).astype(int).mean())).round(2)
+        assert (column_old is not None) and (column_new is not None), (
+            "Need to provide column names for categorical values."
+        )
+        score["rel_diff_error"] = (
+            100 * ((df.loc[:, column_old] != df.loc[:, column_new]).astype(int).mean())  # ty: ignore[unresolved-attribute]
+        ).round(2)  # ty: ignore[unresolved-attribute]
         # num_diff = (df.loc[:, column_old] != df.loc[:, column_new]).sum()
         # score["num_diff"] = num_diff
         # score["num_totla"] = len(df)
@@ -293,7 +295,7 @@ def get_similarity_score(
 
 @dataclass
 class SummaryDiff:
-    num_nan_score: Optional[int] = None
+    num_nan_score: int | None = None
     num_rows_change_relative: float = field(default=0.0)
     num_rows_start: int = field(default=0)
     num_rows_changed: int = field(default=0)
@@ -434,7 +436,7 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
 
     # Sort by error
     if COLUMN_ABS_RELATIVE_ERROR in df_show.columns:
-        df_show = df_show.sort_values(COLUMN_ABS_RELATIVE_ERROR, ascending=False)  # type: ignore
+        df_show = df_show.sort_values(COLUMN_ABS_RELATIVE_ERROR, ascending=False)  # ty: ignore
 
     # Change column names
     df_show = cast(pd.DataFrame, df_show)

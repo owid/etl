@@ -7,6 +7,27 @@ definitions:
     presentation:
       topic_tags:
         - Animal Welfare
+    description_key:
+    - "Survey participants were asked about the acceptability of 9 farming practices in the UK. The responses were categorized into three levels: 'Acceptable', 'Not acceptable', and 'Don't know/No opinion'."
+    - "List of farming practices considered, as described in the survey:
+
+      * Cutting or grinding the teeth of new-born piglets.
+
+      * Keeping chickens in cages with 750 sqcm space (about the size of an A4 piece of paper).
+
+      * Killing new-born calves who cannot produce milk.
+
+      * Cutting the beaks of new-born chickens.
+
+      * Cutting the tails off new-born piglets.
+
+      * Killing new-born chicks by use of CO2 gassing or meat-grinders.
+
+      * Removing calves' horn buds using hot iron.
+
+      * Keeping pigs in cages which prevent them from turning around for several weeks.
+
+      * Castrating new-born calves by cutting or crushing the testicles."
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/

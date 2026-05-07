@@ -1,0 +1,18 @@
+dataset:
+  title: Coefficient of Variation (CV) in caloric intake
+tables:
+  coefficient_of_variation__cv__in_caloric_intake:
+    variables:
+      coefficient_of_variation__cv__of_caloric_intake:
+        title: Coefficient of Variation (CV) of caloric intake
+        unit: ''
+        description: Higher CV values represent larger levels of dietary inequality.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

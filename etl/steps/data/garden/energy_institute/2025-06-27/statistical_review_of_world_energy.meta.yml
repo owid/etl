@@ -8,6 +8,8 @@ definitions:
     * Primary energy consumption is expressed in input-equivalents (using the [substitution method](#dod:substitutionmethod)). For "other renewables", we divide gross electricity generation by a factor of 0.32, which reflects an assumed efficiency of 32% for typical biomass power plants — the dominant source of electricity in this category globally. This approach follows the methodology used by the Statistical Review of World Energy up to the 2024 release. In 2025, the Statistical Review switched to the Physical Energy Content method to calculate Total Energy Supply. For now, we continue to use the substitution method to maintain consistency across our articles and charts.
   description_processing_nuclear_solar_wind_hydro: &description-processing-nuclear-solar-wind-hydro |-
     * Primary energy consumption is expressed in input-equivalents (using the [substitution method](#dod:substitutionmethod)). For nuclear, hydro, solar, and wind, we divide gross electricity generation by a time-dependent thermal efficiency factor (around 41% in recent years). This represents the average efficiency of fossil fuel power plants globally and reflects the amount of fuel that would have been required to produce the same electricity in such plants. This approach follows the methodology used by the Statistical Review of World Energy up to the 2024 release. In 2025, the Statistical Review switched to the Physical Energy Content method to calculate Total Energy Supply. For now, we continue to use the substitution method to maintain consistency across our articles and charts.
+  description_processing_oil_production_twh: &description-processing-oil-production-twh |-
+    * Oil production is approximately converted from million tonnes to energy using a standard average oil-equivalent conversion factor of 41.868 petajoules per million tonnes. We then convert 1 petajoule to 0.278 terawatt-hours.
 
 dataset:
   update_period_days: 365
@@ -451,6 +453,7 @@ tables:
         short_unit: 'TWh'
         description_key:
           - Includes crude oil, shale oil, oil sands, condensates (lease condensate or gas condensates that require further refining) and NGLs (natural gas liquids - ethane, LPG and naphtha separated from the production of natural gas). Excludes liquid fuels from other sources such as biofuels and synthetic derivatives of coal and natural gas. This also excludes liquid fuel adjustment factors such as refinery processing gain. Excludes oil shales/kerogen extracted in solid form.
+        description_processing: *description-processing-oil-production-twh
         display:
           name: Oil production
         presentation:

@@ -45,8 +45,8 @@ def _variable_meta():
         "name": "Population density",
         "unit": "people per km²",
         "description": "Population density by country...",
-        "createdAt": pd.Timestamp("2022-09-20 12:16:46"),  # type: ignore
-        "updatedAt": pd.Timestamp("2023-02-10 11:46:31"),  # type: ignore
+        "createdAt": pd.Timestamp("2022-09-20 12:16:46"),  # ty: ignore
+        "updatedAt": pd.Timestamp("2023-02-10 11:46:31"),  # ty: ignore
         "code": None,
         "coverage": "",
         "timespan": "-10000-2100",
@@ -202,10 +202,10 @@ def test_variable_data_df_from_s3():
             "entityCode": ["GBR"],
         }
     )
-    s3_data = pd.DataFrame({"entities": [1, 1], "values": ["a", 2], "years": [2000, 2001]})
+    fetched_data = pd.DataFrame({"entityId": [1, 1], "value": ["a", 2], "year": [2000, 2001], "variableId": [123, 123]})
 
     with mock.patch("etl.grapher.io._fetch_entities", return_value=entities):
-        with mock.patch("pandas.read_json", return_value=s3_data):
+        with mock.patch("etl.grapher.io._fetch_data_df_from_s3", return_value=fetched_data):
             df = variable_data_df_from_s3(engine, [123])
 
     assert df.to_dict(orient="records") == [
@@ -231,4 +231,4 @@ def test_convert_strings_to_numeric():
     assert [type(x) for x in r] == [int, int, float, str, int, str]
 
     with pytest.raises(AssertionError):
-        r = _convert_strings_to_numeric([None, "UK"])  # type: ignore
+        r = _convert_strings_to_numeric([None, "UK"])  # ty: ignore

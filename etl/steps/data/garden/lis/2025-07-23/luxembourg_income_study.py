@@ -6,8 +6,6 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 
 """
 
-from typing import List
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
@@ -143,7 +141,7 @@ def run() -> None:
 
 
 # It is applied to the three LIS datasets
-def make_table_wide(tb: Table, cols_to_wide: List[str]) -> Table:
+def make_table_wide(tb: Table, cols_to_wide: list[str]) -> Table:
     """
     Make table wide and modify the equivalization variable to make it distinguishable
     """
@@ -189,7 +187,7 @@ def load_keyvars(age: str, ds_meadow: Dataset) -> Table:
 
 
 # Create additional (relative) poverty variables
-def create_relative_pov_variables(tb_keyvars: Table, relative_povlines: List[int]) -> Table:
+def create_relative_pov_variables(tb_keyvars: Table, relative_povlines: list[int]) -> Table:
     """
     Create additional relative poverty variables: number in poverty, income gap ratio, average shortfall and total shortfall
     """
@@ -447,7 +445,7 @@ def check_between_0_and_1(tb: Table, variables: list, welfare: list):
                     if DEBUG:
                         paths.log.fatal(
                             f"""Values for {col} are not between 0 and 1 in {tb_error.m.short_name}:
-                            {tabulate(tb_error[['country', 'year', col]], headers="keys", tablefmt=TABLEFMT)}"""
+                            {tabulate(tb_error[["country", "year", col]], headers="keys", tablefmt=TABLEFMT)}"""
                         )
 
     return tb
@@ -478,7 +476,7 @@ def check_shares_sum_100(tb: Table, welfare: list, margin: float):
                 if DEBUG:
                     paths.log.fatal(
                         f"""{len(tb_error)} share observations ({w}_{e}) are not adding up to 100% in {tb_error.m.short_name}:
-                        {tabulate(tb_error[['country', 'year', 'sum_check']].sort_values(by='sum_check', ascending=False).reset_index(drop=True), headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
+                        {tabulate(tb_error[["country", "year", "sum_check"]].sort_values(by="sum_check", ascending=False).reset_index(drop=True), headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                     )
 
     return tb
@@ -504,7 +502,7 @@ def check_negative_values(tb: Table):
             if DEBUG:
                 paths.log.warning(
                     f"""{len(tb_error)} observations for {v} are negative in {tb_error.m.short_name}:
-                    {tabulate(tb_error[['country', 'year', v]], headers="keys", tablefmt=TABLEFMT)}"""
+                    {tabulate(tb_error[["country", "year", v]], headers="keys", tablefmt=TABLEFMT)}"""
                 )
 
     return tb
@@ -547,7 +545,7 @@ def check_monotonicity(tb: Table, metric: list, welfare: list):
                     if DEBUG:
                         paths.log.fatal(
                             f"""{len(tb_error)} observations for {m}_{w}_{e} are not monotonically increasing in {tb_error.m.short_name}:
-                            {tabulate(tb_error[['country', 'year'] + cols], headers="keys", tablefmt=TABLEFMT, floatfmt=".2f")}"""
+                            {tabulate(tb_error[["country", "year"] + cols], headers="keys", tablefmt=TABLEFMT, floatfmt=".2f")}"""
                         )
 
     return tb
@@ -579,7 +577,7 @@ def check_avg_between_thr(tb: Table, welfare: list) -> Table:
                     tb[f"check_{i}"] = (tb["avg"] >= tb["thr_lower"]) & (tb["avg"] <= tb["thr_upper"])
 
                 elif i < 100:
-                    tb["thr_lower"] = tb[f"thr_p{i-10}_{w}_{e}"]
+                    tb["thr_lower"] = tb[f"thr_p{i - 10}_{w}_{e}"]
                     tb["thr_upper"] = tb[f"thr_p{i}_{w}_{e}"]
 
                     # Count the nulls between the vars I am checking
@@ -589,7 +587,7 @@ def check_avg_between_thr(tb: Table, welfare: list) -> Table:
                     tb[f"check_{i}"] = (tb["avg"] >= tb["thr_lower"]) & (tb["avg"] <= tb["thr_upper"])
 
                 else:
-                    tb["thr_lower"] = tb[f"thr_p{i-10}_{w}_{e}"]
+                    tb["thr_lower"] = tb[f"thr_p{i - 10}_{w}_{e}"]
                     # Count the nulls between the vars I am checking
                     tb[f"null_check_{i}"] = tb[["thr_lower", "avg"]].isnull().sum(1)
 
@@ -610,7 +608,7 @@ def check_avg_between_thr(tb: Table, welfare: list) -> Table:
                 if DEBUG:
                     paths.log.fatal(
                         f"""{len(tb_error)} observations for avg {w}_{e} are not between the corresponding thresholds in {tb_error.m.short_name}:
-                        {tabulate(tb_error[['country', 'year'] + check_cols], headers="keys", tablefmt=TABLEFMT)}"""
+                        {tabulate(tb_error[["country", "year"] + check_cols], headers="keys", tablefmt=TABLEFMT)}"""
                     )
 
     return tb

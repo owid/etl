@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4879
-    date_accessed: 2023-08-10 08:09:30.519208
+    url: https://admin.owid.io/admin/datasets/4879
+    date_accessed: 2026-03-05 10:59:58.965800+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Food miles by transport method (Poore & Nemecek, 2018)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f994d689fc2876eec5a28b8bb4b828b9
-  size: 6442
-  path: 
-    dataset_4879_food_miles_by_transport_method__poore__and__nemecek__2018_values.feather
+  - md5: 548545d0462d132f011b81681b1fae29
+    size: 6482
+    path: dataset_4879_food_miles_by_transport_method__poore__and__nemecek__2018_values.feather

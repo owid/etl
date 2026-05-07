@@ -56,7 +56,7 @@ def run(dest_dir: str) -> None:
         dest_dir,
         tables=[tb],
         check_variables_metadata=True,
-    )  # type: ignore
+    )  # ty: ignore
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

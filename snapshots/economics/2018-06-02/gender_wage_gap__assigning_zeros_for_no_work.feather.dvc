@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Center for Global Development (2018)
+    url: https://www.cgdev.org/blog/chart-week-gender-pay-gaps-around-world-are-bigger-you-think-and-have-almost-nothing-do-girls
+    date_accessed: 2018-06-02
+    published_by: |-
+      Justin Sandefur, Chart of the Week: Gender Pay Gaps around the World Are Bigger Than You Think, and Have Almost Nothing to Do with Girls Schooling, Center for Global Development (2018)
+  name: Gender wage gap (assigning zeros for no work)
+  description: ''
+outs:
+  - md5: 52d12c42de102d9059f90d8267673152
+    size: 3186
+    path: gender_wage_gap__assigning_zeros_for_no_work.feather

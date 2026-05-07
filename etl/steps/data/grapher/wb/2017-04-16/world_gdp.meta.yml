@@ -54,4 +54,4 @@ tables:
             selectedEntityNames:
               - World
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices.
-            hideLegend: true
+            hideSeriesLabels: true

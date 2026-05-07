@@ -1,0 +1,17 @@
+dataset:
+  title: Estimated Malaria Deaths
+tables:
+  estimated_malaria_deaths:
+    variables:
+      malaria_deaths:
+        title: malaria_deaths
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

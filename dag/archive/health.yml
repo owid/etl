@@ -719,3 +719,11 @@ steps:
     - data-private://meadow/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy
   data-private://grapher/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy:
     - data-private://garden/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy
+
+# Cancer diagnosis routes and survival NHS
+  data://meadow/cancer/2024-09-13/diagnosis_routes_by_stage:
+    - snapshot://cancer/2024-09-13/diagnosis_routes_by_stage.csv
+  data://garden/cancer/2024-09-13/diagnosis_routes_by_stage:
+    - data://meadow/cancer/2024-09-13/diagnosis_routes_by_stage
+  data://grapher/cancer/2024-09-13/diagnosis_routes_by_stage:
+    - data://garden/cancer/2024-09-13/diagnosis_routes_by_stage

@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2473
-    date_accessed: 2023-08-10 08:48:16.880145
+    url: https://admin.owid.io/admin/datasets/2473
+    date_accessed: 2026-03-05 09:37:41.655201+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Smoking prevalence and cigarette consumption (IHME, GHDx (2012))
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fe74993d5f521c446638fe58e45dd5f4
-  size: 518434
-  path: 
-    dataset_2473_smoking_prevalence_and_cigarette_consumption__ihme__ghdx__2012_values.feather
+  - md5: fc64b46cad85b6fd1f77a1a01207ad67
+    size: 564314
+    path: dataset_2473_smoking_prevalence_and_cigarette_consumption__ihme__ghdx__2012_values.feather

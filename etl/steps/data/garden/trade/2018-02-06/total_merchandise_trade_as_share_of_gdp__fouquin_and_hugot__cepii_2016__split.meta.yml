@@ -1,0 +1,17 @@
+dataset:
+  title: Total merchandise trade as share of GDP (Fouquin and Hugot (CEPII 2016)) (split)
+tables:
+  total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split:
+    variables:
+      total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__national_data:
+        title: Total merchandise trade as share of GDP (Fouquin and Hugot (CEPII 2016, National Data))
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

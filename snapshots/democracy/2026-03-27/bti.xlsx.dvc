@@ -1,0 +1,24 @@
+meta:
+  origin:
+    producer: Bertelsmann Transformation Index
+    title: Bertelsmann Transformation Index, Scores
+    description: |-
+      Throughout the world, democracy and a market economy have become powerful frameworks in which social sustainability can prosper. Successful processes of reform can be observed in every region of the globe. There are, however, no guarantees of success; many countries undergoing transformation face stagnation and power struggles or violence and even state failure. Good governance is pivotal to reform policies that work. What are the key decisions? What are the lessons to be learned from past experiences? What strategies are likely to succeed? Under which conditions? The BTI 2026 puts development and transformation policies to the test.
+
+      Advocating reforms aimed at supporting the development of a constitutional democracy and a socially responsible market economy, the BTI provides the framework for an exchange of good practices among agents of reform. The BTI publishes two rankings, the Status Index and the Governance Index, both of which are based on in-depth assessments of 137 countries. The Status Index ranks the countries according to the state of their democracy and market economy, while the Governance Index ranks them according to their respective leadership’s performance. Distributed among the dimensions of democracy, market economy and governance, a total of 17 criteria are subdivided into 49 indicators.
+
+      BTI countries are selected according to the following criteria: They have yet to achieve a fully consolidated democracy and market economy, have populations of more than one million, and are recognized as sovereign states.
+
+      The Transformation Index project is managed by the Bertelsmann Stiftung.
+    citation_full: Bertelsmann Stiftung. 2026. Bertelsmann Transformation Index 2026.
+    url_main: https://bti-project.org/
+    url_download: https://bti-project.org/fileadmin/api/content/en/downloads/data/BTI_2006-2026_Scores.xlsx
+    date_accessed: "2026-03-27"
+    date_published: "2026-03-26"
+    license:
+      name: Bertelsmann Stiftung 2026
+      url: https://bti-project.org/en/imprint
+outs:
+  - md5: 83f7b32b215fac9b8ad3b13bf041d1d4
+    size: 1249915
+    path: bti.xlsx

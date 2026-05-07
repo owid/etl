@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 
 import requests
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.ssl_ import create_urllib3_context  # type: ignore
+from requests.packages.urllib3.util.ssl_ import create_urllib3_context  # ty: ignore
 
 
 def get_base_url(url: str, include_scheme: bool = True) -> str:
@@ -56,7 +56,7 @@ def get_base_url(url: str, include_scheme: bool = True) -> str:
     return base_url
 
 
-class _DESAdapter(HTTPAdapter):  # type: ignore
+class _DESAdapter(HTTPAdapter):  # ty: ignore
     """A TransportAdapter that re-enables Triple DES support in requests.
 
     From: https://stackoverflow.com/a/46186957/5056599
@@ -65,15 +65,15 @@ class _DESAdapter(HTTPAdapter):  # type: ignore
 
     ciphers = "HIGH:!DH:!aNULL:DEFAULT@SECLEVEL=1"
 
-    def init_poolmanager(self, *args, **kwargs):  # type: ignore
+    def init_poolmanager(self, *args, **kwargs):  # ty: ignore
         context = create_urllib3_context(ciphers=self.ciphers)
         kwargs["ssl_context"] = context
-        return super(_DESAdapter, self).init_poolmanager(*args, **kwargs)
+        return super().init_poolmanager(*args, **kwargs)
 
-    def proxy_manager_for(self, *args, **kwargs):  # type: ignore
+    def proxy_manager_for(self, *args, **kwargs):  # ty: ignore
         context = create_urllib3_context(ciphers=self.ciphers)
         kwargs["ssl_context"] = context
-        return super(_DESAdapter, self).proxy_manager_for(*args, **kwargs)
+        return super().proxy_manager_for(*args, **kwargs)
 
 
 def download_file_from_url(
@@ -140,5 +140,5 @@ def download_file_from_url(
 
     # Save the requested data into a local file.
     with open(local_path, "wb") as output_file:
-        for chunk in response.iter_content(chunk_size=chunk_size):  # type: ignore
+        for chunk in response.iter_content(chunk_size=chunk_size):  # ty: ignore
             output_file.write(chunk)

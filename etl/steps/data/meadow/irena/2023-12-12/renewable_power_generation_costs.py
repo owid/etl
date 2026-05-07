@@ -103,7 +103,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     solar_pv = (
         data.parse("Fig 3.1", skiprows=22)
         .dropna(how="all", axis=1)
-        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # ty: ignore
     )
     solar_pv = solar_pv[solar_pv["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
@@ -114,14 +114,14 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     onshore_wind = (
         data.parse("Fig 2.11", skiprows=3)
         .drop(columns="Unnamed: 0", errors="raise")
-        .rename(  # type: ignore
+        .rename(  # ty: ignore
             columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
         )
     )
     onshore_wind["technology"] = "Onshore wind"
 
     # Concentrated solar power.
-    csp = data.parse("Fig 5.7", skiprows=4).dropna(how="all", axis=1)  # type: ignore
+    csp = data.parse("Fig 5.7", skiprows=4).dropna(how="all", axis=1)  # ty: ignore
     latest_year = csp.columns[-1]
     csp = (
         csp[csp[f"{latest_year} USD/kWh"] == "Weighted average"]
@@ -131,7 +131,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     csp["technology"] = "Concentrated solar power"
 
     # Offshore wind.
-    offshore_wind = data.parse("Fig 4.12", skiprows=3).rename(  # type: ignore
+    offshore_wind = data.parse("Fig 4.12", skiprows=3).rename(  # ty: ignore
         columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
     )[["year", "cost"]]
     offshore_wind["technology"] = "Offshore wind"
@@ -139,14 +139,14 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     # Geothermal.
     geothermal = data.parse("Fig 7.4", skiprows=5).rename(
         columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
-    )[["year", "cost"]]  # type: ignore
+    )[["year", "cost"]]  # ty: ignore
     geothermal["technology"] = "Geothermal"
 
     # Bioenergy.
     bioenergy = (
         data.parse("Fig 8.1", skiprows=20)
         .dropna(axis=1, how="all")
-        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # ty: ignore
     )
     bioenergy = bioenergy[bioenergy["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
@@ -157,7 +157,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     hydropower = (
         data.parse("Fig 6.1", skiprows=20)
         .dropna(how="all", axis=1)
-        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # ty: ignore
     )
     hydropower = hydropower[hydropower["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"

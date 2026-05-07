@@ -1,0 +1,57 @@
+dataset:
+  title: Shares and numbers employed by sector (World Bank and historical sources)
+tables:
+  shares_and_numbers_employed_by_sector__world_bank_and_historical_sources:
+    variables:
+      labor_force:
+        title: labor_force
+        unit: ''
+        display:
+          name: Number of people in the labor force
+          numDecimalPlaces: 0
+      number_employed_agri:
+        title: number_employed_agri
+        unit: ''
+        display:
+          name: Number of people employed in agriculture
+          numDecimalPlaces: 0
+      number_employed_industry:
+        title: number_employed_industry
+        unit: ''
+        display:
+          name: Number of people employed in industry
+          numDecimalPlaces: 0
+      number_employed_services:
+        title: number_employed_services
+        unit: ''
+        display:
+          name: Number of people employed in services
+          numDecimalPlaces: 0
+      share_employed_agri:
+        title: share_employed_agri
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of the labor force employed in agriculture
+      share_employed_industry:
+        title: share_employed_industry
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of the labor force employed in industry
+      share_employed_services:
+        title: share_employed_services
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of the labor force employed in services
+          numDecimalPlaces: 0
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

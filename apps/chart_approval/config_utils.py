@@ -1,6 +1,6 @@
 import json
 import math
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import requests
@@ -96,7 +96,7 @@ def get_variable_max_year(variable_id: int, env: OWIDEnv) -> int | None:
 
 def get_chart_config_with_hashes(
     chart_id: int, env: OWIDEnv, round_values: bool = True, use_max_year_hash: bool = False
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Get chart config by ID and replace variableId values with hashes of their API data.
 
@@ -192,7 +192,7 @@ def get_variable_data_hash(variable_id: int, env: OWIDEnv, round_values: bool = 
     return str(hash(json.dumps(data)))
 
 
-def get_chart_config(chart_id: int, engine: Engine) -> Dict[str, Any]:
+def get_chart_config(chart_id: int, engine: Engine) -> dict[str, Any]:
     """
     Get chart config by ID without any modifications using ORM.
 

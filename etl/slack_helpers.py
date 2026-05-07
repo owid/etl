@@ -4,7 +4,6 @@ import json
 import tempfile
 import time
 from datetime import datetime
-from typing import Optional
 
 import requests
 import slack_sdk.errors as e
@@ -20,7 +19,7 @@ log = get_logger()
 
 
 def send_slack_message(
-    channel: str, message: str, image_url: Optional[str] = None, image_path: Optional[str] = None, **kwargs
+    channel: str, message: str, image_url: str | None = None, image_path: str | None = None, **kwargs
 ) -> SlackResponse:
     """Send `message` to Slack channel `channel`.
 
@@ -29,7 +28,7 @@ def send_slack_message(
     # If no Slack token is configured, just print the message
     if config.SLACK_API_TOKEN is None:
         print(f"[SLACK {channel}] {message}")
-        return None  # type: ignore
+        return None  # ty: ignore
 
     # Send message + image
     if image_url or image_path:
@@ -84,8 +83,8 @@ def send_slack_message(
 
 
 def upload_image(
-    image_url: Optional[str] = None, image_path: Optional[str] = None, seconds_wait: int = SECONDS_UPLOAD_WAIT, **kwargs
-) -> Optional[SlackResponse]:
+    image_url: str | None = None, image_path: str | None = None, seconds_wait: int = SECONDS_UPLOAD_WAIT, **kwargs
+) -> SlackResponse | None:
     """Upload image to Slack.
 
     This way we obtain a Slack URL that we can add to future messageds (in blocks).
@@ -183,8 +182,8 @@ def channels_mapping() -> dict[str, str]:
 
 def get_messages(
     channel: str,
-    date_min: Optional[datetime] = None,
-    date_max: Optional[datetime] = None,
+    date_min: datetime | None = None,
+    date_max: datetime | None = None,
     limit: int = 1000,
 ) -> list[dict]:
     """Get messages from a Slack channel within a date range.

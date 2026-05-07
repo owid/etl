@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Bank of England, A Millennium of Macroeconomic Data (2016)
+    description: |-
+      The data series joins together numerous sources and is considered tentative by its authors, especially before 1770. For a detailed list of underlying sources, assumptions, and adjustments, see the worksheet titled “A54. Hours worked 1260-2016,” available from the Bank of England's “A Millennium of Macroeconomic Data.”
+    url: https://www.bankofengland.co.uk/statistics/research-datasets
+    date_accessed: 2020-10-13
+    published_by: Bank of England
+  name: Working Hours – BoE (2016)
+  description: ''
+  is_public: false
+outs:
+  - md5: 8040e167b07403ecacc8fb458e17997a
+    size: 20562
+    path: working_hours__boe__2016.feather

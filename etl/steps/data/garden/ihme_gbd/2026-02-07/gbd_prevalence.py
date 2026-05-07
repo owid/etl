@@ -36,6 +36,7 @@ def run() -> None:
     tb = tb.drop(columns=["population_group_name"])
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
+    ds_un_wpp = paths.load_dataset("un_wpp")
 
     # If subset is defined, filter the data to given causes.
     if SUBSET:
@@ -49,6 +50,7 @@ def run() -> None:
     tb = add_regional_aggregates(
         tb,
         ds_regions,
+        ds_un_wpp,
         index_cols=["country", "year", "metric", "measure", "cause", "age"],
         regions=REGIONS,
         age_group_mapping=AGE_GROUPS_RANGES,

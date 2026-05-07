@@ -4,7 +4,7 @@
 
 import json
 from pathlib import Path
-from typing import Dict, cast
+from typing import cast
 
 from owid.catalog import Dataset
 
@@ -42,9 +42,9 @@ def harmonize_countries(source_ds_path: str, dest_dir: str) -> None:
     ds.save()
 
 
-def load_mapping() -> Dict[str, str]:
+def load_mapping() -> dict[str, str]:
     country_mapping_file = MAPPING_FILE
     with open(country_mapping_file) as istream:
         mapping = json.load(istream)
 
-    return cast(Dict[str, str], mapping)
+    return cast(dict[str, str], mapping)

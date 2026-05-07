@@ -1,0 +1,21 @@
+dataset:
+  title: Women's Economic Opportunity 2012 - Economist Intelligence Unit (2012)
+tables:
+  womens_economic_opportunity_2012__economist_intelligence_unit__2012:
+    variables:
+      weo_index_overall_score__economist_intelligence_unit__2012:
+        title: WEO Index overall score (Economist Intelligence Unit (2012))
+        unit: ''
+        description: |-
+          The Women's Economic Opportunity (WEO) Index measures five categories to determine whether the environment for both women employees and women entrepreneurs is favourable. Five category scores are calculated from the unweighted mean of underlying indicators and scaled 0-100, where 100=most favourable. These categories are: Labor policy and practice (comprising two sub-categories: Labor policy and labor practice); Access to Finance; Education and training; Women's legal and social status; and the General business environment. Each category or sub-category features either four or five underlying indicators.
+
+          The overall score (from 0-100) is calculated from a simple average of the unweighted category and indicator variables. That is, every indicator contributes equally to their parent category and every category contributes equally to the overall score.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

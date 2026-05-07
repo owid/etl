@@ -1,4 +1,4 @@
-from typing import Any, Dict, Set, Union, overload
+from typing import Any, overload
 
 from etl.collection.explorer import Explorer
 from etl.collection.model.core import Collection
@@ -6,12 +6,14 @@ from etl.collection.utils import get_tables_by_name_mapping
 
 
 def process_views(
-    collection: Union[Collection, Explorer],
-    dependencies: Set[str],
+    collection: Collection | Explorer,
+    dependencies: set[str],
     combine_metadata_when_mult: bool = False,
 ):
     """Process views in Collection configuration."""
-    # Get table information (table URI) by (i) table name and (ii) dataset_name/table_name
+    # Resolve short-form catalog paths to full paths. Collection.save() does this again
+    # before validation; doing it here too means anything that reads view paths between
+    # create_collection and save sees full paths.
     tables_by_name = get_tables_by_name_mapping(dependencies)
 
     for view in collection.views:
@@ -21,6 +23,10 @@ def process_views(
         # Combine metadata/config with definitions.common_views
         if (collection.definitions is not None) and (collection.definitions.common_views is not None):
             view.combine_with_common(collection.definitions.common_views)
+        else:
+            # Validate even when there are no common_views to merge — the view's own config
+            # might have incompatible settings
+            view.validate_color_scale_config()
 
         # Combine metadata in views which contain multiple indicators
         if combine_metadata_when_mult and view.metadata_is_needed:  # Check if view "contains multiple indicators"
@@ -34,8 +40,8 @@ def process_views(
 
 @overload
 def create_collection_from_config(
-    config: Dict[str, Any],
-    dependencies: Set[str],
+    config: dict[str, Any],
+    dependencies: set[str],
     catalog_path: str,
     *,  # Force keyword-only arguments after this
     dependencies_combined: set[str] | None = None,
@@ -46,8 +52,8 @@ def create_collection_from_config(
 
 @overload
 def create_collection_from_config(
-    config: Dict[str, Any],
-    dependencies: Set[str],
+    config: dict[str, Any],
+    dependencies: set[str],
     catalog_path: str,
     *,  # Force keyword-only arguments after this
     dependencies_combined: set[str] | None = None,
@@ -57,14 +63,14 @@ def create_collection_from_config(
 
 
 def create_collection_from_config(
-    config: Dict[str, Any],
-    dependencies: Set[str],
+    config: dict[str, Any],
+    dependencies: set[str],
     catalog_path: str,
     *,  # Force keyword-only arguments after this
     dependencies_combined: set[str] | None = None,
     validate_schema: bool = True,
     explorer: bool = False,
-) -> Union[Explorer, Collection]:
+) -> Explorer | Collection:
     """Create a Collection or Explorer instance from a configuration dictionary.
 
     config: Configuration of the collection.

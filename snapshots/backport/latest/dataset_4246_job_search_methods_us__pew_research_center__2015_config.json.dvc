@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4246
-    date_accessed: 2023-08-10 09:42:24.920484
+    url: https://admin.owid.io/admin/datasets/4246
+    date_accessed: 2026-03-06 07:47:54.907964+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4246_job_search_methods_us__pew_research_center__2015
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 450ec747171317f6247580282cb594f0
-  size: 8256
-  path: dataset_4246_job_search_methods_us__pew_research_center__2015_config.json
+  - md5: 02fc46fad5e0daf9bcf499acdd950a6b
+    size: 8944
+    path: dataset_4246_job_search_methods_us__pew_research_center__2015_config.json

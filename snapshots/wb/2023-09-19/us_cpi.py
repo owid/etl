@@ -19,10 +19,10 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/us_cpi.csv")
-    url = snap.metadata.origin.url_download  # type: ignore
+    url = snap.metadata.origin.url_download  # ty: ignore
     df = import_US_cpi_API(url)
     # Save the resulting dataframe to a single csv file
-    df_to_file(df, file_path=snap.path)  # type: ignore[reportArgumentType]
+    df_to_file(df, file_path=snap.path)  # ty: ignore[invalid-argument-type]
     # Add the snapshot to DVC
     snap.dvc_add(upload=upload)
 

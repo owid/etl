@@ -1,0 +1,37 @@
+dataset:
+  title: Lead concentrations in paint (IPEN, 2021)
+tables:
+  lead_concentrations_in_paint__ipen__2021:
+    variables:
+      share_paints_exceeding_10000ppm_lead:
+        title: share_paints_exceeding_10000ppm_lead
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of paints with lead levels exceeding 10,000 parts per million
+        description: |-
+          The percentage of sampled lead paints with lead concentrations greater than 10,000 parts per million (ppm) by weight of dry paint.
+      share_paints_exceeding_600ppm_lead:
+        title: share_paints_exceeding_600ppm_lead
+        unit: ''
+        display:
+          name: Share of paints with lead levels exceeding 600 parts per million
+        description: |-
+          The percentage of sampled lead paints with lead concentrations greater than 600 parts per million (ppm) by weight of dry paint.
+      share_paints_exceeding_90ppm_lead:
+        title: share_paints_exceeding_90ppm_lead
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of paints with lead levels exceeding 90 parts per million
+        description: |-
+          The percentage of sampled lead paints with lead concentrations greater than 90 parts per million (ppm) by weight of dry paint.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

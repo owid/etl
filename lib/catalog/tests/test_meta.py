@@ -20,7 +20,7 @@ def test_dict_mixin():
         name: str | None = None
         age: int | None = None
 
-        def to_dict(self) -> dict[str, Any]: ...  # type: ignore
+        def to_dict(self) -> dict[str, Any]: ...  # ty: ignore
 
     assert Dog(name="fred").to_dict() == {"name": "fred"}
     assert Dog(age=10).to_dict() == {"age": 10}
@@ -42,7 +42,7 @@ def test_dict_mixin_nested():
         age: int | None = None
         cat: Cat | None = None
 
-        def to_dict(self) -> dict[str, Any]: ...  # type: ignore
+        def to_dict(self) -> dict[str, Any]: ...  # ty: ignore
 
     assert Dog(name="fred", cat=Cat(name="cred")).to_dict() == {"name": "fred", "cat": {"name": "cred"}}
 
@@ -63,7 +63,7 @@ def test_dataset_version():
 
 
 def test_to_json():
-    meta.Source(name="s1", publication_date="2022-01-01").to_json()  # type: ignore
+    meta.Source(name="s1", publication_date="2022-01-01").to_json()  # ty: ignore
 
 
 def test_update_from_yaml(tmp_path):
@@ -100,11 +100,11 @@ def test_load_license_from_dict():
 
 
 def test_Origin_date_published():
-    assert meta.Origin(producer="p", title="a", date_published="2020-01-01").date_published == "2020-01-01"  # type: ignore
-    assert meta.Origin(producer="p", title="a", date_published="2020").date_published == "2020"  # type: ignore
-    assert meta.Origin(producer="p", title="a", date_published="latest").date_published == "latest"  # type: ignore
+    assert meta.Origin(producer="p", title="a", date_published="2020-01-01").date_published == "2020-01-01"  # ty: ignore
+    assert meta.Origin(producer="p", title="a", date_published="2020").date_published == "2020"  # ty: ignore
+    assert meta.Origin(producer="p", title="a", date_published="latest").date_published == "latest"  # ty: ignore
     with pytest.raises(ValueError):
-        assert meta.Origin(producer="p", title="a", date_published="nope")  # type: ignore
+        assert meta.Origin(producer="p", title="a", date_published="nope")  # ty: ignore
 
 
 def test_hash():
@@ -142,7 +142,7 @@ def test_render():
     <% if dim_a == "x" %>Title X<% elif dim_a == "y" %>Title Y<% else %>Default Title<% endif %>
     """.strip()
 
-    var_meta = meta.VariableMeta(title=jinja_title)  # type: ignore
+    var_meta = meta.VariableMeta(title=jinja_title)  # ty: ignore
     rendered_meta = var_meta.render(dim_dict={"dim_a": "x"})
     assert isinstance(rendered_meta, meta.VariableMeta)
     assert rendered_meta.title == "Title X"
@@ -155,7 +155,7 @@ def test_render_description_key():
         "Desc z",
     ]
 
-    var_meta = meta.VariableMeta(description_key=jinja_description_key)  # type: ignore
+    var_meta = meta.VariableMeta(description_key=jinja_description_key)  # ty: ignore
     rendered_meta = var_meta.render(dim_dict={"dim_a": "x"})
     assert isinstance(rendered_meta, meta.VariableMeta)
     assert rendered_meta.description_key == ["Desc x", "Desc z"]
@@ -166,7 +166,7 @@ def test_render_with_error():
     <% if dim_a == "x" %>Title X<% elif dim_a == "y" %>Title Y<% else %>Default Title<% endif %>
     """.strip()
 
-    var_meta = meta.VariableMeta(title=jinja_title)  # type: ignore
+    var_meta = meta.VariableMeta(title=jinja_title)  # ty: ignore
     with pytest.raises(Exception):
         var_meta.render(dim_dict={"dim_b": "x"})
 

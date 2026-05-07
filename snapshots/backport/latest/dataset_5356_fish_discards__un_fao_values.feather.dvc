@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5356
-    date_accessed: 2023-08-10 07:49:33.339916
+    url: https://admin.owid.io/admin/datasets/5356
+    date_accessed: 2026-03-06 07:44:56.813999+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Fish discards (UN FAO)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a528ab451005ac792925ec855a4dc3b2
-  size: 7218
-  path: dataset_5356_fish_discards__un_fao_values.feather
+  - md5: 6601234d440e19c9c3a7eeef15255f10
+    size: 7250
+    path: dataset_5356_fish_discards__un_fao_values.feather

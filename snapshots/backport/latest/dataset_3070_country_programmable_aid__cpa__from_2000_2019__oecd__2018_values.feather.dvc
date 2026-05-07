@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3070
-    date_accessed: 2023-08-10 07:43:47.091811
+    url: https://admin.owid.io/admin/datasets/3070
+    date_accessed: 2026-03-06 07:51:15.975709+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Country programmable aid (CPA) from 2000-2019 (OECD, 2018)
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 88d7738dd32a455364f9963cf347a5d2
-  size: 34338
-  path: 
-    dataset_3070_country_programmable_aid__cpa__from_2000_2019__oecd__2018_values.feather
+  - md5: 3ade704e7cbdbc413327b433ea7ff776
+    size: 33234
+    path: dataset_3070_country_programmable_aid__cpa__from_2000_2019__oecd__2018_values.feather

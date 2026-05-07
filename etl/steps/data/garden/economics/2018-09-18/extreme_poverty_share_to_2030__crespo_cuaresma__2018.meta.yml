@@ -1,0 +1,20 @@
+dataset:
+  title: Extreme Poverty Share to 2030 - Crespo-Cuaresma (2018)
+tables:
+  extreme_poverty_share_to_2030__crespo_cuaresma__2018:
+    variables:
+      extreme_poverty_to_2030__on_or_off_track:
+        title: Extreme Poverty to 2030 (On or Off-track)
+        unit: ''
+      share_of_the_population_in_extreme_poverty:
+        title: Share of the population in extreme poverty
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

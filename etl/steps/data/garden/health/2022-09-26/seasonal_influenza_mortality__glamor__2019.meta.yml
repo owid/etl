@@ -1,0 +1,41 @@
+dataset:
+  title: Seasonal influenza mortality – GLaMOR (2019)
+tables:
+  seasonal_influenza_mortality__glamor__2019:
+    variables:
+      rate_all_age:
+        title: rate all age
+        unit: ''
+      rate_highest_all_age:
+        title: rate highest all age
+        unit: ''
+      rate_highest_over65:
+        title: rate highest over65
+        unit: ''
+      rate_highest_under65:
+        title: rate highest under65
+        unit: ''
+      rate_lowest_all_age:
+        title: rate lowest all age
+        unit: ''
+      rate_lowest_over65:
+        title: rate lowest over65
+        unit: ''
+      rate_lowest_under65:
+        title: rate lowest under65
+        unit: ''
+      rate_over65:
+        title: rate over65
+        unit: ''
+      rate_under65:
+        title: rate under65
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

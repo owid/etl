@@ -23,7 +23,7 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/ai_private_investment.csv")
     all_dfs = get_data()
-    df_to_file(all_dfs, file_path=snap.path)  # type: ignore[reportArgumentType]
+    df_to_file(all_dfs, file_path=snap.path)  # ty: ignore[invalid-argument-type]
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
 
@@ -59,7 +59,7 @@ def get_data():
 
         return all_dfs
     except Exception as e:
-        raise IOError("Error in fetching or concatenating the data: " + str(e))
+        raise OSError("Error in fetching or concatenating the data: " + str(e))
 
 
 if __name__ == "__main__":

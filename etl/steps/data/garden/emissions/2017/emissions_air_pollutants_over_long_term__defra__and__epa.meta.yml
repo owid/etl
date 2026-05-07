@@ -1,0 +1,50 @@
+dataset:
+  title: Emissions air pollutants over long-term (DEFRA & EPA)
+tables:
+  emissions_air_pollutants_over_long_term__defra__and__epa:
+    variables:
+      ammonia:
+        title: Ammonia
+        unit: thousand tonnes
+      ammonia__index:
+        title: Ammonia (Index)
+        unit: (1980/1990 = 100)
+      nitrogen_oxides__index:
+        title: Nitrogen oxides (Index)
+        unit: (1970 = 100)
+      nitrogen_oxides__nox:
+        title: Nitrogen oxides (NOx)
+        unit: million tonnes
+      non_methane_volatile_organic_compounds__index:
+        title: Non-methane volatile organic compounds (Index)
+        unit: (1970 = 100)
+      non_methane_volatile_organic_compounds__vocs:
+        title: Non-methane volatile organic compounds (VOCs)
+        unit: million tonnes
+      pm10:
+        title: PM₁₀
+        unit: thousand tonnes
+      pm10__index:
+        title: PM₁₀ (Index)
+        unit: (1970 = 100)
+      pm2_5:
+        title: PM₂.₅
+        unit: thousand tonnes
+      pm2_5__index:
+        title: PM₂.₅ (Index)
+        unit: (1970/1990 = 100)
+      sulphur_dioxide__index:
+        title: Sulphur dioxide (Index)
+        unit: (1970 = 100)
+      sulphur_dioxide__so2:
+        title: Sulphur dioxide (SO₂)
+        unit: million tonnes
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

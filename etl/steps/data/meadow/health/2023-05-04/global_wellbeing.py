@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import Dict
-
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
@@ -85,7 +83,7 @@ def run(dest_dir: str) -> None:
     log.info("global_wellbeing.end")
 
 
-def sanity_checks(dfs: Dict[str, pd.DataFrame]):
+def sanity_checks(dfs: dict[str, pd.DataFrame]):
     sheets_expected = {"Country Level", "Global"}
     sheets = set(dfs.keys())
     sheets_missing = sheets_expected.difference(sheets)

@@ -1,0 +1,21 @@
+dataset:
+  title: Air travel trips per capita (Airbus, 2019)
+tables:
+  air_travel_trips_per_capita__airbus__2019:
+    variables:
+      air_travel_trips_per_capita:
+        title: Air travel trips per capita
+        unit: trips per capita
+        display:
+          name: Air travel trips per capita
+        description: |-
+          The allocation of air travel trips to each country is based on the number of passengers originating from that respective country.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

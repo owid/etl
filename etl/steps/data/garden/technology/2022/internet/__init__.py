@@ -1,6 +1,5 @@
 from copy import deepcopy
 from pathlib import Path
-from typing import List
 
 from owid.catalog import Dataset, Source, Table, Variable
 
@@ -130,7 +129,7 @@ def add_metadata(table: Table, table_internet: Table, table_population: Table) -
     return table
 
 
-def combine_all_variable_sources(ds: Dataset) -> List[Source]:
+def combine_all_variable_sources(ds: Dataset) -> list[Source]:
     sources = []
     for t in ds:
         # Collect sources from variables

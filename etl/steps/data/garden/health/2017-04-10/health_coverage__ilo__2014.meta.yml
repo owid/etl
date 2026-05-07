@@ -1,0 +1,22 @@
+dataset:
+  title: Health Coverage – ILO (2014)
+tables:
+  health_coverage__ilo__2014:
+    variables:
+      share_of_population_covered_by_health_insurance__ilo__2014:
+        title: Share of population covered by health insurance (ILO (2014))
+        unit: '%'
+        short_unit: '%'
+        display:
+          unit: Percent
+        description: |-
+          Percentage of the population covered by health insurance (members of health insurance or free access to health care services provided by the State)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

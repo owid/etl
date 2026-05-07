@@ -1,0 +1,5 @@
+out/
+src/
+tsconfig.json
+esbuild.js
+*.ts

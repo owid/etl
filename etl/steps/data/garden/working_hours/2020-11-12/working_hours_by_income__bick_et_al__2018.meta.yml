@@ -1,0 +1,48 @@
+dataset:
+  title: Working Hours by Income – Bick et al (2018)
+tables:
+  working_hours_by_income__bick_et_al__2018:
+    variables:
+      country_income_level:
+        title: country_income_level
+        unit: ''
+        display:
+          name: Country income level
+        description: Country income level (1 = Low; 2 = Medium; 3 = High) (Separate 1–10 numbering does not apply to this
+          variable)
+      hours_all:
+        title: hours_all
+        unit: hour
+        short_unit: h
+        display:
+          name: Weekly working hours for individuals in paid and self-employment, by wage decile
+      hours_paid_empl:
+        title: hours_paid_empl
+        unit: hour
+        short_unit: h
+        display:
+          name: Weekly working hours for individuals in paid employment, by wage decile
+      wage_all:
+        title: wage_all
+        unit: 2011 US$
+        short_unit: $
+        display:
+          name: Hourly wage from paid and self-employment, by wage decile
+        description: Expressed in 2011 PPP-adjusted US$
+      wage_paid_empl:
+        title: wage_paid_empl
+        unit: 2011 US$
+        short_unit: $
+        display:
+          entityAnnotationsMap: Expressed in 2011 PPP-adjusted US$
+          name: Hourly wage from paid employment, by wage decile
+        description: Computed for all workers who are employed as wage workers.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

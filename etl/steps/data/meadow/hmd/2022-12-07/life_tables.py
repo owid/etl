@@ -35,7 +35,7 @@ import tempfile
 from glob import glob
 from io import StringIO
 from pathlib import Path
-from typing import List, Tuple, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -223,17 +223,17 @@ def create_and_add_tables_to_dataset(local_file: Path, ds: Dataset) -> Dataset:
 
 def _sanity_check_relevant_folders(path: str) -> None:
     folders = os.listdir(path)
-    assert all(
-        folder in folders for folder in FOLDERS_EXPECTED
-    ), f"Some of the life table ({FOLDERS_EXPECTED}) folders are not present!"
+    assert all(folder in folders for folder in FOLDERS_EXPECTED), (
+        f"Some of the life table ({FOLDERS_EXPECTED}) folders are not present!"
+    )
 
 
-def _sanity_check_files(path: str, files_expected: List[str]) -> None:
+def _sanity_check_files(path: str, files_expected: list[str]) -> None:
     """Checks that all required files are present once zip is uncompressed."""
     files_found = sorted(os.listdir(path))
-    assert (
-        files_found == files_expected
-    ), f"Files found are not the ones expected! Check that {files_expected} are actually there!"
+    assert files_found == files_expected, (
+        f"Files found are not the ones expected! Check that {files_expected} are actually there!"
+    )
 
 
 def make_table(input_folder: str, folder: dict) -> catalog.Table:
@@ -271,14 +271,14 @@ def make_table(input_folder: str, folder: dict) -> catalog.Table:
     return table
 
 
-def _age_year(input_folder: str) -> Tuple[str, str]:
+def _age_year(input_folder: str) -> tuple[str, str]:
     ageyear = input_folder.split("_")[-1]
     age, year = ageyear.split("x")
     assert age.isdecimal() and year.isdecimal(), f"Age and year should be integers! Check {age} and {year} is not!"
     return age, year
 
 
-def make_df(files: List[str], regex_header: str) -> pd.DataFrame:
+def make_df(files: list[str], regex_header: str) -> pd.DataFrame:
     """Create dataframe.
 
     Parameters
@@ -298,7 +298,7 @@ def make_df(files: List[str], regex_header: str) -> pd.DataFrame:
     dfs = []
     # Load each file
     for f in files:
-        with open(f, "r") as f:
+        with open(f) as f:
             text = f.read()
         # Get relevant fields
         match = re.search(regex_header, text)
@@ -375,8 +375,8 @@ def _clean_correct_missing_data(df: pd.DataFrame, folder_path: str) -> pd.DataFr
     countries_missing_data = sorted(set(rows_missing.country))
     # Run checks
     assert perc_rows_missing < perc_rows_missing_expected, (
-        f"More missing data than expected was found! {round(perc_rows_missing*100, 2)} rows missing, but"
-        f" {round(perc_rows_missing_expected*100,2)} were expected."
+        f"More missing data than expected was found! {round(perc_rows_missing * 100, 2)} rows missing, but"
+        f" {round(perc_rows_missing_expected * 100, 2)} were expected."
     )
     fname = folder_path.split("/")[-1]
     assert countries_missing_data == MISSING_DATA_COUNTRIES[fname], (

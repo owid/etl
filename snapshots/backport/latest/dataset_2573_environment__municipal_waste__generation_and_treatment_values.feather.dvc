@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2573
-    date_accessed: 2023-08-10 08:33:24.139509
+    url: https://admin.owid.io/admin/datasets/2573
+    date_accessed: 2026-03-05 12:28:04.107029+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Environment - Municipal waste, Generation and Treatment
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5ddbe61e0c8f8bc0af38d8caa49c92d1
-  size: 88010
-  path: 
-    dataset_2573_environment__municipal_waste__generation_and_treatment_values.feather
+  - md5: 0e48dfa4d6763cb767b02f7b2c801e96
+    size: 99482
+    path: dataset_2573_environment__municipal_waste__generation_and_treatment_values.feather

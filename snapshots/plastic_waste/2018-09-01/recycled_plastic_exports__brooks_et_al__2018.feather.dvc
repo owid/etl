@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Recycled plastic exports - Brooks et al. (2018)
+    description: |-
+      Cumulative export of plastics over the period 1988-2016 by the top 10 exporting countries. This is measured across several variables: economic value, tonnage, and share of global exports of plastics.
+    url: http://advances.sciencemag.org/content/4/6/eaat0131
+    date_accessed: 2026-03-05
+    published_by: |-
+      Brooks, A. L., Wang, S., & Jambeck, J. R. (2018). The Chinese import ban and its impact on global plastic waste trade. Science Advances, 4(6), eaat0131
+  name: Recycled plastic exports - Brooks et al. (2018)
+  description: ''
+outs:
+  - md5: 7375f1446fb528538a680fb395beeb86
+    size: 4626
+    path: recycled_plastic_exports__brooks_et_al__2018.feather

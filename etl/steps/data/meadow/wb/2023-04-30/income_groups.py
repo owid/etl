@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import List
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
@@ -58,17 +56,17 @@ def run(dest_dir: str) -> None:
 def extract_data_from_excel(df: pd.DataFrame) -> pd.DataFrame:
     # Sanity shape check
     log.info("income_groups: sanity check on table dimensions")
-    assert (num_rows := df.shape[0]) == (
-        num_rows_expected := 239
-    ), f"Invalid number of rows. Expected was {num_rows_expected}, but found {num_rows}"
-    assert (num_cols := df.shape[1]) >= (
-        num_cols_expected := 37
-    ), f"Invalid number of columns. Expected was >{num_cols_expected}, but found {num_cols}"
+    assert (num_rows := df.shape[0]) == (num_rows_expected := 239), (
+        f"Invalid number of rows. Expected was {num_rows_expected}, but found {num_rows}"
+    )
+    assert (num_cols := df.shape[1]) >= (num_cols_expected := 37), (
+        f"Invalid number of columns. Expected was >{num_cols_expected}, but found {num_cols}"
+    )
     # Check data starts in correct row
     log.info("income_groups: sanity check on data location in excel file")
-    assert (
-        df.loc[10, "World Bank Analytical Classifications"] == "Afghanistan"
-    ), "Row 10, column 'World Bank Analytical Classifications' expected to have value 'Afghanistan'"
+    assert df.loc[10, "World Bank Analytical Classifications"] == "Afghanistan", (
+        "Row 10, column 'World Bank Analytical Classifications' expected to have value 'Afghanistan'"
+    )
     # Get year values (columns)
     log.info("income_groups: extract only relevant data from excel sheet")
     years = _get_years(df)
@@ -78,16 +76,16 @@ def extract_data_from_excel(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _get_years(df: pd.DataFrame) -> List[int]:
+def _get_years(df: pd.DataFrame) -> list[int]:
     # Get years
     row_years = 4
     years = list(df.loc[row_years])
     # Format sanity check
     assert np.isnan(years[0]), f"The first column in row {row_years} is expected to be NaN. Instead found {years[0]}"
-    assert (
-        years[1] == "Data for calendar year :"
-    ), f"The second column in row {row_years} is expected to be 'Data for calendar year :'. Instead found {years[1]}"
-    assert all(
-        isinstance(year, int) for year in years[2:]
-    ), f"Columns 3 to the end in row {row_years} should be numbers. Check: {years[2:]}"
+    assert years[1] == "Data for calendar year :", (
+        f"The second column in row {row_years} is expected to be 'Data for calendar year :'. Instead found {years[1]}"
+    )
+    assert all(isinstance(year, int) for year in years[2:]), (
+        f"Columns 3 to the end in row {row_years} should be numbers. Check: {years[2:]}"
+    )
     return years[2:]

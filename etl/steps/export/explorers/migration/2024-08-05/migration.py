@@ -1,7 +1,7 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
 
 import pandas as pd
-from migration_config_dict import ADDITIONAL_DESCRIPTIONS, CONFIG_DICT, MAP_BRACKETS, SORTER  # type: ignore
+from migration_config_dict import ADDITIONAL_DESCRIPTIONS, CONFIG_DICT, MAP_BRACKETS, SORTER  # ty: ignore
 
 from etl.collection.explorer.legacy import ExplorerLegacy
 from etl.helpers import PathFinder

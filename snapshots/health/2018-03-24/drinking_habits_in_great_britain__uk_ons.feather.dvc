@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Drinking habits in Great Britain - UK ONS
+    description: |-
+      "Binge" drinking is defined by the UK Government as a man consuming more than 8 units of alcohol in a single day, or 6 units of alcohol in a single day in the case of a woman.
+    url: https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking
+    date_accessed: 2018-03-24
+    published_by: UK Office for National Statistics (ONS)
+  name: Drinking habits in Great Britain - UK ONS
+  description: ''
+outs:
+  - md5: f6cfaafd0b005cfa9e09825693c90d0f
+    size: 8274
+    path: drinking_habits_in_great_britain__uk_ons.feather

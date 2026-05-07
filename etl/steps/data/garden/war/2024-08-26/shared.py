@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -10,8 +8,8 @@ from etl.data_helpers.misc import expand_time_column
 def add_indicators_extra(
     tb: Table,
     tb_regions: Table,
-    columns_conflict_count: Optional[List[str]] = None,
-    columns_conflict_deaths: Optional[List[str]] = None,
+    columns_conflict_count: list[str] | None = None,
+    columns_conflict_deaths: list[str] | None = None,
 ) -> Table:
     """Scale original columns to obtain new indicators (conflict rate and conflict mortality indicators).
 
@@ -99,10 +97,10 @@ def add_indicators_extra(
 def aggregate_conflict_types(
     tb: Table,
     parent_name: str,
-    children_names: Optional[List[str]] = None,
-    columns_to_aggregate: Optional[List[str]] = None,
-    columns_to_aggregate_absolute: Optional[List[str]] = None,
-    columns_to_groupby: Optional[List[str]] = None,
+    children_names: list[str] | None = None,
+    columns_to_aggregate: list[str] | None = None,
+    columns_to_aggregate_absolute: list[str] | None = None,
+    columns_to_groupby: list[str] | None = None,
     dim_name: str = "conflict_type",
 ) -> Table:
     """Aggregate metrics in broader conflict types."""

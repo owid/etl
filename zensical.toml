@@ -4,7 +4,7 @@ site_name = "OWID's Technical Documentation"
 site_url = "https://docs.owid.io/projects/etl/"
 site_description = "Learn about the ETL pipeline at Our World in Data."
 site_author = "Our World in Data"
-copyright = '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> • <a href="/privacy">Privacy</a> • <a href="https://ourworldindata.org/">Our World in Data</a>'
+copyright = '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> • <a href="privacy/">Privacy</a> • <a href="https://ourworldindata.org/">Our World in Data</a>'
 docs_dir = "docs"
 edit_uri = "edit/master/docs/"
 
@@ -92,8 +92,6 @@ nav = [
             { "Structuring YAML file" = "architecture/metadata/structuring-yaml.md" },
             { "Data Pages Workflow" = "architecture/metadata/data_pages_workflow.md" },
             { "Propagation of metadata" = "architecture/metadata/propagation.md" },
-            { "Processing log" = "architecture/metadata/processing_log.md" },
-            { "ETL MetaGPT Tool" = "architecture/metadata/metadata_chatgpt_update.md" },
             { "FAQs" = "architecture/metadata/faqs.md" },
         ] },
     ] },
@@ -429,3 +427,5 @@ glob = ["ignore/**", "ignore/"]
 tags_file = "tags.md"
 
 [project.plugins.glightbox]
+skip_classes = []
+manual = true

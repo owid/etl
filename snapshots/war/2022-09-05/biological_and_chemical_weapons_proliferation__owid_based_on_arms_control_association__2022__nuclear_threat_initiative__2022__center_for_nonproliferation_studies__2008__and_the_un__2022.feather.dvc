@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data based on ACA (2022), NTI (2022), CNS (2008), UN (2022)
+    description: |-
+      This dataset provides information on countries activities' on biological and chemical weapons, using information from Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008), the UN (2022), and a few supplementary sources.
+
+      You can download the code and complete dataset, including supplementary variables and country profiles with additional information, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/biological_chemical_weapons
+    url: |-
+      https://www.armscontrol.org/factsheets/cbwprolif; https://www.nti.org/countries/; https://nonproliferation.org/wp-content/uploads/2016/03/2008-Chemical-and-Biological-Weapons_-Possession-and-Programs-Past-and-Present.pdf; https://treaties.unoda.org/t/bwc; https://treaties.unoda.org/t/cwc
+    date_accessed: 2022-05-09
+    published_by: Our World in Data based on ACA (2022), NTI (2022), CNS (2008), UN (2022)
+  name: |-
+    Biological and chemical weapons proliferation – OWID based on Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008) and the UN (2022)
+  description: ''
+outs:
+  - md5: 7d084e4f3ff0446661d0a09a298ceb46
+    size: 34274
+    path: biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022.feather

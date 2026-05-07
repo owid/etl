@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: Olivetti (2013)
+    url: http://www.nber.org/papers/w19131.pdf
+    date_accessed: 2017-03-21
+    published_by: Claudia Olivetti 2013
+  name: US Female Labor Force Participation 1890-2005 - Olivetti (2013)
+  description: ''
+outs:
+  - md5: 25369d2e317517a1e3b98f126acd6487
+    size: 3234
+    path: us_female_labor_force_participation_1890_2005__olivetti__2013.feather

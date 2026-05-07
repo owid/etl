@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4881
-    date_accessed: 2023-08-10 09:18:37.005326
+    url: https://admin.owid.io/admin/datasets/4881
+    date_accessed: 2026-03-05 11:04:47.955282+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4881_ethnographic_and_archaeological_evidence_on_violent_deaths
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1f2e90c5d6d9d5a371c320f0d758baa3
-  size: 7007
-  path: 
-    dataset_4881_ethnographic_and_archaeological_evidence_on_violent_deaths_config.json
+  - md5: 62c4da3fd5afb0979cd3e6c4f07a7932
+    size: 7509
+    path: dataset_4881_ethnographic_and_archaeological_evidence_on_violent_deaths_config.json

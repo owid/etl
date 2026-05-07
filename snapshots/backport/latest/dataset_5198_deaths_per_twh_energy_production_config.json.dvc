@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5198
-    date_accessed: 2023-08-10 09:41:57.668621
+    url: https://admin.owid.io/admin/datasets/5198
+    date_accessed: 2026-03-05 09:08:33.632525+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5198_deaths_per_twh_energy_production
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 93a45eaed451b3c488942785a54381f0
-  size: 2712
-  path: dataset_5198_deaths_per_twh_energy_production_config.json
+  - md5: dfe75264588e55996f760752b7e59ffa
+    size: 2842
+    path: dataset_5198_deaths_per_twh_energy_production_config.json

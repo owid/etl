@@ -6,10 +6,10 @@ from pathlib import Path
 import click
 import pandas as pd
 import world_bank_data as wb
+from etl.db_utils import get_engine
 from owid.datautils.io import df_to_file
 from tqdm import tqdm
 
-from etl.db_utils import get_engine
 from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.

@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
@@ -70,7 +68,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_regional_aggregates(tb: Table, ds_regions: Dataset, ds_population: Dataset, index_cols: List[str]) -> Table:
+def add_regional_aggregates(tb: Table, ds_regions: Dataset, ds_population: Dataset, index_cols: list[str]) -> Table:
     """
     Adding the regional aggregated data for the OWID continent regions
     """

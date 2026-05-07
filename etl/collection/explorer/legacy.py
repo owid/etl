@@ -11,7 +11,7 @@ TODO:
 from copy import copy
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -70,10 +70,10 @@ class ExplorerLegacy:
     def __init__(
         self,
         name: str | None = None,
-        config: Dict[str, Any] | None = None,
+        config: dict[str, Any] | None = None,
         df_graphers: pd.DataFrame | None = None,
         df_columns: pd.DataFrame | None = None,
-        comments: List[str] | None = None,
+        comments: list[str] | None = None,
     ):
         """Build Explorer object from `content`.
 
@@ -162,7 +162,7 @@ class ExplorerLegacy:
             # Read graphers (and columns) as dataframe
             csv_data = StringIO("\n".join(content_list[line_nr:]))
             df = pd.read_csv(csv_data, sep=sep, skiprows=0)
-            df = cls._process_df(df, sep)
+            df = cls._process_df(df, sep)  # ty: ignore[unresolved-attribute]
 
             # Graphers
             df_graphers = cls._parse_df_graphers(df)
@@ -223,7 +223,7 @@ class ExplorerLegacy:
         return EXPORT_DIR / "explorers" / (self.catalog_path.replace("#", "/") + ".tsv")
 
     @staticmethod
-    def _parse_config(config_raw, sep) -> Dict[str, Any]:
+    def _parse_config(config_raw, sep) -> dict[str, Any]:
         """Parse the config at the top of the explorer file."""
         config_raw = [c for c in config_raw if c.strip() != ""]
         if sep == ",":
@@ -235,7 +235,7 @@ class ExplorerLegacy:
                     df_config.loc[df_config[df_config.columns[0]] == "selection", df_config.columns[1:]]
                     .dropna(axis=1)
                     .squeeze()
-                    .tolist()
+                    .tolist()  # ty: ignore[unresolved-attribute, call-non-callable]
                 )
                 selection = "\t".join(selection)
                 df_config.loc[df_config[df_config.columns[0]] == "selection", df_config.columns[1]] = selection
@@ -247,7 +247,7 @@ class ExplorerLegacy:
             df_config = df_config.dropna(subset=df_config.columns[1])
 
             assert df_config.shape[1] == 2, "Header of explorer should only have two columns! Please review"
-            conf = df_config.set_index(df_config.columns[0]).squeeze().to_dict()
+            conf = df_config.set_index(df_config.columns[0]).squeeze().to_dict()  # ty: ignore[unresolved-attribute]
         elif sep == "\t":
             conf = {
                 parts[0]: parts[1] if len(parts) > 1 else None for parts in (line.split("\t", 1) for line in config_raw)
@@ -257,7 +257,7 @@ class ExplorerLegacy:
 
         if "selection" in conf:
             assert isinstance(conf["selection"], str), "selection should be a string!"
-            conf["selection"] = conf["selection"].split("\t")  # type: ignore
+            conf["selection"] = conf["selection"].split("\t")  # ty: ignore
 
         # 'true' -> True, 'false' -> False
         bool_mapping = {
@@ -266,7 +266,7 @@ class ExplorerLegacy:
         }
         for k in conf.keys():
             conf[k] = bool_mapping.get(str(conf[k]), conf[k])
-        return conf
+        return conf  # ty: ignore[invalid-return-type]
 
     @staticmethod
     def _process_df(df: pd.DataFrame, sep: str = "\t"):
@@ -382,7 +382,7 @@ class ExplorerLegacy:
         # Pre-process special fields
         conf = copy(self.config)
         # Convert to dataframe df_config
-        df_config = pd.DataFrame.from_dict([conf]).T.reset_index()  # type: ignore
+        df_config = pd.DataFrame.from_dict([conf]).T.reset_index()  # ty: ignore
         df_config.columns = [0, 1]
         df_config = self._add_empty_row(df_config)
         # True, False -> 'true', 'false'
@@ -426,7 +426,7 @@ class ExplorerLegacy:
                 df.loc[df[0] == col, i + 1] = selection
 
         assert isinstance(df, pd.DataFrame), "df should be a dataframe!"
-        return df  # type: ignore
+        return df  # ty: ignore
 
     @property
     def content(self) -> str:
@@ -532,7 +532,7 @@ class ExplorerLegacy:
     def _adapt_df_nested(self, df: pd.DataFrame, keyword: str):
         headers = pd.DataFrame([df.columns.values], columns=df.columns)
         df = pd.concat([headers, df], ignore_index=True)
-        df.columns = range(1, df.shape[1] + 1)
+        df.columns = range(1, df.shape[1] + 1)  # ty: ignore[invalid-assignment]
 
         # Add empty row at the top
         df = self._add_empty_row(df, "top")
@@ -577,7 +577,7 @@ class ExplorerLegacy:
 
         return content_has_changed
 
-    def get_variable_config(self, variable_id: int) -> Dict[str, Any]:
+    def get_variable_config(self, variable_id: int) -> dict[str, Any]:
         variable_config = {}
         # Load configuration for a variable from the explorer columns section, if any.
         if "variableId" in self.df_columns:
@@ -588,9 +588,9 @@ class ExplorerLegacy:
                 # Not sure if this could happen, but raise an error if there are multiple entries for the same variable.
                 log.error(f"Explorer 'columns' table contains multiple rows for variable {variable_id}")
 
-        return variable_config
+        return variable_config  # ty: ignore[invalid-return-type]
 
-    def get_variable_config_from_catalog_path(self, catalog_path: str) -> Dict[str, Any]:
+    def get_variable_config_from_catalog_path(self, catalog_path: str) -> dict[str, Any]:
         variable_config = {}
         if "catalogPath" in self.df_columns:
             variable_row = self.df_columns.loc[self.df_columns["catalogPath"] == catalog_path]
@@ -600,7 +600,7 @@ class ExplorerLegacy:
             elif len(variable_row) > 1:
                 # Not sure if this could happen, but raise an error if there are multiple entries for the same variable.
                 log.error(f"Explorer 'columns' table contains multiple rows for variable {catalog_path}")
-        return variable_config
+        return variable_config  # ty: ignore[invalid-return-type]
 
     def convert_ids_to_etl_paths(self) -> None:
         # Gather all variable ids from the graphers and columns tables.
@@ -666,7 +666,7 @@ class ExplorerLegacy:
 
 def create_explorer_legacy(
     catalog_path: str,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     df_graphers: pd.DataFrame,
     explorer_name: str,
     df_columns: pd.DataFrame | None = None,

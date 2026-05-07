@@ -104,7 +104,7 @@ def hold_back_data(df: pd.DataFrame, days_held_back: int) -> pd.DataFrame:
     """
     todays_date = datetime.now().date()
     date_limit = todays_date - timedelta(days=days_held_back)
-    date_limit = datetime.strftime(date_limit, format="%Y-%m-%d")  # type: ignore
+    date_limit = datetime.strftime(date_limit, format="%Y-%m-%d")  # ty: ignore
     df = df[df["date"] <= date_limit]
     assert all(df["date"] <= date_limit)
     return df
@@ -161,7 +161,7 @@ def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
 
         filled_dfs.append(country_df)
 
-    return pd.concat(filled_dfs)  # type: ignore
+    return pd.concat(filled_dfs)  # ty: ignore
 
 
 def create_monthly_aggregates(df: pd.DataFrame, days_held_back: int) -> pd.DataFrame:

@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5264
-    date_accessed: 2023-08-10 08:25:17.335908
+    url: https://admin.owid.io/admin/datasets/5264
+    date_accessed: 2026-03-10 09:29:30.291722+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5264_international_whaling_commission_status__iwc__2022
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9f85988870db9b5ac7dc80895814e932
-  size: 1850
-  path: dataset_5264_international_whaling_commission_status__iwc__2022_config.json
+  - md5: 9b6f00c9f6f598723d556010eecc96e5
+    size: 1980
+    path: dataset_5264_international_whaling_commission_status__iwc__2022_config.json

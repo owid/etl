@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Pendrill et al. (2019). Agricultural and forestry trade drives large share of tropical deforestation emissions.
+    description: |-
+      Pendrill et al. (2019) developed a land-balance model which attributed detected forest loss across the world to the expansion of croplands, pasture and tree plantations. This is then linked to particular agricultural commodities based on national land use, crop and forest product statistics published in the UN Food and Agricultural Organization balance sheets.
+
+      This study also maps deforestation and related CO2 emissions embedded in the international trade of these products using both a physical trade model, and a MRIO (multi-regional input-output) model. This allows for the quantification of deforestation and related emissions embedded in imported food and forestry products.
+    url: https://www.sciencedirect.com/science/article/pii/S0959378018314365
+    date_accessed: 2020-11-10
+    published_by: |-
+      Pendrill, F., Persson, U. M., Godar, J., Kastner, T., Moran, D., Schmidt, S., & Wood, R. (2019). Agricultural and forestry trade drives large share of tropical deforestation emissions. Global Environmental Change, 56, 1-10.
+  name: Tropical deforestation by country or region (Pendrill et al. (2019))
+  description: ''
+outs:
+  - md5: 3f013fbc77f09a4486776a137f61c85b
+    size: 7354
+    path: tropical_deforestation_by_country_or_region__pendrill_et_al__2019.feather

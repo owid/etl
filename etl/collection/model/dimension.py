@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, ClassVar, List, TypeGuard
+from typing import ClassVar, TypeGuard
 
 from etl.collection.exceptions import DuplicateValuesError, MissingChoiceError
 from etl.collection.model.base import MDIMBase, pruned_json
@@ -22,7 +23,7 @@ class DimensionPresentationUIType:
     TEXT_AREA: ClassVar[str] = "text_area"  # Adding a new type automatically works!
 
     # Compute the list once at class definition time
-    ALL: ClassVar[List[str]] = [
+    ALL: ClassVar[list[str]] = [
         value for key, value in vars().items() if not key.startswith("__") and isinstance(value, str)
     ]
 
@@ -53,7 +54,7 @@ class Dimension(MDIMBase):
 
     slug: str
     name: str
-    choices: List[DimensionChoice]
+    choices: list[DimensionChoice]
     description: str | None = None
     presentation: DimensionPresentation | None = None
 
@@ -82,7 +83,7 @@ class Dimension(MDIMBase):
         return self.presentation.type
 
     @property
-    def choice_slugs(self) -> List[str]:
+    def choice_slugs(self) -> list[str]:
         # if self.choices is not None:
         return [choice.slug for choice in self.choices]
 
@@ -90,7 +91,7 @@ class Dimension(MDIMBase):
     def ppt(self):
         return self.presentation
 
-    def sort_choices(self, slug_order: List[str] | Callable):
+    def sort_choices(self, slug_order: list[str] | Callable):
         """Sort choices based on the given order.
 
         Args:

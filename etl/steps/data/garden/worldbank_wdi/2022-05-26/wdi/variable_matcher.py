@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, cast
 
 import pandas as pd
 from owid.repack import repack_frame
@@ -47,11 +47,11 @@ class VariableMatcher:
         self._grapher_variables = value
 
     @property
-    def variable_mapping(self) -> Dict[str, Any]:
+    def variable_mapping(self) -> dict[str, Any]:
         return self._variable_mapping
 
     @variable_mapping.setter
-    def variable_mapping(self, value: Dict[str, Any]) -> None:
+    def variable_mapping(self, value: dict[str, Any]) -> None:
         assert isinstance(value, dict)
         self._variable_mapping = value
 
@@ -92,13 +92,13 @@ class VariableMatcher:
 
         return cast(pd.DataFrame, df_vars.reset_index(drop=True))
 
-    def load_variable_mapping(self, fname: str) -> Dict[str, Any]:
-        with open(Path(__file__).parent / f"{fname}.variable_mapping.json", "r") as f:
+    def load_variable_mapping(self, fname: str) -> dict[str, Any]:
+        with open(Path(__file__).parent / f"{fname}.variable_mapping.json") as f:
             mapping = json.load(f)
             assert isinstance(mapping, dict)
         return mapping
 
-    def find_grapher_variables(self, name: str) -> Optional[List[Any]]:
+    def find_grapher_variables(self, name: str) -> list[Any] | None:
         """returns grapher variables that match {name}, ordered by updatedAt
         (most recent -> least recent)."""
         names = [name]

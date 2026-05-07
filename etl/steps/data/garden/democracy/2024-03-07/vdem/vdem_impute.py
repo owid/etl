@@ -96,9 +96,9 @@ def run(tb: Table) -> Table:
             if not (merged := tb.merge(tb_, on=["country", "year"], how="inner")).empty:
                 paths.log.info(f"Imputing data for {imp['country']}")
                 assert imp["country"] in IMPUTED_OVERLAPS_EXPECTED, f"Unexpected overlap for {imp['country']}"
-                assert (
-                    len(merged) == IMPUTED_OVERLAPS_EXPECTED[imp["country"]]
-                ), f"Unexpected overlap for {imp['country']}"
+                assert len(merged) == IMPUTED_OVERLAPS_EXPECTED[imp["country"]], (
+                    f"Unexpected overlap for {imp['country']}"
+                )
                 # Drop
                 tb_ = tb_[~tb_["year"].isin(merged["year"])]
 

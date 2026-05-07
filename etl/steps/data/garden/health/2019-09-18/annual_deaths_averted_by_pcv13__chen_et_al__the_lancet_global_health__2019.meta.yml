@@ -1,0 +1,17 @@
+dataset:
+  title: Annual deaths averted by PCV13- Chen et al., The Lancet Global Health (2019)
+tables:
+  annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019:
+    variables:
+      deaths_averted:
+        title: Deaths averted
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

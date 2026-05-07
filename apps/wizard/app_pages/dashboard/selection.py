@@ -1,5 +1,3 @@
-from typing import List
-
 import pandas as pd
 import streamlit as st
 from rapidfuzz import fuzz
@@ -252,7 +250,7 @@ def import_steps_from_preview():
     )
 
 
-def _add_steps_to_selection(steps_related: List[str]):
+def _add_steps_to_selection(steps_related: list[str]):
     """Add steps to the selection."""
     # Remove those already in selection
     new_selected_steps = [step for step in steps_related if step not in st.session_state.selected_steps]

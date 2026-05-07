@@ -1,10 +1,11 @@
 """Unified browser orchestrator for multi-mode ETL browser."""
 
 import random
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from apps.browser.core import OWID_YELLOW, BrowserState, browse_items
 from apps.browser.modes import BrowserMode, ModeRegistry, get_registry

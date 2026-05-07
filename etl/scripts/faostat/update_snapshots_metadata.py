@@ -42,19 +42,19 @@ def run():
         description = df[df["dataset"] == dataset_name]["owid_dataset_description"].item()
 
         # Add a custom attribution to each origin.
-        year_published = snapshot.metadata.origin.date_published.split("-")[0]  # type: ignore
+        year_published = snapshot.metadata.origin.date_published.split("-")[0]  # ty: ignore
         # Currently, FBSH and FBS had their latest update by FAOSTAT in different years.
         # This causes that the two origins are cited in all charts (with different years).
         # To avoid this, we add attribution of FBS to FBSH.
         if dataset_name == "faostat_fbsh":
             snapshot_fbs = Snapshot(f"faostat/{version}/faostat_fbs.zip")
-            year_published = snapshot_fbs.metadata.origin.date_published.split("-")[0]  # type: ignore
-        attribution = f"{snapshot.metadata.origin.producer} ({year_published})"  # type: ignore
+            year_published = snapshot_fbs.metadata.origin.date_published.split("-")[0]  # ty: ignore
+        attribution = f"{snapshot.metadata.origin.producer} ({year_published})"  # ty: ignore
 
         # Update metadata fields of the current snapshot.
-        snapshot.metadata.origin.title = title  # type: ignore
-        snapshot.metadata.origin.description = description  # type: ignore
-        snapshot.metadata.origin.attribution = attribution  # type: ignore
+        snapshot.metadata.origin.title = title  # ty: ignore
+        snapshot.metadata.origin.description = description  # ty: ignore
+        snapshot.metadata.origin.attribution = attribution  # ty: ignore
 
         # Save snapshot metadata.
         snapshot.metadata.save()

@@ -1,0 +1,32 @@
+dataset:
+  title: Wildfire data in the US (NIFC)
+tables:
+  wildfire_data_in_the_us__nifc:
+    variables:
+      acres_burned__comparable_data__nifc:
+        title: Acres burned - comparable data (NIFC)
+        unit: acres burned
+      acres_burned__full_series__nifc:
+        title: Acres burned - full series (NIFC)
+        unit: acres burned
+      acres_burned_per_fire__comparable_data__nifc:
+        title: Acres burned per fire - comparable data (NIFC)
+        unit: acres per fire
+      acres_burned_per_fire__full_series__nifc:
+        title: Acres burned per fire - full series (NIFC)
+        unit: acres per fire
+      number_of_wildfires__comparable_data__nifc:
+        title: Number of wildfires - comparable data (NIFC)
+        unit: wildfires
+      number_of_wildfires__full_series__nifc:
+        title: Number of wildfires - full series (NIFC)
+        unit: wildfires
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

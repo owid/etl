@@ -10,7 +10,7 @@ import math
 import re
 import urllib.parse
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import httpx
 import structlog
@@ -31,13 +31,13 @@ from owid_mcp.config import (
 log = structlog.get_logger()
 
 # Global mapping cache
-_NAME_TO_CODE_MAPPING: Optional[Dict[str, str]] = None
+_NAME_TO_CODE_MAPPING: dict[str, str] | None = None
 
 # SQL validation pattern
 SQL_SELECT_RE = re.compile(r"^\s*select\b", re.IGNORECASE | re.DOTALL)
 
 
-def _load_regions_mapping() -> Dict[str, str]:
+def _load_regions_mapping() -> dict[str, str]:
     """Load OWID regions mapping from YAML file."""
     global _NAME_TO_CODE_MAPPING
 
@@ -49,9 +49,9 @@ def _load_regions_mapping() -> Dict[str, str]:
         Path(__file__).parent.parent / "etl" / "steps" / "data" / "garden" / "regions" / "2023-01-01" / "regions.yml"
     )
 
-    mapping: Dict[str, str] = {}
+    mapping: dict[str, str] = {}
 
-    with open(regions_file, "r", encoding="utf-8") as f:
+    with open(regions_file, encoding="utf-8") as f:
         regions = yaml.safe_load(f)
 
     for region in regions:
@@ -78,7 +78,7 @@ def _load_regions_mapping() -> Dict[str, str]:
     return mapping
 
 
-def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
+def country_name_to_iso3(name: str | None) -> str | None:
     """Convert country name to ISO-3 code using OWID regions mapping."""
     if not name:
         return None
@@ -87,7 +87,7 @@ def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
     return mapping.get(name.lower())
 
 
-async def _make_algolia_request_base(request_config: Dict[str, Any], log_prefix: str) -> List[Dict[str, Any]]:
+async def _make_algolia_request_base(request_config: dict[str, Any], log_prefix: str) -> list[dict[str, Any]]:
     """Base function for making Algolia API requests.
 
     Args:
@@ -114,7 +114,7 @@ async def _make_algolia_request_base(request_config: Dict[str, Any], log_prefix:
         return hits
 
 
-async def make_algolia_request(query: str, limit: int = 10) -> List[Dict[str, Any]]:
+async def make_algolia_request(query: str, limit: int = 10) -> list[dict[str, Any]]:
     """Make a request to Algolia search API and return the hits.
 
     Args:
@@ -152,7 +152,7 @@ async def make_algolia_request(query: str, limit: int = 10) -> List[Dict[str, An
     return hits
 
 
-def parse_csv_to_structured(csv_content: str) -> Dict[str, Any]:
+def parse_csv_to_structured(csv_content: str) -> dict[str, Any]:
     """Parse CSV content into structured data with columns and rows.
 
     Args:
@@ -182,7 +182,7 @@ async def make_algolia_pages_request(
     query: str,
     hits_per_page: int = 10,
     distinct: bool = True,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Make a request to Algolia pages index and return the hits.
 
     Args:
@@ -205,7 +205,7 @@ async def make_algolia_pages_request(
     return await _make_algolia_request_base(request_config, "algolia.pages")
 
 
-async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any]:
+async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> dict[str, Any]:
     """Execute a **read‑only** SQL SELECT via the OWID public Datasette.
 
     Parameters
@@ -341,7 +341,7 @@ def smart_round(value: float | None) -> float | None:
         return round(value)
 
 
-def build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]) -> List[Dict[str, Any]]:
+def build_rows(data_json: dict[str, Any], entities_meta: dict[int, dict[str, str]]) -> list[dict[str, Any]]:
     """Convert the compact OWID arrays into a list[{entity, year, value}]."""
 
     values = data_json["values"]
@@ -352,7 +352,7 @@ def build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str
     if not (len(values) == len(years) == len(entity_ids)):
         raise ValueError("Mismatched lengths in OWID data arrays")
 
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     append = rows.append
 
     for v, y, eid in zip(values, years, entity_ids):
@@ -371,7 +371,7 @@ def build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str
     return rows
 
 
-def build_efficient_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]) -> List[Dict[str, Any]]:
+def build_efficient_rows(data_json: dict[str, Any], entities_meta: dict[int, dict[str, str]]) -> list[dict[str, Any]]:
     """Convert the compact OWID arrays into an efficient grouped format.
 
     Returns a list of entities, each with years and values arrays:
@@ -393,7 +393,7 @@ def build_efficient_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dic
         raise ValueError("Mismatched lengths in OWID data arrays")
 
     # Group data by entity
-    entity_data: Dict[str, Dict[str, list]] = {}
+    entity_data: dict[str, dict[str, list]] = {}
 
     for v, y, eid in zip(values, years, entity_ids):
         meta = entities_meta.get(eid)
@@ -416,7 +416,7 @@ def build_efficient_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dic
     return result
 
 
-async def fetch_json(url: str) -> Dict[str, Any]:
+async def fetch_json(url: str) -> dict[str, Any]:
     """Fetch JSON data from a URL."""
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
         resp = await client.get(url)
@@ -424,7 +424,7 @@ async def fetch_json(url: str) -> Dict[str, Any]:
         return resp.json()
 
 
-def rows_to_csv(rows: List[Dict[str, Any]]) -> str:
+def rows_to_csv(rows: list[dict[str, Any]]) -> str:
     """Convert data rows to CSV format."""
     if not rows:
         return "entity,year,value\n"
@@ -442,7 +442,7 @@ def rows_to_csv(rows: List[Dict[str, Any]]) -> str:
     return "\n".join(csv_lines)
 
 
-def build_catalog_info(catalog_path: str) -> Dict[str, str]:
+def build_catalog_info(catalog_path: str) -> dict[str, str]:
     """Build Parquet URL & example SQL template from catalogPath.
 
     Args:

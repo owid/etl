@@ -1,5 +1,5 @@
 import json
-from typing import List, cast
+from typing import cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
     log.info("life_tables.end")
 
 
-def make_table(ds_meadow: Dataset, tables_old_names: List[str], table_new_name: str) -> Table:
+def make_table(ds_meadow: Dataset, tables_old_names: list[str], table_new_name: str) -> Table:
     """Create a Garden table from multiple Meadow tables.
 
     In Meadow, we have a table per age-year and sex. In Garden, bring the sex dimension in the table as
@@ -78,7 +78,7 @@ def make_table(ds_meadow: Dataset, tables_old_names: List[str], table_new_name: 
     return tb_garden
 
 
-def combine_sex_tables(ds_meadow: Dataset, table_names: List[str]) -> pd.DataFrame:
+def combine_sex_tables(ds_meadow: Dataset, table_names: list[str]) -> pd.DataFrame:
     """Combine meadow tables."""
     dfs = []
     for table_name in table_names:
@@ -105,9 +105,9 @@ def clean_countries(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def load_excluded_countries() -> List[str]:
+def load_excluded_countries() -> list[str]:
     """Load list of excluded countries from JSON file."""
-    with open(N.excluded_countries_path, "r") as f:
+    with open(N.excluded_countries_path) as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data

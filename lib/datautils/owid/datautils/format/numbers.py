@@ -1,18 +1,18 @@
 """Numeric formatting."""
 
 import re
-from typing import Any, Dict, Set, Union
+from typing import Any
 
 
 class IntegerNumber:
     """Wrapper around integer numbers."""
 
-    def __init__(self, number: Union[str, int]) -> None:
+    def __init__(self, number: str | int) -> None:
         self.number_raw = number
         self.number = self.init_clean(number)
 
     @classmethod
-    def init_clean(cls, number: Union[int, str]) -> str:
+    def init_clean(cls, number: int | str) -> str:
         """First number cleaning steps.
 
         Args:
@@ -103,7 +103,7 @@ class IntegerNumberWithWords:
     Use with caution!
     """
 
-    numeric_words: Dict[str, Dict[str, Any]] = {
+    numeric_words: dict[str, dict[str, Any]] = {
         "million": {
             "words": [
                 "million",
@@ -175,22 +175,22 @@ class IntegerNumberWithWords:
         return r"\s?".join(regex)
 
     @classmethod
-    def numeric_words_list(cls) -> Set[str]:
+    def numeric_words_list(cls) -> set[str]:
         """Return list of all numeric words (flattened)."""
         words = set(word for value in cls.numeric_words.values() for word in value["words"] if word != "")
-        return words  # type: ignore
+        return words  # ty: ignore
 
-    def _match_numeric_words(self) -> Dict[str, Union[str, int]]:
+    def _match_numeric_words(self) -> dict[str, str | int]:
         """Match number with words."""
         match = re.search(self.regex_number_verbose(), self.number)
         if match:
             numbers = match.groupdict(default=0)
-            return numbers  # type: ignore
+            return numbers  # ty: ignore
         else:
             raise ValueError("Number may not contain numeric words. Please review!")
 
     @classmethod
-    def _build_IntegerNumber(cls, numbers: Dict[str, Union[str, int]]) -> int:
+    def _build_IntegerNumber(cls, numbers: dict[str, str | int]) -> int:
         """Build number from dictionary."""
         value = 0
         for k, v in numbers.items():
@@ -223,7 +223,7 @@ class IntegerNumberWithWords:
         raise ValueError(f"Given number {self.number_raw} is not valid!")
 
 
-def num_to_str(num_as_str: Union[int, str]) -> str:
+def num_to_str(num_as_str: int | str) -> str:
     """Convert number to string.
 
     Args:
@@ -251,7 +251,7 @@ def remove_multiple_whitespaces(text: str) -> str:
     return re.sub(r"\s+", " ", text)
 
 
-def format_number(number: Union[int, str]) -> int:
+def format_number(number: int | str) -> int:
     """Format number string to integer.
 
     Only supports integer conversion. Handles various formats including

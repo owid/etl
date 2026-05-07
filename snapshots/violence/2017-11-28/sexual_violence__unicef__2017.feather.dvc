@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Sexual Violence - UNICEF Global Databases (2017)
+    description: |-
+      The source notes that in some instances observations differ from the standard definition or refer to only part of a country.
+    url: https://data.unicef.org/topic/child-protection/violence/sexual-violence/
+    date_accessed: 2017-11-28
+    published_by: UNICEF; Data and Analytics Section; Division of Data, Research and Policy
+  name: Sexual Violence – UNICEF (2017)
+  description: ''
+outs:
+  - md5: 4a80ef33480b3afc1035bbabcfbb2dce
+    size: 5706
+    path: sexual_violence__unicef__2017.feather

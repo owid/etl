@@ -7,7 +7,6 @@ python snapshot/covid/2024-11-05/get_vax_reporting.py
 import os
 import re
 from io import StringIO
-from typing import Optional
 
 import github
 import github.PullRequest
@@ -19,7 +18,7 @@ from etl import config
 
 
 def get_repo(
-    repo_name: str, access_token: Optional[str] = None, per_page: Optional[int] = None
+    repo_name: str, access_token: str | None = None, per_page: int | None = None
 ) -> github.Repository.Repository:
     """Get repository."""
     if not access_token:

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: BOND Internet Trends (2019)
+    description: |-
+      Other connected devices include over-the-top (OTT) & game consoles. Mobile includes smartphone & tablet. Usage includes both home & work for consumers 18+. Non deduplicated-time is assigned to each medium individually, regardless of multitasking.
+    url: https://www.bondcap.com/report/it19/#view/41
+    date_accessed: 2019-01-08
+    published_by: BOND Internet Trends (2019)
+  name: Daily hours spent with digital media per adult user, US (BOND Internet Trends (2019))
+  description: ''
+  is_public: false
+outs:
+  - md5: ea39513c2f5c411ed5cbeeaf31d0025a
+    size: 4498
+    path: daily_hours_spent_with_digital_media_per_adult_user__us__bond_internet_trends__2019.feather

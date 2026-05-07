@@ -1,0 +1,39 @@
+dataset:
+  title: Long-term energy transition in Europe - Gales et al. (2007)
+tables:
+  long_term_energy_transition_in_europe__gales_et_al__2007:
+    variables:
+      firewood__gales_et_al__2007:
+        title: Firewood (Gales et al. (2007))
+        unit: '% of energy consumption'
+        display:
+          unit: Number
+      fossil_fuels__gales_et_al__2007:
+        title: Fossil fuels (Gales et al. (2007))
+        unit: '% of energy consumption'
+        display:
+          unit: Per 1,000 population
+      muscle__gales_et_al__2007:
+        title: Muscle (Gales et al. (2007))
+        unit: '% of energy consumption'
+        display:
+          unit: Percent
+      primary_electricity__gales_et_al__2007:
+        title: Primary electricity (Gales et al. (2007))
+        unit: '% of energy consumption'
+        display:
+          unit: Not applicable
+      wind__water__gales_et_al__2007:
+        title: Wind, water (Gales et al. (2007))
+        unit: '% of energy consumption'
+        display:
+          unit: Percent
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

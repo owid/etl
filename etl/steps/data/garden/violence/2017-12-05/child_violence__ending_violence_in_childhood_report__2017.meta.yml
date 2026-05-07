@@ -1,0 +1,47 @@
+dataset:
+  title: Child violence – Ending Violence in Childhood Report (2017)
+tables:
+  child_violence__ending_violence_in_childhood_report__2017:
+    variables:
+      children__1_14__who_experienced_any_violent_discipline:
+        title: Children (1-14) who experienced any violent discipline
+        unit: '%'
+        description: |-
+          Percentage of children aged 1-14 who experienced any violent discipline at home (psychological aggression and/or physical punishment) in the past month
+      children__13_15__who_reported_being_bullied:
+        title: Children (13-15) who reported being bullied
+        unit: '%'
+        short_unit: '%'
+        description: Percentage  of children aged 13-15 who reported being bullied at least once in the past couple of months
+      children__13_15__who_reported_being_in_a_physical_fight_during_past_year:
+        title: Children (13-15) who reported being in a physical fight during past year
+        unit: '%'
+        description: Percentage  of children aged 13-15 who reported being in a physical fight one or more times during the
+          past 12 months
+      girls__15_19__who_ever_experienced_forced_sexual_intercourse_or_any_other_forced_sexual_acts:
+        title: Girls (15-19) who ever experienced forced sexual intercourse or any other forced sexual acts
+        unit: '%'
+        description: |-
+          Percentage of girls aged 15-19 who ever experienced forced sexual intercourse or any other forced sexual acts (including in childhood)
+      girls__15_19__who_experienced_any_physical_violence_since_age_15:
+        title: Girls (15-19) who experienced any physical violence since age 15
+        unit: ''
+        description: Percentage of girls aged 15-19 who experienced any physical violence since age 15
+      number_of_homicide_victims_among_children__0_19__per_100_000_population:
+        title: Number of homicide victims among children (0-19) per 100,000 population
+        unit: per 100,000
+        description: Number of homicide victims among children aged 0-19 per 100,000
+      women__15_and_above__who_experienced_any_intimate_partner_physical_and_or_sexual_violence_last_year:
+        title: Women (15 and above) who experienced any intimate partner physical and/or sexual violence last year
+        unit: '%'
+        description: |-
+          Percentage of women aged 15 and above who experienced any intimate partner physical and/or sexual violence in the last 12 months
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

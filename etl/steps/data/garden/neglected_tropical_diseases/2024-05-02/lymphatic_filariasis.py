@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import numpy as np
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
@@ -67,7 +65,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_regions_to_selected_vars(tb: Table, cols: List[str], ds_regions: Dataset) -> Table:
+def add_regions_to_selected_vars(tb: Table, cols: list[str], ds_regions: Dataset) -> Table:
     """
     Adding regions to selected variables in the table and then combining the table with the original table
     """

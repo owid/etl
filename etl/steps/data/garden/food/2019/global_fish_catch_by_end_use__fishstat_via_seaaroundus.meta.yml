@@ -1,0 +1,98 @@
+dataset:
+  title: Global fish catch by end use (FishStat via SeaAroundUs)
+tables:
+  global_fish_catch_by_end_use__fishstat_via_seaaroundus:
+    variables:
+      artisanal:
+        title: Artisanal
+        unit: ''
+      bottom_trawl:
+        title: bottom_trawl
+        unit: tonnes
+        display:
+          name: Wild fish catch from bottom trawling
+      discards:
+        title: discards
+        unit: ''
+      fish_catch_direct_consumption:
+        title: fish_catch_direct_consumption
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Direct human consumption
+          numDecimalPlaces: 0
+        description: Wild fish catch which is used for direct human consumption.
+      fish_other_uses:
+        title: fish_other_uses
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Other uses
+          numDecimalPlaces: 0
+        description: |-
+          Wild fish catch allocated to uses beyond direct human consumption and animal feed. This can include uses of oils in industry applications, for example.
+      fishmeal_and_fish_oil:
+        title: fishmeal_and_fish_oil
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Fishmeal and oil (animal feed)
+          numDecimalPlaces: 0
+        description: |-
+          This is the quantity of wild fish catch that is used as fishmeal and fish oil for animal feed. This feed is used in land-based livestock farming (e.g. pigs, cows, chickens) and aquaculture (fish farming).
+      gillnet:
+        title: gillnet
+        unit: ''
+      industrial:
+        title: industrial
+        unit: ''
+      landings:
+        title: landings
+        unit: ''
+      longline:
+        title: longline
+        unit: ''
+      other_gear:
+        title: other_gear
+        unit: ''
+      pelagic_trawl:
+        title: pelagic trawl
+        unit: ''
+      purse_seine:
+        title: purse_seine
+        unit: ''
+      recreational:
+        title: recreational
+        unit: ''
+      reported_landings:
+        title: reported_landings
+        unit: ''
+      small_scale:
+        title: small_scale
+        unit: ''
+      subsistence:
+        title: subsistence
+        unit: ''
+      total_fish_catch:
+        title: total_fish_catch
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Total wild fish catch
+          numDecimalPlaces: 0
+        description: Total wild fish catch, measured in tonnes.
+      unknown_gear:
+        title: unknown_gear
+        unit: ''
+      unreported_landings:
+        title: unreported_landings
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

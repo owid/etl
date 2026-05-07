@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, cast
+from typing import cast
 
 import pandas as pd
 
@@ -10,8 +10,8 @@ from etl.helpers import PathFinder
 N = PathFinder(__file__)
 
 
-def load_excluded_countries(excluded_countries_path: Path) -> List[str]:
-    with open(excluded_countries_path, "r") as f:
+def load_excluded_countries(excluded_countries_path: Path) -> list[str]:
+    with open(excluded_countries_path) as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data

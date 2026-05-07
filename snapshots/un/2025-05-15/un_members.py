@@ -33,7 +33,7 @@ def run(upload: bool) -> None:
 
     # Extract the country name and admission year.
     country = [div.find("h2").text for div in divs]
-    admission = [re.search(r"\d{4}$", div.find(class_="text-muted").text).group() for div in divs]  # type: ignore
+    admission = [re.search(r"\d{4}$", div.find(class_="text-muted").text).group() for div in divs]  # ty: ignore
 
     # Check the length of the lists to make sure they are the same.
     if len(country) != len(admission):

@@ -5,8 +5,6 @@ version, where data needed to be combined with the European Electricity Review).
 
 """
 
-from typing import Dict
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table, utils
@@ -288,7 +286,7 @@ def make_table_power_sector_emissions(tb: Table, ds_regions: Dataset, ds_income_
     return table
 
 
-def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
+def combine_yearly_electricity_data(tables: dict[str, Table]) -> Table:
     """Combine all tables in Ember's Yearly Electricity Data into one table.
 
     Parameters
@@ -328,7 +326,7 @@ def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
         )
 
     # Merge all tables into one, with an appropriate short name.
-    tb_combined = pr.multi_merge(list(tables.values()), on=index_columns, how="outer", short_name=paths.short_name)  # type: ignore
+    tb_combined = pr.multi_merge(list(tables.values()), on=index_columns, how="outer", short_name=paths.short_name)  # ty: ignore
 
     # Rename certain columns for consistency.
     tb_combined = tb_combined.rename(

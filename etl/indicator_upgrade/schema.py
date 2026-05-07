@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Dict, Optional
+from typing import Any
 
 from jsonschema import Draft202012Validator, validate, validators
 from structlog import get_logger
@@ -10,15 +10,15 @@ from etl.files import get_schema_from_url
 log = get_logger()
 
 
-def validate_chart_config(config: Dict[str, Any]) -> None:
+def validate_chart_config(config: dict[str, Any]) -> None:
     """Validate the schema of a chart configuration."""
     schema = get_schema_from_url(config["$schema"])
     validate(config, schema)
 
 
 def validate_chart_config_and_set_defaults(
-    config: Dict[str, Any], schema: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
+    config: dict[str, Any], schema: dict[str, Any] | None = None
+) -> dict[str, Any]:
     """Add properties with default values to a config file, if they are not present.
 
     Parameters
@@ -35,21 +35,20 @@ def validate_chart_config_and_set_defaults(
     """
     log.info("schema: validating schema and adding defaults")
 
-    def _extend_with_set_default(validator_class):  # type: ignore
+    def _extend_with_set_default(validator_class):  # ty: ignore
         validate_properties = validator_class.VALIDATORS["properties"]
 
-        def _set_defaults(validator, properties, instance, schema):  # type: ignore
+        def _set_defaults(validator, properties, instance, schema):  # ty: ignore
             for property, subschema in properties.items():
                 if "default" in subschema:
                     instance.setdefault(property, subschema["default"])
 
-            for error in validate_properties(
+            yield from validate_properties(
                 validator,
                 properties,
                 instance,
                 schema,
-            ):
-                yield error
+            )
 
         return validators.extend(
             validator_class,
@@ -64,9 +63,11 @@ def validate_chart_config_and_set_defaults(
 
     # Validate and update config with defaults
     config_new = copy.deepcopy(config)
-    # Remove isInheritanceEnabled if present as it's not part of the schema
+    # Remove chart table fields if present as they're not part of the schema
     if "isInheritanceEnabled" in config_new:
         del config_new["isInheritanceEnabled"]
+    if "forceDatapage" in config_new:
+        del config_new["forceDatapage"]
     # Remove adminBaseUrl and bakedGrapherURL if present
     if "adminBaseUrl" in config_new:
         del config_new["adminBaseUrl"]
@@ -88,7 +89,7 @@ def validate_chart_config_and_set_defaults(
     return config_new
 
 
-def fix_errors_in_schema(config: Dict[str, Any]) -> Dict[str, Any]:
+def fix_errors_in_schema(config: dict[str, Any]) -> dict[str, Any]:
     """Fix common errors in schema and tries to catch up with latest schema version."""
     config_new = copy.deepcopy(config)
     if "map" in config_new:
@@ -101,8 +102,8 @@ def fix_errors_in_schema(config: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def validate_chart_config_and_remove_defaults(
-    config: Dict[str, Any], schema: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
+    config: dict[str, Any], schema: dict[str, Any] | None = None
+) -> dict[str, Any]:
     """Remove properties with values equal to their defaults from schema.
 
     Parameters
@@ -119,23 +120,22 @@ def validate_chart_config_and_remove_defaults(
     """
     log.info("schema: validating schema and removing defaults")
 
-    def _extend_with_remove_default(validator_class):  # type: ignore
+    def _extend_with_remove_default(validator_class):  # ty: ignore
         validate_properties = validator_class.VALIDATORS["properties"]
 
-        def _set_defaults(validator, properties, instance, schema):  # type: ignore
+        def _set_defaults(validator, properties, instance, schema):  # ty: ignore
             for property, subschema in properties.items():
                 is_required = property in (schema or {}).get("required", [])
                 if "default" in subschema:
                     if not is_required and subschema["default"] == instance[property]:
                         del instance[property]
 
-            for error in validate_properties(
+            yield from validate_properties(
                 validator,
                 properties,
                 instance,
                 schema,
-            ):
-                yield error
+            )
 
         return validators.extend(
             validator_class,

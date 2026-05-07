@@ -1,0 +1,50 @@
+dataset:
+  title: Productivity - Level of GDP per capita and productivity
+tables:
+  productivity__level_of_gdp_per_capita_and_productivity:
+    variables:
+      subject__average_hours_worked_per_person_employed__pdb_lv:
+        title: Subject:Average hours worked per person employed - PDB_LV
+        unit: Hours
+      subject__gdp_per_head_of_population__pdb_lv:
+        title: Subject:GDP per head of population - PDB_LV
+        unit: National currency
+      subject__gdp_per_hour_worked__pdb_lv:
+        title: Subject:GDP per hour worked - PDB_LV
+        unit: National currency
+      subject__gdp_per_person_employed__pdb_lv:
+        title: Subject:GDP per person employed - PDB_LV
+        unit: National currency
+      subject__gap_in_gdp_per_capita_with_respect_to_the_usa__pdb_lv:
+        title: Subject:Gap in GDP per capita with respect to the USA - PDB_LV
+        unit: Percentage
+      subject__gap_in_gdp_per_hour_worked_with_respect_to_the_usa__pdb_lv:
+        title: Subject:Gap in GDP per hour worked with respect to the USA - PDB_LV
+        unit: Percentage
+      subject__gap_in_labour_utilisation_with_respect_to_the_usa__pdb_lv:
+        title: Subject:Gap in labour utilisation with respect to the USA - PDB_LV
+        unit: Percentage
+      subject__gross_domestic_product__gdp__millions__pdb_lv:
+        title: Subject:Gross Domestic Product (GDP); millions - PDB_LV
+        unit: National currency
+      subject__hours_worked_for_total_employment__millions__pdb_lv:
+        title: Subject:Hours worked for total employment; millions - PDB_LV
+        unit: Hours
+      subject__labour_utilisation__hours_worked_per_head_of_population__pdb_lv:
+        title: Subject:Labour utilisation (hours worked per head of population) - PDB_LV
+        unit: Percentage
+      subject__total_employment__number_of_persons_employed__thousands__pdb_lv:
+        title: Subject:Total employment (number of persons employed); thousands - PDB_LV
+        unit: Persons
+      subject__total_population__persons__thousands__pdb_lv:
+        title: Subject:Total population; persons; thousands - PDB_LV
+        unit: Persons
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

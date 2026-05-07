@@ -1,7 +1,6 @@
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Union
 
 from pytest import raises
 
@@ -77,7 +76,7 @@ def _test_decompress_file_with_content(containing_dir: str, f: str) -> None:
     assert new_dir.is_dir()
     assert recovered_file.is_file()
     # Read the file to check that its content is the expected one.
-    with open(recovered_file, "r") as _recovered_file:
+    with open(recovered_file) as _recovered_file:
         assert _recovered_file.read() == example_content
 
 
@@ -104,7 +103,7 @@ def _test_decompress_file_with_content_within_folder(containing_dir: str, f: str
     assert new_dir.is_dir()
     assert recovered_file.is_file()
     # Read the file to check that its content is the expected one.
-    with open(recovered_file, "r") as _recovered_file:
+    with open(recovered_file) as _recovered_file:
         assert _recovered_file.read() == example_content
 
 
@@ -135,7 +134,7 @@ def _test_overwrite_file(containing_dir: str, f: str) -> None:
     assert new_dir.is_dir()
     assert recovered_file.is_file()
     # Read the file to check that its content is the expected one.
-    with open(recovered_file, "r") as _recovered_file:
+    with open(recovered_file) as _recovered_file:
         assert _recovered_file.read() == example_content
 
 
@@ -165,7 +164,7 @@ def _test_raise_error_if_file_exists(containing_dir: str, f: str) -> None:
 
 def _create_compressed_file_with_content(
     file_name: str,
-    containing_dir: Union[str, Path],
+    containing_dir: str | Path,
     content: str,
     format: str,
 ) -> None:
@@ -189,7 +188,7 @@ def _create_compressed_file_with_content(
 
 def _create_compressed_file_with_content_within_folder(
     file_name: str,
-    containing_dir: Union[str, Path],
+    containing_dir: str | Path,
     sub_dir_name: str,
     content: str,
     format: str,

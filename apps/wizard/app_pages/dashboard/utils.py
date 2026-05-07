@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -92,7 +92,7 @@ def check_db():
 
 
 @st.cache_data(show_spinner=False)
-def load_steps_df(reload_key: int) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+def load_steps_df(reload_key: int) -> tuple[pd.DataFrame, dict[str, Any]]:
     """Generate and load the steps dataframe.
 
     This is just done once, at the beginning.
@@ -205,7 +205,7 @@ def unselect_step(step: str):
     st.session_state.selected_steps.remove(step)
 
 
-def _get_steps_info(steps_df) -> Dict[str, Any]:
+def _get_steps_info(steps_df) -> dict[str, Any]:
     """From given list of selected steps, get details for each step.
     df: DataFrame with selected steps. It is usually the grid_response["selected_rows"].
     steps_df: DataFrame with all steps. Output of load_steps_df.

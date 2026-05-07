@@ -1,0 +1,22 @@
+meta:
+  source:
+    name: Calculated by Our World in Data based on US Census Bureau and USDA
+    description: |-
+      This dataset was built by Our World in Data based on two sources.
+
+      Corn production data was sources from the United States Department for Agriculture (USDA), available at: https://quickstats.nass.usda.gov/
+
+      Corn land use data from 1926 onwards was also sourced from the USDA (https://quickstats.nass.usda.gov/). Corn land use data pre-1926 was sourced from the US Census Bureau, available at: https://www2.census.gov/prod2/statcomp/documents/HistoricalStatisticsoftheUnitedStates1789-1945.pdf
+
+      Production data was converted from bushels to tonnes using a conversion factor of 0.025.
+      Land use data was converted from acres to hectares using a conversion factor of 0.45.
+    url: https://quickstats.nass.usda.gov/
+    date_accessed: 2026-03-10
+    published_by: United States Department for Agriculture (USDA); and US Census Bureau
+  name: Long-term corn production and yield in the US (US Census Bureau; USDA)
+  description: ''
+  is_public: false
+outs:
+  - md5: 36949a00bac07c5a9f2bc4aad9a7d3cb
+    size: 8122
+    path: long_term_corn_production_and_yield_in_the_us__us_census_bureau__usda.feather

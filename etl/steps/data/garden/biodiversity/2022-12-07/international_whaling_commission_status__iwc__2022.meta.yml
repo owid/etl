@@ -1,0 +1,21 @@
+dataset:
+  title: International Whaling Commission Status (IWC, 2022)
+tables:
+  international_whaling_commission_status__iwc__2022:
+    variables:
+      iwc_status:
+        title: iwc_status
+        unit: ''
+        display:
+          name: Status of membership in the International Whaling Commission
+        description: |-
+          The International Whaling Commission (IWC) was set up to provide for the proper conservation of whale stocks and thus make possible the orderly development of the whaling industry.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

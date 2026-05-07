@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3070
-    date_accessed: 2023-08-10 07:43:08.340376
+    url: https://admin.owid.io/admin/datasets/3070
+    date_accessed: 2026-03-06 07:51:14.729120+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3070_country_programmable_aid__cpa__from_2000_2019__oecd__2018
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7ee64de6d228bc5e1fd6fbc4d3bdd67f
-  size: 3231
-  path: 
-    dataset_3070_country_programmable_aid__cpa__from_2000_2019__oecd__2018_config.json
+  - md5: 09e22d73fa5624bc360477e6c412eed2
+    size: 3361
+    path: dataset_3070_country_programmable_aid__cpa__from_2000_2019__oecd__2018_config.json

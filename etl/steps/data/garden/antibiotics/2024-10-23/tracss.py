@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Dict
-
 import pandas as pd
 from owid.catalog import Table
 
@@ -91,7 +89,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def shorten_survey_responses(tb: Table, responses_dict: Dict) -> Table:
+def shorten_survey_responses(tb: Table, responses_dict: dict) -> Table:
     """
     Shortening the survey responses to make them more readable.
     """
@@ -102,7 +100,7 @@ def shorten_survey_responses(tb: Table, responses_dict: Dict) -> Table:
     return tb
 
 
-def check_keys_exist(tb: Table, dict: Dict, col: str) -> None:
+def check_keys_exist(tb: Table, dict: dict, col: str) -> None:
     current_categories = set(tb[col].cat.categories)
     missing_keys = set(dict.keys()) - current_categories
 

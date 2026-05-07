@@ -1,7 +1,7 @@
 """Utils."""
 
 import os
-from typing import Any, Dict, Optional
+from typing import Any
 
 import streamlit as st
 from cryptography.fernet import Fernet
@@ -15,7 +15,7 @@ UPDATE_GSHEET = "update_gsheet"
 LOCAL_CSV = "local_csv"
 
 
-def _get_secret_key() -> Optional[Fernet]:
+def _get_secret_key() -> Fernet | None:
     secret_key = os.environ.get("FASTTRACK_SECRET_KEY")
     if not secret_key:
         log.warning("FASTTRACK_SECRET_KEY not found in environment variables. Not using encryption.")
@@ -41,7 +41,7 @@ def _decrypt(s: str) -> str:
         return fernet.decrypt(s.encode()).decode() if fernet else s
 
 
-def set_states(states_values: Dict[str, Any]):
+def set_states(states_values: dict[str, Any]):
     for key, value in states_values.items():
         st.session_state[key] = value
 

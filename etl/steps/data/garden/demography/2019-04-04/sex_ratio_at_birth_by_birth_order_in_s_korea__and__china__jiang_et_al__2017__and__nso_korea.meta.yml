@@ -1,0 +1,49 @@
+dataset:
+  title: Sex ratio at birth by birth order in S.Korea & China (Jiang et al. 2017 & NSO Korea)
+tables:
+  sex_ratio_at_birth_by_birth_order_in_s_korea__and__china__jiang_et_al__2017__and__nso_korea:
+    variables:
+      first_child_srb__jiang_et_al__2017__and__nso_korea:
+        title: First child SRB (Jiang et al. 2017 & NSO Korea)
+        unit: male births per 100 female births
+        display:
+          name: First child
+        description: |-
+          Sex ratio at birth (SRB) of the first-born child. SRB is measured as the number of male births per 100 female births. The natural 'sex ratio at birth' is noted to be 105 male births per 100 female births.
+      fourth_child__and__higher_srb__jiang_et_al__2017__and__nso_korea:
+        title: Fourth child & higher SRB (Jiang et al. 2017 & NSO Korea)
+        unit: male births per 100 female births
+        display:
+          name: Fourth child & higher
+        description: |-
+          Sex ratio at birth (SRB) of the fourth-born or higher children. SRB is measured as the number of male births per 100 female births. The natural 'sex ratio at birth' is noted to be 105 male births per 100 female births.
+      second_child_srb__jiang_et_al__2017__and__nso_korea:
+        title: Second child SRB (Jiang et al. 2017 & NSO Korea)
+        unit: male births per 100 female births
+        display:
+          name: Second child
+        description: |-
+          Sex ratio at birth (SRB) of the second-born child. SRB is measured as the number of male births per 100 female births. The natural 'sex ratio at birth' is noted to be 105 male births per 100 female births.
+      third_child_srb__jiang_et_al__2017__and__nso_korea:
+        title: Third child SRB (Jiang et al. 2017 & NSO Korea)
+        unit: male births per 100 female births
+        display:
+          name: Third child
+        description: |-
+          Sex ratio at birth (SRB) of the third-born child. SRB is measured as the number of male births per 100 female births. The natural 'sex ratio at birth' is noted to be 105 male births per 100 female births.
+      total_sex_ratio_at_birth__srb__jiang_et_al__2017:
+        title: Total sex ratio at birth (SRB) (Jiang et al. 2017)
+        unit: male births per 100 female births
+        display:
+          name: Sex ratio at birth
+        description: |-
+          Sex ratio at birth (SRB) is measured as the number of male births per 100 female births. The natural 'sex ratio at birth' is noted to be 105 male births per 100 female births.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

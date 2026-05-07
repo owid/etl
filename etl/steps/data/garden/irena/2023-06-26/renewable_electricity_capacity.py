@@ -1,7 +1,5 @@
 """Create a dataset of renewable electricity capacity using IRENA's Renewable Electricity Capacity and Generation."""
 
-from typing import List
-
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
@@ -27,7 +25,7 @@ REGIONS = [
 ]
 
 
-def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def add_data_for_regions(tb: Table, regions: list[str], ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb_with_regions = tb.copy()
     for region in REGIONS:
         # Find members of current region.

@@ -1,5 +1,6 @@
 import datetime as dt
-from typing import Any, Dict, Hashable, Optional, Set, cast
+from collections.abc import Hashable
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -102,7 +103,7 @@ def make_table_population_daily(ds_population: Dataset, year_min: int, year_max:
     return cast(Table, population)
 
 
-def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: Optional[Set] = None) -> Table:
+def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: set | None = None) -> Table:
     """Add `population` column to table.
 
     Adds population value on a daily basis (extrapolated from yearly data).
@@ -147,14 +148,14 @@ def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: Op
     # Check countries that went missing
     if missing_countries is not None:
         countries_missing = countries_start - countries_end
-        assert (
-            countries_missing == missing_countries
-        ), f"Missing countries don't match the expected! {countries_missing}; expected {missing_countries}"
+        assert countries_missing == missing_countries, (
+            f"Missing countries don't match the expected! {countries_missing}; expected {missing_countries}"
+        )
 
     return tb
 
 
-def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: Optional[Set] = None) -> Table:
+def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: set | None = None) -> Table:
     """Add `population` column to table.
 
     Adds population value on a daily basis (extrapolated from yearly data).
@@ -169,9 +170,9 @@ def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: O
     # Check countries that went missing
     if missing_countries is not None:
         countries_missing = countries_start - countries_end
-        assert (
-            countries_missing == missing_countries
-        ), f"Missing countries don't match the expected! {countries_missing}"
+        assert countries_missing == missing_countries, (
+            f"Missing countries don't match the expected! {countries_missing}"
+        )
 
     return tb
 
@@ -208,9 +209,9 @@ def make_monotonic(tb: Table, max_removed_rows=10) -> Table:
 def add_regions(
     tb: Table,
     ds_regions: Dataset,
-    ds_income: Optional[Dataset] = None,
+    ds_income: Dataset | None = None,
     keep_only_regions: bool = False,
-    regions: Optional[Dict[Hashable, Any]] = None,
+    regions: dict[Hashable, Any] | None = None,
     **kwargs,
 ) -> Table:
     if regions is None:

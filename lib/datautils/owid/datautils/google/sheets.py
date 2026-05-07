@@ -1,7 +1,7 @@
 """Google Sheet utils."""
 
 import os
-from typing import Any, Optional, Union
+from typing import Any
 
 import pandas as pd
 from gsheets import Sheets
@@ -35,7 +35,7 @@ class GSheetsApi:
         if not os.path.isdir(credentials_folder):
             os.makedirs(credentials_folder, exist_ok=True)
 
-    def get(self, spreadsheet_id: str, worksheet_id: Optional[int] = None) -> Union[SpreadSheet, WorkSheet]:
+    def get(self, spreadsheet_id: str, worksheet_id: int | None = None) -> SpreadSheet | WorkSheet:
         """Get a spreadsheet or worksheet from a Google sheet.
 
         If only `spreadsheet_id` is provided, this will return the entire spreadsheet. Otherwise,
@@ -50,14 +50,14 @@ class GSheetsApi:
         """
         ssheet = self.sheets.get(spreadsheet_id)
         if worksheet_id:
-            return ssheet.get(worksheet_id)  # type: ignore[reportReturnType]
-        return ssheet  # type: ignore[reportReturnType]
+            return ssheet.get(worksheet_id)  # ty: ignore[invalid-return-type]
+        return ssheet  # ty: ignore[invalid-return-type]
 
     def download_worksheet(
         self,
         spreadsheet_id: str,
         worksheet_id: int,
-        output_path: Optional[str] = None,
+        output_path: str | None = None,
         encoding: str = "utf-8",
         **kwargs: Any,
     ) -> None:
@@ -74,7 +74,11 @@ class GSheetsApi:
         """
         sheet = self.get(spreadsheet_id, worksheet_id)
         if output_path:
-            sheet.to_csv(output_path, encoding=encoding, **kwargs)  # type: ignore[reportCallIssue]
+            sheet.to_csv(
+                output_path,
+                encoding=encoding,
+                **kwargs,  # ty: ignore[call-non-callable]
+            )
         else:
             make_filename = "%(title)s.csv"
             sheet.to_csv(make_filename=make_filename, encoding=encoding, **kwargs)
@@ -109,5 +113,5 @@ class GSheetsApi:
             Dataframe with the data from the worksheet.
         """
         ws = self.get(spreadsheet_id, worksheet_id)
-        df: pd.DataFrame = ws.to_frame()  # type: ignore[reportAttributeAccessIssue]
+        df: pd.DataFrame = ws.to_frame()  # ty: ignore[unresolved-attribute]
         return df

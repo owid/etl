@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/246
-    date_accessed: 2023-08-10 08:30:41.002831
+    url: https://admin.owid.io/admin/datasets/246
+    date_accessed: 2026-03-06 07:46:06.681325+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_246_oecd__education_statistics__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 666a848f9ec4ff44f6f4a1e739d2e16f
-  size: 6692
-  path: dataset_246_oecd__education_statistics__2017_config.json
+  - md5: 51288d7b99f8b1c712ec7fefe1959dbd
+    size: 7287
+    path: dataset_246_oecd__education_statistics__2017_config.json

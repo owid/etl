@@ -105,7 +105,7 @@ def get_query_parameters_in_chart(chart_url, slug, all_years):
 
 def remove_images():
     """Remove all images in the local folder."""
-    for image in st.session_state.chart_animation_image_paths:  # type: ignore
+    for image in st.session_state.chart_animation_image_paths:  # ty: ignore
         image.unlink()
     # Update session state to reflect that images are deleted.
     st.session_state.chart_animation_images_exist = False
@@ -323,7 +323,7 @@ if st.session_state.chart_animation_show_image_settings:
         max_workers=None,
         max_num_years=st.session_state.chart_animation_max_num_years,
     )
-    st.session_state.chart_animation_images_exist = len(st.session_state.chart_animation_image_paths) > 0  # type: ignore
+    st.session_state.chart_animation_images_exist = len(st.session_state.chart_animation_image_paths) > 0  # ty: ignore
 
     # Select only images that match the required parameters.
     image_paths_selected = [
@@ -347,7 +347,7 @@ if st.session_state.chart_animation_show_image_settings:
                 image_paths=image_paths_selected,
                 output_file=st.session_state.chart_animation_file,
                 duration=duration,
-                loops=loop_count,  # type: ignore
+                loops=loop_count,  # ty: ignore
                 remove_duplicate_frames=remove_duplicates,
                 repetitions_last_frame=repetitions_last_frame,
                 duration_of_animation=duration_of == "Entire animation",

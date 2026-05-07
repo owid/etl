@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Klasing and Milionis (2014)
+    description: |-
+      For consistency, the 62 countries used in Klasing and Milionis are used to calculate the world trade to GDP ratio for the period 1950-2011. The list can be found in Appendix A2 of their paper.
+    url: https://www.sciencedirect.com/science/article/pii/S0022199613001074?via%3Dihub
+    date_accessed: 2018-07-20
+    published_by: |-
+      Klasing, Mariko J. and Milionis, P. (2014). "Quantifying the Evolution of World Trade, 1870-1949". Journal of International Economics 92(1), pp. 185-197
+  name: World trade based on own estimates (% of GDP) (Klasing and Milionis (2014))  (split)
+  description: ''
+  is_public: false
+outs:
+  - md5: c7bc0c3115457f66634f00e605568c2c
+    size: 5282
+    path: world_trade_based_on_own_estimates__pct_of_gdp__klasing_and_milionis__2014__split.feather

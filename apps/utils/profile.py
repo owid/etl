@@ -98,9 +98,9 @@ def cli(step: str, cpu: bool, mem: bool, functions: tuple[str]) -> None:
         if additional_funcs:
             # If -f functions are specified, only profile those (exclude run function)
             for _, func in additional_funcs:
-                lp.add_function(func)  # type: ignore
+                lp.add_function(func)  # ty: ignore
             # Enable profiler but don't profile run itself
-            lp.enable()  # type: ignore
+            lp.enable()  # ty: ignore
             lp_wrapper = module.run
         else:
             # If no -f functions specified, profile the run function
@@ -116,9 +116,9 @@ def cli(step: str, cpu: bool, mem: bool, functions: tuple[str]) -> None:
         # Check if run function takes arguments
         sig = inspect.signature(module.run)
         if len(sig.parameters) > 0:
-            memory_usage((mem_profile(lp_wrapper), [dest_dir]))  # type: ignore[reportArgumentType]
+            memory_usage((mem_profile(lp_wrapper), [dest_dir]))  # ty: ignore[invalid-argument-type]
         else:
-            memory_usage((mem_profile(lp_wrapper), []))  # type: ignore[reportArgumentType]
+            memory_usage((mem_profile(lp_wrapper), []))  # ty: ignore[invalid-argument-type]
     else:
         # Check if run function takes arguments
         sig = inspect.signature(module.run)
@@ -129,8 +129,8 @@ def cli(step: str, cpu: bool, mem: bool, functions: tuple[str]) -> None:
 
     if cpu:
         if additional_funcs:
-            lp.disable()  # Disable after execution  # type: ignore
-        lp.print_stats()  # type: ignore
+            lp.disable()  # Disable after execution  # ty: ignore
+        lp.print_stats()  # ty: ignore
 
 
 def _import_from_path(path: str):
@@ -188,8 +188,8 @@ def _import_module(module_path: Path) -> Any:
     sys.path.append(str(module_path.parent))
 
     spec = importlib.util.spec_from_file_location(module_name, module_path)
-    module = importlib.util.module_from_spec(spec)  # type: ignore
+    module = importlib.util.module_from_spec(spec)  # ty: ignore
     sys.modules[module_name] = module
-    spec.loader.exec_module(module)  # type: ignore
+    spec.loader.exec_module(module)  # ty: ignore
 
     return module

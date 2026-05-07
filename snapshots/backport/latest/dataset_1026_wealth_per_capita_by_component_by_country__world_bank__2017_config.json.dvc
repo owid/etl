@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/1026
-    date_accessed: 2023-08-10 09:21:30.308210
+    url: https://admin.owid.io/admin/datasets/1026
+    date_accessed: 2026-03-06 07:48:29.799372+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_1026_wealth_per_capita_by_component_by_country__world_bank__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9682374d4bb10d715d17d2d2997d178b
-  size: 13787
-  path: 
-    dataset_1026_wealth_per_capita_by_component_by_country__world_bank__2017_config.json
+  - md5: ad2051753f58a6c1fc45c5cb79e81ed0
+    size: 14940
+    path: dataset_1026_wealth_per_capita_by_component_by_country__world_bank__2017_config.json

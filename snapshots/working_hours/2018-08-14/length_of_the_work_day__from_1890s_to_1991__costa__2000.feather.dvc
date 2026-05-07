@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Costa (2000)
+    description: |-
+      See Table 5 and 6 for original data.
+
+      *The surveys that are used are from California in 1892; Kansas in 1895, 1896, 1897, and 1899; Main in 1890; Michigan stoneworkers in 1888; Michigan railway workers in 1893; Wisconsin in 1895; and women in Indianapolis in 1893
+    url: https://www.jstor.org/stable/pdf/10.1086/209954.pdf?refreqid=excelsior%3A8920c4a4b77c89fea2c1e2839f1471d2
+    date_accessed: 2018-08-14
+    published_by: |-
+      Costa, D. (2000). The Wage and the Length of the Work Day: From the 1890s to 1991. Journal of Labor Economics, 18(1), 156-181. doi:10.1086/209954
+  name: 'Length of the work day: from 1890s to 1991 - Costa (2000)'
+  description: ''
+  is_public: false
+outs:
+  - md5: b926d62508a8262f6553dd2ebaa52e31
+    size: 5738
+    path: length_of_the_work_day__from_1890s_to_1991__costa__2000.feather

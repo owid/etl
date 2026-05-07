@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Mobile Money Dataset
+    description: |-
+      The Global Mobile Money Dataset is a set of global metrics on mobile money accounts, collected by the GSM Association (GSMA). It employs a wide range of data sources that the Mobile Money program has been collecting and analyzing since 2009.
+    date_published: "2025-07-01"
+
+    # Citation
+    producer: GSM Association
+    citation_full: |-
+      Global Mobile Money Dataset, GSM Association
+    attribution_short: GSMA
+
+    # Files
+    url_main: https://www.gsma.com/mobilemoneymetrics/#global
+    url_download: https://www.gsma.com/wp-content/uploads/2025/07/Global_Mobile_Money_Dataset_2024.xlsx
+    date_accessed: '2026-03-09'
+
+    # License
+    license:
+      name: © Copyright GSM Association
+outs:
+  - md5: 73ab6eb4dc682f1e58437016bf07d11b
+    size: 960141
+    path: mobile_money.xlsx

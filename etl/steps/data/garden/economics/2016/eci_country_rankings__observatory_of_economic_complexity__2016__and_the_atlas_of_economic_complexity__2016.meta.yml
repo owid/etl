@@ -1,0 +1,36 @@
+dataset:
+  title: ECI Country Rankings (Observatory of Economic Complexity (2016) and the Atlas of Economic Complexity (2016))
+tables:
+  eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016:
+    variables:
+      atlas_of_economic_complexity_eci_ranking__atlas_of_economic_complexity__2016:
+        title: Atlas of Economic Complexity ECI Ranking (Atlas of Economic Complexity (2016))
+        unit: ''
+        description: ECI ranking based on data by the Harvard's Atlas of Economic Complexity.
+      eciplus__observatory_of_economic_complexity__2016:
+        title: ECI+ (Observatory of Economic Complexity (2016))
+        unit: ''
+        description: |-
+          The ECI+ measures the total exports of an economy corrected by how difficult it is to export each product. Please see the sources tab for a more detailed explanation.
+      economic_complexity_index__eci__atlas_of_economic_complexity__2016:
+        title: Economic Complexity Index (ECI) (Atlas of Economic Complexity (2016))
+        unit: ''
+        description: |-
+          The ECI is a measure of the relative knowledge intensity of an economy. ECI measures the knowledge intensity of an economy by considering the knowledge intensity of the products it exports. The ECI country ranking uses HS4 exports data, using the Bustos- Yildirim Method in its data cleaning. Please see the sources tab for a more detailed explanation.
+      economic_complexity_index__eci__observatory_of_economic_complexity__2016:
+        title: Economic Complexity Index (ECI) (Observatory of Economic Complexity (2016))
+        unit: ''
+        description: |-
+          The ECI is a measure of the relative knowledge intensity of an economy. ECI measures the knowledge intensity of an economy by considering the knowledge intensity of the products it exports using the SITC 4-digit product disaggregation in its calculations (countries' revealed comparative advantage (RCA) is smoothed by averaging the RCA). Please see the sources tab for a more detailed explanation.
+      oec_eci_ranking__observatory_of_economic_complexity__2016:
+        title: OEC ECI Ranking (Observatory of Economic Complexity (2016))
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

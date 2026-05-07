@@ -136,7 +136,7 @@ def run(upload: bool) -> None:
     # Initialize a new snapshot.
     snap = Snapshot(f"media_cloud/{SNAPSHOT_VERSION}/media_deaths.csv")
 
-    df_to_file(df=mentions_df, file_path=snap.path)  # type: ignore
+    df_to_file(df=mentions_df, file_path=snap.path)  # ty: ignore
 
     # Save snapshot.
     snap.create_snapshot(upload=upload)

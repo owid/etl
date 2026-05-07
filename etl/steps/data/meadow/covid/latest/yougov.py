@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import List
-
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog.processing import concat
@@ -133,7 +131,7 @@ def short_name_to_country_name(short_name: str) -> str:
     return short_name.replace("yougov_", "").replace("-", " ").replace("_", " ").title()
 
 
-def combine_tables(tables: List[Table]) -> Table:
+def combine_tables(tables: list[Table]) -> Table:
     """Combine tables.
 
     Assigns country name to each table before concatenating them.

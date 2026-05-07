@@ -2,7 +2,7 @@
 
 import re
 from copy import deepcopy
-from typing import Any, List
+from typing import Any
 
 from owid.catalog import Table
 
@@ -142,7 +142,7 @@ def _modify_variable_description_projection(variable_description: str) -> str:
 def _create_metric_version_from_mask(
     table: Table,
     metric: str,
-    mask: List[Any],
+    mask: list[Any],
     metric_suffix: str,
     title_suffix: str,
     display_name_suffix: str,

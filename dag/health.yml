@@ -314,7 +314,7 @@ steps:
   data-private://garden/ihme_gbd/2024-05-20/gbd_risk:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_risk
     - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/un/2024-07-12/un_wpp
   data-private://grapher/ihme_gbd/2024-05-20/gbd_risk:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_risk
 
@@ -392,7 +392,7 @@ steps:
   data://garden/who/2024-07-30/ghe:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/who/2024-07-30/ghe
-    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/un/2024-07-12/un_wpp
     - snapshot://who/2023-07-14/standard_age_distribution.csv
   data://grapher/who/2024-07-30/ghe:
     - data://garden/who/2024-07-30/ghe
@@ -477,12 +477,6 @@ steps:
   data://grapher/cancer/2024-09-13/diagnosis_routes_by_route:
     - data://garden/cancer/2024-09-13/diagnosis_routes_by_route
 
-  data://meadow/cancer/2024-09-13/diagnosis_routes_by_stage:
-    - snapshot://cancer/2024-09-13/diagnosis_routes_by_stage.csv
-  data://garden/cancer/2024-09-13/diagnosis_routes_by_stage:
-    - data://meadow/cancer/2024-09-13/diagnosis_routes_by_stage
-  data://grapher/cancer/2024-09-13/diagnosis_routes_by_stage:
-    - data://garden/cancer/2024-09-13/diagnosis_routes_by_stage
 
   data://meadow/cancer/2024-09-13/diagnosis_routes_survival:
     - snapshot://cancer/2024-09-13/diagnosis_routes_survival.csv
@@ -748,7 +742,6 @@ steps:
   data://garden/cdc/latest/measles_cases:
     - data://meadow/cdc/latest/measles_cases
 
-  #
   # Long-run measles data (auto-updated)
   data://garden/health/latest/measles_long_run:
     - data://garden/cdc/latest/measles_cases
@@ -1056,6 +1049,8 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2025-05-19/gho:
     - data://garden/who/2025-05-19/gho
+     #export://multidim/who/latest/share_overweight_adults:
+     #- data://grapher/who/2025-05-19/gho
 
   # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
   data://garden/health/2025-07-16/drug_approvals:
@@ -1293,6 +1288,7 @@ steps:
     - data://meadow/tuberculosis/2026-02-05/burden_disaggregated
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-12/un_wpp
   data://grapher/tuberculosis/2026-02-05/burden_disaggregated:
     - data://garden/tuberculosis/2026-02-05/burden_disaggregated
 
@@ -1347,6 +1343,8 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_deaths:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_deaths
+  export://multidim/ihme_gbd/latest/air_pollution:
+    - data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_deaths
 
   # GBD 2023 - GBD Risk Factor - DALYs
   data-private://meadow/ihme_gbd/2026-02-07/gbd_risk_dalys:

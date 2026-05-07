@@ -10,7 +10,7 @@ NOTE:
 """
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import click
 import numpy as np
@@ -26,7 +26,7 @@ from etl.version_tracker import VersionTracker
 log = get_logger()
 
 
-def get_grapher_changes(files_changed: Dict[str, Dict[str, str]], steps_df: pd.DataFrame) -> List[Dict[str, Any]]:
+def get_grapher_changes(files_changed: dict[str, dict[str, str]], steps_df: pd.DataFrame) -> list[dict[str, Any]]:
     steps_affected = []
     files_unidentified = []
     grapher_changes = []
@@ -96,7 +96,7 @@ def get_grapher_changes(files_changed: Dict[str, Dict[str, str]], steps_df: pd.D
     return grapher_changes
 
 
-def _get_dataset_name(steps_df: pd.DataFrame, step: str) -> Dict[str, Any] | None:
+def _get_dataset_name(steps_df: pd.DataFrame, step: str) -> dict[str, Any] | None:
     identifier = steps_df.loc[steps_df["step"] == step, "db_dataset_id"].item()
     if np.isnan(identifier):
         log.error(f"Grapher dataset ({step}) in ETL detected that was not submitted to the database! Ignoring it.")
@@ -111,7 +111,7 @@ def _get_dataset_name(steps_df: pd.DataFrame, step: str) -> Dict[str, Any] | Non
     }
 
 
-def get_datasets_mapped(files_changed: Dict[str, Dict[str, str]]) -> List[Dict[str, Dict[str, Any]]]:
+def get_datasets_mapped(files_changed: dict[str, dict[str, str]]) -> list[dict[str, dict[str, Any]]]:
     """Get grapher dataset pairs that need to be (manually) given to the chart upgrader, based on the committed changes
     in the current git branch.
 
@@ -161,8 +161,8 @@ def cli() -> None:
         f"{len(changes)} grapher dataset pairs need to be mapped.\n"
     )
     for change in changes:
-        print(f'[{change["old"]["id"]}] {change["old"]["name"]}')
-        print(f'    Step: {change["old"]["step"]}')
-        print(f'[{change["new"]["id"]}] {change["new"]["name"]}')
-        print(f'    Step: {change["new"]["step"]}')
+        print(f"[{change['old']['id']}] {change['old']['name']}")
+        print(f"    Step: {change['old']['step']}")
+        print(f"[{change['new']['id']}] {change['new']['name']}")
+        print(f"    Step: {change['new']['step']}")
         print()

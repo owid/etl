@@ -1,0 +1,32 @@
+dataset:
+  title: Solar PV Systems Costs - Barbose & Darghouth (2016)
+tables:
+  solar_pv_systems_costs__barbose__and__darghouth__2016:
+    variables:
+      module_price__barbose__and__darghouth__2016:
+        title: Module Price (Barbose & Darghouth (2016))
+        unit: 2015 US$
+        short_unit: $
+        display:
+          unit: Percent
+      non_module_costs__barbose__and__darghouth__2016:
+        title: Non-Module Costs (Barbose & Darghouth (2016))
+        unit: 2015 US$
+        short_unit: $
+        display:
+          unit: Number
+      total_installed_price__barbose__and__darghouth__2016:
+        title: Total Installed Price (Barbose & Darghouth (2016))
+        unit: 2015 US$
+        short_unit: $
+        display:
+          unit: Constant USD
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

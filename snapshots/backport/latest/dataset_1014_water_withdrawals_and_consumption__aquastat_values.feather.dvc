@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/1014
-    date_accessed: 2023-08-10 09:11:15.720177
+    url: https://admin.owid.io/admin/datasets/1014
+    date_accessed: 2026-03-05 09:53:47.142294+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Water withdrawals and consumption - Aquastat
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1707db0ffcdbab98db3a53357537d747
-  size: 31442
-  path: dataset_1014_water_withdrawals_and_consumption__aquastat_values.feather
+  - md5: c94184b41810abfd4b3757104b6432d1
+    size: 29402
+    path: dataset_1014_water_withdrawals_and_consumption__aquastat_values.feather

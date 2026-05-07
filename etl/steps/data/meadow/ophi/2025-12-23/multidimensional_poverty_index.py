@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import List
-
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -54,7 +52,7 @@ def run() -> None:
     ds_meadow.save()
 
 
-def format_columns_and_index(tb: Table, short_name: str, index_columns: List[str]) -> Table:
+def format_columns_and_index(tb: Table, short_name: str, index_columns: list[str]) -> Table:
     """
     Rename columns, format year and select the categories I need.
     """

@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4209
-    date_accessed: 2023-08-10 07:44:58.799868
+    url: https://admin.owid.io/admin/datasets/4209
+    date_accessed: 2026-03-05 14:32:01.460070+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Annual deaths averted by PCV13- Chen et al., The Lancet Global Health (2019)
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7a32be13c78063035d7d708d210b6458
-  size: 6354
-  path: 
-    dataset_4209_annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019_values.feather
+  - md5: 6308fe1b6ade7e26f351239b045d2140
+    size: 6450
+    path: dataset_4209_annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019_values.feather

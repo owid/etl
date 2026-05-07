@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import Dict, List
-
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -63,7 +61,7 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
 
-def remove_columns_and_make_tables_long(tb_dict: Dict[str, Table]) -> List[Table]:
+def remove_columns_and_make_tables_long(tb_dict: dict[str, Table]) -> list[Table]:
     """Remove columns from a list of tables and make them long."""
 
     tb_list = []

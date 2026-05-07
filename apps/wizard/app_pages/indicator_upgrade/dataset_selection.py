@@ -1,6 +1,6 @@
 """Search configuration."""
 
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -64,7 +64,7 @@ def sort_datasets_old(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "SearchConfigForm":
+def build_dataset_form(df: pd.DataFrame, similarity_names: dict[str, Any]) -> "SearchConfigForm":
     """Form to input dataset 1 and dataset 2."""
     if not st.session_state.is_any_migration:
         st.warning(
@@ -77,7 +77,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         column_display = "name"
 
     # Create a column to display the dataset by its dataset id followed by its title.
-    df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]
+    df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]  # ty: ignore[unsupported-operator]
     version = df["step"].str.split("/").str[-2]
     is_archived = df["isArchived"].replace({0: "", 1: " (ARCHIVED) "}).fillna("")
     df["display_name"] = is_archived + df["display_name"] + " [" + version.fillna("unknown version") + "]"
@@ -278,8 +278,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
                     )
                 else:
                     st.success(
-                        "🎉 All indicators have been automatically mapped! "
-                        "You can proceed directly to the final step."
+                        "🎉 All indicators have been automatically mapped! You can proceed directly to the final step."
                     )
 
             else:

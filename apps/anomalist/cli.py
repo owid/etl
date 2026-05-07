@@ -1,5 +1,5 @@
 import json
-from typing import Optional, Tuple, get_args
+from typing import get_args
 
 import click
 import structlog
@@ -75,14 +75,14 @@ memory = Memory(CACHE_DIR, verbose=0)
     help="Append anomalies to existing records instead of replacing them.",
 )
 def cli(
-    anomaly_types: Optional[Tuple[str, ...]],
-    dataset_ids: Optional[list[int]],
+    anomaly_types: tuple[str, ...] | None,
+    dataset_ids: list[int] | None,
     variable_mapping: str,
-    variable_ids: Optional[list[int]],
+    variable_ids: list[int] | None,
     dry_run: bool,
     force: bool,
     reset_db: bool,
-    sample_n: Optional[int],
+    sample_n: int | None,
     append: bool,
 ) -> None:
     """TBD

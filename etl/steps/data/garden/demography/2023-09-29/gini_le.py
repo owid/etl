@@ -109,7 +109,7 @@ def gini_from_mx(tb_group: Table) -> Variable:
     m0 = cast(float, mx[0])
     ax = np.full_like(mx, 0.5)
     ax[0] = AKm02a0(m0=m0, is_male=is_male)
-    ax[i_openage - 1] = 1 / mx[i_openage - 1]  # type: ignore
+    ax[i_openage - 1] = 1 / mx[i_openage - 1]  # ty: ignore
 
     # Estimate X_
     age = np.arange(i_openage) + ax
@@ -119,7 +119,7 @@ def gini_from_mx(tb_group: Table) -> Variable:
     # Estimate D
     OPENAGE = i_openage - 1
     ## Calculates the probability of dying in each age interval
-    qx = mx / (1 + (1 - ax) * mx)  # type: ignore
+    qx = mx / (1 + (1 - ax) * mx)  # ty: ignore
     qx[i_openage - 1] = 1 if not np.isnan(qx[i_openage - 1]) else np.nan
     ## Probability of surviving in each age interval
     px = 1 - qx

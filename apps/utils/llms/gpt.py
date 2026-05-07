@@ -4,7 +4,7 @@ This is mainly focused on GPT interaction. Please use pydantic-ai for LLMs now.
 """
 
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import structlog
 import tiktoken
@@ -141,12 +141,12 @@ MODELS_TOKEN_ENCODINGS = {
 class GPTResponse(ChatCompletion):
     """GPT response."""
 
-    message_content_dix: Optional[Dict[str, Any]] = field(default_factory=dict)
+    message_content_dix: dict[str, Any] | None = field(default_factory=dict)
 
-    def __init__(self: Self, chat_completion_instance: ChatCompletion | None = None, **kwargs) -> None:  # type: ignore[reportInvalidTypeVarUse]
+    def __init__(self: Self, chat_completion_instance: ChatCompletion | None = None, **kwargs) -> None:  # ty: ignore
         """Initialize OpenAI API wrapper."""
         if chat_completion_instance:
-            super().__init__(**chat_completion_instance.dict())  # type: ignore
+            super().__init__(**chat_completion_instance.dict())  # ty: ignore
         else:
             super().__init__(**kwargs)
 
@@ -164,7 +164,7 @@ class GPTResponse(ChatCompletion):
             raise ValueError("`message_content` is empty!")
 
     @property
-    def message_content_as_dict(self: Self) -> Dict[str, Any]:
+    def message_content_as_dict(self: Self) -> dict[str, Any]:
         """Message content from GPT as dictionary."""
         if self.message_content is None:
             raise ValueError("`message_content` is empty!")
@@ -173,7 +173,7 @@ class GPTResponse(ChatCompletion):
                 self.message_content_dix = yaml.safe_load(self.message_content)
             else:
                 raise ValueError("`message_content` is empty!")
-        return self.message_content_dix  # type: ignore[reportReturnType]
+        return self.message_content_dix  # ty: ignore[invalid-return-type]
 
     @property
     def cost(self) -> float | None:
@@ -202,7 +202,7 @@ class GPTResponse(ChatCompletion):
 class GPTQuery:
     """Fields for GPT query."""
 
-    messages: List[Dict[str, str]]
+    messages: list[dict[str, str]]
     temperature: float = 0
 
     def estimated_cost(self: Self, model_name: str) -> float:
@@ -230,7 +230,7 @@ class GPTQuery:
         token_count = sum([get_number_tokens(message["content"], model_name) for message in self.messages])
         return token_count
 
-    def to_dict(self: Self) -> Dict[str, Any]:
+    def to_dict(self: Self) -> dict[str, Any]:
         """Class as dictionary."""
         return {k: v for k, v in asdict(self).items()}
 
@@ -238,12 +238,12 @@ class GPTQuery:
 class OpenAIWrapper(OpenAI):
     """Wrapper for OpenAI API."""
 
-    def __init__(self: Self, **kwargs) -> None:  # type: ignore[reportInvalidTypeVarUse]
+    def __init__(self: Self, **kwargs) -> None:  # ty: ignore
         """Initialize OpenAI API wrapper."""
         super().__init__(**kwargs)
 
     def query_gpt(
-        self: Self, query: Optional[GPTQuery] = None, model: str = MODEL_DEFAULT, **kwargs
+        self: Self, query: GPTQuery | None = None, model: str = MODEL_DEFAULT, **kwargs
     ) -> GPTResponse | None:
         """Query Chat GPT to get message content from the chat completion."""
         # Get model to be used (+ sanity checks)
@@ -268,7 +268,7 @@ class OpenAIWrapper(OpenAI):
                 kwargs["temperature"] = 1
 
         # Get chat completion
-        chat_completion = self.chat.completions.create(**kwargs)  # type: ignore
+        chat_completion = self.chat.completions.create(**kwargs)  # ty: ignore
 
         # Build response
         if isinstance(chat_completion, ChatCompletion):
@@ -309,7 +309,7 @@ def get_number_tokens(text: str, model_name: str) -> int:
     return token_count
 
 
-def get_cost_and_tokens(text_in: str, text_out: str, model_name: str) -> Tuple[float, float]:
+def get_cost_and_tokens(text_in: str, text_out: str, model_name: str) -> tuple[float, float]:
     """Get cost using tiktoken tokenisation."""
     if model_name not in MODEL_RATES_1000_TOKEN:
         raise ValueError(f"Model {model_name} not registered in MODEL_RATES_1000_TOKEN.")

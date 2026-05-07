@@ -46,7 +46,7 @@ def process_data(tb: Table) -> Table:
     tb.columns = [" ".join(col).strip().replace(" ", "_") for col in tb.columns.values]
 
     # Format column names, making it all lowercase
-    tb.columns = tb.columns.str.lower()  # type: ignore
+    tb.columns = tb.columns.str.lower()  # ty: ignore
 
     return tb
 

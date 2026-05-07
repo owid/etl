@@ -1,7 +1,5 @@
 """Keep things in OWID catalog clean by regularly checking and reviewing content."""
 
-from typing import Optional
-
 import rich_click as click
 
 from apps.housekeeper.charts import send_slack_chart_reviews
@@ -35,7 +33,7 @@ CHANNEL_NAME = "#chart-reviews"
     default=False,
     help="Dev mode: replaces Slack mentions with code-formatted names so nobody gets pinged. Requires --channel.",
 )
-def main(review_type: str, channel: Optional[str] = None, dev: bool = False):
+def main(review_type: str, channel: str | None = None, dev: bool = False):
     if dev and channel is None:
         raise click.UsageError("--dev requires --channel to avoid posting to the main channel")
 

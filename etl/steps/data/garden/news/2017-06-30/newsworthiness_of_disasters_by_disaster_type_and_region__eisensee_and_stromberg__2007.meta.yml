@@ -1,0 +1,30 @@
+dataset:
+  title: Newsworthiness of disasters by disaster type and region - Eisensee and Strömberg (2007)
+tables:
+  newsworthiness_of_disasters_by_disaster_type_and_region__eisensee_and_stromberg__2007:
+    variables:
+      equal_coverage_casualties_ratio__eisensee_and_stromberg_2007:
+        title: Equal coverage casualties ratio (Eisensee and Strömberg 2007)
+        unit: ''
+        description: |-
+          The casualties ratio indicates how many casualties would make media coverage equally likely, all else equal (controlling for: the number killed and affected, country, year, and month).
+      fixed_effects_regression__eisensee_and_stromberg_2007:
+        title: Fixed effects regression (Eisensee and Strömberg 2007)
+        unit: '%'
+        description: |-
+          This data is derived by considering ~5,000 natural disasters occurring between 1968 and 2002 and corresponding news coverage in major US networks. Here, it is controlled for the number killed and affected, country, year, and month.
+      share_in_news__eisensee_and_stromberg_2007:
+        title: Share in news (Eisensee and Strömberg 2007)
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          This data is derived by considering ~5,000 natural disasters occurring between 1968 and 2002 and corresponding news coverage in major US networks.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

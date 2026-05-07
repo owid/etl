@@ -1,0 +1,38 @@
+dataset:
+  title: Nitrogen efficiency (Lassaletta et al. 2014)
+tables:
+  nitrogen_efficiency__lassaletta_et_al__2014:
+    variables:
+      nitrogen_crop_output:
+        title: nitrogen_crop_output
+        unit: kilograms per hectare
+        short_unit: kg
+        display:
+          name: Nitrogen output in the form of crops
+        description: Nitrogen output is measured as the nitrogen produced in the form of crops.
+      nitrogen_efficiency:
+        title: nitrogen_efficiency
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100
+          name: Nitrogen use efficiency
+        description: |-
+          Nitrogen use efficiency (NUE) is the ratio between nitrogen inputs and output. A NUE of 40% means that only 40% of nitrogen inputs are converted into nitrogen in the form of crops. The remaining 60% is lost to the environment as a pollutant.
+      nitrogen_input:
+        title: nitrogen_input
+        unit: kilograms per hectare
+        short_unit: kg
+        display:
+          name: Nitrogen input to agriculture
+        description: |-
+          Nitrogen inputs are measured as the application of nitrogen to crops either from synthetic fertilizers, or organic sources such as manure.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

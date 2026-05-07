@@ -201,7 +201,7 @@ def expand_observations(tb: Table) -> Table:
     YEAR_MAX = tb["endyear"].max()
     tb_all_years = pd.DataFrame(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
     df = pd.DataFrame(tb)  # to prevent error "AttributeError: 'DataFrame' object has no attribute 'all_columns'"
-    df = df.merge(tb_all_years, how="cross")  # type: ignore
+    df = df.merge(tb_all_years, how="cross")  # ty: ignore
     tb = Table(df, metadata=tb.metadata)
     # Filter only entries that actually existed
     tb = tb[(tb["year"] >= tb["styear"]) & (tb["year"] <= tb["endyear"])]
@@ -267,12 +267,12 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     ## Combine tables
     tb_ongoing = pr.concat(
         [tb_ongoing, tb_ongoing_world, tb_ongoing_alltypes, tb_ongoing_world_alltypes], ignore_index=True
-    ).sort_values(  # type: ignore
+    ).sort_values(  # ty: ignore
         by=["year", "region", "hostility_level"]
     )
 
     ## Rename columns
-    tb_ongoing = tb_ongoing.rename(  # type: ignore
+    tb_ongoing = tb_ongoing.rename(  # ty: ignore
         columns={
             "micnum": "number_ongoing_conflicts",
             "fatalmin": "number_deaths_ongoing_conflicts_low",
@@ -310,12 +310,12 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_world_alltypes["hostility_level"] = "all"
 
     # Combine
-    tb_new = pd.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pd.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # ty: ignore
         by=["styear", "region", "hostility_level"]
     )
 
     # Rename columns
-    tb_new = tb_new.rename(  # type: ignore
+    tb_new = tb_new.rename(  # ty: ignore
         columns={
             "styear": "year",
             "micnum": "number_new_conflicts",

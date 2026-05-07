@@ -106,7 +106,7 @@ def load_excluded_countries() -> List[str]:
     fname = Path(__file__).stem.split(".")[0]
     with open(Path(__file__).parent / f"{fname}.country_exclude.json", "r") as f:
         data = json.load(f)
-    return data  # type: ignore
+    return data  # ty: ignore
 
 
 excluded_countries = load_excluded_countries()

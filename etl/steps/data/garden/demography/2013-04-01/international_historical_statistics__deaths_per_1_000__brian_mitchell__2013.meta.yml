@@ -1,0 +1,18 @@
+dataset:
+  title: International Historical Statistics (Deaths per 1,000) - Brian Mitchell (2013)
+tables:
+  international_historical_statistics__deaths_per_1_000__brian_mitchell__2013:
+    variables:
+      international_historical_statistics__deaths_per_1_000__brian_mitchell__2013:
+        title: International Historical Statistics (Deaths per 1,000) (Brian Mitchell (2013))
+        unit: per 1,000
+        description: Death rate
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,41 @@
+dataset:
+  title: Literacy rate (% of total respondents) - DHS Surveys
+tables:
+  literacy_rate__pct_of_total_respondents__dhs_surveys:
+    variables:
+      literacy_rate__adult_female__pct_of_total_respondents__dhs_surveys:
+        title: Literacy rate, adult female (% of total respondents) (DHS Surveys)
+        unit: '%'
+        description: |-
+          The female adult literacy rate is defined as the percentage of female survey respondents, aged 15 and above, who can read.
+
+          Variable (M)V155 has been used to calculate literacy rates. The 155 literacy variable indicates whether a respondent who attended primary schooling can read a whole or part of a sentence showed. A respondent who attended secondary education or higher are coded 2 as well as respondent who could read a whole sentence. Possible categories include: 0 - cannot read at all; 1 - able to read only parts of sentence; 2 - able to read whole sentence; 3 - no card with required language; 4 - blind/visually impaired. Our estimates exclude those in categories 3 and 4.
+
+          The female adult literacy rate has been calculated as the total number of female respondents who are in categories 1 or 2, divided by the total number of respondents by country, per year.
+      literacy_rate__adult_male__pct_of_total_respondents__dhs_surveys:
+        title: Literacy rate, adult male (% of total respondents) (DHS Surveys)
+        unit: '%'
+        description: |-
+          The adult male literacy rate is defined as the percentage of male survey respondents, aged 15 and above, who can read.
+
+          Variable (M)V155 has been used to calculate literacy rates. The 155 literacy variable indicates whether a respondent who attended primary schooling can read a whole or part of a sentence showed. A respondent who attended secondary education or higher are coded 2 as well as respondent who could read a whole sentence. Possible categories include: 0 - cannot read at all; 1 - able to read only parts of sentence; 2 - able to read whole sentence; 3 - no card with required language; 4 - blind/visually impaired. Our estimates exclude those in categories 3 and 4.
+
+          The male adult literacy rate has been calculated as the total number of male respondents who are in categories 1 or 2, divided by the total number of respondents by country, per year.
+      literacy_rate__adult_total__pct_of_total_respondents__dhs_surveys:
+        title: Literacy rate, adult total (% of total respondents) (DHS Surveys)
+        unit: '%'
+        description: |-
+          The adult literacy rate is defined as the percentage of survey respondents, aged 15 and above, who can read.
+
+          Variable (M)V155 has been used to calculate literacy rates. The 155 literacy variable indicates whether a respondent who attended primary schooling can read a whole or part of a sentence showed. A respondent who attended secondary education or higher are coded 2 as well as respondent who could read a whole sentence. Possible categories include: 0 - cannot read at all; 1 - able to read only parts of sentence; 2 - able to read whole sentence; 3 - no card with required language; 4 - blind/visually impaired. Our estimates exclude those in categories 3 and 4.
+
+          The adult literacy rate has been calculated as the total number of respondents who are in categories 1 or 2, divided by the total number of respondents by country, per year.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

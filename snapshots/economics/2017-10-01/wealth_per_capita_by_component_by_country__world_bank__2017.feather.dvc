@@ -1,0 +1,11 @@
+meta:
+  source:
+    name: World Bank (2017)
+    date_accessed: 2026-03-06
+    published_by: The World Bank
+  name: Wealth per capita by component by country - World Bank (2017)
+  description: ''
+outs:
+  - md5: 273ce0d81535ec03c303724f0001f293
+    size: 56306
+    path: wealth_per_capita_by_component_by_country__world_bank__2017.feather

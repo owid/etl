@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 from apps.browser.commands import DEFAULT_COMMANDS, Command
 from apps.browser.modes import ModeConfig, ModeResult
@@ -45,7 +46,7 @@ class BaseBrowserMode:
         """Return cached items if available."""
         return self._cached_items
 
-    def get_ranker(self) -> "Ranker" | None:
+    def get_ranker(self) -> Ranker | None:
         """Return optional ranker for match ordering.
 
         Override in subclasses if ranking is needed.
@@ -106,7 +107,7 @@ class BaseBrowserMode:
         except OSError:
             pass  # Silently fail - cache is optional
 
-    def get_options(self) -> list["BrowserOption"]:
+    def get_options(self) -> list[BrowserOption]:
         """Get CLI options available for this mode.
 
         Override in subclasses to provide mode-specific options.

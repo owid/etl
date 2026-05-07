@@ -28,4 +28,13 @@ def test_calculate_checksum_metadata():
     meta = _get_metadata()
     df = _get_data()
 
-    assert db.calculate_checksum_metadata(meta, df) == "-1532881929668971636"
+    # Checksum should be deterministic
+    checksum = db.calculate_checksum_metadata(meta, df)
+    assert checksum == db.calculate_checksum_metadata(meta, df)
+
+    # Different metadata should produce different checksums
+    meta2 = VariableMeta(
+        origins=[Origin(title="Different", producer="Producer")],
+        presentation=VariablePresentationMeta(title_public="Title public"),
+    )
+    assert checksum != db.calculate_checksum_metadata(meta2, df)

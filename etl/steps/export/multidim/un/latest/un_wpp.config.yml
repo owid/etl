@@ -1,0 +1,177 @@
+title:
+  title: "Population & Demography"
+  title_variant: "Data Explorer"
+
+default_selection:
+  - China
+  - India
+  - United States
+  - Indonesia
+  - Pakistan
+  - Nigeria
+  - Brazil
+  - Japan
+
+topic_tags:
+  - Population Growth
+
+definitions:
+  common_views:
+    - dimensions:
+        indicator: population_density
+      config:
+        title: Population density
+    - dimensions:
+        indicator: death_rate
+      config:
+        title: Death rate
+    - dimensions:
+        indicator: median_age
+      config:
+        title: Median age
+    - dimensions:
+        indicator: net_migration
+      config:
+        title: Annual net migration
+    - dimensions:
+        indicator: net_migration_rate
+      config:
+        title: Annual net migration rate
+
+dimensions:
+  - slug: indicator
+    name: Indicator
+    # description: Demographic measures published by the UN World Population Prospects, grouped by topic.
+    choices:
+      # Population
+      - slug: population
+        name: Population
+        description: Total number of people living in a country or region.
+        group: Population
+      - slug: population_change
+        name: Annual population change
+        description: Absolute year-over-year change in the number of people.
+        group: Population
+      - slug: growth_rate
+        name: Population growth rate
+        description: Percentage change in population from one year to the next.
+        group: Population
+      - slug: natural_change_rate
+        name: Natural population growth rate
+        description: Births minus deaths per 1,000 people, excluding migration.
+        group: Population
+      - slug: population_density
+        name: Population density
+        description: Number of people per square kilometer of land area.
+        group: Population
+
+      # Fertility & births
+      - slug: fertility_rate
+        name: Fertility rate
+        description: Average number of children a woman is expected to have over her lifetime.
+        group: Fertility & births
+      - slug: births
+        name: Births
+        description: Total number of live births per year.
+        group: Fertility & births
+      - slug: birth_rate
+        name: Birth rate
+        description: Live births per 1,000 people per year.
+        group: Fertility & births
+
+      # Mortality
+      - slug: deaths
+        name: Deaths
+        description: Total number of deaths per year.
+        group: Mortality
+      - slug: death_rate
+        name: Death rate
+        description: Deaths per 1,000 people per year.
+        group: Mortality
+      - slug: life_expectancy
+        name: Life expectancy
+        description: Average number of remaining years a person is expected to live at a given age.
+        group: Mortality
+
+      # Age & sex structure
+      - slug: dependency_ratio
+        name: Dependency ratio
+        description: People in dependent age groups (children and older adults) per 100 working-age people.
+        group: Age & sex structure
+      - slug: median_age
+        name: Median age
+        description: Age that divides the population into two equally sized halves.
+        group: Age & sex structure
+
+      # Migration
+      - slug: net_migration
+        name: Net migration
+        description: Annual number of immigrants minus emigrants.
+        group: Migration
+      - slug: net_migration_rate
+        name: Net migration rate
+        description: Net migration per 1,000 people per year.
+        group: Migration
+
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: all
+        name: Both sexes
+        description: null
+      - slug: female
+        name: Female
+        description: null
+      - slug: male
+        name: Male
+        description: null
+    presentation:
+      type: radio
+  - slug: age
+    name: Age
+    choices:
+      - slug: all
+        name: Total
+        description: null
+      - slug: "0"
+        name: Under 1 year
+        description: null
+      - slug: 0-4
+        name: Under 5 years
+        description: null
+      - slug: 0-14
+        name: Under 15 years
+        description: null
+      - slug: 0-24
+        name: Under 25 years
+        description: null
+      - slug: "total"
+        name: Total dependency ratio
+        description: null
+      - slug: "youth"
+        name: Youth dependency ratio
+        description: null
+      - slug: "old"
+        name: Old-age dependency ratio
+        description: null
+
+  - slug: variant
+    name: Projection scenario
+    description: Projection scenarios share the same mortality and migration assumptions but differ in their fertility assumptions.
+    choices:
+      - slug: estimates
+        name: None
+        description: Historical estimates only, without future projections
+      - slug: low
+        name: Low
+        description: Lower fertility than the medium variant
+      - slug: medium
+        name: Medium
+        description: UN's central projection
+      - slug: high
+        name: High
+        description: Higher fertility than the medium variant
+    presentation:
+      type: radio
+
+views: []

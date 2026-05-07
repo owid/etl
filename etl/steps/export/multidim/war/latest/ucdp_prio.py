@@ -245,9 +245,11 @@ def edit_faust(c, tb_ucdp, tb_up, region_names):
     c.set_global_metadata(
         {
             "description_short": (
-                lambda view: _set_subtitle(view)
-                if ((view.d.conflict_type == "state_based_stacked") or (view.d.estimate == "best_ci"))
-                else None
+                lambda view: (
+                    _set_subtitle(view)
+                    if ((view.d.conflict_type == "state_based_stacked") or (view.d.estimate == "best_ci"))
+                    else None
+                )
             ),
             "description_key": lambda view: _set_description_key(view, tb_ucdp=tb_ucdp, tb_up=tb_up),
         }

@@ -1294,4 +1294,4 @@ df_graphers.loc[
 # ## Explorer generation
 # Here, the header, tables and graphers dataframes are combined to be shown in for format required for OWID data explorers.
 
-save("poverty-lis", tables, df_header, df_graphers, df_tables)  # type: ignore
+save("poverty-lis", tables, df_header, df_graphers, df_tables)  # ty: ignore

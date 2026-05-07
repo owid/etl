@@ -5,7 +5,7 @@ def test_source_description():
     """Make sure description as a TypedDict works correctly"""
     description: gm.SourceDescription = {"link": "ABC"}
     d = {"description": description}
-    s = gm.Source(**d)  # type: ignore
+    s = gm.Source(**d)  # ty: ignore
     assert "link" in s.description
     assert s.description["link"] == "ABC"
 
@@ -33,3 +33,19 @@ def test_remap_variable_ids():
     assert new_config["columnSlug"] == "123456"
     assert new_config["unknownStrColumnSlug"] == "123456"
     assert new_config["unknownIntColumnSlug"] == 123456
+
+
+def test_chart_config_includes_chart_level_flags():
+    class ChartConfigStub:
+        full = {"slug": "test-chart"}
+
+    class ChartStub:
+        chart_config = ChartConfigStub()
+        isInheritanceEnabled = 1
+        forceDatapage = 1
+
+    config = gm.Chart.config.fget(ChartStub())
+
+    assert config["slug"] == "test-chart"
+    assert config["isInheritanceEnabled"] is True
+    assert config["forceDatapage"] is True

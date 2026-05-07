@@ -17,7 +17,6 @@ Four sources are used overall:
 """
 
 import json
-from typing import List
 
 import owid.catalog.processing as pr
 from gapminder import load_gapminder
@@ -135,7 +134,7 @@ def select_source(df: Table) -> Table:
     return df
 
 
-def _assert_unique(df: Table, subset: List[str]) -> None:
+def _assert_unique(df: Table, subset: list[str]) -> None:
     """Ensure that dataframe has only one row per columns in subset"""
     # NOTE: this could be moved to helpers
     df_deduped = df.drop_duplicates(subset=subset)
@@ -258,9 +257,9 @@ def add_historical_regions(df: Table, tb_regions: Table) -> Table:
         former_country_name = tb_regions.loc[ccode, "name"]
         end_year = tb_regions.loc[ccode, "end_year"]
         # Sanity check
-        assert former_country_name not in set(
-            tb["country"]
-        ), f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
+        assert former_country_name not in set(tb["country"]), (
+            f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
+        )
         # Get list of country successors (equivalent of former state nowadays) and end year (dissolution of former state)
         ccodes_successors = json.loads(tb_regions.loc[ccode, "successors"])
         successor_names = tb_regions.loc[ccodes_successors, "name"].tolist()

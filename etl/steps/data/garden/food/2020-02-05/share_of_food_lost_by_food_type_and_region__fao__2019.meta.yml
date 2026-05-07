@@ -1,0 +1,39 @@
+dataset:
+  title: Share of food lost by food type and region (FAO, 2019)
+tables:
+  share_of_food_lost_by_food_type_and_region__fao__2019:
+    variables:
+      percentage_of_food_loss_by_food_group__fao__2019:
+        title: Percentage of food loss by food group (FAO, 2019)
+        unit: '% of food produces'
+        short_unit: '%'
+        display:
+          name: Share of food lost in post-harvest processes
+          numDecimalPlaces: 1
+        description: |-
+          The share of food lost (from post-harvest through to, but not including, retail level) by food group.
+
+          Post-harvest processes include handling and distribution, food processing, transport and distribution to (but not including) retailers and markets.
+
+          Share of food loss refers to the physical quantity lost for different commodities divided by the amount produced. An economic weight is used to aggregate percentages at regional or commodity group levels, so that higher-value commodities carry more weight in loss estimation than lower-value ones.
+      percentage_of_food_loss_by_region__fao__2019:
+        title: Percentage of food loss by region (FAO, 2019)
+        unit: '% of food produced'
+        short_unit: '%'
+        display:
+          name: Share of food lost in post-harvest processes
+        description: |-
+          The share of food lost (from post-harvest through to, but not including, retail level) by region.
+
+          Post-harvest processes include handling and distribution, food processing, transport and distribution to (but not including) retailers and markets.
+
+          Share of food loss refers to the physical quantity lost for different commodities divided by the amount produced. An economic weight is used to aggregate percentages at regional or commodity group levels, so that higher-value commodities carry more weight in loss estimation than lower-value ones.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

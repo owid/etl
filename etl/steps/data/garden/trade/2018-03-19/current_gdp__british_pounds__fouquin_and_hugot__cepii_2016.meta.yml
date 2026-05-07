@@ -1,0 +1,21 @@
+dataset:
+  title: Current GDP (British pounds) - Fouquin and Hugot (CEPII 2016)
+tables:
+  current_gdp__british_pounds__fouquin_and_hugot__cepii_2016:
+    variables:
+      gdp__fouquin_and_hugot__cepii_2016:
+        title: GDP (Fouquin and Hugot (CEPII 2016))
+        unit: current GBP
+        short_unit: £
+        display:
+          numDecimalPlaces: 0
+        description: GDP in British pounds at current prices.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

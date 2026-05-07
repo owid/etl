@@ -1,0 +1,23 @@
+dataset:
+  title: Friends and family support – OECD based on Gallup (2016)
+tables:
+  friends_and_family_support__oecd_based_on_gallup__2016:
+    variables:
+      people_who_report_having_friends_or_relatives_they_can_count_on:
+        title: People who report having friends or relatives they can count on
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: People who report having friends or relatives they can count on
+          numDecimalPlaces: 1
+        description: |-
+          Percentage of people who report that they have friends or relatives whom they can count on in times of trouble, 2014-16 average or latest available period.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

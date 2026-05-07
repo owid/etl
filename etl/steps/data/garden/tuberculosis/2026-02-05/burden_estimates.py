@@ -50,7 +50,7 @@ def run() -> None:
     #
     tb = add_variable_description_from_producer(tb, dd)
 
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb)
     tb = tb.drop(columns="e_pop_num")
 
     # Add region aggregates.
@@ -100,7 +100,7 @@ def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: 
             num_allowed_nans_per_year=None,
         )
 
-    tb = tb[tb["country"].isin(REGIONS_TO_ADD)]
+    tb = tb.loc[tb["country"].isin(REGIONS_TO_ADD)]
 
     return tb
 

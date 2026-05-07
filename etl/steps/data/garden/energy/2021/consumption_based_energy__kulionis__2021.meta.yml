@@ -1,0 +1,130 @@
+dataset:
+  title: Consumption-based energy (Kulionis, 2021)
+tables:
+  consumption_based_energy__kulionis__2021:
+    variables:
+      consumption_based_energy:
+        title: consumption_based_energy
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Consumption-based (trade-adjusted) energy use
+          numDecimalPlaces: 0
+        description: |-
+          Consumption-based (trade-adjusted) energy use measures domestic energy use minus energy used to produce exported goods, plus energy used to produce imported goods.
+      consumption_co2_per_energy:
+        title: consumption_co2_per_energy
+        unit: kg CO₂ per kWh
+        short_unit: kg/kWh
+        display:
+          name: Consumption-based carbon intensity of energy
+        description: |-
+          Carbon intensity is measured as the quantity of carbon dioxide (CO₂) emitted per unit of energy. Consumption-based metrics adjust for the energy or emissions embedded in traded goods: it is the energy or emissions used domestically minus exported goods; plus the energy or emissions from imported goods.
+      consumption_energy_intensity:
+        title: consumption_energy_intensity
+        unit: kilowatt-hours per $
+        short_unit: kWh
+        display:
+          name: Consumption-based energy intensity per dollar
+        description: |-
+          Consumption-based energy intensity is measured as the number of kilowatt-hours used per dollar of GDP. This is measured in 2017 international-$, which adjusts for inflation and cross-country price differences.  Consumption-based energy adjusts for the energy embedded in traded goods: it is the energy used domestically minus energy used to produce exported goods; plus the energy used for imported goods.
+      consumption_per_capita:
+        title: consumption_per_capita
+        unit: kilowatt-hours
+        short_unit: kWh
+        display:
+          conversionFactor: 1000000000
+          name: Consumption-based (trade-adjusted) energy use per person
+          numDecimalPlaces: 0
+        description: |-
+          Consumption-based (trade-adjusted) energy use measures domestic energy use minus energy used to produce exported goods, plus energy used to produce imported goods.
+      energy_exported_goods:
+        title: energy_exported_goods
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Energy embedded in exported goods
+          numDecimalPlaces: 0
+        description: |-
+          Energy embedded in exported goods is the quantity of energy that is used in the manufacturing of goods and services that are exported to other countries.
+      energy_imported_goods:
+        title: energy_imported_goods
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Energy embedded in imported goods
+          numDecimalPlaces: 0
+        description: |-
+          Energy embedded in imported goods is the quantity of energy that is used in the manufacturing of goods and services that are imported from other countries.
+      net_energy_traded_goods:
+        title: net_energy_traded_goods
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Net energy embedded in traded goods
+          numDecimalPlaces: 0
+        description: |-
+          Net energy embedded in traded goods is the net difference in energy embedded in exported goods, and imported goods. A positive value indicates that a country is a net importer; a negative value indicates that a country is a net exporter.
+      net_energy_traded_goods_pct_domestic:
+        title: net_energy_traded_goods_pct_domestic
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Net energy embedded in traded goods as a share of domestic energy use
+          numDecimalPlaces: 1
+        description: |-
+          Net energy embedded in traded goods is the net difference in energy embedded in exported goods, and imported goods. A positive value indicates that a country is a net importer; a negative value indicates that a country is a net exporter. This is given as a percentage of a country's domestic energy use.
+      net_traded_energy_per_capita:
+        title: net_traded_energy_per_capita
+        unit: kilowatt-hours
+        short_unit: kWh
+        display:
+          conversionFactor: 1000000000
+          name: Net energy embedded in trade per person
+          numDecimalPlaces: 0
+        description: |-
+          Net energy embedded in traded goods is the net difference in energy embedded in exported goods, and imported goods. A positive value indicates that a country is a net importer; a negative value indicates that a country is a net exporter.
+      production_based_energy:
+        title: production_based_energy
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Production-based energy consumption
+          numDecimalPlaces: 0
+        description: |-
+          Production-based energy consumption measures domestic energy consumption only. It does not adjust for energy embedded in traded goods.
+      production_co2_per_energy:
+        title: production_co2_per_energy
+        unit: kg CO₂ per kWh
+        short_unit: kg/kWh
+        display:
+          name: Production-based carbon intensity of energy
+        description: |-
+          Production-based carbon intensity is measured as the quantity of carbon dioxide (CO₂) emitted per unit of energy. Production-based energy does not adjust for the energy embedded in traded goods.
+      production_energy_intensity:
+        title: production_energy_intensity
+        unit: kilowatt-hours per international-$
+        short_unit: kWh
+        display:
+          name: Energy intensity per dollar
+        description: |-
+          Production-based energy intensity is measured as the number of kilowatt-hours used per dollar of GDP. This is measured in 2017 international-$, which adjusts for inflation and cross-country price differences.  Production-based energy does not adjust for the energy embedded in traded goods.
+      production_per_capita:
+        title: production_per_capita
+        unit: kilowatt-hours
+        short_unit: kWh
+        display:
+          conversionFactor: 1000000000
+          name: Production-based energy use per person
+          numDecimalPlaces: 0
+        description: |-
+          Production-based energy consumption measures domestic energy consumption only. It does not adjust for energy embedded in traded goods.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

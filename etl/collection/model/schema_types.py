@@ -269,7 +269,7 @@ class _ViewConfigBase(TypedDict, total=False):
     hideAnnotationFieldsInTitle: HideAnnotationFieldsInTitleConfig
     hideConnectedScatterLines: bool
     hideFacetControl: bool
-    hideLegend: bool
+    hideSeriesLabels: bool
     hideLogo: bool
     hideRelativeToggle: bool
     hideScatterLabels: bool

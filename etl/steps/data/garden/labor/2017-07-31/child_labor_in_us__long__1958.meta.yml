@@ -1,0 +1,19 @@
+dataset:
+  title: Child Labor in US - Long (1958)
+tables:
+  child_labor_in_us__long__1958:
+    variables:
+      child_labor__long__1958:
+        title: Child Labor (Long (1958))
+        unit: '%'
+        short_unit: '%'
+        description: Share of children in employment.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

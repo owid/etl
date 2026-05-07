@@ -8,7 +8,7 @@ import datetime as dt
 import json
 import urllib.error
 import urllib.parse
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -39,7 +39,7 @@ SHEET_TO_GID = {
 }
 
 
-def load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
+def load_existing_sheets_from_snapshots() -> list[dict[str, str]]:
     """Load available sheets from local environment."""
     # get all fasttrack snapshots
     metas = [SnapshotMeta.load_from_yaml(path) for path in (SNAPSHOTS_DIR / "fasttrack").rglob("*.dvc")]
@@ -75,7 +75,7 @@ def load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
         )
 
     # sort them by date accessed
-    existing_sheets.sort(key=lambda m: m["date_accessed"], reverse=True)  # type: ignore
+    existing_sheets.sort(key=lambda m: m["date_accessed"], reverse=True)  # ty: ignore
 
     return existing_sheets
 
@@ -86,7 +86,7 @@ def load_data_from_csv(uploaded_file):
     # Read CSV file as a dataframe
     st.write("Importing CSV...")
     # sep=None autodetects separators
-    csv_df = pd.read_csv(uploaded_file, sep=None)  # type: ignore
+    csv_df = pd.read_csv(uploaded_file, sep=None)  # ty: ignore
 
     try:
         # Parse dataframe
@@ -183,8 +183,8 @@ def parse_data_from_csv(csv_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def parse_metadata_from_csv(
-    filename: str, columns: List[str]
-) -> Tuple[DatasetMeta, Dict[str, VariableMeta], Optional[Origin]]:
+    filename: str, columns: list[str]
+) -> tuple[DatasetMeta, dict[str, VariableMeta], Origin | None]:
     filename = filename.replace(".csv", "")
     title = f"DRAFT {filename}"
     dataset_dict: dict[str, Any] = {
@@ -211,10 +211,10 @@ def parse_metadata_from_csv(
         version_producer="Local CSV",
         url_main="https://unknown.com",
         date_accessed=str(dt.date.today()),
-        date_published=str(dt.date.today()),  # type: ignore
+        date_published=str(dt.date.today()),  # ty: ignore
     )
 
-    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, origin  # type: ignore
+    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, origin  # ty: ignore
 
 
 ###################################
@@ -231,7 +231,7 @@ def _fetch_url_or_empty_dataframe(url, **kwargs):
         return pd.DataFrame()
 
 
-def import_google_sheets(url: str) -> Dict[str, Any]:
+def import_google_sheets(url: str) -> dict[str, Any]:
     # read dataset first to check if we're using data_url instead of data sheet
     dataset_meta = pd.read_csv(f"{url}&gid={SHEET_TO_GID['dataset_meta']}", header=None)
     data_url = _get_data_url(dataset_meta, url)
@@ -284,10 +284,10 @@ def _is_valid_date(series: pd.Series) -> bool:
     # Try converting the series to datetime
     converted = pd.to_datetime(series, errors="coerce")
     # Check if there are any NaT (invalid dates)
-    return converted.notna().all()
+    return bool(converted.notna().all())
 
 
-def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
+def _parse_sources(sources_meta_df: pd.DataFrame) -> Source | None:
     if sources_meta_df.empty:
         return None
 
@@ -310,10 +310,10 @@ def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
     # short_name is not used anymore
     source.pop("short_name", None)
 
-    return Source(**source)  # type: ignore[reportCallIssue]
+    return Source(**source)  # ty: ignore[call-non-callable]
 
 
-def _parse_origins(origins_meta_df: pd.DataFrame) -> Optional[Origin]:
+def _parse_origins(origins_meta_df: pd.DataFrame) -> Origin | None:
     if origins_meta_df.empty:
         return None
 
@@ -325,7 +325,7 @@ def _parse_origins(origins_meta_df: pd.DataFrame) -> Optional[Origin]:
     assert len(origins) == 1, "Only one source is supported for now"
     origin = origins[0]
 
-    origin = _prune_empty(origin)  # type: ignore
+    origin = _prune_empty(origin)  # ty: ignore
 
     # parse license fields
     if origin.get("license.name") or origin.get("license.url"):
@@ -335,7 +335,7 @@ def _parse_origins(origins_meta_df: pd.DataFrame) -> Optional[Origin]:
 
 
 def _parse_dataset(dataset_meta_df: pd.DataFrame) -> DatasetMeta:
-    dataset_dict = _prune_empty(dataset_meta_df.set_index(0)[1].to_dict())  # type: ignore
+    dataset_dict = _prune_empty(dataset_meta_df.set_index(0)[1].to_dict())  # ty: ignore
     dataset_dict["namespace"] = "fasttrack"  # or should it be owid? or institution specific?
     dataset_dict.pop("updated")
     dataset_dict.pop("external_csv", None)
@@ -363,10 +363,10 @@ def _parse_dataset(dataset_meta_df: pd.DataFrame) -> DatasetMeta:
     return dataset_meta
 
 
-def _parse_variables(variables_meta_df: pd.DataFrame) -> Dict[str, VariableMeta]:
+def _parse_variables(variables_meta_df: pd.DataFrame) -> dict[str, VariableMeta]:
     variables_meta_df = variables_meta_df.dropna(subset=["short_name"])
 
-    variables_list = [_prune_empty(v) for v in variables_meta_df.to_dict(orient="records")]  # type: ignore
+    variables_list = [_prune_empty(v) for v in variables_meta_df.to_dict(orient="records")]  # ty: ignore
 
     # default variable values
     for variable in variables_list:
@@ -399,7 +399,7 @@ def parse_metadata_from_sheets(
     variables_meta_df: pd.DataFrame,
     sources_meta_df: pd.DataFrame,
     origins_meta_df: pd.DataFrame,
-) -> Tuple[DatasetMeta, Dict[str, VariableMeta], Optional[Origin]]:
+) -> tuple[DatasetMeta, dict[str, VariableMeta], Origin | None]:
     source = _parse_sources(sources_meta_df)
     origin = _parse_origins(origins_meta_df)
     dataset_meta = _parse_dataset(dataset_meta_df)
@@ -415,7 +415,7 @@ def parse_metadata_from_sheets(
     return dataset_meta, variables_meta_dict, origin
 
 
-def _prune_empty(d: Dict[str, Any]) -> Dict[str, Any]:
+def _prune_empty(d: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in d.items() if v is not None and v != "" and not pd.isnull(v)}
 
 

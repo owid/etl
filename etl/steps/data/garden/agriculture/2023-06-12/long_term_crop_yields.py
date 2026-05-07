@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, cast
+from typing import cast
 
 import numpy as np
 from owid.catalog import Dataset, Table
@@ -55,7 +55,7 @@ def run_sanity_checks_on_inputs(tb_qcl: Table, tb_us: Table, tb_uk: Table, tb_wh
     assert set(tb_qcl["year"]) <= set(tb_wheat["year"])
 
 
-def combine_variables_metadata(combined_table: Table, individual_tables: List[Table]) -> Table:
+def combine_variables_metadata(combined_table: Table, individual_tables: list[Table]) -> Table:
     # Assign sources and licenses of the variables of each individual table to the variables in the combined table.
     combined_table = combined_table.copy()
     for column in combined_table.columns:

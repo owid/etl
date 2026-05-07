@@ -1,0 +1,17 @@
+dataset:
+  title: Solid fuel use for cooking by region - Bonjour et al. (2013)
+tables:
+  solid_fuel_use_for_cooking_by_region__bonjour_et_al__2013:
+    variables:
+      households_using_solid_fuels_as_the_main_cooking_fuel:
+        title: Households using solid fuels as the main cooking fuel
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

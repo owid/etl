@@ -16,7 +16,6 @@ import subprocess
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Optional
 
 import click
 import yaml
@@ -48,7 +47,7 @@ def run_snapshot(
     snapshot: str,
     snapshot_script: Path,
     dvc_files: list[Path],
-    timeout: Optional[int] = None,
+    timeout: int | None = None,
     continue_on_failure: bool = False,
     dry_run: bool = False,
 ) -> ExecutionResult:
@@ -85,7 +84,7 @@ def run_snapshot(
         subprocess.run(["python", snapshot_script, "--upload"], check=True, capture_output=True, text=True, **kwargs)
 
         # Load md5 and size from the (possibly) updated file
-        with open(dvc_file, "r") as f:
+        with open(dvc_file) as f:
             new_outs = yaml.safe_load(f)["outs"][0]
 
         exec_result.status = "SUCCESS"
@@ -142,14 +141,14 @@ def run_snapshot(
 def main(
     dry_run: bool,
     filter: str,
-    timeout: Optional[int],
+    timeout: int | None,
     skip: bool,
     continue_on_failure: bool,
 ):
     # Create a dictionary to store the execution results: duration (in seconds) or "FAILED"
     if OUTPUT_FILE.exists():
         # Load existing results from the JSON file to allow resuming.
-        with open(OUTPUT_FILE, "r") as f:
+        with open(OUTPUT_FILE) as f:
             execution_results = json.load(f)
     else:
         execution_results = {}
@@ -184,7 +183,7 @@ def main(
             continue
 
         # Read the script file.
-        with open(snapshot_script, "r") as f:
+        with open(snapshot_script) as f:
             snapshot_text = f.read()
 
         # Skip script files that are not snapshots (or at least do not have an "--upload" flag explicitly defined).

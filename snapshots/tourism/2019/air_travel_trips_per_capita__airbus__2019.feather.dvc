@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: Airbus (2019)
+    url: https://www.airbus.com/aircraft/market/global-market-forecast.html
+    date_accessed: 2020-10-05
+    published_by: Airbus (2019). Global Market Forecast, 2019-2018.
+  name: Air travel trips per capita (Airbus, 2019)
+  description: ''
+outs:
+  - md5: cfae9578fecc576faba59b9e2e90eae3
+    size: 7362
+    path: air_travel_trips_per_capita__airbus__2019.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Eurobarometer (2017)
+    description: |-
+      The Eurobarometer provides estimates for dated surveys. In some years, there are some countries with multiple surveys. In those cases, we provide yearly averages.
+    url: http://ec.europa.eu/commfrontoffice/publicopinion/index.cfm/Chart/index
+    date_accessed: 2017-04-25
+    published_by: Eurobarometer Interactive
+  name: Life satisfaction – Eurobarometer (2017)
+  description: ''
+outs:
+  - md5: decfccfeba505e89a16976bb1dfe7c89
+    size: 10130
+    path: life_satisfaction__eurobarometer__2017.feather

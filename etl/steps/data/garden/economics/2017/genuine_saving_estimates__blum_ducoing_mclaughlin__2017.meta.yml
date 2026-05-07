@@ -1,0 +1,37 @@
+dataset:
+  title: Genuine saving estimates by various measures - Blum, Ducoing, McLaughlin (2017)
+tables:
+  genuine_saving_estimates__blum_ducoing_mclaughlin__2017:
+    variables:
+      gdp__blum__ducoing__mclaughlin__2017:
+        title: GDP (Blum, Ducoing, McLaughlin (2017))
+        unit: $
+        description: Gross domestic product
+      gstfp__blum__ducoing__mclaughlin__2017:
+        title: GSTFP (Blum, Ducoing, McLaughlin (2017))
+        unit: $
+        description: Genuine saving + net present value of TFP
+      genuine_saving__blum__ducoing__mclaughlin__2017:
+        title: Genuine saving (Blum, Ducoing, McLaughlin (2017))
+        unit: $
+        description: Green Investment + education expenditure
+      green_carbon__blum__ducoing__mclaughlin__2017:
+        title: Green carbon (Blum, Ducoing, McLaughlin (2017))
+        unit: $
+      green_investment__blum__ducoing__mclaughlin__2017:
+        title: Green investment (Blum, Ducoing, McLaughlin (2017))
+        unit: $
+        description: Net + Δ natural capital
+      net_investment__blum__ducoing__mclaughlin__2017:
+        title: Net investment (Blum, Ducoing, McLaughlin (2017))
+        unit: $
+        description: Net fixed produced capital formation and overseas investment
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

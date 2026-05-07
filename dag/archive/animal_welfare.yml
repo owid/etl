@@ -90,3 +90,64 @@ steps:
     - data://garden/faostat/2024-03-14/faostat_qcl
   data://grapher/animal_welfare/2024-05-20/animals_used_for_food:
     - data://garden/animal_welfare/2024-05-20/animals_used_for_food
+  #
+  # Land animals killed for food (grouped into main animals and "other").
+  #
+  data://grapher/animal_welfare/2025-03-26/land_animals_killed_for_food:
+    - data://garden/faostat/2025-03-17/faostat_qcl
+  #
+  # Total number of animals used for food.
+  #
+  data://garden/animal_welfare/2025-03-26/animals_used_for_food:
+    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+    - data://garden/faostat/2025-03-17/faostat_qcl
+    - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
+    - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
+  #
+  # Total number of animals used for food.
+  #
+  data://grapher/animal_welfare/2025-03-26/animals_used_for_food:
+    - data://garden/animal_welfare/2025-03-26/animals_used_for_food
+  #
+  # Chick culling laws (Various sources, 2023).
+  #
+  data://meadow/animal_welfare/2023-09-01/chick_culling_laws:
+    - snapshot://animal_welfare/2023-09-01/chick_culling_laws.csv
+  data://garden/animal_welfare/2023-09-01/chick_culling_laws:
+    - data://meadow/animal_welfare/2023-09-01/chick_culling_laws
+  data://grapher/animal_welfare/2023-09-01/chick_culling_laws:
+    - data://garden/animal_welfare/2023-09-01/chick_culling_laws
+  #
+  # Share of cage-free eggs (Various sources, 2023).
+  #
+  data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs:
+    - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
+    - data://garden/animal_welfare/2023-08-03/us_egg_production
+  data://grapher/animal_welfare/2023-08-03/share_of_cage_free_eggs:
+    - data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs
+  data://garden/animal_welfare/2023-08-01/uk_egg_statistics:
+    - data://meadow/animal_welfare/2023-08-01/uk_egg_statistics
+  data://grapher/animal_welfare/2023-08-01/uk_egg_statistics:
+    - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
+  #
+  # US egg production (The Humane League, 2023).
+  #
+  data://meadow/animal_welfare/2023-08-03/us_egg_production:
+    - snapshot://animal_welfare/2023-08-03/us_egg_production_share_cage_free.csv
+    - snapshot://animal_welfare/2023-08-03/us_egg_production.csv
+  data://garden/animal_welfare/2023-08-03/us_egg_production:
+    - data://meadow/animal_welfare/2023-08-03/us_egg_production
+  #
+  # US egg production - older data (USDA).
+  #
+  data://meadow/animal_welfare/2018-10-19/us_egg_production_2007_2018:
+    - snapshot://animal_welfare/2018-10-19/us_egg_production_2007_2018.pdf
+  #
+  # Global hen inventory (Welfare Footprint Project, 2022).
+  #
+  data://meadow/animal_welfare/2023-08-01/global_hen_inventory:
+    - snapshot://animal_welfare/2023-08-01/global_hen_inventory.csv
+  data://garden/animal_welfare/2023-08-01/global_hen_inventory:
+    - data://meadow/animal_welfare/2023-08-01/global_hen_inventory
+  data://grapher/animal_welfare/2023-08-01/global_hen_inventory:
+    - data://garden/animal_welfare/2023-08-01/global_hen_inventory

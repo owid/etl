@@ -2,7 +2,6 @@
 
 from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -19,9 +18,7 @@ def run() -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("iucn_number_each_status")
     tb = group_classes(tb)
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = paths.regions.harmonize_names(tb)
     tb = tb.format(["country", "year"])
 
     #

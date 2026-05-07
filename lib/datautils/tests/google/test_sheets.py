@@ -14,7 +14,7 @@ class MockSheets:
         return cls()
 
     def get(self, *args, **kwargs):
-        return MockSpreadSheet()  # type: ignore
+        return MockSpreadSheet()  # ty: ignore
 
 
 class MockSpreadSheet:
@@ -22,7 +22,7 @@ class MockSpreadSheet:
         self.name = "spreadsheet"
 
     def get(self, *args, **kwargs):
-        return MockWorkSheet()  # type: ignore
+        return MockWorkSheet()  # ty: ignore
 
     def to_csv(self, *args, **kwargs):
         return None
@@ -55,7 +55,7 @@ class TestGSheetsApi:
     def test_sheets(self, mock_init, mock_sheets_from_files):
         api = GSheetsApi(self.clients_secrets, self.credentials_path)
         _ = api.sheets
-        assert api.sheets.name == "hello"  # type: ignore[reportAttributeAccessIssue]
+        assert api.sheets.name == "hello"  # ty: ignore[unresolved-attribute]
 
     @mock.patch("gsheets.Sheets.from_files", side_effect=MockSheets.from_files)
     @mock.patch("gsheets.Sheets.get", side_effect=MockSheets.get)
@@ -68,7 +68,7 @@ class TestGSheetsApi:
         ws = api.get(spreadsheet_id=self.ss_id, worksheet_id=self.ws_id)
         assert isinstance(ws, MockWorkSheet)
 
-    @mock.patch("owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet())  # type: ignore
+    @mock.patch("owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet())  # ty: ignore
     def test_download_worksheet(self, mock_init, mock_sheets):
         api = GSheetsApi(self.clients_secrets, self.credentials_path)
         # with output_path
@@ -76,13 +76,13 @@ class TestGSheetsApi:
         # without output_path
         api.download_worksheet(self.ss_id, self.ws_id)
 
-    @mock.patch("owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet())  # type: ignore
+    @mock.patch("owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet())  # ty: ignore
     def test_download_spreadsheet(self, mock_init, mock_sheets_1):
         api = GSheetsApi(self.clients_secrets, self.credentials_path)
         # with output_dir
         api.download_spreadsheet(self.ss_id, output_dir="local-path")
 
-    @mock.patch("owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet())  # type: ignore
+    @mock.patch("owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet())  # ty: ignore
     def test_worksheet_to_df(self, mock_init, mock_sheets):
         api = GSheetsApi(self.clients_secrets, self.credentials_path)
         df = api.worksheet_to_df(self.ss_id, self.ws_id)

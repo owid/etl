@@ -1,0 +1,18 @@
+dataset:
+  title: Intercontinental Trade - Costa, Palma and Reis (2015)
+tables:
+  intercontinental_trade__costa__palma_and_reis__2015:
+    variables:
+      intercontinental_trade__1500_1800__costa__palma_and_reis__2015:
+        title: Intercontinental trade, 1500-1800 (Costa, Palma and Reis (2015))
+        unit: £ per capita
+        description: Intercontinental trade between 1500-1800 in £ per capita in constant prices of 1700
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

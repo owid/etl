@@ -1,0 +1,27 @@
+dataset:
+  title: Books - Buringh and Van Zanden (2009)
+tables:
+  books__buringh_and_van_zanden__2009:
+    variables:
+      annual_per_capita_consumption_of_books:
+        title: Annual per capita consumption of books
+        unit: books
+      manuscript_production_per_century:
+        title: Manuscript production per century
+        unit: manuscripts
+        display:
+          numDecimalPlaces: 0
+      production_of_printed_books_per_half_century:
+        title: Production of printed books per half century
+        unit: books
+        display:
+          numDecimalPlaces: 0
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

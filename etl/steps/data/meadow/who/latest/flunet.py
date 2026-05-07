@@ -1,5 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
+import pandas as pd
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -28,11 +29,22 @@ def run(dest_dir: str) -> None:
     # Create a new table and ensure all columns are snake-case.
     tb = tb.rename(columns={"country_area_territory": "country"})
 
-    # Convert messy columns to string.
-    # for col in ("aother_subtype_details", "parainfluenza", "otherrespvirus"):
-    for col in ("aother_subtype_details", "other_respvirus_details"):
-        ix = tb[col].notnull()
-        tb.loc[ix, col] = tb.loc[ix, col].astype("str")
+    # Some columns (e.g. ah5, anotsubtypable) have mixed types because pandas parsed them as
+    # numeric in some CSV chunks but encountered stray strings like 'RSV' or 'ES' in others.
+    # Detect these by checking for actual float/int objects inside an object-dtype column,
+    # then coerce the stray strings to NaN. Pure text columns are left as str.
+    KNOWN_STRAY_STRINGS = {"RSV", "ES"}
+    for col in tb.columns[tb.dtypes == "object"]:
+        if tb[col].dropna().apply(lambda x: isinstance(x, (int, float))).any():
+            stray = {
+                v for v in tb[col] if isinstance(v, str) and pd.isna(pd.to_numeric(v, errors="coerce"))
+            } - KNOWN_STRAY_STRINGS
+            if stray:
+                raise ValueError(f"Column '{col}' contains unexpected non-numeric strings: {stray}")
+            tb[col] = pd.to_numeric(tb[col], errors="coerce")
+        else:
+            ix = tb[col].notnull()
+            tb.loc[ix, col] = tb.loc[ix, col].astype("str")
 
     #
     # Save outputs.

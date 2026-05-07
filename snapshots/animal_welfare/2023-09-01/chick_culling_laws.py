@@ -169,7 +169,7 @@ def main(upload: bool) -> None:
             sources_text += f" {row['comments']}"
         sources_text += "\n"
     # Replace the full citation in the metadata.
-    snap.metadata.origin.citation_full = sources_text  # type: ignore
+    snap.metadata.origin.citation_full = sources_text  # ty: ignore
     # Rewrite metadata to dvc file.
     snap.metadata.save()
 

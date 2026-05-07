@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Causes of Death
+      attribution_short: WHO
     processing_level: minor
   description_disease_producer: |-
     <% if cause == "All Causes" %>

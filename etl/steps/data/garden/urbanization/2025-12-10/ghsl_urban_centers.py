@@ -28,14 +28,9 @@ REGIONS = [
 
 # City size cutoffs (in population).
 CITY_SIZE_CUTOFFS = {
-    "below_300k": (0, 300000),
-    "300k_500k": (300000, 500000),
-    "500k_1m": (500000, 1000000),
-    "300k_1m": (300000, 1000000),
-    "1m_3m": (1000000, 3000000),
-    "3m_5m": (3000000, 5000000),
+    "50k_300k": (50000, 300000),
+    "50k_1m": (50000, 1000000),
     "1m_5m": (1000000, 5000000),
-    "above_5m": (5000000, float("inf")),
     "5m_10m": (5000000, 10000000),
     "above_10m": (10000000, float("inf")),
 }
@@ -285,11 +280,8 @@ def run() -> None:
     ####################################################################################################################
     # SECTION 5: Merge all processed tables
     ####################################################################################################################
-    # Combine all the separate tables back together:
-    # - tb_capitals: country-level + regional aggregates with capital data and shares
-    # - tb_largest_city: country-level only with largest city data and shares
-    # - tb_top_100: individual city rows (e.g., "Paris (France)")
-    # - tb_city_sizes: country-level + regional aggregates with city size distributions and shares
+    # Combine all the separate tables back together (city sizes kept for all countries here
+    # so that growth rates can be calculated correctly; non-region rows will be nulled out later).
     tb = pr.merge(tb_capitals, tb_largest_city, on=["country", "year"], how="outer")
     tb = pr.merge(tb, tb_top_100, on=["country", "year"], how="outer")
     tb = pr.merge(tb, tb_city_sizes, on=["country", "year"], how="outer")
@@ -322,10 +314,9 @@ def run() -> None:
         "urban_density_top_100",
         "urban_pop_top_100",
     ]
-    # Add all city size categories.
+    # City size distribution columns (regions only, but split same way).
     columns_to_split.extend([f"pop_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
     columns_to_split.extend([f"popshare_citysize_{size_name}" for size_name in CITY_SIZE_CUTOFFS.keys()])
-    # Add aggregate city size columns.
     columns_to_split.extend(
         [
             "pop_citysize_above_300k",
@@ -352,8 +343,6 @@ def run() -> None:
     ####################################################################################################################
     # SECTION 7: Calculate growth rates
     ####################################################################################################################
-    # Calculate annualized growth rates for city size share above 300k.
-    # For projections, fill gaps with estimates data to enable growth calculation across the boundary year.
     tb_for_proj_growth = tb.copy()
     tb_for_proj_growth["popshare_citysize_above_300k_projections"] = tb_for_proj_growth[
         "popshare_citysize_above_300k_projections"
@@ -364,6 +353,19 @@ def run() -> None:
     tb["popshare_citysize_above_300k_growth_projections"] = tb_for_proj_growth[
         "popshare_citysize_above_300k_growth_projections"
     ]
+
+    # Null out fine-grained city size breakdown for non-region countries.
+    # Broad aggregates (above_300k, above_1m, below_50k, totalshare_above_1m) are kept for all countries.
+    fine_grained_cols = (
+        [f"pop_citysize_{s}_estimates" for s in CITY_SIZE_CUTOFFS.keys()]
+        + [f"pop_citysize_{s}_projections" for s in CITY_SIZE_CUTOFFS.keys()]
+        + [f"popshare_citysize_{s}_estimates" for s in CITY_SIZE_CUTOFFS.keys()]
+        + [f"popshare_citysize_{s}_projections" for s in CITY_SIZE_CUTOFFS.keys()]
+    )
+    non_region_mask = ~tb["country"].isin(REGIONS)
+    for col in fine_grained_cols:
+        if col in tb.columns:
+            tb.loc[non_region_mask, col] = None
 
     ####################################################################################################################
     # SECTION 8: Format and validate

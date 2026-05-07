@@ -1,0 +1,26 @@
+dataset:
+  title: Distribution of bilateral and unilateral trade partnerships - Fouquin and Hugot (CEPII 2016)
+tables:
+  distribution_of_bilateral_and_unilateral_trade_partnerships__fouquin_and_hugot__cepii_2016:
+    variables:
+      bilateral_trade_partnerships__fouquin_and_hugot__cepii_2016:
+        title: Bilateral trade partnerships (Fouquin and Hugot (CEPII 2016))
+        unit: ''
+        description: A pair in which both countries export to one-another.
+      non_trading__fouquin_and_hugot__cepii_2016:
+        title: Non-trading (Fouquin and Hugot (CEPII 2016))
+        unit: ''
+        description: A pair in which countries do not trade with one-another.
+      unilateral_trade_partnerships__fouquin_and_hugot__cepii_2016:
+        title: Unilateral trade partnerships (Fouquin and Hugot (CEPII 2016))
+        unit: ''
+        description: A pair in which only one country exports to the other.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

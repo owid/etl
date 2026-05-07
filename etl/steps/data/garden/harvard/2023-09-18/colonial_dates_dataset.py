@@ -131,7 +131,7 @@ def process_data(tb: Table, tb_pop: Table) -> Table:
     tb = pr.concat([tb_colonized, tb_rest, tb_count], short_name="colonial_dates_dataset")
 
     # Fill years in the range (tb_colonized['year'].min(), LATEST_YEAR) not present for each country
-    tb = tb.set_index(["country", "year"]).unstack().stack(dropna=False).reset_index()  # type: ignore
+    tb = tb.set_index(["country", "year"]).unstack().stack(dropna=False).reset_index()  # ty: ignore
 
     # Create an additional summarized colonizer column, replacing the values with " - " with "More than one colonizer"
     # I add the "z." to have this at the last position of the map brackets

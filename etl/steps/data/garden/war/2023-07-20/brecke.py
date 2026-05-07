@@ -45,7 +45,6 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
-from owid.catalog.core import processing_log as pl
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -211,9 +210,9 @@ def add_conflict_type(tb: Table) -> Table:
         "Vietnam, 1964-75",
     ]
     mask_custom = tb["name"].isin(wars_interstate)
-    assert (
-        mask_custom.sum() == len(wars_interstate)
-    ), "Some corrections can't be made, because some war names specified in `wars_interstate` are not found in the data!"
+    assert mask_custom.sum() == len(wars_interstate), (
+        "Some corrections can't be made, because some war names specified in `wars_interstate` are not found in the data!"
+    )
     ## Build final mask
     mask = name_wo_year.str.contains("-") | mask_custom
 
@@ -236,7 +235,6 @@ def add_lower_bound_deaths(tb: Table) -> Table:
     return tb
 
 
-@pl.wrap("expand_observations")
 def expand_observations(tb: Table) -> Table:
     """Expand to have a row per (year, conflict).
 
@@ -265,7 +263,6 @@ def expand_observations(tb: Table) -> Table:
     return tb
 
 
-@pl.wrap("estimate_metrics", parents=["totalfatalities"])
 def estimate_metrics(tb: Table) -> Table:
     """Remix table to have the desired metrics.
 
@@ -329,10 +326,10 @@ def _add_ongoing_metrics(tb: Table) -> Table:
         [tb_ongoing, tb_ongoing_all_conf, tb_ongoing_world, tb_ongoing_world_all_conf], ignore_index=True
     )
 
-    tb_ongoing = tb_concat.sort_values(by=["year", "region", "conflict_type"])  # type: ignore
+    tb_ongoing = tb_concat.sort_values(by=["year", "region", "conflict_type"])  # ty: ignore
 
     ## Rename columns
-    tb_ongoing = tb_ongoing.rename(  # type: ignore
+    tb_ongoing = tb_ongoing.rename(  # ty: ignore
         columns={
             "conflict_code": "number_ongoing_conflicts",
             "totalfatalities": "number_deaths_ongoing_conflicts",
@@ -362,12 +359,12 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_world_all_conf["conflict_type"] = "all"
 
     ## Combine
-    tb_new = pr.concat([tb_new, tb_new_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pr.concat([tb_new, tb_new_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True).sort_values(  # ty: ignore
         by=["startyear", "region", "conflict_type"]
     )
 
     ## Rename columns
-    tb_new = tb_new.rename(  # type: ignore
+    tb_new = tb_new.rename(  # ty: ignore
         columns={
             "startyear": "year",
             "conflict_code": "number_new_conflicts",

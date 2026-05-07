@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/4253
-    date_accessed: 2023-08-10 09:03:56.331238
+    url: https://admin.owid.io/admin/datasets/4253
+    date_accessed: 2026-03-10 09:14:30.169071+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4253_friends_and_family_support__oecd_based_on_gallup__2016
   description: The OECD average is population-weighted.
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fefd845842c5b4b71f361643cb04ddea
-  size: 2490
-  path: dataset_4253_friends_and_family_support__oecd_based_on_gallup__2016_config.json
+  - md5: 24bb8cfc8a290a28587eb7fbec9b4e3f
+    size: 2620
+    path: dataset_4253_friends_and_family_support__oecd_based_on_gallup__2016_config.json

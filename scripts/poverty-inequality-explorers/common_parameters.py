@@ -33,11 +33,11 @@ Y_AXIS_MIN = 0
 ####################################################################################################
 # WORLD BANK POVERTY AND INEQUALITY PLATFORM
 ####################################################################################################
-SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2025)"
+SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2026)"
 # TODO: Update the PIP versions here
-DATA_PUBLISHED_BY_PIP = "World Bank (2025). Poverty and Inequality Platform (version 20250930_2021 and 20250930_2017) [Data set]. World Bank Group. https://pip.worldbank.org/."
+DATA_PUBLISHED_BY_PIP = "World Bank (2026). Poverty and Inequality Platform (version 20260324_2021 and 20260324_2017) [Data set]. World Bank Group. https://pip.worldbank.org/."
 SOURCE_LINK_PIP = "https://pip.worldbank.org"
-CONSUMPTION_SPELLS_PIP = 8
+CONSUMPTION_SPELLS_PIP = 10
 INCOME_SPELLS_PIP = 8
 
 # Define PPP versions
@@ -126,12 +126,12 @@ PPP_DESCRIPTION_PIP_CURRENT = f"The data is measured in international-$ at {PPP_
 ####################################################################################################
 # WORLD INEQUALITY DATABASE
 ####################################################################################################
-SOURCE_NAME_WID = "World Inequality Database (WID.world) (2025)"
+SOURCE_NAME_WID = "World Inequality Database (WID.world) (2026)"
 DATA_PUBLISHED_BY_WID = "World Inequality Database (WID), https://wid.world"
 SOURCE_LINK_WID = "https://wid.world"
 
 # NOTE: Also update the year here: https://docs.google.com/spreadsheets/d/1wcFsNZCEn_6SJ05BFkXKLUyvCrnigfR8eeemGKgAYsI/edit#gid=329774797
-PPP_VERSION_WID = 2023
+PPP_VERSION_WID = 2024
 
 ADDITIONAL_DESCRIPTION_WID = NEW_LINE.join(
     [
@@ -197,7 +197,7 @@ def save(
     Save the explorer configuration to MySQL via the Admin API.
     """
     # Header is converted into a tab-separated text
-    header_tsv: str = df_header.to_csv(sep="\t", header=False)  # type: ignore
+    header_tsv: str = df_header.to_csv(sep="\t", header=False)  # ty: ignore
 
     # Graphers table is converted into a tab-separated text
     graphers_tsv = df_graphers

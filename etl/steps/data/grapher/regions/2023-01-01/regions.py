@@ -99,8 +99,9 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
+    # Regions is an internal reference table with no external data origins, so skip the origins check.
     ds_grapher = paths.create_dataset(
-        tables=[tb_regions], default_metadata=ds_garden.metadata, check_variables_metadata=True
+        tables=[tb_regions], default_metadata=ds_garden.metadata, check_variables_metadata=False
     )
     ds_grapher.save()
 

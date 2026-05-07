@@ -618,3 +618,18 @@ steps:
     - data://grapher/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-03-11/income_groups
+  #
+  # FAOSTAT garden step for additional variables for version 2025-03-17
+  #
+  data://garden/faostat/2025-03-17/additional_variables:
+    - data://garden/faostat/2025-03-17/faostat_qi
+    - data://garden/faostat/2025-03-17/faostat_rfn
+    - data://garden/faostat/2025-03-17/faostat_qcl
+    - data://garden/faostat/2025-03-17/faostat_fbsc
+    - data://garden/faostat/2025-03-17/faostat_rl
+    - data://garden/faostat/2025-03-17/faostat_sdgb
+  #
+  # FAOSTAT grapher step for additional variables for version 2025-03-17
+  #
+  data://grapher/faostat/2025-03-17/additional_variables:
+    - data://garden/faostat/2025-03-17/additional_variables

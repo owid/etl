@@ -18,6 +18,6 @@ tables:
         short_unit: ""
         presentation:
           grapher_config:
-            note: "Example machines that are not classified as robots: software (e.g., voice assistants), remote-controlled drones, self-driving cars, “smart” washing machines."
+            note: "Only top-ranked countries with publicly available data are shown. Example machines that are not classified as robots: software (e.g., voice assistants), remote-controlled drones, self-driving cars, “smart” washing machines."
         display:
           numDecimalPlaces: 0

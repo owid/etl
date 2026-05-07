@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any, Dict, List, Tuple, Union, cast
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -476,11 +476,11 @@ def save_mappings_to_database(mapping: pd.DataFrame, old_dataset_id: int, new_da
 
     # Create the mapping dictionary expected by WizardDB.add_variable_mapping
     raw_dict = mapping.set_index("id_old")["id_new"].to_dict()
-    mapping_dict: Dict[int, int] = {}
+    mapping_dict: dict[int, int] = {}
     for k, v in raw_dict.items():
         # Explicit type conversion to satisfy type checker
-        key_int = int(cast(Union[int, float, str], k))
-        value_int = int(cast(Union[int, float, str], v))
+        key_int = int(cast(int | float | str, k))
+        value_int = int(cast(int | float | str, v))
         mapping_dict[key_int] = value_int
 
     # Save to database
@@ -497,7 +497,7 @@ def save_mappings_to_database(mapping: pd.DataFrame, old_dataset_id: int, new_da
 
 def preliminary_mapping(
     old_indicators: pd.DataFrame, new_indicators: pd.DataFrame, match_identical: bool
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Find initial mapping between old and new indicators.
 
     Builds a table with initial mapping, and two other dataframes with the remaining variables to be matched.
@@ -548,7 +548,7 @@ def find_mapping_suggestions(
     missing_old: pd.DataFrame,
     missing_new: pd.DataFrame,
     similarity_name: str = "partial_ratio",
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Find suggestions for mapping old variables to new variables.
 
     Creates a list with new variable suggestions for each old variable. The list is therefore the same
@@ -611,7 +611,7 @@ def find_mapping_suggestions_optim(
     missing_old: pd.DataFrame,
     missing_new: pd.DataFrame,
     similarity_name: str = "partial_ratio",
-) -> List[Dict[str, Union[pd.DataFrame, pd.Series]]]:
+) -> list[dict[str, pd.DataFrame | pd.Series]]:
     """Find suggestions for mapping old variables to new variables.
 
     Creates a list with new variable suggestions for each old variable. The list is therefore the same
@@ -669,7 +669,7 @@ def find_mapping_suggestions_optim(
     suggestions = []
     for idx, old_row in missing_old.iterrows():
         # Retrieve the similarity scores for the current old_name
-        scores = similarity_scores[idx]  # type: ignore
+        scores = similarity_scores[idx]  # ty: ignore
 
         # Sort missing_new based on these scores
         sorted_indices = np.argsort(-scores)  # Negative for descending sort
@@ -687,7 +687,7 @@ def find_mapping_suggestions_optim(
 
 
 def consolidate_mapping_suggestions_with_user(
-    mapping: pd.DataFrame, suggestions: List[Dict[str, Union[pd.Series, pd.DataFrame]]], max_suggestions: int
+    mapping: pd.DataFrame, suggestions: list[dict[str, pd.Series | pd.DataFrame]], max_suggestions: int
 ):
     """Consolidate mapping suggestions with user input.
 
@@ -706,7 +706,7 @@ def consolidate_mapping_suggestions_with_user(
         name_old = suggestion["old"]["name_old"]
         id_old = suggestion["old"]["id_old"]
         missing_new = suggestion["new"]
-        missing_new = missing_new[~missing_new["id_new"].isin(ids_new_ignore)]  # type: ignore[reportCallIssue]
+        missing_new = missing_new[~missing_new["id_new"].isin(ids_new_ignore)]  # ty: ignore[call-non-callable]
         new_indexes = missing_new.index.tolist()
 
         # display comparison to user
@@ -770,7 +770,7 @@ def get_similarity_function(similarity_name: str) -> Any:
     return similarity_function
 
 
-def save_data_to_json_file(data: Union[list[str], dict[Any, Any]], json_file: str, **kwargs: Any) -> None:
+def save_data_to_json_file(data: list[str] | dict[Any, Any], json_file: str, **kwargs: Any) -> None:
     """Save data to a json file.
 
     Parameters

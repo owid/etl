@@ -1,15 +1,55 @@
 import * as assert from 'assert';
 
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 import * as vscode from 'vscode';
-// import * as myExtension from '../../extension';
 
-suite('Extension Test Suite', () => {
+import { classifyDagLine } from '../extension';
+
+suite('classifyDagLine', () => {
 	vscode.window.showInformationMessage('Start all tests.');
 
-	test('Sample test', () => {
-		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+	test('top-level step declaration', () => {
+		const result = classifyDagLine('  data://garden/un/2022-07-11/un_wpp:');
+		assert.deepStrictEqual(result, {
+			uri: 'data://garden/un/2022-07-11/un_wpp',
+			isDefinition: true,
+		});
+	});
+
+	test('plain dependency reference', () => {
+		const result = classifyDagLine('    - data://garden/un/2022-07-11/un_wpp');
+		assert.deepStrictEqual(result, {
+			uri: 'data://garden/un/2022-07-11/un_wpp',
+			isDefinition: false,
+		});
+	});
+
+	test('snapshot dependency', () => {
+		const result = classifyDagLine('    - snapshot://un/2022-07-11/un_wpp.zip');
+		assert.deepStrictEqual(result, {
+			uri: 'snapshot://un/2022-07-11/un_wpp.zip',
+			isDefinition: false,
+		});
+	});
+
+	test('lines with no URI return null', () => {
+		assert.strictEqual(classifyDagLine('  # UN WPP (2022)'), null);
+		assert.strictEqual(classifyDagLine(''), null);
+		assert.strictEqual(classifyDagLine('steps:'), null);
+	});
+
+	test('data-private scheme is recognised', () => {
+		const result = classifyDagLine('  data-private://garden/wip/latest/foo:');
+		assert.deepStrictEqual(result, {
+			uri: 'data-private://garden/wip/latest/foo',
+			isDefinition: true,
+		});
+	});
+
+	test('export scheme is recognised', () => {
+		const result = classifyDagLine('    - export://explorers/un/latest/un_wpp');
+		assert.deepStrictEqual(result, {
+			uri: 'export://explorers/un/latest/un_wpp',
+			isDefinition: false,
+		});
 	});
 });

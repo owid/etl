@@ -1,0 +1,54 @@
+dataset:
+  title: Ukraine-Russia contribution to global food
+tables:
+  ukraine_russia_contribution_to_global_food:
+    variables:
+      russia_exports:
+        title: russia_exports
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      russia_production:
+        title: russia_production
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      russia_share_global_exports:
+        title: russia_share_global_exports
+        unit: '%'
+        short_unit: '%'
+      russia_share_global_production:
+        title: russia_share_global_production
+        unit: '%'
+        short_unit: '%'
+      ukraine_exports:
+        title: ukraine_exports
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      ukraine_production:
+        title: ukraine_production
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      ukraine_share_global_exports:
+        title: ukraine_share_global_exports
+        unit: '%'
+        short_unit: '%'
+      ukraine_share_global_production:
+        title: ukraine_share_global_production
+        unit: '%'
+        short_unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/302
-    date_accessed: 2023-08-10 09:18:56.466506
+    url: https://admin.owid.io/admin/datasets/302
+    date_accessed: 2026-03-05 14:27:07.473212+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_302_tax_composition__todaro_and_smith__2014
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f5487809150bcf994dd457b898099ddd
-  size: 5683
-  path: dataset_302_tax_composition__todaro_and_smith__2014_config.json
+  - md5: 3566233881fcc14d9275827fc36cba7f
+    size: 6278
+    path: dataset_302_tax_composition__todaro_and_smith__2014_config.json

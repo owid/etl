@@ -1,3 +1,6 @@
+topic_tags:
+  - Population Growth
+
 definitions:
   common_views:
     - dimensions:
@@ -25,6 +28,7 @@ definitions:
 config:
   explorerTitle: "Population & Demography"
   explorerSubtitle: "Explore data from the United Nations World Population Prospects."
+  hideAnnotationFieldsInTitle: true
   wpBlockId: 52216
   hasMapTab: true
   thumbnail: "https://owid.cloud/app/uploads/2022/07/Population-Data-Explorer.png"

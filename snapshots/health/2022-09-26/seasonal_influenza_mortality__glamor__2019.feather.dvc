@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: GLaMOR (2019)
+    description: |-
+      This study was part of the Global Pandemic Mortality Project II (GLaMOR) and was conducted by the Netherlands Institute for Health Service Research, in collaboration with the US National Institutes of Health and Centers for Disease Control, funded by the World Health Organization.
+
+      The authors used a two stage approach to estimate annual mortality from seasonal influenza between 2002 and 2011 (excluding the Swine flu pandemic season). In the first step, the authors used weekly or monthly mortality records and influenza surveillance data to estimate age-specific excess respiratory mortality caused by seasonal influenza for 31 countries. In the second step, they used country-specific indicators to extrapolate these estimates to remaining countries. They applied sensitivity analyses and estimated reliability coefficients to understand how sensitive these estimates were to different methodological decisions.
+
+      These estimates focus on respiratory-associated influenza mortality. This means they aim to include respiratory deaths where other complications may have been listed as the primary cause of death, but those deaths were actually caused by influenza. However, it would exclude deaths where patients did not have respiratory disease, even if their deaths were caused by influenza (such as through only cardiovascular complications).
+
+      The global number of people who die from other complications of the flu is unclear. Paget et al. (the authors of the GLaMOR project) state in their paper that their estimate “does not cover cardiovascular deaths, something that could at least double the estimate of influenza-associated deaths.” In recent meta-analyses, Behrouzi et al. found that influenza vaccination reduces the chances of major cardiovascular events (such as heart attacks and strokes) by around 34%, in clinical trials of the elderly. This suggests the death toll from other complications could be large. However, global estimates have not been made of these types of deaths from flu.
+
+      See: Paget, J., Danielle Iuliano, A., Taylor, R. J., Simonsen, L., Viboud, C., & Spreeuwenberg, P. (2022). Estimates of mortality associated with seasonal influenza for the European Union from the GLaMOR project. Vaccine, 40(9), 1361–1369. https://doi.org/10.1016/j.vaccine.2021.11.080
+      Behrouzi, B., Bhatt, D. L., Cannon, C. P., Vardeny, O., Lee, D. S., Solomon, S. D., & Udell, J. A. (2022). Association of Influenza Vaccination With Cardiovascular Risk: A Meta-analysis. JAMA Network Open, 5(4), e228873. https://doi.org/10.1001/jamanetworkopen.2022.8873
+    url: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6815659/
+    date_accessed: 2022-09-26
+    published_by: |-
+      Paget J, Spreeuwenberg P, Charu V, Taylor RJ, Iuliano AD, Bresee J, Simonsen L, Viboud C; Global Seasonal Influenza-associated Mortality Collaborator Network and GLaMOR Collaborating Teams*. Global mortality associated with seasonal influenza epidemics: New burden estimates and predictors from the GLaMOR Project. J Glob Health. 2019 Dec;9(2):020421. doi: 10.7189/jogh.09.020421. PMID: 31673337; PMCID: PMC6815659.
+  name: Seasonal influenza mortality – GLaMOR (2019)
+  description: This dataset has higher estimates for seasonal influenza mortality for Eastern European countries than the CDC dataset.
+  is_public: false
+outs:
+  - md5: 1db49f26fc7baee570f898be6f81a0f4
+    size: 17730
+    path: seasonal_influenza_mortality__glamor__2019.feather

@@ -4,7 +4,6 @@ import shutil
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Set
 
 import click
 import commentjson
@@ -29,7 +28,7 @@ def should_exclude(path: Path) -> bool:
     return True
 
 
-def snapshots_to_exclude(active_snapshots: Set[str]) -> Set[str]:
+def snapshots_to_exclude(active_snapshots: set[str]) -> set[str]:
     to_exclude = set()
 
     active_snapshots_folders = {s.rsplit("/", 1)[0] for s in active_snapshots}
@@ -47,7 +46,7 @@ def snapshots_to_exclude(active_snapshots: Set[str]) -> Set[str]:
     return to_exclude
 
 
-def steps_to_exclude(active_steps: Set[str]) -> Set[str]:
+def steps_to_exclude(active_steps: set[str]) -> set[str]:
     to_exclude = set()
 
     for d in STEPS_DATA_DIR.rglob("*"):

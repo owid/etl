@@ -3,7 +3,7 @@
 import json
 from operator import itemgetter
 from pathlib import Path
-from typing import List, cast
+from typing import cast
 
 import streamlit as st
 from owid.catalog import Dataset
@@ -26,7 +26,7 @@ NUM_SUGGESTIONS = 1000
 ####################################################################################################
 # FUNCTIONS & other configs
 ####################################################################################################
-def sort_values(values: List[str], values_priority: List[str]) -> List[str]:
+def sort_values(values: list[str], values_priority: list[str]) -> list[str]:
     """Sort values based on priorities.
 
     For instance, we want column 'country' to be shown first. The top prefered values are in `values_priority`.
@@ -60,7 +60,7 @@ def sort_values(values: List[str], values_priority: List[str]) -> List[str]:
     return values
 
 
-def sort_table_names(dataset: Dataset) -> List[str]:
+def sort_table_names(dataset: Dataset) -> list[str]:
     """Sort table names based on priorities.
 
     For instance, we want table 'location' to be shown first. The top prefered values are in `values_priority`.
@@ -76,7 +76,7 @@ def sort_table_names(dataset: Dataset) -> List[str]:
     return table_names
 
 
-def sort_indicators(indicators: List[str]) -> List[str]:
+def sort_indicators(indicators: list[str]) -> list[str]:
     """Sort indicators based on priorities.
 
     For instance, we want column 'country' to be shown first. The top prefered values are in `values_priority`.
@@ -278,7 +278,7 @@ def render(step_uri):
                     with st.popover("Automatically mapped entities"):
                         st.dataframe(harmonizer.mapping)
 
-                ambiguous = cast(List, harmonizer.ambiguous)
+                ambiguous = cast(list, harmonizer.ambiguous)
 
                 ## 1/ AUTOMATIC
                 st.session_state.entity_mapping = harmonizer.mapping

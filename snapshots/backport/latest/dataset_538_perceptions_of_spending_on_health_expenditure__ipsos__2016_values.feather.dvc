@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/538
-    date_accessed: 2023-08-10 07:48:15.109553
+    url: https://admin.owid.io/admin/datasets/538
+    date_accessed: 2026-03-05 13:31:11.161427+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Perceptions of spending on health expenditure - IPSOS (2016)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d4480d505f9f6ea6ecc247f01223e90b
-  size: 7570
-  path: 
-    dataset_538_perceptions_of_spending_on_health_expenditure__ipsos__2016_values.feather
+  - md5: e32771b6a9a42c6dfd4559d35e3c9816
+    size: 7610
+    path: dataset_538_perceptions_of_spending_on_health_expenditure__ipsos__2016_values.feather

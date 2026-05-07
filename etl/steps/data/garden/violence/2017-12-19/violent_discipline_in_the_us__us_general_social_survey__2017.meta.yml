@@ -1,0 +1,49 @@
+dataset:
+  title: Violent discipline in the US (US General Social Survey (2017))
+tables:
+  violent_discipline_in_the_us__us_general_social_survey__2017:
+    variables:
+      favor_spanking_to_discipline_child__agree__us_general_social_survey__2017:
+        title: Favor spanking to discipline child - Agree (US General Social Survey (2017))
+        unit: ''
+        description: |-
+          The General Social Survey in the US asks: Do you strongly agree, agree, disagree, or strongly disagree that it is sometimes necessary to discipline a child with a good, hard spanking? This variable records the number of survey responses stating 'Agree'
+      favor_spanking_to_discipline_child__disagree__us_general_social_survey__2017:
+        title: Favor spanking to discipline child - Disagree (US General Social Survey (2017))
+        unit: ''
+        description: |-
+          The General Social Survey in the US asks: Do you strongly agree, agree, disagree, or strongly disagree that it is sometimes necessary to discipline a child with a good, hard spanking? This variable records the number of survey responses stating 'Disagree'
+      favor_spanking_to_discipline_child__dont_know__us_general_social_survey__2017:
+        title: Favor spanking to discipline child - Don't know (US General Social Survey (2017))
+        unit: ''
+        description: |-
+          The General Social Survey in the US asks: Do you strongly agree, agree, disagree, or strongly disagree that it is sometimes necessary to discipline a child with a good, hard spanking? This variable records the number of survey responses stating 'Don't know'
+      favor_spanking_to_discipline_child__no_answer__us_general_social_survey__2017:
+        title: Favor spanking to discipline child - No answer (US General Social Survey (2017))
+        unit: ''
+        description: |-
+          The General Social Survey in the US asks: Do you strongly agree, agree, disagree, or strongly disagree that it is sometimes necessary to discipline a child with a good, hard spanking? This variable records the number of blank survey responses
+      favor_spanking_to_discipline_child__not_applicable__us_general_social_survey__2017:
+        title: Favor spanking to discipline child - Not applicable (US General Social Survey (2017))
+        unit: ''
+        description: |-
+          The General Social Survey in the US asks: Do you strongly agree, agree, disagree, or strongly disagree that it is sometimes necessary to discipline a child with a good, hard spanking? This variable records the number of instances where the question was not asked
+      favor_spanking_to_discipline_child__strongly_agree__us_general_social_survey__2017:
+        title: Favor spanking to discipline child - Strongly agree (US General Social Survey (2017))
+        unit: ''
+        description: |-
+          The General Social Survey in the US asks: Do you strongly agree, agree, disagree, or strongly disagree that it is sometimes necessary to discipline a child with a good, hard spanking? This variable records the number of survey responses stating 'Strongly Agree'
+      favor_spanking_to_discipline_child__strongly_disagree__us_general_social_survey__2017:
+        title: Favor spanking to discipline child - Strongly disagree (US General Social Survey (2017))
+        unit: ''
+        description: |-
+          The General Social Survey in the US asks: Do you strongly agree, agree, disagree, or strongly disagree that it is sometimes necessary to discipline a child with a good, hard spanking? This variable records the number of survey responses stating 'Strongly disagree'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

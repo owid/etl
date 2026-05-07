@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
@@ -10,9 +8,10 @@ from etl.data_helpers.population import add_population
 def add_regional_aggregates(
     tb: Table,
     ds_regions: Dataset,
-    index_cols: List[str],
-    regions: List[str],
-    age_group_mapping: Dict[str, List[int]],
+    ds_un_wpp: Dataset,
+    index_cols: list[str],
+    regions: list[str],
+    age_group_mapping: dict[str, list[int]],
     run_percent: bool = False,
 ) -> Table:
     """
@@ -29,11 +28,11 @@ def add_regional_aggregates(
     tb_rate = tb[tb["metric"] == "Rate"].copy()
 
     # Calculate region aggregates for Number
-    tb_number = add_regions_to_number(tb_number, age_group_mapping, ds_regions, index_cols, regions)
+    tb_number = add_regions_to_number(tb_number, age_group_mapping, ds_regions, ds_un_wpp, index_cols, regions)
     # Calculate region aggregates for Rate
     tb_rate_regions = add_regions_to_rate(tb_number, regions)
-    tb_rate = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)  # type: ignore
-    tb_out = pr.concat([tb_rate, tb_number], ignore_index=True)  # type: ignore
+    tb_rate = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)  # ty: ignore
+    tb_out = pr.concat([tb_rate, tb_number], ignore_index=True)  # ty: ignore
     if run_percent:
         tb_percent_regions = add_regions_to_percent(tb_number, regions, index_cols)
         # Check there aren't any values above 100
@@ -44,10 +43,20 @@ def add_regional_aggregates(
     tb_out = pr.concat([tb_out, tb_percent], ignore_index=True)
     assert tb_out.age.m.origins
     tb_out = tb_out.drop(columns="population")
+
+    # Ensure low-cardinality string/object columns are categorical.
+    # This matters because ds.read() with safe_types=True (the default) converts
+    # category → string. Without this, repack_frame has to rediscover the optimal
+    # dtype for each column via a slow to_int → to_float → to_category cascade
+    # (~20s+ for 23M rows).
+    for col in tb_out.columns:
+        if tb_out[col].dtype == "object" or tb_out[col].dtype.name == "string":
+            tb_out[col] = tb_out[col].astype("category")
+
     return tb_out
 
 
-def add_regions_to_percent(tb_number: Table, regions: List[str], index_cols: List[str]) -> Table:
+def add_regions_to_percent(tb_number: Table, regions: list[str], index_cols: list[str]) -> Table:
     """
     Calculating the share of deaths using the value of 'All causes' for each dataset as a denominator
     """
@@ -68,22 +77,22 @@ def add_regions_to_percent(tb_number: Table, regions: List[str], index_cols: Lis
     return tb_percent
 
 
-def add_regions_to_rate(tb_number: Table, regions: List[str]) -> Table:
+def add_regions_to_rate(tb_number: Table, regions: list[str]) -> Table:
     tb_rate = tb_number[(tb_number["country"].isin(regions)) & (tb_number["metric"] == "Number")].copy()
 
     # Calculate rates per 100,000 for regions
     tb_rate["value"] = (tb_rate["value"] / tb_rate["population"]) * 100000
     tb_rate["metric"] = "Rate"
-    tb_rate = tb_rate.astype({"metric": "category"})
     return tb_rate
 
 
 def add_regions_to_number(
     tb_number: Table,
-    age_group_mapping: Dict[str, List[int]],
+    age_group_mapping: dict[str, list[int]],
     ds_regions: Dataset,
-    index_cols: List[str],
-    regions: List[str],
+    ds_un_wpp: Dataset,
+    index_cols: list[str],
+    regions: list[str],
 ) -> Table:
     # Add population data - some datasets will have data disaggregated by sex
     if "sex" in tb_number.columns:
@@ -97,6 +106,7 @@ def add_regions_to_number(
             sex_group_all="Both",
             sex_group_female="Female",
             sex_group_male="Male",
+            ds_un_wpp=ds_un_wpp,
         )
     else:
         tb_number = add_population(
@@ -105,15 +115,13 @@ def add_regions_to_number(
             year_col="year",
             age_col="age",
             age_group_mapping=age_group_mapping,
+            ds_un_wpp=ds_un_wpp,
         )
     assert tb_number["value"].notna().all(), "Values are missing in the Number table, check configuration"
 
-    # Convert categorical columns to string to avoid sum() issues in geo.add_regions_to_table
-    categorical_cols = tb_number.select_dtypes(include=["category"]).columns.tolist()
-    for col in categorical_cols:
-        tb_number[col] = tb_number[col].astype(str)
-
     # Add region aggregates - for Number
+    # NOTE: geo.add_regions_to_table handles categorical columns correctly,
+    # no need to convert to string first.
     tb_number = geo.add_regions_to_table(
         tb_number,
         index_columns=index_cols,
@@ -121,10 +129,6 @@ def add_regions_to_number(
         ds_regions=ds_regions,
         min_num_values_per_year=1,
     )
-
-    # Convert back to categorical after aggregation
-    for col in categorical_cols:
-        tb_number[col] = tb_number[col].astype("category")
 
     return tb_number
 

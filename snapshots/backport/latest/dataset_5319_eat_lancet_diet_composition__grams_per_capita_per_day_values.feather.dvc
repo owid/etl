@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5319
-    date_accessed: 2023-08-10 08:43:17.956852
+    url: https://admin.owid.io/admin/datasets/5319
+    date_accessed: 2026-03-10 07:42:13.726239+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: eat-lancet-diet-composition (grams per capita per day)
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b2712701bb12d2b1ed47517f6fcd7858
-  size: 67930
-  path: 
-    dataset_5319_eat_lancet_diet_composition__grams_per_capita_per_day_values.feather
+  - md5: 6e5ca7f00a176c50c60fb805ad763688
+    size: 68706
+    path: dataset_5319_eat_lancet_diet_composition__grams_per_capita_per_day_values.feather

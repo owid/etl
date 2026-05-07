@@ -316,8 +316,8 @@ def test_to_safe_types_multiindex():
     df_safe = repack.to_safe_types(df)
 
     # Check index levels
-    assert df_safe.index.levels[0].dtype == "Int64"  # type: ignore
-    assert df_safe.index.levels[1].dtype == "string[pyarrow]"  # type: ignore
+    assert df_safe.index.levels[0].dtype == "Int64"  # ty: ignore
+    assert df_safe.index.levels[1].dtype == "string[pyarrow]"  # ty: ignore
     # Check column dtype
     assert df_safe["float_col"].dtype == "Float64"
 

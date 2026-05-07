@@ -1,0 +1,154 @@
+dataset:
+  title: Agricultural total factor productivity (USDA)
+tables:
+  agricultural_total_factor_productivity__usda:
+    variables:
+      ag_land_index:
+        title: ag_land_index
+        unit: ''
+      ag_land_quantity:
+        title: ag_land_quantity
+        unit: hectares of rainfed-cropland-equivalents
+        short_unit: ha
+        display:
+          conversionFactor: 1000
+          name: Agricultural land
+        description: Agricultural land is the sum of croplands and pasture used for livestock grazing.
+      animal_feed_quantity:
+        title: animal_feed_quantity
+        unit: Mcal of metabolizable energy
+        short_unit: Mcal
+        display:
+          conversionFactor: 1000000
+          name: Animal feed production
+        description: Animal feed production is measured in Mcal of metabolizable energy.
+      animal_output_quantity:
+        title: animal_output_quantity
+        unit: ''
+      capital_index:
+        title: capital_index
+        unit: ''
+      capital_quantity:
+        title: capital_quantity
+        unit: constant 2015 US$
+        short_unit: $
+        display:
+          conversionFactor: 1000000
+          name: Capital stock in agriculture
+      crop_output_quantity:
+        title: crop_output_quantity
+        unit: ''
+      cropland_quantity:
+        title: cropland_quantity
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000
+          name: Cropland
+      fertilizer_per_ag_land:
+        title: fertilizer_per_ag_land
+        unit: tonnes per hectares of cropland-rainfed equivalents
+        display:
+          name: Fertilizer use per unit of agricultural land
+        description: |-
+          Total fertilizer consumption is the sum of synthetic inputs of nitrogen, potassium and phosphorous, plus organic nitrogen inputs. This is measured per unit of agricultural land, where this land is normalized between cropland and pasture into 'rainfed-cropland-equivalents'.
+      fertilizer_per_capita:
+        title: fertilizer_per_capita
+        unit: kilograms per year
+        short_unit: kg
+        display:
+          conversionFactor: 1000
+          name: Fertilizer use per capita
+        description: |-
+          Total fertilizer consumption is the sum of synthetic inputs of nitrogen, potassium and phosphorous, plus organic nitrogen inputs. This is calculated as the average per person by dividing by a country or region's total population.
+      fertilizer_per_cropland:
+        title: fertilizer_per_cropland
+        unit: kilograms per hectare
+        short_unit: ha
+        display:
+          conversionFactor: 1000
+          name: Fertilizer use per hectare of cropland
+        description: |-
+          Total fertilizer consumption is the sum of synthetic inputs of nitrogen, potassium and phosphorous, plus organic nitrogen inputs. This is divided by total cropland are to get an average of fertilizer use per unit of cropland.
+      fertilizer_quantity:
+        title: fertilizer_quantity
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Fertilizer consumption
+        description: |-
+          Fertilizer consumption is measured as the sum of synthetic inputs of nitrogen, potassium and phosphorous, plus organic nitrogen inputs.
+      fish_output_quantity:
+        title: fish_output_quantity
+        unit: ''
+      inputs:
+        title: inputs
+        unit: ''
+      irrigation_quantity:
+        title: irrigation_quantity
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000
+          name: Area equipped for irrigation
+      labor_index:
+        title: labor_index
+        unit: ''
+      labor_quantity:
+        title: labor_quantity
+        unit: economically active people
+        display:
+          conversionFactor: 1000
+          name: Number of people working in agriculture
+        description: |-
+          Agricultural labor is measured as the number of economically active people working in agriculture. This is converted to full-time equivalents.
+      livestock_quantity:
+        title: livestock_quantity
+        unit: head of standard livestock units
+        display:
+          conversionFactor: 1000
+          name: Livestock quantity
+        description: Livestock counts are measured in heads of standard livestock units.
+      machinery_per_ag_land:
+        title: machinery_per_ag_land
+        unit: ''
+        display:
+          name: Machinery per unit of agricultural land
+      machinery_per_cropland:
+        title: machinery_per_cropland
+        unit: ''
+      machinery_quantity:
+        title: machinery_quantity
+        unit: horsepower
+        display:
+          conversionFactor: 1000
+          name: Agricultural machinery
+      materials_index:
+        title: materials_index
+        unit: ''
+      output:
+        title: output
+        unit: ''
+      output_quantity:
+        title: output_quantity
+        unit: ''
+      pasture_quantity:
+        title: pasture_quantity
+        unit: hectares
+        short_unit: ha
+        display:
+          conversionFactor: 1000
+          name: Pasture
+        description: Pasture is grassland used for livestock grazing.
+      tfp:
+        title: tfp
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

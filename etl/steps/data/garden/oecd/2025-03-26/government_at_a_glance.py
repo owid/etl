@@ -158,9 +158,9 @@ def run() -> None:
     tb.loc[tb["unit_multiplier"] == "Millions", "value"] *= 1_000_000
 
     # Check if all unit keys are in the dataset.
-    assert set(tb["unit"].unique()) == set(
-        UNITS.keys()
-    ), f"Some unit keys are not in the dataset: {set(tb['unit'].unique())- set(UNITS.keys())}".format()
+    assert set(tb["unit"].unique()) == set(UNITS.keys()), (
+        f"Some unit keys are not in the dataset: {set(tb['unit'].unique()) - set(UNITS.keys())}".format()
+    )
 
     # Rename unit column.
     tb["unit"] = tb["unit"].map(UNITS)
@@ -169,9 +169,9 @@ def run() -> None:
     tb["indicator"] = tb["indicator"].map(INDICATORS).fillna(tb["indicator"])
 
     # Check if all the functions are in the dataset, excluding NA values.
-    assert (
-        set(tb["function"].dropna().unique()) == set(FUNCTIONS.keys())
-    ), f"Some function keys are not in the dataset: {set(tb['function'].dropna().unique()) - set(FUNCTIONS.keys())}".format()
+    assert set(tb["function"].dropna().unique()) == set(FUNCTIONS.keys()), (
+        f"Some function keys are not in the dataset: {set(tb['function'].dropna().unique()) - set(FUNCTIONS.keys())}".format()
+    )
 
     # Rename function column.
     tb["function"] = tb["function"].map(FUNCTIONS)
@@ -239,7 +239,7 @@ def sanity_checks(tb: Table) -> None:
             if DEBUG:
                 log.warning(
                     f"""{len(tb_error)} observations of {column} are negative:
-                        {tabulate(tb_error[INDEX + [column]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                        {tabulate(tb_error[INDEX + [column]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
                 )
 
     # SPENDING BY FUNCTION ADDING UP TO 100%
@@ -265,7 +265,7 @@ def sanity_checks(tb: Table) -> None:
         if DEBUG:
             log.warning(
                 f"""{len(tb_error)} observations of Government expenditure by function do not add up to 100%:
-                    {tabulate(tb_error[["country", "year", "Government expenditure by function"]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {tabulate(tb_error[["country", "year", "Government expenditure by function"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
             )
 
     return None

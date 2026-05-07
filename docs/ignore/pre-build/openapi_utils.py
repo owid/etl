@@ -1,7 +1,7 @@
 """Utility functions for fetching and processing OpenAPI specs from GitHub."""
 
 import re
-from typing import Any, Dict
+from typing import Any
 
 import yaml
 
@@ -26,7 +26,7 @@ def load_openapi_spec_from_github(
     repo: str,
     file_path: str,
     branch: str | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Load OpenAPI specification from GitHub repository.
 
     Args:

@@ -266,7 +266,7 @@ def main():
 
     _show_options()
 
-    hide_unchanged_explorers: bool = st.session_state.get("hide_unchanged_explorers")  # type: ignore
+    hide_unchanged_explorers: bool = st.session_state.get("hide_unchanged_explorers")  # ty: ignore
 
     # Step 1: Display explorer selection UI
     explorer_slug = _display_explorer_selection(hide_unchanged_explorers)

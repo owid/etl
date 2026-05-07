@@ -1,0 +1,44 @@
+dataset:
+  title: Methods used by employed workers to find their current jobs - Pellizzari (2010)
+tables:
+  methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010:
+    variables:
+      percentage_of_workers_who_relied_on_adverts_to_find_their_current_jobs:
+        title: Percentage of workers who relied on adverts to find their current jobs
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      percentage_of_workers_who_relied_on_agencies_to_find_their_current_jobs:
+        title: Percentage of workers who relied on agencies to find their current jobs
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      percentage_of_workers_who_relied_on_direct_applications_to_find_their_current_job:
+        title: Percentage of workers who relied on direct applications to find their current job
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      percentage_of_workers_who_relied_on_other_methods_to_find_their_current_job:
+        title: Percentage of workers who relied on other methods to find their current job
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      percentage_of_workers_who_relied_on_personal_contacts_to_find_their_current_job:
+        title: Percentage of workers who relied on personal contacts to find their current job
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

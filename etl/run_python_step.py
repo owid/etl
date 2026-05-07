@@ -4,11 +4,11 @@
 
 import sys
 from importlib import import_module
-from typing import Optional
 
 import rich_click as click
 from ipdb import launch_ipdb_on_exception
 
+from etl import config
 from etl.paths import BASE_PACKAGE, STEP_DIR
 from etl.steps import run_module_run
 
@@ -17,11 +17,13 @@ from etl.steps import run_module_run
 @click.argument("uri")
 @click.argument("dest_dir")
 @click.option("--ipdb", is_flag=True)
-def main(uri: str, dest_dir: str, ipdb: Optional[bool]) -> None:
+def main(uri: str, dest_dir: str, ipdb: bool | None) -> None:
     """Import and run a specific step of the ETL.
 
     Meant to be ran as a subprocess by the main `etl` command. There's a quite big overhead (~3s) from importing all packages again in the new subprocess.
     """
+    config.enable_structlog_filtering()
+
     step_type, path = uri.split("://", 1)
 
     allowed_step_types = ["data", "data-private", "export"]

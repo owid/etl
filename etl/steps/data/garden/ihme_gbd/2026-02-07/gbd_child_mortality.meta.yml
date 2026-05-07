@@ -5,6 +5,7 @@ definitions:
       topic_tags:
         - Global Health
         - Causes of Death
+      attribution_short: IHME
     processing_level: minor
 
   description_key: |-

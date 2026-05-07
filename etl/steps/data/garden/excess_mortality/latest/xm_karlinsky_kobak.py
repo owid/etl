@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -122,7 +122,7 @@ def filter_entries(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def estimate_time_unit(df: pd.DataFrame, column_idx: List[str]) -> pd.DataFrame:
+def estimate_time_unit(df: pd.DataFrame, column_idx: list[str]) -> pd.DataFrame:
     """Deduce time unit from time column."""
     # Ensure that for each entity and year, we don't have the same time value repeated
     assert df[column_idx].value_counts().max() == 1, "There are duplicate year-entitiy-time pairs."
@@ -130,9 +130,9 @@ def estimate_time_unit(df: pd.DataFrame, column_idx: List[str]) -> pd.DataFrame:
     ds = df.groupby("entity")["time"].nunique().sort_values(ascending=False)
     ds = ds.map({12: "monthly", 53: "weekly"})
     ds.name = "time_unit"
-    assert (
-        ds.isna().sum() == 0
-    ), "Some entities have neither 12 nor 53 time values. Therefore `time_unit` cannot be estimated!"
+    assert ds.isna().sum() == 0, (
+        "Some entities have neither 12 nor 53 time values. Therefore `time_unit` cannot be estimated!"
+    )
     # Add `time_unit` column to df
     shape_0 = df.shape
     df = df.merge(ds, on="entity")
@@ -163,7 +163,7 @@ def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _get_column_renaming(df: pd.DataFrame) -> Dict[Any, str]:
+def _get_column_renaming(df: pd.DataFrame) -> dict[Any, str]:
     """Build column renaming dictionary."""
     # Build column rename dictionary
     template = "baseline_proj"

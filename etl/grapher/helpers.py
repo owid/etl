@@ -1,13 +1,13 @@
 import copy
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, Optional, Set, Union, cast
+from typing import Any, Literal, cast
 
 import numpy as np
 import pandas as pd
 import pymysql
 import structlog
-from jsonschema import validate
 from owid import catalog
 from owid.catalog.core import Table, jinja, warnings
 from owid.catalog.core.utils import dynamic_yaml_load, dynamic_yaml_to_dict, underscore
@@ -82,7 +82,7 @@ def _yield_wide_table(
         table_to_yield = table_to_yield[[c for c in table_to_yield.columns if c not in dim_names]]
 
         # Filter NaN values from dimensions and return dictionary
-        dim_dict = _create_dim_dict(dim_names, dim_values)  # type: ignore
+        dim_dict = _create_dim_dict(dim_names, dim_values)  # ty: ignore
 
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
@@ -94,9 +94,9 @@ def _yield_wide_table(
                 continue
 
             # Safety check to see if the metadata is still intact
-            assert (
-                table_to_yield[column].metadata.unit is not None
-            ), f"Unit for column {column} should not be None here!"
+            assert table_to_yield[column].metadata.unit is not None, (
+                f"Unit for column {column} should not be None here!"
+            )
 
             # Select only one column and dimensions for performance
             # Silence - DeprecationWarning: Passing a BlockManager to Table is deprecated and will raise
@@ -117,12 +117,14 @@ def _yield_wide_table(
             tab.metadata.short_name = short_name
             tab.rename(columns={column: short_name}, inplace=True)
 
-            tab[short_name].metadata = _metadata_for_dimensions(tab[short_name].metadata, dim_dict, column)
+            tab[short_name].metadata = _metadata_for_dimensions(  # ty: ignore[unresolved-attribute]
+                tab[short_name].metadata, dim_dict, column
+            )
 
             yield tab
 
 
-def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: str) -> catalog.VariableMeta:
+def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: dict[str, Any], column: str) -> catalog.VariableMeta:
     """Add dimensions to metadata and expand Jinja in metadata fields."""
     # Add info about dimensions to metadata
     if dim_dict:
@@ -155,7 +157,7 @@ def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any
         ) from e
 
 
-def _create_dim_dict(dim_names: List[str], dim_values: List[Any]) -> Dict[str, Any]:
+def _create_dim_dict(dim_names: list[str], dim_values: list[Any]) -> dict[str, Any]:
     # Filter NaN values from dimensions and return dictionary
     return {n: v for n, v in zip(dim_names, dim_values) if pd.notnull(v)}
 
@@ -168,7 +170,7 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
     dim_names = [k for k in long_tb.primary_key if k not in ("year", "country", "date")]
 
     # Unstack dimensions to a wide format
-    wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))  # type: ignore
+    wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))  # ty: ignore
 
     # Drop columns with all NaNs
     wide_tb = wide_tb.dropna(axis=1, how="all")
@@ -206,7 +208,7 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
     return wide_tb
 
 
-def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[str, Any]:
+def render_yaml_file(path: str | Path, dim_dict: dict[str, str]) -> dict[str, Any]:
     """Load YAML file and render Jinja in all fields. Return a dictionary.
 
     Usage:
@@ -221,7 +223,7 @@ def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[s
     return jinja._expand_jinja(meta, dim_dict)
 
 
-def _title_column_and_dimensions(title: str, dim_dict: Dict[str, Any]) -> str:
+def _title_column_and_dimensions(title: str, dim_dict: dict[str, Any]) -> str:
     """Create new title from column title and dimensions.
     For instance `Deaths`, ["age", "sex"], ["10-18", "male"] will be converted into
     Deaths - Age: 10-18 - Sex: male
@@ -230,7 +232,7 @@ def _title_column_and_dimensions(title: str, dim_dict: Dict[str, Any]) -> str:
     return " - ".join([title] + dims)
 
 
-def _underscore_column_and_dimensions(column: str, dim_dict: Dict[str, Any], trim_long_short_name: bool = True) -> str:
+def _underscore_column_and_dimensions(column: str, dim_dict: dict[str, Any], trim_long_short_name: bool = True) -> str:
     # add dimension names to dimensions
     dims = [f"{dim_name}_{dim_value}" for dim_name, dim_value in dim_dict.items()]
 
@@ -266,14 +268,14 @@ def _assert_long_table(table: catalog.Table) -> None:
         "value",
     }, "Table must have columns `variable`, `meta` and `value`"
     assert isinstance(table, catalog.Table), "Table must be instance of `catalog.Table`"
-    assert (
-        table["meta"].dropna().map(lambda x: isinstance(x, catalog.VariableMeta)).all()
-    ), "Values in column `meta` must be either instances of `catalog.VariableMeta` or null"
+    assert table["meta"].dropna().map(lambda x: isinstance(x, catalog.VariableMeta)).all(), (
+        "Values in column `meta` must be either instances of `catalog.VariableMeta` or null"
+    )
 
 
 def long_to_wide_tables(
     table: catalog.Table,
-    metadata_path: Optional[Path] = None,
+    metadata_path: Path | None = None,
 ) -> Iterable[catalog.Table]:
     """Yield wide tables from long table with the following columns:
     - variable: short variable name (needs to be underscored)
@@ -293,9 +295,9 @@ def long_to_wide_tables(
         # extract metadata from column and make sure it is identical for all rows
         meta = t.pop("meta")
         t.pop("variable")
-        assert set(meta.map(id)) == {
-            id(meta.iloc[0])
-        }, f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
+        assert set(meta.map(id)) == {id(meta.iloc[0])}, (
+            f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
+        )
         t[var_name].metadata = meta.iloc[0]
 
         # name table as variable name
@@ -308,14 +310,14 @@ def long_to_wide_tables(
 
 
 def _get_entities_from_db(
-    countries: Set[str], by: Literal["name", "code"], engine: Engine | None = None
-) -> Dict[str, int]:
+    countries: set[str], by: Literal["name", "code"], engine: Engine | None = None
+) -> dict[str, int]:
     q = f"select id as entity_id, {by} from entities where {by} in %(names)s"
     df = read_sql(q, engine, params={"names": list(countries)})
-    return cast(Dict[str, int], df.set_index(by).entity_id.to_dict())
+    return cast(dict[str, int], df.set_index(by).entity_id.to_dict())
 
 
-def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = None) -> Dict[str, int]:
+def _get_and_create_entities_in_db(countries: set[str], engine: Engine | None = None) -> dict[str, int]:
     engine = engine or get_engine()
     with Session(engine) as session:
         log.info("Creating entities in DB", countries=countries)
@@ -394,21 +396,21 @@ def country_to_entity_id(
         assert by == "name", "create_entities works only with `by='name'`"
         ix = entity_id.isnull()
         # cast to float to fix issues with categories
-        entity_id[ix] = (  # type: ignore[reportCallIssue]
-            country[ix].map(_get_and_create_entities_in_db(set(country[ix].unique()), engine=engine)).astype(float)  # type: ignore[reportCallIssue]
+        entity_id[ix] = (  # ty: ignore[call-non-callable]
+            country[ix].map(_get_and_create_entities_in_db(set(country[ix].unique()), engine=engine)).astype(float)  # ty: ignore[call-non-callable]
         )
 
-    assert not entity_id.isnull().any(), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"  # type: ignore[reportCallIssue]
+    assert not entity_id.isnull().any(), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"  # ty: ignore[call-non-callable]
 
     return cast(pd.Series, entity_id.astype(int))
 
 
-def _unique(x: List[Any]) -> List[Any]:
+def _unique(x: list[Any]) -> list[Any]:
     """Uniquify a list, preserving order."""
     return list(dict.fromkeys(x))
 
 
-def combine_metadata_sources(sources: List[catalog.Source]) -> catalog.Source:
+def combine_metadata_sources(sources: list[catalog.Source]) -> catalog.Source:
     """Combine each of the attributes in the sources and assign them to the first source, since
     that is the only source that grapher will read.
 
@@ -460,7 +462,7 @@ def combine_metadata_sources(sources: List[catalog.Source]) -> catalog.Source:
 
         # Instead of leaving an empty string, make any empty field None.
         if combined_value == "":
-            combined_value = None  # type: ignore
+            combined_value = None  # ty: ignore
 
         setattr(default_source, attribute, combined_value)
 
@@ -525,9 +527,9 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
 
     variable_titles = pd.Series([table[col].title for col in table.columns]).dropna()
     variable_titles_counts = variable_titles.value_counts()
-    assert (
-        variable_titles_counts.empty or variable_titles_counts.max() == 1
-    ), f"Variable titles are not unique:\n{variable_titles_counts[variable_titles_counts > 1].index}."
+    assert variable_titles_counts.empty or variable_titles_counts.max() == 1, (
+        f"Variable titles are not unique:\n{variable_titles_counts[variable_titles_counts > 1].index}."
+    )
 
     # Remember original dimensions
     dim_names = [n for n in table.index.names if n and n not in ("year", "date", "entity_id", "country")]
@@ -551,7 +553,7 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
 
     # Add entity code and name
     with Session(engine) as session:
-        table = add_entity_code_and_name(session, table).copy_metadata(table)
+        table = add_entity_code_and_name(session, table).copy_metadata(table)  # ty: ignore[call-non-callable]
 
     table = table.set_index(["entityId", "entityCode", "entityName", "year"] + dim_names)
 
@@ -575,9 +577,9 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
 
         if len(variable_meta.sources) == 0:
             # Take the metadata sources from the dataset's metadata (after combining them into one).
-            assert (
-                len(dataset_meta.sources) > 0
-            ), f"If column `{column}` has no sources, dataset must have at least one."
+            assert len(dataset_meta.sources) > 0, (
+                f"If column `{column}` has no sources, dataset must have at least one."
+            )
             source = combine_metadata_sources(dataset_meta.sources)
 
             # Add the dataset description as if it was a source's description.
@@ -587,7 +589,7 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
                 else:
                     source.description = dataset_meta.description
         else:
-            sources: List[catalog.Source] = table[column].metadata.sources
+            sources: list[catalog.Source] = table[column].metadata.sources
 
             if len(sources) > 1:
                 # Combine multiple sources into one.
@@ -611,12 +613,12 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
 
 @dataclass
 class IntRange:
-    min: int  # type: ignore
+    min: int  # ty: ignore
     _min: int = field(init=False, repr=False)
-    max: int  # type: ignore
+    max: int  # ty: ignore
     _max: int = field(init=False, repr=False)
 
-    @property  # type: ignore
+    @property  # ty: ignore
     def min(self) -> int:
         return self._min
 
@@ -624,7 +626,7 @@ class IntRange:
     def min(self, x: int) -> None:
         self._min = int(x)
 
-    @property  # type: ignore
+    @property  # ty: ignore
     def max(self) -> int:
         return self._max
 
@@ -633,8 +635,8 @@ class IntRange:
         self._max = int(x)
 
     @staticmethod
-    def from_values(xs: List[int]) -> "IntRange":
-        return IntRange(min(xs), max(xs))  # type: ignore[unknown-argument]
+    def from_values(xs: list[int]) -> "IntRange":
+        return IntRange(min=min(xs), max=max(xs))  # ty: ignore[unknown-argument]
 
     def to_values(self) -> list[int]:
         return [self.min, self.max]
@@ -642,7 +644,7 @@ class IntRange:
 
 def contains_inf(s: pd.Series) -> bool:
     """Check if a series contains infinity."""
-    return pd.api.types.is_numeric_dtype(s.dtype) and np.isinf(s).any()  # type: ignore
+    return pd.api.types.is_numeric_dtype(s.dtype) and np.isinf(s).any()  # ty: ignore
 
 
 def sanitize_numpy(obj: Any) -> Any:
@@ -658,10 +660,10 @@ def sanitize_numpy(obj: Any) -> Any:
 
 def add_columns_for_multiindicator_chart(
     table: catalog.Table,
-    columns_in_chart: List[str],
+    columns_in_chart: list[str],
     chart_slug: str,
-    suffix_for_titles: Optional[str] = None,
-    columns_to_fill_with_zeros: Optional[List[str]] = None,
+    suffix_for_titles: str | None = None,
+    columns_to_fill_with_zeros: list[str] | None = None,
 ) -> catalog.Table:
     """Add columns that will be used in a specific multi-indicator (e.g. a stacked area) chart handling issues with
     missing data.
@@ -749,7 +751,7 @@ def add_columns_for_multiindicator_chart(
 
 def adapt_table_with_dates_to_grapher(
     tb: catalog.Table,
-    columns: Optional[List[str]] = None,
+    columns: list[str] | None = None,
     date_column: str = "date",
     country_column: str = "country",
     drop_date_column: bool = True,
@@ -831,15 +833,16 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
         else:
             raise AssertionError("Table must have columns country and year or date.")
 
+        cols_missing_title_public = []
         for col in tab:
             if col in ("year", "country"):
                 continue
             catalog.utils.validate_underscore(col)
             assert tab[col].metadata.unit is not None, f"Column `{col}` must have a unit."
             assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
-            assert (
-                tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
-            ), f"Column `{col}` must have either sources or origins"
+            assert tab[col].m.origins or tab[col].m.sources or ds.metadata.sources, (
+                f"Column `{col}` must have either sources or origins"
+            )
 
             _validate_description_key(tab[col].m.description_key, col)
             _validate_ordinal_variables(tab, col)
@@ -857,10 +860,13 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             display_name = (tab[col].m.display or {}).get("name")
             title_public = getattr(tab[col].m.presentation, "title_public", None)
             if warn_title_public and display_name and not title_public:
-                warnings.warn(
-                    f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
-                    warnings.DisplayNameWarning,
-                )
+                cols_missing_title_public.append(col)
+
+        if cols_missing_title_public:
+            warnings.warn(
+                f"{len(cols_missing_title_public)} column(s) use display.name but no presentation.title_public (e.g. {', '.join(cols_missing_title_public[:3])}). Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
+                warnings.DisplayNameWarning,
+            )
 
 
 def _validate_grapher_config(tab: Table, col: str) -> None:
@@ -874,14 +880,16 @@ def _validate_grapher_config(tab: Table, col: str) -> None:
         # schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version", "title")]
         schema["required"] = []
 
+        from jsonschema import validate
+
         validate(grapher_config, schema)
 
 
 def _validate_description_key(description_key: list[str], col: str) -> None:
     if description_key:
-        assert not all(
-            len(x) == 1 for x in description_key
-        ), f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
+        assert not all(len(x) == 1 for x in description_key), (
+            f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
+        )
 
 
 def _validate_ordinal_variables(tab: Table, col: str) -> None:
@@ -890,6 +898,6 @@ def _validate_ordinal_variables(tab: Table, col: str) -> None:
         vals = tab[col].dropna()
 
         extra_values = set(vals) - set(vals.m.sort)
-        assert (
-            not extra_values
-        ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
+        assert not extra_values, (
+            f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
+        )

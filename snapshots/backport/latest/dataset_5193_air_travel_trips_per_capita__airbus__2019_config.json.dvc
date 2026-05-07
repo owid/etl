@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5193
-    date_accessed: 2023-08-10 08:53:33.136704
+    url: https://admin.owid.io/admin/datasets/5193
+    date_accessed: 2026-03-05 09:55:16.474695+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5193_air_travel_trips_per_capita__airbus__2019
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0abe94041c7c119429d5690aac226bd7
-  size: 1821
-  path: dataset_5193_air_travel_trips_per_capita__airbus__2019_config.json
+  - md5: b82136ef6b36a70875bf04108d4944d1
+    size: 1951
+    path: dataset_5193_air_travel_trips_per_capita__airbus__2019_config.json

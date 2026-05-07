@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: US Census and WDI (2013)
+    url: (a) and (b) https://www.census.gov/, (c) http://apps.who.int/nha/database
+    date_accessed: 2017-11-15
+    published_by: |-
+      (a) Historical Statistics of the United States Colonial Times to 1970 (1929-1970), (b) US Census Statistical Abstract 1990 (1970-1990), (c) World Bank WDI (1990-2013)
+  name: Health Expenditure US 1929-2013 Private - US Census and WDI (2013)
+  description: ''
+outs:
+  - md5: 8a66bfad64431c71a8c9bfbacf34a870
+    size: 3314
+    path: health_expenditure_us_1929_2013_private__us_census_and_wdi__2013.feather

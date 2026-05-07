@@ -8,7 +8,6 @@ See documentation of class DataAnomaly below for more details on how anomaly cla
 
 import abc
 import os
-from typing import Tuple
 
 import plotly.express as px
 from owid.catalog import Table
@@ -122,7 +121,7 @@ def _split_long_title(text: str) -> str:
 
 
 class SpinachAreaHarvestedAnomaly(DataAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "The area harvested of spinach for China (which refers to mainland) in 1984 is zero. "
         "This causes that other regions that are aggregates which include China mainland have a spurious reduction in "
         "area harvested of spinach in that year, and a spurious increase in yield. "
@@ -205,7 +204,7 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
 
 
 class EggYieldNorthernEuropeAnomaly(DataAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "The amount of eggs produced per bird for Northern Europe (FAO) is unreasonably high before 1973, with values "
         "between 50kg and 115kg, while from 1973 on it has more reasonable values, below 20kg. "
         "Therefore, we remove all values for Northern Europe (FAO) between 1961 and 1972."
@@ -283,7 +282,7 @@ class EggYieldNorthernEuropeAnomaly(DataAnomaly):
 
 
 class TeaProductionAnomaly(DataAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Tea production in FAO data increased dramatically from 1990 to 1991 for many different countries (including "
         "some of the main producers, like China and India). However, data from 1991 was flagged as 'Estimated value' "
         "(while data prior to 1991 is flagged as 'Official figure'). This potentially anomalous increase was not "
@@ -368,7 +367,7 @@ class TeaProductionAnomaly(DataAnomaly):
             assert high_value / low_value > 3
 
     def inspect(self, tb):
-        log.info("The anomaly causes: " "\n* The production of tea to increase dramatically from 1990 to 1991.")
+        log.info("The anomaly causes: \n* The production of tea to increase dramatically from 1990 to 1991.")
         for element_code in self.affected_element_codes:
             selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
             tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
@@ -390,7 +389,7 @@ class TeaProductionAnomaly(DataAnomaly):
 
 
 class HighYieldAnomaly(DataAnomaly):
-    description = ()  # type: ignore
+    description = ()  # ty: ignore
 
     affected_item_codes = []
     affected_element_codes = []
@@ -419,7 +418,7 @@ class HighYieldAnomaly(DataAnomaly):
         ).all()
 
     def inspect(self, tb):
-        log.info("The anomaly causes: " "\n* The yield of certain items, countries and years to be unreasonably high.")
+        log.info("The anomaly causes: \n* The yield of certain items, countries and years to be unreasonably high.")
         for element_code in self.affected_element_codes:
             selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
             tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
@@ -442,7 +441,7 @@ class HighYieldAnomaly(DataAnomaly):
 
 
 class FruitYieldAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "For example, the yield of item 'Fruit Primary' in Denmark prior to 1985 is larger than 6000 tonnes/ha. "
         "Similar issues happen to Antigua and Barbuda and Burkina Faso. "
@@ -492,7 +491,7 @@ class FruitYieldAnomaly(HighYieldAnomaly):
 
 
 class FruitYieldNetherlandsAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "This happens to item 'Fruit Primary' in Netherlands prior to 1984. "
         "Therefore, we remove these possibly spurious values."
@@ -537,7 +536,7 @@ class FruitYieldNetherlandsAnomaly(HighYieldAnomaly):
 
 
 class LocustBeansYieldAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "This happens to item 'Locust beans (carobs)' for region 'Net Food Importing Developing Countries (FAO)'. "
         "Therefore, we remove these possibly spurious values."
@@ -583,7 +582,7 @@ class LocustBeansYieldAnomaly(HighYieldAnomaly):
 
 
 class WalnutsYieldAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "This happens to item 'Walnuts, in shell' for region 'Eastern Asia (FAO)'. "
         "Therefore, we remove these possibly spurious values."
@@ -629,7 +628,7 @@ class WalnutsYieldAnomaly(HighYieldAnomaly):
 
 
 class OtherTropicalFruitYieldNorthernAfricaAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "This happens to item 'Other tropical fruits, n.e.c.' for region 'Northern Africa (FAO)'. "
         "Therefore, we remove these possibly spurious values."
@@ -667,7 +666,7 @@ class OtherTropicalFruitYieldNorthernAfricaAnomaly(HighYieldAnomaly):
 
 
 class OtherTropicalFruitYieldSouthAmericaAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "This happens to item 'Other tropical fruits, n.e.c.' for South America. "
         "Therefore, we remove these possibly spurious values."
@@ -699,7 +698,7 @@ class OtherTropicalFruitYieldSouthAmericaAnomaly(HighYieldAnomaly):
 
 
 class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "The number of poultry birds in Europe, the EU, and High-income countries, has spurious jumps on recent years. "
         "The reason is that some European countries (a least Germany, Italy and Spain) lack data on those years. "
         "However, the original FAO data for Europe and the EU does have data for those years (even though the member countries do not). "
@@ -791,7 +790,7 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
 
 
 class MalaysiaHighMilkConsumption(DataAnomaly):
-    description = (  # type: ignore
+    description = (  # ty: ignore
         "Malaysia's milk consumption from 2010 onwards is unreasonably high. "
         "Its per capita consumption is significantly larger than any other country. "
         "We therefore remove Malaysia's milk consumption (total and per capita) from 2010 on."
@@ -829,7 +828,7 @@ class MalaysiaHighMilkConsumption(DataAnomaly):
             assert value_after.item() > (10 * value_before.item())
 
     def inspect(self, tb):
-        log.info("The anomaly causes: " "\n* Milk consumption in Malaysia is unreasonably high after 2010.")
+        log.info("The anomaly causes: \n* Milk consumption in Malaysia is unreasonably high after 2010.")
         for element_code in self.affected_element_codes:
             selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
             tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
@@ -870,7 +869,7 @@ detected_anomalies = {
 }
 
 
-def handle_anomalies(dataset_short_name: str, tb: Table) -> Tuple[Table, str]:
+def handle_anomalies(dataset_short_name: str, tb: Table) -> tuple[Table, str]:
     if dataset_short_name not in detected_anomalies:
         # If there is no anomaly class for a given dataset, return the same data and an empty anomaly description.
         return tb, ""

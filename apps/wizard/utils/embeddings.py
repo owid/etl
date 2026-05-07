@@ -1,22 +1,22 @@
 import os
 import pickle
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 import torch
-from joblib import Memory
 from sentence_transformers import SentenceTransformer, util
 from structlog import get_logger
 
 from etl.config import DOCS_BUILD
 from etl.paths import CACHE_DIR
 
-memory = Memory(CACHE_DIR, verbose=0)
-
 # Initialize log.
 log = get_logger()
+
+DEFAULT_MODEL_NAME = "all-MiniLM-L6-v2"
 
 
 def set_device() -> str:
@@ -41,16 +41,21 @@ if "DEVICE" not in os.environ:
 DEVICE = set_device()
 
 
-@memory.cache
-def get_model(model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
-    "Load the pre-trained model"
-    model = SentenceTransformer(model_name)
-    return model
+def get_model(model_name: str = DEFAULT_MODEL_NAME) -> SentenceTransformer:
+    """Load the pre-trained model.
+
+    Uses the HuggingFace on-disk cache (not joblib): first call downloads the model,
+    subsequent calls skip the Hub roundtrip via local_files_only=True (~0.1s).
+    """
+    try:
+        return SentenceTransformer(model_name, local_files_only=True)
+    except OSError:
+        return SentenceTransformer(model_name)
 
 
 @dataclass
 class Doc:
-    similarity: Optional[float] = field(default=None, init=False)
+    similarity: float | None = field(default=None, init=False)
 
     def text(self) -> str:
         raise NotImplementedError
@@ -64,15 +69,11 @@ class EmbeddingsModel(Generic[TDoc]):
     docs: list[TDoc]
     embeddings: torch.Tensor
 
-    def __init__(self, model: SentenceTransformer, model_name: Optional[str] = None) -> None:
-        # Get model name
-        if model_name is None:
-            # NOTE: this is a bit of a hack, it's better to pass it explicitly
-            # TODO: fix it when we update to the latest version
-            model_name = model.tokenizer.name_or_path.split("/")[-1]  # type: ignore
-
+    def __init__(self, model: SentenceTransformer, model_name: str | None = None) -> None:
+        # Derive name from the model so it cannot drift from the embeddings file.
+        # Callers may override to namespace cache files (e.g. "sim_charts_title").
         self.model = model
-        self.model_name = model_name
+        self.model_name = model_name or model.tokenizer.name_or_path.split("/")[-1]
 
     @property
     def cache_file_keys(self) -> Path:
@@ -94,7 +95,7 @@ class EmbeddingsModel(Generic[TDoc]):
             with open(self.cache_file_keys, "rb") as f:
                 keys = pickle.load(f)
 
-        return keys, embeddings  # type: ignore
+        return keys, embeddings  # ty: ignore
 
     def _save(self, keys: list[str], embeddings: torch.Tensor) -> None:
         """Save embeddings and keys to cache files."""
@@ -102,7 +103,7 @@ class EmbeddingsModel(Generic[TDoc]):
         with open(self.cache_file_keys, "wb") as f:
             pickle.dump(keys, f)
 
-    def fit(self, docs: list[TDoc], text: Optional[Callable] = None, batch_size=32, workers=1) -> "EmbeddingsModel":
+    def fit(self, docs: list[TDoc], text: Callable | None = None, batch_size=32, workers=1) -> "EmbeddingsModel":
         """Fit the model to the documents.
 
         :param docs: List of documents to fit the model to.
@@ -180,7 +181,7 @@ class EmbeddingsModel(Generic[TDoc]):
 
         # Get requested embeddings in order
         indices = [key_to_index[text] for text in texts]
-        req_embeddings = embeddings[indices]  # type: ignore
+        req_embeddings = embeddings[indices]  # ty: ignore
 
         self.docs = docs
         self.embeddings = req_embeddings
@@ -202,7 +203,7 @@ class EmbeddingsModel(Generic[TDoc]):
                 score = (score + 1) / 2
             elif typ == "euclidean":
                 # distance = torch.cdist(embeddings, input_embedding)
-                score = util.euclidean_sim(embeddings, input_embedding)  # type: ignore
+                score = util.euclidean_sim(embeddings, input_embedding)  # ty: ignore
                 score = 1 / (1 - score)  # Normalize to [0, 1]
             else:
                 raise ValueError(f"Invalid similarity type: {typ}")
@@ -228,7 +229,7 @@ class EmbeddingsModel(Generic[TDoc]):
             doc.similarity = similarities[i]
 
         # Sort the documents by descending similarity score.
-        sorted_documents = sorted(_docs, key=lambda x: x.similarity, reverse=True)  # type: ignore
+        sorted_documents = sorted(_docs, key=lambda x: x.similarity, reverse=True)  # ty: ignore
 
         log.info("get_sorted_documents_by_similarity.end", t=time.time() - t)
 

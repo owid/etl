@@ -1,7 +1,7 @@
 """Generate GHE garden dataset"""
 
 import os
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -127,7 +127,7 @@ def rename_table_for_compatibility(tb: Table) -> Table:
     return tb
 
 
-def format_who_standard(who_standard: Table) -> Dict[Any, Any]:
+def format_who_standard(who_standard: Table) -> dict[Any, Any]:
     """
     Convert who standard age distribution into a dict and combine the over 85 age-groups
     """
@@ -147,7 +147,7 @@ def format_who_standard(who_standard: Table) -> Dict[Any, Any]:
     return who_standard_dict
 
 
-def clean_data(df: Table, regions: Table, who_standard: Dict[str, float], ds_population: Dataset) -> Table:
+def clean_data(df: Table, regions: Table, who_standard: dict[str, float], ds_population: Dataset) -> Table:
     log.info("ghe.basic cleaning")
     df["sex"] = df["sex"].map({"TOTAL": "Both sexes", "MALE": "Male", "FEMALE": "Female"})
     df = Table(
@@ -192,7 +192,7 @@ def clean_data(df: Table, regions: Table, who_standard: Dict[str, float], ds_pop
     return df
 
 
-def add_age_standardized_metric(df: Table, who_standard: Dict[str, float]) -> Table:
+def add_age_standardized_metric(df: Table, who_standard: dict[str, float]) -> Table:
     """
     Using the WHO's standard population we can calculate the age-standardized metric
     Values from : https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/gpe_discussion_paper_series_paper31_2001_age_standardization_rates.pdf

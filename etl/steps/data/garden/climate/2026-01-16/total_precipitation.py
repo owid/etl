@@ -4,7 +4,6 @@ import calendar
 
 import owid.catalog.processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -23,9 +22,8 @@ def run() -> None:
     # Process data.
     #
     # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = paths.regions.harmonize_names(tb)
+
     # Extract year and month as integers
     tb["year"] = tb["time"].astype(str).str[0:4].astype(int)
     tb["month"] = tb["time"].astype(str).str[5:7].astype(int)

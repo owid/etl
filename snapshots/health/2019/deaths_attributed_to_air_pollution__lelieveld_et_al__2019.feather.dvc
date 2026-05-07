@@ -1,0 +1,26 @@
+meta:
+  source:
+    name: |-
+      Lelieveld et al. (2019). Effects of fossil fuel and total anthropogenic emission removal on public health and climate. PNAS.
+    description: |-
+      Lelieveld et al. (2019) quantify excess mortality and years of life lost (YLL) from air pollution.
+
+      They do this by applying an atmospheric chemistry–general circulation model to calculate the impacts of air pollution on climate and public health. This model includes concentrations of ozone (O3) and particulate matter, including PM2.5. These concentrations are then used to convert to health burden based on the Global Burden of Disease methodology.
+
+      – Air pollution deaths from all sources includes pollution from all anthropogenic sources (fossil fuels, agriculture, residential energy use, and non-fossil industrial emissions) and natural emissions from sources such as desert dust.
+      – Air pollution deaths from fossil fuels includes local air pollution generated from the burning of coal, oil and gas.
+      – Air pollution deaths from all anthropogenic sources includes pollution from fossil fuels plus agriculture, residential energy use, and non-fossil industrial emissions.
+
+      Our World in Data has also converted these mortality and YLL metrics into rates based on the population figures included in the study's Supplemental material.
+
+      Our World in Data has also calculated fossil fuel and total anthropogenic pollution deaths as a share of total air pollution deaths based on the paper's original data.
+    url: https://www.pnas.org/content/116/15/7192
+    date_accessed: 2020-11-17
+    published_by: |-
+      Lelieveld, J., Klingmüller, K., Pozzer, A., Burnett, R. T., Haines, A., & Ramanathan, V. (2019). Effects of fossil fuel and total anthropogenic emission removal on public health and climate. Proceedings of the National Academy of Sciences, 116(15), 7192-7197.
+  name: Deaths attributed to air pollution (Lelieveld et al. 2019)
+  description: ''
+outs:
+  - md5: 1f8be7d389940b741982eb2e5b898c38
+    size: 35330
+    path: deaths_attributed_to_air_pollution__lelieveld_et_al__2019.feather

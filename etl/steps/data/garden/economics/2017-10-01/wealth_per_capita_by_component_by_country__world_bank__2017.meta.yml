@@ -1,0 +1,72 @@
+dataset:
+  title: Wealth per capita by component by country - World Bank (2017)
+tables:
+  wealth_per_capita_by_component_by_country__world_bank__2017:
+    variables:
+      forest__non_timber:
+        title: Forest, non-timber
+        unit: $
+        description: |-
+          The annual value of non-timber forest ecosystem services is estimated by multiplying total forest area in a given year by the sum of the per-hectare monetary values for the three benefit categories (non-wood forest products; recreation, hunting, and fishing; and watershed protection). The capitalized value of non-wood services is equal to the present value of annual services, discounted into the future. The World Bank calculates estimates based on sources such as FAO's Global Forest Resources Assessment
+      forest__timber:
+        title: Forest, timber
+        unit: $
+        description: |-
+          The predominant economic use of forests has been as a source of timber. Timber resources are valued according to the present discounted value of rents from the production of roundwood over the expected lifetime of standing timber resources. The World Bank calculates this value using various sources, i.e. UN FAOSTAT database
+      fossil_energy_resources__oil__natural_gas__coal:
+        title: Fossil energy resources (oil, natural gas, coal)
+        unit: $
+        description: |-
+          Petroleum, natural gas, coal (all grades). The value of these resources is measured as the present value of the stream of expected rents that may be extracted from the resource until it is exhausted. The WB calculates these values using various sources, i.e. Rystad Energy, UCUBE (Upstream Database), IEA "World Energy Statistics, etc.
+      gdp:
+        title: GDP
+        unit: ''
+      human_capital:
+        title: Human capital
+        unit: $
+        description: |-
+          Total human capital is calculated as the discounted value of lifetime earnings. This method takes into account estimates of years of schooling and experience.
+      land__crop__pasture:
+        title: Land (crop, pasture)
+        unit: $
+        description: |-
+          The sum of cropland and pastureland. The value of these two forms of land is calculated as the present value of returns to the land. The World Bank uses sources such as the FAOSTAT database.
+      metals_and_minerals:
+        title: Metals and minerals
+        unit: $
+        description: |-
+          Bauxite, copper, gold, iron ore, lead, nickel, phosphate rock, silver, tin, and zinc. The value of these resources is measured as the present value of the stream of expected rents that may be extracted from the resource until it is exhausted. The WB calculates these values using various sources, i.e. US Geological Survey (USGS), Minerals Yearbook, etc.
+      natural_capital__renewable__excluding_sub_soil_assets:
+        title: Natural capital, renewable (excluding sub-soil assets)
+        unit: $
+        description: |-
+          Sum of forests - timber, forests - non-timber, protected areas, cropland, pastureland. (See those sources for further detail on each.)
+      net_foreign_assets:
+        title: Net foreign assets
+        unit: $
+        description: |-
+          Net foreign assets (NFA) are a measure of the cross-border assets and liabilities held by a country’s residents. A country’s external asset position, or net foreign assets (NFA), is calculated as: NFA = FA - FL
+      produced_capital:
+        title: Produced capital
+        unit: $
+        description: |-
+          Physical capital estimates include the value of structures, machinery, and equipment, since the value of the stocks is derived (using the perpetual inventory method) from gross capital formation data that account for these elements. Urban land is also accounted for, however, in the investment figures only land improvements are captured. Thus, the final capital estimates do not entirely reflect the value of urban land.
+      protected_areas:
+        title: Protected areas
+        unit: $
+        description: |-
+          Areas protected for conservation and preservation of ecosystems provide a range of services to the country. For instance, wildlife reserves can generate significant revenues for developing countries in particular from international tourism activities. And about one-third of the world’s big cities get their drinking water from sources in or downstream of protected areas, saving billions of dollars in supply and treatment costs thanks to forests and wetlands that regulate the flow of water and remove contaminants (Dudley et al 2010). Valuing such ecosystem services on a global basis, however, is difficult. For this reason, protected areas are valued in the World Bank wealth accounts using a simplified approach. Under this approach, the quasi-opportunity cost of protection per unit area of land contained in terrestrial protected areas is estimated as the lower of returns to cropland and pastureland. This is likely to be a lower bound on the true value of protected areas. Returns are capitalized over an infinite time horizon. The World Bank bases calculations on a number of its own databases and indicators.
+      total_wealth_per_capita:
+        title: Total wealth per capita
+        unit: $
+        description: |-
+          Total wealth is calculated by summing up each component of wealth (“bottom-up approach”): Natural capital + Produced capital + Human capital + Net foreign assets. (See each of the individual variables for further detail)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

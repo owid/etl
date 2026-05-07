@@ -13,7 +13,7 @@ This will update etl/collection/model/schema_types.py with the latest types.
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import Any
 
 from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.files import get_schema_from_url
@@ -24,12 +24,12 @@ class TypedDictGenerator:
     """Generate TypedDict classes from JSON schemas."""
 
     def __init__(self):
-        self.generated_classes: Set[str] = set()
-        self.imports: Set[str] = set()
-        self.nested_types: Dict[str, Dict[str, Any]] = {}  # Maps class names to their schemas
+        self.generated_classes: set[str] = set()
+        self.imports: set[str] = set()
+        self.nested_types: dict[str, dict[str, Any]] = {}  # Maps class names to their schemas
 
     def json_type_to_python_type(
-        self, json_schema: Dict[str, Any], property_name: str = "", grapher_schema: Dict[str, Any] = None
+        self, json_schema: dict[str, Any], property_name: str = "", grapher_schema: dict[str, Any] = None
     ) -> str:
         """Convert JSON schema to Python type annotation."""
         # Handle $ref to grapher schema
@@ -158,10 +158,10 @@ class TypedDictGenerator:
     def generate_typeddict(
         self,
         class_name: str,
-        properties: Dict[str, Any],
-        required: List[str] = None,
+        properties: dict[str, Any],
+        required: list[str] = None,
         description: str = "",
-        grapher_schema: Dict[str, Any] = None,
+        grapher_schema: dict[str, Any] = None,
     ) -> str:
         """Generate a TypedDict definition."""
         if required is None:
@@ -233,7 +233,7 @@ class TypedDictGenerator:
 
         return "\n".join(lines)
 
-    def extract_view_config_properties(self, multidim_schema: Dict[str, Any]) -> Dict[str, Any]:
+    def extract_view_config_properties(self, multidim_schema: dict[str, Any]) -> dict[str, Any]:
         """Extract view config properties from multidim schema."""
         try:
             return (
@@ -247,7 +247,7 @@ class TypedDictGenerator:
         except (KeyError, AttributeError):
             return {}
 
-    def extract_metadata_properties(self, dataset_schema: Dict[str, Any]) -> Dict[str, Any]:
+    def extract_metadata_properties(self, dataset_schema: dict[str, Any]) -> dict[str, Any]:
         """Extract metadata properties from dataset schema."""
         try:
             return (

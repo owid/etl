@@ -1,0 +1,88 @@
+dataset:
+  title: Global Preferences Survey (GPS) - Falk, Becker, Dohmen, Enke, Huffman, and Sunde (2018)
+tables:
+  global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018:
+    variables:
+      altruism__falk_et_al__2018__gps:
+        title: Altruism (Falk et al. (2018) GPS)
+        unit: ''
+        description: |-
+          Altruism was measured using one quantitative and one qualitative question both relating to donations.
+
+          The quantitative scenario asked if the respondent unexpectedly received 1,000 euros how much of this amount they would donate.
+
+          The qualitative items asked how willing respondents would be to give to good causes without expecting anything in return on an 11 point scale.
+
+          Higher values indicate the country average for altruism is above the world average.
+
+          The quantitative item is given a weight of roughly two-thirds, and the qualitative item a weight of about a third. For more information, see Table I in Falk et al. (2018).
+      negative_reciprocity__falk_et_al__2018__gps:
+        title: Negative reciprocity (Falk et al. (2018) GPS)
+        unit: ''
+        description: |-
+          Negative reciprocity was measured using three self-assessments.
+
+          First, respondents were asked if they would exact revenge if treated unjustly, even if doing so comes with a cost (0-10).
+
+          The second and third questions asked about respondents' willingness to punish someone for unfair behavior, either towards themselves or a third person. The third question captures prosocial punishment comparable to norm enforcement.
+
+          Higher values indicate the country average for negative reciprocity is above the world average.
+
+          The three items receive roughly equal weights, a third each. For more information, see Table I in Falk et al. (2018).
+      patience__time_preference__falk_et_al__2018__gps:
+        title: Patience (time preference) (Falk et al. (2018) GPS)
+        unit: ''
+        description: |-
+          The measure of patience (time preference) is a combination of two survey measures, one quantitative item and one qualitative item.
+
+          The quantitative survey poses 5 interdependent binary choices between immediate and delayed financial rewards - the "staircase" (or "unfolding brackets") procedure. In each of the 5 questions, participants had to decide whether to receive a payment today or a larger payment in 12 months. The immediate payment x remained the same in all four subsequent questions, but the delayed payment y was increased or decreasing depending on the participant's previous choices.
+
+          In the international survey, monetary amounts x and y were expressed in the local currency, scaled relative to the median household income in the given country.
+
+          The qualitative patience measure is collected using the individuals' self-assessment regarding their willingness to wait on an 11 point Likert scale, asking: "How willing are you to give up something that is beneficial for you today in order to benefit more from that in the future?"
+
+          Higher values indicate the country average for patience is above the world average.
+
+          The quantitative item has a weight of 71% in the patience (time preference) measure. For more information, see Table I in Falk et al. (2018).
+      positive_reciprocity__falk_et_al__2018__gps:
+        title: Positive reciprocity (Falk et al. (2018) GPS)
+        unit: ''
+        description: |-
+          Positive reciprocity preferences were measured using one quantitative and one qualitative question.
+
+          In the quantitative item respondents were presented with a scenario where they got lost in an unfamiliar area and a stranger - when asked directions - offered to take them to their destination. Respondents then asked which out of six presents (worth between 5 and 30 euros, or respective country equivalents) they would give to the stranger as a "thank you".
+
+          Respondents were also asked to provide a self-assessment about how willing they are to return a favor on an 11 point Likert scale.
+
+          Higher values indicate the country average for positive reciprocity is above the world average.
+
+          The two items receive roughly equal weights. For more information, see Table I in Falk et al. (2018).
+      risk_taking__falk_et_al__2018__gps:
+        title: Risk taking (Falk et al. (2018) GPS)
+        unit: ''
+        description: |-
+          Participants' risk preference was measured using both quantitative questions and a qualitative question. The quantitative question posed a series of 5 binary choices where participants chose between a fixed lottery (individual could win x or zero) and varying payments y (paid with certainty).
+
+          Choice of the lottery resulted in an increase of the sure amount being offered in the next question, and vice versa, to determine an individual's certainty equivalent.
+
+          The qualitative question asks for the participant's self assessment of their willingness to take risks on an 11 point scale: "In general, how willing are you to take risks?"
+
+          Higher values indicate the country average for risk taking is above the world average.
+
+          The qualitative and quantitative responses were combined using roughly equal weights. For more information, see Table I in Falk et al. (2018).
+      trust__falk_et_al__2018__gps:
+        title: Trust (Falk et al. (2018) GPS)
+        unit: ''
+        description: |-
+          Trust is measured based on one item asking respondents whether they assume other people only have the best intentions. Responses range from 0 - 10 on the Likert scale. For more information, see Table I in Falk et al. (2018).
+
+          Higher values indicate the country average for trust is above the world average.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

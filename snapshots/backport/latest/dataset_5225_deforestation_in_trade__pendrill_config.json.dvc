@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5225
-    date_accessed: 2023-08-10 08:30:50.997404
+    url: https://admin.owid.io/admin/datasets/5225
+    date_accessed: 2026-03-05 10:57:33.375239+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5225_deforestation_in_trade__pendrill
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 87cbabf3af0cef2307b33d43d7cf334c
-  size: 12222
-  path: dataset_5225_deforestation_in_trade__pendrill_config.json
+  - md5: 398a87ae23c8c3fd4095290f61211329
+    size: 13375
+    path: dataset_5225_deforestation_in_trade__pendrill_config.json

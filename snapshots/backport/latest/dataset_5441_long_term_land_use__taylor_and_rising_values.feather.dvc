@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5441
-    date_accessed: 2023-08-10 09:24:25.889009
+    url: https://admin.owid.io/admin/datasets/5441
+    date_accessed: 2026-03-05 09:58:03.596766+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Long-term land use (Taylor and Rising)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 35d0550a536ed5701d20f817111017f3
-  size: 960402
-  path: dataset_5441_long_term_land_use__taylor_and_rising_values.feather
+  - md5: 01785869fff87ee30182bd7f212e288a
+    size: 1019914
+    path: dataset_5441_long_term_land_use__taylor_and_rising_values.feather

@@ -1,7 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from typing import Optional
-
 import pandas as pd
 from owid.catalog import Table
 
@@ -30,7 +28,7 @@ def run(dest_dir: str, paths: PathFinder) -> None:
     ds_grapher.save()
 
 
-def to_grapher_date(tb: Table, zero_day: Optional[str] = None) -> Table:
+def to_grapher_date(tb: Table, zero_day: str | None = None) -> Table:
     """Modify date so Grapher understands it."""
     if zero_day is None:
         zero_day = ZERO_DATE

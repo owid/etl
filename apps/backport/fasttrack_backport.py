@@ -1,6 +1,6 @@
 import datetime as dt
 import os
-from typing import Optional, cast
+from typing import cast
 
 import gspread
 import pandas as pd
@@ -54,7 +54,7 @@ SHEET_TO_GID = {
 )
 def cli(
     dataset_id: int,
-    short_name: Optional[str] = None,
+    short_name: str | None = None,
     backport: bool = True,
     recreate: bool = False,
 ) -> None:
@@ -88,7 +88,7 @@ def _create_client():
     # Add your service account file
     creds = Credentials.from_service_account_file(os.environ["GOOGLE_APPLICATION_CREDENTIALS"], scopes=scope)
 
-    return gspread.authorize(creds)  # type: ignore
+    return gspread.authorize(creds)  # ty: ignore
 
 
 def _create_temp_dataset(pb: PotentialBackport, short_name):
@@ -174,7 +174,7 @@ def _fill_variables_meta(spreadsheet, meta, short_name):
     vars_df = vars_df.reindex(columns=wks.row_values(1)).fillna("")
 
     # update values
-    values = [vars_df.columns.values.tolist()] + vars_df.values.tolist()  # type: ignore
+    values = [vars_df.columns.values.tolist()] + vars_df.values.tolist()  # ty: ignore
     wks.update("A1", values)
 
 
@@ -192,7 +192,7 @@ def _copy_template(client, spreadsheet_title):
 
 def migrate(
     dataset_id: int,
-    short_name: Optional[str] = None,
+    short_name: str | None = None,
     backport: bool = True,
     recreate: bool = False,
 ) -> None:

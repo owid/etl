@@ -2,8 +2,6 @@
 Load a meadow dataset and create a garden dataset.
 """
 
-from typing import List
-
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
@@ -96,7 +94,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def aggregate_malaria(tb: Table, groupby_cols: List[str], index_cols: List[str]) -> Table:
+def aggregate_malaria(tb: Table, groupby_cols: list[str], index_cols: list[str]) -> Table:
     """
     Aggregating the three types of malaria into a new overall category
     """
@@ -138,7 +136,7 @@ def aggregate_products(tb: Table) -> Table:
     return tb
 
 
-def format_table(tb: Table, group: List[str], index_col: List[str], short_name: str) -> Table:
+def format_table(tb: Table, group: list[str], index_col: list[str], short_name: str) -> Table:
     """
     Formatting original table so that we can have total funding by disease, product and disease*product
     """

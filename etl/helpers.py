@@ -5,9 +5,10 @@
 import os
 import re
 import time
+from collections.abc import Callable, Iterable
 from functools import cache
 from pathlib import Path
-from typing import Any, Callable, Iterable, Literal, Optional, overload
+from typing import Any, Literal, overload
 
 import deprecated
 import pandas as pd
@@ -163,7 +164,7 @@ def create_dataset(
             if dim_names:
                 # First pass to update metadata from YAML
                 if meta_path.exists():
-                    table.update_metadata_from_yaml(meta_path, table.m.short_name)  # type: ignore
+                    table.update_metadata_from_yaml(meta_path, table.m.short_name)  # ty: ignore
                 log.info("long_to_wide.start", shape=table.shape, short_name=table.m.short_name, dim_names=dim_names)
                 t = time.time()
                 table = gh.long_to_wide(table)
@@ -172,7 +173,7 @@ def create_dataset(
                 # Ignore extra variables for the following pass of metadata
                 extra_variables = "ignore"
             else:
-                log.info("long_to_wide.skip", short_name=table.m.short_name)
+                pass
 
         ds.add(table, formats=formats, repack=repack)
 
@@ -218,7 +219,7 @@ def render_yaml_metadata(ds: catalog.Dataset) -> None:
     for table_name in ds.table_names:
         table = ds[table_name]
         for col in table.columns:
-            table[col].metadata = table[col].metadata.render({})
+            table[col].metadata = table[col].metadata.render({})  # ty: ignore[unresolved-attribute]
         table._save_metadata(os.path.join(ds.path, table.metadata.checked_name + ".meta.json"))
 
 
@@ -310,8 +311,8 @@ class PathFinder:
     @property
     def channel(self) -> CHANNEL:
         if self._is_snapshot_file:
-            return "snapshot"  # type: ignore
-        return self.f.parent.parent.parent.name  # type: ignore
+            return "snapshot"  # ty: ignore
+        return self.f.parent.parent.parent.name  # ty: ignore
 
     @property
     def namespace(self) -> str:
@@ -401,7 +402,7 @@ class PathFinder:
         """Return step name."""
         return self.create_step_name(
             short_name=self.short_name,
-            channel=self.channel,  # type: ignore
+            channel=self.channel,  # ty: ignore
             namespace=self.namespace,
             version=self.version,
             step_type=self.step_type,
@@ -606,7 +607,7 @@ class PathFinder:
             )
             dataset = catalog.Dataset(dataset_path)
 
-        return dataset  # type: ignore[reportReturnType]
+        return dataset  # ty: ignore[invalid-return-type]
 
     def load_snapshot(self, short_name: str | None = None, **kwargs) -> Snapshot:
         """Load snapshot dependency. short_name defaults to the current step's short_name."""
@@ -650,7 +651,7 @@ class PathFinder:
         assert isinstance(cs, CollectionSet)
         return cs
 
-    def init_snapshot(self, filename: Optional[str] = None) -> Snapshot:
+    def init_snapshot(self, filename: str | None = None) -> Snapshot:
         """Create a snapshot using the current step's location to determine namespace, version, and optionally filename.
 
         Args:
@@ -832,13 +833,20 @@ class PathFinder:
             If True, the indicator name is treated as a dimension. This means that the indicator will be included in the dimensions of the collection, allowing it to be used as a filter or in views.
 
         choice_renames : Listable[dict[str, dict[str, str] | Callable] | None], default None
-            Use this to rename the names of the dimension choices. Multiple formats supported:
-                * `None`: No renames are applied (also applies when `tb` is list).
+            Rename the display names of dimension choices. Multiple formats supported:
+                * `None`: No renames are applied.
                 * `dict[str, dict[str, str]]`: Key is the dimension slug, value is a mapping
-                    with original choice slug as key and the new choice name as value.
+                    with choice slug as key and the new choice name as value.
                 * `dict[str, Callable]`: Key is the dimension slug, value is a function that
-                    returns the new name for given slug (returns None to keep original)
-                * For multiple tables: Can be list matching `tb` length with any of the above formats.
+                    returns the new name for given slug (returns None to keep original).
+
+            When ``tb`` is a list:
+                * **Single dict** (common): applied to the final combined collection
+                  after all combining and YAML overrides, so these renames take
+                  precedence. Choice slugs should match the final collection's slugs.
+                * **List of dicts** (per-table): each element corresponds to a table in
+                  ``tb``. Renames are applied per sub-collection (can trigger conflict
+                  detection), then remapped to the final slugs and re-applied.
 
         catalog_path_full : bool, default False
             If True, it uses full catalog path. If False, uses shorter version (e.g., `table#indicator` or `dataset/table#indicator`).

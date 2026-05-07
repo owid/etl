@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Chen et al.(2019)
+    url: https://www.thelancet.com/journals/langlo/article/PIIS2214-109X(18)30422-4/fulltext
+    date_accessed: 2019-09-18
+    published_by: |-
+      Chen, C., Liceras, F. C., Flasche, S., Sidharta, S., Yoong, J., Sundaram, N., & Jit, M. (2019). Effect and cost-effectiveness of pneumococcal conjugate vaccination: a global modelling analysis. The Lancet Global Health, 7(1), e58-e67.
+  name: Annual deaths averted by PCV13- Chen et al., The Lancet Global Health (2019)
+  description: ''
+  is_public: false
+outs:
+  - md5: 21626e198d5ab4ac79157d296646116a
+    size: 2978
+    path: annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019.feather

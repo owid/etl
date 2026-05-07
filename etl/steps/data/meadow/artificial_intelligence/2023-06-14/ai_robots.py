@@ -33,13 +33,15 @@ def run(dest_dir: str) -> None:
     #
     # Merge columns that have country values into one 'country' column
     df["country"] = df.apply(
-        lambda row: row["Installed Countries - Country"]
-        if pd.notnull(row["Installed Countries - Country"])
-        else row["Installed Countries - Label"]
-        if pd.notnull(row["Installed Countries - Label"])
-        else row["New Robots Installed - Label"]
-        if pd.notnull(row["New Robots Installed - Label"])
-        else None,
+        lambda row: (
+            row["Installed Countries - Country"]
+            if pd.notnull(row["Installed Countries - Country"])
+            else row["Installed Countries - Label"]
+            if pd.notnull(row["Installed Countries - Label"])
+            else row["New Robots Installed - Label"]
+            if pd.notnull(row["New Robots Installed - Label"])
+            else None
+        ),
         axis=1,
     )
 

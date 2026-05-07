@@ -1,0 +1,23 @@
+dataset:
+  title: Historical gender equality index - How Was Life? (2014)
+tables:
+  historical_gender_equality_index__how_was_life__2014:
+    variables:
+      regional_averages_of_the_composite_gender_equality_index:
+        title: Regional averages of the composite gender equality index
+        unit: ''
+        description: |-
+          The composite index includes the gender differences in four dimensions, health, socio-economic resources, household and politics. Health is measured by life expectancy and sex ratios whereas socio-economic resources are captured by average years of education and labour force participation. The gender disparities in the household are captured by the marriage ages and the data on distribution of parliamentary seats between men and women is used as an indication of gender disparities in the politics. Each of these variables is presented in female/male ratio.
+
+          Regional averages of the composite gender equality index, where years correspond to the decadal average.
+
+          An index equal to 100 is perfect equality.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

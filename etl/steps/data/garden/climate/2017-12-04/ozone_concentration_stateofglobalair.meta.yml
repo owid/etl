@@ -1,0 +1,20 @@
+dataset:
+  title: Ozone concentration-StateofGlobalAir
+tables:
+  ozone_concentration_stateofglobalair:
+    variables:
+      ozone_concentration_stateofglobalair:
+        title: Ozone concentration-StateofGlobalAir
+        unit: ppb
+        display:
+          unit: Percent
+        description: Population-weighted ozone (O3) concentration by country (1990-2015) in parts per billion (ppb)- via StateofGlobalAir
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

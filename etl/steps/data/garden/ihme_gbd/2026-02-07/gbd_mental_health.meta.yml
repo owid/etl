@@ -3,6 +3,7 @@ definitions:
     presentation:
       topic_tags:
         - Mental Health
+      attribution_short: IHME
     processing_level: major
   short_unit: |-
     <% if metric == "Number" %>

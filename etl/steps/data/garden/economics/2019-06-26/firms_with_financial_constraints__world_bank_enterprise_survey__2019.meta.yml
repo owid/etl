@@ -1,0 +1,20 @@
+dataset:
+  title: Firms with financial constraints - World Bank Enterprise Survey (2019)
+tables:
+  firms_with_financial_constraints__world_bank_enterprise_survey__2019:
+    variables:
+      share_of_firms_for_which_access_to_finance_is_a_major_constraint__in_pct:
+        title: Share of firms for which access to finance is a major constraint (in %)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

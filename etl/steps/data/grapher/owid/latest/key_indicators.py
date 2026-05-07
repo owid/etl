@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Any, List
+from typing import Any
 
 from owid import catalog
 
@@ -84,7 +84,7 @@ def _split_in_projection_and_historical(
 def _add_metric_new(
     table: catalog.Table,
     metric: str,
-    mask: List[Any],
+    mask: list[Any],
     metric_suffix: str,
     title_suffix: str,
     display_name_suffix: str,

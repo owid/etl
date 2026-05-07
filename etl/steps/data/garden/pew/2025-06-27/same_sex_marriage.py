@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
@@ -106,10 +104,10 @@ def explode_country_years(tb: Table) -> Table:
 
 def add_country_counts_and_population_by_status(
     tb: Table,
-    columns: List[str],
+    columns: list[str],
     ds_regions: Dataset,
     ds_population: Dataset,
-    regions: List[str],
+    regions: list[str],
     missing_data_on_columns: bool = False,
 ) -> Table:
     """

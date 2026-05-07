@@ -283,14 +283,14 @@ def _build_post_url(base_site_url: str, slug: str, post_type: str) -> str:
 
 
 def find_chart_citations_in_content(
-    content: str, slug: str, chart_slug: str, base_site_url: str, post_type: str
+    content: str, slug: str, chart_slugs: list[str], base_site_url: str, post_type: str
 ) -> list[Citation]:
     """Find all citations of a chart in post content JSON.
 
     Args:
         content: JSON content of the post
         slug: Post slug
-        chart_slug: Chart slug to search for
+        chart_slugs: All chart slugs to search for (current slug plus redirect slugs)
         base_site_url: Base URL for the site (e.g., https://ourworldindata.org)
         post_type: Post type (e.g., 'article', 'data-insight')
     """
@@ -308,7 +308,7 @@ def find_chart_citations_in_content(
     for i, item in enumerate(body):
         if isinstance(item, dict) and item.get("type") == "chart":
             url = item.get("url", "")
-            if _url_matches_chart_slug(url, chart_slug):
+            if any(_url_matches_chart_slug(url, s) for s in chart_slugs):
                 # Find heading or text before chart
                 context, heading_slug = find_context_before_chart(body, i)
                 if heading_slug:
@@ -340,7 +340,7 @@ def find_chart_citations_in_content(
                     for item in value:
                         if isinstance(item, dict) and item.get("spanType") == "span-link":
                             url = item.get("url", "")
-                            if _url_matches_chart_slug(url, chart_slug):
+                            if any(_url_matches_chart_slug(url, s) for s in chart_slugs):
                                 link_text = extract_text_from_value(item.get("children", []))
                                 if url not in seen_urls:
                                     seen_urls.add(url)
@@ -356,7 +356,7 @@ def find_chart_citations_in_content(
             # Check for standalone span-links (e.g., in additional-charts)
             elif obj.get("spanType") == "span-link":
                 url = obj.get("url", "")
-                if f"/grapher/{chart_slug}" in url and url not in seen_urls:
+                if any(f"/grapher/{s}" in url for s in chart_slugs) and url not in seen_urls:
                     seen_urls.add(url)
                     link_text = extract_text_from_value(obj.get("children", []))
                     # Use link text itself as context if no parent text
@@ -381,6 +381,19 @@ def find_chart_citations_in_content(
     return citations
 
 
+def _get_all_chart_slugs(session: Session, chart_slug: str) -> list[str]:
+    """Return the current slug plus all redirect slugs that point to this chart."""
+    query = text("""
+        SELECT csr.slug
+        FROM chart_slug_redirects csr
+        JOIN charts c ON csr.chart_id = c.id
+        JOIN chart_configs cc ON c.configId = cc.id
+        WHERE cc.slug = :chart_slug
+    """)
+    rows = session.execute(query, {"chart_slug": chart_slug}).fetchall()
+    return [chart_slug] + [row[0] for row in rows]
+
+
 @st.cache_data(show_spinner=False)
 def find_all_citations(_session: Session, chart_slug: str, base_site_url: str) -> list[ArticleCitations]:
     """Find all posts citing the given chart.
@@ -393,21 +406,24 @@ def find_all_citations(_session: Session, chart_slug: str, base_site_url: str) -
     Returns:
         List of ArticleCitations, one per article that cites the chart
     """
-    # Find all posts that reference this chart via posts_gdocs_links
+    # Find all posts that reference this chart via posts_gdocs_links,
+    # including articles that used old/redirect slugs for this chart.
+    all_slugs = _get_all_chart_slugs(_session, chart_slug)
+
     query = text("""
         SELECT DISTINCT p.id, p.slug, p.type, p.content
         FROM posts_gdocs_links l
         JOIN posts_gdocs p ON l.sourceId = p.id
-        WHERE l.linkType = 'grapher' AND l.target = :chart_slug
+        WHERE l.linkType = 'grapher' AND l.target IN :slugs
         AND p.published = 1
     """)
 
     results = []
-    rows = _session.execute(query, {"chart_slug": chart_slug}).fetchall()
+    rows = _session.execute(query, {"slugs": tuple(all_slugs)}).fetchall()
 
     for row in rows:
         _post_id, slug, post_type, content = row
-        citations = find_chart_citations_in_content(content, slug, chart_slug, base_site_url, post_type)
+        citations = find_chart_citations_in_content(content, slug, all_slugs, base_site_url, post_type)
         if citations:
             results.append(
                 ArticleCitations(

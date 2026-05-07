@@ -1,5 +1,5 @@
 import json
-from typing import List, cast
+from typing import cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -61,8 +61,8 @@ def run(dest_dir: str) -> None:
     log.info("child_mortality.end")
 
 
-def load_excluded_countries() -> List[str]:
-    with open(N.excluded_countries_path, "r") as f:
+def load_excluded_countries() -> list[str]:
+    with open(N.excluded_countries_path) as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data

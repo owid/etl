@@ -1,0 +1,23 @@
+dataset:
+  title: Number of deaths in England and Wales by age - ONS
+tables:
+  number_of_deaths_in_england_and_wales_by_age__ons:
+    variables:
+      both_sexes__number_of_deaths:
+        title: Both sexes (number of deaths)
+        unit: deaths
+      female__number_of_deaths:
+        title: Female (number of deaths)
+        unit: deaths
+      male__number_of_deaths:
+        title: Male (number of deaths)
+        unit: deaths
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

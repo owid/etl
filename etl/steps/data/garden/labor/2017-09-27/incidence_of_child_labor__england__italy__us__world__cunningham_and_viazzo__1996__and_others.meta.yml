@@ -1,0 +1,20 @@
+dataset:
+  title: Incidence of child labor (England, Italy, US, World) - Cunningham and Viazzo (1996) and others
+tables:
+  incidence_of_child_labor__england__italy__us__world__cunningham_and_viazzo__1996__and_others:
+    variables:
+      child_labor__pct_children_recorded_as_working__cunningham_and_viazzo__1996__and_others:
+        title: Child Labor (% children recorded as working) (Cunningham and Viazzo (1996) and others)
+        unit: '%'
+        display:
+          unit: Rate
+        description: Percentage of children recorded as working.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -51,7 +51,7 @@ mock_income_groups = pd.DataFrame(
 )
 
 
-def mock_opens(filename, _):
+def mock_opens(filename, _="r"):
     # This function mocks opening a file with path given by filename, and returns custom content for that file.
     mock_files_content = {
         "MOCK_COUNTRIES_FILE": mock_countries,
@@ -204,8 +204,8 @@ class TestHarmonizeCountries:
             warn_on_unused_countries=False,
             warn_on_missing_countries=False,
         )
-        df_out.country = df_out.country.astype("string")
-        result.country = result.country.astype("string")
+        df_out.country = df_out.country.astype("string")  # ty: ignore[unresolved-attribute]
+        result.country = result.country.astype("string")  # ty: ignore[unresolved-attribute]
         assert dataframes.are_equal(df1=df_out, df2=result)[0]
 
     def test_one_unknown_country_made_nan_and_a_known_country_changed(self):

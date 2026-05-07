@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -20,11 +20,11 @@ class SemanticSearchResult(BaseModel):
     indicator_id: int
     snippet: str
     score: float
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
     # Additional fields for wizard app
-    catalog_path: Optional[str] = None
+    catalog_path: str | None = None
     n_charts: int = 0
-    description: Optional[str] = None
+    description: str | None = None
     popularity: float = 0.0
 
     class Config:
@@ -34,7 +34,7 @@ class SemanticSearchResult(BaseModel):
 class SemanticSearchResponse(BaseModel):
     """JSON schema for semantic search response."""
 
-    results: List[SemanticSearchResult]
+    results: list[SemanticSearchResult]
     query: str
     total_results: int
 

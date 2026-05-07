@@ -4,9 +4,10 @@ import math
 import os
 import random
 import time
+from collections.abc import Iterable
 from datetime import date, datetime
 from functools import wraps
-from typing import Any, Iterable, List, Literal, Optional, Set, TypeVar, Union, cast
+from typing import Any, Literal, TypeVar, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -54,7 +55,7 @@ def check_known_columns(df: pd.DataFrame, known_cols: list) -> None:
         raise Exception(f"Previous column(s) missing: {missing_cols}")
 
 
-def check_values_in_column(df: pd.DataFrame, column_name: str, values_expected: Union[Set[Any], List[Any]]):
+def check_values_in_column(df: pd.DataFrame, column_name: str, values_expected: set[Any] | list[Any]):
     """Check values in a column are as expected.
 
     It checks both ways:
@@ -75,12 +76,12 @@ def check_values_in_column(df: pd.DataFrame, column_name: str, values_expected: 
 
 def interpolate_table(
     df: TableOrDataFrame,
-    entity_col: str | List[str] | Iterable[str],
+    entity_col: str | list[str] | Iterable[str],
     time_col: str,
     time_mode: Literal["full_range", "full_range_entity", "observed", "none"] = "full_range",
     method: str = "linear",
     limit_direction: str = "both",
-    limit_area: Optional[str] = None,
+    limit_area: str | None = None,
 ) -> TableOrDataFrame:
     """Interpolate missing values in a column linearly.
 
@@ -103,7 +104,7 @@ def interpolate_table(
 
     if time_mode != "none":
         # Expand time
-        df = expand_time_column(  # type: ignore[assignment]
+        df = expand_time_column(  # ty: ignore[invalid-assignment]
             df,
             dimension_col=entity_col,
             time_col=time_col,
@@ -114,9 +115,9 @@ def interpolate_table(
     df = cast(TableOrDataFrame, df.set_index(index).sort_index())
 
     # Interpolate
-    df = (  # type: ignore[assignment]
+    df = (  # ty: ignore[invalid-assignment]
         df.groupby(entity_col)
-        .transform(lambda x: x.interpolate(method=method, limit_direction=limit_direction, limit_area=limit_area))  # type: ignore
+        .transform(lambda x: x.interpolate(method=method, limit_direction=limit_direction, limit_area=limit_area))  # ty: ignore
         .reset_index()
     )
 
@@ -126,11 +127,11 @@ def interpolate_table(
 def expand_time_column(
     df: TableOrDataFrame,
     time_col: str,
-    dimension_col: Optional[str | Iterable[str]] = None,
+    dimension_col: str | Iterable[str] | None = None,
     method: Literal["full_range", "full_range_entity", "observed", "none"] = "full_range",
-    until_time: Optional[int | datetime] = None,
-    since_time: Optional[int | datetime] = None,
-    fillna_method: Optional[List[str] | str] = None,
+    until_time: int | datetime | None = None,
+    since_time: int | datetime | None = None,
+    fillna_method: list[str] | str | None = None,
 ) -> TableOrDataFrame:
     """Add rows to complete the timeseries.
 
@@ -211,7 +212,7 @@ def expand_time_column(
         if single_dimension:
             # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
             # Optionally fill missing years linearly.
-            entities_in_data = df[dimension_col].unique()
+            entities_in_data = df[dimension_col].unique()  # ty: ignore[call-non-callable]
             iterables = [entities_in_data, date_values]
             names = [dimension_col, time_col]
         else:
@@ -237,7 +238,7 @@ def expand_time_column(
             group[dimension_col] = group[dimension_col].ffill().bfill()  # Fill NaNs in 'country'
             return group
 
-        df = df.groupby(dimension_col).apply(_reindex_dates).reset_index(drop=True).set_index(index)  # type: ignore
+        df = df.groupby(dimension_col).apply(_reindex_dates).reset_index(drop=True).set_index(index)  # ty: ignore
         df = cast(TableOrDataFrame, df.reset_index())
     # Either full range or all observations.
     elif method in {"full_range", "observed"}:
@@ -255,9 +256,9 @@ def expand_time_column(
         )
 
         # Reindex
-        df = (  # type: ignore[assignment]
+        df = (  # ty: ignore[invalid-assignment]
             df.set_index(index)
-            .reindex(pd.MultiIndex.from_product(iterables, names=names))  # type: ignore
+            .reindex(pd.MultiIndex.from_product(iterables, names=names))  # ty: ignore
             .sort_index()
         )
 
@@ -283,7 +284,7 @@ def expand_time_column(
         if isinstance(start, datetime):
             date_values = pd.date_range(start=start, end=end)
         else:
-            date_values = range(start, end + 1)  # type: ignore
+            date_values = range(start, end + 1)  # ty: ignore
 
         # Build ranges to add (preliminary)
         iterables, names = _get_iter_and_names(
@@ -306,9 +307,9 @@ def expand_time_column(
 
         # Extend the dataframe
         if isinstance(df, Table):
-            df = pr.concat([df, Table(df_range)])  #  type: ignore
+            df = pr.concat([df, Table(df_range)])  # ty: ignore
         elif isinstance(df, pd.DataFrame):
-            df = pd.concat([df, df_range])  # type: ignore
+            df = pd.concat([df, df_range])  # ty: ignore
 
     df = df.sort_values(index)
 
@@ -352,7 +353,7 @@ def expand_time_column(
     # Output dataframe in same order as input
     df = df.loc[:, columns_order]
 
-    if not DID_INTERPOLATE:  # type: ignore
+    if not DID_INTERPOLATE:  # ty: ignore
         try:
             df = df.astype(dtypes)
         except pd.errors.IntCastingNaNError:
@@ -369,7 +370,7 @@ def explode_rows_by_time_range(
     col_time_start: str,
     col_time_end: str,
     col_time: str,
-    cols_scale: Optional[List[str]] = None,
+    cols_scale: list[str] | None = None,
 ) -> Table:
     """Expand a table to have a row per time unit given a range.
 
@@ -610,9 +611,9 @@ def compare_tables(
                     elif metric == "bard_max":
                         condition = max(bard(a=_old, b=_new, eps=bard_eps)) < bard_max
                     else:
-                        condition = metric(_old, _new)  # type: ignore
+                        condition = metric(_old, _new)  # ty: ignore
 
-                    if condition:  # type: ignore
+                    if condition:  # ty: ignore
                         # If the old and new tables are equal for this country-column, skip this column.
                         continue
 
@@ -650,7 +651,7 @@ def compare_tables(
             fig.show()
 
 
-def round_to_nearest_power_of_ten(value: Union[int, float], floor: bool = True) -> float:
+def round_to_nearest_power_of_ten(value: int | float, floor: bool = True) -> float:
     """Round a number to its nearest power of ten.
 
     If `floor`, values are rounded down, e.g. 123 -> 100. Otherwise, they are rounded up, e.g. 123 -> 1000.
@@ -684,7 +685,7 @@ def round_to_nearest_power_of_ten(value: Union[int, float], floor: bool = True) 
     return rounded_value
 
 
-def round_to_sig_figs(value: Union[int, float], sig_figs: int = 1) -> float:
+def round_to_sig_figs(value: int | float, sig_figs: int = 1) -> float:
     """Round a number to a fixed amount of significant figures.
 
     For example, if `sig_figs=1`:
@@ -716,8 +717,8 @@ def round_to_sig_figs(value: Union[int, float], sig_figs: int = 1) -> float:
 
 
 def round_to_shifted_power_of_ten(
-    value: Union[int, float], shifts: Optional[List[int]] = None, floor: bool = True
-) -> Union[int, float]:
+    value: int | float, shifts: list[int] | None = None, floor: bool = True
+) -> int | float:
     """Round a number to its nearest power of ten, shifted by a certain coefficient.
 
     By default, the coefficients are 1, 2, 3, and 5.
@@ -928,7 +929,7 @@ def retry_on_network_error(max_retries: int = 3, base_delay: float = 1.0):
     return decorator
 
 
-def _get_variables_to_process(table: Table, metadata_variables: Optional[List[str]]) -> List[str]:
+def _get_variables_to_process(table: Table, metadata_variables: list[str] | None) -> list[str]:
     """Determine which variables to process for metadata export."""
     if metadata_variables is None:
         return list(table.columns)
@@ -941,7 +942,7 @@ def _get_variables_to_process(table: Table, metadata_variables: Optional[List[st
     return variables_to_process
 
 
-def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]]:
+def _extract_metadata_rows(metadata_obj, included_fields: set) -> list[list[str]]:
     """Extract metadata rows from a metadata object, keeping only specified fields."""
     rows = []
 
@@ -954,7 +955,7 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
             continue
 
         # Get display name
-        display_name = GSHEET_EXPORT_CONFIG["FIELD_DISPLAY_NAMES"].get(key, key)
+        display_name = GSHEET_EXPORT_CONFIG["FIELD_DISPLAY_NAMES"].get(key, key)  # ty: ignore[unresolved-attribute]
 
         if isinstance(value, list):
             # Handle special case for origins - extract attributes for each
@@ -1006,7 +1007,7 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
     return rows
 
 
-def _extract_origin_attributes(origin, base_display_name: str) -> List[List[str]]:
+def _extract_origin_attributes(origin, base_display_name: str) -> list[list[str]]:
     """Extract individual attributes from an Origin object or list of Origin objects and format them."""
     # Define the origin attributes we want to show and their display names
     origin_field_mapping = {
@@ -1080,12 +1081,12 @@ def export_table_to_gsheet(
     table: Table,
     sheet_title: str,
     update_existing: bool = True,
-    folder_id: Optional[str] = None,
+    folder_id: str | None = None,
     role: Literal["reader", "commenter", "writer"] = "reader",
     general_access: Literal["anyone", "domain", "user"] = "anyone",
     include_metadata: bool = True,
-    metadata_variables: Optional[List[str]] = None,
-) -> Optional[tuple[str, str]]:
+    metadata_variables: list[str] | None = None,
+) -> tuple[str, str] | None:
     """Export a Table to Google Sheets with improved error handling and performance.
 
     Returns
@@ -1128,7 +1129,7 @@ def export_table_to_gsheet(
         raise RuntimeError(f"Failed to export table to Google Sheets: {e}")
 
 
-def _add_metadata_tabs(sheet: GoogleSheet, table: Table, metadata_variables: Optional[List[str]]) -> None:
+def _add_metadata_tabs(sheet: GoogleSheet, table: Table, metadata_variables: list[str] | None) -> None:
     """Add metadata tabs to the sheet."""
 
     """Create metadata DataFrames for each variable in the table."""
@@ -1166,7 +1167,7 @@ def _set_permissions(sheet_id: str, role: str, general_access: str) -> None:
     drive.set_file_permissions(file_id=sheet_id, role=role, general_access=general_access)
 
 
-def get_team_folder_id() -> Optional[str]:
+def get_team_folder_id() -> str | None:
     """Get the team folder ID for OWID ETL exports."""
     # Use the shared folder ID if available
     if OWID_SHARED_FOLDER_ID:

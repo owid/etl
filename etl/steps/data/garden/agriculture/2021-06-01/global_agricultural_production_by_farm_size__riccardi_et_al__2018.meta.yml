@@ -1,0 +1,56 @@
+dataset:
+  title: Global agricultural production by farm size (Riccardi et al. 2018)
+tables:
+  global_agricultural_production_by_farm_size__riccardi_et_al__2018:
+    variables:
+      area_ha:
+        title: area_ha
+        unit: ''
+      cereals_kcal:
+        title: cereals_kcal
+        unit: ''
+      feed_kcal:
+        title: feed_kcal
+        unit: ''
+      food_kcal:
+        title: food_kcal
+        unit: ''
+      fruit_kcal:
+        title: fruit_kcal
+        unit: ''
+      oilcrops_kcal:
+        title: oilcrops_kcal
+        unit: ''
+      other_allocation_kcal:
+        title: other_allocation_kcal
+        unit: ''
+      other_foods_kcal:
+        title: other_foods_kcal
+        unit: ''
+      processing_kcal:
+        title: processing_kcal
+        unit: ''
+      pulses_kcal:
+        title: pulses_kcal
+        unit: ''
+      roots_kcal:
+        title: roots_kcal
+        unit: ''
+      seed_kcal:
+        title: seed_kcal
+        unit: ''
+      vegetables_kcal:
+        title: vegetables_kcal
+        unit: ''
+      waste_kcal:
+        title: waste_kcal
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

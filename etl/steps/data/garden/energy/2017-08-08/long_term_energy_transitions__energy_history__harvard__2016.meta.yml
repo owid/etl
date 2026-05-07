@@ -1,0 +1,46 @@
+dataset:
+  title: Long-term energy transitions - Energy History, Harvard (2016)
+tables:
+  long_term_energy_transitions__energy_history__harvard__2016:
+    variables:
+      animal_muscle__energy_history__harvard__2016:
+        title: Animal muscle (Energy History, Harvard (2016))
+        unit: ''
+        short_unit: '%'
+      coal__energy_history__harvard__2016:
+        title: Coal (Energy History, Harvard (2016))
+        unit: '%'
+        short_unit: '%'
+      fuelwood__energy_history__harvard__2016:
+        title: Fuelwood (Energy History, Harvard (2016))
+        unit: '%'
+        short_unit: '%'
+      human_muscle__energy_history__harvard__2016:
+        title: Human muscle (Energy History, Harvard (2016))
+        unit: ''
+        short_unit: '%'
+      natural_gas__energy_history__harvard__2016:
+        title: Natural Gas (Energy History, Harvard (2016))
+        unit: '%'
+        short_unit: '%'
+      oil__energy_history__harvard__2016:
+        title: Oil (Energy History, Harvard (2016))
+        unit: '%'
+        short_unit: '%'
+      primary_electricity__energy_history__harvard__2016:
+        title: Primary electricity (Energy History, Harvard (2016))
+        unit: '%'
+        short_unit: '%'
+      water__and__wind__energy_history__harvard__2016:
+        title: Water & Wind (Energy History, Harvard (2016))
+        unit: '%'
+        short_unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

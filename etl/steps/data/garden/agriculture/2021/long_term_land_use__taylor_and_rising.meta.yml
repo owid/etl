@@ -1,0 +1,116 @@
+dataset:
+  title: Long-term land use (Taylor and Rising)
+tables:
+  long_term_land_use__taylor_and_rising:
+    variables:
+      agriculture_ha:
+        title: agriculture_ha
+        unit: ''
+      agriculture_ha_per_capita:
+        title: agriculture_ha_per_capita
+        unit: ''
+      agriculture_ha_share:
+        title: agriculture_ha_share
+        unit: ''
+      cropland_ha:
+        title: cropland_ha
+        unit: ''
+      cropland_ha_per_capita:
+        title: cropland_ha_per_capita
+        unit: ''
+      cropland_ha_share:
+        title: cropland_ha_share
+        unit: ''
+      forest_ha:
+        title: forest_ha
+        unit: ''
+      forest_ha_per_capita:
+        title: forest_ha_per_capita
+        unit: ''
+      forest_ha_share:
+        title: forest_ha_share
+        unit: ''
+      frontier_land_ha:
+        title: frontier_land_ha
+        unit: ''
+      frontier_land_ha_per_capita:
+        title: frontier_land_ha_per_capita
+        unit: ''
+      frontier_land_ha_share:
+        title: frontier_land_ha_share
+        unit: ''
+      intensive_agriculture_ha:
+        title: intensive_agriculture_ha
+        unit: ''
+      intensive_agriculture_ha_per_capita:
+        title: intensive_agriculture_ha_per_capita
+        unit: ''
+      intensive_agriculture_ha_share:
+        title: intensive_agriculture_ha_share
+        unit: ''
+      natural_ex_ha:
+        title: natural_ex_ha
+        unit: ''
+      natural_ex_ha_per_capita:
+        title: natural_ex_ha_per_capita
+        unit: ''
+      natural_ex_ha_share:
+        title: natural_ex_ha_share
+        unit: ''
+      natural_ha:
+        title: natural_ha
+        unit: ''
+      natural_ha_per_capita:
+        title: natural_ha_per_capita
+        unit: ''
+      natural_ha_share:
+        title: natural_ha_share
+        unit: ''
+      nonintensive_agriculture_ha:
+        title: nonintensive_agriculture_ha
+        unit: ''
+      nonintensive_agriculture_ha_per_capita:
+        title: nonintensive_agriculture_ha_per_capita
+        unit: ''
+      nonintensive_agriculture_ha_share:
+        title: nonintensive_agriculture_ha_share
+        unit: ''
+      pasture_ha:
+        title: pasture_ha
+        unit: ''
+      pasture_ha_per_capita:
+        title: pasture_ha_per_capita
+        unit: ''
+      pasture_ha_share:
+        title: pasture_ha_share
+        unit: ''
+      protected_land_ha:
+        title: protected_land_ha
+        unit: ''
+      protected_land_ha_per_capita:
+        title: protected_land_ha_per_capita
+        unit: ''
+      protected_land_ha_share:
+        title: protected_land_ha_share
+        unit: ''
+      total_land_ha:
+        title: total_land_ha
+        unit: ''
+      tropicalforest_ha:
+        title: tropicalforest_ha
+        unit: ''
+      tropicalforest_ha_per_capita:
+        title: tropicalforest_ha_per_capita
+        unit: ''
+      tropicalforest_ha_share:
+        title: tropicalforest_ha_share
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

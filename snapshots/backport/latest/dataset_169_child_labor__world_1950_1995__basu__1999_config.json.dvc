@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/169
-    date_accessed: 2023-08-10 09:04:23.205250
+    url: https://admin.owid.io/admin/datasets/169
+    date_accessed: 2026-03-06 07:48:29.798233+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_169_child_labor__world_1950_1995__basu__1999
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3b7afa392507819d52c6497d71238eae
-  size: 2000
-  path: dataset_169_child_labor__world_1950_1995__basu__1999_config.json
+  - md5: 6c2840e19e6e0204da2b479d83635a66
+    size: 2130
+    path: dataset_169_child_labor__world_1950_1995__basu__1999_config.json

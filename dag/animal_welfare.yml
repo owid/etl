@@ -1,48 +1,5 @@
 steps:
   #
-  # Global hen inventory (Welfare Footprint Project, 2022).
-  #
-  data://meadow/animal_welfare/2023-08-01/global_hen_inventory:
-    - snapshot://animal_welfare/2023-08-01/global_hen_inventory.csv
-  data://garden/animal_welfare/2023-08-01/global_hen_inventory:
-    - data://meadow/animal_welfare/2023-08-01/global_hen_inventory
-  data://grapher/animal_welfare/2023-08-01/global_hen_inventory:
-    - data://garden/animal_welfare/2023-08-01/global_hen_inventory
-  #
-  # UK egg statistics (Defra, 2023).
-  #
-  data://meadow/animal_welfare/2023-08-01/uk_egg_statistics:
-    - snapshot://animal_welfare/2023-08-01/uk_egg_statistics.ods
-  data://garden/animal_welfare/2023-08-01/uk_egg_statistics:
-    - data://meadow/animal_welfare/2023-08-01/uk_egg_statistics
-  data://grapher/animal_welfare/2023-08-01/uk_egg_statistics:
-    - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
-  #
-  # US egg production (The Humane League, 2023).
-  #
-  data://meadow/animal_welfare/2023-08-03/us_egg_production:
-    - snapshot://animal_welfare/2023-08-03/us_egg_production.csv
-    - snapshot://animal_welfare/2023-08-03/us_egg_production_share_cage_free.csv
-  data://garden/animal_welfare/2023-08-03/us_egg_production:
-    - data://meadow/animal_welfare/2023-08-03/us_egg_production
-  #
-  # Share of cage-free eggs (Various sources, 2023).
-  #
-  data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs:
-    - data://garden/animal_welfare/2023-08-03/us_egg_production
-    - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
-  data://grapher/animal_welfare/2023-08-03/share_of_cage_free_eggs:
-    - data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs
-  #
-  # Chick culling laws (Various sources, 2023).
-  #
-  data://meadow/animal_welfare/2023-09-01/chick_culling_laws:
-    - snapshot://animal_welfare/2023-09-01/chick_culling_laws.csv
-  data://garden/animal_welfare/2023-09-01/chick_culling_laws:
-    - data://meadow/animal_welfare/2023-09-01/chick_culling_laws
-  data://grapher/animal_welfare/2023-09-01/chick_culling_laws:
-    - data://garden/animal_welfare/2023-09-01/chick_culling_laws
-  #
   # Various sources - Bullfighting laws.
   #
   data://meadow/animal_welfare/2024-06-04/bullfighting_laws:
@@ -117,29 +74,110 @@ steps:
   data://grapher/animal_welfare/2024-12-17/fur_laws:
     - data://garden/animal_welfare/2024-12-17/fur_laws
   #
-  # Total number of animals used for food.
-  #
-  data://garden/animal_welfare/2025-03-26/animals_used_for_food:
-    - data://garden/faostat/2025-03-17/faostat_qcl
-    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
-    - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
-    - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
-  #
-  # Total number of animals used for food.
-  #
-  data://grapher/animal_welfare/2025-03-26/animals_used_for_food:
-    - data://garden/animal_welfare/2025-03-26/animals_used_for_food
-  #
-  # Land animals killed for food (grouped into main animals and "other").
-  #
-  data://grapher/animal_welfare/2025-03-26/land_animals_killed_for_food:
-    - data://garden/faostat/2025-03-17/faostat_qcl
-  #
   # Animal welfare data explorer.
   #
   export://explorers/animal_welfare/latest/animal_welfare:
-    - data://grapher/animal_welfare/2025-03-26/animals_used_for_food
-    - data://grapher/animal_welfare/2023-08-01/global_hen_inventory
-    - data://grapher/animal_welfare/2023-09-01/chick_culling_laws
-    - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
+    - data://grapher/animal_welfare/2026-04-16/chick_culling_laws
     - data://grapher/animal_welfare/2024-12-17/fur_laws
+    - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
+    - data://grapher/animal_welfare/2026-04-28/eggs_and_hens_statistics
+    - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
+  #
+  # Total number of animals used for food.
+  #
+  data://garden/animal_welfare/2026-03-03/animals_used_for_food:
+    - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+    - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
+  #
+  # Total number of animals used for food.
+  #
+  data://grapher/animal_welfare/2026-03-03/animals_used_for_food:
+    - data://garden/animal_welfare/2026-03-03/animals_used_for_food
+  #
+  # Land animals killed for food (grouped into main animals and "other").
+  #
+  data://grapher/animal_welfare/2026-03-03/land_animals_killed_for_food:
+    - data://garden/faostat/2026-02-25/faostat_qcl
+  #
+  # Chick culling laws (Various sources).
+  #
+  data://meadow/animal_welfare/2026-04-16/chick_culling_laws:
+    - snapshot://animal_welfare/2026-04-16/chick_culling_laws.csv
+  data://garden/animal_welfare/2026-04-16/chick_culling_laws:
+    - data://meadow/animal_welfare/2026-04-16/chick_culling_laws
+  data://grapher/animal_welfare/2026-04-16/chick_culling_laws:
+    - data://garden/animal_welfare/2026-04-16/chick_culling_laws
+  #
+  # UK egg statistics (Defra).
+  #
+  # This step is needed to fill barn/organic data for 2006-2011, missing in the new release.
+  data://meadow/animal_welfare/2023-08-01/uk_egg_statistics:
+    - snapshot://animal_welfare/2023-08-01/uk_egg_statistics.ods
+  #
+  # UK livestock populations (Defra).
+  #
+  data://meadow/animal_welfare/2026-04-16/uk_livestock_populations:
+    - snapshot://animal_welfare/2026-04-16/uk_livestock_populations.ods
+  #
+  # UK egg statistics (Defra).
+  #
+  data://meadow/animal_welfare/2026-04-16/uk_egg_statistics:
+    - snapshot://animal_welfare/2026-04-16/uk_egg_statistics.ods
+  data://garden/animal_welfare/2026-04-16/uk_egg_statistics:
+    - data://meadow/animal_welfare/2026-04-16/uk_egg_statistics
+    - data://meadow/animal_welfare/2023-08-01/uk_egg_statistics
+    - data://meadow/animal_welfare/2026-04-16/uk_livestock_populations
+  #
+  # EU laying hens by way of keeping (European Commission).
+  #
+  data://meadow/animal_welfare/2026-04-16/laying_hens_keeping_eu:
+    - snapshot://animal_welfare/2026-04-16/laying_hens_keeping_eu.xlsx
+  #
+  # EU eggs market situation dashboard (European Commission).
+  #
+  data://meadow/animal_welfare/2026-04-16/eu_eggs_dashboard_2025_01:
+    - snapshot://animal_welfare/2026-04-16/eu_eggs_dashboard_2025_01.pdf
+  data://meadow/animal_welfare/2026-04-16/eu_eggs_dashboard_2026_04:
+    - snapshot://animal_welfare/2026-04-16/eu_eggs_dashboard_2026_04.pdf
+  data://garden/animal_welfare/2026-04-16/eu_eggs_dashboard:
+    - data://meadow/animal_welfare/2026-04-16/eu_eggs_dashboard_2025_01
+    - data://meadow/animal_welfare/2026-04-16/eu_eggs_dashboard_2026_04
+  data://garden/animal_welfare/2026-04-16/laying_hens_keeping_eu:
+    - data://meadow/animal_welfare/2026-04-16/laying_hens_keeping_eu
+    - data://garden/animal_welfare/2026-04-16/eu_eggs_dashboard
+  #
+  # US egg production - older data (USDA).
+  #
+  # Non updateable.
+  data://meadow/animal_welfare/2026-04-16/us_egg_production_2007_2018:
+    - snapshot://animal_welfare/2026-04-16/us_egg_production_2007_2018.pdf
+  #
+  # US egg production (USDA).
+  #
+  data://meadow/animal_welfare/2026-04-16/us_egg_production:
+    - snapshot://animal_welfare/2026-04-16/us_egg_production.pdf
+  #
+  # US egg production (USDA).
+  #
+  data://garden/animal_welfare/2026-04-16/us_egg_production:
+    - data://meadow/animal_welfare/2026-04-16/us_egg_production
+    - data://meadow/animal_welfare/2026-04-16/us_egg_production_2007_2018
+  #
+  # Global hen inventory (Welfare Footprint Institute).
+  #
+  data://meadow/animal_welfare/2026-04-28/global_hen_inventory:
+    - snapshot://animal_welfare/2026-04-28/global_hen_inventory.csv
+  data://garden/animal_welfare/2026-04-28/global_hen_inventory:
+    - data://meadow/animal_welfare/2026-04-28/global_hen_inventory
+  #
+  # Eggs and hens statistics (various sources).
+  #
+  data://garden/animal_welfare/2026-04-28/eggs_and_hens_statistics:
+    - data://garden/animal_welfare/2026-04-16/uk_egg_statistics
+    - data://garden/animal_welfare/2026-04-16/us_egg_production
+    - data://garden/animal_welfare/2026-04-16/laying_hens_keeping_eu
+    - data://garden/animal_welfare/2026-04-28/global_hen_inventory
+  data://grapher/animal_welfare/2026-04-28/eggs_and_hens_statistics:
+    - data://garden/animal_welfare/2026-04-28/eggs_and_hens_statistics

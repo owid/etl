@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/675
-    date_accessed: 2023-08-10 08:43:58.087038
+    url: https://admin.owid.io/admin/datasets/675
+    date_accessed: 2026-03-05 14:27:54.119098+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_675_forestry_area__fao__2017
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: aa4578239cf6311359c454533ea5eabf
-  size: 2195
-  path: dataset_675_forestry_area__fao__2017_config.json
+  - md5: abd8df1bcf38adf66b98c1c5086971df
+    size: 2325
+    path: dataset_675_forestry_area__fao__2017_config.json

@@ -78,11 +78,13 @@ def load_table_stats(
 
     # Columns available for sparklines/dimensions
     dim_cols_present = [c for c in ["country", "year"] if c in dimensions or c in all_cols]
+    # Extra dimensions beyond country/year (e.g. lighting_source, price_year)
+    extra_dims = sorted(d for d in dimensions if d not in ("country", "year"))
     can_sparkline = has_year and has_country and use_feather
 
     # Load all needed columns in a single feather read for efficiency
     if use_feather:
-        cols_to_load = list(dict.fromkeys(dim_cols_present + indicator_cols))  # dedup, preserve order
+        cols_to_load = list(dict.fromkeys(dim_cols_present + extra_dims + indicator_cols))  # dedup, preserve order
         tb = _read_columns(str(feather_path), cols_to_load)
     else:
         # Fallback: load full table (parquet/csv datasets)
@@ -92,23 +94,103 @@ def load_table_stats(
     year_min = year_max = entity_count = None
     sampled_entities: list[str] | None = None
     if "year" in tb.columns:
-        year_col = tb["year"].astype(int)
-        year_min = int(year_col.min())
-        year_max = int(year_col.max())
+        try:
+            year_col = tb["year"].astype(int)
+            year_min = int(year_col.min())
+            year_max = int(year_col.max())
+        except (ValueError, TypeError):
+            # Year column contains non-numeric values like ranges ("2020-2025")
+            # Disable sparklines since they require sortable numeric years
+            can_sparkline = False
     if "country" in tb.columns:
         all_entities = list(tb["country"].unique())
         entity_count = len(all_entities)
-        MAX_SPARKLINE_ENTITIES = 50
+        MAX_SPARKLINE_ENTITIES = 20
         if len(all_entities) > MAX_SPARKLINE_ENTITIES:
             sampled_entities = _random.sample(all_entities, MAX_SPARKLINE_ENTITIES)
         else:
             sampled_entities = all_entities
+
+    # Discover unique values for extra dimensions
+    extra_dimensions: dict[str, list] = {}
+    for dim in extra_dims:
+        if dim in tb.columns:
+            vals = sorted(tb[dim].dropna().unique(), key=str)
+            extra_dimensions[dim] = [str(v) if not isinstance(v, (int, float)) else v for v in vals]
 
     # Filter to sampled entities once for sparklines
     if can_sparkline and sampled_entities is not None:
         sparkline_df = tb[tb["country"].isin(sampled_entities)]
     else:
         sparkline_df = None
+
+    # Precompute sparklines for ALL numeric indicators in a single groupby pass.
+    # Previously this did one groupby per indicator (~380k tiny pandas ops for WB PIP).
+    # Now: one groupby, numpy arrays directly → ~5.8k iterations total.
+    precomputed_sparklines: dict[str, dict] = {}
+    if sparkline_df is not None:
+        import numpy as np
+
+        numeric_ind_cols = [
+            c
+            for c in indicator_cols
+            if tb[c].dtype.kind in ("f", "i", "u") or str(tb[c].dtype).startswith(("Float", "Int"))
+        ]
+
+        if numeric_ind_cols:
+            group_cols = ["country"] + [d for d in extra_dims if d in sparkline_df.columns]
+            sparkline_sorted = sparkline_df.sort_values(group_cols + ["year"])
+
+            for c in numeric_ind_cols:
+                precomputed_sparklines[c] = {}
+
+            # Cap dimension combinations to limit JSON size for high-dimensional tables
+            MAX_DIM_COMBOS = 200
+            seen_dim_keys: set[str] = set()
+
+            for group_key, grp in sparkline_sorted.groupby(group_cols, observed=True):
+                if isinstance(group_key, str):
+                    entity = group_key
+                    dim_key = "_"
+                else:
+                    entity = str(group_key[0])
+                    dim_key = "|".join(str(v) for v in group_key[1:]) if len(group_key) > 1 else "_"
+
+                # Skip unseen dim combos once we've hit the cap
+                if dim_key not in seen_dim_keys:
+                    if len(seen_dim_keys) >= MAX_DIM_COMBOS:
+                        continue
+                    seen_dim_keys.add(dim_key)
+
+                years = grp["year"].values
+
+                for c in numeric_ind_cols:
+                    values = grp[c].values
+                    if values.dtype.kind == "f":
+                        mask = ~np.isnan(values)
+                    else:
+                        mask = np.ones(len(values), dtype=bool)
+
+                    valid_years = years[mask]
+                    valid_values = values[mask]
+
+                    if len(valid_years) < 2:
+                        continue
+
+                    n = len(valid_years)
+                    if n > 200:
+                        step_size = n / 200
+                        idx = [int(i * step_size) for i in range(200)]
+                        valid_years = valid_years[idx]
+                        valid_values = valid_values[idx]
+
+                    if dim_key not in precomputed_sparklines[c]:
+                        precomputed_sparklines[c][dim_key] = {}
+                    # Compact format: {years: [...], values: [...]} instead of [{year, value}, ...]
+                    precomputed_sparklines[c][dim_key][entity] = {
+                        "years": valid_years.astype(int).tolist(),
+                        "values": [round(float(v), 4) for v in valid_values],
+                    }
 
     indicators = []
     for col in indicator_cols:
@@ -141,27 +223,16 @@ def load_table_stats(
                 {"value": str(k), "count": int(v), "pct": round(100 * v / total_non_null, 1)} for k, v in top.items()
             ]
 
-        # Sparkline: per-entity time series
-        sparkline_by_entity = None
-        if is_numeric and sparkline_df is not None:
-            sparkline_by_entity = {}
-            for entity, grp in sparkline_df.groupby("country", observed=True):
-                series_ent = grp.set_index("year")[col].dropna().sort_index()
-                if len(series_ent) < 2:
-                    continue
-                data = list(series_ent.items())
-                if len(data) > 200:
-                    step_size = len(data) / 200
-                    data = [data[int(i * step_size)] for i in range(200)]
-                sparkline_by_entity[str(entity)] = [{"year": int(y), "value": round(float(v), 4)} for y, v in data]
+        # Sparkline data was precomputed above in a single groupby pass
+        sparkline_by_entity = precomputed_sparklines.get(col) or None
 
         # Quality flags
         quality_flags = []
         if not meta.title:
             quality_flags.append("missing_title")
-        if not meta.unit and is_numeric:
+        if meta.unit is None and is_numeric:
             quality_flags.append("missing_unit")
-        if not meta.description_short:
+        if not meta.description_short and not meta.description_key:
             quality_flags.append("missing_description")
         if not meta.origins:
             quality_flags.append("missing_origins")
@@ -199,6 +270,7 @@ def load_table_stats(
         "n_indicators_shown": len(indicator_cols),
         "truncated": truncated,
         "dimensions": sorted(dimensions),
+        "extra_dimensions": extra_dimensions,
         "year_min": year_min,
         "year_max": year_max,
         "entity_count": entity_count,

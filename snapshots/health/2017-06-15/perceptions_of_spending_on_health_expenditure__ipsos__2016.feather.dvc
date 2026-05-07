@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Perceptions of spending on health expenditure - IPSOS (2016)
+    description: |-
+      Ipsos MORI conducted 27,250 interviews across 50 countries between September-November 2016 via the Ipsos MORI Online Panel system. In the Czech Republic, Montenegro, Netherlands, Norway and Serbia, interviews were carried out through a combination of the online system and face-to-face methodologies.
+
+      Data are weighted to match the profile of the population.
+    url: https://www.ipsos.com/ipsos-mori/en-uk/perceptions-are-not-reality-what-world-gets-wrong
+    date_accessed: 2017-06-15
+    published_by: Ipsos MORI Perils of Perception Study 2016
+  name: Perceptions of spending on health expenditure - IPSOS (2016)
+  description: ''
+outs:
+  - md5: e59d667a2efbe257386f7a155f3c37d5
+    size: 4634
+    path: perceptions_of_spending_on_health_expenditure__ipsos__2016.feather

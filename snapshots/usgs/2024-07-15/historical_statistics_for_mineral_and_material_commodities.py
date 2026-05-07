@@ -3,7 +3,6 @@
 import tempfile
 from pathlib import Path
 from time import sleep
-from typing import Optional
 from zipfile import ZipFile
 
 import click
@@ -77,7 +76,7 @@ def get_table_of_commodities_and_urls(url_main: str) -> pd.DataFrame:
     return df
 
 
-def _fetch_file_url_from_media_path(media_path: str) -> Optional[str]:
+def _fetch_file_url_from_media_path(media_path: str) -> str | None:
     # The link to the file of some of the commodities lead to a subpage.
     # In those cases, the url is a media path, e.g. "/media/files/aluminum-historical-statistics-data-series-140"
     url = f"https://www.usgs.gov{media_path}"
@@ -92,15 +91,15 @@ def _fetch_file_url_from_media_path(media_path: str) -> Optional[str]:
     div = soup_subpage.find("div", class_="media-full-entity")
 
     # Find the first link within the div.
-    file_link = div.find("a", href=True)  # type: ignore
+    file_link = div.find("a", href=True)  # ty: ignore
 
     # Extract the URL.
-    data_file_url = file_link["href"] if file_link else None  # type: ignore
+    data_file_url = file_link["href"] if file_link else None  # ty: ignore
 
     # Wait before sending next query.
     sleep(TIME_BETWEEN_QUERIES)
 
-    return data_file_url  # type: ignore
+    return data_file_url  # ty: ignore
 
 
 def download_all_files(df: pd.DataFrame, snapshot_path: Path) -> None:
@@ -122,13 +121,13 @@ def download_all_files(df: pd.DataFrame, snapshot_path: Path) -> None:
             if row["supply_demand_url"] != "NA":
                 download_file_from_url(
                     url=row["supply_demand_url"],
-                    local_path=supply_demand_dir / f"{underscore(row['commodity'])}.xlsx",  # type: ignore[reportArgumentType]
+                    local_path=supply_demand_dir / f"{underscore(row['commodity'])}.xlsx",  # ty: ignore[invalid-argument-type]
                 )
 
             if row["end_use_url"] != "NA":
                 download_file_from_url(
                     url=row["end_use_url"],
-                    local_path=end_use_dir / f"{underscore(row['commodity'])}.xlsx",  # type: ignore[reportArgumentType]
+                    local_path=end_use_dir / f"{underscore(row['commodity'])}.xlsx",  # ty: ignore[invalid-argument-type]
                 )
 
         # Create the zip file at the snapshot path.
@@ -154,7 +153,7 @@ def run(upload: bool) -> None:
     # Then, all urls leading to subpages will be fetched and the download link extracted.
     # In the end a sanity check will ensure all urls correspond to a download link.
     # NOTE: This may take a few minutes.
-    df = get_table_of_commodities_and_urls(url_main=snap.metadata.origin.url_main)  # type: ignore
+    df = get_table_of_commodities_and_urls(url_main=snap.metadata.origin.url_main)  # ty: ignore
 
     # Download the supply-demand statistics file and end-use statistics file for each commodity in a temporary folder.
     # A compressed file will be created at the end in the corresponding data/snapshots/ folder.

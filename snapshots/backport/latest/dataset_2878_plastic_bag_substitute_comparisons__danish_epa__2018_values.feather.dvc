@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2878
-    date_accessed: 2023-08-10 09:04:07.433738
+    url: https://admin.owid.io/admin/datasets/2878
+    date_accessed: 2026-03-05 10:56:05.450050+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Plastic bag substitute comparisons (Danish EPA, 2018)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a40fef9828797d1b4af1664e054b94d8
-  size: 7106
-  path: dataset_2878_plastic_bag_substitute_comparisons__danish_epa__2018_values.feather
+  - md5: 59c1f02b80bd440b6254f604a54ec257
+    size: 7146
+    path: dataset_2878_plastic_bag_substitute_comparisons__danish_epa__2018_values.feather

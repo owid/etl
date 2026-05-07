@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3021
-    date_accessed: 2023-08-10 09:01:57.842825
+    url: https://admin.owid.io/admin/datasets/3021
+    date_accessed: 2026-03-10 09:15:43.534210+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3021_total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split
@@ -10,7 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: db680b7a58f427f3d3f8d4b7100f132a
-  size: 2492
-  path: 
-    dataset_3021_total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split_config.json
+  - md5: 556f6ec6322aa078f550332c34aab15f
+    size: 2622
+    path: dataset_3021_total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split_config.json

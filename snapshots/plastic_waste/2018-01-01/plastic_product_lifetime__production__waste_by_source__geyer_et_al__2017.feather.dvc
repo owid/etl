@@ -1,0 +1,27 @@
+meta:
+  source:
+    name: Plastic product lifetime, production, waste by source - Geyer et al. (2017)
+    description: |-
+      Data is given as mean product lifetimes of plastic products (measured in years), plastic production, and plastic waste by industrial sector/use (measured in tonnes per year).
+
+      Data is also given for primary production and plastic waste by polymer type. Polymer types are as follows:
+      - LDPE: Low-density polyethylene
+      - HDPE: High-density polyethylene
+      - PP: Polypropylene
+      - PS: Polystyrene
+      - PVC: Polyvinyl chloride
+      - PET: Polyethylene terephthalate
+      - PUT: Polyurethanes
+      - PP&A fibres: polyester, polyamide, and acrylic fibres
+      - Other polymers
+      - Additives
+    url: http://advances.sciencemag.org/content/3/7/e1700782
+    date_accessed: 2026-03-10
+    published_by: |-
+      Geyer, R., Jambeck, J. R., & Law, K. L. (2017). Production, use, and fate of all plastics ever made. Science Advances, 3(7), e1700782.
+  name: Plastic product lifetime, production, waste by source - Geyer et al. (2017)
+  description: ''
+outs:
+  - md5: 172980e80a0941ebf839f422318ce7c4
+    size: 4786
+    path: plastic_product_lifetime__production__waste_by_source__geyer_et_al__2017.feather

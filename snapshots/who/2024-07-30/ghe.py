@@ -2,7 +2,6 @@
 
 import json
 from pathlib import Path
-from typing import List
 
 import click
 import pandas as pd
@@ -43,7 +42,7 @@ def main(upload: bool) -> None:
     snap.create_snapshot(data=df, upload=upload)
 
 
-def get_causes_list() -> List[str]:
+def get_causes_list() -> list[str]:
     url = "https://xmart-api-public.who.int/DEX_CMS/GHE_FULL?$apply=groupby((DIM_GHECAUSE_TITLE))"
     res = requests.get(url)
     assert res.ok
@@ -63,7 +62,7 @@ def get_cause_data(url) -> pd.DataFrame:
     return repack_frame(data_df)
 
 
-def get_cause_data_with_retry(url) -> pd.DataFrame:  # type: ignore
+def get_cause_data_with_retry(url) -> pd.DataFrame:  # ty: ignore
     for attempt in Retrying(
         wait=wait_fixed(5),
         stop=stop_after_attempt(10),
@@ -112,7 +111,7 @@ def download_cause_data(causes) -> pd.DataFrame:
     all_df = pd.concat(all_data)
     all_df = all_df.reset_index()
 
-    return repack_frame(all_df)  # type: ignore[reportArgumentType]
+    return repack_frame(all_df)  # ty: ignore[invalid-argument-type]
 
 
 if __name__ == "__main__":

@@ -1,17 +1,19 @@
 """Semantic search functionality for OWID indicators - API version."""
 
 import threading
-from typing import Any, Dict, List, Optional
+from typing import Any
+
+import sentry_sdk
 
 from apps.wizard.app_pages.indicator_search.data import Indicator, _get_data_indicators_from_db
 from apps.wizard.utils.embeddings import EmbeddingsModel, get_model
 from owid_mcp.data_utils import build_catalog_info
 
 # Global variables to store preloaded data and initialization state
-_indicators: Optional[List[Indicator]] = None
-_embeddings_model: Optional[EmbeddingsModel[Indicator]] = None
+_indicators: list[Indicator] | None = None
+_embeddings_model: EmbeddingsModel[Indicator] | None = None
 _initialization_complete: bool = False
-_initialization_error: Optional[str] = None
+_initialization_error: str | None = None
 
 
 def _initialize_semantic_search():
@@ -31,6 +33,7 @@ def _initialize_semantic_search():
 
         _initialization_complete = True
     except Exception as e:
+        sentry_sdk.capture_exception(e)
         _initialization_error = str(e)
         _initialization_complete = True
 
@@ -41,7 +44,7 @@ def initialize_semantic_search_async():
     thread.start()
 
 
-def search_indicators(query: str, limit: int = 10) -> List[Dict[str, Any]]:
+def search_indicators(query: str, limit: int = 10) -> list[dict[str, Any]]:
     """Search indicators using the preloaded model."""
     if not _initialization_complete:
         raise RuntimeError("Semantic search model is still initializing. Please wait and try again.")
@@ -58,7 +61,7 @@ def search_indicators(query: str, limit: int = 10) -> List[Dict[str, Any]]:
     # Format results
     results = []
     for indicator in sorted_indicators[:limit]:
-        metadata: Dict[str, Any] = {"chart_count": indicator.n_charts}
+        metadata: dict[str, Any] = {"chart_count": indicator.n_charts}
 
         if indicator.catalogPath and indicator.catalogPath != "NULL":
             metadata["catalog_path"] = indicator.catalogPath
@@ -94,7 +97,17 @@ def is_ready() -> bool:
     return _initialization_complete and _embeddings_model is not None and _initialization_error is None
 
 
-def get_model_info() -> Dict[str, Any]:
+def is_initialization_complete() -> bool:
+    """Check if initialization has finished (successfully or with error)."""
+    return _initialization_complete
+
+
+def get_initialization_error() -> str | None:
+    """Return the initialization error message, if any."""
+    return _initialization_error
+
+
+def get_model_info() -> dict[str, Any]:
     """Get information about the loaded model and indicators."""
     return {
         "indicators_loaded": len(_indicators) if _indicators else 0,

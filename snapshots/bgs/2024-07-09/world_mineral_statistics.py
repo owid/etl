@@ -9,7 +9,6 @@ import json
 import time
 import zipfile
 from pathlib import Path
-from typing import Dict, List
 
 import click
 import requests
@@ -32,7 +31,7 @@ URL_BASE = "https://www2.bgs.ac.uk/mineralsuk/statistics/wms.cfc"
 TIME_BETWEEN_QUERIES = 0.1
 
 
-def fetch_raw_data(data_types: List[str], years: List[int], commodity_to_id: Dict[str, int]):
+def fetch_raw_data(data_types: list[str], years: list[int], commodity_to_id: dict[str, int]):
     # To load data for all countries we can set "country=" in the query.
     # Queries need to be in groups of maximum 10 years.
     # Example query:
@@ -86,14 +85,14 @@ def main(upload: bool) -> None:
     soup = BeautifulSoup(page_map.text, "html.parser")
 
     # Map mineral names (commodities) to ids.
-    soup_commodity = soup.find("select", id="commodity").find_all("option")  # type: ignore
+    soup_commodity = soup.find("select", id="commodity").find_all("option")  # ty: ignore
     commodity_to_id = {option.text.strip(): int(option["value"]) for option in soup_commodity if option["value"]}
 
     # Data type options are simply "Imports", "Exports" and "Production".
     data_types = ["Imports", "Exports", "Production"]
 
     # Get the list of available years.
-    soup_years = soup.find("select", id="dateFrom").find_all("option")  # type: ignore
+    soup_years = soup.find("select", id="dateFrom").find_all("option")  # ty: ignore
     years = [int(option.text.strip()) for option in soup_years if option["value"]]
 
     # First fetch all necessary data, without processing it.

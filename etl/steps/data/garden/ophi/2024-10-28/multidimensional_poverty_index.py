@@ -124,9 +124,9 @@ def select_categories_and_rename(tb: Table) -> Table:
 
     for col, categories in CATEGORIES_TO_KEEP.items():
         # Assert that all categories are in the column
-        assert set(categories).issubset(
-            set(tb[col].unique())
-        ), f"Categories {set(categories) - set(tb[col].unique())} not in column {col}"
+        assert set(categories).issubset(set(tb[col].unique())), (
+            f"Categories {set(categories) - set(tb[col].unique())} not in column {col}"
+        )
 
         # Filter categories
         tb = tb[tb[col].isin(categories)].reset_index(drop=True)
@@ -136,9 +136,9 @@ def select_categories_and_rename(tb: Table) -> Table:
 
     # Check that the column ind_lab contains all INDICATOR_NAMES
     indicators_excluding_nan = tb[tb["ind_lab"].notna()]["ind_lab"].unique()
-    assert (
-        set(indicators_excluding_nan) == set(INDICATOR_NAMES)
-    ), f"Column ind_lab is not identical to the expected list. These are the differences: {set(INDICATOR_NAMES) - set(indicators_excluding_nan)}"
+    assert set(indicators_excluding_nan) == set(INDICATOR_NAMES), (
+        f"Column ind_lab is not identical to the expected list. These are the differences: {set(INDICATOR_NAMES) - set(indicators_excluding_nan)}"
+    )
 
     # Remove indicator and area columns
     tb = tb.drop(columns=["indicator"])

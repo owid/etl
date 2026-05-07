@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Food and Agriculture Organization of the United Nations
+    url: http://www.fao.org/3/ca9229en/ca9229en.pdf
+    date_accessed: 2021-07-30
+    published_by: |-
+      FAO. 2020. The State of World Fisheries and Aquaculture 2020. Sustainability in action. Rome. https://doi.org/10.4060/ca9229en
+  name: Employment in fisheries and aquaculture (UN FAO, 2021)
+  description: ''
+  is_public: false
+outs:
+  - md5: 67f5f19d6fc42f5553ea94bca6abeb02
+    size: 4826
+    path: employment_in_fisheries_and_aquaculture__un_fao__2021.feather

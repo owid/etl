@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: Bick, Fuchs-Schündeln, and Lagakos (2018)
+    description: |-
+      Data comes from nationally representative household surveys that cover workers in all sectors, including the self-employed, which represent the majority of the workforce in low-income countries. Most of the data is from 2005 or within a few years of 2005.
+
+      International comparability of hours data is kept as high as possible by satisfying the following three criteria:
+      1. The surveys cover the entire calendar year (rather than, say, one month of the year). This is necessary to prevent any bias induced by seasonality in labor demand.
+      2. Hours worked are measured in a consistent way: actual (rather than usual) hours in all jobs (not just the primary job), and in the week prior to the interview.
+      3. Hours worked cover the production of goods or services counted in the National Income and Product Accounts (NIPA). Thus, the working hours cover unpaid work in agricultural or nonagricultural businesses, as well as wage employment, but do not cover home-produced services, such as child care.
+
+      Data not currently in the Grapher but available from the paper that might be of interest:
+      – Employment rates
+      – Average working hours by: sex, age group, educational attainment, sector (agriculture, manufacturing, services)
+    url: https://www.aeaweb.org/articles?id=10.1257/aer.20151720
+    date_accessed: 2020-11-12
+    published_by: |-
+      Bick, A., Fuchs-Schündeln, N., & Lagakos, D. (2018). How do hours worked vary with income? Cross-country evidence and implications. American Economic Review, 108(1), 170–199. https://doi.org/10.1257/aer.20151720
+  name: Working Hours by Income – Bick et al (2018)
+  description: ''
+  is_public: false
+outs:
+  - md5: 6c4781b00a86d164c5d56daeb77d923f
+    size: 20218
+    path: working_hours_by_income__bick_et_al__2018.feather

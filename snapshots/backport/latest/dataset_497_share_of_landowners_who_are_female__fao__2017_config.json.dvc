@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/497
-    date_accessed: 2023-08-10 08:26:54.407138
+    url: https://admin.owid.io/admin/datasets/497
+    date_accessed: 2026-03-05 09:55:31.565618+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_497_share_of_landowners_who_are_female__fao__2017
@@ -10,20 +10,9 @@ meta:
     Share of agricultural landowners who are female (%).
 
 
-    I thought the data came from the FAOSTAT WCAD dataset. But from what I've read
-    [here](https://www.fao.org/3/i4862e/i4862e.pdf),
-    WCAD informs about land management and not landownership. So we can't update this
-    dataset with FAOSTAT data. I think the
-    data comes from [this page](https://www.fao.org/gender-landrights-database/data-map/statistics/en/),
-    where they claim
-    "The data is shown in the interactive map and are also available in graph and
-    table formats." but I haven't found any
-    way to access the data but to copy or scrape the page. In any case the data has
-    not changed. Last time I checked (2023-04-11)
-    the data doesn't seem to have changed with respect to this dataset, so there's
-    no need to update it.
+    I thought the data came from the FAOSTAT WCAD dataset. But from what I've read [here](https://www.fao.org/3/i4862e/i4862e.pdf), WCAD informs about land management and not landownership. So we can't update this dataset with FAOSTAT data. I think the data comes from [this page](https://www.fao.org/gender-landrights-database/data-map/statistics/en/), where they claim "The data is shown in the interactive map and are also available in graph and table formats." but I haven't found any way to access the data but to copy or scrape the page. In any case the data has not changed. Last time I checked (2023-04-11) the data doesn't seem to have changed with respect to this dataset, so there's no need to update it.
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a7931784279174ca349d86f9da8fa906
-  size: 4902
-  path: dataset_497_share_of_landowners_who_are_female__fao__2017_config.json
+  - md5: 35997bd97d9cce922d061d8ee21c9a24
+    size: 5032
+    path: dataset_497_share_of_landowners_who_are_female__fao__2017_config.json

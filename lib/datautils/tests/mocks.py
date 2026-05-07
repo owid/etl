@@ -1,5 +1,5 @@
 import json
-from typing import Any, List
+from typing import Any
 
 
 class MockResponse:
@@ -7,6 +7,6 @@ class MockResponse:
         self.json_data = json_data
         self.status_code = status_code
 
-    def iter_content(self, chunk_size: int) -> List[bytes]:
+    def iter_content(self, chunk_size: int) -> list[bytes]:
         _ = chunk_size
         return [json.dumps(self.json_data).encode()]

@@ -13,8 +13,6 @@ Auxiliary datasets:
 
 """
 
-from typing import Dict
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Origin, Table
@@ -165,7 +163,7 @@ COLUMNS = {
 
 
 def combine_tables_data_and_metadata(
-    tables: Dict[str, Table],
+    tables: dict[str, Table],
     ds_population: Dataset,
     ds_regions: Dataset,
     ds_gdp: Dataset,
@@ -313,21 +311,21 @@ def sanity_check_outputs(tb: Table) -> None:
     index_cols = ["country", "year", "iso_code"]
     row_all_nan = tb.drop(columns=index_cols).isnull().all(axis=1)
     assert row_all_nan.sum() == 0, (
-        "All rows should contain at least one non-NaN value, but " f"{row_all_nan.sum()} row(s) contain all NaN values."
+        f"All rows should contain at least one non-NaN value, but {row_all_nan.sum()} row(s) contain all NaN values."
     )
 
     # Check for deprecated country names
     old_names = ["burma", "macedonia", "swaziland", "czech republic"]
     countries_lower = set(tb["country"].str.lower())
     for old_name in old_names:
-        assert (
-            old_name not in countries_lower
-        ), f"{old_name} is a deprecated country name that should not exist in the dataset."
+        assert old_name not in countries_lower, (
+            f"{old_name} is a deprecated country name that should not exist in the dataset."
+        )
 
     # Codebook column order should match data column order
-    assert (
-        tb.codebook["column"].tolist() == tb.columns.tolist()
-    ), "Codebook column descriptions are not in the same order as data columns."
+    assert tb.codebook["column"].tolist() == tb.columns.tolist(), (
+        "Codebook column descriptions are not in the same order as data columns."
+    )
 
     log.info("All validation checks passed.")
 

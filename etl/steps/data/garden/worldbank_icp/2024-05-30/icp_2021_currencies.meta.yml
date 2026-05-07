@@ -1,0 +1,13 @@
+tables:
+  icp_2021_currencies:
+    variables:
+      currency_code:
+        title: ISO 4217 currency code
+        description_short: The ISO 4217 three-letter code for the currency used in ICP 2021 price surveys (e.g. "USD").
+        unit: ""
+        short_unit: ""
+      currency_name:
+        title: Currency name
+        description_short: The name of the currency used in ICP 2021 price surveys (e.g. "US Dollar").
+        unit: ""
+        short_unit: ""

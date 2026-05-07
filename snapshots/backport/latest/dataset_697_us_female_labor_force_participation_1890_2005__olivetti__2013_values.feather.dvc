@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/697
-    date_accessed: 2023-08-10 08:37:17.698628
+    url: https://admin.owid.io/admin/datasets/697
+    date_accessed: 2026-03-05 14:27:56.326486+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: US Female Labor Force Participation 1890-2005 - Olivetti (2013)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e7ffd5f1515b0125163e3914a056404a
-  size: 6410
-  path: 
-    dataset_697_us_female_labor_force_participation_1890_2005__olivetti__2013_values.feather
+  - md5: 037f1509705c075a24f020dc6757daaa
+    size: 6450
+    path: dataset_697_us_female_labor_force_participation_1890_2005__olivetti__2013_values.feather

@@ -3,7 +3,7 @@
 import re
 import tempfile
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Any
 
 import pandas as pd
 import structlog
@@ -46,7 +46,7 @@ METADATA_VARIABLES_FILENAME = "Gender_StatsSeries.csv"
 METADATA_COUNTRIES_FILENAME = "Gender_StatsCountry.csv"
 
 
-def load_data_from_walden(walden_ds: walden.Catalog) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def load_data_from_walden(walden_ds: walden.Catalog) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Load data and metadata."""
     # Get Walden dataset
     with tempfile.TemporaryDirectory() as f:
@@ -185,12 +185,12 @@ def check_consistency_data_and_metadata(df: pd.DataFrame, metadata_variables: pd
     # Combine
     merged = df_var.merge(metadata_var, left_on="variable_code", right_on="series_code", how="outer")
     # Check no code is left unmapped
-    assert (
-        merged.variable_code.isna().sum() == 0
-    ), "There is some variable_code missing in the data that was present in the metadata (series_code)!"
-    assert (
-        merged.series_code.isna().sum() == 0
-    ), "There is some series_code missing in the metadata that was present in the data (variable_code)!"
+    assert merged.variable_code.isna().sum() == 0, (
+        "There is some variable_code missing in the data that was present in the metadata (series_code)!"
+    )
+    assert merged.series_code.isna().sum() == 0, (
+        "There is some series_code missing in the metadata that was present in the data (variable_code)!"
+    )
     # Final check: Some variable names are not expected to be equivalent. At the moment there are 45 discrepancies, which have been reviewed.
     # If this number was to change, we would need to review the discrepancies again.
     # pd.set_option("display.max_colwidth", 40000)

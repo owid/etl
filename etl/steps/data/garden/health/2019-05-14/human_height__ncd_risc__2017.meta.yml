@@ -1,0 +1,59 @@
+dataset:
+  title: Human Height - NCD RisC (2017)
+tables:
+  human_height__ncd_risc__2017:
+    variables:
+      change_in_female_height__pct:
+        title: Change in female height (%)
+        unit: '%'
+        short_unit: '%'
+        description: Percentage difference in mean male height between 1896 and 1996.
+      change_in_female_height__cm:
+        title: Change in female height (cm)
+        unit: centimeters
+        short_unit: cm
+        description: Absolute difference between mean female height between 1896 and 1996.
+      change_in_male_height__pct:
+        title: Change in male height (%)
+        unit: '%'
+        short_unit: '%'
+        description: Percentage difference in mean male height between 1896 and 1996.
+      change_in_male_height__cm:
+        title: Change in male height (cm)
+        unit: centimeters
+        short_unit: cm
+        description: Absolute difference between mean male height between 1896 and 1996.
+      change_in_ratio:
+        title: Change in ratio
+        unit: ''
+      male_to_female_height_ratio:
+        title: Male-to-female height ratio
+        unit: ''
+        description: |-
+          The ratio between the mean height of adult men and women, by birth year. Values greater than 1 indicate the mean height of men
+          is greater than that of women.
+      mean_female_height__cm:
+        title: Mean female height (cm)
+        unit: centimeters
+        short_unit: cm
+        description: Mean height of women aged 18 or older by birth year, extending from 1896 to 1996.
+      mean_male_height__cm:
+        title: Mean male height (cm)
+        unit: centimeters
+        short_unit: cm
+        description: Mean height of men aged 18 or older by birth year, extending from 1896 to 1996.
+      year_on_year_change_in_female_height__pct:
+        title: Year-on-year change in female height (%)
+        unit: ''
+      year_on_year_change_in_male_height__pct:
+        title: Year-on-year change in male height (%)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

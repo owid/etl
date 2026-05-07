@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import List
 
 import pandas as pd
 from owid.catalog import Table
@@ -18,7 +17,7 @@ SOURCE_NAME = "unwpp"
 def load_unwpp() -> Table:
     # load wpp data
     ds = paths.load_dependency(short_name="un_wpp", namespace="un")
-    df = ds["population"]  # type: ignore
+    df = ds["population"]  # ty: ignore
 
     # Filter
     df = df.reset_index()
@@ -65,8 +64,8 @@ def _post_sanity_checks(df: pd.DataFrame) -> None:
     assert df.groupby(["country", "year"])["population"].count().max() == 1
 
 
-def load_excluded_countries(excluded_countries_path: Path) -> List[str]:
-    with open(excluded_countries_path, "r") as f:
+def load_excluded_countries(excluded_countries_path: Path) -> list[str]:
+    with open(excluded_countries_path) as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data

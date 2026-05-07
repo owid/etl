@@ -21,7 +21,7 @@ def combine_data_sheets(data: pd.ExcelFile) -> pd.DataFrame:
     combined = pd.DataFrame()
     for sheet_name in sorted(data.sheet_names):
         # Parse sheet for the current year.
-        df = data.parse(sheet_name, skiprows=2, header=[0, 1, 2, 3])  # type: ignore
+        df = data.parse(sheet_name, skiprows=2, header=[0, 1, 2, 3])  # ty: ignore
 
         # Combine multiline header.
         df.columns = ["country"] + [column[0] for column in df.columns[1:]]

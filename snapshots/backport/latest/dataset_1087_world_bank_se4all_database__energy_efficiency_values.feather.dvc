@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/1087
-    date_accessed: 2023-08-10 08:43:10.877361
+    url: https://admin.owid.io/admin/datasets/1087
+    date_accessed: 2026-03-10 07:57:11.205133+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: World Bank SE4ALL database - Energy efficiency
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 96d0018a5e8843946045c1b75dc9492e
-  size: 535042
-  path: dataset_1087_world_bank_se4all_database__energy_efficiency_values.feather
+  - md5: 647a7f603ca62c6c42f2934d12c27bc8
+    size: 534114
+    path: dataset_1087_world_bank_se4all_database__energy_efficiency_values.feather

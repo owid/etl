@@ -1,22 +1,23 @@
 import random
-from typing import Any, Callable, Generator, Iterable, List, Optional, cast
+from collections.abc import Callable, Generator, Iterable
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
 from pandas.api.types import (
-    is_datetime64_any_dtype,  # type: ignore
-    is_numeric_dtype,  # type: ignore
+    is_datetime64_any_dtype,  # ty: ignore
+    is_numeric_dtype,  # ty: ignore
     union_categoricals,
 )
 
 # ######## Note - this file will be moved to owid-catalog before the branch is merged ##############
 
 
-def get_list_description_with_max_length(items: List[Any], max_items: int = 20) -> str:
+def get_list_description_with_max_length(items: list[Any], max_items: int = 20) -> str:
     if len(items) > max_items:
         return (
             f"[{len(items)} items] "
-            + f'{", ".join(str(item) for item in items[:int(max_items/2)])} ... {", ".join(str(item) for item in items[-int(max_items/2):])}'
+            + f"{', '.join(str(item) for item in items[: int(max_items / 2)])} ... {', '.join(str(item) for item in items[-int(max_items / 2) :])}"
         )
     else:
         return ", ".join(str(item) for item in items)
@@ -34,7 +35,7 @@ def yield_list_lines(description: str, items: Iterable[Any]) -> Generator[str, N
 
 
 def get_compact_list_description(
-    items_iterable: Iterable[Any], tuple_headers: List[str] = [], max_items: int = 20
+    items_iterable: Iterable[Any], tuple_headers: list[str] = [], max_items: int = 20
 ) -> Generator[str, None, None]:
     """Returns a compact desription of a list.
 
@@ -187,18 +188,18 @@ class HighLevelDiff:
 
     df1: pd.DataFrame
     df2: pd.DataFrame
-    columns_missing_in_df1: List[str]
-    columns_missing_in_df2: List[str]
-    columns_shared: List[str]
-    index_columns_missing_in_df1: List[str]
-    index_columns_missing_in_df2: List[str]
-    index_columns_shared: List[str]
+    columns_missing_in_df1: list[str]
+    columns_missing_in_df2: list[str]
+    columns_shared: list[str]
+    index_columns_missing_in_df1: list[str]
+    index_columns_missing_in_df2: list[str]
+    index_columns_shared: list[str]
     index_values_missing_in_df1: pd.Index
     index_values_missing_in_df2: pd.Index
     index_values_shared: pd.Index
     duplicate_index_values_in_df1: pd.Series
     duplicate_index_values_in_df2: pd.Series
-    value_differences: Optional[pd.DataFrame] = None
+    value_differences: pd.DataFrame | None = None
 
     def __init__(
         self,
@@ -261,8 +262,12 @@ class HighLevelDiff:
         self.index_values_missing_in_df1 = self.df2.index.difference(self.df1.index)
         self.index_values_missing_in_df2 = self.df1.index.difference(self.df2.index)
         self.index_values_shared = self.df2.index.intersection(self.df1.index)
-        self.duplicate_index_values_in_df1 = self.df1[self.df1.index.duplicated()].index.values
-        self.duplicate_index_values_in_df2 = self.df2[self.df2.index.duplicated()].index.values
+        self.duplicate_index_values_in_df1 = (  # ty: ignore[invalid-assignment]
+            self.df1[self.df1.index.duplicated()].index.values
+        )
+        self.duplicate_index_values_in_df2 = (  # ty: ignore[invalid-assignment]
+            self.df2[self.df2.index.duplicated()].index.values
+        )
 
         # Now we calculate the value differences in the intersection of the two dataframes.
         if self.columns_shared and not self.index_values_shared.empty:
@@ -324,7 +329,7 @@ class HighLevelDiff:
         return self.value_differences is None
 
     @property
-    def df1_value_differences(self) -> Optional[pd.DataFrame]:
+    def df1_value_differences(self) -> pd.DataFrame | None:
         """Get a sliced version of df1 that contains only the columns and rows that differ from df2.
 
         Note that this only includes the part of the dataframe that has structural overlap with
@@ -338,7 +343,7 @@ class HighLevelDiff:
         )
 
     @property
-    def df2_value_differences(self) -> Optional[pd.DataFrame]:
+    def df2_value_differences(self) -> pd.DataFrame | None:
         """Get a sliced version of df2 that contains only the columns and rows that differ from df2.
 
         Note that this only includes the part of the dataframe that has structural overlap with

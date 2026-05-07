@@ -1,15 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2465
-    date_accessed: 2023-08-10 08:39:45.837883
+    url: https://admin.owid.io/admin/datasets/2465
+    date_accessed: 2026-03-05 11:01:32.524147+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Smoking cigarette sales (International Smoking Statistics (2017))
+  name: 'Smoking cigarette sales (International Smoking Statistics (2017)) '
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a7c97a036762c2a236fa89740cf0824f
-  size: 18042
-  path: 
-    dataset_2465_smoking_cigarette_sales__international_smoking_statistics__2017_values.feather
+  - md5: ab50f0458b388d1cd1583bddae51c3aa
+    size: 20106
+    path: dataset_2465_smoking_cigarette_sales__international_smoking_statistics__2017_values.feather

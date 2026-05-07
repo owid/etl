@@ -1,6 +1,6 @@
 # owid-catalog
 
-> Python library for accessing Our World in Data's catalog of research data.
+> Python library for accessing Our World in Data's catalog of research data. Version: 1.0.1
 
 # Catalog Library
 
@@ -56,7 +56,6 @@ tb_grouped = tb.groupby("country").sum()  # Preserves metadata
 
 The Data API provides unified access to OWID's published data through a simple client interface.
 
-<!--
 ## Quick Reference
 The API library is centered around the `Client` class, which provides quick access to different data APIs: `IndicatorsAPI`, `TablesAPI`, and `ChartsAPI`. Each API provides methods `search()` and `fetch()` for discovering and retrieving data, respectively.
 
@@ -134,6 +133,16 @@ The workflow triggers automatically when `lib/catalog/pyproject.toml` changes on
 
 **Manual trigger:** You can still manually trigger the workflow by clicking `Run Workflow` in  GitHub Actions if needed.
 
+### Generate `llms.txt`
+
+The library ships an `llms.txt` file (at `docs/libraries/catalog/llms.txt`) that is auto-generated from module docstrings and documentation markdown files. To regenerate it after changing docstrings or docs:
+
+```shell
+make docs.llms
+```
+
+This runs `docs/ignore/others/bake_llms_txt.py`, which inspects the public API surface and doc files so the output stays in sync with the codebase.
+
 ---
 
 # owid-catalog: Data Structures and Processing
@@ -204,9 +213,9 @@ pandas Series with metadata.
 
 ## quick
 
-Quick access functions for data discovery and retrieval. For more complex use cases, refer to the full API.
+Quick access functions for data discovery and retrieval.
 
-### `fetch(path: 'str') -> "'Table | ChartTable'"`
+### `fetch(path: 'str') -> 'Table | ChartTable'`
 
 Fetch data directly by path (auto-detects tables, indicators, or charts).
 
@@ -423,7 +432,7 @@ Example:
 
 #### `init_private_attributes(self: 'BaseModel', context: 'Any', /) -> 'None'`
 
-This function is meant to behave like a BaseModel method to initialise private attributes.
+This function is meant to behave like a BaseModel method to initialize private attributes.
 
 It takes context as an argument since that's what pydantic-core passes when calling it.
 
@@ -611,7 +620,7 @@ Example:
 
 #### `init_private_attributes(self: 'BaseModel', context: 'Any', /) -> 'None'`
 
-This function is meant to behave like a BaseModel method to initialise private attributes.
+This function is meant to behave like a BaseModel method to initialize private attributes.
 
 It takes context as an argument since that's what pydantic-core passes when calling it.
 
@@ -920,11 +929,11 @@ Provides iteration, indexing, and conversion to CatalogFrame
 for backwards compatibility.
 
 Attributes:
-    results: List of result objects.
+    items: List of result objects.
     query: The query that produced these results.
-    total_count: Total number of results available (may be more than len(results)).
+    total_count: Total number of results available (may be more than len(items)).
 
-#### `filter(self, predicate: 'Callable[[T], bool]') -> "'ResponseSet[T]'"`
+#### `filter(self, predicate: 'Callable[[T], bool]') -> 'ResponseSet[T]'`
 
 Filter results by predicate function.
 
@@ -981,7 +990,7 @@ Example:
 
 Set total_count to length of results if not provided.
 
-#### `set_ui_advanced(self) -> "'ResponseSet[T]'"`
+#### `set_ui_advanced(self) -> 'ResponseSet[T]'`
 
 Switch to advanced display showing all fields (type, slug, popularity, etc.).
 
@@ -993,7 +1002,7 @@ Example:
     >>> results.set_ui_advanced()
     ```
 
-#### `set_ui_basic(self) -> "'ResponseSet[T]'"`
+#### `set_ui_basic(self) -> 'ResponseSet[T]'`
 
 Switch to basic display showing only key fields (title, description, url).
 
@@ -1005,7 +1014,7 @@ Example:
     >>> results.set_ui_basic()
     ```
 
-#### `sort_by(self, key: 'str | Callable[[T], Any]', *, reverse: 'bool' = False) -> "'ResponseSet[T]'"`
+#### `sort_by(self, key: 'str | Callable[[T], Any]', *, reverse: 'bool' = False) -> 'ResponseSet[T]'`
 
 Sort results by attribute name or key function.
 
@@ -1033,9 +1042,30 @@ Example:
     >>> results.filter(lambda r: r.version > '2024').sort_by('version', reverse=True)
     ```
 
-#### `to_frame(self) -> 'pd.DataFrame'`
+#### `to_dict(self) -> 'list[dict[str, Any]]'`
+
+Convert results to a list of plain dictionaries.
+
+Useful for serializing results for AI/LLM context windows
+or any scenario where you need simple dict representations.
+
+Returns:
+    List of dictionaries, one per result item.
+
+Example:
+    ```py
+    >>> results = client.charts.search("gdp")
+    >>> results.to_dict()
+    [{'slug': 'gdp-per-capita', 'title': 'GDP per capita', ...}, ...]
+    ```
+
+#### `to_frame(self, all_fields: 'bool | None' = None) -> 'pd.DataFrame'`
 
 Convert results to a DataFrame.
+
+Args:
+    all_fields: If True, show all fields. If False, show only key fields.
+        If None (default), use the instance's _ui_advanced setting.
 
 Returns:
     DataFrame with one row per result.
@@ -1102,10 +1132,6 @@ Example:
     table = table.set_index(["country", "year"])
     print(table.all_columns)  # ["country", "year", "gdp", "population"]
     ```
-
-#### `amend_log(self, variable_names: 'list[str] | None' = None, comment: 'str | None' = None, operation: 'str | None' = None) -> 'Table'`
-
-Amend operation or comment of the latest processing log entry.
 
 #### `astype(self, *args: 'Any', **kwargs: 'Any') -> 'Table'`
 
@@ -1379,7 +1405,7 @@ Example:
     print(var.metadata.title)
     ```
 
-#### `groupby(self, *args: 'Any', observed: 'bool' = True, **kwargs: 'Any') -> "'TableGroupBy'"`
+#### `groupby(self, *args: 'Any', observed: 'bool' = True, **kwargs: 'Any') -> 'TableGroupBy'`
 
 Groupby that preserves metadata. It uses observed=True by default.
 
@@ -1726,7 +1752,7 @@ Example:
     table.reset_index(inplace=True)  # Modify in place
     ```
 
-#### `rolling(self, *args: 'Any', **kwargs: 'Any') -> "'TableRolling'"`
+#### `rolling(self, *args: 'Any', **kwargs: 'Any') -> 'TableRolling'`
 
 Rolling operation that preserves metadata.
 
@@ -1919,8 +1945,6 @@ Example:
     ```python
     table.underscore(inplace=True)
     ```
-
-#### `update_log(self, operation: 'str', parents: 'list[Any] | None' = None, variable_names: 'list[str] | None' = None, comment: 'str | None' = None) -> 'Table'`
 
 #### `update_metadata(self, **kwargs: 'Any') -> 'Table'`
 
@@ -2241,8 +2265,6 @@ Example:
 
 #### `Indicator.processing_level` (property)
 
-#### `Indicator.processing_log` (property)
-
 #### `rolling(self, *args: 'Any', **kwargs: 'Any') -> 'IndicatorRolling'`
 
 Create a rolling window operation that preserves metadata.
@@ -2281,42 +2303,12 @@ Example:
 
 Convert Indicator to a Table (single-column table).
 
+When a new name is given, the indicator's metadata is copied to the renamed column
+so that origins are not lost.
+
 #### `Indicator.type` (property)
 
 #### `Indicator.unit` (property)
-
-#### `update_log(self, operation: 'str', parents: 'list[Any] | None' = None, variable: 'str | None' = None, comment: 'str | None' = None) -> 'Indicator'`
-
-Add an entry to the indicator's processing log.
-
-Records data transformation operations for data provenance tracking.
-
-Args:
-    operation: Name of the operation performed (e.g., "merge", "aggregate").
-    parents: List of parent indicators that contributed to this operation.
-        If None, uses the indicator itself as the only parent.
-    variable: Name of the variable for the log entry. If None, uses the
-        indicator's name or UNNAMED_INDICATOR.
-    comment: Optional comment describing the operation in detail.
-
-Returns:
-    The indicator itself (for method chaining).
-
-Example:
-    ```python
-    # Log a custom transformation
-    ind.update_log(
-        operation="normalize",
-        comment="Normalized to 2015 baseline"
-    )
-
-    # Log a merge operation
-    result.update_log(
-        operation="merge",
-        parents=[ind1, ind2],
-        comment="Combined GDP and population data"
-    )
-    ```
 
 
 ### Indicator
@@ -2451,8 +2443,6 @@ Example:
 
 #### `Indicator.processing_level` (property)
 
-#### `Indicator.processing_log` (property)
-
 #### `rolling(self, *args: 'Any', **kwargs: 'Any') -> 'IndicatorRolling'`
 
 Create a rolling window operation that preserves metadata.
@@ -2491,42 +2481,12 @@ Example:
 
 Convert Indicator to a Table (single-column table).
 
+When a new name is given, the indicator's metadata is copied to the renamed column
+so that origins are not lost.
+
 #### `Indicator.type` (property)
 
 #### `Indicator.unit` (property)
-
-#### `update_log(self, operation: 'str', parents: 'list[Any] | None' = None, variable: 'str | None' = None, comment: 'str | None' = None) -> 'Indicator'`
-
-Add an entry to the indicator's processing log.
-
-Records data transformation operations for data provenance tracking.
-
-Args:
-    operation: Name of the operation performed (e.g., "merge", "aggregate").
-    parents: List of parent indicators that contributed to this operation.
-        If None, uses the indicator itself as the only parent.
-    variable: Name of the variable for the log entry. If None, uses the
-        indicator's name or UNNAMED_INDICATOR.
-    comment: Optional comment describing the operation in detail.
-
-Returns:
-    The indicator itself (for method chaining).
-
-Example:
-    ```python
-    # Log a custom transformation
-    ind.update_log(
-        operation="normalize",
-        comment="Normalized to 2015 baseline"
-    )
-
-    # Log a merge operation
-    result.update_log(
-        operation="merge",
-        parents=[ind1, ind2],
-        comment="Combined GDP and population data"
-    )
-    ```
 
 
 ### `copy_metadata(from_variable: 'Indicator', to_variable: 'Indicator', inplace: 'bool' = False) -> 'Indicator | None'`
@@ -2869,7 +2829,7 @@ Example:
     print(meta.title)
     ```
 
-#### `save(self, filename: str | pathlib.Path) -> None`
+#### `save(self, filename: str | pathlib._local.Path) -> None`
 
 Save metadata to a JSON file.
 
@@ -3096,7 +3056,7 @@ The number of fields is limited, but should handle everything that we get from
 Snapshot. There is a lot more opportunity to store more metadata at the table and
 the variable level.
 
-#### `update_from_yaml(self, path: pathlib.Path | str, if_source_exists: Literal['fail', 'append', 'replace'] = 'fail') -> None`
+#### `update_from_yaml(self, path: pathlib._local.Path | str, if_source_exists: Literal['fail', 'append', 'replace'] = 'fail') -> None`
 
 The main reason for wanting to do this is to manually override what goes into Grapher before an export.
 

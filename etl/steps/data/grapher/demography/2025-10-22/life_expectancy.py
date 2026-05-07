@@ -28,7 +28,7 @@ def run() -> None:
     # Process data.
     team_folder_id = get_team_folder_id()
     sheet_url, sheet_id = export_table_to_gsheet(
-        table=tb_gsheet,  # type: ignore
+        table=tb_gsheet,  # ty: ignore
         sheet_title="Long-run life expectancy at birth",
         folder_id=team_folder_id,
         metadata_variables=["life_expectancy_at_birth"],

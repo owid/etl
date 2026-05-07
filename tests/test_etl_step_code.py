@@ -6,7 +6,7 @@ def test_no_table_dataset_assignment():
         with open(step_file) as istream:
             for i, line in enumerate(istream):
                 if ".metadata.dataset = " in line:
-                    assert False, "Bad table dataset assignment found in %s:%d" % (step_file, i)
+                    assert False, f"Bad table dataset assignment found in {step_file}:{i}"
 
 
 def iter_steps():

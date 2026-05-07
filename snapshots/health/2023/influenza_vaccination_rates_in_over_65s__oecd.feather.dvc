@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: OECD
+    description: |-
+      This data comes from the OECD.
+
+      'Influenza vaccination rate refers to the number of people aged 65 and older who have received an annual influenza vaccination, divided by the total number of people over 65 years of age. This indicator is measured as a percentage of the population aged 65 and older who have received an annual influenza vaccine. The data come from administrative sources or surveys, depending on the country.'
+    url: https://data.oecd.org/healthcare/influenza-vaccination-rates.htm
+    date_accessed: 2026-03-05
+    published_by: 'OECD (2022), Influenza vaccination rates (indicator). doi: 10.1787/e452582e-en (Accessed on 25 September 2022)'
+  name: Influenza vaccination rates in over 65s (OECD)
+  description: https://github.com/owid/notebooks/tree/main/FionaSpooner/oecd_flu_vaccination
+  is_public: false
+outs:
+  - md5: 9cfed4cc043149c0ef73940329711ac2
+    size: 6162
+    path: influenza_vaccination_rates_in_over_65s__oecd.feather

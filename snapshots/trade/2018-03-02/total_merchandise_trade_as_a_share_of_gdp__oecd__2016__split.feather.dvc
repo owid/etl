@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: OECD, Balanced International Merchandise Trade Statistics (2015)
+    description: |-
+      The Balanced International Merchandise Trade Statistics (BIMTS) database follows a four step procedure in order to reconcile bilateral trade asymmetries, i.e. so that exports from country A to country B are consistent with the imports of country B from country A. For more information on the OECD’s balancing methodology see the link provided above.
+
+      To calculate the total value of exports to the world, we sum the value of all products exported, by country, to all of its trading partners. Then to express total exports as a share of GDP, the total value of exports is divided by the exporting country’s GDP. GDP data is taken from the World Bank’s WDI available at: https://data.worldbank.org/indicator/NY.GDP.MKTP.CD
+    url: https://stats.oecd.org/Index.aspx?DataSetCode=BIMTS_CPA#
+    date_accessed: 2018-03-02
+    published_by: OECD
+  name: Total merchandise trade as a share of GDP (OECD (2016)) (split)
+  description: ''
+  is_public: false
+outs:
+  - md5: dea6445cc5ed6bde291419e756371080
+    size: 7346
+    path: total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split.feather

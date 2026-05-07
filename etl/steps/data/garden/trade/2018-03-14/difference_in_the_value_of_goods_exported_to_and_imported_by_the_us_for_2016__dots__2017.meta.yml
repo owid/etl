@@ -1,0 +1,19 @@
+dataset:
+  title: Difference in the value of goods exported to and imported by the US for 2016 (DOTS (2017))
+tables:
+  difference_in_the_value_of_goods_exported_to_and_imported_by_the_us_for_2016__dots__2017:
+    variables:
+      difference_in_the_value_of_goods_exported_to_and_imported_by_the_us__dots__2017:
+        title: Difference in the value of goods exported to and imported by the US (DOTS (2017))
+        unit: Current US$ (in millions)
+        description: |-
+          Differences between the value of goods that US reports importing from partner countries, and the value of the goods that each partner country reports exporting to the US (for 2016 only).
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

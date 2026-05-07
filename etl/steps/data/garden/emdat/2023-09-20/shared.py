@@ -1,6 +1,6 @@
 import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -40,7 +40,7 @@ REGIONS = {
 # The following decisions are based on the current location of the countries that succeeded the region, and their income
 # group. Continent and income group assigned corresponds to the continent and income group of the majority of the
 # population in the member countries.
-HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
+HISTORIC_TO_CURRENT_REGION: dict[str, dict[str, str | list[str]]] = {
     "Czechoslovakia": {
         "continent": "Europe",
         "income_group": "High-income countries",
@@ -238,7 +238,7 @@ def detect_overlapping_regions(
             )
             # Concatenate both selections of data, and select duplicated rows.
             combined = pd.concat([region_values, member_values])
-            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
+            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # ty: ignore
             if len(overlaps) > 0:
                 # Add the overlap found to the dictionary of all overlaps.
                 all_overlaps.update({year: set(overlaps[country_col]) for year in overlaps[year_col].unique()})
@@ -251,12 +251,12 @@ def detect_overlapping_regions(
 
 def add_region_aggregates(
     data: Table,
-    regions_to_add: Dict[Any, Any],
-    index_columns: List[str],
+    regions_to_add: dict[Any, Any],
+    index_columns: list[str],
     ds_regions: Dataset,
     ds_income_groups: Dataset,
     country_column: str = "country",
-    aggregates: Optional[Dict[str, str]] = None,
+    aggregates: dict[str, str] | None = None,
 ) -> Table:
     """Add region aggregates for all regions (which may include continents and income groups).
 
@@ -343,7 +343,7 @@ def get_last_day_of_month(year: int, month: int):
     return last_day
 
 
-def correct_data_points(tb: Table, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> Table:
+def correct_data_points(tb: Table, corrections: list[tuple[dict[Any, Any], dict[Any, Any]]]) -> Table:
     """Make individual corrections to data points in a table.
 
     Parameters

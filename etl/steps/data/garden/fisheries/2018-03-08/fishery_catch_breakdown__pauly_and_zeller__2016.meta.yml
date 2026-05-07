@@ -1,0 +1,29 @@
+dataset:
+  title: Fishery catch breakdown - Pauly and Zeller (2016)
+tables:
+  fishery_catch_breakdown__pauly_and_zeller__2016:
+    variables:
+      artisanal__small_scale_commercial:
+        title: Artisanal (small-scale commercial)
+        unit: tonnes
+      discards:
+        title: Discards
+        unit: tonnes
+      industrial__large_scale_commercial:
+        title: Industrial (large-scale commercial)
+        unit: tonnes
+      recreational:
+        title: Recreational
+        unit: tonnes
+      subsistence:
+        title: Subsistence
+        unit: tonnes
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

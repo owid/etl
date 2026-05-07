@@ -4,10 +4,11 @@ import inspect
 import json
 import re
 from collections import defaultdict
+from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, cast
+from typing import Any, cast
 
 import fastjsonschema
 import pandas as pd
@@ -32,6 +33,7 @@ from etl.collection.model.view import CommonView, View, ViewIndicators
 from etl.collection.utils import (
     fill_placeholders,
     get_complete_dimensions_filter,
+    get_tables_by_name_mapping,
     map_indicator_path_to_id,
     unique_records,
     validate_indicators_in_db,
@@ -181,7 +183,7 @@ class Collection(MDIMBase):
         log.info(f"Exporting collection config to {self.local_config_path}")
         self.save_file(self.local_config_path, force_create=True)
 
-    def save(  # type: ignore[override]
+    def save(  # ty: ignore[invalid-method-override]
         self,
         owid_env: OWIDEnv | None = None,
         tolerate_extra_indicators: bool = False,
@@ -191,6 +193,13 @@ class Collection(MDIMBase):
         # Ensure we have an environment set
         if owid_env is None:
             owid_env = OWID_ENV
+
+        # Resolve short-form catalog paths ("table#column") to full paths using the DAG.
+        # process_views already did this at create-time; we redo it here to pick up
+        # indicators or map.columnSlug values set afterwards.
+        tables_by_name = get_tables_by_name_mapping(self.dependencies)
+        for view in self.views:
+            view.expand_paths(tables_by_name)
 
         # Prune non-used dimension choices
         if prune_choices:
@@ -214,6 +223,10 @@ class Collection(MDIMBase):
 
         # Check that all indicators in collection exist
         validate_indicators_in_db(indicators, owid_env.engine)
+
+        # Ensure at least one topic tag is set (needed for search)
+        # Disabled as it is not really necessary? This fails on CI/CD for explorers
+        # self.validate_topic_tags()
 
         # Run sanity checks on grouped views
         self.validate_grouped_views()
@@ -335,7 +348,7 @@ class Collection(MDIMBase):
             # Update dimensions
             view.dimensions = view_dimensions
 
-    def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> dict[str, Any]:  # type: ignore
+    def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> dict[str, Any]:  # ty: ignore
         dix = super().to_dict(encode_json=encode_json)
         if drop_definitions:
             dix = {k: v for k, v in dix.items() if k not in {"_definitions", "definitions"}}
@@ -369,13 +382,13 @@ class Collection(MDIMBase):
         for view in self.views:
             for dim_slug, choice_slugs in dix.items():
                 # Check that dimension is defined in the view!
-                assert (
-                    dim_slug in view.dimensions
-                ), f"Dimension {dim_slug} not found in dimensions! View:\n{yaml_dump(view.to_dict())}"
+                assert dim_slug in view.dimensions, (
+                    f"Dimension {dim_slug} not found in dimensions! View:\n{yaml_dump(view.to_dict())}"
+                )
                 # Check that choices defined in the view are valid!
-                assert (
-                    view.dimensions[dim_slug] in choice_slugs
-                ), f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
+                assert view.dimensions[dim_slug] in choice_slugs, (
+                    f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
+                )
 
     def validate_schema(self, schema_path: str | Path | None = None):
         """Validate class against schema."""
@@ -409,9 +422,9 @@ class Collection(MDIMBase):
         )
 
         try:
-            validator(self.to_dict())  # type: ignore
+            validator(self.to_dict())  # ty: ignore
         except fastjsonschema.JsonSchemaException as e:
-            raise ValueError(f"Config validation error: {e.message}")  # type: ignore
+            raise ValueError(f"Config validation error: {e.message}")  # ty: ignore
 
     def indicators_in_use(self, tolerate_extra_indicators: bool = False):
         # Get all indicators used in all views
@@ -508,6 +521,14 @@ class Collection(MDIMBase):
             if not any(indicator.startswith(f"{dep}/") for dep in deps):
                 raise ValueError(f"Indicator {indicator} is not covered by any dependency: {deps}")
         return True
+
+    def validate_topic_tags(self):
+        """Ensure that at least one topic tag is set. Required for search."""
+        if not self.topic_tags:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' must have at least one topic tag. "
+                "Add 'topic_tags' to your config YAML."
+            )
 
     def validate_grouped_views(self):
         for view in self.views:
@@ -1145,7 +1166,7 @@ def sanity_check_grouped_view(view: View) -> None:
     metadata_dict = (
         view.metadata
         if isinstance(view.metadata, dict)
-        else view.metadata.to_dict()  # type: ignore[union-attr]
+        else view.metadata.to_dict()  # ty: ignore[unresolved-attribute, call-non-callable]
         if hasattr(view.metadata, "to_dict")
         else {}
     )

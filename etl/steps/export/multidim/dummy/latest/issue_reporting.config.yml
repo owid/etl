@@ -1,6 +1,10 @@
 title:
   title: Demo for raising issues with MDIMs
   title_variant: ""
+
+topic_tags:
+  - COVID-19
+
 default_selection:
   - World
 

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 from dataclasses_json import DataClassJsonMixin
 
@@ -14,7 +13,7 @@ class Indicator(Doc, DataClassJsonMixin):
     description: str
     n_charts: int
     catalogPath: str
-    dataset: Optional[str] = None
+    dataset: str | None = None
     popularity: float = 0.0
 
     def text(self) -> str:
@@ -52,4 +51,4 @@ def _get_data_indicators_from_db() -> list[Indicator]:
     """
     df = read_sql(query)
     indicators = df.to_dict(orient="records")
-    return [Indicator(**indicator) for indicator in indicators]  # type: ignore
+    return [Indicator(**indicator) for indicator in indicators]  # ty: ignore

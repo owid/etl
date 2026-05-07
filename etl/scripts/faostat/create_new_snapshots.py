@@ -31,7 +31,7 @@ import argparse
 import datetime as dt
 import json
 import tempfile
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 import requests
 from dateutil import parser
@@ -55,7 +55,7 @@ from etl.snapshot import Snapshot, SnapshotMeta, snapshot_catalog
 class FAODataset:
     namespace: str = NAMESPACE
 
-    def __init__(self, dataset_metadata: Dict[str, Any]) -> None:
+    def __init__(self, dataset_metadata: dict[str, Any]) -> None:
         """[summary]
 
         Args:
@@ -64,7 +64,7 @@ class FAODataset:
         self._dataset_metadata = dataset_metadata
         self._dataset_server_metadata = self._load_dataset_server_metadata()
 
-    def _load_dataset_server_metadata(self) -> Dict[str, Any]:
+    def _load_dataset_server_metadata(self) -> dict[str, Any]:
         # Fetch only header of the dataset file on the server, which contains additional metadata, like last
         # modification date.
         head_request = requests.head(self.source_data_url)
@@ -106,7 +106,7 @@ class FAODataset:
         return self._dataset_metadata["FileLocation"]
 
     @property
-    def metadata(self) -> Dict[str, Any]:
+    def metadata(self) -> dict[str, Any]:
         """
         Snapshot-compatible view of this dataset's metadata.
 
@@ -165,7 +165,7 @@ class FAODataset:
         snap.create_snapshot(upload=True)
 
 
-def load_faostat_catalog() -> List[Dict[str, Any]]:
+def load_faostat_catalog() -> list[dict[str, Any]]:
     # Some of the texts returned have special characters that seem to require CP-1252 decoding.
     # datasets = requests.get(FAO_CATALOG_URL).json()["Datasets"]["Dataset"]
     datasets = json.loads(requests.get(FAO_CATALOG_URL).content.decode("utf-8"))["Datasets"]["Dataset"]
@@ -173,7 +173,7 @@ def load_faostat_catalog() -> List[Dict[str, Any]]:
 
 
 def is_dataset_already_up_to_date(
-    existing_snapshots: List[Snapshot], source_data_url: str, source_modification_date: dt.date
+    existing_snapshots: list[Snapshot], source_data_url: str, source_modification_date: dt.date
 ) -> bool:
     """Check if our latest snapshot for a particular domain dataset is already up-to-date.
 
@@ -215,7 +215,7 @@ class FAOAdditionalMetadata:
         self.faostat_metadata = None
 
     @property
-    def metadata(self) -> Dict[str, Any]:
+    def metadata(self) -> dict[str, Any]:
         return {
             "namespace": NAMESPACE,
             "short_name": f"{NAMESPACE}_metadata",

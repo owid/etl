@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
-
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog.processing import concat
@@ -86,7 +84,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_pathogen_group(tb: Table, group_name: str, group_pathogens: List[str]):
+def add_pathogen_group(tb: Table, group_name: str, group_pathogens: list[str]):
     tb_group = tb[tb["organism"].isin(group_pathogens)].copy()
 
     tb_group = tb_group.groupby("date", as_index=False)[["present", "percentage"]].sum()

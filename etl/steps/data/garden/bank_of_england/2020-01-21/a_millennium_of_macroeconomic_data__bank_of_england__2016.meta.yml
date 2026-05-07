@@ -1,0 +1,296 @@
+dataset:
+  title: A Millennium of Macroeconomic Data - Bank of England (2016)
+tables:
+  a_millennium_of_macroeconomic_data__bank_of_england__2016:
+    variables:
+      dollar_oil_prices:
+        title: $ Oil prices
+        unit: $ per barrel
+      dollar_ps_exchange_rate:
+        title: $/£ exchange rate
+        unit: Calendar year average
+      _10_year_medium_term_government_bond_yields:
+        title: 10 year/medium-term government bond yields
+        unit: '%, calendar year average'
+      average_weekly_hours_worked:
+        title: Average weekly hours worked
+        unit: hours
+      bank_rate__pct_calendar_year_average:
+        title: Bank Rate (% calendar year average)
+        unit: '% calendar year average'
+      bank_rate__pct_end_period:
+        title: Bank Rate (% end period)
+        unit: '% end period'
+      bank_of_england_balance_sheet__using_consolidated_balance_sheet:
+        title: Bank of England Balance sheet, using consolidated balance sheet
+        unit: '% of nominal GDP'
+        description: Using consolidated balance sheet and GB+NI nominal GDP
+      bank_of_england_balance_sheet__using_unconsolidated_balance_sheet:
+        title: Bank of England Balance sheet, using unconsolidated balance sheet
+        unit: '% of nominal GDP'
+        description: Using unconsolidated balance sheet and GB+NI nominal GDP
+      broad_money:
+        title: Broad Money
+        unit: Year end, £
+        description: Spliced break-adjusted broad money measure based on M3/M4/M4x
+      capital_services__whole_economy:
+        title: Capital Services, whole economy
+        unit: 2013 prices
+      central_government_gross_debt__market_value:
+        title: Central Government Gross Debt (market value)
+        unit: Financial year end, market value £
+        description: Includes estimated capital value of terminable annuities
+      central_government_gross_debt__nominal_par_value:
+        title: Central Government Gross Debt (nominal par value)
+        unit: Financial year end, nominal par value £
+        description: Includes estimated capital value of terminable annuities
+      coin_in_circulation_outside_the_bank_of_england:
+        title: Coin in circulation outside the Bank of England
+        unit: Year end, £
+      composite_estimate_of_english_and__geographically_consistent__uk_real_gdp_at_factor_cost:
+        title: Composite estimate of English and (geographically-consistent) UK real GDP at factor cost
+        unit: 2013=100
+      consols__long_term_government_bond_yields:
+        title: Consols / long-term government bond yields
+        unit: '%, calendar year average'
+      consumer_price_index:
+        title: Consumer price index
+        unit: 2015=100
+      consumer_price_inflation:
+        title: Consumer price inflation
+        unit: '%'
+      corporate_bond_yields:
+        title: Corporate bond yields
+        unit: '%, calendar year average'
+      corporate_borrowing_rate_from_banks:
+        title: Corporate borrowing rate from banks
+        unit: '%, calendar year average'
+        description: |-
+          NB Possible break in the mean of around +1% in 1977 reflecting a shift from the rate charged to blue chip companies to one covering the whole of the PNFC sector.
+      credit:
+        title: Credit
+        unit: Year end, £
+        description: Break-adjusted stock of bank and building society lending, M4Lx
+      current_account:
+        title: Current account
+        unit: £
+        description: GB only before 1816
+      current_account__pct_of_nominal_gdp:
+        title: Current account (% of nominal GDP)
+        unit: '% of nominal GDP'
+        description: Using conformable measure of nominal GDP
+      current_account_deficit_including_estimated_non_monetary_bullion_flows_prior_to_1946:
+        title: Current account deficit including estimated non-monetary bullion flows prior to 1946
+        unit: £
+      current_account_deficit_including_estimated_non_monetary_bullion_flows_prior_to_1946__pct_of_nominal_gdp:
+        title: Current account deficit including estimated non-monetary bullion flows prior to 1946 (% of nominal GDP)
+        unit: '% of nominal GDP'
+        description: Using conformable measure of nominal GDP
+      earnings_per_head:
+        title: Earnings per head
+        unit: Average weekly earnings, £
+      employment:
+        title: Employment
+        unit: ''
+        description: Break-adjusted measure of employment.
+      export_prices:
+        title: Export prices
+        unit: 2013=100
+      export_volumes:
+        title: Export volumes
+        unit: Chained Volume measure, 2013 prices.
+      gdp_deflator_at_market_prices:
+        title: GDP deflator at market prices
+        unit: 2013=100
+      growth_rate_of_composite_estimate_of_english_and__geographically_consistent__uk_real_gdp_at_factor_cost:
+        title: Growth rate of composite estimate of English and (geographically-consistent) UK real GDP at factor cost
+        unit: '%'
+      growth_rate_of_index_of_real_uk_gdp_at_market_prices_cost__based_on_changing_political_boundaries:
+        title: Growth rate of index of real UK GDP at market prices cost - based on changing political boundaries
+        unit: '%'
+      growth_rate_of_real_gdp_of_england_at_factor_cost:
+        title: Growth rate of real GDP of England at factor cost
+        unit: '%'
+      growth_rate_of_real_gdp_of_england_at_market_prices:
+        title: Growth rate of real GDP of England at market prices
+        unit: '%'
+      growth_rate_of_real_uk_gdp_at_factor_cost__geographically_consistent_estimate_based_on_post_1922_borders:
+        title: Growth rate of real UK GDP at factor cost, geographically-consistent estimate based on post-1922 borders
+        unit: '%'
+      growth_rate_of_real_uk_gdp_at_market_prices__geographically_consistent_estimate_based_on_post_1922_borders:
+        title: Growth rate of real UK GDP at market prices, geographically-consistent estimate based on post-1922 borders
+        unit: '%'
+      hp_filter_of_log_of_real_composite_estimate_of_english_and_uk_real_gdp_at_factor_cost:
+        title: HP-filter of log of real composite estimate of English and UK real GDP at factor cost
+        unit: approx. % difference from trend
+      house_price_index:
+        title: House price index
+        unit: Calendar year average, Jan 2015 =100
+        description: NB uses building costs as a rough proxy prior to 1895
+      import_prices:
+        title: Import prices
+        unit: 2013=100
+      import_volumes:
+        title: Import volumes
+        unit: Chained Volume measure, 2013 prices.
+      index_of_real_uk_gdp_at_market_prices_cost__based_on_changing_political_boundaries:
+        title: Index of real UK GDP at market prices cost - based on changing political boundaries
+        unit: GB before 1801, GB+Ireland 1801-1920, GB + Northern Ireland after 1920.  Indexed to 100 in 1920
+      labour_productivity__real_gdp_per_head:
+        title: Labour productivity (real GDP per head)
+        unit: 2013 prices
+      labour_productivity__real_gdp_per_hour:
+        title: Labour productivity (real GDP per hour)
+        unit: 2013 prices
+      labour_share__whole_economy_excluding_rents:
+        title: Labour share, whole economy excluding rents
+        unit: share of GDP excluding rents
+      m1:
+        title: M1
+        unit: Year end, £
+        description: Spliced break-adjusted stock
+      monetary_base:
+        title: Monetary base
+        unit: Year end, £
+        description: M0
+      mortgage_rates:
+        title: Mortgage rates
+        unit: '%, calendar year average'
+      nominal_eri:
+        title: Nominal ERI
+        unit: Calendar year average, 1913=100
+      nominal_gdp_of_england_at_market_prices:
+        title: Nominal GDP of England at market prices
+        unit: £
+      nominal_uk_gdp_at_market_prices__based_on_political_definition:
+        title: Nominal UK GDP at market prices, based on political definition
+        unit: £
+        description: |-
+          Nominal UK GDP at market prices based on the political definition of the UK:  GB before 1801, GB+I 1801-1920, GB+NI 1921-present
+      nominal_uk_gdp_at_market_prices__constant_border_uk__gb_plus_ni:
+        title: Nominal UK GDP at market prices, constant border UK (GB + NI)
+        unit: £
+      notes_and_coin_in_circulation:
+        title: Notes and coin in circulation
+        unit: Year end, £
+      population__england:
+        title: Population (England)
+        unit: ''
+      population__gbplusni:
+        title: Population (GB+NI)
+        unit: ''
+        description: GB+NI population, using Broadberry et al (2015) GB estimates
+      public_sector_net_lending__plus__borrowing__pct_of_nominal_gdp:
+        title: Public Sector Net Lending(+)/Borrowing(-) (% of nominal GDP)
+        unit: '% of nominal GDP'
+        description: Using GDP based on political boundaries
+      public_sector_net_lending__plus__borrowing__calendar_year_total:
+        title: Public Sector Net Lending(+)/Borrowing(-) (calendar year total)
+        unit: Calendar year total, £
+        description: Excluding the temporary effects of financial interventions.  Central government only prior to 1900.
+      public_sector_total_receipts__pct_of_nominal_gdp:
+        title: Public Sector Total Receipts (% of nominal GDP)
+        unit: '% of nominal GDP'
+        description: Using GB+NI nominal GDP
+      public_sector_total_receipts__calendar_year_total:
+        title: Public Sector Total Receipts (calendar year total)
+        unit: Calendar year total, £
+        description: Excluding the temporary effects of financial interventions.
+      public_sector_total_managed_expenditure__pct_of_nominal_gdp:
+        title: Public sector Total Managed Expenditure (% of nominal GDP)
+        unit: '% of nominal GDP'
+        description: Using GB+NI nominal GDP
+      public_sector_total_managed_expenditure__calendar_year_total:
+        title: Public sector Total Managed Expenditure (calendar year total)
+        unit: Calendar year total, £
+        description: Excluding the temporary effects of financial interventions.
+      real_dollar_ps_exchange_rate:
+        title: Real $/£ exchange rate
+        unit: Calendar year average, 1913=100
+      real_eri:
+        title: Real ERI
+        unit: Calendar year average, 1913=100
+      real_gdp_of_england_at_factor_cost:
+        title: Real GDP of England at factor cost
+        unit: Chained Volume measure, 2013 prices
+      real_gdp_of_england_at_market_prices:
+        title: Real GDP of England at market prices
+        unit: Chained Volume measure, 2013 prices
+      real_gdp_per_capita:
+        title: Real GDP per capita
+        unit: constant 2013 GBP
+        short_unit: £
+        display:
+          numDecimalPlaces: 0
+      real_uk_gdp_at_factor_cost__geographically_consistent_estimate_based_on_post_1922_borders:
+        title: Real UK GDP at factor cost, geographically-consistent estimate based on post-1922 borders
+        unit: Chained Volume measure, 2013 prices
+      real_uk_gdp_at_market_prices__geographically_consistent_estimate_based_on_post_1922_borders:
+        title: Real UK GDP at market prices, geographically-consistent estimate based on post-1922 borders
+        unit: Chained Volume measure, 2013 prices
+      real_uk_gross_disposable_national_income_at_market_prices__constant_border_estimate:
+        title: Real UK gross disposable national income at market prices, constant border estimate
+        unit: Chained Volume measure, 2013 prices.  Nominal GDI divided by private and public consumption deflator
+      real_consumption:
+        title: Real consumption
+        unit: Chained Volume measure, 2013 prices
+      real_consumption_wages:
+        title: Real consumption wages
+        unit: 1900=100
+      real_government_consumption_of_goods_and_services:
+        title: Real government consumption of goods and services
+        unit: Chained Volume measure, 2013 prices
+      real_investment:
+        title: Real investment
+        unit: Chained Volume measure, 2013 prices
+      secured_credit:
+        title: Secured credit
+        unit: Year end, £
+        description: Break-adjusted stock of bank and building society lending secured on dwellings, excluding impact of securitisations
+      share_prices:
+        title: Share prices
+        unit: April 1962=100, Year end
+      stockbuilding_contribution:
+        title: Stockbuilding contribution
+        unit: pp contribution to GDP(E)
+      tfp_growth:
+        title: TFP growth
+        unit: '%'
+      terms_of_trade:
+        title: Terms of Trade
+        unit: 2013=100
+      trade_deficit:
+        title: Trade deficit
+        unit: £
+      trade_deficit__pct_of_nominal_gdp:
+        title: Trade deficit (% of nominal GDP)
+        unit: '% of nominal GDP'
+        description: Using conformable measure of nominal GDP
+      uk_public_sector_debt__pct_of_nominal_gdp__measure_1:
+        title: 'UK Public sector debt (% of nominal GDP: measure 1)'
+        unit: '% of nominal GDP: measure 1'
+        description: Using GB+Ireland GDP before 1920
+      uk_public_sector_debt__pct_of_nominal_gdp__measure_2:
+        title: 'UK Public sector debt (% of nominal GDP: measure 2)'
+        unit: '% of nominal GDP: measure 2'
+        description: Based on GB funded debt and GB GDP before 1817
+      uk_public_sector_debt__calendar_year_end:
+        title: UK Public sector debt (calendar year end)
+        unit: Calendar Year end nominal par value outstanding, £
+        description: Excluding public sector banks.  Includes estimated capital value of terminable annuities
+      unemployment_rate:
+        title: Unemployment rate
+        unit: '%'
+        description: LFS consistent measure, rough GB estimates prior to 1855.
+      wholesale_producer_price_index:
+        title: Wholesale/producer price index
+        unit: 2010=100
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

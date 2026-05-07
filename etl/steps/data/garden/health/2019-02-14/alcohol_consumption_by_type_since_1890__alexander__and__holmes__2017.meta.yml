@@ -1,0 +1,35 @@
+dataset:
+  title: Alcohol consumption by type since 1890 (Alexander & Holmes, 2017)
+tables:
+  alcohol_consumption_by_type_since_1890__alexander__and__holmes__2017:
+    variables:
+      beer__pct_total_alcohol:
+        title: Beer (% total alcohol)
+        unit: '% of total alcohol consumption'
+        short_unit: '%'
+        display:
+          name: Beer
+        description: Beer as a share of total alcohol consumption.
+      spirits__pct_total_alcohol:
+        title: Spirits (% total alcohol)
+        unit: '% of total alcohol consumption'
+        short_unit: '%'
+        display:
+          name: Spirits
+        description: Spirits as a share of total alcohol consumption.
+      wine__pct_total_alcohol:
+        title: Wine (% total alcohol)
+        unit: '% of total alcohol consumption'
+        short_unit: '%'
+        display:
+          name: Wine
+        description: Wine as a share of total alcohol consumption.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

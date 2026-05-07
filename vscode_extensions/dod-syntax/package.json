@@ -3,13 +3,13 @@
   "publisher": "owid",
   "displayName": "DoD Syntax",
   "description": "Syntax highlighting, autocomplete, and hover details for Definition of Data (DoD) references",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "repository": {
     "type": "git",
     "url": "https://github.com/owid/etl"
   },
   "engines": {
-    "vscode": "^1.100.0"
+    "vscode": "^1.109.0"
   },
   "categories": [
     "Other"
@@ -55,16 +55,16 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.8",
-    "@types/node": "20.x",
-    "@types/vscode": "^1.100.0",
-    "@typescript-eslint/eslint-plugin": "^8.7.0",
-    "@typescript-eslint/parser": "^8.7.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.19.37",
+    "@types/vscode": "^1.109.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1",
-    "esbuild": "^0.27.0",
-    "eslint": "^9.11.1",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.27.4",
+    "eslint": "^9.39.4",
     "npm-run-all": "^4.1.5",
-    "typescript": "^5.6.2"
+    "typescript": "^5.9.3"
   }
 }

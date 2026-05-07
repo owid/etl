@@ -3,7 +3,7 @@
 #
 
 from pathlib import Path
-from typing import Any, Optional, Union, cast
+from typing import Any, cast
 
 import click
 import pandas as pd
@@ -122,7 +122,7 @@ def etl_catalog(
     namespace: str,
     dataset: str,
     table: str,
-    version: Optional[Union[str, int]],
+    version: str | int | None,
     debug: bool,
 ) -> None:
     """
@@ -146,7 +146,7 @@ def etl_catalog(
             namespace=namespace,
             dataset=dataset,
             channels=[channel],
-            version=version,  # type: ignore[reportArgumentType]
+            version=version,  # ty: ignore[invalid-argument-type]
         )
     except Exception as e:
         if debug:
@@ -163,7 +163,7 @@ def etl_catalog(
                 namespace=namespace,
                 dataset=dataset,
                 channel=channel,
-                version=version,  # type: ignore[reportArgumentType]
+                version=version,  # ty: ignore[invalid-argument-type]
             )
         except ValueError as e:
             # try again after reindexing
@@ -174,7 +174,7 @@ def etl_catalog(
                     namespace=namespace,
                     dataset=dataset,
                     channel=channel,
-                    version=version,  # type: ignore[reportArgumentType]
+                    version=version,  # ty: ignore[invalid-argument-type]
                 )
             else:
                 raise e

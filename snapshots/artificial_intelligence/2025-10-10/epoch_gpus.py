@@ -3,9 +3,9 @@
 import tempfile
 import zipfile
 from pathlib import Path
-from urllib.request import urlretrieve
 
 import click
+import requests
 
 from etl.snapshot import Snapshot
 
@@ -26,7 +26,12 @@ def main(upload: bool) -> None:
 
         # Download the zip file
         click.echo(f"Downloading {snap.metadata.origin.url_download}...")
-        urlretrieve(snap.metadata.origin.url_download, zip_path)
+        response = requests.get(
+            snap.metadata.origin.url_download,
+            headers={"User-Agent": "Mozilla/5.0 (Our World in Data ETL)"},
+        )
+        response.raise_for_status()
+        zip_path.write_bytes(response.content)
 
         # Extract ml_hardware.csv from the zip
         with zipfile.ZipFile(zip_path, "r") as zip_ref:

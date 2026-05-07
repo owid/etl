@@ -1,7 +1,6 @@
 """CLI functions for upgrading indicators and charts."""
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict, List
 
 import click
 import pandas as pd
@@ -27,7 +26,7 @@ DEFAULT_MAX_WORKERS = 5
 log = get_logger()
 
 
-def get_affected_charts_cli(indicator_mapping: Dict[int, int]) -> List[gm.Chart]:
+def get_affected_charts_cli(indicator_mapping: dict[int, int]) -> list[gm.Chart]:
     """Get affected charts for CLI (without Streamlit dependencies)."""
     log.info("Finding affected charts...")
     charts = find_charts_from_variable_ids(set(indicator_mapping.keys()))
@@ -36,7 +35,7 @@ def get_affected_charts_cli(indicator_mapping: Dict[int, int]) -> List[gm.Chart]
 
 
 def _update_single_chart(
-    chart: gm.Chart, indicator_mapping: Dict[int, int], api: AdminAPI, user_id: int | None = None
+    chart: gm.Chart, indicator_mapping: dict[int, int], api: AdminAPI, user_id: int | None = None
 ) -> int:
     """Update a single chart and return its ID."""
     # Update chart config
@@ -59,7 +58,7 @@ def _update_single_chart(
     return chart_id
 
 
-def get_affected_narrative_charts_cli(charts: List[gm.Chart]) -> List[gm.NarrativeChart]:
+def get_affected_narrative_charts_cli(charts: list[gm.Chart]) -> list[gm.NarrativeChart]:
     """Get affected narrative charts for CLI (without Streamlit dependencies).
 
     Finds narrative charts by looking up which ones have the affected charts as parents.
@@ -73,10 +72,10 @@ def get_affected_narrative_charts_cli(charts: List[gm.Chart]) -> List[gm.Narrati
 
 
 def push_new_narrative_charts_cli(
-    narrative_charts: List[gm.NarrativeChart],
-    indicator_mapping: Dict[int, int],
+    narrative_charts: list[gm.NarrativeChart],
+    indicator_mapping: dict[int, int],
     dry_run: bool = False,
-) -> List[Dict]:
+) -> list[dict]:
     """Update narrative charts in the database (CLI version).
 
     Uses AdminAPI to:
@@ -107,7 +106,7 @@ def push_new_narrative_charts_cli(
 
     # Update narrative charts sequentially
     successful_updates = 0
-    errors: List[Dict] = []
+    errors: list[dict] = []
 
     for nc in narrative_charts:
         try:
@@ -143,11 +142,11 @@ def push_new_narrative_charts_cli(
 
 
 def push_new_charts_cli(
-    charts: List[gm.Chart],
-    indicator_mapping: Dict[int, int],
+    charts: list[gm.Chart],
+    indicator_mapping: dict[int, int],
     dry_run: bool = False,
     max_workers: int = DEFAULT_MAX_WORKERS,
-) -> List[Dict]:
+) -> list[dict]:
     """Update charts in the database (CLI version).
 
     Returns a list of errors (each error is a dict with 'chart_id', 'chart_slug', and 'error' keys).
@@ -172,7 +171,7 @@ def push_new_charts_cli(
 
     # Update charts in parallel
     successful_updates = 0
-    errors: List[Dict] = []
+    errors: list[dict] = []
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all chart updates
@@ -207,7 +206,7 @@ def push_new_charts_cli(
     return errors
 
 
-def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX_WORKERS) -> Dict:
+def cli_upgrade_indicators(dry_run: bool = False, max_workers: int = DEFAULT_MAX_WORKERS) -> dict:
     """Main CLI function to upgrade indicators using existing variable mapping in DB.
 
     Returns a dictionary with:

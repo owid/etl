@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Sync VS Code extensions",
+      "type": "shell",
+      "command": "make vsce-sync",
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "reveal": "never",
+        "panel": "dedicated",
+        "close": true
+      }
+    }
+  ]
+}

@@ -1,6 +1,5 @@
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Optional
 
 import pandas as pd
 
@@ -18,12 +17,12 @@ class Chart(Doc):
     note: str
     tags: list[str]
     slug: str
-    created_at: Optional[datetime] = None
-    views_7d: Optional[int] = None
-    views_14d: Optional[int] = None
-    views_365d: Optional[int] = None
-    gpt_reason: Optional[str] = None
-    coviews: Optional[int] = None
+    created_at: datetime | None = None
+    views_7d: int | None = None
+    views_14d: int | None = None
+    views_365d: int | None = None
+    gpt_reason: str | None = None
+    coviews: int | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -44,6 +43,16 @@ def get_raw_charts() -> pd.DataFrame:
         from chart_tags as ct
         join tags as t on ct.tagId = t.id
         group by 1
+    ),
+    analytics as (
+        select
+            SUBSTRING_INDEX(url, '/', -1) as slug,
+            max(views_7d) as views_7d,
+            max(views_14d) as views_14d,
+            max(views_365d) as views_365d
+        from analytics_pageviews
+        where url like '%%/grapher/%%'
+        group by 1
     )
     select
         c.id as chart_id,
@@ -58,7 +67,7 @@ def get_raw_charts() -> pd.DataFrame:
         a.views_365d
     from charts as c
     join chart_configs as cf on c.configId = cf.id
-    left join analytics_pageviews as a on cf.slug = SUBSTRING_INDEX(a.url, '/', -1) and a.url like '%%/grapher/%%'
+    left join analytics as a on cf.slug = a.slug
     left join tags as t on c.id = t.chart_id
     -- exclude drafts
     where cf.full->>'$.isPublished' != 'false'

@@ -1,0 +1,69 @@
+dataset:
+  title: Excess fertilizers (West et al. 2014)
+tables:
+  excess_fertilizers__west_et_al__2014:
+    variables:
+      croparea_kmsq:
+        title: croparea_kmsq
+        unit: ''
+      excess_nitrogen_per_ha:
+        title: excess_nitrogen_per_ha
+        unit: kilograms per hectare
+        short_unit: kg
+        display:
+          name: Excess nitrogen per hectare of cropland
+        description: |-
+          Amount of excess nitrogen per hectare of cropland. This is the difference between nitrogen inputs, and amount harvested in crops.
+      excess_nitrogen_total:
+        title: excess_nitrogen_total
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Excess nitrogen
+          numDecimalPlaces: 0
+        description: |-
+          Total amount of excess nitrogen from croplands. This is the difference between nitrogen inputs, and amount harvested in crops.
+      excess_phosphorous_per_ha:
+        title: excess_phosphorous_per_ha
+        unit: kilograms per hectare
+        short_unit: kg
+        display:
+          name: Excess phosphorous per hectare of cropland
+        description: |-
+          Amount of excess phosphorous per hectare of cropland. This is the difference between phosphorous inputs, and the amount harvested in crops.
+      excess_phosphorous_total:
+        title: excess_phosphorous_total
+        unit: ''
+      nitrogen_applied_per_ha:
+        title: nitrogen_applied_per_ha
+        unit: ''
+      phosphorous_applied_rate:
+        title: phosphorous_applied_rate
+        unit: ''
+      share_global_applied_nitrogen:
+        title: share_global_applied_nitrogen
+        unit: ''
+      share_global_applied_phosphorous:
+        title: share_global_applied_phosphorous
+        unit: ''
+      share_global_excess_nitrogen:
+        title: share_global_excess_nitrogen
+        unit: ''
+      share_global_excess_phosphorous:
+        title: share_global_excess_phosphorous
+        unit: ''
+      total_applied_nitrogen:
+        title: total_applied_nitrogen
+        unit: ''
+      total_applied_phosphorous:
+        title: total_applied_phosphorous
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,14 +1,14 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/295
-    date_accessed: 2023-08-10 09:18:21.317778
+    url: https://admin.owid.io/admin/datasets/295
+    date_accessed: 2026-03-05 13:11:13.432006+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_295_tax_revenue__piketty__2014
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1b3dd63e2631c634bf6dc2d056069b77
-  size: 1970
-  path: dataset_295_tax_revenue__piketty__2014_config.json
+  - md5: d53cd3dd278d4fd22163d04a99446a0e
+    size: 2100
+    path: dataset_295_tax_revenue__piketty__2014_config.json

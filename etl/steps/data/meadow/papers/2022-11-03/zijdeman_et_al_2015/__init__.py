@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
@@ -13,7 +11,6 @@ log = get_logger()
 
 # naming conventions
 N = PathFinder(__file__)
-
 
 # Dataset details from Walden
 NAMESPACE = "papers"
@@ -51,7 +48,7 @@ def run(dest_dir: str) -> None:
     log.info("zijdeman_et_al_2015.end")
 
 
-def load_data(path: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def load_data(path: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Load data from Excel file."""
     df = pd.read_excel(path, sheet_name=None)
     data = df["Data Long Format"]

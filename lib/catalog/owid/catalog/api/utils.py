@@ -51,7 +51,7 @@ def _loading_data_from_api(message: str = "Loading data"):
     """
     # Check if we're in a Jupyter notebook
     try:
-        get_ipython  # type: ignore
+        get_ipython  # ty: ignore
         in_notebook = True
     except NameError:
         in_notebook = False

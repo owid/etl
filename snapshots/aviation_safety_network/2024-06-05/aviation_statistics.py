@@ -75,8 +75,8 @@ def main(upload: bool) -> None:
     snap_by_nature = Snapshot(f"aviation_safety_network/{SNAPSHOT_VERSION}/aviation_statistics_by_nature.csv")
 
     # Fetch data on total accidents/fatalities, by period or by nature.
-    period_df = get_aviation_data(url=snap_by_period.metadata.origin.url_main)  # type: ignore
-    nature_df = get_aviation_data(url=snap_by_nature.metadata.origin.url_main)  # type: ignore
+    period_df = get_aviation_data(url=snap_by_period.metadata.origin.url_main)  # ty: ignore
+    nature_df = get_aviation_data(url=snap_by_nature.metadata.origin.url_main)  # ty: ignore
 
     # Create snapshots.
     snap_by_period.create_snapshot(upload=upload, data=period_df)

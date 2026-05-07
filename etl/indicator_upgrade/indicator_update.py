@@ -4,7 +4,7 @@ These functions are used when there are updates on variables. They are used in t
 """
 
 from copy import deepcopy
-from typing import Any, Dict, List, Set
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -22,7 +22,7 @@ from etl.indicator_upgrade.schema import (
 log = get_logger()
 
 
-def find_charts_from_variable_ids(variable_ids: Set[int]) -> List[gm.Chart]:
+def find_charts_from_variable_ids(variable_ids: set[int]) -> list[gm.Chart]:
     """Retrieve charts that use the given variables from their IDs."""
     log.info(f"variable_update: finding charts using old variables ({len(variable_ids)} variables)")
     with Session(get_engine()) as session:
@@ -48,9 +48,9 @@ def find_charts_from_variable_ids(variable_ids: Set[int]) -> List[gm.Chart]:
 
 
 def update_narrative_chart_config(
-    config: Dict[str, Any],
-    indicator_mapping: Dict[int, int],
-) -> Dict[str, Any]:
+    config: dict[str, Any],
+    indicator_mapping: dict[int, int],
+) -> dict[str, Any]:
     """Update indicator references in a narrative chart config.
 
     Narrative charts have a simpler config structure (just the patch).
@@ -86,15 +86,16 @@ def update_narrative_chart_config(
 
 
 def update_chart_config(
-    config: Dict[str, Any],
-    indicator_mapping: Dict[int, int],
-    schema: Dict[str, Any],
-) -> Dict[str, Any]:
+    config: dict[str, Any],
+    indicator_mapping: dict[int, int],
+    schema: dict[str, Any],
+) -> dict[str, Any]:
     """Update indicator references to the new ones.
 
     The chart config contains some fields that point to the indicators in use. In the attempt to migrating these, we should update all references to the new indicators.
     """
-    updater = ChartIndicatorUpdater(indicator_mapping, schema)
+    is_inheritance_enabled = config.get("isInheritanceEnabled", False)
+    updater = ChartIndicatorUpdater(indicator_mapping, schema, is_inheritance_enabled=is_inheritance_enabled)
     config_new = updater.run(deepcopy(config))
     return config_new
 
@@ -104,8 +105,9 @@ class ChartIndicatorUpdater:
 
     def __init__(
         self,
-        indicator_mapping: Dict[int, int],
-        schema: Dict[str, Any],
+        indicator_mapping: dict[int, int],
+        schema: dict[str, Any],
+        is_inheritance_enabled: bool = False,
     ) -> None:
         """Constructor.
 
@@ -115,12 +117,20 @@ class ChartIndicatorUpdater:
             Mapping between old and new indicator IDs.
         schema : Optional[Dict[str, Any]]
             Schema of the chart configuration. Defaults to None.
+        is_inheritance_enabled : bool
+            Whether chart inheritance is enabled. When True, we skip stripping
+            schema-default values from the config, because the admin API needs
+            the full config to correctly compute the patch against the indicator's
+            ETL config. Without this, properties like hasMapTab=false (a schema
+            default that overrides the indicator's hasMapTab=true) would be
+            stripped, causing the chart to re-inherit the indicator's value.
         """
         # Variable mapping dictionary: Old variable ID -> New variable ID
         self.indicator_mapping = indicator_mapping
         self.schema = schema
+        self.is_inheritance_enabled = is_inheritance_enabled
 
-    def run(self, config: Dict[str, Any]) -> Dict[str, Any]:
+    def run(self, config: dict[str, Any]) -> dict[str, Any]:
         """Run the chart variable updater."""
         # Fix errors in schema
         config_new = fix_errors_in_schema(config)
@@ -132,15 +142,21 @@ class ChartIndicatorUpdater:
         config_new = update_chart_config_dimensions(config_new, self.indicator_mapping)
         # Update sorting
         config_new = update_chart_config_sort(config_new, self.indicator_mapping)
-        # Validate the  configuration of the chart and remove default values (if any)
-        config_new = validate_chart_config_and_remove_defaults(config_new, self.schema)
+        # Validate the configuration of the chart and remove default values (if any).
+        # Skip this for inheritance-enabled charts: the admin API computes the patch
+        # by diffing the full config against the indicator's ETL config. If we strip
+        # schema-default values here, overrides that happen to match the schema default
+        # (e.g. hasMapTab=false) but differ from the indicator default (hasMapTab=true)
+        # would be lost, causing the chart to re-inherit the indicator's value.
+        if not self.is_inheritance_enabled:
+            config_new = validate_chart_config_and_remove_defaults(config_new, self.schema)
         return config_new
 
 
 def update_chart_config_map(
-    config: Dict[str, Any],
-    indicator_mapping: Dict[int, int],
-) -> Dict[str, Any]:
+    config: dict[str, Any],
+    indicator_mapping: dict[int, int],
+) -> dict[str, Any]:
     """Update map config."""
     log.info("variable_update: updating map config")
     # Proceed only if chart uses map and has `map` field
@@ -158,9 +174,9 @@ def update_chart_config_map(
 
 
 def update_chart_config_dimensions(
-    config: Dict[str, Any],
-    indicator_mapping: Dict[int, int],
-) -> Dict[str, Any]:
+    config: dict[str, Any],
+    indicator_mapping: dict[int, int],
+) -> dict[str, Any]:
     """Update dimensions in the chart config."""
     log.info("variable_update: updating dimensions")
     # Update dimensions field
@@ -171,9 +187,9 @@ def update_chart_config_dimensions(
 
 
 def update_chart_config_sort(
-    config: Dict[str, Any],
-    indicator_mapping: Dict[int, int],
-) -> Dict[str, Any]:
+    config: dict[str, Any],
+    indicator_mapping: dict[int, int],
+) -> dict[str, Any]:
     """Update sort in the chart config.
 
     There are three fields that deal with the sorting of bars in bar charts and marimekko.

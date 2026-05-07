@@ -1,0 +1,22 @@
+dataset:
+  title: Health Insurance Coverage (Tanzi & Schuknecht (2000)) (split)
+tables:
+  health_insurance_coverage__tanzi__and__schuknecht__2000__split:
+    variables:
+      health_insurance_coverage__tanzi__and__schuknecht__2000:
+        title: Health Insurance Coverage (Tanzi & Schuknecht (2000))
+        unit: Percent of Labour Force
+        short_unit: '%'
+        display:
+          shortUnit: '%'
+          unit: '%'
+        description: Health Insurance coverage (percent of labour force)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

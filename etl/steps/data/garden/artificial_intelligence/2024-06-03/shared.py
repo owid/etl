@@ -1,5 +1,3 @@
-from typing import List
-
 import pandas as pd
 from owid.catalog import Table
 
@@ -9,7 +7,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_columns: List[str]) -> Table:
+def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_columns: list[str]) -> Table:
     """
     This function calculates aggregates for a given column in a Table. It is used to calculate the total yearly and cumulative number of notable AI systems for each domain or country.
 

@@ -1,0 +1,23 @@
+dataset:
+  title: OECD - Trust in government
+tables:
+  oecd__trust_in_government:
+    variables:
+      trust_government:
+        title: trust_government
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Trust in government
+          numDecimalPlaces: 1
+          shortUnit: '%'
+          unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

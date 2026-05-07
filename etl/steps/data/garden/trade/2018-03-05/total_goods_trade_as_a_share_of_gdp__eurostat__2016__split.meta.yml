@@ -1,0 +1,17 @@
+dataset:
+  title: Total goods trade as a share of GDP (Eurostat (2016)) (split)
+tables:
+  total_goods_trade_as_a_share_of_gdp__eurostat__2016__split:
+    variables:
+      total_goods_trade_as_a_share_of_gdp__eurostat__2016:
+        title: Total goods trade as a share of GDP (Eurostat (2016))
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

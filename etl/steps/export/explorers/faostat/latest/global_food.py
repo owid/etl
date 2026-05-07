@@ -1,7 +1,8 @@
 """Step that pushes the global-food explorer (tsv content) to DB, to create the global-food (indicator-based) explorer.."""
 
+from collections.abc import Callable
 from copy import deepcopy
-from typing import Any, Callable, Dict, Optional
+from typing import Any
 
 from owid.catalog.utils import underscore
 from structlog import get_logger
@@ -401,10 +402,10 @@ def default_slug_name_transformation(slug):
 
 
 def humanize_dimension_names_in_config(
-    config: Dict[str, Any],
-    transformation: Optional[Callable[[str], str]] = None,
-    replacements: Optional[Dict[str, str]] = None,
-) -> Dict[str, Any]:
+    config: dict[str, Any],
+    transformation: Callable[[str], str] | None = None,
+    replacements: dict[str, str] | None = None,
+) -> dict[str, Any]:
     """Transform all machine-readable slugs, e.g. "area_harvested" into human-readable names, e.g. "Area harvested"."""
     if transformation is None:
         transformation = default_slug_name_transformation

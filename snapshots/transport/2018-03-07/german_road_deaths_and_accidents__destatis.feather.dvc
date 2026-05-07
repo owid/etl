@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: German road deaths and accidents - destatis
+    url: |-
+      https://www.destatis.de/EN/FactsFigures/EconomicSectors/TransportTraffic/TrafficAccidents/Tables_/RoadTrafficAccidents.html
+    date_accessed: 2018-03-07
+    published_by: Statistisches Bundesamt
+  name: German road deaths and accidents - destatis
+  description: ''
+outs:
+  - md5: 243bcb1a662162ea9ad0a0f077865180
+    size: 4482
+    path: german_road_deaths_and_accidents__destatis.feather

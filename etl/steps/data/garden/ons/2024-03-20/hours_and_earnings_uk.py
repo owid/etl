@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Dict
-
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -54,7 +52,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def calculate_ratios(tb: Table, indicator_names: Dict[str, str]) -> Table:
+def calculate_ratios(tb: Table, indicator_names: dict[str, str]) -> Table:
     """Calculate ratios between indicators and median."""
 
     # Rename values in indicator column

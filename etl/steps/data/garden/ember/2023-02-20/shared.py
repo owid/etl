@@ -1,6 +1,6 @@
 import itertools
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -39,7 +39,7 @@ VERSION = CURRENT_DIR.name
 # The following decisions are based on the current location of the countries that succeeded the region, and their income
 # group. Continent and income group assigned corresponds to the continent and income group of the majority of the
 # population in the member countries.
-HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
+HISTORIC_TO_CURRENT_REGION: dict[str, dict[str, str | list[str]]] = {
     "Czechoslovakia": {
         "continent": "Europe",
         "income_group": "High-income countries",
@@ -155,8 +155,8 @@ def get_countries_in_region(
     region: str,
     df_regions: pd.DataFrame,
     df_income: pd.DataFrame,
-    region_modifications: Optional[Dict[str, Dict[str, List[str]]]] = None,
-) -> List[str]:
+    region_modifications: dict[str, dict[str, list[str]]] | None = None,
+) -> list[str]:
     """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
 
     Parameters
@@ -239,7 +239,7 @@ def add_population(
     interpolate_missing_population: bool = False,
     warn_on_missing_countries: bool = True,
     show_full_warning: bool = True,
-    expected_countries_without_population: List[str] = [],
+    expected_countries_without_population: list[str] = [],
 ) -> pd.DataFrame:
     """Add a column of OWID population to the countries in the data, including population of historical regions.
 
@@ -388,7 +388,7 @@ def detect_overlapping_regions(
             )
             # Concatenate both selections of data, and select duplicated rows.
             combined = pd.concat([region_values, member_values])
-            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
+            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # ty: ignore
             if len(overlaps) > 0:
                 # Add the overlap found to the dictionary of all overlaps.
                 all_overlaps.update({year: set(overlaps[country_col]) for year in overlaps[year_col].unique()})
@@ -401,12 +401,12 @@ def detect_overlapping_regions(
 
 def add_region_aggregates(
     data: pd.DataFrame,
-    regions_to_add: Dict[Any, Any],
-    index_columns: List[str],
+    regions_to_add: dict[Any, Any],
+    index_columns: list[str],
     df_regions: pd.DataFrame,
     df_income: pd.DataFrame,
     country_column: str = "country",
-    aggregates: Optional[Dict[str, str]] = None,
+    aggregates: dict[str, str] | None = None,
 ) -> pd.DataFrame:
     """Add region aggregates for all regions (which may include continents and income groups).
 
@@ -470,8 +470,8 @@ def add_region_aggregates(
 
 
 def _expand_combinations_in_amendments(
-    amendments: List[Tuple[Dict[Any, Any], Dict[Any, Any]]],
-) -> List[Tuple[Dict[Any, Any], Dict[Any, Any]]]:
+    amendments: list[tuple[dict[Any, Any], dict[Any, Any]]],
+) -> list[tuple[dict[Any, Any], dict[Any, Any]]]:
     """When values in amendments are given as lists, explode them to have all possible combinations of values."""
     amendments_expanded = []
     for wrong_row, corrected_row in amendments:
@@ -482,7 +482,7 @@ def _expand_combinations_in_amendments(
     return amendments_expanded
 
 
-def correct_data_points(df: pd.DataFrame, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> pd.DataFrame:
+def correct_data_points(df: pd.DataFrame, corrections: list[tuple[dict[Any, Any], dict[Any, Any]]]) -> pd.DataFrame:
     """Make individual corrections to data points in a dataframe.
 
     Parameters

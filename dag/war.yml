@@ -51,6 +51,7 @@ steps:
   # UCDP (+preview)
   data://meadow/war/latest/ucdp_ced:
     - snapshot://war/latest/ucdp_ced_v25_01_25_12.csv
+    - snapshot://war/latest/ucdp_ced_v26_01_26_03.csv
   data://garden/war/latest/ucdp_preview:
     - data://meadow/war/2025-06-13/ucdp
     - data://garden/war/2025-06-13/ucdp
@@ -215,3 +216,7 @@ steps:
     - data://meadow/war/2025-05-15/nuclear_weapons_inventories
   data://grapher/war/2025-05-15/nuclear_weapons_inventories:
     - data://garden/war/2025-05-15/nuclear_weapons_inventories
+
+  # Countries in Conflict explorer.
+  export://explorers/war/latest/countries_in_conflict_data:
+    - data://grapher/war/2025-06-13/ucdp

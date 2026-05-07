@@ -1,0 +1,22 @@
+dataset:
+  title: Average effective age of retirement, by gender (OECD, 2018)
+tables:
+  average_effective_age_of_retirement__by_gender__oecd__2018:
+    variables:
+      average_effective_age_of_retirement__men__oecd:
+        title: Average effective age of retirement, men (OECD)
+        unit: years
+        description: The average effective age at which men retired from the labour market.
+      average_effective_age_of_retirement__women__oecd:
+        title: Average effective age of retirement, women (OECD)
+        unit: years
+        description: The average effective age at which women retired from the labour market.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

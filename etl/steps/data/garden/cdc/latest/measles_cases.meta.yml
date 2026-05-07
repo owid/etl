@@ -16,9 +16,3 @@ tables:
       cases:
         title: Number of measles cases
         unit: cases
-      states_with_cases:
-        title: Number of states with measles cases
-        unit: states
-      outbreaks_n:
-        title: Number of measles outbreaks
-        unit: outbreaks

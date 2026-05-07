@@ -1,0 +1,20 @@
+dataset:
+  title: Percentage of persons without health insurance - Council of Economic Advisers and National Center for Health Statistics
+tables:
+  percentage_of_persons_without_health_insurance__council_of_economic_advisers_and_national_center_for_health_statistics:
+    variables:
+      percentage_of_persons_without_health_insurance__pct:
+        title: Percentage of persons without health insurance (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

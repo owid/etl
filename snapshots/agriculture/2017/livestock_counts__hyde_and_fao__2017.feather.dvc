@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Livestock counts - HYDE & FAO (2017)
+    description: |-
+      This dataset on livestock counts has been compiled by OWID based on the combination of data from the HYDE database and UN Food and Agricultural Organization (FAO) statistics.
+
+      Data for all livestock from 1890-1950 is sourced from the HYDE Database (History Database of the Global Environment), published by the PBL Netherlands Environmental Assessment Agency. Available at: http://themasites.pbl.nl/tridion/en/themasites/hyde/landusedata/livestock/index-2.html [accessed 12th October 2017].
+
+      Data from 1961 onwards is sources from the UN Food and Agricultural Organization (FAO) statistics. Available at: http://www.fao.org/faostat/en/#data/QA [accessed 12th October 2017].
+    date_accessed: 2026-03-05
+    published_by: Livestock counts - HYDE & FAO (2017)
+  name: Livestock counts - HYDE & FAO (2017)
+  description: ''
+outs:
+  - md5: f5d3309823127b5de463863d0a95d24c
+    size: 41050
+    path: livestock_counts__hyde_and_fao__2017.feather

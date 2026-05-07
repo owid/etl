@@ -106,12 +106,6 @@ SUM_COL_DICT = {
     "TU20FWGT": "final_weight_2020",  # 2020 weight
 }
 
-# TODO: figure out why line number is sometimes negative?
-# are case numbers unique people? or people in a year?
-# how do i fix the metadata here
-# seperate this into meadow and garden steps also
-
-
 ACTIVITY_COL_DICT = {
     "TUCASEID": "case_id",
     "TUACTIVITY_N": "activity_number",

@@ -252,7 +252,7 @@ class IndicatorsAPI:
         ```
     """
 
-    def __init__(self, client: "Client", search_url: str, catalog_url: str) -> None:
+    def __init__(self, client: Client, search_url: str, catalog_url: str) -> None:
         """Initialize the IndicatorsAPI.
 
         Args:
@@ -416,7 +416,7 @@ class IndicatorsAPI:
             )
 
         return ResponseSet(
-            results=results,
+            items=results,
             query=query,
             total_count=data.get("total_results", len(results)),
             base_url=self.catalog_url,

@@ -1,0 +1,20 @@
+dataset:
+  title: North Atlantic cod catch (Schijns et al. 2021)
+tables:
+  north_atlantic_cod_catch__schijns_et_al__2021:
+    variables:
+      northern_atlantic_cod_catch:
+        title: Northern Atlantic cod catch
+        unit: tonnes
+        short_unit: t
+        description: |-
+          This measures estimates of North Atlantic cod (Gadus morhua) catch off Newfoundland and Labrador, Eastern Canada. The stock defined by this assessment includes all cod caught within NAFO-delineated Divisions 2J3KL.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

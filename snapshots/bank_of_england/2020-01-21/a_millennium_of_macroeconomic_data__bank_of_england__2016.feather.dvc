@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: A Millennium of Macroeconomic Data - Bank of England
+    description: |-
+      This dataset consists of all the variables from the Headline Annual Composite Series and real GDP per capita taken from the 'Summary of Population and GDP per capita 1086-2016' worksheet available from the Bank of England's 'A Millennium of Macroeconomic Data'.
+    url: https://www.bankofengland.co.uk/statistics/research-datasets
+    date_accessed: 2020-01-21
+    published_by: Bank of England
+  name: A Millennium of Macroeconomic Data - Bank of England (2016)
+  description: ''
+  is_public: false
+outs:
+  - md5: aa73791de6df2d1b8d7831b1e077344a
+    size: 210978
+    path: a_millennium_of_macroeconomic_data__bank_of_england__2016.feather

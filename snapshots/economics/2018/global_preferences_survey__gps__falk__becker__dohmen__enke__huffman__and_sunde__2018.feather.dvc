@@ -1,0 +1,26 @@
+meta:
+  source:
+    name: Falk, Becker, Dohmen, Enke, Huffman, and Sunde (2018) - Global Preferences Survey (GPS)
+    description: |-
+      The Global Preferences Survey (GPS) measures preferences for nationally representative samples taken from each of the 76 countries covered. This includes 15 countries from the Americas, 25 from Europe, 22 from Asia and the Pacific, and 14 African countries - 11 of which are Sub-Saharan. In total, this covers 90% of both the world population and total income.
+
+      The median sample size was 1,000 participants per country. The sample includes preference measures for over 80,000 participants altogether.
+
+      Country level averages for each economic preference were calculated using individual-level data weighted by the sampling weights provided by the Gallup World Poll. Each preference is normalized to have mean 0 and standard deviation 1 in the individual-level data.
+
+      For more information on the construction of the GPS dataset, see Section II.A of the paper by Falk et al. (2018).
+
+      Full citation:
+      Falk, A., Becker, A., Dohmen, T., Enke, B., Huffman, D., & Sunde, U. (2018). Global evidence on economic preferences. Quarterly Journal of Economics (forthcoming).
+
+      Falk, A., Becker, A., Dohmen, T. J., Huffman, D., & Sunde, U. (2016). The preference survey module: A validated instrument for measuring risk, time, and social preferences. IZA Discussion Paper No. 9674.
+    url: https://www.briq-institute.org/global-preferences/downloads
+    date_accessed: 2018-11-06
+    published_by: briq - Institute on Behavior and Inequality
+  name: Global Preferences Survey (GPS) - Falk, Becker, Dohmen, Enke, Huffman, and Sunde (2018)
+  description: ''
+  is_public: false
+outs:
+  - md5: 2f4d05f8c36b890146471d3b32e4206f
+    size: 10594
+    path: global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018.feather

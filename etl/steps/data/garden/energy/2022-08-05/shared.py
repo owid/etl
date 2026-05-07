@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, cast
+from typing import cast
 
 import pandas as pd
 from owid import catalog
@@ -85,8 +85,8 @@ HISTORIC_TO_CURRENT_REGION = {
 
 
 def gather_sources_from_tables(
-    tables: List[catalog.Table],
-) -> List[catalog.meta.Source]:
+    tables: list[catalog.Table],
+) -> list[catalog.meta.Source]:
     """Gather unique sources from the metadata.dataset of each table in a list of tables.
 
     Note: To check if a source is already listed, only the name of the source is considered (not the description or any
@@ -104,7 +104,7 @@ def gather_sources_from_tables(
 
     """
     # Initialise list that will gather all unique metadata sources from the tables.
-    known_sources: List[catalog.meta.Source] = []
+    known_sources: list[catalog.meta.Source] = []
     for table in tables:
         # Get list of sources of the dataset of current table.
         table_sources = table.metadata.dataset.sources
@@ -119,7 +119,7 @@ def gather_sources_from_tables(
 
 
 def add_population_of_historical_regions(
-    population: Optional[pd.DataFrame],
+    population: pd.DataFrame | None,
 ) -> pd.DataFrame:
     """Add historical regions to the population dataset.
 
@@ -167,7 +167,7 @@ def add_population(
     country_col: str = "country",
     year_col: str = "year",
     population_col: str = "population",
-    population: Optional[pd.DataFrame] = None,
+    population: pd.DataFrame | None = None,
     warn_on_missing_countries: bool = True,
     show_full_warning: bool = True,
 ) -> pd.DataFrame:

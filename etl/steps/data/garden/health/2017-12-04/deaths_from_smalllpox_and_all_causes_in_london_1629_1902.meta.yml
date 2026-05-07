@@ -1,0 +1,24 @@
+dataset:
+  title: Deaths from Smalllpox and all causes in London 1629-1902
+tables:
+  deaths_from_smalllpox_and_all_causes_in_london_1629_1902:
+    variables:
+      deaths_from_smallpox_in_london_1629_1902__owid__2017:
+        title: Deaths from Smallpox in London 1629-1902 (OWID, 2017)
+        unit: ''
+      deaths_from_all_causes_in_london_1629_1902__owid__2017:
+        title: Deaths from all causes in London 1629-1902 (OWID, 2017)
+        unit: ''
+      smallpox_death_rate_in_london_1629_1902__owid__2017:
+        title: Smallpox death rate in London 1629-1902 (OWID, 2017)
+        unit: ''
+        description: Deaths from smallpox per 100 deaths from all causes
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

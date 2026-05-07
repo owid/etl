@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: National Women's Law Center (2014)
+    url: |-
+      https://www.nwlc.org/wp-content/uploads/2015/08/women_are_76_percent_of_workers_in_the_10_largest_low-wage_jobs_and_suffer_a_10_percent_wage_gap_april_2014.pdf
+    date_accessed: 2017-11-01
+    published_by: National Women's Law Center
+  name: Lowest paying occupations, percent female – NWLC (2014)
+  description: ''
+outs:
+  - md5: f1271ce90c839e9d1b63b60fc78d7ab2
+    size: 3194
+    path: lowest_paying_occupations__percent_female__nwlc__2014.feather

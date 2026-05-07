@@ -57,9 +57,9 @@ def run() -> None:
     for table in [tb_eurostat_euro, tb_eurostat_pps, tb_ember_annual]:
         for column in table.columns:
             if column not in ["country", "year"]:
-                assert (
-                    table[column].metadata.dimensions is not None
-                ), f"Column {column} in table {table.m.short_name} has no dimensions."
+                assert table[column].metadata.dimensions is not None, (
+                    f"Column {column} in table {table.m.short_name} has no dimensions."
+                )
 
     # Create a combined annual table.
     tb_annual = pr.multi_merge(

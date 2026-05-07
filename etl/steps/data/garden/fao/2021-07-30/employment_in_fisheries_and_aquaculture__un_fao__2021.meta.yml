@@ -1,0 +1,36 @@
+dataset:
+  title: Employment in fisheries and aquaculture (UN FAO, 2021)
+tables:
+  employment_in_fisheries_and_aquaculture__un_fao__2021:
+    variables:
+      aquaculture__number_employed:
+        title: Aquaculture (number employed)
+        unit: people
+        display:
+          name: Number of people employed in aquaculture
+          numDecimalPlaces: 0
+        description: Number of people employed as fish farmers (aquaculture). This does not include those employed as fishers
+          (wild catch).
+      fisheries__number_employed:
+        title: Fisheries (number employed)
+        unit: people
+        display:
+          name: Number of people employed in fisheries
+          numDecimalPlaces: 0
+        description: Number of people employed as fishers. This does not include fish farmers (those employed in aquaculture).
+      fisheries_and_aquaculture__number_employed:
+        title: Fisheries and aquaculture (number employed)
+        unit: people
+        display:
+          name: Number of people employed in fisheries or fish farms
+          numDecimalPlaces: 0
+        description: The number of people employed in wild fisheries or in fish farming (aquaculture).
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
