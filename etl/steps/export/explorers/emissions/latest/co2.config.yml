@@ -82,15 +82,11 @@ dimensions:
   - slug: relative_to_world
     name: Relative to world total
     presentation:
-      # Radio rather than checkbox: the framework requires checkboxes to have exactly
-      # 2 choices, but co2 needs a third "na" slot for views that don't expose the
-      # toggle (per_capita, per_kwh, …) — those rows render the dimension as blank.
-      type: radio
+      type: checkbox
+      choice_slug_true: relative
     choices:
-      - slug: na
-        name: ''
       - slug: total
-        name: 'Total'
+        name: ''
       - slug: relative
         name: Relative to world total
 views: []
