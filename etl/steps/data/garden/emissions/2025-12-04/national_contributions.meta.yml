@@ -23,7 +23,7 @@ definitions:
     processing_level: major
     presentation:
       topic_tags:
-      - CO2 & Greenhouse Gas Emissions
+        - CO2 & Greenhouse Gas Emissions
 
 dataset:
   update_period_days: 365
@@ -122,6 +122,11 @@ tables:
         description_processing: *processing-greenhouse-gases
         presentation:
           title_public: Annual greenhouse gas emissions including land use
+          grapher_config:
+            title: Greenhouse gas emissions
+            subtitle: '[Greenhouse gas emissions](#dod:ghgemissions) include carbon dioxide, methane and nitrous oxide from all sources, including [land-use change](#dod:land-use-change-emissions). They are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) over a 100-year timescale.'
+            note: Land-use change emissions can be negative.
+            tab: map
       annual_emissions_ch4_fossil_co2eq:
         title: Annual methane emissions from fossil fuels and industry in CO₂ equivalents
         unit: tonnes of CO₂ equivalents
@@ -146,6 +151,10 @@ tables:
         description_processing: *processing-methane
         presentation:
           title_public: Annual methane emissions including land use
+          grapher_config:
+            title: Methane emissions
+            subtitle: Methane (CH₄) emissions are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents). Emissions from [fossil fuels, industry](#dod:fossilemissions), agriculture, and [land-use change](#dod:land-use-change-emissions) are included.
+            tab: map
       annual_emissions_n2o_fossil_co2eq:
         title: Annual nitrous oxide emissions from fossil fuels and industry in CO₂ equivalents
         unit: tonnes of CO₂ equivalents
@@ -171,6 +180,10 @@ tables:
         presentation:
           title_public: Annual nitrous oxide emissions including land use
       # Cumulative emissions of CH4, CO2, N2O and GHG, in tonnes of CO2eq (as originally given in the data).
+          grapher_config:
+            title: Nitrous oxide emissions
+            subtitle: Nitrous oxide (N₂O) emissions are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents).
+            tab: map
       cumulative_emissions_ghg_fossil:
         title: Cumulative greenhouse gas emissions from fossil fuels and industry
         unit: tonnes of CO₂ equivalents
@@ -263,6 +276,10 @@ tables:
         description_short: *measured-in-celsius
         presentation:
           title_public: Change in global mean surface temperature caused by greenhouse gas emissions from fossil fuels and industry
+          grapher_config:
+            title: Contribution to global mean surface temperature rise from fossil sources
+            subtitle: The global mean surface temperature change as a result of a country or region's cumulative emissions of carbon dioxide, methane, and nitrous oxide. This is for [fossil fuel and industry](#dod:fossilemissions) emissions only – it does not include [land use](#dod:land-use-change-emissions) or agriculture.
+            tab: map
       temperature_response_ghg_land:
         title: Change in global mean surface temperature caused by greenhouse gas emissions from agriculture and land use
         unit: °C
@@ -270,6 +287,10 @@ tables:
         description_short: *measured-in-celsius
         presentation:
           title_public: Change in global mean surface temperature caused by greenhouse gas emissions from agriculture and land use
+          grapher_config:
+            title: Contribution to global mean surface temperature rise from agriculture and land use
+            subtitle: The global mean surface temperature change as a result of a country or region's cumulative emissions of carbon dioxide, methane, and nitrous oxide. This is for [land use](#dod:land-use-change-emissions) and agriculture only.
+            tab: map
       temperature_response_ghg_total:
         title: Change in global mean surface temperature caused by greenhouse gas emissions
         unit: °C
@@ -280,6 +301,10 @@ tables:
           - The warming effects of each gas are calculated based on cumulative CO₂-equivalent emissions using the Global Warming Potential (GWP*) approach.
         presentation:
           title_public: Change in global mean surface temperature caused by greenhouse gas emissions
+          grapher_config:
+            title: Contribution to global mean surface temperature rise
+            subtitle: The global mean surface temperature change as a result of a country or region's cumulative emissions of three gases – carbon dioxide, methane, and nitrous oxide.
+            note: This does not include cooling impacts from sulphur dioxide and aerosols, so the net warming can be lower.
       temperature_response_ch4_fossil:
         title: Change in global mean surface temperature caused by methane emissions from fossil fuels and industry
         unit: °C
@@ -362,6 +387,10 @@ tables:
         description_processing: *processing-greenhouse-gases
         presentation:
           title_public: Share of global greenhouse gas emissions
+          grapher_config:
+            subtitle: '[Greenhouse gas emissions](#dod:ghgemissions) include carbon dioxide, methane and nitrous oxide from all sources, including [land-use change](#dod:land-use-change-emissions). They are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) over a 100-year timescale.'
+            note: Land-use change emissions can be negative.
+            tab: map
       share_of_annual_emissions_ch4_total:
         title: Share of global methane emissions
         unit: "%"
@@ -369,6 +398,9 @@ tables:
         description_short: "Measured as a percentage of the world's methane emissions."
         presentation:
           title_public: Share of global methane emissions
+          grapher_config:
+            subtitle: Includes methane emissions from [fossil fuels, industry](#dod:fossilemissions) and agricultural sources.
+            tab: map
       share_of_annual_emissions_co2_total:
         title: Share of global CO₂ emissions
         unit: "%"
@@ -384,6 +416,9 @@ tables:
         presentation:
           title_public: Share of global nitrous oxide emissions
       # Share of global temperature change caused by greenhouse gas emissions from each country (calculated by OWID).
+          grapher_config:
+            subtitle: Nitrous oxide (N₂O) emissions are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents).
+            tab: map
       share_of_temperature_response_ghg_total:
         title: Share of contribution to global warming
         unit: "%"
@@ -395,6 +430,10 @@ tables:
         presentation:
           title_public: Share of contribution to global warming
       # Per capita emissions (calculated by OWID).
+          grapher_config:
+            title: 'Global warming: Contributions to the change in global mean surface temperature'
+            subtitle: This is shown as a country or region's share of the global mean surface temperature change as a result of its cumulative emissions of three gases – carbon dioxide, methane, and nitrous oxide.
+            note: Cooling effects of sulphur dioxide and aerosols are not included – this means the net impact for some countries can be negative. Methane and nitrous oxide are included using the GWP* approach.
       annual_emissions_co2_total_per_capita:
         title: Per capita CO₂ emissions
         unit: tonnes per person
@@ -417,6 +456,10 @@ tables:
         description_processing: *processing-methane
         presentation:
           title_public: Per capita methane emissions including land use
+          grapher_config:
+            title: Per capita methane emissions
+            subtitle: Per capita methane emissions are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) per person per year.
+            tab: map
       annual_emissions_n2o_total_co2eq_per_capita:
         title: Per capita nitrous oxide emissions in CO₂ equivalents
         unit: tonnes of CO₂ equivalents per person
@@ -425,6 +468,10 @@ tables:
         description_processing: *processing-nitrous-oxide
         presentation:
           title_public: Per capita nitrous oxide emissions including land use
+          grapher_config:
+            title: Per capita nitrous oxide emissions
+            subtitle: Per capita nitrous oxide emissions are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) per person per year.
+            tab: map
       annual_emissions_ghg_total_co2eq_per_capita:
         title: Per capita greenhouse gas emissions in CO₂ equivalents
         unit: tonnes of CO₂ equivalents per person
@@ -433,6 +480,11 @@ tables:
         description_processing: *processing-greenhouse-gases
         presentation:
           title_public: Per capita greenhouse gas emissions including land use
+          grapher_config:
+            title: Per capita greenhouse gas emissions
+            subtitle: '[Greenhouse gas emissions](#dod:ghgemissions) include carbon dioxide, methane and nitrous oxide from all sources, including [land-use change](#dod:land-use-change-emissions). They are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) over a 100-year timescale.'
+            note: Land-use change emissions can be negative.
+            tab: map
       annual_emissions_ghg_fossil_co2eq_per_capita:
         title: Per capita greenhouse gas emissions from fossil fuels and industry in CO₂ equivalents
         unit: tonnes of CO₂ equivalents per person
