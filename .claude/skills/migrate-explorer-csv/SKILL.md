@@ -75,12 +75,15 @@ def run() -> None:
 - convert types and units to ETL conventions (long format with `country`/`year` index)
 - optionally compute per-capita or per-region aggregates
 - write `*.meta.yml` with origins, descriptions, per-indicator metadata
+- **FAUST for single-indicator explorer views**: while authoring indicator metadata, push chart text/config (`title_public`, `subtitle`, `note`, `map.colorScale`, `hasMapTab`, `tab`, `yAxis`, …) into each indicator's `presentation.{title_public, grapher_config}`. Cross-cutting baselines go under `definitions.common.presentation.grapher_config` (recursive merge). The explorer view inherits this text at chart render time, eliminating duplication with `<short>.config.yml`. See `.claude/docs/explorer-programmatic-construction.md` for the full mechanics and `dynamic-yaml` `"{definitions.<key>}"` interpolation pattern.
 
 ### 5. Grapher step
 
 `etl/steps/data/grapher/<ns>/<date>/<short>.py` — read the garden table and save as a grapher dataset (long format `country`/`year`/`value`).
 
 ### 6. Explorer step — leverage the migration helper
+
+Construction style: same full-YAML vs table-driven choice as the other migration skills — **see `.claude/docs/explorer-programmatic-construction.md`** for the full discussion. Note that CSV-explorer migrations have a slight advantage because *you control the garden output*: you can shape the new garden table to be dimensional (one row per country/year × dim_a × dim_b) so `paths.create_collection(tb=tb, indicator_names=..., dimensions=...)` expands views directly, and reach for `c.group_views(...)` if some explorer views need to bundle multiple indicators.
 
 Before hand-translating the legacy config, try the programmatic helper in `etl/collection/explorer/migration.py`:
 

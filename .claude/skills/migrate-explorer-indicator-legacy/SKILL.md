@@ -66,8 +66,9 @@ Identify:
 
 ### 2. Decide between full-YAML and table-driven
 
-- **Full YAML** when each view is bespoke (different titles, subtitles, configs per dimension combination). Model after `crop_yields.{py,config.yml}`.
-- **Table-driven** when the upstream is a multidim grapher dataset and dimensions map onto its indicator dimensions. Model after `migration/latest/migration_flows.py` — the YAML carries the static config, and `paths.create_collection(tb=tb, indicator_names=[...], dimensions=[...], common_view_config=...)` expands views automatically. Post-process in Python for the residual logic (e.g. per-metric `display` settings via `add_display_settings(c)`).
+This decision is shared with the other migration skills. **Read `.claude/docs/explorer-programmatic-construction.md`** for the full discussion: when to go programmatic, the API contract for `tb[col].m.dimensions` and `paths.create_collection(tb=tb, ...)`, FAUST migration up to `presentation.grapher_config` in garden metadata, post-processing with `sort_choices` / `group_views`, and pitfalls.
+
+For Pattern B specifically: the legacy `df_graphers`/`df_columns` plumbing maps onto either form, but a legacy step that already builds dimensions from a multidim grapher dataset (rather than hand-stitching variable IDs) is usually a clean fit for table-driven. If many of the legacy views are multi-indicator already, you'll either keep them in YAML or rebuild them via `c.group_views(...)` after the auto-expansion.
 
 ### 3. Scaffold the new step
 
@@ -126,6 +127,7 @@ def run() -> None:
 | `df_graphers["<Name> Dropdown"]` unique values | one entry under `dimensions:` (slug = snake-case of `<Name>`, presentation type = dropdown/radio/checkbox) |
 | Each row of `df_graphers` | one entry under `views:` with `dimensions:` map and `indicators.y[].catalogPath` |
 | Per-row `hasMapTab`, `minTime`, `yAxisMin`, `defaultView`, `type`, … | `view.config` (or hoist into a `definitions: &common_view_config` if shared) |
+| Per-row `title`/`subtitle`/`note` for single-indicator views | Prefer `presentation.grapher_config` in the indicator's garden metadata; only put in `view.config` if the view has multiple indicators or the text genuinely differs from the indicator's metadata |
 | `df_columns` rows | `view.indicators.y[].display` (per-view, per-indicator) |
 | Loops setting `display` on every "Production" view, etc. | Either fold into YAML (DRY via anchors) or keep as Python post-processing |
 
