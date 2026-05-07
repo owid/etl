@@ -72,10 +72,17 @@ def run() -> None:
         explorer=True,
     )
 
-    # Default view: per-capita primary-energy consumption, total (matches the
-    # legacy explorer's defaultView=true row).
+    # Universal chart-level config so every view exposes table + map + line + bar
+    # tabs. Plus the default view: per-capita primary-energy consumption, total
+    # (matches the legacy explorer's defaultView=true row).
     c.edit_views(
         [
+            {
+                "config": {
+                    "type": "LineChart DiscreteBar",
+                    "hasMapTab": True,
+                },
+            },
             {
                 "dimensions": {
                     "view": "total",
