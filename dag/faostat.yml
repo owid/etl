@@ -227,3 +227,14 @@ steps:
   #
   data://grapher/faostat/2026-02-25/additional_variables:
     - data://garden/faostat/2026-02-25/additional_variables
+  ######################################################################################################################
+  #
+  # FAOSTAT Detailed Trade Matrix (faostat_tm).
+  #
+  # Standalone trade-flow steps that powers a bespoke food trade visualization.
+  # They are intentionally decoupled from the rest of the FAOSTAT pipeline because the matrix is huge (~8.5 GB uncompressed), and won't go to grapher in the usual way.
+  data://meadow/faostat/2026-05-07/faostat_tm:
+    - snapshot://faostat/2026-05-07/faostat_tm.zip
+  data://garden/faostat/2026-05-07/faostat_tm:
+    - data://meadow/faostat/2026-05-07/faostat_tm
+  ######################################################################################################################
