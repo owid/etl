@@ -26,7 +26,7 @@ definitions:
       - *international_aviation_description_key
     presentation:
       topic_tags:
-      - CO2 & Greenhouse Gas Emissions
+        - CO2 & Greenhouse Gas Emissions
     processing_level: major
 
 dataset:
@@ -44,6 +44,11 @@ tables:
         description_key:
           - *consumption_emissions_description_key
           - *international_aviation_description_key
+        presentation:
+          grapher_config:
+            title: Consumption-based CO₂ emissions
+            subtitle: '[Consumption-based emissions](#dod:consumptionbasedemissions) include those from [fossil fuels and industry](#dod:fossilemissions). [Land-use change emissions](#dod:land-use-change-emissions) are not included.'
+            tab: map
       consumption_emissions_as_share_of_global:
         title: "Share of global annual CO₂ consumption-based emissions"
         unit: "%"
@@ -82,9 +87,7 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             subtitle: >-
-              [Consumption-based emissions](#dod:consumptionbasedemissions) are national
-              emissions that have been adjusted for trade. It's production-based emissions
-              minus emissions embedded in exports, plus emissions embedded in imports.
+              [Consumption-based emissions](#dod:consumptionbasedemissions) are national emissions that have been adjusted for trade. It's production-based emissions minus emissions embedded in exports, plus emissions embedded in imports.
             hideAnnotationFieldsInTitle:
               time: true
               entity: true
@@ -108,8 +111,8 @@ tables:
                   - 20
                   - 50
                 customNumericColors:
-                  - null
-                  - null
+                  - 
+                  - 
             selectedEntityNames:
               - United States
               - United Kingdom
@@ -146,6 +149,8 @@ tables:
         presentation:
           title_public: CO₂ emissions per capita
       ##################################################################################################################
+          grapher_config:
+            title: CO₂ emissions per capita
       consumption_emissions_per_gdp:
         title: "Annual consumption-based CO₂ emissions per GDP (kg per international-$)"
         unit: "kilograms per international-$"
@@ -154,6 +159,11 @@ tables:
         description_key:
           - *consumption_emissions_description_key
           - *international_aviation_description_key
+        presentation:
+          grapher_config:
+            title: Consumption-based carbon intensity
+            subtitle: Carbon intensity measures the kilograms of CO₂ emitted per unit of GDP. [Consumption-based emissions](#dod:consumptionbasedemissions) include those from [fossil fuels and industry](#dod:fossilemissions). [Land-use change emissions](#dod:land-use-change-emissions) are not included.
+            tab: map
       cumulative_consumption_emissions:
         title: "Cumulative CO₂ consumption-based emissions"
         unit: "tonnes"
@@ -175,61 +185,101 @@ tables:
         unit: "tonnes"
         short_unit: "t"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from cement since the first year of available data, measured in tonnes."
+        presentation:
+          grapher_config:
+            tab: map
       cumulative_emissions_from_cement_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from cement"
         unit: "%"
         short_unit: "%"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from cement since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from cement."
+        presentation:
+          grapher_config:
+            tab: map
       cumulative_emissions_from_coal:
         title: "Cumulative CO₂ emissions from coal"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from coal since the first year of available data, measured in tonnes."
+        presentation:
+          grapher_config:
+            tab: map
       cumulative_emissions_from_coal_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from coal"
         unit: "%"
         short_unit: "%"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from coal since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from coal."
+        presentation:
+          grapher_config:
+            tab: map
       cumulative_emissions_from_flaring:
         title: "Cumulative CO₂ emissions from flaring"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from flaring since the first year of available data, measured in tonnes."
+        presentation:
+          grapher_config:
+            tab: map
       cumulative_emissions_from_flaring_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from flaring"
         unit: "%"
         short_unit: "%"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from flaring since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from flaring."
+        presentation:
+          grapher_config:
+            tab: map
       cumulative_emissions_from_gas:
         title: "Cumulative CO₂ emissions from gas"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from gas since the first year of available data, measured in tonnes."
+        presentation:
+          grapher_config:
+            tab: map
       cumulative_emissions_from_gas_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from gas"
         unit: "%"
         short_unit: "%"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from gas since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from gas."
+        presentation:
+          grapher_config:
+            title: Share of global cumulative CO₂ emissions from burning gas
+            tab: map
       cumulative_emissions_from_land_use_change:
         title: "Cumulative CO₂ emissions from land-use change"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from land-use change since the first year of available data, measured in tonnes."
+        presentation:
+          grapher_config:
+            subtitle: Emissions from [land-use change](#dod:land-use-change-emissions) can be positive or negative depending on whether these changes emit (positive) or sequester (negative) carbon.
+            tab: map
       cumulative_emissions_from_land_use_change_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from land-use change"
         unit: "%"
         short_unit: "%"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from land-use change since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from land-use change."
+        presentation:
+          grapher_config:
+            subtitle: Emissions from [land-use change](#dod:land-use-change-emissions) can be positive or negative depending on whether these changes emit (positive) or sequester (negative) carbon. Cumulative emissions are the running sum of emissions since 1850.
+            tab: map
       cumulative_emissions_from_oil:
         title: "Cumulative CO₂ emissions from oil"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from oil since the first year of available data, measured in tonnes."
+        presentation:
+          grapher_config:
+            tab: map
       cumulative_emissions_from_oil_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from oil"
         unit: "%"
         short_unit: "%"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from oil since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from oil."
+        presentation:
+          grapher_config:
+            title: Share of cumulative CO₂ emissions from oil
+            tab: map
       cumulative_emissions_from_other_industry:
         title: "Cumulative CO₂ emissions from other industry"
         unit: "tonnes"
@@ -245,26 +295,45 @@ tables:
         unit: "tonnes"
         short_unit: "t"
         description_short: "Total cumulative emissions of carbon dioxide (CO₂), excluding land-use change, since the first year of available data, measured in tonnes."
+        presentation:
+          grapher_config:
+            subtitle: Running sum of CO₂ emissions produced from [fossil fuels and industry](#dod:fossilemissions) since the first year of recording, measured in tonnes. [Land-use change emissions](#dod:land-use-change-emissions) are not included.
       cumulative_emissions_total_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions"
         unit: "%"
         short_unit: "%"
         description_short: "Total cumulative emissions of carbon dioxide (CO₂), excluding land-use change, since the first year of available data, measured as a percentage of global total cumulative emissions of CO₂."
+        presentation:
+          grapher_config:
+            subtitle: Cumulative emissions are the running sum of annual emissions since 1750. This measures [fossil fuel and industry emissions](#dod:fossilemissions). [Land-use change emissions](#dod:land-use-change-emissions) are not included.
       cumulative_emissions_total_including_land_use_change:
         title: "Cumulative CO₂ emissions including land-use change"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Total cumulative emissions of carbon dioxide (CO₂), including land-use change, since the first year of available data, measured in tonnes."
+        presentation:
+          grapher_config:
+            subtitle: Emissions include those from [fossil fuels and industry](#dod:fossilemissions), and [land-use change](#dod:land-use-change-emissions). They are measured as the cumulative total since 1850, in tonnes.
+            note: Emissions from land-use change can be positive or negative depending on whether carbon is emitted or sequestered.
+            tab: map
       cumulative_emissions_total_including_land_use_change_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions including land-use change"
         unit: "%"
         short_unit: "%"
         description_short: "Total cumulative emissions of carbon dioxide (CO₂), including land-use change, since the first year of available data, measured as a percentage of global total cumulative emissions of CO₂ (including land-use change)."
+        presentation:
+          grapher_config:
+            subtitle: Emissions include those from [fossil fuels and industry](#dod:fossilemissions), and [land-use change](#dod:land-use-change-emissions). This is measured as the cumulative total since 1850.
+            note: Emissions from land-use change can be positive or negative depending on whether carbon is emitted or sequestered.
+            tab: map
       emissions_from_cement:
         title: "Annual CO₂ emissions from cement"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual emissions of carbon dioxide (CO₂) from cement, measured in tonnes."
+        presentation:
+          grapher_config:
+            tab: map
       emissions_from_cement_as_share_of_global:
         title: "Share of global annual CO₂ emissions from cement"
         unit: "%"
@@ -281,11 +350,18 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        presentation:
+          grapher_config:
+            title: Per capita CO₂ emissions from cement
+            tab: map
       emissions_from_coal:
         title: "Annual CO₂ emissions from coal"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual emissions of carbon dioxide (CO₂) from coal, measured in tonnes."
+        presentation:
+          grapher_config:
+            tab: map
       emissions_from_coal_as_share_of_global:
         title: "Share of global annual CO₂ emissions from coal"
         unit: "%"
@@ -302,11 +378,18 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        presentation:
+          grapher_config:
+            title: Per capita CO₂ emissions from coal
+            tab: map
       emissions_from_flaring:
         title: "Annual CO₂ emissions from flaring"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual emissions of carbon dioxide (CO₂) from flaring, measured in tonnes."
+        presentation:
+          grapher_config:
+            tab: map
       emissions_from_flaring_as_share_of_global:
         title: "Share of global annual CO₂ emissions from flaring"
         unit: "%"
@@ -323,11 +406,18 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        presentation:
+          grapher_config:
+            title: Per capita CO₂ emissions from flaring
+            tab: map
       emissions_from_gas:
         title: "Annual CO₂ emissions from gas"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual emissions of carbon dioxide (CO₂) from gas, measured in tonnes."
+        presentation:
+          grapher_config:
+            tab: map
       emissions_from_gas_as_share_of_global:
         title: "Share of global annual CO₂ emissions from gas"
         unit: "%"
@@ -344,16 +434,29 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        presentation:
+          grapher_config:
+            title: Per capita CO₂ emissions from gas
+            tab: map
       emissions_from_land_use_change:
         title: "Annual CO₂ emissions from land-use change"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual emissions of carbon dioxide (CO₂) from land-use change, measured in tonnes."
+        presentation:
+          grapher_config:
+            subtitle: Emissions from [land-use change](#dod:land-use-change-emissions) can be positive or negative depending on whether these changes emit (positive) or sequester (negative) carbon.
+            tab: map
       emissions_from_land_use_change_as_share_of_global:
         title: "Share of global annual CO₂ emissions from land-use change"
         unit: "%"
         short_unit: "%"
         description_short: "Annual emissions of carbon dioxide (CO₂) from land-use change, measured as a percentage of global emissions of CO₂ from land-use change in the same year."
+        presentation:
+          grapher_config:
+            title: Share of global CO₂ emissions from land-use change
+            subtitle: Emissions from [land-use change](#dod:land-use-change-emissions) can be positive or negative depending on whether these changes emit (positive) or sequester (negative) carbon.
+            tab: map
       emissions_from_land_use_change_per_capita:
         title: "Annual CO₂ emissions from land-use change per capita"
         unit: "tonnes per person"
@@ -365,11 +468,18 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        presentation:
+          grapher_config:
+            subtitle: Emissions from [land-use change](#dod:land-use-change-emissions) can be positive or negative depending on whether these changes emit (positive) or sequester (negative) carbon.
+            tab: map
       emissions_from_oil:
         title: "Annual CO₂ emissions from oil"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual emissions of carbon dioxide (CO₂) from oil, measured in tonnes."
+        presentation:
+          grapher_config:
+            tab: map
       emissions_from_oil_as_share_of_global:
         title: "Share of global annual CO₂ emissions from oil"
         unit: "%"
@@ -386,6 +496,10 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        presentation:
+          grapher_config:
+            title: Per capita CO₂ emissions from oil
+            tab: map
       emissions_from_other_industry:
         title: "Annual CO₂ emissions from other industry"
         unit: "tonnes"
@@ -412,21 +526,39 @@ tables:
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in tonnes."
+        presentation:
+          grapher_config:
+            subtitle: Carbon dioxide (CO₂) emissions from [fossil fuels and industry](#dod:fossilemissions). [Land-use change emissions](#dod:land-use-change-emissions) are not included.
       emissions_total_as_share_of_global:
         title: "Share of global annual CO₂ emissions"
         unit: "%"
         short_unit: "%"
         description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured as a percentage of global emissions of CO₂ in the same year."
+        presentation:
+          grapher_config:
+            title: Share of global CO₂ emissions
+            subtitle: Carbon dioxide (CO₂) emissions from [fossil fuels and industry](#dod:fossilemissions). [Land-use change emissions](#dod:land-use-change-emissions) are not included.
       emissions_total_including_land_use_change:
         title: "Annual CO₂ emissions including land-use change"
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes."
+        presentation:
+          grapher_config:
+            subtitle: Emissions include those from [fossil fuels and industry](#dod:fossilemissions), and [land-use change](#dod:land-use-change-emissions). They are measured in tonnes.
+            note: Emissions from land-use change can be positive or negative depending on whether carbon is emitted or sequestered.
+            tab: map
       emissions_total_including_land_use_change_as_share_of_global:
         title: "Share of global annual CO₂ emissions including land-use change"
         unit: "%"
         short_unit: "%"
         description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured as a percentage of global total emissions of CO₂ in the same year."
+        presentation:
+          grapher_config:
+            title: Share of global CO₂ emissions including land-use change
+            subtitle: Emissions include those from [fossil fuels and industry](#dod:fossilemissions), and [land-use change](#dod:land-use-change-emissions).
+            note: Emissions from land-use change can be positive or negative depending on whether carbon is emitted or sequestered.
+            tab: map
       emissions_total_including_land_use_change_per_capita:
         title: "Annual CO₂ emissions including land-use change per capita"
         unit: "tonnes per person"
@@ -438,6 +570,12 @@ tables:
           - *per_capita_description_key
           - *production_emissions_description_key
           - *international_aviation_description_key
+        presentation:
+          grapher_config:
+            title: Per capita CO₂ emissions including land-use change
+            subtitle: Emissions include those from [fossil fuels and industry](#dod:fossilemissions), and [land-use change](#dod:land-use-change-emissions). They are measured in tonnes.
+            note: Emissions from land-use change can be positive or negative depending on whether carbon is emitted or sequestered.
+            tab: map
       emissions_total_including_land_use_change_per_gdp:
         title: "Annual CO₂ emissions including land-use change per GDP"
         unit: "kilograms per international-$"
@@ -453,16 +591,27 @@ tables:
         unit: "kilograms per international-$"
         short_unit: "kg/$"
         description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per dollar of GDP (2011 international-$)."
+        presentation:
+          grapher_config:
+            title: 'Carbon intensity: CO₂ emissions per dollar of GDP'
+            subtitle: Kilograms of CO₂ emitted per dollar of GDP. [Fossil fuel and industry emissions](#dod:fossilemissions) are included. [Land-use change emissions](#dod:land-use-change-emissions) are not included. GDP data is adjusted for inflation and differences in living costs between countries.
+            note: GDP data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices.
+            tab: map
       emissions_total_per_unit_energy:
         title: "Annual CO₂ emissions per unit energy (kg per kilowatt-hour)"
         unit: "kilograms per kilowatt-hour"
         short_unit: "kg/kWh"
         description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per kilowatt-hour of primary energy consumption."
+        presentation:
+          grapher_config:
+            title: Carbon intensity of energy production
+            subtitle: Amount of carbon dioxide emitted per unit of energy production, measured in kilograms of CO₂ per kilowatt-hour.
+            tab: map
       gdp:
         title: "GDP"
         unit: "2011 international-$"
         short_unit: "$"
-        description_short:  >-
+        description_short: >-
           Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation)
           and price differences between countries.
       growth_emissions_total:
@@ -493,6 +642,11 @@ tables:
         description_key:
           - *traded_emissions_description_key
           - *international_aviation_description_key
+        presentation:
+          grapher_config:
+            title: Share of CO₂ emissions embedded in trade
+            subtitle: Exported or imported emissions as a percentage of domestic production emissions. Positive values (red) represent net importers of CO₂. Negative values (blue) represent net exporters of CO₂.
+            tab: map
       population:
         title: "Population"
         unit: "persons"

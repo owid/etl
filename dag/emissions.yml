@@ -68,6 +68,12 @@ steps:
   export://multidim/emissions/latest/air_pollution:
     - data://grapher/emissions/2025-02-12/ceds_air_pollutants
   #
+  # CO₂ and greenhouse gas emissions explorer.
+  #
+  export://explorers/emissions/latest/co2:
+    - data://grapher/gcp/2025-11-13/global_carbon_budget
+    - data://grapher/emissions/2025-12-04/national_contributions
+  #
   # RFF - Emissions-weighted Carbon Price.
   #
   data://meadow/rff/2025-06-02/emissions_weighted_carbon_price:
