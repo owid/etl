@@ -5,7 +5,7 @@ definitions:
         - War & Peace
       grapher_config:
         note: &preliminary_note |-
-          Data for the latest year is based on quarterly reports from the source. These come with a higher level of uncertainty, and in many cases can be underestimates.
+          Data for 2025 and 2026 is based on quarterly reports from the source. These come with a higher level of uncertainty, and in many cases can be underestimates.
     display:
       numDecimalPlaces: 0
 
@@ -84,7 +84,7 @@ definitions:
     key_point_2: |-
       UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
     key_point_pre_1: &key_point_pre_1 |-
-      UCDP's data for 2025 is preliminary. This means the number of deaths may be too low because more information becomes available later, or they may be too high because some events are later found not to be part of an armed conflict. We still show this data to provide more up-to-date information, but figures on this chart may change in the future if UCDP revises its estimates.
+      UCDP's data for 2025 and 2026 is preliminary. This means the number of deaths may be too low because more information becomes available later, or they may be too high because some events are later found not to be part of an armed conflict. In addition, data for 2026 only covers the first quarter of the year. We still show this data to provide more up-to-date information, but figures on this chart may change in the future if UCDP revises its estimates.
     key_point_pre_2: &key_point_pre_2 |-
       We use UCDP's quarterly [Candidate Events Datasets](https://ucdp.uu.se/downloads/) for the preliminary data. We add data for the first quarter of the current year in May, for the second quarter in August, for the third quarter in November, and for the fourth quarter in February.
     description_key: &description_key_deaths
@@ -532,7 +532,7 @@ tables:
 dataset:
   title: UCDP, History of war (preview)
   description: |-
-    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 25.1), the UCDP/PRIO Armed Conflict Dataset (version 25.1), the UCDP Battle-Related Deaths Dataset (version 25.1), and the UCDP Candidate Event Dataset (version 25.0.X).
+    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 25.1), the UCDP/PRIO Armed Conflict Dataset (version 25.1), the UCDP Battle-Related Deaths Dataset (version 25.1), and the UCDP Candidate Event Dataset (versions 25.01.25.12 and 26.01.26.03).
 
     Its difference with the main "UCDP, History of war" dataset is that it includes data up to the latest available, using preliminary data from the UCDP Candidate Event Dataset.
 
