@@ -1,9 +1,8 @@
 meta:
   origin:
     producer: Foldvari
-    title: Clio-Infra
-    title_snapshot: Clio-Infra - Universities founded
-    description_snapshot: |-
+    title: Universities founded
+    description: |-
       Additional information: Author's note: The quantity and quality of available information on universities vary by period and geographical area. Even the definition of university is not universal: in some countries even colleges offering undergradute programmes can be named universities (Latin America, Japan, Near East). Please see source for further information.
     citation_full: Foldvari, P. (2015). Universities founded. Clio-Infra.
     url_main: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/KVRJPW

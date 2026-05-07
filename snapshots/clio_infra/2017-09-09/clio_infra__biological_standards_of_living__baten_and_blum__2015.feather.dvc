@@ -1,12 +1,12 @@
 meta:
   origin:
     producer: Baten and Blum
-    title: Anthropometric within-country inequality and the estimation of skill premia with anthropometric indicators
+    title: Height Gini
     description: |-
-      Additional information: Methodologies used for data collection and processing. Reconstruction of height ginis by birth decade using a variety of different sources. The height gini is a transformation of the coefficient of height inequality, based on Moradi and Baten’s formula: g htgini=-33.5 + 20.5*cv.
+      Additional information: Methodologies used for data collection and processing. Reconstruction of height ginis by birth decade using a variety of different sources. The height gini is a transformation of the coefficient of height inequality, based on Moradi and Baten's formula: g htgini=-33.5 + 20.5*cv.
 
       Data quality: As good as possible, but counter-checking and improvement welcome. Interpretations on individual country level should be done with careful checking.  An important caveat is many individual countries cannot be measured without a substantial amount of measurement error. The tendencies of anthropometric inequality by world region (in which country-specific measurement error tends to average out) is probably informative.
-    citation_full: Jörg Baten and Matthias Blum, “Anthropometric within-country Inequality and the Estimation of Skill Premia with Anthropometric Indicators”, Review of Economics -- Jahrbuch fuer Wirtschaftswissenschaften (2011).
+    citation_full: Jörg Baten and Matthias Blum, "Anthropometric within-country Inequality and the Estimation of Skill Premia with Anthropometric Indicators", Review of Economics -- Jahrbuch fuer Wirtschaftswissenschaften (2011).
     url_main: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/HKZPR9
     date_accessed: '2017-09-09'
     date_published: '2015'
