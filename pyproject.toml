@@ -308,6 +308,7 @@ dependencies = [
 [tool.owl]
 steps-dir = "owl_steps"
 snapshots-dir = "data/snapshots"
+snapshots-r2-remote = "r2:owid-snapshots"
 data-dir = "data"
 default-channel = "garden"
 

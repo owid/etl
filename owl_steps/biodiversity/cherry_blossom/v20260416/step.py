@@ -11,9 +11,11 @@ from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
+from owid.catalog import Table
 from owid.catalog import processing as pr
 from owl.catalog import export, load_snapshot
 from owl.dataset import Action, Dataset
+from owl.grapher import upsert_dataset
 from owl.snapshot import Snapshot
 
 # ── Helpers ─────────────────────────────────────────────────────────
@@ -37,18 +39,16 @@ def _fetch_from_r2(md5: str, suffix: str) -> Path:
 # ── Snapshots ────────────────────────────────────────────────────────
 
 
-@Snapshot(version="2024-01-25")
-def historical_data():
+@Snapshot
+def historical_data() -> Path:
     """Historical cherry blossom data (812–2015) from Aono's XLS."""
-    path = _fetch_from_r2("fc459738bd4a0a73c716755d598c6678", ".xls")
-    return pd.read_excel(path, skiprows=25)
+    return _fetch_from_r2("fc459738bd4a0a73c716755d598c6678", ".xls")
 
 
-@Snapshot(version="2025-04-07")
-def recent_data():
-    """Recent years (2016–2025) from personal communication with Aono."""
-    path = _fetch_from_r2("92a4923dc15e29707f33f8eb589d236d", ".csv")
-    return pd.read_csv(path)
+@Snapshot
+def recent_data() -> Path:
+    """Recent years (2016–2026) from personal communication with Aono."""
+    return _fetch_from_r2("ef18617c3feeb2bb3fa5158f31ac9997", ".csv")
 
 
 # ── Dataset ──────────────────────────────────────────────────────────
@@ -58,8 +58,8 @@ def recent_data():
 def cherry_blossom(historical_data: Snapshot, recent_data: Snapshot):
     """Combine historical + recent data, convert dates, compute rolling average."""
 
-    tb_hist = load_snapshot(historical_data, short_name="cherry_blossom")
-    tb_recent = load_snapshot(recent_data, short_name="cherry_blossom_recent")
+    tb_hist = load_snapshot(historical_data, skiprows=25)
+    tb_recent = load_snapshot(recent_data)
 
     # ── Clean historical data ────────────────────────────────────────
     tb_hist = tb_hist.dropna(subset=["Full-flowering date (DOY)"])
@@ -86,14 +86,16 @@ def cherry_blossom(historical_data: Snapshot, recent_data: Snapshot):
     tb["full_flowering_date"] = date_combine.apply(lambda x: int(datetime.strptime(x, "%Y%m%d").strftime("%j")))
     tb = tb.drop(columns=["Full-flowering date (DOY)", "full_flowering_date_raw"])
 
-    # ── 20-year rolling average ──────────────────────────────────────
-    # Origins propagate automatically through .rolling().mean()
-    tb = tb.sort_values("year")
-    tb["average_20_years"] = tb["full_flowering_date"].rolling(20, min_periods=5).mean()
+    # ── 30-year rolling average ──────────────────────────────────────
+    # Add rows for missing years so the rolling window matches the ETL step.
+    all_years = Table(pd.DataFrame({"year": range(tb["year"].min(), tb["year"].max() + 1), "country": "Japan"}))
+    tb = pr.merge(all_years, tb, on=["year", "country"], how="left").copy_metadata(tb)
+    tb["average_last_30_years"] = tb["full_flowering_date"].rolling(30, min_periods=10).mean()
 
     # ── Final columns ────────────────────────────────────────────────
     tb["year"] = tb["year"].astype(int)
-    tb = tb[["country", "year", "full_flowering_date", "average_20_years"]]
+    tb = tb[["country", "year", "full_flowering_date", "average_last_30_years"]]
+    tb = tb.dropna(subset=["full_flowering_date", "average_last_30_years"], how="all")
 
     return export(tb)
 
@@ -108,3 +110,10 @@ def export_csv(cherry_blossom: Dataset):
     out = "/tmp/cherry_blossom.csv"
     df.to_csv(out, index=False)
     print(f"  wrote {out} ({len(df)} rows)")
+
+
+@Action(kind="grapher")
+def upsert_to_grapher(cherry_blossom: Dataset):
+    """Upsert the cherry blossom dataset to Grapher MySQL."""
+    dataset_id = upsert_dataset(cherry_blossom)
+    print(f"  upserted Grapher dataset {dataset_id}")

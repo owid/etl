@@ -4852,13 +4852,11 @@ requires-dist = [
     { name = "graphviz", specifier = ">=0.21" },
     { name = "owid-catalog" },
     { name = "pandas", specifier = ">=2.2" },
-    { name = "prefect", marker = "extra == 'prefect'", specifier = ">=3.0" },
     { name = "pyarrow", specifier = ">=16.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "tomli", specifier = ">=2.0" },
 ]
-provides-extras = ["prefect"]
 
 [[package]]
 name = "owid-repack"

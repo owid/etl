@@ -13,25 +13,39 @@ from owid.catalog import Origin, Table
 from owl.snapshot import Snapshot
 
 
-def load_snapshot(snapshot: Snapshot, short_name: str | None = None) -> Table:
+def _read_snapshot(snapshot: Snapshot, **kwargs) -> pd.DataFrame:
+    path = snapshot.path()
+    suffix = path.suffix.lower()
+    if suffix == ".csv":
+        return pd.read_csv(path, **kwargs)
+    if suffix in {".xls", ".xlsx"}:
+        return pd.read_excel(path, **kwargs)
+    if suffix == ".parquet":
+        result = snapshot.load()
+        if isinstance(result, tuple):
+            df, _meta = result
+            return df
+        return result
+    raise ValueError(
+        f"Cannot infer snapshot reader from suffix {path.suffix!r}; use snapshot.path() and read it manually."
+    )
+
+
+def load_snapshot(snapshot: Snapshot, short_name: str | None = None, **kwargs) -> Table:
     """Load a Snapshot as an owid-catalog Table with origins attached.
 
-    Wraps snapshot.load() into a Table and, if the snapshot's .meta.yml
-    has an "origin" key, attaches it to every column's VariableMeta.
+    Wraps a raw snapshot file into a Table and, if the snapshot's ``meta.yml``
+    has an ``origin`` key, attaches it to every column's VariableMeta.
 
     Args:
         snapshot: A @Snapshot object to load.
         short_name: Table short_name. Defaults to the snapshot's function name.
+        **kwargs: Passed to the inferred pandas reader.
 
     Returns:
         Table with data and (if available) origins on all columns.
     """
-    result = snapshot.load()
-    if isinstance(result, tuple):
-        df, _meta = result
-    else:
-        df = result
-
+    df = _read_snapshot(snapshot, **kwargs)
     tb = Table(df, short_name=short_name or snapshot.name)
 
     # Attach origin from .meta.yml if present

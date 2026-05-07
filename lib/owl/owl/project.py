@@ -14,6 +14,7 @@ class OwlProject:
     snapshots_dir: str = "data/snapshots"
     data_dir: str = "data"
     default_channel: str = "garden"
+    snapshots_r2_remote: str | None = None
 
     @property
     def steps_root(self) -> pathlib.Path:
@@ -60,6 +61,7 @@ def load_project(start: pathlib.Path | None = None) -> OwlProject:
         snapshots_dir=config.get("snapshots-dir", "data/snapshots"),
         data_dir=config.get("data-dir", "data"),
         default_channel=config.get("default-channel", "garden"),
+        snapshots_r2_remote=config.get("snapshots-r2-remote"),
     )
 
 

@@ -1,0 +1,29 @@
+snapshots:
+  generated_data:
+    origin:
+      producer: Our World in Data
+      title: Generated DataFrame snapshot example
+      description_snapshot: A tiny generated DataFrame used to demonstrate Owl snapshots that are created directly in Python.
+      date_accessed: "2026-05-06"
+      license:
+        name: CC BY 4.0
+        url: https://creativecommons.org/licenses/by/4.0/
+
+datasets:
+  dataframe_snapshot_example:
+    dataset:
+      title: DataFrame snapshot example
+      description: A tiny example dataset loaded from a DataFrame-backed snapshot.
+      source: Our World in Data
+    columns:
+      country:
+        title: Country
+        role: entity
+      year:
+        title: Year
+        unit: year
+        role: time
+      value:
+        title: Value
+        unit: units
+        role: metric

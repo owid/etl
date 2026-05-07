@@ -1,132 +1,107 @@
-"""
-Minimal Grapher DB upsert — bridge between lightweight ETL and MySQL.
+"""Bridge from Owl catalog datasets to Grapher MySQL.
 
-This is a proof-of-concept. The heavyweight ETL does much more (threading,
-S3 uploads, admin API, ghost cleanup, checksums). This just upserts a
-dataset row.
+This intentionally delegates to the existing ETL Grapher upsert machinery, so
+Owl does not grow a parallel implementation of dataset/variable/origin upserts.
 """
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+import warnings
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-import pymysql
+from owid import catalog
+from sqlalchemy.orm import Session
+from tqdm import tqdm
 
-
-def _connect(env_path: str | None = None) -> pymysql.Connection:
-    """Connect to the local Grapher MySQL using .env credentials."""
-    import os
-
-    from dotenv import load_dotenv
-
-    if env_path:
-        load_dotenv(env_path)
-    else:
-        load_dotenv()
-
-    return pymysql.connect(
-        host=os.environ.get("DB_HOST", "127.0.0.1"),
-        port=int(os.environ.get("DB_PORT", "3306")),
-        user=os.environ["DB_USER"],
-        password=os.environ["DB_PASS"],
-        database=os.environ["DB_NAME"],
-        autocommit=False,
-    )
+from apps.chart_sync.admin_api import AdminAPI
+from etl import config
+from etl.config import OWID_ENV
+from etl.db import get_engine
+from etl.grapher import helpers as gh
+from etl.grapher import model as gm
+from etl.grapher import to_db as db
+from owl.dataset import Dataset as OwlDataset
+from owl.project import parse_step_file
 
 
-def upsert_dataset(
-    meta: dict,
-    short_name: str,
-    *,
-    namespace: str = "owid",
-    version: str = "",
-    user_id: int = 1,
-    env_path: str | None = None,
-) -> int:
-    """Upsert a dataset row in the Grapher DB. Returns the dataset id.
+def upsert_dataset(dataset: OwlDataset, *, workers: int | None = None) -> int:
+    """Upsert an Owl dataset to Grapher using ETL's existing Grapher code.
 
     Args:
-        meta: Dataset metadata dict (from .meta.yml "dataset" section).
-              Uses keys: title, description, source, tags.
-        short_name: Dataset short name (e.g. "cherry_blossom").
-        namespace: Grapher namespace. Default "owid".
-        version: Dataset version string.
-        user_id: Grapher user id for createdBy/editedBy.
-        env_path: Path to .env file with DB creds. Default: auto-discover.
+        dataset: Owl ``@Dataset`` object whose catalog output already exists.
+        workers: Optional override for variable upload concurrency.
 
     Returns:
-        The dataset id (existing or newly created).
+        Grapher dataset id.
     """
-    conn = _connect(env_path)
-    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    dataset.run()
 
-    try:
-        cur = conn.cursor()
+    ds = catalog.Dataset(dataset._data_path)
+    ds.metadata = gh._adapt_dataset_metadata_for_grapher(ds.metadata)
 
-        # Ensure namespace exists
-        cur.execute(
-            "INSERT INTO namespaces (name, description) VALUES (%s, %s) ON DUPLICATE KEY UPDATE name=name",
-            (namespace, ""),
-        )
+    engine = get_engine()
+    admin_api = AdminAPI(OWID_ENV)
 
-        # Build catalog path
-        catalog_path = f"grapher/{namespace}/{version}/{short_name}" if version else f"grapher/{namespace}/{short_name}"
+    info = parse_step_file(dataset._source_file)
+    namespace = ds.metadata.namespace or info.namespace
+    grapher_path = f"grapher/{namespace}/{info.version}/{dataset.name}"
 
-        title = meta.get("title", short_name)
-        description = meta.get("description", "")
+    dataset_upsert_result = db.upsert_dataset(engine, ds, namespace, ds.metadata.sources)
+    preloaded_checksums = db.load_dataset_variables(dataset_upsert_result.dataset_id, engine)
 
-        # Check if dataset exists
-        cur.execute(
-            "SELECT id FROM datasets WHERE shortName = %s AND namespace = %s",
-            (short_name, namespace),
-        )
-        row = cur.fetchone()
+    catalog_paths: list[str] = []
+    uploaded_sources = list(dataset_upsert_result.source_ids.values())
+    max_workers = workers or config.GRAPHER_INSERT_WORKERS
 
-        if row:
-            dataset_id = row[0]
-            cur.execute(
-                """UPDATE datasets SET
-                    name = %s,
-                    description = %s,
-                    updatedAt = %s,
-                    metadataEditedAt = %s,
-                    metadataEditedByUserId = %s,
-                    dataEditedAt = %s,
-                    dataEditedByUserId = %s,
-                    version = %s,
-                    catalogPath = %s
-                WHERE id = %s""",
-                (title, description, now, now, user_id, now, user_id, version, catalog_path, dataset_id),
-            )
-        else:
-            cur.execute(
-                """INSERT INTO datasets
-                    (name, description, namespace, shortName, version, catalogPath,
-                     createdAt, updatedAt, createdByUserId,
-                     metadataEditedAt, metadataEditedByUserId,
-                     dataEditedAt, dataEditedByUserId,
-                     isPrivate, nonRedistributable, isArchived)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0, 0, 0)""",
-                (
-                    title,
-                    description,
-                    namespace,
-                    short_name,
-                    version,
-                    catalog_path,
-                    now,
-                    now,
-                    user_id,
-                    now,
-                    user_id,
-                    now,
-                    user_id,
-                ),
-            )
-            dataset_id = cur.lastrowid
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        conn.commit()
-        return dataset_id
+    with ThreadPoolExecutor(max_workers=max_workers) as thread_pool:
+        futures = []
+        verbose = True
+        count = 0
 
-    finally:
-        conn.close()
+        for table in tqdm(ds):
+            assert not table.empty, f"table {table.metadata.short_name} is empty"
+            table = gh._adapt_table_for_grapher(table, engine)
+            db.check_table(table)
+
+            with Session(engine, expire_on_commit=False) as session:
+                db_origins = db.upsert_origins(session, table)
+
+            for one_variable_table in gh._yield_wide_table(table, na_action="drop"):
+                count += 1
+                assert len(one_variable_table.columns) == 1
+                variable_name = one_variable_table.columns[0]
+                catalog_path = f"{grapher_path}/{table.metadata.short_name}#{variable_name}"
+                catalog_paths.append(catalog_path)
+
+                if count > 20 and verbose:
+                    verbose = False
+
+                futures.append(
+                    thread_pool.submit(
+                        db.upsert_table,
+                        engine,
+                        admin_api,
+                        one_variable_table,
+                        dataset_upsert_result,
+                        catalog_path=catalog_path,
+                        dimensions=(one_variable_table.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                        checksums=preloaded_checksums.get(catalog_path, {}),
+                        db_origins=[db_origins[origin] for origin in one_variable_table.iloc[:, 0].origins],
+                        verbose=verbose,
+                    )
+                )
+
+        [future.result() for future in as_completed(futures)]
+
+    with Session(engine) as session:
+        upserted_variable_ids = list(gm.Variable.catalog_paths_to_variable_ids(session, catalog_paths).values())
+
+    cleanup_ok = db.cleanup_ghost_variables(engine, dataset_upsert_result.dataset_id, upserted_variable_ids)
+    db.cleanup_ghost_sources(engine, dataset_upsert_result.dataset_id, uploaded_sources)
+    db.set_dataset_checksum_and_editedAt(
+        dataset_upsert_result.dataset_id, ds.checksum() if cleanup_ok else "to_be_rerun"
+    )
+
+    return dataset_upsert_result.dataset_id

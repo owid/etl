@@ -31,7 +31,7 @@ snapshots:
       producer: Yasuyuki Aono
       title: Cherry Blossom Full Bloom Dates in Kyoto, Japan
       description: |-
-        Recent years (2016-2025) of peak cherry blossom full-flowering dates
+        Recent years (2016-2026) of peak cherry blossom full-flowering dates
         in Kyoto, Japan. Data gathered from personal communication with
         Yasuyuki Aono and social media posts.
       citation_full: |-
@@ -40,8 +40,8 @@ snapshots:
         - Aono (2012) Chikyu Kankyo (Global Environment), 17, 21-29
       attribution_short: Aono
       url_main: https://web.archive.org/web/20250214112552/http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
-      date_accessed: "2025-04-07"
-      date_published: "2025-04-07"
+      date_accessed: "2026-04-16"
+      date_published: "2026-04-16"
       license:
         name: CC BY 4.0
         url: https://creativecommons.org/licenses/by/4.0/
@@ -74,11 +74,11 @@ datasets:
           Prunus jamasakura species of cherry tree in Kyoto, Japan.
         unit: day of the year
         role: metric
-      average_20_years:
-        title: Twenty-year average day of peak cherry blossom
+      average_last_30_years:
+        title: 30-year average day of peak cherry blossom
         description: |-
-          A twenty-year moving average of the day of the year with peak
-          cherry blossom. Only calculated for 20-year periods with at
-          least five years of data.
+          A 30-year moving average of the day of the year with peak cherry
+          blossom. Only calculated for 30-year periods with at least ten
+          years of data.
         unit: day of the year
         role: metric

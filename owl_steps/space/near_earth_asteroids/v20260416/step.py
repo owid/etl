@@ -9,7 +9,6 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-import pandas as pd
 from owl.catalog import export, load_snapshot
 from owl.dataset import Dataset
 from owl.snapshot import Snapshot
@@ -34,11 +33,10 @@ def _fetch_from_r2(md5: str, suffix: str) -> Path:
 # ── Snapshot ─────────────────────────────────────────────────────────
 
 
-@Snapshot(version="2026-01-08")
-def raw_data():
+@Snapshot
+def raw_data() -> Path:
     """NASA CNEOS cumulative totals of near-Earth asteroids."""
-    path = _fetch_from_r2("aae7e75196978dff4eb61598035a5fd3", ".csv")
-    return pd.read_csv(path)
+    return _fetch_from_r2("aae7e75196978dff4eb61598035a5fd3", ".csv")
 
 
 # ── Dataset ──────────────────────────────────────────────────────────
@@ -48,7 +46,7 @@ def raw_data():
 def near_earth_asteroids(raw_data: Snapshot):
     """Clean data and compute size-bucket counts."""
 
-    tb = load_snapshot(raw_data, short_name="near_earth_asteroids")
+    tb = load_snapshot(raw_data)
 
     # Keep only the columns we need
     tb = tb[["Date", "NEA-km", "NEA-140m", "NEA"]]

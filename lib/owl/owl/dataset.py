@@ -301,9 +301,7 @@ class Dataset:
 
         for dep in self._dependencies():
             if isinstance(dep, Snapshot):
-                if not dep._path.exists():
-                    return True
-                if dep._path.stat().st_mtime > my_mtime:
+                if dep.identity_mtime() > my_mtime:
                     return True
             elif isinstance(dep, Dataset):
                 if dep.is_stale():
@@ -373,26 +371,6 @@ class Dataset:
         _log_dataset(f"wrote {out_path} ({len(df)} rows)")
         return pd.DataFrame(df)
 
-    def run_with_prefect(self, force=False):
-        """Run with Prefect tracking — each step becomes a task in a flow."""
-        from importlib import import_module
-
-        prefect = import_module("prefect")
-        flow = prefect.flow
-        task = prefect.task
-
-        dataset_self = self
-
-        @flow(name=dataset_self.name, log_prints=True)
-        def dataset_flow():
-            @task(name=f"run:{dataset_self.name}")
-            def execute():
-                return dataset_self.run(force=force)
-
-            return execute()
-
-        return dataset_flow()
-
     def __repr__(self):
         return f"Dataset({self.path}/{self.name})"
 
@@ -402,9 +380,11 @@ class Action:
 
     is_action = True
 
-    def __init__(self, fn=None, *, deps=None):
+    def __init__(self, fn=None, *, deps=None, kind: str = "default", default: bool | None = None):
         self._fn = None
         self._explicit_deps = deps
+        self.kind = kind
+        self.default = (kind == "default") if default is None else default
         self.name = None
         self._source_file = None
         self.path = None
@@ -491,9 +471,7 @@ class Action:
 
         for dep in self._dependencies():
             if isinstance(dep, Snapshot):
-                if not dep._path.exists():
-                    return True
-                if dep._path.stat().st_mtime > my_mtime:
+                if dep.identity_mtime() > my_mtime:
                     return True
             elif isinstance(dep, Dataset):
                 if dep.is_stale():

@@ -15,9 +15,6 @@ dependencies = [
     "tomli>=2.0",
 ]
 
-[project.optional-dependencies]
-prefect = ["prefect>=3.0"]
-
 [project.scripts]
 owl = "owl.cli:cli"
 
