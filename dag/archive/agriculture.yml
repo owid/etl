@@ -273,3 +273,15 @@ steps:
   #
   data://grapher/agriculture/2025-10-16/corn_yields:
     - data://garden/agriculture/2025-10-16/corn_yields
+  #
+  # Decoupling of agricultural production and land use (with feed correction)
+  #
+  data://garden/agriculture/2026-02-23/decoupling_food_production_and_land_use:
+    - data://garden/faostat/2025-03-17/faostat_rl
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2025-03-17/faostat_fbsc
+  #
+  # Decoupling of agricultural production and land use (with feed correction)
+  #
+  data://grapher/agriculture/2026-02-23/decoupling_food_production_and_land_use:
+    - data://garden/agriculture/2026-02-23/decoupling_food_production_and_land_use
