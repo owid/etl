@@ -114,6 +114,11 @@ def create_collection(
             # Single dict (or None): don't pass to sub-collections.
             choice_renames_ = [None] * num_tables
 
+        # Hand-listed YAML views belong to the combined collection, not to each sub-collection
+        # — applying them per-table would duplicate them and `combine_collections` would
+        # reject the duplicate. Strip them here and re-attach during combine via `config_yaml`.
+        sub_config = {**config_yaml, "views": []}
+
         # Create collections for each table.
         collections = []
         indicator_as_dimension_ = False
@@ -122,7 +127,7 @@ def create_collection(
                 indicator_as_dimension_ = True
 
             c = create_collection_single_table(
-                config_yaml=config_yaml,
+                config_yaml=sub_config,
                 dependencies=dependencies,
                 catalog_path=catalog_path,
                 tb=tb[i],
@@ -144,11 +149,16 @@ def create_collection(
             return collections[0]
 
         # Combine all collections, capturing slug changes for remapping.
+        # Forward `dependencies` so that `process_views` (called from inside
+        # combine_collections via create_collection_from_config) can expand short-form
+        # `<table>#<indicator>` catalog paths in YAML hand-listed views against the
+        # dependency tables.
         slug_changes: dict = {}
         c = combine_collections(
             collections=collections,
             catalog_path=catalog_path,
             config=config_yaml,
+            dependencies=dependencies,
             is_explorer=explorer,
             _slug_changes_out=slug_changes,
         )
