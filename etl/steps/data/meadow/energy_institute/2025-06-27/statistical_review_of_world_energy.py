@@ -536,7 +536,7 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin, lice
         title="Thermal equivalent efficiency factors",
         description="Thermal equivalent efficiency factors used to convert non-fossil electricity to primary energy.",
         origins=[origin],
-        licenses=[license],
+        licenses=[license] if license else [],
     )
 
     return efficiency

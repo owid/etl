@@ -155,6 +155,10 @@ tables:
           name: Coal
         presentation:
           title_public: 'Coal consumption'
+          grapher_config:
+            title: Coal consumption
+            subtitle: Coal consumption by country or region, measured in terawatt-hours (TWh).
+            tab: map
       coal_production_ej:
         title: 'Coal production - EJ'
         unit: 'exajoules'
@@ -253,6 +257,10 @@ tables:
           name: Gas
         presentation:
           title_public: 'Gas consumption'
+          grapher_config:
+            title: Gas consumption
+            subtitle: Natural gas consumption, measured in [terawatt-hours](#dod:watt-hours).
+            tab: map
       gas_production_bcfd:
         title: 'Gas production - BCFD'
         unit: 'billion cubic feet per day'
@@ -273,8 +281,7 @@ tables:
         title: 'Gas production - EJ'
         unit: 'exajoules'
         short_unit: 'EJ'
-        description_short:
-          Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        description_short: Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
         presentation:
           title_public: 'Gas production'
       gas_production_twh:  # Added by OWID.
@@ -403,6 +410,10 @@ tables:
           name: Oil
         presentation:
           title_public: 'Oil consumption'
+          grapher_config:
+            title: Oil consumption
+            subtitle: Measured in [terawatt-hours](#dod:watt-hours).
+            tab: map
       oil_consumption_kbd:
         title: 'Oil consumption - kBD'
         unit: 'thousand barrels per day'
