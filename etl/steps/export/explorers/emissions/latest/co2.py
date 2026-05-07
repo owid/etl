@@ -41,7 +41,7 @@ def _tag(tb):
         if col not in COLUMN_DIMENSIONS:
             continue
         tb[col].metadata.dimensions = COLUMN_DIMENSIONS[col]
-        tb[col].metadata.original_short_name = "value"
+        tb[col].metadata.original_short_name = "emissions"
     return tb
 
 
@@ -59,18 +59,34 @@ def run() -> None:
     c = paths.create_collection(
         config=config,
         tb=[tb_gcb, tb_nc],
-        indicator_names="value",
+        indicator_names="emissions",
         short_name="co2",
         explorer=True,
     )
 
-    # Universal chart-level config; per-view title/subtitle/tab inherit from
-    # each indicator's upstream `presentation.grapher_config`.
-    c.set_global_config(
-        {
-            "type": "LineChart",
-            "hasMapTab": True,
-        }
+    # Universal chart-level config + a dimension-scoped override for the flagship
+    # per-capita CO₂ territorial view (also exposes a Slope tab). Per-view
+    # title/subtitle/tab inherit from each indicator's upstream `presentation.grapher_config`.
+    c.edit_views(
+        [
+            {
+                "config": {
+                    "type": "LineChart DiscreteBar",
+                    "hasMapTab": True,
+                },
+            },
+            {
+                "dimensions": {
+                    "gas": "co2",
+                    "accounting": "territorial",
+                    "fuel": "all_fossil",
+                    "count": "per_capita",
+                },
+                "config": {
+                    "type": "LineChart SlopeChart DiscreteBar",
+                },
+            },
+        ]
     )
 
     c.save(tolerate_extra_indicators=True)

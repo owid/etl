@@ -14,6 +14,8 @@ config:
   wpBlockId: "36228"
   thumbnail: https://assets.ourworldindata.org/uploads/2022/12/CO2-data-explorer-Thumbnail.png
   tab: chart
+  hideAnnotationFieldsInTitle: true
+  originUrl: /co2-and-greenhouse-gas-emissions
 dimensions:
   - slug: gas
     name: Gas or warming impact
