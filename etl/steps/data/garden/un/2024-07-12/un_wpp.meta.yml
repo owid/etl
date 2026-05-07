@@ -539,7 +539,7 @@ tables:
         description_key:
           - |-
             <% if age == '0' -%>
-            The biological norm typically falls in the range 103-107, with small variations across populations.
+            On average, about 105 boys are born for every 100 girls.
             <%- endif -%>
           - |-
             <% if age == '0' -%>
