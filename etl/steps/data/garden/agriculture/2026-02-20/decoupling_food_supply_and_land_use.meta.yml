@@ -9,14 +9,14 @@ definitions:
 
 dataset:
   update_period_days: 365
-  title: "Decoupling of agricultural production and land use (alternative method)"
+  title: "Decoupling of food supply and land use"
 
 tables:
-  decoupling_food_production_and_land_use_alternative:
-    title: "Decoupling of agricultural production and land use (alternative method)"
+  decoupling_food_supply_and_land_use:
+    title: "Decoupling of food supply and land use"
     variables:
       food_energy:
-        title: "Food production in terms of energy content"
+        title: "Food supply in terms of energy content"
         unit: kilocalories
         short_unit: kcal
       agricultural_land:

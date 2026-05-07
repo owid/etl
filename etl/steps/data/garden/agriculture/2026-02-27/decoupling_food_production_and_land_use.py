@@ -1207,7 +1207,7 @@ def run() -> None:
 
     # Select countries that achieved decoupling: production increased and land use decreased over the full time window.
     # Set plot=True to generate individual country charts and a slope chart grid.
-    countries_decoupled = detect_decoupled_countries(tb_grouped, plot=True)
+    countries_decoupled = detect_decoupled_countries(tb_grouped, plot=False)
 
     # Filter to decoupled countries.
     tb_grouped = tb_grouped[tb_grouped["country"].isin(countries_decoupled)].reset_index(drop=True)
