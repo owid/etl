@@ -167,16 +167,6 @@ steps:
   # TODO: The following steps are experiments; clean up once we make a decision on this. For more details:
   # https://github.com/owid/owid-issues/issues/2057
   #
-  # Decoupling of agricultural production and land use
-  #
-  data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use:
-    - data://garden/faostat/2025-03-17/faostat_fbsc
-    - data://garden/faostat/2025-03-17/faostat_rl
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/agriculture/2025-08-06/decoupling_food_production_and_land_use:
-    - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use
-  #
   # Decoupling of agricultural production and land use (alternative method)
   #
   data://garden/agriculture/2026-02-20/decoupling_food_production_and_land_use_alternative:
@@ -202,7 +192,7 @@ steps:
   data://grapher/agriculture/2026-02-25/decoupling_food_production_and_land_use:
     - data://garden/agriculture/2026-02-25/decoupling_food_production_and_land_use
   #
-  # Decoupling of agricultural production and land use (with feed correction)
+  # Decoupling of agricultural production and land use (with feed correction). New attempt using SCL data.
   #
   data://garden/agriculture/2026-02-27/decoupling_food_production_and_land_use:
     - data://garden/faostat/2026-02-25/faostat_fbsc
@@ -212,7 +202,7 @@ steps:
     # TODO: Add faostat_scl as a proper dependency once a new version is imported.
     # For now, the step reads the SCL feather file directly from data/garden/faostat/2025-03-10/faostat_scl/.
   #
-  # Decoupling of agricultural production and land use (with feed correction)
+  # Decoupling of agricultural production and land use (with feed correction). New attempt using SCL data.
   #
   data://grapher/agriculture/2026-02-27/decoupling_food_production_and_land_use:
     - data://garden/agriculture/2026-02-27/decoupling_food_production_and_land_use
