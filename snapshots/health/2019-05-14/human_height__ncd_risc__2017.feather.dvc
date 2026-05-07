@@ -1,11 +1,11 @@
 meta:
   origin:
-    producer: NCD Risk Factor Collaboration (NCD-RisC)
-    title: Human Height
-    description: Mean heights of men and women aged 18 or older by birth year, extending from 1896 to 1996.
-    citation_full: NCD Risk Factor Collaboration (NCD-RisC). Human Height (2017). Available at http://www.ncdrisc.org/data-downloads-height.html.
+    producer: NCD Risk Factor Collaboration
+    title: Human height
+    description: |-
+      Mean heights of men and women aged 18 or older by birth year, extending from 1896 to 1996.
+    citation_full: NCD Risk Factor Collaboration (NCD-RisC) (2017). Human height data.
     attribution_short: NCD-RisC
-    version_producer: '2017'
     url_main: http://www.ncdrisc.org/data-downloads-height.html
     date_accessed: '2019-05-14'
     date_published: '2017'

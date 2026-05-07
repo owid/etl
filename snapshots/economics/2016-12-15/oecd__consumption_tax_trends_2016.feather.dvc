@@ -1,9 +1,8 @@
 meta:
   origin:
     producer: OECD
-    title: Consumption Tax Trends
-    citation_full: OECD (2016), Consumption Tax Trends, OECD Publishing, Paris.
-    version_producer: '2016'
+    title: Consumption Tax Trends 2016
+    citation_full: OECD (2016), Consumption Tax Trends 2016, OECD Publishing, Paris.
     url_main: http://www.oecd-ilibrary.org/taxation/consumption-tax-trends-2016_ctt-2016-en
     date_accessed: '2016-12-15'
     date_published: '2016'

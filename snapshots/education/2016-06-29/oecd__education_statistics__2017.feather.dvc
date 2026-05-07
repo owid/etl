@@ -2,8 +2,7 @@ meta:
   origin:
     producer: OECD
     title: Education Statistics
-    citation_full: 'OECD: Education Statistics (2017).'
-    version_producer: '2017'
+    citation_full: OECD (2017). Education Statistics.
     url_main: http://www.oecd-ilibrary.org/education/data/education-at-a-glance_eag-data-en
     date_accessed: '2016-06-29'
     date_published: '2017'

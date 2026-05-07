@@ -1,12 +1,11 @@
 meta:
   origin:
-    producer: United Nations World Tourism Organization
+    producer: UNWTO
     title: World Tourism Barometer
-    description: The UNWTO World Tourism Barometer monitors short-term tourism trends on a regular basis to provide global tourism stakeholders with up-to-date analysis on international tourism.
-    title_snapshot: World Tourism Barometer - Tourism data by world region
-    citation_full: United Nations World Tourism Organization - World Tourism Barometer (2019).
+    description: |-
+      The UNWTO World Tourism Barometer monitors short-term tourism trends on a regular basis to provide global tourism stakeholders with up-to-date analysis on international tourism.
+    citation_full: United Nations World Tourism Organization (2019). World Tourism Barometer. Merged data presented by the United Nations World Tourism Organization (UNWTO) in the Tourism Barometer.
     attribution_short: UNWTO
-    version_producer: '2019'
     url_main: http://mkt.unwto.org/barometer
     date_accessed: '2019-05-10'
     date_published: '2019'
