@@ -89,4 +89,25 @@ def run() -> None:
         ]
     )
 
+    _apply_decimal_overrides(c)
+
     c.save(tolerate_extra_indicators=True)
+
+
+def _apply_decimal_overrides(c) -> None:
+    """Override the default 2-decimal rendering for views where it isn't right.
+
+    `numDecimalPlaces` lives on the indicator's `display` block, not on view-level
+    config — so `edit_views` doesn't reach it and we set it via a per-view loop.
+    """
+    for view in c.views:
+        if view.matches(gas=["methane", "all_ghg"], count="per_capita"):
+            decimals = 1
+        elif view.matches(gas="warming_impact", fuel=["all_fossil", "land_use"]):
+            decimals = 3
+        else:
+            continue
+        if not view.indicators.y:
+            continue
+        for indicator in view.indicators.y:
+            indicator.display = {**(indicator.display or {}), "numDecimalPlaces": decimals}
