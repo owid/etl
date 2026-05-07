@@ -352,9 +352,47 @@ After `paths.create_collection()` returns the collection `c`, you can mutate it 
   - `overwrite_dimension_choice=True` if `choice_new_slug` collides with an existing choice and you want grouped views to win.
   - **Use cases**: an explorer with `sex={female, male}` views — `group_views` adds `sex=combined` showing both timeseries on one chart. Same pattern works for age brackets, region groups, conflict types, or any dimension where users may want a single multi-line chart.
 
-- **Manual loop over `c.views`** — set per-view `display` settings when those can't live in indicator metadata (e.g. when the same indicator is shown with different color scales in different views). Pattern: `migration_flows.py`'s `add_display_settings(c)`. Avoid this if the same settings can flow from indicator metadata instead.
+- **`c.edit_views([...])`** — apply chart-level config to many views at once, optionally scoped by dimension. Each entry is `{"dimensions": <filter>, "config": {...}, "metadata": {...}}`; the framework merges entries by *specificity* (more dimensions in the filter = wins on conflicts). Use this in preference to `set_global_config` whenever you have per-slice overrides:
+
+    ```python
+    c.edit_views([
+        # No filter → applies to every view (defaults).
+        {"config": {"type": "LineChart DiscreteBar", "hasMapTab": True}},
+        # Scoped override — only this exact (gas, accounting, fuel, count) cell gets a Slope tab.
+        {
+            "dimensions": {"gas": "co2", "accounting": "territorial", "fuel": "all_fossil", "count": "per_capita"},
+            "config": {"type": "LineChart SlopeChart DiscreteBar"},
+        },
+    ])
+    ```
+
+    Callable values inside `config` (e.g. `"title": lambda v: ...`) are evaluated against each matching view, so dimension-aware text templates still work. `set_global_config` is just a one-entry shortcut for `edit_views`; reach for `edit_views` once you have more than one slice to address.
+
+- **Manual loop over `c.views`** — for things `edit_views` can't reach: per-indicator `display` blocks (`numDecimalPlaces`, `colorScaleScheme`, `colorScaleNumericBins`, `display.color`, …). These live on `view.indicators.y[i].display`, not on `view.config`. Match views via the `view.matches(**kwargs)` helper, which accepts a single value or a list (list = OR semantics):
+
+    ```python
+    for view in c.views:
+        if view.matches(gas=["methane", "all_ghg"], count="per_capita"):
+            decimals = 1
+        elif view.matches(gas="warming_impact", fuel=["land_use", "fossil_plus_land_use"]):
+            decimals = 3
+        else:
+            continue
+        for indicator in view.indicators.y or []:
+            indicator.display = {**(indicator.display or {}), "numDecimalPlaces": decimals}
+    ```
+
+    Pattern: `migration_flows.py`'s `add_display_settings(c)`. Avoid this loop when the setting can live on the indicator's garden metadata instead.
 
 - **`choice_renames={dim: {slug: display_name, ...}}`** (passed directly to `create_collection`) — map slug → display name when you need to derive the display label programmatically. Model: `multidim/minerals/latest/minerals.py`.
+
+- **Sidecar `<short>.dims.yaml`** — when the column → dimensions map exceeds ~50 entries, lift it out of the Python step into a sidecar YAML loaded at module-import time. Keeps `<short>.py` focused on logic and turns dim-tagging changes into a 1-line YAML edit. Model: `etl/steps/export/explorers/emissions/latest/co2.{py,dims.yaml}`:
+
+    ```python
+    from pathlib import Path
+    import yaml
+    COLUMN_DIMENSIONS = yaml.safe_load((Path(__file__).parent / "co2.dims.yaml").read_text())
+    ```
 
 ## Step 7 — DAG entry
 
@@ -395,6 +433,9 @@ Hand the user the exact `etlr` command — don't run it yourself.
 - **YAML anchors / merge keys** (`&common_view`, `<<: *common_view`) — don't use them. They can't filter by dimension and add per-view noise. Use `definitions.common_views` instead.
 - **Hyphens in `short_name`** — file is `food_footprints.py` but `short_name="food-footprints"`. Mismatch produces a published explorer whose URL doesn't match the legacy slug.
 - **`tolerate_extra_indicators`** — usually want `True` for explorers since you're cherry-picking indicators from larger upstream datasets.
+- **Checkbox dimensions must have exactly 2 choices.** The `na` pattern (3 choices: `na`, `off`, `on`) works for `radio` and `dropdown` but not `checkbox` — the framework rejects it with `Dimension choices for 'checkbox' must have exactly two choices`. If you genuinely need a third "doesn't apply" state, either use a radio with three choices, or drop the `na` slot and let the framework hide/disable the toggle when the current dimension state has no matching `<true>` view.
+- **YAML 1.1 booleanizes unquoted `no`/`yes`/`on`/`off`/`true`/`false` slugs.** A `view.dimensions: { relative_to_world: no }` reads back as `{"relative_to_world": False}`, which won't match the string slug `"no"` declared in `dimensions[*].choices`. Use semantic slugs (`total`/`relative`, `absolute`/`share`) or quote the strings — but choosing different slug names is the more durable fix.
+- **`edit_views` doesn't reach indicator-level `display`.** Fields like `numDecimalPlaces`, `colorScaleScheme`, `colorScaleNumericBins`, and per-indicator `color` live on `view.indicators.y[i].display`, not on `view.config`. `edit_views` only writes view-level `config`/`metadata`. For these, fall back to a `c.views` loop (see Step 6) or push them into the indicator's garden `presentation.grapher_config` so they apply at chart render time.
 
 ## Reference examples
 
@@ -410,6 +451,8 @@ Full-YAML (each view hand-listed):
 Table-driven (views auto-expanded from a dimensional table):
 
 - `etl/steps/export/explorers/migration/latest/migration_flows.{py,config.yml}` — passes `tb=tb, indicator_names=[...], dimensions=[...]` to `create_collection`; YAML carries only the static config and dimension presentation. Includes `add_display_settings(c)` post-processing.
+- `etl/steps/export/explorers/emissions/latest/co2.{py,dims.yaml,config.yml}` — sidecar `.dims.yaml` for the 54-entry column→dimensions map; uses `c.edit_views([...])` with both an unscoped default and a 4-dim-filtered override; uses a `c.views` loop with `view.matches(...)` for per-indicator `numDecimalPlaces` overrides.
+- `etl/steps/export/explorers/emissions/latest/air_pollution.{py,config.yml}` — table-driven with `c.group_views(...)` to add facet views, `c.drop_views(...)` to prune cross-products.
 - `etl/steps/export/multidim/minerals/latest/minerals.py` — same APIs in the multidim channel; useful read for `choice_renames`.
 
 ## Follow-up
