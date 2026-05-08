@@ -56,89 +56,68 @@ views:
       sub_metric: main_index
     indicators:
       y:
-        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#democracy_eiu
-          display:
-            name: "Democracy Index"
-            includeInTable: true
+        - catalogPath: eiu#democracy_eiu
   - dimensions:
       dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: political_regime
     indicators:
       y:
-        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#regime_eiu
+        - catalogPath: eiu#regime_eiu
   - dimensions:
       dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: electoral_pluralism_index
     indicators:
       y:
-        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#elect_freefair_eiu
-          display:
-            name: "Electoral Pluralism Index"
-            includeInTable: true
+        - catalogPath: eiu#elect_freefair_eiu
   - dimensions:
       dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: functioning_government_index
     indicators:
       y:
-        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#funct_gov_eiu
-          display:
-            name: "Functioning Government Index"
-            shortUnit: ""
-            includeInTable: true
-            numDecimalPlaces: 1
+        - catalogPath: eiu#funct_gov_eiu
   - dimensions:
       dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: political_participation_index
     indicators:
       y:
-        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#pol_part_eiu
-          display:
-            name: "Political Participation Index"
-            includeInTable: true
+        - catalogPath: eiu#pol_part_eiu
   - dimensions:
       dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: democratic_culture_index
     indicators:
       y:
-        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#dem_culture_eiu
-          display:
-            name: "Democratic Culture Index"
-            includeInTable: true
+        - catalogPath: eiu#dem_culture_eiu
   - dimensions:
       dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: civil_liberties_index
     indicators:
       y:
-        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#civlib_eiu
-          display:
-            name: "Civil Liberties Index"
-            includeInTable: true
-            numDecimalPlaces: 1
+        - catalogPath: eiu#civlib_eiu
   - dimensions:
       dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: number_and_share_of_democracies
     indicators:
       y:
-        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_authoritarian_regime
+        - catalogPath: eiu/num_countries#num_regime_eiu__category_authoritarian_regime
           display:
             name: "Authoritarian regimes"
             color: "#f88a50"
-        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_hybrid_regime
+        - catalogPath: eiu/num_countries#num_regime_eiu__category_hybrid_regime
           display:
             name: "Hybrid regimes"
             color: "#feeea5"
-        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_flawed_democracy
+        - catalogPath: eiu/num_countries#num_regime_eiu__category_flawed_democracy
           display:
             name: "Flawed democracies"
             color: "#c7e7f1"
-        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_full_democracy
+        - catalogPath: eiu/num_countries#num_regime_eiu__category_full_democracy
           display:
             name: "Full democracies"
             color: "#5e94c4"
@@ -155,23 +134,23 @@ views:
       sub_metric: people_living_in_democracies
     indicators:
       y:
-        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category__1
+        - catalogPath: eiu/num_people#pop_regime_eiu__category__1
           display:
             name: "No regime data"
             color: "#555555"
-        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_authoritarian_regime
+        - catalogPath: eiu/num_people#pop_regime_eiu__category_authoritarian_regime
           display:
             name: "People living in authoritarian regimes"
             color: "#f88a50"
-        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_hybrid_regime
+        - catalogPath: eiu/num_people#pop_regime_eiu__category_hybrid_regime
           display:
             name: "People living in hybrid regimes"
             color: "#feeea5"
-        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_flawed_democracy
+        - catalogPath: eiu/num_people#pop_regime_eiu__category_flawed_democracy
           display:
             name: "People living in flawed democracies"
             color: "#c7e7f1"
-        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_full_democracy
+        - catalogPath: eiu/num_people#pop_regime_eiu__category_full_democracy
           display:
             name: "People living in full democracies"
             color: "#5e94c4"

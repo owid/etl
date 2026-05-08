@@ -64,87 +64,71 @@ views:
       sub_metric: main_index
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/polity#democracy_polity
+        - catalogPath: polity#democracy_polity
   - dimensions:
       dataset: polity
       metric: democracy
       sub_metric: competitiveness_of_executive_recruitment_score
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/polity#exec_reccomp_polity
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: polity#exec_reccomp_polity
   - dimensions:
       dataset: polity
       metric: democracy
       sub_metric: openness_of_executive_recruitment_score
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/polity#exec_recopen_polity
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: polity#exec_recopen_polity
   - dimensions:
       dataset: polity
       metric: democracy
       sub_metric: constraints_on_the_executive_score
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/polity#exec_constr_polity
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: polity#exec_constr_polity
   - dimensions:
       dataset: polity
       metric: democracy
       sub_metric: regulation_of_political_participation_score
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/polity#polpart_reg_polity
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: polity#polpart_reg_polity
   - dimensions:
       dataset: polity
       metric: democracy
       sub_metric: competitiveness_of_political_participation_score
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/polity#polpart_comp_polity
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: polity#polpart_comp_polity
   - dimensions:
       dataset: polity
       metric: democracy
       sub_metric: main_index_distribution
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/polity#democracy_recod_polity
-          display:
-            name: "Democracy Index"
-            includeInTable: true
+        - catalogPath: polity#democracy_recod_polity
   - dimensions:
       dataset: polity
       metric: political_regime
       sub_metric: main_classification
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/polity#regime_polity
-          display:
-            includeInTable: true
-            numDecimalPlaces: 0
+        - catalogPath: polity#regime_polity
   - dimensions:
       dataset: polity
       metric: political_regime
       sub_metric: number_and_share_of_democracies
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_autocracy
+        - catalogPath: polity/num_countries#num_regime_polity__category_autocracy
           display:
             name: "Autocracies"
             color: "#e74731"
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_anocracy
+        - catalogPath: polity/num_countries#num_regime_polity__category_anocracy
           display:
             name: "Anocracies"
             color: "#967282"
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_democracy
+        - catalogPath: polity/num_countries#num_regime_polity__category_democracy
           display:
             name: "Democracies"
             color: "#5496c5"
@@ -161,19 +145,19 @@ views:
       sub_metric: people_living_in_democracies
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_regime_polity__category__1
+        - catalogPath: polity/num_people#pop_regime_polity__category__1
           display:
             name: "No regime data"
             color: "#555555"
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_group_age_dem_polity__category_autocracy
+        - catalogPath: polity/num_people#pop_group_age_dem_polity__category_autocracy
           display:
             name: "People living in autocracies"
             color: "#e74731"
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_regime_polity__category_anocracy
+        - catalogPath: polity/num_people#pop_regime_polity__category_anocracy
           display:
             name: "People living in anocracies"
             color: "#967282"
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_regime_polity__category_democracy
+        - catalogPath: polity/num_people#pop_regime_polity__category_democracy
           display:
             name: "People living in democracies"
             color: "#5496c5"
@@ -186,43 +170,38 @@ views:
       sub_metric: age_of_democracy
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/polity#age_dem_polity
-          display:
-            unit: "years"
-            shortUnit: "years"
-            includeInTable: true
-            numDecimalPlaces: 0
+        - catalogPath: polity#age_dem_polity
   - dimensions:
       dataset: polity
       metric: political_regime
       sub_metric: number_and_share_of_long_standing_democracies
     indicators:
       y:
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_autocracy
+        - catalogPath: polity/num_countries#num_regime_polity__category_autocracy
           display:
             name: "Autocracies"
             color: "#8d6e71"
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_anocracy
+        - catalogPath: polity/num_countries#num_regime_polity__category_anocracy
           display:
             name: "Anocracies"
             color: "#c6a1a5"
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_1_18_years
+        - catalogPath: polity/num_countries#num_group_age_dem_polity__category_1_18_years
           display:
             name: "Democracies aged 1-18"
             color: "#edf8b1"
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_19_30_years
+        - catalogPath: polity/num_countries#num_group_age_dem_polity__category_19_30_years
           display:
             name: "aged 19-30"
             color: "#c7e9b4"
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_31_60_years
+        - catalogPath: polity/num_countries#num_group_age_dem_polity__category_31_60_years
           display:
             name: "aged 31-60"
             color: "#41b6c4"
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_61_90_years
+        - catalogPath: polity/num_countries#num_group_age_dem_polity__category_61_90_years
           display:
             name: "aged 61-90"
             color: "#225ea8"
-        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_91plus_years
+        - catalogPath: polity/num_countries#num_group_age_dem_polity__category_91plus_years
           display:
             name: "aged 91 +"
             color: "#172976"

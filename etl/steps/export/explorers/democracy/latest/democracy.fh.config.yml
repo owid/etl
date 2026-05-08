@@ -60,62 +60,50 @@ views:
       sub_metric: main_classification
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh#regime
-          display:
-            shortUnit: ""
-            numDecimalPlaces: 0
+        - catalogPath: fh#regime
   - dimensions:
       dataset: freedom_house
       metric: freedom
       sub_metric: political_rights_score
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh#polrights_score
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: fh#polrights_score
   - dimensions:
       dataset: freedom_house
       metric: freedom
       sub_metric: political_rights_rating
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh#polrights
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: fh#polrights
   - dimensions:
       dataset: freedom_house
       metric: freedom
       sub_metric: civil_liberties_score
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh#civlibs_score
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: fh#civlibs_score
   - dimensions:
       dataset: freedom_house
       metric: freedom
       sub_metric: civil_liberties_rating
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh#civlibs
-          display:
-            shortUnit: ""
-            numDecimalPlaces: 0
+        - catalogPath: fh#civlibs
   - dimensions:
       dataset: freedom_house
       metric: freedom
       sub_metric: number_and_share_of_free_countries_and_territories
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#num_regime__category_not_free
+        - catalogPath: fh_regions#num_regime__category_not_free
           display:
             name: "Not free countries"
             color: "#a588c3"
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#num_regime__category_partly_free
+        - catalogPath: fh_regions#num_regime__category_partly_free
           display:
             name: "Partly free countries"
             color: "#e8b864"
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#num_regime__category_free
+        - catalogPath: fh_regions#num_regime__category_free
           display:
             name: "Free countries"
             color: "#58ac8c"
@@ -132,19 +120,19 @@ views:
       sub_metric: people_living_in_free_countries_and_territories
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_regime__category__1
+        - catalogPath: fh_regions#pop_regime__category__1
           display:
             name: "No regime data"
             color: "#555555"
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_regime__category_not_free
+        - catalogPath: fh_regions#pop_regime__category_not_free
           display:
             name: "People living in not free countries"
             color: "#a588c3"
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_regime__category_partly_free
+        - catalogPath: fh_regions#pop_regime__category_partly_free
           display:
             name: "People living in partly free countries"
             color: "#e8b864"
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_regime__category_free
+        - catalogPath: fh_regions#pop_regime__category_free
           display:
             name: "People living in free countries"
             color: "#58ac8c"
@@ -157,64 +145,53 @@ views:
       sub_metric: main_classification
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh#electdem
+        - catalogPath: fh#electdem
   - dimensions:
       dataset: freedom_house
       metric: electoral_democracy
       sub_metric: democratic_electoral_institutions
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh#electprocess
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: fh#electprocess
   - dimensions:
       dataset: freedom_house
       metric: electoral_democracy
       sub_metric: political_rights_score
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh#polrights_score
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: fh#polrights_score
   - dimensions:
       dataset: freedom_house
       metric: electoral_democracy
       sub_metric: political_rights_rating
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh#polrights
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: fh#polrights
   - dimensions:
       dataset: freedom_house
       metric: electoral_democracy
       sub_metric: civil_liberties_score
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh#civlibs_score
-          display:
-            numDecimalPlaces: 0
+        - catalogPath: fh#civlibs_score
   - dimensions:
       dataset: freedom_house
       metric: electoral_democracy
       sub_metric: civil_liberties_rating
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh#civlibs
-          display:
-            shortUnit: ""
-            numDecimalPlaces: 0
+        - catalogPath: fh#civlibs
   - dimensions:
       dataset: freedom_house
       metric: electoral_democracy
       sub_metric: number_and_share_of_democracies
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#num_electdem__category_non_electoral_democracy
+        - catalogPath: fh_regions#num_electdem__category_non_electoral_democracy
           display:
             name: "Non-democracies"
             color: "#ef8a62"
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#num_electdem__category_electoral_democracy
+        - catalogPath: fh_regions#num_electdem__category_electoral_democracy
           display:
             name: "Electoral democracies"
             color: "#2c7bb6"
@@ -231,15 +208,15 @@ views:
       sub_metric: people_living_in_democracies
     indicators:
       y:
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_electdem__category__1
+        - catalogPath: fh_regions#pop_electdem__category__1
           display:
             name: "No regime data"
             color: "#555555"
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_electdem__category_non_electoral_democracy
+        - catalogPath: fh_regions#pop_electdem__category_non_electoral_democracy
           display:
             name: "People living in non-democracies"
             color: "#ef8a62"
-        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_electdem__category_electoral_democracy
+        - catalogPath: fh_regions#pop_electdem__category_electoral_democracy
           display:
             name: "People living in electoral democracies"
             color: "#2c7bb6"
