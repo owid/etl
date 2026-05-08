@@ -25,7 +25,7 @@ Instead of creating a `Dataset` object, these create `MDIM` or `Explorer` object
 !!! question "Why do we need both?"
     We understand MDIMs as a more powerful version of explorers, and will likely replace them in the long-run from a technical perspective. MDIMs still are still missing some key features to fully be able to replace explorers.
 
-    [Learn more :material-arrow-down:](#mdims-pending-features)
+    [Learn more :material-arrow-down:](#mdim-pending-features)
 
 ## Creating an MDIM (or Explorer)
 MDIMs are defined by a collection of indicators that are presented in different views. Each view is defined by a specific dimension value (e.g. `sex="female"`). Ultimately, an MDIM is presented as a chart with additional selection options to switch from one view to another.

@@ -212,9 +212,6 @@ unused-ignore-comment = "ignore"
 call-top-callable = "ignore"
 possibly-missing-submodule = "ignore"
 
-[tool.uv]
-exclude-newer = "3 days"
-
 [tool.pytest.ini_options]
 markers = [
     "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",

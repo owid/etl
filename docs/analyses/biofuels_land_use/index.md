@@ -43,7 +43,7 @@ Despite this caveat, we will take Cerulogy's estimate at face value for the rema
 
 [The UFOP Report on Global Market Supply 2022/2023](https://www.ufop.de/files/4716/7878/1413/UFOP_Global_Suppy_Report_2022-2023.pdf) says that:
 
-> Crop plants were grown on more than 1.4 billion hectares worldwide in 2021. [...]
+> Crop plants were grown on more than 1.4 billion hectares worldwide in 2021. \[...\]
 Only around 8 per cent of the area was used in biofuels production.
 
 [FAOSTAT's Land Use dataset](https://www.fao.org/faostat/en/#data/RL) estimates that global cropland area in 2021 was [1.57 billion hectares](https://ourworldindata.org/grapher/cropland-area?tab=line&country=~OWID_WRL) (and hasn't changed much in the last decade).
@@ -68,7 +68,7 @@ Given that we couldn't find a clear origin for UFOP's large estimate on the exte
 [Popp et al. (2018)](https://www.researchgate.net/publication/324131165_Biofuel_use_Peculiarities_and_implications) estimated that 2% of global cropland is devoted to biofuels (30-35 million gross hectares).
 After removing co-products, the area would be smaller.
 They say:
-> If we include co-products [...] then the land that is needed to grow feedstocks reduces [...] to about 1.5%.
+> If we include co-products \[...\] then the land that is needed to grow feedstocks reduces \[...\] to about 1.5%.
 
 This would imply around 23 million hectares.
 
@@ -186,7 +186,7 @@ This is in very good agreement with our estimate, given that their energy densit
 An alternative estimate of solar energy density comes from [Victoria et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2542435121001008).
 In their supplementary Note S3, they say:
 
-> [...] Assuming 17% efficiency and that only 30% of the land is covered by solar panels in large-scale installations, the capacity density results in 51 W / m², which is in agreement with values reported in [Ong et al. (2013)](https://www.osti.gov/servlets/purl/1086349/).
+> \[...\] Assuming 17% efficiency and that only 30% of the land is covered by solar panels in large-scale installations, the capacity density results in 51 W / m², which is in agreement with values reported in [Ong et al. (2013)](https://www.osti.gov/servlets/purl/1086349/).
 For an average annual generation for solar PV of 1370 kWh / kW, 38 million ha would be needed.
 The land area of the world is 13,003 million ha [OWID (2019)](https://ourworldindata.org/land-use).
 Hence, our current electricity consumption could be supplied by solar PV covering 0.3% of the available land.

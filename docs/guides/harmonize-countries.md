@@ -33,7 +33,7 @@ Since we also present long-run datasets over multiple centuries, a time period i
 Our harmonization tool relies on [:fontawesome-brands-github: rapidfuzz](https://github.com/rapidfuzz/RapidFuzz).
 
 ## Guidelines for harmonization
-Our harmonizer is available from [Wizard :material-arrow-down:](#using-wizard), the terminal with [our CLI :material-arrow-down:](#using-our-cli), and the [interactive shell :material-arrow-down:](#using-the-interactive-shell).
+Our harmonizer is available from [Wizard :material-arrow-down:](#using-wizard), the terminal with [our CLI :material-arrow-down:](#using-our-cli), and the [interactive window :material-arrow-down:](#using-the-interactive-window).
 
 
 ### Using Wizard

@@ -22,6 +22,11 @@ def prune_dict(d: dict) -> dict:
     values (None, empty lists, empty dicts) from a dictionary and its nested
     structures.
 
+    Inside lists, only empty dicts and empty lists are filtered — `None` is
+    preserved so that positional arrays (e.g. `customNumericColors`,
+    `customNumericLabels` in grapher_config) keep their alignment, where `None`
+    means "fall back to default" at that index.
+
     Args:
         d: Dictionary to prune.
 
@@ -35,10 +40,12 @@ def prune_dict(d: dict) -> dict:
             "_internal": "hidden",
             "count": 0,  # Kept (not empty)
             "empty_list": [],
-            "nested": {"value": 1, "null": None}
+            "nested": {"value": 1, "null": None},
+            "positional": [None, None, "#bc8e5a"],  # None preserved inside list
         }
         result = prune_dict(d)
-        # Returns: {"title": "Dataset", "count": 0, "nested": {"value": 1}}
+        # Returns: {"title": "Dataset", "count": 0, "nested": {"value": 1},
+        #          "positional": [None, None, "#bc8e5a"]}
         ```
     """
     out = {}
@@ -47,7 +54,14 @@ def prune_dict(d: dict) -> dict:
             if isinstance(v, dict):
                 out[k] = prune_dict(v)
             elif isinstance(v, list):
-                out[k] = [prune_dict(x) if isinstance(x, dict) else x for x in v if x not in [None, [], {}]]
+                # Preserve None and other primitives in lists; only filter empty
+                # dicts/lists to avoid serializing pointless placeholders. None is
+                # semantically meaningful at a positional index (fallback marker).
+                out[k] = [
+                    prune_dict(x) if isinstance(x, dict) else x
+                    for x in v
+                    if not (isinstance(x, (dict, list)) and not x)
+                ]
             else:
                 out[k] = v
     return out
