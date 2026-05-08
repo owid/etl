@@ -45,6 +45,16 @@ steps:
   data://explorers/emdat/latest/natural_disasters:
     - data://garden/emdat/2026-04-30/natural_disasters
   #
+  # EM-DAT Natural disasters.
+  #
+  # Multi-dim charts on the human and economic impact of natural disasters.
+  export://multidim/natural_disasters/latest/affected:
+    - data://grapher/emdat/2026-04-30/natural_disasters
+  export://multidim/natural_disasters/latest/economic_damages:
+    - data://grapher/emdat/2026-04-30/natural_disasters
+  export://multidim/natural_disasters/latest/deaths:
+    - data://grapher/emdat/2026-04-30/natural_disasters
+  #
   # NOAA/NCEI Natural Hazards Data
   #
   data://meadow/noaa_ncei/2025-10-30/natural_hazards:

@@ -299,4 +299,4 @@ https://ourworldindata.org/search?datasetProducts=<urlencoded producer or datase
 ## Related
 
 - `.claude/skills/update-dataset/SKILL.md` step 9 — the orchestrator entry point that should call this skill.
-- `.claude/skills/chart-text-report/SKILL.md` — reuses the same grapher-channel metadata patterns for chart-view selection.
+- `.claude/skills/faust-metadata-audit/SKILL.md` — reuses the same grapher-channel metadata patterns for chart-view selection.

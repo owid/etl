@@ -1,0 +1,222 @@
+definitions:
+  description_key_common: &description-key-common |-
+    The data shows the global average values for a given impact for each source. Note, however, this can vary significantly depending on the specific context.
+  description_key_land_use: &description-key-land-use
+    - *description-key-common
+    - The land use of different energy sources can vary significantly, depending on the context of the production site - its location; climate; and choices around the density and spacing of equipment. For example, the spacing of wind turbines and solar panels will affect how much land is needed per unit of electricity output.
+    - Wind energy is not included in these comparisons of average land use figures. This is because the land use of wind energy can be measured in several ways and is distinctly different from the land use of other energy technologies. Land between wind turbines can be used for other purposes (such as farming), which is not the case for other energy sources. The spacing of turbines and the context of the site means that its land use is highly variable. For this reason we don't provide an average land use figure for wind in this data. However, we do include figures for wind in [our article on this topic](https://ourworldindata.org/land-use-per-energy-source).
+  description_key_metal_mineral_use: &description-key-metal-mineral-use
+    - *description-key-common
+    - The metal and mineral requirements for each source are based on the requirements of the actual amount of material extracted from the ground, which includes all the losses throughout the extraction, refining and fabrication processes.
+    - These figures will be towards the high end of estimates which measure based on the final amount of materials required per unit of electricity.
+
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Energy
+
+dataset:
+  update_period_days: 0
+  title: Life-cycle Assessment of Electricity Sources
+
+tables:
+  life_cycle_assessment_of_electricity:
+    title: Life-cycle impacts of electricity sources
+    variables:
+      ghg_emissions:
+        title: Greenhouse gas emissions per unit of electricity
+        unit: kilograms of CO₂-equivalents per megawatt-hour
+        short_unit: kgCO₂e/MWh
+        description_short: Lifecycle greenhouse gas emissions per unit of electricity, including emissions from the burning of fuels, mining of materials and production of energy technologies.
+        description_key:
+          - *description-key-common
+        display:
+          name: Greenhouse gas emissions
+          shortUnit: kgCO₂e
+          numDecimalPlaces: 0
+      freshwater_eutrophication:
+        title: Freshwater eutrophication per unit of electricity
+        unit: grams of phosphorus-equivalents per megawatt-hour
+        short_unit: gP-eq/MWh
+        description_short: "Freshwater eutrophication is caused by the emissions of phosphorus compounds to freshwater: either rivers or lakes. This is measured in grams of phosphorus emitted per unit of electricity production."
+        description_key:
+          - *description-key-common
+        display:
+          name: Freshwater eutrophication
+          shortUnit: gP-eq
+          numDecimalPlaces: 0
+      ionising_radiation:
+        title: Ionising radiation per unit of electricity
+        unit: kilograms of U-235-equivalents per megawatt-hour
+        short_unit: kg U-235eq/MWh
+        description_short: Ionising radiation impacts per unit of electricity produced, expressed in U-235 equivalents.
+        description_key:
+          - *description-key-common
+        display:
+          name: Ionising radiation
+          shortUnit: kg U-235eq
+          numDecimalPlaces: 1
+      water_use:
+        title: Dissipated water use per unit of electricity
+        unit: cubic metres per megawatt-hour
+        short_unit: m³/MWh
+        description_short: Dissipated water includes all uses that immediately deprive the local environment of using water. This therefore gives some indication of local scarcity of a water resource. For example, water immediately returned to the environment (in river, ocean, or groundwater) is not counted, while water used as an ingredient for a chemical product, or evaporated, is counted.
+        description_key:
+          - *description-key-common
+        display:
+          name: Water use
+          shortUnit: m³
+          numDecimalPlaces: 0
+      metal_mineral_use:
+        title: Metal and mineral requirements per unit of electricity
+        unit: grams of antimony-equivalents per megawatt-hour
+        short_unit: g Sb-eq/MWh
+        description_short: Energy technologies require a range of mineral and metal inputs. Here they are distilled into a single figure of material requirements, which is measured in grams of Sb-equivalents per megawatt-hour of electricity produced.
+        description_key: *description-key-metal-mineral-use
+        display:
+          name: Total material use
+          shortUnit: g
+          numDecimalPlaces: 2
+      noncarcinogenic_toxicity:
+        title: Non-carcinogenic toxicity per unit of electricity
+        unit: comparative toxic units per terawatt-hour
+        short_unit: CTUh/TWh
+        description_short: Non-carcinogenic toxicity impacts on human health per terawatt-hour of electricity, expressed in comparative toxic units.
+        description_key:
+          - *description-key-common
+        display:
+          name: Non-carcinogenic toxicity
+          shortUnit: CTUh
+          numDecimalPlaces: 1
+      carcinogenic_toxicity:
+        title: Carcinogenic toxicity per unit of electricity
+        unit: comparative toxic units per terawatt-hour
+        short_unit: CTUh/TWh
+        description_short: Carcinogenic toxicity impacts on human health per terawatt-hour of electricity, expressed in comparative toxic units.
+        description_key:
+          - *description-key-common
+        display:
+          name: Carcinogenic toxicity
+          shortUnit: CTUh
+          numDecimalPlaces: 1
+      land_use_energy:
+        title: Land use per unit of electricity
+        unit: square metres per megawatt-hour
+        short_unit: m²/MWh
+        description_short: Total land used per unit of electricity production, including direct land use (e.g. the area of a power plant or solar farm) and indirect land use from mining of fuels and materials.
+        description_key: *description-key-land-use
+        display:
+          name: Land use
+          shortUnit: m²
+          numDecimalPlaces: 1
+      aluminium_use:
+        title: Aluminium requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Aluminium required per megawatt-hour of electricity produced.
+        description_key:
+          - *description-key-common
+        display:
+          name: Aluminium
+          shortUnit: g
+          numDecimalPlaces: 2
+      chromium_use:
+        title: Chromium requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Chromium required per megawatt-hour of electricity produced.
+        description_key:
+          - *description-key-common
+        display:
+          name: Chromium
+          shortUnit: g
+          numDecimalPlaces: 2
+      cobalt_use:
+        title: Cobalt requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Cobalt required per megawatt-hour of electricity produced.
+        description_key:
+          - *description-key-common
+        display:
+          name: Cobalt
+          shortUnit: g
+          numDecimalPlaces: 3
+      copper_use:
+        title: Copper requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Copper required per megawatt-hour of electricity produced.
+        description_key:
+          - *description-key-common
+        display:
+          name: Copper
+          shortUnit: g
+          numDecimalPlaces: 2
+      manganese_use:
+        title: Manganese requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Manganese required per megawatt-hour of electricity produced.
+        description_key:
+          - *description-key-common
+        display:
+          name: Manganese
+          shortUnit: g
+          numDecimalPlaces: 2
+      molybdenum_use:
+        title: Molybdenum requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Molybdenum required per megawatt-hour of electricity produced.
+        description_key:
+          - *description-key-common
+        display:
+          name: Molybdenum
+          shortUnit: g
+          numDecimalPlaces: 2
+      nickel_use:
+        title: Nickel requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Nickel required per megawatt-hour of electricity produced.
+        description_key:
+          - *description-key-common
+        display:
+          name: Nickel
+          shortUnit: g
+          numDecimalPlaces: 2
+      silicon_use:
+        title: Silicon requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Silicon required per megawatt-hour of electricity produced.
+        description_key:
+          - *description-key-common
+        display:
+          name: Silicon
+          shortUnit: g
+          numDecimalPlaces: 2
+      zinc_use:
+        title: Zinc requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Zinc required per megawatt-hour of electricity produced.
+        description_key:
+          - *description-key-common
+        display:
+          name: Zinc
+          shortUnit: g
+          numDecimalPlaces: 2
+      uranium_use:
+        title: Uranium requirements per unit of electricity
+        unit: grams per megawatt-hour
+        short_unit: g/MWh
+        description_short: Uranium required per megawatt-hour of electricity produced.
+        description_key:
+          - *description-key-common
+        display:
+          name: Uranium
+          shortUnit: g
+          numDecimalPlaces: 3

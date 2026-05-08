@@ -67,12 +67,12 @@ docs.build: .venv
 	@echo '==> Pre-processing documentation files'
 	@$(MAKE) --no-print-directory docs.pre
 	@echo '==> Building documentation with Zensical'
-	@DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:[(f,h) for f,h in o(cfg,p) if '/.venv' not in f]; __import__('zensical').build(__import__('os').path.abspath('zensical.toml'),{'clean':True,'strict':False})"
+	@DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:type(r:=o(cfg,p))(x for x in r if '/.venv' not in x[0]); __import__('zensical').build(__import__('os').path.abspath('zensical.toml'),{'clean':True,'strict':False})"
 	@echo '==> Post-processing documentation files'
 	@$(MAKE) --no-print-directory docs.post
 
 docs.serve: .venv
-	DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:[(f,h) for f,h in o(cfg,p) if '/.venv' not in f]; __import__('zensical').serve(__import__('os').path.abspath('zensical.toml'),{'dev_addr':'localhost:9010','open':False,'strict':False})"
+	DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:type(r:=o(cfg,p))(x for x in r if '/.venv' not in x[0]); __import__('zensical').serve(__import__('os').path.abspath('zensical.toml'),{'dev_addr':'localhost:9010','open':False,'strict':False})"
 
 watch-all:
 	.venv/bin/watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .

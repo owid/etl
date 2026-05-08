@@ -1,6 +1,6 @@
-"""Generate a Markdown chart-text report for a grapher dataset or a hand-picked list of indicators.
+"""Generate a Markdown FAUST audit for a grapher dataset or a hand-picked list of indicators.
 
-For each indicator (column), resolves the five fields that the chart-text-report
+For each indicator (column), resolves the five fields that the faust-metadata-audit
 skill cares about and tags each one as [inherited] (from the column's VariableMeta)
 or [missing]. There is no [override] tag in this mode because there are no views —
 each indicator is reported standalone.
@@ -8,13 +8,13 @@ each indicator is reported standalone.
 Two input modes:
 
 1. Whole dataset:
-       .venv/bin/python .claude/skills/chart-text-report/scripts/grapher_dataset_mode.py \\
+       .venv/bin/python .claude/skills/faust-metadata-audit/scripts/grapher_dataset_mode.py \\
            --dataset data/grapher/wb/2026-03-24/world_bank_pip
 
    Iterates every column of every table in the dataset.
 
 2. Hand-picked indicators (by catalogPath, one per line in a file or passed directly):
-       .venv/bin/python .claude/skills/chart-text-report/scripts/grapher_dataset_mode.py \\
+       .venv/bin/python .claude/skills/faust-metadata-audit/scripts/grapher_dataset_mode.py \\
            --indicators grapher/wb/2026-03-24/world_bank_pip/incomes#thr__... \\
                         grapher/wb/2026-03-24/world_bank_pip/incomes#share__...
 
@@ -210,9 +210,9 @@ def main() -> None:
         # Validate shape.
         for cp in catalog_paths:
             parse_catalog_path(cp)  # raises ValueError on malformed paths
-        title = args.title or "Indicator chart-text report"
+        title = args.title or "Indicator FAUST audit"
         subheading = f"{len(catalog_paths)} catalogPaths"
-        out_path = args.output or OUT_DIR / "indicators_chart_text_report.md"
+        out_path = args.output or OUT_DIR / "indicators_faust_audit.md"
 
     md = render_report(title=title, catalog_paths=catalog_paths, subheading=subheading)
     out_path.write_text(md, encoding="utf-8")

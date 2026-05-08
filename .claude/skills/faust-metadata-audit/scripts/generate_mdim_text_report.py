@@ -7,10 +7,10 @@ or [missing]. Supports per-MDim dimension collapsing with placeholder parametriz
 Usage (edit the MDIMS list below or invoke with a JSON config):
 
     # Use the built-in MDIMS list:
-    .venv/bin/python .claude/skills/chart-text-report/scripts/generate_mdim_text_report.py
+    .venv/bin/python .claude/skills/faust-metadata-audit/scripts/generate_mdim_text_report.py
 
     # Or pass a JSON file with one object per MDim:
-    .venv/bin/python .claude/skills/chart-text-report/scripts/generate_mdim_text_report.py --config ai/mdim_list.json
+    .venv/bin/python .claude/skills/faust-metadata-audit/scripts/generate_mdim_text_report.py --config ai/mdim_list.json
 
 JSON config shape (list of objects):
     [
