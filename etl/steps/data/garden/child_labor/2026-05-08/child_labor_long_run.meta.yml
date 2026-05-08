@@ -24,6 +24,8 @@ tables:
         title: United States (Long) - Share in child labor - << sex >>, age << age_group >> (<< source >>)
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
   belgium:
     variables:
       number:
@@ -34,6 +36,8 @@ tables:
         title: Belgium - Share in child labor - age << age >>
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
   portugal:
     variables:
       number:
@@ -44,6 +48,8 @@ tables:
         title: Portugal (Goulart) - Share in child labor in << sector >> - << sex >>, age << age_group >>
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
   denmark:
     variables:
       number:
@@ -54,12 +60,16 @@ tables:
         title: Denmark - Share in child labor in << sector >> - << age_group >>
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
   italy:
     variables:
       share:
         title: Italy - Share in child labor in << sector >> - << sex >>
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
   sweden:
     variables:
       number:
@@ -70,30 +80,40 @@ tables:
         title: Sweden - Share in child labor in << sector >>
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
   us_carter_sutch:
     variables:
       share:
         title: United States (Carter & Sutch) - Share in child labor (<< age_group >>) - << sex >>
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
   portugal_goulart_bedi:
     variables:
       share:
         title: Portugal (Goulart & Bedi) - Share in child labor - << measure >>, age << age_group >> (<< bound >>)
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
   england_wales_scotland:
     variables:
       share:
         title: Britain (Kirby) - Share in child labor in << occupation >> - << sex >>
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
   england_wales:
     variables:
       share:
         title: England and Wales (Cunningham & Viazzo) - Share in child labor - << age_group >>
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
   japan:
     variables:
       number:
@@ -104,3 +124,5 @@ tables:
         title: Japan - Share in child labor - << gender >>, << age_group >>
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
