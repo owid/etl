@@ -5,19 +5,16 @@
 # inherits it at chart render time. Per-view `config:` here is intentionally empty
 # for single-y views; multi-y views keep their combined chart config.
 
+definitions:
+  group_subtitle: &group_subtitle |-
+    [Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house).
+
 config:
   explorerTitle: "Democracy"
   explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
   isPublished: true
 
 dimensions:
-  - slug: dataset
-    name: "Dataset"
-    presentation:
-      type: dropdown
-    choices:
-      - slug: freedom_house
-        name: "Freedom House"
   - slug: metric
     name: "Metric"
     presentation:
@@ -55,42 +52,36 @@ dimensions:
 
 views:
   - dimensions:
-      dataset: freedom_house
       metric: freedom
       sub_metric: main_classification
     indicators:
       y:
         - catalogPath: fh#regime
   - dimensions:
-      dataset: freedom_house
       metric: freedom
       sub_metric: political_rights_score
     indicators:
       y:
         - catalogPath: fh#polrights_score
   - dimensions:
-      dataset: freedom_house
       metric: freedom
       sub_metric: political_rights_rating
     indicators:
       y:
         - catalogPath: fh#polrights
   - dimensions:
-      dataset: freedom_house
       metric: freedom
       sub_metric: civil_liberties_score
     indicators:
       y:
         - catalogPath: fh#civlibs_score
   - dimensions:
-      dataset: freedom_house
       metric: freedom
       sub_metric: civil_liberties_rating
     indicators:
       y:
         - catalogPath: fh#civlibs
   - dimensions:
-      dataset: freedom_house
       metric: freedom
       sub_metric: number_and_share_of_free_countries_and_territories
     indicators:
@@ -109,13 +100,12 @@ views:
             color: "#58ac8c"
     config:
       title: "Free countries and territories"
-      subtitle: "[Data](#dod:regimes-fh) by [Freedom House](#dod:freedom-house)."
+      subtitle: *group_subtitle
       stackMode: "relative"
       yAxis:
         min: 0
         facetDomain: "independent"
   - dimensions:
-      dataset: freedom_house
       metric: freedom
       sub_metric: people_living_in_free_countries_and_territories
     indicators:
@@ -138,51 +128,44 @@ views:
             color: "#58ac8c"
     config:
       title: "People living in free countries and territories"
-      subtitle: "[Data](#dod:regimes-fh) by [Freedom House](#dod:freedom-house)."
+      subtitle: *group_subtitle
   - dimensions:
-      dataset: freedom_house
       metric: electoral_democracy
       sub_metric: main_classification
     indicators:
       y:
         - catalogPath: fh#electdem
   - dimensions:
-      dataset: freedom_house
       metric: electoral_democracy
       sub_metric: democratic_electoral_institutions
     indicators:
       y:
         - catalogPath: fh#electprocess
   - dimensions:
-      dataset: freedom_house
       metric: electoral_democracy
       sub_metric: political_rights_score
     indicators:
       y:
         - catalogPath: fh#polrights_score
   - dimensions:
-      dataset: freedom_house
       metric: electoral_democracy
       sub_metric: political_rights_rating
     indicators:
       y:
         - catalogPath: fh#polrights
   - dimensions:
-      dataset: freedom_house
       metric: electoral_democracy
       sub_metric: civil_liberties_score
     indicators:
       y:
         - catalogPath: fh#civlibs_score
   - dimensions:
-      dataset: freedom_house
       metric: electoral_democracy
       sub_metric: civil_liberties_rating
     indicators:
       y:
         - catalogPath: fh#civlibs
   - dimensions:
-      dataset: freedom_house
       metric: electoral_democracy
       sub_metric: number_and_share_of_democracies
     indicators:
@@ -197,13 +180,12 @@ views:
             color: "#2c7bb6"
     config:
       title: "Countries that are democracies and non-democracies"
-      subtitle: "[Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house)."
+      subtitle: *group_subtitle
       stackMode: "relative"
       yAxis:
         min: 0
         facetDomain: "independent"
   - dimensions:
-      dataset: freedom_house
       metric: electoral_democracy
       sub_metric: people_living_in_democracies
     indicators:
@@ -222,4 +204,4 @@ views:
             color: "#2c7bb6"
     config:
       title: "People living in democracies and non-democracies"
-      subtitle: "[Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house)."
+      subtitle: *group_subtitle

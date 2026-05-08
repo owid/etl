@@ -5,19 +5,15 @@
 # inherits it at chart render time. Per-view `config:` here is intentionally empty
 # for single-y views; multi-y views keep their combined chart config.
 
+definitions:
+  group_subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity)."
+
 config:
   explorerTitle: "Democracy"
   explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
   isPublished: true
 
 dimensions:
-  - slug: dataset
-    name: "Dataset"
-    presentation:
-      type: dropdown
-    choices:
-      - slug: polity
-        name: "Polity"
   - slug: metric
     name: "Metric"
     presentation:
@@ -59,63 +55,54 @@ dimensions:
 
 views:
   - dimensions:
-      dataset: polity
       metric: democracy
       sub_metric: main_index
     indicators:
       y:
         - catalogPath: polity#democracy_polity
   - dimensions:
-      dataset: polity
       metric: democracy
       sub_metric: competitiveness_of_executive_recruitment_score
     indicators:
       y:
         - catalogPath: polity#exec_reccomp_polity
   - dimensions:
-      dataset: polity
       metric: democracy
       sub_metric: openness_of_executive_recruitment_score
     indicators:
       y:
         - catalogPath: polity#exec_recopen_polity
   - dimensions:
-      dataset: polity
       metric: democracy
       sub_metric: constraints_on_the_executive_score
     indicators:
       y:
         - catalogPath: polity#exec_constr_polity
   - dimensions:
-      dataset: polity
       metric: democracy
       sub_metric: regulation_of_political_participation_score
     indicators:
       y:
         - catalogPath: polity#polpart_reg_polity
   - dimensions:
-      dataset: polity
       metric: democracy
       sub_metric: competitiveness_of_political_participation_score
     indicators:
       y:
         - catalogPath: polity#polpart_comp_polity
   - dimensions:
-      dataset: polity
       metric: democracy
       sub_metric: main_index_distribution
     indicators:
       y:
         - catalogPath: polity#democracy_recod_polity
   - dimensions:
-      dataset: polity
       metric: political_regime
       sub_metric: main_classification
     indicators:
       y:
         - catalogPath: polity#regime_polity
   - dimensions:
-      dataset: polity
       metric: political_regime
       sub_metric: number_and_share_of_democracies
     indicators:
@@ -134,13 +121,12 @@ views:
             color: "#5496c5"
     config:
       title: "Countries that are democracies and non-democracies"
-      subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity)."
+      subtitle: "{definitions.group_subtitle}"
       stackMode: "relative"
       yAxis:
         min: 0
         facetDomain: "independent"
   - dimensions:
-      dataset: polity
       metric: political_regime
       sub_metric: people_living_in_democracies
     indicators:
@@ -163,16 +149,14 @@ views:
             color: "#5496c5"
     config:
       title: "People living in democracies and non-democracies"
-      subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity)."
+      subtitle: "{definitions.group_subtitle}"
   - dimensions:
-      dataset: polity
       metric: political_regime
       sub_metric: age_of_democracy
     indicators:
       y:
         - catalogPath: polity#age_dem_polity
   - dimensions:
-      dataset: polity
       metric: political_regime
       sub_metric: number_and_share_of_long_standing_democracies
     indicators:
@@ -207,5 +191,5 @@ views:
             color: "#172976"
     config:
       title: "Countries that are long-standing democracies"
-      subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity). Democracies are political systems with broadly open, multi-party, and competitive elections for a chief executive who faces comprehensive institutional constraints, and political participation is broadly competitive."
+      subtitle: "{definitions.group_subtitle} Democracies are political systems with broadly open, multi-party, and competitive elections for a chief executive who faces comprehensive institutional constraints, and political participation is broadly competitive."
       stackMode: "relative"

@@ -5,19 +5,17 @@
 # inherits it at chart render time. Per-view `config:` here is intentionally empty
 # for single-y views; multi-y views keep their combined chart config.
 
+definitions:
+  group_config: &group_config
+    subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
+    note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+
 config:
   explorerTitle: "Democracy"
   explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
   isPublished: true
 
 dimensions:
-  - slug: dataset
-    name: "Dataset"
-    presentation:
-      type: dropdown
-    choices:
-      - slug: bertelsmann_transformation_index
-        name: "Bertelsmann Transformation Index"
   - slug: metric
     name: "Metric"
     presentation:
@@ -69,112 +67,96 @@ dimensions:
 
 views:
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: democratic_features
       sub_metric: main_index
     indicators:
       y:
         - catalogPath: bti#democracy_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: democratic_features
       sub_metric: stateness_index
     indicators:
       y:
         - catalogPath: bti#state_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: democratic_features
       sub_metric: political_participation_index
     indicators:
       y:
         - catalogPath: bti#political_participation_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: democratic_features
       sub_metric: rule_of_law_index
     indicators:
       y:
         - catalogPath: bti#rule_of_law_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: democratic_features
       sub_metric: stability_of_democratic_institutions_index
     indicators:
       y:
         - catalogPath: bti#stability_dem_inst_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: democratic_features
       sub_metric: political_and_social_integration_index
     indicators:
       y:
         - catalogPath: bti#pol_soc_integr_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: political_regime
       sub_metric: main_classification
     indicators:
       y:
         - catalogPath: bti#regime_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: political_regime
       sub_metric: basic_state_functions_score
     indicators:
       y:
         - catalogPath: bti#state_basic_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: political_regime
       sub_metric: free_and_fair_elections_score
     indicators:
       y:
         - catalogPath: bti#electfreefair_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: political_regime
       sub_metric: effective_power_to_govern_score
     indicators:
       y:
         - catalogPath: bti#effective_power_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: political_regime
       sub_metric: freedom_of_association_score
     indicators:
       y:
         - catalogPath: bti#freeassoc_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: political_regime
       sub_metric: freedom_of_expression_score
     indicators:
       y:
         - catalogPath: bti#freeexpr_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: political_regime
       sub_metric: separation_of_powers_score
     indicators:
       y:
         - catalogPath: bti#sep_power_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: political_regime
       sub_metric: civil_rights_score
     indicators:
       y:
         - catalogPath: bti#civ_rights_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: political_regime
       sub_metric: democratic_features
     indicators:
       y:
         - catalogPath: bti#democracy_bti
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: political_regime
       sub_metric: number_and_share_of_democracies
     indicators:
@@ -201,14 +183,12 @@ views:
             color: "#034c8c"
     config:
       title: "Countries that are democracies and autocracies"
-      subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
-      note: "Data excludes long-term members of the OECD because they are considered consolidated democracies."
+      <<: *group_config
       stackMode: "relative"
       yAxis:
         min: 0
         facetDomain: "independent"
   - dimensions:
-      dataset: bertelsmann_transformation_index
       metric: political_regime
       sub_metric: people_living_in_democracies
     indicators:
@@ -239,5 +219,4 @@ views:
             color: "#034c8c"
     config:
       title: "People living in democracies and autocracies"
-      subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
-      note: "Data excludes long-term members of the OECD because they are considered consolidated democracies."
+      <<: *group_config

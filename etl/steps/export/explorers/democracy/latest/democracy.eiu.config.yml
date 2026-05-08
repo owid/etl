@@ -5,19 +5,15 @@
 # inherits it at chart render time. Per-view `config:` here is intentionally empty
 # for single-y views; multi-y views keep their combined chart config.
 
+definitions:
+  group_subtitle: &group_subtitle "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
+
 config:
   explorerTitle: "Democracy"
   explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
   isPublished: true
 
 dimensions:
-  - slug: dataset
-    name: "Dataset"
-    presentation:
-      type: dropdown
-    choices:
-      - slug: economist_intelligence_unit
-        name: "Economist Intelligence Unit"
   - slug: metric
     name: "Metric"
     presentation:
@@ -51,56 +47,48 @@ dimensions:
 
 views:
   - dimensions:
-      dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: main_index
     indicators:
       y:
         - catalogPath: eiu#democracy_eiu
   - dimensions:
-      dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: political_regime
     indicators:
       y:
         - catalogPath: eiu#regime_eiu
   - dimensions:
-      dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: electoral_pluralism_index
     indicators:
       y:
         - catalogPath: eiu#elect_freefair_eiu
   - dimensions:
-      dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: functioning_government_index
     indicators:
       y:
         - catalogPath: eiu#funct_gov_eiu
   - dimensions:
-      dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: political_participation_index
     indicators:
       y:
         - catalogPath: eiu#pol_part_eiu
   - dimensions:
-      dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: democratic_culture_index
     indicators:
       y:
         - catalogPath: eiu#dem_culture_eiu
   - dimensions:
-      dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: civil_liberties_index
     indicators:
       y:
         - catalogPath: eiu#civlib_eiu
   - dimensions:
-      dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: number_and_share_of_democracies
     indicators:
@@ -123,13 +111,12 @@ views:
             color: "#5e94c4"
     config:
       title: "Countries that are democracies and non-democracies"
-      subtitle: "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
+      subtitle: *group_subtitle
       stackMode: "relative"
       yAxis:
         min: 0
         facetDomain: "independent"
   - dimensions:
-      dataset: economist_intelligence_unit
       metric: democracy
       sub_metric: people_living_in_democracies
     indicators:
@@ -156,6 +143,6 @@ views:
             color: "#5e94c4"
     config:
       title: "People living in democracies and non-democracies"
-      subtitle: "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
+      subtitle: *group_subtitle
       yAxis:
         facetDomain: "independent"
