@@ -1,13 +1,15 @@
 definitions:
+  description_processing_sources: |-
+    - Primary energy consumption data was compiled based on two key data sources: [Energy Institute (EI) Statistical Review of World Energy](https://www.energyinst.org/statistical-review), and [International energy data from the U.S. Energy Information Administration (EIA)](https://www.eia.gov/international/data/world/total-energy/more-total-energy-data). EI provides the longest and most up-to-date time-series of primary energy. However, it does not provide data for all countries. We have therefore supplemented this dataset with energy data from the EIA. Where EI provides data for a given country, this data is adopted; for countries where this data is missing, we rely on EIA energy figures.
+  description_processing_per_capita: |-
+    - Per capita figures have been calculated using a population dataset that is based on [different sources](https://ourworldindata.org/population-sources).
+  description_processing_per_gdp: |-
+    - To calculate energy per unit of GDP, we divide by total real GDP figures from [the Maddison Project Database](https://ourworldindata.org/grapher/gdp-maddison-project-database).
   common:
     processing_level: major
     presentation:
       topic_tags:
         - Energy
-    description_processing: |
-      - Primary energy consumption data was compiled based on two key data sources: [Energy Institute (EI) Statistical Review of World Energy](https://www.energyinst.org/statistical-review), and [International energy data from the U.S. Energy Information Administration (EIA)](https://www.eia.gov/international/data/world/total-energy/more-total-energy-data). EI provides the longest and most up-to-date time-series of primary energy. However, it does not provide data for all countries. We have therefore supplemented this dataset with energy data from the EIA. Where EI provides data for a given country, this data is adopted; for countries where this data is missing, we rely on EIA energy figures.
-      - Per capita figures have been calculated using a population dataset that is based on [different sources](https://ourworldindata.org/population-sources).
-      - To calculate energy per unit of GDP, we divide by total real GDP figures from [the Maddison Project Database](https://ourworldindata.org/grapher/gdp-maddison-project-database).
 
 dataset:
   update_period_days: 365
@@ -20,12 +22,16 @@ tables:
         title: Annual change in primary energy consumption (%)
         short_unit: '%'
         unit: '%'
+        description_processing: |-
+          {definitions.description_processing_sources}
         presentation:
           title_public: Annual change in primary energy consumption
       annual_change_in_primary_energy_consumption__twh:
         title: Annual change in primary energy consumption (TWh)
         short_unit: TWh
         unit: terawatt-hours
+        description_processing: |-
+          {definitions.description_processing_sources}
         presentation:
           title_public: Annual change in primary energy consumption
       gdp:
@@ -45,6 +51,8 @@ tables:
         short_unit: TWh
         unit: terawatt-hours
         description_short: Measured in terawatt-hours.
+        description_processing: |-
+          {definitions.description_processing_sources}
         display:
           numDecimalPlaces: 0
         presentation:
@@ -54,6 +62,9 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours per $
         description_short: Measured in kilowatt-hours per international-$.
+        description_processing: |-
+          {definitions.description_processing_sources}
+          {definitions.description_processing_per_gdp}
         display:
           name: Energy consumption per dollar
         presentation:
@@ -63,6 +74,9 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours per person
         description_short: Measured in kilowatt-hours per person.
+        description_processing: |-
+          {definitions.description_processing_sources}
+          {definitions.description_processing_per_capita}
         display:
           name: Per capita energy consumption
           numDecimalPlaces: 0
