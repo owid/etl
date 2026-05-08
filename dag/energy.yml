@@ -266,6 +266,19 @@ steps:
   data://grapher/energy/2025-06-27/primary_energy_consumption:
     - data://garden/energy/2025-06-27/primary_energy_consumption
   #
+  # Energy - Primary energy consumption (sourced from the new EIA International Energy garden).
+  #
+  data://garden/energy/2026-05-05/primary_energy_consumption:
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+    - data://garden/demography/2024-07-15/population
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/eia/2026-05-05/international_energy
+  #
+  # Energy - Primary energy consumption.
+  #
+  data://grapher/energy/2026-05-05/primary_energy_consumption:
+    - data://garden/energy/2026-05-05/primary_energy_consumption
+  #
   # IRENA - Renewable energy statistics.
   #
   data://meadow/irena/2025-07-18/renewable_energy_statistics:
