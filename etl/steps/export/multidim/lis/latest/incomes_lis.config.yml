@@ -31,14 +31,17 @@ dimensions:
         name: Mean income
       - slug: median
         name: Median income
-      - slug: avg
-        name: Mean income, by decile
       - slug: thr
-        name: Income threshold for each decile
+        name: Income threshold
         description: The income level below which 10%, 20%, 30%, etc. of the population falls
+        group: By decile
+      - slug: avg
+        name: "Mean income "
+        group: By decile
       - slug: share
-        name: Income share of each decile
+        name: Income share
         description: The share of income received by each income group
+        group: By decile
 
   - name: Group
     slug: decile
