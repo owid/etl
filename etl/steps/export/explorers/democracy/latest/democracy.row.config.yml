@@ -101,6 +101,7 @@ views:
       title: "Countries that are democracies and autocracies"
       subtitle: *group_subtitle_1
       note: *note
+      type: "StackedDiscreteBar StackedArea"
       stackMode: "relative"
   - dimensions:
       metric: political_regime
@@ -369,6 +370,7 @@ views:
       title: "Countries that are democracies and autocracies"
       subtitle: *group_subtitle_1
       note: *note
+      type: "StackedDiscreteBar StackedArea"
       stackMode: "relative"
   - dimensions:
       metric: political_regime_including_ambiguous_categories

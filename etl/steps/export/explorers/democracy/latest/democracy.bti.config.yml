@@ -21,10 +21,10 @@ dimensions:
     presentation:
       type: dropdown
     choices:
-      - slug: political_regime
-        name: "Political regime"
       - slug: democratic_features
         name: "Democratic features"
+      - slug: political_regime
+        name: "Political regime"
   - slug: sub_metric
     name: "Sub-metric"
     presentation:
@@ -184,6 +184,7 @@ views:
     config:
       title: "Countries that are democracies and autocracies"
       <<: *group_config
+      type: "StackedDiscreteBar StackedArea"
       stackMode: "relative"
       yAxis:
         min: 0
@@ -220,3 +221,4 @@ views:
     config:
       title: "People living in democracies and autocracies"
       <<: *group_config
+      type: "StackedDiscreteBar StackedArea"

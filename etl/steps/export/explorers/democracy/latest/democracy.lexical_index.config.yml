@@ -106,6 +106,7 @@ views:
     config:
       title: "Countries that are democracies and autocracies"
       subtitle: "{definitions.group_subtitle_base}"
+      type: "StackedDiscreteBar StackedArea"
       stackMode: "relative"
   - dimensions:
       metric: political_regime
