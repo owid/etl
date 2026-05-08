@@ -29,6 +29,7 @@ TOP_CONFIG = {
     "explorerTitle": "Democracy",
     "explorerSubtitle": "Explore changes in the world's democratic and non-democratic systems.",
     "isPublished": True,
+    "originUrl": "https://ourworldindata.org/democracy",
     "thumbnail": "https://assets.ourworldindata.org/uploads/2022/06/Democracy-Data-Explorer.png",
     "wpBlockId": "51850",
     "subNavId": "explorers",
