@@ -760,6 +760,7 @@ def run() -> None:
         min_num_values_per_year=1,
         ignore_overlaps_of_zeros=True,
         accepted_overlaps=KNOWN_OVERLAPS,
+        min_frac_countries_informed=0.7,
     )
 
     # Set an appropriate index and sort.
