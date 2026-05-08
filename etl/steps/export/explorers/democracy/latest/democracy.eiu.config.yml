@@ -1,0 +1,182 @@
+# Mini-explorer for eiu indicators (used by democracy.py with combine_collections).
+# Carries only the views whose `dataset` dimension maps to this upstream source.
+# FAUST (title, subtitle, note, map config, etc.) lives in the indicator's
+# `presentation.grapher_config` in the corresponding garden meta.yml — Grapher
+# inherits it at chart render time. Per-view `config:` here is intentionally empty
+# for single-y views; multi-y views keep their combined chart config.
+
+config:
+  explorerTitle: "Democracy"
+  explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
+  isPublished: true
+
+dimensions:
+  - slug: dataset
+    name: "Dataset"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: economist_intelligence_unit
+        name: "Economist Intelligence Unit"
+  - slug: metric
+    name: "Metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: democracy
+        name: "Democracy"
+  - slug: sub_metric
+    name: "Sub-metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: main_index
+        name: "Main index"
+      - slug: number_and_share_of_democracies
+        name: "Number and share of democracies"
+      - slug: people_living_in_democracies
+        name: "People living in democracies"
+      - slug: political_participation_index
+        name: "Political participation index"
+      - slug: political_regime
+        name: "Political regime"
+      - slug: electoral_pluralism_index
+        name: "Electoral pluralism index"
+      - slug: functioning_government_index
+        name: "Functioning government index"
+      - slug: democratic_culture_index
+        name: "Democratic culture index"
+      - slug: civil_liberties_index
+        name: "Civil liberties index"
+
+views:
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#democracy_eiu
+          display:
+            name: "Democracy Index"
+            includeInTable: true
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: political_regime
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#regime_eiu
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: electoral_pluralism_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#elect_freefair_eiu
+          display:
+            name: "Electoral Pluralism Index"
+            includeInTable: true
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: functioning_government_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#funct_gov_eiu
+          display:
+            name: "Functioning Government Index"
+            shortUnit: ""
+            includeInTable: true
+            numDecimalPlaces: 1
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: political_participation_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#pol_part_eiu
+          display:
+            name: "Political Participation Index"
+            includeInTable: true
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: democratic_culture_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#dem_culture_eiu
+          display:
+            name: "Democratic Culture Index"
+            includeInTable: true
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: civil_liberties_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#civlib_eiu
+          display:
+            name: "Civil Liberties Index"
+            includeInTable: true
+            numDecimalPlaces: 1
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_authoritarian_regime
+          display:
+            name: "Authoritarian regimes"
+            color: "#f88a50"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_hybrid_regime
+          display:
+            name: "Hybrid regimes"
+            color: "#feeea5"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_flawed_democracy
+          display:
+            name: "Flawed democracies"
+            color: "#c7e7f1"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_full_democracy
+          display:
+            name: "Full democracies"
+            color: "#5e94c4"
+    config:
+      title: "Countries that are democracies and non-democracies"
+      subtitle: "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
+      stackMode: "relative"
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_authoritarian_regime
+          display:
+            name: "People living in authoritarian regimes"
+            color: "#f88a50"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_hybrid_regime
+          display:
+            name: "People living in hybrid regimes"
+            color: "#feeea5"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_flawed_democracy
+          display:
+            name: "People living in flawed democracies"
+            color: "#c7e7f1"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_full_democracy
+          display:
+            name: "People living in full democracies"
+            color: "#5e94c4"
+    config:
+      title: "People living in democracies and non-democracies"
+      subtitle: "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
+      yAxis:
+        facetDomain: "independent"

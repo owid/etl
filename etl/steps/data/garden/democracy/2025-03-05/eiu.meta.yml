@@ -56,36 +56,339 @@ tables:
               - url: "https://ourworldindata.org/explorers/democracy"
                 text: "How do different approaches score democracy across the world?"
 
+            title: Democracy Index
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 10
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#b2182b'
+                  - '#d73027'
+                  - '#f46d43'
+                  - '#fdae61'
+                  - '#fee090'
+                  - '#ffffbf'
+                  - '#dff3f8'
+                  - '#aad9e9'
+                  - '#73add2'
+                  - '#4575b4'
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+                  - 8
+                  - 9
+                  - 10
+                customCategoryLabels:
+                  No data: No data
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       elect_freefair_eiu:
         title: Free and fair elections
         description_short: |-
           Extent to which all citizens can choose their political leaders in free and fair elections. Higher values indicate more pluralism.
         unit: ""
 
+        presentation:
+          grapher_config:
+            title: Electoral Pluralism Index
+            subtitle: Data by the [Economist Intelligence Unit](#dod:economist-intelligence-unit). Expert estimates of the extent to which all citizens can choose their political leaders in free and fair elections. Higher values indicate more pluralism.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 10
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#b2182b'
+                  - '#d73027'
+                  - '#f46d43'
+                  - '#fdae61'
+                  - '#fee090'
+                  - '#ffffbf'
+                  - '#dff3f8'
+                  - '#aad9e9'
+                  - '#73add2'
+                  - '#4575b4'
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+                  - 8
+                  - 9
+                  - 10
+                customCategoryLabels:
+                  No data: No data
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       funct_gov_eiu:
         title: Functioning government
         description_short: |-
           Extent to which citizens have a functioning government that acts on their behalf. It ranges from 0 to 10 (most effective).
         unit: ""
 
+        presentation:
+          grapher_config:
+            title: Functioning Government Index
+            subtitle: Data by the [Economist Intelligence Unit](#dod:economist-intelligence-unit). Expert estimates of the extent to which citizens have a functioning government that acts on their behalf. The index ranges from 0 to 10 (most effective).
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 10
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#b2182b'
+                  - '#d73027'
+                  - '#f46d43'
+                  - '#fdae61'
+                  - '#fee090'
+                  - '#ffffbf'
+                  - '#dff3f8'
+                  - '#aad9e9'
+                  - '#73add2'
+                  - '#4575b4'
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+                  - 8
+                  - 9
+                  - 10
+                customCategoryLabels:
+                  No data: No data
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       pol_part_eiu:
         title: Political participation
         description_short: |-
           Extent to which citizens can and do participate in politics. It ranges from 0 to 10 (most active).
         unit: ""
 
+        presentation:
+          grapher_config:
+            title: Political Participation Index
+            subtitle: Data by the [Economist Intelligence Unit](#dod:economist-intelligence-unit). Expert estimates of the extent to which citizens can and do participate in politics. The index ranges from 0 to 10 (highest participation).
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 10
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#b2182b'
+                  - '#d73027'
+                  - '#f46d43'
+                  - '#fdae61'
+                  - '#fee090'
+                  - '#ffffbf'
+                  - '#dff3f8'
+                  - '#aad9e9'
+                  - '#73add2'
+                  - '#4575b4'
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+                  - 8
+                  - 9
+                  - 10
+                customCategoryLabels:
+                  No data: No data
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       dem_culture_eiu:
         title: Democratic culture
         description_short: |-
           Extent to which citizens prefer democracy over other political systems. It ranges from 0 to 10 (strongest preference for democracy).
         unit: ""
 
+        presentation:
+          grapher_config:
+            title: Democratic Culture Index
+            subtitle: Data by the [Economist Intelligence Unit](#dod:economist-intelligence-unit). Expert estimates of the extent to which citizens prefer democracy over other political systems. The index ranges from 0 to 10 (strongest preference for democracy).
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 10
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#b2182b'
+                  - '#d73027'
+                  - '#f46d43'
+                  - '#fdae61'
+                  - '#fee090'
+                  - '#ffffbf'
+                  - '#dff3f8'
+                  - '#aad9e9'
+                  - '#73add2'
+                  - '#4575b4'
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+                  - 8
+                  - 9
+                  - 10
+                customCategoryLabels:
+                  No data: No data
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       civlib_eiu:
         title: Civil liberties
         description_short: |-
           Extent to which citizens enjoy civil liberties. It ranges from 0 to 10 (most liberties).
         unit: ""
 
+        presentation:
+          grapher_config:
+            title: Civil Liberties Index
+            subtitle: Data by the [Economist Intelligence Unit](#dod:economist-intelligence-unit). The index ranges from 0 to 10 (most liberties).
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 10
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#b2182b'
+                  - '#d73027'
+                  - '#f46d43'
+                  - '#fdae61'
+                  - '#fee090'
+                  - '#ffffbf'
+                  - '#dff3f8'
+                  - '#aad9e9'
+                  - '#73add2'
+                  - '#4575b4'
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+                  - 8
+                  - 9
+                  - 10
+                customCategoryLabels:
+                  No data: No data
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       regime_eiu:
         title: Regime
         unit: ""
@@ -97,6 +400,47 @@ tables:
           - Hybrid regimes have serious weaknesses in democratic institutions and culture.
           - Authoritarian regimes have few democratic institutions and little democratic culture.
 
+        presentation:
+          grapher_config:
+            title: Democracy
+            subtitle: '[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit).'
+            note: The Chart tab uses numeric values, ranging from 3 for full democracies to 0 for authoritarian regimes.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 3
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#f88a50'
+                  - '#feeea5'
+                  - '#c7e7f1'
+                  - '#5e94c4'
+                customNumericLabels:
+                  - Authoritarian regime
+                  - Hybrid regime
+                  - Flawed democracy
+                  - Full democracy
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericValues:
+                  - 0
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                customCategoryLabels:
+                  No data: No data
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
   num_countries:
     common:
       presentation:

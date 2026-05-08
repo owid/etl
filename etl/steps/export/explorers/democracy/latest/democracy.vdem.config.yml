@@ -1,0 +1,922 @@
+# Mini-explorer for vdem indicators (used by democracy.py with combine_collections).
+# Carries only the views whose `dataset` dimension maps to this upstream source.
+# FAUST (title, subtitle, note, map config, etc.) lives in the indicator's
+# `presentation.grapher_config` in the corresponding garden meta.yml — Grapher
+# inherits it at chart render time. Per-view `config:` here is intentionally empty
+# for single-y views; multi-y views keep their combined chart config.
+
+config:
+  explorerTitle: "Democracy"
+  explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
+  isPublished: true
+
+dimensions:
+  - slug: dataset
+    name: "Dataset"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: varieties_of_democracy
+        name: "Varieties of Democracy"
+      - slug: regimes_of_the_world
+        name: "Regimes of the World"
+  - slug: metric
+    name: "Metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: electoral_democracy
+        name: "Electoral democracy"
+      - slug: liberal_democracy
+        name: "Liberal democracy"
+      - slug: participatory_democracy
+        name: "Participatory democracy"
+      - slug: deliberative_democracy
+        name: "Deliberative democracy"
+      - slug: egalitarian_democracy
+        name: "Egalitarian democracy"
+      - slug: varieties_of_democracy
+        name: "Varieties of democracy"
+      - slug: political_regime
+        name: "Political regime"
+      - slug: political_regime_including_ambiguous_categories
+        name: "Political regime, including ambiguous categories"
+  - slug: sub_metric
+    name: "Sub-metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: main_index
+        name: "Main index"
+      - slug: elected_political_leaders_index
+        name: "Elected political leaders index"
+      - slug: share_of_adult_citizens_who_have_the_right_to_vote
+        name: "Share of adult citizens who have the right to vote"
+      - slug: free_and_fair_elections_index
+        name: "Free and fair elections index"
+      - slug: freedom_of_association_index
+        name: "Freedom of association index"
+      - slug: freedom_of_expression_index
+        name: "Freedom of expression index"
+      - slug: electoral_democracy_index
+        name: "Electoral democracy index"
+      - slug: liberal_political_institutions_index
+        name: "Liberal political institutions index"
+      - slug: individual_liberties_and_equality_before_the_law_index
+        name: "Individual liberties and equality before the law index"
+      - slug: judicial_constraints_on_the_executive_index
+        name: "Judicial constraints on the executive index"
+      - slug: legislative_constraints_on_the_executive_index
+        name: "Legislative constraints on the executive index"
+      - slug: participatory_political_institutions_index
+        name: "Participatory political institutions index"
+      - slug: strong_elected_regional_governments_index
+        name: "Strong elected regional governments index"
+      - slug: strong_elected_local_governments_index
+        name: "Strong elected local governments index"
+      - slug: civil_society_participation_index
+        name: "Civil society participation index"
+      - slug: direct_popular_voting_index
+        name: "Direct popular voting index"
+      - slug: deliberative_political_institutions_index
+        name: "Deliberative political institutions index"
+      - slug: justified_political_positions_score
+        name: "Justified political positions score"
+      - slug: common_good_justifications_score
+        name: "Common good justifications score"
+      - slug: respect_for_counterarguments_score
+        name: "Respect for counterarguments score"
+      - slug: elite_consultations_score
+        name: "Elite consultations score"
+      - slug: engaged_society_score
+        name: "Engaged society score"
+      - slug: egalitarian_political_institutions_index
+        name: "Egalitarian political institutions index"
+      - slug: equal_rights_protection_index
+        name: "Equal rights protection index"
+      - slug: equal_access_to_power_index
+        name: "Equal access to power index"
+      - slug: equal_resource_distribution_index
+        name: "Equal resource distribution index"
+      - slug: main_indices
+        name: "Main indices"
+      - slug: main_classification
+        name: "Main classification"
+      - slug: number_and_share_of_democracies
+        name: "Number and share of democracies"
+      - slug: people_living_in_democracies
+        name: "People living in democracies"
+      - slug: multi_party_elections
+        name: "Multi-party elections"
+      - slug: multi_party_elections_for_chief_executive
+        name: "Multi-party elections for chief executive"
+      - slug: multi_party_elections_for_legislature
+        name: "Multi-party elections for legislature"
+      - slug: free_and_fair_elections
+        name: "Free and fair elections"
+      - slug: democratic_electoral_institutions
+        name: "Democratic electoral institutions"
+      - slug: age_of_electoral_democracy
+        name: "Age of electoral democracy"
+      - slug: number_and_share_of_long_standing_electoral_democracies
+        name: "Number and share of long-standing electoral democracies"
+      - slug: transparent_laws
+        name: "Transparent laws"
+      - slug: access_to_justice_for_men
+        name: "Access to justice for men"
+      - slug: access_to_justice_for_women
+        name: "Access to justice for women"
+      - slug: liberal_political_institutions
+        name: "Liberal political institutions"
+      - slug: age_of_liberal_democracy
+        name: "Age of liberal democracy"
+      - slug: number_and_share_of_long_standing_liberal_democracies
+        name: "Number and share of long-standing liberal democracies"
+
+views:
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral Democracy Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: elected_political_leaders_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_with_regions#electoff_vdem
+          display:
+            name: "Elected Political Leaders Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: share_of_adult_citizens_who_have_the_right_to_vote
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_with_regions#suffr_vdem
+          display:
+            name: ""
+            unit: "%"
+            shortUnit: "%"
+            numDecimalPlaces: 1
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: free_and_fair_elections_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electfreefair_vdem__estimate_best
+          display:
+            name: "Free and Fair Elections Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: freedom_of_association_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#freeassoc_vdem__estimate_best
+          display:
+            name: "Freedom of Association Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: freedom_of_expression_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#freeexpr_vdem__estimate_best
+          display:
+            name: "Freedom of Expression index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#libdem_vdem__estimate_best
+          display:
+            name: "Liberal Democracy Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral Democracy Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: liberal_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#lib_vdem__estimate_best
+          display:
+            name: "Liberal Political Institutions Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: individual_liberties_and_equality_before_the_law_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#indiv_libs_vdem__estimate_best
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: judicial_constraints_on_the_executive_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#judicial_constr_vdem__estimate_best
+          display:
+            name: "Judicial Checks on Government Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: legislative_constraints_on_the_executive_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#legis_constr_vdem__estimate_best
+          display:
+            name: "Legislative Checks on Government Index"
+            color: "#3e4c66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#participdem_vdem__estimate_best
+          display:
+            name: "Participatory Denocracy Index"
+            color: "#3e4c66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral Democracy Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: participatory_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#particip_vdem__estimate_best
+          display:
+            name: "Participatory Political Institutions Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: strong_elected_regional_governments_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#regelect_vdem__estimate_best
+          display:
+            name: "Strong Elected Regional Governments Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: strong_elected_local_governments_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#locelect_vdem__estimate_best
+          display:
+            name: "Strong Elected Local Governments Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: civil_society_participation_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#civsoc_particip_vdem__estimate_best
+          display:
+            name: "Civil Society Participation Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: direct_popular_voting_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#dirpop_vote_vdem
+          display:
+            name: "Direct Democracy Index"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#delibdem_vdem__estimate_best
+          display:
+            name: "Deliberative Democracy Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral Democracy Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: deliberative_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#delib_vdem__estimate_best
+          display:
+            name: "Deliberative Political Institutions Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: justified_political_positions_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#justified_polch_vdem__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: common_good_justifications_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#justcomgd_polch_vdem__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: respect_for_counterarguments_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#counterarg_polch_vdem__estimate_best
+          display:
+            name: "Respect for counterarguments"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: elite_consultations_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#elitecons_polch_vdem__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: engaged_society_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#soccons_polch_vdem__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#egaldem_vdem__estimate_best
+          display:
+            name: "Egalitarian Democracy Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral Democracy Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: egalitarian_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#egal_vdem__estimate_best
+          display:
+            name: "Egaliatarian Political Institutions Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: equal_rights_protection_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_rights_vdem__estimate_best
+          display:
+            name: "Equal Rights Protection Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: equal_access_to_power_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_access_vdem__estimate_best
+          display:
+            name: "Equal Access to Power Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: equal_resource_distribution_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_res_vdem__estimate_best
+          display:
+            name: "Equal Resource Distribution Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: varieties_of_democracy
+      sub_metric: main_indices
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral democracy"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#libdem_vdem__estimate_best
+          display:
+            name: "Liberal democracy"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#participdem_vdem__estimate_best
+          display:
+            name: "Participatory democracy"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#delibdem_vdem__estimate_best
+          display:
+            name: "Deliberative democracy"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#egaldem_vdem__estimate_best
+          display:
+            name: "Egalitarian democracy"
+    config:
+      title: "Varieties of democracy"
+      subtitle: "The indices are by [V-Dem](#dod:v-dem), based on expert estimates, and range from 0 to 1 (most democratic)."
+      selectedFacetStrategy: "entity"
+      addCountryMode: "change-country"
+      minTime: 1900
+      yAxis:
+        max: 1
+        min: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_row_owid
+          display:
+            name: ""
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_closed_autocracy
+          display:
+            name: "Closed autocracies"
+            color: "#d7191c"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_autocracy
+          display:
+            name: "Electoral autocracies"
+            color: "#ec9d4f"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_democracy
+          display:
+            name: "Electoral democracies"
+            color: "#6da5b8"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_liberal_democracy
+          display:
+            name: "Liberal democracies"
+            color: "#2c7bb6"
+    config:
+      title: "Countries that are democracies and autocracies"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem)."
+      note: "The share of closed autocracies increases a lot in 1900 because V-Dem covers many more countries since then, often colonies."
+      stackMode: "relative"
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime__category_closed_autocracy
+          display:
+            name: "People living in closed autocracies"
+            color: "#d7191c"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime__category_electoral_autocracy
+          display:
+            name: "in electoral autocracies"
+            color: "#ec9d4f"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime__category_electoral_democracy
+          display:
+            name: "in electoral democracies"
+            color: "#6da5b8"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime__category_liberal_democracy
+          display:
+            name: "in liberal democracies"
+            color: "#2c7bb6"
+    config:
+      title: "People living in democracies and autocracies"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem)."
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_redux_row_owid
+          display:
+            name: ""
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: multi_party_elections
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: multi_party_elections_for_chief_executive
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_hoe_row_owid__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: multi_party_elections_for_legislature
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_leg_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: free_and_fair_elections
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electfreefair_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: democratic_electoral_institutions
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electdem_dich_row_owid__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: age_of_electoral_democracy
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#num_years_in_electdem_consecutive
+          display:
+            shortUnit: "years"
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: number_and_share_of_long_standing_electoral_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_closed_autocracy
+          display:
+            name: "Closed autocracies"
+            color: "#8d6e71"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_autocracy
+          display:
+            name: "Electoral autocracies"
+            color: "#c6a1a5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_electdem__category_1_18_years
+          display:
+            name: "Electoral democracies aged 1-18"
+            color: "#edf8b1"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_electdem__category_19_30_years
+          display:
+            name: "aged 19-30"
+            color: "#c7e9b4"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_electdem__category_31_60_years
+          display:
+            name: "aged 31-60"
+            color: "#41b6c4"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_electdem__category_61_90_years
+          display:
+            name: "aged 61-90"
+            color: "#225ea8"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_electdem__category_91plus_years
+          display:
+            name: "aged 91 +"
+            color: "#172976"
+    config:
+      title: "Countries that are long-standing electoral democracies"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections."
+      note: "The share of closed autocracies increases a lot in 1900 because V-Dem covers many more countries since then, often colonies."
+      stackMode: "relative"
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_row_owid
+          display:
+            name: ""
+            numDecimalPlaces: 0
+    config:
+      title: "Liberal democracy"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Liberal democracies are political systems that hold meaningful, free and fair, and multi-party elections, and their citizens have further individual rights, are equal before the law, and the legislative and the courts constrain the executive."
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#8d6e71"
+            - "#c6a1a5"
+            - "#f3d0d4"
+            - null
+          customNumericLabels:
+            - "Closed autocracy"
+            - "Electoral autocracy"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 2
+            - 3
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_row_owid"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: transparent_laws
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#transplaws_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: access_to_justice_for_men
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#accessjust_m_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: access_to_justice_for_women
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#accessjust_w_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: liberal_political_institutions
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#lib_dich_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: age_of_liberal_democracy
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#num_years_in_libdem_consecutive
+          display:
+            shortUnit: "years"
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: number_and_share_of_long_standing_liberal_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_closed_autocracy
+          display:
+            name: "Closed autocracies"
+            color: "#8d6e71"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_autocracy
+          display:
+            name: "Electoral autocracies"
+            color: "#c6a1a5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_democracy
+          display:
+            name: "Electoral democracies"
+            color: "#f3d0d4"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_libdem__category_1_18_years
+          display:
+            name: "Liberal democracies aged 1-18"
+            color: "#edf8b1"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_libdem__category_19_30_years
+          display:
+            name: "aged 19-30"
+            color: "#c7e9b4"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_libdem__category_31_60_years
+          display:
+            name: "aged 31-60"
+            color: "#41b6c4"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_libdem__category_61_90_years
+          display:
+            name: "aged 60-90"
+            color: "#225ea8"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_libdem__category_91plus_years
+          display:
+            name: "aged 91 +"
+            color: "#172976"
+    config:
+      title: "Countries that are long-standing liberal democracies"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Liberal democracies are political systems that hold meaningful, free and fair, and multi-party elections, and their citizens have further individual rights, are equal before the law, and the legislative and the courts constrain the executive."
+      note: "The share of closed autocracies increases a lot in 1900 because V-Dem covers many more countries since then, often colonies."
+      stackMode: "relative"
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime_including_ambiguous_categories
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_amb_row_owid
+          display:
+            name: ""
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime_including_ambiguous_categories
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_closed_autocracy
+          display:
+            name: "Closed autocracies"
+            color: "#d7191c"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_closed__maybe_electoral__autocracy
+          display:
+            name: "Probably closed autocracies"
+            color: "#e74731"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_electoral__maybe_closed__autocracy
+          display:
+            name: "Probably electoral autocracy"
+            color: "#f88e52"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_autocracy
+          display:
+            name: "Electoral autocracies"
+            color: "#fdae61"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_electoral_autocracy__maybe_electoral_democracy
+          display:
+            name: " Probably electoral autocracy"
+            color: "#f0cda5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_electoral_democracy__maybe_electoral_autocracy
+          display:
+            name: " Probably electoral democracy"
+            color: "#d0dcc1"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_democracy
+          display:
+            name: "Electoral democracies"
+            color: "#abd9e9"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_electoral_democracy__maybe_liberal_democracy
+          display:
+            name: "Probably electoral democracy"
+            color: "#8dc1dc"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_liberal_democracy__maybe_electoral_democracy
+          display:
+            name: "Probably liberal democracy"
+            color: "#5496c5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_liberal_democracy
+          display:
+            name: "Liberal democracies"
+            color: "#2c7bb6"
+    config:
+      title: "Countries that are democracies and autocracies"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem)."
+      note: "The share of closed autocracies increases a lot in 1900 because V-Dem covers many more countries since then, often colonies."
+      stackMode: "relative"
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime_including_ambiguous_categories
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_closed_autocracy
+          display:
+            name: "People living in closed autocracies"
+            color: "#d7191c"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_closed__maybe_electoral__autocracy
+          display:
+            name: "in probably closed aut."
+            color: "#e74731"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral__maybe_closed__autocracy
+          display:
+            name: "in probably elect. aut."
+            color: "#f88e52"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral_autocracy
+          display:
+            name: "in electoral autocracies"
+            color: "#fdae61"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral_autocracy__maybe_electoral_democracy
+          display:
+            name: " in probably elect. aut."
+            color: "#f0cda5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral_democracy__maybe_electoral_autocracy
+          display:
+            name: "in probably elect. dem."
+            color: "#d0dcc1"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral_democracy
+          display:
+            name: "in electoral democracies"
+            color: "#abd9e9"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral_democracy__maybe_liberal_democracy
+          display:
+            name: " in probably elect. dem."
+            color: "#8dc1dc"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_liberal_democracy__maybe_electoral_democracy
+          display:
+            name: "in probably lib. dem."
+            color: "#5496c5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_liberal_democracy
+          display:
+            name: "in liberal democracies"
+            unit: "people"
+            color: "#2c7bb6"
+    config:
+      title: "People living in democracies and autocracies"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem)."

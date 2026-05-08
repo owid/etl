@@ -1,0 +1,271 @@
+# Mini-explorer for bti indicators (used by democracy.py with combine_collections).
+# Carries only the views whose `dataset` dimension maps to this upstream source.
+# FAUST (title, subtitle, note, map config, etc.) lives in the indicator's
+# `presentation.grapher_config` in the corresponding garden meta.yml — Grapher
+# inherits it at chart render time. Per-view `config:` here is intentionally empty
+# for single-y views; multi-y views keep their combined chart config.
+
+config:
+  explorerTitle: "Democracy"
+  explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
+  isPublished: true
+
+dimensions:
+  - slug: dataset
+    name: "Dataset"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: bertelsmann_transformation_index
+        name: "Bertelsmann Transformation Index"
+  - slug: metric
+    name: "Metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: political_regime
+        name: "Political regime"
+      - slug: democratic_features
+        name: "Democratic features"
+  - slug: sub_metric
+    name: "Sub-metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: main_index
+        name: "Main index"
+      - slug: main_classification
+        name: "Main classification"
+      - slug: number_and_share_of_democracies
+        name: "Number and share of democracies"
+      - slug: people_living_in_democracies
+        name: "People living in democracies"
+      - slug: stateness_index
+        name: "Stateness index"
+      - slug: political_participation_index
+        name: "Political participation index"
+      - slug: rule_of_law_index
+        name: "Rule of law index"
+      - slug: stability_of_democratic_institutions_index
+        name: "Stability of democratic institutions index"
+      - slug: political_and_social_integration_index
+        name: "Political and social integration index"
+      - slug: basic_state_functions_score
+        name: "Basic state functions score"
+      - slug: free_and_fair_elections_score
+        name: "Free and fair elections score"
+      - slug: effective_power_to_govern_score
+        name: "Effective power to govern score"
+      - slug: freedom_of_association_score
+        name: "Freedom of association score"
+      - slug: freedom_of_expression_score
+        name: "Freedom of expression score"
+      - slug: separation_of_powers_score
+        name: "Separation of powers score"
+      - slug: civil_rights_score
+        name: "Civil rights score"
+      - slug: democratic_features
+        name: "Democratic features"
+
+views:
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#democracy_bti
+          display:
+            name: "Democratic Features Index"
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: stateness_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#state_bti
+          display:
+            name: "Stateness Index"
+            shortUnit: ""
+            numDecimalPlaces: 1
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: political_participation_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#political_participation_bti
+          display:
+            name: "Political Participation Index"
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: rule_of_law_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#rule_of_law_bti
+          display:
+            name: "Rule of Law Index"
+            shortUnit: ""
+            numDecimalPlaces: 1
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: stability_of_democratic_institutions_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#stability_dem_inst_bti
+          display:
+            name: "Stability of Democratic Institutions Index"
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: political_and_social_integration_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#pol_soc_integr_bti
+          display:
+            name: "Political and Social Integration Index"
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#regime_bti
+          display:
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: basic_state_functions_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#state_basic_bti
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: free_and_fair_elections_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#electfreefair_bti
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: effective_power_to_govern_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#effective_power_bti
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: freedom_of_association_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#freeassoc_bti
+          display:
+            shortUnit: ""
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: freedom_of_expression_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#freeexpr_bti
+          display:
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: separation_of_powers_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#sep_power_bti
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: civil_rights_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#civ_rights_bti
+          display:
+            shortUnit: ""
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: democratic_features
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#democracy_bti
+          display:
+            name: "Democratic Features Index"
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_countries#num_regime_bti__category_hard_line_autocracy
+          display:
+            name: "Hard-line autocracies"
+            color: "#8a148c"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_countries#num_regime_bti__category_moderate_autocracy
+          display:
+            name: "Moderate autocracies"
+            color: "#d979d2"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_countries#num_regime_bti__category_highly_defective_democracy
+          display:
+            name: "Highly defective democracies"
+            color: "#1ac6d9"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_countries#num_regime_bti__category_defective_democracy
+          display:
+            name: "Defective democracies"
+            color: "#0487d9"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_countries#num_regime_bti__category_consolidating_democracy
+          display:
+            name: "Consolidating democracies"
+            color: "#034c8c"
+    config:
+      title: "Countries that are democracies and autocracies"
+      subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
+      note: "Data excludes long-term members of the OECD because they are considered consolidated democracies."
+      stackMode: "relative"
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category_hard_line_autocracy
+          display:
+            name: "People living in hard-line autocracies"
+            color: "#8a148c"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category_moderate_autocracy
+          display:
+            name: "People living in moderate autocracies"
+            color: "#d979d2"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category_highly_defective_democracy
+          display:
+            name: "People living in highly defective democracies"
+            color: "#1ac6d9"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category_defective_democracy
+          display:
+            name: "People living in defective democracies"
+            color: "#0487d9"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category_consolidating_democracy
+          display:
+            name: "People living in consolidating democracies"
+            color: "#034c8c"
+    config:
+      title: "People living in democracies and autocracies"
+      subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
+      note: "Data excludes long-term members of the OECD because they are considered consolidated democracies."

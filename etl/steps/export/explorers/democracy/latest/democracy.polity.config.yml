@@ -1,0 +1,232 @@
+# Mini-explorer for polity indicators (used by democracy.py with combine_collections).
+# Carries only the views whose `dataset` dimension maps to this upstream source.
+# FAUST (title, subtitle, note, map config, etc.) lives in the indicator's
+# `presentation.grapher_config` in the corresponding garden meta.yml — Grapher
+# inherits it at chart render time. Per-view `config:` here is intentionally empty
+# for single-y views; multi-y views keep their combined chart config.
+
+config:
+  explorerTitle: "Democracy"
+  explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
+  isPublished: true
+
+dimensions:
+  - slug: dataset
+    name: "Dataset"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: polity
+        name: "Polity"
+  - slug: metric
+    name: "Metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: political_regime
+        name: "Political regime"
+      - slug: democracy
+        name: "Democracy"
+  - slug: sub_metric
+    name: "Sub-metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: main_index
+        name: "Main index"
+      - slug: main_classification
+        name: "Main classification"
+      - slug: number_and_share_of_democracies
+        name: "Number and share of democracies"
+      - slug: people_living_in_democracies
+        name: "People living in democracies"
+      - slug: competitiveness_of_executive_recruitment_score
+        name: "Competitiveness of executive recruitment score"
+      - slug: openness_of_executive_recruitment_score
+        name: "Openness of executive recruitment score"
+      - slug: constraints_on_the_executive_score
+        name: "Constraints on the executive score"
+      - slug: regulation_of_political_participation_score
+        name: "Regulation of political participation score"
+      - slug: competitiveness_of_political_participation_score
+        name: "Competitiveness of political participation score"
+      - slug: main_index_distribution
+        name: "Main index distribution"
+      - slug: age_of_democracy
+        name: "Age of democracy"
+      - slug: number_and_share_of_long_standing_democracies
+        name: "Number and share of long-standing democracies"
+
+views:
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#democracy_polity
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: competitiveness_of_executive_recruitment_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#exec_reccomp_polity
+          display:
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: openness_of_executive_recruitment_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#exec_recopen_polity
+          display:
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: constraints_on_the_executive_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#exec_constr_polity
+          display:
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: regulation_of_political_participation_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#polpart_reg_polity
+          display:
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: competitiveness_of_political_participation_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#polpart_comp_polity
+          display:
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: main_index_distribution
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#democracy_recod_polity
+          display:
+            name: "Democracy Index"
+            includeInTable: true
+  - dimensions:
+      dataset: polity
+      metric: political_regime
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#regime_polity
+          display:
+            includeInTable: true
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: polity
+      metric: political_regime
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_autocracy
+          display:
+            name: "Autocracies"
+            color: "#e74731"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_anocracy
+          display:
+            name: "Anocracies"
+            color: "#967282"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_democracy
+          display:
+            name: "Democracies"
+            color: "#5496c5"
+    config:
+      title: "Countries that are democracies and non-democracies"
+      subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity)."
+      stackMode: "relative"
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      dataset: polity
+      metric: political_regime
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_regime_polity__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_group_age_dem_polity__category_autocracy
+          display:
+            name: "People living in autocracies"
+            color: "#e74731"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_regime_polity__category_anocracy
+          display:
+            name: "People living in anocracies"
+            color: "#967282"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_regime_polity__category_democracy
+          display:
+            name: "People living in democracies"
+            color: "#5496c5"
+    config:
+      title: "People living in democracies and non-democracies"
+      subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity)."
+  - dimensions:
+      dataset: polity
+      metric: political_regime
+      sub_metric: age_of_democracy
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#age_dem_polity
+          display:
+            unit: "years"
+            shortUnit: "years"
+            includeInTable: true
+            numDecimalPlaces: 0
+  - dimensions:
+      dataset: polity
+      metric: political_regime
+      sub_metric: number_and_share_of_long_standing_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_autocracy
+          display:
+            name: "Autocracies"
+            color: "#8d6e71"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_anocracy
+          display:
+            name: "Anocracies"
+            color: "#c6a1a5"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_1_18_years
+          display:
+            name: "Democracies aged 1-18"
+            color: "#edf8b1"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_19_30_years
+          display:
+            name: "aged 19-30"
+            color: "#c7e9b4"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_31_60_years
+          display:
+            name: "aged 31-60"
+            color: "#41b6c4"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_61_90_years
+          display:
+            name: "aged 61-90"
+            color: "#225ea8"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_91plus_years
+          display:
+            name: "aged 91 +"
+            color: "#172976"
+    config:
+      title: "Countries that are long-standing democracies"
+      subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity). Democracies are political systems with broadly open, multi-party, and competitive elections for a chief executive who faces comprehensive institutional constraints, and political participation is broadly competitive."
+      stackMode: "relative"

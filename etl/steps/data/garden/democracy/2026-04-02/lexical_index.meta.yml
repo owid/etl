@@ -32,6 +32,34 @@ tables:
 
           Equivalent indicator: `executive_elections`
 
+        presentation:
+          grapher_config:
+            title: Elections for the government's chief executive
+            subtitle: Data by the Lexical Index of Electoral Democracy.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#ef8a62'
+                  - '#2c7bb6'
+                customNumericLabels:
+                  - "No"
+                  - "Yes"
+                  - Electoral democracy
+                  - Liberal democracy
+                customNumericValues:
+                  - 0
+                  - 0
+                  - 1
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       legelec_lied:
         title: Legislative elections
         unit: ""
@@ -42,6 +70,34 @@ tables:
 
           Equivalent indicator: `legislative_elections`
 
+        presentation:
+          grapher_config:
+            title: Elections for the legislature
+            subtitle: Data by the Lexical Index of Electoral Democracy.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#ef8a62'
+                  - '#2c7bb6'
+                customNumericLabels:
+                  - "No"
+                  - "Yes"
+                  - Electoral democracy
+                  - Liberal democracy
+                customNumericValues:
+                  - 0
+                  - 0
+                  - 1
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       exe_leg_elec_lied:
         title: Elections for chief executive and legislature
         unit: ""
@@ -62,6 +118,34 @@ tables:
 
           Equivalent indicator: `multiparty_legislative_election`
 
+        presentation:
+          grapher_config:
+            title: Political opposition
+            subtitle: Data by the Lexical Index of Electoral Democracy. Political opposition is more than one party or non-party candidate being able to compete in elections for the legislature.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#ef8a62'
+                  - '#2c7bb6'
+                customNumericLabels:
+                  - "No"
+                  - "Yes"
+                  - Electoral democracy
+                  - Liberal democracy
+                customNumericValues:
+                  - 0
+                  - 0
+                  - 1
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       competition_lied:
         title: Competitive elections
         unit: ""
@@ -75,6 +159,33 @@ tables:
 
           Equivalent indicator: `competitive_elections`
 
+        presentation:
+          grapher_config:
+            title: Competitive elections
+            subtitle: Data by the Lexical Index of Electoral Democracy. Competitive elections have an uncertain outcome because their timing is not violated, voters are not systematically coerced, and election fraud is not consequential.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: BinaryMapPaletteE
+                binningStrategy: manual
+                customNumericColors:
+                  - '#e56e5a'
+                  - '#2c7bb6'
+                customNumericLabels:
+                  - "No"
+                  - "Yes"
+                  - Electoral democracy
+                  - Liberal democracy
+                customNumericValues:
+                  - 0
+                  - 0
+                  - 1
+              tooltipUseCustomLabels: true
       poliberties_lied:
         title: Political liberties
         unit: ""
@@ -84,6 +195,34 @@ tables:
 
           Equivalent indicator: ``
 
+        presentation:
+          grapher_config:
+            title: Political liberties
+            subtitle: Data by the Lexical Index of Electoral Democracy. Political liberties are respect for the freedoms of expression, assembly, and association.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#ef8a62'
+                  - '#2c7bb6'
+                customNumericLabels:
+                  - "No"
+                  - "Yes"
+                  - Electoral democracy
+                  - Liberal democracy
+                customNumericValues:
+                  - 0
+                  - 0
+                  - 1
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       regime_redux_lied:
         title: Political regime (reduced)
         unit: ""
@@ -142,6 +281,54 @@ tables:
           6: electoral democracy
           7: full democracy (polyarchy)
 
+        presentation:
+          grapher_config:
+            title: Democracy
+            subtitle: Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index).
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 7
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#d7191c'
+                  - '#e74731'
+                  - '#f88e52'
+                  - 
+                  - 
+                  - '#8dc1dc'
+                  - '#5496c5'
+                  - '#2c7bb6'
+                customNumericLabels:
+                  - Non-elect. autocracy
+                  - One-party autocracy
+                  - ''
+                  - Multi-party autocracy
+                  - Exclusive democracy
+                  - Male democracy
+                  - Electoral democracy
+                  - Full democracy
+                  - '8'
+                  - Liberal democracy
+                customNumericValues:
+                  - 0
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+                customCategoryLabels:
+                  No data: No data
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       male_suffrage_lied:
         title: Universal right to vote for men
         unit: ""
@@ -152,6 +339,33 @@ tables:
 
           Equivalent indicator: `male_suffrage`
 
+        presentation:
+          grapher_config:
+            title: Men's universal right to vote
+            subtitle: This does not consider elections not being held, informal restrictions, or legal restrictions based on age, criminal conviction, disability, and local residency.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: PiYG
+                binningStrategy: manual
+                legendDescription: Universal Suffrage
+                customNumericColors:
+                  - '#f4a582'
+                  - '#92c5de'
+                customNumericLabels:
+                  - "No"
+                  - "Yes"
+                customNumericValues:
+                  - 0
+                  - 0.5
+                  - 1
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       female_suffrage_lied:
         title: Universal right to vote for women
         unit: ""
@@ -162,6 +376,33 @@ tables:
 
           Equivalent indicator: `female_suffrage`
 
+        presentation:
+          grapher_config:
+            title: Women's universal right to vote
+            subtitle: This does not consider elections not being held, informal restrictions, or legal restrictions based on age, criminal conviction, disability, and local residency.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: PiYG
+                binningStrategy: manual
+                legendDescription: Universal Suffrage
+                customNumericColors:
+                  - '#f4a582'
+                  - '#92c5de'
+                customNumericLabels:
+                  - "No"
+                  - "Yes"
+                customNumericValues:
+                  - 0
+                  - 0.5
+                  - 1
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       suffrage_lied:
         title: Universal suffrage
         unit: ""
@@ -192,6 +433,42 @@ tables:
           - Male democracies are exclusive democracies that have comprehensive suffrage for men.
           - Electoral democracies are male democracies that also have comprehensive suffrage for women.
 
+        presentation:
+          grapher_config:
+            title: Electoral democracy
+            subtitle: Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index). Electoral democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#ef8a62'
+                  - '#2c7bb6'
+                customNumericLabels:
+                  - "No"
+                  - "Yes"
+                  - ''
+                  - Multi-party autocracy
+                  - Exclusive democracy
+                  - Male democracy
+                  - Electoral democracy
+                  - Polyarchy
+                  - '8'
+                  - Liberal democracy
+                customNumericValues:
+                  - 0
+                  - 0
+                  - 1
+                customCategoryLabels:
+                  No data: No data
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       is_full_democracy:
         title: Country is a full democracy
         description_short: |-
@@ -200,6 +477,42 @@ tables:
           It is a boolean indicator that indicates whether the country is a full democracy (score 7 in the `lexical_index_plus` indicator).
         unit: ""
 
+        presentation:
+          grapher_config:
+            title: Full democracy
+            subtitle: Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index). Full democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#ef8a62'
+                  - '#2c7bb6'
+                customNumericLabels:
+                  - "No"
+                  - "Yes"
+                  - ''
+                  - Multi-party autocracy
+                  - Exclusive democracy
+                  - Male democracy
+                  - Electoral democracy
+                  - Full democracy
+                  - '8'
+                  - Liberal democracy
+                customNumericValues:
+                  - 0
+                  - 0
+                  - 1
+                customCategoryLabels:
+                  No data: No data
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       is_electoral_democracy:
         title: Country is an electoral democracy
         description_short: |-
@@ -216,6 +529,64 @@ tables:
         description_key: &key_electdem
           - Electoral democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
 
+        presentation:
+          grapher_config:
+            title: Age of electoral democracy
+            subtitle: Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index). Electoral democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: auto
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#edf8b1'
+                  - '#c7e9b4'
+                  - '#41b6c4'
+                  - '#225ea8'
+                  - '#172976'
+                customNumericLabels:
+                  - ''
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                customNumericValues:
+                  - 0
+                  - 18
+                  - 30
+                  - 60
+                  - 90
+                  - 1
+                customCategoryColors:
+                  No data: '#ffffff'
+                  no data: '#ffffff'
+                  male democracy: '#c7a2b6'
+                  closed autocracy: '#8d6e71'
+                  electoral autocracy: '#c6a1a5'
+                  exclusive democracy: '#d2aebe'
+                  one-party autocracy: '#a3809a'
+                  multiparty autocracy: '#bb96ae'
+                  multi-party autocracy: '#bb96ae'
+                  non-electoral autocracy: '#97758e'
+                  not an electoral democracy: '#fdae61'
+                  multiparty autocracy without elected executive: '#af8aa5'
+                  multi-party autocracy without elected executive: '#af8aa5'
+                customCategoryLabels:
+                  male democracy: Male democracy
+                  exclusive democracy: Exclusive democracy
+                  one-party autocracy: One-party autocracy
+                  multi-party autocracy: Multi-party autocracy
+                  non-electoral autocracy: Non-electoral autocracy
+                  multi-party autocracy without elected executive: Multi-party autocracy without elected executive
+                customHiddenCategories:
+                  No data: true
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
       group_age_electdem_lied:
         title: "Age of electoral democracy (category)"
         unit: ""
@@ -237,6 +608,64 @@ tables:
         description_key: &key_poly
           - In full democracies, citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association.
         description_processing: *polyarchy_fulldem_proc
+        presentation:
+          grapher_config:
+            title: Age of full democracy
+            subtitle: Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index). Full democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: auto
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#edf8b1'
+                  - '#c7e9b4'
+                  - '#41b6c4'
+                  - '#225ea8'
+                customNumericLabels:
+                  - ''
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                customNumericValues:
+                  - 0
+                  - 18
+                  - 30
+                  - 60
+                  - 9
+                customCategoryColors:
+                  No data: '#ffffff'
+                  no data: '#ffffff'
+                  male democracy: '#c7a2b6'
+                  closed autocracy: '#8d6e71'
+                  electoral autocracy: '#c6a1a5'
+                  electoral democracy: '#debac7'
+                  exclusive democracy: '#d2aebe'
+                  one-party autocracy: '#a3809a'
+                  multiparty autocracy: '#bb96ae'
+                  multi-party autocracy: '#bb96ae'
+                  non-electoral autocracy: '#97758e'
+                  not an electoral democracy: '#fdae61'
+                  multiparty autocracy without elected executive: '#af8aa5'
+                  multi-party autocracy without elected executive: '#af8aa5'
+                customCategoryLabels:
+                  male democracy: Male democracy
+                  electoral democracy: Electoral democracy
+                  exclusive democracy: Exclusive democracy
+                  one-party autocracy: One-party autocracy
+                  multi-party autocracy: Multi-party autocracy
+                  non-electoral autocracy: Non-electoral autocracy
+                  multi-party autocracy without elected executive: Multi-party autocracy without elected executive
+                customHiddenCategories:
+                  No data: true
+                customNumericColorsActive: true
+              tooltipUseCustomLabels: true
 
       group_age_polyarchy_lied:
         title: "Age of full democracy (category)"
