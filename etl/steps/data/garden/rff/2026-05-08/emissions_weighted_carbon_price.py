@@ -169,6 +169,100 @@ def sanity_check_outputs(tb_combined: Table, expected_countries_dropping_taxes: 
         )
 
 
+def plot_price_coverage_curve(tb: Table, year: int | None = None) -> None:
+    """Plot a step curve of carbon price vs. cumulative share of global CO₂ emissions.
+
+    For a given year, sorts countries by their emissions-weighted carbon price (descending) and
+    plots a horizontal segment per country whose width is that country's share of global CO₂
+    emissions covered by a carbon tax or ETS. Unpriced emissions form a flat zero tail out to
+    x=1, so the area under the curve makes the global picture (a small high-priced sliver, a
+    long low-priced tail, and a large unpriced gap) immediately legible.
+
+    Expects the combined country-level table BEFORE `tb.format(...)` (i.e. with `country` and
+    `year` as plain columns, and `co2_with_tax_or_ets_as_share_of_world_co2` already in
+    percent — `run()` multiplies the coverage block by 100 before this point).
+
+    Parameters
+    ----------
+    tb : Table
+        Combined garden table after harmonization, before `format()`.
+    year : int | None
+        Year to plot. Defaults to the latest year present.
+    """
+    import plotly.graph_objects as go
+
+    df = tb[
+        [
+            "country",
+            "year",
+            "price_with_tax_or_ets_weighted_by_share_of_co2",
+            "co2_with_tax_or_ets_as_share_of_world_co2",
+        ]
+    ].copy()
+    df = df[df["country"] != "World"]
+    if year is None:
+        year = int(df["year"].dropna().max())
+    df = (
+        df[
+            (df["year"] == year)
+            & (df["price_with_tax_or_ets_weighted_by_share_of_co2"].fillna(0) > 0)
+            & (df["co2_with_tax_or_ets_as_share_of_world_co2"].fillna(0) > 0)
+        ]
+        .sort_values("price_with_tax_or_ets_weighted_by_share_of_co2", ascending=False)
+        .reset_index(drop=True)
+    )
+    if df.empty:
+        log.warning(f"No priced countries found for year {year}; nothing to plot.")
+        return
+
+    # Coverage column is in percent at this stage — convert to a 0–1 proportion of global CO₂.
+    share = df["co2_with_tax_or_ets_as_share_of_world_co2"] / 100.0
+    cum = share.cumsum().tolist()
+    prices = df["price_with_tax_or_ets_weighted_by_share_of_co2"].tolist()
+
+    # Step curve with hv shape: (0, p₁), (cum₁, p₂), ..., (cum_{N-1}, p_N), (cum_N, 0), (1, 0).
+    xs = [0.0] + cum[:-1] + [cum[-1], 1.0]
+    ys = prices + [0.0, 0.0]
+
+    fig = go.Figure(
+        go.Scatter(
+            x=xs,
+            y=ys,
+            mode="lines",
+            line_shape="hv",
+            line=dict(color="#cf0a2c", width=2.5),
+            hovertemplate="cum. share: %{x:.3f}<br>price: $%{y:.2f}/tCO2<extra></extra>",
+            showlegend=False,
+        )
+    )
+    # Per-country markers at each segment's midpoint, for country-level hover.
+    seg_mid_x = [(0.0 if i == 0 else cum[i - 1]) + share.iloc[i] / 2 for i in range(len(df))]
+    fig.add_trace(
+        go.Scatter(
+            x=seg_mid_x,
+            y=prices,
+            mode="markers",
+            marker=dict(size=6, color="#cf0a2c"),
+            customdata=df[["country", "co2_with_tax_or_ets_as_share_of_world_co2"]].values,
+            hovertemplate=(
+                "<b>%{customdata[0]}</b><br>"
+                "price: $%{y:.2f}/tCO2<br>"
+                "share of global CO2: %{customdata[1]:.2f}%<extra></extra>"
+            ),
+            showlegend=False,
+        )
+    )
+    fig.update_layout(
+        title=f"Share of global CO₂ emissions covered by carbon pricing ({year})",
+        xaxis_title="Proportion of global CO₂ emissions",
+        yaxis_title="Carbon price (constant 2021 US$ per ton CO₂e)",
+        xaxis=dict(range=[0, 1]),
+        yaxis=dict(rangemode="tozero"),
+        template="plotly_white",
+    )
+    fig.show()
+
+
 def run() -> None:
     #
     # Load data.
@@ -211,6 +305,10 @@ def run() -> None:
     # Some countries suddenly dropped their carbon mechanisms to zero.
     expected_countries_dropping_taxes = set()
     sanity_check_outputs(tb_combined, expected_countries_dropping_taxes=expected_countries_dropping_taxes)
+
+    # Optional: render the carbon-price-vs-cumulative-emissions-covered step curve for a given year.
+    # Uncomment for ad-hoc inspection — opens an interactive plotly figure, not part of the build output.
+    # plot_price_coverage_curve(tb_combined, year=2024)
 
     # Improve table format.
     tb_combined = tb_combined.format(keys=["country", "year"], sort_columns=True)
