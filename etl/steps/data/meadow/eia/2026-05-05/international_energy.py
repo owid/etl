@@ -1,17 +1,4 @@
-"""Load a snapshot and create a meadow dataset.
-
-The EIA International Energy bulk file packs every (variable, country, frequency) timeseries
-into one row, with the data as a list of [period, value] pairs. This step reshapes the raw JSON
-into long-format tables indexed by (country, period, variable, unit) so the garden step can
-filter and pivot whichever indicators it needs.
-
-Two tables are emitted:
-
-- ``international_energy`` — annual series only (the bulk of the data).
-- ``international_energy_monthly`` — monthly series only (mainly oil & petroleum production).
-
-Quarterly series are dropped: they're a small subset of what's in monthly form already.
-"""
+"""Load a snapshot and create a meadow dataset."""
 
 import pandas as pd
 from owid.catalog import Table

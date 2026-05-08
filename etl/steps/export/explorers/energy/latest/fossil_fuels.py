@@ -1,6 +1,4 @@
-"""Load the fossil_fuels grapher dataset and create the fossil fuels explorer.
-
-"""
+"""Load the fossil_fuels grapher dataset and create the fossil fuels explorer."""
 
 from etl.helpers import PathFinder
 
