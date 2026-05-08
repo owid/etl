@@ -19,7 +19,7 @@ meta:
     date_accessed: '2026-05-08'
     date_published: '2026-04-22'
     license:
-      name: CC BY-NC-ND 4.0
+      name: CC BY-NC-SA 4.0
       url: https://github.com/g-dolphin/WorldCarbonPricingDatabase/
 outs:
   - md5: 7e84f61436c777a50578f1a3a7ad9263
