@@ -205,8 +205,6 @@ definitions:
     colorScaleEqualSizeBins: true
     colorScaleNumericMinValue: 0
     colorScaleInvert: false
-  monthly_oil_subtitle: &monthly_oil_subtitle |-
-    Monthly production of crude oil including lease condensate.
   monthly_oil_note: &monthly_oil_note |-
     Monthly production is allocated to the first day of each month: so, December 2019 production is allocated to 1st December 2019. This includes the production of crude oil, including lease condensate.
 
@@ -433,8 +431,7 @@ views:
             <<: *oil_production_monthly_total_colors
     config:
       <<: *common_view
-      title: Monthly oil production
-      subtitle: *monthly_oil_subtitle
+      title: Monthly crude oil production
       note: *monthly_oil_note
 
   - dimensions: {resource: oil, metric: monthly_production, count: per_capita}
@@ -445,8 +442,7 @@ views:
             <<: *oil_production_monthly_pc_colors
     config:
       <<: *common_view
-      title: Monthly oil production per capita
-      subtitle: *monthly_oil_subtitle
+      title: Monthly crude oil production per capita
       note: *monthly_oil_note
 
   # ---------- Natural gas ----------
