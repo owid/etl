@@ -111,6 +111,20 @@ steps:
   export://multidim/energy/latest/energy_prices:
     - data://grapher/energy/2025-02-03/energy_prices
   #
+  # UNECE - Life Cycle Assessment of Electricity Generation Options.
+  #
+  data://meadow/unece/2026-05-04/life_cycle_assessment_of_electricity:
+    - snapshot://unece/2026-05-04/life_cycle_assessment_of_electricity.pdf
+  data://garden/unece/2026-05-04/life_cycle_assessment_of_electricity:
+    - data://meadow/unece/2026-05-04/life_cycle_assessment_of_electricity
+  data://grapher/unece/2026-05-04/life_cycle_assessment_of_electricity:
+    - data://garden/unece/2026-05-04/life_cycle_assessment_of_electricity
+  #
+  # Impacts of energy production explorer.
+  #
+  export://explorers/energy/latest/impacts_of_energy_sources:
+    - data://grapher/unece/2026-05-04/life_cycle_assessment_of_electricity
+  #
   # IRENA - Renewable energy patents.
   #
   data://meadow/irena/2025-06-20/renewable_energy_patents:

@@ -18,7 +18,7 @@ Learn more about our architecture in the following sections: -->
 
 <div class="grid cards" markdown>
 
--   :fontawesome-solid-paintbrush: &nbsp; **[The design principles of the ETL](design/compute-graph/index.md)**
+-   :fontawesome-solid-paintbrush: &nbsp; **[The design principles of the ETL](design/compute-graph.md)**
 
     ***
 

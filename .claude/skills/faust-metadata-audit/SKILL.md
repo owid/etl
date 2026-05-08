@@ -1,11 +1,11 @@
 ---
-name: chart-text-report
-description: Generate a compact Markdown report of user-facing chart text (Title, Subtitle, Footnote, description_short, description_key) for an MDim, a grapher/garden dataset, or a hand-picked list of indicators. Each field is tagged by source (override / inherited / missing) so the reader can tell what Grapher renders vs. what comes from the ETL. Trigger when the user wants to review, audit, or spot-check the user-facing text of one or many charts/indicators at once — e.g. "dump the FAUST for dataset X", "I want to review the text of all views in this MDim", "show me the chart text for these indicators".
+name: faust-metadata-audit
+description: Generate a compact Markdown audit of user-facing chart text (Title, Subtitle, Footnote, description_short, description_key — i.e. FAUST) for an MDim, a grapher/garden dataset, or a hand-picked list of indicators. Each field is tagged by source (override / inherited / missing) so the reader can tell what Grapher renders vs. what comes from the ETL metadata. Trigger when the user wants to review, audit, or spot-check the user-facing text of one or many charts/indicators at once — e.g. "audit the FAUST for dataset X", "dump the FAUST for dataset X", "I want to review the text of all views in this MDim", "show me the chart text for these indicators".
 metadata:
   internal: true
 ---
 
-# Chart text report
+# FAUST metadata audit
 
 Produce a Markdown audit of the user-facing chart text for a set of indicators or MDim views. The goal is editorial review: a reader should be able to scan the file and see exactly what Grapher renders, without opening every chart.
 
@@ -135,16 +135,16 @@ Total views: **N**   (for MDims)
      Only add `--grapher` if you've changed indicator data/metadata that also needs to land in MySQL for live rendering. No DB-bypass fallback: if MySQL is unreachable, report the error and stop.
    - **MDim mode (render the report)** — edit the `MDIMS` list at the top of `scripts/generate_mdim_text_report.py` or pass `--config <json>` with the same shape; then:
      ```
-     .venv/bin/python .claude/skills/chart-text-report/scripts/generate_mdim_text_report.py
+     .venv/bin/python .claude/skills/faust-metadata-audit/scripts/generate_mdim_text_report.py
      ```
    - **Dataset mode** — audit every indicator of a grapher dataset:
      ```
-     .venv/bin/python .claude/skills/chart-text-report/scripts/grapher_dataset_mode.py \
+     .venv/bin/python .claude/skills/faust-metadata-audit/scripts/grapher_dataset_mode.py \
          --dataset data/grapher/wb/2026-03-24/world_bank_pip
      ```
    - **Indicator-list mode** — hand-picked catalogPaths:
      ```
-     .venv/bin/python .claude/skills/chart-text-report/scripts/grapher_dataset_mode.py \
+     .venv/bin/python .claude/skills/faust-metadata-audit/scripts/grapher_dataset_mode.py \
          --indicators 'grapher/wb/2026-03-24/world_bank_pip/incomes#thr__...' \
                       'grapher/wb/2026-03-24/world_bank_pip/incomes#share__...'
      ```
@@ -173,7 +173,7 @@ Then audit:
 1. **Spot-check several view types**, not just one — overrides, `before_vs_after`, single-decile, all-decile (multi-indicator), share-vs-non-share. Different code paths populate different fields.
 2. **Override fields live on the view; inherited fields don't.** A view's `metadata.description_key` in the `.config.json` only contains bullets the MDim explicitly set (via `view.metadata["description_key"] = [...]` or `view_metadata` in `group_views`). Empty array / missing key means the bullets come from the underlying y-indicator — read those via `Dataset(<grapher_path>).read(<table>, load_data=False)[<col>].metadata.description_key`.
 3. **Programmatic display.name overrides on indicators within multi-indicator views** (e.g. `5th decile (median)` annotation on the decile_5 indicator inside a `thr+all` view) live on `view['indicators']['y'][i]['display']['name']`, not on the view's text fields. Inspect them per-indicator.
-4. **Slug collisions in the report (`Income-share-decile` vs `income-share-decile`, `Expressed-constant-international` vs `expressed-constant-international`) are tooling artefacts** — the chart-text-report script can split a single bullet into two slugs because of trailing whitespace or invisible diffs. The actual rendered text is identical. Per the user's feedback, ignore capital/lowercase slug differences during audits.
+4. **Slug collisions in the report (`Income-share-decile` vs `income-share-decile`, `Expressed-constant-international` vs `expressed-constant-international`) are tooling artefacts** — the audit script can split a single bullet into two slugs because of trailing whitespace or invisible diffs. The actual rendered text is identical. Per the user's feedback, ignore capital/lowercase slug differences during audits.
 5. **Check punctuation around markdown links specifically.** `[Economic Inequality.](url)` (period inside) vs `[Economic Inequality](url).` (period outside) is a common copy-edit issue and easy to miss.
 6. **Common drift you'll see:**
    - `_post-tax_` / `_pre-tax_` hyphenation removed from welfare_type bullets
@@ -198,4 +198,4 @@ Then audit:
 
 - `.claude/projects/-Users-parriagadap-etl/memory/faust_definition.md` — FAUST = Footnote, Axis titles, Units, Subtitle, Title.
 - `.claude/projects/-Users-parriagadap-etl/memory/feedback_chart_faust_inheritance.md` — the inheritance rule, with the caveat about `grapher_config` not being universally populated.
-- `.claude/skills/chart-text-report/scripts/` — the scripts this skill drives.
+- `.claude/skills/faust-metadata-audit/scripts/` — the scripts this skill drives.
