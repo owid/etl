@@ -1,5 +1,58 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  # Shared subtitle prefix — referenced via {definitions.bti_attribution} dynamic-yaml interpolation.
+  bti_attribution: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
+
+  # Mapping anchors (referenced via `<<: *name`)
+  map_tab: &map_tab
+    hasMapTab: true
+    tab: map
+
+  # List anchors for map.colorScale.customNumericColors
+  bti_palette_3: &bti_palette_3
+    - "#8a148c"
+    - "#d979d2"
+    - "#1ac6d9"
+  bti_palette_5: &bti_palette_5
+    - "#8a148c"
+    - "#d979d2"
+    - "#1ac6d9"
+    - "#0487d9"
+    - "#034c8c"
+
+  # List anchors for map.colorScale.customNumericValues
+  values_1_10: &values_1_10
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+  values_intermediate: &values_intermediate
+    - 1
+    - 2.5
+    - 4.5
+    - 6.5
+    - 8.5
+    - 10
+
+  # Reused customNumericLabels for index-style 5-bucket maps
+  labels_quality: &labels_quality
+    - Poor
+    - Flawed
+    - Fair
+    - Sound
+    - Excellent
+    - ""
+    - ""
+    - ""
+    - ""
+    - ""
+
   common:
     presentation:
       topic_tags:
@@ -12,6 +65,14 @@ dataset:
 
 tables:
   bti:
+    common:
+      presentation:
+        grapher_config:
+          <<: *map_tab
+          note: Data excludes long-term members of the OECD because they are considered stable democracies.
+          yAxis:
+            max: 10
+            min: 1
     variables:
       democracy_bti:
         title: "Democracy score"
@@ -20,46 +81,15 @@ tables:
         description_processing: |-
           Values for continents have been obtained by averaging the values of the countries in the continent.
         unit: ""
-
         presentation:
           grapher_config:
             title: Democratic Features Index
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent of political participation, the rule of law, stable democratic institutions, political and social integration, and a capable state. The index ranges from 1 to 10 (most democratic).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent of political participation, the rule of law, stable democratic institutions, political and social integration, and a capable state. The index ranges from 1 to 10 (most democratic)."
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors:
-                  - 
-                  - 
-                customNumericLabels:
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                customNumericValues:
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  - 6
-                  - 7
-                  - 8
-                  - 9
-                  - 10
+                customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
@@ -81,10 +111,7 @@ tables:
         presentation:
           grapher_config:
             title: Democracy
-            subtitle: '[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index).'
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
+            subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
             yAxis:
               max: 5
               min: 1
@@ -93,23 +120,18 @@ tables:
               colorScale:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                  - '#0487d9'
-                  - '#034c8c'
+                customNumericColors: *bti_palette_5
                 customNumericLabels:
                   - Hard-line autocracy
                   - Moderate autocracy
                   - Highly defective democracy
                   - Defective democracy
                   - Consolidating democracy
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
                 customNumericValues:
                   - 1
                   - 1
@@ -138,35 +160,13 @@ tables:
         presentation:
           grapher_config:
             title: Free and Fair Elections Score
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which elections are free from irregularities, the rights to vote, run for office, and campaign are unrestricted, registration is easy, and campaigning and media access are fair. The scores range from 1 to 10 (most free and fair).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which elections are free from irregularities, the rights to vote, run for office, and campaign are unrestricted, registration is easy, and campaigning and media access are fair. The scores range from 1 to 10 (most free and fair)."
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                  - 
-                  - 
-                  - 
-                customNumericValues:
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  - 6
-                  - 7
-                  - 8
-                  - 9
-                  - 10
+                customNumericColors: *bti_palette_3
+                customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
@@ -185,35 +185,13 @@ tables:
         presentation:
           grapher_config:
             title: Effective Power to Govern Score
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which no individual or group holds de facto veto power over democratically elected political leaders. The scores range from 1 to 10 (most effective).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which no individual or group holds de facto veto power over democratically elected political leaders. The scores range from 1 to 10 (most effective)."
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                  - 
-                  - 
-                  - 
-                customNumericValues:
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  - 6
-                  - 7
-                  - 8
-                  - 9
-                  - 10
+                customNumericColors: *bti_palette_3
+                customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
@@ -232,35 +210,13 @@ tables:
         presentation:
           grapher_config:
             title: Freedom of Association Score
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which residents and groups can associate and assemble free from government interference. Scores range from 1 to 10 (most free).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which residents and groups can associate and assemble free from government interference. Scores range from 1 to 10 (most free)."
             map:
               colorScale:
                 baseColorScheme: GnBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                  - 
-                  - 
-                  - 
-                customNumericValues:
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  - 6
-                  - 7
-                  - 8
-                  - 9
-                  - 10
+                customNumericColors: *bti_palette_3
+                customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
@@ -281,35 +237,13 @@ tables:
         presentation:
           grapher_config:
             title: Freedom of Expression Score
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which individuals, groups, and the press can express their views free from government interference. Scores range from 1 to 10 (most free).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which individuals, groups, and the press can express their views free from government interference. Scores range from 1 to 10 (most free)."
             map:
               colorScale:
                 baseColorScheme: YlGn
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                  - 
-                  - 
-                  - 
-                customNumericValues:
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  - 6
-                  - 7
-                  - 8
-                  - 9
-                  - 10
+                customNumericColors: *bti_palette_3
+                customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
@@ -330,35 +264,13 @@ tables:
         presentation:
           grapher_config:
             title: Separation of Powers Score
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent of mutual checks and balances on political powers. Scores range from 1 to 10 (most separated).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent of mutual checks and balances on political powers. Scores range from 1 to 10 (most separated)."
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                  - 
-                  - 
-                  - 
-                customNumericValues:
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  - 6
-                  - 7
-                  - 8
-                  - 9
-                  - 10
+                customNumericColors: *bti_palette_3
+                customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
@@ -377,35 +289,13 @@ tables:
         presentation:
           grapher_config:
             title: Civil Rights Score
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which civil rights are codified in law, the state prosecutes any violations, and works to prevent discrimination. Scores range from 1 to 10 (most rights).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which civil rights are codified in law, the state prosecutes any violations, and works to prevent discrimination. Scores range from 1 to 10 (most rights)."
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                  - 
-                  - 
-                  - 
-                customNumericValues:
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  - 6
-                  - 7
-                  - 8
-                  - 9
-                  - 10
+                customNumericColors: *bti_palette_3
+                customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
@@ -422,40 +312,15 @@ tables:
         presentation:
           grapher_config:
             title: Stateness Index
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which the state has the monopoly on the use of force, provides basic public services across the country, citizens accept the state as legitimate, religious dogmas do not interfere, and citizenship is accessible. The index ranges from 1 to 10 (high stateness).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which the state has the monopoly on the use of force, provides basic public services across the country, citizens accept the state as legitimate, religious dogmas do not interfere, and citizenship is accessible. The index ranges from 1 to 10 (high stateness)."
             maxTime: 2023
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                customNumericLabels:
-                  - Poor
-                  - Flawed
-                  - Fair
-                  - Sound
-                  - Excellent
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                customNumericValues:
-                  - 1
-                  - 2.5
-                  - 4.5
-                  - 6.5
-                  - 8.5
-                  - 10
+                customNumericColors: *bti_palette_3
+                customNumericLabels: *labels_quality
+                customNumericValues: *values_intermediate
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
@@ -467,43 +332,18 @@ tables:
         description_short: |-
           Indicates the extent to which the state has the monopoly on the use of force and provides basic public services across the country. It ranges from 1 to 10 (most functioning).
         unit: ""
-
         presentation:
           grapher_config:
             title: Basic State Functions Score
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which the state has the monopoly on the use of force and provides basic public services across the country. Scores range from 1 to 10 (most functioning).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which the state has the monopoly on the use of force and provides basic public services across the country. Scores range from 1 to 10 (most functioning)."
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                  - '#0487d9'
-                  - '#034c8c'
-                  - 
-                  - 
-                  - 
-                customNumericValues:
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  - 6
-                  - 7
-                  - 8
-                  - 9
-                  - 10
+                customNumericColors: *bti_palette_5
+                customNumericValues: *values_1_10
                 customCategoryLabels:
-                  No data: ''
+                  No data: ""
               tooltipUseCustomLabels: true
       political_participation_bti:
         title: "Political participation"
@@ -516,39 +356,14 @@ tables:
         presentation:
           grapher_config:
             title: Political Participation Index
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which elections are free and fair, democratically elected leaders have the effective power to govern, and citizens have the freedoms of association and expression. The index ranges from 1 to 10 (most democratic).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which elections are free and fair, democratically elected leaders have the effective power to govern, and citizens have the freedoms of association and expression. The index ranges from 1 to 10 (most democratic)."
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                customNumericLabels:
-                  - Poor
-                  - Flawed
-                  - Fair
-                  - Sound
-                  - Excellent
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                customNumericValues:
-                  - 1
-                  - 2.5
-                  - 4.5
-                  - 6.5
-                  - 8.5
-                  - 10
+                customNumericColors: *bti_palette_3
+                customNumericLabels: *labels_quality
+                customNumericValues: *values_intermediate
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
@@ -565,40 +380,15 @@ tables:
         presentation:
           grapher_config:
             title: Rule of Law Index
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which political power is separated, the judiciary is independent, office abuse is prosecuted, and civil rights are enforced. The index ranges from 1 to 10 (most rule-based).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which political power is separated, the judiciary is independent, office abuse is prosecuted, and civil rights are enforced. The index ranges from 1 to 10 (most rule-based)."
             maxTime: 2023
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                customNumericLabels:
-                  - Poor
-                  - Flawed
-                  - Fair
-                  - Sound
-                  - Excellent
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                customNumericValues:
-                  - 1
-                  - 2.5
-                  - 4.5
-                  - 6.5
-                  - 8.5
-                  - 10
+                customNumericColors: *bti_palette_3
+                customNumericLabels: *labels_quality
+                customNumericValues: *values_intermediate
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
@@ -616,39 +406,14 @@ tables:
         presentation:
           grapher_config:
             title: Stability of Democratic Institutions Index
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which democratic institutions are effective and efficient and all relevant actors accept them. The index ranges from 1 to 10 (most stable).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which democratic institutions are effective and efficient and all relevant actors accept them. The index ranges from 1 to 10 (most stable)."
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                customNumericLabels:
-                  - Poor
-                  - Flawed
-                  - Fair
-                  - Sound
-                  - Excellent
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                customNumericValues:
-                  - 1
-                  - 2.5
-                  - 4.5
-                  - 6.5
-                  - 8.5
-                  - 10
+                customNumericColors: *bti_palette_3
+                customNumericLabels: *labels_quality
+                customNumericValues: *values_intermediate
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
@@ -665,39 +430,14 @@ tables:
         presentation:
           grapher_config:
             title: Political and Social Integration Index
-            subtitle: Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which the party system is stable and rooted in society, interest groups are numerous and diverse, regular citizens approve of democratic norms and procedures, and societal trust is high. The index ranges from 1 to 10 (most integrated).
-            note: Data excludes long-term members of the OECD because they are considered stable democracies.
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 10
-              min: 1
+            subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which the party system is stable and rooted in society, interest groups are numerous and diverse, regular citizens approve of democratic norms and procedures, and societal trust is high. The index ranges from 1 to 10 (most integrated)."
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors:
-                  - '#8a148c'
-                  - '#d979d2'
-                  - '#1ac6d9'
-                customNumericLabels:
-                  - Poor
-                  - Flawed
-                  - Fair
-                  - Sound
-                  - Excellent
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                customNumericValues:
-                  - 1
-                  - 2.5
-                  - 4.5
-                  - 6.5
-                  - 8.5
-                  - 10
+                customNumericColors: *bti_palette_3
+                customNumericLabels: *labels_quality
+                customNumericValues: *values_intermediate
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
