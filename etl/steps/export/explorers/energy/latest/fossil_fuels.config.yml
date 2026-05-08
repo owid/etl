@@ -11,13 +11,13 @@ definitions:
   reserves_subtitle: &reserves_subtitle |-
     Proved reserves are fuels that are known with reasonable certainty to be recoverable in the future from known reservoirs under existing economic and operating conditions.
   net_imports_subtitle_gas: &net_imports_subtitle_gas |-
-    Net imports is calculated as total imports minus total exports. This includes all forms of dry natural gas, including liquified natural gas (LNG). Vented and flared gas are not included. A negative value indicates that a country exports more than it imports.
+    Net imports is calculated as total imports minus total exports. This includes all forms of dry natural gas, including liquefied natural gas (LNG). Vented and flared gas are not included. A negative value indicates that a country exports more than it imports.
   net_imports_subtitle_coal: &net_imports_subtitle_coal |-
     Net imports is calculated as total imports minus total exports. A negative value indicates that a country exports more than it imports.
   net_imports_subtitle_oil: &net_imports_subtitle_oil |-
     Net imports is calculated as total imports minus total exports. A negative value indicates that a country exports more than it imports.
   gas_note: &gas_note |-
-    This includes all forms of dry natural gas, including liquified natural gas (LNG). Vented and flared gas are not included.
+    This includes all forms of dry natural gas, including liquefied natural gas (LNG). Vented and flared gas are not included.
   coal_note: &coal_note |-
     This includes five coal types: anthracite, metallurgical, bituminous, subbituminous, and lignite.
   crude_oil_note: &crude_oil_note |-
