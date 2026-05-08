@@ -67,6 +67,8 @@ tables:
                   - 6
                   - 7
               columnSlug: grapher/democracy/2026-03-23/fh/fh#civlibs
+        display:
+          numDecimalPlaces: 0
       polrights:
         title: Political rights rating
         unit: ""
@@ -109,6 +111,8 @@ tables:
                   - 6
                   - 7
               columnSlug: grapher/democracy/2026-03-23/fh/fh#polrights
+        display:
+          numDecimalPlaces: 0
       regime:
         title: Political regime
         unit: ""
@@ -155,6 +159,8 @@ tables:
                 customNumericColorsActive: true
               columnSlug: grapher/democracy/2026-03-23/fh/fh#regime
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       country_flag:
         title: Entity considered a country by Freedom House
         unit: ""
@@ -200,6 +206,8 @@ tables:
                   - 11
                   - 12
               columnSlug: grapher/democracy/2026-03-23/fh/fh#electprocess
+        display:
+          numDecimalPlaces: 0
       polrights_score:
         title: Political rights score
         unit: ""
@@ -243,6 +251,8 @@ tables:
                   - 35
                   - 40
               columnSlug: grapher/democracy/2026-03-23/fh/fh#polrights_score
+        display:
+          numDecimalPlaces: 0
       civlibs_score:
         title: Civil liberties score
         unit: ""
@@ -280,6 +290,8 @@ tables:
                   - 50
                   - 60
               columnSlug: grapher/democracy/2026-03-23/fh/fh#civlibs_score
+        display:
+          numDecimalPlaces: 0
       electdem:
         title: Electoral democracy
         unit: ""

@@ -154,6 +154,8 @@ tables:
                 customNumericColorsActive: true
               columnSlug: grapher/democracy/2024-05-13/polity/polity#exec_reccomp_polity
               timeTolerance: 2
+        display:
+          numDecimalPlaces: 0
       exec_recopen_polity:
         title: Openness of executive recruitment
         unit: ""
@@ -222,6 +224,8 @@ tables:
               columnSlug: grapher/democracy/2024-05-13/polity/polity#exec_recopen_polity
               timeTolerance: 2
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       exec_constr_polity:
         title: Constraints on the executive
         unit: ""
@@ -320,6 +324,8 @@ tables:
                   No data: No data
               columnSlug: grapher/democracy/2024-05-13/polity/polity#exec_constr_polity
               timeTolerance: 2
+        display:
+          numDecimalPlaces: 0
       polpart_reg_polity:
         title: Regulation of political participation
         unit: ""
@@ -385,6 +391,8 @@ tables:
                 customNumericColorsActive: true
               columnSlug: grapher/democracy/2024-05-13/polity/polity#polpart_reg_polity
               timeTolerance: 2
+        display:
+          numDecimalPlaces: 0
       polpart_comp_polity:
         title: Competitiveness of political participation
         unit: ""
@@ -462,6 +470,8 @@ tables:
                 customNumericColorsActive: true
               columnSlug: grapher/democracy/2024-05-13/polity/polity#polpart_comp_polity
               timeTolerance: 2
+        display:
+          numDecimalPlaces: 0
       regime_polity:
         title: Political regime
         unit: ""
@@ -513,6 +523,9 @@ tables:
                 customNumericColorsActive: true
               timeTolerance: 2
               tooltipUseCustomLabels: true
+        display:
+          includeInTable: true
+          numDecimalPlaces: 0
       democracy_recod_polity:
         title: Democracy (recoded 0-20)
         unit: ""
@@ -529,6 +542,9 @@ tables:
               min: 0
             stackMode: relative
             minTime: latest
+        display:
+          name: Democracy Index
+          includeInTable: true
       age_dem_polity:
         title: Democracy age
         unit: ""
@@ -587,6 +603,11 @@ tables:
               columnSlug: grapher/democracy/2024-05-13/polity/polity#age_dem_polity
               timeTolerance: 2
               tooltipUseCustomLabels: true
+        display:
+          unit: years
+          shortUnit: years
+          includeInTable: true
+          numDecimalPlaces: 0
       experience_dem_polity:
         title: Experience with democracy
         unit: ""

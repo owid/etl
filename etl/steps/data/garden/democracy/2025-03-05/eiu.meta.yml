@@ -104,6 +104,9 @@ tables:
                   No data: No data
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          name: Democracy Index
+          includeInTable: true
       elect_freefair_eiu:
         title: Free and fair elections
         description_short: |-
@@ -161,6 +164,9 @@ tables:
                   No data: No data
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          name: Electoral Pluralism Index
+          includeInTable: true
       funct_gov_eiu:
         title: Functioning government
         description_short: |-
@@ -218,6 +224,10 @@ tables:
                   No data: No data
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          name: Functioning Government Index
+          includeInTable: true
+          numDecimalPlaces: 1
       pol_part_eiu:
         title: Political participation
         description_short: |-
@@ -275,6 +285,9 @@ tables:
                   No data: No data
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          name: Political Participation Index
+          includeInTable: true
       dem_culture_eiu:
         title: Democratic culture
         description_short: |-
@@ -332,6 +345,9 @@ tables:
                   No data: No data
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          name: Democratic Culture Index
+          includeInTable: true
       civlib_eiu:
         title: Civil liberties
         description_short: |-
@@ -389,6 +405,10 @@ tables:
                   No data: No data
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          name: Civil Liberties Index
+          includeInTable: true
+          numDecimalPlaces: 1
       regime_eiu:
         title: Regime
         unit: ""

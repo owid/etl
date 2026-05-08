@@ -63,6 +63,8 @@ tables:
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
+        display:
+          name: Democratic Features Index
       regime_bti:
         title: "Political regime"
         description_short: |-
@@ -119,6 +121,8 @@ tables:
                   No data: No data
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       electfreefair_bti:
         title: "Free and fair elections"
         description_short: |-
@@ -260,6 +264,8 @@ tables:
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       freeexpr_bti:
         title: "Freedom of expression"
         description_short: |-
@@ -307,6 +313,8 @@ tables:
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       sep_power_bti:
         title: "Separation of powers"
         description_short: |-
@@ -401,6 +409,8 @@ tables:
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       state_bti:
         title: "Stateness"
         description_short: |-
@@ -449,6 +459,9 @@ tables:
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
+        display:
+          name: Stateness Index
+          numDecimalPlaces: 1
       state_basic_bti:
         title: "Basic state functions"
         description_short: |-
@@ -539,6 +552,8 @@ tables:
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
+        display:
+          name: Political Participation Index
       rule_of_law_bti:
         title: "Rule of law"
         description_short: |-
@@ -587,6 +602,9 @@ tables:
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
+        display:
+          name: Rule of Law Index
+          numDecimalPlaces: 1
       stability_dem_inst_bti:
         title: "Stability of democratic institutions"
         description_short: |-
@@ -634,6 +652,8 @@ tables:
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
+        display:
+          name: Stability of Democratic Institutions Index
       pol_soc_integr_bti:
         title: "Political and social integration"
         description_short: |-
@@ -681,6 +701,8 @@ tables:
                 customCategoryLabels:
                   No data: No data
               tooltipUseCustomLabels: true
+        display:
+          name: Political and Social Integration Index
   num_countries:
     variables:
       num_regime_bti:

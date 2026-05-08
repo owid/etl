@@ -156,6 +156,8 @@ tables:
           numDecimalPlaces: 2
 
       ## 2.2.5 Share of population with suffrage
+          name: Elected Political Leaders Index
+          color: '#3c4e66'
       suffr_vdem:
         title: "Share of population with suffrage"
         description_short: |-
@@ -223,6 +225,8 @@ tables:
           numDecimalPlaces: 2
 
       ## 3.1.3.3 Election turnout
+          unit: '%'
+          shortUnit: '%'
       turnout_vdem:
         title: "Voter turnout of registered voters"
         description_short: |-
@@ -309,6 +313,7 @@ tables:
           numDecimalPlaces: 2
 
       ## 9.4.2 Government effectiveness
+          name: Direct Democracy Index
         presentation:
           grapher_config:
             title: Direct Democracy Index
@@ -422,6 +427,9 @@ tables:
                 customNumericColorsActive: true
               columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#num_years_in_electdem_consecutive
               tooltipUseCustomLabels: true
+        display:
+          shortUnit: years
+          numDecimalPlaces: 0
       num_years_in_electdem_consecutive_cat: # electdem_age_group_row_owid
         title: Electoral democracy age group
         description_short: Category of electoral democracies based on the country's age of electoral democracy.
@@ -491,6 +499,9 @@ tables:
                 customNumericColorsActive: true
               columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#num_years_in_libdem_consecutive
               tooltipUseCustomLabels: true
+        display:
+          shortUnit: years
+          numDecimalPlaces: 0
       num_years_in_libdem_consecutive_cat: # libdem_age_group_row_owid
         title: Liberal democracy age group
         description_short: Category of liberal democracies based on the country's age of liberal democracy.
@@ -744,6 +755,8 @@ tables:
                   - 3
               columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_row_owid
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       regime_amb_row_owid:
         title: Political regime (inc. ambiguous categories)
         unit: ""
@@ -813,6 +826,8 @@ tables:
                 customNumericColorsActive: true
               columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_amb_row_owid
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       regime_redux_row_owid:
         title: Political regime (reduced)
         description_short: |-
@@ -859,6 +874,8 @@ tables:
                 customNumericColorsActive: true
               columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_redux_row_owid
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       v2xpas_democracy:
         title: |-
           Political parties support democracy
@@ -1032,6 +1049,9 @@ tables:
                   - 0.9
                   - 1
               columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+        display:
+          name: Electoral Democracy Index
+          color: '#3c4e66'
       libdem_vdem:
         title: |-
           Liberal democracy index ({definitions.aux.estimate} estimate)
@@ -1099,6 +1119,9 @@ tables:
         unit: ""
 
       # 2.1.3 Participatory democracy index
+        display:
+          name: Liberal Democracy Index
+          color: '#3c4e66'
       participdem_vdem:
         title: |-
           Extent of direct popular votes ({definitions.aux.estimate} estimate)
@@ -1155,6 +1178,9 @@ tables:
         unit: ""
 
       ## 2.1.4 Deliberative democracy index
+        display:
+          name: Participatory Denocracy Index
+          color: '#3e4c66'
       delibdem_vdem:
         title: |-
           Deliberative democracy index ({definitions.aux.estimate} estimate)
@@ -1213,6 +1239,9 @@ tables:
           - *key_regions_agg
 
       ## 2.1.5 Egalitarian democracy index
+        display:
+          name: Deliberative Democracy Index
+          color: '#3c4e66'
       egaldem_vdem:
         title: |-
           Egalitarian democracy index ({definitions.aux.estimate} estimate)
@@ -1271,6 +1300,9 @@ tables:
           - *key_regions_agg
 
       ## 2.2.11 Legislative constraints on the executive index
+        display:
+          name: Egalitarian Democracy Index
+          color: '#3c4e66'
       legis_constr_vdem:
         title: |-
           Legislative constraints on the executive index ({definitions.aux.estimate} estimate)
@@ -1326,6 +1358,9 @@ tables:
         unit: ""
 
       ## 2.2.8 Liberal component index
+        display:
+          name: Legislative Checks on Government Index
+          color: '#3e4c66'
       lib_vdem:
         title: |-
           Liberal component index ({definitions.aux.estimate} estimate)
@@ -1381,6 +1416,9 @@ tables:
         unit: ""
 
       ## 2.2.15 Local government index
+        display:
+          name: Liberal Political Institutions Index
+          color: '#3c4e66'
       locelect_vdem:
         title: |-
           Elected local governments ({definitions.aux.estimate} estimate)
@@ -1436,6 +1474,9 @@ tables:
         unit: ""
 
       ## 2.2.12 Participatory component index
+        display:
+          name: Strong Elected Local Governments Index
+          color: '#3c4e66'
       particip_vdem:
         title: |-
           Participatory political institutions ({definitions.aux.estimate} estimate)
@@ -1492,6 +1533,9 @@ tables:
         unit: ""
 
       ## 2.2.16 Regional government index
+        display:
+          name: Participatory Political Institutions Index
+          color: '#3c4e66'
       regelect_vdem:
         title: "Elected regional governments ({definitions.aux.estimate} estimate)"
         description_short: |-
@@ -1547,6 +1591,9 @@ tables:
         unit: ""
 
       ## 2.2.21 Equal distribution of resources index
+        display:
+          name: Strong Elected Regional Governments Index
+          color: '#3c4e66'
       equal_res_vdem:
         title: |-
           Equal resource distribution index ({definitions.aux.estimate} estimate)
@@ -1604,6 +1651,9 @@ tables:
           - *key_regions_agg
 
       ## 3.5.1.6 Legislature corrupt activities
+        display:
+          name: Equal Resource Distribution Index
+          color: '#3c4e66'
       corr_leg_vdem:
         title: |-
           Legislative corruption score ({definitions.aux.estimate} estimate)
@@ -1710,6 +1760,8 @@ tables:
           - *key_regions_agg
 
       ## 3.6.0.1 Reasoned justification
+        display:
+          color: '#3c4e66'
       justified_polch_vdem:
         title: |-
           Justified political positions ({definitions.aux.estimate} estimate)
@@ -1767,6 +1819,8 @@ tables:
           - *key_regions_agg
 
       ## 3.6.0.5 Engaged society
+        display:
+          color: '#3c4e66'
       soccons_polch_vdem:
         title: "Engaged society ({definitions.aux.estimate} estimate)"
         description_short: |-
@@ -1825,6 +1879,8 @@ tables:
         unit: ""
 
       ## 3.7.0.6 Judicial corruption decision
+        display:
+          color: '#3c4e66'
       corr_jud_vdem:
         title: |-
           Judicial corruption score ({definitions.aux.estimate} estimate)
@@ -2358,6 +2414,9 @@ tables:
         unit: ""
 
       ## 3.6.0.3 Respect counterarguments
+        display:
+          name: Civil Society Participation Index
+          color: '#3c4e66'
       counterarg_polch_vdem:
         title: |-
           Respect for counterarguments ({definitions.aux.estimate} estimate)
@@ -2419,6 +2478,9 @@ tables:
           - *key_regions_agg
 
       # 2.2.17 Deliberative component index
+        display:
+          name: Respect for counterarguments
+          color: '#3c4e66'
       delib_vdem:
         title: |-
           Deliberative political institutions index ({definitions.aux.estimate} estimate)
@@ -2480,6 +2542,9 @@ tables:
           - *key_regions_agg
 
       ## 2.2.18 Egalitarian component index
+        display:
+          name: Deliberative Political Institutions Index
+          color: '#3c4e66'
       egal_vdem:
         title: |-
           Egalitarian political institutions index ({definitions.aux.estimate} estimate)
@@ -2537,6 +2602,9 @@ tables:
           - *key_regions_agg
 
       ## 2.2.6 Clean elections index
+        display:
+          name: Egaliatarian Political Institutions Index
+          color: '#3c4e66'
       electfreefair_vdem:
         title: |-
           Clean elections index ({definitions.aux.estimate} estimate)
@@ -2602,6 +2670,9 @@ tables:
         unit: ""
 
       ### 3.6.0.4 Range of consultation
+        display:
+          name: Free and Fair Elections Index
+          color: '#3c4e66'
       elitecons_polch_vdem:
         title: "Elite consultation ({definitions.aux.estimate} estimate)"
         description_short: |-
@@ -2660,6 +2731,8 @@ tables:
         unit: ""
 
       ## 2.2.20 Equal access index
+        display:
+          color: '#3c4e66'
       equal_access_vdem:
         title: |-
           Equal access to power index ({definitions.aux.estimate} estimate)
@@ -2715,6 +2788,9 @@ tables:
         unit: ""
 
       ## 2.2.19 Equal protection index
+        display:
+          name: Equal Access to Power Index
+          color: '#3c4e66'
       equal_rights_vdem:
         title: |-
           Equal rights protection index ({definitions.aux.estimate} estimate)
@@ -2770,6 +2846,9 @@ tables:
         unit: ""
 
       ## 2.2.4 Freedom of association thick index
+        display:
+          name: Equal Rights Protection Index
+          color: '#3c4e66'
       freeassoc_vdem:
         title: "Freedom of association thick index ({definitions.aux.estimate} estimate)"
         description_short: |-
@@ -2822,6 +2901,9 @@ tables:
         unit: ""
 
       ## 2.2.3 Freedom of Expression and Alternative Sources of Information index
+        display:
+          name: Freedom of Association Index
+          color: '#3c4e66'
       freeexpr_vdem:
         title: "Freedom of expression and alternative sources of information index ({definitions.aux.estimate} estimate)"
         description_short: |-
@@ -2884,6 +2966,9 @@ tables:
         unit: ""
 
       ## 2.2.9 Equality before the law and individual liberty index
+        display:
+          name: Freedom of Expression index
+          color: '#3c4e66'
       indiv_libs_vdem:
         title: |-
           Equality before the law and individual liberty index ({definitions.aux.estimate} estimate)
@@ -2991,6 +3076,9 @@ tables:
         unit: ""
 
       # 5.15.1 Academic Freedom Index
+        display:
+          name: Judicial Checks on Government Index
+          color: '#3c4e66'
       v2xca_academ:
         title: |-
           Academic freedom index ({definitions.aux.estimate} estimate)
@@ -3445,6 +3533,7 @@ tables:
           numDecimalPlaces: 0
 
       # [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.4 Access to justice for women
+          color: '#3c4e66'
       accessjust_w_row:
         title: Access to justice for women ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3503,6 +3592,7 @@ tables:
           numDecimalPlaces: 0
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.1.1 Electoral democracy index
+          color: '#3c4e66'
       electdem_dich_row_owid:
         title: Electoral democracy ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3548,6 +3638,7 @@ tables:
           numDecimalPlaces: 0
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.1.2.15 Election free and fair
+          color: '#3c4e66'
       electfreefair_row:
         title: Free and fair elections ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3609,6 +3700,7 @@ tables:
           numDecimalPlaces: 0
 
       ## [CUSTOM] TODOO
+          color: '#3c4e66'
       electmulpar_hoe_row_owid:
         title: Multi-party elections for government's chief executive ({definitions.aux.estimate} estimate)
         description_short: |
@@ -3659,6 +3751,7 @@ tables:
           numDecimalPlaces: 0
 
       ## [CUSTOM, based on `v2elmulpar_osp`]
+          color: '#3c4e66'
       electmulpar_leg_row:
         title: Multiparty elections for legislature ({definitions.aux.estimate} estimate)
         description_short: |-
@@ -3703,6 +3796,7 @@ tables:
           numDecimalPlaces: 0
 
       ## [RE-ESTIMATE] 3.1.2.5 Elections multiparty
+          color: '#3c4e66'
       electmulpar_row:
         title: Multiparty elections ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3758,6 +3852,7 @@ tables:
           numDecimalPlaces: 0
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.2.8 Liberal component index
+          color: '#3c4e66'
       lib_dich_row:
         title: Liberal political institutions ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3803,6 +3898,7 @@ tables:
           numDecimalPlaces: 0
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.1 Transparent laws with predictable enforcement
+          color: '#3c4e66'
       transplaws_row:
         title: Transparent laws with predictable enforcement ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3862,6 +3958,7 @@ tables:
   ##################################################################################################
   ##################################################################################################
   # TABLE: COUNT OF COUNTRIES IN X REGIME
+          color: '#3c4e66'
   vdem_num_countries:
     common:
       unit: "countries"

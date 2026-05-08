@@ -60,6 +60,9 @@ tables:
                   - 1
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          color: '#3c4e66'
+          numDecimalPlaces: 0
       legelec_lied:
         title: Legislative elections
         unit: ""
@@ -98,6 +101,8 @@ tables:
                   - 1
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       exe_leg_elec_lied:
         title: Elections for chief executive and legislature
         unit: ""
@@ -146,6 +151,9 @@ tables:
                   - 1
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          color: '#3c4e66'
+          numDecimalPlaces: 0
       competition_lied:
         title: Competitive elections
         unit: ""
@@ -186,6 +194,8 @@ tables:
                   - 0
                   - 1
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       poliberties_lied:
         title: Political liberties
         unit: ""
@@ -223,6 +233,9 @@ tables:
                   - 1
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          color: '#3c4e66'
+          numDecimalPlaces: 0
       regime_redux_lied:
         title: Political regime (reduced)
         unit: ""
@@ -329,6 +342,9 @@ tables:
                   No data: No data
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          color: '#3c4e66'
+          numDecimalPlaces: 0
       male_suffrage_lied:
         title: Universal right to vote for men
         unit: ""
@@ -366,6 +382,8 @@ tables:
                   - 1
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
       female_suffrage_lied:
         title: Universal right to vote for women
         unit: ""
@@ -403,6 +421,9 @@ tables:
                   - 1
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          color: '#3c4e66'
+          numDecimalPlaces: 0
       suffrage_lied:
         title: Universal suffrage
         unit: ""
@@ -587,6 +608,10 @@ tables:
                   No data: true
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
+        display:
+          unit: years
+          shortUnit: years
+          numDecimalPlaces: 0
       group_age_electdem_lied:
         title: "Age of electoral democracy (category)"
         unit: ""
@@ -667,6 +692,10 @@ tables:
                 customNumericColorsActive: true
               tooltipUseCustomLabels: true
 
+        display:
+          unit: years
+          shortUnit: years
+          numDecimalPlaces: 0
       group_age_polyarchy_lied:
         title: "Age of full democracy (category)"
         unit: ""
