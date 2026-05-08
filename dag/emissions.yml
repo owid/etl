@@ -125,7 +125,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
     - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/energy/2025-06-27/primary_energy_consumption
+    - data://garden/energy/2026-05-05/primary_energy_consumption
     - data://meadow/gcp/2025-11-13/global_carbon_budget
   #
   # GCP - Global Carbon Budget.
@@ -179,7 +179,7 @@ steps:
   data://garden/emissions/2025-12-04/owid_co2:
     - data://garden/regions/2023-01-01/regions
     - data://garden/emissions/2025-12-04/national_contributions
-    - data://garden/energy/2025-06-27/primary_energy_consumption
+    - data://garden/energy/2026-05-05/primary_energy_consumption
     - data://garden/gcp/2025-11-13/global_carbon_budget
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population

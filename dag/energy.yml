@@ -162,15 +162,9 @@ steps:
   #
   # EIA - Energy consumption.
   #
+  # TODO: To be archived once dependencies are updated.
   data://meadow/eia/2025-07-08/energy_consumption:
     - snapshot://eia/2025-07-08/international_energy_data.zip
-  #
-  # EIA - Energy consumption.
-  #
-  data://garden/eia/2025-07-08/energy_consumption:
-    - data://meadow/eia/2025-07-08/energy_consumption
-    - data://garden/wb/2025-07-01/income_groups
-    - data://garden/regions/2023-01-01/regions
   #
   # EIA - International Energy.
   #
@@ -252,19 +246,6 @@ steps:
   #
   data://grapher/energy/2025-06-27/global_primary_energy:
     - data://garden/energy/2025-06-27/global_primary_energy
-  #
-  # Energy - Primary energy consumption.
-  #
-  data://garden/energy/2025-06-27/primary_energy_consumption:
-    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-    - data://garden/demography/2024-07-15/population
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/eia/2025-07-08/energy_consumption
-  #
-  # Energy - Primary energy consumption.
-  #
-  data://grapher/energy/2025-06-27/primary_energy_consumption:
-    - data://garden/energy/2025-06-27/primary_energy_consumption
   #
   # Energy - Primary energy consumption (sourced from the new EIA International Energy garden).
   #
@@ -482,7 +463,7 @@ steps:
   #
   data://garden/energy_data/2026-04-24/owid_energy:
     - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/energy/2025-06-27/primary_energy_consumption
+    - data://garden/energy/2026-05-05/primary_energy_consumption
     - data://garden/energy/2025-06-27/fossil_fuel_production
     - data://garden/energy/2026-04-24/electricity_mix
     - data://garden/demography/2024-07-15/population

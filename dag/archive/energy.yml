@@ -803,3 +803,24 @@ steps:
   #
   data://grapher/energy/2026-01-26/uk_historical_electricity:
     - data://garden/energy/2026-01-26/uk_historical_electricity
+  #
+  # EIA - Energy consumption.
+  #
+  # TODO: To be archived once dependencies are updated.
+  data://garden/eia/2025-07-08/energy_consumption:
+    - data://garden/wb/2025-07-01/income_groups
+    - data://meadow/eia/2025-07-08/energy_consumption
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Energy - Primary energy consumption.
+  #
+  data://garden/energy/2025-06-27/primary_energy_consumption:
+    - data://garden/eia/2025-07-08/energy_consumption
+    - data://garden/demography/2024-07-15/population
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+  #
+  # Energy - Primary energy consumption.
+  #
+  data://grapher/energy/2025-06-27/primary_energy_consumption:
+    - data://garden/energy/2025-06-27/primary_energy_consumption
