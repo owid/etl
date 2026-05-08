@@ -17,90 +17,90 @@ tables:
   us_long:
     variables:
       number:
-        title: Number in child labor - << sex >>, age << age_group >> (<< source >>)
+        title: United States (Long) - Number in child labor - << sex >>, age << age_group >> (<< source >>)
         unit: people
         short_unit: ""
       share:
-        title: Share in child labor - << sex >>, age << age_group >> (<< source >>)
+        title: United States (Long) - Share in child labor - << sex >>, age << age_group >> (<< source >>)
         unit: "%"
         short_unit: "%"
   belgium:
     variables:
       number:
-        title: Number in child labor - age << age >>
+        title: Belgium - Number in child labor - age << age >>
         unit: people
         short_unit: ""
       share:
-        title: Share in child labor - age << age >>
+        title: Belgium - Share in child labor - age << age >>
         unit: "%"
         short_unit: "%"
   portugal:
     variables:
       number:
-        title: Number in child labor in << sector >> - << sex >>, age << age_group >>
+        title: Portugal (Goulart) - Number in child labor in << sector >> - << sex >>, age << age_group >>
         unit: people
         short_unit: ""
       share:
-        title: Share in child labor in << sector >> - << sex >>, age << age_group >>
+        title: Portugal (Goulart) - Share in child labor in << sector >> - << sex >>, age << age_group >>
         unit: "%"
         short_unit: "%"
   denmark:
     variables:
       number:
-        title: Number in child labor in << sector >> - << age_group >>
+        title: Denmark - Number in child labor in << sector >> - << age_group >>
         unit: people
         short_unit: ""
       share:
-        title: Share in child labor in << sector >> - << age_group >>
+        title: Denmark - Share in child labor in << sector >> - << age_group >>
         unit: "%"
         short_unit: "%"
   italy:
     variables:
       share:
-        title: Share in child labor in << sector >> - << sex >>
+        title: Italy - Share in child labor in << sector >> - << sex >>
         unit: "%"
         short_unit: "%"
   sweden:
     variables:
       number:
-        title: Number in child labor in << sector >>
+        title: Sweden - Number in child labor in << sector >>
         unit: people
         short_unit: ""
       share:
-        title: Share in child labor in << sector >>
+        title: Sweden - Share in child labor in << sector >>
         unit: "%"
         short_unit: "%"
   us_carter_sutch:
     variables:
       share:
-        title: Share in child labor (<< age_group >>) - << sex >>
+        title: United States (Carter & Sutch) - Share in child labor (<< age_group >>) - << sex >>
         unit: "%"
         short_unit: "%"
   portugal_goulart_bedi:
     variables:
       share:
-        title: Share in child labor - << measure >>, age << age_group >> (<< bound >>)
+        title: Portugal (Goulart & Bedi) - Share in child labor - << measure >>, age << age_group >> (<< bound >>)
         unit: "%"
         short_unit: "%"
   england_wales_scotland:
     variables:
       share:
-        title: Share in child labor in << occupation >> - << sex >>
+        title: Britain (Kirby) - Share in child labor in << occupation >> - << sex >>
         unit: "%"
         short_unit: "%"
   england_wales:
     variables:
       share:
-        title: Share in child labor - << age_group >>
+        title: England and Wales (Cunningham & Viazzo) - Share in child labor - << age_group >>
         unit: "%"
         short_unit: "%"
   japan:
     variables:
       number:
-        title: Number in child labor - << gender >>, << age_group >>
+        title: Japan - Number in child labor - << gender >>, << age_group >>
         unit: people
         short_unit: ""
       share:
-        title: Share in child labor - << gender >>, << age_group >>
+        title: Japan - Share in child labor - << gender >>, << age_group >>
         unit: "%"
         short_unit: "%"
