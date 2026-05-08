@@ -42,7 +42,7 @@ FROM_INTERNATIONAL_ENERGY: list[tuple[str, str, float]] = [
     ("natural_gas_exports", "natural_gas_exports", BCM_TO_M3),
     ("natural_gas_reserves", "natural_gas_reserves", TCM_TO_M3),
     # Oil — kb/d → m³/year, oil reserves Gbbl → m³.
-    ("petroleum_production", "oil_production", KBPD_TO_M3_PER_YEAR),
+    ("crude_oil_production", "oil_production", KBPD_TO_M3_PER_YEAR),
     ("petroleum_consumption", "oil_consumption", KBPD_TO_M3_PER_YEAR),
     ("crude_oil_imports", "oil_imports", KBPD_TO_M3_PER_YEAR),
     ("crude_oil_exports", "oil_exports", KBPD_TO_M3_PER_YEAR),
