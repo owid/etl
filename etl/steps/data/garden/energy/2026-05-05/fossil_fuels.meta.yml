@@ -183,9 +183,6 @@ tables:
         title: Share of oil production exported
         unit: '%'
         short_unit: '%'
-      population:
-        title: Population
-        unit: people
   fossil_fuels_monthly:
     variables:
       oil_production_monthly:

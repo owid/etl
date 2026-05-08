@@ -1,31 +1,24 @@
-"""Garden step for the OWID Fossil Fuels dataset, used by the natural-resources explorer.
-
-Reads the curated EIA International Energy garden (which itself merges the live EIA bulk file
-with a frozen 2022 archive of EIA's old international-tool tables for indicators EIA has
-since retired — natural gas reserves and oil reserves) and converts to the physical units
-the explorer expects (tonnes for coal, cubic metres for gas and oil). Adds OWID region
-aggregates, then derives net imports, import/export shares, and per-capita variants.
-"""
+"""Garden step for the OWID Fossil Fuels dataset, used by the natural-resources explorer."""
 
 from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# Conversion factors (sourced from the original natural_resources importer).
-BARREL_TO_M3 = 0.1589873  # 1 barrel = 0.1589873 m³.
+# Conversion factors, sourced from:
+# https://www.eia.gov/state/seds/sep_prices/notes/pr_metric.pdf
+BARREL_TO_M3 = 0.1589873
 DAYS_PER_JULIAN_YEAR = 365.25
-# 1 thousand barrels per day → m³ per (Julian) year.
+# 1 thousand barrels per day to m³ per (Julian) year.
 KBPD_TO_M3_PER_YEAR = 1000 * DAYS_PER_JULIAN_YEAR * BARREL_TO_M3
-# 1 thousand barrels per day → m³ per (average Julian) month.
+# 1 thousand barrels per day to m³ per (average Julian) month.
 KBPD_TO_M3_PER_MONTH = KBPD_TO_M3_PER_YEAR / 12
 # Mass / volume scale-ups.
-MT_TO_TONNES = 1_000_000  # million tonnes → tonnes.
-BCM_TO_M3 = 1e9  # billion cubic metres → cubic metres.
-TCM_TO_M3 = 1e12  # trillion cubic metres → cubic metres.
-GBBL_TO_M3 = 1e9 * BARREL_TO_M3  # billion barrels → cubic metres.
+MT_TO_TONNES = 1_000_000  # million tonnes to tonnes.
+BCM_TO_M3 = 1e9  # billion cubic metres to cubic metres.
+TCM_TO_M3 = 1e12  # trillion cubic metres to cubic metres.
+GBBL_TO_M3 = 1e9 * BARREL_TO_M3  # billion barrels to cubic metres.
 
 # (international_energy_column, output_column, factor_to_target_unit)
 FROM_INTERNATIONAL_ENERGY: list[tuple[str, str, float]] = [
@@ -66,29 +59,8 @@ SHARE_INDICATORS = [
     ("share_of_oil_production_exported", "oil_exports", "oil_production"),
 ]
 
-# Columns that should be summed when computing regional aggregates (everything else is intensive
-# or derived later).
+# Columns derived by linear unit conversion from upstream extensive columns.
 EXTENSIVE_COLUMNS = [out for _, out, _ in FROM_INTERNATIONAL_ENERGY]
-
-# OWID region aggregates to add. We deliberately exclude "World" so EIA's own World totals are
-# kept (they include estimates for missing-country gaps that a plain country sum would miss).
-REGIONS = {
-    "Africa": {},
-    "Asia": {},
-    "Europe": {},
-    "North America": {},
-    "Oceania": {},
-    "South America": {},
-    "Low-income countries": {},
-    "Lower-middle-income countries": {},
-    "Upper-middle-income countries": {},
-    "High-income countries": {},
-}
-
-# Same Aruba/Netherlands Antilles overlap as the EIA international_energy garden.
-# NOTE: The year range must exactly match the years where both entities have data; extra years
-# trigger an "overlaps not found" warning because the function compares the full year-set dict.
-KNOWN_OVERLAPS = [{year: {"Aruba", "Netherlands Antilles"} for year in range(1986, 2025)}]
 
 
 def select_and_convert(tb_input: Table) -> Table:
@@ -103,9 +75,9 @@ def select_and_convert(tb_input: Table) -> Table:
 
 
 def add_derived_columns(tb: Table) -> Table:
-    """Add net imports, import/export shares, and per-capita variants.
+    """Add net imports + import/export shares.
 
-    Run after region aggregation so these apply to both countries and regions.
+    Per-capita variants are added separately via ``paths.regions.add_per_capita``.
     """
     # Net imports = imports − exports.
     for target, imports_col, exports_col in NET_IMPORTS:
@@ -116,15 +88,10 @@ def add_derived_columns(tb: Table) -> Table:
     for target, num, den in SHARE_INDICATORS:
         tb[target] = (tb[num] / tb[den]).clip(upper=1) * 100
 
-    # Per-capita variants for every extensive column plus net imports.
-    per_capita_inputs = EXTENSIVE_COLUMNS + [name for name, *_ in NET_IMPORTS]
-    for col in per_capita_inputs:
-        tb[f"{col}_per_capita"] = tb[col] / tb["population"]
-
     return tb
 
 
-def build_monthly_table(tb_eia_monthly: Table, ds_population) -> Table:
+def build_monthly_table(tb_eia_monthly: Table) -> Table:
     """Build the monthly companion table.
 
     Converts the kb/d crude-oil-production-monthly column from international_energy_monthly
@@ -135,11 +102,10 @@ def build_monthly_table(tb_eia_monthly: Table, ds_population) -> Table:
     tb["oil_production_monthly"] = tb["crude_oil_production_monthly"] * KBPD_TO_M3_PER_MONTH
     tb = tb.drop(columns=["crude_oil_production_monthly"])
 
-    # Add per-capita: pull annual population, join on (country, year-of-date).
+    # add_per_capita expects a year column to look up annual population, so derive year from date.
     tb["year"] = tb["date"].dt.year
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
-    tb["oil_production_monthly_per_capita"] = tb["oil_production_monthly"] / tb["population"]
-    tb = tb.drop(columns=["year", "population"])
+    tb = paths.regions.add_per_capita(tb=tb, columns=["oil_production_monthly"], warn_on_missing_countries=False)
+    tb = tb.drop(columns=["year"])
 
     return tb.format(keys=["country", "date"], short_name=f"{paths.short_name}_monthly")
 
@@ -151,7 +117,6 @@ def run() -> None:
     ds_eia = paths.load_dataset("international_energy")
     tb_eia = ds_eia.read("international_energy")
     tb_eia_monthly = ds_eia.read("international_energy_monthly")
-    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -159,32 +124,18 @@ def run() -> None:
     # Pick the columns we need and convert to physical units.
     tb = select_and_convert(tb_eia)
 
-    # Add OWID region aggregates by summing the extensive columns from country-level data. The
-    # incoming table already contains EIA's regional aggregates (e.g. "Africa (EIA)") and OWID
-    # continents computed by the upstream international_energy garden, but those continents were
-    # computed in the upstream's energy units; recomputing here gives consistent physical-unit
-    # totals for our explorer.
-    aggregations = {col: "sum" for col in EXTENSIVE_COLUMNS if col in tb.columns}
-    tb = paths.regions.add_aggregates(
-        tb=tb,
-        regions=REGIONS,
-        aggregations=aggregations,
-        min_num_values_per_year=1,
-        ignore_overlaps_of_zeros=True,
-        accepted_overlaps=KNOWN_OVERLAPS,
-    )
-
-    # Population for per-capita calculations.
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
-
-    # Net imports, trade shares, per-capita variants.
+    # Net imports + trade shares.
     tb = add_derived_columns(tb)
+
+    # Per-capita variants for all extensive + net-imports columns; this also joins population.
+    per_capita_inputs = EXTENSIVE_COLUMNS + [name for name, *_ in NET_IMPORTS]
+    tb = paths.regions.add_per_capita(tb=tb, columns=per_capita_inputs, warn_on_missing_countries=False)
 
     # Set an appropriate index and sort.
     tb = tb.format(keys=["country", "year"], short_name=paths.short_name)
 
     # Build the monthly companion table.
-    tb_monthly = build_monthly_table(tb_eia_monthly, ds_population)
+    tb_monthly = build_monthly_table(tb_eia_monthly)
 
     #
     # Save outputs.
