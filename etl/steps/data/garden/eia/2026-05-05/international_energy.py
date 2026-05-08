@@ -736,9 +736,11 @@ def run() -> None:
 
     # Harmonize country names on both sides using the local mapping (covers the EIA-style
     # regions like "Africa (EIA)" and the country names used in both bulk and archive).
-    tb = paths.regions.harmonize_names(tb=tb)
+    tb = paths.regions.harmonize_names(tb=tb, warn_on_unused_countries=False)
     tb_archive_wide = paths.regions.harmonize_names(
-        tb=tb_archive_wide, warn_on_missing_countries=False, warn_on_unused_countries=False
+        tb=tb_archive_wide,
+        warn_on_unused_countries=False,
+        warn_on_unknown_excluded_countries=False,
     )
 
     # Merge bulk and archive on (country, year). Archive only contributes the reserves columns.
