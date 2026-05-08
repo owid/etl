@@ -70,6 +70,8 @@ def _reshape_us_long(tb: Table) -> Table:
     # Source is empty for most rows; only "Both, 10 & older" splits into Census/Whelpton.
     tb = tb.copy()
     tb["source"] = tb["source"].astype(object).fillna("Combined")
+    # Keep only the child age band; this dataset is about child labor.
+    tb = tb[tb["age_group"] == "10-15"]
     out = _melt_year_prefixed(tb, id_cols=["sex", "age_group", "source"], stubs=["millions", "pct"])
     out["number"] = out["millions"].astype(float) * 1_000_000
     out["share"] = out["pct"].astype(float)
