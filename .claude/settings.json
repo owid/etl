@@ -16,15 +16,15 @@
         ]
       }
     ],
-    "PostToolUse": [
+    "PreToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(jq -r '.tool_input.file_path // .tool_response.filePath // empty'); case \"$f\" in \"$CLAUDE_PROJECT_DIR\"/*.py) cd \"$CLAUDE_PROJECT_DIR\" && make check || exit 2 ;; esac",
-            "asyncRewake": true,
-            "statusMessage": "make check"
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && out=$(make check 2>&1) || { echo \"$out\" >&2; exit 2; }",
+            "if": "Bash(git commit *)",
+            "statusMessage": "make check (pre-commit)"
           }
         ]
       }
