@@ -101,7 +101,7 @@ tables:
       price_with_ets_weighted_by_share_of_co2:
         title: Average price on emissions covered by an ETS, weighted by the share of the country's CO₂ emissions
         description_short: *description_short_dollars
-        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        unit: constant 2021 US$ per tonne of CO₂ equivalents
         short_unit: $/t
         display:
           numDecimalPlaces: 2
@@ -109,7 +109,7 @@ tables:
       price_with_ets_weighted_by_share_of_ghg:
         title: Average price on emissions covered by an ETS, weighted by the share of the country's GHG emissions
         description_short: *description_short_dollars
-        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        unit: constant 2021 US$ per tonne of CO₂ equivalents
         short_unit: $/t
         display:
           numDecimalPlaces: 2
@@ -117,7 +117,7 @@ tables:
       price_with_tax_or_ets_weighted_by_share_of_co2:
         title: Average price on emissions covered by a carbon tax or an ETS, weighted by the share of the country's CO₂ emissions
         description_short: *description_short_dollars
-        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        unit: constant 2021 US$ per tonne of CO₂ equivalents
         short_unit: $/t
         display:
           numDecimalPlaces: 2
@@ -125,7 +125,7 @@ tables:
       price_with_tax_or_ets_weighted_by_share_of_ghg:
         title: Average price on emissions covered by a carbon tax or an ETS, weighted by the share of the country's GHG emissions
         description_short: *description_short_dollars
-        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        unit: constant 2021 US$ per tonne of CO₂ equivalents
         short_unit: $/t
         display:
           numDecimalPlaces: 2
@@ -133,7 +133,7 @@ tables:
       price_with_tax_weighted_by_share_of_co2:
         title: Average price on emissions covered by a carbon tax, weighted by the share of the country's CO₂ emissions
         description_short: *description_short_dollars
-        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        unit: constant 2021 US$ per tonne of CO₂ equivalents
         short_unit: $/t
         display:
           numDecimalPlaces: 2
@@ -141,7 +141,7 @@ tables:
       price_with_tax_weighted_by_share_of_ghg:
         title: Average price on emissions covered by a carbon tax, weighted by the share of the country's GHG emissions
         description_short: *description_short_dollars
-        unit: constant 2019 US$ per tonne of CO₂ equivalents
+        unit: constant 2021 US$ per tonne of CO₂ equivalents
         short_unit: $/t
         display:
           numDecimalPlaces: 2
