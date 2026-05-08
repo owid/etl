@@ -131,42 +131,22 @@ def sanity_check_inputs(tb_economy: Table, tb_coverage: Table) -> None:
             log.warning("The last year in the data may be incomplete. Define LAST_INFORMED_YEAR.")
 
 
-def sanity_check_outputs(tb_combined: Table, expected_countries_dropping_taxes: set) -> None:
-    """Run sanity checks on the output table.
-
-    Parameters
-    ----------
-    tb_combined : Table
-        Output table
-
-    """
+def sanity_check_outputs(tb_combined: Table) -> None:
+    """Run sanity checks on the output table."""
     error = "There should be no columns with only nans."
     assert tb_combined.columns[tb_combined.isna().all()].empty, error
     error = "Country named 'World' should be included in the countries file."
     assert "World" in set(tb_combined["country"]), error
 
-    # Warn if any country suddenly drops its carbon prices to zero, which may be spurious.
-    countries_to_inspect_for_any_carbon_mechanism = []
+    # Warn if a country had a non-zero value in the prior year and dropped to zero in the latest
+    # year — often a sign of a spurious or partial-year input that needs human review.
+    last_year = tb_combined["year"].max()
     for column in tb_combined.drop(columns=["country", "year"]).columns:
-        countries_without_taxes_now = set(
-            tb_combined[(tb_combined["year"] == tb_combined["year"].max()) & (tb_combined[column] == 0)]["country"]
-        )
-        countries_that_had_taxes = set(
-            tb_combined[(tb_combined["year"] == (tb_combined["year"].max() - 1)) & (tb_combined[column] > 0)]["country"]
-        )
-        countries_to_inspect = countries_without_taxes_now & countries_that_had_taxes
-        if len(countries_without_taxes_now & countries_that_had_taxes - expected_countries_dropping_taxes) > 0:
-            log.warning(
-                f"Some countries unexpectedly dropped '{column}' to zero in the last year, inspect them: "
-                f"{countries_to_inspect}"
-            )
-        countries_to_inspect_for_any_carbon_mechanism += list(countries_to_inspect)
-    # Check if the list of countries to inspect has changed.
-    if set(countries_to_inspect_for_any_carbon_mechanism) != expected_countries_dropping_taxes:
-        log.warning(
-            "The list of countries that dropped their carbon prices to zero in the last year has changed. "
-            "Remove temporary solution where spurious zeros are removed."
-        )
+        zero_now = set(tb_combined[(tb_combined["year"] == last_year) & (tb_combined[column] == 0)]["country"])
+        nonzero_before = set(tb_combined[(tb_combined["year"] == last_year - 1) & (tb_combined[column] > 0)]["country"])
+        dropped = sorted(zero_now & nonzero_before)
+        if dropped:
+            log.warning(f"Countries with '{column}' dropped to zero in {last_year}: {dropped}")
 
 
 def plot_price_coverage_curve(tb: Table, year: int | None = None) -> None:
@@ -301,10 +281,8 @@ def run() -> None:
         # Keep only data points prior to (or at) a certain year.
         tb_combined = tb_combined[tb_combined["year"] <= LAST_INFORMED_YEAR].reset_index(drop=True)
 
-    # Sanity checks.
-    # Some countries suddenly dropped their carbon mechanisms to zero.
-    expected_countries_dropping_taxes = set()
-    sanity_check_outputs(tb_combined, expected_countries_dropping_taxes=expected_countries_dropping_taxes)
+    # Sanity checks on the output table.
+    sanity_check_outputs(tb_combined)
 
     # Optional: render the carbon-price-vs-cumulative-emissions-covered step curve for a given year.
     # Uncomment for ad-hoc inspection — opens an interactive plotly figure, not part of the build output.
