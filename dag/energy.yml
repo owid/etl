@@ -178,7 +178,7 @@ steps:
   data://meadow/eia/2026-05-05/international_energy_archive:
     - snapshot://eia/2026-05-05/international_energy_archive.zip
   #
-  # Energy - Fossil fuels (curated from EIA International Energy garden in physical units).
+  # Energy - Fossil fuels.
   #
   data://garden/energy/2026-05-05/fossil_fuels:
     - data://garden/eia/2026-05-05/international_energy
@@ -241,7 +241,7 @@ steps:
   data://grapher/energy/2025-06-27/global_primary_energy:
     - data://garden/energy/2025-06-27/global_primary_energy
   #
-  # Energy - Primary energy consumption (sourced from the new EIA International Energy garden).
+  # Energy - Primary energy consumption.
   #
   data://garden/energy/2026-05-05/primary_energy_consumption:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy

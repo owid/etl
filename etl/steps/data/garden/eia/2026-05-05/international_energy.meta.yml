@@ -11,7 +11,12 @@ dataset:
 tables:
   international_energy:
     variables:
-      total_energy_consumption: {}
+      total_energy_consumption:
+        title: Total energy consumption
+        description_short: |-
+          Measured in terawatt-hours.
+        short_unit: TWh
+        unit: terawatt-hours
       total_energy_production: {}
       energy_consumption_from_coal: {}
       energy_consumption_from_natural_gas: {}
