@@ -41,7 +41,7 @@ definitions:
     type: Integer
     tolerance: 2
     colorScaleScheme: Purples
-    colorScaleNumericBins: 1000000000,,;5000000000,,;10000000000,,;5000000000,,;100000000000,,;500000000000
+    colorScaleNumericBins: 1000000000,,;5000000000,,;10000000000,,;50000000000,,;100000000000,,;500000000000
     colorScaleEqualSizeBins: true
     colorScaleNumericMinValue: 0
     colorScaleInvert: false
@@ -192,7 +192,7 @@ definitions:
     type: Numeric
     tolerance: 2
     colorScaleScheme: OrRd
-    colorScaleNumericBins: 500000,,;1000000,,;5000000,,;10000000,,;5000000,,;100000000,,;500000000
+    colorScaleNumericBins: 500000,,;1000000,,;5000000,,;10000000,,;50000000,,;100000000,,;500000000
     colorScaleEqualSizeBins: true
     colorScaleNumericMinValue: 0
     colorScaleInvert: false
