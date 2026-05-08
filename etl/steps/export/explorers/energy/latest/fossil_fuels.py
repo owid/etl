@@ -1,8 +1,5 @@
-"""Load the fossil_fuels grapher dataset and create the natural-resources explorer tsv file.
+"""Load the fossil_fuels grapher dataset and create the fossil fuels explorer.
 
-The explorer slug is kept as "natural-resources" for URL backward compatibility — the live
-explorer lives at /explorers/natural-resources, even though its title is "Fossil Fuels" and the
-underlying dataset is fossil_fuels.
 """
 
 from etl.helpers import PathFinder
@@ -21,7 +18,7 @@ def run() -> None:
     #
     c = paths.create_collection(
         config=config,
-        short_name="natural-resources",
+        short_name="fossil-fuels",
         explorer=True,
     )
 

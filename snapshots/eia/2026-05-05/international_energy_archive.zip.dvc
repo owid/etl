@@ -1,8 +1,7 @@
 meta:
   origin:
-    title: International Energy (archive)
-    title_snapshot: International Energy Statistics — historical exports
-    description_snapshot: |-
+    title: International Energy Data (archival data)
+    description: |-
       Archive dataset of country-level tables extracted from the U.S. Energy Information Administration (EIA) via [its online tool](https://www.eia.gov/international/data/world). Some of the data is no longer publicly available.
     producer: U.S. Energy Information Administration
     attribution_short: EIA

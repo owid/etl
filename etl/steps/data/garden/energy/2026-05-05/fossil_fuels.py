@@ -1,4 +1,4 @@
-"""Garden step for the OWID Fossil Fuels dataset, used by the natural-resources explorer."""
+"""Garden step for the OWID Fossil Fuels data explorer."""
 
 from owid.catalog import Table
 
