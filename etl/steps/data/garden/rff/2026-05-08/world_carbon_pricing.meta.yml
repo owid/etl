@@ -42,7 +42,7 @@ tables:
         title: Gross tax rate
         unit: Current local currency unit per ton of CO₂ equivalent
         short_unit: current LCU/t CO₂e
-        description_short: Tax rate in current local currency unit (LCU) per ton of CO₂ equivalent
+        description_short: Tax rate in current local currency unit (LCU) per ton of CO₂ equivalent.
         display:
           numDecimalPlaces: 2
         processing_level: minor
