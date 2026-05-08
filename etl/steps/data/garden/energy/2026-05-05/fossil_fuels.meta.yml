@@ -8,8 +8,6 @@ definitions:
 
 dataset:
   title: Fossil fuels
-  description: |-
-    Fossil-fuel reserves, production, trade, and consumption by country, combining EIA International Energy Statistics with the Energy Institute Statistical Review of World Energy (the latter contributing natural gas and oil reserves, which are not in the EIA bulk file).
   update_period_days: 365
 
 tables:
