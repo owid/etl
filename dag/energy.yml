@@ -160,12 +160,6 @@ steps:
   data://grapher/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
   #
-  # EIA - Energy consumption.
-  #
-  # TODO: To be archived once dependencies are updated.
-  data://meadow/eia/2025-07-08/energy_consumption:
-    - snapshot://eia/2025-07-08/international_energy_data.zip
-  #
   # EIA - International Energy.
   #
   data://meadow/eia/2026-05-05/international_energy:

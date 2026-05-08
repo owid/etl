@@ -806,7 +806,6 @@ steps:
   #
   # EIA - Energy consumption.
   #
-  # TODO: To be archived once dependencies are updated.
   data://garden/eia/2025-07-08/energy_consumption:
     - data://garden/wb/2025-07-01/income_groups
     - data://meadow/eia/2025-07-08/energy_consumption
@@ -824,3 +823,9 @@ steps:
   #
   data://grapher/energy/2025-06-27/primary_energy_consumption:
     - data://garden/energy/2025-06-27/primary_energy_consumption
+  #
+  # EIA - Energy consumption.
+  #
+  # TODO: To be archived once dependencies are updated.
+  data://meadow/eia/2025-07-08/energy_consumption:
+    - snapshot://eia/2025-07-08/international_energy_data.zip
