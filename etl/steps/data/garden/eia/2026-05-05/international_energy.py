@@ -22,12 +22,14 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Conversion factors.
+# Conversion factors, from:
+# https://www.eia.gov/state/seds/sep_prices/notes/pr_metric.pdf
 TJ_TO_TWH = 1 / 3600
 QUAD_BTU_TO_TWH = 293.0710701722222  # 1 quadrillion Btu = 293.07 TWh.
 MILLION_BTU_TO_KWH = 293.0710701722222
 THOUSAND_BTU_TO_KWH = 0.2930710701722222
 SHORT_TON_TO_TONNE = 0.9071847  # 1 short ton = 0.907 metric tonnes.
+TCF_TO_TCM = 0.02831685  # 1 trillion cubic feet = 0.0283168 trillion cubic metres (TCM).
 
 # Curated indicators: (eia_variable, eia_unit, output_column, factor, output_unit, output_short_unit, title).
 # The pair (eia_variable, eia_unit) selects one row family in the meadow long table; the value is
@@ -560,8 +562,6 @@ INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
 # Indicators sourced from the frozen 2022 archive of EIA's old international tool — these don't
 # exist in the current bulk file because EIA retired the upstream tables.
 # Each tuple: (archive_topic, archive_indicator, archive_unit, output_column, factor, output_unit, output_short_unit, title).
-# 1 trillion cubic feet = 0.0283168 trillion cubic metres (TCM).
-TCF_TO_TCM = 0.0283168
 ARCHIVE_INDICATORS: list[tuple[str, str, str, str, float, str, str, str]] = [
     (
         "natural_gas_reserves",
@@ -617,12 +617,7 @@ REGIONS = {
     "World": {},
 }
 
-# Known overlaps between historical regions and successor countries. Aruba's contribution is
-# negligible compared to the Netherlands Antilles aggregate, so the small double counting in
-# Europe-level aggregates does not affect results meaningfully.
-# NOTE: The year range must exactly match the years where both entities have data; extra years
-# trigger an "overlaps not found" warning because the function compares the full year-set dict.
-# Bump the upper bound (exclusive) when a new update extends the data past the current year.
+# Known overlaps between historical regions and successor countries.
 KNOWN_OVERLAPS = [{year: {"Aruba", "Netherlands Antilles"} for year in range(1986, 2025)}]
 
 
@@ -734,8 +729,7 @@ def run() -> None:
     # Pivot archive-derived indicators to wide.
     tb_archive_wide = curate_archive_indicators(tb_archive)
 
-    # Harmonize country names on both sides using the local mapping (covers the EIA-style
-    # regions like "Africa (EIA)" and the country names used in both bulk and archive).
+    # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb, warn_on_unused_countries=False)
     tb_archive_wide = paths.regions.harmonize_names(
         tb=tb_archive_wide,
@@ -749,8 +743,7 @@ def run() -> None:
     # Attach indicator-level metadata before adding regions, so aggregates inherit it.
     tb = attach_indicator_metadata(tb)
 
-    # Add OWID region aggregates. Only sum extensive indicators; intensive ones (per capita,
-    # per GDP) stay country-level only.
+    # Add region aggregates. Only sum extensive indicators; intensive ones (per capita, per GDP) stay country-level.
     extensive_columns = [c for c in tb.columns if c not in {"country", "year"} and c not in INTENSIVE_INDICATORS]
     aggregations = {col: "sum" for col in extensive_columns}
     tb = paths.regions.add_aggregates(
