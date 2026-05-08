@@ -1,6 +1,7 @@
 {
-  // Needed for ty type checker to work correctly
-  "python.languageServer": "None",
+  "python.languageServer": "Pylance",
+  // Disable Pylance type checking so it doesn't conflict with `ty` (run via `make check`).
+  "python.analysis.typeCheckingMode": "off",
   "esbonio.sphinx.confDir": "",
   "files.associations": {
     "*.dvc": "yaml"
