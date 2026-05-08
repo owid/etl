@@ -150,7 +150,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_with_regions#electoff_vdem
         unit: ""
         display:
           numDecimalPlaces: 2
@@ -219,7 +218,6 @@ tables:
                   - 80
                   - 90
                   - 100
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_with_regions#suffr_vdem
         unit: "%"
         display:
           numDecimalPlaces: 2
@@ -350,7 +348,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#dirpop_vote_vdem
       goveffective_vdem_wbgi:
         title: Government effectiveness
         description_short: |-
@@ -425,7 +422,6 @@ tables:
                 customHiddenCategories:
                   No data: true
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#num_years_in_electdem_consecutive
               tooltipUseCustomLabels: true
         display:
           shortUnit: years
@@ -497,7 +493,6 @@ tables:
                 customHiddenCategories:
                   No data: true
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#num_years_in_libdem_consecutive
               tooltipUseCustomLabels: true
         display:
           shortUnit: years
@@ -753,7 +748,6 @@ tables:
                   - 1
                   - 2
                   - 3
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_row_owid
               tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
@@ -824,7 +818,6 @@ tables:
                 customCategoryLabels:
                   No data: No data
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_amb_row_owid
               tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
@@ -872,7 +865,6 @@ tables:
                   - 1
                   - 3
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_redux_row_owid
               tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
@@ -1048,7 +1040,6 @@ tables:
                   - 0.8
                   - 0.9
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
         display:
           name: Electoral Democracy Index
           color: '#3c4e66'
@@ -1095,7 +1086,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#libdem_vdem__estimate_best
         description_key:
           - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in big and small differences in democracy, want scores for almost all countries, and prefer a narrow understanding of democracy. For data that focuses on big differences in political systems or has a broad understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
           - It takes a narrow view of democracy by focusing on electoral (free and fair elections) and liberal political institutions (civil rights and protection from the state).
@@ -1166,7 +1156,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#participdem_vdem__estimate_best
         description_from_producer: |-
           Question: To what extent is the ideal of participatory democracy achieved?
 
@@ -1224,7 +1213,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#delibdem_vdem__estimate_best
         description_from_producer: |-
           Question: To what extent is the ideal of deliberative democracy achieved?
 
@@ -1285,7 +1273,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#egaldem_vdem__estimate_best
         description_from_producer: |-
           Question: To what extent is the ideal of egalitarian democracy achieved?
 
@@ -1346,7 +1333,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#legis_constr_vdem__estimate_best
         description_from_producer: |-
           Question: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
 
@@ -1404,7 +1390,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#lib_vdem__estimate_best
         description_from_producer: &description_prod_lib_vdem |-
           Question: To what extent is the liberal principle of democracy achieved?
 
@@ -1462,7 +1447,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#locelect_vdem__estimate_best
         description_from_producer: |-
           Question: Are there elected local governments, and — if so — to what extent can they operate without interference from unelected bodies at the local level?
 
@@ -1520,7 +1504,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#particip_vdem__estimate_best
         description_from_producer: |-
           Question: To what extent is the participatory principle achieved?
 
@@ -1579,7 +1562,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#regelect_vdem__estimate_best
         description_from_producer: |-
           Question: Are there elected regional governments, and — if so — to what extent can they operate without interference from unelected bodies at the regional level?
 
@@ -1637,7 +1619,6 @@ tables:
                   - 0.8
                   - 0.9
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_res_vdem__estimate_best
         description_from_producer: |-
           Question: How equal is the distribution of resources?
 
@@ -1741,7 +1722,6 @@ tables:
                   - 2
                   - 3
                   - 2
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#justcomgd_polch_vdem__estimate_best
         description_from_producer: |-
           Question: Question: When important policy changes are being considered, to what extent do political elites justify their positions in terms of the common good?
 
@@ -1801,7 +1781,6 @@ tables:
                   - 2
                   - 3
                   - 2
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#justified_polch_vdem__estimate_best
         description_from_producer: |-
           Question: When important policy changes are being considered, i.e. before a decision has been made, to what extent do political elites give public and reasoned justifications for their positions?
 
@@ -1859,7 +1838,6 @@ tables:
                   - 2
                   - 3
                   - 2
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#soccons_polch_vdem__estimate_best
         description_from_producer: |-
           Question: When important policy changes are being considered, how wide and how independent are public deliberations?
 
@@ -2398,7 +2376,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#civsoc_particip_vdem__estimate_best
         description_from_producer: |-
           Question: Are major CSOs routinely consulted by policymakers; how large is the involvement of people in CSOs; are women prevented from participating; and is legislative candidate nomination within party organization highly decentralized or made through party primaries?
 
@@ -2456,7 +2433,6 @@ tables:
                   - 2
                   - 3
                   - 2
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#counterarg_polch_vdem__estimate_best
         description_from_producer: |-
           Question: When important policy changes are being considered, to what extent do political elites acknowledge and respect counterarguments?
 
@@ -2524,7 +2500,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#delib_vdem__estimate_best
         description_from_producer: |-
           Question: To what extent is the deliberative principle of democracy achieved?
 
@@ -2588,7 +2563,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#egal_vdem__estimate_best
         description_from_producer: |-
           Question: To what extent is the egalitarian principle achieved?
 
@@ -2648,7 +2622,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electfreefair_vdem__estimate_best
         description_key:
           - This index, produced by Varieties of Democracy (V-Dem), is useful if you are exclusively interested in how free and fair elections are. For data that focuses on how democratic a country's political system is more broadly, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
           - It is based on assessments by V-Dem's country experts.
@@ -2711,7 +2684,6 @@ tables:
                   - 2
                   - 3
                   - 2
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#elitecons_polch_vdem__estimate_best
         description_from_producer: |-
           Question: When important policy changes are being considered, how wide is the range of consultation at elite levels?
 
@@ -2776,7 +2748,6 @@ tables:
                   - 0.8
                   - 0.9
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_access_vdem__estimate_best
         description_from_producer: |-
           Question: How equal is access to power?
 
@@ -2834,7 +2805,6 @@ tables:
                   - 0.8
                   - 0.9
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_rights_vdem__estimate_best
         description_from_producer: |-
           Question: How equal is the protection of rights and freedoms across social groups by the state?
 
@@ -2891,7 +2861,6 @@ tables:
                   - 0.8
                   - 0.9
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#freeassoc_vdem__estimate_best
         description_from_producer: |-
           Question: To what extent are parties, including opposition parties, allowed to form and to participate in elections, and to what extent are civil society organizations able to form and to operate freely?
 
@@ -2946,7 +2915,6 @@ tables:
                   - 0.8
                   - 0.9
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#freeexpr_vdem__estimate_best
         description_key:
           - This index, produced by Varieties of Democracy (V-Dem), combines information on freedom of discussion, freedom of academic and cultural expression, media censorship, media self-censorship, media bias, harassment of journalists, and the existence of critical and different perspectives in print and broadcast media.
           - It is based on assessments by V-Dem's country experts.
@@ -3066,7 +3034,6 @@ tables:
                   - 0.799
                   - 0.899
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#judicial_constr_vdem__estimate_best
         description_from_producer: |-
           Question: To what extent does the executive respect the constitution and comply with court rulings, and to what extent is the judiciary able to act in an independent fashion?
 
@@ -3507,7 +3474,6 @@ tables:
                   - 0
                   - 1
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#accessjust_m_row__estimate_best
               tooltipUseCustomLabels: true
         description_from_producer: |-
           Question: Do men enjoy secure and effective access to justice?
@@ -3567,7 +3533,6 @@ tables:
                   - 0
                   - 1
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#accessjust_w_row__estimate_best
               tooltipUseCustomLabels: true
         description_from_producer: |-
           Question: Do women enjoy equal, secure, and effective access to justice?
@@ -3626,7 +3591,6 @@ tables:
                   - 0
                   - 1
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electdem_dich_row_owid__estimate_best
               tooltipUseCustomLabels: true
         description_from_producer: *description_prod_electdem_vdem
         description_processing: |-
@@ -3672,7 +3636,6 @@ tables:
                   - 0
                   - 1
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electfreefair_row__estimate_best
               tooltipUseCustomLabels: true
         description_key:
           - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
@@ -3734,7 +3697,6 @@ tables:
                   - 0
                   - 1
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_hoe_row_owid__estimate_best
               tooltipUseCustomLabels: true
         unit: ""
         description_processing: |-
@@ -3785,7 +3747,6 @@ tables:
                   - 0
                   - 1
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_leg_row__estimate_best
               tooltipUseCustomLabels: true
         description_processing: |-
           We use the value from `v2elmulpar_osp` whenever `v2eltype` is 0, 1, 4 or 5. Otherwise the value is missing.
@@ -3830,7 +3791,6 @@ tables:
                   - 0
                   - 1
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_row__estimate_best
               tooltipUseCustomLabels: true
         description_from_producer: |-
           Question: Question: Was this national election multiparty?
@@ -3886,7 +3846,6 @@ tables:
                   - 0
                   - 1
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#lib_dich_row__estimate_best
               tooltipUseCustomLabels: true
         description_from_producer: *description_prod_lib_vdem
         description_processing: |-
@@ -3932,7 +3891,6 @@ tables:
                   - 0
                   - 1
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#transplaws_row__estimate_best
               tooltipUseCustomLabels: true
         description_from_producer: |-
           Question: Are the laws of the land clear, well publicized, coherent (consistent with each other), relatively stable from year to year, and enforced in a predictable manner?

@@ -93,7 +93,6 @@ tables:
                   - 10
                 customCategoryLabels:
                   No data: No data
-              columnSlug: grapher/democracy/2024-05-13/polity/polity#democracy_polity
               timeTolerance: 2
       exec_reccomp_polity:
         title: Competitiveness of executive recruitment
@@ -152,7 +151,6 @@ tables:
                 customCategoryLabels:
                   No data: No data
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2024-05-13/polity/polity#exec_reccomp_polity
               timeTolerance: 2
         display:
           numDecimalPlaces: 0
@@ -221,7 +219,6 @@ tables:
                 customCategoryLabels:
                   No data: No data
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2024-05-13/polity/polity#exec_recopen_polity
               timeTolerance: 2
               tooltipUseCustomLabels: true
         display:
@@ -322,7 +319,6 @@ tables:
                   - 7
                 customCategoryLabels:
                   No data: No data
-              columnSlug: grapher/democracy/2024-05-13/polity/polity#exec_constr_polity
               timeTolerance: 2
         display:
           numDecimalPlaces: 0
@@ -389,7 +385,6 @@ tables:
                 customCategoryLabels:
                   No data: No data
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2024-05-13/polity/polity#polpart_reg_polity
               timeTolerance: 2
         display:
           numDecimalPlaces: 0
@@ -468,7 +463,6 @@ tables:
                 customCategoryLabels:
                   No data: No data
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2024-05-13/polity/polity#polpart_comp_polity
               timeTolerance: 2
         display:
           numDecimalPlaces: 0
@@ -600,7 +594,6 @@ tables:
                 customHiddenCategories:
                   No data: true
                 customNumericColorsActive: true
-              columnSlug: grapher/democracy/2024-05-13/polity/polity#age_dem_polity
               timeTolerance: 2
               tooltipUseCustomLabels: true
         display:
