@@ -1,0 +1,5116 @@
+# Democracy explorer migrated from MySQL `explorers.tsv` (slug=democracy).
+# 124 views across 7 datasets × 12 metrics × 84 sub-metrics.
+# Source charts (grapher IDs) resolved against PROD `chart_configs.full`.
+# Shared config factored into `definitions.common_views`:
+#   - unfiltered: tab=map + hasMapTab=true (101 views; 23 outliers override hasMapTab: false).
+#   - filtered: 17 entries factor per-dataset/per-metric defaults.
+# Per-view config carries only deltas vs. the deep-merged inherited stack.
+
+definitions:
+  common_views:
+    # Default to map tab; views without a map override hasMapTab: false.
+    - config:
+        tab: "map"
+        hasMapTab: true
+    # 11 views match this filter
+    - dimensions:
+        sub_metric: main_classification
+      config:
+        selectedFacetStrategy: "entity"
+        map:
+          colorScale:
+            binningStrategy: "manual"
+            baseColorScheme: "RdYlBu"
+          tooltipUseCustomLabels: true
+    # 8 views match this filter
+    - dimensions:
+        metric: deliberative_democracy
+      config:
+        map:
+          colorScale:
+            binningStrategy: "manual"
+    # 8 views match this filter
+    - dimensions:
+        sub_metric: main_index
+      config:
+        map:
+          colorScale:
+            binningStrategy: "manual"
+    # 7 views match this filter
+    - dimensions:
+        metric: participatory_democracy
+      config:
+        yAxis:
+          max: 1
+          min: 0
+        map:
+          colorScale:
+            binningStrategy: "manual"
+            baseColorScheme: "YlGnBu"
+            customNumericColors:
+              - "#9f0026"
+              - "#e31a1c"
+              - "#fd8d3c"
+              - "#fed976"
+              - "#ffeda0"
+              - "#edf8b1"
+              - "#c7e9b4"
+              - "#41b6c4"
+              - "#225ea8"
+              - "#172976"
+    # 7 views match this filter
+    - dimensions:
+        sub_metric: number_and_share_of_democracies
+      config:
+        tab: "chart"
+        hasMapTab: false
+        stackMode: "relative"
+    # 7 views match this filter
+    - dimensions:
+        sub_metric: people_living_in_democracies
+      config:
+        tab: "chart"
+        hasMapTab: false
+    # 6 views match this filter
+    - dimensions:
+        metric: egalitarian_democracy
+      config:
+        yAxis:
+          max: 1
+          min: 0
+        map:
+          colorScale:
+            binningStrategy: "manual"
+            customNumericColors:
+              - "#9f0026"
+              - "#e31a1c"
+              - "#fd8d3c"
+              - "#fed976"
+              - "#ffeda0"
+              - "#edf8b1"
+              - "#c7e9b4"
+              - "#41b6c4"
+              - "#225ea8"
+              - "#172976"
+    # 6 views match this filter
+    - dimensions:
+        metric: democratic_features
+      config:
+        note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+        yAxis:
+          max: 10
+          min: 1
+        map:
+          colorScale:
+            binningStrategy: "manual"
+            baseColorScheme: "PuBu"
+            customCategoryLabels:
+              No data: "No data"
+          tooltipUseCustomLabels: true
+    # 4 views match this filter
+    - dimensions:
+        sub_metric: electoral_democracy_index
+      config:
+        title: "Electoral Democracy Index"
+        subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed. The index ranges from 0 to 1 (most democratic)."
+        map:
+          colorScale:
+            baseColorScheme: "YlGnBu"
+            customNumericValues:
+              - 0
+              - 0.1
+              - 0.2
+              - 0.3
+              - 0.4
+              - 0.5
+              - 0.6
+              - 0.7
+              - 0.8
+              - 0.9
+              - 1
+          columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best"
+    # 6 views match this filter
+    - dimensions:
+        dataset: varieties_of_democracy
+        metric: liberal_democracy
+      config:
+        yAxis:
+          max: 1
+          min: 0
+        map:
+          colorScale:
+            binningStrategy: "manual"
+            customNumericColors:
+              - "#9f0026"
+              - "#e31a1c"
+              - "#fd8d3c"
+              - "#fed976"
+              - "#ffeda0"
+              - "#edf8b1"
+              - "#c7e9b4"
+              - "#41b6c4"
+              - "#225ea8"
+              - "#172976"
+    # 6 views match this filter
+    - dimensions:
+        dataset: varieties_of_democracy
+        metric: electoral_democracy
+      config:
+        yAxis:
+          min: 0
+        map:
+          colorScale:
+            binningStrategy: "manual"
+            customNumericColors:
+              - "#9f0026"
+              - "#e31a1c"
+              - "#fd8d3c"
+              - "#fed976"
+              - "#ffeda0"
+              - "#edf8b1"
+              - "#c7e9b4"
+              - "#41b6c4"
+              - "#225ea8"
+              - "#172976"
+    # 5 views match this filter
+    - dimensions:
+        dataset: varieties_of_democracy
+        sub_metric: main_index
+      config:
+        map:
+          colorScale:
+            baseColorScheme: "YlGnBu"
+    # 4 views match this filter
+    - dimensions:
+        dataset: regimes_of_the_world
+        sub_metric: main_classification
+      config:
+        yAxis:
+          min: 0
+    # 4 views match this filter
+    - dimensions:
+        metric: political_regime
+        sub_metric: main_classification
+      config:
+        title: "Democracy"
+    # 3 views match this filter
+    - dimensions:
+        dataset: lexical_index
+        sub_metric: main_classification
+      config:
+        yAxis:
+          min: 0
+        map:
+          colorScale:
+            customCategoryLabels:
+              No data: "No data"
+            customNumericColorsActive: true
+    # 3 views match this filter
+    - dimensions:
+        dataset: regimes_of_the_world
+        metric: political_regime
+      config:
+        subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem)."
+    # 3 views match this filter
+    - dimensions:
+        dataset: lexical_index
+        metric: political_regime
+      config:
+        subtitle: "Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index)."
+
+config:
+  explorerTitle: "Democracy"
+  explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
+  isPublished: true
+  thumbnail: "https://assets.ourworldindata.org/uploads/2022/06/Democracy-Data-Explorer.png"
+  wpBlockId: "51850"
+  subNavId: explorers
+  subNavCurrentId: "democracy-data"
+  hideAlertBanner: true
+  hideAnnotationFieldsInTitle: true
+  pickerColumnSlugs: []
+  selection:
+    - "Argentina"
+    - "Australia"
+    - "Botswana"
+    - "China"
+    - "World"
+
+dimensions:
+  - slug: dataset
+    name: "Dataset"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: varieties_of_democracy
+        name: "Varieties of Democracy"
+      - slug: regimes_of_the_world
+        name: "Regimes of the World"
+      - slug: lexical_index
+        name: "Lexical Index"
+      - slug: freedom_house
+        name: "Freedom House"
+      - slug: bertelsmann_transformation_index
+        name: "Bertelsmann Transformation Index"
+      - slug: economist_intelligence_unit
+        name: "Economist Intelligence Unit"
+      - slug: polity
+        name: "Polity"
+  - slug: metric
+    name: "Metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: electoral_democracy
+        name: "Electoral democracy"
+      - slug: liberal_democracy
+        name: "Liberal democracy"
+      - slug: participatory_democracy
+        name: "Participatory democracy"
+      - slug: deliberative_democracy
+        name: "Deliberative democracy"
+      - slug: egalitarian_democracy
+        name: "Egalitarian democracy"
+      - slug: varieties_of_democracy
+        name: "Varieties of democracy"
+      - slug: political_regime
+        name: "Political regime"
+      - slug: political_regime_including_ambiguous_categories
+        name: "Political regime, including ambiguous categories"
+      - slug: full_democracy
+        name: "Full democracy"
+      - slug: freedom
+        name: "Freedom"
+      - slug: democratic_features
+        name: "Democratic features"
+      - slug: democracy
+        name: "Democracy"
+  - slug: sub_metric
+    name: "Sub-metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: main_index
+        name: "Main index"
+      - slug: elected_political_leaders_index
+        name: "Elected political leaders index"
+      - slug: share_of_adult_citizens_who_have_the_right_to_vote
+        name: "Share of adult citizens who have the right to vote"
+      - slug: free_and_fair_elections_index
+        name: "Free and fair elections index"
+      - slug: freedom_of_association_index
+        name: "Freedom of association index"
+      - slug: freedom_of_expression_index
+        name: "Freedom of expression index"
+      - slug: electoral_democracy_index
+        name: "Electoral democracy index"
+      - slug: liberal_political_institutions_index
+        name: "Liberal political institutions index"
+      - slug: individual_liberties_and_equality_before_the_law_index
+        name: "Individual liberties and equality before the law index"
+      - slug: judicial_constraints_on_the_executive_index
+        name: "Judicial constraints on the executive index"
+      - slug: legislative_constraints_on_the_executive_index
+        name: "Legislative constraints on the executive index"
+      - slug: participatory_political_institutions_index
+        name: "Participatory political institutions index"
+      - slug: strong_elected_regional_governments_index
+        name: "Strong elected regional governments index"
+      - slug: strong_elected_local_governments_index
+        name: "Strong elected local governments index"
+      - slug: civil_society_participation_index
+        name: "Civil society participation index"
+      - slug: direct_popular_voting_index
+        name: "Direct popular voting index"
+      - slug: deliberative_political_institutions_index
+        name: "Deliberative political institutions index"
+      - slug: justified_political_positions_score
+        name: "Justified political positions score"
+      - slug: common_good_justifications_score
+        name: "Common good justifications score"
+      - slug: respect_for_counterarguments_score
+        name: "Respect for counterarguments score"
+      - slug: elite_consultations_score
+        name: "Elite consultations score"
+      - slug: engaged_society_score
+        name: "Engaged society score"
+      - slug: egalitarian_political_institutions_index
+        name: "Egalitarian political institutions index"
+      - slug: equal_rights_protection_index
+        name: "Equal rights protection index"
+      - slug: equal_access_to_power_index
+        name: "Equal access to power index"
+      - slug: equal_resource_distribution_index
+        name: "Equal resource distribution index"
+      - slug: main_indices
+        name: "Main indices"
+      - slug: main_classification
+        name: "Main classification"
+      - slug: number_and_share_of_democracies
+        name: "Number and share of democracies"
+      - slug: people_living_in_democracies
+        name: "People living in democracies"
+      - slug: multi_party_elections
+        name: "Multi-party elections"
+      - slug: multi_party_elections_for_chief_executive
+        name: "Multi-party elections for chief executive"
+      - slug: multi_party_elections_for_legislature
+        name: "Multi-party elections for legislature"
+      - slug: free_and_fair_elections
+        name: "Free and fair elections"
+      - slug: democratic_electoral_institutions
+        name: "Democratic electoral institutions"
+      - slug: age_of_electoral_democracy
+        name: "Age of electoral democracy"
+      - slug: number_and_share_of_long_standing_electoral_democracies
+        name: "Number and share of long-standing electoral democracies"
+      - slug: transparent_laws
+        name: "Transparent laws"
+      - slug: access_to_justice_for_men
+        name: "Access to justice for men"
+      - slug: access_to_justice_for_women
+        name: "Access to justice for women"
+      - slug: liberal_political_institutions
+        name: "Liberal political institutions"
+      - slug: age_of_liberal_democracy
+        name: "Age of liberal democracy"
+      - slug: number_and_share_of_long_standing_liberal_democracies
+        name: "Number and share of long-standing liberal democracies"
+      - slug: elections_for_legislature
+        name: "Elections for legislature"
+      - slug: elections_for_chief_executive
+        name: "Elections for chief executive"
+      - slug: political_opposition
+        name: "Political opposition"
+      - slug: competitive_elections
+        name: "Competitive elections"
+      - slug: universal_right_to_vote_for_men
+        name: "Universal right to vote for men"
+      - slug: universal_right_to_vote_for_women
+        name: "Universal right to vote for women"
+      - slug: political_liberties
+        name: "Political liberties"
+      - slug: age_of_full_democracy
+        name: "Age of full democracy"
+      - slug: number_and_share_of_long_standing_full_democracies
+        name: "Number and share of long-standing full democracies"
+      - slug: political_rights_score
+        name: "Political rights score"
+      - slug: political_rights_rating
+        name: "Political rights rating"
+      - slug: civil_liberties_score
+        name: "Civil liberties score"
+      - slug: civil_liberties_rating
+        name: "Civil liberties rating"
+      - slug: number_and_share_of_free_countries_and_territories
+        name: "Number and share of free countries and territories"
+      - slug: people_living_in_free_countries_and_territories
+        name: "People living in free countries and territories"
+      - slug: stateness_index
+        name: "Stateness index"
+      - slug: political_participation_index
+        name: "Political participation index"
+      - slug: rule_of_law_index
+        name: "Rule of law index"
+      - slug: stability_of_democratic_institutions_index
+        name: "Stability of democratic institutions index"
+      - slug: political_and_social_integration_index
+        name: "Political and social integration index"
+      - slug: basic_state_functions_score
+        name: "Basic state functions score"
+      - slug: free_and_fair_elections_score
+        name: "Free and fair elections score"
+      - slug: effective_power_to_govern_score
+        name: "Effective power to govern score"
+      - slug: freedom_of_association_score
+        name: "Freedom of association score"
+      - slug: freedom_of_expression_score
+        name: "Freedom of expression score"
+      - slug: separation_of_powers_score
+        name: "Separation of powers score"
+      - slug: civil_rights_score
+        name: "Civil rights score"
+      - slug: democratic_features
+        name: "Democratic features"
+      - slug: political_regime
+        name: "Political regime"
+      - slug: electoral_pluralism_index
+        name: "Electoral pluralism index"
+      - slug: functioning_government_index
+        name: "Functioning government index"
+      - slug: democratic_culture_index
+        name: "Democratic culture index"
+      - slug: civil_liberties_index
+        name: "Civil liberties index"
+      - slug: competitiveness_of_executive_recruitment_score
+        name: "Competitiveness of executive recruitment score"
+      - slug: openness_of_executive_recruitment_score
+        name: "Openness of executive recruitment score"
+      - slug: constraints_on_the_executive_score
+        name: "Constraints on the executive score"
+      - slug: regulation_of_political_participation_score
+        name: "Regulation of political participation score"
+      - slug: competitiveness_of_political_participation_score
+        name: "Competitiveness of political participation score"
+      - slug: main_index_distribution
+        name: "Main index distribution"
+      - slug: age_of_democracy
+        name: "Age of democracy"
+      - slug: number_and_share_of_long_standing_democracies
+        name: "Number and share of long-standing democracies"
+
+views:
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral Democracy Index"
+            color: "#3c4e66"
+    config:
+      title: "Electoral Democracy Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed. The index ranges from 0 to 1 (most democratic)."
+      yAxis:
+        max: 1
+      map:
+        colorScale:
+          customNumericValues:
+            - 0
+            - 0.1
+            - 0.2
+            - 0.3
+            - 0.4
+            - 0.5
+            - 0.6
+            - 0.7
+            - 0.8
+            - 0.9
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: elected_political_leaders_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_with_regions#electoff_vdem
+          display:
+            name: "Elected Political Leaders Index"
+            color: "#3c4e66"
+    config:
+      title: "Elected Political Leaders Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). It measures the extent to which broad elections choose the chief executive and the legislature. The index ranges from 0 to 1 (chief executive and entire legislature elected)."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+      map:
+        colorScale:
+          baseColorScheme: "BinaryMapPaletteA"
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_with_regions#electoff_vdem"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: share_of_adult_citizens_who_have_the_right_to_vote
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_with_regions#suffr_vdem
+          display:
+            name: ""
+            unit: "%"
+            shortUnit: "%"
+            numDecimalPlaces: 1
+    config:
+      title: "Share of adult citizens who have the right to vote"
+      subtitle: "Share of adult citizens who have the legal right to vote in national elections."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 0
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          customNumericLabels:
+            - ""
+            - null
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+            - 70
+            - 80
+            - 90
+            - 100
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_with_regions#suffr_vdem"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: free_and_fair_elections_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electfreefair_vdem__estimate_best
+          display:
+            name: "Free and Fair Elections Index"
+            color: "#3c4e66"
+    config:
+      title: "Free and Fair Elections Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which election violence, government intimidation, fraud, large irregularities, and vote buying are absent. The index ranges from 0 to 1 (most free and fair)."
+      yAxis:
+        max: 1
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electfreefair_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: freedom_of_association_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#freeassoc_vdem__estimate_best
+          display:
+            name: "Freedom of Association Index"
+            color: "#3c4e66"
+    config:
+      title: "Freedom of Association Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which parties and civil society organizations can form and operate freely. The index ranges from 0 to 1 (most free)."
+      yAxis:
+        max: 1
+      map:
+        colorScale:
+          baseColorScheme: "GnBu"
+          customNumericValues:
+            - 0
+            - 0.1
+            - 0.2
+            - 0.3
+            - 0.4
+            - 0.5
+            - 0.6
+            - 0.7
+            - 0.8
+            - 0.9
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#freeassoc_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: electoral_democracy
+      sub_metric: freedom_of_expression_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#freeexpr_vdem__estimate_best
+          display:
+            name: "Freedom of Expression index"
+            color: "#3c4e66"
+    config:
+      title: "Freedom of Expression Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of free speech and the freedom of the press. The index ranges from 0 to 1 (most free)."
+      yAxis:
+        max: 1
+      map:
+        colorScale:
+          baseColorScheme: "YlGn"
+          customNumericValues:
+            - 0
+            - 0.1
+            - 0.2
+            - 0.3
+            - 0.4
+            - 0.5
+            - 0.6
+            - 0.7
+            - 0.8
+            - 0.9
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#freeexpr_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#libdem_vdem__estimate_best
+          display:
+            name: "Liberal Democracy Index"
+            color: "#3c4e66"
+    config:
+      title: "Liberal Democracy Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, civil liberties, and executive constraints. The index ranges from 0 to 1 (most democratic)."
+      map:
+        colorScale:
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#libdem_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral Democracy Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: liberal_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#lib_vdem__estimate_best
+          display:
+            name: "Liberal Political Institutions Index"
+            color: "#3c4e66"
+    config:
+      title: "Liberal Political Institutions Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of individual and minority rights, equality before the law, and constraints on the executive by the legislature and courts. The index ranges from 0 to 1 (most liberal)."
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#lib_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: individual_liberties_and_equality_before_the_law_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#indiv_libs_vdem__estimate_best
+    config:
+      title: "Individual Liberties and Equality before the Law Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which laws are transparent and predictably enforced, public administration is impartial, and citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion. The index ranges from 0 to 1 (most liberties)."
+      minTime: "latest"
+      map:
+        colorScale:
+          baseColorScheme: "Blues"
+          customNumericValues:
+            - 0
+            - 0.1
+            - 0.2
+            - 0.3
+            - 0.4
+            - 0.5
+            - 0.6
+            - 0.7
+            - 0.8
+            - 0.9
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#indiv_libs_vdem__estimate_low"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: judicial_constraints_on_the_executive_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#judicial_constr_vdem__estimate_best
+          display:
+            name: "Judicial Checks on Government Index"
+            color: "#3c4e66"
+    config:
+      title: "Judicial Checks on Government Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the executive respects the constitution and complies with the rulings of independent courts. The index ranges from 0 to 1 (most constrained)."
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#judicial_constr_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: liberal_democracy
+      sub_metric: legislative_constraints_on_the_executive_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#legis_constr_vdem__estimate_best
+          display:
+            name: "Legislative Checks on Government Index"
+            color: "#3e4c66"
+    config:
+      title: "Legislative Checks on Government Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the legislature and government agencies can question, investigate and oversee the executive. The index ranges from 0 to 1 (most constrained)."
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#legis_constr_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#participdem_vdem__estimate_best
+          display:
+            name: "Participatory Denocracy Index"
+            color: "#3e4c66"
+    config:
+      title: "Participatory Democracy Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and citizens being able to engage in regional and local government, civil society organizations, and direct democracy. The index ranges from 0 to 1 (most democratic)."
+      maxTime: 2024
+      map:
+        colorScale:
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#participdem_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral Democracy Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: participatory_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#particip_vdem__estimate_best
+          display:
+            name: "Participatory Political Institutions Index"
+            color: "#3c4e66"
+    config:
+      title: "Participatory Political Institutions Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy. The index ranges from 0 to 1 (most participatory)."
+      map:
+        colorScale:
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#particip_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: strong_elected_regional_governments_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#regelect_vdem__estimate_best
+          display:
+            name: "Strong Elected Regional Governments Index"
+            color: "#3c4e66"
+    config:
+      title: "Strong Elected Regional Governments Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens elect regional governments that are free from the influence of unelected regional actors, except for courts. The index ranges from 0 to 1 (strongest)."
+      maxTime: 2024
+      map:
+        colorScale:
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#regelect_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: strong_elected_local_governments_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#locelect_vdem__estimate_best
+          display:
+            name: "Strong Elected Local Governments Index"
+            color: "#3c4e66"
+    config:
+      title: "Strong Elected Local Governments Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens elect local governments that are free from the influence of unelected local actors, except for courts. The index ranges from 0 to 1 (strongest)."
+      map:
+        colorScale:
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#locelect_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: civil_society_participation_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#civsoc_particip_vdem__estimate_best
+          display:
+            name: "Civil Society Participation Index"
+            color: "#3c4e66"
+    config:
+      title: "Civil Society Participation Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens are active in diverse organizations which choose and influence policy-makers. The index ranges from 0 to 1 (most active)."
+      map:
+        colorScale:
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#civsoc_particip_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: participatory_democracy
+      sub_metric: direct_popular_voting_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#dirpop_vote_vdem
+          display:
+            name: "Direct Democracy Index"
+    config:
+      title: "Direct Democracy Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens can easily vote on specific issues themselves in popular initiatives, referendums, and plebiscites. The index ranges from 0 to 1 (easiest)."
+      map:
+        colorScale:
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#dirpop_vote_vdem"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#delibdem_vdem__estimate_best
+          display:
+            name: "Deliberative Democracy Index"
+            color: "#3c4e66"
+    config:
+      title: "Deliberative Democracy Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and citizens and leaders discussing different views and seeking the public good. The index ranges from 0 to 1 (most democratic)."
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          customNumericColors:
+            - "#9f0026"
+            - "#e31a1c"
+            - "#fd8d3c"
+            - "#fed976"
+            - "#ffeda0"
+            - "#edf8b1"
+            - "#c7e9b4"
+            - "#41b6c4"
+            - "#225ea8"
+            - "#172976"
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#delibdem_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral Democracy Index"
+            color: "#3c4e66"
+    config:
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          customNumericColors:
+            - "#9f0026"
+            - "#e31a1c"
+            - "#fd8d3c"
+            - "#fed976"
+            - "#ffeda0"
+            - "#edf8b1"
+            - "#c7e9b4"
+            - "#41b6c4"
+            - "#225ea8"
+            - "#172976"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: deliberative_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#delib_vdem__estimate_best
+          display:
+            name: "Deliberative Political Institutions Index"
+            color: "#3c4e66"
+    config:
+      title: "Deliberative Political Institutions Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens and leaders discuss different views and seek the public good. The index ranges from 0 to 1 (most deliberative)."
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          customNumericColors:
+            - "#9f0026"
+            - "#e31a1c"
+            - "#fd8d3c"
+            - "#fed976"
+            - "#ffeda0"
+            - "#edf8b1"
+            - "#c7e9b4"
+            - "#41b6c4"
+            - "#225ea8"
+            - "#172976"
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#delib_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: justified_political_positions_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#justified_polch_vdem__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+    config:
+      title: "Justified Political Positions Score"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders give reasons for their views. Higher scores mean more justification. A score of 0 is approximately the average across all countries and years."
+      yAxis:
+        max: 4
+        min: -4
+      map:
+        colorScale:
+          baseColorScheme: "RdBu"
+          customNumericColors:
+            - "#9f0026"
+            - null
+            - "#e31a1c"
+            - "#fd8d3c"
+            - "#fed976"
+            - "#ffeda0"
+            - "#edf8b1"
+            - "#172976"
+          customNumericValues:
+            - 0
+            - -3
+            - -2
+            - -1
+            - 0
+            - 1
+            - 2
+            - 3
+            - 2
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#justified_polch_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: common_good_justifications_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#justcomgd_polch_vdem__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+    config:
+      title: "Common Good Justifications Score"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders justify their views with what is best for society overall. Higher scores mean more justification. A score of 0 is approximately the average across all countries and years."
+      yAxis:
+        max: 4
+        min: -4
+      map:
+        colorScale:
+          baseColorScheme: "RdBu"
+          customNumericColors:
+            - "#9f0026"
+            - null
+            - "#e31a1c"
+            - "#fd8d3c"
+            - "#fed976"
+            - "#ffeda0"
+            - "#edf8b1"
+            - "#172976"
+          customNumericValues:
+            - 0
+            - -3
+            - -2
+            - -1
+            - 0
+            - 1
+            - 2
+            - 3
+            - 2
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#justcomgd_polch_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: respect_for_counterarguments_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#counterarg_polch_vdem__estimate_best
+          display:
+            name: "Respect for counterarguments"
+            color: "#3c4e66"
+    config:
+      title: "Respect for Counterarguments Score"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders acknowledge and respect different views and sometimes change their own. Higher scores mean more respect. A score of 0 is approximately the average across all countries and years."
+      yAxis:
+        max: 4
+        min: -4
+      map:
+        colorScale:
+          baseColorScheme: "RdBu"
+          customNumericColors:
+            - "#9f0026"
+            - null
+            - "#e31a1c"
+            - "#fd8d3c"
+            - "#fed976"
+            - "#ffeda0"
+            - "#edf8b1"
+            - "#172976"
+          customNumericValues:
+            - 0
+            - -3
+            - -2
+            - -1
+            - 0
+            - 1
+            - 2
+            - 3
+            - 2
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#counterarg_polch_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: elite_consultations_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#elitecons_polch_vdem__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+    config:
+      title: "Elite Consultations Score"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which leaders across the political spectrum, society, and business are consulted when deciding on policies. Higher scores mean more consultation. A score of 0 is approximately the average across all countries and years."
+      yAxis:
+        max: 4
+        min: -4
+      map:
+        colorScale:
+          baseColorScheme: "RdBu"
+          customNumericColors:
+            - "#9f0026"
+            - null
+            - "#e31a1c"
+            - "#fd8d3c"
+            - "#fed976"
+            - "#ffeda0"
+            - "#edf8b1"
+            - "#172976"
+          customNumericValues:
+            - 0
+            - -3
+            - -2
+            - -1
+            - 0
+            - 1
+            - 2
+            - 3
+            - 2
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#elitecons_polch_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: deliberative_democracy
+      sub_metric: engaged_society_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#soccons_polch_vdem__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+    config:
+      title: "Engaged Society Score"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which many ordinary people discuss policies freely in private and public. Higher scores mean more engagement. A score of 0 is approximately the average across all countries and years."
+      yAxis:
+        max: 4
+        min: -4
+      map:
+        colorScale:
+          baseColorScheme: "RdBu"
+          customNumericColors:
+            - "#9f0026"
+            - null
+            - "#e31a1c"
+            - "#fd8d3c"
+            - "#fed976"
+            - "#ffeda0"
+            - "#edf8b1"
+            - "#172976"
+          customNumericValues:
+            - 0
+            - -3
+            - -2
+            - -1
+            - 0
+            - 1
+            - 2
+            - 3
+            - 2
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#soccons_polch_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#egaldem_vdem__estimate_best
+          display:
+            name: "Egalitarian Democracy Index"
+            color: "#3c4e66"
+    config:
+      title: "Egalitarian Democracy Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and the protection of rights, access to power, and distribution of resources being equal. The index ranges from 0 to 1 (most democratic)."
+      map:
+        colorScale:
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#egaldem_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral Democracy Index"
+            color: "#3c4e66"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: egalitarian_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#egal_vdem__estimate_best
+          display:
+            name: "Egaliatarian Political Institutions Index"
+            color: "#3c4e66"
+    config:
+      title: "Egalitarian Political Institutions Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the protection of rights, access to power, and distribution of resources are equal. The index ranges from 0 to 1 (most egalitarian)."
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          customNumericValues:
+            - 0
+            - 0.099
+            - 0.199
+            - 0.299
+            - 0.399
+            - 0.499
+            - 0.599
+            - 0.699
+            - 0.799
+            - 0.899
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#egal_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: equal_rights_protection_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_rights_vdem__estimate_best
+          display:
+            name: "Equal Rights Protection Index"
+            color: "#3c4e66"
+    config:
+      title: "Equal Rights Protection Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the state grants and protects rights and freedoms equally across all social groups. The index ranges from 0 to 1 (most equal)."
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          customNumericValues:
+            - 0
+            - 0.1
+            - 0.2
+            - 0.3
+            - 0.4
+            - 0.5
+            - 0.6
+            - 0.7
+            - 0.8
+            - 0.9
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_rights_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: equal_access_to_power_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_access_vdem__estimate_best
+          display:
+            name: "Equal Access to Power Index"
+            color: "#3c4e66"
+    config:
+      title: "Equal Access to Power Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which all social groups can influence and participate in policy-making. The index ranges from 0 to 1 (most equal)."
+      map:
+        colorScale:
+          baseColorScheme: "GnBu"
+          customNumericValues:
+            - 0
+            - 0.1
+            - 0.2
+            - 0.3
+            - 0.4
+            - 0.5
+            - 0.6
+            - 0.7
+            - 0.8
+            - 0.9
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_access_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: egalitarian_democracy
+      sub_metric: equal_resource_distribution_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_res_vdem__estimate_best
+          display:
+            name: "Equal Resource Distribution Index"
+            color: "#3c4e66"
+    config:
+      title: "Equal Resource Distribution Index"
+      subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which all social groups benefit from public spending, and have equal access to education, healthcare, and the welfare state. The index ranges from 0 to 1 (most equal)."
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          customNumericValues:
+            - 0
+            - 0.1
+            - 0.2
+            - 0.3
+            - 0.4
+            - 0.5
+            - 0.6
+            - 0.7
+            - 0.8
+            - 0.9
+            - 1
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#equal_res_vdem__estimate_best"
+  - dimensions:
+      dataset: varieties_of_democracy
+      metric: varieties_of_democracy
+      sub_metric: main_indices
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral democracy"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#libdem_vdem__estimate_best
+          display:
+            name: "Liberal democracy"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#participdem_vdem__estimate_best
+          display:
+            name: "Participatory democracy"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#delibdem_vdem__estimate_best
+          display:
+            name: "Deliberative democracy"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#egaldem_vdem__estimate_best
+          display:
+            name: "Egalitarian democracy"
+    config:
+      title: "Varieties of democracy"
+      subtitle: "The indices are by [V-Dem](#dod:v-dem), based on expert estimates, and range from 0 to 1 (most democratic)."
+      tab: "chart"
+      hasMapTab: false
+      selectedFacetStrategy: "entity"
+      addCountryMode: "change-country"
+      minTime: 1900
+      yAxis:
+        max: 1
+        min: 0
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_row_owid
+          display:
+            name: ""
+            numDecimalPlaces: 0
+    config:
+      yAxis:
+        max: 0
+      map:
+        colorScale:
+          customNumericColors:
+            - "#ff0000"
+            - "#ffc0c0"
+            - "#80ff80"
+            - "#008000"
+          customNumericLabels:
+            - "Closed autocracy"
+            - "Electoral autocracy"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 2
+            - 3
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_row_owid"
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_closed_autocracy
+          display:
+            name: "Closed autocracies"
+            color: "#d7191c"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_autocracy
+          display:
+            name: "Electoral autocracies"
+            color: "#ec9d4f"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_democracy
+          display:
+            name: "Electoral democracies"
+            color: "#6da5b8"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_liberal_democracy
+          display:
+            name: "Liberal democracies"
+            color: "#2c7bb6"
+    config:
+      title: "Countries that are democracies and autocracies"
+      note: "The share of closed autocracies increases a lot in 1900 because V-Dem covers many more countries since then, often colonies."
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime__category_closed_autocracy
+          display:
+            name: "People living in closed autocracies"
+            color: "#d7191c"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime__category_electoral_autocracy
+          display:
+            name: "in electoral autocracies"
+            color: "#ec9d4f"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime__category_electoral_democracy
+          display:
+            name: "in electoral democracies"
+            color: "#6da5b8"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime__category_liberal_democracy
+          display:
+            name: "in liberal democracies"
+            color: "#2c7bb6"
+    config:
+      title: "People living in democracies and autocracies"
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_redux_row_owid
+          display:
+            name: ""
+            numDecimalPlaces: 0
+    config:
+      title: "Electoral democracy"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections."
+      yAxis:
+        max: 2
+      map:
+        colorScale:
+          customNumericColors:
+            - "#8d6e71"
+            - "#c6a1a5"
+            - "#abd9e9"
+          customNumericLabels:
+            - "Closed autocracy"
+            - "Electoral autocracy"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 3
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_redux_row_owid"
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: multi_party_elections
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Multi-party elections"
+      subtitle: "Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem)."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_row__estimate_best"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: multi_party_elections_for_chief_executive
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_hoe_row_owid__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Multi-party elections for government's chief executive"
+      subtitle: "Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem)."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_hoe_row_owid__estimate_best"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: multi_party_elections_for_legislature
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_leg_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Multi-party elections for legislature"
+      subtitle: "Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem)."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electmulpar_leg_row__estimate_best"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: free_and_fair_elections
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electfreefair_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Free and fair elections"
+      subtitle: "Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether election violence, government intimidation, fraud, large irregularities, and vote buying are broadly absent."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electfreefair_row__estimate_best"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: democratic_electoral_institutions
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electdem_dich_row_owid__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Meaningful democratic electoral institutions"
+      subtitle: "Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether the country has meaningful democratic electoral institutions, meaning political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#electdem_dich_row_owid__estimate_best"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: age_of_electoral_democracy
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#num_years_in_electdem_consecutive
+          display:
+            shortUnit: "years"
+            numDecimalPlaces: 0
+    config:
+      title: "Age of electoral democracy"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections."
+      yAxis:
+        min: "auto"
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#edf8b1"
+            - "#c7e9b4"
+            - "#41b6c4"
+            - "#225ea8"
+            - "#172976"
+          customNumericLabels:
+            - ""
+            - null
+            - null
+            - null
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 0
+            - 18
+            - 30
+            - 60
+            - 90
+            - 176
+          customCategoryColors:
+            No data: "#ffffff"
+            no data: "#ffffff"
+            closed autocracy: "#8d6e71"
+            electoral autocracy: "#c6a1a5"
+            not an electoral democracy: "#fdae61"
+          customCategoryLabels:
+            no data: "No data"
+            closed autocracy: "Closed autocracy"
+            electoral autocracy: "Electoral autocracy"
+          customHiddenCategories:
+            No data: true
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#num_years_in_electdem_consecutive"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: electoral_democracy
+      sub_metric: number_and_share_of_long_standing_electoral_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_closed_autocracy
+          display:
+            name: "Closed autocracies"
+            color: "#8d6e71"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_autocracy
+          display:
+            name: "Electoral autocracies"
+            color: "#c6a1a5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_electdem__category_1_18_years
+          display:
+            name: "Electoral democracies aged 1-18"
+            color: "#edf8b1"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_electdem__category_19_30_years
+          display:
+            name: "aged 19-30"
+            color: "#c7e9b4"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_electdem__category_31_60_years
+          display:
+            name: "aged 31-60"
+            color: "#41b6c4"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_electdem__category_61_90_years
+          display:
+            name: "aged 61-90"
+            color: "#225ea8"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_electdem__category_91plus_years
+          display:
+            name: "aged 91 +"
+            color: "#172976"
+    config:
+      title: "Countries that are long-standing electoral democracies"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections."
+      note: "The share of closed autocracies increases a lot in 1900 because V-Dem covers many more countries since then, often colonies."
+      tab: "chart"
+      hasMapTab: false
+      stackMode: "relative"
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_row_owid
+          display:
+            name: ""
+            numDecimalPlaces: 0
+    config:
+      title: "Liberal democracy"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Liberal democracies are political systems that hold meaningful, free and fair, and multi-party elections, and their citizens have further individual rights, are equal before the law, and the legislative and the courts constrain the executive."
+      yAxis:
+        max: 0
+      map:
+        colorScale:
+          customNumericColors:
+            - "#8d6e71"
+            - "#c6a1a5"
+            - "#f3d0d4"
+            - null
+          customNumericLabels:
+            - "Closed autocracy"
+            - "Electoral autocracy"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 2
+            - 3
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_row_owid"
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: transparent_laws
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#transplaws_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Transparent laws"
+      subtitle: "Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether laws are transparent, coherent, and relatively stable, and their enforcement predictable."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#transplaws_row__estimate_best"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: access_to_justice_for_men
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#accessjust_m_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Access to justice for men"
+      subtitle: "Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether men can safely bring cases before courts, are able to seek redress if public authorities violate their rights, and trials are fair."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#accessjust_m_row__estimate_best"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: access_to_justice_for_women
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#accessjust_w_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Access to justice for women"
+      subtitle: "Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether women can safely bring cases before courts, are able to seek redress if public authorities violate their rights, and trials are fair."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#accessjust_w_row__estimate_best"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: liberal_political_institutions
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#lib_dich_row__estimate_best
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Liberal political institutions"
+      subtitle: "Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether the country has liberal political institutions, meaning citizens have individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_multi_without_regions#lib_dich_row__estimate_best"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: age_of_liberal_democracy
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#num_years_in_libdem_consecutive
+          display:
+            shortUnit: "years"
+            numDecimalPlaces: 0
+    config:
+      title: "Age of liberal democracy"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Liberal democracies are political systems that hold meaningful, free and fair, and multi-party elections, and their citizens have further individual rights, are equal before the law, and the legislative and the courts constrain the executive."
+      yAxis:
+        min: "auto"
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#edf8b1"
+            - "#c7e9b4"
+            - "#41b6c4"
+            - "#225ea8"
+            - "#172976"
+          customNumericLabels:
+            - ""
+            - null
+            - null
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 0
+            - 18
+            - 30
+            - 60
+            - 90
+            - 1
+          customCategoryColors:
+            No data: "#ffffff"
+            no data: "#ffffff"
+            closed autocracy: "#8d6e71"
+            electoral autocracy: "#c6a1a5"
+            electoral democracy: "#f3d0d4"
+            not a liberal democracy: "#fdae61"
+          customCategoryLabels:
+            no data: "No data"
+            closed autocracy: "Closed autocracy"
+            electoral autocracy: "Electoral autocracy"
+            electoral democracy: "Electoral democracy"
+          customHiddenCategories:
+            No data: true
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#num_years_in_libdem_consecutive"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: liberal_democracy
+      sub_metric: number_and_share_of_long_standing_liberal_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_closed_autocracy
+          display:
+            name: "Closed autocracies"
+            color: "#8d6e71"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_autocracy
+          display:
+            name: "Electoral autocracies"
+            color: "#c6a1a5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_democracy
+          display:
+            name: "Electoral democracies"
+            color: "#f3d0d4"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_libdem__category_1_18_years
+          display:
+            name: "Liberal democracies aged 1-18"
+            color: "#edf8b1"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_libdem__category_19_30_years
+          display:
+            name: "aged 19-30"
+            color: "#c7e9b4"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_libdem__category_31_60_years
+          display:
+            name: "aged 31-60"
+            color: "#41b6c4"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_libdem__category_61_90_years
+          display:
+            name: "aged 60-90"
+            color: "#225ea8"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_years_in_libdem__category_91plus_years
+          display:
+            name: "aged 91 +"
+            color: "#172976"
+    config:
+      title: "Countries that are long-standing liberal democracies"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Liberal democracies are political systems that hold meaningful, free and fair, and multi-party elections, and their citizens have further individual rights, are equal before the law, and the legislative and the courts constrain the executive."
+      note: "The share of closed autocracies increases a lot in 1900 because V-Dem covers many more countries since then, often colonies."
+      tab: "chart"
+      hasMapTab: false
+      stackMode: "relative"
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime_including_ambiguous_categories
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_amb_row_owid
+          display:
+            name: ""
+            numDecimalPlaces: 0
+    config:
+      title: "Democracy"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). The intermediate categories indicate that the country may belong in the next-higher or next-lower group."
+      yAxis:
+        max: 9
+      map:
+        colorScale:
+          customNumericColors:
+            - "#d7191c"
+            - "#e74731"
+            - "#f88e52"
+            - null
+            - "#f0cda5"
+            - "#d0dcc1"
+            - null
+            - "#8dc1dc"
+            - "#5496c5"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "Closed autocracy"
+            - ""
+            - "2"
+            - "Electoral autocracy"
+            - ""
+            - "5"
+            - "Electoral democracy"
+            - ""
+            - "8"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_amb_row_owid"
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime_including_ambiguous_categories
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_closed_autocracy
+          display:
+            name: "Closed autocracies"
+            color: "#d7191c"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_closed__maybe_electoral__autocracy
+          display:
+            name: "Probably closed autocracies"
+            color: "#e74731"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_electoral__maybe_closed__autocracy
+          display:
+            name: "Probably electoral autocracy"
+            color: "#f88e52"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_autocracy
+          display:
+            name: "Electoral autocracies"
+            color: "#fdae61"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_electoral_autocracy__maybe_electoral_democracy
+          display:
+            name: " Probably electoral autocracy"
+            color: "#f0cda5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_electoral_democracy__maybe_electoral_autocracy
+          display:
+            name: " Probably electoral democracy"
+            color: "#d0dcc1"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime__category_electoral_democracy
+          display:
+            name: "Electoral democracies"
+            color: "#abd9e9"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_electoral_democracy__maybe_liberal_democracy
+          display:
+            name: "Probably electoral democracy"
+            color: "#8dc1dc"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_liberal_democracy__maybe_electoral_democracy
+          display:
+            name: "Probably liberal democracy"
+            color: "#5496c5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_num_countries#num_countries_regime_amb__category_liberal_democracy
+          display:
+            name: "Liberal democracies"
+            color: "#2c7bb6"
+    config:
+      title: "Countries that are democracies and autocracies"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem)."
+      note: "The share of closed autocracies increases a lot in 1900 because V-Dem covers many more countries since then, often colonies."
+  - dimensions:
+      dataset: regimes_of_the_world
+      metric: political_regime_including_ambiguous_categories
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_closed_autocracy
+          display:
+            name: "People living in closed autocracies"
+            color: "#d7191c"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_closed__maybe_electoral__autocracy
+          display:
+            name: "in probably closed aut."
+            color: "#e74731"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral__maybe_closed__autocracy
+          display:
+            name: "in probably elect. aut."
+            color: "#f88e52"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral_autocracy
+          display:
+            name: "in electoral autocracies"
+            color: "#fdae61"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral_autocracy__maybe_electoral_democracy
+          display:
+            name: " in probably elect. aut."
+            color: "#f0cda5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral_democracy__maybe_electoral_autocracy
+          display:
+            name: "in probably elect. dem."
+            color: "#d0dcc1"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral_democracy
+          display:
+            name: "in electoral democracies"
+            color: "#abd9e9"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_electoral_democracy__maybe_liberal_democracy
+          display:
+            name: " in probably elect. dem."
+            color: "#8dc1dc"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_liberal_democracy__maybe_electoral_democracy
+          display:
+            name: "in probably lib. dem."
+            color: "#5496c5"
+        - catalogPath: grapher/democracy/2026-03-17/vdem/vdem_population#population_regime_amb__category_liberal_democracy
+          display:
+            name: "in liberal democracies"
+            unit: "people"
+            color: "#2c7bb6"
+    config:
+      title: "People living in democracies and autocracies"
+      subtitle: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem)."
+  - dimensions:
+      dataset: lexical_index
+      metric: political_regime
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#regime_lied
+          display:
+            name: ""
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      yAxis:
+        max: 7
+      map:
+        colorScale:
+          customNumericColors:
+            - "#d7191c"
+            - "#e74731"
+            - "#f88e52"
+            - null
+            - null
+            - "#8dc1dc"
+            - "#5496c5"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "Non-elect. autocracy"
+            - "One-party autocracy"
+            - ""
+            - "Multi-party autocracy"
+            - "Exclusive democracy"
+            - "Male democracy"
+            - "Electoral democracy"
+            - "Full democracy"
+            - "8"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+  - dimensions:
+      dataset: lexical_index
+      metric: political_regime
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_regime_lied__category_non_electoral_autocracy
+          display:
+            name: "Non-electoral autocracies"
+            color: "#d7191c"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_regime_lied__category_one_party_autocracy
+          display:
+            name: "One-party autocracies"
+            color: "#e74731"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_regime_lied__category_multi_party_autocracy_without_elected_executive
+          display:
+            name: "Multi-party autocracies without elected executive"
+            color: "#f88e52"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_regime_lied__category_multi_party_autocracy
+          display:
+            name: "Multi-party autocracy"
+            color: "#fee090"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_regime_lied__category_exclusive_democracy
+          display:
+            name: "Exclusive democracies"
+            color: "#e0f3f8"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_regime_lied__category_male_democracy
+          display:
+            name: "Male democracies"
+            color: "#8dc1dc"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_regime_lied__category_electoral_democracy
+          display:
+            name: "Electoral democracies"
+            color: "#5496c5"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_regime_lied__category_polyarchy
+          display:
+            name: "Full democracies"
+            color: "#2c7bb6"
+    config:
+      title: "Countries that are democracies and autocracies"
+  - dimensions:
+      dataset: lexical_index
+      metric: political_regime
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#pop_democracy_lied__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#pop_regime_lied__category_non_electoral_autocracy
+          display:
+            name: "People living in non-electoral autocracies"
+            color: "#d7191c"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#pop_regime_lied__category_one_party_autocracy
+          display:
+            name: "one-party autocracies"
+            color: "#e74731"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#pop_regime_lied__category_multi_party_autocracy_without_elected_executive
+          display:
+            name: "multi-party autocracies without elected executive"
+            color: "#f88e52"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#pop_regime_lied__category_multi_party_autocracy
+          display:
+            name: "multi-party autocracies"
+            color: "#fee090"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#pop_regime_lied__category_exclusive_democracy
+          display:
+            name: "exclusive democracies"
+            color: "#e0f3f8"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#pop_regime_lied__category_male_democracy
+          display:
+            name: "male democracies"
+            color: "#8dc1dc"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#pop_regime_lied__category_electoral_democracy
+          display:
+            name: "electoral democracies"
+            color: "#5496c5"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#pop_regime_lied__category_polyarchy
+          display:
+            name: "People living in full democracies"
+            color: "#2c7bb6"
+    config:
+      title: "People living in democracies and autocracies"
+  - dimensions:
+      dataset: lexical_index
+      metric: electoral_democracy
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#democracy_lied
+    config:
+      title: "Electoral democracy"
+      subtitle: "Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index). Electoral democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections."
+      yAxis:
+        max: 1
+      map:
+        colorScale:
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - ""
+            - "Multi-party autocracy"
+            - "Exclusive democracy"
+            - "Male democracy"
+            - "Electoral democracy"
+            - "Polyarchy"
+            - "8"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+  - dimensions:
+      dataset: lexical_index
+      metric: electoral_democracy
+      sub_metric: elections_for_legislature
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#legelec_lied
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Elections for the legislature"
+      subtitle: "Data by the Lexical Index of Electoral Democracy."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: lexical_index
+      metric: electoral_democracy
+      sub_metric: elections_for_chief_executive
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#exelec_lied
+          display:
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Elections for the government's chief executive"
+      subtitle: "Data by the Lexical Index of Electoral Democracy."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: lexical_index
+      metric: electoral_democracy
+      sub_metric: political_opposition
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#opposition_lied
+          display:
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Political opposition"
+      subtitle: "Data by the Lexical Index of Electoral Democracy. Political opposition is more than one party or non-party candidate being able to compete in elections for the legislature."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: lexical_index
+      metric: electoral_democracy
+      sub_metric: competitive_elections
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#competition_lied
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Competitive elections"
+      subtitle: "Data by the Lexical Index of Electoral Democracy. Competitive elections have an uncertain outcome because their timing is not violated, voters are not systematically coerced, and election fraud is not consequential."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "BinaryMapPaletteE"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#e56e5a"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: lexical_index
+      metric: electoral_democracy
+      sub_metric: universal_right_to_vote_for_men
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#male_suffrage_lied
+          display:
+            shortUnit: ""
+            numDecimalPlaces: 0
+    config:
+      title: "Men's universal right to vote"
+      subtitle: "This does not consider elections not being held, informal restrictions, or legal restrictions based on age, criminal conviction, disability, and local residency."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "PiYG"
+          binningStrategy: "manual"
+          legendDescription: "Universal Suffrage"
+          customNumericColors:
+            - "#f4a582"
+            - "#92c5de"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+          customNumericValues:
+            - 0
+            - 0.5
+            - 1
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: lexical_index
+      metric: electoral_democracy
+      sub_metric: universal_right_to_vote_for_women
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#female_suffrage_lied
+          display:
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Women's universal right to vote"
+      subtitle: "This does not consider elections not being held, informal restrictions, or legal restrictions based on age, criminal conviction, disability, and local residency."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "PiYG"
+          binningStrategy: "manual"
+          legendDescription: "Universal Suffrage"
+          customNumericColors:
+            - "#f4a582"
+            - "#92c5de"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+          customNumericValues:
+            - 0
+            - 0.5
+            - 1
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: lexical_index
+      metric: electoral_democracy
+      sub_metric: age_of_electoral_democracy
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#age_electdem_lied
+          display:
+            unit: "years"
+            shortUnit: "years"
+            numDecimalPlaces: 0
+    config:
+      title: "Age of electoral democracy"
+      subtitle: "Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index). Electoral democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections."
+      yAxis:
+        min: "auto"
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#edf8b1"
+            - "#c7e9b4"
+            - "#41b6c4"
+            - "#225ea8"
+            - "#172976"
+          customNumericLabels:
+            - ""
+            - null
+            - null
+            - null
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 0
+            - 18
+            - 30
+            - 60
+            - 90
+            - 1
+          customCategoryColors:
+            No data: "#ffffff"
+            no data: "#ffffff"
+            male democracy: "#c7a2b6"
+            closed autocracy: "#8d6e71"
+            electoral autocracy: "#c6a1a5"
+            exclusive democracy: "#d2aebe"
+            one-party autocracy: "#a3809a"
+            multiparty autocracy: "#bb96ae"
+            multi-party autocracy: "#bb96ae"
+            non-electoral autocracy: "#97758e"
+            not an electoral democracy: "#fdae61"
+            multiparty autocracy without elected executive: "#af8aa5"
+            multi-party autocracy without elected executive: "#af8aa5"
+          customCategoryLabels:
+            male democracy: "Male democracy"
+            exclusive democracy: "Exclusive democracy"
+            one-party autocracy: "One-party autocracy"
+            multi-party autocracy: "Multi-party autocracy"
+            non-electoral autocracy: "Non-electoral autocracy"
+            multi-party autocracy without elected executive: "Multi-party autocracy without elected executive"
+          customHiddenCategories:
+            No data: true
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: lexical_index
+      metric: electoral_democracy
+      sub_metric: number_and_share_of_long_standing_electoral_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_democracy_lied__category_autocracy
+          display:
+            name: "Not electoral democracies"
+            color: "#97758e"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_group_age_electdem_lied__category_1_18_years
+          display:
+            name: "Electoral democracies aged 1-18"
+            color: "#edf8b1"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_group_age_electdem_lied__category_19_30_years
+          display:
+            name: "aged 19-30"
+            color: "#c7e9b4"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_group_age_electdem_lied__category_31_60_years
+          display:
+            name: "aged 31-60"
+            color: "#41b6c4"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_group_age_electdem_lied__category_61_90_years
+          display:
+            name: "aged 61-90"
+            color: "#225ea8"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_group_age_electdem_lied__category_91plus_years
+          display:
+            name: "aged 91 +"
+            color: "#172976"
+    config:
+      title: "Countries that are long-standing electoral democracies"
+      subtitle: "Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index). Electoral democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections."
+      tab: "chart"
+      hasMapTab: false
+      stackMode: "relative"
+  - dimensions:
+      dataset: lexical_index
+      metric: full_democracy
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#is_full_democracy
+    config:
+      title: "Full democracy"
+      subtitle: "Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index). Full democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association."
+      yAxis:
+        max: 1
+      map:
+        colorScale:
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - ""
+            - "Multi-party autocracy"
+            - "Exclusive democracy"
+            - "Male democracy"
+            - "Electoral democracy"
+            - "Full democracy"
+            - "8"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+  - dimensions:
+      dataset: lexical_index
+      metric: full_democracy
+      sub_metric: political_liberties
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#poliberties_lied
+          display:
+            color: "#3c4e66"
+            numDecimalPlaces: 0
+    config:
+      title: "Political liberties"
+      subtitle: "Data by the Lexical Index of Electoral Democracy. Political liberties are respect for the freedoms of expression, assembly, and association."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdYlBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "Electoral democracy"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: lexical_index
+      metric: full_democracy
+      sub_metric: age_of_full_democracy
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/lexical_index#age_polyarchy_lied
+          display:
+            unit: "years"
+            shortUnit: "years"
+            numDecimalPlaces: 0
+    config:
+      title: "Age of full democracy"
+      subtitle: "Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index). Full democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association."
+      yAxis:
+        min: "auto"
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#edf8b1"
+            - "#c7e9b4"
+            - "#41b6c4"
+            - "#225ea8"
+          customNumericLabels:
+            - ""
+            - null
+            - null
+            - null
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 0
+            - 18
+            - 30
+            - 60
+            - 9
+          customCategoryColors:
+            No data: "#ffffff"
+            no data: "#ffffff"
+            male democracy: "#c7a2b6"
+            closed autocracy: "#8d6e71"
+            electoral autocracy: "#c6a1a5"
+            electoral democracy: "#debac7"
+            exclusive democracy: "#d2aebe"
+            one-party autocracy: "#a3809a"
+            multiparty autocracy: "#bb96ae"
+            multi-party autocracy: "#bb96ae"
+            non-electoral autocracy: "#97758e"
+            not an electoral democracy: "#fdae61"
+            multiparty autocracy without elected executive: "#af8aa5"
+            multi-party autocracy without elected executive: "#af8aa5"
+          customCategoryLabels:
+            male democracy: "Male democracy"
+            electoral democracy: "Electoral democracy"
+            exclusive democracy: "Exclusive democracy"
+            one-party autocracy: "One-party autocracy"
+            multi-party autocracy: "Multi-party autocracy"
+            non-electoral autocracy: "Non-electoral autocracy"
+            multi-party autocracy without elected executive: "Multi-party autocracy without elected executive"
+          customHiddenCategories:
+            No data: true
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: lexical_index
+      metric: full_democracy
+      sub_metric: number_and_share_of_long_standing_full_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_is_full_democracy__category_no
+          display:
+            name: "Not full democracies"
+            color: "#97758e"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_group_age_polyarchy_lied__category_1_18_years
+          display:
+            name: "Full democracies aged 1-18"
+            color: "#edf8b1"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_group_age_polyarchy_lied__category_19_30_years
+          display:
+            name: "aged 19-30"
+            color: "#c7e9b4"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_group_age_polyarchy_lied__category_31_60_years
+          display:
+            name: "aged 31-60"
+            color: "#41b6c4"
+        - catalogPath: grapher/democracy/2026-04-02/lexical_index/region_aggregates#num_group_age_polyarchy_lied__category_61_90_years
+          display:
+            name: "aged 61-90"
+            color: "#225ea8"
+    config:
+      title: "Countries that are long-standing full democracies"
+      subtitle: "Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index). Full democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association."
+      tab: "chart"
+      hasMapTab: false
+      stackMode: "relative"
+  - dimensions:
+      dataset: freedom_house
+      metric: freedom
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh#regime
+          display:
+            shortUnit: ""
+            numDecimalPlaces: 0
+    config:
+      title: "Free country"
+      subtitle: "[Data](#dod:regimes-fh) by [Freedom House](#dod:freedom-house). Free countries are those in which citizens have many political rights (free and fair elections, political pluralism and participation, functioning government) and civil liberties (freedoms of expression and association, rule of law, personal autonomy)."
+      yAxis:
+        max: 2
+        min: 0
+      map:
+        colorScale:
+          customNumericColors:
+            - "#a588c3"
+            - "#e8b864"
+            - "#58ac8c"
+          customNumericLabels:
+            - "Not free"
+            - "Partly free"
+            - "Free"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 2
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-23/fh/fh#regime"
+  - dimensions:
+      dataset: freedom_house
+      metric: freedom
+      sub_metric: political_rights_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh#polrights_score
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Political Rights Score"
+      subtitle: "Data by [Freedom House](#dod:freedom-house). The score captures the extent of free and fair elections, political pluralism and participation, and a functioning government. Higher scores indicate more rights."
+      yAxis:
+        max: 40
+        min: -3
+      map:
+        colorScale:
+          baseColorScheme: "Blues"
+          binningStrategy: "manual"
+          customNumericColors:
+            - null
+            - null
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - null
+          customNumericValues:
+            - 0
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+        columnSlug: "grapher/democracy/2026-03-23/fh/fh#polrights_score"
+  - dimensions:
+      dataset: freedom_house
+      metric: freedom
+      sub_metric: political_rights_rating
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh#polrights
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Political Rights Rating"
+      subtitle: "Data by [Freedom House](#dod:freedom-house). It captures the extent of free and fair elections, political pluralism and participation, and a functioning government. Lower ratings indicate more rights."
+      yAxis:
+        max: 7
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "Blues"
+          binningStrategy: "manual"
+          colorSchemeInvert: true
+          customNumericColors:
+            - null
+          customNumericLabels:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
+            - "5"
+            - "6"
+            - "7"
+          customNumericValues:
+            - 1
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+        columnSlug: "grapher/democracy/2026-03-23/fh/fh#polrights"
+  - dimensions:
+      dataset: freedom_house
+      metric: freedom
+      sub_metric: civil_liberties_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh#civlibs_score
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Civil Liberties Score"
+      subtitle: "Data by [Freedom House](#dod:freedom-house). The score captures the extent of freedom of expression and association, the rule of law, and personal autonomy. Higher scores indicate more liberties."
+      yAxis:
+        max: 60
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "Greens"
+          binningStrategy: "manual"
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - "53-60"
+            - null
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+        columnSlug: "grapher/democracy/2026-03-23/fh/fh#civlibs_score"
+  - dimensions:
+      dataset: freedom_house
+      metric: freedom
+      sub_metric: civil_liberties_rating
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh#civlibs
+          display:
+            shortUnit: ""
+            numDecimalPlaces: 0
+    config:
+      title: "Civil Liberties Rating"
+      subtitle: "Data by [Freedom House](#dod:freedom-house). It captures the extent of freedom of expression and association, the rule of law, and personal autonomy. Lower ratings indicate more liberties."
+      yAxis:
+        max: 7
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "Greens"
+          binningStrategy: "manual"
+          colorSchemeInvert: true
+          customNumericColors:
+            - null
+          customNumericLabels:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
+            - "5"
+            - "6"
+            - "7"
+          customNumericValues:
+            - 1
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+        columnSlug: "grapher/democracy/2026-03-23/fh/fh#civlibs"
+  - dimensions:
+      dataset: freedom_house
+      metric: freedom
+      sub_metric: number_and_share_of_free_countries_and_territories
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#num_regime__category_not_free
+          display:
+            name: "Not free countries"
+            color: "#a588c3"
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#num_regime__category_partly_free
+          display:
+            name: "Partly free countries"
+            color: "#e8b864"
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#num_regime__category_free
+          display:
+            name: "Free countries"
+            color: "#58ac8c"
+    config:
+      title: "Free countries and territories"
+      subtitle: "[Data](#dod:regimes-fh) by [Freedom House](#dod:freedom-house)."
+      tab: "chart"
+      hasMapTab: false
+      stackMode: "relative"
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      dataset: freedom_house
+      metric: freedom
+      sub_metric: people_living_in_free_countries_and_territories
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_regime__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_regime__category_not_free
+          display:
+            name: "People living in not free countries"
+            color: "#a588c3"
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_regime__category_partly_free
+          display:
+            name: "People living in partly free countries"
+            color: "#e8b864"
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_regime__category_free
+          display:
+            name: "People living in free countries"
+            color: "#58ac8c"
+    config:
+      title: "People living in free countries and territories"
+      subtitle: "[Data](#dod:regimes-fh) by [Freedom House](#dod:freedom-house)."
+      tab: "chart"
+      hasMapTab: false
+  - dimensions:
+      dataset: freedom_house
+      metric: electoral_democracy
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh#electdem
+    config:
+      title: "Democracy"
+      subtitle: "[Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house). Democracies are political systems in which citizens have the right to choose the chief executive and legislature in broadly free and fair elections and have substantial other political rights and civil liberties."
+      note: "The Chart tab uses numeric values, with 1 for electoral democracies and 0 for non-democracies."
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          customNumericColors:
+            - "#ef8a62"
+            - "#2c7bb6"
+          customNumericLabels:
+            - "No"
+            - "Yes"
+            - "free"
+            - "Liberal democracy"
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2026-03-23/fh/fh#electdem"
+  - dimensions:
+      dataset: freedom_house
+      metric: electoral_democracy
+      sub_metric: democratic_electoral_institutions
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh#electprocess
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Democratic Electoral Institutions Score"
+      subtitle: "Data by [Freedom House](#dod:freedom-house). The score captures the extent to which the chief executive and legislature are chosen in free and fair elections under universal suffrage. It ranges from 0 to 12 (most democratic)."
+      yAxis:
+        max: 12
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "YlGn"
+          binningStrategy: "manual"
+          customNumericColors:
+            - null
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 1
+            - 3
+            - 5
+            - 7
+            - 9
+            - 11
+            - 12
+        columnSlug: "grapher/democracy/2026-03-23/fh/fh#electprocess"
+  - dimensions:
+      dataset: freedom_house
+      metric: electoral_democracy
+      sub_metric: political_rights_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh#polrights_score
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Political Rights Score"
+      subtitle: "Data by [Freedom House](#dod:freedom-house). The score captures the extent of free and fair elections, political pluralism and participation, and a functioning government. Higher scores indicate more rights."
+      yAxis:
+        max: 40
+        min: -3
+      map:
+        colorScale:
+          baseColorScheme: "Blues"
+          binningStrategy: "manual"
+          customNumericColors:
+            - null
+            - null
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - null
+          customNumericValues:
+            - 0
+            - 0
+            - 5
+            - 10
+            - 15
+            - 20
+            - 25
+            - 30
+            - 35
+            - 40
+        columnSlug: "grapher/democracy/2026-03-23/fh/fh#polrights_score"
+  - dimensions:
+      dataset: freedom_house
+      metric: electoral_democracy
+      sub_metric: political_rights_rating
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh#polrights
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Political Rights Rating"
+      subtitle: "Data by [Freedom House](#dod:freedom-house). It captures the extent of free and fair elections, political pluralism and participation, and a functioning government. Lower ratings indicate more rights."
+      yAxis:
+        max: 7
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "Blues"
+          binningStrategy: "manual"
+          colorSchemeInvert: true
+          customNumericColors:
+            - null
+          customNumericLabels:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
+            - "5"
+            - "6"
+            - "7"
+          customNumericValues:
+            - 1
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+        columnSlug: "grapher/democracy/2026-03-23/fh/fh#polrights"
+  - dimensions:
+      dataset: freedom_house
+      metric: electoral_democracy
+      sub_metric: civil_liberties_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh#civlibs_score
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Civil Liberties Score"
+      subtitle: "Data by [Freedom House](#dod:freedom-house). The score captures the extent of freedom of expression and association, the rule of law, and personal autonomy. Higher scores indicate more liberties."
+      yAxis:
+        max: 60
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "Greens"
+          binningStrategy: "manual"
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - "53-60"
+            - null
+          customNumericValues:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
+            - 50
+            - 60
+        columnSlug: "grapher/democracy/2026-03-23/fh/fh#civlibs_score"
+  - dimensions:
+      dataset: freedom_house
+      metric: electoral_democracy
+      sub_metric: civil_liberties_rating
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh#civlibs
+          display:
+            shortUnit: ""
+            numDecimalPlaces: 0
+    config:
+      title: "Civil Liberties Rating"
+      subtitle: "Data by [Freedom House](#dod:freedom-house). It captures the extent of freedom of expression and association, the rule of law, and personal autonomy. Lower ratings indicate more liberties."
+      yAxis:
+        max: 7
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "Greens"
+          binningStrategy: "manual"
+          colorSchemeInvert: true
+          customNumericColors:
+            - null
+          customNumericLabels:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
+            - "5"
+            - "6"
+            - "7"
+          customNumericValues:
+            - 1
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+        columnSlug: "grapher/democracy/2026-03-23/fh/fh#civlibs"
+  - dimensions:
+      dataset: freedom_house
+      metric: electoral_democracy
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#num_electdem__category_non_electoral_democracy
+          display:
+            name: "Non-democracies"
+            color: "#ef8a62"
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#num_electdem__category_electoral_democracy
+          display:
+            name: "Electoral democracies"
+            color: "#2c7bb6"
+    config:
+      title: "Countries that are democracies and non-democracies"
+      subtitle: "[Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house)."
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      dataset: freedom_house
+      metric: electoral_democracy
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_electdem__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_electdem__category_non_electoral_democracy
+          display:
+            name: "People living in non-democracies"
+            color: "#ef8a62"
+        - catalogPath: grapher/democracy/2026-03-23/fh/fh_regions#pop_electdem__category_electoral_democracy
+          display:
+            name: "People living in electoral democracies"
+            color: "#2c7bb6"
+    config:
+      title: "People living in democracies and non-democracies"
+      subtitle: "[Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house)."
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#democracy_bti
+          display:
+            name: "Democratic Features Index"
+    config:
+      title: "Democratic Features Index"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent of political participation, the rule of law, stable democratic institutions, political and social integration, and a capable state. The index ranges from 1 to 10 (most democratic)."
+      map:
+        colorScale:
+          customNumericColors:
+            - null
+            - null
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: stateness_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#state_bti
+          display:
+            name: "Stateness Index"
+            shortUnit: ""
+            numDecimalPlaces: 1
+    config:
+      title: "Stateness Index"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which the state has the monopoly on the use of force, provides basic public services across the country, citizens accept the state as legitimate, religious dogmas do not interfere, and citizenship is accessible. The index ranges from 1 to 10 (high stateness)."
+      maxTime: 2023
+      map:
+        colorScale:
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+          customNumericLabels:
+            - "Poor"
+            - "Flawed"
+            - "Fair"
+            - "Sound"
+            - "Excellent"
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 1
+            - 2.5
+            - 4.5
+            - 6.5
+            - 8.5
+            - 10
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: political_participation_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#political_participation_bti
+          display:
+            name: "Political Participation Index"
+    config:
+      title: "Political Participation Index"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which elections are free and fair, democratically elected leaders have the effective power to govern, and citizens have the freedoms of association and expression. The index ranges from 1 to 10 (most democratic)."
+      map:
+        colorScale:
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+          customNumericLabels:
+            - "Poor"
+            - "Flawed"
+            - "Fair"
+            - "Sound"
+            - "Excellent"
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 1
+            - 2.5
+            - 4.5
+            - 6.5
+            - 8.5
+            - 10
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: rule_of_law_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#rule_of_law_bti
+          display:
+            name: "Rule of Law Index"
+            shortUnit: ""
+            numDecimalPlaces: 1
+    config:
+      title: "Rule of Law Index"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which political power is separated, the judiciary is independent, office abuse is prosecuted, and civil rights are enforced. The index ranges from 1 to 10 (most rule-based)."
+      maxTime: 2023
+      map:
+        colorScale:
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+          customNumericLabels:
+            - "Poor"
+            - "Flawed"
+            - "Fair"
+            - "Sound"
+            - "Excellent"
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 1
+            - 2.5
+            - 4.5
+            - 6.5
+            - 8.5
+            - 10
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: stability_of_democratic_institutions_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#stability_dem_inst_bti
+          display:
+            name: "Stability of Democratic Institutions Index"
+    config:
+      title: "Stability of Democratic Institutions Index"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which democratic institutions are effective and efficient and all relevant actors accept them. The index ranges from 1 to 10 (most stable)."
+      map:
+        colorScale:
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+          customNumericLabels:
+            - "Poor"
+            - "Flawed"
+            - "Fair"
+            - "Sound"
+            - "Excellent"
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 1
+            - 2.5
+            - 4.5
+            - 6.5
+            - 8.5
+            - 10
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: democratic_features
+      sub_metric: political_and_social_integration_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#pol_soc_integr_bti
+          display:
+            name: "Political and Social Integration Index"
+    config:
+      title: "Political and Social Integration Index"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which the party system is stable and rooted in society, interest groups are numerous and diverse, regular citizens approve of democratic norms and procedures, and societal trust is high. The index ranges from 1 to 10 (most integrated)."
+      map:
+        colorScale:
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+          customNumericLabels:
+            - "Poor"
+            - "Flawed"
+            - "Fair"
+            - "Sound"
+            - "Excellent"
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 1
+            - 2.5
+            - 4.5
+            - 6.5
+            - 8.5
+            - 10
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#regime_bti
+          display:
+            numDecimalPlaces: 0
+    config:
+      subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
+      note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+      yAxis:
+        max: 5
+        min: 1
+      map:
+        colorScale:
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+            - "#0487d9"
+            - "#034c8c"
+          customNumericLabels:
+            - "Hard-line autocracy"
+            - "Moderate autocracy"
+            - "Highly defective democracy"
+            - "Defective democracy"
+            - "Consolidating democracy"
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 1
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: basic_state_functions_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#state_basic_bti
+    config:
+      title: "Basic State Functions Score"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which the state has the monopoly on the use of force and provides basic public services across the country. Scores range from 1 to 10 (most functioning)."
+      note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+      yAxis:
+        max: 10
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+            - "#0487d9"
+            - "#034c8c"
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: ""
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: free_and_fair_elections_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#electfreefair_bti
+    config:
+      title: "Free and Fair Elections Score"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which elections are free from irregularities, the rights to vote, run for office, and campaign are unrestricted, registration is easy, and campaigning and media access are fair. The scores range from 1 to 10 (most free and fair)."
+      note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+      yAxis:
+        max: 10
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: effective_power_to_govern_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#effective_power_bti
+    config:
+      title: "Effective Power to Govern Score"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which no individual or group holds de facto veto power over democratically elected political leaders. The scores range from 1 to 10 (most effective)."
+      note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+      yAxis:
+        max: 10
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: freedom_of_association_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#freeassoc_bti
+          display:
+            shortUnit: ""
+            numDecimalPlaces: 0
+    config:
+      title: "Freedom of Association Score"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which residents and groups can associate and assemble free from government interference. Scores range from 1 to 10 (most free)."
+      note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+      yAxis:
+        max: 10
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "GnBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: freedom_of_expression_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#freeexpr_bti
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Freedom of Expression Score"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which individuals, groups, and the press can express their views free from government interference. Scores range from 1 to 10 (most free)."
+      note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+      yAxis:
+        max: 10
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "YlGn"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: separation_of_powers_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#sep_power_bti
+    config:
+      title: "Separation of Powers Score"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent of mutual checks and balances on political powers. Scores range from 1 to 10 (most separated)."
+      note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+      yAxis:
+        max: 10
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: civil_rights_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#civ_rights_bti
+          display:
+            shortUnit: ""
+            numDecimalPlaces: 0
+    config:
+      title: "Civil Rights Score"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent to which civil rights are codified in law, the state prosecutes any violations, and works to prevent discrimination. Scores range from 1 to 10 (most rights)."
+      note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+      yAxis:
+        max: 10
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#8a148c"
+            - "#d979d2"
+            - "#1ac6d9"
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: democratic_features
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/bti#democracy_bti
+          display:
+            name: "Democratic Features Index"
+    config:
+      title: "Democratic Features Index"
+      subtitle: "Data by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index). Expert estimates of the extent of political participation, the rule of law, stable democratic institutions, political and social integration, and a capable state. The index ranges from 1 to 10 (most democratic)."
+      note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+      yAxis:
+        max: 10
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - null
+            - null
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_countries#num_regime_bti__category_hard_line_autocracy
+          display:
+            name: "Hard-line autocracies"
+            color: "#8a148c"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_countries#num_regime_bti__category_moderate_autocracy
+          display:
+            name: "Moderate autocracies"
+            color: "#d979d2"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_countries#num_regime_bti__category_highly_defective_democracy
+          display:
+            name: "Highly defective democracies"
+            color: "#1ac6d9"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_countries#num_regime_bti__category_defective_democracy
+          display:
+            name: "Defective democracies"
+            color: "#0487d9"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_countries#num_regime_bti__category_consolidating_democracy
+          display:
+            name: "Consolidating democracies"
+            color: "#034c8c"
+    config:
+      title: "Countries that are democracies and autocracies"
+      subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
+      note: "Data excludes long-term members of the OECD because they are considered consolidated democracies."
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      dataset: bertelsmann_transformation_index
+      metric: political_regime
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category_hard_line_autocracy
+          display:
+            name: "People living in hard-line autocracies"
+            color: "#8a148c"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category_moderate_autocracy
+          display:
+            name: "People living in moderate autocracies"
+            color: "#d979d2"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category_highly_defective_democracy
+          display:
+            name: "People living in highly defective democracies"
+            color: "#1ac6d9"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category_defective_democracy
+          display:
+            name: "People living in defective democracies"
+            color: "#0487d9"
+        - catalogPath: grapher/democracy/2026-03-27/bti/num_people#pop_regime_bti__category_consolidating_democracy
+          display:
+            name: "People living in consolidating democracies"
+            color: "#034c8c"
+    config:
+      title: "People living in democracies and autocracies"
+      subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
+      note: "Data excludes long-term members of the OECD because they are considered consolidated democracies."
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#democracy_eiu
+          display:
+            name: "Democracy Index"
+            includeInTable: true
+    config:
+      title: "Democracy Index"
+      subtitle: "Data by the [Economist Intelligence Unit](#dod:economist-intelligence-unit). Expert estimates of the extent to which citizens can choose their political leaders in free and fair elections, enjoy civil liberties, prefer democracy over other political systems, can and do participate in politics, and have a functioning government that acts on their behalf. The index ranges from 0 to 10 (most democratic)."
+      yAxis:
+        max: 10
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          customNumericColors:
+            - "#b2182b"
+            - "#d73027"
+            - "#f46d43"
+            - "#fdae61"
+            - "#fee090"
+            - "#ffffbf"
+            - "#dff3f8"
+            - "#aad9e9"
+            - "#73add2"
+            - "#4575b4"
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: political_regime
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#regime_eiu
+    config:
+      title: "Democracy"
+      subtitle: "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
+      note: "The Chart tab uses numeric values, ranging from 3 for full democracies to 0 for authoritarian regimes."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 3
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#f88a50"
+            - "#feeea5"
+            - "#c7e7f1"
+            - "#5e94c4"
+          customNumericLabels:
+            - "Authoritarian regime"
+            - "Hybrid regime"
+            - "Flawed democracy"
+            - "Full democracy"
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 2
+            - 3
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: electoral_pluralism_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#elect_freefair_eiu
+          display:
+            name: "Electoral Pluralism Index"
+            includeInTable: true
+    config:
+      title: "Electoral Pluralism Index"
+      subtitle: "Data by the [Economist Intelligence Unit](#dod:economist-intelligence-unit). Expert estimates of the extent to which all citizens can choose their political leaders in free and fair elections. Higher values indicate more pluralism."
+      yAxis:
+        max: 10
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#b2182b"
+            - "#d73027"
+            - "#f46d43"
+            - "#fdae61"
+            - "#fee090"
+            - "#ffffbf"
+            - "#dff3f8"
+            - "#aad9e9"
+            - "#73add2"
+            - "#4575b4"
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: functioning_government_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#funct_gov_eiu
+          display:
+            name: "Functioning Government Index"
+            shortUnit: ""
+            includeInTable: true
+            numDecimalPlaces: 1
+    config:
+      title: "Functioning Government Index"
+      subtitle: "Data by the [Economist Intelligence Unit](#dod:economist-intelligence-unit). Expert estimates of the extent to which citizens have a functioning government that acts on their behalf. The index ranges from 0 to 10 (most effective)."
+      yAxis:
+        max: 10
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#b2182b"
+            - "#d73027"
+            - "#f46d43"
+            - "#fdae61"
+            - "#fee090"
+            - "#ffffbf"
+            - "#dff3f8"
+            - "#aad9e9"
+            - "#73add2"
+            - "#4575b4"
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: political_participation_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#pol_part_eiu
+          display:
+            name: "Political Participation Index"
+            includeInTable: true
+    config:
+      title: "Political Participation Index"
+      subtitle: "Data by the [Economist Intelligence Unit](#dod:economist-intelligence-unit). Expert estimates of the extent to which citizens can and do participate in politics. The index ranges from 0 to 10 (highest participation)."
+      yAxis:
+        max: 10
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#b2182b"
+            - "#d73027"
+            - "#f46d43"
+            - "#fdae61"
+            - "#fee090"
+            - "#ffffbf"
+            - "#dff3f8"
+            - "#aad9e9"
+            - "#73add2"
+            - "#4575b4"
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: democratic_culture_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#dem_culture_eiu
+          display:
+            name: "Democratic Culture Index"
+            includeInTable: true
+    config:
+      title: "Democratic Culture Index"
+      subtitle: "Data by the [Economist Intelligence Unit](#dod:economist-intelligence-unit). Expert estimates of the extent to which citizens prefer democracy over other political systems. The index ranges from 0 to 10 (strongest preference for democracy)."
+      yAxis:
+        max: 10
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#b2182b"
+            - "#d73027"
+            - "#f46d43"
+            - "#fdae61"
+            - "#fee090"
+            - "#ffffbf"
+            - "#dff3f8"
+            - "#aad9e9"
+            - "#73add2"
+            - "#4575b4"
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: civil_liberties_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/eiu#civlib_eiu
+          display:
+            name: "Civil Liberties Index"
+            includeInTable: true
+            numDecimalPlaces: 1
+    config:
+      title: "Civil Liberties Index"
+      subtitle: "Data by the [Economist Intelligence Unit](#dod:economist-intelligence-unit). The index ranges from 0 to 10 (most liberties)."
+      yAxis:
+        max: 10
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#b2182b"
+            - "#d73027"
+            - "#f46d43"
+            - "#fdae61"
+            - "#fee090"
+            - "#ffffbf"
+            - "#dff3f8"
+            - "#aad9e9"
+            - "#73add2"
+            - "#4575b4"
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_authoritarian_regime
+          display:
+            name: "Authoritarian regimes"
+            color: "#f88a50"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_hybrid_regime
+          display:
+            name: "Hybrid regimes"
+            color: "#feeea5"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_flawed_democracy
+          display:
+            name: "Flawed democracies"
+            color: "#c7e7f1"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_countries#num_regime_eiu__category_full_democracy
+          display:
+            name: "Full democracies"
+            color: "#5e94c4"
+    config:
+      title: "Countries that are democracies and non-democracies"
+      subtitle: "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      dataset: economist_intelligence_unit
+      metric: democracy
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_authoritarian_regime
+          display:
+            name: "People living in authoritarian regimes"
+            color: "#f88a50"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_hybrid_regime
+          display:
+            name: "People living in hybrid regimes"
+            color: "#feeea5"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_flawed_democracy
+          display:
+            name: "People living in flawed democracies"
+            color: "#c7e7f1"
+        - catalogPath: grapher/democracy/2025-03-05/eiu/num_people#pop_regime_eiu__category_full_democracy
+          display:
+            name: "People living in full democracies"
+            color: "#5e94c4"
+    config:
+      title: "People living in democracies and non-democracies"
+      subtitle: "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
+      yAxis:
+        facetDomain: "independent"
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#democracy_polity
+    config:
+      title: "Democracy Index"
+      subtitle: "Data by [Polity 5](#dod:polity). Expert estimates of the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive. The index ranges from -10 to 10 (fully democratic)."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 10
+        min: -10
+      map:
+        colorScale:
+          baseColorScheme: "RdBu"
+          customNumericColors:
+            - "#9f0026"
+            - "#fd8d3c"
+            - "#fed976"
+            - "#ffeda0"
+            - "#edf8b1"
+            - null
+            - "#c7e9b4"
+            - "#41b6c4"
+            - null
+            - "#172976"
+          customNumericLabels:
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - -10
+            - -9
+            - -7
+            - -5
+            - -3
+            - -1
+            - 1
+            - 3
+            - 5
+            - 7
+            - 9
+            - 10
+          customCategoryLabels:
+            No data: "No data"
+        columnSlug: "grapher/democracy/2024-05-13/polity/polity#democracy_polity"
+        timeTolerance: 2
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: competitiveness_of_executive_recruitment_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#exec_reccomp_polity
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Competitiveness of Executive Recruitment Score"
+      subtitle: "Data by [Polity 5](#dod:polity)."
+      note: "The Chart tab uses numeric values, ranging from 4 for an elected executive to 0 if executive power is seized."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 3
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#b2182b"
+            - "#e74731"
+            - "#967282"
+            - "#5496c5"
+          customNumericLabels:
+            - "Power seized"
+            - "Elite selection"
+            - "Dual or transitional"
+            - "Election"
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 2
+            - 3
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2024-05-13/polity/polity#exec_reccomp_polity"
+        timeTolerance: 2
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: openness_of_executive_recruitment_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#exec_recopen_polity
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Openness of Executive Recruitment Score"
+      subtitle: "Data by [Polity 5](#dod:polity)."
+      note: "The Chart tab uses numeric values, ranging from 4 if recruitment is open to 0 if executive power is seized."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 4
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#b2182b"
+            - "#e74731"
+            - "#b66162"
+            - "#967282"
+            - "#0571b0"
+          customNumericLabels:
+            - "Power seized"
+            - "Hereditary succession"
+            - "Dual, chief minister designated"
+            - "Dual, chief minister elected"
+            - "Open"
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2024-05-13/polity/polity#exec_recopen_polity"
+        timeTolerance: 2
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: constraints_on_the_executive_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#exec_constr_polity
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Constraints on the Executive Score"
+      subtitle: "Data by [Polity 5](#dod:polity)."
+      note: "The Chart tab uses numeric values, ranging from 7 for an subordinated or on-par executive, to 1 if executive is unconstrained."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 7
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "PuBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#e74731"
+            - "#b66162"
+            - "#967282"
+            - null
+            - null
+          customNumericLabels:
+            - "Unconstrained"
+            - "2"
+            - "Slight to moderate"
+            - "4"
+            - "Substantial"
+            - "6"
+            - "Executive parity or subordination"
+            - "executive parity or subordination"
+            - ""
+            - ""
+          customNumericValues:
+            - 1
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+          customCategoryLabels:
+            No data: "No data"
+        columnSlug: "grapher/democracy/2024-05-13/polity/polity#exec_constr_polity"
+        timeTolerance: 2
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: regulation_of_political_participation_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#polpart_reg_polity
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Regulation of Political Participation Score"
+      subtitle: "Data by [Polity 5](#dod:polity)."
+      note: "The Chart tab uses numeric values, ranging from 5 for unrestricted, stable political participation to 0 for highly unstable participation."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 5
+        min: 1
+      map:
+        colorScale:
+          baseColorScheme: "RdBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#b2182b"
+            - "#e74731"
+            - "#b66162"
+            - "#967282"
+            - null
+          customNumericLabels:
+            - "Highly unstable"
+            - "Multiple identities"
+            - "Sectarian"
+            - "Restricted"
+            - "Unrestricted and stable"
+            - "competitive"
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2024-05-13/polity/polity#polpart_reg_polity"
+        timeTolerance: 2
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: competitiveness_of_political_participation_score
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#polpart_comp_polity
+          display:
+            numDecimalPlaces: 0
+    config:
+      title: "Competitiveness of Political Participation Score"
+      subtitle: "Data by [Polity 5](#dod:polity)."
+      note: "The Chart tab uses numeric values, ranging from 5 for competitive political participation to 0 for highly unstable political participation."
+      selectedFacetStrategy: "entity"
+      yAxis:
+        max: 5
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "RdBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#67001f"
+            - "#b2182b"
+            - "#e74731"
+            - "#b66162"
+            - "#967282"
+            - null
+          customNumericLabels:
+            - "Unregulated"
+            - "Repressed"
+            - "Suppressed"
+            - "Factional"
+            - "Transitional"
+            - "Competitive"
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2024-05-13/polity/polity#polpart_comp_polity"
+        timeTolerance: 2
+  - dimensions:
+      dataset: polity
+      metric: democracy
+      sub_metric: main_index_distribution
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#democracy_recod_polity
+          display:
+            name: "Democracy Index"
+            includeInTable: true
+    config:
+      title: "Distribution of Democracy Index"
+      subtitle: "Data by [Polity 5](#dod:polity). Expert estimates of the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive. The index here ranges from 0 to 20 (fully democratic)."
+      tab: "chart"
+      hasMapTab: false
+      stackMode: "relative"
+      minTime: "latest"
+      yAxis:
+        max: 20
+        min: 0
+  - dimensions:
+      dataset: polity
+      metric: political_regime
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#regime_polity
+          display:
+            includeInTable: true
+            numDecimalPlaces: 0
+    config:
+      subtitle: "Data by [Polity 5](#dod:polity)."
+      note: "The Chart tab uses numeric values, ranging from 2 for democracies to 0 for autocracies."
+      yAxis:
+        max: 2
+        min: 0
+      map:
+        colorScale:
+          customNumericColors:
+            - "#e74731"
+            - "#967282"
+            - "#5496c5"
+          customNumericLabels:
+            - "Autocracy"
+            - "Anocracy"
+            - "Democracy"
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+            - ""
+          customNumericValues:
+            - 0
+            - 0
+            - 1
+            - 2
+          customCategoryLabels:
+            No data: "No data"
+          customNumericColorsActive: true
+        timeTolerance: 2
+  - dimensions:
+      dataset: polity
+      metric: political_regime
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_autocracy
+          display:
+            name: "Autocracies"
+            color: "#e74731"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_anocracy
+          display:
+            name: "Anocracies"
+            color: "#967282"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_democracy
+          display:
+            name: "Democracies"
+            color: "#5496c5"
+    config:
+      title: "Countries that are democracies and non-democracies"
+      subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity)."
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      dataset: polity
+      metric: political_regime
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_regime_polity__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_group_age_dem_polity__category_autocracy
+          display:
+            name: "People living in autocracies"
+            color: "#e74731"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_regime_polity__category_anocracy
+          display:
+            name: "People living in anocracies"
+            color: "#967282"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_people#pop_regime_polity__category_democracy
+          display:
+            name: "People living in democracies"
+            color: "#5496c5"
+    config:
+      title: "People living in democracies and non-democracies"
+      subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity)."
+  - dimensions:
+      dataset: polity
+      metric: political_regime
+      sub_metric: age_of_democracy
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/polity#age_dem_polity
+          display:
+            unit: "years"
+            shortUnit: "years"
+            includeInTable: true
+            numDecimalPlaces: 0
+    config:
+      title: "Age of democracy"
+      subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity). Democracies are political systems with broadly open, multi-party, and competitive elections for a chief executive who faces comprehensive institutional constraints, and political participation is broadly competitive."
+      yAxis:
+        min: "auto"
+      map:
+        colorScale:
+          baseColorScheme: "YlGnBu"
+          binningStrategy: "manual"
+          customNumericColors:
+            - "#edf8b1"
+            - "#c7e9b4"
+            - "#41b6c4"
+            - "#225ea8"
+            - "#172976"
+          customNumericLabels:
+            - ""
+            - null
+            - null
+            - null
+            - null
+            - null
+            - null
+          customNumericValues:
+            - 0
+            - 18
+            - 30
+            - 60
+            - 90
+            - 120
+          customCategoryColors:
+            No data: "#ffffff"
+            no data: "#ffffff"
+            anocracy: "#c6a1a5"
+            autocracy: "#8d6e71"
+          customCategoryLabels:
+            no data: "No data"
+            anocracy: "Anocracy"
+            autocracy: "Autocracy"
+            not an electoral democracy: "non-democracy"
+          customHiddenCategories:
+            No data: true
+          customNumericColorsActive: true
+        columnSlug: "grapher/democracy/2024-05-13/polity/polity#age_dem_polity"
+        timeTolerance: 2
+        tooltipUseCustomLabels: true
+  - dimensions:
+      dataset: polity
+      metric: political_regime
+      sub_metric: number_and_share_of_long_standing_democracies
+    indicators:
+      y:
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_autocracy
+          display:
+            name: "Autocracies"
+            color: "#8d6e71"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_regime_polity__category_anocracy
+          display:
+            name: "Anocracies"
+            color: "#c6a1a5"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_1_18_years
+          display:
+            name: "Democracies aged 1-18"
+            color: "#edf8b1"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_19_30_years
+          display:
+            name: "aged 19-30"
+            color: "#c7e9b4"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_31_60_years
+          display:
+            name: "aged 31-60"
+            color: "#41b6c4"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_61_90_years
+          display:
+            name: "aged 61-90"
+            color: "#225ea8"
+        - catalogPath: grapher/democracy/2024-05-13/polity/num_countries#num_group_age_dem_polity__category_91plus_years
+          display:
+            name: "aged 91 +"
+            color: "#172976"
+    config:
+      title: "Countries that are long-standing democracies"
+      subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity). Democracies are political systems with broadly open, multi-party, and competitive elections for a chief executive who faces comprehensive institutional constraints, and political participation is broadly competitive."
+      tab: "chart"
+      hasMapTab: false
+      stackMode: "relative"
