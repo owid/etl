@@ -9,50 +9,98 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: Child labor in the long run
   update_period_days: 365
 
 
 tables:
-  child_labor_long_run:
+  us_long:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   processing_level: minor
-      #   description_processing: Description of processing of testing variable.
-      #   description_from_producer: Description of testing variable from producer.
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
-
+      number:
+        title: Number in child labor - << sex >>, age << age_group >> (<< source >>)
+        unit: people
+        short_unit: ""
+      share:
+        title: Share in child labor - << sex >>, age << age_group >> (<< source >>)
+        unit: "%"
+        short_unit: "%"
+  belgium:
+    variables:
+      number:
+        title: Number in child labor - age << age >>
+        unit: people
+        short_unit: ""
+      share:
+        title: Share in child labor - age << age >>
+        unit: "%"
+        short_unit: "%"
+  portugal:
+    variables:
+      number:
+        title: Number in child labor in << sector >> - << sex >>, age << age_group >>
+        unit: people
+        short_unit: ""
+      share:
+        title: Share in child labor in << sector >> - << sex >>, age << age_group >>
+        unit: "%"
+        short_unit: "%"
+  denmark:
+    variables:
+      number:
+        title: Number in child labor in << sector >> - << age_group >>
+        unit: people
+        short_unit: ""
+      share:
+        title: Share in child labor in << sector >> - << age_group >>
+        unit: "%"
+        short_unit: "%"
+  italy:
+    variables:
+      share:
+        title: Share in child labor in << sector >> - << sex >>
+        unit: "%"
+        short_unit: "%"
+  sweden:
+    variables:
+      number:
+        title: Number in child labor in << sector >>
+        unit: people
+        short_unit: ""
+      share:
+        title: Share in child labor in << sector >>
+        unit: "%"
+        short_unit: "%"
+  us_carter_sutch:
+    variables:
+      share:
+        title: Share in child labor (<< age_group >>) - << sex >>
+        unit: "%"
+        short_unit: "%"
+  portugal_goulart_bedi:
+    variables:
+      share:
+        title: Share in child labor - << measure >>, age << age_group >> (<< bound >>)
+        unit: "%"
+        short_unit: "%"
+  england_wales_scotland:
+    variables:
+      share:
+        title: Share in child labor in << occupation >> - << sex >>
+        unit: "%"
+        short_unit: "%"
+  england_wales:
+    variables:
+      share:
+        title: Share in child labor - << age_group >>
+        unit: "%"
+        short_unit: "%"
+  japan:
+    variables:
+      number:
+        title: Number in child labor - << gender >>, << age_group >>
+        unit: people
+        short_unit: ""
+      share:
+        title: Share in child labor - << gender >>, << age_group >>
+        unit: "%"
+        short_unit: "%"
