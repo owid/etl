@@ -8,10 +8,6 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
-[options]
-exclude-newer = "2026-05-08T10:28:53.753202Z"
-exclude-newer-span = "P3D"
-
 [[package]]
 name = "affine"
 version = "2.4.0"

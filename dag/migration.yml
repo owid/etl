@@ -77,6 +77,11 @@ steps:
   export://explorers/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
 
+  # UN DESA migration flows S3 JSON export (2024)
+  export://s3/un_migration/latest/migration_stock_flows_json:
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2025-03-18/migration_stock_flows
+
 
   # UNHCR refugee data (2025)
   data://meadow/un/2025-07-03/refugee_data:
