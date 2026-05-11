@@ -151,9 +151,9 @@ When you do stop, present a concise summary of the issue and what options exist.
    **Watch for silent-delete patterns.** Some sanity_checks functions also mutate the table — e.g. `world_bank_pip`'s `sanity_checks` drops rows that fail invariants and reports the count via the log-control flag. With the flag off the deletions still happen; the reviewer just never learns which rows disappeared. When reading a sanity_checks function, scan for `drop`, `filter`, `tb = tb[...]` — anything that removes rows — and list every deletion in the PR body, not just the warning counts. If the deletion seems newly applicable to upstream fixes (e.g. the row should no longer be anomalous in the new release), that's a candidate for removing the workaround entirely.
 
 5c) Country harmonization audit
-   Run after the garden step completes (and after 5b if it ran). Verifies that the country mappings consumed by `paths.regions.harmonize_names(...)` are well-formed and surfaces any harmonization warnings the garden run produced. Output: `workbench/<short_name>/harmonization_audit.md`.
+   Run after the garden step completes (and after 5b if it ran). Verifies that the country entities reaching the garden output are canonical, and that the mappings/exclusions consumed by `paths.regions.harmonize_names(...)` are well-formed. Output: `workbench/<short_name>/harmonization_audit.md`.
 
-   **Modern API.** Garden steps should be calling `paths.regions.harmonize_names(tb, country_col=..., countries_file=..., excluded_countries_file=...)` — the wrapper in `etl/data_helpers/geo.py:1874`. If you find a step still using the deprecated `geo.harmonize_countries(...)` directly, step 1b's `/check-outdated-practices` should already have flagged it; treat that as a separate cleanup. The audit below is API-agnostic — both call sites end up emitting the same three warning strings.
+   **Modern API.** Garden steps should be calling `paths.regions.harmonize_names(tb, country_col=..., countries_file=..., excluded_countries_file=...)` — the wrapper in `etl/data_helpers/geo.py:1874`. If you find a step still using the deprecated `geo.harmonize_countries(...)` directly, step 1b's `/check-outdated-practices` should already have flagged it; treat that as a separate cleanup. The audit below is API-agnostic — both call sites end up emitting the same three warning strings. Some garden steps don't use the harmonizer at all and instead assign `country` inline in Python (no `.countries.json` involved); for those, the JSON checks below have nothing to look at — the garden-output check in step 5 is what catches non-canonical entities, so always run it.
 
    **Source of truth.** Canonical names come from **two** datasets, both consulted by the harmonizer:
 
@@ -234,19 +234,43 @@ When you do stop, present a concise summary of the issue and what options exist.
       ```
       `suspicious_canonical` is the actionable signal: each entry is a known country/region that we are dropping. Sometimes this is intentional (e.g. dropping "World" rows because the source double-counts them) — surface, don't auto-fix. **Pause and ask the user** if the list is non-empty. The full list is dumped so the LLM can also eyeball it for entities that aren't in `canonical` but look like real countries (typos, alternative names) we should be mapping rather than dropping.
 
-   5. **Write findings** to `workbench/<short_name>/harmonization_audit.md` with five sections, populated only when non-empty. **Each section must list every flagged entity**, not just a count — counts alone aren't actionable, the user (or you) needs to read the actual names to judge whether each is intentional. For long lists (>20 entries) group by pattern when the grouping is obvious (e.g. ILO's `" (ILO)"`-suffixed regions vs. international orgs vs. derived "World ..." aggregates) so the reviewer can scan categories instead of one flat list. Sections:
+   5. **Audit garden output entities.** Always run this check, regardless of whether `.countries.json` exists or is populated — JSON mappings describe *inputs* to the harmonizer, but the entities that actually reach Grapher are whatever sits in the `country` column/index of the built garden tables. Inline `country` assignments (e.g. hardcoded `tb["country"] = "England and Wales"`) and post-harmonization mutations both bypass the JSON check entirely; this is the only step that catches them.
+      ```python
+      from owid.catalog import Dataset
+
+      garden_dir = Path("data/garden/<namespace>/<new_version>/<short_name>")
+      ds_garden = Dataset(str(garden_dir))
+
+      entities: set[str] = set()
+      for tname in ds_garden.table_names:
+          tb = ds_garden[tname]
+          # `country` can live in the index (after .format()) or as a regular column.
+          if "country" in tb.index.names:
+              entities.update(tb.index.get_level_values("country").dropna().astype(str).unique())
+          elif "country" in tb.columns:
+              entities.update(tb["country"].dropna().astype(str).unique())
+          # tables with no country column are silently skipped (e.g. reference tables)
+
+      output_not_in_canonical = sorted(entities - canonical)
+      print("Garden output entities not in OWID's canonical regions or income groups:",
+            output_not_in_canonical)
+      ```
+      Same triage rules as the JSON-targets check (Python check #3): typo / casing / alias / legitimately custom aggregate. A non-empty list means at least one entity that ships to Grapher isn't registered in either the regions catalog or the income-groups dataset. **Stop and decide with the user before proceeding.** Common fixes: typo or casing → patch the inline assignment (or `.countries.json`, whichever is the source) so the value matches the canonical name; alias → switch to the canonical name; legitimate custom aggregate → accept and note in the PR description that the entity lives outside the canonical system.
+
+   6. **Write findings** to `workbench/<short_name>/harmonization_audit.md` with six sections, populated only when non-empty. **Each section must list every flagged entity**, not just a count — counts alone aren't actionable, the user (or you) needs to read the actual names to judge whether each is intentional. For long lists (>20 entries) group by pattern when the grouping is obvious (e.g. ILO's `" (ILO)"`-suffixed regions vs. international orgs vs. derived "World ..." aggregates) so the reviewer can scan categories instead of one flat list. Sections:
       - `## Missing in mapping` — countries in source data not in `.countries.json` (from log warning #1) — list each missing source name
       - `## Unused mappings` — `.countries.json` entries the data never used (warning #2) — list each unused source→target pair
       - `## Unknown excluded entries` — `.excluded_countries.json` entries not present in source data (warning #3) — list each
       - `## Targets not in OWID's canonical regions or income groups` — target names from `.countries.json` that aren't registered in either dataset (Python check #3) — list each target name and the source names that map to it
       - `## Excluded entries matching canonical regions` — possible over-exclusion (Python check #4) — list each
+      - `## Garden output entities not in OWID's canonical regions or income groups` — distinct `country` values found in the built garden tables that aren't in canonical regions or income groups (Python check #5) — list each entity
 
-   6. **Surface in PR.** If any section was populated, add a collapsed "Harmonization audit" section to the PR description (after the per-step sections, before the Slack announcement) **with the same listings**, not just a summary. Empty sections can be omitted.
+   7. **Surface in PR.** If any section was populated, add a collapsed "Harmonization audit" section to the PR description (after the per-step sections, before the Slack announcement) **with the same listings**, not just a summary. Empty sections can be omitted.
 
    **When you report progress to the user during the workflow, never just give a count — always include the list (or grouped categories) so they can judge in one glance.**
 
    **Checkpoint summary:**
-   - "Targets not in OWID's canonical regions or income groups" or "Missing in mapping" non-empty ⇒ stop, decide with user.
+   - "Targets not in OWID's canonical regions or income groups" or "Garden output entities not in OWID's canonical regions or income groups" or "Missing in mapping" non-empty ⇒ stop, decide with user.
    - "Excluded entries matching canonical regions" non-empty ⇒ stop, ask whether each exclusion is intentional.
    - "Unused mappings" or "Unknown excluded entries" non-empty ⇒ surface in PR description; not a blocker.
 
