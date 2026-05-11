@@ -5,7 +5,7 @@ meta:
     description: |-
       Lookup table mapping IPCC 2006 emissions category codes (e.g. `1A1A`) to their human-readable sector names (e.g. "Main Activity Electricity and Heat Production"). The codes follow the IPCC 2006 Guidelines for National Greenhouse Gas Inventories classification.
 
-      The file was historically distributed inside the Emissions-weighted Carbon Price (ECP) repository under `_raw/_aux_files/`. Following the upstream restructure of the ECP repo in 2026, this auxiliary file is no longer present on the `main` branch. It is still accessible on the `ej-path-edits` side branch, and we pin to a specific commit on that branch so the snapshot is reproducible regardless of future upstream changes.
+    # The file was historically distributed inside the Emissions-weighted Carbon Price (ECP) repository under `_raw/_aux_files/`. Following the upstream restructure of the ECP repo in 2026, this auxiliary file is no longer present on the `main` branch. It is still accessible on the `ej-path-edits` side branch, and we pin to a specific commit on that branch so the snapshot is reproducible regardless of future upstream changes.
     citation_full: |-
       Dolphin, G., Merkle, M. Emissions-weighted carbon price: sources and methods. Sci Data 11, 1017 (2024). [https://doi.org/10.1038/s41597-024-03121-6](https://doi.org/10.1038/s41597-024-03121-6).
 
