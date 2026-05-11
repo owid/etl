@@ -20,9 +20,9 @@ dimensions:
       type: dropdown
     choices:
       - slug: political_regime
-        name: "­­­Political regime"
+        name: "\xad\xad\xadPolitical regime"
       - slug: democracy
-        name: "­­­Democracy"
+        name: "\xad\xad\xadDemocracy"
   - slug: sub_metric
     name: "Sub-metric"
     presentation:
@@ -47,7 +47,7 @@ dimensions:
       - slug: competitiveness_of_political_participation_score
         name: "Competitiveness of political participation score"
       - slug: main_index_distribution
-        name: "­­­­­Main index distribution"
+        name: "\xad\xad\xad\xad\xadMain index distribution"
       - slug: age_of_democracy
         name: "Age of democracy"
       - slug: number_and_share_of_long_standing_democracies

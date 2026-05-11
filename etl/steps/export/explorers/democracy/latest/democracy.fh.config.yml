@@ -21,9 +21,9 @@ dimensions:
       type: dropdown
     choices:
       - slug: electoral_democracy
-        name: "­­­­Electoral democracy"
+        name: "\xad\xad\xad\xadElectoral democracy"
       - slug: freedom
-        name: "­­­­Freedom"
+        name: "\xad\xad\xad\xadFreedom"
   - slug: sub_metric
     name: "Sub-metric"
     presentation:
@@ -32,9 +32,9 @@ dimensions:
       - slug: main_classification
         name: "Main classification"
       - slug: number_and_share_of_democracies
-        name: "­Number and share of democracies"
+        name: "\xadNumber and share of democracies"
       - slug: people_living_in_democracies
-        name: "­People living in democracies"
+        name: "\xadPeople living in democracies"
       - slug: democratic_electoral_institutions
         name: "Democratic electoral institutions"
       - slug: political_rights_score

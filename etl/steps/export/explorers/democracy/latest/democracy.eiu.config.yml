@@ -20,7 +20,7 @@ dimensions:
       type: dropdown
     choices:
       - slug: democracy
-        name: "­­­­Democracy"
+        name: "\xad\xad\xad\xadDemocracy"
   - slug: sub_metric
     name: "Sub-metric"
     presentation:
@@ -29,11 +29,11 @@ dimensions:
       - slug: main_index
         name: "Main index"
       - slug: number_and_share_of_democracies
-        name: "­­­Number and share of democracies"
+        name: "\xad\xad\xadNumber and share of democracies"
       - slug: people_living_in_democracies
-        name: "­­­People living in democracies"
+        name: "\xad\xad\xadPeople living in democracies"
       - slug: political_participation_index
-        name: "­Political participation index"
+        name: "\xadPolitical participation index"
       - slug: political_regime
         name: "Political regime"
       - slug: electoral_pluralism_index
@@ -43,7 +43,7 @@ dimensions:
       - slug: democratic_culture_index
         name: "Democratic culture index"
       - slug: civil_liberties_index
-        name: "­Civil liberties index"
+        name: "\xadCivil liberties index"
 
 views:
   - dimensions:

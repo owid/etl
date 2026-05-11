@@ -20,9 +20,9 @@ dimensions:
       type: dropdown
     choices:
       - slug: electoral_democracy
-        name: "­­Electoral democracy"
+        name: "\xad\xadElectoral democracy"
       - slug: political_regime
-        name: "­­Political regime"
+        name: "\xad\xadPolitical regime"
       - slug: full_democracy
         name: "Full democracy"
   - slug: sub_metric
@@ -37,9 +37,9 @@ dimensions:
       - slug: people_living_in_democracies
         name: "People living in democracies"
       - slug: age_of_electoral_democracy
-        name: "­Age of electoral democracy"
+        name: "\xadAge of electoral democracy"
       - slug: number_and_share_of_long_standing_electoral_democracies
-        name: "­Number and share of long-standing electoral democracies"
+        name: "\xadNumber and share of long-standing electoral democracies"
       - slug: elections_for_legislature
         name: "Elections for legislature"
       - slug: elections_for_chief_executive

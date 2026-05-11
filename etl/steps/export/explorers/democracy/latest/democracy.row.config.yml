@@ -24,13 +24,13 @@ dimensions:
       type: dropdown
     choices:
       - slug: electoral_democracy
-        name: "­Electoral democracy"
+        name: "\xadElectoral democracy"
       - slug: liberal_democracy
-        name: "­Liberal democracy"
+        name: "\xadLiberal democracy"
       - slug: political_regime
-        name: "­Political regime"
+        name: "\xadPolitical regime"
       - slug: political_regime_including_ambiguous_categories
-        name: "­Political regime, including ambiguous categories"
+        name: "\xadPolitical regime, including ambiguous categories"
   - slug: sub_metric
     name: "Sub-metric"
     presentation:
@@ -49,7 +49,7 @@ dimensions:
       - slug: multi_party_elections_for_legislature
         name: "Multi-party elections for legislature"
       - slug: free_and_fair_elections
-        name: "­Free and fair elections"
+        name: "\xadFree and fair elections"
       - slug: democratic_electoral_institutions
         name: "Democratic electoral institutions"
       - slug: age_of_electoral_democracy
@@ -63,7 +63,7 @@ dimensions:
       - slug: access_to_justice_for_women
         name: "Access to justice for women"
       - slug: liberal_political_institutions
-        name: "­Liberal political institutions"
+        name: "\xadLiberal political institutions"
       - slug: age_of_liberal_democracy
         name: "Age of liberal democracy"
       - slug: number_and_share_of_long_standing_liberal_democracies
