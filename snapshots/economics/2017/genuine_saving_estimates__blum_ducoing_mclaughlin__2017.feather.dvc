@@ -1,10 +1,10 @@
 meta:
   origin:
     producer: Blum et al.
-    title: A sustainable century? Genuine savings in developing and developed countries 1900–2000
-    citation_full: 'Blum, M., Ducoing, C., Ruiz, M., and McLaughlin, E. (2017). "A sustainable century? Genuine savings in developing and developed countries 1900–2000." In Hamilton, K., and Hepburn, C. (Eds.), National Wealth: What is Missing, Why it Matters. Oxford University Press.'
+    title: 'A sustainable century? Genuine savings in developing and developed countries, 1900–2000'
+    citation_full: 'Blum, M., Ducoing, C., Ruiz, P., and McLaughlin, E. (2017). "A sustainable century? Genuine savings in developing and developed countries, 1900–2000." In Hamilton, K., and Hepburn, C. (Eds.), National Wealth: What is Missing, Why it Matters. Oxford University Press.'
     url_main: https://www.st-andrews.ac.uk/media/dept-of-geography-and-sustainable-development/pdf-s/DP%202016-15%20Blum%20et%20al.pdf
-    date_accessed: '2026-03-05'
+    date_accessed: '2017-01-01'
     date_published: '2017'
 outs:
   - md5: 1fcf69f0da59650cb111c167d27486c0

@@ -1,11 +1,11 @@
 meta:
   origin:
     producer: World Bank
-    title: Total wealth by component, by country grouping
+    title: Wealth (total) by component for various country groupings
     description: |-
       Wealth is the value of an economy's capital stocks. GDP is seen as the return on wealth. The World Bank calculates wealth as the sum of produced capital, natural capital, human capital, net foreign assets.
-    citation_full: World Bank (2017).
-    date_accessed: '2026-03-10'
+    citation_full: 'World Bank (2017). Wealth (total) by component for various country groupings.'
+    date_accessed: '2017-01-01'
     date_published: '2017'
 outs:
   - md5: 815df7c10aff3fde010bf4116ccbe75c

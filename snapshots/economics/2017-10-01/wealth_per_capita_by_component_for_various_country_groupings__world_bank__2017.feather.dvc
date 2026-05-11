@@ -1,11 +1,11 @@
 meta:
   origin:
     producer: World Bank
-    title: Wealth per capita by component, by country grouping
+    title: Wealth per capita by component for various country groupings
     description: |-
       Wealth is the value of an economy's capital stocks. GDP is seen as the return on wealth. The World Bank calculates wealth as the sum of produced capital, natural capital, human capital, net foreign assets.
-    citation_full: World Bank (2017).
-    date_accessed: '2026-03-06'
+    citation_full: World Bank (2017). Wealth per capita by component for various country groupings.
+    date_accessed: '2017-10-01'
     date_published: '2017'
 outs:
   - md5: 6eff49a52d6f7bd6bd8eb22a5e25dae6

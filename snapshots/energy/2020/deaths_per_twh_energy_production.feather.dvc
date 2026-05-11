@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Various sources
+    producer: Markandya and Wilkinson, and Sovacool et al.
     title: Deaths per TWh energy production
     description: |-
       Death rates from energy production is measured as the number of deaths by energy source per terawatt-hour (TWh) of electricity production.

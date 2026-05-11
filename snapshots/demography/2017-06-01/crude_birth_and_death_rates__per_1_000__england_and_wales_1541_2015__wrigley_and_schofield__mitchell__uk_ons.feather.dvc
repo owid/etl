@@ -1,12 +1,12 @@
 meta:
   origin:
-    producer: Various sources
-    title: Crude birth and death rates, England and Wales
+    producer: Wrigley and Schofield, Mitchell, and UK ONS
+    title: Crude birth and death rates, England and Wales 1541–2015
     description: |-
-      *Note: Our World In Data compiled the data from the above sources as follows: for the years 1541-1861: Wrigley and Schofield (1981); for the years 1862-2003: Brian Mitchell (2010); for the years 2004-2015: UK Office for National Statistics (2016).
+      Our World in Data compiled the data from the following sources: for the years 1541–1861, Wrigley and Schofield (1981); for the years 1862–2003, Brian Mitchell (2010); for the years 2004–2015, the UK Office for National Statistics (2016).
 
-      For 1541-1861 series: Wrigley and Schofield (1981); for 1862-2003 series: International Historical Statistics, Brian Mitchell (2010); for 2004-2015 series: UK Office for National Statistics (2016)
-    citation_full: 'Wrigley, E. A. and Schofield, R. S. (1981). The Population History of England: A Reconstruction; Mitchell, B. (2010). International Historical Statistics; UK Office for National Statistics (2016).'
+      Brian Mitchell's series is available at [International Historical Statistics](http://www.eui.eu/Research/Library/ResearchGuides/Economics/Statistics/DataPortal/IHS.aspx#Access). The UK ONS series is available at the [ONS births, deaths and marriages portal](https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/).
+    citation_full: 'Wrigley, E. A., and Schofield, R. S. (1981). The Population History of England: A Reconstruction. Cambridge University Press; Mitchell, B. R. (2010). International Historical Statistics; UK Office for National Statistics (2016). Births, deaths and marriages.'
     url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/
     date_accessed: '2017-06-01'
     date_published: '2016'

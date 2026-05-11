@@ -1,7 +1,7 @@
 meta:
   origin:
-    producer: Various sources
-    title: Smallpox cases by country, 1920–1977
+    producer: World Health Organization
+    title: Smallpox cases by country
     description: |-
       Data until 1966 was compiled from relevant tables in Fenner et al. (1988)'s Chapter 8 (link above): Fenner, F., Henderson, D. A., Arita, I., Jezek, Z., Ladnyi, I. D., & World Health Organization. (1988). Smallpox and its eradication.
 
@@ -19,7 +19,8 @@ meta:
       East Pakistan was changed into Bangladesh and West Pakistan was changed into Pakistan.
       Upper Volta was changed into Burkina Faso, Southern Rhodesia to Zimbabwe, Ceylon to Sri Lanka but Dahomey (a region in today's Nigeria) was left as it is.
       For all countries that approached zero cases and then were not included in the Weekly Epidemiological Record (WER) anymore subsequently were assumed to have zero cases. This was done for 1967-1977.
-    citation_full: Fenner et al. (1988) and various Weekly Epidemiological Records.
+    citation_full: Fenner, F., Henderson, D. A., Arita, I., Jezek, Z., Ladnyi, I. D., & World Health Organization. (1988). Smallpox and its eradication. Geneva, Switzerland, and various Weekly Epidemiological Records published by the World Health Organization.
+    attribution_short: WHO
     url_main: http://apps.who.int/iris/bitstream/10665/39485/1/9241561106.pdf
     date_accessed: '2018-05-12'
     date_published: '1988'

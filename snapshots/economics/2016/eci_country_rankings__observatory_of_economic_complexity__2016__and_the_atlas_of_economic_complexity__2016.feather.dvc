@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Various sources
+    producer: Observatory of Economic Complexity and Atlas of Economic Complexity
     title: ECI country rankings
     description: |-
       The Economic Complexity Index takes data on exports, and reduces a country's economic system into two dimensions: (i) The number or 'diversification' of products in the export basket, and (ii) the quality, or 'ubiquity' of products in the export basket.
@@ -17,14 +17,14 @@ meta:
 
       The following visualization shows ECI rankings for all countries in the world. Link: https://ourworldindata.org/grapher/economic-complexity-rankings
 
-      As we can see, there is a clear pattern – richer countries tend to have similar economic structures, and these structures allow them to produce and export a varied basket of sophisticated products.
+      As we can see, there is a clear pattern — richer countries tend to have similar economic structures, and these structures allow them to produce and export a varied basket of sophisticated products.
 
       But what about countries endowed with rare natural resources, like petroleum, which would make a country's export basket less ubiquitous, and hence misleadingly be assigned a more favourable ECI ranking? If a country exporting petroleum can only produce a few other products, then the low ubiquity for their export basket can be explained by these natural resources, and the ECI ranking is corrected by the country's inability to produce different types of products. However, if this country can also produce a diverse range of other goods, then low ubiquity correctly indicates greater economic complexity which is reflected in the ranking. Hence, information on diversity can correct for the information of ubiquity, and vice versa.
 
-      The data here comes from the Economic Complexity Index scores published by the MIT Observatory of Economic Complexity. These are different to those published by the Harvard Atlas of Economic Complexity. As far as we are aware, the discrepancies stem from differences in the way each sources clean the underlying cross-country trade data. You can explore differences between these two data sources here: https://ourworldindata.org/grapher/eci-country-rankings-comparison?country=KOR.
+      The data here comes from the Economic Complexity Index scores published by the MIT Observatory of Economic Complexity (https://atlas.media.mit.edu/en/rankings/country/eci/). These are different to those published by the Harvard Atlas of Economic Complexity (http://atlas.cid.harvard.edu/rankings). As far as we are aware, the discrepancies stem from differences in the way each sources clean the underlying cross-country trade data. You can explore differences between these two data sources here: https://ourworldindata.org/grapher/eci-country-rankings-comparison?country=KOR.
     citation_full: MIT Observatory of Economic Complexity (OEC) (2016) and the Harvard Atlas of Economic Complexity (2016).
     url_main: https://atlas.media.mit.edu/en/rankings/country/eci/
-    date_accessed: '2017-11-06'
+    date_accessed: '2016-01-01'
     date_published: '2016'
 outs:
   - md5: 0ea3776a1633743ff6a8ee0fca4e2f44

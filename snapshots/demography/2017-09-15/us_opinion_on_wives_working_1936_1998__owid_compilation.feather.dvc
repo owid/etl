@@ -1,10 +1,10 @@
 meta:
   origin:
-    producer: Various sources
+    producer: Fogli and Veldkamp and GSS
     title: US opinion on wives working 1936-1998
     description: |-
-      The question asked in the Fogli and Veldkamp data varies slightly, see their appendix (B.2 Survey data) for more detail. GSS survey respondents answered the question "Do you approve or disapprove of a married woman earning money in business or industry if she has a husband capable of supporting her?"
-    citation_full: For 1936-1970 we use Fogli and Veldkamp (2011); For 1972-1998 we use GSS data.
+      An OWID compilation of US public opinion data on married women working, combining two sources. For 1936-1970, data is taken from Fogli and Veldkamp (2011); the question asked varies slightly across the underlying surveys, see their appendix (B.2 Survey data) for more detail. For 1972-1998, data is taken from the General Social Survey (GSS), where respondents answered the question "Do you approve or disapprove of a married woman earning money in business or industry if she has a husband capable of supporting her?"
+    citation_full: 'Fogli, A. and Veldkamp, L. (2011). Nature or nurture? Learning and the geography of female labor force participation. And General Social Survey (GSS), NORC at the University of Chicago.'
     url_main: https://www.economicdynamics.org/meetpapers/2009/paper_141.pdf
     url_download: https://gssdataexplorer.norc.org/variables/589/vshow
     date_accessed: '2017-09-15'

@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: Various sources
-    title: Technology diffusion in the United States
+    title: Technology diffusion - Comin and Hobijn (2004) and others
     description: |-
       A similar dataset was previously assembled by Horace Dediu, who writes at: http://www.asymco.com/author/asymco/. We are thankful for Horace Dediu's generosity in making his dataset available. We have tracked down all of his sources and assembled our dataset based on these sources.
 
@@ -27,8 +27,8 @@ meta:
       - Greenwood, Seshadri & Yorikoglu (2005), Engines of Liberation.
       - Data on dishwashers, dryers, freezers, microwaves, refrigerators, and washers use the US Census Bureau's data from 1992 to 2011, using Greenwood et al. (2005) data for previous years.
     citation_full: Horace Dediu; Comin and Hobijn (2004); other sources collated by Our World in Data.
-    url_main: http://www.asymco.com/author/asymco/
-    url_download: http://www.nber.org/data/chat/
+    attribution_short: Comin and Hobijn and others
+    url_main: http://www.nber.org/data/chat/
     date_accessed: '2017-09-29'
     date_published: '2004'
 outs:
