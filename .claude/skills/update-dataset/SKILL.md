@@ -236,6 +236,8 @@ When you do stop, present a concise summary of the issue and what options exist.
 
    5. **Audit garden output entities.** Always run this check, regardless of whether `.countries.json` exists or is populated — JSON mappings describe *inputs* to the harmonizer, but the entities that actually reach Grapher are whatever sits in the `country` column/index of the built garden tables. Inline `country` assignments (e.g. hardcoded `tb["country"] = "England and Wales"`) and post-harmonization mutations both bypass the JSON check entirely; this is the only step that catches them.
       ```python
+      from pathlib import Path
+
       from owid.catalog import Dataset
 
       garden_dir = Path("data/garden/<namespace>/<new_version>/<short_name>")
