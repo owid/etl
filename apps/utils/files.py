@@ -6,37 +6,11 @@ from typing import Any
 
 from cookiecutter.main import cookiecutter
 
-from etl.files import apply_ruff_formatter_to_files, ruamel_dump, ruamel_load
+from etl.files import apply_ruff_formatter_to_files
 from etl.paths import DAG_DIR, STEP_DIR
-from etl.steps import DAG
 
 # TODO: Move this to apps/wizard
 DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
-
-
-def add_to_dag(dag: DAG, dag_path: Path = DAG_WIZARD_PATH) -> str:
-    """Add dag to dag_path file."""
-    with open(dag_path) as f:
-        doc = ruamel_load(f)
-
-    doc["steps"].update(dag)
-
-    with open(dag_path, "w") as f:
-        f.write(ruamel_dump(doc))
-
-    # Get subdag as string
-    return ruamel_dump({"steps": dag})
-
-
-def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
-    with open(dag_path) as f:
-        doc = ruamel_load(f)
-
-    doc["steps"].pop(step, None)
-
-    with open(dag_path, "w") as f:
-        # Add new step to DAG
-        f.write(ruamel_dump(doc))
 
 
 def generate_step(cookiecutter_path: Path, data: dict[str, Any], target_dir: Path) -> None:

@@ -416,8 +416,8 @@ def show_anomaly_compact(index, df):
     # Get relevant metadata for this view
     # By default, the entity with highest score, but user may have selected other ones!
     entity_default = df.iloc[row]["entity_name"]
-    entities = st.session_state.get(f"selected_entities_{key}", entity_default)
-    entities = entities if entities != [] else [entity_default]
+    entities = st.session_state.get(key_selection, [entity_default])
+    entities = entities if entities else [entity_default]
 
     # entities = df["entity_id"].tolist()
     year_default = df.iloc[row]["year"]

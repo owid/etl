@@ -11,13 +11,7 @@
 __pycache__
 .ipynb_checkpoints
 etl/scripts/countries-regions/intermediate
-!data/
-data/*
-!data/reference/
-!data/reference
-!data/garden/
-data/garden/*
-!data/garden/reference/
+/data
 export/*
 .env
 .env.*
@@ -60,6 +54,8 @@ notebooks/
 zpop/
 node_modules/
 dist/
+vscode_extensions/*/.vscode-test/
+vscode_extensions/*/out/
 
 .claude/settings.local.json
 CLAUDE.local.md

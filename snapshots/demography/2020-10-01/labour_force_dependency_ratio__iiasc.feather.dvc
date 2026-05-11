@@ -11,7 +11,7 @@ meta:
       Background on the labour force assumptions for the 'LFDR - Constant Participation' and 'LFDR - High Participation' scenarios:
       Future labour force participation rates are calculated from statistical modelling based on the 2014 and 2015 Labour Force Survey, assuming constant entry and exit rates in the labour force by age, sex, education, and country. The 'high participation (Swedish) scenario' assumes a convergence in labour participation rates by 2050 to what was observed in Sweden during 2014-2015.
     url: https://www.pnas.org/content/117/14/7690.abstract
-    date_accessed: 2026-03-06
+    date_accessed: '2020-10-01'
     published_by: |-
       Marois, G., Bélanger, A., & Lutz, W. (2020). Population aging, migration, and productivity in Europe. Proceedings of the National Academy of Sciences, 117(14), 7690-7695.
   name: Labour Force Dependency Ratio (IIASC)

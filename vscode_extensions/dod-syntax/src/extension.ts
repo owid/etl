@@ -426,6 +426,9 @@ export function activate(context: vscode.ExtensionContext) {
                             const updateDate = new Date(result.updatedAt).toLocaleDateString();
                             hoverContent.appendMarkdown(`*Updated:* ${updateDate}\n`);
                         }
+                        if (result.source) {
+                            hoverContent.appendMarkdown(`\n*Source: \`${result.source}\`*\n`);
+                        }
                     } else if (result && result.success && result.dod) {
                         // Old single result format: DOD data in nested 'dod' property
                         const dod = result.dod;
@@ -436,6 +439,9 @@ export function activate(context: vscode.ExtensionContext) {
                         if (dod.updatedAt) {
                             const updateDate = new Date(dod.updatedAt).toLocaleDateString();
                             hoverContent.appendMarkdown(`*Updated:* ${updateDate}\n`);
+                        }
+                        if (dod.source) {
+                            hoverContent.appendMarkdown(`\n*Source: \`${dod.source}\`*\n`);
                         }
                     } else {
                         hoverContent.appendMarkdown(`**Definition not available**\n\n`);

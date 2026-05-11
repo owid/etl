@@ -43,6 +43,27 @@ def load_yaml_as_string(path):
         return yaml.load(file, Loader=SafeLoader)
 
 
+def _strip_jinja_templated_values(obj):
+    """Recursively remove dict entries whose value is a Jinja-templated string.
+
+    Used to skip schema validation for typed (non-string) fields that contain
+    Jinja templates — those validate at runtime after rendering, not statically.
+    Only called on `display` and `presentation.grapher_config` blocks (which
+    have typed numeric fields like ``numDecimalPlaces``, ``yAxis.min``,
+    ``yEquals``); string-typed fields elsewhere keep their schema coverage.
+    """
+    if isinstance(obj, dict):
+        for key in list(obj.keys()):
+            val = obj[key]
+            if isinstance(val, str) and "<%" in val:
+                del obj[key]
+            else:
+                _strip_jinja_templated_values(val)
+    elif isinstance(obj, list):
+        for item in obj:
+            _strip_jinja_templated_values(item)
+
+
 def _get_changed_files_vs_master(pattern: str) -> set[str] | None:
     """Return set of files changed vs master matching pattern, or None to validate all.
 
@@ -145,12 +166,22 @@ def test_dataset_schemas():
                 if "$schema" in ind.get("presentation", {}).get("grapher_config", {}):
                     del ind["presentation"]["grapher_config"]
 
-                # Ignore display fields containing Jinja templates (validated after rendering)
+                # Strip Jinja templates from the two blocks that hold typed
+                # numeric fields (display: numDecimalPlaces, yAxis…; grapher_config:
+                # yAxis.min/max, yEquals…). Runtime rendering + post-render schema
+                # validation in `etl.grapher.helpers._validate_grapher_config`
+                # catches type mismatches for those fields after Jinja resolves.
+                # All other fields (description_short, title_public, etc.) keep
+                # their schema coverage even when they contain Jinja, since their
+                # schema type is `string` and Jinja-templated strings still pass.
                 display = ind.get("display", {})
                 if display:
                     for key in list(display.keys()):
                         if isinstance(display[key], str) and "<%" in display[key]:
                             del display[key]
+                gc = ind.get("presentation", {}).get("grapher_config", {})
+                if gc:
+                    _strip_jinja_templated_values(gc)
 
         # Validate the loaded data against the schema
         try:

@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Women's Economic Opportunity 2012 - Economist Intelligence Unit (2012)
+  origin:
+    producer: Economist Intelligence Unit
+    title: Women's Economic Opportunity
     description: |-
       The Women's Economic Opportunity (WEO) Index measures five categories to determine whether the environment for both women employees and women entrepreneurs is favourable. Five category scores are calculated from the unweighted mean of underlying indicators and scaled 0-100, where 100=most favourable. These categories are: Labor policy and practice (comprising two sub-categories: Labor policy and labor practice); Access to Finance; Education and training; Women's legal and social status; and the General business environment. Each category or sub-category features either four or five underlying indicators.
 
@@ -11,11 +12,10 @@ meta:
       World Bank classifications include entities: High income (OECD), High income, High income (non-OECD), Upper-middle income, Lower-middle income, Low income, Europe & Central Asia, Latin America & the Caribbean, East Asia & Pacific, Middle East & North Africa, South Asia, and Sub-Saharan Africa.
 
       UN classifications include entities: Europe, Americas, Oceania, Asia, and Africa.
-    url: https://www.eiu.com/public/topical_report.aspx?campaignid=weoindex2012
-    date_accessed: 2018-03-22
-    published_by: Economist Intelligence Unit (2012)
-  name: Women's Economic Opportunity 2012 - Economist Intelligence Unit (2012)
-  description: ''
+    citation_full: Economist Intelligence Unit (2012). Women's Economic Opportunity 2012.
+    url_main: https://www.eiu.com/public/topical_report.aspx?campaignid=weoindex2012
+    date_accessed: '2018-03-22'
+    date_published: '2012'
 outs:
   - md5: eda4c93b766304f35283b225cb652a0b
     size: 6466

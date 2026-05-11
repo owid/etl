@@ -61,3 +61,23 @@ steps:
     - data://meadow/un/2026-04-08/child_labor_report
   data://grapher/un/2026-04-08/child_labor_report:
     - data://garden/un/2026-04-08/child_labor_report
+
+  #
+  # Child labor in the long run (multiple sources)
+  #
+  data://meadow/child_labor/2026-05-08/child_labor_long_run:
+    - snapshot://child_labor/2026-05-06/child_labor_us_long.csv
+    - snapshot://child_labor/2026-05-06/child_labor_belgium.csv
+    - snapshot://child_labor/2026-05-06/child_labor_portugal.csv
+    - snapshot://child_labor/2026-05-06/child_labor_denmark.csv
+    - snapshot://child_labor/2026-05-06/child_labor_italy.csv
+    - snapshot://child_labor/2026-05-06/child_labor_sweden.csv
+    - snapshot://child_labor/2026-05-06/child_labor_us_carter_sutch.csv
+    - snapshot://child_labor/2026-05-06/child_labor_portugal_goulart_bedi.csv
+    - snapshot://child_labor/2026-05-06/child_labor_england_wales_scotland.csv
+    - snapshot://un/2026-05-06/child_labor_england_wales.csv
+    - snapshot://un/2026-05-06/child_labor_japan.csv
+  data://garden/child_labor/2026-05-08/child_labor_long_run:
+    - data://meadow/child_labor/2026-05-08/child_labor_long_run
+  data://grapher/child_labor/2026-05-08/child_labor_long_run:
+    - data://garden/child_labor/2026-05-08/child_labor_long_run

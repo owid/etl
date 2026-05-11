@@ -129,7 +129,7 @@ git checkout -b data/new-dataset
     - Path of the step should be similar to `etl/steps/data/garden/<namespace>/<version>/<dataset_short_name>.py`.
     - The step must contain a `run()` function that loads data from the last `meadow` step, processes the data and
     creates a dataset with one or more tables and the necessary metadata.
-    - Country names must be harmonized (for which the [harmonize](../architecture/workflow/harmonization.md) tool of `etl` can be used).
+    - Country names must be harmonized (for which the [harmonize](../harmonize-countries.md) tool of `etl` can be used).
     - Add plenty of assertions and sanity checks to the step (if possible, compare the data with its previous version and
     check for abrupt changes).
     - Run `make format && make test` to ensure that the step runs well and is well formatted.

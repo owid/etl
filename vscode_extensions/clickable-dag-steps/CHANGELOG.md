@@ -1,7 +1,10 @@
 # Changelog
 
-## [0.0.4] – 2026-04-23
-- Support YAML-only export steps by linking DAG entries to adjacent `.config.yml` files when no `.py` file exists.
+## [0.0.5] – 2026-05-11
+- Support YAML-only export steps by linking DAG entries to adjacent `.config.yml` files when no `.py` file exists (carried over after merging master).
+
+## [0.0.4] – 2026-04-27
+- Extract URI-line classifier as `classifyDagLine` so the heuristic and any future refactor share one definition; add a focused test suite.
 
 ## [0.0.3] – 2025-05-27
 - Improved decoration system with clearer rules for active vs archive DAG files.

@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Integrated Life-cycle Assessment of Electricity Sources
+    description: |-
+      This dataset is based on the large meta-analysis of the impacts of electricity production carried out by the UNECE's Lifecycle Assessment of Electricity Generation Options assessment. This is based on literature review of life-cycle assessments of electricity sources: these not only include the direct impacts of an electricity source (for example, the land used for individual power plants) but also include any supply chain inputs (for example, land use upstream in supply chains, such as mining for fuel or raw materials. This meta-analysis included measurements across all regions; here we present the global average across these values. Note that for some impacts - land use, for example - there can be significant differences in the maximum and minimum values for a given source depending on context, such as the climate of a given location; choices around spacing and density of electricity sources etc.
+
+      The content of the report was updated with a [corrigendum](https://unece.org/sites/default/files/2022-07/Corrigendum%20to%20UNECE%20LCA%20report%20-%20land%20use.pdf).
+    date_published: "2021-10-29"
+
+    # Citation
+    producer: UNECE
+    citation_full: |-
+      UNECE - Integrated Life-cycle Assessment of Electricity Sources (2022). United Nations Economic Commission for Europe.
+
+    # Files
+    url_main: https://unece.org/sed/documents/2021/10/reports/life-cycle-assessment-electricity-generation-options
+    # The PDF has to be downloaded manually from:
+    # https://unece.org/sites/default/files/2022-04/LCA_3_FINAL%20March%202022.pdf
+    # And then:
+    # etls life_cycle_assessment --path-to-file <path_to_downloaded_file>
+    date_accessed: "2026-05-04"
+
+    # License
+    license:
+      name: © UNECE 2022
+      url: https://unece.org/terms-and-conditions-use-united-nations-websites
+outs:
+  - md5: fc29b2975f251cf7189c3f956371f6eb
+    size: 12167719
+    path: life_cycle_assessment_of_electricity.pdf

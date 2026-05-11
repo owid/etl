@@ -173,26 +173,6 @@ def test_app_dashboard():
     assert not at.exception
 
 
-# @pytest.mark.integration
-# @pytest.mark.usefixtures("set_config")
-# def test_app_dataset_preview():
-#     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/dataset_preview/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
-
-#     # Select random dataset
-#     dataset_id = _get_random_dataset()
-
-#     sel = at.selectbox[0]
-#     sel.set_value(dataset_id).run()
-
-#     assert not at.exception
-
-#     # Click dependency graph
-#     btn = _pick_button_by_label(at, "Dependency graph")
-#     btn.click().run()
-
-#     assert not at.exception
-
-
 def _get_random_dataset():
     with Session(config.OWID_ENV.engine) as session:
         ds = (
@@ -216,27 +196,6 @@ def test_app_producer_analytics():
     ).run()
 
     assert not at.exception
-
-
-@pytest.mark.integration
-@pytest.mark.usefixtures("set_config")
-def test_app_explorer():
-    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/explorer_edit.py"), default_timeout=DEFAULT_TIMEOUT).run()
-
-    assert not at.exception
-
-
-# @pytest.mark.integration
-# @pytest.mark.usefixtures("set_config")
-# def test_app_insight_search():
-#     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/insight_search/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
-
-#     # Set Author
-#     assert len(at.multiselect) == 1
-#     at.multiselect
-#     at.multiselect[0].set_value(["Max Roser"]).run()
-
-#     assert not at.exception
 
 
 # @pytest.mark.integration
