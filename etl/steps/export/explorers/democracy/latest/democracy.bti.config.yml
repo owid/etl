@@ -186,7 +186,7 @@ views:
     config:
       title: "Countries that are democracies and autocracies"
       <<: *group_config
-      type: "StackedDiscreteBar StackedArea"
+      type: "StackedArea StackedDiscreteBar"
       stackMode: "relative"
       yAxis:
         min: 0
@@ -223,4 +223,4 @@ views:
     config:
       title: "People living in democracies and autocracies"
       <<: *group_config
-      type: "StackedDiscreteBar StackedArea"
+      type: "StackedArea StackedDiscreteBar"

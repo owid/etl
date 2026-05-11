@@ -69,6 +69,11 @@ tables:
       presentation:
         grapher_config:
           <<: *map_tab
+          chartTypes:
+            - LineChart
+            - SlopeChart
+            - DiscreteBar
+            - Marimekko
           note: Data excludes long-term members of the OECD because they are considered stable democracies.
           yAxis:
             max: 10
@@ -96,6 +101,9 @@ tables:
         display:
           name: Democratic Features Index
       regime_bti:
+        # `Main classification` view in PROD is line-only — the categorical 1–5 scale
+        # doesn't lend itself to the slope/discrete-bar/Marimekko toggles the other
+        # `bti` indicators expose. Override the table-level common chartTypes here.
         title: "Political regime"
         description_short: |-
           Identifies the political regime of a country. It distinguishes between hard-line autocracies (score 1), moderate autocracies (score 2), highly defective democracies (score 3), defective democracies (score 4), and consolidating democracies (score 5).
@@ -112,6 +120,9 @@ tables:
           grapher_config:
             title: Democracy
             subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
+            chartTypes:
+              - LineChart
+              - DiscreteBar
             yAxis:
               max: 5
               min: 1
