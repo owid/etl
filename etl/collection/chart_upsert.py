@@ -42,7 +42,8 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
         raise ValueError(f"Chart mode (no dimensions) requires exactly one view; got {len(collection.views)}.")
 
     view = collection.views[0]
-    slug = _resolve_chart_slug(collection, view)
+    # Grapher slugs are dash-separated; mdim short_names are snake_case.
+    slug = collection.short_name.replace("_", "-")
     config = _build_chart_config(view, slug)
 
     admin_api = AdminAPI(owid_env)
@@ -74,15 +75,6 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
         admin_url=f"{owid_env.admin_site}/admin/charts/{chart_id}/edit",
     )
     return chart_id
-
-
-def _resolve_chart_slug(collection: "Collection", view: "View") -> str:
-    """Derive the chart slug from the collection's short_name.
-
-    Grapher chart slugs are conventionally dash-separated; the mdim short_name is snake_case.
-    """
-    del view  # unused for now; kept in the signature for future explicit-slug overrides
-    return collection.short_name.replace("_", "-")
 
 
 def _build_chart_config(view: "View", slug: str) -> dict[str, Any]:
