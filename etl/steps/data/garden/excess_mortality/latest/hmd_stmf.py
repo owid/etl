@@ -2,7 +2,7 @@
 
 from datetime import date
 
-import pandas as pd
+import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.catalog.utils import underscore
 from shared import harmonize_countries  # ty: ignore
@@ -36,10 +36,7 @@ def run() -> None:
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["hmd_stmf"]
-    tb_meadow = tb_meadow.reset_index()
-
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow)
+    df = tb_meadow.reset_index()
 
     #
     # Process data.
@@ -47,8 +44,7 @@ def run() -> None:
     log.info("hmd_stmf: processing data")
     df = process(df)
 
-    # Create a new table with the processed data.
-    tb_garden = Table(df, short_name=tb_meadow.metadata.short_name)
+    tb_garden = df
 
     # Set index
     tb_garden = tb_garden.set_index(["entity", "week", "age"], verify_integrity=True)
@@ -67,7 +63,7 @@ def run() -> None:
     log.info("hmd_stmf: end")
 
 
-def process(df: pd.DataFrame) -> pd.DataFrame:
+def process(df: Table) -> Table:
     # Check dataframe fields and values
     log.info("\thmd_stmf: initial dataframe API check")
     df_api_check(df)
@@ -92,13 +88,13 @@ def process(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def df_api_check(df: pd.DataFrame) -> None:
+def df_api_check(df: Table) -> None:
     check_values_in_column(df, "year", list(range(YEAR_MIN_EXPECTED, YEAR_MAX_EXPECTED + 1)))
     check_values_in_column(df, "week", list(range(1, 54)))
     check_values_in_column(df, "sex", ["m", "f", "b"])
 
 
-def filter_entries(df: pd.DataFrame) -> pd.DataFrame:
+def filter_entries(df: Table) -> Table:
     """Filter some rows."""
     # Select only years YEAR_MIN - YEAR_MAX (2010-2019 (for baseline) and 2020-now)
     df = df[(df["year"] >= YEAR_MIN) & (df["year"] <= YEAR_MAX)]
@@ -107,7 +103,7 @@ def filter_entries(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
+def reshape_df(df: Table) -> Table:
     """Pivot/unpivot to get data in the right format."""
     # Unpivot [Entity, Year, Week, Sex, [D*]] -> [Entity, Week, Sex, Age, [Years]]
     df = df.melt(
@@ -117,7 +113,8 @@ def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
         value_name="deaths",
     )
     # Pivot wide
-    df = df.pivot(
+    df = pr.pivot(
+        df,
         index=["entity", "week", "age"],
         columns="year",
         values="deaths",
@@ -127,7 +124,7 @@ def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def add_uk(df: pd.DataFrame):
+def add_uk(df: Table):
     """Add UK to main dataframe.
 
     By default, the dataset only contains data for England and Wales, Scotland and Northern Ireland.
@@ -148,18 +145,18 @@ def add_uk(df: pd.DataFrame):
     # Assign Entity name
     df_uk["entity"] = "United Kingdom"
     # Add UK to main dataset
-    df = pd.concat([df, df_uk], ignore_index=True)
+    df = pr.concat([df, df_uk], ignore_index=True)
     return df
 
 
-def format_age(df: pd.DataFrame) -> pd.DataFrame:
+def format_age(df: Table) -> Table:
     """Remove 'd' from age strings."""
     df["age"] = df["age"].str.replace("d", "")
     df.loc[df["age"] == "total", "age"] = "all_ages"
     return df
 
 
-def format_columns(df: pd.DataFrame) -> pd.DataFrame:
+def format_columns(df: Table) -> Table:
     """Adapt dataframe column names to WMD-like format."""
     # Sort columns
     cols_first = ["entity", "week", "age"]

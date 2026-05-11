@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
+import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.catalog.utils import underscore
 from shared import harmonize_countries
@@ -28,10 +28,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("wmd")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow["wmd"].reset_index()
-
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow)
+    df = ds_meadow["wmd"].reset_index()
 
     #
     # Process data.
@@ -39,9 +36,7 @@ def run() -> None:
     log.info("wmd: processing data")
     df = process(df)
 
-    # Create a new table with the processed data.
-    tb_garden = Table(df, short_name=tb_meadow.metadata.short_name)
-    print(tb_garden.head())
+    tb_garden = df
 
     # Set index
     tb_garden = tb_garden.set_index(["entity", "time", "time_unit", "age"], verify_integrity=True)
@@ -61,7 +56,7 @@ def run() -> None:
     log.info("wmd: end")
 
 
-def process(df: pd.DataFrame) -> pd.DataFrame:
+def process(df: Table) -> Table:
     # Clean dataframe
     log.info("\thmd_stmf: cleaning bad values")
     df = df_clean(df)
@@ -83,7 +78,7 @@ def process(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def df_clean(df: pd.DataFrame) -> pd.DataFrame:
+def df_clean(df: Table) -> Table:
     ix = df.year == 0
     # NOTE: There are some values for FJI with year 0. Drop them as a hotfix.
     if ix.any():
@@ -92,7 +87,7 @@ def df_clean(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def df_api_check(df: pd.DataFrame) -> None:
+def df_api_check(df: Table) -> None:
     # Check years
     check_values_in_column(df, "year", list(range(YEAR_MIN_EXPECTED, YEAR_MAX_EXPECTED + 1)))
     # Check time and time_unit
@@ -104,10 +99,11 @@ def df_api_check(df: pd.DataFrame) -> None:
     check_values_in_column(df[df["time_unit"] == "weekly"], "time", list(range(1, 54)))
 
 
-def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
+def reshape_df(df: Table) -> Table:
     # Make wide [...l -> [[index], [years]]
     df = (
-        df.pivot(
+        pr.pivot(
+            df,
             index=["entity", "time", "time_unit"],
             columns="year",
             values="deaths",
@@ -118,12 +114,12 @@ def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def format_age(df: pd.DataFrame) -> pd.DataFrame:
+def format_age(df: Table) -> Table:
     """Create column `age` with value 'all_ages'."""
     return df.assign(**{"age": "all_ages"})
 
 
-def format_columns(df: pd.DataFrame) -> pd.DataFrame:
+def format_columns(df: Table) -> Table:
     """Final touches."""
     # Sort columns
     cols_first = ["entity", "time", "time_unit", "age"]

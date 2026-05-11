@@ -3,8 +3,10 @@
 from datetime import datetime, timedelta
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
+from owid.catalog.core.indicators import combine_indicators_metadata
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -19,7 +21,7 @@ paths = PathFinder(__file__)
 YEAR_MAX = 2025
 
 
-def process_df(df: pd.DataFrame) -> pd.DataFrame:
+def process_df(df: Table) -> Table:
     """Process data"""
     # Add baseline average
     log.info("\texcess_mortality: add `baseline_avg`")
@@ -45,14 +47,18 @@ def process_df(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def add_baseline_avg(df: pd.DataFrame) -> pd.DataFrame:
+def add_baseline_avg(df: Table) -> Table:
     """Add field `baseline_avg` to `df`
 
     It is estimated by averaging deaths from 2015 to 2019.
     """
     column_new_metric = "baseline_avg"
     # calculate baseline average and standard error -----
-    df[column_new_metric] = df[["2015", "2016", "2017", "2018", "2019"]].mean(axis=1)
+    baseline_columns = ["2015", "2016", "2017", "2018", "2019"]
+    df[column_new_metric] = df[baseline_columns].mean(axis=1)
+    df[column_new_metric].metadata = combine_indicators_metadata(
+        indicators=[df[col] for col in baseline_columns], name=column_new_metric
+    )
     # because there's only one Week 53 in the past 5 years, use the baseline average from Week 52 instead. ONS does this.
     cols_link = ["entity", "time_unit", "age"]
     # Get rows with time == 53
@@ -60,16 +66,16 @@ def add_baseline_avg(df: pd.DataFrame) -> pd.DataFrame:
     df_52 = df[df["time"] == 52].copy()[cols_link + [column_new_metric]]
     df_53 = df_53.merge(df_52, on=cols_link)
     df = df[df.time != 53]
-    df = pd.concat([df, df_53], ignore_index=True)
+    df = pr.concat([df, df_53], ignore_index=True)
     return df
 
 
-def add_xm_and_p_score(df: pd.DataFrame) -> pd.DataFrame:
+def add_xm_and_p_score(df: Table) -> Table:
     """Add fields `xm` and `p_score` to `df`"""
     COLUMNS_IDX = ["entity", "time", "time_unit"]
 
     # calculate both excess deaths and p-scores above both baselines: 5-yr avg and projected
-    def _add_metrics(df: pd.DataFrame, year: str):
+    def _add_metrics(df: Table, year: str):
         if year == "2020":
             suffix = ""
         elif year in [str(year) for year in range(2021, YEAR_MAX + 1)]:
@@ -94,7 +100,7 @@ def add_xm_and_p_score(df: pd.DataFrame) -> pd.DataFrame:
             )
         return df.assign(**new_indicators)
 
-    def _get_p_scores(df: pd.DataFrame) -> pd.DataFrame:
+    def _get_p_scores(df: Table) -> Table:
         # get p-scores and make wide
         cols = ["baseline_proj", "excess_avg", "p_avg", "excess_proj", "p_proj"]
         metrics = ["baseline_avg"]
@@ -106,14 +112,10 @@ def add_xm_and_p_score(df: pd.DataFrame) -> pd.DataFrame:
                     metrics.append(col_year)
         df_ = df[COLUMNS_IDX + ["age"] + metrics].copy()
         # Pivot
-        df_ = df_.pivot(index=COLUMNS_IDX, columns="age", values=metrics)
-        # Set column names
-        df_.columns = ["_".join(col) for col in df_.columns.values]
-        # Reset index
-        df_ = df_.reset_index()
+        df_ = pr.pivot(df_, index=COLUMNS_IDX, columns="age", values=metrics, join_column_levels_with="_")
         return df_
 
-    def _get_deaths(df: pd.DataFrame) -> pd.DataFrame:
+    def _get_deaths(df: Table) -> Table:
         # Get deaths
         columns_idx = COLUMNS_IDX
         columns_years = [str(year) for year in range(2010, YEAR_MAX + 1)]
@@ -127,7 +129,7 @@ def add_xm_and_p_score(df: pd.DataFrame) -> pd.DataFrame:
                 col = f"deaths_{col}_all_ages"
             return col
 
-        df_.columns = list(map(_rename_columnn, df_.columns))
+        df_ = df_.rename(columns={col: _rename_columnn(col) for col in df_.columns})
         return df_
 
     # Add metrics for each year
@@ -138,14 +140,14 @@ def add_xm_and_p_score(df: pd.DataFrame) -> pd.DataFrame:
     df_p = _get_p_scores(df)
     df_d = _get_deaths(df)
     # Merge
-    df = df_p.merge(df_d, on=COLUMNS_IDX)
+    df = pr.merge(df_p, df_d, on=COLUMNS_IDX)
     # Round metric values
     columns = [col for col in df.columns if col not in COLUMNS_IDX]
     df[columns] = df[columns].round(2)
     return df
 
 
-def make_df_long(df: pd.DataFrame) -> pd.DataFrame:
+def make_df_long(df: Table) -> Table:
     """Make `df` long"""
 
     def _build_yearly_data(df, year, remove_w53):
@@ -208,13 +210,13 @@ def make_df_long(df: pd.DataFrame) -> pd.DataFrame:
     # Rename column
     df["deaths_since_2020_all_ages"] = df["deaths_2020_all_ages"]
     # Merge
-    df = pd.concat([df] + dfs, ignore_index=True)
+    df = pr.concat([df] + dfs, ignore_index=True)
     # Format date
     df["date"] = pd.to_datetime(df["date"])
     return df
 
 
-def minor_tweaks(df: pd.DataFrame) -> pd.DataFrame:
+def minor_tweaks(df: Table) -> Table:
     """Minor df changes"""
     # create a new dataframe and get rid of columns I don't need
     columns = [
@@ -267,7 +269,7 @@ def minor_tweaks(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def add_cum_metrics(df: pd.DataFrame) -> pd.DataFrame:
+def add_cum_metrics(df: Table) -> Table:
     # calculate cumulative excess deaths and p-scores for each country
     df = (
         df.sort_values("date")
@@ -290,10 +292,10 @@ def add_cum_metrics(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def add_population(df: pd.DataFrame) -> pd.DataFrame:
+def add_population(df: Table) -> Table:
     # Load population data
     df["year"] = df["date"].dt.year
-    df = geo.add_population_to_table(Table(df), paths.load_dataset("population"), country_col="entity", year_col="year")
+    df = geo.add_population_to_table(df, paths.load_dataset("population"), country_col="entity", year_col="year")
     df = df.drop(columns=["year"])
     # Get per million metrics
     df["excess_per_million_proj_all_ages"] = df["excess_proj_all_ages"] / (df["population"] / 1e6)
@@ -303,7 +305,7 @@ def add_population(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def final_formatting(df: pd.DataFrame) -> pd.DataFrame:
+def final_formatting(df: Table) -> Table:
     # Keep columns just in case they were in use on github.com/owid/owid-datasets
     # df = df.drop(
     #     columns=[

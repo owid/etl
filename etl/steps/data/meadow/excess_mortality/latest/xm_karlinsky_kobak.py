@@ -2,13 +2,11 @@
 
 In this step we perform sanity checks on the expected input fields and the values that they take."""
 
-from pathlib import Path
-
-import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder
+from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
 # Initialize logger.
@@ -44,15 +42,22 @@ def run(dest_dir: str) -> None:
     snap_ages = paths.load_snapshot("xm_karlinsky_kobak_ages.csv")
 
     # Load data from snapshot.
-    df_all = load_dataframe(snap_all.path, column_names=COLUMN_NAMES)
-    df_ages = load_dataframe(snap_ages.path, column_names=COLUMN_NAMES_AGES)
+    tb_all = load_table(snap_all, column_names=COLUMN_NAMES)
+    tb_ages = load_table(snap_ages, column_names=COLUMN_NAMES_AGES)
+    # Both files are part of the same Karlinsky and Kobak data product. Use a single origin object
+    # so downstream concatenation does not render duplicate chart sources for the same source.
+    origin = tb_all["deaths"].metadata.origins
+    for col in tb_ages.columns:
+        tb_ages[col].metadata.origins = origin
 
     #
     # Process data.
     #
-    # Create a new table and ensure all columns are snake-case.
-    tb_all = Table(df_all, short_name=paths.short_name, underscore=True)
-    tb_ages = Table(df_ages, short_name=f"{paths.short_name}_by_age", underscore=True)
+    # Ensure all columns are snake-case.
+    tb_all.metadata.short_name = paths.short_name
+    tb_all = tb_all.underscore()
+    tb_ages.metadata.short_name = f"{paths.short_name}_by_age"
+    tb_ages = tb_ages.underscore()
     # Set index
     tb_all = tb_all.set_index(["country", "year", "time"], verify_integrity=True)
     tb_ages = tb_ages.set_index(["country", "year", "age", "sex", "time"], verify_integrity=True)
@@ -76,11 +81,11 @@ def run(dest_dir: str) -> None:
     log.info("xm_karlinsky_kobak.end")
 
 
-def load_dataframe(path: Path | str, column_names: list[str]) -> pd.DataFrame:
+def load_table(snap: Snapshot, column_names: list[str]) -> Table:
     """Load the data from the latest version of the dataset."""
-    df = pd.read_csv(path, names=column_names, encoding="latin-1")
+    tb = snap.read_csv(names=column_names, encoding="latin-1")
     # Check columns
-    assert df.reset_index().shape[1] == len(column_names) + 1, (
+    assert tb.reset_index().shape[1] == len(column_names) + 1, (
         "Check columns in source! There seems to be more (or less) columns."
     )
-    return df
+    return tb
