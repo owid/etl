@@ -11,11 +11,6 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# It may happen that the data for the most recent year is incomplete.
-# If so, define the following to be last year fully informed.
-# LAST_INFORMED_YEAR = 2021
-LAST_INFORMED_YEAR = None
-
 # Columns to keep from raw dataset and how to rename them.
 COLUMNS = {
     "jurisdiction": "country",
@@ -97,46 +92,27 @@ COLUMNS = {
 
 
 def sanity_check_inputs(tb_economy: Table, tb_coverage: Table) -> None:
-    """Run sanity checks on the raw data from meadow.
+    """Assert that the meadow tables have matching keys and plausible value ranges."""
+    error = "Economy and coverage tables have different jurisdictions."
+    assert set(tb_economy["jurisdiction"]) == set(tb_coverage["jurisdiction"]), error
+    error = "Economy and coverage tables have different years."
+    assert set(tb_economy["year"]) == set(tb_coverage["year"]), error
+    error = "Duplicate (jurisdiction, year) rows."
+    assert not tb_economy.duplicated(subset=["jurisdiction", "year"]).any(), error
+    assert not tb_coverage.duplicated(subset=["jurisdiction", "year"]).any(), error
 
-    Parameters
-    ----------
-    tb_economy : Table
-        Raw data from meadow on prices.
-    tb_coverage : Table
-        Raw data from meadow on coverage.
-
-    """
-    # The economy and coverage tables historically had the same jurisdiction set, but starting in
-    # the v2026.1 release they drift slightly (e.g. economy adds HK/Macau; coverage retains
-    # legacy "Dc"/"District of Columbia" duplicates). Surface the differences as warnings and let
-    # the outer merge handle the row alignment.
-    economy_only = set(tb_economy["jurisdiction"]) - set(tb_coverage["jurisdiction"])
-    coverage_only = set(tb_coverage["jurisdiction"]) - set(tb_economy["jurisdiction"])
-    if economy_only:
-        log.warning(f"Jurisdictions in economy but not coverage: {sorted(economy_only)}")
-    if coverage_only:
-        log.warning(f"Jurisdictions in coverage but not economy: {sorted(coverage_only)}")
-    extra_coverage_years = set(tb_coverage["year"]) - set(tb_economy["year"])
-    if extra_coverage_years:
-        log.warning(f"Coverage has years not present in economy: {sorted(extra_coverage_years)}")
-
-    # If the last year in the data is the current year, or if the data for the last year is missing, raise a warning.
-    for tb in [tb_economy, tb_coverage]:
-        column = tb.columns[2]
-        if (
-            tb["year"].max() == int(paths.version.split("-")[0])
-            or tb[["year", column]].groupby(["year"], observed=True).sum(min_count=1)[column].isnull().iloc[-1]
-        ):
-            log.warning("The last year in the data may be incomplete. Define LAST_INFORMED_YEAR.")
+    # All coverage and price values must be non-negative.
+    coverage_cols = [c for c in tb_coverage.columns if c not in ["jurisdiction", "year"]]
+    price_cols = [c for c in tb_economy.columns if c not in ["jurisdiction", "year"]]
+    error = "Negative coverage or price values found."
+    assert tb_coverage[coverage_cols].min().min() >= 0, error
+    assert tb_economy[price_cols].min().min() >= 0, error
 
 
 def sanity_check_outputs(tb_combined: Table) -> None:
     """Run sanity checks on the output table."""
     error = "There should be no columns with only nans."
     assert tb_combined.columns[tb_combined.isna().all()].empty, error
-    error = "Country named 'World' should be included in the countries file."
-    assert "World" in set(tb_combined["country"]), error
 
     # Warn if a country had a non-zero value in the prior year and dropped to zero in the latest
     # year — often a sign of a spurious or partial-year input that needs human review.
@@ -255,7 +231,6 @@ def run() -> None:
     #
     # Process data.
     #
-    # Sanity checks on raw data.
     sanity_check_inputs(tb_economy=tb_economy, tb_coverage=tb_coverage)
 
     # Convert all values in coverage to percentages (instead of fractions).
@@ -268,18 +243,17 @@ def run() -> None:
     tb_combined = tb_combined[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Harmonize country names.
-    # NOTE: In the file of excluded countries we add all sub-national regions. This way, if an actual country is added
-    # or removed, we will be warned. But, if many sub-national regions are added and including them in the excluded
-    # countries file becomes a problem, we can remove that file and impose below make_missing_countries_nan=True, and
-    # drop nans.
+    # NOTE: We consider only countries, and exclude sub-national jurisdictions.
     tb_combined = paths.regions.harmonize_names(tb_combined)
 
-    # Remove sub-regions within a country.
-    tb_combined = tb_combined.dropna(subset=["country"]).reset_index(drop=True)
-
-    if LAST_INFORMED_YEAR is not None:
-        # Keep only data points prior to (or at) a certain year.
-        tb_combined = tb_combined[tb_combined["year"] <= LAST_INFORMED_YEAR].reset_index(drop=True)
+    # Since the 2026 release, they provide data since 1970 (for Mexico and World); but it's all made of zeros.
+    error = "Expected pre-1989 data to start in 1970, only for Mexico and World, and be all zeros."
+    assert set(tb_combined[tb_combined["year"] < 1989]["country"]) == {"Mexico", "World"}, error
+    assert tb_combined["year"].min() == 1970, error
+    assert tb_combined["year"].min() == 1970, error
+    assert tb_combined[tb_combined["year"] < 1989].drop(columns=["country", "year"]).sum(axis=0).sum() == 0, error
+    # Remove pre-1989 data (which covers only Mexico, and it's made of zeros).
+    tb_combined = tb_combined[tb_combined["year"] >= 1989].reset_index(drop=True)
 
     # Sanity checks on the output table.
     sanity_check_outputs(tb_combined)
