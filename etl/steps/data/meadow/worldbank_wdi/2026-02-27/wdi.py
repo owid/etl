@@ -15,95 +15,54 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Rich-metadata columns we pull out of WDISeries.csv (left = CSV header, right = column
+# the garden step expects). WDISeries.csv is the per-field metadata table the WB
+# ships inside the WDI zip; it tracks the data portal's rich glossary fields and
+# is generally fresher than the DDH API for the same fields.
+WDI_SERIES_RICH_COLUMNS: dict[str, str] = {
+    "Long definition": "long_definition",
+    "Short definition": "short_definition",
+    "Aggregation method": "aggregation_method",
+    "Periodicity": "periodicity",
+    "Base Period": "base_period",
+    "Limitations and exceptions": "limitations_and_exceptions",
+    "Statistical concept and methodology": "statistical_concept_and_methodology",
+    "Development relevance": "development_relevance",
+    "Notes from original source": "notes_from_original_source",
+    "Other notes": "other_notes",
+    "Related source links": "related_source_links",
+    "Other web links": "other_web_links",
+    "Related indicators": "related_indicators",
+    "General comments": "general_comments",
+    "License Type": "license_type",
+}
 
-def create_metadata_table(legacy_json: dict, new_json: dict) -> Table:
-    """Create metadata table by merging legacy and new API metadata.
 
-    Legacy JSON (from api.worldbank.org/v2) provides core fields:
-    - indicator_code, indicator_name, unit, source, topic
+def create_metadata_table(legacy_json: dict, series_csv) -> Table:
+    """Build the wdi_metadata table from two complementary WB sources.
 
-    New JSON (from ddh-openapi.worldbank.org) provides every metadata-glossary
-    field WB exposes per indicator (long_definition, aggregation_method,
-    periodicity, license_type, statistical_concept_and_methodology,
-    development_relevance, etc.).
+    - Legacy v2 JSON (api.worldbank.org/v2): core fields used as join keys
+      downstream — `indicator_code`, `indicator_name`, `unit`, `source`, `topic`.
+      `source` is the `rawName` the garden step matches against `wdi.sources.json`,
+      so we keep legacy as the authoritative source for these four fields. CSV's
+      `Source` agrees with legacy on 1499 of 1516 indicators, but the 17 mismatches
+      are CSV-NaN cases where legacy still has a value (Enterprise Surveys group).
 
-    DDH fields whose snake_cased name would collide with a legacy column are
-    stored under a `_meta` suffix (e.g. `Source` -> `source_meta`) so the
-    legacy values stay authoritative — the garden step uses legacy `source`
-    as a join key into wdi.sources.json.
+    - WDISeries.csv (inside the WDI zip): per-field rich metadata. WB keeps this
+      in sync with their data portal display, while the DDH API lags. CSV `Source`
+      and `Topic` are intentionally omitted here — legacy v2 wins for those.
     """
-    # Parse legacy metadata (core fields)
+    # Legacy JSON → core join-key columns.
     df_legacy = pd.DataFrame(legacy_json["data"])
     df_legacy.rename(columns={"indicator_code": "series_code"}, inplace=True)
 
-    # Parse new metadata (rich descriptions)
-    indicators_data = []
-    for indicator in new_json["data"]:
-        fields = indicator.get("fields", [])
-        indicator_info = {"series_code": None}
+    # WDISeries.csv → rich glossary fields, snake_cased to the garden-expected names.
+    df_csv = pd.read_csv(series_csv, usecols=["Series Code", *WDI_SERIES_RICH_COLUMNS.keys()])
+    df_csv = df_csv.rename(columns={"Series Code": "series_code", **WDI_SERIES_RICH_COLUMNS})
 
-        for field in fields:
-            field_name = field.get("name", "")
-            field_description = field.get("description", "")
-            if field_name == "Series Code":
-                indicator_info["series_code"] = field_description
-            elif field_name == "Code" and not indicator_info["series_code"]:
-                indicator_info["series_code"] = field_description
-            elif field_name == "Long definition":
-                indicator_info["long_definition"] = field_description
-            elif field_name == "Short definition":
-                indicator_info["short_definition"] = field_description
-            elif field_name == "Limitations and exceptions":
-                indicator_info["limitations_and_exceptions"] = field_description
-            elif field_name == "Statistical concept and methodology":
-                indicator_info["statistical_concept_and_methodology"] = field_description
-            elif field_name == "Development relevance":
-                indicator_info["development_relevance"] = field_description
-            elif field_name == "Notes from original source":
-                indicator_info["notes_from_original_source"] = field_description
-            elif field_name == "Aggregation method":
-                indicator_info["aggregation_method"] = field_description
-            elif field_name == "Periodicity":
-                indicator_info["periodicity"] = field_description
-            elif field_name == "Base Period":
-                indicator_info["base_period"] = field_description
-            elif field_name == "License Type":
-                indicator_info["license_type"] = field_description
-            elif field_name == "General comments":
-                indicator_info["general_comments"] = field_description
-            elif field_name == "Other notes":
-                indicator_info["other_notes"] = field_description
-            elif field_name == "Related source links":
-                indicator_info["related_source_links"] = field_description
-            elif field_name == "Other web links":
-                indicator_info["other_web_links"] = field_description
-            elif field_name == "Related indicators":
-                indicator_info["related_indicators"] = field_description
-            # `Source` and `Topic` collide with legacy columns, so store them under `_meta`.
-            elif field_name == "Source":
-                indicator_info["source_meta"] = field_description
-            elif field_name == "Topic":
-                indicator_info["topic_meta"] = field_description
-            # Skipped: Indicator Name (legacy has it), and the taxonomy fields
-            # (Description, First level, Second level, Unit of measure) which only
-            # appear on the ~130 indicators where a classification entry survived
-            # snapshot dedup instead of the rich-metadata entry.
+    df_meta = df_legacy.merge(df_csv, on="series_code", how="left")
 
-        if indicator_info["series_code"]:
-            indicators_data.append(indicator_info)
-
-    df_new = pd.DataFrame(indicators_data)
-
-    # Drop duplicates from new metadata (keep first occurrence)
-    df_new = df_new.drop_duplicates(subset=["series_code"], keep="first")
-
-    # Merge: legacy as base, add rich descriptions from new
-    df_meta = df_legacy.merge(df_new, on="series_code", how="left")
-
-    # Create Table with proper naming
-    tb_meta = Table(df_meta, short_name="wdi_metadata", underscore=True)
-
-    return tb_meta
+    return Table(df_meta, short_name="wdi_metadata", underscore=True)
 
 
 def run() -> None:
@@ -175,11 +134,9 @@ def run() -> None:
         # Add original code as titles
         tb[col].m.title = indicator_code_map[col]
 
-    # Load metadata from both JSON files in snapshot
-    # Legacy JSON provides core fields (indicator_name, source), new JSON provides rich descriptions
+    # Load metadata: legacy JSON for core join keys, WDISeries.csv for rich glossary fields.
     legacy_json = json.load(zf.open("WDIMetadataLegacy.json"))
-    new_json = json.load(zf.open("WDIMetadata.json"))
-    tb_meta = create_metadata_table(legacy_json, new_json)
+    tb_meta = create_metadata_table(legacy_json, zf.open("WDISeries.csv"))
 
     #
     # Save outputs.
