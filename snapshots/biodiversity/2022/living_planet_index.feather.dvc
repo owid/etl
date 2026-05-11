@@ -8,6 +8,12 @@ meta:
       The index value is measured relative to species' populations in 1970 (i.e. 1970 = 1).
 
       To calculate an LPI, a generalised additive modelling framework is used to determine the underlying trend in each population time-series. Average rates of change are then calculated and aggregated to the species level. For the global LPI, the method of aggregation has recently been revised to include a weighting system which gives trends from more species-rich systems, realms and groups more weight in the final index.
+
+      The Living Planet Database contains tens of thousands of vertebrate population time-series from around the world. It is the largest collection of its kind, and is publicly available, making it an invaluable tool for both research and conservation.
+
+      This dataset contains time-series of population abundance data for vertebrate species spanning years between 1970 and 2021. This is the public version of the database as confidential records that cannot be shared have been removed. The open-source code used to calculate the Living Planet Index using this data set can be found here: [https://github.com/Zoological-Society-of-London/rlpi](https://github.com/Zoological-Society-of-London/rlpi).
+
+      [Text from [Living Planet Index website](https://www.livingplanetindex.org/data_portal)]
     citation_full: World Wildlife Fund (WWF) and Zoological Society of London (2022). Living Planet Report 2022 – Building a nature-positive society. Almond, R.E.A., Grooten, M., Juffe Bignoli, D. and Petersen, T. (Eds). WWF, Gland, Switzerland.
     attribution_short: WWF and ZSL
     url_main: http://stats.livingplanetindex.org/

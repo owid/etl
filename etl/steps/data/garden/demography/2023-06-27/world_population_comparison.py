@@ -1,119 +1,71 @@
-from typing import cast
-
-import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
 
-P = PathFinder(__file__)
+paths = PathFinder(__file__)
 log = get_logger()
 
 
 def run(dest_dir: str) -> None:
     log.info("world_population_comparison: start")
-    # load snapshot
-    data = pd.read_csv(Snapshot("fasttrack/2023-06-19/world_population_comparison.csv").path)
+    snap = Snapshot("fasttrack/2023-06-19/world_population_comparison.csv")
+    tb = snap.read_csv()
 
-    # create empty dataframe and table
-    tb = Table(data, short_name=P.short_name)
-
-    # Add sources
     tb_hyde = get_hyde_32()
     tb_gapminder = get_gapminder_v7()
     tb_un = get_un_2022()
     tb_owid = get_owid()
-    tb = (
-        pd.concat([tb, tb_hyde, tb_gapminder, tb_un, tb_owid], ignore_index=True)
-        .set_index(["country", "year"])
-        .sort_index()
-    )
-    tb.metadata.short_name = P.short_name
+    tb = pr.concat([tb, tb_hyde, tb_gapminder, tb_un, tb_owid], ignore_index=True)
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
 
-    # add table, update metadata from *.meta.yml and save
-    print(tb)
-    ds = create_dataset(dest_dir, tables=[tb])
+    ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
     ds.save()
     log.info("world_population_comparison: end")
 
 
 def get_hyde_32() -> Table:
-    """Load HYDE 3.2 data and format accordingly."""
     log.info("world_population_comparison: load hyde")
-    ds = cast(Dataset, P.load_dependency(namespace="hyde", short_name="baseline"))
+    ds = paths.load_dataset("baseline", namespace="hyde")
     tb = ds["population"].reset_index()
-    # Get only World data, add source name
     tb = tb.groupby("year", as_index=False)[["population"]].sum()
-    tb.loc[:, "country"] = "HYDE 3.2 (2017)"
-
-    # Rename population column
-    tb = tb.rename(columns={"population": "world_population"})
-    return tb
+    tb["country"] = "HYDE 3.2 (2017)"
+    return tb.rename(columns={"population": "world_population"})
 
 
 def get_gapminder_v7() -> Table:
-    """Load Gapminder v7 data and format accordingly."""
     log.info("world_population_comparison: load gapminder")
-    ds = cast(Dataset, P.load_dependency(namespace="gapminder", short_name="population"))
+    ds = paths.load_dataset("population", namespace="gapminder")
     tb = ds["population"].reset_index()
-    # Get only World data, add source name
     tb = tb.groupby("year", as_index=False)[["population"]].sum()
-    tb.loc[:, "country"] = "Gapminder v7 (2022)"
-
-    # Rename population column
-    tb = tb.rename(columns={"population": "world_population"})
-    return tb
+    tb["country"] = "Gapminder v7 (2022)"
+    return tb.rename(columns={"population": "world_population"})
 
 
 def get_un_2022() -> Table:
-    """Load UN 2022 data and format accordingly.
-
-    Both historical estimates and medium variant projections are loaded.
-    """
+    """Load UN 2022 data — historical estimates and medium variant projections."""
     log.info("world_population_comparison: load un wpp")
-    ds = cast(Dataset, P.load_dependency(namespace="un", short_name="un_wpp"))
+    ds = paths.load_dataset("un_wpp", namespace="un")
     tb = ds["population"].reset_index()
-    # Get estimates: only World data, all sexes and ages, add source name
-    tb_estimates = tb[
-        (tb["location"] == "World")
-        & (tb["sex"] == "all")
-        & (tb["age"] == "all")
-        & (tb["variant"] == "estimates")
-        & (tb["metric"] == "population")
-    ]
-    tb_estimates = tb_estimates[["year", "value"]]
-    tb_estimates.loc[:, "country"] = "UN (2022 revision)"
-    # Get projections: only World data, all sexes and ages, add source name
-    tb_proj = tb[
-        (tb["location"] == "World")
-        & (tb["sex"] == "all")
-        & (tb["age"] == "all")
-        & (tb["variant"] == "medium")
-        & (tb["metric"] == "population")
-    ]
-    tb_proj = tb_proj[["year", "value"]]
-    tb_proj.loc[:, "country"] = "UN, medium variant projection (2022 revision)"
 
-    # Merge estimates & projections
-    tb = pd.concat([tb_estimates, tb_proj], ignore_index=True)
+    common = (tb["location"] == "World") & (tb["sex"] == "all") & (tb["age"] == "all") & (tb["metric"] == "population")
+    tb_estimates = tb[common & (tb["variant"] == "estimates")][["year", "value"]]
+    tb_estimates["country"] = "UN (2022 revision)"
+    tb_proj = tb[common & (tb["variant"] == "medium")][["year", "value"]]
+    tb_proj["country"] = "UN, medium variant projection (2022 revision)"
 
-    # Rename population column
-    tb = tb.rename(columns={"value": "world_population"})  # ty: ignore
-    return tb
+    tb = pr.concat([tb_estimates, tb_proj], ignore_index=True)
+    return tb.rename(columns={"value": "world_population"})
 
 
 def get_owid() -> Table:
-    """Load Gapminder v7 data and format accordingly."""
+    """Load OWID population dataset."""
     log.info("world_population_comparison: load owid")
-    ds = cast(Dataset, P.load_dependency(namespace="demography", short_name="population"))
+    ds = paths.load_dataset("population", namespace="demography")
     tb = ds["population"].reset_index()
-    # Get only World data, add source name
     tb = tb[tb["country"] == "World"]
     tb["country"] = "OWID based on HYDE 3.2, Gapminder v7 and UN 2022"
     tb = tb[["country", "year", "population"]]
-
-    # Rename population column
-    tb = tb.rename(columns={"population": "world_population"})
-
-    return tb
+    return tb.rename(columns={"population": "world_population"})
