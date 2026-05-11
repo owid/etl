@@ -22,9 +22,9 @@ dimensions:
       type: dropdown
     choices:
       - slug: democratic_features
-        name: "Democratic features"
+        name: "­­­­­Democratic features"
       - slug: political_regime
-        name: "Political regime"
+        name: "­­­­­Political regime"
   - slug: sub_metric
     name: "Sub-metric"
     presentation:
@@ -35,9 +35,9 @@ dimensions:
       - slug: main_classification
         name: "Main classification"
       - slug: number_and_share_of_democracies
-        name: "Number and share of democracies"
+        name: "­­Number and share of democracies"
       - slug: people_living_in_democracies
-        name: "People living in democracies"
+        name: "­­People living in democracies"
       - slug: stateness_index
         name: "Stateness index"
       - slug: political_participation_index
@@ -51,13 +51,13 @@ dimensions:
       - slug: basic_state_functions_score
         name: "Basic state functions score"
       - slug: free_and_fair_elections_score
-        name: "Free and fair elections score"
+        name: "­­Free and fair elections score"
       - slug: effective_power_to_govern_score
         name: "Effective power to govern score"
       - slug: freedom_of_association_score
-        name: "Freedom of association score"
+        name: "­Freedom of association score"
       - slug: freedom_of_expression_score
-        name: "Freedom of expression score"
+        name: "­Freedom of expression score"
       - slug: separation_of_powers_score
         name: "Separation of powers score"
       - slug: civil_rights_score

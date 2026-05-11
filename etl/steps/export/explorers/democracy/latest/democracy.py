@@ -46,8 +46,6 @@ TOP_CONFIG = {
 }
 
 
-
-
 def run() -> None:
     explorers = [
         paths.create_collection(
