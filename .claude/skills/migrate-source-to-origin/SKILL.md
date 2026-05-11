@@ -377,6 +377,8 @@ match `YYYY-MM-DD`, `YYYY`, or `latest`).
 
 ## Out of scope
 
-- Batch driving via `dag/migrated.yml` — invoke this skill once per file and
-  loop in your conversation.
+- Batch driving via `dag/migrated.yml`. For multi-file requests, dispatch one
+  subagent per file in parallel (Agent tool calls in a single message). Don't
+  process serially yourself — that's slow and burns context. Each subagent
+  invokes this skill independently.
 - Indicator-level metadata (garden / grapher steps) — only snapshot DVC `meta.origin`.
