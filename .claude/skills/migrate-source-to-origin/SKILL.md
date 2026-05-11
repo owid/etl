@@ -147,6 +147,16 @@ Institution or author(s).
   In either compilation case, consider an `attribution_short` that gives the
   recognizable shorthand readers see on charts (often the dataset names, e.g.
   `HYDE and FAO`).
+- **Paper-backed named products**: when a paper or research group has
+  produced a recognizable named data product (a website, database, or
+  project that a chart reader would identify — e.g. `Sea Around Us`,
+  `V-Dem`, `World Inequality Database`, `Human Life-Table Database`),
+  use the product name as `producer` rather than the author surnames.
+  Keep the author names in `citation_full`. Acronyms (`V-Dem`, `WID`,
+  `HLD`) usually belong in `attribution_short`, not `producer`. Apply
+  this only when the product is clearly more chart-readable than the
+  authors — for one-off papers with no public product, authors are
+  correct.
 - Must NOT contain: years, semicolons, `&` (use `and`), `OWID` / `Our World in Data`,
   trailing period (except when value ends `et al.`).
 - Strip OWID-derivation prefixes: `Our World in Data based on X` → `X`.
