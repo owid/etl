@@ -64,7 +64,9 @@ It's easier to do it in two steps:
 
 import datetime as dt
 import json
+import re
 import tempfile
+import time
 import zipfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -92,6 +94,31 @@ LEGACY_API_BASE_URL = "https://api.worldbank.org/v2/indicator"
 
 # Number of parallel workers for fetching legacy metadata
 MAX_WORKERS = 20
+
+# DDH is intermittently flaky (502 Bad Gateway, occasionally empty responses).
+# Apply bounded retries with exponential backoff to any call hitting it.
+DDH_RETRY_STATUSES = (500, 502, 503, 504)
+DDH_RETRY_MAX_ATTEMPTS = 6
+DDH_RETRY_BACKOFF_BASE = 2.0
+
+
+def _ddh_get_json(url: str, timeout: int = 120) -> dict:
+    """GET a DDH URL and decode JSON, retrying on transient errors."""
+    last_err: Exception | None = None
+    for attempt in range(DDH_RETRY_MAX_ATTEMPTS):
+        try:
+            response = requests.get(url, timeout=timeout)
+            if response.status_code in DDH_RETRY_STATUSES:
+                last_err = requests.HTTPError(f"{response.status_code} on {url}")
+            else:
+                response.raise_for_status()
+                return response.json()
+        except (requests.RequestException, json.JSONDecodeError) as e:
+            last_err = e
+        sleep_s = DDH_RETRY_BACKOFF_BASE**attempt
+        print(f"  DDH request failed ({last_err!r}); retrying in {sleep_s:.0f}s [attempt {attempt + 1}/{DDH_RETRY_MAX_ATTEMPTS}]")
+        time.sleep(sleep_s)
+    raise RuntimeError(f"DDH request failed after {DDH_RETRY_MAX_ATTEMPTS} attempts: {url}") from last_err
 
 
 @click.command()
@@ -127,6 +154,38 @@ def main(upload: bool) -> None:
     snap.dvc_add(upload=upload)
 
 
+def _score_indicator_entry(indicator: dict) -> tuple[int, int, int, int]:
+    """Score one DDH indicator entry for dedupe. Higher is better.
+
+    Priority (lexicographic on the tuple):
+      1. Has a non-empty `Long definition` — keeps rich entries over taxonomy-only stubs
+         (`Code` + `Description` + `First level` + `Second level`).
+      2. Highest `Base Period` year — resolves duplicates like
+         `NY.GDP.PCAP.PP.KD` where WB ships both the legacy 2017-PPP entry and
+         the new 2021-PPP entry; the 2017 one was winning under last-wins.
+      3. Number of non-empty fields filled in.
+      4. Total content length, as a final tiebreak.
+    """
+    has_long_def = 0
+    base_period = 0
+    n_filled = 0
+    total_len = 0
+    for field in indicator.get("fields", []):
+        desc = (field.get("description") or "").strip()
+        if not desc:
+            continue
+        n_filled += 1
+        total_len += len(desc)
+        name = field.get("name")
+        if name == "Long definition":
+            has_long_def = 1
+        elif name == "Base Period":
+            m = re.search(r"\d{4}", desc)
+            if m:
+                base_period = int(m.group(0))
+    return (has_long_def, base_period, n_filled, total_len)
+
+
 def add_json_metadata_to_zip(zip_path: Path) -> None:
     """Fetch JSON metadata from API and add it to the existing zip file."""
     all_indicators = []
@@ -136,9 +195,7 @@ def add_json_metadata_to_zip(zip_path: Path) -> None:
     # Fetch all indicators using pagination
     while True:
         url = f"{API_BASE_URL}?dataset_unique_id={DATASET_ID}&top={batch_size}&skip={skip}"
-        response = requests.get(url)
-        response.raise_for_status()
-        batch_data = response.json()
+        batch_data = _ddh_get_json(url)
 
         # Check if we got any data
         if not batch_data.get("data") or len(batch_data["data"]) == 0:
@@ -152,23 +209,27 @@ def add_json_metadata_to_zip(zip_path: Path) -> None:
 
         skip += batch_size
 
-    # Deduplicate by series code - keep the last occurrence (likely most recent)
-    unique_indicators = {}
+    # The DDH API returns multiple entries per series code: typically several
+    # revisions of the indicator's metadata (e.g. PPP 2017 vs PPP 2021 base year)
+    # plus an occasional "classification-only" stub. WB hasn't yet exposed a
+    # last_modified flag (see thread with apirlea@worldbank.org, Sep 2025), so
+    # we pick the best entry per code via `_score_indicator_entry`.
+    entries_by_code: dict[str, list[dict]] = {}
     for indicator in all_indicators:
-        # Find the series code in fields
         series_code = None
         for field in indicator.get("fields", []):
-            if field.get("name") == "Series Code":
+            if field.get("name") in ("Series Code", "Code"):
                 series_code = field.get("description")
                 break
-            elif field.get("name") == "Code":
-                series_code = field.get("description")
-                break
-
         if series_code:
-            unique_indicators[series_code] = indicator
+            entries_by_code.setdefault(series_code, []).append(indicator)
 
-    deduped_indicators = list(unique_indicators.values())
+    # Stable tiebreak via index: when scores match, prefer the later occurrence
+    # (preserves the previous "last-wins" behaviour for tied entries).
+    deduped_indicators = [
+        max(enumerate(entries), key=lambda x: (_score_indicator_entry(x[1]), x[0]))[1]
+        for entries in entries_by_code.values()
+    ]
     print(
         f"After deduplication: {len(deduped_indicators)} unique indicators (removed {len(all_indicators) - len(deduped_indicators)} duplicates)"
     )
@@ -290,7 +351,7 @@ def add_legacy_metadata_to_zip(zip_path: Path) -> None:
 
 def update_snapshot_metadata(snap: Snapshot) -> None:
     # Load WDI metadata from the json file using the World Bank API.
-    meta_orig = json.loads(requests.get(URL_METADATA).content)
+    meta_orig = _ddh_get_json(URL_METADATA)
 
     assert snap.metadata.origin
 
