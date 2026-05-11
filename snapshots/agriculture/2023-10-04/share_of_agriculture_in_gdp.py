@@ -4,7 +4,7 @@ import click
 import pandas as pd
 
 from etl.backport_helpers import long_to_wide
-from etl.snapshot import Snapshot, SnapshotMeta
+from etl.snapshot import Snapshot
 
 SNAPSHOT_NAMESPACE = Path(__file__).parent.parent.name
 SNAPSHOT_VERSION = Path(__file__).parent.name
@@ -23,22 +23,8 @@ def main(upload: bool) -> None:
         "backport/latest/dataset_3009_share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data__split_values.feather"
     )
     snap_values.pull()
-    snap_config = Snapshot(
-        "backport/latest/dataset_3009_share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data__split_config.json"
-    )
-    snap_config.pull()
-
-    # Create snapshot metadata for the new file
-    snap = Snapshot(f"{SNAPSHOT_NAMESPACE}/{SNAPSHOT_VERSION}/share_of_agriculture_in_gdp.feather")
-
-    meta = SnapshotMeta(**snap_values.metadata.to_dict())
-    meta.namespace = SNAPSHOT_NAMESPACE
-    meta.version = SNAPSHOT_VERSION
-    meta.short_name = "share_of_agriculture_in_gdp"
-    meta.is_public = True
-    meta.fill_from_backport_snapshot(snap_config.path)
-
-    snap.metadata = meta
+    # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
+    snap = Snapshot("agriculture/2023-10-04/share_of_agriculture_in_gdp.feather")
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))

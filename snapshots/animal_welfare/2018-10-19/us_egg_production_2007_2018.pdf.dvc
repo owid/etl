@@ -9,7 +9,7 @@ meta:
     url_main: https://esmis.nal.usda.gov/concern/publications/73667q50n
     # NOTE: Original USDA URL is no longer available. This is an archived copy hosted by The Humane League on OSF.
     url_download: https://osf.io/download/xqt4z/
-    date_accessed: '2026-04-17'
+    date_accessed: '2018-10-19'
     date_published: '2018-10-19'
     license:
       name: Public domain
