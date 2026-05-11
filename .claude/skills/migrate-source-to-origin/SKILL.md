@@ -134,6 +134,17 @@ exception under `description` below).
 If you cannot point to a producer-published name for the broader data product
 and a producer-defined name for the slice, default to "they coincide".
 
+**OWID-defined slice exception.** If the legacy `meta.name` clearly
+describes a topical slice that the producer doesn't publish under that
+name (e.g. legacy `meta.name: "Perceptions of spending on health
+expenditure - IPSOS (2016)"` vs. producer's title `Perils of Perception
+Study`), use `title_snapshot: "<data product> - <slice descriptor>"` to
+preserve the slice descriptor even though the slicing is OWID's. The
+parent `title` is still the producer-issued title, and
+`description_snapshot` stays empty unless the legacy has slice-specific
+text. Without this, useful slice info from `meta.name` gets discarded
+under the strict "meta.name is junk" rule.
+
 ## STEP 2: Field rules
 
 ### `producer` (required, ≤255 chars)
