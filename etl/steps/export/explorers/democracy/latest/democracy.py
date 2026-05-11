@@ -19,15 +19,15 @@ paths = PathFinder(__file__)
 
 # (yaml_filename_key, dataset_slug, dataset_display_name)
 # Order = canonical order of the `Dataset` dropdown choices.
-SOURCES = [
-    ("vdem", "varieties_of_democracy", "Varieties of Democracy"),
-    ("row", "regimes_of_the_world", "Regimes of the World"),
-    ("lexical_index", "lexical_index", "Lexical Index"),
-    ("fh", "freedom_house", "Freedom House"),
-    ("bti", "bertelsmann_transformation_index", "Bertelsmann Transformation Index"),
-    ("eiu", "economist_intelligence_unit", "Economist Intelligence Unit"),
-    ("polity", "polity", "Polity"),
-]
+SOURCES = {
+    "vdem": "Varieties of Democracy",
+    "row": "Regimes of the World",
+    "lexical_index": "Lexical Index",
+    "fh": "Freedom House",
+    "bti": "Bertelsmann Transformation Index",
+    "eiu": "Economist Intelligence Unit",
+    "polity": "Polity",
+}
 
 
 TOP_CONFIG = {
@@ -46,14 +46,16 @@ TOP_CONFIG = {
 }
 
 
+
+
 def run() -> None:
     explorers = [
         paths.create_collection(
-            config=paths.load_collection_config(f"democracy.{file_key}.config.yml"),
-            short_name=ds_slug,  # becomes the `dataset` dim choice slug after combine
+            config=paths.load_collection_config(f"democracy.{slug}.config.yml"),
+            short_name=slug,  # becomes the `dataset` dim choice slug after combine
             explorer=True,
         )
-        for file_key, ds_slug, _ in SOURCES
+        for slug in SOURCES.keys()
     ]
 
     final = combine_collections(
@@ -63,7 +65,7 @@ def run() -> None:
         force_collection_dimension=True,
         collection_dimension_slug="dataset",
         collection_dimension_name="Dataset",
-        collection_choices_names=[name for _, _, name in SOURCES],
+        collection_choices_names=[name for name in SOURCES.values()],
     )
 
     final.save(tolerate_extra_indicators=True)
