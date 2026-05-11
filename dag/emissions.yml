@@ -75,7 +75,6 @@ steps:
     - data://grapher/gcp/2025-11-13/global_carbon_budget
     - data://grapher/emissions/2025-12-04/national_contributions
 
-  # Emissions - Greenhouse gas emissions by custom sector.
   #
   data-private://garden/emissions/2025-09-24/emissions_by_custom_sector:
     - snapshot-private://wri/2025-09-24/emissions_by_detailed_sector.json
