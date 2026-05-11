@@ -7,5 +7,5 @@ tables:
         title: Population
         short_unit: ""
         unit: ""
-        description_short: |-
+        description: |-
           Population by country and year.

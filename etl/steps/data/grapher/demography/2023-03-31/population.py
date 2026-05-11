@@ -98,9 +98,7 @@ def add_projection_and_historical_metrics(table: Table, year_threshold: int, met
         metric_suffix="historical",
         title_suffix="(historical estimates)",
         display_name_suffix="",
-        description=_modify_variable_description_historical(
-            table[metric].metadata.description or table[metric].metadata.description_short or ""
-        ),
+        description=_modify_variable_description_historical(table[metric].metadata.description),
     )
     # Add projection metric
     table = _create_metric_version_from_mask(
@@ -110,9 +108,7 @@ def add_projection_and_historical_metrics(table: Table, year_threshold: int, met
         metric_suffix="projection",
         title_suffix="(future projections)",
         display_name_suffix="(future projections)",
-        description=_modify_variable_description_projection(
-            table[metric].metadata.description or table[metric].metadata.description_short or ""
-        ),
+        description=_modify_variable_description_projection(table[metric].metadata.description),
     )
     return table
 
@@ -189,7 +185,7 @@ def _create_metric_version_from_mask(
         else:
             display_name = table[metric_new].metadata.title
         table[metric_new].metadata.display["name"] = f"{display_name} {display_name_suffix}"
-    table[metric_new].metadata.description_short = description
+    table[metric_new].metadata.description = description
     # Get dtype
     dtype = table[metric].dtype
     if "int" in str(dtype).lower():
