@@ -382,8 +382,6 @@ tables:
             subtitle: Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections.
             hasMapTab: true
             tab: map
-            yAxis:
-              min: auto
             map:
               colorScale:
                 baseColorScheme: YlGnBu
@@ -452,8 +450,6 @@ tables:
             subtitle: Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Liberal democracies are political systems that hold meaningful, free and fair, and multi-party elections, and their citizens have further individual rights, are equal before the law, and the legislative and the courts constrain the executive.
             hasMapTab: true
             tab: map
-            yAxis:
-              min: auto
             map:
               colorScale:
                 baseColorScheme: YlGnBu
@@ -2981,7 +2977,6 @@ tables:
                   - 0.8
                   - 0.9
                   - 1
-              columnSlug: grapher/democracy/2026-03-17/vdem/vdem_multi_with_regions#indiv_libs_vdem__estimate_low
         description_from_producer: |-
           Question: To what extent are laws transparent and rigorously enforced and public administration impartial, and to what extent do citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion?
 

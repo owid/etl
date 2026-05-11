@@ -554,8 +554,6 @@ tables:
             subtitle: '[Data](#dod:regimes-polity) by [Polity 5](#dod:polity). Democracies are political systems with broadly open, multi-party, and competitive elections for a chief executive who faces comprehensive institutional constraints, and political participation is broadly competitive.'
             hasMapTab: true
             tab: map
-            yAxis:
-              min: auto
             map:
               colorScale:
                 baseColorScheme: YlGnBu
