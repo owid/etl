@@ -34,7 +34,7 @@ steps:
   data://grapher/malnutrition/2024-12-16/malnutrition:
     - data://garden/malnutrition/2024-12-16/malnutrition
   data://garden/malnutrition/2024-12-16/malnutrition:
-    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/worldbank_wdi/2026-02-27/wdi
     - data://garden/un/2024-07-12/un_wpp
 
   #
@@ -51,7 +51,7 @@ steps:
 
   # Internet
   data://garden/technology/2024-12-23/internet:
-    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/worldbank_wdi/2026-02-27/wdi
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
@@ -300,22 +300,6 @@ steps:
     - data://meadow/news/2024-05-23/gdelt_v2
   data://grapher/news/2024-05-23/gdelt_v2:
     - data://garden/news/2024-05-23/gdelt_v2
-
-  # World Development Indicators - WDI
-  # TO BE ARCHIVED
-  data://meadow/worldbank_wdi/2024-05-20/wdi:
-    - snapshot://worldbank_wdi/2024-05-20/wdi.zip
-
-  data://garden/worldbank_wdi/2024-05-20/wdi:
-    - snapshot://worldbank_wdi/2024-05-20/wdi.zip
-    - data://meadow/worldbank_wdi/2024-05-20/wdi
-    - data://garden/demography/2024-07-15/population
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
-
-  data://grapher/worldbank_wdi/2024-05-20/wdi:
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-
   # World Development Indicators - WDI
   data://meadow/worldbank_wdi/2025-01-24/wdi:
     - snapshot://worldbank_wdi/2025-01-24/wdi.zip
@@ -339,7 +323,7 @@ steps:
     - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_nature.csv
   data://garden/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://meadow/aviation_safety_network/2024-06-05/aviation_statistics
-    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/worldbank_wdi/2026-02-27/wdi
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
 
