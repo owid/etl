@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Ruggles et al.
+    producer: IPUMS USA
     title: IPUMS USA
     description: |-
       Samples of the decennial Census (1900-2000) and the 2018 ACS from IPUMS-USA has been used to construct variables on the percentage of Americans living alone, by age and sex.
