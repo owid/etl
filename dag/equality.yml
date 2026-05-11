@@ -10,6 +10,16 @@ steps:
   data://grapher/lgbt_rights/2023-04-27/lgbti_policy_index:
     - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
 
+  # LGBTI National Policy Dataset (Velasco, 2026)
+  data://meadow/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
+    - snapshot://lgbt_rights/2026-05-11/lgbti_national_policy_dataset.csv
+  data://garden/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
+    - data://meadow/lgbt_rights/2026-05-11/lgbti_national_policy_dataset
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
+    - data://garden/lgbt_rights/2026-05-11/lgbti_national_policy_dataset
+
   # Equaldex dataset
   data://meadow/lgbt_rights/2025-04-07/equaldex:
     - snapshot://lgbt_rights/2025-04-07/equaldex.csv
