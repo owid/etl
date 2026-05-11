@@ -390,6 +390,57 @@ class Dataset:
                 )
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
+    def update_metadata_from_dict(
+        self,
+        metadata: dict[str, Any],
+        if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+        errors: Literal["ignore", "warn", "raise"] = "raise",
+        extra_variables: Literal["raise", "ignore"] = "raise",
+    ) -> None:
+        """Update dataset and table metadata from a parsed metadata dictionary."""
+        from owid.catalog.core.meta import Source
+        from owid.catalog.core.yaml_metadata import update_metadata_from_dict
+
+        for k, v in metadata.get("dataset", {}).items():
+            if k != "sources":
+                setattr(self.metadata, k, v)
+
+        dataset_sources = metadata.get("dataset", {}).get("sources")
+        if dataset_sources is not None:
+            if if_source_exists == "replace":
+                self.metadata.sources = []
+            new_sources = []
+            for source_annot in dataset_sources:
+                ds_sources = [s for s in self.metadata.sources if s.name == source_annot["name"]]
+                if ds_sources:
+                    ds_sources[0].update(**source_annot)
+                elif self.metadata.sources and if_source_exists == "fail":
+                    raise ValueError(
+                        f"Source {self.metadata.sources[0].name} would be overwritten by source {source_annot['name']}"
+                    )
+                else:
+                    new_sources.append(Source(**source_annot))
+            self.metadata.sources.extend(new_sources)
+
+        for table_name in metadata.get("tables", {}).keys():
+            try:
+                table = self[table_name]
+            except KeyError as e:
+                if errors == "raise":
+                    raise e
+                if errors == "warn":
+                    warnings.warn(str(e))
+                continue
+            update_metadata_from_dict(
+                table,
+                metadata,
+                table_name,
+                if_origins_exist=if_origins_exist,
+                extra_variables=extra_variables,
+            )
+            table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
+
     def index(self, catalog_path: Path = Path("/")) -> pd.DataFrame:
         """Generate an index DataFrame describing all tables in this dataset.
 

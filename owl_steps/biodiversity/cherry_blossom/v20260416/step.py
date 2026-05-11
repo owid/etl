@@ -77,7 +77,7 @@ def cherry_blossom(historical_data: Snapshot, recent_data: Snapshot):
     )
 
     # ── Combine ──────────────────────────────────────────────────────
-    tb = pr.concat([tb_hist, tb_recent], ignore_index=True, short_name="cherry_blossom")
+    tb = pr.concat([tb_recent, tb_hist], ignore_index=True, short_name="cherry_blossom")
 
     # ── Convert MDD flowering date → day of year ─────────────────────
     year_zpad = tb["year"].astype(str).str.zfill(4)
@@ -101,15 +101,6 @@ def cherry_blossom(historical_data: Snapshot, recent_data: Snapshot):
 
 
 # ── Actions ──────────────────────────────────────────────────────────
-
-
-@Action
-def export_csv(cherry_blossom: Dataset):
-    """Export cherry blossom data to CSV for quick inspection."""
-    df = cherry_blossom.load()
-    out = "/tmp/cherry_blossom.csv"
-    df.to_csv(out, index=False)
-    print(f"  wrote {out} ({len(df)} rows)")
 
 
 @Action(kind="grapher")

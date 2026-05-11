@@ -195,6 +195,9 @@ def _prepare_table(df: pd.DataFrame | Table, name: str, meta: dict[str, Any]) ->
         for col_name, col_meta in columns_meta.items()
         if col_meta.get("role") in {"entity", "time", "dimension"} and col_name in tb.columns
     ]
+    if not primary_key and {"country", "year"} <= set(tb.columns):
+        primary_key = ["country", "year"]
+
     if primary_key:
         tb = tb.set_index(primary_key, verify_integrity=True)
         tb.metadata.short_name = name
@@ -237,11 +240,45 @@ class Dataset:
 
     @property
     def meta(self) -> dict:
-        """Dataset metadata from the Owl metadata file, lazy-loaded."""
+        """Legacy Owl dataset metadata from the metadata file, lazy-loaded."""
         if self._meta is None:
             all_meta = _load_yaml_sidecar(self._source_file)
             self._meta = all_meta.get("datasets", {}).get(self.name, {})
         return self._meta
+
+    @property
+    def _metadata_path(self) -> pathlib.Path | None:
+        source = pathlib.Path(self._source_file)
+        for path in [source.parent / "meta.yml", source.with_suffix(".meta.yml")]:
+            if path.exists():
+                return path
+        return None
+
+    @property
+    def _catalog_metadata(self) -> dict | None:
+        """Standard catalog metadata for this dataset, if provided.
+
+        Owl supports either the ETL shape at the top level:
+            dataset: ...
+            tables: ...
+
+        or the same catalog shape nested under a dataset name:
+            datasets:
+              my_dataset:
+                dataset: ...
+                tables: ...
+        """
+        all_meta = _load_yaml_sidecar(self._source_file)
+        nested = all_meta.get("datasets", {}).get(self.name, {})
+        if "tables" in nested or "dataset" in nested:
+            return {k: v for k, v in nested.items() if k in {"dataset", "tables", "definitions", "macros"}}
+        if "tables" in all_meta or "dataset" in all_meta:
+            return {k: v for k, v in all_meta.items() if k in {"dataset", "tables", "definitions", "macros"}}
+        return None
+
+    @property
+    def _uses_catalog_metadata(self) -> bool:
+        return self._catalog_metadata is not None
 
     @property
     def _data_path(self) -> pathlib.Path:
@@ -352,13 +389,17 @@ class Dataset:
 
         merged = _deep_merge(dict(self.meta), inline_dict)
         table = _prepare_table(df, self.name, merged)
-        dataset_meta = _dataset_meta_from_dict(merged)
 
         from owl.log import dataset as _log_dataset
 
         out_path = self._data_path
         info = parse_step_file(self._source_file)
         project = load_project(pathlib.Path(self._source_file).parent)
+
+        if self._uses_catalog_metadata:
+            dataset_meta = CatalogDatasetMeta()
+        else:
+            dataset_meta = _dataset_meta_from_dict(merged)
         dataset_meta.channel = self.channel or project.default_channel
         dataset_meta.namespace = info.namespace
         dataset_meta.version = info.version
@@ -367,6 +408,11 @@ class Dataset:
         ds = catalog.Dataset.create_empty(out_path, metadata=dataset_meta)
         ds.add(table)
         ds.save()
+
+        if self._uses_catalog_metadata:
+            assert self._catalog_metadata is not None
+            ds.update_metadata_from_dict(self._catalog_metadata)
+            ds.save()
 
         _log_dataset(f"wrote {out_path} ({len(df)} rows)")
         return pd.DataFrame(df)
