@@ -1,5 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import dataclasses
 import json
 import os
 import re
@@ -8,13 +9,14 @@ from typing import Any, cast
 
 import pandas as pd
 import requests
-from owid.catalog import Dataset, Source, Table, VariableMeta
+from owid.catalog import Dataset, Origin, Table, VariableMeta
 from owid.catalog.core.warnings import DisplayNameWarning, NoOriginsWarning, ignore_warnings
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
 from etl.grapher import helpers as gh
 from etl.helpers import PathFinder, create_dataset
+from etl.snapshot import Snapshot
 
 log = getLogger()
 # Get paths and naming conventions for current step.
@@ -34,7 +36,13 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("un_sdg")
-    assert len(ds_garden.m.sources) == 1, "Expected only one source"
+
+    # Load the snapshot's origin directly: `DatasetMeta` doesn't declare an `origins`
+    # field, so the per-snapshot origin doesn't survive a dataset save/load round-trip.
+    # The snapshot is already a transitive dep of this step (via meadow → garden), so
+    # it's available locally.
+    base_origin = Snapshot("un/2023-08-16/un_sdg.feather").metadata.origin
+    assert base_origin is not None, "Expected un_sdg snapshot to declare an origin"
 
     # Add table of processed data to the new dataset.
     # add tables to dataset
@@ -54,7 +62,7 @@ def run(dest_dir: str) -> None:
         var_gr = var_df.groupby("variable_name")
         source_desc = load_source_description()
         for var_name, df_var in var_gr:
-            df_tab = add_metadata_and_prepare_for_grapher(df_var, ds_garden, source_desc)
+            df_tab = add_metadata_and_prepare_for_grapher(df_var, base_origin, source_desc)
 
             # NOTE: long format is quite inefficient, we're creating a table for every variable
             # converting it to wide format would be too sparse, but we could move dimensions from
@@ -116,7 +124,7 @@ def create_metadata_desc(indicator: str, series_code: str, source_desc: dict, se
     return source_desc_out
 
 
-def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, ds_garden: Dataset, source_desc: dict) -> Table:
+def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, base_origin: Origin, source_desc: dict) -> Table:
     """
     Adding variable name specific metadata - there is an option to add more detailed metadata in the un_sdg.source_description.json
     but the default option is to link out to the metadata pdfs provided by the UN.
@@ -132,21 +140,15 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, ds_garden: Dataset
     )
     df_gr = Table(df_gr, short_name=df_gr["variable_name"].iloc[0])
 
-    source = Source(
-        name=df_gr["source"].iloc[0],
-        url=ds_garden.metadata.sources[0].url,
-        source_data_url=ds_garden.metadata.sources[0].source_data_url,
-        owid_data_url=ds_garden.metadata.sources[0].owid_data_url,
-        date_accessed=ds_garden.metadata.sources[0].date_accessed,
-        publication_date=ds_garden.metadata.sources[0].publication_date,
-        publication_year=ds_garden.metadata.sources[0].publication_year,
-        published_by=ds_garden.metadata.sources[0].published_by,
-    )
+    # Per-variable origin: keep the snapshot's UN-level metadata, but override `producer`
+    # with the cleaned underlying-source name (FAO, WHO, …) so each chart credits the
+    # reporting agency rather than blanket "United Nations".
+    origin = dataclasses.replace(base_origin, producer=df_gr["source"].iloc[0])
 
     df_gr["meta"] = VariableMeta(
         title=df_gr["variable_name_meta"].iloc[0],
         description=source_desc_out,
-        sources=[source],
+        origins=[origin],
         unit=df_gr["long_unit"].iloc[0].lower(),
         short_unit=df_gr["short_unit"].iloc[0],
         additional_info=None,

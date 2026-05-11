@@ -5,31 +5,12 @@ definitions:
       topic_tags:
         - Clean Water & Sanitation
 
-  un_origin: &un_origin
-    producer: United Nations (2023)
-    title: United Nations Sustainable Development Goals (2023-Q2)
-    description: >-
-      The United Nations Sustainable Development Goal (SDG) dataset is the primary collection of data tracking progress
-      towards the SDG indicators,
-
-      compiled from officially-recognized international sources.
-    citation_full: SDG Indicators Database, United Nations, Department of Economic and Social Affairs (2023)
-    url_main: https://unstats.un.org/sdgs/dataportal/database
-    url_download: https://unstats.un.org/sdgapi
-    date_accessed: "2023-08-16"
-    date_published: "2023-08-16"
-    license:
-      url: https://www.un.org/en/about-us/terms-of-use
-
 dataset:
   update_period_days: 730
 tables:
   _6_2_1__sh_san_safe__all_areas:
     variables:
       _6_2_1__sh_san_safe__all_areas:
-        sources: []
-        origins:
-          - *un_origin
         title: 6.2.1 - Proportion of population using safely managed sanitation services, by urban/rural (%) - SH_SAN_SAFE - All areas
         unit: "%"
         short_unit: "%"
@@ -98,9 +79,6 @@ tables:
   _6_1_1__sh_h2o_safe__all_areas:
     variables:
       _6_1_1__sh_h2o_safe__all_areas:
-        sources: []
-        origins:
-          - *un_origin
         title: 6.1.1 - Proportion of population using safely managed drinking water services, by urban/rural (%) - SH_H2O_SAFE - All areas
         unit: "%"
         short_unit: "%"
