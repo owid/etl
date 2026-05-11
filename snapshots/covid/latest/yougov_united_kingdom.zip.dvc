@@ -3,8 +3,8 @@
 meta:
   origin:
     # Country-specific
-    title_snapshot: COVID-19, Behaviour Tracker Data Hub (Hong Kong)
-    url_download: https://github.com/YouGov-Data/covid-19-tracker/raw/master/data/hong-kong.csv
+    title_snapshot: COVID-19, Behaviour Tracker Data Hub (United Kingdom)
+    url_download: https://github.com/YouGov-Data/covid-19-tracker/raw/master/data/united-kingdom.zip
 
     # Data product / Snapshot
     title: COVID-19, Behaviour Tracker Data Hub
@@ -41,6 +41,6 @@ meta:
       url: https://yougov.co.uk/about/terms
 
 outs:
-  - md5: f092af6ba61d088fb6729dca36240d3c
-    size: 8110080
-    path: yougov_hong-kong.csv
+  - md5: e2d9c0a0d20664d78de85d1ed1678ac3
+    size: 6381223
+    path: yougov_united_kingdom.zip

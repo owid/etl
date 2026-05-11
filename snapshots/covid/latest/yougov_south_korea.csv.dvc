@@ -3,8 +3,8 @@
 meta:
   origin:
     # Country-specific
-    title_snapshot: COVID-19, Behaviour Tracker Data Hub (United Kingdom)
-    url_download: https://github.com/YouGov-Data/covid-19-tracker/raw/master/data/united-kingdom.zip
+    title_snapshot: COVID-19, Behaviour Tracker Data Hub (South Korea)
+    url_download: https://github.com/YouGov-Data/covid-19-tracker/raw/master/data/south-korea.csv
 
     # Data product / Snapshot
     title: COVID-19, Behaviour Tracker Data Hub
@@ -41,6 +41,6 @@ meta:
       url: https://yougov.co.uk/about/terms
 
 outs:
-  - md5: e2d9c0a0d20664d78de85d1ed1678ac3
-    size: 6381223
-    path: yougov_united-kingdom.zip
+  - md5: c97c85da64a63df5d1c613658c9a77cd
+    size: 22147340
+    path: yougov_south_korea.csv
