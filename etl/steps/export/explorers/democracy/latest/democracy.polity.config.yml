@@ -19,23 +19,18 @@ dimensions:
     presentation:
       type: dropdown
     choices:
-      - slug: political_regime
-        name: "\xad\xad\xadPolitical regime"
       - slug: democracy
         name: "\xad\xad\xadDemocracy"
+      - slug: political_regime
+        name: "\xad\xad\xadPolitical regime"
   - slug: sub_metric
     name: "Sub-metric"
     presentation:
       type: dropdown
     choices:
+      # Democracy
       - slug: main_index
         name: "Main index"
-      - slug: main_classification
-        name: "Main classification"
-      - slug: number_and_share_of_democracies
-        name: "Number and share of democracies"
-      - slug: people_living_in_democracies
-        name: "People living in democracies"
       - slug: competitiveness_of_executive_recruitment_score
         name: "Competitiveness of executive recruitment score"
       - slug: openness_of_executive_recruitment_score
@@ -48,6 +43,13 @@ dimensions:
         name: "Competitiveness of political participation score"
       - slug: main_index_distribution
         name: "\xad\xad\xad\xad\xadMain index distribution"
+      # Political regime
+      - slug: main_classification
+        name: "Main classification"
+      - slug: number_and_share_of_democracies
+        name: "Number and share of democracies"
+      - slug: people_living_in_democracies
+        name: "People living in democracies"
       - slug: age_of_democracy
         name: "Age of democracy"
       - slug: number_and_share_of_long_standing_democracies

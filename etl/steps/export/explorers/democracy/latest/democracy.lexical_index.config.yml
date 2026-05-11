@@ -19,10 +19,10 @@ dimensions:
     presentation:
       type: dropdown
     choices:
-      - slug: electoral_democracy
-        name: "\xad\xadElectoral democracy"
       - slug: political_regime
         name: "\xad\xadPolitical regime"
+      - slug: electoral_democracy
+        name: "\xad\xadElectoral democracy"
       - slug: full_democracy
         name: "Full democracy"
   - slug: sub_metric
@@ -36,10 +36,6 @@ dimensions:
         name: "Number and share of democracies"
       - slug: people_living_in_democracies
         name: "People living in democracies"
-      - slug: age_of_electoral_democracy
-        name: "\xadAge of electoral democracy"
-      - slug: number_and_share_of_long_standing_electoral_democracies
-        name: "\xadNumber and share of long-standing electoral democracies"
       - slug: elections_for_legislature
         name: "Elections for legislature"
       - slug: elections_for_chief_executive
@@ -52,6 +48,10 @@ dimensions:
         name: "Universal right to vote for men"
       - slug: universal_right_to_vote_for_women
         name: "Universal right to vote for women"
+      - slug: age_of_electoral_democracy
+        name: "\xadAge of electoral democracy"
+      - slug: number_and_share_of_long_standing_electoral_democracies
+        name: "\xadNumber and share of long-standing electoral democracies"
       - slug: political_liberties
         name: "Political liberties"
       - slug: age_of_full_democracy

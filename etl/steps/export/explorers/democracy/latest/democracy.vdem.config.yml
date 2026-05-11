@@ -36,6 +36,7 @@ dimensions:
     presentation:
       type: dropdown
     choices:
+      # electoral democracy
       - slug: main_index
         name: "Main index"
       - slug: elected_political_leaders_index
@@ -48,6 +49,8 @@ dimensions:
         name: "Freedom of association index"
       - slug: freedom_of_expression_index
         name: "Freedom of expression index"
+
+      # liberal democracy
       - slug: electoral_democracy_index
         name: "Electoral democracy index"
       - slug: liberal_political_institutions_index
@@ -58,6 +61,8 @@ dimensions:
         name: "Judicial constraints on the executive index"
       - slug: legislative_constraints_on_the_executive_index
         name: "Legislative constraints on the executive index"
+
+      # participatory democracy
       - slug: participatory_political_institutions_index
         name: "Participatory political institutions index"
       - slug: strong_elected_regional_governments_index
@@ -68,6 +73,7 @@ dimensions:
         name: "Civil society participation index"
       - slug: direct_popular_voting_index
         name: "Direct popular voting index"
+      # deliberative democracy
       - slug: deliberative_political_institutions_index
         name: "Deliberative political institutions index"
       - slug: justified_political_positions_score
@@ -80,6 +86,7 @@ dimensions:
         name: "Elite consultations score"
       - slug: engaged_society_score
         name: "Engaged society score"
+      # egalitarian democracy
       - slug: egalitarian_political_institutions_index
         name: "Egalitarian political institutions index"
       - slug: equal_rights_protection_index
@@ -88,6 +95,7 @@ dimensions:
         name: "Equal access to power index"
       - slug: equal_resource_distribution_index
         name: "Equal resource distribution index"
+      # varieties of democracy
       - slug: main_indices
         name: "Main indices"
 

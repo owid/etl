@@ -28,22 +28,22 @@ dimensions:
     choices:
       - slug: main_index
         name: "Main index"
-      - slug: number_and_share_of_democracies
-        name: "\xad\xad\xadNumber and share of democracies"
-      - slug: people_living_in_democracies
-        name: "\xad\xad\xadPeople living in democracies"
-      - slug: political_participation_index
-        name: "\xadPolitical participation index"
       - slug: political_regime
         name: "Political regime"
       - slug: electoral_pluralism_index
         name: "Electoral pluralism index"
       - slug: functioning_government_index
         name: "Functioning government index"
+      - slug: political_participation_index
+        name: "\xadPolitical participation index"
       - slug: democratic_culture_index
         name: "Democratic culture index"
       - slug: civil_liberties_index
         name: "\xadCivil liberties index"
+      - slug: number_and_share_of_democracies
+        name: "\xad\xad\xadNumber and share of democracies"
+      - slug: people_living_in_democracies
+        name: "\xad\xad\xadPeople living in democracies"
 
 views:
   - dimensions:

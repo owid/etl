@@ -23,12 +23,12 @@ dimensions:
     presentation:
       type: dropdown
     choices:
+      - slug: political_regime
+        name: "\xadPolitical regime"
       - slug: electoral_democracy
         name: "\xadElectoral democracy"
       - slug: liberal_democracy
         name: "\xadLiberal democracy"
-      - slug: political_regime
-        name: "\xadPolitical regime"
       - slug: political_regime_including_ambiguous_categories
         name: "\xadPolitical regime, including ambiguous categories"
   - slug: sub_metric
@@ -228,7 +228,7 @@ views:
             - "#8d6e71"
             - "#c6a1a5"
             - "#f3d0d4"
-            - 
+            -
           customNumericLabels:
             - "Closed autocracy"
             - "Electoral autocracy"
