@@ -211,10 +211,20 @@ landing-page URL goes to `url_main`, the direct-download URL to
 `url_download`. URLs in the legacy must not be silently dropped.
 
 ### `date_accessed` (required)
-`YYYY-MM-DD`. Use `source.date_accessed` when plausible. If it's
-implausibly later than the snapshot's version directory (a sign the
-legacy migration tool stamped today's date as a default), prefer a date
-in the description prose like `[accessed 18th July 2017]`.
+`YYYY-MM-DD`. Plausibility test: a plausible `date_accessed` is no later
+than ~1 month after the snapshot's version directory date. Anything
+later (e.g. snapshot in `2020/` but `date_accessed: 2026-03-05`) is
+almost always the legacy-migration tool stamping the day it ran, not a
+real access date — treat it as missing.
+
+Resolution order:
+1. Use `source.date_accessed` if plausible by the test above.
+2. Else, look for an explicit access date in the legacy description
+   prose (`[accessed 18th July 2017]`).
+3. Else, fall back to the snapshot's version directory: for `2020/` use
+   `2020-01-01`; for `2017-09-27/` use `2017-09-27`. The snapshot file
+   was committed on that date, so this is the best lower bound for when
+   the data was pulled.
 
 ### `license` (default omitted)
 Object with `name` and `url`. Omit if not present in the legacy source.
