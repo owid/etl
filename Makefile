@@ -228,7 +228,7 @@ vsce-sync:
 # Idempotent; runs as a dependency of .venv so a fresh clone gets the hook
 # the first time anyone sets up the environment.
 install-hooks:
-	@if [ -d .git ]; then \
+	@if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then \
 		git config core.hooksPath scripts/hooks; \
 		chmod +x scripts/hooks/pre-commit; \
 		echo '==> pre-commit hook active (core.hooksPath=scripts/hooks)'; \
