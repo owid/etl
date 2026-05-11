@@ -685,6 +685,11 @@ def create_description_from_producer(var: dict[str, Any]) -> str | None:
     for column, header in _PRODUCER_DESCRIPTION_SECTIONS:
         value = var.get(column)
         if pd.notnull(value) and len(value.strip()) > 0:
+            # ~90% of WDI indicators are "Annual", which adds noise next to a yearly
+            # time series — only surface periodicity when it deviates (Triennial,
+            # Biennial, Every two years, Quarterly-represented-as-Annual).
+            if column == "periodicity" and value.strip() == "Annual":
+                continue
             desc += f"\n\n### {header}:\n{value}"
 
     desc = re.sub(r" *(\n+) *", r"\1", re.sub(r"[ \t]+", " ", desc)).strip()
