@@ -19,73 +19,136 @@ definitions:
 
   # Per-law short description (used for description_short and as building block for title)
   law_short: |-
-    <% if law == "age_of_consent" %>Whether the minimum age of consent for same-sex sexual activity equals that for different-sex sexual activity.
-    <% elif law == "blood_donations" %>Whether men who have sex with men may donate blood without restriction. Both lifetime bans and temporary deferrals are coded as restrictions.
-    <% elif law == "civil_unions" %>Whether same-sex couples have access to a legally recognized partnership distinct from marriage (civil union, domestic partnership, or registered partnership).
-    <% elif law == "constitutional_protections_gender_identity" %>Whether gender identity is explicitly named in the national constitution or established as a protected characteristic through binding constitutional court interpretation.
-    <% elif law == "constitutional_protections_sexual_orientation" %>Whether sexual orientation is explicitly named in the national constitution or established as a protected characteristic through binding constitutional court interpretation.
-    <% elif law == "conversion_therapies" %>Whether conversion therapy is banned by law, executive order, or judicial ruling.
-    <% elif law == "death_penalty" %>Whether the death penalty is a codified or de facto punishment for same-sex sexual acts.
-    <% elif law == "employment_discrimination_gender_identity" %>Whether national law prohibits employment discrimination based on gender identity.
-    <% elif law == "employment_discrimination_sexual_orientation" %>Whether national law prohibits employment discrimination based on sexual orientation.
-    <% elif law == "gender_affirming_care_adults" %>Whether gender-affirming healthcare for adults is publicly funded, or explicitly restricted or banned by national law.
-    <% elif law == "gender_affirming_care_minors" %>Whether gender-affirming healthcare for minors under 18 is publicly funded, or explicitly restricted or banned by national law.
-    <% elif law == "gender_assignment_surgeries_on_children" %>Whether non-consensual gender assignment surgeries on intersex minors are banned.
-    <% elif law == "gender_marker_change" %>Whether a legal process exists to change the gender marker on official identity documents.
-    <% elif law == "goods_services_discrimination_gender_identity" %>Whether national law prohibits discrimination in the provision of goods and services based on gender identity.
-    <% elif law == "goods_services_discrimination_sexual_orientation" %>Whether national law prohibits discrimination in the provision of goods and services based on sexual orientation.
-    <% elif law == "hate_crime_protections_gender_identity" %>Whether gender identity is included as a protected characteristic in hate crime legislation that imposes enhanced penalties.
-    <% elif law == "hate_crime_protections_sexual_orientation" %>Whether sexual orientation is included as a protected characteristic in hate crime legislation that imposes enhanced penalties.
-    <% elif law == "incitement_to_hatred" %>Whether incitement to hatred based on sexual orientation or gender identity is prohibited.
-    <% elif law == "joint_adoption" %>Whether same-sex couples may jointly adopt children.
-    <% elif law == "lgb_military" %>Whether lesbian, gay, and bisexual people may serve openly in the military.
-    <% elif law == "lgbtq_civil_society_restrictions" %>Whether national law explicitly restricts the formation, registration, operation, or funding of LGBTQ+ civil society organizations.
-    <% elif law == "marriage_equality" %>Whether same-sex couples can legally marry, or whether constitutional amendments or statutes ban same-sex marriage.
-    <% elif law == "morality_propaganda" %>Whether national law restricts the promotion, advocacy, or public expression of LGBTI identities (so-called "gay propaganda" or morality provisions).
-    <% elif law == "religious_exemption_laws" %>Whether national law allows individuals, businesses, or organizations to refuse services to LGBTQ+ people on religious or conscientious grounds, beyond standard clergy exemptions.
-    <% elif law == "same_sex_acts" %>Whether consensual same-sex sexual acts between adults are legal, or whether they are criminalized under national law.
-    <% elif law == "third_gender_recognition" %>Whether a third gender marker or non-binary category is legally recognized on official identity documents.
-    <% elif law == "transgender_military" %>Whether transgender people may serve openly in the military.
+    <% if law == "age_of_consent" %>
+    Whether the minimum age of consent for same-sex sexual activity equals that for different-sex sexual activity.
+    <% elif law == "blood_donations" %>
+    Whether men who have sex with men may donate blood without restriction. Both lifetime bans and temporary deferrals are coded as restrictions.
+    <% elif law == "civil_unions" %>
+    Whether same-sex couples have access to a legally recognized partnership distinct from marriage (civil union, domestic partnership, or registered partnership).
+    <% elif law == "constitutional_protections_gender_identity" %>
+    Whether gender identity is explicitly named in the national constitution or established as a protected characteristic through binding constitutional court interpretation.
+    <% elif law == "constitutional_protections_sexual_orientation" %>
+    Whether sexual orientation is explicitly named in the national constitution or established as a protected characteristic through binding constitutional court interpretation.
+    <% elif law == "conversion_therapies" %>
+    Whether conversion therapy is banned by law, executive order, or judicial ruling.
+    <% elif law == "death_penalty" %>
+    Whether the death penalty is a codified or de facto punishment for same-sex sexual acts.
+    <% elif law == "employment_discrimination_gender_identity" %>
+    Whether national law prohibits employment discrimination based on gender identity.
+    <% elif law == "employment_discrimination_sexual_orientation" %>
+    Whether national law prohibits employment discrimination based on sexual orientation.
+    <% elif law == "gender_affirming_care_adults" %>
+    Whether gender-affirming healthcare for adults is publicly funded, or explicitly restricted or banned by national law.
+    <% elif law == "gender_affirming_care_minors" %>
+    Whether gender-affirming healthcare for minors under 18 is publicly funded, or explicitly restricted or banned by national law.
+    <% elif law == "gender_assignment_surgeries_on_children" %>
+    Whether non-consensual gender assignment surgeries on intersex minors are banned.
+    <% elif law == "gender_marker_change" %>
+    Whether a legal process exists to change the gender marker on official identity documents.
+    <% elif law == "goods_services_discrimination_gender_identity" %>
+    Whether national law prohibits discrimination in the provision of goods and services based on gender identity.
+    <% elif law == "goods_services_discrimination_sexual_orientation" %>
+    Whether national law prohibits discrimination in the provision of goods and services based on sexual orientation.
+    <% elif law == "hate_crime_protections_gender_identity" %>
+    Whether gender identity is included as a protected characteristic in hate crime legislation that imposes enhanced penalties.
+    <% elif law == "hate_crime_protections_sexual_orientation" %>
+    Whether sexual orientation is included as a protected characteristic in hate crime legislation that imposes enhanced penalties.
+    <% elif law == "incitement_to_hatred" %>
+    Whether incitement to hatred based on sexual orientation or gender identity is prohibited.
+    <% elif law == "joint_adoption" %>
+    Whether same-sex couples may jointly adopt children.
+    <% elif law == "lgb_military" %>
+    Whether lesbian, gay, and bisexual people may serve openly in the military.
+    <% elif law == "lgbtq_civil_society_restrictions" %>
+    Whether national law explicitly restricts the formation, registration, operation, or funding of LGBTQ+ civil society organizations.
+    <% elif law == "marriage_equality" %>
+    Whether same-sex couples can legally marry, or whether constitutional amendments or statutes ban same-sex marriage.
+    <% elif law == "morality_propaganda" %>
+    Whether national law restricts the promotion, advocacy, or public expression of LGBTI identities (so-called "gay propaganda" or morality provisions).
+    <% elif law == "religious_exemption_laws" %>
+    Whether national law allows individuals, businesses, or organizations to refuse services to LGBTQ+ people on religious or conscientious grounds, beyond standard clergy exemptions.
+    <% elif law == "same_sex_acts" %>
+    Whether consensual same-sex sexual acts between adults are legal, or whether they are criminalized under national law.
+    <% elif law == "third_gender_recognition" %>
+    Whether a third gender marker or non-binary category is legally recognized on official identity documents.
+    <% elif law == "transgender_military" %>
+    Whether transgender people may serve openly in the military.
     <% endif %>
 
   # Per-(law, status) descriptive title — what the score actually measures for this row.
   status_title: |-
-    <% if law == "age_of_consent" and status == "equal" %>Age of consent is equal for same-sex and different-sex partners
-    <% elif law == "age_of_consent" and status == "unequal" %>Age of consent is higher for same-sex than different-sex partners
-    <% elif law == "blood_donations" and status == "legal" %>Men who have sex with men can donate blood without restriction
-    <% elif law == "blood_donations" and status == "illegal" %>Men who have sex with men face a deferral or ban on blood donation
-    <% elif law == "civil_unions" and status == "legal" %>Civil unions or registered partnerships for same-sex couples are legally recognized
-    <% elif law == "constitutional_protections_gender_identity" and status == "legal" %>Gender identity is a constitutionally protected characteristic
-    <% elif law == "constitutional_protections_sexual_orientation" and status == "legal" %>Sexual orientation is a constitutionally protected characteristic
-    <% elif law == "conversion_therapies" and status == "illegal" %>Conversion therapy is banned
-    <% elif law == "death_penalty" and status == "legal" %>Death penalty applies to same-sex sexual acts
-    <% elif law == "employment_discrimination_gender_identity" and status == "illegal" %>Employment discrimination on the basis of gender identity is prohibited
-    <% elif law == "employment_discrimination_sexual_orientation" and status == "illegal" %>Employment discrimination on the basis of sexual orientation is prohibited
-    <% elif law == "gender_affirming_care_adults" and status == "covered" %>Gender-affirming healthcare for adults is publicly funded
-    <% elif law == "gender_affirming_care_adults" and status == "restricted" %>Gender-affirming healthcare for adults is restricted or banned
-    <% elif law == "gender_affirming_care_minors" and status == "covered" %>Gender-affirming healthcare for minors is publicly funded
-    <% elif law == "gender_affirming_care_minors" and status == "restricted" %>Gender-affirming healthcare for minors is restricted or banned
-    <% elif law == "gender_assignment_surgeries_on_children" and status == "illegal" %>Non-consensual gender assignment surgeries on intersex minors are banned
-    <% elif law == "gender_assignment_surgeries_on_children" and status == "legal" %>Non-consensual gender assignment surgeries on intersex minors are permitted
-    <% elif law == "gender_marker_change" and status == "legal" %>A legal process exists to change the gender marker on identity documents
-    <% elif law == "goods_services_discrimination_gender_identity" and status == "illegal" %>Discrimination in goods and services on the basis of gender identity is prohibited
-    <% elif law == "goods_services_discrimination_sexual_orientation" and status == "illegal" %>Discrimination in goods and services on the basis of sexual orientation is prohibited
-    <% elif law == "hate_crime_protections_gender_identity" and status == "legal" %>Hate crime protections cover gender identity
-    <% elif law == "hate_crime_protections_sexual_orientation" and status == "legal" %>Hate crime protections cover sexual orientation
-    <% elif law == "incitement_to_hatred" and status == "legal" %>Incitement to hatred based on sexual orientation or gender identity is prohibited
-    <% elif law == "joint_adoption" and status == "legal" %>Same-sex couples may jointly adopt children
-    <% elif law == "lgb_military" and status == "legal" %>Lesbian, gay, and bisexual people may serve openly in the military
-    <% elif law == "lgb_military" and status == "illegal" %>Lesbian, gay, and bisexual people are banned from the military
-    <% elif law == "lgbtq_civil_society_restrictions" and status == "legal" %>National law restricts LGBTQ+ civil society organizations
-    <% elif law == "marriage_equality" and status == "legal" %>Same-sex couples can legally marry
-    <% elif law == "marriage_equality" and status == "illegal" %>Same-sex marriage is banned by constitution or statute
-    <% elif law == "morality_propaganda" and status == "legal" %>National law restricts the public expression of LGBTI identities
-    <% elif law == "religious_exemption_laws" and status == "legal" %>Religious exemptions allow refusal of services to LGBTQ+ people
-    <% elif law == "same_sex_acts" and status == "legal" %>Same-sex sexual acts are legal
-    <% elif law == "same_sex_acts" and status == "illegal" %>Same-sex sexual acts are criminalized
-    <% elif law == "third_gender_recognition" and status == "legal" %>A third gender marker is legally recognized on identity documents
-    <% elif law == "transgender_military" and status == "legal" %>Transgender people may serve openly in the military
-    <% elif law == "transgender_military" and status == "illegal" %>Transgender people are banned from the military
+    <% if law == "age_of_consent" and status == "equal" %>
+    Age of consent is equal for same-sex and different-sex partners
+    <% elif law == "age_of_consent" and status == "unequal" %>
+    Age of consent is higher for same-sex than different-sex partners
+    <% elif law == "blood_donations" and status == "legal" %>
+    Men who have sex with men can donate blood without restriction
+    <% elif law == "blood_donations" and status == "illegal" %>
+    Men who have sex with men face a deferral or ban on blood donation
+    <% elif law == "civil_unions" and status == "legal" %>
+    Civil unions or registered partnerships for same-sex couples are legally recognized
+    <% elif law == "constitutional_protections_gender_identity" and status == "legal" %>
+    Gender identity is a constitutionally protected characteristic
+    <% elif law == "constitutional_protections_sexual_orientation" and status == "legal" %>
+    Sexual orientation is a constitutionally protected characteristic
+    <% elif law == "conversion_therapies" and status == "illegal" %>
+    Conversion therapy is banned
+    <% elif law == "death_penalty" and status == "legal" %>
+    Death penalty applies to same-sex sexual acts
+    <% elif law == "employment_discrimination_gender_identity" and status == "illegal" %>
+    Employment discrimination on the basis of gender identity is prohibited
+    <% elif law == "employment_discrimination_sexual_orientation" and status == "illegal" %>
+    Employment discrimination on the basis of sexual orientation is prohibited
+    <% elif law == "gender_affirming_care_adults" and status == "covered" %>
+    Gender-affirming healthcare for adults is publicly funded
+    <% elif law == "gender_affirming_care_adults" and status == "restricted" %>
+    Gender-affirming healthcare for adults is restricted or banned
+    <% elif law == "gender_affirming_care_minors" and status == "covered" %>
+    Gender-affirming healthcare for minors is publicly funded
+    <% elif law == "gender_affirming_care_minors" and status == "restricted" %>
+    Gender-affirming healthcare for minors is restricted or banned
+    <% elif law == "gender_assignment_surgeries_on_children" and status == "illegal" %>
+    Non-consensual gender assignment surgeries on intersex minors are banned
+    <% elif law == "gender_assignment_surgeries_on_children" and status == "legal" %>
+    Non-consensual gender assignment surgeries on intersex minors are permitted
+    <% elif law == "gender_marker_change" and status == "legal" %>
+    A legal process exists to change the gender marker on identity documents
+    <% elif law == "goods_services_discrimination_gender_identity" and status == "illegal" %>
+    Discrimination in goods and services on the basis of gender identity is prohibited
+    <% elif law == "goods_services_discrimination_sexual_orientation" and status == "illegal" %>
+    Discrimination in goods and services on the basis of sexual orientation is prohibited
+    <% elif law == "hate_crime_protections_gender_identity" and status == "legal" %>
+    Hate crime protections cover gender identity
+    <% elif law == "hate_crime_protections_sexual_orientation" and status == "legal" %>
+    Hate crime protections cover sexual orientation
+    <% elif law == "incitement_to_hatred" and status == "legal" %>
+    Incitement to hatred based on sexual orientation or gender identity is prohibited
+    <% elif law == "joint_adoption" and status == "legal" %>
+    Same-sex couples may jointly adopt children
+    <% elif law == "lgb_military" and status == "legal" %>
+    Lesbian, gay, and bisexual people may serve openly in the military
+    <% elif law == "lgb_military" and status == "illegal" %>
+    Lesbian, gay, and bisexual people are banned from the military
+    <% elif law == "lgbtq_civil_society_restrictions" and status == "legal" %>
+    National law restricts LGBTQ+ civil society organizations
+    <% elif law == "marriage_equality" and status == "legal" %>
+    Same-sex couples can legally marry
+    <% elif law == "marriage_equality" and status == "illegal" %>
+    Same-sex marriage is banned by constitution or statute
+    <% elif law == "morality_propaganda" and status == "legal" %>
+    National law restricts the public expression of LGBTI identities
+    <% elif law == "religious_exemption_laws" and status == "legal" %>
+    Religious exemptions allow refusal of services to LGBTQ+ people
+    <% elif law == "same_sex_acts" and status == "legal" %>
+    Same-sex sexual acts are legal
+    <% elif law == "same_sex_acts" and status == "illegal" %>
+    Same-sex sexual acts are criminalized
+    <% elif law == "third_gender_recognition" and status == "legal" %>
+    A third gender marker is legally recognized on identity documents
+    <% elif law == "transgender_military" and status == "legal" %>
+    Transgender people may serve openly in the military
+    <% elif law == "transgender_military" and status == "illegal" %>
+    Transgender people are banned from the military
     <% endif %>
 
 dataset:
