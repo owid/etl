@@ -9,7 +9,7 @@ meta:
       - Survey data are representative of the U.S. general population.
       - Lead is measured in blood samples obtained from individual survey participants.
     url: https://www.epa.gov/americaschildrenenvironment/ace-biomonitoring-lead
-    date_accessed: 2026-03-05
+    date_accessed: '2021-01-01'
     published_by: |-
       Centers for Disease Control and Prevention; National Center for Health Statistics and National Center for Environmental Health; National Health and Nutrition Examination Survey
   name: Lead blood concentrations in USA (US CDC)

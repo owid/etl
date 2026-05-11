@@ -1,0 +1,33 @@
+# This is a file extracted from Table 1 in page 545.
+# In case of updating, it needs to be uploaded manually
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "The world of child labor. An historical and regional survey"
+    description: |-
+      This definitive resource details both the current and historical state of child labor in each region of the world, focusing on its causes, consequences, and cures. Including contributions by an international team of leading child labor scholars, researchers, policy-makers, and activists, as well as a wealth of current statistical data, it is the most comprehensive reference available on the subject.
+    date_published: "2009"
+    title_snapshot: "The world of child labor. An historical and regional survey - History of child labor in Britain"
+    description_snapshot: |-
+      Table 1, taken from the book chapter on child labor in the UK.
+
+    # Citation
+    producer: Hindman
+    citation_full: |-
+      Kirby, P. (2009). History of child labor in Britain. Table 1 In H.D. Hindman (Ed.), The world of child labor. An historical and regional survey (p. 545). Routledge.
+
+    # Files
+    url_main: https://www.google.co.uk/books/edition/The_World_of_Child_Labor/lrKec5YTVYAC
+    date_accessed: '2026-05-06'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.google.co.uk/books/edition/The_World_of_Child_Labor/lrKec5YTVYAC
+outs:
+  - md5: e0559479d1a3e57ba7892ebffb1df98c
+    size: 541
+    path: child_labor_england_wales_scotland.csv

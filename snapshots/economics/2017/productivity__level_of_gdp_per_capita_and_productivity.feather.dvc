@@ -1,11 +1,12 @@
 meta:
-  source:
-    name: OECD - Productivity - Level of GDP per capita and productivity
+  origin:
+    producer: OECD
+    title: Productivity - Level of GDP per capita and productivity
     description: |-
       Abstract
       Productivity is considered a central driver of long-term economic growth and living standards.
       Contact person/organisation
-      productivity.contact@oecd.org  The OECD Compendium of Productivity Indicators provides a comprehensive overview of recent and longer term trends in productivity levels and growth in OECD and selected non-OECD countries. The most recent edition of the Compendium, as well as information on the methodologies used in the OECD Productivity Dtabase, are available on the OECD productivity internet page:
+      productivity.contact@oecd.org  The OECD Compendium of Productivity Indicators provides a comprehensive overview of recent and longer term trends in productivity levels and growth in OECD and selected non-OECD countries. The most recent edition of the Compendium, as well as information on the methodologies used in the OECD Productivity Dtabase, are available on the OECD productivity internet page:
       OECD productivity internet page
       http://www.oecd.org/std/productivity-stats/
       Data source(s) used
@@ -18,11 +19,10 @@ meta:
       * OECD 35 countries; * BRIICS, Colombia and Lithuania; * Geographical / economic zones.
       Sector coverage
       Total economy.
-    url: https://stats.oecd.org/Index.aspx?DataSetCode=PDB_LV
-    date_accessed: 2018-03-16
-    published_by: OECD.Stat
-  name: Productivity - Level of GDP per capita and productivity
-  description: This is a dataset imported by the automated fetcher
+    citation_full: OECD.Stat - Productivity - Level of GDP per capita and productivity. OECD, 2017.
+    url_main: https://stats.oecd.org/Index.aspx?DataSetCode=PDB_LV
+    date_accessed: '2018-03-16'
+    date_published: '2017'
 outs:
   - md5: ae840a296658d0e4da2f8d3f19378453
     size: 177538
