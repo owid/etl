@@ -99,3 +99,6 @@ steps:
     - data://grapher/democracy/2026-04-02/lexical_index
     - data://grapher/democracy/2025-03-05/eiu
     - data://grapher/democracy/2024-05-13/polity
+    # OWID regions indicator — referenced as the `color` dimension on BTI views to
+    # colour Marimekko bars by region (see democracy.py).
+    - data://grapher/regions/2023-01-01/regions

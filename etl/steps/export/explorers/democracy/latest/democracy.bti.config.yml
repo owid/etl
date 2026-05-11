@@ -80,6 +80,8 @@ views:
     indicators:
       y:
         - catalogPath: bti#state_bti
+    config:
+      colorVariableId: regions#owid_region
   - dimensions:
       metric: democratic_features
       sub_metric: political_participation_index
