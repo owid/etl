@@ -214,7 +214,6 @@ def run() -> None:
     # indicator title/subtitle remain unset and inherit from the indicator metadata.
     c.set_global_config(
         {
-            "type": "LineChart",
             "yAxisMin": 0,
             "hasMapTab": _has_map_tab,
             "defaultView": _default_view,
