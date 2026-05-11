@@ -116,7 +116,9 @@ def _ddh_get_json(url: str, timeout: int = 120) -> dict:
         except (requests.RequestException, json.JSONDecodeError) as e:
             last_err = e
         sleep_s = DDH_RETRY_BACKOFF_BASE**attempt
-        print(f"  DDH request failed ({last_err!r}); retrying in {sleep_s:.0f}s [attempt {attempt + 1}/{DDH_RETRY_MAX_ATTEMPTS}]")
+        print(
+            f"  DDH request failed ({last_err!r}); retrying in {sleep_s:.0f}s [attempt {attempt + 1}/{DDH_RETRY_MAX_ATTEMPTS}]"
+        )
         time.sleep(sleep_s)
     raise RuntimeError(f"DDH request failed after {DDH_RETRY_MAX_ATTEMPTS} attempts: {url}") from last_err
 
