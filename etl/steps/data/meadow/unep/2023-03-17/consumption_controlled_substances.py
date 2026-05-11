@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
     for name, name_pretty in CHEMICAL_NAMES.items():
         log.info(f"consumption_controlled_substances: loading snapshot `{name}`.")
         # Retrieve snapshot.
-        snap: Snapshot = paths.load_dependency(f"consumption_controlled_substances.{name}.xlsx")
+        snap: Snapshot = paths.load_dependency(f"consumption_controlled_substances_{name}.xlsx")
         # Load data from snapshot.
         df = format_frame(pd.read_excel(snap.path, skiprows=1), name=name_pretty)
         # Append to list of dataframes
