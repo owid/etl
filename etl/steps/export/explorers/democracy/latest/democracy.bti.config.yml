@@ -30,14 +30,9 @@ dimensions:
     presentation:
       type: dropdown
     choices:
+      # Democratic features
       - slug: main_index
         name: "Main index"
-      - slug: main_classification
-        name: "Main classification"
-      - slug: number_and_share_of_democracies
-        name: "\xad\xadNumber and share of democracies"
-      - slug: people_living_in_democracies
-        name: "\xad\xadPeople living in democracies"
       - slug: stateness_index
         name: "Stateness index"
       - slug: political_participation_index
@@ -48,6 +43,9 @@ dimensions:
         name: "Stability of democratic institutions index"
       - slug: political_and_social_integration_index
         name: "Political and social integration index"
+      # Political regime
+      - slug: main_classification
+        name: "Main classification"
       - slug: basic_state_functions_score
         name: "Basic state functions score"
       - slug: free_and_fair_elections_score
@@ -64,6 +62,10 @@ dimensions:
         name: "Civil rights score"
       - slug: democratic_features
         name: "Democratic features"
+      - slug: number_and_share_of_democracies
+        name: "\xad\xadNumber and share of democracies"
+      - slug: people_living_in_democracies
+        name: "\xad\xadPeople living in democracies"
 
 views:
   - dimensions:
