@@ -81,15 +81,6 @@ def run() -> None:
         formats=["csv", "feather"],
     )
 
-    # Add all sources from dependencies to dataset
-    ds_garden.metadata.sources = ds_hmd.metadata.sources + ds_wmd.metadata.sources + ds_kobak.metadata.sources
-
-    # Source in YAML file only have name, load them from dataset.
-    tb_garden = ds_garden[paths.short_name]  # need to reload it to get updated metadata
-    source_by_name = {source.name: source for source in ds_garden.metadata.sources}
-    for col in tb_garden.columns:
-        tb_garden[col].metadata.sources = [source_by_name[source.name] for source in tb_garden[col].metadata.sources]
-
     # Save changes in the new garden dataset.
     ds_garden.save()
 

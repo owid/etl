@@ -576,10 +576,6 @@ tables:
           - *origin_hmd
           - *origin_wmd
           - *origin_kk
-        sources:
-          - name: Human Mortality Database
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years, per million people"
