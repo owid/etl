@@ -36,7 +36,7 @@ steps:
     - data://garden/wash/2025-12-08/household
     - data://garden/who/2024-07-30/ghe
     # WDI
-    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/worldbank_wdi/2026-02-27/wdi
 
   # Sequencing (variants)
   data-private://meadow/covid/latest/sequence:
