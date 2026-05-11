@@ -2,7 +2,6 @@
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -20,12 +19,6 @@ def run(dest_dir: str) -> None:
 
     metadata = tb.metadata
 
-    # Load the snapshot's origin directly: `DatasetMeta` has no `origins` field,
-    # so the per-snapshot origin doesn't survive the meadow save/load round-trip.
-    # The snapshot is already a transitive dep of this step via the meadow.
-    base_origin = Snapshot("un/2023-08-16/un_sdg.feather").metadata.origin
-    assert base_origin is not None, "Expected un_sdg snapshot to declare an origin"
-
     #
     # Process data.
     #
@@ -42,9 +35,6 @@ def run(dest_dir: str) -> None:
     pivot_tb = pivot_tb.format(["country", "year"])
 
     pivot_tb.metadata = metadata
-
-    for col in pivot_tb.columns:
-        pivot_tb[col].metadata.origins = [base_origin]
 
     #
     # Save outputs.

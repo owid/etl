@@ -16,7 +16,6 @@ from structlog import getLogger
 
 from etl.grapher import helpers as gh
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 log = getLogger()
 # Get paths and naming conventions for current step.
@@ -37,12 +36,9 @@ def run(dest_dir: str) -> None:
     # Load garden dataset.
     ds_garden = paths.load_dataset("un_sdg")
 
-    # Load the snapshot's origin directly: `DatasetMeta` doesn't declare an `origins`
-    # field, so the per-snapshot origin doesn't survive a dataset save/load round-trip.
-    # The snapshot is already a transitive dep of this step (via meadow → garden), so
-    # it's available locally.
-    base_origin = Snapshot("un/2023-08-16/un_sdg.feather").metadata.origin
-    assert base_origin is not None, "Expected un_sdg snapshot to declare an origin"
+    # Pull the snapshot-level origin off the `value` column of the first garden
+    # table; the garden step re-attaches it after the legacy DataFrame cast.
+    base_origin = ds_garden[ds_garden.table_names[0]]["value"].metadata.origins[0]
 
     # Add table of processed data to the new dataset.
     # add tables to dataset
