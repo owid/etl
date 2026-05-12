@@ -830,15 +830,24 @@ class SnapshotMeta(MetaBase):
                 raise ValueError("Metadata YAML should be stored under `meta` key")
             meta = yml["meta"]
 
-            # fill metadata that can be inferred from path
-            if "namespace" not in meta:
-                meta["namespace"] = _parse_snapshot_path(Path(filename))[0]
-            if "version" not in meta:
-                meta["version"] = _parse_snapshot_path(Path(filename))[1]
-            if "short_name" not in meta:
-                meta["short_name"] = _parse_snapshot_path(Path(filename))[2]
-            if "file_extension" not in meta:
-                meta["file_extension"] = _parse_snapshot_path(Path(filename))[3]
+            # Always derive these fields from the path. If the YAML provides them explicitly,
+            # they must match — otherwise rename the file or remove the override.
+            namespace, version, short_name, file_extension = _parse_snapshot_path(Path(filename))
+            for key, derived in (
+                ("namespace", namespace),
+                ("version", version),
+                ("short_name", short_name),
+                ("file_extension", file_extension),
+            ):
+                if key in meta and str(meta[key]) != str(derived):
+                    raise ValueError(
+                        f"{filename}: YAML field '{key}'={meta[key]!r} does not match the value "
+                        f"derived from the filename ({derived!r}). Rename the file or remove the override."
+                    )
+            meta["namespace"] = namespace
+            meta["version"] = version
+            meta["short_name"] = short_name
+            meta["file_extension"] = file_extension
 
             if "origin" in meta:
                 meta["origin"] = Origin.from_dict(meta["origin"])
@@ -996,6 +1005,9 @@ def snapshot_catalog(match: str = r".*") -> Iterator[Snapshot]:
             yield Snapshot(uri)
 
 
+_SHORT_NAME_RE = re.compile(r"^[a-z_][a-z0-9_]*$")
+
+
 def _parse_snapshot_path(path: Path) -> tuple[str, str, str, str]:
     """Parse snapshot path into namespace, short_name, file_extension."""
     version = path.parent.name
@@ -1003,4 +1015,7 @@ def _parse_snapshot_path(path: Path) -> tuple[str, str, str, str]:
 
     short_name, ext = path.stem.split(".", 1)
     assert "." not in ext, f"{path.name} cannot contain `.`"
+    assert _SHORT_NAME_RE.match(short_name), (
+        f"{path.name}: short_name {short_name!r} must be snake_case (matching {_SHORT_NAME_RE.pattern})"
+    )
     return namespace, version, short_name, ext

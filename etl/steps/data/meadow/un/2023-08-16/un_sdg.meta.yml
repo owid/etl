@@ -1,7 +1,3 @@
-dataset:
-  description: |-
-    The United Nations Sustainable Development Goal (SDG) dataset is the primary collection of data tracking progress towards the SDG indicators,
-    compiled from officially-recognized international sources.
 tables:
   un_sdg:
     variables:

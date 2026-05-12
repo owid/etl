@@ -1,9 +1,7 @@
 dataset:
   update_period_days: 730
-  sources: []
 definitions:
   common:
-    sources: []
     origins:
       - producer: World Wildlife Fund (WWF) and Zoological Society of London
         title: Zoological Society of London

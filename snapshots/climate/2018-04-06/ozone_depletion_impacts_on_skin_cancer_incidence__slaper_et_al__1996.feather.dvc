@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Ozone depletion impacts on skin cancer incidence - Slaper et al.
+  origin:
+    producer: Slaper et al.
+    title: Estimates of ozone depletion and skin cancer incidence to examine the Vienna Convention achievements
     description: |-
       The authors modelled the number of excess skin cancer cases they would expect among fair-skinned populations in the United States and Northwest Europe as a result of stratospheric ozone depletion.
 
@@ -9,12 +10,10 @@ meta:
       The Montreal Protocol scenario assumed a decline of five important ozone-depleting substances by 50% by the end of 1999 as agreed in the protocol in 1987.
 
       The Copenhagen Amendment assumed the production of 21 ozone-depleting substances reduced to zero by the end of 1995.
-    url: https://www.nature.com/articles/384256a0.pdf
-    date_accessed: 2018-04-06
-    published_by: |-
-      Slaper, H. et al. Estimates of ozone depletion and skin cancer incidence to examine the Vienna Convention achievements. Nature 384(6606): 256–258 (1996).
-  name: Ozone depletion impacts on skin cancer incidence (Slaper et al., 1996)
-  description: ''
+    citation_full: 'Slaper, H. et al. Estimates of ozone depletion and skin cancer incidence to examine the Vienna Convention achievements. Nature 384(6606): 256–258 (1996).'
+    url_main: https://www.nature.com/articles/384256a0.pdf
+    date_accessed: '2018-04-06'
+    date_published: '1996'
 outs:
   - md5: 92f35bc9a644b3736ea2c4e18355d52d
     size: 4738

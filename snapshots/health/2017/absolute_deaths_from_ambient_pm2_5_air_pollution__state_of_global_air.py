@@ -4,7 +4,7 @@ import click
 import pandas as pd
 
 from etl.backport_helpers import long_to_wide
-from etl.snapshot import Snapshot, SnapshotMeta
+from etl.snapshot import Snapshot
 
 SNAPSHOT_NAMESPACE = Path(__file__).parent.parent.name
 SNAPSHOT_VERSION = Path(__file__).parent.name
@@ -23,21 +23,8 @@ def main(upload: bool) -> None:
         "backport/latest/dataset_380_absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air_values.feather"
     )
     snap_values.pull()
-    snap_config = Snapshot(
-        "backport/latest/dataset_380_absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air_config.json"
-    )
-    snap_config.pull()
-
-    # Create snapshot metadata for the new file
-    meta = SnapshotMeta(**snap_values.metadata.to_dict())
-    meta.namespace = SNAPSHOT_NAMESPACE
-    meta.version = SNAPSHOT_VERSION
-    meta.short_name = "absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air"
-    meta.fill_from_backport_snapshot(snap_config.path)
-    meta.save()
-
-    # Create a new snapshot.
-    snap = Snapshot(meta.uri)
+    # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
+    snap = Snapshot("health/2017/absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air.feather")
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))

@@ -1,43 +1,32 @@
+"""Load a snapshot and create a meadow dataset."""
+
 import numpy as np
-import pandas as pd
-from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
-log = get_logger()
-
-# naming conventions
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
-    log.info("postnatal_care.start")
-
-    # retrieve raw data
+def run() -> None:
+    # Retrieve raw data from snapshot.
     snap = paths.load_snapshot("postnatal_care.csv")
     tb = snap.read()
 
+    # Drop rows with no Series Code (footer / blank rows in the source CSV).
     tb = tb[tb["Series Code"].notna()]
 
-    # clean and transform data
+    # Clean and transform data.
     tb = clean_data(tb)
 
-    # underscore all table columns
-    tb = tb.underscore()
+    # Improve table format.
+    tb = tb.underscore().format(["country", "year"], short_name=paths.short_name)
 
-    #
     # Save outputs.
-    #
-    # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
-
-    # finally save the dataset
-    ds.save()
-
-    log.info("postnatal_care.end")
+    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
+    ds_meadow.save()
 
 
-def clean_data(tb: pd.DataFrame) -> pd.DataFrame:
+def clean_data(tb):
     tb = tb.drop(columns=["Country Code", "Series Name", "Series Code"])
 
     cols = tb.columns[1:].str[:4].tolist()
@@ -45,4 +34,5 @@ def clean_data(tb: pd.DataFrame) -> pd.DataFrame:
     tb = tb.replace("..", np.nan)
     tb = tb.melt(id_vars="country", value_vars=cols)
     tb = tb.rename(columns={"variable": "year", "value": "postnatal_care_coverage"})
+    tb["year"] = tb["year"].astype(int)
     return tb

@@ -2,7 +2,6 @@ meta:
   namespace: artificial_intelligence
   short_name: epoch
   name: Parameter, Compute and Data Trends in Machine Learning (Epoch, 2023)
-  version: '2023-10-04'
   publication_year: 2023
   publication_date:
   source_name: Epoch (2023)
