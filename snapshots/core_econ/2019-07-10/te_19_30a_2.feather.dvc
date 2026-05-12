@@ -3,7 +3,6 @@ meta:
     name: Maddison (2018)
     description: The underlying real GDP per capita is in 2011US$ with multiple benchmarks.
     url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2018
-    date_accessed: 2026-05-12
     published_by: Maddison Project Database, version 2018. Bolt, Jutta, Robert Inklaar, Herman de Jong and Jan Luiten van Zanden (2018)
   name: TE-19.30a_2
   description: core-econ.org

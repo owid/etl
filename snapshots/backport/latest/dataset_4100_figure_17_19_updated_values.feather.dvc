@@ -2,7 +2,6 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://admin.owid.io/admin/datasets/4100
-    date_accessed: 2026-05-12 11:01:33.951770+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Figure 17.19_updated

@@ -2,7 +2,6 @@ meta:
   source:
     name: Millennium Ecosystem Assessment (2005)
     url: http://www.millenniumassessment.org/documents/document.356.aspx.pdf
-    date_accessed: 2026-05-12
     published_by: 'Millennium Ecosystem Assessment (2005). Ecosystems and Human Well-Being: Synthesis. Washington, DC: Island Press.'
   name: TE-20.3
   description: core-econ.org

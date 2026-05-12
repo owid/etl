@@ -3,7 +3,6 @@ meta:
     name: Wallis (2000), BEA (2020), FRED (2020)
     url: |-
       https://www.jstor.org/stable/2647051?seq=1#page_scan_tab_contents; https://www.bea.gov/data/government/receipts-and-expenditures; https://fred.stlouisfed.org/series/GNPA
-    date_accessed: 2026-05-12
     published_by: |-
       Wallis, J. J., (2000) American Government Finance in the Long Run: 1790 to 1990. Journal of Economic Perspectives, 14(1), pp. 61-82; US Bureau of Economic Analysis (2020); Federal Reserve Bank of St Louis (FRED)
   name: TE-14.1_gov

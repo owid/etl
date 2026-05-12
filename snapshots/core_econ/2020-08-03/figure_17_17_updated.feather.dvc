@@ -2,7 +2,6 @@ meta:
   source:
     name: BLS (2020)
     url: https://www.bls.gov/home.htm
-    date_accessed: 2026-05-12
     published_by: US Bureau of Labor Statistics (2020)
   name: Figure_17.17_updated
   description: core-econ.org

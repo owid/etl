@@ -2,7 +2,6 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://admin.owid.io/admin/datasets/5134
-    date_accessed: 2026-05-12 09:14:06.859011+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5134_te_16_1

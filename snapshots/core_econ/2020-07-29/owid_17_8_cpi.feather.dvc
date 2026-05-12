@@ -2,7 +2,6 @@ meta:
   source:
     name: FRED (2018)
     url: http://research.stlouisfed.org/fred2/series/CPIAUCNS/downloaddata
-    date_accessed: 2026-05-12
     published_by: Federal Reserve Bank of St Louis (FRED)
   name: OWID_17.8_CPI
   description: core-econ.org

@@ -2,7 +2,6 @@ meta:
   source:
     name: ONS (2020)
     url: https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/l55o/mm23
-    date_accessed: 2026-05-12
     published_by: Office for National Statistics (2020)
   name: TE-13.20c
   description: core-econ.org

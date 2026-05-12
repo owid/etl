@@ -2,7 +2,6 @@ meta:
   source:
     name: FRED (2014)
     url: http://research.stlouisfed.org/fred2/
-    date_accessed: 2026-05-12
     published_by: Federal Reserve Bank of St Louis (FRED)
   name: Figure_17.28_interest_rate
   description: core-econ.org

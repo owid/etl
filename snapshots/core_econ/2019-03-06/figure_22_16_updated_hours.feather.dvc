@@ -2,7 +2,6 @@ meta:
   source:
     name: OECD (2018)
     url: https://stats.oecd.org/index.aspx?DataSetCode=ANHRS#
-    date_accessed: 2026-05-12
     published_by: OECD.Stat. Average annual hours actually worked per worker (2018)
   name: Figure 22.16_updated_hours
   description: core-econ.org

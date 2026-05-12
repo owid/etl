@@ -4,7 +4,6 @@ meta:
     description: Most recent UK data received directly from the ​Bank of England.
     url: |-
       US data: http://www.federalreserve.gov/releases/Z1/default.htm; UK data: https://www.bankofengland.co.uk/financial-stability-report/2012/june-2012
-    date_accessed: 2026-05-12
     published_by: |-
       US Federal Reserve. 2016. ‘Financial Accounts of the United States, Historical.’ December 10; Bank of England. 2012. Financial Stability Report, Issue 31.
   name: Figure 17.21_updated

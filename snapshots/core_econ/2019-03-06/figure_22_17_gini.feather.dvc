@@ -2,7 +2,6 @@ meta:
   source:
     name: LIS Database (2015)
     url: https://www.lisdatacenter.org
-    date_accessed: 2026-05-12
     published_by: Cross National Data Center. LIS Database (2015)
   name: Figure 22.17_gini
   description: core-econ.org

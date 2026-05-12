@@ -2,7 +2,6 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://admin.owid.io/admin/datasets/4097
-    date_accessed: 2026-05-12 11:01:10.527564+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: TE-1.6b

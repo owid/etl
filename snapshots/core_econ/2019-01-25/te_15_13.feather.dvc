@@ -2,7 +2,6 @@ meta:
   source:
     name: UK Office for National Statistics (2019)
     url: https://www.ons.gov.uk
-    date_accessed: 2026-05-12
     published_by: UK Office for National Statistics (2019)
   name: TE-15.13
   description: core-econ.org

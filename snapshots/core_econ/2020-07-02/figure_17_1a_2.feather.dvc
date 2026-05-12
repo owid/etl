@@ -2,7 +2,6 @@ meta:
   source:
     name: CPB Netherlands Bureau for Economic Policy Analysis (2015)
     url: https://www.cpb.nl/en/worldtrademonitor
-    date_accessed: 2026-05-12
     published_by: CPB Netherlands Bureau for Economic Policy Analysis. 2015. ‘World Trade Monitor.’
   name: Figure_17.1a-2
   description: core-econ.org

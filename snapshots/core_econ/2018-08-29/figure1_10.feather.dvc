@@ -3,7 +3,6 @@ meta:
     name: The 2015 Total Economy Database
     description: Missing observations for East Germany has been obtained by linear interpolation between 1950 and 1960.
     url: https://www.conference-board.org/data/economydatabase/index.cfm?id=27762
-    date_accessed: 2026-05-12
     published_by: 'The Conference Board: ‘The 2015 Total Economy Database’'
   name: Figure1.10
   description: core-econ.org

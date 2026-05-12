@@ -2,7 +2,6 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://admin.owid.io/admin/datasets/5194
-    date_accessed: 2026-05-12 11:09:57.746483+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Figure_15.6_United_States_Decades

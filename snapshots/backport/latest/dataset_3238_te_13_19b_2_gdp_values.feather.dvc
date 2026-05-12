@@ -2,7 +2,6 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://admin.owid.io/admin/datasets/3238
-    date_accessed: 2026-05-12 10:58:50.178853+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: TE-13.19b_2_GDP

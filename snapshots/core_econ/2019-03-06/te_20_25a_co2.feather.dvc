@@ -2,7 +2,6 @@ meta:
   source:
     name: The World Bank (2018)
     url: https://databank.worldbank.org/data/reports.aspx?source=2&series=EN.ATM.CO2E.PC#
-    date_accessed: 2026-05-12
     published_by: The World Bank (2018). ‘World Development Indicators.’
   name: TE-20.25a_CO2
   description: core-econ.org

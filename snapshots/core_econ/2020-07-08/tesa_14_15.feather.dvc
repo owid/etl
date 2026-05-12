@@ -1,7 +1,6 @@
 meta:
   source:
     name: Reserve Bank of India
-    date_accessed: 2026-05-12
     published_by: Reserve Bank of India - Database of Indian Economy
   name: TESA_14.15
   description: core-econ.org

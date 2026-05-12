@@ -3,7 +3,6 @@ meta:
     name: Algan, Beasley, Guyot and Murtin (2014)
     description: |-
       This paper collects web searches related to well-being by using Google Trends, a tool provided freely by Google that enables to study the evolution of the salience of keywords across space and over time. For a given keyword, Google Trends gives the evolution of the number of requests that contained that keyword for each week since 2004, at a detailed geographical level (from a city or a region to the whole world). Here, this tool tracks all the queries related to emotional, physiological and physical pain across and within US states and cities.
-    date_accessed: 2026-05-12
     published_by: |-
       Yann Algan, Elizabeth Beasley, Florian Guyot, and Fabrice Murtin (2014) ‘Big Data Measures of Human Well-Being: Evidence from a Google Stress Index on US States’. Sciences Po Working Paper
   name: TE-13.1

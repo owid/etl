@@ -2,7 +2,6 @@ meta:
   source:
     name: Fochesato and Bowles (2013 and 2017), Wang and Caminada (2011), OECD
     url: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.362.4442; https://stats.oecd.org
-    date_accessed: 2026-05-12
     published_by: |-
       Mattia Fochesato and Samuel Bowles. 2013. ‘Wealth Inequality from Prehistory to the Present: Data, Sources and Methods.’ Dynamics of Wealth Inequality Project, Behavioral Sciences Program, Santa Fe Institute; Mattia Fochesato and Samuel Bowles. 2017. ‘Technology, Institutions and Wealth Inequality in the Very Long Run’. Santa Fe Institute; Chen Wang and Koen Caminada. 2011. ‘Leiden Budget Incidence Fiscal Redistribution Dataset’. Version 1. Leiden Department of Economics Research; OECD Stat
   name: Figure 19.1_ version2

@@ -2,7 +2,6 @@ meta:
   source:
     name: OECD
     url: https://stats.oecd.org/Index.aspx?DataSetCode=PDB_LV
-    date_accessed: 2026-05-12
     published_by: OECD. Level of GDP per capita and productivity. Accessed July 2022.
   name: TE-3.2_GDP
   description: core-econ.org

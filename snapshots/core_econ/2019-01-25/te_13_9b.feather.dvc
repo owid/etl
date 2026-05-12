@@ -2,7 +2,6 @@ meta:
   source:
     name: The World Bank (2018)
     url: https://datacatalog.worldbank.org/dataset/world-development-indicators
-    date_accessed: 2026-05-12
     published_by: The World Bank Development Indicators (2018)
   name: TE-13.9b
   description: core-econ.org

@@ -4,7 +4,6 @@ meta:
     description: |-
       Bureau of Labor Statistics data for Spanish real wages available only from 1979. Spanish real wage growth for 1970–1979 has therefore been estimated using Tables 16.25 and 16.5 from Barciela López, Carlos, Albert Carreras, and Xavier Tafunell. 2005. Estadísticas históricas de España: Siglos XIX-XX. Bilbao: Fundación BBVA.
     url: http://www.bls.gov/fls/#gdp
-    date_accessed: 2026-05-12
     published_by: Bureau of Labor Statistics (2011)
   name: TE-16.12
   description: core-econ.org

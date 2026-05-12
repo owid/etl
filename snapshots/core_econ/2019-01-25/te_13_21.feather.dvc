@@ -2,7 +2,6 @@ meta:
   source:
     name: The World Bank (2019)
     url: https://databank.worldbank.org/data/reports.aspx?source=2&series=FP.CPI.TOTL.ZG
-    date_accessed: 2026-05-12
     published_by: The World Bank (2019) World Development Indicators.
   name: TE-13.21
   description: core-econ.org

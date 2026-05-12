@@ -2,7 +2,6 @@ meta:
   source:
     name: OECD (2019)
     url: https://stats.oecd.org
-    date_accessed: 2026-05-12
     published_by: OECD (2019). OECD Statistics.
   name: TE-16.14
   description: core-econ.org

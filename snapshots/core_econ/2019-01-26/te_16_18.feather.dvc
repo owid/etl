@@ -4,7 +4,6 @@ meta:
     description: International Labour Organization, ILOSTAT database accessed through The World Bank indicators.
     url: |-
       https://www.bls.gov/fls/; https://www.ilo.org/global/statistics-and-databases/research-and-databases/kilm/lang--en/index.htm; https://data.worldbank.org/indicator/SL.IND.EMPL.ZS?locations=DE-FR-KR-GB-US-JP-TW-CN
-    date_accessed: 2026-05-12
     published_by: |-
       US Bureau of Labor Statistics (2004). International Labor Comparisons (ILC). Updated 14 October; International Labour Association (2018). ILOSTAT Database
   name: TE-16.18

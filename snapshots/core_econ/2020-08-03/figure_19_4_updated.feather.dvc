@@ -2,7 +2,6 @@ meta:
   source:
     name: WID (2020)
     url: https://wid.world
-    date_accessed: 2026-05-12
     published_by: |-
       Facundo Alvaredo, Anthony B. Atkinson, Thomas Piketty, Emmanuel Saez, and Gabriel Zucman (2020) ‘The World Wealth and Income Database (WID)’.
   name: Figure_19.4_updated

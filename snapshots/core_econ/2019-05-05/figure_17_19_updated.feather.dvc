@@ -2,7 +2,6 @@ meta:
   source:
     name: The FRED
     url: http://research.stlouisfed.org/
-    date_accessed: 2026-05-12
     published_by: Federal Reserve Bank of St Louis (FRED)
   name: Figure 17.19_updated
   description: core-econ.org

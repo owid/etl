@@ -1,7 +1,6 @@
 meta:
   source:
     name: World Bank (2020)
-    date_accessed: 2026-05-12
     published_by: World Bank National Accounts data
   name: TESA_13.9b
   description: core-econ.org

@@ -6,7 +6,6 @@ meta:
 
       LOTI provides a more realistic representation of the global mean trends than Meteorological Station Data (dTs); it slightly underestimates warming or cooling trends, since the much larger heat capacity of water compared to air causes a slower and diminished reaction to changes; dTs on the other hand overestimates trends, since it disregards most of the dampening effects of the oceans that cover about two thirds of the Earth's surface.
     url: https://data.giss.nasa.gov/gistemp/
-    date_accessed: 2026-05-12
     published_by: |-
       GISTEMP Team, 2018: GISS Surface Temperature Analysis (GISTEMP). NASA Goddard Institute for Space Studies. Dataset accessed 2018-11-25
   name: TE-1.6b

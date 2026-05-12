@@ -2,7 +2,6 @@ meta:
   source:
     name: CBO (2014)
     url: https://www.cbo.gov/sites/default/files/cbofiles/attachments/45010-breakout-AppendixE.pdf
-    date_accessed: 2026-05-12
     published_by: Congressional Budget Office (2014)
   name: Figure_17.28_budget_balance
   description: core-econ.org
