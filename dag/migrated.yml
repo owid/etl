@@ -1448,3 +1448,23 @@ steps:
     - data://garden/crime/2017-10-24/violent_victimization__us_bureau_of_justice_statistics__2017
   data://garden/crime/2017-10-24/violent_victimization__us_bureau_of_justice_statistics__2017:
     - snapshot://crime/2017-10-24/violent_victimization__us_bureau_of_justice_statistics__2017.feather
+  data-private://grapher/core_econ/2018-09-21/figure_3_21_2nd_version:
+    - data-private://garden/core_econ/2018-09-21/figure_3_21_2nd_version
+  data-private://garden/core_econ/2018-09-21/figure_3_21_2nd_version:
+    - snapshot-private://core_econ/2018-09-21/figure_3_21_2nd_version.feather
+  data-private://grapher/core_econ/2020-07-08/tesa_13_9b:
+    - data-private://garden/core_econ/2020-07-08/tesa_13_9b
+  data-private://garden/core_econ/2020-07-08/tesa_13_9b:
+    - snapshot-private://core_econ/2020-07-08/tesa_13_9b.feather
+  data-private://grapher/core_econ/2019-11-22/te_1_1:
+    - data-private://garden/core_econ/2019-11-22/te_1_1
+  data-private://garden/core_econ/2019-11-22/te_1_1:
+    - snapshot-private://core_econ/2019-11-22/te_1_1.feather
+  data-private://grapher/core_econ/2020-07-17/te_13_4:
+    - data-private://garden/core_econ/2020-07-17/te_13_4
+  data-private://garden/core_econ/2020-07-17/te_13_4:
+    - snapshot-private://core_econ/2020-07-17/te_13_4.feather
+  data-private://grapher/core_econ/2018-09-27/te_13_9a:
+    - data-private://garden/core_econ/2018-09-27/te_13_9a
+  data-private://garden/core_econ/2018-09-27/te_13_9a:
+    - snapshot-private://core_econ/2018-09-27/te_13_9a.feather
