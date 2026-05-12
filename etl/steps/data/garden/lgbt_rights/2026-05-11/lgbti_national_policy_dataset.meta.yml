@@ -16,9 +16,6 @@ definitions:
   proportion_methodology: |-
     The score ranges from 0 (the policy does not exist in any jurisdiction) to 1 (the policy is in effect at the national level). Fractional values reflect subnational adoption in federal or decentralized countries (e.g., the United States, Australia, Brazil, India), weighted by constant 2000/2001 Census population shares so that changes over time reflect policy shifts rather than demographic change.
 
-  status_labeling_note: |-
-    Status labels are not consistently aligned with progressive vs. regressive directions across all policies. For criminalization policies (Same-sex acts, Death penalty, Morality/propaganda, LGBTQ+ civil society restrictions), "Legal" means the restriction is in effect. For anti-discrimination protections (Employment, Goods/services), "Illegal" means the protection exists. For ban-style policies (Conversion therapies, Gender assignment surgeries on children), "Illegal" means the ban exists.
-
   description_regions_processing: |-
     Regional aggregates are computed from country-level data using [Our World in Data's region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and our [consolidated population data](https://ourworldindata.org/population-sources). A country is counted as having full implementation when the policy proportion equals 1.
 
@@ -173,7 +170,6 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "{definitions.proportion_methodology}"
-          - "{definitions.status_labeling_note}"
         unit: ""
         short_unit: ""
         display:
