@@ -213,11 +213,11 @@ tables:
         description_short: |
           Agricultural use of all fertilizer products (including nitrogenous, potash, and phosphate fertilizers) per area of cropland, which corresponds to the sum of arable land and permanent crops.
         presentation:
-          title_public: Fertilizer use per hectare of cropland
           topic_tags:
             - Agricultural Production
             - Fertilizers
           grapher_config:
+            title: Fertilizer use per hectare of cropland
             subtitle: Application of all fertilizer products (including nitrogenous, potash, and phosphate fertilizers), measured in kilograms of total nutrient per hectare of cropland.
             hasMapTab: true
             tab: map

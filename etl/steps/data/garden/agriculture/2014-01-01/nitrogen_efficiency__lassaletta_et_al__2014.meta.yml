@@ -20,10 +20,10 @@ tables:
         description: |-
           Nitrogen use efficiency (NUE) is the ratio between nitrogen inputs and output. A NUE of 40% means that only 40% of nitrogen inputs are converted into nitrogen in the form of crops. The remaining 60% is lost to the environment as a pollutant.
         presentation:
-          title_public: Nitrogen use efficiency
           topic_tags:
             - Fertilizers
           grapher_config:
+            title: Nitrogen use efficiency
             subtitle: Nitrogen use efficiency (NUE) is the ratio between nitrogen inputs and output. A NUE of 40% means that only 40% of nitrogen inputs are converted into nitrogen in the form of crops.
             hasMapTab: true
             tab: map
