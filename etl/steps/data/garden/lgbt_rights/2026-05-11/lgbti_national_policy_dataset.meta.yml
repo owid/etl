@@ -14,7 +14,7 @@ definitions:
     This data comes from the LGBTI National Policy Dataset, compiled by Kristopher Velasco at Princeton University. It tracks the adoption, scope, and enforcement of 27 LGBTI-related policies across 197 countries, with annual data starting in 1991.
 
   proportion_methodology: |-
-    The score ranges from 0 (the policy does not exist in any jurisdiction) to 1 (the policy is in effect at the national level). Fractional values reflect subnational adoption in federal or decentralized countries (e.g., the United States, Canada, Australia, India), weighted by constant 2000/2001 Census population shares.
+    The score ranges from 0 (the policy does not exist in any jurisdiction) to 1 (the policy is in effect at the national level). Fractional values reflect subnational adoption in federal or decentralized countries (e.g., the United States, Australia, Brazil, India), weighted by constant 2000/2001 Census population shares so that changes over time reflect policy shifts rather than demographic change.
 
   status_labeling_note: |-
     Status labels are not consistently aligned with progressive vs. regressive directions across all policies. For criminalization policies (Same-sex acts, Death penalty, Morality/propaganda, LGBTQ+ civil society restrictions), "Legal" means the restriction is in effect. For anti-discrimination protections (Employment, Goods/services), "Illegal" means the protection exists. For ban-style policies (Conversion therapies, Gender assignment surgeries on children), "Illegal" means the ban exists.
