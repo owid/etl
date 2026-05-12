@@ -22,6 +22,14 @@ definitions:
   description_key_full_implementation: |-
     A country is counted as having full implementation when the policy score equals 1. Subnational adoption (scores below 1 in countries with federal or decentralized systems such as the United States, Australia, Canada, Mexico, Brazil, or the United Kingdom) is treated as not fully implemented.
 
+  # Reusable derivation snippets for description_processing.
+  derivation_age_of_consent: |-
+    From the original dataset, we combined two indicators — age of consent equal and age of consent unequal — into a single categorical indicator (Equal, Partial implementation, No legal provisions, Unequal) based on the proportion scores of both directions.
+  derivation_marriage: |-
+    From the original dataset, we combined three indicators — marriage equality (legal direction), marriage equality (illegal direction, i.e. constitutional or statutory bans), and civil unions — into a single categorical indicator (Legal, Partially legal, No legal provisions, Ban and marriage both partial, Partially banned, Banned) based on the proportion scores of all three.
+  derivation_lgb_military_join: |-
+    From the original dataset, we combined two indicators — LGB allowed in the military and LGB banned from the military — into a single categorical indicator (Allowed, No policy, Banned) based on the proportion scores of both directions.
+
   # Per-law short description (used for description_short and as building block for title)
   law_short: |-
     <% if law == "age_of_consent" %>
@@ -189,7 +197,8 @@ tables:
           - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          From the country-level policy scores, we classified each country-year as having full implementation when the score equals 1, then counted these countries within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -205,7 +214,8 @@ tables:
           - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          From the country-level policy scores, we classified each country-year as not fully implemented when the score is below 1 (no policy, or subnational adoption only), then counted these countries within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -221,7 +231,8 @@ tables:
           - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          From the country-level policy scores, we identified countries where the score equals 1 (full national implementation) and summed their populations within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -237,7 +248,8 @@ tables:
           - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          From the country-level policy scores, we identified countries where the score is below 1 (no policy, or subnational adoption only) and summed their populations within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -255,8 +267,7 @@ tables:
           - "{definitions.description_key_dataset}"
           - "The indicator is coded as follows: **_Equal_** (age of consent is equal and implemented), **_Partial implementation_** (age of consent is equal or unequal, but not completely implemented), **_No legal provisions_** (there are no laws regulating the age of consent between same-sex and different-sex partners) and **_Unequal_** (age of consent is different and implemented)."
         processing_level: major
-        description_processing: |-
-          From the original dataset, we combined two indicators — age of consent equal and age of consent unequal — into a single categorical indicator that classifies each country-year as Equal, Partial implementation, No legal provisions, or Unequal based on the proportion scores of both directions.
+        description_processing: "{definitions.derivation_age_of_consent}"
         unit: ""
         short_unit: ""
         display:
@@ -277,8 +288,7 @@ tables:
           - "{definitions.description_key_dataset}"
           - "The indicator is coded as follows: **_Legal_** (marriage equality is fully implemented; civil unions may also exist), **_Partially legal_** (marriage equality is partially implemented; civil unions may also exist), **_No legal provisions_** (there are no laws regulating same-sex marriage nor civil unions), **_Ban and marriage both partial_** (marriage equality and the ban are both partially implemented; civil unions are partially implemented as well), **_Partially banned_** (the marriage ban is partially implemented, or marriage equality is banned with partial civil union or marriage recognition) and **_Banned_** (marriage equality is banned and fully implemented; no civil unions)."
         processing_level: major
-        description_processing: |-
-          From the original dataset, we combined three indicators — marriage equality (legal direction), marriage equality (illegal direction, i.e. constitutional or statutory bans), and civil unions — into a single categorical indicator.
+        description_processing: "{definitions.derivation_marriage}"
         unit: ""
         short_unit: ""
         display:
@@ -301,8 +311,7 @@ tables:
           - "{definitions.description_key_dataset}"
           - "The indicator is coded as follows: **_Allowed_** (LGB people are allowed to serve in the military), **_No policy_** (there is no policy allowing or banning LGB military service) and **_Banned_** (LGB people are banned from serving in the military)."
         processing_level: major
-        description_processing: |-
-          From the original dataset, we combined two indicators — LGB allowed in the military and LGB banned from the military — into a single categorical indicator.
+        description_processing: "{definitions.derivation_lgb_military_join}"
         unit: ""
         short_unit: ""
         display:
@@ -322,7 +331,8 @@ tables:
         description_short: |-
           The number of countries where the age of consent is equal for same-sex and different-sex partners.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_age_of_consent} We then counted the countries classified as "Equal" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -333,7 +343,8 @@ tables:
         description_short: |-
           The number of countries with partial implementation of laws regulating the age of consent for same-sex and different-sex partners.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_age_of_consent} We then counted the countries classified as "Partial implementation" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -344,7 +355,8 @@ tables:
         description_short: |-
           The number of countries without legal provisions regulating the age of consent for same-sex and different-sex partners.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_age_of_consent} We then counted the countries classified as "No legal provisions" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -355,7 +367,8 @@ tables:
         description_short: |-
           The number of countries with unequal age of consent for same-sex and different-sex partners.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_age_of_consent} We then counted the countries classified as "Unequal" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -368,7 +381,8 @@ tables:
         description_short: |-
           The total population of countries where the age of consent is equal for same-sex and different-sex partners.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "Equal" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -379,7 +393,8 @@ tables:
         description_short: |-
           The total population of countries with partial implementation of laws regulating the age of consent for same-sex and different-sex partners.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "Partial implementation" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -390,7 +405,8 @@ tables:
         description_short: |-
           The total population of countries without legal provisions regulating the age of consent for same-sex and different-sex partners.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "No legal provisions" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -401,7 +417,8 @@ tables:
         description_short: |-
           The total population of countries with unequal age of consent for same-sex and different-sex partners.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_age_of_consent} We then summed the populations of countries classified as "Unequal" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -414,7 +431,8 @@ tables:
         description_short: |-
           The number of countries where same-sex marriage is legal and fully implemented (civil unions may also exist).
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then counted the countries classified as "Legal" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -425,7 +443,8 @@ tables:
         description_short: |-
           The number of countries where same-sex marriage is partially legal (civil unions may also exist).
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then counted the countries classified as "Partially legal" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -436,7 +455,8 @@ tables:
         description_short: |-
           The number of countries without legal provisions regulating same-sex marriage or civil unions.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then counted the countries classified as "No legal provisions" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -447,7 +467,8 @@ tables:
         description_short: |-
           The number of countries where same-sex marriage and its ban are both partially implemented.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then counted the countries classified as "Ban and marriage both partial" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -458,7 +479,8 @@ tables:
         description_short: |-
           The number of countries where same-sex marriage is partially banned (the ban is not fully implemented, or civil unions provide partial recognition alongside the ban).
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then counted the countries classified as "Partially banned" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -469,7 +491,8 @@ tables:
         description_short: |-
           The number of countries where same-sex marriage is banned and the ban is fully implemented (no civil unions).
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then counted the countries classified as "Banned" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -482,7 +505,8 @@ tables:
         description_short: |-
           The total population of countries where same-sex marriage is legal and fully implemented (civil unions may also exist).
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "Legal" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -493,7 +517,8 @@ tables:
         description_short: |-
           The total population of countries where same-sex marriage is partially legal (civil unions may also exist).
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "Partially legal" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -504,7 +529,8 @@ tables:
         description_short: |-
           The total population of countries without legal provisions regulating same-sex marriage or civil unions.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "No legal provisions" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -515,7 +541,8 @@ tables:
         description_short: |-
           The total population of countries where same-sex marriage and its ban are both partially implemented.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "Ban and marriage both partial" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -526,7 +553,8 @@ tables:
         description_short: |-
           The total population of countries where same-sex marriage is partially banned.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "Partially banned" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -537,7 +565,8 @@ tables:
         description_short: |-
           The total population of countries where same-sex marriage is banned and the ban is fully implemented.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -550,7 +579,8 @@ tables:
         description_short: |-
           The number of countries where lesbian, gay, and bisexual people are allowed to serve in the military.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_lgb_military_join} We then counted the countries classified as "Allowed" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -561,7 +591,8 @@ tables:
         description_short: |-
           The number of countries with no policy allowing or banning LGB people from serving in the military.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_lgb_military_join} We then counted the countries classified as "No policy" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -572,7 +603,8 @@ tables:
         description_short: |-
           The number of countries where lesbian, gay, and bisexual people are banned from serving in the military.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_lgb_military_join} We then counted the countries classified as "Banned" within each region. {definitions.description_regions_processing}
         unit: countries
         short_unit: ""
         display:
@@ -585,7 +617,8 @@ tables:
         description_short: |-
           The total population of countries where lesbian, gay, and bisexual people are allowed to serve in the military.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_lgb_military_join} We then summed the populations of countries classified as "Allowed" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -596,7 +629,8 @@ tables:
         description_short: |-
           The total population of countries with no policy allowing or banning LGB people from serving in the military.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_lgb_military_join} We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
@@ -607,7 +641,8 @@ tables:
         description_short: |-
           The total population of countries where lesbian, gay, and bisexual people are banned from serving in the military.
         processing_level: major
-        description_processing: "{definitions.description_regions_processing}"
+        description_processing: |-
+          {definitions.derivation_lgb_military_join} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}
         unit: people
         short_unit: ""
         display:
