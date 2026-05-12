@@ -26,6 +26,7 @@ tables:
           - "Scores are re-evaluated each year: analysts adjust points only when real-world events warrant, allowing the metric to flag both rapid crackdowns and gradual reforms."
         presentation:
           grapher_config:
+            title: Freedom Score
             subtitle: |-
               Data by [Freedom House](#dod:freedom-house). The score captures the extent of free and fair elections, political pluralism and participation, a functioning government, freedom of expression and association, the rule of law, and personal autonomy. Higher scores indicate more freedom.
 
