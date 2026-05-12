@@ -1896,3 +1896,55 @@ steps:
     - data-private://garden/core_econ/2020-07-29/figure_17_8_nominal_ir
   data-private://garden/core_econ/2020-07-29/figure_17_8_nominal_ir:
     - snapshot-private://core_econ/2020-07-29/figure_17_8_nominal_ir.feather
+  data-private://grapher/core_econ/2020-07-29/owid_17_8_rir:
+    - data-private://garden/core_econ/2020-07-29/owid_17_8_rir
+  data-private://garden/core_econ/2020-07-29/owid_17_8_rir:
+    - snapshot-private://core_econ/2020-07-29/owid_17_8_rir.feather
+  data-private://grapher/core_econ/2020-07-29/owid_17_8_cpi:
+    - data-private://garden/core_econ/2020-07-29/owid_17_8_cpi
+  data-private://garden/core_econ/2020-07-29/owid_17_8_cpi:
+    - snapshot-private://core_econ/2020-07-29/owid_17_8_cpi.feather
+  data-private://grapher/core_econ/2020-07-29/te_17_13_gov:
+    - data-private://garden/core_econ/2020-07-29/te_17_13_gov
+  data-private://garden/core_econ/2020-07-29/te_17_13_gov:
+    - snapshot-private://core_econ/2020-07-29/te_17_13_gov.feather
+  data-private://grapher/core_econ/2020-07-29/te_17_16_unemployment:
+    - data-private://garden/core_econ/2020-07-29/te_17_16_unemployment
+  data-private://garden/core_econ/2020-07-29/te_17_16_unemployment:
+    - snapshot-private://core_econ/2020-07-29/te_17_16_unemployment.feather
+  data-private://grapher/core_econ/2020-07-29/te_17_13_union:
+    - data-private://garden/core_econ/2020-07-29/te_17_13_union
+  data-private://garden/core_econ/2020-07-29/te_17_13_union:
+    - snapshot-private://core_econ/2020-07-29/te_17_13_union.feather
+  data-private://grapher/core_econ/2020-07-29/te_17_16_cpi:
+    - data-private://garden/core_econ/2020-07-29/te_17_16_cpi
+  data-private://garden/core_econ/2020-07-29/te_17_16_cpi:
+    - snapshot-private://core_econ/2020-07-29/te_17_16_cpi.feather
+  data-private://grapher/core_econ/2020-07-29/figure_17_28_budget_balance:
+    - data-private://garden/core_econ/2020-07-29/figure_17_28_budget_balance
+  data-private://garden/core_econ/2020-07-29/figure_17_28_budget_balance:
+    - snapshot-private://core_econ/2020-07-29/figure_17_28_budget_balance.feather
+  data-private://grapher/core_econ/2020-08-03/te_22_2:
+    - data-private://garden/core_econ/2020-08-03/te_22_2
+  data-private://garden/core_econ/2020-08-03/te_22_2:
+    - snapshot-private://core_econ/2020-08-03/te_22_2.feather
+  data-private://grapher/core_econ/2020-07-29/figure_17_28_unemployment:
+    - data-private://garden/core_econ/2020-07-29/figure_17_28_unemployment
+  data-private://garden/core_econ/2020-07-29/figure_17_28_unemployment:
+    - snapshot-private://core_econ/2020-07-29/figure_17_28_unemployment.feather
+  data-private://grapher/core_econ/2020-08-03/figure_19_3_updated:
+    - data-private://garden/core_econ/2020-08-03/figure_19_3_updated
+  data-private://garden/core_econ/2020-08-03/figure_19_3_updated:
+    - snapshot-private://core_econ/2020-08-03/figure_19_3_updated.feather
+  data-private://grapher/core_econ/2020-07-29/te_18_8:
+    - data-private://garden/core_econ/2020-07-29/te_18_8
+  data-private://garden/core_econ/2020-07-29/te_18_8:
+    - snapshot-private://core_econ/2020-07-29/te_18_8.feather
+  data-private://grapher/core_econ/2020-08-04/te_20_1:
+    - data-private://garden/core_econ/2020-08-04/te_20_1
+  data-private://garden/core_econ/2020-08-04/te_20_1:
+    - snapshot-private://core_econ/2020-08-04/te_20_1.feather
+  data-private://grapher/core_econ/2020-10-06/figure_15_6_united_states_decades:
+    - data-private://garden/core_econ/2020-10-06/figure_15_6_united_states_decades
+  data-private://garden/core_econ/2020-10-06/figure_15_6_united_states_decades:
+    - snapshot-private://core_econ/2020-10-06/figure_15_6_united_states_decades.feather

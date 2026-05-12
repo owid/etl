@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: BLS (2014)
+    url: http://www.bls.gov/cps/
+    date_accessed: 2026-05-12
+    published_by: US Bureau of Labor Statistics (2014)
+  name: Figure_17.28_unemployment
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 778b9f70deaedd8a55e0dea0d825cb27
+    size: 6722
+    path: figure_17_28_unemployment.feather

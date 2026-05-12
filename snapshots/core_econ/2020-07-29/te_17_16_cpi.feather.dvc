@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: OECD (2020)
+    description: |-
+      The series shown are unweighted averages for 16 OECD countries. The countries in the sample are: Australia, Austria, Belgium, Canada, Finland, France, Germany, Italy, Japan, Norway, Portugal, Spain, Sweden, Switzerland, the UK and the US.
+    url: https://stats.oecd.org/viewhtml.aspx?datasetcode=PRICES_CPI&lang=en#
+    date_accessed: 2026-05-12
+    published_by: OECD (2020) ‘OECD Statistics’
+  name: TE-17.16_CPI
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 56a328c259ad0e3fc65304628735099e
+    size: 4498
+    path: te_17_16_cpi.feather

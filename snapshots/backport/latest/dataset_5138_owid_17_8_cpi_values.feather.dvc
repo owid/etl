@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5138
-    date_accessed: 2023-08-10 08:25:46.263158
+    url: https://admin.owid.io/admin/datasets/5138
+    date_accessed: 2026-05-12 11:09:14.319284+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: OWID_17.8_CPI
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7f327833672fc0341e6dc78a80b348b7
-  size: 7226
-  path: dataset_5138_owid_17_8_cpi_values.feather
+  - md5: de1883e22d04e3ab2164f72657b8da40
+    size: 7258
+    path: dataset_5138_owid_17_8_cpi_values.feather

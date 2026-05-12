@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: Figure_15.6_United_States_Decades
+    date_accessed: 2026-05-12
+    published_by: Figure_15.6_United_States_Decades
+  name: Figure_15.6_United_States_Decades
+  description: ''
+  is_public: false
+outs:
+  - md5: ecc04cda047ac904b142ad7ac8cf19bd
+    size: 3418
+    path: figure_15_6_united_states_decades.feather

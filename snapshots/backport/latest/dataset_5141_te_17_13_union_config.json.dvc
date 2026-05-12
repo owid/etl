@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5141
-    date_accessed: 2023-08-10 09:19:28.733234
+    url: https://admin.owid.io/admin/datasets/5141
+    date_accessed: 2026-05-12 11:09:24.516985+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5141_te_17_13_union
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 03cc2cf0e14273b45f8fb4d248f73911
-  size: 2526
-  path: dataset_5141_te_17_13_union_config.json
+  - md5: aed810c4583c672ed9e2423bf20a2171
+    size: 2749
+    path: dataset_5141_te_17_13_union_config.json

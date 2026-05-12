@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: BLS (2020), Mayer (2004)
+    url: |-
+      https://data.bls.gov/pdq/SurveyOutputServlet; https://digitalcommons.ilr.cornell.edu/cgi/viewcontent.cgi?referer=&httpsredir=1&article=1176&context=key_workplace
+    date_accessed: 2026-05-12
+    published_by: US Bureau of Labor Statistics (2020); Mayer, G. (2004) Union membership trends in the United States
+  name: TE-17.13_union
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 8060c46da3fc5a4fdcb4169f767defa3
+    size: 5090
+    path: te_17_13_union.feather
