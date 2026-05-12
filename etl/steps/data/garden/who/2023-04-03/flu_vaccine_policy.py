@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
-
 from owid.catalog import Table
 
 from etl.helpers import PathFinder

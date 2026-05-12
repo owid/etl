@@ -17,9 +17,7 @@ def run() -> None:
     tb = tb.rename(columns={"COUNTRYNAME": "country", "YEAR": "year"})
 
     # Long → wide on DESCRIPTION; each indicator becomes its own column.
-    tb = tb.pivot(
-        index=["country", "year"], columns="DESCRIPTION", values="VALUE", join_column_levels_with="_"
-    )
+    tb = tb.pivot(index=["country", "year"], columns="DESCRIPTION", values="VALUE", join_column_levels_with="_")
 
     tb = tb.format(["country", "year"], short_name=paths.short_name)
     tb.update_metadata_from_yaml(paths.metadata_path, "flu_vaccine_policy")
