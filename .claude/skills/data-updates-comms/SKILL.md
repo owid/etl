@@ -121,9 +121,9 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
 ## Output format
 
-**The output file must use the Slack form's prompt wording verbatim as section headings.** The user copy-pastes the answer blocks (inside ```text``` fences) into the matching Slack fields, so each prompt is its own `## <verbatim heading>`.
+**The output file must use the Slack form's prompt wording verbatim as section headings.** The user copy-pastes the answer text into the matching Slack fields, so each prompt is its own `## <verbatim heading>`.
 
-**Keep the file lean.** No "E.g.:" example lines, no `[filled]` / `[prompt — user rewrites]` tags, no inline framing instructions, no `_Snippets to draw from:_` / `_Candidate caveats:_` / `_Context from this PR:_` label preambles. The skill keeps the framing reminders for itself (see "Editorial framing" below); the file is just headings → snippet bullets (where relevant) → fenced answer block.
+**Keep the file lean.** No "E.g.:" example lines, no `[filled]` / `[prompt — user rewrites]` tags, no inline framing instructions, no `_Snippets to draw from:_` / `_Candidate caveats:_` / `_Context from this PR:_` label preambles, no ```text``` code fences around the answers. The skill keeps the framing reminders for itself (see "Editorial framing" below); the file is just headings → answer prose (for mechanical fields) or snippet bullets (for editorial fields).
 
 The verbatim Slack prompt headings (do **not** rephrase, abbreviate, or change punctuation):
 
@@ -154,7 +154,7 @@ Before drafting fields #6, #7, #8, remember they go to Charlie, who turns them i
 
 ### Exact draft file structure
 
-````markdown
+```markdown
 # Data update comms draft — <dataset name>
 
 Source: `<ns>/<new_version>/<short_name>` · Branch: `<branch>` · Generated: <iso datetime>
@@ -163,33 +163,23 @@ Source: `<ns>/<new_version>/<short_name>` · Branch: `<branch>` · Generated: <i
 
 ## What dataset(s) did you update?
 
-```text
 <Dataset title — Producer>
-```
 
 ## When was this data released? When is the next scheduled release / our plan for next update?
 
-```text
 Released: <date_published>. Next: <best-effort or "unknown — …">.
-```
 
 ## Who is the data source(s)? Is there anything our users should know about them?
 
-```text
 <producer>. <citation_full or attribution_short, trimmed>.
-```
 
 ## What's the coverage of the data in terms of years and countries/regions?
 
-```text
 Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if applicable>. <Sparse-recent-year flag if applicable.>
-```
 
 ## How many charts did this update affect?
 
-```text
 <N> published charts (<size qualifier>).
-```
 
 ## What does this dataset help our users understand about the world, and why is it important they know that?
 
@@ -197,27 +187,15 @@ Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if a
 - <substantive snippet>
 - <substantive snippet>
 
-```text
-
-```
-
 ## Any important caveats or pitfalls in interpretation that users should know about this data? (optional)
 
 - <caveat snippet>
 - <caveat snippet>
 
-```text
-
-```
-
 ## Anything interesting to note about this update, including what you had to do? Anything else you'd like to add? (optional)
 
 - <interesting snippet>
 - <interesting snippet>
-
-```text
-
-```
 
 ## Add 1–3 chart views we might use in the public announcement
 
@@ -226,20 +204,19 @@ Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if a
 
 ## Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)
 
-```text
 https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
-```
 
 ---
 
 ## Pending mechanical follow-ups
 
 - <only if any — e.g. "next release date is best-effort", "verify producer's release cadence", source-of-truth caveats>
-````
+```
 
 **Strict rules:**
 - Do not paraphrase the prompt headings — they must match the Slack form character-for-character.
-- Each answer that is meant to be copy-pasted goes in a ```text``` fenced block. Editorial fields (#6, #7, #8) have unfenced snippet bullets above an empty fenced block for the user to write in.
+- No code fences around answers — they sit as plain prose under each heading.
+- Editorial fields (#6, #7, #8) carry snippet bullets only; the user writes their own answer when filling the Slack form.
 - Snippet bullets must be substantive prose, not labelled quotes. Drop source prefixes like "Snapshot description:" — the user shouldn't see them.
 - Optional sections (#7, #8, #10) keep their `(optional)` suffix.
 - Notes about scope corrections, source-of-truth caveats, or branch-version mismatches go **below the form** under a `## Pending mechanical follow-ups` section — never inside the verbatim Slack fields.
