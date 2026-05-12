@@ -761,6 +761,16 @@ steps:
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
 
+  # UNODC Homicide Data
+  data://meadow/unodc/2025-05-28/homicide:
+    - snapshot://unodc/2025-05-28/homicide.xlsx
+  data://garden/unodc/2025-05-28/homicide:
+    - data://meadow/unodc/2025-05-28/homicide
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/unodc/2025-05-28/homicide:
+    - data://garden/unodc/2025-05-28/homicide
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
