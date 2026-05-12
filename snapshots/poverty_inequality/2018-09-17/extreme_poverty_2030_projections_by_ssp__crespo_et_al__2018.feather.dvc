@@ -1,12 +1,13 @@
 meta:
-  source:
-    name: Extreme Poverty 2030 Projections by SSP - Crespo-Cuaresma et al. (2018)
+  origin:
+    producer: Crespo-Cuaresma et al.
+    title: 'Will the Sustainable Development Goals be fulfilled? Assessing present and future global poverty'
     description: |-
       Data on extreme poverty projections by country and region are sourced from the Nature publication by Crespo-Cuaresma et al. (2018). This data is also presented visually at the World Poverty Clock: http://worldpoverty.io/index.html
 
       Extreme poverty is defined by the international poverty line, set at a threshold of $1.90 per person per day, which is adjusted for inflation (by normalising to 2011 dollars), and corrected for cross-country price differences (PPP).
 
-      The UN's Sustainable Development Goal (SDG) Target 1.1 is to end extreme poverty by 2030. 'Ending extreme poverty' is assumed when a country reaches an extreme poverty level below 3% of the total population.
+      The UN's Sustainable Development Goal (SDG) Target 1.1 is to end extreme poverty by 2030. "Ending extreme poverty" is assumed when a country reaches an extreme poverty level below 3% of the total population.
 
       Scenarios of future extreme poverty rates were assessed and modelled by Crespo-Cuaresma et al. (2018) using a combination of the IMF World Economic Outlook, and multiple Shared Socioeconomic Pathways (SSP).
 
@@ -21,17 +22,15 @@ meta:
 
       - SSP5: presents a scenario with high economic growth (and therefore low adaptation challenges) coupled with high demand for fossil energy from developing economies, but with high global CO2 emissions.
 
-      SSP2 is defined as the baseline 'business-as-usual' scenario.
+      SSP2 is defined as the baseline "business-as-usual" scenario.
 
-      The categories of 'extremely fragile', 'fragile' and 'non-fragile' have been added for reference based on the OECD (2018) States of Fragility framework. This framework measures the fragility of countries based on multiple political and socioeconomic indicators. More information on this fragility measure can be found at the OECD (2018) report.
+      The categories of "extremely fragile", "fragile" and "non-fragile" have been added for reference based on the OECD (2018) States of Fragility framework. This framework measures the fragility of countries based on multiple political and socioeconomic indicators. More information on this fragility measure can be found at the OECD (2018) report.
 
       Reference: OECD (2018), States of Fragility. OECD Publishing, Paris. Available at: https://www.oecd-ilibrary.org/development/states-of-fragility-2018_9789264302075-en
-    url: https://www.nature.com/articles/s41599-018-0083
-    date_accessed: 2018-09-17
-    published_by: |-
-      Cuaresma, J. C., Fengler, W., Kharas, H., Bekhtiar, K., Brottrager, M., & Hofer, M. (2018). Will the Sustainable Development Goals be fulfilled? Assessing present and future global poverty. Palgrave Communications, 4(1), 29.
-  name: Extreme Poverty 2030 Projections by SSP - Crespo et al. (2018)
-  description: ''
+    citation_full: 'Cuaresma, J. C., Fengler, W., Kharas, H., Bekhtiar, K., Brottrager, M., & Hofer, M. (2018). Will the Sustainable Development Goals be fulfilled? Assessing present and future global poverty. Palgrave Communications, 4(1), 29.'
+    url_main: https://www.nature.com/articles/s41599-018-0083
+    date_accessed: '2018-09-17'
+    date_published: '2018'
   is_public: false
 outs:
   - md5: 8d875fa953864447d5819029561613c1
