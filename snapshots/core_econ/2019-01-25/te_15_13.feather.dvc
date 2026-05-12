@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: UK Office for National Statistics (2019)
+    url: https://www.ons.gov.uk
+    published_by: UK Office for National Statistics (2019)
+  name: TE-15.13
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 9308a741251d9234e16412ea6de1160b
+    size: 3778
+    path: te_15_13.feather

@@ -1,0 +1,28 @@
+dataset:
+  title: TE-17.4
+tables:
+  te_17_4:
+    variables:
+      financial_business_sector__debt__pct_of_gdp:
+        title: Financial business sector- Debt (% of GDP)
+        unit: '%'
+      government__debt__pct_of_gdp:
+        title: Government- Debt (% of GDP)
+        unit: '%'
+        description: Government debt is a sum of local, state and federal government debt.
+      households__debt__pct_of_gdp:
+        title: Households - Debt (% of GDP)
+        unit: '%'
+        description: Household debt is the sum of household and non-profit organisation debt.
+      non_financial_business_sector__debt__pct_of_gdp:
+        title: Non-financial business sector- Debt (% of GDP)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,17 @@
+dataset:
+  title: TESA_14.15
+tables:
+  tesa_14_15:
+    variables:
+      government_debt__pct_of_gdp:
+        title: Government debt (% of GDP)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,21 @@
+dataset:
+  title: TE-14.1_GDP
+tables:
+  te_14_1_gdp:
+    variables:
+      gdp_growth__pct:
+        title: GDP growth (%)
+        unit: '%'
+        description: The underlying real GDP per capita is in 2011US$ with multiple benchmarks.
+      government_revenue__as_a_per_cent_of_gnp:
+        title: Government revenue (as a per cent of GNP)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

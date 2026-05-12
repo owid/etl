@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Luttmer (2011)
+    description: |-
+      The firm level employee data is contained within the supplementary data available from the link above. It is in the folder for Figure I.
+    url: http://restud.oxfordjournals.org/content/78/3/1042.short
+    published_by: Luttmer, E. G. J., (2011) On the mechanics of firm growth. Review of Economic Studies, 78, 1042-1068
+  name: TE-7.1
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: cb032698fe91796347c019c8856d2a35
+    size: 5634
+    path: te_7_1.feather

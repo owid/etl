@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Maddison Project Database (2018); Huberman, Minns (2007); OECD (2019)
+    url: |-
+      https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2018; http://personal.lse.ac.uk/minns/Huberman_Minns_EEH_2007.pdf; https://stats.oecd.org/index.aspx?DataSetCode=ANHRS#
+    published_by: |-
+      Maddison Project Database, version 2018. Bolt, Jutta, Robert Inklaar, Herman de Jong and Jan Luiten van Zanden (2018), “Rebasing ‘Maddison’: new income comparisons and the shape of long-run economic development”, Maddison Project Working paper 10;  Michael Huberman and Chris Minns. 2007. ‘The times they are not changin’: Days and hours of work in Old and New Worlds, 1870–2000’. Explorations in Economic History 44 (4): pp. 538–567.; OECD Statistics
+  name: TE-3.1
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 03f5180a86e09843c505dd29fac44b33
+    size: 4554
+    path: te_3_1.feather

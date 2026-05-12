@@ -1,49 +1,26 @@
 """Load a snapshot and create a meadow dataset."""
 
-import pandas as pd
-from owid.catalog import Table
-from structlog import get_logger
+from etl.helpers import PathFinder
 
-from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
-
-# Initialize logger.
-log = get_logger()
-
-# Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
-    log.info("flu_vaccine_policy.start")
+def run() -> None:
+    snap = paths.load_snapshot("flu_vaccine_policy.xlsx")
+    tb = snap.read_excel()
 
-    #
-    # Load inputs.
-    #
-    # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("flu_vaccine_policy.xlsx")
+    # Drop the trailing summary row.
+    tb = tb[:-1]
 
-    # Load data from snapshot.
-    df = pd.read_excel(snap.path)
-    # Drop the last row
-    df = df[:-1]
-    # Drop extraneous columns
-    df = df.drop(columns=["ISO_3_CODE", "WHO_REGION", "INDCODE", "INDCAT_DESCRIPTION", "INDSORT"])
-    df = df.rename(columns={"COUNTRYNAME": "country", "YEAR": "year"})
-    df = pd.pivot(df, index=["country", "year"], columns="DESCRIPTION", values="VALUE")
-    #
-    # Process data.
-    #
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    # Drop columns we won't use, rename to canonical names.
+    tb = tb.drop(columns=["ISO_3_CODE", "WHO_REGION", "INDCODE", "INDCAT_DESCRIPTION", "INDSORT"])
+    tb = tb.rename(columns={"COUNTRYNAME": "country", "YEAR": "year"})
+
+    # Long → wide on DESCRIPTION; each indicator becomes its own column.
+    tb = tb.pivot(index=["country", "year"], columns="DESCRIPTION", values="VALUE", join_column_levels_with="_")
+
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
     tb.update_metadata_from_yaml(paths.metadata_path, "flu_vaccine_policy")
-    #
-    # Save outputs.
-    #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
-    # Save changes in the new garden dataset.
+    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
     ds_meadow.save()
-
-    log.info("flu_vaccine_policy.end")

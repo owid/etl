@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3241
-    date_accessed: 2023-08-10 07:45:34.248054
+    url: https://admin.owid.io/admin/datasets/3241
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3241_figure_15_20_inflation
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e1fa7ff7d86193b83e3ff3e7382b5e36
-  size: 1578
-  path: dataset_3241_figure_15_20_inflation_config.json
+  - md5: 3d04a84d7df5457296557cb4d0797227
+    size: 1708
+    path: dataset_3241_figure_15_20_inflation_config.json
