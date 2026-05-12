@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: UNESCO Institute for Statistics
+    title: UNESCO Institute for Statistics (UIS) - Education
+    description: |-
+      The UNESCO Institute for Statistics (UIS) is the official and trusted source of internationally-comparable data on education, science, culture and communication. As the official statistical agency of UNESCO, the UIS produces a wide range of state-of-the-art databases to fuel the policies and investments needed to transform lives and propel the world towards its development goals. The UIS provides free access to data for all UNESCO countries and regional groupings from 1970 to the most recent year available.
+    title_snapshot: UNESCO Institute for Statistics (UIS) - Education (SDGs)
+    description_snapshot: This snapshot is for the SDG Global and Thematic Indicators dataset.
+    citation_full: UNESCO Institute for Statistics (UIS), Education, https://uis.unesco.org/bdds, 2026
+    attribution_short: UIS
+    url_main: https://databrowser.uis.unesco.org/resources/bulk
+    url_download: https://download.uis.unesco.org/bdds/202602/SDG.zip
+    date_accessed: '2026-05-12'
+    date_published: '2026-02-01'
+    license:
+      name: CC BY 3.0 IGO
+      url: https://databrowser.uis.unesco.org/terms-and-conditions
+outs:
+  - md5: 805fdda7e08d76f81094b81d401e4369
+    size: 34266318
+    path: education_sdgs.zip

@@ -17,7 +17,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
     - data://garden/worldbank_wdi/2026-02-27/wdi
-    - data://garden/unesco/2025-05-01/education_opri
+    - data://garden/unesco/2026-05-12/education_opri
   data://grapher/education/2023-07-17/education_lee_lee:
     - data://garden/education/2023-07-17/education_lee_lee
 
@@ -59,21 +59,23 @@ steps:
       - data://garden/education/2023-08-14/oecd_education
 
   # UNESCO data on other policy related education indicators
-  data://garden/unesco/2025-05-01/education_opri:
-    - data://meadow/unesco/2025-05-01/education_opri:
-      - snapshot://unesco/2025-05-01/education_opri.zip
+  data://meadow/unesco/2026-05-12/education_opri:
+    - snapshot://unesco/2026-05-12/education_opri.zip
+  data://garden/unesco/2026-05-12/education_opri:
+    - data://meadow/unesco/2026-05-12/education_opri
     - snapshot://wb/2024-06-18/edstats_metadata.xls
-  data://grapher/unesco/2025-05-01/education_opri:
-    - data://garden/unesco/2025-05-01/education_opri
+  data://grapher/unesco/2026-05-12/education_opri:
+    - data://garden/unesco/2026-05-12/education_opri
 
   # UNESCO data on SDG education indicators
-  data://garden/unesco/2025-05-01/education_sdgs:
-    - data://meadow/unesco/2025-05-01/education_sdgs:
-      - snapshot://unesco/2025-05-01/education_sdgs.zip
+  data://meadow/unesco/2026-05-12/education_sdgs:
+    - snapshot://unesco/2026-05-12/education_sdgs.zip
+  data://garden/unesco/2026-05-12/education_sdgs:
+    - data://meadow/unesco/2026-05-12/education_sdgs
     - snapshot://wb/2024-06-18/edstats_metadata.xls
     - data://garden/education/2017-09-30/public_expenditure
-  data://grapher/unesco/2025-05-01/education_sdgs:
-    - data://garden/unesco/2025-05-01/education_sdgs
+  data://grapher/unesco/2026-05-12/education_sdgs:
+    - data://garden/unesco/2026-05-12/education_sdgs
 
   # World Bank EdStats
   data://garden/wb/2024-11-04/edstats:
@@ -87,9 +89,9 @@ steps:
   # Mdim for enrolment rates
   #
   export://multidim/education/latest/enrolment_rates:
-    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/unesco/2026-05-12/education_sdgs
     - data://grapher/worldbank_wdi/2025-09-08/wdi
-    - data://grapher/unesco/2025-05-01/education_opri
+    - data://grapher/unesco/2026-05-12/education_opri
   #
   # Buringh and van Zanden literacy rates between 1451 and 1800
   #
@@ -119,51 +121,52 @@ steps:
   #
   export://multidim/education/latest/years_of_schooling:
     - data://grapher/un/2025-05-07/undp_hdr
-    - data://grapher/unesco/2025-05-01/education_opri
+    - data://grapher/unesco/2026-05-12/education_opri
     - data://grapher/wb/2025-09-08/gender_statistics
 
   #
   # Literacy OMM
   #
+  data://garden/literacy/2025-06-11/historic_literacy_omm:
+    - data://garden/education/2025-06-10/literacy_1900_1950
+    - data://garden/education/2025-06-10/literacy_1950
+    - data://garden/education/2025-06-09/literacy_1451_1800
+    - data://meadow/education/2023-08-14/oecd_education
+    - data://garden/unesco/2026-05-12/education_sdgs
   data://grapher/literacy/2025-06-11/historic_literacy_omm:
-    - data://garden/literacy/2025-06-11/historic_literacy_omm:
-      - data://garden/education/2025-06-10/literacy_1900_1950
-      - data://garden/education/2025-06-10/literacy_1950
-      - data://garden/education/2025-06-09/literacy_1451_1800
-      - data://meadow/education/2023-08-14/oecd_education
-      - data://garden/unesco/2025-05-01/education_sdgs
+    - data://garden/literacy/2025-06-11/historic_literacy_omm
 
   #
   # Mdim for completion rates
   #
   export://multidim/education/latest/completion_rates:
-    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/unesco/2026-05-12/education_sdgs
 
   #
   # Mdim for education spending
   #
   export://multidim/education/latest/education_spending:
-    - data://grapher/unesco/2025-05-01/education_sdgs
-    - data://grapher/unesco/2025-05-01/education_opri
+    - data://grapher/unesco/2026-05-12/education_sdgs
+    - data://grapher/unesco/2026-05-12/education_opri
 
   #
   # Mdim for literacy rates
   #
   export://multidim/education/latest/literacy:
-    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/unesco/2026-05-12/education_sdgs
 
   #
   # Mdim for children out of school
   #
   export://multidim/education/latest/children_out_of_school:
-    - data://grapher/unesco/2025-05-01/education_sdgs
-    - data://grapher/unesco/2025-05-01/education_opri
+    - data://grapher/unesco/2026-05-12/education_sdgs
+    - data://grapher/unesco/2026-05-12/education_opri
 
   #
   # Mdim for proficiency levels in different subjects
   #
   export://multidim/education/latest/proficiency:
-    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/unesco/2026-05-12/education_sdgs
 
 
   #
@@ -185,14 +188,14 @@ steps:
   # Mdim for qualified/trained teachers
   #
   export://multidim/education/latest/teachers:
-    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/unesco/2026-05-12/education_sdgs
     - data://grapher/worldbank_wdi/2025-09-08/wdi
 
   #
   # Mdim for women teachers
   #
   export://multidim/education/latest/women_teachers:
-    - data://grapher/unesco/2025-05-01/education_opri
+    - data://grapher/unesco/2026-05-12/education_opri
 
   #
   # Harmonized test scores

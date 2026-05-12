@@ -62,7 +62,7 @@ steps:
     - data://garden/ggdc/2025-10-09/penn_world_table
     - data://garden/education/2025-08-20/harmonized_scores
     - data://grapher/wb/2025-09-08/gender_statistics
-    - data://garden/unesco/2025-05-01/education_sdgs
+    - data://garden/unesco/2026-05-12/education_sdgs
     - data://garden/happiness/2026-03-16/happiness
     - data://garden/who/2025-05-19/gho
     - data://garden/wb/2026-03-24/world_bank_pip
