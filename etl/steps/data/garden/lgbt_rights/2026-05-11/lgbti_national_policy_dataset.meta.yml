@@ -17,6 +17,9 @@ definitions:
   description_regions_processing: |-
     Regional aggregates are computed from country-level data using [Our World in Data's region definitions](https://ourworldindata.org/world-region-map-definitions) and our [consolidated population data](https://ourworldindata.org/population-sources). A country is counted as having full implementation when the policy proportion equals 1.
 
+  description_key_full_implementation: |-
+    A country is counted as having full implementation when the policy score equals 1. Subnational adoption (scores below 1 in countries with federal or decentralized systems such as the United States, Australia, Canada, Mexico, Brazil, or the United Kingdom) is treated as not fully implemented.
+
   # Per-law short description (used for description_short and as building block for title)
   law_short: |-
     <% if law == "age_of_consent" %>
@@ -183,6 +186,8 @@ tables:
           Number of countries with full implementation — {definitions.status_title}
         description_short: |-
           The number of countries in the region with full implementation (policy score equal to 1) of: {definitions.status_title}.
+        description_key:
+          - "{definitions.description_key_full_implementation}"
         processing_level: major
         description_processing: "{definitions.description_regions_processing}"
         unit: countries
@@ -196,6 +201,8 @@ tables:
           Number of countries without full implementation — {definitions.status_title}
         description_short: |-
           The number of countries in the region without full implementation (policy score below 1) of: {definitions.status_title}.
+        description_key:
+          - "{definitions.description_key_full_implementation}"
         processing_level: major
         description_processing: "{definitions.description_regions_processing}"
         unit: countries
@@ -209,6 +216,8 @@ tables:
           Population in countries with full implementation — {definitions.status_title}
         description_short: |-
           Total population of countries in the region with full implementation (policy score equal to 1) of: {definitions.status_title}.
+        description_key:
+          - "{definitions.description_key_full_implementation}"
         processing_level: major
         description_processing: "{definitions.description_regions_processing}"
         unit: people
@@ -222,6 +231,8 @@ tables:
           Population in countries without full implementation — {definitions.status_title}
         description_short: |-
           Total population of countries in the region without full implementation (policy score below 1) of: {definitions.status_title}.
+        description_key:
+          - "{definitions.description_key_full_implementation}"
         processing_level: major
         description_processing: "{definitions.description_regions_processing}"
         unit: people
