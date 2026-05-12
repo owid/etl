@@ -8,8 +8,11 @@ The source is long format: one row per (country, year, law, status). We:
      "full implementation" (proportion >= 1) vs. "no/partial" (< 1).
   5. Emit a combined-categorical table reproducing v1's `age_of_consent`,
      `marriage`, and `lgb_military_join` ordinal indicators.
+  6. Emit regional aggregates of the combined-categorical indicators: country
+     counts and population by category, per region.
 """
 
+from owid.catalog.utils import underscore
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder
@@ -84,6 +87,9 @@ def run() -> None:
     # Combined-categorical table reproducing v1's three ordinal indicators.
     tb_combined = _build_combined_categorical_table(tb_country)
 
+    # Regional aggregates of the combined-categorical indicators (counts + population by category).
+    tb_combined_regions = _build_combined_categorical_regional_aggregates(tb_combined)
+
     # Format and short-name all tables.
     tb_country = tb_country.format(
         ["country", "year", "law", "status"],
@@ -100,12 +106,17 @@ def run() -> None:
         short_name="lgbti_national_policy_dataset_combined",
         sort_columns=True,
     )
+    tb_combined_regions = tb_combined_regions.format(
+        ["country", "year"],
+        short_name="lgbti_national_policy_dataset_combined_regions",
+        sort_columns=True,
+    )
 
     #
     # Save outputs.
     #
     ds_garden = paths.create_dataset(
-        tables=[tb_country, tb_regions, tb_combined],
+        tables=[tb_country, tb_regions, tb_combined, tb_combined_regions],
         default_metadata=ds_meadow.metadata,
     )
     ds_garden.save()
@@ -208,3 +219,37 @@ def _build_combined_categorical_table(tb):
     wide["lgb_military_join"] = wide["lgb_military_join"].copy_metadata(wide["country"])
 
     return wide[["country", "year", "age_of_consent", "marriage", "lgb_military_join"]]
+
+
+def _build_combined_categorical_regional_aggregates(tb_combined):
+    """Build regional aggregates for the three combined ordinal indicators.
+
+    For each (indicator, category) pair, produce two region-level series:
+      - `<indicator>_<category>_count`: number of countries in the region in that category
+      - `<indicator>_<category>_pop`:   total population in those countries
+
+    Output is wide-format indexed by (country, year), with one column per
+    (indicator, category) × {count, pop}. This mirrors v1's structure
+    (`age_of_consent_equal_count`, `marriage_legal_pop`, etc.).
+    """
+    tb = tb_combined.copy()
+    tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
+
+    new_cols = []
+    for indicator in ("age_of_consent", "marriage", "lgb_military_join"):
+        for category in tb[indicator].dropna().unique():
+            cat_snake = underscore(category)
+            count_col = f"{indicator}_{cat_snake}_count"
+            pop_col = f"{indicator}_{cat_snake}_pop"
+            tb[count_col] = (tb[indicator] == category).astype("int64")
+            tb[pop_col] = tb[count_col] * tb["population"]
+            new_cols.extend([count_col, pop_col])
+
+    aggregations = {col: "sum" for col in new_cols}
+    tb_regions = paths.regions.add_aggregates(
+        tb=tb[["country", "year"] + new_cols],
+        regions=REGIONS,
+        aggregations=aggregations,
+    )
+    tb_regions = tb_regions[tb_regions["country"].isin(REGIONS)].reset_index(drop=True)
+    return tb_regions[["country", "year"] + new_cols]
