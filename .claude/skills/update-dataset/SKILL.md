@@ -71,6 +71,30 @@ Persistence:
 
 When you do stop, present a concise summary of the issue and what options exist.
 
+## When the update isn't a drop-in version bump
+
+Some updates carry structural changes that make the standard rename-only flow the wrong tool. Recognise them up front and adjust the workflow.
+
+**Triggers** — any of these means you're in restructure territory, not a version bump:
+- `short_name` changes (producer rebranded the dataset).
+- File format/schema changes (wide → long, different file extension with a different column set, new dimensions).
+- Policy/indicator set changes substantially (splits, dropped composites, newly added areas).
+- Score semantics change (e.g. binary → continuous with subnational coverage).
+
+**Workflow adjustments:**
+
+1. **Skip `etl update`.** The rename-only flow copies the old step files into a new folder — useless when the schema is different. Author the new step chain by hand, using the old version as inspiration but not as a starting copy.
+2. **Add the new chain to the DAG before archiving the old.** Leave both chains active while you build and validate v2; archive the v1 entries only once v2 is on staging and the chart remap is queued or done.
+3. **Decide on naming convention upfront.** Ask the user whether to preserve v1 short_names where they map cleanly, or to adopt the source's fresh naming scheme. Fresh naming is cleaner but means the auto-Indicator-Upgrader can't help.
+4. **Hand-curate the v1 → v2 indicator mapping.** When short_names change entirely, the auto-upgrader has nothing to match on, but the Indicator Upgrader also matches on **`title`** — so if v2 titles are descriptive (full sentences rather than the bare short_name), you can hand the user a table of v1 title → v2 title pairs and they can drive the chart remap from there. Generate this table from the v1 meta.yml + the v2 grapher catalog.
+5. **Defer the Slack and `/latest` announcements until charts have been remapped.** Both posts depend on `charts.published_count` and `charts.selected_views` from the v2 chain. Drafting them before the remap gives the wrong count (zero) and no representative views. Tell the user to ping you when the chart remap is done, then run steps 8 / 9 / 9b.
+
+For the **long-format with dimensions** sub-case specifically (e.g. one row per `(country, year, <dim1>, <dim2>)`), use the modern OWID pattern:
+- Meadow + garden: `tb.format(["country", "year", <dim1>, <dim2>, ...], sort_columns=True)`.
+- Aggregations: `paths.regions.add_aggregates(tb, index_columns=[...full key...], regions=REGIONS, aggregations={...})`.
+- Grapher: pass long tables through unchanged; the framework auto-expands them into per-cell variables.
+- Metadata: variables are keyed by the long-column name, with `<% if <dim> == "X" and <dim2> == "Y" %>...<% endif %>` Jinja blocks inside `title`, `description_short`, `display.name`. Grep this repo for `tb.format(["country", "year"` with more than two index entries to find current reference examples.
+
 ## Workflow orchestration
 
 0) Initial setup
@@ -584,6 +608,14 @@ These pages need a fresh staging build, so they're only meaningful after the PR'
 - Column name changes: update garden processing code and metadata YAMLs (garden/grapher) to match schema changes.
 - Indexing: avoid leaking index columns from `reset_index()`; format tables with `tb.format(["country", "year"])` as appropriate.
 - Metadata validation errors are guidance — update YAML to add/remove variables as indicated.
+- **Mixed-type object columns at meadow**: when `pd.read_csv` produces an `object` column that mixes strings and `NaN` (common for sparse text columns like sources/comments/punishments), the feather repacker rejects it. Cast those columns to pandas `"string"` dtype before `tb.format(...)`.
+- **`paths.regions` auto-resolves DAG dependencies**: `paths.regions.add_population(tb)` and `paths.regions.add_aggregates(tb, regions=[...])` pick up the `population` and `income_groups` datasets directly from the DAG. Don't `paths.load_dataset("population")` and pass it through unless the helper specifically asks for the dataset — the parameter is unused.
+- **WB income-group aggregates**: add the four classification names (`High-income countries`, `Upper-middle-income countries`, `Lower-middle-income countries`, `Low-income countries`) to your `REGIONS` list and add `data://garden/wb/<latest>/income_groups` to the DAG. `paths.regions.add_aggregates(...)` auto-resolves the classification.
+- **Detect structural placeholders dynamically**: when a source ships "balanced panel" rows that are zero everywhere by design (status combos that exist only for completeness), detect them at runtime (`groupby(...).max() == 0`) and assert the count matches the codebook. A coding change in the source then surfaces as a test failure instead of silently shipping noise.
+- **Codebook-vs-data inconsistencies**: when the codebook documents one thing but the actual CSV shows another (placeholder claimed but non-zero rows present, etc.), preserve the data as-shipped and flag it in the PR description for the producer to confirm. Don't silently force the data to match the codebook.
+- **`processing_level: major` requires `description_processing`**: keep `processing_level: minor` as the common default and override to `major` only on indicators that have a `description_processing` field. Don't blanket-set `major` on the common block and then leave country-level proportions without their own processing note.
+- **Per-indicator description_processing reads better than a generic shared note**: when an indicator is derived (combined-categorical buckets, regional aggregates, computed counts), spell out *that indicator's* derivation. Reusing named definitions for shared boilerplate is fine; just compose them into per-indicator sentences rather than dropping a single generic note across all indicators.
+- **`description_key` in `definitions.common` propagates only to indicators without their own list**: if you want a bullet to appear on every indicator, either keep it on `common.description_key` and don't define per-indicator lists (it inherits), or prepend it explicitly to each per-indicator list (treats it as a "first bullet" pattern).
 
 ## Artifacts (expected)
 
