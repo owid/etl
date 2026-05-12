@@ -19,8 +19,20 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# OWID regions to aggregate over (matches v1).
-REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
+# OWID regions to aggregate over: the 6 continents + World, plus the 4 World Bank income groups.
+REGIONS = [
+    "Europe",
+    "Asia",
+    "North America",
+    "South America",
+    "Africa",
+    "Oceania",
+    "World",
+    "High-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "Low-income countries",
+]
 
 # Threshold to binarize the continuous proportion into "full implementation" yes/no.
 FULL_IMPL_THRESHOLD = 1.0
