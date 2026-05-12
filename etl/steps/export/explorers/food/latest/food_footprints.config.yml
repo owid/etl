@@ -110,3 +110,11 @@ views:
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_retail
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_packaging
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_losses
+    # Multi-y view: the title/subtitle describe the combination (an 8-source stacked bar of
+    # emissions across the supply chain), so they can't live on any single indicator's
+    # grapher_config — kept inline here. `c.edit_views(... view_type=specific_food_product ...)`
+    # in food_footprints.py intentionally skips this view.
+    config:
+      title: "Food: greenhouse gas emissions across the supply chain"
+      subtitle: |-
+        [Greenhouse gas emissions](#dod:ghgemissions) are measured in kilograms of [carbon dioxide-equivalents (CO₂eq)](#dod:carbondioxideequivalents) per kilogram of food.

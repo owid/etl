@@ -140,11 +140,13 @@ def _dim(view, key):
 
 
 def _title(view) -> str:
-    by_stage = _dim(view, "by_stage")
+    """Title for `view_type=specific_food_product` views only (scoped by `c.edit_views`).
+
+    Commodity-side single-y views inherit from the Poore & Nemecek garden meta.yml; the
+    multi-y commodity stage view carries its own `title:` in `food_footprints.config.yml`.
+    """
     impact = _dim(view, "impact")
     unit = _dim(view, "unit")
-    if by_stage == "stages":
-        return "Food: greenhouse gas emissions across the supply chain"
     if impact == "all_impacts":
         return f"Environmental impacts of food per {UNIT_NOUN[unit]}"
     if unit == "compare_units":
@@ -153,14 +155,12 @@ def _title(view) -> str:
 
 
 def _subtitle(view) -> str | None:
-    by_stage = _dim(view, "by_stage")
+    """Subtitle for `view_type=specific_food_product` views only (scoped by `c.edit_views`).
+
+    See `_title` for why commodity views aren't handled here.
+    """
     impact = _dim(view, "impact")
     unit = _dim(view, "unit")
-    if by_stage == "stages":
-        return (
-            "[Greenhouse gas emissions](#dod:ghgemissions) are measured in kilograms of "
-            "[carbon dioxide-equivalents (CO₂eq)](#dod:carbondioxideequivalents) per kilogram of food."
-        )
     if impact == "all_impacts":
         return None
     if impact in IMPACT_SUBTITLE:
@@ -286,15 +286,20 @@ def run() -> None:
         ]
     )
 
-    # Templated chart text via lambdas. `set_global_config` sets these on every view (auto-
-    # expanded + grouped + the YAML stage view); the lambdas branch on `view.d` to handle
-    # each shape.
-    c.set_global_config(
-        {
-            "type": _chart_type,
-            "title": _title,
-            "subtitle": _subtitle,
-        }
+    # Chart type still applies to every view (DiscreteBar default; StackedDiscreteBar
+    # for the YAML stage view).
+    c.set_global_config({"type": _chart_type})
+
+    # Templated title / subtitle are only needed for the Clark `specific_food_product`
+    # side. Commodity single-y views inherit from the Poore & Nemecek garden meta.yml;
+    # the YAML-listed commodity stage view carries its own title/subtitle inline.
+    c.edit_views(
+        [
+            {
+                "dimensions": {"view_type": "specific_food_product"},
+                "config": {"title": _title, "subtitle": _subtitle},
+            },
+        ]
     )
 
     c.save(tolerate_extra_indicators=True)
