@@ -32,6 +32,16 @@ definitions:
     name: "Full democracies"
     color: "#2c7bb6"
 
+  display_1930: &display_1930
+    name: "aged 19-30"
+    color: "#c7e9b4"
+  display_3160: &display_3160
+    name: "aged 31-60"
+    color: "#41b6c4"
+  display_6190: &display_6190
+    name: "aged 61-90"
+    color: "#225ea8"
+
 config:
   explorerTitle: "Democracy"
   explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
@@ -90,6 +100,8 @@ views:
     indicators:
       y:
         - catalogPath: lexical_index#regime_lied
+    config:
+      colorVariableId: lexical_index#regime_lied
   - dimensions:
       metric: political_regime
       sub_metric: number_and_share_of_democracies
@@ -114,7 +126,7 @@ views:
     config:
       title: "Countries that are democracies and autocracies"
       subtitle: "{definitions.group_subtitle_base}"
-      type: "StackedDiscreteBar StackedArea"
+      type: "StackedArea StackedDiscreteBar"
       stackMode: "relative"
   - dimensions:
       metric: political_regime
@@ -144,49 +156,65 @@ views:
     config:
       title: "People living in democracies and autocracies"
       subtitle: "{definitions.group_subtitle_base}"
-      type: "StackedDiscreteBar StackedArea"
+      type: "StackedArea StackedDiscreteBar"
+
+  # === Electoral democracy views ===
   - dimensions:
       metric: electoral_democracy
       sub_metric: main_classification
     indicators:
       y:
         - catalogPath: lexical_index#democracy_lied
+    config:
+      colorVariableId: lexical_index#democracy_lied
   - dimensions:
       metric: electoral_democracy
       sub_metric: elections_for_legislature
     indicators:
       y:
         - catalogPath: lexical_index#legelec_lied
+    config:
+      colorVariableId: lexical_index#legelec_lied
   - dimensions:
       metric: electoral_democracy
       sub_metric: elections_for_chief_executive
     indicators:
       y:
         - catalogPath: lexical_index#exelec_lied
+    config:
+      colorVariableId: lexical_index#exelec_lied
   - dimensions:
       metric: electoral_democracy
       sub_metric: political_opposition
     indicators:
       y:
         - catalogPath: lexical_index#opposition_lied
+    config:
+      colorVariableId: lexical_index#opposition_lied
   - dimensions:
       metric: electoral_democracy
       sub_metric: competitive_elections
     indicators:
       y:
         - catalogPath: lexical_index#competition_lied
+    config:
+      colorVariableId: lexical_index#competition_lied
   - dimensions:
       metric: electoral_democracy
       sub_metric: universal_right_to_vote_for_men
     indicators:
       y:
         - catalogPath: lexical_index#male_suffrage_lied
+    config:
+      colorVariableId: lexical_index#male_suffrage_lied
   - dimensions:
       metric: electoral_democracy
       sub_metric: universal_right_to_vote_for_women
     indicators:
       y:
         - catalogPath: lexical_index#female_suffrage_lied
+    config:
+      colorVariableId: lexical_index#female_suffrage_lied
   - dimensions:
       metric: electoral_democracy
       sub_metric: age_of_electoral_democracy
@@ -207,17 +235,11 @@ views:
             name: "Electoral democracies aged 1-18"
             color: "#edf8b1"
         - catalogPath: region_aggregates#num_group_age_electdem_lied__category_19_30_years
-          display:
-            name: "aged 19-30"
-            color: "#c7e9b4"
+          display: *display_1930
         - catalogPath: region_aggregates#num_group_age_electdem_lied__category_31_60_years
-          display:
-            name: "aged 31-60"
-            color: "#41b6c4"
+          display: *display_3160
         - catalogPath: region_aggregates#num_group_age_electdem_lied__category_61_90_years
-          display:
-            name: "aged 61-90"
-            color: "#225ea8"
+          display: *display_6190
         - catalogPath: region_aggregates#num_group_age_electdem_lied__category_91plus_years
           display:
             name: "aged 91 +"
@@ -226,18 +248,25 @@ views:
       title: "Countries that are long-standing electoral democracies"
       subtitle: "{definitions.group_subtitle_base} Electoral democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections."
       stackMode: "relative"
+      type: "StackedArea StackedDiscreteBar"
+
+  # === Full democracy views ===
   - dimensions:
       metric: full_democracy
       sub_metric: main_classification
     indicators:
       y:
         - catalogPath: lexical_index#is_full_democracy
+    config:
+      colorVariableId: lexical_index#is_full_democracy
   - dimensions:
       metric: full_democracy
       sub_metric: political_liberties
     indicators:
       y:
         - catalogPath: lexical_index#poliberties_lied
+    config:
+      colorVariableId: lexical_index#poliberties_lied
   - dimensions:
       metric: full_democracy
       sub_metric: age_of_full_democracy
@@ -258,18 +287,13 @@ views:
             name: "Full democracies aged 1-18"
             color: "#edf8b1"
         - catalogPath: region_aggregates#num_group_age_polyarchy_lied__category_19_30_years
-          display:
-            name: "aged 19-30"
-            color: "#c7e9b4"
+          display: *display_1930
         - catalogPath: region_aggregates#num_group_age_polyarchy_lied__category_31_60_years
-          display:
-            name: "aged 31-60"
-            color: "#41b6c4"
+          display: *display_3160
         - catalogPath: region_aggregates#num_group_age_polyarchy_lied__category_61_90_years
-          display:
-            name: "aged 61-90"
-            color: "#225ea8"
+          display: *display_6190
     config:
       title: "Countries that are long-standing full democracies"
       subtitle: "{definitions.group_subtitle_base} Full democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association."
       stackMode: "relative"
+      type: "StackedArea StackedDiscreteBar"
