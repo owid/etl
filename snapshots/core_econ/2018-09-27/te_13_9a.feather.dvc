@@ -1,13 +1,13 @@
 meta:
-  source:
-    name: Broadberry, Campbell and Klein (2015)
-    url: |-
-      http://www.lse.ac.uk/economicHistory/pdf/Broadberry/BritishGDPLongRun16a.pdf; http://www.lse.ac.uk/economicHistory/pdf/Broadberry/Finaldata12701870.xls
-    published_by: |-
-      Stephen Broadberry, Bruce M. S. Campbell, and Alexander Klein. 2015. British Economic Growth, 1270–1870. Cambridge: Cambridge University Press.
-  name: TE-13.9a
-  description: core-econ.org
   is_public: false
+  origin:
+    producer: Broadberry et al.
+    title: 'British economic growth, 1270-1870'
+    citation_full: 'Stephen Broadberry, Bruce M. S. Campbell, and Alexander Klein. 2015. British Economic Growth, 1270–1870. Cambridge: Cambridge University Press.'
+    url_main: http://www.lse.ac.uk/economicHistory/pdf/Broadberry/BritishGDPLongRun16a.pdf
+    url_download: http://www.lse.ac.uk/economicHistory/pdf/Broadberry/Finaldata12701870.xls
+    date_accessed: '2018-09-27'
+    date_published: '2015'
 outs:
   - md5: 6744a9cf92facd0f6b5bbe1361f110b6
     size: 9802

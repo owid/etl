@@ -1,13 +1,13 @@
 meta:
-  source:
-    name: Almunia et al. (2010)
-    description: "The 7 countries in the sample are France, Germany, UK, Poland, Sweden, Japan, UK and US.\t\t"
-    url: https://www.nber.org/papers/w15524
-    published_by: |-
-      Miguel Almunia, Agustín Bénétrix, Barry Eichengreen, Kevin H. O’Rourke, and Gisela Rua. 2010. ‘From Great Depression to Great Credit Crisis: Similarities, Differences and Lessons.’ Economic Policy 25 (62): pp. 219–65.
-  name: Figure_17.1b-2
-  description: core-econ.org
   is_public: false
+  origin:
+    producer: Almunia et al.
+    title: 'From Great Depression to Great Credit Crisis: Similarities, Differences and Lessons'
+    description: The 7 countries in the sample are France, Germany, UK, Poland, Sweden, Japan, UK and US.
+    citation_full: "Miguel Almunia, Agust\xEDn B\xE9n\xE9trix, Barry Eichengreen, Kevin H. O'Rourke, and Gisela Rua. 2010. 'From Great Depression to Great Credit Crisis: Similarities, Differences and Lessons.' Economic Policy 25 (62): pp. 219–65."
+    url_main: https://www.nber.org/papers/w15524
+    date_accessed: '2020-07-02'
+    date_published: '2010'
 outs:
   - md5: baaf66d31dd286d9ee55383ece4a7868
     size: 4594
