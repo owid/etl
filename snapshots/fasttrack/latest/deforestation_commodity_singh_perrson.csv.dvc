@@ -12,6 +12,6 @@ meta:
   description: ''
   license: {}
 outs:
-  - md5: eb784269ce91d35bdc29c9bcc1f50c66
-    size: 303806
+  - md5: 474f8322d64b8a5b1bacf22bc6fb8c5f
+    size: 195904
     path: deforestation_commodity_singh_perrson.csv

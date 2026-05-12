@@ -27,16 +27,8 @@ tables:
         display:
           numDecimalPlaces: 0
         description: Estimated deforestation driven by the conversion to cropland for the production of soy.
-      oilseeds_excl_soy_and_palm:
-        title: Oilseeds (excl. soy and palm)
-        unit: hectares
-        short_unit: ha
-        display:
-          numDecimalPlaces: 0
-        description: Estimated deforestation driven by the conversion to cropland for the production of oilseeds, excluding
-          palm and soy.
       forestry:
-        title: Forestry (paper and wood)
+        title: Oilseeds (excl. soy and palm)
         unit: hectares
         short_unit: ha
         display:
@@ -44,76 +36,34 @@ tables:
         description: Estimated deforestation driven by the conversion to managed forest for products such as paper, pulp and
           wood.
       cereals:
-        title: Cereals
+        title: Forestry (paper and wood)
         unit: hectares
         short_unit: ha
         display:
           numDecimalPlaces: 0
         description: Estimated deforestation driven by the conversion to cropland for cereal production.
       roots_and_tubers:
-        title: Roots and tubers
+        title: Cereals
         unit: hectares
         short_unit: ha
         display:
           numDecimalPlaces: 0
         description: Estimated deforestation driven by the conversion to cropland for the production of roots and tubers.
-      vegetables:
+      cocoa_and_coffee:
+        title: Roots and tubers
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation driven by the conversion to land for the production of coffee and cocoa.
+      other_crops:
         title: Vegetables
         unit: hectares
         short_unit: ha
         display:
           numDecimalPlaces: 0
-        description: Estimated deforestation driven by the conversion to land for the production of vegetables.
-      fruit_and_nuts:
-        title: Fruit and nuts
-        unit: hectares
-        short_unit: ha
-        display:
-          numDecimalPlaces: 0
-        description: Estimated deforestation driven by the conversion to land for the production of fruit and nuts.
-      coffee:
-        title: Coffee
-        unit: hectares
-        short_unit: ha
-        display:
-          numDecimalPlaces: 0
-        description: Estimated deforestation driven by the conversion to land for the production of coffee.
-      cocoa:
-        title: Cocoa
-        unit: hectares
-        short_unit: ha
-        display:
-          numDecimalPlaces: 0
-        description: Estimated deforestation driven by the conversion to land for the production of cocoa.
-      stimulants_and_spices_excl_coffee_and_cocoa:
-        title: Stimulants and spices (excl. coffee, cocoa)
-        unit: hectares
-        short_unit: ha
-        display:
-          numDecimalPlaces: 0
         description: |-
-          Estimated deforestation driven by the conversion to cropland for the production of stimulants and spices, excluding cocoa and coffee beans.
-      plant_based_fibres:
-        title: Plant-based fibres
-        unit: hectares
-        short_unit: ha
-        display:
-          numDecimalPlaces: 0
-        description: Estimated deforestation driven by the conversion to cropland for the production of plant-based fibres.
-      pulses:
-        title: Pulses
-        unit: hectares
-        short_unit: ha
-        display:
-          numDecimalPlaces: 0
-        description: Estimated deforestation driven by the conversion to cropland for the production of pulses.
-      sugar:
-        title: Sugar
-        unit: hectares
-        short_unit: ha
-        display:
-          numDecimalPlaces: 0
-        description: Estimated deforestation driven by the conversion to cropland for sugar production.
+          Estimated deforestation driven by the conversion to land for the production of crops such as sugar, pulses, plant-based fibres, oilseeds (excluding palm and oil).
     dimensions:
       - name: country
         slug: country
