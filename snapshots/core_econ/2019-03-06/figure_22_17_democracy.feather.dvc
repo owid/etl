@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Inter-Parliamentary Union
+    url: http://archive.ipu.org/wmn-e/suffrage.htm
+    date_accessed: 2026-05-12
+    published_by: Inter-Parliamentary Union
+  name: Figure 22.17_democracy
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 720f70a9db47fc0c1fd17a183af6098e
+    size: 3282
+    path: figure_22_17_democracy.feather

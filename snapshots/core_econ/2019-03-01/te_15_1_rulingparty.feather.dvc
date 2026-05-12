@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: US National Archives (2012)
+    url: https://www.archives.gov/federal-register/electoral-college/votes/index.html
+    date_accessed: 2026-05-12
+    published_by: US National Archives. 2012. ‘1789–2012 Presidential Elections’. US Electoral College.
+  name: TE-15.1_RulingParty
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: d92722d99ab9f481b5e3d8ad8f3419a1
+    size: 3386
+    path: te_15_1_rulingparty.feather

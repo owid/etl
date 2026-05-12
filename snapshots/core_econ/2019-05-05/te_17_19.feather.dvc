@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: US Bureau of Economic Analysis, US Federal Reserve (2018)
+    url: 'Credit market debt: http://www.federalreserve.gov/releases/Z1/default.htm; Disposable income: http://www.bea.gov/'
+    date_accessed: 2026-05-12
+    published_by: |-
+      US Federal Reserve. 2018. ‘Financial Accounts of the United States, Historical’. December; US Bureau of Economic Analysis
+  name: TE-17.19
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: d386f778c3b8d2f386e6fa067d00e0f7
+    size: 4842
+    path: te_17_19.feather

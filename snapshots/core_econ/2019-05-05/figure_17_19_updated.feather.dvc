@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: The FRED
+    url: http://research.stlouisfed.org/
+    date_accessed: 2026-05-12
+    published_by: Federal Reserve Bank of St Louis (FRED)
+  name: Figure 17.19_updated
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 16444cdeaca2f54039f427a7edd45bc6
+    size: 4778
+    path: figure_17_19_updated.feather

@@ -1,0 +1,22 @@
+dataset:
+  title: TE-17.19
+tables:
+  te_17_19:
+    variables:
+      all_transactions_house_price_index__2005_100:
+        title: All-Transactions House Price Index (2005=100)
+        unit: ''
+      household_debt_to_income_ratio:
+        title: Household debt to income ratio
+        unit: ''
+        description: |-
+          The household debt to income ratio is outstanding households and nonprofit organizations credit market debt divided by disposable personal income.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

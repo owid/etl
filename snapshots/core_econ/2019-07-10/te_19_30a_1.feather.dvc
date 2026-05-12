@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Wang and Caminada (2017)
+    description: |-
+      Gini data available at roughly five year intervals. Gini averaged for each country over the time period available. Time periods are: 1981-2010 for Australia, 1987-2013 for Austria, 1985-2000 for Belgium, 1971 - 2010 for Canada, 1987 - 2013 for Denmark, 1987 - 2013 for Finland, 1978 - 2010 for France, 1973 - 2013 for Germany, 1986 - 2014 for Italy, 1985 - 2013 for Luxembourg, 1983 - 2013 for Netherlands, 1979 - 2013 for Norway, 1967 - 2005 for Sweden, 1982 - 2013 for Switzerland, 1969 - 2013 for the United Kingdom and 1974 - 2013 for the United States. 																		
+    url: |-
+      https://www.universiteitleiden.nl/en/law/institute-for-tax-law-and-economics/economics/data-sets/leiden-lis-budget-incidence-fiscal-redistribution-dataset-on-income-inequality-for-47-lis-countries---1967-2014
+    date_accessed: 2026-05-12
+    published_by: |-
+      Koen Caminada, Jinxian Wang, Kees Goudswaard & Chen Wang (2017), Income inequality and fiscal redistribution in 47 LIS-countries (1967-2014), LIS Working Paper Series No. 724.
+  name: TE-19.30a_1
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 18655c3f9a8fbdef29948d3ca1b6c380
+    size: 4106
+    path: te_19_30a_1.feather
