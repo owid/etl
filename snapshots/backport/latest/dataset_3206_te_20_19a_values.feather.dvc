@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3206
-    date_accessed: 2023-08-10 08:49:03.786502
+    url: https://admin.owid.io/admin/datasets/3206
+    date_accessed: 2026-05-12 10:57:54.729436+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: TE-20.19a
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7e2401a7cd2efda6c68887e5d659456b
-  size: 6722
-  path: dataset_3206_te_20_19a_values.feather
+  - md5: 44cb4d9f70be38e7c85377edcd81c7a3
+    size: 6762
+    path: dataset_3206_te_20_19a_values.feather

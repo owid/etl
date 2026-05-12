@@ -1668,3 +1668,83 @@ steps:
     - data-private://garden/core_econ/2019-01-07/figure_19_9
   data-private://garden/core_econ/2019-01-07/figure_19_9:
     - snapshot-private://core_econ/2019-01-07/figure_19_9.feather
+  data-private://grapher/core_econ/2019-01-26/te_16_12_wage:
+    - data-private://garden/core_econ/2019-01-26/te_16_12_wage
+  data-private://garden/core_econ/2019-01-26/te_16_12_wage:
+    - snapshot-private://core_econ/2019-01-26/te_16_12_wage.feather
+  data-private://grapher/core_econ/2019-01-26/te_16_14:
+    - data-private://garden/core_econ/2019-01-26/te_16_14
+  data-private://garden/core_econ/2019-01-26/te_16_14:
+    - snapshot-private://core_econ/2019-01-26/te_16_14.feather
+  data-private://grapher/core_econ/2019-01-26/te_16_18:
+    - data-private://garden/core_econ/2019-01-26/te_16_18
+  data-private://garden/core_econ/2019-01-26/te_16_18:
+    - snapshot-private://core_econ/2019-01-26/te_16_18.feather
+  data-private://grapher/core_econ/2019-01-26/te_17_11:
+    - data-private://garden/core_econ/2019-01-26/te_17_11
+  data-private://garden/core_econ/2019-01-26/te_17_11:
+    - snapshot-private://core_econ/2019-01-26/te_17_11.feather
+  data-private://grapher/core_econ/2019-02-03/te_20_3:
+    - data-private://garden/core_econ/2019-02-03/te_20_3
+  data-private://garden/core_econ/2019-02-03/te_20_3:
+    - snapshot-private://core_econ/2019-02-03/te_20_3.feather
+  data-private://grapher/core_econ/2019-02-03/te_20_19a:
+    - data-private://garden/core_econ/2019-02-03/te_20_19a
+  data-private://garden/core_econ/2019-02-03/te_20_19a:
+    - snapshot-private://core_econ/2019-02-03/te_20_19a.feather
+  data-private://grapher/core_econ/2019-02-03/te_20_19b:
+    - data-private://garden/core_econ/2019-02-03/te_20_19b
+  data-private://garden/core_econ/2019-02-03/te_20_19b:
+    - snapshot-private://core_econ/2019-02-03/te_20_19b.feather
+  data-private://grapher/core_econ/2019-02-03/figure_20_22:
+    - data-private://garden/core_econ/2019-02-03/figure_20_22
+  data-private://garden/core_econ/2019-02-03/figure_20_22:
+    - snapshot-private://core_econ/2019-02-03/figure_20_22.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19a_capital:
+    - data-private://garden/core_econ/2019-03-01/te_13_19a_capital
+  data-private://garden/core_econ/2019-03-01/te_13_19a_capital:
+    - snapshot-private://core_econ/2019-03-01/te_13_19a_capital.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19a_consumption:
+    - data-private://garden/core_econ/2019-03-01/te_13_19a_consumption
+  data-private://garden/core_econ/2019-03-01/te_13_19a_consumption:
+    - snapshot-private://core_econ/2019-03-01/te_13_19a_consumption.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19a_gdp:
+    - data-private://garden/core_econ/2019-03-01/te_13_19a_gdp
+  data-private://garden/core_econ/2019-03-01/te_13_19a_gdp:
+    - snapshot-private://core_econ/2019-03-01/te_13_19a_gdp.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19a_2_consumption:
+    - data-private://garden/core_econ/2019-03-01/te_13_19a_2_consumption
+  data-private://garden/core_econ/2019-03-01/te_13_19a_2_consumption:
+    - snapshot-private://core_econ/2019-03-01/te_13_19a_2_consumption.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19a_2_capital:
+    - data-private://garden/core_econ/2019-03-01/te_13_19a_2_capital
+  data-private://garden/core_econ/2019-03-01/te_13_19a_2_capital:
+    - snapshot-private://core_econ/2019-03-01/te_13_19a_2_capital.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19b_capital:
+    - data-private://garden/core_econ/2019-03-01/te_13_19b_capital
+  data-private://garden/core_econ/2019-03-01/te_13_19b_capital:
+    - snapshot-private://core_econ/2019-03-01/te_13_19b_capital.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19b_gdp:
+    - data-private://garden/core_econ/2019-03-01/te_13_19b_gdp
+  data-private://garden/core_econ/2019-03-01/te_13_19b_gdp:
+    - snapshot-private://core_econ/2019-03-01/te_13_19b_gdp.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19b_consumption:
+    - data-private://garden/core_econ/2019-03-01/te_13_19b_consumption
+  data-private://garden/core_econ/2019-03-01/te_13_19b_consumption:
+    - snapshot-private://core_econ/2019-03-01/te_13_19b_consumption.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19a_2_gdp:
+    - data-private://garden/core_econ/2019-03-01/te_13_19a_2_gdp
+  data-private://garden/core_econ/2019-03-01/te_13_19a_2_gdp:
+    - snapshot-private://core_econ/2019-03-01/te_13_19a_2_gdp.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19b_2_consumption:
+    - data-private://garden/core_econ/2019-03-01/te_13_19b_2_consumption
+  data-private://garden/core_econ/2019-03-01/te_13_19b_2_consumption:
+    - snapshot-private://core_econ/2019-03-01/te_13_19b_2_consumption.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19b_2_capital:
+    - data-private://garden/core_econ/2019-03-01/te_13_19b_2_capital
+  data-private://garden/core_econ/2019-03-01/te_13_19b_2_capital:
+    - snapshot-private://core_econ/2019-03-01/te_13_19b_2_capital.feather
+  data-private://grapher/core_econ/2019-03-01/te_13_19b_2_gdp:
+    - data-private://garden/core_econ/2019-03-01/te_13_19b_2_gdp
+  data-private://garden/core_econ/2019-03-01/te_13_19b_2_gdp:
+    - snapshot-private://core_econ/2019-03-01/te_13_19b_2_gdp.feather

@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: FRED (2016)
+    url: https://fred.stlouisfed.org/series/NAEXKP01ZAA657S
+    date_accessed: 2026-05-12
+    published_by: Federal Reserve Bank of St. Louis (2016) FRED.
+  name: TE-13.19b_2_GDP
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 1809c97a9149645ac0a169e497c36cdc
+    size: 3618
+    path: te_13_19b_2_gdp.feather
