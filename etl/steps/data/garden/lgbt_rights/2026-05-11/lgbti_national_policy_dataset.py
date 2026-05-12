@@ -181,11 +181,11 @@ def _build_regional_aggregates(tb):
 
 
 def _build_combined_categorical_table(tb):
-    """Recreate v1's three combined ordinal indicators: age_of_consent, marriage, lgb_military_join.
+    """Create three combined ordinal indicators: age_of_consent, marriage, lgb_military_join.
 
-    The v1 logic bucketed each policy's Proportion into 0 / 0.5 / 1 (where 0.5 means "0 < x < 1"),
+    It buckets each policy's Proportion into 0 / 0.5 / 1 (where 0.5 means "0 < x < 1"),
     concatenated the bucket strings of the relevant policies, and mapped to a human-readable
-    category. We replicate that approach here on the long-format v2 data.
+    category.
     """
     # Pivot the long table to wide so we can address each (law, status) column by name.
     wide = tb.pivot(index=["country", "year"], columns=["law", "status"], values="proportion")
@@ -230,7 +230,9 @@ def _build_combined_categorical_table(tb):
     wide.loc[(mil_legal == 0) & (mil_ban == 0), "lgb_military_join"] = "No policy"
     wide["lgb_military_join"] = wide["lgb_military_join"].copy_metadata(wide["country"])
 
-    return wide[["country", "year", "age_of_consent", "marriage", "lgb_military_join"]]
+    wide = wide[["country", "year", "age_of_consent", "marriage", "lgb_military_join"]]
+
+    return wide
 
 
 def _build_combined_categorical_regional_aggregates(tb_combined):
@@ -241,8 +243,7 @@ def _build_combined_categorical_regional_aggregates(tb_combined):
       - `<indicator>_<category>_pop`:   total population in those countries
 
     Output is wide-format indexed by (country, year), with one column per
-    (indicator, category) × {count, pop}. This mirrors v1's structure
-    (`age_of_consent_equal_count`, `marriage_legal_pop`, etc.).
+    (indicator, category) × {count, pop}.
     """
     tb = tb_combined.copy()
     tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
@@ -264,4 +265,7 @@ def _build_combined_categorical_regional_aggregates(tb_combined):
         aggregations=aggregations,
     )
     tb_regions = tb_regions[tb_regions["country"].isin(REGIONS)].reset_index(drop=True)
-    return tb_regions[["country", "year"] + new_cols]
+
+    tb_regions = tb_regions[["country", "year"] + new_cols]
+
+    return tb_regions
