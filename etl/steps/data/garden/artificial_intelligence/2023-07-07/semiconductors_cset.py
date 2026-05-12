@@ -1,42 +1,19 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
+from etl.helpers import PathFinder
 
-from owid.catalog import Dataset, Table
-
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
-
-# Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("semiconductors_cset"))
+def run() -> None:
+    ds_meadow = paths.load_dataset("semiconductors_cset")
+    tb = ds_meadow.read("semiconductors_cset")
 
-    # Read table from meadow dataset.
-    tb = ds_meadow["semiconductors_cset"]
-    tb.reset_index(inplace=True)
-
-    #
-    # Process data.
-    #
-    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
     tb["year"] = 2021
-    tb_pivot = tb.pivot(index=["country", "year"], columns="provided_name", values="share_provided")
-    tb_pivot.reset_index(inplace=True)
-    tb_pivot.set_index(["country", "year"], inplace=True)
-    tb = Table(tb_pivot, short_name=paths.short_name, underscore=True)
 
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_pivot], default_metadata=ds_meadow.metadata)
+    tb = tb.pivot(index=["country", "year"], columns="provided_name", values="share_provided", join_column_levels_with="_")
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
 
-    # Save changes in the new garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
     ds_garden.save()
