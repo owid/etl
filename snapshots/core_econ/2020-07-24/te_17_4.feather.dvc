@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: US Federal Reserve (2020), US Bureau of Economic Analysis (2020)
+    description: ''
+    url: http://www.federalreserve.gov/releases/Z1/default.htm; http://www.bea.gov/
+    date_accessed: 2026-05-12
+    published_by: Federal Reserve Financial Accounts of the United States (2020); US Bureau of Economic Analysis (2020)
+  name: TE-17.4
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 363adfd0d5e074f3c0d9b95da119182c
+    size: 7442
+    path: te_17_4.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: OECD (2020)
+    description: |-
+      Some early data points come from  David R Howell, Dean Baker, Andrew Glyn, and John Schmitt. 2007. ‘Are Protective Labor Market Institutions at the Root of Unemployment? A Critical Review of the Evidence’. Capitalism and Society 2 (1) (January). These early data points measure averages in the consecutive 5 years.
+    url: https://stats.oecd.org/Index.aspx?QueryId=36499
+    date_accessed: 2026-05-12
+    published_by: OECD (2020) OECD Statistics
+  name: TE-16.1
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 8d1fec077bb20992228cab3cdb1136f7
+    size: 6810
+    path: te_16_1.feather

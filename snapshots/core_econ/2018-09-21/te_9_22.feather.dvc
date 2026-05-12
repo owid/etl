@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Visser (2015) and the OECD Employment Outlook 2012
+    url: |-
+      http://uva-aias.net/en/ictwss; https://www.oecd-ilibrary.org/employment/oecd-employment-outlook-2012_empl_outlook-2012-en;jsessionid=1vufoylr4qxq9.x-oecd-live-02
+    date_accessed: 2026-05-12
+    published_by: |-
+      Visser, Jelle (2015). ‘ICTWSS Data base. version 5.0.’. Amsterdam: Amsterdam Institute for Advanced Labour Studies AIAS. Updated October 2015.; The OECD Employment Outlook 2012
+  name: TE-9.22
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 4b94100376dac4a4ba3fbee48b9b86b7
+    size: 5122
+    path: te_9_22.feather
