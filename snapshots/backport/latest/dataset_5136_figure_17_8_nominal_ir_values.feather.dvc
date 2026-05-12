@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5136
-    date_accessed: 2023-08-10 08:45:44.241760
+    url: https://admin.owid.io/admin/datasets/5136
+    date_accessed: 2026-05-12 11:07:42.645499+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Figure_17.8_nominal_ir
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 39952ea5d22b62649f8a3d7d8a4574fe
-  size: 7226
-  path: dataset_5136_figure_17_8_nominal_ir_values.feather
+  - md5: 91da32d853dc8192fc798988018e929b
+    size: 7258
+    path: dataset_5136_figure_17_8_nominal_ir_values.feather

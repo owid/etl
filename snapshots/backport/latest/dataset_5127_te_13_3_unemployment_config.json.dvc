@@ -1,8 +1,8 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5127
-    date_accessed: 2023-08-10 09:23:52.091089
+    url: https://admin.owid.io/admin/datasets/5127
+    date_accessed: 2026-05-12 11:07:16.329955+00:00
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5127_te_13_3_unemployment
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ba906996d19983aa3ee5fec9c3babff5
-  size: 2385
-  path: dataset_5127_te_13_3_unemployment_config.json
+  - md5: 45d8ac69d7b94584f4696c0c317cc162
+    size: 2608
+    path: dataset_5127_te_13_3_unemployment_config.json
