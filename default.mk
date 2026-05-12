@@ -37,12 +37,17 @@ check-uv-default:
 	fi
 
 .venv-default: check-uv .sanity-check
-	@echo '==> Installing packages'
-	@if [ -n "$(PYTHON_VERSION)" ]; then \
-		echo '==> Using Python version $(PYTHON_VERSION)'; \
-		UV_PYTHON=$(PYTHON_VERSION) uv sync --all-extras --group dev; \
+	@if [ -d .venv ] && [ .venv -nt pyproject.toml ] && { [ ! -f uv.lock ] || [ .venv -nt uv.lock ]; }; then \
+		true; \
 	else \
-		uv sync --all-extras --group dev; \
+		echo '==> Installing packages'; \
+		if [ -n "$(PYTHON_VERSION)" ]; then \
+			echo '==> Using Python version $(PYTHON_VERSION)'; \
+			UV_PYTHON=$(PYTHON_VERSION) uv sync --all-extras --group dev; \
+		else \
+			uv sync --all-extras --group dev; \
+		fi; \
+		touch .venv; \
 	fi
 
 check-default:
