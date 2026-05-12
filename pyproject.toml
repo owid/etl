@@ -87,6 +87,9 @@ dependencies = [
     "chardet<6.0.0",  # requests 2.32.5 checks chardet < 6.0.0 and warns if exceeded
 ]
 
+[tool.uv]
+exclude-newer = "3 days"
+
 [tool.uv.sources]
 owid-catalog = { path = "lib/catalog", editable = true }
 owid-datautils = { path = "lib/datautils", editable = true }
