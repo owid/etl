@@ -541,6 +541,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 Commit and push incrementally as you go — after each step that produces code changes. Don't wait until the end. Use descriptive commit messages with appropriate emojis (the one auto-prepended by `etl pr` for the chosen category + 🤖 for AI-written code).
 
 At the end of the workflow, update the PR description with:
+- A **tracking-issue link** as the first line of the Summary — e.g. `Tracks: [owid/owid-issues#NNNN](https://github.com/owid/owid-issues/issues/NNNN)`. Most data updates have a corresponding `owid-issues` ticket; try to find it by searching the title or `<short_name>` first, and **ask the user for the issue number if you can't locate one** rather than skipping the link silently.
 - A summary of key changes at the top
 - Collapsed sections for each pipeline step (Snapshot, Meadow, Garden, Grapher)
 - A collapsed section for the Slack announcement
