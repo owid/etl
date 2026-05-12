@@ -37,6 +37,10 @@ tables:
           grapher_config:
             title: Civil Liberties Rating
             subtitle: Data by [Freedom House](#dod:freedom-house). It captures the extent of freedom of expression and association, the rule of law, and personal autonomy. Lower ratings indicate more liberties.
+            chartTypes:
+              - LineChart
+              - SlopeChart
+              - DiscreteBar
             hasMapTab: true
             tab: map
             yAxis:
@@ -47,16 +51,14 @@ tables:
                 baseColorScheme: Greens
                 binningStrategy: manual
                 colorSchemeInvert: true
-                customNumericColors:
-                  - 
                 customNumericLabels:
-                  - '1'
-                  - '2'
-                  - '3'
-                  - '4'
-                  - '5'
-                  - '6'
-                  - '7'
+                  - "1"
+                  - "2"
+                  - "3"
+                  - "4"
+                  - "5"
+                  - "6"
+                  - "7"
                 customNumericValues:
                   - 1
                   - 1
@@ -80,6 +82,10 @@ tables:
           grapher_config:
             title: Political Rights Rating
             subtitle: Data by [Freedom House](#dod:freedom-house). It captures the extent of free and fair elections, political pluralism and participation, and a functioning government. Lower ratings indicate more rights.
+            chartTypes:
+              - LineChart
+              - SlopeChart
+              - DiscreteBar
             hasMapTab: true
             tab: map
             yAxis:
@@ -91,15 +97,15 @@ tables:
                 binningStrategy: manual
                 colorSchemeInvert: true
                 customNumericColors:
-                  - 
+                  -
                 customNumericLabels:
-                  - '1'
-                  - '2'
-                  - '3'
-                  - '4'
-                  - '5'
-                  - '6'
-                  - '7'
+                  - "1"
+                  - "2"
+                  - "3"
+                  - "4"
+                  - "5"
+                  - "6"
+                  - "7"
                 customNumericValues:
                   - 1
                   - 1
@@ -129,32 +135,33 @@ tables:
         presentation:
           grapher_config:
             title: Free country
-            subtitle: '[Data](#dod:regimes-fh) by [Freedom House](#dod:freedom-house). Free countries are those in which citizens have many political rights (free and fair elections, political pluralism and participation, functioning government) and civil liberties (freedoms of expression and association, rule of law, personal autonomy).'
+            subtitle: "[Data](#dod:regimes-fh) by [Freedom House](#dod:freedom-house). Free countries are those in which citizens have many political rights (free and fair elections, political pluralism and participation, functioning government) and civil liberties (freedoms of expression and association, rule of law, personal autonomy)."
+            chartTypes:
+              - LineChart
             hasMapTab: true
             tab: map
             yAxis:
               max: 2
               min: 0
             selectedFacetStrategy: entity
+            colorScale: &color_regime
+              binningStrategy: manual
+              customNumericColors:
+                - "#a588c3"
+                - "#e8b864"
+                - "#58ac8c"
+              customNumericLabels:
+                - Not free
+                - Partly free
+                - Free
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 2
+              customNumericColorsActive: true
             map:
-              colorScale:
-                baseColorScheme: RdYlBu
-                binningStrategy: manual
-                customNumericColors:
-                  - '#a588c3'
-                  - '#e8b864'
-                  - '#58ac8c'
-                customNumericLabels:
-                  - Not free
-                  - Partly free
-                  - Free
-                  - Liberal democracy
-                customNumericValues:
-                  - 0
-                  - 0
-                  - 1
-                  - 2
-                customNumericColorsActive: true
+              colorScale: *color_regime
               tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
@@ -174,6 +181,10 @@ tables:
           grapher_config:
             title: Democratic Electoral Institutions Score
             subtitle: Data by [Freedom House](#dod:freedom-house). The score captures the extent to which the chief executive and legislature are chosen in free and fair elections under universal suffrage. It ranges from 0 to 12 (most democratic).
+            chartTypes:
+              - LineChart
+              - SlopeChart
+              - DiscreteBar
             hasMapTab: true
             tab: map
             yAxis:
@@ -183,16 +194,6 @@ tables:
               colorScale:
                 baseColorScheme: YlGn
                 binningStrategy: manual
-                customNumericColors:
-                  - 
-                customNumericLabels:
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
                 customNumericValues:
                   - 0
                   - 1
@@ -214,6 +215,11 @@ tables:
           grapher_config:
             title: Political Rights Score
             subtitle: Data by [Freedom House](#dod:freedom-house). The score captures the extent of free and fair elections, political pluralism and participation, and a functioning government. Higher scores indicate more rights.
+            chartTypes:
+              - LineChart
+              - SlopeChart
+              - DiscreteBar
+              - Marimekko
             hasMapTab: true
             tab: map
             yAxis:
@@ -223,18 +229,6 @@ tables:
               colorScale:
                 baseColorScheme: Blues
                 binningStrategy: manual
-                customNumericColors:
-                  - 
-                  - 
-                customNumericLabels:
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - 
                 customNumericValues:
                   - 0
                   - 0
@@ -258,6 +252,11 @@ tables:
           grapher_config:
             title: Civil Liberties Score
             subtitle: Data by [Freedom House](#dod:freedom-house). The score captures the extent of freedom of expression and association, the rule of law, and personal autonomy. Higher scores indicate more liberties.
+            chartTypes:
+              - LineChart
+              - SlopeChart
+              - DiscreteBar
+              - Marimekko
             hasMapTab: true
             tab: map
             yAxis:
@@ -267,15 +266,6 @@ tables:
               colorScale:
                 baseColorScheme: Greens
                 binningStrategy: manual
-                customNumericLabels:
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - 53-60
-                  - 
                 customNumericValues:
                   - 0
                   - 10
@@ -303,7 +293,9 @@ tables:
         presentation:
           grapher_config:
             title: Democracy
-            subtitle: '[Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house). Democracies are political systems in which citizens have the right to choose the chief executive and legislature in broadly free and fair elections and have substantial other political rights and civil liberties.'
+            subtitle: "[Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house). Democracies are political systems in which citizens have the right to choose the chief executive and legislature in broadly free and fair elections and have substantial other political rights and civil liberties."
+            chartTypes:
+              - LineChart
             note: The Chart tab uses numeric values, with 1 for electoral democracies and 0 for non-democracies.
             hasMapTab: true
             tab: map
@@ -311,23 +303,21 @@ tables:
               max: 1
               min: 0
             selectedFacetStrategy: entity
+            colorScale: &color_electdem
+              binningStrategy: manual
+              customNumericColorsActive: true
+              customNumericColors:
+                - "#ef8a62"
+                - "#2c7bb6"
+              customNumericLabels:
+                - "No"
+                - "Yes"
+              customNumericValues:
+                - 0
+                - 0
+                - 1
             map:
-              colorScale:
-                baseColorScheme: RdYlBu
-                binningStrategy: manual
-                customNumericColors:
-                  - '#ef8a62'
-                  - '#2c7bb6'
-                customNumericLabels:
-                  - "No"
-                  - "Yes"
-                  - free
-                  - Liberal democracy
-                customNumericValues:
-                  - 0
-                  - 0
-                  - 1
-                customNumericColorsActive: true
+              colorScale: *color_electdem
               tooltipUseCustomLabels: true
   fh_regions:
     variables:

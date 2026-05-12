@@ -8,6 +8,9 @@
 definitions:
   group_subtitle: &group_subtitle |-
     [Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house).
+  common_views:
+    - config:
+        colorVariableId: regions#owid_region
 
 config:
   explorerTitle: "Democracy"
@@ -57,6 +60,8 @@ views:
     indicators:
       y:
         - catalogPath: fh#regime
+    config:
+      colorVariableId: fh#regime
   - dimensions:
       metric: freedom
       sub_metric: political_rights_score
@@ -100,6 +105,7 @@ views:
             color: "#58ac8c"
     config:
       title: "Free countries and territories"
+      type: &id001 "StackedArea StackedDiscreteBar"
       subtitle: *group_subtitle
       stackMode: "relative"
       yAxis:
@@ -128,6 +134,7 @@ views:
             color: "#58ac8c"
     config:
       title: "People living in free countries and territories"
+      type: *id001
       subtitle: *group_subtitle
   - dimensions:
       metric: electoral_democracy
@@ -135,6 +142,8 @@ views:
     indicators:
       y:
         - catalogPath: fh#electdem
+    config:
+      colorVariableId: fh#electdem
   - dimensions:
       metric: electoral_democracy
       sub_metric: democratic_electoral_institutions
@@ -180,6 +189,7 @@ views:
             color: "#2c7bb6"
     config:
       title: "Countries that are democracies and non-democracies"
+      type: *id001
       subtitle: *group_subtitle
       stackMode: "relative"
       yAxis:
@@ -204,4 +214,5 @@ views:
             color: "#2c7bb6"
     config:
       title: "People living in democracies and non-democracies"
+      type: *id001
       subtitle: *group_subtitle
