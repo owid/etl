@@ -1,0 +1,450 @@
+config:
+  explorerTitle: "Conflict Data Source"
+  explorerSubtitle: "Explore the world's conflicts through the leading approaches to measuring them."
+  isPublished: true
+definitions:
+  common_views:
+    - config:
+        yAxisMin: 0
+        hideAnnotationFieldsInTitle: true
+        chartTypes:
+          - "LineChart"
+          - "DiscreteBar"
+dimensions:
+  - slug: conflict_type
+    name: "Conflict type"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: all_state_based_conflicts
+        name: "All state-based conflicts"
+      - slug: interstate_conflicts
+        name: "Interstate conflicts"
+      - slug: intrastate_conflicts
+        name: "Intrastate conflicts"
+  - slug: measure
+    name: "Measure"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: conflict_deaths
+        name: "Conflict deaths"
+      - slug: death_rate
+        name: "Death rate"
+      - slug: number_of_conflicts
+        name: "Number of conflicts"
+      - slug: conflict_rate
+        name: "Conflict rate"
+      - slug: conflict_participants
+        name: "Conflict participants"
+  - slug: conflict_sub_type
+    name: "Conflict sub-type"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: na
+        name: ""
+      - slug: all_sub_types
+        name: "All sub-types"
+      - slug: by_sub_type
+        name: "By sub-type"
+  - slug: sub_measure
+    name: "Sub-measure"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: regional_data
+        name: "Regional data"
+      - slug: all_ongoing_conflicts
+        name: "All ongoing conflicts"
+      - slug: only_new_conflicts
+        name: "Only new conflicts"
+      - slug: country_level_data
+        name: "Country-level data"
+views:
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_low__conflict_type_all"
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_high__conflict_type_all"
+    config:
+      title: "Deaths in wars"
+      subtitle: "Included are deaths of combatants due to fighting in [conventional wars](#dod:conventional-war-mars) that were ongoing that year."
+      yScaleToggle: true
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_low__conflict_type_civil_war"
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_low__conflict_type_others__non_civil"
+    config:
+      title: "Deaths in wars"
+      subtitle: "Included are deaths of combatants due to fighting in [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_all"
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_all"
+    config:
+      title: "Death rate in wars"
+      subtitle: "Deaths of combatants due to fighting, per 100,000 people. Included are [conventional wars](#dod:conventional-war-mars) that were ongoing that year."
+      yScaleToggle: true
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_civil_war"
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_others__non_civil"
+    config:
+      title: "Death rate in wars"
+      subtitle: "Deaths of combatants due to fighting, per 100,000 people. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_ongoing_conflicts__conflict_type_all"
+    config:
+      title: "Number of wars"
+      subtitle: "Included are [conventional wars](#dod:conventional-war-mars) that were ongoing that year."
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_ongoing_conflicts__conflict_type_civil_war"
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_ongoing_conflicts__conflict_type_others__non_civil"
+    config:
+      title: "Number of wars"
+      subtitle: "Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_new_conflicts__conflict_type_all"
+    config:
+      title: "Number of new wars"
+      subtitle: "Included are [conventional wars](#dod:conventional-war-mars) that started that year."
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_new_conflicts__conflict_type_civil_war"
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_new_conflicts__conflict_type_others__non_civil"
+    config:
+      title: "Number of new wars"
+      subtitle: "Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that started that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_ongoing_conflicts_per_country__conflict_type_all"
+    config:
+      title: "Rate of wars"
+      subtitle: "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [conventional wars](#dod:conventional-war-mars) that were ongoing that year."
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_ongoing_conflicts_per_country__conflict_type_civil_war"
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_ongoing_conflicts_per_country_pair__conflict_type_others__non_civil"
+    config:
+      title: "Rate of wars"
+      subtitle: "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_new_conflicts_per_country__conflict_type_all"
+    config:
+      title: "Rate of new wars"
+      subtitle: "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [conventional wars](#dod:conventional-war-mars) that started that year."
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_new_conflicts_per_country__conflict_type_civil_war"
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_new_conflicts_per_country_pair__conflict_type_others__non_civil"
+    config:
+      title: "Rate of new wars"
+      subtitle: "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that started that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars_country#number_participants__conflict_type_all"
+    config:
+      title: "Number of states involved in wars"
+      subtitle: "Included are states that were [major participants](#dod:major-participant-mars) in at least one [conventional war](#dod:conventional-war-mars) that year."
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars_country#participated_in_conflict__conflict_type_all"
+    config:
+      title: "States involved in wars"
+      subtitle: "Included are states that were [major participants](#dod:major-participant-mars) in at least one [conventional war](#dod:conventional-war-mars) that year."
+      note: "Some states are not shown in the map because they do not exist anymore."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_high__conflict_type_others__non_civil"
+    config:
+      title: "Deaths in interstate wars"
+      subtitle: "Included are deaths of combatants due to fighting in [interstate wars](#dod:interstate-war-mars) that were ongoing that year."
+      yScaleToggle: true
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_others__non_civil"
+    config:
+      title: "Death rate in interstate wars"
+      subtitle: "Deaths of combatants due to fighting, per 100,000 people. Included are [interstate wars](#dod:interstate-war-mars) that were ongoing that year."
+      yScaleToggle: true
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_ongoing_conflicts__conflict_type_others__non_civil"
+    config:
+      title: "Number of interstate wars"
+      subtitle: "Included are [interstate wars](#dod:interstate-war-mars) that were ongoing that year."
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_new_conflicts__conflict_type_others__non_civil"
+    config:
+      title: "Number of new interstate wars"
+      subtitle: "Included are [interstate wars](#dod:interstate-war-mars) that started that year."
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_ongoing_conflicts_per_country_pair__conflict_type_others__non_civil"
+    config:
+      title: "Rate of interstate wars"
+      subtitle: "The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. Included are [interstate wars](#dod:interstate-war-mars) that were ongoing that year."
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_new_conflicts_per_country_pair__conflict_type_others__non_civil"
+    config:
+      title: "Rate of new interstate wars"
+      subtitle: "The number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. Included are [interstate wars](#dod:interstate-war-mars) that started that year."
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars_country#number_participants__conflict_type_others__non_civil"
+    config:
+      title: "Number of states involved in interstate wars"
+      subtitle: "Included are states that were [major participants](#dod:major-participant-mars) in at least one [interstate war](#dod:interstate-war-mars) that year."
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars_country#participated_in_conflict__conflict_type_others__non_civil"
+    config:
+      title: "States involved in interstate wars"
+      subtitle: "Included are states that were [major participants](#dod:major-participant-mars) in at least one [interstate war](#dod:interstate-war-mars) that year."
+      note: "Some states are not shown in the map because they do not exist anymore."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_high__conflict_type_civil_war"
+    config:
+      title: "Deaths in civil wars"
+      subtitle: "Included are deaths of combatants due to fighting in [civil wars](#dod:civil-war-mars) that were ongoing that year."
+      yScaleToggle: true
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_civil_war"
+    config:
+      title: "Death rate in civil wars"
+      subtitle: "Deaths of combatants due to fighting, per 100,000 people. Included are [civil wars](#dod:civil-war-mars) that were ongoing that year."
+      yScaleToggle: true
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_ongoing_conflicts__conflict_type_civil_war"
+    config:
+      title: "Number of civil wars"
+      subtitle: "Included are [civil wars](#dod:civil-war-mars) that were ongoing that year."
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_new_conflicts__conflict_type_civil_war"
+    config:
+      title: "Number of new civil wars"
+      subtitle: "Included are [civil wars](#dod:civil-war-mars) that started that year."
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_ongoing_conflicts_per_country__conflict_type_civil_war"
+    config:
+      title: "Rate of civil wars"
+      subtitle: "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [civil wars](#dod:civil-war-mars) that were ongoing that year."
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars#number_new_conflicts_per_country__conflict_type_civil_war"
+    config:
+      title: "Rate of new civil wars"
+      subtitle: "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [civil wars](#dod:civil-war-mars) that started that year."
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars_country#number_participants__conflict_type_civil_war"
+    config:
+      title: "Number of states involved in civil wars"
+      subtitle: "Included are states that were [major participants](#dod:major-participant-mars) in at least one [civil war](#dod:civil-war-mars) that year."
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2023-09-21/mars/mars_country#participated_in_conflict__conflict_type_civil_war"
+    config:
+      title: "States involved in civil wars"
+      subtitle: "Included are states that were [major participants](#dod:major-participant-mars) in at least one [civil war](#dod:civil-war-mars) that year."
+      note: "Some states are not shown in the map because they do not exist anymore."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"

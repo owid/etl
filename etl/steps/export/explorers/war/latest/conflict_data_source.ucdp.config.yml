@@ -1,0 +1,1242 @@
+config:
+  explorerTitle: "Conflict Data Source"
+  explorerSubtitle: "Explore the world's conflicts through the leading approaches to measuring them."
+  isPublished: true
+definitions:
+  common_views:
+    - config:
+        yAxisMin: 0
+        hideAnnotationFieldsInTitle: true
+        chartTypes:
+          - "LineChart"
+          - "DiscreteBar"
+dimensions:
+  - slug: conflict_type
+    name: "Conflict type"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: all_armed_conflicts
+        name: "All armed conflicts"
+      - slug: all_state_based_conflicts
+        name: "All state-based conflicts"
+      - slug: interstate_conflicts
+        name: "Interstate conflicts"
+      - slug: intrastate_conflicts
+        name: "Intrastate conflicts"
+      - slug: extrastate_conflicts
+        name: "Extrastate conflicts"
+      - slug: non_state_conflicts
+        name: "Non-state conflicts"
+      - slug: one_sided_violence
+        name: "One-sided violence"
+  - slug: measure
+    name: "Measure"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: conflict_deaths
+        name: "Conflict deaths"
+      - slug: death_rate
+        name: "Death rate"
+      - slug: number_of_conflicts
+        name: "Number of conflicts"
+      - slug: conflict_rate
+        name: "Conflict rate"
+      - slug: conflict_locations
+        name: "Conflict locations"
+      - slug: conflict_participants
+        name: "Conflict participants"
+  - slug: conflict_sub_type
+    name: "Conflict sub-type"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: na
+        name: ""
+      - slug: by_sub_type
+        name: "By sub-type"
+      - slug: all_sub_types
+        name: "All sub-types"
+      - slug: only_non_internationalized_conflicts
+        name: "Only non-internationalized conflicts"
+      - slug: only_internationalized_conflicts
+        name: "Only internationalized conflicts"
+  - slug: sub_measure
+    name: "Sub-measure"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: na
+        name: ""
+      - slug: country_and_region_data
+        name: "Country and region data"
+      - slug: all_ongoing_conflicts
+        name: "All ongoing conflicts"
+      - slug: only_new_conflicts
+        name: "Only new conflicts"
+      - slug: regional_data
+        name: "Regional data"
+      - slug: country_level_data
+        name: "Country-level data"
+views:
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts__conflict_type_one_sided_violence"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts__conflict_type_non_state_conflict"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts__conflict_type_intrastate"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts__conflict_type_interstate"
+    config:
+      title: "Deaths in armed conflicts based on where they occurred"
+      subtitle: "Included are deaths of combatants and civilians due to fighting in [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), [extrasystemic](#dod:extrasystemic-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [one-sided violence](#dod:onesided-ucdp) that were ongoing that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts__conflict_type_all"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low__conflict_type_all"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high__conflict_type_all"
+    config:
+      title: "Deaths in armed conflicts based on where they occurred"
+      subtitle: "Included are deaths of combatants and civilians due to fighting in [armed conflicts](#dod:armed-conflict-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_one_sided_violence"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_non_state_conflict"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_intrastate"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_interstate"
+    config:
+      title: "Death rate in armed conflicts based on where they occurred"
+      subtitle: "Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), [extrasystemic](#dod:extrasystemic-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [one-sided violence](#dod:onesided-ucdp) that were ongoing that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_all"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_all"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_all"
+    config:
+      title: "Death rate in armed conflicts based on where they occurred"
+      subtitle: "Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [armed conflicts](#dod:armed-conflict-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_one_sided_violence"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_non_state_conflict"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_intrastate"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_interstate"
+    config:
+      title: "Number of armed conflicts"
+      subtitle: "Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), [extrasystemic](#dod:extrasystemic-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [one-sided violence](#dod:onesided-ucdp) that were ongoing that year."
+      note: "Some conflicts affect several regions. The sum across all regions can therefore be higher than the global number."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_one_sided_violence"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_non_state_conflict"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_intrastate"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_interstate"
+    config:
+      title: "Number of new armed conflicts"
+      subtitle: "Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), [extrasystemic](#dod:extrasystemic-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [one-sided violence](#dod:onesided-ucdp) that started that year."
+      note: "Some conflicts affect several regions, and do not necessarily start at the same time across them. The sum across all regions can therefore be higher than the global number."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_all"
+    config:
+      title: "Number of armed conflicts"
+      subtitle: "Included are [armed conflicts](#dod:armed-conflict-ucdp) that were ongoing that year."
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_all"
+    config:
+      title: "Number of new armed conflicts"
+      subtitle: "Included are [armed conflicts](#dod:armed-conflict-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_one_sided_violence"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_non_state_conflict"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_intrastate"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country_pair__conflict_type_interstate"
+    config:
+      title: "Rate of armed conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), [extrasystemic](#dod:extrasystemic-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [one-sided violence](#dod:onesided-ucdp) that were ongoing that year."
+      note: "Some conflicts affect several regions. The sum across all regions can therefore be higher than the global number."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_one_sided_violence"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_non_state_conflict"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_intrastate"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_interstate"
+    config:
+      title: "Rate of new armed conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), [extrasystemic](#dod:extrasystemic-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [one-sided violence](#dod:onesided-ucdp) that started that year."
+      note: "Some conflicts affect several regions, and do not necessarily start at the same time across them. The sum across all regions can therefore be higher than the global number."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_all"
+    config:
+      title: "Rate of armed conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [armed conflicts](#dod:armed-conflict-ucdp) that were ongoing that year."
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_all"
+    config:
+      title: "Rate of new armed conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [armed conflicts](#dod:armed-conflict-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "conflict_locations"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#number_locations__conflict_type_all"
+    config:
+      title: "Number of countries where armed conflicts took place"
+      subtitle: "Included are [armed conflicts](#armed-conflict-ucdp) that caused at least one death in the country that year."
+  - dimensions:
+      conflict_type: "all_armed_conflicts"
+      measure: "conflict_locations"
+      conflict_sub_type: "na"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#is_location_of_conflict__conflict_type_all"
+    config:
+      title: "Countries where armed conflicts took place"
+      subtitle: "Included are [armed conflicts](#armed-conflict-ucdp) that caused at least one death in the country that year."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low__conflict_type_state_based"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts__conflict_type_state_based"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high__conflict_type_state_based"
+    config:
+      title: "Deaths in state-based conflicts based on where they occurred"
+      subtitle: "Included are deaths of combatants and civilians due to fighting in [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts__conflict_type_intrastate__internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts__conflict_type_interstate"
+    config:
+      title: "Deaths in state-based conflicts based on where they occurred"
+      subtitle: "Included are deaths of combatants and civilians due to fighting in [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that were ongoing that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_state_based"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_state_based"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_state_based"
+    config:
+      title: "Death rate in state-based conflicts based on where they occurred"
+      subtitle: "Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_intrastate__internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_per_capita__conflict_type_interstate"
+    config:
+      title: "Death rate in state-based conflicts based on where they occurred"
+      subtitle: "Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that were ongoing that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_state_based"
+    config:
+      title: "Number of state-based conflicts"
+      subtitle: "Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that were ongoing that year."
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_state_based"
+    config:
+      title: "Rate of state-based conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that were ongoing that year."
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_intrastate__internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_interstate"
+    config:
+      title: "Number of state-based conflicts"
+      subtitle: "Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that were ongoing that year."
+      note: "Some conflicts affect several regions. The sum across all regions can therefore be higher than the global number."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_intrastate__internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country_pair__conflict_type_interstate"
+    config:
+      title: "Rate of state-based conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that were ongoing that year."
+      note: "Some conflicts affect several regions. The sum across all regions can therefore be higher than the global number."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_state_based"
+    config:
+      title: "Number of new state-based conflicts"
+      subtitle: "Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that started that year."
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_state_based"
+    config:
+      title: "Rate of new state-based conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that started that year."
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_intrastate__internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_interstate"
+    config:
+      title: "Number of new state-based conflicts"
+      subtitle: "Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that started that year."
+      note: "Some conflicts affect several regions, and do not necessarily start at the same time across them. The sum across all regions can therefore be higher than the global number."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_intrastate__internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_interstate"
+    config:
+      title: "Rate of new state-based conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that started that year."
+      note: "Some conflicts affect several regions, and do not necessarily start at the same time across them. The sum across all regions can therefore be higher than the global number."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_country#number_participants__conflict_type_state_based"
+    config:
+      title: "Number of states involved in state-based conflicts"
+      subtitle: "Included are states that were [primary participants](#dod:primary-participant-ucdp) in at least one [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), or [extrasystemic](#dod:extrasystemic-ucdp) conflict that year."
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_country#participated_in_conflict__conflict_type_state_based"
+    config:
+      title: "States involved in state-based conflicts"
+      subtitle: "Included are states that were [primary participants](#dod:primary-participant-ucdp) in at least one [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), or [extrasystemic](#dod:extrasystemic-ucdp) conflict that year."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_locations"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#number_locations__conflict_type_state_based"
+    config:
+      title: "Number of countries where state-based conflicts took place"
+      subtitle: "Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that caused at least one death in the country that year."
+  - dimensions:
+      conflict_type: "all_state_based_conflicts"
+      measure: "conflict_locations"
+      conflict_sub_type: "na"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#is_location_of_conflict__conflict_type_state_based"
+    config:
+      title: "Countries where state-based conflicts took place"
+      subtitle: "Included are [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts that caused at least one death in the country that year."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "na"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low__conflict_type_interstate"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high__conflict_type_interstate"
+    config:
+      title: "Deaths in interstate conflicts based on where they occurred"
+      subtitle: "Included are deaths of combatants and civilians due to fighting in [interstate conflicts](#dod:interstate-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "na"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_interstate"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_interstate"
+    config:
+      title: "Death rate in interstate conflicts based on where they occurred"
+      subtitle: "Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [interstate conflicts](#dod:interstate-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_interstate"
+    config:
+      title: "Number of interstate conflicts"
+      subtitle: "Included are [interstate conflicts](#dod:interstate-ucdp) that were ongoing that year."
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_interstate"
+    config:
+      title: "Number of new interstate conflicts"
+      subtitle: "Included are [interstate conflicts](#dod:interstate-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country_pair__conflict_type_interstate"
+    config:
+      title: "Rate of interstate conflicts"
+      subtitle: "The number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. Included are [interstate conflicts](#dod:interstate-ucdp) that were ongoing that year."
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_interstate"
+    config:
+      title: "Rate of new interstate conflicts"
+      subtitle: "The number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. Included are [interstate conflicts](#dod:interstate-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_country#number_participants__conflict_type_interstate"
+    config:
+      title: "Number of states involved in interstate conflicts"
+      subtitle: "Included are states that were [primary participants](#dod:primary-participant-ucdp) in at least one [interstate conflict](#dod:interstate-ucdp) that year."
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_country#participated_in_conflict__conflict_type_interstate"
+    config:
+      title: "States involved in interstate conflicts"
+      subtitle: "Included are states that were [primary participants](#dod:primary-participant-ucdp) in at least one [interstate conflict](#dod:interstate-ucdp) that year."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_locations"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#number_locations__conflict_type_interstate"
+    config:
+      title: "Number of countries where interstate conflicts took place"
+      subtitle: "Included are [interstate conflicts](#dod:interstate-ucdp) that caused at least one death in the country that year."
+  - dimensions:
+      conflict_type: "interstate_conflicts"
+      measure: "conflict_locations"
+      conflict_sub_type: "na"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#is_location_of_conflict__conflict_type_interstate"
+    config:
+      title: "Countries where interstate conflicts took place"
+      subtitle: "Included are [interstate wars](#dod:interstate-war-cow) that were ongoing that year."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low__conflict_type_intrastate"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high__conflict_type_intrastate"
+    config:
+      title: "Deaths in intrastate conflicts based on where they occurred"
+      subtitle: "Included are deaths of combatants and civilians due to fighting in [intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "only_non_internationalized_conflicts"
+      sub_measure: "na"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high__conflict_type_intrastate__non_internationalized"
+    config:
+      title: "Deaths in non-internationalized intrastate conflicts"
+      subtitle: "Included are deaths of combatants and civilians due to fighting in [non-internationalized intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "only_internationalized_conflicts"
+      sub_measure: "na"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low__conflict_type_intrastate__internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high__conflict_type_intrastate__internationalized"
+    config:
+      title: "Deaths in internationalized intrastate conflicts"
+      subtitle: "Included are deaths of combatants and civilians due to fighting in [internationalized intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_intrastate"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_intrastate"
+    config:
+      title: "Death rate in intrastate conflicts based on where they occurred"
+      subtitle: "Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "only_non_internationalized_conflicts"
+      sub_measure: "na"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_intrastate__non_internationalized"
+    config:
+      title: "Death rate in non-internationalized intrastate conflicts"
+      subtitle: "Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [non-internationalized intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "only_internationalized_conflicts"
+      sub_measure: "na"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_intrastate__internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_intrastate__internationalized"
+    config:
+      title: "Death rate in internationalized intrastate conflicts"
+      subtitle: "Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [internationalized intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_intrastate"
+    config:
+      title: "Number of intrastate conflicts"
+      subtitle: "Included are [intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year."
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_intrastate"
+    config:
+      title: "Number of new intrastate conflicts"
+      subtitle: "Included are [intrastate conflicts](#dod:intrastate-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_intrastate__internationalized"
+    config:
+      title: "Number of intrastate conflicts"
+      subtitle: "Included are [non-internationalized and internationalized intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_intrastate__internationalized"
+    config:
+      title: "Number of new intrastate conflicts"
+      subtitle: "Included are [non-internationalized and internationalized intrastate conflicts](#dod:intrastate-ucdp) that started that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_intrastate"
+    config:
+      title: "Rate of intrastate conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year."
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_intrastate"
+    config:
+      title: "Rate of new intrastate conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [intrastate conflicts](#dod:intrastate-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_intrastate__internationalized"
+    config:
+      title: "Rate of intrastate conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [non-internationalized and internationalized intrastate conflicts](#dod:intrastate-ucdp) that were ongoing that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "by_sub_type"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_intrastate__non_internationalized"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_intrastate__internationalized"
+    config:
+      title: "Rate of new intrastate conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [non-internationalized and internationalized intrastate conflicts](#dod:intrastate-ucdp) that started that year."
+      chartTypes:
+        - "StackedBar"
+      baseColorScheme: "stackedAreaDefault"
+      hideRelativeToggle: false
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_country#number_participants__conflict_type_intrastate"
+    config:
+      title: "Number of states involved in intrastate conflicts"
+      subtitle: "Included are states that were [primary participants](#dod:primary-participant-ucdp) in at least one [intrastate conflict](#dod:intrastate-ucdp) that year."
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_country#participated_in_conflict__conflict_type_intrastate"
+    config:
+      title: "States involved in intrastate conflicts"
+      subtitle: "Included are states that were [primary participants](#dod:primary-participant-ucdp) in at least one [intrastate conflict](#dod:intrastate-ucdp) that year."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_locations"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#number_locations__conflict_type_intrastate"
+    config:
+      title: "Number of countries where armed conflicts took place"
+      subtitle: "Included are [intrastate conflicts](#dod:intrastate-ucdp) that caused at least one death in the country that year."
+  - dimensions:
+      conflict_type: "intrastate_conflicts"
+      measure: "conflict_locations"
+      conflict_sub_type: "all_sub_types"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#is_location_of_conflict__conflict_type_intrastate"
+    config:
+      title: "Countries where intrastate conflicts took place"
+      subtitle: "Included are [intrastate conflicts](#dod:intrastate-ucdp) that caused at least one death in the country that year."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "extrastate_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "na"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high__conflict_type_extrasystemic"
+    config:
+      title: "Deaths in extrasystemic conflicts"
+      subtitle: "Included are deaths of combatants and civilians due to fighting in [extrasystemic conflicts](#dod:extrasystemic-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "extrastate_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "na"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_extrasystemic"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_extrasystemic"
+    config:
+      title: "Death rate in extrasystemic conflicts"
+      subtitle: "Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [extrasystemic conflicts](#dod:extrasystemic-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "extrastate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "na"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_extrasystemic"
+    config:
+      title: "Number of extrasystemic conflicts"
+      subtitle: "Included are [extrasystemic conflicts](#dod:extrasystemic-ucdp) that were ongoing that year."
+  - dimensions:
+      conflict_type: "extrastate_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "na"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_extrasystemic"
+    config:
+      title: "Number of new extrasystemic conflicts"
+      subtitle: "Included are [extrasystemic conflicts](#dod:extrasystemic-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "extrastate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "na"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_extrasystemic"
+    config:
+      title: "Rate of extrasystemic conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [extrasystemic conflicts](#dod:extrasystemic-ucdp) that were ongoing that year."
+  - dimensions:
+      conflict_type: "extrastate_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "na"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_extrasystemic"
+    config:
+      title: "Rate of new extrasystemic conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [extrasystemic conflicts](#dod:extrasystemic-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "extrastate_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_country#participated_in_conflict__conflict_type_extrasystemic"
+    config:
+      title: "Number of states involved in extrasystemic conflicts"
+      subtitle: "Included are states that were [primary participants](#dod:primary-participant-ucdp) in at least one [extraystemic conflict](#dod:extrasystemic-ucdp) that year."
+  - dimensions:
+      conflict_type: "extrastate_conflicts"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_country#number_participants__conflict_type_extrasystemic"
+    config:
+      title: "States involved in extrasystemic conflicts"
+      subtitle: "Included are states that were [primary participants](#dod:primary-participant-ucdp) in at least one [extraystemic conflict](#dod:extrasystemic-ucdp) that year."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "non_state_conflicts"
+      measure: "conflict_deaths"
+      conflict_sub_type: "na"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low__conflict_type_non_state_conflict"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high__conflict_type_non_state_conflict"
+    config:
+      title: "Deaths in non-state conflicts based on where they occurred"
+      subtitle: "Included are deaths of combatants and civilians due to fighting in [non-state conflicts](#dod:nonstate-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "non_state_conflicts"
+      measure: "death_rate"
+      conflict_sub_type: "na"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_non_state_conflict"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_non_state_conflict"
+    config:
+      title: "Death rate in non-state conflicts based on where they occurred"
+      subtitle: "Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [non-state conflicts](#dod:nonstate-ucdp) that were ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "non_state_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "na"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_non_state_conflict"
+    config:
+      title: "Number of non-state conflicts"
+      subtitle: "Included are [non-state conflicts](#dod:nonstate-ucdp) that were ongoing that year."
+  - dimensions:
+      conflict_type: "non_state_conflicts"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "na"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_non_state_conflict"
+    config:
+      title: "Number of new non-state conflicts"
+      subtitle: "Included are [non-state conflicts](#dod:nonstate-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "non_state_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "na"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_non_state_conflict"
+    config:
+      title: "Rate of non-state conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [non-state conflicts](#dod:nonstate-ucdp) that were ongoing that year."
+  - dimensions:
+      conflict_type: "non_state_conflicts"
+      measure: "conflict_rate"
+      conflict_sub_type: "na"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_non_state_conflict"
+    config:
+      title: "Rate of new non-state conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are [non-state conflicts](#dod:nonstate-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "non_state_conflicts"
+      measure: "conflict_locations"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#number_locations__conflict_type_non_state_conflict"
+    config:
+      title: "Number of countries where non-state conflicts took place"
+      subtitle: "Included are [non-state conflicts](#dod:intrastate-ucdp) that caused at least one death in the country that year."
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "non_state_conflicts"
+      measure: "conflict_locations"
+      conflict_sub_type: "na"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#is_location_of_conflict__conflict_type_non_state_conflict"
+    config:
+      title: "Countries where non-state conflicts took place"
+      subtitle: "Included are [non-state conflicts](#dod:intrastate-ucdp) that caused at least one death in the country that year."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "one_sided_violence"
+      measure: "conflict_deaths"
+      conflict_sub_type: "na"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low__conflict_type_one_sided_violence"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high__conflict_type_one_sided_violence"
+    config:
+      title: "Deaths from one-sided violence based on where they occurred"
+      subtitle: "Included are deaths of civilians from [one-sided violence](#dod:onesided-ucdp) that was ongoing that year."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "one_sided_violence"
+      measure: "death_rate"
+      conflict_sub_type: "na"
+      sub_measure: "country_and_region_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_low_per_capita__conflict_type_one_sided_violence"
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_deaths_ongoing_conflicts_high_per_capita__conflict_type_one_sided_violence"
+    config:
+      title: "Death rate from one-sided violence based on where they occurred"
+      subtitle: "Deaths of civilians from [one-sided violence](#dod:onesided-ucdp) that was ongoing that year, per 100,000 people."
+      note: "'Best' estimates as identified by UCDP."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "one_sided_violence"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "na"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts__conflict_type_one_sided_violence"
+    config:
+      title: "Number of one-sided conflicts"
+      subtitle: "Included is [one-sided violence](#dod:onesided-ucdp) that was ongoing that year."
+  - dimensions:
+      conflict_type: "one_sided_violence"
+      measure: "number_of_conflicts"
+      conflict_sub_type: "na"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts__conflict_type_one_sided_violence"
+    config:
+      title: "Number of new one-sided conflicts"
+      subtitle: "Included is [one-sided violence](#dod:onesided-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "one_sided_violence"
+      measure: "conflict_rate"
+      conflict_sub_type: "na"
+      sub_measure: "all_ongoing_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_ongoing_conflicts_per_country__conflict_type_one_sided_violence"
+    config:
+      title: "Rate of one-sided conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included is [one-sided violence](#dod:onesided-ucdp) that was ongoing that year."
+  - dimensions:
+      conflict_type: "one_sided_violence"
+      measure: "conflict_rate"
+      conflict_sub_type: "na"
+      sub_measure: "only_new_conflicts"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp#number_new_conflicts_per_country__conflict_type_one_sided_violence"
+    config:
+      title: "Rate of new one-sided conflicts"
+      subtitle: "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included is [one-sided violence](#dod:onesided-ucdp) that started that year."
+  - dimensions:
+      conflict_type: "one_sided_violence"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_country#number_participants__conflict_type_one_sided_violence"
+    config:
+      title: "Number of states engaging in one-sided violence"
+      subtitle: "Included are states that were [primary perpetrators](#dod:primary-participant-ucdp) of at least one instance of [one-sided violence](#dod:onesided-ucdp) that year."
+  - dimensions:
+      conflict_type: "one_sided_violence"
+      measure: "conflict_participants"
+      conflict_sub_type: "na"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_country#participated_in_conflict__conflict_type_one_sided_violence"
+    config:
+      title: "States engaging in one-sided violence"
+      subtitle: "Included are states that were [primary perpetrators](#dod:primary-participant-ucdp) of at least one instance of [one-sided violence](#dod:onesided-ucdp) that year."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "one_sided_violence"
+      measure: "conflict_locations"
+      conflict_sub_type: "na"
+      sub_measure: "regional_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#number_locations__conflict_type_one_sided_violence"
+    config:
+      title: "Number of countries where one-sided violence took place"
+      subtitle: "Included is [one-sided violence](#dod:onesided-ucdp) that caused at least one death in the country that year."
+      selectedFacetStrategy: "entity"
+  - dimensions:
+      conflict_type: "one_sided_violence"
+      measure: "conflict_locations"
+      conflict_sub_type: "na"
+      sub_measure: "country_level_data"
+    indicators:
+      y:
+        - catalogPath: "grapher/war/2025-06-13/ucdp/ucdp_locations#is_location_of_conflict__conflict_type_one_sided_violence"
+    config:
+      title: "Countries where one-sided violence took place"
+      subtitle: "Included is [one-sided violence](#dod:onesided-ucdp) that caused at least one death in the country that year."
+      hasMapTab: true
+      tab: "map"
+      selectedFacetStrategy: "entity"

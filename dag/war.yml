@@ -220,3 +220,15 @@ steps:
   # Countries in Conflict explorer.
   export://explorers/war/latest/countries_in_conflict_data:
     - data://grapher/war/2025-06-13/ucdp
+
+  # Conflict Data Source explorer — combines one mini-explorer per data source via
+  # `combine_collections(collection_dimension_slug="data_source")`. A sibling
+  # explorer (`conflict-data`) will reuse the same sub-configs in a follow-up PR.
+  export://explorers/war/latest/conflict_data_source:
+    - data://grapher/war/2023-09-21/cow
+    - data://grapher/war/2023-09-21/cow_mid
+    - data://grapher/war/2023-09-21/mars
+    - data://grapher/war/2023-09-21/mie
+    - data://grapher/war/2023-09-21/prio_v31
+    - data://grapher/war/2025-06-13/ucdp
+    - data://grapher/war/2025-06-16/ucdp_prio
