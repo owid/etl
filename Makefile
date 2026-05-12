@@ -229,9 +229,11 @@ vsce-sync:
 # the first time anyone sets up the environment.
 install-hooks:
 	@if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then \
-		git config core.hooksPath scripts/hooks; \
-		chmod +x scripts/hooks/pre-commit; \
-		echo '==> pre-commit hook active (core.hooksPath=scripts/hooks)'; \
+		if [ "$$(git config --get core.hooksPath 2>/dev/null)" != "scripts/hooks" ]; then \
+			git config core.hooksPath scripts/hooks; \
+			chmod +x scripts/hooks/pre-commit; \
+			echo '==> pre-commit hook active (core.hooksPath=scripts/hooks)'; \
+		fi; \
 	fi
 
 .venv: .venv-default install-hooks
