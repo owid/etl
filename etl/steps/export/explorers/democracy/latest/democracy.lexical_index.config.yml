@@ -7,6 +7,30 @@
 
 definitions:
   group_subtitle_base: Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index).
+  display_ne_aut: &display_ne_aut
+    name: "Non-electoral autocracies"
+    color: "#d7191c"
+  display_1p_aut: &display_1p_aut
+    name: "One-party autocracies"
+    color: "#e74731"
+  display_m_aut_wo_exe: &display_m_aut_wo_exe
+    name: "Multi-party autocracies without elected executive"
+    color: "#f88e52"
+  display_m_aut: &display_m_aut
+    name: "Multi-party autocracies"
+    color: "#fee090"
+  display_exc_dem: &display_exc_dem
+    name: "Exclusive democracies"
+    color: "#e0f3f8"
+  display_m_dem: &display_m_dem
+    name: "Male democracies"
+    color: "#8dc1dc"
+  display_elect_dem: &display_elect_dem
+    name: "Electoral democracies"
+    color: "#5496c5"
+  display_f_dem: &display_f_dem
+    name: "Full democracies"
+    color: "#2c7bb6"
 
 config:
   explorerTitle: "Democracy"
@@ -72,37 +96,21 @@ views:
     indicators:
       y:
         - catalogPath: region_aggregates#num_regime_lied__category_non_electoral_autocracy
-          display:
-            name: "Non-electoral autocracies"
-            color: "#d7191c"
+          display: *display_ne_aut
         - catalogPath: region_aggregates#num_regime_lied__category_one_party_autocracy
-          display:
-            name: "One-party autocracies"
-            color: "#e74731"
+          display: *display_1p_aut
         - catalogPath: region_aggregates#num_regime_lied__category_multi_party_autocracy_without_elected_executive
-          display:
-            name: "Multi-party autocracies without elected executive"
-            color: "#f88e52"
+          display: *display_m_aut_wo_exe
         - catalogPath: region_aggregates#num_regime_lied__category_multi_party_autocracy
-          display:
-            name: "Multi-party autocracy"
-            color: "#fee090"
+          display: *display_m_aut
         - catalogPath: region_aggregates#num_regime_lied__category_exclusive_democracy
-          display:
-            name: "Exclusive democracies"
-            color: "#e0f3f8"
+          display: *display_exc_dem
         - catalogPath: region_aggregates#num_regime_lied__category_male_democracy
-          display:
-            name: "Male democracies"
-            color: "#8dc1dc"
+          display: *display_m_dem
         - catalogPath: region_aggregates#num_regime_lied__category_electoral_democracy
-          display:
-            name: "Electoral democracies"
-            color: "#5496c5"
+          display: *display_elect_dem
         - catalogPath: region_aggregates#num_regime_lied__category_polyarchy
-          display:
-            name: "Full democracies"
-            color: "#2c7bb6"
+          display: *display_f_dem
     config:
       title: "Countries that are democracies and autocracies"
       subtitle: "{definitions.group_subtitle_base}"
@@ -118,40 +126,25 @@ views:
             name: "No regime data"
             color: "#555555"
         - catalogPath: region_aggregates#pop_regime_lied__category_non_electoral_autocracy
-          display:
-            name: "People living in non-electoral autocracies"
-            color: "#d7191c"
+          display: *display_ne_aut
         - catalogPath: region_aggregates#pop_regime_lied__category_one_party_autocracy
-          display:
-            name: "one-party autocracies"
-            color: "#e74731"
+          display: *display_1p_aut
         - catalogPath: region_aggregates#pop_regime_lied__category_multi_party_autocracy_without_elected_executive
-          display:
-            name: "multi-party autocracies without elected executive"
-            color: "#f88e52"
+          display: *display_m_aut_wo_exe
         - catalogPath: region_aggregates#pop_regime_lied__category_multi_party_autocracy
-          display:
-            name: "multi-party autocracies"
-            color: "#fee090"
+          display: *display_m_aut
         - catalogPath: region_aggregates#pop_regime_lied__category_exclusive_democracy
-          display:
-            name: "exclusive democracies"
-            color: "#e0f3f8"
+          display: *display_exc_dem
         - catalogPath: region_aggregates#pop_regime_lied__category_male_democracy
-          display:
-            name: "male democracies"
-            color: "#8dc1dc"
+          display: *display_m_dem
         - catalogPath: region_aggregates#pop_regime_lied__category_electoral_democracy
-          display:
-            name: "electoral democracies"
-            color: "#5496c5"
+          display: *display_elect_dem
         - catalogPath: region_aggregates#pop_regime_lied__category_polyarchy
-          display:
-            name: "People living in full democracies"
-            color: "#2c7bb6"
+          display: *display_f_dem
     config:
       title: "People living in democracies and autocracies"
       subtitle: "{definitions.group_subtitle_base}"
+      type: "StackedDiscreteBar StackedArea"
   - dimensions:
       metric: electoral_democracy
       sub_metric: main_classification

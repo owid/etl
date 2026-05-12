@@ -6,6 +6,22 @@
 # for single-y views; multi-y views keep their combined chart config.
 
 definitions:
+  display_hl_aut: &display_hl_aut
+    name: "Hard-line autocracies"
+    color: "#8a148c"
+  display_mod_aut: &display_mod_aut
+    name: "Moderate autocracies"
+    color: "#d979d2"
+  display_hd_dem: &display_hd_dem
+    name: "Highly defective democracies"
+    color: "#1ac6d9"
+  display_def_dem: &display_def_dem
+    name: "Defective democracies"
+    color: "#0487d9"
+  display_con_dem: &display_con_dem
+    name: "Consolidating democracies"
+    color: "#034c8c"
+
   group_config: &group_config
     subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
     note: "Data excludes long-term members of the OECD because they are considered stable democracies."
@@ -169,25 +185,15 @@ views:
     indicators:
       y:
         - catalogPath: bti/num_countries#num_regime_bti__category_hard_line_autocracy
-          display:
-            name: "Hard-line autocracies"
-            color: "#8a148c"
+          display: *display_hl_aut
         - catalogPath: bti/num_countries#num_regime_bti__category_moderate_autocracy
-          display:
-            name: "Moderate autocracies"
-            color: "#d979d2"
+          display: *display_mod_aut
         - catalogPath: bti/num_countries#num_regime_bti__category_highly_defective_democracy
-          display:
-            name: "Highly defective democracies"
-            color: "#1ac6d9"
+          display: *display_hd_dem
         - catalogPath: bti/num_countries#num_regime_bti__category_defective_democracy
-          display:
-            name: "Defective democracies"
-            color: "#0487d9"
+          display: *display_def_dem
         - catalogPath: bti/num_countries#num_regime_bti__category_consolidating_democracy
-          display:
-            name: "Consolidating democracies"
-            color: "#034c8c"
+          display: *display_con_dem
     config:
       title: "Countries that are democracies and autocracies"
       <<: *group_config
@@ -206,25 +212,15 @@ views:
             name: "No regime data"
             color: "#555555"
         - catalogPath: bti/num_people#pop_regime_bti__category_hard_line_autocracy
-          display:
-            name: "People living in hard-line autocracies"
-            color: "#8a148c"
+          display: *display_hl_aut
         - catalogPath: bti/num_people#pop_regime_bti__category_moderate_autocracy
-          display:
-            name: "People living in moderate autocracies"
-            color: "#d979d2"
+          display: *display_mod_aut
         - catalogPath: bti/num_people#pop_regime_bti__category_highly_defective_democracy
-          display:
-            name: "People living in highly defective democracies"
-            color: "#1ac6d9"
+          display: *display_hd_dem
         - catalogPath: bti/num_people#pop_regime_bti__category_defective_democracy
-          display:
-            name: "People living in defective democracies"
-            color: "#0487d9"
+          display: *display_def_dem
         - catalogPath: bti/num_people#pop_regime_bti__category_consolidating_democracy
-          display:
-            name: "People living in consolidating democracies"
-            color: "#034c8c"
+          display: *display_con_dem
     config:
       title: "People living in democracies and autocracies"
       <<: *group_config

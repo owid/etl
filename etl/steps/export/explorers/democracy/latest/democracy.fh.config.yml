@@ -6,6 +6,23 @@
 # for single-y views; multi-y views keep their combined chart config.
 
 definitions:
+  display_n_dem: &display_n_dem
+    name: "Non-democracies"
+    color: "#ef8a62"
+  display_elect_dem: &display_elect_dem
+    name: "Electoral democracies"
+    color: "#2c7bb6"
+
+  display_nf: &display_nf
+    name: "Not free countries"
+    color: "#a588c3"
+  display_pf: &display_pf
+    name: "Partly free countries"
+    color: "#e8b864"
+  display_f: &display_f
+    name: "Free countries"
+    color: "#58ac8c"
+
   group_subtitle: &group_subtitle |-
     [Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house).
   common_views:
@@ -92,17 +109,11 @@ views:
     indicators:
       y:
         - catalogPath: fh_regions#num_regime__category_not_free
-          display:
-            name: "Not free countries"
-            color: "#a588c3"
+          display: *display_nf
         - catalogPath: fh_regions#num_regime__category_partly_free
-          display:
-            name: "Partly free countries"
-            color: "#e8b864"
+          display: *display_pf
         - catalogPath: fh_regions#num_regime__category_free
-          display:
-            name: "Free countries"
-            color: "#58ac8c"
+          display: *display_f
     config:
       title: "Free countries and territories"
       type: &id001 "StackedArea StackedDiscreteBar"
@@ -121,17 +132,11 @@ views:
             name: "No regime data"
             color: "#555555"
         - catalogPath: fh_regions#pop_regime__category_not_free
-          display:
-            name: "People living in not free countries"
-            color: "#a588c3"
+          display: *display_nf
         - catalogPath: fh_regions#pop_regime__category_partly_free
-          display:
-            name: "People living in partly free countries"
-            color: "#e8b864"
+          display: *display_pf
         - catalogPath: fh_regions#pop_regime__category_free
-          display:
-            name: "People living in free countries"
-            color: "#58ac8c"
+          display: *display_f
     config:
       title: "People living in free countries and territories"
       type: *id001
@@ -180,13 +185,9 @@ views:
     indicators:
       y:
         - catalogPath: fh_regions#num_electdem__category_non_electoral_democracy
-          display:
-            name: "Non-democracies"
-            color: "#ef8a62"
+          display: *display_n_dem
         - catalogPath: fh_regions#num_electdem__category_electoral_democracy
-          display:
-            name: "Electoral democracies"
-            color: "#2c7bb6"
+          display: *display_elect_dem
     config:
       title: "Countries that are democracies and non-democracies"
       type: *id001
@@ -205,13 +206,9 @@ views:
             name: "No regime data"
             color: "#555555"
         - catalogPath: fh_regions#pop_electdem__category_non_electoral_democracy
-          display:
-            name: "People living in non-democracies"
-            color: "#ef8a62"
+          display: *display_n_dem
         - catalogPath: fh_regions#pop_electdem__category_electoral_democracy
-          display:
-            name: "People living in electoral democracies"
-            color: "#2c7bb6"
+          display: *display_elect_dem
     config:
       title: "People living in democracies and non-democracies"
       type: *id001
