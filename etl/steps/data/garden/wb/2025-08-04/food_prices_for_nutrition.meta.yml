@@ -121,7 +121,7 @@ tables:
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
-                customNumericValues: [0, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]
+                customNumericValues: [0, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2, -1]
 
       affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of an energy sufficient diet: ratio of cost to food expenditures"
@@ -141,7 +141,7 @@ tables:
               colorScale:
                 baseColorScheme: BuPu
                 binningStrategy: manual
-                customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+                customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, -1]
 
       percent_of_the_population_who_cannot_afford_sufficient_calories:
         title: Share of the population who cannot afford sufficient calories
@@ -196,7 +196,7 @@ tables:
               colorScale:
                 baseColorScheme: YlOrRd
                 binningStrategy: manual
-                customNumericValues: [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000]
+                customNumericValues: [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, -1]
 
       cost_of_a_healthy_diet_in_ppp_dollars:
         title: Cost of a healthy diet
@@ -221,7 +221,7 @@ tables:
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
-                customNumericValues: [0, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6]
+                customNumericValues: [0, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, -1]
 
       cost_of_a_healthy_diet_relative_to_the_cost_of_sufficient_energy_from_starchy_staples:
         title: Cost of a healthy diet relative to the cost of sufficient energy from starchy staples
@@ -318,7 +318,7 @@ tables:
               colorScale:
                 baseColorScheme: BuPu
                 binningStrategy: manual
-                customNumericValues: [0, 50, 100, 150, 200, 250, 300]
+                customNumericValues: [0, 50, 100, 150, 200, 250, 300, -1]
 
       percent_of_the_population_who_cannot_afford_a_healthy_diet:
         title: Share of the population who cannot afford a healthy diet
@@ -464,7 +464,7 @@ tables:
               colorScale:
                 baseColorScheme: YlOrRd
                 binningStrategy: manual
-                customNumericValues: [0, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000]
+                customNumericValues: [0, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, -1]
 
       cost_of_vegetables_in_ppp_dollars:
         title: Cost of vegetables
@@ -520,7 +520,7 @@ tables:
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
-                customNumericValues: [0, 1.5, 2, 2.5, 3, 3.5, 4]
+                customNumericValues: [0, 1.5, 2, 2.5, 3, 3.5, 4, -1]
 
       affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of a nutrient adequate diet: ratio of cost to food expenditures"
