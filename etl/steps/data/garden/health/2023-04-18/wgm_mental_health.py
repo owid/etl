@@ -132,10 +132,14 @@ def _share_answers(tb: Table, weight_column: str, dimensions: list[str] = []) ->
     columns_index = columns_index_base + dimensions
 
     # Named aggregation keeps columns flat and preserves origins from `weight_column`.
-    tb_ = tb.groupby(columns_index, observed=True).agg(
-        sum=(weight_column, "sum"),
-        count=(weight_column, "count"),
-    ).reset_index()
+    tb_ = (
+        tb.groupby(columns_index, observed=True)
+        .agg(
+            sum=(weight_column, "sum"),
+            count=(weight_column, "count"),
+        )
+        .reset_index()
+    )
 
     columns_normalise = [col for col in columns_index if col != "answer"]
     tb_["sum_denominator"] = tb_.groupby(columns_normalise, observed=True)["sum"].transform("sum")
