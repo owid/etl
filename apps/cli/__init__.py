@@ -190,6 +190,7 @@ GROUPS = (
             "commands": {
                 "chart-sync": "apps.chart_sync.cli.cli",
                 "approve": "apps.chart_approval.cli.cli",
+                "chart-pull": "apps.chart_pull.cli.cli",
             },
         },
         {
