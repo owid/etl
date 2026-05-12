@@ -1,4 +1,3 @@
-import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
@@ -53,13 +52,13 @@ COLUMNS_REQUIRED = [
 ]
 
 
-def clean_data(df: pd.DataFrame, column_rename: dict[str, str] | None) -> pd.DataFrame:
+def clean_data(tb: Table, column_rename: dict[str, str] | None) -> Table:
     if not column_rename:
         column_rename = COLUMN_RENAME
 
     # sanity checks
     columns_expected = set(column_rename)
-    columns_given = set(df.columns)
+    columns_given = set(tb.columns)
     # check if all columns are expected
     columns_unexpected = columns_given.difference(columns_expected)
     if columns_unexpected:
@@ -70,31 +69,32 @@ def clean_data(df: pd.DataFrame, column_rename: dict[str, str] | None) -> pd.Dat
         raise ValueError(f"There are missing columns! {columns_missing}")
 
     # rename columns
-    df = df.rename(columns=column_rename, errors="raise")
+    tb = tb.rename(columns=column_rename, errors="raise")
 
     # table might contain some columns with only NaNs. These should be dropped, as they don't contain any data.
     # Note that *not* all should be dropped, some are required for correct functioning!
-    df = df.dropna(how="all", axis=1)
+    tb = tb.dropna(how="all", axis=1)
     for col in COLUMNS_REQUIRED:
-        if col not in df.columns:
+        if col not in tb.columns:
             raise ValueError(f"Missing required column{col}")
-    return df
+    return tb
 
 
 def run_pipeline(dest_dir: str, paths: PathFinder, column_rename: dict[str, str] | None = None):
     log.info(f"{paths.short_name}.start")
-    # read snapshot dataset
+    # read snapshot dataset (preserves column-level origin metadata)
     snap = paths.load_dependency(paths.short_name + ".csv")
-    df = pd.read_csv(snap.path, header=4)
+    tb = snap.read_csv(header=4)
     # clean and transform data
-    df = clean_data(df, column_rename)
+    tb = clean_data(tb, column_rename)
 
     # create new dataset and reuse snapshot metadata
     ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
     ds.metadata.version = paths.version
 
-    # # create table with metadata from dataframe and underscore all columns
-    tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
+    # set short name and underscore columns; preserves origin from snap.read_csv
+    tb.metadata.short_name = snap.metadata.short_name
+    tb = tb.underscore()
 
     # add table to a dataset
     ds.add(tb)

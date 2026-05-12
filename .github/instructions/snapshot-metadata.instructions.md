@@ -249,7 +249,7 @@ When filling metadata for snapshots, follow these guidelines:
         "faqs": [
           {
             "question": "What should be the value if there are multiple producers?",
-            "answer": "We don't have a clear guideline for this at the moment, and depending on the case you might want to specify all the producers. However, a good option is to use 'Various sources'.",
+            "answer": "When the data product names a small number of producers (up to three), list them explicitly using the same `and` / `et al.` conventions as for authors, e.g. `Jambeck et al. and World Bank`, `FAO, OECD, and Millennium Ecosystem Assessment`. Naming the producers preserves provenance that 'Various sources' would hide.\n\nReserve `Various sources` for compilations whose underlying sources are too numerous to enumerate (typically four or more), or where the legacy material itself doesn't name them (e.g. country-by-country compilations of laws). When you do use `Various sources`, consider setting `attribution_short` to a recognizable shorthand readers would see on charts (often a dataset name, e.g. `HYDE and FAO`).",
             "link": "https://github.com/owid/etl/discussions/1608"
           }
         ],

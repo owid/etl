@@ -68,38 +68,6 @@ steps:
   export://multidim/emissions/latest/air_pollution:
     - data://grapher/emissions/2025-02-12/ceds_air_pollutants
   #
-  # RFF - Emissions-weighted Carbon Price.
-  #
-  data://meadow/rff/2025-06-02/emissions_weighted_carbon_price:
-    - snapshot://rff/2025-06-02/emissions_weighted_carbon_price.zip
-  #
-  # RFF - Emissions-weighted Carbon Price.
-  #
-  data://garden/rff/2025-06-02/emissions_weighted_carbon_price:
-    - data://meadow/rff/2025-06-02/emissions_weighted_carbon_price
-  #
-  # RFF - Emissions-weighted Carbon Price.
-  #
-  data://grapher/rff/2025-06-02/emissions_weighted_carbon_price:
-    - data://garden/rff/2025-06-02/emissions_weighted_carbon_price
-  #
-  # RFF - World Carbon Pricing.
-  #
-  # The following step loads the EWC snapshot simply to get the IPCC codes.
-  data://meadow/rff/2025-06-02/world_carbon_pricing:
-    - snapshot://rff/2025-06-02/world_carbon_pricing.zip
-    - snapshot://rff/2025-06-02/emissions_weighted_carbon_price.zip
-  #
-  # RFF - World Carbon Pricing.
-  #
-  data://garden/rff/2025-06-02/world_carbon_pricing:
-    - data://meadow/rff/2025-06-02/world_carbon_pricing
-  #
-  # RFF - World Carbon Pricing.
-  #
-  data://grapher/rff/2025-06-02/world_carbon_pricing:
-    - data://garden/rff/2025-06-02/world_carbon_pricing
-  #
   # Emissions - Greenhouse gas emissions by custom sector.
   #
   data-private://garden/emissions/2025-09-24/emissions_by_custom_sector:
@@ -240,3 +208,36 @@ steps:
   #
   data://grapher/emissions/2026-03-04/emissions_by_custom_sector:
     - data://garden/emissions/2026-03-04/emissions_by_custom_sector
+  #
+  # RFF - World Carbon Pricing.
+  #
+  # The IPCC codes lookup is loaded from a dedicated snapshot pinned to an old commit of the ECP
+  # repo, since the file was removed from upstream during the 2026 restructure.
+  data://meadow/rff/2026-05-08/world_carbon_pricing:
+    - snapshot://rff/2026-05-08/world_carbon_pricing.zip
+    - snapshot://rff/2026-05-08/ipcc_codes.csv
+  #
+  # RFF - World Carbon Pricing.
+  #
+  data://garden/rff/2026-05-08/world_carbon_pricing:
+    - data://meadow/rff/2026-05-08/world_carbon_pricing
+  #
+  # RFF - World Carbon Pricing.
+  #
+  data://grapher/rff/2026-05-08/world_carbon_pricing:
+    - data://garden/rff/2026-05-08/world_carbon_pricing
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  data://meadow/rff/2026-05-08/emissions_weighted_carbon_price:
+    - snapshot://rff/2026-05-08/emissions_weighted_carbon_price.zip
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  data://garden/rff/2026-05-08/emissions_weighted_carbon_price:
+    - data://meadow/rff/2026-05-08/emissions_weighted_carbon_price
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  data://grapher/rff/2026-05-08/emissions_weighted_carbon_price:
+    - data://garden/rff/2026-05-08/emissions_weighted_carbon_price

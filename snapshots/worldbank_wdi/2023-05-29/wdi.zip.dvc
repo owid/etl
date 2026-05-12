@@ -2,7 +2,6 @@ meta:
   namespace: worldbank_wdi
   short_name: wdi
   name: World Development Indicators - World Bank (2023.05.11)
-  version: '2023-05-11'
   publication_date: '2023-05-11'
   source_name: World Bank
   url:

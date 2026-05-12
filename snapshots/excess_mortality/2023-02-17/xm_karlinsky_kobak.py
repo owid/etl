@@ -24,7 +24,7 @@ def main(upload: bool) -> None:
     snap.dvc_add(upload=upload)
 
     # Data broken down by ages
-    snap = Snapshot(f"excess_mortality/{SNAPSHOT_VERSION}/xm_karlinsky_kobak.ages.csv")
+    snap = Snapshot(f"excess_mortality/{SNAPSHOT_VERSION}/xm_karlinsky_kobak_ages.csv")
     snap.download_from_source()
     snap.dvc_add(upload=upload)
 

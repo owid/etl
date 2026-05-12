@@ -1,12 +1,8 @@
 """Load a snapshot and create a meadow dataset."""
 
-import os
-import zipfile
 from typing import cast
 
 import numpy as np
-import pandas as pd
-from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -26,24 +22,22 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = cast(Snapshot, paths.load_dependency("wrp_2021.zip"))
-    dest_dir_zip = os.path.dirname(snap.path)
 
-    with zipfile.ZipFile(snap.path, "r") as zip_file:
-        # Extract the desired file
-        zip_file.extract("lrf_wrp_2021_full_data.csv", dest_dir_zip)
+    # Read CSV from inside the zip archive (preserves origins on columns).
+    with snap.extracted() as archive:
+        tb = archive.read("lrf_wrp_2021_full_data.csv", low_memory=False)
 
-    # Load data from snapshot.
-    df = pd.read_csv(dest_dir_zip + "/" + "lrf_wrp_2021_full_data.csv", low_memory=False)
-    countries_both_years = df["country.in.both.waves"] == 1
-    df.replace(" ", np.nan, inplace=True)
-    df = df[countries_both_years]
-    df.reset_index(drop=True, inplace=True)
+    # Filter to countries present in both waves.
+    countries_both_years = tb["country.in.both.waves"] == 1
+    tb = tb.replace(" ", np.nan)
+    tb = tb[countries_both_years].reset_index(drop=True)
 
     #
     # Process data.
     #
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    # Ensure all columns are snake-case.
+    tb = tb.underscore()
+    tb.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
