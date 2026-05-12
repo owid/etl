@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3231
-    date_accessed: 2023-08-10 08:47:02.573597
+    url: https://admin.owid.io/admin/datasets/3231
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: TE-13.19a_2_consumption
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4359c4a836cc965d60f279bf4193eaf4
-  size: 7026
-  path: dataset_3231_te_13_19a_2_consumption_values.feather
+  - md5: 67cfc4e873f136b66e8b267825666b20
+    size: 7066
+    path: dataset_3231_te_13_19a_2_consumption_values.feather

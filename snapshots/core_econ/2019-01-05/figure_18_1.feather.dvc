@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: Ford Motor Company (2014)
+    url: http://corporate.ford.com/our-company/operations-worldwide/global-operations-list
+    published_by: Ford Motor Company (2014)
+  name: Figure_18.1
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: e14e0aa51c6ce75c70b453e42e822100
+    size: 3290
+    path: figure_18_1.feather

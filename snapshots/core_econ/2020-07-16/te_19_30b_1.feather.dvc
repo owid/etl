@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: LIS (2017)
+    description: |-
+      Ginis are averaged over the time period available. Time periods are 2006-2013 for Brazil, 2004-2013 for Colombia, 2006-2014 for Guatemala, 2006-2012 for Korea, 1984-2012 for Mexico, 2004-2013 for Peru, 1981-2013 for Taiwan and 22004-2013 for Uruguay.
+    url: |-
+      https://www.universiteitleiden.nl/en/law/institute-for-tax-law-and-economics/economics/data-sets/leiden-lis-budget-incidence-fiscal-redistribution-dataset-on-income-inequality-for-47-lis-countries---1967-2014
+    published_by: |-
+      Leiden LIS Budget Incidence Fiscal Redistribution Dataset on Income Inequality (2017), assembled by Jinxian Wang and Koen Caminada (Version 1, November 2017)
+  name: TE-19.30b_1
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 6e5d8f8de742b7f755e181a73bd7a3a0
+    size: 3826
+    path: te_19_30b_1.feather

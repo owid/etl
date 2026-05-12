@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: OECD (2015)
+    url: https://stats.oecd.org
+    published_by: OECD (2015) OECD Statistics
+  name: Figure 15.20_Inflation
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 47308480044cf5e516982abe0675047f
+    size: 3298
+    path: figure_15_20_inflation.feather

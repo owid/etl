@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: Thomas and Dimsdale (2018)
+    url: https://www.bankofengland.co.uk/statistics/research-datasets
+    published_by: Ryland Thomas and Nicholas Dimsdale. (2018). ‘A Millennium of UK Data’. Bank of England OBRA dataset.
+  name: TE-14.15
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 886ea73d7d1014d91b950de7edd0754b
+    size: 5466
+    path: te_14_15.feather

@@ -1,0 +1,22 @@
+dataset:
+  title: Figure_17.17_updated
+tables:
+  figure_17_17_updated:
+    variables:
+      manufacturing_productivity_index__1949_100:
+        title: Manufacturing Productivity Index (1949=100)
+        unit: ''
+      manufacturing_real_wages_index__1949_100:
+        title: Manufacturing Real Wages Index (1949=100)
+        unit: ''
+        description: |-
+          Real wages series created by deflating average hourly earnings of production and nonsupervisory employees using the consumer price index for all urban consumers.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

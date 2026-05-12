@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3253
-    date_accessed: 2023-08-10 09:41:13.877876
+    url: https://admin.owid.io/admin/datasets/3253
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3253_figure_22_16_updated_democracy
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: efd6bffe1409c321a83b8ea0f36b11a9
-  size: 1770
-  path: dataset_3253_figure_22_16_updated_democracy_config.json
+  - md5: 1ad2ed662fd5b5f24bceff34b05626cc
+    size: 1900
+    path: dataset_3253_figure_22_16_updated_democracy_config.json
