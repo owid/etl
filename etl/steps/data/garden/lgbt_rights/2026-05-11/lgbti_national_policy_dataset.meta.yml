@@ -177,9 +177,6 @@ tables:
             {definitions.status_title}
           numDecimalPlaces: 2
           tolerance: 0
-        presentation:
-          title_public: |-
-            {definitions.status_title}
 
   lgbti_national_policy_dataset_regions:
     variables:
