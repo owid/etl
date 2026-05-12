@@ -122,12 +122,12 @@ tables:
                   - 7
         display:
           numDecimalPlaces: 0
+
       regime:
         title: Political regime
         unit: ""
         description_short: |-
           The variable identifies the political regime of a country. It distinguishes between free countries (score 2), partly free countries (score 1), and not free countries (score 0).
-
         description_key:
           - Free countries are understood as countries in which citizens have many political rights (free and fair elections, political pluralism and participation, functioning government) and civil liberties (freedoms of expression and association, rule of law, personal autonomy).
           - Partly free country are countries in which citizens have some political rights and civil liberties.
@@ -136,7 +136,6 @@ tables:
           score 0: Not free
           Score 1: Partly free
           Score 2: Free
-
         presentation:
           grapher_config:
             title: Free country
@@ -170,6 +169,7 @@ tables:
               tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
+
       country_flag:
         title: Entity considered a country by Freedom House
         unit: ""
@@ -210,6 +210,7 @@ tables:
                   - 12
         display:
           numDecimalPlaces: 0
+
       polrights_score:
         title: Political rights score
         unit: ""

@@ -12,7 +12,6 @@ definitions:
   display_elect_dem: &display_elect_dem
     name: "Electoral democracies"
     color: "#2c7bb6"
-
   display_nf: &display_nf
     name: "Not free countries"
     color: "#a588c3"
@@ -25,6 +24,7 @@ definitions:
 
   group_subtitle: &group_subtitle |-
     [Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house).
+
   common_views:
     - config:
         colorVariableId: regions#owid_region
