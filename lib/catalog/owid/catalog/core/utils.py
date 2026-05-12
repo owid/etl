@@ -15,12 +15,26 @@ T = TypeVar("T")
 log = structlog.get_logger()
 
 
+# Fields where an empty list / dict is semantically meaningful and must NOT be pruned —
+# an explicit empty is a different signal from "absent" downstream. Keep this list small;
+# the default behaviour (drop empties) is what most callers want.
+KEEP_IF_EMPTY: frozenset[str] = frozenset(
+    {
+        # `chartTypes: []` is an explicit "render no chart-type toggles" override — different
+        # from the schema default of `['LineChart', 'DiscreteBar']` that kicks in when the
+        # key is absent.
+        "chartTypes",
+    }
+)
+
+
 def prune_dict(d: dict) -> dict:
     """Remove private keys and empty values from a dictionary recursively.
 
     Removes all keys starting with underscore (private fields) and all empty
     values (None, empty lists, empty dicts) from a dictionary and its nested
-    structures.
+    structures — *except* keys listed in ``KEEP_IF_EMPTY``, where an explicit
+    empty value is meaningful and must round-trip through serialization.
 
     Inside lists, only empty dicts and empty lists are filtered — `None` is
     preserved so that positional arrays (e.g. `customNumericColors`,
@@ -40,30 +54,35 @@ def prune_dict(d: dict) -> dict:
             "_internal": "hidden",
             "count": 0,  # Kept (not empty)
             "empty_list": [],
+            "chartTypes": [],     # Kept — in KEEP_IF_EMPTY
             "nested": {"value": 1, "null": None},
             "positional": [None, None, "#bc8e5a"],  # None preserved inside list
         }
         result = prune_dict(d)
-        # Returns: {"title": "Dataset", "count": 0, "nested": {"value": 1},
-        #          "positional": [None, None, "#bc8e5a"]}
+        # Returns: {"title": "Dataset", "count": 0, "chartTypes": [],
+        #          "nested": {"value": 1}, "positional": [None, None, "#bc8e5a"]}
         ```
     """
     out = {}
     for k, v in d.items():
-        if not k.startswith("_") and v not in [None, [], {}]:
-            if isinstance(v, dict):
-                out[k] = prune_dict(v)
-            elif isinstance(v, list):
-                # Preserve None and other primitives in lists; only filter empty
-                # dicts/lists to avoid serializing pointless placeholders. None is
-                # semantically meaningful at a positional index (fallback marker).
-                out[k] = [
-                    prune_dict(x) if isinstance(x, dict) else x
-                    for x in v
-                    if not (isinstance(x, (dict, list)) and not x)
-                ]
-            else:
-                out[k] = v
+        if k.startswith("_"):
+            continue
+        is_empty = v in [None, [], {}]
+        if is_empty and k not in KEEP_IF_EMPTY:
+            continue
+        if isinstance(v, dict):
+            out[k] = prune_dict(v) if not is_empty else v
+        elif isinstance(v, list):
+            # Preserve None and other primitives in lists; only filter empty
+            # dicts/lists to avoid serializing pointless placeholders. None is
+            # semantically meaningful at a positional index (fallback marker).
+            out[k] = [
+                prune_dict(x) if isinstance(x, dict) else x
+                for x in v
+                if not (isinstance(x, (dict, list)) and not x)
+            ]
+        else:
+            out[k] = v
     return out
 
 
