@@ -932,25 +932,6 @@ class Source(Base):
         return ds
 
     @classmethod
-    def from_catalog_source(cls, source: catalog.Source, dataset_id: int) -> "Source":
-        if source.name is None:
-            raise ValueError("Source name was None - please fix this in the metadata.")
-
-        return Source(
-            name=source.name,
-            datasetId=dataset_id,
-            description=SourceDescription(
-                link=source.url,
-                retrievedDate=source.date_accessed,
-                # NOTE: published_by should be non-empty as it is shown in the Sources tab in admin
-                dataPublishedBy=source.published_by or source.name,
-                # NOTE: we remap `description` to additionalInfo since that is what is shown as `Description` in
-                # the admin UI. Clean this up with the new data model
-                additionalInfo=source.description,
-            ),
-        )
-
-    @classmethod
     def load_source(cls, session: Session, source_id: int) -> "Source":
         return session.scalars(select(cls).where(cls.id == source_id)).one()
 

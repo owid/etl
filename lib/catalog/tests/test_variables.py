@@ -13,7 +13,6 @@ from owid.catalog.core.indicators import (
     combine_indicators_metadata,
     get_unique_licenses_from_indicators,
     get_unique_origins_from_indicators,
-    get_unique_sources_from_indicators,
 )
 from owid.catalog.core.meta import VariableMeta, VariablePresentationMeta
 
@@ -76,7 +75,7 @@ def _assert_untouched_data_and_metadata_did_not_change(tb1, tb1_expected):
         assert tb1._fields[column] == tb1_expected._fields[column]
 
 
-def test_create_new_variable_as_sum_of_other_two(table_1, sources, origins, licenses) -> None:
+def test_create_new_variable_as_sum_of_other_two(table_1, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["c"] = tb1["a"] + tb1["b"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -90,7 +89,6 @@ def test_create_new_variable_as_sum_of_other_two(table_1, sources, origins, lice
         "Key description point 1 of Indicator 2",
         "Key description point 2 of Indicator 2",
     ]
-    assert tb1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -112,7 +110,6 @@ def test_create_new_variable_as_sum_of_another_variable_plus_a_scalar(table_1) -
         "Key description point 1 of Indicator 1",
         "Common key description point",
     ]
-    assert tb1["d"].metadata.sources == table_1["a"].metadata.sources
     assert tb1["d"].metadata.origins == table_1["a"].metadata.origins
     assert tb1["d"].metadata.licenses == table_1["a"].metadata.licenses
     assert tb1["d"].metadata.processing_level == "minor"
@@ -158,7 +155,7 @@ def test_operations_of_variable_and_scalar(table_1):
     assert table_1["a"].metadata == table_1_original["a"].metadata
 
 
-def test_create_new_variable_as_product_of_other_two(table_1, sources, origins, licenses) -> None:
+def test_create_new_variable_as_product_of_other_two(table_1, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["e"] = tb1["a"] * tb1["b"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -171,7 +168,6 @@ def test_create_new_variable_as_product_of_other_two(table_1, sources, origins, 
         "Key description point 1 of Indicator 2",
         "Key description point 2 of Indicator 2",
     ]
-    assert tb1["e"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["e"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["e"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -182,7 +178,7 @@ def test_create_new_variable_as_product_of_other_two(table_1, sources, origins, 
     assert tb1["e"].metadata.display == tb1["a"].metadata.display
 
 
-def test_create_new_variable_as_product_of_other_three(table_1, sources, origins, licenses) -> None:
+def test_create_new_variable_as_product_of_other_three(table_1, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["c"] = tb1["a"] + tb1["b"]
     tb1["f"] = tb1["a"] * tb1["b"] * tb1["c"]
@@ -197,7 +193,6 @@ def test_create_new_variable_as_product_of_other_three(table_1, sources, origins
         "Key description point 1 of Indicator 2",
         "Key description point 2 of Indicator 2",
     ]
-    assert tb1["f"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["f"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["f"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of all variables.
@@ -208,7 +203,7 @@ def test_create_new_variable_as_product_of_other_three(table_1, sources, origins
     assert tb1["c"].metadata.display == tb1["a"].metadata.display
 
 
-def test_create_new_variable_as_division_of_other_two(table_1, sources, origins, licenses) -> None:
+def test_create_new_variable_as_division_of_other_two(table_1, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["g"] = tb1["a"] / tb1["b"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -221,7 +216,6 @@ def test_create_new_variable_as_division_of_other_two(table_1, sources, origins,
         "Key description point 1 of Indicator 2",
         "Key description point 2 of Indicator 2",
     ]
-    assert tb1["g"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["g"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["g"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -232,7 +226,7 @@ def test_create_new_variable_as_division_of_other_two(table_1, sources, origins,
     assert tb1["g"].metadata.display == tb1["a"].metadata.display
 
 
-def test_create_new_variable_as_floor_division_of_other_two(table_1, sources, origins, licenses) -> None:
+def test_create_new_variable_as_floor_division_of_other_two(table_1, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["h"] = tb1["b"] // tb1["a"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -246,7 +240,6 @@ def test_create_new_variable_as_floor_division_of_other_two(table_1, sources, or
         "Key description point 2 of Indicator 2",
         "Key description point 1 of Indicator 1",
     ]
-    assert tb1["h"].metadata.sources == [sources[2], sources[3], sources[1]]
     assert tb1["h"].metadata.origins == [origins[2], origins[3], origins[1]]
     assert tb1["h"].metadata.licenses == [licenses[2], licenses[3], licenses[1]]
     # Processing level should be the highest of the two variables.
@@ -257,7 +250,7 @@ def test_create_new_variable_as_floor_division_of_other_two(table_1, sources, or
     assert tb1["h"].metadata.display == tb1["a"].metadata.display
 
 
-def test_create_new_variable_as_module_division_of_other_two(table_1, sources, origins, licenses) -> None:
+def test_create_new_variable_as_module_division_of_other_two(table_1, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["i"] = tb1["a"] % tb1["b"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -270,7 +263,6 @@ def test_create_new_variable_as_module_division_of_other_two(table_1, sources, o
         "Key description point 1 of Indicator 2",
         "Key description point 2 of Indicator 2",
     ]
-    assert tb1["i"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["i"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["i"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -281,7 +273,7 @@ def test_create_new_variable_as_module_division_of_other_two(table_1, sources, o
     assert tb1["i"].metadata.display == tb1["a"].metadata.display
 
 
-def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_1, sources, origins, licenses) -> None:
+def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_1, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["j"] = tb1["a"] ** 2
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -292,7 +284,6 @@ def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_
         "Key description point 1 of Indicator 1",
         "Common key description point",
     ]
-    assert tb1["j"].metadata.sources == [sources[2], sources[1]]
     assert tb1["j"].metadata.origins == [origins[2], origins[1]]
     assert tb1["j"].metadata.licenses == [licenses[1]]
     assert tb1["j"].metadata.processing_level == "minor"
@@ -301,7 +292,7 @@ def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_
 
 
 def test_create_new_variables_as_another_variable_to_the_power_of_another_variable(
-    table_1, sources, origins, licenses
+    table_1, origins, licenses
 ) -> None:
     tb1 = table_1.copy()
     tb1["k"] = tb1["a"] ** tb1["b"]
@@ -315,7 +306,6 @@ def test_create_new_variables_as_another_variable_to_the_power_of_another_variab
         "Key description point 1 of Indicator 2",
         "Key description point 2 of Indicator 2",
     ]
-    assert tb1["k"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["k"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["k"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -324,12 +314,6 @@ def test_create_new_variables_as_another_variable_to_the_power_of_another_variab
     assert tb1["k"].metadata.presentation is None
     # Since "a" and "b" have identical display, the combination should have the same display.
     assert tb1["k"].metadata.display == tb1["a"].metadata.display
-
-
-def test_get_unique_sources_from_indicators(variable_1, variable_2, sources):
-    assert get_unique_sources_from_indicators([variable_1, variable_2]) == [sources[2], sources[1], sources[3]]
-    # Ensure that the function respects the order in which sources appear.
-    assert get_unique_sources_from_indicators([variable_2, variable_1]) == [sources[2], sources[3], sources[1]]
 
 
 def test_get_unique_origins_from_indicators(variable_1, variable_2, origins):
@@ -344,7 +328,7 @@ def test_get_unique_licenses_from_indicators(variable_1, variable_2, licenses):
     assert get_unique_licenses_from_indicators([variable_2, variable_1]) == [licenses[2], licenses[3], licenses[1]]
 
 
-def test_combine_indicators_metadata_with_different_fields(variable_1, variable_2, sources, origins, licenses) -> None:
+def test_combine_indicators_metadata_with_different_fields(variable_1, variable_2, origins, licenses) -> None:
     variable_1 = variable_1.copy()
     variable_2 = variable_2.copy()
     for operation in ["+", "-", "melt", "pivot", "concat"]:
@@ -355,7 +339,6 @@ def test_combine_indicators_metadata_with_different_fields(variable_1, variable_
         assert metadata.description is None
         assert metadata.unit is None
         assert metadata.short_unit is None
-        assert metadata.sources == [sources[2], sources[1], sources[3]]
         assert metadata.origins == [origins[2], origins[1], origins[3]]
         assert metadata.licenses == [licenses[1], licenses[2], licenses[3]]
         # variable_2 has a major processing level, so the combined variable should have a major processing level.
@@ -377,7 +360,6 @@ def test_combine_indicators_metadata_with_equal_fields(variable_1, variable_2) -
         assert metadata.description == variable_1.metadata.description
         assert metadata.unit == variable_1.metadata.unit
         assert metadata.short_unit == variable_1.metadata.short_unit
-        assert metadata.sources == variable_1.metadata.sources
         assert metadata.origins == variable_1.metadata.origins
         assert metadata.licenses == variable_2.metadata.licenses
         # Now both variables have the same processing level, which is minor.
@@ -417,7 +399,7 @@ def test_copy() -> None:
     assert v1.metadata.license.name == "dog license"
 
 
-def test_divide_variables_where_only_numerator_has_metadata(variable_1, variable_2, sources, origins, licenses) -> None:
+def test_divide_variables_where_only_numerator_has_metadata(variable_1, variable_2, origins, licenses) -> None:
     variable_1 = variable_1.copy()
     variable_2 = variable_2.copy()
     # We remove metadata values from the denominator.
@@ -433,7 +415,6 @@ def test_divide_variables_where_only_numerator_has_metadata(variable_1, variable
     assert variable.metadata.unit == variable_1.metadata.unit
     assert variable.metadata.short_unit == variable_1.metadata.short_unit
     # Sources, origins and licenses should be propagated as normally.
-    assert variable.metadata.sources == [sources[2], sources[1], sources[3]]
     assert variable.metadata.origins == [origins[2], origins[1], origins[3]]
     assert variable.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # variable_2 has a major processing level, so the combined variable should have a major processing level.
@@ -445,7 +426,7 @@ def test_divide_variables_where_only_numerator_has_metadata(variable_1, variable
 
 
 def test_divide_variables_where_only_denominator_has_metadata(
-    variable_1, variable_2, sources, origins, licenses
+    variable_1, variable_2, origins, licenses
 ) -> None:
     variable_1 = variable_1.copy()
     variable_2 = variable_2.copy()
@@ -462,7 +443,6 @@ def test_divide_variables_where_only_denominator_has_metadata(
     assert variable.metadata.unit is None
     assert variable.metadata.short_unit is None
     # Sources, origins and licenses should be propagated as normally.
-    assert variable.metadata.sources == [sources[2], sources[1], sources[3]]
     assert variable.metadata.origins == [origins[2], origins[1], origins[3]]
     assert variable.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # variable_2 has a major processing level, so the combined variable should have a major processing level.
@@ -564,7 +544,6 @@ def test_combine_indicators_metadata_uses_all_fields() -> None:
         "description_short",
         "description_from_producer",
         "description_key",
-        "sources",
         "origins",
         "licenses",
         "unit",
