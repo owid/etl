@@ -33,8 +33,8 @@ def run() -> None:
     # Keep only the columns we publish (drop sources, supplementary metadata, ISO/COW codes).
     tb = tb[["country", "year", "law", "status", "proportion"]].copy()
 
-    # Harmonize country names (modern API).
-    tb = paths.regions.harmonize_names(tb=tb, country_col="country")
+    # Harmonize country names
+    tb = paths.regions.harmonize_names(tb=tb)
 
     # Drop structural-placeholder (law, status) combinations — combos that are all-zero per the codebook.
     placeholders = _detect_structural_placeholders(tb)
@@ -73,13 +73,13 @@ def run() -> None:
 def _detect_structural_placeholders(tb):
     """Return the set of (law, status) combos that are zero for every country and year.
 
-    The codebook reports 19 placeholders; we detect them dynamically and assert the count
-    is in a reasonable range so a coding change in the source surfaces as a test failure.
+    Codebook v2.0 §1.1 reports 18 placeholders and 36 active combinations. We detect them
+    dynamically and assert the count to surface any source-side coding changes.
     """
     placeholder_series = tb.groupby(["law", "status"], observed=True)["proportion"].max()
     placeholders = set(placeholder_series[placeholder_series == 0].index)
-    assert 17 <= len(placeholders) <= 20, (
-        f"Expected 17-20 placeholder (law, status) combos per codebook v2.0; found {len(placeholders)}."
+    assert len(placeholders) == 18, (
+        f"Expected 18 placeholder (law, status) combos per codebook v2.0 §1.1; found {len(placeholders)}."
     )
     return placeholders
 

@@ -4,20 +4,20 @@ meta:
   origin:
     # Data product / Snapshot
     title: LGBTI National Policy Dataset
-    description: |-
-      The LGBTI National Policy Dataset (Version 2.0) is a country-year-policy panel dataset tracking the adoption, scope, and enforcement of LGBTI-related policies across 197 countries from 1991 to 2025. It is distributed in long format, where each row represents a single country in a single year for one specific policy-status combination.
+    description: >-
+      The LGBTI National Policy Dataset (Version 2.0) is a country-year-policy panel dataset tracking the
+      adoption, scope, and enforcement of LGBTI-related policies across 197 countries from 1991 to 2025. The
+      dataset is distributed in long format, where each row represents a single country in a single year for one
+      specific policy-status combination. It is designed for use in comparative political research, policy diffusion
+      analysis, and quantitative cross-national studies of LGBTI rights.
 
-      The dataset covers 27 distinct policy areas organized into 54 policy-status combinations (each policy paired with two mutually exclusive status directions, such as Legal/Illegal or Equal/Unequal). Of these 54 combinations, 35 contain substantive data; the remaining 19 are structural placeholders included to maintain a fully balanced panel suitable for econometric methods.
 
-      The 27 policy areas span criminalization (Same-Sex Acts, Death Penalty, Morality/Propaganda, LGBTQ+ Civil Society Restrictions), relationship recognition (Marriage Equality, Civil Unions, Joint Adoption, Age of Consent), anti-discrimination protections (Employment Discrimination and Goods/Services Discrimination on the basis of Sexual Orientation and Gender Identity, Constitutional Protections, Religious Exemption Laws), hate crime and speech laws (Hate Crime Protections, Incitement to Hatred, Conversion Therapies), military service (LGB Military, Transgender Military), gender identity and healthcare (Third-Gender Recognition, Gender Affirming Care for Adults and Minors, Gender Assignment Surgeries on Children, Gender Marker Change), and Blood Donations.
-
-      Each policy-status row carries a Proportion score on a 0.0–1.0 scale. The Proportion captures population-weighted subnational policy adoption using constant 2000/2001 Census population shares for 15 federal or decentralized countries (Argentina, Australia, Bosnia and Herzegovina, Brazil, Canada, India, Indonesia, Iraq, Mexico, Nigeria, Russia, Spain, Switzerland, United Kingdom, United States). For all other countries, the score is binary: 0 if the policy does not exist, 1 if it is in effect at the national level. The constant-denominator design ensures that changes in Proportion reflect policy shifts rather than demographic change.
-
-      Status labels are not consistently aligned with progressive vs. regressive policy directions across all policies. For criminalization policies, `Legal` means the criminalization is in effect (regressive). For anti-discrimination, conversion therapy bans, and gender assignment surgery bans, `Illegal` means the protection or ban exists (progressive). The codebook provides a complete Policy Orientation Reference table.
-
-      The dataset also includes supplementary metadata columns capturing maximum punishment for criminalization policies, fines, sexes covered by each law, evidence of enforcement, subnational variation flags, gender marker change requirements (from the Trans Rights Indicator Project), civil union benefit levels, blood donation restriction periods, and temporal metadata recording years of national adoption, first adoption, repeal, and changes. Eight source columns provide dual citations (primary legal text and corroborating international monitoring source) for every active row.
-    date_published: "2026-03-15"
-    version_producer: "v2.0"
+      The dataset covers 27 distinct policy areas organized into 54 policy-status combinations (each policy
+      paired with two mutually exclusive status directions). Of these 54 combinations, 36 contain substantive
+      data; the remaining 18 are structural placeholders with all-zero values, included to maintain a fully
+      balanced panel suitable for econometric methods.
+    date_published: "2026-03-23"
+    version_producer: "2.0"
 
     # Citation
     producer: Velasco
