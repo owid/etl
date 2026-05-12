@@ -56,7 +56,5 @@ def run() -> None:
     tb_questions.metadata.short_name = paths.short_name
     tb_index.metadata.short_name = f"{paths.short_name}_index"
 
-    ds_garden = paths.create_dataset(
-        tables=[tb_questions, tb_index], default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb_questions, tb_index], default_metadata=ds_meadow.metadata)
     ds_garden.save()

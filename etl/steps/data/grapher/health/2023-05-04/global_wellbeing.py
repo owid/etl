@@ -10,7 +10,5 @@ def run() -> None:
     tb_questions = ds_garden.read("global_wellbeing", reset_index=False)
     tb_index = ds_garden.read("global_wellbeing_index", reset_index=False)
 
-    ds_grapher = paths.create_dataset(
-        tables=[tb_questions, tb_index], default_metadata=ds_garden.metadata
-    )
+    ds_grapher = paths.create_dataset(tables=[tb_questions, tb_index], default_metadata=ds_garden.metadata)
     ds_grapher.save()
