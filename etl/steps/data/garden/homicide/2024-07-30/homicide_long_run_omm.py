@@ -1,7 +1,6 @@
 from owid.catalog import Table
 from owid.catalog import processing as pr
 from owid.catalog.utils import underscore
-from owid.datautils import dataframes
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -31,7 +30,7 @@ def run(dest_dir: str) -> None:
     tb_eisner = tb_eisner.rename(
         columns={"death_rate_per_100_000_population": "death_rate_per_100_000_population_eisner"}
     ).drop(columns="source")
-    tb_combined = dataframes.multi_merge([tb_eisner, tb_who_long], on=["country", "year"], how="outer")
+    tb_combined = pr.merge(tb_eisner, tb_who_long, on=["country", "year"], how="outer")
 
     # We only want entities for which long-run data is available in grapher - so let's drop all the others
 

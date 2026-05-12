@@ -916,7 +916,10 @@ class Source(Base):
         return select(cls).where(*conds)
 
     def upsert(self, session: Session) -> "Source":
-        ds = session.scalars(self._upsert_select).one_or_none()
+        # NOTE: `sources` has no unique constraint, so legacy data may include duplicate rows
+        # matching this query. Pick the oldest (lowest id) and let the dupes remain — they're
+        # still referenced by other variables that point to them by id.
+        ds = session.scalars(self._upsert_select.order_by(self.__class__.id)).first()
 
         if not ds:
             ds = self

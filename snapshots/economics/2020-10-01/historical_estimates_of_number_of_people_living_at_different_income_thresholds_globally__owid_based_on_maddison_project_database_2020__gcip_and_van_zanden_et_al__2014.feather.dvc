@@ -1,12 +1,10 @@
 meta:
-  source:
-    name: OWID based on Maddison Project Database 2020, GCIP and van Zanden et al. (2014))
-    description: 'See data appendix:'
+  origin:
+    producer: Maddison Project Database, GCIP and van Zanden et al.
+    title: Historical estimates of number of people living at different income thresholds globally
+    citation_full: Our World in Data based on Maddison Project Database (2020), Global Consumption and Income Project (GCIP), and van Zanden et al. (2014).
     date_accessed: '2020-10-01'
-    published_by: OWID based on Maddison Project Database 2020, GCIP and van Zanden et al. (2014))
-  name: |-
-    Historical estimates of number of people living at different income thresholds globally (OWID based on Maddison Project Database 2020, GCIP and van Zanden et al. (2014))
-  description: ''
+    date_published: '2020'
   is_public: false
 outs:
   - md5: c89d0f847c7c46ff72b59f4ea2272723

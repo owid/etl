@@ -43,4 +43,4 @@ meta:
 outs:
   - md5: 98bc01d4ea56c6956a688da9483d2d22
     size: 13436353
-    path: yougov_united-arab-emirates.csv
+    path: yougov_united_arab_emirates.csv

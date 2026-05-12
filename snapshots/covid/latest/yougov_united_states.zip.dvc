@@ -3,8 +3,8 @@
 meta:
   origin:
     # Country-specific
-    title_snapshot: COVID-19, Behaviour Tracker Data Hub (Saudi Arabia)
-    url_download: https://github.com/YouGov-Data/covid-19-tracker/raw/master/data/saudi-arabia.csv
+    title_snapshot: COVID-19, Behaviour Tracker Data Hub (United States)
+    url_download: https://github.com/YouGov-Data/covid-19-tracker/raw/master/data/united-states.zip
 
     # Data product / Snapshot
     title: COVID-19, Behaviour Tracker Data Hub
@@ -41,6 +41,6 @@ meta:
       url: https://yougov.co.uk/about/terms
 
 outs:
-  - md5: 4b88993cda5ebef8bf7973b37302313f
-    size: 12823408
-    path: yougov_saudi-arabia.csv
+  - md5: c4375a44d01b612ca11665430ce9e60b
+    size: 3395753
+    path: yougov_united_states.zip

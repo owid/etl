@@ -92,8 +92,10 @@ Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 ### Preserving metadata/origins in steps
 
 - **No `np.where`** — strips origins. Use `tb["col"] = tb["b"]; tb.loc[mask, "col"] = tb.loc[mask, "a"]`
+- **No `pd.concat`** — strips origins. Use `pr.concat` (`from owid.catalog import processing as pr`)
 - **No `index.map()`** to pull columns from another table — loses origins. Use `tb.join(other[["col"]], how="left")`
 - **`snap.read_csv/json/excel/feather/...`** — prefer over manual file reading + `pd.DataFrame`
+- **Don't re-wrap `snap.read_csv()` output in `Table(...)`** — the Table constructor with a plain DataFrame argument drops column-level origins. Mutate the returned Table directly: `tb = snap.read_csv(); tb = tb.dropna(...)`
 - **`paths.regions.harmonize_names(tb, country_col=..., countries_file=...)`** — current harmonization API (replaces `geo.harmonize_countries`)
 - **`Table.format()`** needs both `country` and `year`. For year-less tables: `set_index("country")` + set `tb.metadata.short_name`
 - **`*.meta.yml`**: omit `dataset:` block — inherited from origin. Only define `tables:` → `variables:`

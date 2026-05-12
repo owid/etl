@@ -1,14 +1,5 @@
 dataset:
-  namespace: fasttrack
-  version: latest
-  short_name: owid_upload_gini_compare_1980
   title: DRAFT owid_upload_gini_compare_1980
-  description: ''
-  sources:
-  - name: Unknown
-    published_by: Unknown
-    publication_year: 2023
-    date_accessed: 2023-05-09
 tables:
   owid_upload_gini_compare_1980:
     variables:

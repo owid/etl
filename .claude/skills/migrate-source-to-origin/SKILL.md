@@ -31,13 +31,24 @@ skill once per file in a loop.
 
 ## Workflow
 
-1. **Read the DVC file.** Note:
-   - The legacy `meta.source` block (and any sibling `meta.name`,
-     `meta.description`, `meta.license`). `meta.name` is OWID's internal
-     label, NOT the producer's title.
-   - If a prior `meta.origin` already exists, you're replacing it — but
-     still treat the legacy `meta.source` (if present) as the source of truth.
-   - The `outs:` block (and any other top-level YAML keys) — preserve verbatim.
+1. **Read the DVC file.** Identify the legacy shape:
+   - **`meta.source:` block** (the common form). Sibling `meta.name`,
+     `meta.description`, `meta.license` may also exist.
+   - **Flat top-level fields under `meta:`** (older shape, no `source:`
+     wrapper): `source_name`, `source_published_by`, `publication_year`,
+     `publication_date`, `url`, `source_data_url`, `license_url`,
+     `license_name`, `description`, `date_accessed`, `is_public`,
+     `file_extension`, plus the internal `name`. Treat these as if they
+     lived under `meta.source.*` — same field rules apply. Drop
+     `namespace`/`short_name`/`version`/`file_extension`/`wdir` — they're
+     derived from the file path.
+
+   `meta.name` is OWID's internal label, NOT the producer's title — drop it.
+
+   If a prior `meta.origin` already exists, you're replacing it — but
+   still treat the legacy fields (if present) as the source of truth.
+
+   The `outs:` block (and any other top-level YAML keys) — preserve verbatim.
 
 2. **Apply STEP 1 (coincidence test)** — see below — to decide whether
    `title_snapshot` and `description_snapshot` should be set at all.
@@ -61,11 +72,57 @@ skill once per file in a loop.
    one-liner instead of `Edit`. Most files don't have such comments, so
    `Edit` is fine by default.
 
-7. **Validate** the rewritten file:
+7. **Audit the diff** before validating. Read every legacy field and
+   confirm it maps somewhere in the new origin (or has a documented
+   reason to drop). Watch for these common silent drops:
+   - "Accessed YYYY-MM-DD" tail inside legacy `published_by` — drop from
+     `citation_full` only because `date_accessed` carries the same fact.
+   - Expanded methodology phrases in legacy description (e.g. "including
+     journal articles, …") — keep verbatim in `description`, do not
+     compress.
+   - Downstream `dataset.description` that adds info beyond what the
+     snapshot's description had — lift into `origin.description` (see
+     "Downstream sweep" below).
+
+8. **Validate** the rewritten file:
    ```bash
    .venv/bin/python -c "from etl.snapshot import SnapshotMeta; SnapshotMeta.load_from_yaml('<dvc_path>')"
    ```
    If this fails, read the error, fix the YAML or the offending field, and retry.
+
+9. **Downstream sweep (when migrating snapshots in active chains).**
+   Snapshots used by active garden/grapher steps often have matching
+   `dataset.sources:`, `all_sources:`, or variable-level `sources:` /
+   `descriptions:` blocks in the downstream meta.yml that duplicate the
+   snapshot's source info. After the snapshot is migrated, scan each
+   downstream meta.yml:
+   - If `dataset.description` adds info beyond the snapshot's
+     `description`, lift the extra into `origin.description`.
+   - If a variable's `description_key` / `descriptions:` anchor carries
+     per-source notes (e.g. "OWID uses WHO data for the following
+     countries: …"), move those into the relevant snapshot's
+     `origin.description_snapshot` (see the OWID-curated slice notes case
+     under `description_snapshot`). The notes then travel with the origin
+     to every chart that uses the snapshot.
+   - **Variable-level `description:` → `description_short:` (do NOT lift
+     to `origin.description`).** The legacy variable `description` field
+     is a concept definition for the indicator (renders as the chart's
+     subtitle/data-page short blurb), not source metadata. Rename it to
+     `description_short:` at the same variable level. Lifting it into
+     the snapshot's `origin.description` is wrong — it muddies the
+     producer's data-product description with indicator-concept prose
+     and removes the text from where charts actually display it.
+   - Then strip the now-redundant `sources:`, `licenses:`, `descriptions:`,
+     `all_sources:`, and `dataset.sources:` blocks from the downstream
+     meta.yml.
+   - The downstream `.py` may need refactoring too: `pd.read_csv(snap.path)`
+     and `Table(df, ...)` patterns drop column origins. Use
+     `snap.read_csv()` + `pr.concat` so origins flow through Table
+     operations all the way to grapher.
+
+   Optional for one-off snapshot migrations; mandatory when the
+   downstream meta.yml carries rich source-level prose or when the
+   chain's grapher step combines multiple snapshots.
 
 ---
 
@@ -197,9 +254,32 @@ Bank WDI, OECD reports, etc.), you MAY add one short factual sentence
 identifying what the database is — never two sentences.
 
 ### `description_snapshot` (default omitted)
-Set ONLY when STEP 1 says they differ. Verbatim from the legacy
-`source.description` — the paragraphs about this specific slice. When
-they coincide, omit and put everything in `description`.
+Set in two cases:
+1. **Producer-defined slice (STEP 1 says they differ).** Verbatim from
+   the legacy `source.description` — the paragraphs about this specific
+   slice.
+2. **OWID-curated slice notes.** When the snapshot feeds a combined
+   indicator and the downstream grapher meta.yml has source-specific
+   notes ("OWID uses WHO data for the following countries: …",
+   per-source methodology asides), lift those notes here so they travel
+   with the origin into every chart that uses the snapshot — instead of
+   leaving them in `description_key` or `descriptions:` anchors at the
+   variable level.
+
+When the snapshot coincides with the data product AND has no OWID-curated
+slice notes, omit `description_snapshot` and put everything in `description`.
+
+**Source-property prose belongs on origin, not on variables.** When the
+legacy `dataset.description` contains data-interpretation caveats that
+are properties of how the producer reports the data (e.g. "Negative
+values imply that quantities destroyed or exported exceeded the sum of
+production and imports, so they came from stockpiles"), these are
+source facts — they belong in `origin.description` (or
+`description_snapshot`). Do NOT lift them into variable-level
+`description_key` / `description_short`, which are for
+indicator-concept text. Origin prose travels with the snapshot to every
+chart that uses it; variable-level fields are indicator-specific and
+don't follow the source.
 
 ### `citation_full` (required)
 Producer's preferred citation; long is OK. Start capital, end with a period,
@@ -210,6 +290,13 @@ citation, it goes here.
 Set ONLY when there is a well-known acronym or short brand strictly shorter and more
 recognizable than `producer` (e.g. `FAO`, `WHO`, `V-Dem`). If `producer` is already
 short (`Fouquin and Hugot`, `World Bank`, `NASA`), omit. No year, no period.
+
+**Pairing pattern.** When the institution has a well-known acronym, spell
+out the full name as `producer` and put the acronym in `attribution_short`:
+`producer: World Health Organization` + `attribution_short: WHO`;
+`producer: Food and Agriculture Organization of the United Nations` +
+`attribution_short: FAO`. This gives the data-source pane the full name
+and the chart byline a compact acronym.
 
 ### `version_producer` (default omitted, ≤255 chars)
 Set ONLY when the producer issues a series of releases AND uses a release identifier
@@ -223,6 +310,10 @@ IDs, not versions — never use them here.
 pick a year that is part of a coverage range (`1827–2014`) or a projection
 (`2030–2050`).
 
+**Precision.** When the legacy has both `publication_year: 2022` and
+`publication_date: 2022-09-01`, prefer the full date. Same goes for any
+explicit month/day mentioned in the legacy description.
+
 ### `url_main` and `url_download` (default omitted when no URLs in legacy)
 URLs the legacy provides — typically in `source.url`,
 `source.source_data_url`, or as inline links in `source.description`.
@@ -232,11 +323,11 @@ landing-page URL goes to `url_main`, the direct-download URL to
 `url_download`. URLs in the legacy must not be silently dropped.
 
 ### `date_accessed` (required)
-`YYYY-MM-DD`. Plausibility test: a plausible `date_accessed` is no later
-than ~1 month after the snapshot's version directory date. Anything
-later (e.g. snapshot in `2020/` but `date_accessed: 2026-03-05`) is
-almost always the legacy-migration tool stamping the day it ran, not a
-real access date — treat it as missing.
+`YYYY-MM-DD`. Plausibility test: any `date_accessed` from **2026-03 or
+later** on an older snapshot is likely the legacy-migration tool
+stamping the day it ran, not a real access date. Earlier dates — even
+ones years after the snapshot's version directory — are real OWID
+re-access dates and should be trusted.
 
 Resolution order:
 1. Use `source.date_accessed` if plausible by the test above.
@@ -379,4 +470,7 @@ match `YYYY-MM-DD`, `YYYY`, or `latest`).
 
 - Batch driving via `dag/migrated.yml` — invoke this skill once per file and
   loop in your conversation.
-- Indicator-level metadata (garden / grapher steps) — only snapshot DVC `meta.origin`.
+- Authoring indicator-level metadata from scratch — only snapshot DVC
+  `meta.origin` and the cleanup of duplicate source info in downstream
+  garden/grapher meta.yml + `.py` (see "Downstream sweep" in Workflow
+  step 9).
