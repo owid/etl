@@ -7,6 +7,11 @@ definitions:
         - LGBT+ Rights
         - Human Rights
       attribution_short: Velasco
+    description_key:
+      - "{definitions.description_key_dataset}"
+
+  description_key_dataset: |-
+    This data comes from the LGBTI National Policy Dataset, compiled by Kristopher Velasco at Princeton University. It tracks the adoption, scope, and enforcement of 27 LGBTI-related policies across 197 countries, with annual data starting in 1991.
 
   proportion_methodology: |-
     The score ranges from 0 (the policy does not exist in any jurisdiction) to 1 (the policy is in effect at the national level). Fractional values reflect subnational adoption in 15 federal or decentralized countries (Argentina, Australia, Bosnia and Herzegovina, Brazil, Canada, India, Indonesia, Iraq, Mexico, Nigeria, Russia, Spain, Switzerland, United Kingdom, United States), weighted by constant 2000/2001 Census population shares. The fixed denominator ensures that changes in the score reflect policy shifts, not demographic change.
@@ -166,6 +171,7 @@ tables:
         description_short: |-
           {definitions.law_short}
         description_key:
+          - "{definitions.description_key_dataset}"
           - "{definitions.proportion_methodology}"
           - "{definitions.status_labeling_note}"
         unit: ""
@@ -187,6 +193,7 @@ tables:
         description_short: |-
           The number of countries in the region with full implementation (policy score equal to 1) of: {definitions.status_title}.
         description_key:
+          - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
         processing_level: major
         description_processing: "{definitions.description_regions_processing}"
@@ -202,6 +209,7 @@ tables:
         description_short: |-
           The number of countries in the region without full implementation (policy score below 1) of: {definitions.status_title}.
         description_key:
+          - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
         processing_level: major
         description_processing: "{definitions.description_regions_processing}"
@@ -217,6 +225,7 @@ tables:
         description_short: |-
           Total population of countries in the region with full implementation (policy score equal to 1) of: {definitions.status_title}.
         description_key:
+          - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
         processing_level: major
         description_processing: "{definitions.description_regions_processing}"
@@ -232,6 +241,7 @@ tables:
         description_short: |-
           Total population of countries in the region without full implementation (policy score below 1) of: {definitions.status_title}.
         description_key:
+          - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
         processing_level: major
         description_processing: "{definitions.description_regions_processing}"
@@ -249,6 +259,7 @@ tables:
         description_short: |-
           Whether the minimum age of consent for same-sex sexual activity equals that for different-sex sexual activity.
         description_key:
+          - "{definitions.description_key_dataset}"
           - "The indicator is coded as follows: **_Equal_** (age of consent is equal and implemented), **_Partial implementation_** (age of consent is equal or unequal, but not completely implemented), **_No legal provisions_** (there are no laws regulating the age of consent between same-sex and different-sex partners) and **_Unequal_** (age of consent is different and implemented)."
         processing_level: major
         description_processing: |-
@@ -270,6 +281,7 @@ tables:
         description_short: |-
           Whether same-sex couples can legally marry, whether civil unions or registered partnerships are recognized instead, or whether same-sex marriage is banned.
         description_key:
+          - "{definitions.description_key_dataset}"
           - "The indicator is coded as follows: **_Legal_** (marriage equality is fully implemented; civil unions may also exist), **_Partially legal_** (marriage equality is partially implemented; civil unions may also exist), **_No legal provisions_** (there are no laws regulating same-sex marriage nor civil unions), **_Ban and marriage both partial_** (marriage equality and the ban are both partially implemented; civil unions are partially implemented as well), **_Partially banned_** (the marriage ban is partially implemented, or marriage equality is banned with partial civil union or marriage recognition) and **_Banned_** (marriage equality is banned and fully implemented; no civil unions)."
         processing_level: major
         description_processing: |-
@@ -293,6 +305,7 @@ tables:
         description_short: |-
           Whether lesbian, gay, and bisexual people are allowed to serve in the military, banned from serving, or whether no policy exists.
         description_key:
+          - "{definitions.description_key_dataset}"
           - "The indicator is coded as follows: **_Allowed_** (LGB people are allowed to serve in the military), **_No policy_** (there is no policy allowing or banning LGB military service) and **_Banned_** (LGB people are banned from serving in the military)."
         processing_level: major
         description_processing: |-
