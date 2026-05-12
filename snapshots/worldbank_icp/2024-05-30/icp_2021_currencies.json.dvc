@@ -13,7 +13,7 @@ meta:
     citation_full: World Bank (2024). International Comparison Program 2021. https://www.worldbank.org/en/programs/icp
     url_main: https://www.worldbank.org/en/programs/icp
     url_download: https://api.worldbank.org/v2/sources/90/country/all/metatypes/CurrencyUnit?format=json
-    date_accessed: '2026-02-24'
+    date_accessed: '2024-05-30'
     date_published: '2024-05-30' # Date of the accompanying World Bank press release: https://www.worldbank.org/en/news/press-release/2024/05/30/global-purchasing-power-parities-data-released-for-2021
     license:
       name: Creative Commons Attribution 4.0

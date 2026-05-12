@@ -1,16 +1,13 @@
 meta:
-  source:
-    name: |-
-      Fouquet & Pearson (2006). Seven centuries of energy services: The price and use of light in the United Kingdom (1300-2000).
-    url: https://www.jstor.org/stable/23296980
-    source_data_url: |-
+  origin:
+    producer: Fouquet and Pearson
+    title: 'Seven centuries of energy services: The price and use of light in the United Kingdom (1300-2000)'
+    citation_full: 'Fouquet, R., & Pearson, P. J. (2006). Seven centuries of energy services: The price and use of light in the United Kingdom (1300-2000). The Energy Journal, 27(1).'
+    url_main: https://www.jstor.org/stable/23296980
+    url_download: |-
       gAAAAABnRYZlXxepMAB9sIKn_qv_qmZn_zxaLMC7r6W0Pm4yDGaffkjMBQa1ovpzqTVnmQFcclmueGVS_TPk9_ethfFaKeAVFo7yRlvM-T5Vn56IJP1ZDGZzGF1pZQtvwvsWCYq7O_ZzRq9mGI439QHZ5s-0oewSvJFcpvI_Nc1EqVdsO-Hyb3hKhvCdXuR5Sg_E0gtagMAeh0KT8kAYTIxfAVtj29fY5yVUXXQU76CEkSRtenAVfSYjMD7hwik8ZFaG-fS-XRrP
     date_accessed: '2024-11-26'
-    published_by: |-
-      Fouquet, R., & Pearson, P. J. (2006). Seven centuries of energy services: The price and use of light in the United Kingdom (1300-2000). The energy journal, 27(1).
-  name: Lighting efficiency and shares in the UK
-  description: ''
-  license: {}
+    date_published: '2006'
   is_public: false
 outs:
   - md5: 8de6c6871078ece444a6c927db29ad48

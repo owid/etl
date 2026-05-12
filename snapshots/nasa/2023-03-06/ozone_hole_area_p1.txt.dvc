@@ -1,6 +1,5 @@
 meta:
   namespace: nasa
-  short_name: ozone_hole_area
   name: Ozone hole area and concentration (NASA, 2023)
   version: 2023-03-06
   publication_year: 2023

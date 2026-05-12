@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
 
     # Load fast track dataset
     snap = paths.load_snapshot("cholera.csv")
-    cholera_ft = pd.read_csv(snap.path)
+    cholera_ft = snap.read_csv()
 
     # Load countries regions
     regions_dataset = paths.load_dataset("regions")
@@ -40,16 +40,17 @@ def run(dest_dir: str) -> None:
     # Add global aggregate
     cholera_bp = add_global_total(cholera_bp, regions)
     # Combine datasets
-    cholera_combined = pd.concat([cholera_bp, cholera_ft])
+    cholera_combined = pr.concat([cholera_bp, cholera_ft])
 
     cholera_combined = add_regions(cholera_combined, regions)
 
-    tb_garden = Table(cholera_combined.set_index(["country", "year"], verify_integrity=True), short_name="cholera")
+    tb_garden = cholera_combined.set_index(["country", "year"], verify_integrity=True)
+    tb_garden.metadata.short_name = "cholera"
 
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden])
+    # Create a new garden dataset, inheriting metadata (title etc.) from the WER snapshot's origin.
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -90,7 +91,7 @@ def process_gho_cholera(who_gh_dataset: Dataset) -> Table:
     return tb
 
 
-def add_global_total(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
+def add_global_total(tb: Table, regions: Table) -> Table:
     """
     Calculate global total of cholera cases and add it to the existing dataset
     """
@@ -98,29 +99,28 @@ def add_global_total(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
     countries = regions[regions["region_type"] == "country"]["name"].to_list()
     manual_countries_to_allow = ["Serbia and Montenegro (former)"]
     countries = countries + manual_countries_to_allow
-    assert all(df["country"].isin(countries)), (
-        f"{df['country'][~df['country'].isin(countries)].drop_duplicates()}, is not a country"
+    assert all(tb["country"].isin(countries)), (
+        f"{tb['country'][~tb['country'].isin(countries)].drop_duplicates()}, is not a country"
     )
-    df_glob = df.groupby(["year"]).agg({"cholera_reported_cases": "sum", "cholera_deaths": "sum"}).reset_index()
-    df_glob["country"] = "World"
-    df_glob["cholera_case_fatality_rate"] = cholera_case_fatality_rate(df_glob)
-    df = pd.concat([df, df_glob])
+    tb_glob = tb.groupby(["year"]).agg({"cholera_reported_cases": "sum", "cholera_deaths": "sum"}).reset_index()
+    tb_glob["country"] = "World"
+    tb_glob["cholera_case_fatality_rate"] = cholera_case_fatality_rate(tb_glob)
+    tb = pr.concat([tb, tb_glob])
 
-    return df
+    return tb
 
 
-def add_regions(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
+def add_regions(tb: Table, regions: Table) -> Table:
     continents = regions[regions["region_type"] == "continent"]["name"].to_list()
 
     countries_in_regions = {
-        region: sorted(set(geo.list_countries_in_region(region)) & set(df["country"])) for region in continents
+        region: sorted(set(geo.list_countries_in_region(region)) & set(tb["country"])) for region in continents
     }
-    df_cont = df
-    df_out = pd.DataFrame()
+    tb_out = None
     for continent in continents:
         if continent == "Europe":
-            df_cont = geo.add_region_aggregates(
-                df=df[["year", "country", "cholera_reported_cases", "cholera_deaths"]],
+            tb_cont = geo.add_region_aggregates(
+                df=tb[["year", "country", "cholera_reported_cases", "cholera_deaths"]],
                 region=continent,
                 countries_in_region=countries_in_regions[continent] + ["Serbia and Montenegro (former)"],
                 countries_that_must_have_data=[],
@@ -128,8 +128,8 @@ def add_regions(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
                 frac_allowed_nans_per_year=0.2,
             )
         else:
-            df_cont = geo.add_region_aggregates(
-                df=df[["year", "country", "cholera_reported_cases", "cholera_deaths"]],
+            tb_cont = geo.add_region_aggregates(
+                df=tb[["year", "country", "cholera_reported_cases", "cholera_deaths"]],
                 region=continent,
                 countries_in_region=countries_in_regions[continent],
                 countries_that_must_have_data=[],
@@ -138,14 +138,14 @@ def add_regions(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
                 year_col="year",
                 frac_allowed_nans_per_year=1,
             )
-        df_cont = df_cont[df_cont["country"].isin(continents)]
-        df_out = pd.concat([df_out, df_cont])
-    df_out["cholera_case_fatality_rate"] = cholera_case_fatality_rate(df_out)
+        tb_cont = tb_cont[tb_cont["country"].isin(continents)]
+        tb_out = tb_cont if tb_out is None else pr.concat([tb_out, tb_cont])
+    tb_out["cholera_case_fatality_rate"] = cholera_case_fatality_rate(tb_out)
 
-    df = pd.concat([df, df_out])
+    tb = pr.concat([tb, tb_out])
 
-    return df
+    return tb
 
 
-def cholera_case_fatality_rate(df: pd.DataFrame) -> pd.Series:
-    return (df["cholera_deaths"] / df["cholera_reported_cases"]) * 100
+def cholera_case_fatality_rate(tb: Table) -> Table:
+    return (tb["cholera_deaths"] / tb["cholera_reported_cases"]) * 100

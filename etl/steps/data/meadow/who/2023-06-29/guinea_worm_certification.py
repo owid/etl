@@ -1,13 +1,9 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
-
-import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Initialize logger.
 log = get_logger()
@@ -23,16 +19,17 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("guinea_worm.csv"))
+    snap = paths.load_snapshot("guinea_worm.csv")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path, skiprows=2)
-    df = clean_certification_table(df).reset_index(drop=True)
+    tb = snap.read_csv(skiprows=2)
+    tb = clean_certification_table(tb).reset_index(drop=True)
     #
     # Process data.
     #
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    # Ensure all columns are snake-case.
+    tb = tb.underscore()
+    tb.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
@@ -46,12 +43,11 @@ def run(dest_dir: str) -> None:
     log.info("guinea_worm.end")
 
 
-def clean_certification_table(df: pd.DataFrame) -> pd.DataFrame:
-    df.columns.values[0] = "country"
-    df.columns.values[24] = "year_certified"
-    df.year_certified = df.year_certified.str.replace(r"Countries certified in", "", regex=True)
+def clean_certification_table(tb: Table) -> Table:
+    tb = tb.rename(columns={tb.columns[0]: "country", tb.columns[24]: "year_certified"})
+    tb["year_certified"] = tb["year_certified"].str.replace(r"Countries certified in", "", regex=True)
 
-    df = df.replace(
+    tb = tb.replace(
         {
             "year_certified": {
                 "Countries at precertification stage": "Pre-certification",
@@ -61,4 +57,4 @@ def clean_certification_table(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
 
-    return df
+    return tb

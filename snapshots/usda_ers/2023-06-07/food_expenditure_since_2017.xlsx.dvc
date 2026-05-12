@@ -1,6 +1,5 @@
 meta:
   namespace: usda_ers
-  short_name: food_expenditure
   name: Food expenditure
   version: '2023-06-07'
   publication_year: 2023

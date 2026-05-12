@@ -7,7 +7,6 @@ definitions:
 
 dataset:
   update_period_days: 0
-  sources: []
 
 tables:
   fertility_rate:
@@ -17,8 +16,7 @@ tables:
         unit: children per woman
         display:
           name: Fertility rate
-        description_short: |-
-          The number of children that would be born to a woman if she were to live to the end of her child-bearing years and give birth to children at the current age-specific fertility rates.
+        description_short: Total fertility rate represents the number of children that would be born to a woman if she were to live to the end of her childbearing years and bear children in accordance with age-specific fertility rates of the specified year.
         presentation:
           title_public: "Fertility rate: children per woman"
           attribution_short: Gapminder

@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Number of parties to multilateral environmental agreements - UNCTAD
+  origin:
+    producer: UNCTAD
+    title: 'Development and Globalization: Facts and Figures'
     description: |-
       Data represents the number of parties signed into international, multilateral environmental agreements.
 
@@ -18,11 +19,10 @@ meta:
       Ozone: Ozone Vienna Convention
       Ramsar: Ramsar Convention
       Rotterdam: Rotterdam Convention.
-    url: http://stats.unctad.org/Dgff2016/index.html
-    date_accessed: 2017-10-12
-    published_by: 'UNCTAD Development and Globalization: Facts and Figures (2016). United Nations Conference on Trade and Development'
-  name: Number of parties to multilateral environmental agreements - UNCTAD
-  description: ''
+    citation_full: 'United Nations Conference on Trade and Development (2016). Development and Globalization: Facts and Figures.'
+    url_main: http://stats.unctad.org/Dgff2016/index.html
+    date_accessed: '2017-10-12'
+    date_published: '2016'
 outs:
   - md5: de9f78ef4fe07ac4cf834926e513a2e2
     size: 12994

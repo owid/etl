@@ -1,26 +1,27 @@
 meta:
-  name: European Health Information Gateway (WHO, 2022)
-  publication_year: 2022
+  origin:
+    producer: World Health Organization
+    title: European Health for All database
+    description: |-
+      Since the mid-1980s, Member States of the WHO European Region have been reporting essential health-related statistics to the Health for All (HFA) family of databases, making it one of WHO's oldest sources of data. As it is based on reported data, rather than estimates, the HFA family of databases is also particularly valuable.
 
-  publication_date: '2022-09-01'
-  source_name: WHO (2022)
-  source_published_by: WHO Regional Office for Europe. European Health for All database
-    (HFA-DB). Published 2022-09-01. Accessed 2023-07-13. https://gateway.euro.who.int
-  url: 
-    https://gateway.euro.who.int/en/indicators/hfa_545-6410-autopsy-rate-for-all-deaths/
-  source_data_url:
-  license_url: https://www.who.int/about/policies/publishing/copyright
-  license_name: CC BY-NC-SA 3.0 IGO
-  date_accessed: 2023-07-13
-  file_extension: csv
-  is_public: true
-  description: |
-    Since the mid-1980s, Member States of the WHO European Region have been reporting essential health-related statistics to the Health for All (HFA) family of databases, making it one of WHO’s oldest sources of data. As it is based on reported data, rather than estimates, the HFA family of databases is also particularly valuable.
+      HFA databases bring together the indicators that are part of major monitoring frameworks relevant to the Region, such as Health 2020 and the Sustainable Development Goals. The indicators cover basic demographics, health status, health determinants and risk factors, as well as health care resources, expenditures and more.
+    title_snapshot: European Health for All database - Autopsy rate for all deaths
+    description_snapshot: |-
+      The data for the following countries is taken from the WHO European Health Information Gateway:
 
-    HFA databases bring together the indicators that are part of major monitoring frameworks relevant to the Region, such as Health 2020 and the Sustainable Development Goals. The indicators cover basic demographics, health status, health determinants and risk factors, as well as health care resources, expenditures and more.
+      Armenia, Austria, Azerbaijan, Belarus, Bulgaria, Croatia, Cyprus, Czechia, Denmark, Estonia, Finland, Georgia, Hungary, Iceland, Israel, Kazakhstan, Kyrgyzstan, Latvia, Lithuania, Luxembourg, Malta, Moldova, Netherlands, North Macedonia, Norway, Portugal, Romania, Russia, San Marino, Serbia, Slovakia, Sweden, Switzerland, Tajikistan, Turkey, Turkmenistan, Ukraine, United Kingdom and Uzbekistan.
 
-wdir: ../../../data/snapshots/who/2022-09-01
+      The WHO European Health Information Gateway aggregates data from national statistics offices. Countries have data across multiple years.
+    citation_full: WHO Regional Office for Europe. European Health for All database (HFA-DB). Published 2022-09-01. https://gateway.euro.who.int.
+    attribution_short: WHO
+    url_main: https://gateway.euro.who.int/en/indicators/hfa_545-6410-autopsy-rate-for-all-deaths/
+    date_accessed: '2023-07-13'
+    date_published: '2022-09-01'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
 outs:
-- md5: 5b7d5a6cdbe8de8af1c4e2eb0a8cd9c3
-  size: 30011
-  path: autopsy.csv
+  - md5: 5b7d5a6cdbe8de8af1c4e2eb0a8cd9c3
+    size: 30011
+    path: autopsy.csv

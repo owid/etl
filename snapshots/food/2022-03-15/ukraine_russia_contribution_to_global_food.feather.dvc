@@ -1,11 +1,12 @@
 meta:
-  source:
-    name: Calculated by Our World in Data based on the Food and Agriculture Organization of the United Nations
-    url: https://www.fao.org/faostat/en/#data/FBS
-    date_accessed: 2022-03-15
-    published_by: Calculated by Our World in Data based on the Food and Agriculture Organization of the United Nations
-  name: Ukraine-Russia contribution to global food
-  description: ''
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: Food Balance Sheets
+    attribution_short: FAO
+    citation_full: Food and Agriculture Organization of the United Nations. Food Balance Sheets. FAOSTAT.
+    url_main: https://www.fao.org/faostat/en/#data/FBS
+    date_accessed: '2022-03-15'
+    date_published: '2022'
 outs:
   - md5: 8ad4bc767528a4ffa15b64907f6b5f59
     size: 6650

@@ -4,7 +4,7 @@ import click
 import pandas as pd
 
 from etl.backport_helpers import long_to_wide
-from etl.snapshot import Snapshot, SnapshotMeta
+from etl.snapshot import Snapshot
 
 SNAPSHOT_NAMESPACE = Path(__file__).parent.parent.name
 SNAPSHOT_VERSION = Path(__file__).parent.name
@@ -23,23 +23,10 @@ def main(upload: bool) -> None:
         "backport/latest/dataset_532_crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons_values.feather"
     )
     snap_values.pull()
-    snap_config = Snapshot(
-        "backport/latest/dataset_532_crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons_config.json"
+    # Create a new snapshot. Metadata is hardcoded in the accompanying DVC file.
+    snap = Snapshot(
+        "demography/2017-06-01/crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons.feather"
     )
-    snap_config.pull()
-
-    # Create snapshot metadata for the new file
-    meta = SnapshotMeta(**snap_values.metadata.to_dict())
-    meta.namespace = SNAPSHOT_NAMESPACE
-    meta.version = SNAPSHOT_VERSION
-    meta.short_name = (
-        "crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons"
-    )
-    meta.fill_from_backport_snapshot(snap_config.path)
-    meta.save()
-
-    # Create a new snapshot.
-    snap = Snapshot(meta.uri)
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))

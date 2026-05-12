@@ -42,7 +42,7 @@ COLUMNS_COMMON_NOTES = [
 _INDEX_COLNAME_AUX = "index"
 
 
-def make_tables(df: pd.DataFrame, short_name: str) -> list[Table]:
+def make_tables(tb: Table, short_name: str) -> list[Table]:
     """Make tables.
 
     There are three tables created:
@@ -50,13 +50,13 @@ def make_tables(df: pd.DataFrame, short_name: str) -> list[Table]:
         - Notes table: Table linking entries in the main table with specific notes.
         - Bulk ID table: Mapping between IDs in the main table and bulk IDs. Bulk IDs are legacy IDs. This table might be removed in the future.
     """
-    df = _add_range_index(df)
+    tb = _add_range_index(tb)
     # Main table
-    tb_main = make_table_main(df, short_name)
+    tb_main = make_table_main(tb, short_name)
     # Notes table
-    tb_notes = make_table_notes(df)
+    tb_notes = make_table_notes(tb)
     # Bulk ID table
-    tb_bulk_id = make_table_bulk_id(df)
+    tb_bulk_id = make_table_bulk_id(tb)
     # Return
     tables = [
         tb_main,
@@ -69,59 +69,57 @@ def make_tables(df: pd.DataFrame, short_name: str) -> list[Table]:
     return tables
 
 
-def table_to_clean_df(tb: Table, entities_with_comma: list[str] | None = None) -> pd.DataFrame:
-    """Clean data"""
-    # Table to DataFrame
-    df = pd.DataFrame(tb)
+def table_to_clean_df(tb: Table, entities_with_comma: list[str] | None = None) -> Table:
+    """Clean data (preserves Table type and column-level origins)."""
     # Check for duplicate conflicts (currently in debug mode)
-    check_duplicates(df, logging=True, filename=tb.metadata.dataset.short_name)
+    check_duplicates(tb, logging=True, filename=tb.metadata.dataset.short_name)
     # Clean participants
-    df = clean_participants(df, entities_with_comma=entities_with_comma)
+    tb = clean_participants(tb, entities_with_comma=entities_with_comma)
     # Remove expected duplicates and check that there are no more duplicates
-    # check_duplicates(df, force_error=True)
-    if df.duplicated().any():
+    # check_duplicates(tb, force_error=True)
+    if tb.duplicated().any():
         raise ValueError("Why was this not cought?!")
-    return df
+    return tb
 
 
-def make_table_main(df: pd.DataFrame, short_name: str) -> Table:
+def make_table_main(tb: Table, short_name: str) -> Table:
     """Create main table.
 
     The resulting table contains all the columns from `COLUMNS_COMMON`, and those available from `COLUMNS_EXTRA`."""
     # Get available extra columns
-    df = df[COLUMNS_COMMON + _extra_columns(df) + [_INDEX_COLNAME_AUX]].set_index(_INDEX_COLNAME_AUX)
+    tb = tb[COLUMNS_COMMON + _extra_columns(tb) + [_INDEX_COLNAME_AUX]].set_index(_INDEX_COLNAME_AUX)
     # Check for duplicates
-    msk = df.duplicated()
+    msk = tb.duplicated()
     if msk.any():
-        raise ValueError(f"{msk.sum()} rows in table are duplicated! {df[msk]}")
-    tb = Table(df, short_name=short_name)
+        raise ValueError(f"{msk.sum()} rows in table are duplicated! {tb[msk]}")
+    tb.metadata.short_name = short_name
     return tb
 
 
-def make_table_notes(df: pd.DataFrame) -> Table:
+def make_table_notes(tb: Table) -> Table:
     """Create notes table.
 
     For each row in the main table, there might be a note. This table links each row in the main table with a note. If there
     are no notes, the table will be empty (which should be hadnled later)
     """
-    df = df[COLUMNS_COMMON_NOTES + [_INDEX_COLNAME_AUX]].dropna().set_index(_INDEX_COLNAME_AUX)
-    tb = Table(df, short_name="notes")
+    tb = tb[COLUMNS_COMMON_NOTES + [_INDEX_COLNAME_AUX]].dropna().set_index(_INDEX_COLNAME_AUX)
+    tb.metadata.short_name = "notes"
     return tb
 
 
-def make_table_bulk_id(df: pd.DataFrame) -> Table:
-    df = df[["bulk_id", _INDEX_COLNAME_AUX]].set_index(_INDEX_COLNAME_AUX)
-    tb = Table(df, short_name="bulk_id")
+def make_table_bulk_id(tb: Table) -> Table:
+    tb = tb[["bulk_id", _INDEX_COLNAME_AUX]].set_index(_INDEX_COLNAME_AUX)
+    tb.metadata.short_name = "bulk_id"
     return tb
 
 
 def clean_participants(
-    df: pd.DataFrame,
+    df: Table,
     mapping: dict[str, str] | None = None,
     entities_with_comma: list[str] | None = None,
     default_separator: str = ", ",
     new_separator: str = "; ",
-) -> pd.DataFrame:
+) -> Table:
     """Clean the names of the participants in each conflicts.
 
     Typical cleaning includes:
