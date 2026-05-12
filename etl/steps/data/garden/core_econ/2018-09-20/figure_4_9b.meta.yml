@@ -1,0 +1,18 @@
+dataset:
+  title: Figure 4.9b
+tables:
+  figure_4_9b:
+    variables:
+      contribution:
+        title: Contribution
+        unit: $
+        description: Contribution to worldwide public goods game in US dollars.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Glyn (2006); N.B.S of China; Bank of England and US B.L.S
+    description: |-
+      Hourly Compensation Costs data for Mexico, South Korea, Finland, the Philippines and Sri Lanka has been smoothed using a backward-looking five-year moving average.
+    url: |-
+      http://www.stats.gov.cn/tjsj/ndsj/2013/indexeh.htm; http://www.bls.gov/fls/; https://www.conference-board.org/ilcprogram/index.cfm?id=38269
+    published_by: |-
+      Andrew Glyn. 2006. Capitalism Unleashed: Finance, Globalization, and Welfare. Oxford: Oxford University Press; National Bureau of Statistics of China. Annual Data; Bank of England; US Bureau of Labor Statistics. 2015. International Labor Comparisons.
+  name: Figure 18.23_updated
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 2f3287b358b43a80cf3452489d35e92f
+    size: 5346
+    path: figure_18_23_updated.feather

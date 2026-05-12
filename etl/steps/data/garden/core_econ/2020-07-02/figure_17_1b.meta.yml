@@ -1,0 +1,23 @@
+dataset:
+  title: Figure_17.1b
+tables:
+  figure_17_1b:
+    variables:
+      central_bank_discount_rates__april_2008__june_2012:
+        title: Central Bank Discount Rates (April 2008 - June 2012)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      central_bank_discount_rates__june_1929__august_1933:
+        title: Central Bank Discount Rates (June 1929 - August 1933)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,20 @@
+dataset:
+  title: TE-1.1
+tables:
+  te_1_1:
+    variables:
+      real_gdp_per_capita_in_2011_usd:
+        title: Real GDP per capita in 2011 US$
+        unit: 2011 US$
+        short_unit: $
+        description: |-
+          Measure of real GDP per capita accounts for inflation, i.e. changes in the price level, and is suitable for cross-country income comparisons.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
