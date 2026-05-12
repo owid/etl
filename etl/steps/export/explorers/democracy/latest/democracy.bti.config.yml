@@ -9,6 +9,9 @@ definitions:
   group_config: &group_config
     subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
     note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+  common_views:
+    - config:
+        colorVariableId: regions#owid_region
 
 config:
   explorerTitle: "Democracy"
@@ -80,8 +83,6 @@ views:
     indicators:
       y:
         - catalogPath: bti#state_bti
-    config:
-      colorVariableId: regions#owid_region
   - dimensions:
       metric: democratic_features
       sub_metric: political_participation_index
@@ -112,6 +113,8 @@ views:
     indicators:
       y:
         - catalogPath: bti#regime_bti
+    config:
+      colorVariableId: bti#regime_bti
   - dimensions:
       metric: political_regime
       sub_metric: basic_state_functions_score

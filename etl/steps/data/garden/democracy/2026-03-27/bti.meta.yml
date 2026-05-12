@@ -9,10 +9,6 @@ definitions:
     tab: map
 
   # List anchors for map.colorScale.customNumericColors
-  bti_palette_3: &bti_palette_3
-    - "#8a148c"
-    - "#d979d2"
-    - "#1ac6d9"
   bti_palette_5: &bti_palette_5
     - "#8a148c"
     - "#d979d2"
@@ -127,32 +123,28 @@ tables:
               max: 5
               min: 1
             selectedFacetStrategy: entity
+            colorScale: &color_regime_bti
+              binningStrategy: manual
+              customNumericColorsActive: true
+              customNumericColors: *bti_palette_5
+              customNumericValues:
+                - 1
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+              customNumericLabels:
+                - Hard-line autocracy
+                - Moderate autocracy
+                - Highly defective democracy
+                - Defective democracy
+                - Consolidating democracy
             map:
               colorScale:
-                baseColorScheme: RdYlBu
-                binningStrategy: manual
-                customNumericColors: *bti_palette_5
-                customNumericLabels:
-                  - Hard-line autocracy
-                  - Moderate autocracy
-                  - Highly defective democracy
-                  - Defective democracy
-                  - Consolidating democracy
-                  - ""
-                  - ""
-                  - ""
-                  - ""
-                  - ""
-                customNumericValues:
-                  - 1
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
+                <<: *color_regime_bti
                 customCategoryLabels:
                   No data: No data
-                customNumericColorsActive: true
               tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
@@ -176,7 +168,6 @@ tables:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors: *bti_palette_3
                 customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
@@ -201,7 +192,6 @@ tables:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors: *bti_palette_3
                 customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
@@ -226,7 +216,6 @@ tables:
               colorScale:
                 baseColorScheme: GnBu
                 binningStrategy: manual
-                customNumericColors: *bti_palette_3
                 customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
@@ -253,7 +242,6 @@ tables:
               colorScale:
                 baseColorScheme: YlGn
                 binningStrategy: manual
-                customNumericColors: *bti_palette_3
                 customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
@@ -280,7 +268,6 @@ tables:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors: *bti_palette_3
                 customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
@@ -305,7 +292,6 @@ tables:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors: *bti_palette_3
                 customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: No data
@@ -324,12 +310,10 @@ tables:
           grapher_config:
             title: Stateness Index
             subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which the state has the monopoly on the use of force, provides basic public services across the country, citizens accept the state as legitimate, religious dogmas do not interfere, and citizenship is accessible. The index ranges from 1 to 10 (high stateness)."
-            maxTime: 2023
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors: *bti_palette_3
                 customNumericLabels: *labels_quality
                 customNumericValues: *values_intermediate
                 customCategoryLabels:
@@ -351,7 +335,6 @@ tables:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors: *bti_palette_5
                 customNumericValues: *values_1_10
                 customCategoryLabels:
                   No data: ""
@@ -372,7 +355,6 @@ tables:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors: *bti_palette_3
                 customNumericLabels: *labels_quality
                 customNumericValues: *values_intermediate
                 customCategoryLabels:
@@ -392,12 +374,10 @@ tables:
           grapher_config:
             title: Rule of Law Index
             subtitle: "{definitions.bti_attribution} Expert estimates of the extent to which political power is separated, the judiciary is independent, office abuse is prosecuted, and civil rights are enforced. The index ranges from 1 to 10 (most rule-based)."
-            maxTime: 2023
             map:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors: *bti_palette_3
                 customNumericLabels: *labels_quality
                 customNumericValues: *values_intermediate
                 customCategoryLabels:
@@ -422,7 +402,6 @@ tables:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors: *bti_palette_3
                 customNumericLabels: *labels_quality
                 customNumericValues: *values_intermediate
                 customCategoryLabels:
@@ -446,7 +425,6 @@ tables:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericColors: *bti_palette_3
                 customNumericLabels: *labels_quality
                 customNumericValues: *values_intermediate
                 customCategoryLabels:
