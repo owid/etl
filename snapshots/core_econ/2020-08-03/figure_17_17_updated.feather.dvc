@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: BLS (2020)
+    url: https://www.bls.gov/home.htm
+    date_accessed: 2026-05-12
+    published_by: US Bureau of Labor Statistics (2020)
+  name: Figure_17.17_updated
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 0a08f66d1e38d7844d996b2ef6af7e15
+    size: 5018
+    path: figure_17_17_updated.feather

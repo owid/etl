@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: Matthew Shum (2004)
+    date_accessed: 2026-05-12
+    published_by: Matthew Shum (2004)
+  name: Figure_7.21
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: a42dca49fe29872b74a488110d66ad5f
+    size: 4562
+    path: figure_7_21.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Allen, R. C. (2009)
+    description: |-
+      The bar chart shows the price of labour relative to the price of energy — specifically, the wages of building labourers divided by the price of 1 million BTU (British Thermal Units, a unit of energy equivalent to slightly more than 1,000 joules).
+
+      Data received directly from author via Kevin O'Rourke.
+    date_accessed: 2026-05-12
+    published_by: |-
+      Allen, R. C. (2009), 'The British Industrial Revolution in Global Perspective, New Approaches to Economic and Social History', Cambridge University Press.
+  name: Figure 2.10
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: d97ff81cc46e7c28f41cb9d5b0dcde7e
+    size: 3082
+    path: figure_2_10.feather

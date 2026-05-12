@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Herrmann, Thöni and Gächter (2008)
+    description: Data received directly from Simon Gächter.
+    date_accessed: 2026-05-12
+    published_by: |-
+      Benedikt Herrmann, Christian Thoni, and Simon Gachter. 2008. ‘Antisocial Punishment Across Societies’. Science 319 (5868): pp. 1362–67.
+  name: Figure 4.9b
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: b5106100cf0a2a8f98015fbf5af51629
+    size: 4106
+    path: figure_4_9b.feather

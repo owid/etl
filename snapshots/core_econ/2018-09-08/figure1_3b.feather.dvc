@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Nordhaus (1998)
+    url: http://www.nber.org/chapters/c6064.pdf
+    date_accessed: 2026-05-12
+    published_by: |-
+      William Nordhaus (1998) "Do Real Output and Real Wage Measures Capture Reality? The History of Lighting Suggests Not" Cowles Foundation Paper Number 957, Mimeo, Table 1.6
+  name: Figure1.3b
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: ea3ec2281a934b29a76be0fce213eabd
+    size: 3098
+    path: figure1_3b.feather

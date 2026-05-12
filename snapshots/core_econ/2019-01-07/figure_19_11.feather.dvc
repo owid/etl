@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Corak (2013); Chen, Förster and Llena-Nozal (2013)
+    url: |-
+      https://milescorak.files.wordpress.com/2012/01/inequality-from-generation-to-generation-the-united-states-in-comparison-v3.pdf
+    date_accessed: 2026-05-12
+    published_by: |-
+      Miles Corak. 2013. ‘Inequality from Generation to Generation: The United States in Comparison.’ In The Economics of Inequality, Poverty, and Discrimination in the 21st Century, edited by Robert S. Rycroft. Santa Barbara, CA: Greenwood Pub Group
+  name: Figure_19.11
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 6b858f15140ef086eb3dd7348ebff9ef
+    size: 4466
+    path: figure_19_11.feather

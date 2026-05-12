@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Data by Simon de Deo (2016)
+    description: Calculations by Simon DeDeo, Santa Fe Institute, from New York Times. 2016. ‘NYT article archive’.
+    url: https://help.nytimes.com/hc/en-us/articles/115014772767-Archives
+    date_accessed: 2026-05-12
+    published_by: Simon de Deo (2016)
+  name: FIgure1.7
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 56f4a392db7cd62c1537ae4922e5d91d
+    size: 6698
+    path: figure1_7.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Nordhaus (2007)
+    url: http://www.econ.yale.edu/~nordhaus/homepage/homepage/nordhaus_computers_jeh_2007.pdf
+    date_accessed: 2026-05-12
+    published_by: |-
+      William D. Nordhaus (2007). ‘Two Centuries of Productivity Growth in Computing’. The Journal of Economic History 67 (01), Index updated to 2010.
+  name: OWID_21.3
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: bcf61b6266c2ff8cbfcd547447272091
+    size: 9930
+    path: owid_21_3.feather

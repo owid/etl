@@ -1,0 +1,23 @@
+dataset:
+  title: Figure_7.21
+tables:
+  figure_7_21:
+    variables:
+      market_share__pct:
+        title: Market share (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      quarterly_national_advertising_expenditure__dollar__millions:
+        title: Quarterly national advertising expenditure ($, millions)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
