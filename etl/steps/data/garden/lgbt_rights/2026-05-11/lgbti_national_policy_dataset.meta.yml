@@ -15,7 +15,7 @@ definitions:
     Status labels are not consistently aligned with progressive vs. regressive directions across all policies. For criminalization policies (Same-sex acts, Death penalty, Morality/propaganda, LGBTQ+ civil society restrictions), "Legal" means the restriction is in effect. For anti-discrimination protections (Employment, Goods/services), "Illegal" means the protection exists. For ban-style policies (Conversion therapies, Gender assignment surgeries on children), "Illegal" means the ban exists.
 
   description_regions_processing: |-
-    Regional aggregates are computed from country-level data using [Our World in Data's region definitions](https://ourworldindata.org/world-region-map-definitions) and our [consolidated population data](https://ourworldindata.org/population-sources). A country is counted as having full implementation when the policy proportion equals 1.
+    Regional aggregates are computed from country-level data using [Our World in Data's region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and our [consolidated population data](https://ourworldindata.org/population-sources). A country is counted as having full implementation when the policy proportion equals 1.
 
   description_key_full_implementation: |-
     A country is counted as having full implementation when the policy score equals 1. Subnational adoption (scores below 1 in countries with federal or decentralized systems such as the United States, Australia, Canada, Mexico, Brazil, or the United Kingdom) is treated as not fully implemented.
