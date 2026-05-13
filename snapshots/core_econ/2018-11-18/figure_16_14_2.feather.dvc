@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: J. Visser (2016)
+    url: http://archive.uva-aias.net/uploaded_files/regular/ICTWSScodebook50-2.pdf
+    published_by: |-
+      Visser, Jelle. 2016. ‘ICTWSS: Database on Institutional Characteristics of Trade Unions, Wage Setting, State Intervention and Social Pacts in 51 countries between 1960 and 2014’ Amsterdam Institute for Advanced Labour Studies (AIAS).
+  name: 16.14-2
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 5af19c3c76e9885d5e8b4caf0b616f93
+    size: 4682
+    path: figure_16_14_2.feather

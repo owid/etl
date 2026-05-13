@@ -1,0 +1,18 @@
+dataset:
+  title: TE-13.20a
+tables:
+  te_13_20a:
+    variables:
+      gdp_growth__pct:
+        title: GDP growth (%)
+        unit: '%'
+        description: The underlying real GDP per capita is in 2011US$ with multiple benchmarks.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: ONS (2020)
+    url: https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/l55o/mm23
+    published_by: Office for National Statistics (2020)
+  name: TE-13.20c
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: b9f3f600ff5869151c1f624914b58705
+    size: 3250
+    path: te_13_20c.feather

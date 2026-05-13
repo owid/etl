@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Grilli et al. (1991)
+    url: http://www.people.fas.harvard.edu/~iversen/PDFfiles/Grillietal1991.pdf
+    published_by: |-
+      Vittorio Grilli, Donato Masciandaro, Guido Tabellini, Edmond Malinvaud, and Marco Pagano. 1991. ‘Political and Monetary Institutions and Public Financial Policies in the Industrial Countries’. Economic Policy 6 (13): pp. 341–392.
+  name: Figure 15.20_CentralBank
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: dc34d383a36a2301fe74c932c969920b
+    size: 3274
+    path: figure_15_20_centralbank.feather

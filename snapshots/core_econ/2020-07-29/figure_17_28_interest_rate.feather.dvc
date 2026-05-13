@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: FRED (2014)
+    url: http://research.stlouisfed.org/fred2/
+    published_by: Federal Reserve Bank of St Louis (FRED)
+  name: Figure_17.28_interest_rate
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 778b9f70deaedd8a55e0dea0d825cb27
+    size: 6722
+    path: figure_17_28_interest_rate.feather

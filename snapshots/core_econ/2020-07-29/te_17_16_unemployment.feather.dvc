@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: OECD (2020)
+    url: https://stats.oecd.org/Index.aspx?QueryId=21760#
+    published_by: OECD (2020) ‘OECD Statistics’
+  name: TE-17.16_unemployment
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 56a328c259ad0e3fc65304628735099e
+    size: 4498
+    path: te_17_16_unemployment.feather
