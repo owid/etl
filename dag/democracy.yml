@@ -1,9 +1,9 @@
 steps:
   # VDEM (2026)
   data://garden/democracy/2026-03-17/vdem:
-    - data://garden/regions/2023-01-01/regions
     - data://meadow/democracy/2026-03-17/vdem:
         - snapshot://democracy/2026-03-17/vdem.zip
+    - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
   data://grapher/democracy/2026-03-17/vdem:
     - data://garden/democracy/2026-03-17/vdem
