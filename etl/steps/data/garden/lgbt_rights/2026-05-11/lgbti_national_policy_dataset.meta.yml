@@ -29,6 +29,16 @@ definitions:
     From the original dataset, we combined three indicators — marriage equality (legal direction), marriage equality (illegal direction, i.e. constitutional or statutory bans), and civil unions — into a single categorical indicator (Legal, Partially legal, No legal provisions, Ban and marriage both partial, Partially banned, Banned) based on the proportion scores of all three.
   derivation_lgb_military_join: |-
     From the original dataset, we combined two indicators — LGB allowed in the military and LGB banned from the military — into a single categorical indicator (Allowed, No policy, Banned) based on the proportion scores of both directions.
+  derivation_binary_two_direction: |-
+    From the original dataset, we combined the two opposing direction indicators (the progressive direction, e.g. legal, and the regressive direction, e.g. illegal) into a single categorical indicator. We bucketed each proportion into 0, partial (between 0 and 1), or 1, and then assigned a category from the bucket combination. Countries where either direction shows partial subnational implementation, or both directions are coded as 1 (typically a transition year), are classified as "Subnationally mixed".
+  derivation_single_direction: |-
+    From the original dataset's single-direction proportion (0 = no policy, 1 = fully implemented, intermediate values = partial subnational adoption), we coded countries into three categories: the substantive direction in effect, partial subnational implementation ("Subnationally mixed"), or no policy in effect.
+  derivation_so_gi_pair: |-
+    From the original dataset's two separate indicators — one for sexual orientation and one for gender identity — we combined them into a single categorical indicator with five categories: both protected, sexual orientation only, gender identity only, no protection, and "Subnationally mixed" (any partial subnational coverage in either dimension).
+  derivation_gac: |-
+    From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The most common patterns get a dedicated category (e.g. covered for both, adults covered with minors restricted); rarer combinations are grouped as "Subnationally mixed or other".
+  derivation_gmc: |-
+    From the original dataset, we combined the gender-marker-change proportion (legal direction) with the recorded legal-pathway requirement (Self-ID, Medical or psychological diagnosis, Surgery, Surgery plus sterilization) into a single categorical indicator that distinguishes both whether legal gender change is possible and what the procedure requires.
 
   # Per-law short description (used for description_short and as building block for title)
   law_short: |-
@@ -324,8 +334,6 @@ tables:
           - Banned
 
       # ── New combined-categorical indicators added in this PR (Bastian feedback) ──────
-      # Description, description_key, processing_level, and description_processing are
-      # intentionally minimal here; the metadata sweep step will populate them per indicator.
       same_sex_acts:
         title: Same-sex sexual acts
         description_short: |-
@@ -342,6 +350,8 @@ tables:
           - Subnationally mixed
           - No legal provisions
 
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction}'
       blood_donations:
         title: Blood donations by men who have sex with men
         description_short: |-
@@ -358,6 +368,8 @@ tables:
           - Subnationally mixed
           - No policy
 
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction}'
       transgender_military:
         title: Transgender military service
         description_short: |-
@@ -374,6 +386,8 @@ tables:
           - Subnationally mixed
           - No policy
 
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction}'
       civil_unions:
         title: Civil unions or registered partnerships
         description_short: |-
@@ -389,6 +403,8 @@ tables:
           - Subnationally mixed
           - Not recognized
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       joint_adoption:
         title: Joint adoption by same-sex couples
         description_short: |-
@@ -404,6 +420,8 @@ tables:
           - Subnationally mixed
           - Not permitted
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       constitutional_protections_sexual_orientation:
         title: Constitutional protections based on sexual orientation
         description_short: |-
@@ -419,6 +437,8 @@ tables:
           - Subnationally mixed
           - Not protected
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       constitutional_protections_gender_identity:
         title: Constitutional protections based on gender identity
         description_short: |-
@@ -434,6 +454,8 @@ tables:
           - Subnationally mixed
           - Not protected
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       hate_crime_protections_sexual_orientation:
         title: Hate crime protections based on sexual orientation
         description_short: |-
@@ -449,6 +471,8 @@ tables:
           - Subnationally mixed
           - Not covered
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       hate_crime_protections_gender_identity:
         title: Hate crime protections based on gender identity
         description_short: |-
@@ -464,6 +488,8 @@ tables:
           - Subnationally mixed
           - Not covered
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       incitement_to_hatred:
         title: Incitement to hatred protections
         description_short: |-
@@ -479,6 +505,8 @@ tables:
           - Subnationally mixed
           - Not prohibited
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       third_gender_recognition:
         title: Legal recognition of a third gender
         description_short: |-
@@ -494,6 +522,8 @@ tables:
           - Subnationally mixed
           - Not recognized
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       employment_discrimination_sexual_orientation:
         title: Employment discrimination based on sexual orientation
         description_short: |-
@@ -509,6 +539,8 @@ tables:
           - Subnationally mixed
           - No protection
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       employment_discrimination_gender_identity:
         title: Employment discrimination based on gender identity
         description_short: |-
@@ -524,6 +556,8 @@ tables:
           - Subnationally mixed
           - No protection
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       goods_services_discrimination_sexual_orientation:
         title: Goods and services discrimination based on sexual orientation
         description_short: |-
@@ -539,6 +573,8 @@ tables:
           - Subnationally mixed
           - No protection
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       goods_services_discrimination_gender_identity:
         title: Goods and services discrimination based on gender identity
         description_short: |-
@@ -554,6 +590,8 @@ tables:
           - Subnationally mixed
           - No protection
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       conversion_therapies:
         title: Conversion therapy
         description_short: |-
@@ -569,6 +607,8 @@ tables:
           - Subnationally mixed
           - Not banned
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       gender_assignment_surgeries_on_children:
         title: Non-consensual gender assignment surgeries on intersex minors
         description_short: |-
@@ -584,6 +624,8 @@ tables:
           - Subnationally mixed
           - Not banned
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       death_penalty:
         title: Death penalty for same-sex acts
         description_short: |-
@@ -599,6 +641,8 @@ tables:
           - Subnationally mixed
           - No death penalty
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       morality_propaganda:
         title: Anti-LGBTI "propaganda" or morality laws
         description_short: |-
@@ -614,6 +658,8 @@ tables:
           - Subnationally mixed
           - No restrictions
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       lgbtq_civil_society_restrictions:
         title: Restrictions on LGBTQ+ civil society
         description_short: |-
@@ -629,6 +675,8 @@ tables:
           - Subnationally mixed
           - No restrictions
 
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       religious_exemption_laws:
         title: Religious exemption laws
         description_short: |-
@@ -645,6 +693,8 @@ tables:
           - No religious exemptions
 
       # ── SO + GI pair combinations (Bastian feedback) ────────────────────────────────
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction}'
       employment_discrimination:
         title: Employment discrimination protections (combined SO + GI)
         description_short: |-
@@ -662,6 +712,8 @@ tables:
           - Subnationally mixed
           - No protection
 
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair}'
       goods_services_discrimination:
         title: Goods and services discrimination protections (combined SO + GI)
         description_short: |-
@@ -679,6 +731,8 @@ tables:
           - Subnationally mixed
           - No protection
 
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair}'
       hate_crime_protections:
         title: Hate crime protections (combined SO + GI)
         description_short: |-
@@ -696,6 +750,8 @@ tables:
           - Subnationally mixed
           - Not covered
 
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair}'
       constitutional_protections:
         title: Constitutional protections (combined SO + GI)
         description_short: |-
@@ -714,6 +770,8 @@ tables:
           - Not protected
 
       # ── Gender-affirming care combined: adults + minors (Bastian feedback) ──────────
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair}'
       gender_affirming_care:
         title: Gender-affirming care (adults and minors)
         description_short: |-
@@ -733,6 +791,8 @@ tables:
           - Neither covered nor restricted
 
       # ── Gender marker change with legal-pathway requirements (Bastian feedback) ─────
+        processing_level: major
+        description_processing: '{definitions.derivation_gac}'
       gender_marker_change:
         title: Legal change of gender marker
         description_short: |-
@@ -752,6 +812,8 @@ tables:
           - Subnationally mixed
           - Not legally possible
 
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc}'
   lgbti_national_policy_dataset_combined_regions:
     variables:
       # AGE OF CONSENT — number of countries
@@ -1079,11 +1141,11 @@ tables:
           numDecimalPlaces: 0
 
       # ── New combined-region indicators added in this PR (Bastian feedback) ────────
-      # Title, unit, short_unit, and display only — description fields are filled in
-      # by the metadata sweep step.
-
       same_sex_acts_no_legal_provisions_count:
         title: Number of countries — No legal provisions (same sex acts)
+        description_short: The number of countries classified as "No legal provisions" on the indicator on consensual same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "No legal provisions" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1092,6 +1154,9 @@ tables:
 
       same_sex_acts_no_legal_provisions_pop:
         title: Population — No legal provisions (same sex acts)
+        description_short: The total population of countries classified as "No legal provisions" on the indicator on consensual same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No legal provisions" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1100,6 +1165,9 @@ tables:
 
       same_sex_acts_legal_count:
         title: Number of countries — Legal (same sex acts)
+        description_short: The number of countries classified as "Legal" on the indicator on consensual same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "Legal" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1108,6 +1176,9 @@ tables:
 
       same_sex_acts_legal_pop:
         title: Population — Legal (same sex acts)
+        description_short: The total population of countries classified as "Legal" on the indicator on consensual same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Legal" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1116,6 +1187,9 @@ tables:
 
       same_sex_acts_criminalized_count:
         title: Number of countries — Criminalized (same sex acts)
+        description_short: The number of countries classified as "Criminalized" on the indicator on consensual same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "Criminalized" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1124,6 +1198,9 @@ tables:
 
       same_sex_acts_criminalized_pop:
         title: Population — Criminalized (same sex acts)
+        description_short: The total population of countries classified as "Criminalized" on the indicator on consensual same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Criminalized" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1132,6 +1209,9 @@ tables:
 
       same_sex_acts_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (same sex acts)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on consensual same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1140,6 +1220,9 @@ tables:
 
       same_sex_acts_subnationally_mixed_pop:
         title: Population — Subnationally mixed (same sex acts)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on consensual same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1148,6 +1231,9 @@ tables:
 
       blood_donations_no_policy_count:
         title: Number of countries — No policy (blood donations)
+        description_short: The number of countries classified as "No policy" on the indicator on blood donations by men who have sex with men.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "No policy" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1156,6 +1242,9 @@ tables:
 
       blood_donations_no_policy_pop:
         title: Population — No policy (blood donations)
+        description_short: The total population of countries classified as "No policy" on the indicator on blood donations by men who have sex with men.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1164,6 +1253,9 @@ tables:
 
       blood_donations_no_msm_restrictions_count:
         title: Number of countries — No MSM restrictions (blood donations)
+        description_short: The number of countries classified as "No MSM restrictions" on the indicator on blood donations by men who have sex with men.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "No MSM restrictions" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1172,6 +1264,9 @@ tables:
 
       blood_donations_no_msm_restrictions_pop:
         title: Population — No MSM restrictions (blood donations)
+        description_short: The total population of countries classified as "No MSM restrictions" on the indicator on blood donations by men who have sex with men.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No MSM restrictions" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1180,6 +1275,9 @@ tables:
 
       blood_donations_deferral_or_ban_count:
         title: Number of countries — Deferral or ban (blood donations)
+        description_short: The number of countries classified as "Deferral or ban" on the indicator on blood donations by men who have sex with men.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "Deferral or ban" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1188,6 +1286,9 @@ tables:
 
       blood_donations_deferral_or_ban_pop:
         title: Population — Deferral or ban (blood donations)
+        description_short: The total population of countries classified as "Deferral or ban" on the indicator on blood donations by men who have sex with men.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Deferral or ban" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1196,6 +1297,9 @@ tables:
 
       transgender_military_no_policy_count:
         title: Number of countries — No policy (transgender military)
+        description_short: The number of countries classified as "No policy" on the indicator on transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "No policy" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1204,6 +1308,9 @@ tables:
 
       transgender_military_no_policy_pop:
         title: Population — No policy (transgender military)
+        description_short: The total population of countries classified as "No policy" on the indicator on transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1212,6 +1319,9 @@ tables:
 
       transgender_military_allowed_count:
         title: Number of countries — Allowed (transgender military)
+        description_short: The number of countries classified as "Allowed" on the indicator on transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "Allowed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1220,6 +1330,9 @@ tables:
 
       transgender_military_allowed_pop:
         title: Population — Allowed (transgender military)
+        description_short: The total population of countries classified as "Allowed" on the indicator on transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Allowed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1228,6 +1341,9 @@ tables:
 
       transgender_military_banned_count:
         title: Number of countries — Banned (transgender military)
+        description_short: The number of countries classified as "Banned" on the indicator on transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "Banned" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1236,6 +1352,9 @@ tables:
 
       transgender_military_banned_pop:
         title: Population — Banned (transgender military)
+        description_short: The total population of countries classified as "Banned" on the indicator on transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1244,6 +1363,9 @@ tables:
 
       civil_unions_not_recognized_count:
         title: Number of countries — Not recognized (civil unions)
+        description_short: The number of countries classified as "Not recognized" on the indicator on civil unions or registered partnerships for same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not recognized" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1252,6 +1374,9 @@ tables:
 
       civil_unions_not_recognized_pop:
         title: Population — Not recognized (civil unions)
+        description_short: The total population of countries classified as "Not recognized" on the indicator on civil unions or registered partnerships for same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not recognized" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1260,6 +1385,9 @@ tables:
 
       civil_unions_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (civil unions)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on civil unions or registered partnerships for same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1268,6 +1396,9 @@ tables:
 
       civil_unions_subnationally_mixed_pop:
         title: Population — Subnationally mixed (civil unions)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on civil unions or registered partnerships for same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1276,6 +1407,9 @@ tables:
 
       civil_unions_legally_recognized_count:
         title: Number of countries — Legally recognized (civil unions)
+        description_short: The number of countries classified as "Legally recognized" on the indicator on civil unions or registered partnerships for same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Legally recognized" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1284,6 +1418,9 @@ tables:
 
       civil_unions_legally_recognized_pop:
         title: Population — Legally recognized (civil unions)
+        description_short: The total population of countries classified as "Legally recognized" on the indicator on civil unions or registered partnerships for same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Legally recognized" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1292,6 +1429,9 @@ tables:
 
       joint_adoption_not_permitted_count:
         title: Number of countries — Not permitted (joint adoption)
+        description_short: The number of countries classified as "Not permitted" on the indicator on joint adoption by same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not permitted" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1300,6 +1440,9 @@ tables:
 
       joint_adoption_not_permitted_pop:
         title: Population — Not permitted (joint adoption)
+        description_short: The total population of countries classified as "Not permitted" on the indicator on joint adoption by same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not permitted" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1308,6 +1451,9 @@ tables:
 
       joint_adoption_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (joint adoption)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on joint adoption by same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1316,6 +1462,9 @@ tables:
 
       joint_adoption_subnationally_mixed_pop:
         title: Population — Subnationally mixed (joint adoption)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on joint adoption by same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1324,6 +1473,9 @@ tables:
 
       joint_adoption_permitted_count:
         title: Number of countries — Permitted (joint adoption)
+        description_short: The number of countries classified as "Permitted" on the indicator on joint adoption by same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Permitted" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1332,6 +1484,9 @@ tables:
 
       joint_adoption_permitted_pop:
         title: Population — Permitted (joint adoption)
+        description_short: The total population of countries classified as "Permitted" on the indicator on joint adoption by same-sex couples.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Permitted" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1340,6 +1495,9 @@ tables:
 
       constitutional_protections_sexual_orientation_not_protected_count:
         title: Number of countries — Not protected (constitutional protections sexual orientation)
+        description_short: The number of countries classified as "Not protected" on the indicator on constitutional protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not protected" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1348,6 +1506,9 @@ tables:
 
       constitutional_protections_sexual_orientation_not_protected_pop:
         title: Population — Not protected (constitutional protections sexual orientation)
+        description_short: The total population of countries classified as "Not protected" on the indicator on constitutional protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not protected" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1356,6 +1517,9 @@ tables:
 
       constitutional_protections_sexual_orientation_constitutionally_protected_count:
         title: Number of countries — Constitutionally protected (constitutional protections sexual orientation)
+        description_short: The number of countries classified as "Constitutionally protected" on the indicator on constitutional protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Constitutionally protected" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1364,6 +1528,9 @@ tables:
 
       constitutional_protections_sexual_orientation_constitutionally_protected_pop:
         title: Population — Constitutionally protected (constitutional protections sexual orientation)
+        description_short: The total population of countries classified as "Constitutionally protected" on the indicator on constitutional protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Constitutionally protected" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1372,6 +1539,9 @@ tables:
 
       constitutional_protections_gender_identity_not_protected_count:
         title: Number of countries — Not protected (constitutional protections gender identity)
+        description_short: The number of countries classified as "Not protected" on the indicator on constitutional protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not protected" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1380,6 +1550,9 @@ tables:
 
       constitutional_protections_gender_identity_not_protected_pop:
         title: Population — Not protected (constitutional protections gender identity)
+        description_short: The total population of countries classified as "Not protected" on the indicator on constitutional protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not protected" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1388,6 +1561,9 @@ tables:
 
       constitutional_protections_gender_identity_constitutionally_protected_count:
         title: Number of countries — Constitutionally protected (constitutional protections gender identity)
+        description_short: The number of countries classified as "Constitutionally protected" on the indicator on constitutional protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Constitutionally protected" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1396,6 +1572,9 @@ tables:
 
       constitutional_protections_gender_identity_constitutionally_protected_pop:
         title: Population — Constitutionally protected (constitutional protections gender identity)
+        description_short: The total population of countries classified as "Constitutionally protected" on the indicator on constitutional protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Constitutionally protected" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1404,6 +1583,9 @@ tables:
 
       hate_crime_protections_sexual_orientation_not_covered_count:
         title: Number of countries — Not covered (hate crime protections sexual orientation)
+        description_short: The number of countries classified as "Not covered" on the indicator on hate crime protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not covered" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1412,6 +1594,9 @@ tables:
 
       hate_crime_protections_sexual_orientation_not_covered_pop:
         title: Population — Not covered (hate crime protections sexual orientation)
+        description_short: The total population of countries classified as "Not covered" on the indicator on hate crime protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not covered" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1420,6 +1605,9 @@ tables:
 
       hate_crime_protections_sexual_orientation_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (hate crime protections sexual orientation)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on hate crime protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1428,6 +1616,9 @@ tables:
 
       hate_crime_protections_sexual_orientation_subnationally_mixed_pop:
         title: Population — Subnationally mixed (hate crime protections sexual orientation)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on hate crime protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1436,6 +1627,9 @@ tables:
 
       hate_crime_protections_sexual_orientation_covered_by_hate_crime_laws_count:
         title: Number of countries — Covered by hate crime laws (hate crime protections sexual orientation)
+        description_short: The number of countries classified as "Covered by hate crime laws" on the indicator on hate crime protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Covered by hate crime laws" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1444,6 +1638,9 @@ tables:
 
       hate_crime_protections_sexual_orientation_covered_by_hate_crime_laws_pop:
         title: Population — Covered by hate crime laws (hate crime protections sexual orientation)
+        description_short: The total population of countries classified as "Covered by hate crime laws" on the indicator on hate crime protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Covered by hate crime laws" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1452,6 +1649,9 @@ tables:
 
       hate_crime_protections_gender_identity_not_covered_count:
         title: Number of countries — Not covered (hate crime protections gender identity)
+        description_short: The number of countries classified as "Not covered" on the indicator on hate crime protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not covered" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1460,6 +1660,9 @@ tables:
 
       hate_crime_protections_gender_identity_not_covered_pop:
         title: Population — Not covered (hate crime protections gender identity)
+        description_short: The total population of countries classified as "Not covered" on the indicator on hate crime protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not covered" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1468,6 +1671,9 @@ tables:
 
       hate_crime_protections_gender_identity_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (hate crime protections gender identity)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on hate crime protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1476,6 +1682,9 @@ tables:
 
       hate_crime_protections_gender_identity_subnationally_mixed_pop:
         title: Population — Subnationally mixed (hate crime protections gender identity)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on hate crime protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1484,6 +1693,9 @@ tables:
 
       hate_crime_protections_gender_identity_covered_by_hate_crime_laws_count:
         title: Number of countries — Covered by hate crime laws (hate crime protections gender identity)
+        description_short: The number of countries classified as "Covered by hate crime laws" on the indicator on hate crime protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Covered by hate crime laws" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1492,6 +1704,9 @@ tables:
 
       hate_crime_protections_gender_identity_covered_by_hate_crime_laws_pop:
         title: Population — Covered by hate crime laws (hate crime protections gender identity)
+        description_short: The total population of countries classified as "Covered by hate crime laws" on the indicator on hate crime protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Covered by hate crime laws" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1500,6 +1715,9 @@ tables:
 
       incitement_to_hatred_not_prohibited_count:
         title: Number of countries — Not prohibited (incitement to hatred)
+        description_short: The number of countries classified as "Not prohibited" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not prohibited" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1508,6 +1726,9 @@ tables:
 
       incitement_to_hatred_not_prohibited_pop:
         title: Population — Not prohibited (incitement to hatred)
+        description_short: The total population of countries classified as "Not prohibited" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not prohibited" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1516,6 +1737,9 @@ tables:
 
       incitement_to_hatred_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (incitement to hatred)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1524,6 +1748,9 @@ tables:
 
       incitement_to_hatred_subnationally_mixed_pop:
         title: Population — Subnationally mixed (incitement to hatred)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1532,6 +1759,9 @@ tables:
 
       incitement_to_hatred_prohibited_count:
         title: Number of countries — Prohibited (incitement to hatred)
+        description_short: The number of countries classified as "Prohibited" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Prohibited" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1540,6 +1770,9 @@ tables:
 
       incitement_to_hatred_prohibited_pop:
         title: Population — Prohibited (incitement to hatred)
+        description_short: The total population of countries classified as "Prohibited" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Prohibited" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1548,6 +1781,9 @@ tables:
 
       third_gender_recognition_not_recognized_count:
         title: Number of countries — Not recognized (third gender recognition)
+        description_short: The number of countries classified as "Not recognized" on the indicator on legal recognition of a third gender.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not recognized" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1556,6 +1792,9 @@ tables:
 
       third_gender_recognition_not_recognized_pop:
         title: Population — Not recognized (third gender recognition)
+        description_short: The total population of countries classified as "Not recognized" on the indicator on legal recognition of a third gender.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not recognized" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1564,6 +1803,9 @@ tables:
 
       third_gender_recognition_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (third gender recognition)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on legal recognition of a third gender.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1572,6 +1814,9 @@ tables:
 
       third_gender_recognition_subnationally_mixed_pop:
         title: Population — Subnationally mixed (third gender recognition)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on legal recognition of a third gender.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1580,6 +1825,9 @@ tables:
 
       third_gender_recognition_recognized_count:
         title: Number of countries — Recognized (third gender recognition)
+        description_short: The number of countries classified as "Recognized" on the indicator on legal recognition of a third gender.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Recognized" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1588,6 +1836,9 @@ tables:
 
       third_gender_recognition_recognized_pop:
         title: Population — Recognized (third gender recognition)
+        description_short: The total population of countries classified as "Recognized" on the indicator on legal recognition of a third gender.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Recognized" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1596,6 +1847,9 @@ tables:
 
       employment_discrimination_sexual_orientation_no_protection_count:
         title: Number of countries — No protection (employment discrimination sexual orientation)
+        description_short: The number of countries classified as "No protection" on the indicator on employment discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1604,6 +1858,9 @@ tables:
 
       employment_discrimination_sexual_orientation_no_protection_pop:
         title: Population — No protection (employment discrimination sexual orientation)
+        description_short: The total population of countries classified as "No protection" on the indicator on employment discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1612,6 +1869,9 @@ tables:
 
       employment_discrimination_sexual_orientation_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (employment discrimination sexual orientation)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1620,6 +1880,9 @@ tables:
 
       employment_discrimination_sexual_orientation_subnationally_mixed_pop:
         title: Population — Subnationally mixed (employment discrimination sexual orientation)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1628,6 +1891,9 @@ tables:
 
       employment_discrimination_sexual_orientation_discrimination_prohibited_count:
         title: Number of countries — Discrimination prohibited (employment discrimination sexual orientation)
+        description_short: The number of countries classified as "Discrimination prohibited" on the indicator on employment discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1636,6 +1902,9 @@ tables:
 
       employment_discrimination_sexual_orientation_discrimination_prohibited_pop:
         title: Population — Discrimination prohibited (employment discrimination sexual orientation)
+        description_short: The total population of countries classified as "Discrimination prohibited" on the indicator on employment discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1644,6 +1913,9 @@ tables:
 
       employment_discrimination_gender_identity_no_protection_count:
         title: Number of countries — No protection (employment discrimination gender identity)
+        description_short: The number of countries classified as "No protection" on the indicator on employment discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1652,6 +1924,9 @@ tables:
 
       employment_discrimination_gender_identity_no_protection_pop:
         title: Population — No protection (employment discrimination gender identity)
+        description_short: The total population of countries classified as "No protection" on the indicator on employment discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1660,6 +1935,9 @@ tables:
 
       employment_discrimination_gender_identity_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (employment discrimination gender identity)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1668,6 +1946,9 @@ tables:
 
       employment_discrimination_gender_identity_subnationally_mixed_pop:
         title: Population — Subnationally mixed (employment discrimination gender identity)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1676,6 +1957,9 @@ tables:
 
       employment_discrimination_gender_identity_discrimination_prohibited_count:
         title: Number of countries — Discrimination prohibited (employment discrimination gender identity)
+        description_short: The number of countries classified as "Discrimination prohibited" on the indicator on employment discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1684,6 +1968,9 @@ tables:
 
       employment_discrimination_gender_identity_discrimination_prohibited_pop:
         title: Population — Discrimination prohibited (employment discrimination gender identity)
+        description_short: The total population of countries classified as "Discrimination prohibited" on the indicator on employment discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1692,6 +1979,9 @@ tables:
 
       goods_services_discrimination_sexual_orientation_no_protection_count:
         title: Number of countries — No protection (goods services discrimination sexual orientation)
+        description_short: The number of countries classified as "No protection" on the indicator on goods and services discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1700,6 +1990,9 @@ tables:
 
       goods_services_discrimination_sexual_orientation_no_protection_pop:
         title: Population — No protection (goods services discrimination sexual orientation)
+        description_short: The total population of countries classified as "No protection" on the indicator on goods and services discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1708,6 +2001,9 @@ tables:
 
       goods_services_discrimination_sexual_orientation_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (goods services discrimination sexual orientation)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1716,6 +2012,9 @@ tables:
 
       goods_services_discrimination_sexual_orientation_subnationally_mixed_pop:
         title: Population — Subnationally mixed (goods services discrimination sexual orientation)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1724,6 +2023,9 @@ tables:
 
       goods_services_discrimination_sexual_orientation_discrimination_prohibited_count:
         title: Number of countries — Discrimination prohibited (goods services discrimination sexual orientation)
+        description_short: The number of countries classified as "Discrimination prohibited" on the indicator on goods and services discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1732,6 +2034,9 @@ tables:
 
       goods_services_discrimination_sexual_orientation_discrimination_prohibited_pop:
         title: Population — Discrimination prohibited (goods services discrimination sexual orientation)
+        description_short: The total population of countries classified as "Discrimination prohibited" on the indicator on goods and services discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1740,6 +2045,9 @@ tables:
 
       goods_services_discrimination_gender_identity_no_protection_count:
         title: Number of countries — No protection (goods services discrimination gender identity)
+        description_short: The number of countries classified as "No protection" on the indicator on goods and services discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1748,6 +2056,9 @@ tables:
 
       goods_services_discrimination_gender_identity_no_protection_pop:
         title: Population — No protection (goods services discrimination gender identity)
+        description_short: The total population of countries classified as "No protection" on the indicator on goods and services discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1756,6 +2067,9 @@ tables:
 
       goods_services_discrimination_gender_identity_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (goods services discrimination gender identity)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1764,6 +2078,9 @@ tables:
 
       goods_services_discrimination_gender_identity_subnationally_mixed_pop:
         title: Population — Subnationally mixed (goods services discrimination gender identity)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1772,6 +2089,9 @@ tables:
 
       goods_services_discrimination_gender_identity_discrimination_prohibited_count:
         title: Number of countries — Discrimination prohibited (goods services discrimination gender identity)
+        description_short: The number of countries classified as "Discrimination prohibited" on the indicator on goods and services discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1780,6 +2100,9 @@ tables:
 
       goods_services_discrimination_gender_identity_discrimination_prohibited_pop:
         title: Population — Discrimination prohibited (goods services discrimination gender identity)
+        description_short: The total population of countries classified as "Discrimination prohibited" on the indicator on goods and services discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Discrimination prohibited" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1788,6 +2111,9 @@ tables:
 
       conversion_therapies_not_banned_count:
         title: Number of countries — Not banned (conversion therapies)
+        description_short: The number of countries classified as "Not banned" on the indicator on conversion therapy bans.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not banned" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1796,6 +2122,9 @@ tables:
 
       conversion_therapies_not_banned_pop:
         title: Population — Not banned (conversion therapies)
+        description_short: The total population of countries classified as "Not banned" on the indicator on conversion therapy bans.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not banned" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1804,6 +2133,9 @@ tables:
 
       conversion_therapies_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (conversion therapies)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on conversion therapy bans.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1812,6 +2144,9 @@ tables:
 
       conversion_therapies_subnationally_mixed_pop:
         title: Population — Subnationally mixed (conversion therapies)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on conversion therapy bans.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1820,6 +2155,9 @@ tables:
 
       conversion_therapies_banned_count:
         title: Number of countries — Banned (conversion therapies)
+        description_short: The number of countries classified as "Banned" on the indicator on conversion therapy bans.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Banned" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1828,6 +2166,9 @@ tables:
 
       conversion_therapies_banned_pop:
         title: Population — Banned (conversion therapies)
+        description_short: The total population of countries classified as "Banned" on the indicator on conversion therapy bans.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1836,6 +2177,9 @@ tables:
 
       gender_assignment_surgeries_on_children_not_banned_count:
         title: Number of countries — Not banned (gender assignment surgeries on children)
+        description_short: The number of countries classified as "Not banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not banned" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1844,6 +2188,9 @@ tables:
 
       gender_assignment_surgeries_on_children_not_banned_pop:
         title: Population — Not banned (gender assignment surgeries on children)
+        description_short: The total population of countries classified as "Not banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not banned" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1852,6 +2199,9 @@ tables:
 
       gender_assignment_surgeries_on_children_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (gender assignment surgeries on children)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1860,6 +2210,9 @@ tables:
 
       gender_assignment_surgeries_on_children_subnationally_mixed_pop:
         title: Population — Subnationally mixed (gender assignment surgeries on children)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1868,6 +2221,9 @@ tables:
 
       gender_assignment_surgeries_on_children_non_consensual_surgeries_banned_count:
         title: Number of countries — Non-consensual surgeries banned (gender assignment surgeries on children)
+        description_short: The number of countries classified as "Non-consensual surgeries banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Non-consensual surgeries banned" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1876,6 +2232,9 @@ tables:
 
       gender_assignment_surgeries_on_children_non_consensual_surgeries_banned_pop:
         title: Population — Non-consensual surgeries banned (gender assignment surgeries on children)
+        description_short: The total population of countries classified as "Non-consensual surgeries banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Non-consensual surgeries banned" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1884,6 +2243,9 @@ tables:
 
       death_penalty_no_death_penalty_count:
         title: Number of countries — No death penalty (death penalty)
+        description_short: The number of countries classified as "No death penalty" on the indicator on the death penalty for same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "No death penalty" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1892,6 +2254,9 @@ tables:
 
       death_penalty_no_death_penalty_pop:
         title: Population — No death penalty (death penalty)
+        description_short: The total population of countries classified as "No death penalty" on the indicator on the death penalty for same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No death penalty" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1900,6 +2265,9 @@ tables:
 
       death_penalty_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (death penalty)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on the death penalty for same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1908,6 +2276,9 @@ tables:
 
       death_penalty_subnationally_mixed_pop:
         title: Population — Subnationally mixed (death penalty)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on the death penalty for same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1916,6 +2287,9 @@ tables:
 
       death_penalty_death_penalty_applies_count:
         title: Number of countries — Death penalty applies (death penalty)
+        description_short: The number of countries classified as "Death penalty applies" on the indicator on the death penalty for same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Death penalty applies" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1924,6 +2298,9 @@ tables:
 
       death_penalty_death_penalty_applies_pop:
         title: Population — Death penalty applies (death penalty)
+        description_short: The total population of countries classified as "Death penalty applies" on the indicator on the death penalty for same-sex sexual acts.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Death penalty applies" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1932,6 +2309,9 @@ tables:
 
       morality_propaganda_no_restrictions_count:
         title: Number of countries — No restrictions (morality propaganda)
+        description_short: The number of countries classified as "No restrictions" on the indicator on anti-LGBTI "propaganda" or morality laws.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "No restrictions" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1940,6 +2320,9 @@ tables:
 
       morality_propaganda_no_restrictions_pop:
         title: Population — No restrictions (morality propaganda)
+        description_short: The total population of countries classified as "No restrictions" on the indicator on anti-LGBTI "propaganda" or morality laws.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No restrictions" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1948,6 +2331,9 @@ tables:
 
       morality_propaganda_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (morality propaganda)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on anti-LGBTI "propaganda" or morality laws.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1956,6 +2342,9 @@ tables:
 
       morality_propaganda_subnationally_mixed_pop:
         title: Population — Subnationally mixed (morality propaganda)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on anti-LGBTI "propaganda" or morality laws.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1964,6 +2353,9 @@ tables:
 
       morality_propaganda_restrictions_in_effect_count:
         title: Number of countries — Restrictions in effect (morality propaganda)
+        description_short: The number of countries classified as "Restrictions in effect" on the indicator on anti-LGBTI "propaganda" or morality laws.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Restrictions in effect" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1972,6 +2364,9 @@ tables:
 
       morality_propaganda_restrictions_in_effect_pop:
         title: Population — Restrictions in effect (morality propaganda)
+        description_short: The total population of countries classified as "Restrictions in effect" on the indicator on anti-LGBTI "propaganda" or morality laws.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Restrictions in effect" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1980,6 +2375,9 @@ tables:
 
       lgbtq_civil_society_restrictions_no_restrictions_count:
         title: Number of countries — No restrictions (lgbtq civil society restrictions)
+        description_short: The number of countries classified as "No restrictions" on the indicator on restrictions on LGBTQ+ civil society organizations.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "No restrictions" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -1988,6 +2386,9 @@ tables:
 
       lgbtq_civil_society_restrictions_no_restrictions_pop:
         title: Population — No restrictions (lgbtq civil society restrictions)
+        description_short: The total population of countries classified as "No restrictions" on the indicator on restrictions on LGBTQ+ civil society organizations.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No restrictions" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -1996,6 +2397,9 @@ tables:
 
       lgbtq_civil_society_restrictions_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (lgbtq civil society restrictions)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on restrictions on LGBTQ+ civil society organizations.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2004,6 +2408,9 @@ tables:
 
       lgbtq_civil_society_restrictions_subnationally_mixed_pop:
         title: Population — Subnationally mixed (lgbtq civil society restrictions)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on restrictions on LGBTQ+ civil society organizations.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2012,6 +2419,9 @@ tables:
 
       lgbtq_civil_society_restrictions_restrictions_in_effect_count:
         title: Number of countries — Restrictions in effect (lgbtq civil society restrictions)
+        description_short: The number of countries classified as "Restrictions in effect" on the indicator on restrictions on LGBTQ+ civil society organizations.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Restrictions in effect" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2020,6 +2430,9 @@ tables:
 
       lgbtq_civil_society_restrictions_restrictions_in_effect_pop:
         title: Population — Restrictions in effect (lgbtq civil society restrictions)
+        description_short: The total population of countries classified as "Restrictions in effect" on the indicator on restrictions on LGBTQ+ civil society organizations.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Restrictions in effect" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2028,6 +2441,9 @@ tables:
 
       religious_exemption_laws_no_religious_exemptions_count:
         title: Number of countries — No religious exemptions (religious exemption laws)
+        description_short: The number of countries classified as "No religious exemptions" on the indicator on religious exemption laws.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "No religious exemptions" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2036,6 +2452,9 @@ tables:
 
       religious_exemption_laws_no_religious_exemptions_pop:
         title: Population — No religious exemptions (religious exemption laws)
+        description_short: The total population of countries classified as "No religious exemptions" on the indicator on religious exemption laws.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "No religious exemptions" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2044,6 +2463,9 @@ tables:
 
       religious_exemption_laws_religious_exemptions_in_effect_count:
         title: Number of countries — Religious exemptions in effect (religious exemption laws)
+        description_short: The number of countries classified as "Religious exemptions in effect" on the indicator on religious exemption laws.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Religious exemptions in effect" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2052,6 +2474,9 @@ tables:
 
       religious_exemption_laws_religious_exemptions_in_effect_pop:
         title: Population — Religious exemptions in effect (religious exemption laws)
+        description_short: The total population of countries classified as "Religious exemptions in effect" on the indicator on religious exemption laws.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Religious exemptions in effect" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2063,6 +2488,9 @@ tables:
 
       employment_discrimination_both_protected_count:
         title: Number of countries — Both protected (employment discrimination)
+        description_short: The number of countries classified as "Both protected" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Both protected" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2071,6 +2499,9 @@ tables:
 
       employment_discrimination_both_protected_pop:
         title: Population — Both protected (employment discrimination)
+        description_short: The total population of countries classified as "Both protected" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both protected" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2079,6 +2510,9 @@ tables:
 
       employment_discrimination_sexual_orientation_only_count:
         title: Number of countries — Sexual orientation only (employment discrimination)
+        description_short: The number of countries classified as "Sexual orientation only" on the indicator on employment discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2087,6 +2521,9 @@ tables:
 
       employment_discrimination_sexual_orientation_only_pop:
         title: Population — Sexual orientation only (employment discrimination)
+        description_short: The total population of countries classified as "Sexual orientation only" on the indicator on employment discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2095,6 +2532,9 @@ tables:
 
       employment_discrimination_gender_identity_only_count:
         title: Number of countries — Gender identity only (employment discrimination)
+        description_short: The number of countries classified as "Gender identity only" on the indicator on employment discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Gender identity only" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2103,6 +2543,9 @@ tables:
 
       employment_discrimination_gender_identity_only_pop:
         title: Population — Gender identity only (employment discrimination)
+        description_short: The total population of countries classified as "Gender identity only" on the indicator on employment discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Gender identity only" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2111,6 +2554,9 @@ tables:
 
       employment_discrimination_no_protection_count:
         title: Number of countries — No protection (employment discrimination)
+        description_short: The number of countries classified as "No protection" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2119,6 +2565,9 @@ tables:
 
       employment_discrimination_no_protection_pop:
         title: Population — No protection (employment discrimination)
+        description_short: The total population of countries classified as "No protection" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2127,6 +2576,9 @@ tables:
 
       employment_discrimination_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (employment discrimination)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2135,6 +2587,9 @@ tables:
 
       employment_discrimination_subnationally_mixed_pop:
         title: Population — Subnationally mixed (employment discrimination)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2143,6 +2598,9 @@ tables:
 
       goods_services_discrimination_both_protected_count:
         title: Number of countries — Both protected (goods services discrimination)
+        description_short: The number of countries classified as "Both protected" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Both protected" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2151,6 +2609,9 @@ tables:
 
       goods_services_discrimination_both_protected_pop:
         title: Population — Both protected (goods services discrimination)
+        description_short: The total population of countries classified as "Both protected" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both protected" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2159,6 +2620,9 @@ tables:
 
       goods_services_discrimination_sexual_orientation_only_count:
         title: Number of countries — Sexual orientation only (goods services discrimination)
+        description_short: The number of countries classified as "Sexual orientation only" on the indicator on goods and services discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2167,6 +2631,9 @@ tables:
 
       goods_services_discrimination_sexual_orientation_only_pop:
         title: Population — Sexual orientation only (goods services discrimination)
+        description_short: The total population of countries classified as "Sexual orientation only" on the indicator on goods and services discrimination protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2175,6 +2642,9 @@ tables:
 
       goods_services_discrimination_gender_identity_only_count:
         title: Number of countries — Gender identity only (goods services discrimination)
+        description_short: The number of countries classified as "Gender identity only" on the indicator on goods and services discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Gender identity only" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2183,6 +2653,9 @@ tables:
 
       goods_services_discrimination_gender_identity_only_pop:
         title: Population — Gender identity only (goods services discrimination)
+        description_short: The total population of countries classified as "Gender identity only" on the indicator on goods and services discrimination protections based on gender identity.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Gender identity only" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2191,6 +2664,9 @@ tables:
 
       goods_services_discrimination_no_protection_count:
         title: Number of countries — No protection (goods services discrimination)
+        description_short: The number of countries classified as "No protection" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2199,6 +2675,9 @@ tables:
 
       goods_services_discrimination_no_protection_pop:
         title: Population — No protection (goods services discrimination)
+        description_short: The total population of countries classified as "No protection" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "No protection" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2207,6 +2686,9 @@ tables:
 
       goods_services_discrimination_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (goods services discrimination)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2215,6 +2697,9 @@ tables:
 
       goods_services_discrimination_subnationally_mixed_pop:
         title: Population — Subnationally mixed (goods services discrimination)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2223,6 +2708,9 @@ tables:
 
       hate_crime_protections_both_covered_count:
         title: Number of countries — Both covered (hate crime protections)
+        description_short: The number of countries classified as "Both covered" on the indicator on hate crime protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Both covered" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2231,6 +2719,9 @@ tables:
 
       hate_crime_protections_both_covered_pop:
         title: Population — Both covered (hate crime protections)
+        description_short: The total population of countries classified as "Both covered" on the indicator on hate crime protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both covered" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2239,6 +2730,9 @@ tables:
 
       hate_crime_protections_sexual_orientation_only_count:
         title: Number of countries — Sexual orientation only (hate crime protections)
+        description_short: The number of countries classified as "Sexual orientation only" on the indicator on hate crime protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2247,6 +2741,9 @@ tables:
 
       hate_crime_protections_sexual_orientation_only_pop:
         title: Population — Sexual orientation only (hate crime protections)
+        description_short: The total population of countries classified as "Sexual orientation only" on the indicator on hate crime protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2255,6 +2752,9 @@ tables:
 
       hate_crime_protections_not_covered_count:
         title: Number of countries — Not covered (hate crime protections)
+        description_short: The number of countries classified as "Not covered" on the indicator on hate crime protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Not covered" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2263,6 +2763,9 @@ tables:
 
       hate_crime_protections_not_covered_pop:
         title: Population — Not covered (hate crime protections)
+        description_short: The total population of countries classified as "Not covered" on the indicator on hate crime protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Not covered" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2271,6 +2774,9 @@ tables:
 
       hate_crime_protections_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (hate crime protections)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on hate crime protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2279,6 +2785,9 @@ tables:
 
       hate_crime_protections_subnationally_mixed_pop:
         title: Population — Subnationally mixed (hate crime protections)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on hate crime protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2287,6 +2796,9 @@ tables:
 
       constitutional_protections_both_protected_count:
         title: Number of countries — Both protected (constitutional protections)
+        description_short: The number of countries classified as "Both protected" on the indicator on constitutional protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Both protected" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2295,6 +2807,9 @@ tables:
 
       constitutional_protections_both_protected_pop:
         title: Population — Both protected (constitutional protections)
+        description_short: The total population of countries classified as "Both protected" on the indicator on constitutional protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Both protected" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2303,6 +2818,9 @@ tables:
 
       constitutional_protections_sexual_orientation_only_count:
         title: Number of countries — Sexual orientation only (constitutional protections)
+        description_short: The number of countries classified as "Sexual orientation only" on the indicator on constitutional protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2311,6 +2829,9 @@ tables:
 
       constitutional_protections_sexual_orientation_only_pop:
         title: Population — Sexual orientation only (constitutional protections)
+        description_short: The total population of countries classified as "Sexual orientation only" on the indicator on constitutional protections based on sexual orientation.
+        processing_level: major
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Sexual orientation only" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2319,6 +2840,9 @@ tables:
 
       constitutional_protections_not_protected_count:
         title: Number of countries — Not protected (constitutional protections)
+        description_short: The number of countries classified as "Not protected" on the indicator on constitutional protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Not protected" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2327,6 +2851,9 @@ tables:
 
       constitutional_protections_not_protected_pop:
         title: Population — Not protected (constitutional protections)
+        description_short: The total population of countries classified as "Not protected" on the indicator on constitutional protections (sexual orientation and gender identity combined).
+        processing_level: major
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Not protected" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2338,6 +2865,9 @@ tables:
 
       gender_affirming_care_covered_for_adults_and_minors_count:
         title: Number of countries — Covered for adults and minors (gender-affirming care)
+        description_short: The number of countries classified as "Covered for adults and minors" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then counted the countries classified as "Covered for adults and minors" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2346,6 +2876,9 @@ tables:
 
       gender_affirming_care_covered_for_adults_and_minors_pop:
         title: Population — Covered for adults and minors (gender-affirming care)
+        description_short: The total population of countries classified as "Covered for adults and minors" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Covered for adults and minors" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2354,6 +2887,9 @@ tables:
 
       gender_affirming_care_covered_for_adults_only_count:
         title: Number of countries — Covered for adults only (gender-affirming care)
+        description_short: The number of countries classified as "Covered for adults only" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then counted the countries classified as "Covered for adults only" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2362,6 +2898,9 @@ tables:
 
       gender_affirming_care_covered_for_adults_only_pop:
         title: Population — Covered for adults only (gender-affirming care)
+        description_short: The total population of countries classified as "Covered for adults only" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Covered for adults only" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2370,6 +2909,9 @@ tables:
 
       gender_affirming_care_adults_covered__minors_restricted_count:
         title: Number of countries — Adults covered, minors restricted (gender-affirming care)
+        description_short: The number of countries classified as "Adults covered, minors restricted" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then counted the countries classified as "Adults covered, minors restricted" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2378,6 +2920,9 @@ tables:
 
       gender_affirming_care_adults_covered__minors_restricted_pop:
         title: Population — Adults covered, minors restricted (gender-affirming care)
+        description_short: The total population of countries classified as "Adults covered, minors restricted" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Adults covered, minors restricted" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2386,6 +2931,9 @@ tables:
 
       gender_affirming_care_restricted_for_both_count:
         title: Number of countries — Restricted for both (gender-affirming care)
+        description_short: The number of countries classified as "Restricted for both" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then counted the countries classified as "Restricted for both" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2394,6 +2942,9 @@ tables:
 
       gender_affirming_care_restricted_for_both_pop:
         title: Population — Restricted for both (gender-affirming care)
+        description_short: The total population of countries classified as "Restricted for both" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Restricted for both" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2402,6 +2953,9 @@ tables:
 
       gender_affirming_care_subnationally_mixed_or_other_count:
         title: Number of countries — Subnationally mixed or other (gender-affirming care)
+        description_short: The number of countries classified as "Subnationally mixed or other" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then counted the countries classified as "Subnationally mixed or other" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2410,6 +2964,9 @@ tables:
 
       gender_affirming_care_subnationally_mixed_or_other_pop:
         title: Population — Subnationally mixed or other (gender-affirming care)
+        description_short: The total population of countries classified as "Subnationally mixed or other" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Subnationally mixed or other" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2418,6 +2975,9 @@ tables:
 
       gender_affirming_care_neither_covered_nor_restricted_count:
         title: Number of countries — Neither covered nor restricted (gender-affirming care)
+        description_short: The number of countries classified as "Neither covered nor restricted" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then counted the countries classified as "Neither covered nor restricted" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2426,6 +2986,9 @@ tables:
 
       gender_affirming_care_neither_covered_nor_restricted_pop:
         title: Population — Neither covered nor restricted (gender-affirming care)
+        description_short: The total population of countries classified as "Neither covered nor restricted" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Neither covered nor restricted" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2437,6 +3000,9 @@ tables:
 
       gender_marker_change_legally_possible__requirement_unknown_count:
         title: Number of countries — Legally possible, requirement unknown (gender marker change)
+        description_short: The number of countries classified as "Legally possible, requirement unknown" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Legally possible, requirement unknown" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2445,6 +3011,9 @@ tables:
 
       gender_marker_change_legally_possible__requirement_unknown_pop:
         title: Population — Legally possible, requirement unknown (gender marker change)
+        description_short: The total population of countries classified as "Legally possible, requirement unknown" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Legally possible, requirement unknown" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2453,6 +3022,9 @@ tables:
 
       gender_marker_change_medical_or_psychological_diagnosis_count:
         title: Number of countries — Medical or psychological diagnosis (gender marker change)
+        description_short: The number of countries classified as "Medical or psychological diagnosis" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Medical or psychological diagnosis" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2461,6 +3033,9 @@ tables:
 
       gender_marker_change_medical_or_psychological_diagnosis_pop:
         title: Population — Medical or psychological diagnosis (gender marker change)
+        description_short: The total population of countries classified as "Medical or psychological diagnosis" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Medical or psychological diagnosis" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2469,6 +3044,9 @@ tables:
 
       gender_marker_change_not_legally_possible_count:
         title: Number of countries — Not legally possible (gender marker change)
+        description_short: The number of countries classified as "Not legally possible" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Not legally possible" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2477,6 +3055,9 @@ tables:
 
       gender_marker_change_not_legally_possible_pop:
         title: Population — Not legally possible (gender marker change)
+        description_short: The total population of countries classified as "Not legally possible" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Not legally possible" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2485,6 +3066,9 @@ tables:
 
       gender_marker_change_self_declaration_count:
         title: Number of countries — Self-declaration (gender marker change)
+        description_short: The number of countries classified as "Self-declaration" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Self-declaration" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2493,6 +3077,9 @@ tables:
 
       gender_marker_change_self_declaration_pop:
         title: Population — Self-declaration (gender marker change)
+        description_short: The total population of countries classified as "Self-declaration" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Self-declaration" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2501,6 +3088,9 @@ tables:
 
       gender_marker_change_subnationally_mixed_count:
         title: Number of countries — Subnationally mixed (gender marker change)
+        description_short: The number of countries classified as "Subnationally mixed" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2509,6 +3099,9 @@ tables:
 
       gender_marker_change_subnationally_mixed_pop:
         title: Population — Subnationally mixed (gender marker change)
+        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2517,6 +3110,9 @@ tables:
 
       gender_marker_change_surgery_and_sterilization_required_count:
         title: Number of countries — Surgery and sterilization required (gender marker change)
+        description_short: The number of countries classified as "Surgery and sterilization required" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Surgery and sterilization required" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2525,6 +3121,9 @@ tables:
 
       gender_marker_change_surgery_and_sterilization_required_pop:
         title: Population — Surgery and sterilization required (gender marker change)
+        description_short: The total population of countries classified as "Surgery and sterilization required" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Surgery and sterilization required" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
@@ -2533,6 +3132,9 @@ tables:
 
       gender_marker_change_surgery_required_count:
         title: Number of countries — Surgery required (gender marker change)
+        description_short: The number of countries classified as "Surgery required" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Surgery required" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
@@ -2541,6 +3143,9 @@ tables:
 
       gender_marker_change_surgery_required_pop:
         title: Population — Surgery required (gender marker change)
+        description_short: The total population of countries classified as "Surgery required" on the indicator on legal change of gender marker.
+        processing_level: major
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Surgery required" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
