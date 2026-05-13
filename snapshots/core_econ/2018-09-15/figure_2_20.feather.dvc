@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Clark, G. (2005)
+    description: |-
+      Methods used for calculating the data are covered in R. C. Allen (2001), 'The Great Divergence in European Wages and Prices from the Middle Ages to the First World War'.
+
+      Data received directly from author via Kevin O'Rourke.
+    published_by: |-
+      Clark, G. (2005), 'The Condition of the Working Class in England', 1209–2004, Journal of Political Economy, Vol. 113, No. 6 (December 2005), pp. 1307-1340
+  name: Figure 2.20
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 12b7624f26bd36e2c2a0c3ed9bf8cb49
+    size: 4594
+    path: figure_2_20.feather

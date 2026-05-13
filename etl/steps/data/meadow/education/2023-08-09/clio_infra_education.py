@@ -1,12 +1,8 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
-
-import pandas as pd
-from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -17,15 +13,15 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap_years_education = cast(Snapshot, paths.load_dependency("years_of_education.xlsx"))
-    snap_years_education_gini = cast(Snapshot, paths.load_dependency("years_of_education_gini.xlsx"))
-    snap_years_education_gender = cast(Snapshot, paths.load_dependency("years_of_education_gender.xlsx"))
-    snap_numeracy = cast(Snapshot, paths.load_dependency("numeracy.xlsx"))
-    snap_numeracy_gender = cast(Snapshot, paths.load_dependency("numeracy_gender.xlsx"))
+    snap_years_education = paths.load_snapshot("years_of_education.xlsx")
+    snap_years_education_gini = paths.load_snapshot("years_of_education_gini.xlsx")
+    snap_years_education_gender = paths.load_snapshot("years_of_education_gender.xlsx")
+    snap_numeracy = paths.load_snapshot("numeracy.xlsx")
+    snap_numeracy_gender = paths.load_snapshot("numeracy_gender.xlsx")
     #
     # Process data.
     #
-    dfs = []
+    tbs = []
 
     for snap in [
         snap_years_education,
@@ -34,26 +30,26 @@ def run(dest_dir: str) -> None:
         snap_numeracy,
         snap_numeracy_gender,
     ]:
-        df = pd.read_excel(snap.path)
-        # Melting the DataFrame
+        tb = snap.read_excel()
+        # Melting the table.
         year_cols = [str(year) for year in range(1500, 2051)]
-        df_melted = pd.melt(
-            df,
+        tb_melted = tb.melt(
             id_vars=["country name"],
             value_vars=year_cols,
             var_name="year",
             value_name=snap.metadata.short_name,
         )
-        dfs.append(df_melted)
+        tbs.append(tb_melted)
 
-    merged_df = dfs[0]
-    # Iterate through the remaining DataFrames and merge them
-    for df in dfs[1:]:
-        merged_df = pd.merge(merged_df, df, on=["country name", "year"], how="outer")
-    merged_df.rename(columns={"country name": "country"}, inplace=True)
+    merged_tb = tbs[0]
+    # Iterate through the remaining tables and merge them.
+    for tb in tbs[1:]:
+        merged_tb = pr.merge(merged_tb, tb, on=["country name", "year"], how="outer")
+    merged_tb = merged_tb.rename(columns={"country name": "country"})
 
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(merged_df, short_name=paths.short_name, underscore=True)
+    # Ensure all columns are snake-case.
+    tb = merged_tb.underscore()
+    tb.metadata.short_name = paths.short_name
     tb = tb.set_index(["country", "year"], verify_integrity=True)
     tb = tb.dropna(how="all")
 

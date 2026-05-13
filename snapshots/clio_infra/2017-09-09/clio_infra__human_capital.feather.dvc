@@ -1,13 +1,32 @@
 meta:
-  source:
-    name: Universities founded (Foldvari 2015)
+  origin:
+    producer: Various sources
+    title: Clio-Infra - Human Capital
     description: |-
-      Additional information: Author's note: The quantity and quality of available information on universities vary by period and geographical area. Even the definition of university is not universal: in some countries even colleges offering undergradute programmes can be named universities (Latin America, Japan, Near East). Please see source for further information.
-    url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/KVRJPW
-    date_accessed: 2017-09-09
-    published_by: Clio-Infra
-  name: Clio-Infra - Human Capital
-  description: This is a dataset imported by the automated fetcher
+      Clio-Infra is a collaborative project that provides historical data on global economic development. The Human Capital theme brings together datasets covering education, numeracy, and the founding of universities, compiled by individual researchers from central statistical agencies, historical reconstructions, and scholarly research.
+
+      This snapshot is an Our World in Data compilation of six Clio-Infra datasets on human capital:
+
+      - Average years of education (van Leeuwen, van Leeuwen-Li 2015) — https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/KCBMKI
+      - Book titles per capita (Fink-Jensen 2015) — https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/AOQMAZ
+      - Composite wellbeing index (Rijpma 2017) — https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/QIPFQF
+      - Educational inequality gini coefficient (van Leeuwen and van Leeuwen-Li 2015) — https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/KORKQW
+      - Numeracy (total) (Baten 2015) — https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/GEQKCG
+      - Universities founded (Foldvari 2015) — https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/KVRJPW
+
+      Per-component notes:
+
+      - Average years of education (van Leeuwen, van Leeuwen-Li 2015): Publisher source: Central statistical agencies, historical reconstructions.
+      - Book titles per capita (Fink-Jensen 2015): Publisher source: Combination of datasets and publications that contain data on book production for different regions and periods. Includes CLIO Infra data.
+      - Composite wellbeing index (Rijpma 2017): Publisher source: Composite measure constructed from 9 variables from the CLIO-Infra project.
+      - Educational inequality gini coefficient (van Leeuwen and van Leeuwen-Li 2015): Publisher source: Central statistical agencies, historical reconstructions.
+      - Numeracy (total) (Baten 2015): Publisher source: Reconstruction of data using a variety of sources, incl. scholarly research.
+      - Universities founded (Foldvari 2015): Additional information: Author's note: The quantity and quality of available information on universities vary by period and geographical area. Even the definition of university is not universal: in some countries even colleges offering undergradute programmes can be named universities (Latin America, Japan, Near East). Please see source for further information. Publisher source: Central statistical agencies, historical reconstructions.
+    citation_full: 'Clio-Infra. (2015–2017). Human Capital datasets: van Leeuwen and van Leeuwen-Li (2015), Fink-Jensen (2015), Rijpma (2017), Baten (2015), and Foldvari (2015). International Institute of Social History.'
+    attribution_short: Clio-Infra
+    url_main: https://clio-infra.eu/
+    date_accessed: '2017-09-09'
+    date_published: '2017'
 outs:
   - md5: c163e93ca9f1cfd5046e9c10ee4bcebd
     size: 262122

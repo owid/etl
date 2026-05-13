@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3240
-    date_accessed: 2023-08-10 07:47:12.962968
+    url: https://admin.owid.io/admin/datasets/3240
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: TE-15.1_inflation
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9a38deaa0a20c57a8d54db14f9fd6e64
-  size: 6522
-  path: dataset_3240_te_15_1_inflation_values.feather
+  - md5: 7a086936ded1e92e2c513cfd159cd9db
+    size: 6562
+    path: dataset_3240_te_15_1_inflation_values.feather

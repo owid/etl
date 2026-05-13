@@ -35,7 +35,8 @@ def main(upload: bool) -> None:
     snap = modify_metadata(snap)
 
     # Download CSV
-    download_csv(snap.path, snap.m.source.source_data_url)  # ty: ignore
+    assert snap.m.origin and snap.m.origin.url_download
+    download_csv(snap.path, snap.m.origin.url_download)
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
@@ -87,14 +88,12 @@ def download_csv(path: Path, csv_url: str) -> None:
 
 def modify_metadata(snap: Snapshot) -> Snapshot:
     """Modify metadata"""
+    assert snap.metadata.origin
     # Get access date
-    snap.metadata.source.date_accessed = date.today()  # ty: ignore
+    snap.metadata.origin.date_accessed = date.today().isoformat()
     # Set publication date
     publication_date = _get_publication_date()
-    assert snap.metadata.source
-    snap.metadata.source.publication_date = publication_date  # ty: ignore
-    # Set publication year
-    snap.metadata.source.publication_year = publication_date.year
+    snap.metadata.origin.date_published = publication_date.isoformat()
     # Save
     snap.metadata.save()
     return snap

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Obstfeld and Taylor (2005), IMF (2020)
+    description: |-
+      The data shown in the figure is the average absolute current account balance (as a percentage of GDP) for 15 countries in five-year blocks (from 1870–74 through to 2015–19). The countries in the sample are Argentina, Australia, Canada, Denmark, Finland, France, Germany, Italy, Japan, Netherlands, Norway, Spain, Sweden, UK, US. The 2018 data for Finland, France, Italy, Netherlands, Norway, Spain, the United States and the 2019 data for all countries are IMF estimates.
+    url: https://www.imf.org/external/pubs/ft/weo/2019/01/weodata/index.aspx
+    published_by: |-
+      Figure 2.2 from Maurice Obstfeld and Alan M. Taylor. 2005. Global Capital Markets: Integration, Crisis, and Growth (Japan–US Center UFJ Bank Monographs on International Financial Markets). Cambridge: Cambridge University Press;  International Monetary Fund (2020) World Economic Outlook Database
+  name: TE-18.8
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 7cd4847a7b643f46c938f07116693a0f
+    size: 3546
+    path: te_18_8.feather

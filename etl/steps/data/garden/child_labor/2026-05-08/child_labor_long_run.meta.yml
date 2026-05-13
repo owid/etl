@@ -1,0 +1,128 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Child Labor
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Child labor in the long run
+  update_period_days: 365
+
+
+tables:
+  us_long:
+    variables:
+      number:
+        title: United States (Long) - Number in child labor - << sex >>, age << age_group >> (<< source >>)
+        unit: people
+        short_unit: ""
+      share:
+        title: United States (Long) - Share in child labor - << sex >>, age << age_group >> (<< source >>)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  belgium:
+    variables:
+      number:
+        title: Belgium - Number in child labor - age << age >>
+        unit: people
+        short_unit: ""
+      share:
+        title: Belgium - Share in child labor - age << age >>
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  portugal:
+    variables:
+      number:
+        title: Portugal (Goulart) - Number in child labor in << sector >> - << sex >>, age << age_group >>
+        unit: people
+        short_unit: ""
+      share:
+        title: Portugal (Goulart) - Share in child labor in << sector >> - << sex >>, age << age_group >>
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  denmark:
+    variables:
+      number:
+        title: Denmark - Number in child labor in << sector >> - << age_group >>
+        unit: people
+        short_unit: ""
+      share:
+        title: Denmark - Share in child labor in << sector >> - << age_group >>
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  italy:
+    variables:
+      share:
+        title: Italy - Share in child labor in << sector >> - << sex >>
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  sweden:
+    variables:
+      number:
+        title: Sweden - Number in child labor in << sector >>
+        unit: people
+        short_unit: ""
+      share:
+        title: Sweden - Share in child labor in << sector >>
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  us_carter_sutch:
+    variables:
+      share:
+        title: United States (Carter & Sutch) - Share in child labor (<< age_group >>) - << sex >>
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  portugal_goulart_bedi:
+    variables:
+      share:
+        title: Portugal (Goulart & Bedi) - Share in child labor - << measure >>, age << age_group >> (<< bound >>)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  england_wales_scotland:
+    variables:
+      share:
+        title: Britain (Kirby) - Share in child labor in << occupation >> - << sex >>
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  england_wales:
+    variables:
+      share:
+        title: England and Wales (Cunningham & Viazzo) - Share in child labor - << age_group >>
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  japan:
+    variables:
+      number:
+        title: Japan - Number in child labor - << gender >>, << age_group >>
+        unit: people
+        short_unit: ""
+      share:
+        title: Japan - Share in child labor - << gender >>, << age_group >>
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1

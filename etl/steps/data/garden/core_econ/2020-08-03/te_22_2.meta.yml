@@ -1,0 +1,18 @@
+dataset:
+  title: TE-22.2
+tables:
+  te_22_2:
+    variables:
+      total_tax_revenue__pct_of_gdp:
+        title: Total tax revenue (% of GDP)
+        unit: '%'
+        description: Total tax revenue is the sum of direct and indirect tax revenue.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

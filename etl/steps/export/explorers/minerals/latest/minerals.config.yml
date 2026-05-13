@@ -1,0 +1,49 @@
+config:
+  explorerTitle: Minerals
+  explorerSubtitle: Explore the production, reserves and value of minerals.
+  isPublished: true
+  selection:
+    - World
+    - Australia
+    - Chile
+    - China
+    - United States
+  originUrl: https://ourworldindata.org/metals-minerals
+
+dimensions:
+  - slug: mineral
+    name: Mineral
+    presentation:
+      type: dropdown
+    choices: []
+
+  - slug: metric
+    name: Metric
+    presentation:
+      type: dropdown
+    choices:
+      - slug: production
+        name: Production
+      - slug: reserves
+        name: Reserves
+      - slug: unit_value
+        name: Unit value
+
+  - slug: type
+    name: Type
+    presentation:
+      type: dropdown
+    choices: []
+
+  - slug: measure
+    name: Share of global
+    presentation:
+      type: checkbox
+      choice_slug_true: share_of_global
+    choices:
+      - slug: absolute
+        name: ""
+      - slug: share_of_global
+        name: Share of global
+
+views: []

@@ -1,15 +1,15 @@
 meta:
-  source:
-    name: Economic impacts of 1.5C - Pretis et al.
+  origin:
+    producer: Pretis et al.
+    title: Uncertain impacts on economic growth when stabilizing global temperatures at 1.5°C or 2°C warming
     description: |-
       Please cite the data as:
 
       Pretis, Schwarz, Tang, Haustein, and Allen. 2018. "Uncertain Impacts on Economic Growth When Stabilizing Global Temperatures at 1.5°C or 2°C Warming". Philosophical Transactions of the Royal Society, A. DOI 10.1098/rsta.2016.0460.
-    url: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3073059
-    date_accessed: 2026-03-05
-    published_by: Philosophical Transactions of the Royal Society, 2018
-  name: Economic impacts of 1.5C - Pretis et al.
-  description: ''
+    citation_full: Pretis, Schwarz, Tang, Haustein, and Allen. 2018. "Uncertain Impacts on Economic Growth When Stabilizing Global Temperatures at 1.5°C or 2°C Warming". Philosophical Transactions of the Royal Society, A. DOI 10.1098/rsta.2016.0460.
+    url_main: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3073059
+    date_accessed: '2018-03-21'
+    date_published: '2018'
 outs:
   - md5: fcad290aa107d55a32af1cac8224b697
     size: 12634

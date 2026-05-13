@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: FRED (2016)
+    url: https://fred.stlouisfed.org/series/NAEXKP04GBA657S
+    published_by: Federal Reserve Bank of St. Louis (2016) FRED.
+  name: TE-13.19a_Capital
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: aacbbc61eadab15e53d42c8086a4e067
+    size: 3786
+    path: te_13_19a_capital.feather

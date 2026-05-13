@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5126
-    date_accessed: 2023-08-10 08:03:32.627611
+    url: https://admin.owid.io/admin/datasets/5126
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: TE-13.3_GDP
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: de93dfd9d891eb1f95771391fc89c137
-  size: 7066
-  path: dataset_5126_te_13_3_gdp_values.feather
+  - md5: 8e20370e146dd1097e8c58497e56c1cf
+    size: 7098
+    path: dataset_5126_te_13_3_gdp_values.feather

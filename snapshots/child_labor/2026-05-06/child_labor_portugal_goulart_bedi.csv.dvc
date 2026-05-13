@@ -1,0 +1,33 @@
+# This is a file extracted from Table 1 in page 233.
+# In case of updating, it needs to be uploaded manually
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "The Evolution of Child Labor in Portugal, 1850-2001"
+    description: |-
+      This paper traces the long-run evolution of child labor in Portugal from 1850 to 2001, drawing on historical census and labor force data to examine activity, employment, and unemployment rates among children and youth aged 10-19.
+    date_published: "2017"
+    title_snapshot: "The Evolution of Child Labor in Portugal, 1850-2001 - Child and youth labor indicators"
+    description_snapshot: |-
+      Table 1, taken from the journal article on the long-run evolution of child labor in Portugal.
+
+    # Citation
+    producer: Goulart and Bedi
+    citation_full: |-
+      Goulart, P., & Bedi, A. S. (2017). The Evolution of Child Labor in Portugal, 1850-2001. Table 1. Social Science History, 41(2), 233. https://doi.org/10.1017/ssh.2017.3
+
+    # Files
+    url_main: https://www.cambridge.org/core/journals/social-science-history/article/evolution-of-child-labor-in-portugal-18502001/26D8038575400EE3D8D03A7828B4CDBD
+    date_accessed: '2026-05-07'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.cambridge.org/core/journals/social-science-history/article/evolution-of-child-labor-in-portugal-18502001/26D8038575400EE3D8D03A7828B4CDBD
+outs:
+  - md5: 8ce824731c1113cd77e57b84f1a1ea19
+    size: 451
+    path: child_labor_portugal_goulart_bedi.csv

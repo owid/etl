@@ -1,16 +1,34 @@
 meta:
-  source:
-    name: Height Gini (Baten and Blum 2015)
+  origin:
+    producer: Various sources
+    title: Clio-Infra - Biological Standards of Living
     description: |-
-      Additional information: Methodologies used for data collection and processing. Reconstruction of height ginis by birth decade using a variety of different sources. The height gini is a transformation of the coefficient of height inequality, based on Moradi and Baten’s formula: g htgini=-33.5 + 20.5*cv.
+      Clio-Infra is a collaborative project that provides historical data on global economic development. The Biological Standards of Living theme brings together datasets on human heights and anthropometric inequality, reconstructed by birth decade and country from a variety of historical and scholarly sources.
 
-      Data quality: As good as possible, but counter-checking and improvement welcome. Interpretations on individual country level should be done with careful checking.  An important caveat is many individual countries cannot be measured without a substantial amount of measurement error. The tendencies of anthropometric inequality by world region (in which country-specific measurement error tends to average out) is probably informative.
-    url: https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/HKZPR9
-    date_accessed: 2017-09-09
-    published_by: |-
-      Jörg Baten and Matthias Blum, “Anthropometric within-country Inequality and the Estimation of Skill Premia with Anthropometric Indicators”, Review of Economics -- Jahrbuch fuer Wirtschaftswissenschaften (2011)
-  name: Clio-Infra - Biological Standards of Living - Baten and Blum (2015)
-  description: This is a dataset imported by the automated fetcher
+      This snapshot is an Our World in Data compilation of two Clio-Infra datasets curated by Baten and Blum (2015) on biological standards of living:
+
+      - Height (Baten and Blum 2015) — https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/IAEKLA
+      - Height Gini (Baten and Blum 2015) — https://datasets.socialhistory.org/dataset.xhtml?persistentId=hdl:10622/HKZPR9
+
+      Additional information: Methodologies used for data collection and processing. Reconstruction of heights by birth decade using a variety of different sources. Please see link for the complete list.
+
+      Additional information: Methodologies used for data collection and processing. Reconstruction of height ginis by birth decade using a variety of different sources. The height gini is a transformation of the coefficient of height inequality, based on Moradi and Baten's formula: g htgini=-33.5 + 20.5*cv.
+
+      Data quality: As good as possible, but counter-checking and improvement welcome. Interpretations on individual country level should be done with careful checking. An important caveat is many individual countries cannot be measured without a substantial amount of measurement error. The tendencies of anthropometric inequality by world region (in which country-specific measurement error tends to average out) is probably informative.
+
+      Publisher source: Data collated from a host of academic papers. Please refer to the link for the complete list.
+    citation_full: |-
+      Clio-Infra. (2015). Biological Standards of Living datasets curated by Baten and Blum (2015). International Institute of Social History. Underlying publications:
+
+      For the post-1800 period: Baten, Joerg and Matthias Blum, "Growing Taller, but Unequal: Biological Well-Being in World Regions and Its Determinants, 1810-1989." Economic History of Developing Regions (2012).
+
+      For the pre-1800 period: Koepke, Nikola and Baten, Joerg "The Biological Standard of Living in Europe During the Last Two Millennia," in European Review of Economic History 9-1 (2005).
+
+      Jörg Baten and Matthias Blum, "Anthropometric within-country Inequality and the Estimation of Skill Premia with Anthropometric Indicators", Review of Economics -- Jahrbuch fuer Wirtschaftswissenschaften (2011).
+    attribution_short: Clio-Infra
+    url_main: https://clio-infra.eu/
+    date_accessed: '2017-09-09'
+    date_published: '2015'
 outs:
   - md5: ed58540cdefeb5d87987b51e5f304127
     size: 19378
