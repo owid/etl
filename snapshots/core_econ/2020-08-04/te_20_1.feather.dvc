@@ -1,11 +1,12 @@
 meta:
-  source:
-    name: The World Bank (2020)
-    url: |-
-      https://www.worldbank.org/en/research/commodity-markets#1; https://www.imf.org/~/media/Files/Research/CommodityPrices/TechnicalDoc.ashx
-    published_by: The World Bank (2020) ‘Commodity Price Data.’
-  name: TE-20.1
-  description: core-econ.org
+  origin:
+    producer: World Bank
+    title: Commodity price data
+    citation_full: 'The World Bank (2020) Commodity Price Data.'
+    url_main: https://www.worldbank.org/en/research/commodity-markets#1
+    url_download: https://www.imf.org/~/media/Files/Research/CommodityPrices/TechnicalDoc.ashx
+    date_accessed: '2020-08-04'
+    date_published: '2020'
   is_public: false
 outs:
   - md5: 8d25233d89e0249cc492d04d8772d419

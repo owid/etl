@@ -1,14 +1,15 @@
 meta:
-  source:
-    name: US Bureau of Labor Statistics (2015)
+  origin:
+    producer: US Bureau of Labor Statistics
+    title: International labor comparisons
     description: |-
       Data is for hourly compensation costs in manufacturing, which includes total hourly direct pay (pre-tax), employer social insurance expenditures, and labour-related taxes. National currency data converted into US dollars at the average daily exchange rate for the reference year
 
       Graph of Sri Lanka shows most recent available data, for the year 2008.
-    url: https://www.bls.gov/fls/
-    published_by: US Bureau of Labor Statistics. 2015. International Labor Comparisons.
-  name: TE-18.12
-  description: core-econ.org
+    citation_full: US Bureau of Labor Statistics. 2015. International Labor Comparisons.
+    url_main: https://www.bls.gov/fls/
+    date_accessed: '2019-01-05'
+    date_published: '2015'
   is_public: false
 outs:
   - md5: 66f6dcec1637e16034b0ad163979df01

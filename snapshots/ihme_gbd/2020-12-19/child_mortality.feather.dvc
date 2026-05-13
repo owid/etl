@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: IHME, Global Burden of Disease
+    title: Global Burden of Disease Study 2019 (GBD 2019) Under-5 Mortality by Detailed Age Groups 1950-2019
+    description: |-
+      This dataset provides annual estimates for 1950–2019 for numbers of deaths, mortality rate, and probability of death by sex for 6 age groups under 5 years: 0–6 days (early neonatal), 7–27 days (late neonatal), 1–5 months, 6–11 months, 12–23 months, and 2–4 years. There were 7,417 sources used to produce these estimates. These included 28,016 location-years of vital registration data, 481 surveys with complete birth histories, and 1,081 sources on summary birth histories.
+    citation_full: 'Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2019 (GBD 2019) Under-5 Mortality by Detailed Age Groups 1950-2019. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2020.'
+    attribution_short: IHME-GBD
+    url_main: https://ghdx.healthdata.org/record/ihme-data/global-burden-disease-study-2019-gbd-2019-under-5-mortality-detailed-age-groups-1950-2019
+    date_accessed: '2022-10-13'
+    date_published: '2020-12-19'
+    license:
+      name: Free-of-Charge Non-commercial User Agreement
+      url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+outs:
+  - md5: 9cb4502a78e86bd26d576616dbc3230b
+    size: 17156050
+    path: child_mortality.feather

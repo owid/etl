@@ -91,6 +91,67 @@ COLUMNS = {
 }
 
 
+def add_prices_on_covered_emissions(tb_combined: Table) -> Table:
+    """Add the average price paid on covered emissions for each instrument (tax, ETS, both).
+
+    RFF only publishes economy-wide prices weighted by a country's total CO2 emissions (with or without coverage).
+    In other words, their price equals [price per covered tonne] x [share of emissions covered],
+    diluted by the share of emissions that pay nothing. To recover the actual price per
+    covered tonne, we divide the RFF price by the coverage share.
+
+    Can the two mechanisms overlap? Per the World Carbon Pricing Database documentation, countries typically design their carbon tax to exempt sectors that are already in an ETS, so emissions-level overlap is rare.
+    Where overlap genuinely exists, RFF subtracts it from `cov_all_CO2_jurCO2`.
+    """
+    ####################################################################################################################
+    # Coverage shares should be ≤ 100%, but a handful of country-years exceed this in the
+    # published RFF data. The methodology paper does not explain how this can happen.
+    # We list the known cases here, assert that nothing else exceeds 100%, and
+    # clip the denominator at 1 for those rows so the resulting price stays in a sensible
+    # range.
+    # Countries where tax-coverage exceeds 101% in some years.
+    # (Note that the extra 1% is to allow for rounding errors).
+    error = "Unexpected countries with tax coverage > 100%"
+    assert set(tb_combined[tb_combined["co2_with_tax_as_share_of_co2"] > 101]["country"]) == {"Luxembourg"}, error
+
+    # No country should have ETS-coverage above 100%.
+    error = "Unexpected countries with ETS coverage > 100%"
+    assert set(tb_combined[tb_combined["co2_with_ets_as_share_of_co2"] > 101]["country"]) == set(), error
+
+    # Countries where combined tax-or-ETS coverage exceeds 100% in some years.
+    error = "Unexpected countries with tax-or-ETS coverage > 100%"
+    assert set(tb_combined[tb_combined["co2_with_tax_or_ets_as_share_of_co2"] > 101]["country"]) == {
+        "Denmark",
+        "Finland",
+        "Ireland",
+        "Luxembourg",
+        "Netherlands",
+        "Norway",
+        "Portugal",
+    }, error
+    ####################################################################################################################
+
+    # Average tax rate on emissions covered by a tax.
+    tax_coverage = (tb_combined["co2_with_tax_as_share_of_co2"] / 100).clip(upper=1)
+    tb_combined["price_with_tax_on_covered_co2"] = (
+        tb_combined["price_with_tax_weighted_by_share_of_co2"] / tax_coverage.where(tax_coverage > 0)
+    ).fillna(0)
+
+    # Average ETS price on emissions covered by an ETS.
+    ets_coverage = tb_combined["co2_with_ets_as_share_of_co2"] / 100
+    tb_combined["price_with_ets_on_covered_co2"] = (
+        tb_combined["price_with_ets_weighted_by_share_of_co2"] / ets_coverage.where(ets_coverage > 0)
+    ).fillna(0)
+
+    # Average price on emissions covered by a tax or an ETS.
+    tax_or_ets_coverage = (tb_combined["co2_with_tax_or_ets_as_share_of_co2"] / 100).clip(upper=1)
+    tb_combined["price_with_tax_or_ets_on_covered_co2"] = (
+        tb_combined["price_with_tax_or_ets_weighted_by_share_of_co2"]
+        / tax_or_ets_coverage.where(tax_or_ets_coverage > 0)
+    ).fillna(0)
+
+    return tb_combined
+
+
 def sanity_check_inputs(tb_economy: Table, tb_coverage: Table) -> None:
     """Assert that the meadow tables have matching keys and plausible value ranges."""
     error = "Economy and coverage tables have different jurisdictions."
@@ -133,7 +194,7 @@ def plot_price_coverage_curve(tb: Table) -> None:
         [
             "country",
             "year",
-            "price_with_tax_or_ets_weighted_by_share_of_co2",
+            "price_with_tax_or_ets_on_covered_co2",
             "co2_with_tax_or_ets_as_share_of_world_co2",
         ]
     ].reset_index(drop=True)
@@ -141,16 +202,16 @@ def plot_price_coverage_curve(tb: Table) -> None:
     tb_plot = (
         tb_plot[
             (tb_plot["year"] == year)
-            & (tb_plot["price_with_tax_or_ets_weighted_by_share_of_co2"].fillna(0) > 0)
+            & (tb_plot["price_with_tax_or_ets_on_covered_co2"].fillna(0) > 0)
             & (tb_plot["co2_with_tax_or_ets_as_share_of_world_co2"].fillna(0) > 0)
         ]
-        .sort_values("price_with_tax_or_ets_weighted_by_share_of_co2", ascending=False)
+        .sort_values("price_with_tax_or_ets_on_covered_co2", ascending=False)
         .reset_index(drop=True)
     )
 
     share = tb_plot["co2_with_tax_or_ets_as_share_of_world_co2"]
     cumulative_share = share.cumsum().tolist()
-    prices = tb_plot["price_with_tax_or_ets_weighted_by_share_of_co2"].tolist()
+    prices = tb_plot["price_with_tax_or_ets_on_covered_co2"].tolist()
 
     # Step curve with hv shape: (0, p₁), (cumulative₁, p₂), ..., (cumulative_{N-1}, p_N), (cumulative_N, 0), (100, 0).
     xs = [0.0] + cumulative_share[:-1] + [cumulative_share[-1], 100.0]
@@ -230,6 +291,9 @@ def run() -> None:
     assert tb_combined[tb_combined["year"] < 1989].drop(columns=["country", "year"]).sum(axis=0).sum() == 0, error
     # Remove pre-1989 data (which covers only Mexico, and it's made of zeros).
     tb_combined = tb_combined[tb_combined["year"] >= 1989].reset_index(drop=True)
+
+    # Derive the average price paid on covered emissions for each instrument.
+    tb_combined = add_prices_on_covered_emissions(tb_combined)
 
     # Sanity checks on the output table.
     sanity_check_outputs(tb_combined=tb_combined)

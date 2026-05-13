@@ -1,10 +1,13 @@
 meta:
-  source:
-    name: FRED (2020)
-    url: http://research.stlouisfed.org/fred2/series/CPIAUCSL/; http://research.stlouisfed.org/fred2/series/UNRATE
-    published_by: Federal Reserve Bank of St. Louis (2020) - FRED
-  name: TE-15.6
-  description: core-econ.org
+  origin:
+    producer: Federal Reserve Bank of St. Louis
+    title: FRED economic data
+    citation_full: Federal Reserve Bank of St. Louis (2020) - FRED.
+    attribution_short: FRED
+    url_main: http://research.stlouisfed.org/fred2/series/CPIAUCSL/
+    url_download: http://research.stlouisfed.org/fred2/series/UNRATE
+    date_accessed: '2020-07-24'
+    date_published: '2020'
   is_public: false
 outs:
   - md5: 74de6525b3c1e1c8fcc0394769c63df2
