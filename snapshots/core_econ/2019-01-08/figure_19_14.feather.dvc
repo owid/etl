@@ -1,12 +1,13 @@
 meta:
-  source:
-    name: Bowles (2012)
+  origin:
+    producer: Bowles
+    title: The new economics of inequality and redistribution
     description: |-
       Bars represent ordinary least squares coefficients (value of the estimated coefficient is in parentheses) predicting support for redistribution. The dependent variable is standardised. Independent variables are the respondent's belief in the importance of the factor shown to getting ahead in life. The coefficients are the estimated effects of a one-point increase in the response scale for a given belief on the standard deviations of the support for redistribution.
-    published_by: |-
-      Figure 5.3 in Samuel Bowles. 2012. The New Economics of Inequality and Redistribution. Cambridge: Cambridge University Press; Christina Fong, Samuel Bowles, and Herbert Gintis. 2005. ‘Strong Reciprocity and the Welfare State’. In Handbook of Giving, Reciprocity and Altruism. Edited by Serge-Christophe Kolm and Jean Mercier Ythier. Amsterdam: Elsevier.
-  name: Figure_19.14
-  description: core-econ.org
+    citation_full: |-
+      Figure 5.3 in Samuel Bowles. 2012. The New Economics of Inequality and Redistribution. Cambridge: Cambridge University Press; Christina Fong, Samuel Bowles, and Herbert Gintis. 2005. 'Strong Reciprocity and the Welfare State'. In Handbook of Giving, Reciprocity and Altruism. Edited by Serge-Christophe Kolm and Jean Mercier Ythier. Amsterdam: Elsevier.
+    date_accessed: '2019-01-08'
+    date_published: '2012'
   is_public: false
 outs:
   - md5: efbc1cddc3e19fa985f632eac3a711ec
