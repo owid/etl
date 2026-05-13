@@ -30,13 +30,13 @@ definitions:
   derivation_lgb_military_join: |-
     From the original dataset, we combined two indicators — LGB allowed in the military and LGB banned from the military — into a single categorical indicator (Allowed, No policy, Banned) based on the proportion scores of both directions.
   derivation_binary_two_direction: |-
-    From the original dataset, we combined the two opposing direction indicators (the progressive direction, e.g. legal, and the regressive direction, e.g. illegal) into a single categorical indicator. We bucketed each proportion into 0, partial (between 0 and 1), or 1, and then assigned a category from the bucket combination. Countries where either direction shows partial subnational implementation, or both directions are coded as 1 (typically a transition year), are classified as "Subnationally mixed".
+    From the original dataset, we combined the two opposing direction indicators (the progressive direction, e.g. legal, and the regressive direction, e.g. illegal) into a single categorical indicator. We bucketed each proportion into 0, partial (between 0 and 1), or 1, and then assigned a category from the bucket combination. Countries where either direction shows partial subnational implementation, or both directions are coded as 1 (typically a transition year), are classified as "Varies by region".
   derivation_single_direction: |-
-    From the original dataset's single-direction proportion (0 = no policy, 1 = fully implemented, intermediate values = partial subnational adoption), we coded countries into three categories: the substantive direction in effect, partial subnational implementation ("Subnationally mixed"), or no policy in effect.
+    From the original dataset's single-direction proportion (0 = no policy, 1 = fully implemented, intermediate values = partial subnational adoption), we coded countries into three categories: the substantive direction in effect, partial subnational implementation ("Varies by region"), or no policy in effect.
   derivation_so_gi_pair: |-
-    From the original dataset's two separate indicators — one for sexual orientation and one for gender identity — we combined them into a single categorical indicator with five categories: both protected, sexual orientation only, gender identity only, no protection, and "Subnationally mixed" (any partial subnational coverage in either dimension).
+    From the original dataset's two separate indicators — one for sexual orientation and one for gender identity — we combined them into a single categorical indicator with five categories: both protected, sexual orientation only, gender identity only, no protection, and "Varies by region" (any partial subnational coverage in either dimension).
   derivation_gac: |-
-    From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The most common patterns get a dedicated category (e.g. covered for both, adults covered with minors restricted); rarer combinations are grouped as "Subnationally mixed or other".
+    From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The most common patterns get a dedicated category (e.g. covered for both, adults covered with minors restricted); rarer combinations are grouped as "Varies by region or other".
   derivation_gmc: |-
     From the original dataset, we combined the gender-marker-change proportion (legal direction) with the recorded legal-pathway requirement (Self-ID, Medical or psychological diagnosis, Surgery, Surgery plus sterilization) into a single categorical indicator that distinguishes both whether legal gender change is possible and what the procedure requires.
 
@@ -347,7 +347,7 @@ tables:
         sort:
           - Legal
           - Criminalized
-          - Subnationally mixed
+          - Varies by region
           - No legal provisions
 
         processing_level: major
@@ -365,7 +365,7 @@ tables:
         sort:
           - No MSM restrictions
           - Deferral or ban
-          - Subnationally mixed
+          - Varies by region
           - No policy
 
         processing_level: major
@@ -383,7 +383,7 @@ tables:
         sort:
           - Allowed
           - Banned
-          - Subnationally mixed
+          - Varies by region
           - No policy
 
         processing_level: major
@@ -400,7 +400,7 @@ tables:
         type: ordinal
         sort:
           - Legally recognized
-          - Subnationally mixed
+          - Varies by region
           - Not recognized
 
         processing_level: major
@@ -417,7 +417,7 @@ tables:
         type: ordinal
         sort:
           - Permitted
-          - Subnationally mixed
+          - Varies by region
           - Not permitted
 
         processing_level: major
@@ -434,7 +434,7 @@ tables:
         type: ordinal
         sort:
           - Constitutionally protected
-          - Subnationally mixed
+          - Varies by region
           - Not protected
 
         processing_level: major
@@ -451,7 +451,7 @@ tables:
         type: ordinal
         sort:
           - Constitutionally protected
-          - Subnationally mixed
+          - Varies by region
           - Not protected
 
         processing_level: major
@@ -468,7 +468,7 @@ tables:
         type: ordinal
         sort:
           - Covered by hate crime laws
-          - Subnationally mixed
+          - Varies by region
           - Not covered
 
         processing_level: major
@@ -485,7 +485,7 @@ tables:
         type: ordinal
         sort:
           - Covered by hate crime laws
-          - Subnationally mixed
+          - Varies by region
           - Not covered
 
         processing_level: major
@@ -502,7 +502,7 @@ tables:
         type: ordinal
         sort:
           - Prohibited
-          - Subnationally mixed
+          - Varies by region
           - Not prohibited
 
         processing_level: major
@@ -519,7 +519,7 @@ tables:
         type: ordinal
         sort:
           - Recognized
-          - Subnationally mixed
+          - Varies by region
           - Not recognized
 
         processing_level: major
@@ -536,7 +536,7 @@ tables:
         type: ordinal
         sort:
           - Discrimination prohibited
-          - Subnationally mixed
+          - Varies by region
           - No protection
 
         processing_level: major
@@ -553,7 +553,7 @@ tables:
         type: ordinal
         sort:
           - Discrimination prohibited
-          - Subnationally mixed
+          - Varies by region
           - No protection
 
         processing_level: major
@@ -570,7 +570,7 @@ tables:
         type: ordinal
         sort:
           - Discrimination prohibited
-          - Subnationally mixed
+          - Varies by region
           - No protection
 
         processing_level: major
@@ -587,7 +587,7 @@ tables:
         type: ordinal
         sort:
           - Discrimination prohibited
-          - Subnationally mixed
+          - Varies by region
           - No protection
 
         processing_level: major
@@ -604,7 +604,7 @@ tables:
         type: ordinal
         sort:
           - Banned
-          - Subnationally mixed
+          - Varies by region
           - Not banned
 
         processing_level: major
@@ -621,7 +621,7 @@ tables:
         type: ordinal
         sort:
           - Non-consensual surgeries banned
-          - Subnationally mixed
+          - Varies by region
           - Not banned
 
         processing_level: major
@@ -638,7 +638,7 @@ tables:
         type: ordinal
         sort:
           - Death penalty applies
-          - Subnationally mixed
+          - Varies by region
           - No death penalty
 
         processing_level: major
@@ -655,7 +655,7 @@ tables:
         type: ordinal
         sort:
           - Restrictions in effect
-          - Subnationally mixed
+          - Varies by region
           - No restrictions
 
         processing_level: major
@@ -672,7 +672,7 @@ tables:
         type: ordinal
         sort:
           - Restrictions in effect
-          - Subnationally mixed
+          - Varies by region
           - No restrictions
 
         processing_level: major
@@ -689,7 +689,7 @@ tables:
         type: ordinal
         sort:
           - Religious exemptions in effect
-          - Subnationally mixed
+          - Varies by region
           - No religious exemptions
 
       # ── SO + GI pair combinations (Bastian feedback) ────────────────────────────────
@@ -709,7 +709,7 @@ tables:
           - Both protected
           - Sexual orientation only
           - Gender identity only
-          - Subnationally mixed
+          - Varies by region
           - No protection
 
         processing_level: major
@@ -728,7 +728,7 @@ tables:
           - Both protected
           - Sexual orientation only
           - Gender identity only
-          - Subnationally mixed
+          - Varies by region
           - No protection
 
         processing_level: major
@@ -747,7 +747,7 @@ tables:
           - Both covered
           - Sexual orientation only
           - Gender identity only
-          - Subnationally mixed
+          - Varies by region
           - Not covered
 
         processing_level: major
@@ -766,7 +766,7 @@ tables:
           - Both protected
           - Sexual orientation only
           - Gender identity only
-          - Subnationally mixed
+          - Varies by region
           - Not protected
 
       # ── Gender-affirming care combined: adults + minors (Bastian feedback) ──────────
@@ -787,7 +787,7 @@ tables:
           - Covered for adults only
           - Adults covered, minors restricted
           - Restricted for both
-          - Subnationally mixed or other
+          - Varies by region or other
           - Neither covered nor restricted
 
       # ── Gender marker change with legal-pathway requirements (Bastian feedback) ─────
@@ -809,7 +809,7 @@ tables:
           - Surgery required
           - Surgery and sterilization required
           - Legally possible, requirement unknown
-          - Subnationally mixed
+          - Varies by region
           - Not legally possible
 
         processing_level: major
@@ -1207,26 +1207,26 @@ tables:
           name: Criminalized
           numDecimalPlaces: 0
 
-      same_sex_acts_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (same sex acts)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on consensual same-sex sexual acts.
+      same_sex_acts_varies_by_region_count:
+        title: Number of countries — Varies by region (same sex acts)
+        description_short: The number of countries classified as "Varies by region" on the indicator on consensual same-sex sexual acts.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      same_sex_acts_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (same sex acts)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on consensual same-sex sexual acts.
+      same_sex_acts_varies_by_region_pop:
+        title: Population — Varies by region (same sex acts)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on consensual same-sex sexual acts.
         processing_level: major
-        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_binary_two_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       blood_donations_no_policy_count:
@@ -1383,26 +1383,26 @@ tables:
           name: Not recognized
           numDecimalPlaces: 0
 
-      civil_unions_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (civil unions)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on civil unions or registered partnerships for same-sex couples.
+      civil_unions_varies_by_region_count:
+        title: Number of countries — Varies by region (civil unions)
+        description_short: The number of countries classified as "Varies by region" on the indicator on civil unions or registered partnerships for same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      civil_unions_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (civil unions)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on civil unions or registered partnerships for same-sex couples.
+      civil_unions_varies_by_region_pop:
+        title: Population — Varies by region (civil unions)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on civil unions or registered partnerships for same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       civil_unions_legally_recognized_count:
@@ -1449,26 +1449,26 @@ tables:
           name: Not permitted
           numDecimalPlaces: 0
 
-      joint_adoption_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (joint adoption)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on joint adoption by same-sex couples.
+      joint_adoption_varies_by_region_count:
+        title: Number of countries — Varies by region (joint adoption)
+        description_short: The number of countries classified as "Varies by region" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      joint_adoption_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (joint adoption)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on joint adoption by same-sex couples.
+      joint_adoption_varies_by_region_pop:
+        title: Population — Varies by region (joint adoption)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       joint_adoption_permitted_count:
@@ -1603,26 +1603,26 @@ tables:
           name: Not covered
           numDecimalPlaces: 0
 
-      hate_crime_protections_sexual_orientation_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (hate crime protections sexual orientation)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on hate crime protections based on sexual orientation.
+      hate_crime_protections_sexual_orientation_varies_by_region_count:
+        title: Number of countries — Varies by region (hate crime protections sexual orientation)
+        description_short: The number of countries classified as "Varies by region" on the indicator on hate crime protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      hate_crime_protections_sexual_orientation_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (hate crime protections sexual orientation)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on hate crime protections based on sexual orientation.
+      hate_crime_protections_sexual_orientation_varies_by_region_pop:
+        title: Population — Varies by region (hate crime protections sexual orientation)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on hate crime protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       hate_crime_protections_sexual_orientation_covered_by_hate_crime_laws_count:
@@ -1669,26 +1669,26 @@ tables:
           name: Not covered
           numDecimalPlaces: 0
 
-      hate_crime_protections_gender_identity_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (hate crime protections gender identity)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on hate crime protections based on gender identity.
+      hate_crime_protections_gender_identity_varies_by_region_count:
+        title: Number of countries — Varies by region (hate crime protections gender identity)
+        description_short: The number of countries classified as "Varies by region" on the indicator on hate crime protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      hate_crime_protections_gender_identity_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (hate crime protections gender identity)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on hate crime protections based on gender identity.
+      hate_crime_protections_gender_identity_varies_by_region_pop:
+        title: Population — Varies by region (hate crime protections gender identity)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on hate crime protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       hate_crime_protections_gender_identity_covered_by_hate_crime_laws_count:
@@ -1735,26 +1735,26 @@ tables:
           name: Not prohibited
           numDecimalPlaces: 0
 
-      incitement_to_hatred_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (incitement to hatred)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
+      incitement_to_hatred_varies_by_region_count:
+        title: Number of countries — Varies by region (incitement to hatred)
+        description_short: The number of countries classified as "Varies by region" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      incitement_to_hatred_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (incitement to hatred)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
+      incitement_to_hatred_varies_by_region_pop:
+        title: Population — Varies by region (incitement to hatred)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on incitement-to-hatred laws covering sexual orientation or gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       incitement_to_hatred_prohibited_count:
@@ -1801,26 +1801,26 @@ tables:
           name: Not recognized
           numDecimalPlaces: 0
 
-      third_gender_recognition_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (third gender recognition)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on legal recognition of a third gender.
+      third_gender_recognition_varies_by_region_count:
+        title: Number of countries — Varies by region (third gender recognition)
+        description_short: The number of countries classified as "Varies by region" on the indicator on legal recognition of a third gender.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      third_gender_recognition_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (third gender recognition)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on legal recognition of a third gender.
+      third_gender_recognition_varies_by_region_pop:
+        title: Population — Varies by region (third gender recognition)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on legal recognition of a third gender.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       third_gender_recognition_recognized_count:
@@ -1867,26 +1867,26 @@ tables:
           name: No protection
           numDecimalPlaces: 0
 
-      employment_discrimination_sexual_orientation_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (employment discrimination sexual orientation)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections based on sexual orientation.
+      employment_discrimination_sexual_orientation_varies_by_region_count:
+        title: Number of countries — Varies by region (employment discrimination sexual orientation)
+        description_short: The number of countries classified as "Varies by region" on the indicator on employment discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      employment_discrimination_sexual_orientation_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (employment discrimination sexual orientation)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections based on sexual orientation.
+      employment_discrimination_sexual_orientation_varies_by_region_pop:
+        title: Population — Varies by region (employment discrimination sexual orientation)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on employment discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       employment_discrimination_sexual_orientation_discrimination_prohibited_count:
@@ -1933,26 +1933,26 @@ tables:
           name: No protection
           numDecimalPlaces: 0
 
-      employment_discrimination_gender_identity_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (employment discrimination gender identity)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections based on gender identity.
+      employment_discrimination_gender_identity_varies_by_region_count:
+        title: Number of countries — Varies by region (employment discrimination gender identity)
+        description_short: The number of countries classified as "Varies by region" on the indicator on employment discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      employment_discrimination_gender_identity_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (employment discrimination gender identity)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections based on gender identity.
+      employment_discrimination_gender_identity_varies_by_region_pop:
+        title: Population — Varies by region (employment discrimination gender identity)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on employment discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       employment_discrimination_gender_identity_discrimination_prohibited_count:
@@ -1999,26 +1999,26 @@ tables:
           name: No protection
           numDecimalPlaces: 0
 
-      goods_services_discrimination_sexual_orientation_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (goods services discrimination sexual orientation)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections based on sexual orientation.
+      goods_services_discrimination_sexual_orientation_varies_by_region_count:
+        title: Number of countries — Varies by region (goods services discrimination sexual orientation)
+        description_short: The number of countries classified as "Varies by region" on the indicator on goods and services discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      goods_services_discrimination_sexual_orientation_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (goods services discrimination sexual orientation)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections based on sexual orientation.
+      goods_services_discrimination_sexual_orientation_varies_by_region_pop:
+        title: Population — Varies by region (goods services discrimination sexual orientation)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on goods and services discrimination protections based on sexual orientation.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       goods_services_discrimination_sexual_orientation_discrimination_prohibited_count:
@@ -2065,26 +2065,26 @@ tables:
           name: No protection
           numDecimalPlaces: 0
 
-      goods_services_discrimination_gender_identity_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (goods services discrimination gender identity)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections based on gender identity.
+      goods_services_discrimination_gender_identity_varies_by_region_count:
+        title: Number of countries — Varies by region (goods services discrimination gender identity)
+        description_short: The number of countries classified as "Varies by region" on the indicator on goods and services discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      goods_services_discrimination_gender_identity_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (goods services discrimination gender identity)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections based on gender identity.
+      goods_services_discrimination_gender_identity_varies_by_region_pop:
+        title: Population — Varies by region (goods services discrimination gender identity)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on goods and services discrimination protections based on gender identity.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       goods_services_discrimination_gender_identity_discrimination_prohibited_count:
@@ -2131,26 +2131,26 @@ tables:
           name: Not banned
           numDecimalPlaces: 0
 
-      conversion_therapies_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (conversion therapies)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on conversion therapy bans.
+      conversion_therapies_varies_by_region_count:
+        title: Number of countries — Varies by region (conversion therapies)
+        description_short: The number of countries classified as "Varies by region" on the indicator on conversion therapy bans.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      conversion_therapies_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (conversion therapies)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on conversion therapy bans.
+      conversion_therapies_varies_by_region_pop:
+        title: Population — Varies by region (conversion therapies)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on conversion therapy bans.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       conversion_therapies_banned_count:
@@ -2197,26 +2197,26 @@ tables:
           name: Not banned
           numDecimalPlaces: 0
 
-      gender_assignment_surgeries_on_children_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (gender assignment surgeries on children)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+      gender_assignment_surgeries_on_children_varies_by_region_count:
+        title: Number of countries — Varies by region (gender assignment surgeries on children)
+        description_short: The number of countries classified as "Varies by region" on the indicator on non-consensual gender assignment surgeries on intersex minors.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      gender_assignment_surgeries_on_children_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (gender assignment surgeries on children)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+      gender_assignment_surgeries_on_children_varies_by_region_pop:
+        title: Population — Varies by region (gender assignment surgeries on children)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on non-consensual gender assignment surgeries on intersex minors.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       gender_assignment_surgeries_on_children_non_consensual_surgeries_banned_count:
@@ -2263,26 +2263,26 @@ tables:
           name: No death penalty
           numDecimalPlaces: 0
 
-      death_penalty_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (death penalty)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on the death penalty for same-sex sexual acts.
+      death_penalty_varies_by_region_count:
+        title: Number of countries — Varies by region (death penalty)
+        description_short: The number of countries classified as "Varies by region" on the indicator on the death penalty for same-sex sexual acts.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      death_penalty_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (death penalty)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on the death penalty for same-sex sexual acts.
+      death_penalty_varies_by_region_pop:
+        title: Population — Varies by region (death penalty)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on the death penalty for same-sex sexual acts.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       death_penalty_death_penalty_applies_count:
@@ -2329,26 +2329,26 @@ tables:
           name: No restrictions
           numDecimalPlaces: 0
 
-      morality_propaganda_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (morality propaganda)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on anti-LGBTI "propaganda" or morality laws.
+      morality_propaganda_varies_by_region_count:
+        title: Number of countries — Varies by region (morality propaganda)
+        description_short: The number of countries classified as "Varies by region" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      morality_propaganda_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (morality propaganda)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on anti-LGBTI "propaganda" or morality laws.
+      morality_propaganda_varies_by_region_pop:
+        title: Population — Varies by region (morality propaganda)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       morality_propaganda_restrictions_in_effect_count:
@@ -2395,26 +2395,26 @@ tables:
           name: No restrictions
           numDecimalPlaces: 0
 
-      lgbtq_civil_society_restrictions_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (lgbtq civil society restrictions)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on restrictions on LGBTQ+ civil society organizations.
+      lgbtq_civil_society_restrictions_varies_by_region_count:
+        title: Number of countries — Varies by region (lgbtq civil society restrictions)
+        description_short: The number of countries classified as "Varies by region" on the indicator on restrictions on LGBTQ+ civil society organizations.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      lgbtq_civil_society_restrictions_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (lgbtq civil society restrictions)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on restrictions on LGBTQ+ civil society organizations.
+      lgbtq_civil_society_restrictions_varies_by_region_pop:
+        title: Population — Varies by region (lgbtq civil society restrictions)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on restrictions on LGBTQ+ civil society organizations.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       lgbtq_civil_society_restrictions_restrictions_in_effect_count:
@@ -2574,26 +2574,26 @@ tables:
           name: No protection
           numDecimalPlaces: 0
 
-      employment_discrimination_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (employment discrimination)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
+      employment_discrimination_varies_by_region_count:
+        title: Number of countries — Varies by region (employment discrimination)
+        description_short: The number of countries classified as "Varies by region" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      employment_discrimination_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (employment discrimination)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
+      employment_discrimination_varies_by_region_pop:
+        title: Population — Varies by region (employment discrimination)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       goods_services_discrimination_both_protected_count:
@@ -2684,26 +2684,26 @@ tables:
           name: No protection
           numDecimalPlaces: 0
 
-      goods_services_discrimination_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (goods services discrimination)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
+      goods_services_discrimination_varies_by_region_count:
+        title: Number of countries — Varies by region (goods services discrimination)
+        description_short: The number of countries classified as "Varies by region" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      goods_services_discrimination_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (goods services discrimination)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
+      goods_services_discrimination_varies_by_region_pop:
+        title: Population — Varies by region (goods services discrimination)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on goods and services discrimination protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       hate_crime_protections_both_covered_count:
@@ -2772,26 +2772,26 @@ tables:
           name: Not covered
           numDecimalPlaces: 0
 
-      hate_crime_protections_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (hate crime protections)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on hate crime protections (sexual orientation and gender identity combined).
+      hate_crime_protections_varies_by_region_count:
+        title: Number of countries — Varies by region (hate crime protections)
+        description_short: The number of countries classified as "Varies by region" on the indicator on hate crime protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      hate_crime_protections_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (hate crime protections)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on hate crime protections (sexual orientation and gender identity combined).
+      hate_crime_protections_varies_by_region_pop:
+        title: Population — Varies by region (hate crime protections)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on hate crime protections (sexual orientation and gender identity combined).
         processing_level: major
-        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_so_gi_pair} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       constitutional_protections_both_protected_count:
@@ -2951,26 +2951,26 @@ tables:
           name: Restricted for both
           numDecimalPlaces: 0
 
-      gender_affirming_care_subnationally_mixed_or_other_count:
-        title: Number of countries — Subnationally mixed or other (gender-affirming care)
-        description_short: The number of countries classified as "Subnationally mixed or other" on the indicator on gender-affirming care for adults and minors.
+      gender_affirming_care_varies_by_region_or_other_count:
+        title: Number of countries — Varies by region or other (gender-affirming care)
+        description_short: The number of countries classified as "Varies by region or other" on the indicator on gender-affirming care for adults and minors.
         processing_level: major
-        description_processing: '{definitions.derivation_gac} We then counted the countries classified as "Subnationally mixed or other" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gac} We then counted the countries classified as "Varies by region or other" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed or other
+          name: Varies by region or other
           numDecimalPlaces: 0
 
-      gender_affirming_care_subnationally_mixed_or_other_pop:
-        title: Population — Subnationally mixed or other (gender-affirming care)
-        description_short: The total population of countries classified as "Subnationally mixed or other" on the indicator on gender-affirming care for adults and minors.
+      gender_affirming_care_varies_by_region_or_other_pop:
+        title: Population — Varies by region or other (gender-affirming care)
+        description_short: The total population of countries classified as "Varies by region or other" on the indicator on gender-affirming care for adults and minors.
         processing_level: major
-        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Subnationally mixed or other" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Varies by region or other" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed or other
+          name: Varies by region or other
           numDecimalPlaces: 0
 
       gender_affirming_care_neither_covered_nor_restricted_count:
@@ -3086,26 +3086,26 @@ tables:
           name: Self-declaration
           numDecimalPlaces: 0
 
-      gender_marker_change_subnationally_mixed_count:
-        title: Number of countries — Subnationally mixed (gender marker change)
-        description_short: The number of countries classified as "Subnationally mixed" on the indicator on legal change of gender marker.
+      gender_marker_change_varies_by_region_count:
+        title: Number of countries — Varies by region (gender marker change)
+        description_short: The number of countries classified as "Varies by region" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
-      gender_marker_change_subnationally_mixed_pop:
-        title: Population — Subnationally mixed (gender marker change)
-        description_short: The total population of countries classified as "Subnationally mixed" on the indicator on legal change of gender marker.
+      gender_marker_change_varies_by_region_pop:
+        title: Population — Varies by region (gender marker change)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Subnationally mixed" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Subnationally mixed
+          name: Varies by region
           numDecimalPlaces: 0
 
       gender_marker_change_surgery_and_sterilization_required_count:

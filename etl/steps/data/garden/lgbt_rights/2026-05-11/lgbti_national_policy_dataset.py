@@ -89,7 +89,7 @@ def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixe
     cleaned up almost all of these (we counted 1 stray row across the panel, in Brazil
     GAC 2025), and the v2.0+ subnational coverage means most countries with both
     directions populated are real subnational mixes. For both interpretations,
-    "Subnationally mixed" is a safer default than picking one direction arbitrarily.
+    "Varies by region" is a safer default than picking one direction arbitrarily.
     """
     m = {
         f"{prog_key}: 0 {reg_key}: 0": neither_label,
@@ -191,7 +191,7 @@ COMBINED_CONFIGS = [
             prog_label="Legal",
             reg_label="Criminalized",
             neither_label="No legal provisions",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -206,7 +206,7 @@ COMBINED_CONFIGS = [
             prog_label="No MSM restrictions",
             reg_label="Deferral or ban",
             neither_label="No policy",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -221,7 +221,7 @@ COMBINED_CONFIGS = [
             prog_label="Allowed",
             reg_label="Banned",
             neither_label="No policy",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     # ── Single-direction progressive policies (Legal carries the substantive data) ──────
@@ -232,7 +232,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Legally recognized",
             neither_label="Not recognized",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -242,7 +242,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Permitted",
             neither_label="Not permitted",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -252,7 +252,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Constitutionally protected",
             neither_label="Not protected",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -262,7 +262,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Constitutionally protected",
             neither_label="Not protected",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -272,7 +272,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Covered by hate crime laws",
             neither_label="Not covered",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -282,7 +282,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Covered by hate crime laws",
             neither_label="Not covered",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -292,7 +292,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Prohibited",
             neither_label="Not prohibited",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -302,7 +302,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Recognized",
             neither_label="Not recognized",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     # ── Single-direction progressive policies (Illegal carries the substantive data) ────
@@ -313,7 +313,7 @@ COMBINED_CONFIGS = [
             key="illegal",
             yes_label="Discrimination prohibited",
             neither_label="No protection",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -323,7 +323,7 @@ COMBINED_CONFIGS = [
             key="illegal",
             yes_label="Discrimination prohibited",
             neither_label="No protection",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -333,7 +333,7 @@ COMBINED_CONFIGS = [
             key="illegal",
             yes_label="Discrimination prohibited",
             neither_label="No protection",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -343,7 +343,7 @@ COMBINED_CONFIGS = [
             key="illegal",
             yes_label="Discrimination prohibited",
             neither_label="No protection",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -353,7 +353,7 @@ COMBINED_CONFIGS = [
             key="illegal",
             yes_label="Banned",
             neither_label="Not banned",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -363,7 +363,7 @@ COMBINED_CONFIGS = [
             key="illegal",
             yes_label="Non-consensual surgeries banned",
             neither_label="Not banned",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     # ── Single-direction regressive policies (Legal direction is the substantive one) ───
@@ -374,7 +374,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Death penalty applies",
             neither_label="No death penalty",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -384,7 +384,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Restrictions in effect",
             neither_label="No restrictions",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -394,7 +394,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Restrictions in effect",
             neither_label="No restrictions",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -404,7 +404,7 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Religious exemptions in effect",
             neither_label="No religious exemptions",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     # ── SO + GI pair combinations (Bastian feedback) ────────────────────────────────────
@@ -421,7 +421,7 @@ COMBINED_CONFIGS = [
             a_only_label="Sexual orientation only",
             b_only_label="Gender identity only",
             neither_label="No protection",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -437,7 +437,7 @@ COMBINED_CONFIGS = [
             a_only_label="Sexual orientation only",
             b_only_label="Gender identity only",
             neither_label="No protection",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -453,7 +453,7 @@ COMBINED_CONFIGS = [
             a_only_label="Sexual orientation only",
             b_only_label="Gender identity only",
             neither_label="Not covered",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     {
@@ -469,14 +469,14 @@ COMBINED_CONFIGS = [
             a_only_label="Sexual orientation only",
             b_only_label="Gender identity only",
             neither_label="Not protected",
-            mixed_label="Subnationally mixed",
+            mixed_label="Varies by region",
         ),
     },
     # ── Gender-affirming care: adults + minors combined (Bastian feedback) ──────────────
     # 4 source columns (adults covered / restricted, minors covered / restricted) →
     # one categorical indicator. Of 81 possible 4-tuple patterns, only 12 occur in the
     # v2 data; we map the 5 most common ones and route everything else to the
-    # "Subnationally mixed or other" default.
+    # "Varies by region or other" default.
     {
         "short_name": "gender_affirming_care",
         "sources": [
@@ -492,7 +492,7 @@ COMBINED_CONFIGS = [
             "ac: 0 ar: 1 mc: 0 mr: 1": "Restricted for both",
             "ac: 0 ar: 0 mc: 0 mr: 0": "Neither covered nor restricted",
         },
-        "default_category": "Subnationally mixed or other",
+        "default_category": "Varies by region or other",
     },
 ]
 
@@ -511,7 +511,7 @@ def _build_one_combined(wide, config):
 
     The bucket key is "<label1>: <b1> <label2>: <b2> ...", looked up in `category_map`.
     Unmapped key combinations get the optional `default_category` value (typically used
-    for "Subnationally mixed or other" buckets where enumerating every pattern is noisy);
+    for "Varies by region or other" buckets where enumerating every pattern is noisy);
     if `default_category` is unset, unmapped keys are left as their raw bucket string,
     which surfaces them as a sanity check rather than silently dropping.
     """
@@ -690,7 +690,7 @@ def _build_gmc_combined(wide):
 
     Categories:
       - Not legally possible            : proportion = 0
-      - Subnationally mixed             : 0 < proportion < 1
+      - Varies by region             : 0 < proportion < 1
       - Self-declaration                : proportion = 1, requirement in {Self-ID, Self-Declaration}
       - Medical/psychological diagnosis : proportion = 1, requirement = Medical/Psychological
       - Surgery required                : proportion = 1, requirement = Surgery
@@ -712,7 +712,7 @@ def _build_gmc_combined(wide):
         if p == 0:
             return "Not legally possible"
         if 0 < p < 1:
-            return "Subnationally mixed"
+            return "Varies by region"
         # p == 1: refine by requirement
         if r in REQ_LABELS:
             return REQ_LABELS[r]
