@@ -407,7 +407,7 @@ COMBINED_CONFIGS = [
             mixed_label="Varies by region",
         ),
     },
-    # ── SO + GI pair combinations (Bastian feedback) ────────────────────────────────────
+    # ── SO + GI pair combinations ────────────────────────────────────
     {
         "short_name": "employment_discrimination",
         "sources": [
@@ -472,7 +472,7 @@ COMBINED_CONFIGS = [
             mixed_label="Varies by region",
         ),
     },
-    # ── Gender-affirming care: adults + minors combined (Bastian feedback) ──────────────
+    # ── Gender-affirming care: adults + minors combined ──────────────
     # 4 source columns (adults covered / restricted, minors covered / restricted) →
     # one categorical indicator. Of 81 possible 4-tuple patterns, only 12 occur in the
     # v2 data; we map the 5 most common ones and route everything else to the

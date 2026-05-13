@@ -333,7 +333,7 @@ tables:
           - No policy
           - Banned
 
-      # ── New combined-categorical indicators added in this PR (Bastian feedback) ──────
+      # ── New combined-categorical indicators added in this PR ──────
       same_sex_acts:
         title: Same-sex sexual acts
         description_short: |-
@@ -692,7 +692,7 @@ tables:
           - Varies by region
           - Religious exemptions in effect
 
-      # ── SO + GI pair combinations (Bastian feedback) ────────────────────────────────
+      # ── SO + GI pair combinations ────────────────────────────────
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
       employment_discrimination:
@@ -769,7 +769,7 @@ tables:
           - Varies by region
           - Not protected
 
-      # ── Gender-affirming care combined: adults + minors (Bastian feedback) ──────────
+      # ── Gender-affirming care combined: adults + minors ──────────
         processing_level: major
         description_processing: '{definitions.derivation_so_gi_pair}'
       gender_affirming_care:
@@ -790,7 +790,7 @@ tables:
           - Varies by region or other
           - Restricted for both
 
-      # ── Gender marker change with legal-pathway requirements (Bastian feedback) ─────
+      # ── Gender marker change with legal-pathway requirements ─────
         processing_level: major
         description_processing: '{definitions.derivation_gac}'
       gender_marker_change:
@@ -1140,7 +1140,7 @@ tables:
           name: Banned
           numDecimalPlaces: 0
 
-      # ── New combined-region indicators added in this PR (Bastian feedback) ────────
+      # ── New combined-region indicators added in this PR ────────
       same_sex_acts_no_legal_provisions_count:
         title: Number of countries — No legal provisions (same sex acts)
         description_short: The number of countries classified as "No legal provisions" on the indicator on consensual same-sex sexual acts.
