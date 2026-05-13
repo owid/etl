@@ -9,7 +9,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-05-10T07:08:31.290795Z"
+exclude-newer = "2026-05-10T08:03:28.029919Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -1654,7 +1654,7 @@ wheels = [
 
 [[package]]
 name = "owid-datautils"
-version = "0.6.2"
+version = "0.6.3"
 source = { editable = "." }
 dependencies = [
     { name = "boto3" },
