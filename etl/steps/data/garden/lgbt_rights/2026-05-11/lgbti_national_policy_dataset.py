@@ -678,10 +678,7 @@ def _build_combined_categorical_table(tb):
     for config in COMBINED_CONFIGS:
         wide[config["short_name"]] = _build_one_combined(wide, config)
 
-    output_cols = (
-        ["country", "year", "gender_marker_change"]
-        + [c["short_name"] for c in COMBINED_CONFIGS]
-    )
+    output_cols = ["country", "year", "gender_marker_change"] + [c["short_name"] for c in COMBINED_CONFIGS]
     return wide[output_cols]
 
 
@@ -723,6 +720,7 @@ def _build_gmc_combined(wide):
 
     out = [classify(p, r) for p, r in zip(prop, req)]
     from owid.catalog import Variable
+
     result = Variable(out, index=wide.index, name="gender_marker_change")
     # Copy origins/metadata from the source proportion column so the indicator carries provenance.
     return result.copy_metadata(wide["gender_marker_change__legal"])
