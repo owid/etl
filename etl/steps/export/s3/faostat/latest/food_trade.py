@@ -1,19 +1,24 @@
 """S3 export step for the FAOSTAT food-trade Sankey viz.
 
-Produces a slim long-format slice of `faostat_tm` for the latest well-covered
-year — one row per (focal country, partner, item, direction) in tonnes — so a
-bespoke Sankey-style viz can pick a country + product + direction and show the
-top trade partners without having to load the full 50 M-row garden table.
+Produces a slim CSV of bilateral trade flows for the latest well-covered year
+in tonnes, matching the exact schema fetched by the bespoke `food-trade`
+project in owid-grapher (see `bespoke/projects/food-trade/src/data.ts`).
 
-Each row reflects what the *focal country itself* reported (i.e.
-`country = reporter_country` in the source). So for the same A→B trade flow
-you may get two rows — A's reported export and B's reported import — and these
-may disagree on the exact quantity. We do not try to reconcile them here; the
-viz can pick whichever side of the report it wants to display.
+Schema (one row per directional A → B flow for each item):
+    Exporter (str)   — country that exports the goods
+    Importer (str)   — country that imports the goods
+    Item     (str)   — FAOSTAT item / product
+    Value    (float) — quantity in tonnes
 
-Outputs (uploaded to S3, publicly readable):
-  * https://owid-public.owid.io/data/faostat/food-trade.csv      (~77 MB, universal)
-  * https://owid-public.owid.io/data/faostat/food-trade.parquet  (~5 MB, efficient)
+For each (Exporter, Importer, Item) the FAOSTAT detailed trade matrix
+typically has two reports (one from each side) that can disagree. We pick
+the **importer-reported** quantity by default — by trade-economics
+convention, import figures are more thoroughly tracked (for tariff /
+customs purposes) — and fall back to the exporter-reported quantity when
+the importer didn't report.
+
+Output:
+    https://owid-public.owid.io/food-trade/trade.csv
 """
 
 import tempfile
@@ -28,9 +33,12 @@ from etl.helpers import PathFinder
 
 log = structlog.get_logger()
 
-# Public S3 bucket and prefix.
+# Public S3 bucket and prefix. The viz fetches
+# https://owid-public.owid.io/food-trade/trade.csv?nocache, so the file must
+# land at `s3://owid-public/food-trade/trade.csv`.
 S3_BUCKET_NAME = "owid-public"
-S3_DATA_DIR = Path("data/faostat")
+S3_DATA_DIR = Path("food-trade")
+S3_FILENAME = "trade.csv"
 
 # Year exported by the Sankey viz. Hard-coded on purpose: when FAOSTAT
 # publishes a new release, the assertion below will fail and force a
@@ -55,35 +63,60 @@ def _assert_year_is_latest_well_covered(tb: Table, year: int) -> None:
 
 
 def build_food_trade_slice(tb: Table) -> pd.DataFrame:
-    """Filter and reshape the garden table into the slim long-format slice
-    consumed by the food-trade viz."""
+    """Reshape the garden table into the slim one-row-per-directional-flow
+    slice consumed by the bespoke food-trade viz."""
     _assert_year_is_latest_well_covered(tb, YEAR)
 
-    # Keep only physical-quantity rows in tonnes for the chosen year.
+    # Keep only physical quantities in tonnes for the chosen year. ~99% of
+    # Export/Import quantity rows are in tonnes; the remainder are live-animal
+    # counts (head / 1000-head) which aren't suitable for a tonnes-based Sankey.
     qty = tb[
         (tb["year"] == YEAR) & tb["element"].isin(["Export quantity", "Import quantity"]) & (tb["unit"] == "t")
     ].copy()
-
-    # Drop self-trade rows (small but non-zero).
     qty["reporter_country"] = qty["reporter_country"].astype(str)
     qty["partner_country"] = qty["partner_country"].astype(str)
     qty = qty[qty["reporter_country"] != qty["partner_country"]]
 
-    # Map element to a clearer direction tag.
-    qty["direction"] = qty["element"].map({"Export quantity": "export", "Import quantity": "import"}).astype(str)
+    # Split into exporter-side and importer-side reports, keyed on the
+    # directional (Exporter, Importer, Item) tuple.
+    #
+    # * Export-quantity rows are already keyed (reporter=Exporter, partner=Importer).
+    # * Import-quantity rows are keyed (reporter=Importer, partner=Exporter); we
+    #   swap the columns so they share a key with the exporter side.
+    exp_side = (
+        qty.loc[
+            qty["element"] == "Export quantity",
+            ["reporter_country", "partner_country", "item", "value"],
+        ]
+        .rename(columns={"reporter_country": "Exporter", "partner_country": "Importer", "item": "Item"})
+        .rename(columns={"value": "value_exporter"})
+    )
+    imp_side = (
+        qty.loc[
+            qty["element"] == "Import quantity",
+            ["reporter_country", "partner_country", "item", "value"],
+        ]
+        .rename(columns={"reporter_country": "Importer", "partner_country": "Exporter", "item": "Item"})
+        .rename(columns={"value": "value_importer"})
+    )
 
-    df = pd.DataFrame(
-        qty[["reporter_country", "partner_country", "item", "item_code", "direction", "value", "year"]]
-    ).rename(columns={"value": "tonnes"})
+    # Full-outer-join so the union of all known flows is preserved.
+    merged = exp_side.merge(imp_side, on=["Exporter", "Importer", "Item"], how="outer")
 
-    # Sort conveniently.
-    df = df.sort_values(
-        ["reporter_country", "item", "direction", "tonnes"],
-        ascending=[True, True, True, False],
-    ).reset_index(drop=True)
+    # Reconcile to a single Value. Prefer the importer's number (FAOSTAT
+    # convention — better tracked at customs); fall back to the exporter's
+    # number when the importer didn't report.
+    merged["Value"] = merged["value_importer"].fillna(merged["value_exporter"])
+    # Drop flows where both sides are missing (shouldn't happen by construction
+    # but harmless) and flows that round to zero.
+    merged = merged.dropna(subset=["Value"])
+    merged = merged[merged["Value"] > 0]
 
-    log.info("food_trade.rows", n=len(df), year=YEAR)
-    return df
+    out = pd.DataFrame(merged[["Exporter", "Importer", "Item", "Value"]])
+    out = out.sort_values(["Exporter", "Importer", "Item"]).reset_index(drop=True)
+
+    log.info("food_trade.rows", n=len(out), year=YEAR)
+    return out
 
 
 def run() -> None:
@@ -96,36 +129,18 @@ def run() -> None:
     #
     # Process data.
     #
-    df = build_food_trade_slice(tb)
+    out = build_food_trade_slice(tb)
 
     #
     # Save outputs.
     #
     with tempfile.TemporaryDirectory() as tmp:
-        tmp_path = Path(tmp)
-
-        # CSV — universal, browse-able / downloadable by humans.
-        csv_path = tmp_path / "food-trade.csv"
-        df.to_csv(csv_path, index=False)
-
-        # Parquet — compact, faster for the viz to fetch and parse.
-        parquet_path = tmp_path / "food-trade.parquet"
-        df.to_parquet(parquet_path, index=False, compression="zstd")
-
-        for local_file in (csv_path, parquet_path):
-            s3_file = S3_DATA_DIR / local_file.name
-            s3_url = f"s3://{S3_BUCKET_NAME}/{s3_file}"
-            if DRY_RUN:
-                log.info(
-                    "food_trade.dry_run_skip_upload",
-                    local=str(local_file),
-                    s3=s3_url,
-                    size_mb=f"{local_file.stat().st_size / 1e6:.1f}",
-                )
-            else:
-                log.info(
-                    "food_trade.uploading",
-                    s3=s3_url,
-                    size_mb=f"{local_file.stat().st_size / 1e6:.1f}",
-                )
-                s3_utils.upload(s3_url, local_file, public=True, downloadable=False)
+        local_file = Path(tmp) / S3_FILENAME
+        out.to_csv(local_file, index=False)
+        s3_url = f"s3://{S3_BUCKET_NAME}/{S3_DATA_DIR / S3_FILENAME}"
+        size_mb = f"{local_file.stat().st_size / 1e6:.1f}"
+        if DRY_RUN:
+            log.info("food_trade.dry_run_skip_upload", local=str(local_file), s3=s3_url, size_mb=size_mb)
+        else:
+            log.info("food_trade.uploading", s3=s3_url, size_mb=size_mb)
+            s3_utils.upload(s3_url, local_file, public=True, downloadable=False)
