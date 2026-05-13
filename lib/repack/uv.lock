@@ -7,6 +7,10 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
+[options]
+exclude-newer = "2026-05-10T06:29:18.296332Z"
+exclude-newer-span = "P3D"
+
 [[package]]
 name = "asttokens"
 version = "3.0.1"
