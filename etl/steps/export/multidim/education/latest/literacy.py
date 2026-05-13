@@ -167,6 +167,8 @@ def get_literacy_rate_columns(tb):
             "poorest_quintile",
             "richest_quintile",
             "adjusted",
+            "immigrant_background",
+            "non_immigrant_background",
         ]
     )
 
