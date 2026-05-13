@@ -696,7 +696,7 @@ tables:
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
       employment_discrimination:
-        title: Employment discrimination protections (combined SO + GI)
+        title: Employment discrimination protections (sexual orientation and gender identity)
         description_short: |-
           Whether national law prohibits employment discrimination based on sexual orientation, gender identity, both, or neither.
         unit: ""
@@ -715,7 +715,7 @@ tables:
         processing_level: major
         description_processing: '{definitions.derivation_so_gi_pair}'
       goods_services_discrimination:
-        title: Goods and services discrimination protections (combined SO + GI)
+        title: Goods and services discrimination protections (sexual orientation and gender identity)
         description_short: |-
           Whether national law prohibits discrimination in the provision of goods and services based on sexual orientation, gender identity, both, or neither.
         unit: ""
@@ -734,7 +734,7 @@ tables:
         processing_level: major
         description_processing: '{definitions.derivation_so_gi_pair}'
       hate_crime_protections:
-        title: Hate crime protections (combined SO + GI)
+        title: Hate crime protections (sexual orientation and gender identity)
         description_short: |-
           Whether national hate crime legislation covers sexual orientation, gender identity, both, or neither as a protected characteristic.
         unit: ""
@@ -753,7 +753,7 @@ tables:
         processing_level: major
         description_processing: '{definitions.derivation_so_gi_pair}'
       constitutional_protections:
-        title: Constitutional protections (combined SO + GI)
+        title: Constitutional protections (sexual orientation and gender identity)
         description_short: |-
           Whether the constitution explicitly or via binding court interpretation protects sexual orientation, gender identity, both, or neither.
         unit: ""
