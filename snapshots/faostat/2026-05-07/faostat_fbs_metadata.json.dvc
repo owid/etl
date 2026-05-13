@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'FBS metadata: items and item groups'
+    description: |-
+      FAOSTAT Food Balance Sheet (FBS) metadata, comprising the item definitions and the item-group hierarchy. Each FBS commodity carries a "Default composition" description that lists the FAO item codes it aggregates (e.g. "Wheat and products" → 15 Wheat, 16 Flour, wheat, 17 Bran, wheat, ...), and the item-group table records which commodities are part of each FBS group total (e.g. "Cereals - Excluding Beer"). Together these define the authoritative rollup from FAOSTAT detailed-trade-matrix items to FBS commodity / group totals.
+
+      Only the `item` and `itemgroup` categories from the `fbs` domain are included — this is a slim, viz-focused snapshot, distinct from the broader `faostat_metadata.json` snapshot used by the rest of the FAOSTAT pipeline.
+    citation_full: 'Food and Agriculture Organization of the United Nations - Food Balance Sheets metadata (2026).'
+    attribution: Food and Agriculture Organization of the United Nations (2026)
+    attribution_short: UN FAO
+    url_main: https://www.fao.org/faostat/en/#data/FBS
+    date_accessed: '2026-05-07'
+    date_published: '2026-05-07'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.fao.org/contact-us/terms/db-terms-of-use/en
+
+outs:
+  - md5: 5c48ac91508d265600683b39881a94f3
+    size: 119196
+    path: faostat_fbs_metadata.json

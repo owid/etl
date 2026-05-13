@@ -1,0 +1,161 @@
+# Curated items for the food-trade Sankey viz.
+#
+# Each entry is one option in the viz dropdown. The list of TM items rolled
+# up under each entry is *not* listed here — it is auto-derived at runtime
+# from FAOSTAT's own metadata via the FAO item codes embedded in each FBS
+# item's "Default composition" description. So the YAML only names which FBS
+# item we're tracking; the TM rollup follows by construction.
+#
+# Each entry:
+#   display:        name shown in the dropdown
+#   fbs_item_code:  FBS item code. We use the integer code (rather than the
+#                   item name) because the codes are stable across FAOSTAT
+#                   releases while names occasionally get renamed. Whether the
+#                   entry is a commodity or a group total is inferred from the
+#                   code itself: code < 2900 → commodity (no share line);
+#                   code ≥ 2900 → group total (gets a "% of production /
+#                   domestic supply" share line). The trailing `#` comment is
+#                   the current FBS item name for human readability only.
+#
+# TM items in the snapshot that map to NO FBS commodity (industrial / non-food,
+# e.g. Cigarettes, Cotton, "Food preparations n.e.c.") are dropped automatically.
+
+items:
+  # ─────────────────────────────────────────────────────────────────────────
+  # Cereals
+  - display: Cereals (total)
+    fbs_item_code: 2905  # Cereals - Excluding Beer (group)
+  - display: Wheat
+    fbs_item_code: 2511  # Wheat and products
+  - display: Maize (corn)
+    fbs_item_code: 2514  # Maize and products
+  - display: Rice
+    fbs_item_code: 2807  # Rice and products
+  - display: Barley
+    fbs_item_code: 2513  # Barley and products
+  - display: Rye
+    fbs_item_code: 2515  # Rye and products
+  - display: Oats
+    fbs_item_code: 2516  # Oats
+  - display: Millet
+    fbs_item_code: 2517  # Millet and products
+  - display: Sorghum
+    fbs_item_code: 2518  # Sorghum and products
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Roots, pulses, sugar
+  - display: Starchy roots (total)
+    fbs_item_code: 2907  # Starchy Roots (group)
+  - display: Potatoes
+    fbs_item_code: 2531  # Potatoes and products
+  - display: Cassava
+    fbs_item_code: 2532  # Cassava and products
+  - display: Pulses (total)
+    fbs_item_code: 2911  # Pulses (group)
+  - display: Beans (dry)
+    fbs_item_code: 2546  # Beans
+  - display: Peas (dry)
+    fbs_item_code: 2547  # Peas
+  - display: Sugar & sweeteners (total)
+    fbs_item_code: 2909  # Sugar & Sweeteners (group)
+  - display: Sugar (raw equivalent)
+    fbs_item_code: 2542  # Sugar (Raw Equivalent)
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Oilcrops and vegetable oils
+  - display: Oilcrops (total)
+    fbs_item_code: 2913  # Oilcrops (group)
+  - display: Soybeans
+    fbs_item_code: 2555  # Soyabeans
+  - display: Sunflower seed
+    fbs_item_code: 2557  # Sunflower seed
+  - display: Groundnuts
+    fbs_item_code: 2552  # Groundnuts
+  - display: Vegetable Oils (total)
+    fbs_item_code: 2914  # Vegetable Oils (group)
+  - display: Palm oil
+    fbs_item_code: 2577  # Palm Oil
+  - display: Olive oil
+    fbs_item_code: 2580  # Olive Oil
+  - display: Soybean oil
+    fbs_item_code: 2571  # Soyabean Oil
+  - display: Sunflower-seed oil
+    fbs_item_code: 2573  # Sunflowerseed Oil
+  - display: Cottonseed oil
+    fbs_item_code: 2575  # Cottonseed Oil
+  - display: Coconut oil
+    fbs_item_code: 2578  # Coconut Oil
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Vegetables
+  - display: Vegetables (total)
+    fbs_item_code: 2918  # Vegetables (group)
+  - display: Tomatoes
+    fbs_item_code: 2601  # Tomatoes and products
+  - display: Onions
+    fbs_item_code: 2602  # Onions
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Fruits
+  - display: Fruits excl. wine (total)
+    fbs_item_code: 2919  # Fruits - Excluding Wine (group)
+  - display: Bananas
+    fbs_item_code: 2615  # Bananas
+  - display: Apples
+    fbs_item_code: 2617  # Apples and products
+  - display: Oranges & mandarins
+    fbs_item_code: 2611  # Oranges, Mandarines
+  - display: Pineapples
+    fbs_item_code: 2618  # Pineapples and products
+  - display: Grapes (excl. wine)
+    fbs_item_code: 2620  # Grapes and products (excl wine)
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Meat
+  - display: Meat (total)
+    fbs_item_code: 2943  # Meat (group)
+  - display: Bovine meat
+    fbs_item_code: 2731  # Bovine Meat
+  - display: Pigmeat
+    fbs_item_code: 2733  # Pigmeat
+  - display: Poultry meat
+    fbs_item_code: 2734  # Poultry Meat
+  - display: Mutton & goat meat
+    fbs_item_code: 2732  # Mutton & Goat Meat
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Dairy, eggs, honey
+  - display: Milk excl. butter (total)
+    fbs_item_code: 2948  # Milk - Excluding Butter (group)
+  - display: Eggs (total)
+    fbs_item_code: 2949  # Eggs (group)
+  - display: Honey
+    fbs_item_code: 2745  # Honey
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Stimulants
+  - display: Stimulants (total)
+    fbs_item_code: 2922  # Stimulants (group)
+  - display: Coffee
+    fbs_item_code: 2630  # Coffee and products
+  - display: Cocoa beans
+    fbs_item_code: 2633  # Cocoa Beans and products
+  - display: Tea
+    fbs_item_code: 2635  # Tea (including mate)
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Alcoholic beverages
+  - display: Alcoholic beverages (total)
+    fbs_item_code: 2924  # Alcoholic Beverages (group)
+  - display: Wine
+    fbs_item_code: 2655  # Wine
+  - display: Beer
+    fbs_item_code: 2656  # Beer
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Fish & seafood
+  # Disabled: the FAOSTAT detailed trade matrix doesn't include fish — fish
+  # trade is tracked in a separate FAO dataset, so the FBS "Fish, Seafood"
+  # group (FAO codes 1501-1517) has zero coverage in our TM snapshot.
+  # - display: Fish & seafood (total)
+  #   fbs_item_code: 2960  # Fish, Seafood (group)

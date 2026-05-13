@@ -238,6 +238,11 @@ steps:
   data://garden/faostat/2026-05-07/faostat_tm:
     - data://meadow/faostat/2026-05-07/faostat_tm
   # Long-format slice of the trade matrix for the latest year with enough data coverage.
+  # Depends on a slim FBS-only metadata snapshot to auto-derive the TM→FBS item rollups
+  # (codes embedded in each FBS item's "Default composition" description). The snapshot
+  # is pinned to the same version as the trade-matrix snapshot, and is independent of
+  # the broader faostat_metadata snapshot used by the rest of the FAOSTAT pipeline.
   export://s3/faostat/latest/food_trade:
     - data://garden/faostat/2026-05-07/faostat_tm
+    - snapshot://faostat/2026-05-07/faostat_fbs_metadata.json
   ######################################################################################################################
