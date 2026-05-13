@@ -323,6 +323,327 @@ tables:
           - No policy
           - Banned
 
+      # ── New combined-categorical indicators added in this PR (Bastian feedback) ──────
+      # Description, description_key, processing_level, and description_processing are
+      # intentionally minimal here; the metadata sweep step will populate them per indicator.
+      same_sex_acts:
+        title: Same-sex sexual acts
+        description_short: |-
+          Whether consensual same-sex sexual acts between adults are legal or criminalized under national law.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Same-sex sexual acts
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Legal
+          - Criminalized
+          - Subnationally mixed
+          - No legal provisions
+
+      blood_donations:
+        title: Blood donations by men who have sex with men
+        description_short: |-
+          Whether men who have sex with men may donate blood without restriction. Any deferral or lifetime ban is coded as a restriction.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Blood donations by men who have sex with men
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - No MSM restrictions
+          - Deferral or ban
+          - Subnationally mixed
+          - No policy
+
+      transgender_military:
+        title: Transgender military service
+        description_short: |-
+          Whether transgender people may serve openly in the military.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Transgender military service
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Allowed
+          - Banned
+          - Subnationally mixed
+          - No policy
+
+      civil_unions:
+        title: Civil unions or registered partnerships
+        description_short: |-
+          Whether same-sex couples have access to a legally recognized partnership (civil union, domestic partnership, or registered partnership).
+        unit: ""
+        short_unit: ""
+        display:
+          name: Civil unions or registered partnerships
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Legally recognized
+          - Subnationally mixed
+          - Not recognized
+
+      joint_adoption:
+        title: Joint adoption by same-sex couples
+        description_short: |-
+          Whether same-sex couples may jointly adopt children.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Joint adoption by same-sex couples
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Permitted
+          - Subnationally mixed
+          - Not permitted
+
+      constitutional_protections_sexual_orientation:
+        title: Constitutional protections based on sexual orientation
+        description_short: |-
+          Whether sexual orientation is explicitly named in the constitution or established through binding constitutional court interpretation.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Constitutional protections based on sexual orientation
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Constitutionally protected
+          - Subnationally mixed
+          - Not protected
+
+      constitutional_protections_gender_identity:
+        title: Constitutional protections based on gender identity
+        description_short: |-
+          Whether gender identity is explicitly named in the constitution or established through binding constitutional court interpretation.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Constitutional protections based on gender identity
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Constitutionally protected
+          - Subnationally mixed
+          - Not protected
+
+      hate_crime_protections_sexual_orientation:
+        title: Hate crime protections based on sexual orientation
+        description_short: |-
+          Whether sexual orientation is a protected characteristic in hate crime legislation with enhanced penalties.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Hate crime protections based on sexual orientation
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Covered by hate crime laws
+          - Subnationally mixed
+          - Not covered
+
+      hate_crime_protections_gender_identity:
+        title: Hate crime protections based on gender identity
+        description_short: |-
+          Whether gender identity is a protected characteristic in hate crime legislation with enhanced penalties.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Hate crime protections based on gender identity
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Covered by hate crime laws
+          - Subnationally mixed
+          - Not covered
+
+      incitement_to_hatred:
+        title: Incitement to hatred protections
+        description_short: |-
+          Whether incitement to hatred based on sexual orientation or gender identity is prohibited.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Incitement to hatred protections
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Prohibited
+          - Subnationally mixed
+          - Not prohibited
+
+      third_gender_recognition:
+        title: Legal recognition of a third gender
+        description_short: |-
+          Whether a third gender marker or non-binary category is legally recognized on official identity documents.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Legal recognition of a third gender
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Recognized
+          - Subnationally mixed
+          - Not recognized
+
+      employment_discrimination_sexual_orientation:
+        title: Employment discrimination based on sexual orientation
+        description_short: |-
+          Whether national law prohibits employment discrimination based on sexual orientation.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Employment discrimination based on sexual orientation
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Discrimination prohibited
+          - Subnationally mixed
+          - No protection
+
+      employment_discrimination_gender_identity:
+        title: Employment discrimination based on gender identity
+        description_short: |-
+          Whether national law prohibits employment discrimination based on gender identity.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Employment discrimination based on gender identity
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Discrimination prohibited
+          - Subnationally mixed
+          - No protection
+
+      goods_services_discrimination_sexual_orientation:
+        title: Goods and services discrimination based on sexual orientation
+        description_short: |-
+          Whether national law prohibits discrimination in the provision of goods and services based on sexual orientation.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Goods and services discrimination based on sexual orientation
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Discrimination prohibited
+          - Subnationally mixed
+          - No protection
+
+      goods_services_discrimination_gender_identity:
+        title: Goods and services discrimination based on gender identity
+        description_short: |-
+          Whether national law prohibits discrimination in the provision of goods and services based on gender identity.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Goods and services discrimination based on gender identity
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Discrimination prohibited
+          - Subnationally mixed
+          - No protection
+
+      conversion_therapies:
+        title: Conversion therapy
+        description_short: |-
+          Whether conversion therapy is banned by law, executive order, or judicial ruling.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Conversion therapy
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Banned
+          - Subnationally mixed
+          - Not banned
+
+      gender_assignment_surgeries_on_children:
+        title: Non-consensual gender assignment surgeries on intersex minors
+        description_short: |-
+          Whether non-consensual gender assignment surgeries on intersex minors are banned.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Non-consensual gender assignment surgeries on intersex minors
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Non-consensual surgeries banned
+          - Subnationally mixed
+          - Not banned
+
+      death_penalty:
+        title: Death penalty for same-sex acts
+        description_short: |-
+          Whether the death penalty is a codified or de facto punishment for same-sex sexual acts.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Death penalty for same-sex acts
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Death penalty applies
+          - Subnationally mixed
+          - No death penalty
+
+      morality_propaganda:
+        title: Anti-LGBTI "propaganda" or morality laws
+        description_short: |-
+          Whether national law restricts the public expression of LGBTI identities (so-called "gay propaganda" or morality provisions).
+        unit: ""
+        short_unit: ""
+        display:
+          name: Anti-LGBTI "propaganda" or morality laws
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Restrictions in effect
+          - Subnationally mixed
+          - No restrictions
+
+      lgbtq_civil_society_restrictions:
+        title: Restrictions on LGBTQ+ civil society
+        description_short: |-
+          Whether national law explicitly restricts the formation, registration, operation, or funding of LGBTQ+ civil society organizations.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Restrictions on LGBTQ+ civil society
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Restrictions in effect
+          - Subnationally mixed
+          - No restrictions
+
+      religious_exemption_laws:
+        title: Religious exemption laws
+        description_short: |-
+          Whether national law allows individuals, businesses, or organizations to refuse services to LGBTQ+ people on religious or conscientious grounds.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Religious exemption laws
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Religious exemptions in effect
+          - Subnationally mixed
+          - No religious exemptions
+
   lgbti_national_policy_dataset_combined_regions:
     variables:
       # AGE OF CONSENT — number of countries
@@ -648,3 +969,984 @@ tables:
         display:
           name: Banned
           numDecimalPlaces: 0
+
+      # ── New combined-region indicators added in this PR (Bastian feedback) ────────
+      # Title, unit, short_unit, and display only — description fields are filled in
+      # by the metadata sweep step.
+
+      same_sex_acts_no_legal_provisions_count:
+        title: Number of countries — No legal provisions (same sex acts)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No legal provisions
+          numDecimalPlaces: 0
+
+      same_sex_acts_no_legal_provisions_pop:
+        title: Population — No legal provisions (same sex acts)
+        unit: people
+        short_unit: ""
+        display:
+          name: No legal provisions
+          numDecimalPlaces: 0
+
+      same_sex_acts_legal_count:
+        title: Number of countries — Legal (same sex acts)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Legal
+          numDecimalPlaces: 0
+
+      same_sex_acts_legal_pop:
+        title: Population — Legal (same sex acts)
+        unit: people
+        short_unit: ""
+        display:
+          name: Legal
+          numDecimalPlaces: 0
+
+      same_sex_acts_criminalized_count:
+        title: Number of countries — Criminalized (same sex acts)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Criminalized
+          numDecimalPlaces: 0
+
+      same_sex_acts_criminalized_pop:
+        title: Population — Criminalized (same sex acts)
+        unit: people
+        short_unit: ""
+        display:
+          name: Criminalized
+          numDecimalPlaces: 0
+
+      same_sex_acts_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (same sex acts)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      same_sex_acts_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (same sex acts)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      blood_donations_no_policy_count:
+        title: Number of countries — No policy (blood donations)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No policy
+          numDecimalPlaces: 0
+
+      blood_donations_no_policy_pop:
+        title: Population — No policy (blood donations)
+        unit: people
+        short_unit: ""
+        display:
+          name: No policy
+          numDecimalPlaces: 0
+
+      blood_donations_no_msm_restrictions_count:
+        title: Number of countries — No MSM restrictions (blood donations)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No MSM restrictions
+          numDecimalPlaces: 0
+
+      blood_donations_no_msm_restrictions_pop:
+        title: Population — No MSM restrictions (blood donations)
+        unit: people
+        short_unit: ""
+        display:
+          name: No MSM restrictions
+          numDecimalPlaces: 0
+
+      blood_donations_deferral_or_ban_count:
+        title: Number of countries — Deferral or ban (blood donations)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Deferral or ban
+          numDecimalPlaces: 0
+
+      blood_donations_deferral_or_ban_pop:
+        title: Population — Deferral or ban (blood donations)
+        unit: people
+        short_unit: ""
+        display:
+          name: Deferral or ban
+          numDecimalPlaces: 0
+
+      transgender_military_no_policy_count:
+        title: Number of countries — No policy (transgender military)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No policy
+          numDecimalPlaces: 0
+
+      transgender_military_no_policy_pop:
+        title: Population — No policy (transgender military)
+        unit: people
+        short_unit: ""
+        display:
+          name: No policy
+          numDecimalPlaces: 0
+
+      transgender_military_allowed_count:
+        title: Number of countries — Allowed (transgender military)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Allowed
+          numDecimalPlaces: 0
+
+      transgender_military_allowed_pop:
+        title: Population — Allowed (transgender military)
+        unit: people
+        short_unit: ""
+        display:
+          name: Allowed
+          numDecimalPlaces: 0
+
+      transgender_military_banned_count:
+        title: Number of countries — Banned (transgender military)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Banned
+          numDecimalPlaces: 0
+
+      transgender_military_banned_pop:
+        title: Population — Banned (transgender military)
+        unit: people
+        short_unit: ""
+        display:
+          name: Banned
+          numDecimalPlaces: 0
+
+      civil_unions_not_recognized_count:
+        title: Number of countries — Not recognized (civil unions)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not recognized
+          numDecimalPlaces: 0
+
+      civil_unions_not_recognized_pop:
+        title: Population — Not recognized (civil unions)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not recognized
+          numDecimalPlaces: 0
+
+      civil_unions_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (civil unions)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      civil_unions_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (civil unions)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      civil_unions_legally_recognized_count:
+        title: Number of countries — Legally recognized (civil unions)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Legally recognized
+          numDecimalPlaces: 0
+
+      civil_unions_legally_recognized_pop:
+        title: Population — Legally recognized (civil unions)
+        unit: people
+        short_unit: ""
+        display:
+          name: Legally recognized
+          numDecimalPlaces: 0
+
+      joint_adoption_not_permitted_count:
+        title: Number of countries — Not permitted (joint adoption)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not permitted
+          numDecimalPlaces: 0
+
+      joint_adoption_not_permitted_pop:
+        title: Population — Not permitted (joint adoption)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not permitted
+          numDecimalPlaces: 0
+
+      joint_adoption_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (joint adoption)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      joint_adoption_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (joint adoption)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      joint_adoption_permitted_count:
+        title: Number of countries — Permitted (joint adoption)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Permitted
+          numDecimalPlaces: 0
+
+      joint_adoption_permitted_pop:
+        title: Population — Permitted (joint adoption)
+        unit: people
+        short_unit: ""
+        display:
+          name: Permitted
+          numDecimalPlaces: 0
+
+      constitutional_protections_sexual_orientation_not_protected_count:
+        title: Number of countries — Not protected (constitutional protections sexual orientation)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not protected
+          numDecimalPlaces: 0
+
+      constitutional_protections_sexual_orientation_not_protected_pop:
+        title: Population — Not protected (constitutional protections sexual orientation)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not protected
+          numDecimalPlaces: 0
+
+      constitutional_protections_sexual_orientation_constitutionally_protected_count:
+        title: Number of countries — Constitutionally protected (constitutional protections sexual orientation)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Constitutionally protected
+          numDecimalPlaces: 0
+
+      constitutional_protections_sexual_orientation_constitutionally_protected_pop:
+        title: Population — Constitutionally protected (constitutional protections sexual orientation)
+        unit: people
+        short_unit: ""
+        display:
+          name: Constitutionally protected
+          numDecimalPlaces: 0
+
+      constitutional_protections_gender_identity_not_protected_count:
+        title: Number of countries — Not protected (constitutional protections gender identity)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not protected
+          numDecimalPlaces: 0
+
+      constitutional_protections_gender_identity_not_protected_pop:
+        title: Population — Not protected (constitutional protections gender identity)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not protected
+          numDecimalPlaces: 0
+
+      constitutional_protections_gender_identity_constitutionally_protected_count:
+        title: Number of countries — Constitutionally protected (constitutional protections gender identity)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Constitutionally protected
+          numDecimalPlaces: 0
+
+      constitutional_protections_gender_identity_constitutionally_protected_pop:
+        title: Population — Constitutionally protected (constitutional protections gender identity)
+        unit: people
+        short_unit: ""
+        display:
+          name: Constitutionally protected
+          numDecimalPlaces: 0
+
+      hate_crime_protections_sexual_orientation_not_covered_count:
+        title: Number of countries — Not covered (hate crime protections sexual orientation)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not covered
+          numDecimalPlaces: 0
+
+      hate_crime_protections_sexual_orientation_not_covered_pop:
+        title: Population — Not covered (hate crime protections sexual orientation)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not covered
+          numDecimalPlaces: 0
+
+      hate_crime_protections_sexual_orientation_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (hate crime protections sexual orientation)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      hate_crime_protections_sexual_orientation_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (hate crime protections sexual orientation)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      hate_crime_protections_sexual_orientation_covered_by_hate_crime_laws_count:
+        title: Number of countries — Covered by hate crime laws (hate crime protections sexual orientation)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Covered by hate crime laws
+          numDecimalPlaces: 0
+
+      hate_crime_protections_sexual_orientation_covered_by_hate_crime_laws_pop:
+        title: Population — Covered by hate crime laws (hate crime protections sexual orientation)
+        unit: people
+        short_unit: ""
+        display:
+          name: Covered by hate crime laws
+          numDecimalPlaces: 0
+
+      hate_crime_protections_gender_identity_not_covered_count:
+        title: Number of countries — Not covered (hate crime protections gender identity)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not covered
+          numDecimalPlaces: 0
+
+      hate_crime_protections_gender_identity_not_covered_pop:
+        title: Population — Not covered (hate crime protections gender identity)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not covered
+          numDecimalPlaces: 0
+
+      hate_crime_protections_gender_identity_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (hate crime protections gender identity)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      hate_crime_protections_gender_identity_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (hate crime protections gender identity)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      hate_crime_protections_gender_identity_covered_by_hate_crime_laws_count:
+        title: Number of countries — Covered by hate crime laws (hate crime protections gender identity)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Covered by hate crime laws
+          numDecimalPlaces: 0
+
+      hate_crime_protections_gender_identity_covered_by_hate_crime_laws_pop:
+        title: Population — Covered by hate crime laws (hate crime protections gender identity)
+        unit: people
+        short_unit: ""
+        display:
+          name: Covered by hate crime laws
+          numDecimalPlaces: 0
+
+      incitement_to_hatred_not_prohibited_count:
+        title: Number of countries — Not prohibited (incitement to hatred)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not prohibited
+          numDecimalPlaces: 0
+
+      incitement_to_hatred_not_prohibited_pop:
+        title: Population — Not prohibited (incitement to hatred)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not prohibited
+          numDecimalPlaces: 0
+
+      incitement_to_hatred_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (incitement to hatred)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      incitement_to_hatred_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (incitement to hatred)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      incitement_to_hatred_prohibited_count:
+        title: Number of countries — Prohibited (incitement to hatred)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Prohibited
+          numDecimalPlaces: 0
+
+      incitement_to_hatred_prohibited_pop:
+        title: Population — Prohibited (incitement to hatred)
+        unit: people
+        short_unit: ""
+        display:
+          name: Prohibited
+          numDecimalPlaces: 0
+
+      third_gender_recognition_not_recognized_count:
+        title: Number of countries — Not recognized (third gender recognition)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not recognized
+          numDecimalPlaces: 0
+
+      third_gender_recognition_not_recognized_pop:
+        title: Population — Not recognized (third gender recognition)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not recognized
+          numDecimalPlaces: 0
+
+      third_gender_recognition_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (third gender recognition)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      third_gender_recognition_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (third gender recognition)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      third_gender_recognition_recognized_count:
+        title: Number of countries — Recognized (third gender recognition)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Recognized
+          numDecimalPlaces: 0
+
+      third_gender_recognition_recognized_pop:
+        title: Population — Recognized (third gender recognition)
+        unit: people
+        short_unit: ""
+        display:
+          name: Recognized
+          numDecimalPlaces: 0
+
+      employment_discrimination_sexual_orientation_no_protection_count:
+        title: Number of countries — No protection (employment discrimination sexual orientation)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      employment_discrimination_sexual_orientation_no_protection_pop:
+        title: Population — No protection (employment discrimination sexual orientation)
+        unit: people
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      employment_discrimination_sexual_orientation_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (employment discrimination sexual orientation)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      employment_discrimination_sexual_orientation_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (employment discrimination sexual orientation)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      employment_discrimination_sexual_orientation_discrimination_prohibited_count:
+        title: Number of countries — Discrimination prohibited (employment discrimination sexual orientation)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Discrimination prohibited
+          numDecimalPlaces: 0
+
+      employment_discrimination_sexual_orientation_discrimination_prohibited_pop:
+        title: Population — Discrimination prohibited (employment discrimination sexual orientation)
+        unit: people
+        short_unit: ""
+        display:
+          name: Discrimination prohibited
+          numDecimalPlaces: 0
+
+      employment_discrimination_gender_identity_no_protection_count:
+        title: Number of countries — No protection (employment discrimination gender identity)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      employment_discrimination_gender_identity_no_protection_pop:
+        title: Population — No protection (employment discrimination gender identity)
+        unit: people
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      employment_discrimination_gender_identity_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (employment discrimination gender identity)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      employment_discrimination_gender_identity_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (employment discrimination gender identity)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      employment_discrimination_gender_identity_discrimination_prohibited_count:
+        title: Number of countries — Discrimination prohibited (employment discrimination gender identity)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Discrimination prohibited
+          numDecimalPlaces: 0
+
+      employment_discrimination_gender_identity_discrimination_prohibited_pop:
+        title: Population — Discrimination prohibited (employment discrimination gender identity)
+        unit: people
+        short_unit: ""
+        display:
+          name: Discrimination prohibited
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_sexual_orientation_no_protection_count:
+        title: Number of countries — No protection (goods services discrimination sexual orientation)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_sexual_orientation_no_protection_pop:
+        title: Population — No protection (goods services discrimination sexual orientation)
+        unit: people
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_sexual_orientation_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (goods services discrimination sexual orientation)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_sexual_orientation_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (goods services discrimination sexual orientation)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_sexual_orientation_discrimination_prohibited_count:
+        title: Number of countries — Discrimination prohibited (goods services discrimination sexual orientation)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Discrimination prohibited
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_sexual_orientation_discrimination_prohibited_pop:
+        title: Population — Discrimination prohibited (goods services discrimination sexual orientation)
+        unit: people
+        short_unit: ""
+        display:
+          name: Discrimination prohibited
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_gender_identity_no_protection_count:
+        title: Number of countries — No protection (goods services discrimination gender identity)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_gender_identity_no_protection_pop:
+        title: Population — No protection (goods services discrimination gender identity)
+        unit: people
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_gender_identity_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (goods services discrimination gender identity)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_gender_identity_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (goods services discrimination gender identity)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_gender_identity_discrimination_prohibited_count:
+        title: Number of countries — Discrimination prohibited (goods services discrimination gender identity)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Discrimination prohibited
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_gender_identity_discrimination_prohibited_pop:
+        title: Population — Discrimination prohibited (goods services discrimination gender identity)
+        unit: people
+        short_unit: ""
+        display:
+          name: Discrimination prohibited
+          numDecimalPlaces: 0
+
+      conversion_therapies_not_banned_count:
+        title: Number of countries — Not banned (conversion therapies)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not banned
+          numDecimalPlaces: 0
+
+      conversion_therapies_not_banned_pop:
+        title: Population — Not banned (conversion therapies)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not banned
+          numDecimalPlaces: 0
+
+      conversion_therapies_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (conversion therapies)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      conversion_therapies_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (conversion therapies)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      conversion_therapies_banned_count:
+        title: Number of countries — Banned (conversion therapies)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Banned
+          numDecimalPlaces: 0
+
+      conversion_therapies_banned_pop:
+        title: Population — Banned (conversion therapies)
+        unit: people
+        short_unit: ""
+        display:
+          name: Banned
+          numDecimalPlaces: 0
+
+      gender_assignment_surgeries_on_children_not_banned_count:
+        title: Number of countries — Not banned (gender assignment surgeries on children)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not banned
+          numDecimalPlaces: 0
+
+      gender_assignment_surgeries_on_children_not_banned_pop:
+        title: Population — Not banned (gender assignment surgeries on children)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not banned
+          numDecimalPlaces: 0
+
+      gender_assignment_surgeries_on_children_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (gender assignment surgeries on children)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      gender_assignment_surgeries_on_children_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (gender assignment surgeries on children)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      gender_assignment_surgeries_on_children_non_consensual_surgeries_banned_count:
+        title: Number of countries — Non-consensual surgeries banned (gender assignment surgeries on children)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Non-consensual surgeries banned
+          numDecimalPlaces: 0
+
+      gender_assignment_surgeries_on_children_non_consensual_surgeries_banned_pop:
+        title: Population — Non-consensual surgeries banned (gender assignment surgeries on children)
+        unit: people
+        short_unit: ""
+        display:
+          name: Non-consensual surgeries banned
+          numDecimalPlaces: 0
+
+      death_penalty_no_death_penalty_count:
+        title: Number of countries — No death penalty (death penalty)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No death penalty
+          numDecimalPlaces: 0
+
+      death_penalty_no_death_penalty_pop:
+        title: Population — No death penalty (death penalty)
+        unit: people
+        short_unit: ""
+        display:
+          name: No death penalty
+          numDecimalPlaces: 0
+
+      death_penalty_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (death penalty)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      death_penalty_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (death penalty)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      death_penalty_death_penalty_applies_count:
+        title: Number of countries — Death penalty applies (death penalty)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Death penalty applies
+          numDecimalPlaces: 0
+
+      death_penalty_death_penalty_applies_pop:
+        title: Population — Death penalty applies (death penalty)
+        unit: people
+        short_unit: ""
+        display:
+          name: Death penalty applies
+          numDecimalPlaces: 0
+
+      morality_propaganda_no_restrictions_count:
+        title: Number of countries — No restrictions (morality propaganda)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No restrictions
+          numDecimalPlaces: 0
+
+      morality_propaganda_no_restrictions_pop:
+        title: Population — No restrictions (morality propaganda)
+        unit: people
+        short_unit: ""
+        display:
+          name: No restrictions
+          numDecimalPlaces: 0
+
+      morality_propaganda_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (morality propaganda)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      morality_propaganda_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (morality propaganda)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      morality_propaganda_restrictions_in_effect_count:
+        title: Number of countries — Restrictions in effect (morality propaganda)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Restrictions in effect
+          numDecimalPlaces: 0
+
+      morality_propaganda_restrictions_in_effect_pop:
+        title: Population — Restrictions in effect (morality propaganda)
+        unit: people
+        short_unit: ""
+        display:
+          name: Restrictions in effect
+          numDecimalPlaces: 0
+
+      lgbtq_civil_society_restrictions_no_restrictions_count:
+        title: Number of countries — No restrictions (lgbtq civil society restrictions)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No restrictions
+          numDecimalPlaces: 0
+
+      lgbtq_civil_society_restrictions_no_restrictions_pop:
+        title: Population — No restrictions (lgbtq civil society restrictions)
+        unit: people
+        short_unit: ""
+        display:
+          name: No restrictions
+          numDecimalPlaces: 0
+
+      lgbtq_civil_society_restrictions_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (lgbtq civil society restrictions)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      lgbtq_civil_society_restrictions_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (lgbtq civil society restrictions)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      lgbtq_civil_society_restrictions_restrictions_in_effect_count:
+        title: Number of countries — Restrictions in effect (lgbtq civil society restrictions)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Restrictions in effect
+          numDecimalPlaces: 0
+
+      lgbtq_civil_society_restrictions_restrictions_in_effect_pop:
+        title: Population — Restrictions in effect (lgbtq civil society restrictions)
+        unit: people
+        short_unit: ""
+        display:
+          name: Restrictions in effect
+          numDecimalPlaces: 0
+
+      religious_exemption_laws_no_religious_exemptions_count:
+        title: Number of countries — No religious exemptions (religious exemption laws)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No religious exemptions
+          numDecimalPlaces: 0
+
+      religious_exemption_laws_no_religious_exemptions_pop:
+        title: Population — No religious exemptions (religious exemption laws)
+        unit: people
+        short_unit: ""
+        display:
+          name: No religious exemptions
+          numDecimalPlaces: 0
+
+      religious_exemption_laws_religious_exemptions_in_effect_count:
+        title: Number of countries — Religious exemptions in effect (religious exemption laws)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Religious exemptions in effect
+          numDecimalPlaces: 0
+
+      religious_exemption_laws_religious_exemptions_in_effect_pop:
+        title: Population — Religious exemptions in effect (religious exemption laws)
+        unit: people
+        short_unit: ""
+        display:
+          name: Religious exemptions in effect
+          numDecimalPlaces: 0
+

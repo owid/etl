@@ -73,6 +73,48 @@ LGB_MILITARY_MAP = {
     "legal: 0 illegal: 0": "No policy",
 }
 
+
+def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixed_label):
+    """Standard bucket map for a two-direction policy (progressive vs regressive).
+
+    The bucket key is "<prog_key>: <b1> <reg_key>: <b2>". The four resolved cases:
+      - Both 0      → neither_label  ("no policy in either direction")
+      - Progressive 1, regressive 0 → prog_label
+      - Progressive 0, regressive 1 → reg_label
+      - Anything else (subnational partial or transition year, both >0) → mixed_label
+
+    For transition years where both = 1, we default to prog_label; this is the
+    placeholder for the future end-of-year rule (see Bastian's note).
+    """
+    m = {
+        f"{prog_key}: 0 {reg_key}: 0": neither_label,
+        f"{prog_key}: 1 {reg_key}: 0": prog_label,
+        f"{prog_key}: 0 {reg_key}: 1": reg_label,
+        f"{prog_key}: 0.5 {reg_key}: 0": mixed_label,
+        f"{prog_key}: 0 {reg_key}: 0.5": mixed_label,
+        f"{prog_key}: 0.5 {reg_key}: 0.5": mixed_label,
+        f"{prog_key}: 1 {reg_key}: 0.5": mixed_label,
+        f"{prog_key}: 0.5 {reg_key}: 1": mixed_label,
+        f"{prog_key}: 1 {reg_key}: 1": prog_label,  # transition year — TODO: end-of-year rule
+    }
+    return m
+
+
+def _single_direction_map(*, key, yes_label, neither_label, mixed_label):
+    """Standard 3-bucket map for a single-substantive-direction policy.
+
+    The bucket key is "<key>: <b>". The three resolved cases:
+      - 0     → neither_label
+      - 0.5   → mixed_label (any subnational variation)
+      - 1     → yes_label (the substantive direction is fully in effect)
+    """
+    return {
+        f"{key}: 0": neither_label,
+        f"{key}: 0.5": mixed_label,
+        f"{key}: 1": yes_label,
+    }
+
+
 # Per-indicator config for combined-categorical indicators.
 # Each entry says which (law, status) proportion columns feed the bucket key,
 # which label each bucket gets via the bucket-key string, and the final category map.
@@ -103,6 +145,235 @@ COMBINED_CONFIGS = [
             ("lgb_military__illegal", "illegal"),
         ],
         "category_map": LGB_MILITARY_MAP,
+    },
+    # ── Two-direction policies (both Legal and Illegal carry substantive data) ──────────
+    {
+        "short_name": "same_sex_acts",
+        "sources": [
+            ("same_sex_acts__legal", "legal"),
+            ("same_sex_acts__illegal", "illegal"),
+        ],
+        "category_map": _binary_map(
+            prog_key="legal",
+            reg_key="illegal",
+            prog_label="Legal",
+            reg_label="Criminalized",
+            neither_label="No legal provisions",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "blood_donations",
+        "sources": [
+            ("blood_donations__legal", "legal"),
+            ("blood_donations__illegal", "illegal"),
+        ],
+        "category_map": _binary_map(
+            prog_key="legal",
+            reg_key="illegal",
+            prog_label="No MSM restrictions",
+            reg_label="Deferral or ban",
+            neither_label="No policy",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "transgender_military",
+        "sources": [
+            ("transgender_military__legal", "legal"),
+            ("transgender_military__illegal", "illegal"),
+        ],
+        "category_map": _binary_map(
+            prog_key="legal",
+            reg_key="illegal",
+            prog_label="Allowed",
+            reg_label="Banned",
+            neither_label="No policy",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    # ── Single-direction progressive policies (Legal carries the substantive data) ──────
+    {
+        "short_name": "civil_unions",
+        "sources": [("civil_unions__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Legally recognized",
+            neither_label="Not recognized",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "joint_adoption",
+        "sources": [("joint_adoption__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Permitted",
+            neither_label="Not permitted",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "constitutional_protections_sexual_orientation",
+        "sources": [("constitutional_protections_sexual_orientation__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Constitutionally protected",
+            neither_label="Not protected",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "constitutional_protections_gender_identity",
+        "sources": [("constitutional_protections_gender_identity__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Constitutionally protected",
+            neither_label="Not protected",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "hate_crime_protections_sexual_orientation",
+        "sources": [("hate_crime_protections_sexual_orientation__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Covered by hate crime laws",
+            neither_label="Not covered",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "hate_crime_protections_gender_identity",
+        "sources": [("hate_crime_protections_gender_identity__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Covered by hate crime laws",
+            neither_label="Not covered",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "incitement_to_hatred",
+        "sources": [("incitement_to_hatred__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Prohibited",
+            neither_label="Not prohibited",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "third_gender_recognition",
+        "sources": [("third_gender_recognition__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Recognized",
+            neither_label="Not recognized",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    # ── Single-direction progressive policies (Illegal carries the substantive data) ────
+    {
+        "short_name": "employment_discrimination_sexual_orientation",
+        "sources": [("employment_discrimination_sexual_orientation__illegal", "illegal")],
+        "category_map": _single_direction_map(
+            key="illegal",
+            yes_label="Discrimination prohibited",
+            neither_label="No protection",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "employment_discrimination_gender_identity",
+        "sources": [("employment_discrimination_gender_identity__illegal", "illegal")],
+        "category_map": _single_direction_map(
+            key="illegal",
+            yes_label="Discrimination prohibited",
+            neither_label="No protection",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "goods_services_discrimination_sexual_orientation",
+        "sources": [("goods_services_discrimination_sexual_orientation__illegal", "illegal")],
+        "category_map": _single_direction_map(
+            key="illegal",
+            yes_label="Discrimination prohibited",
+            neither_label="No protection",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "goods_services_discrimination_gender_identity",
+        "sources": [("goods_services_discrimination_gender_identity__illegal", "illegal")],
+        "category_map": _single_direction_map(
+            key="illegal",
+            yes_label="Discrimination prohibited",
+            neither_label="No protection",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "conversion_therapies",
+        "sources": [("conversion_therapies__illegal", "illegal")],
+        "category_map": _single_direction_map(
+            key="illegal",
+            yes_label="Banned",
+            neither_label="Not banned",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "gender_assignment_surgeries_on_children",
+        "sources": [("gender_assignment_surgeries_on_children__illegal", "illegal")],
+        "category_map": _single_direction_map(
+            key="illegal",
+            yes_label="Non-consensual surgeries banned",
+            neither_label="Not banned",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    # ── Single-direction regressive policies (Legal direction is the substantive one) ───
+    {
+        "short_name": "death_penalty",
+        "sources": [("death_penalty__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Death penalty applies",
+            neither_label="No death penalty",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "morality_propaganda",
+        "sources": [("morality_propaganda__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Restrictions in effect",
+            neither_label="No restrictions",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "lgbtq_civil_society_restrictions",
+        "sources": [("lgbtq_civil_society_restrictions__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Restrictions in effect",
+            neither_label="No restrictions",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "religious_exemption_laws",
+        "sources": [("religious_exemption_laws__legal", "legal")],
+        "category_map": _single_direction_map(
+            key="legal",
+            yes_label="Religious exemptions in effect",
+            neither_label="No religious exemptions",
+            mixed_label="Subnationally mixed",
+        ),
     },
 ]
 
