@@ -1,10 +1,12 @@
 meta:
-  source:
-    name: The FRED
-    url: http://research.stlouisfed.org/
-    published_by: Federal Reserve Bank of St Louis (FRED)
-  name: Figure 17.19_updated
-  description: core-econ.org
+  origin:
+    producer: Federal Reserve Bank of St. Louis
+    title: Federal Reserve Economic Data (FRED)
+    citation_full: Federal Reserve Bank of St. Louis. Federal Reserve Economic Data (FRED).
+    attribution_short: FRED
+    url_main: http://research.stlouisfed.org/
+    date_accessed: '2019-05-05'
+    date_published: '2019'
   is_public: false
 outs:
   - md5: 16444cdeaca2f54039f427a7edd45bc6
