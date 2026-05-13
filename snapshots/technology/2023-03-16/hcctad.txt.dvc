@@ -1,21 +1,15 @@
 meta:
-  namespace: technology
-  short_name: hcctad
-  name: Historical Cross Country Technology Adoption Dataset (Comin & Hobijn, 2004)
-  version: 2023-03-16
-  publication_date: 2004-01-01
-  source_name: Data compiled from multiple sources by Comin & Hobijn (2004)
-  source_published_by: 'Comin, D. and Hohijn B., "Cross-Country Technological Adoption: Making the Theories Face the Facts". Journal of Monetary Economics, January 2004, pp. 39-83.'
-  url: https://www.nber.org/research/data/historical-cross-country-technology-adoption-hccta-dataset
-  source_data_url: https://www.nber.org/hccta/hcctad.txt
-  file_extension: txt
-  license_url:
-  license_name:
-  date_accessed: 2023-03-16
+  origin:
+    producer: Comin and Hobijn
+    title: Cross-Country Technological Adoption - Making the Theories Face the Facts
+    description: |-
+      The Historical Cross Country Technology Adoption Dataset (HCCTAD) is a dataset collected by Diego Comin (NYU) and Bart Hobijn (Federal Reserve Bank of New York), to allow for the analysis of the adoption patterns of some of the major technologies introduced in the past 250 years across the world's leading industrialized economies.
+    citation_full: 'Comin, D. and Hobijn, B. (2004). Cross-Country Technological Adoption: Making the Theories Face the Facts. Journal of Monetary Economics, 51(1), 39–83.'
+    url_main: https://www.nber.org/research/data/historical-cross-country-technology-adoption-hccta-dataset
+    url_download: https://www.nber.org/hccta/hcctad.txt
+    date_accessed: '2023-03-16'
+    date_published: '2004-01-01'
   is_public: true
-  description: |
-    The Historical Cross Country Technology Adoption Dataset (HCCTAD) is a dataset collected by Diego Comin (NYU) and Bart Hobijn (Federal Reserve Bank of New York), to allow for the analysis of the adoption patterns of some of the major technologies introduced in the past 250 years across the World’s leading industrialized economies.
-wdir: ../../../data/snapshots/technology/2023-03-16
 outs:
   - md5: 4c50a1fef4a9174cab0cf548feeccc7f
     size: 1572981

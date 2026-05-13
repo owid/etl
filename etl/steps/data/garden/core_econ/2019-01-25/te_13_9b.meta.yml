@@ -1,0 +1,28 @@
+dataset:
+  title: TE-13.9b
+tables:
+  te_13_9b:
+    variables:
+      gdp_growth:
+        title: GDP growth
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Annual percentage growth
+      growth_rate_of_agriculture__forestry__and_fishing:
+        title: Growth rate of agriculture, forestry, and fishing
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Value added annual percentage growth
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

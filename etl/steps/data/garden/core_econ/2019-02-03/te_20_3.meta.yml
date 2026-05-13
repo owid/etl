@@ -1,0 +1,17 @@
+dataset:
+  title: TE-20.3
+tables:
+  te_20_3:
+    variables:
+      cod_landings__tonnes:
+        title: Cod landings (tonnes)
+        unit: tonnes
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

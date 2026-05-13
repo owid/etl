@@ -1,0 +1,17 @@
+dataset:
+  title: TE-7.1
+tables:
+  te_7_1:
+    variables:
+      number_of_employees:
+        title: Number of employees
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

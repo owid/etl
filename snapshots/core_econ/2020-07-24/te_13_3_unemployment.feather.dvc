@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: ONS (2020)
+    url: https://www.ons.gov.uk/employmentandlabourmarket/peoplenotinwork/unemployment/timeseries/mgsx/lms
+    published_by: Office for National Statistics (2020)
+  name: TE-13.3_unemployment
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 0ce9b11d7861c8e1127ef6a9e19fcc5f
+    size: 4146
+    path: te_13_3_unemployment.feather

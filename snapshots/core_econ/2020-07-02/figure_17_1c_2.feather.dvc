@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: IMF (2009), IMF (2013)
+    url: |-
+      https://www.imf.org/external/pubs/ft/weo/2009/update/01/pdf/0109.pdf; https://www.imf.org/en/Publications/FM/Issues/2016/12/31/Fiscal-Adjustment-in-an-Uncertain-World
+    published_by: |-
+      International Monetary Fund. 2009. World Economic Outlook: January 2009; International Monetary Fund. 2013. ‘IMF Fiscal Monitor April 2013: Fiscal Adjustment in an Uncertain World, April 2013.’ April 16.
+  name: Figure_17.1c-2
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 5a65b1ec211cf2df610d5cdfc9c38d86
+    size: 3114
+    path: figure_17_1c_2.feather

@@ -1,0 +1,17 @@
+dataset:
+  title: Figure_19.7
+tables:
+  figure_19_7:
+    variables:
+      total_projected_job_growth_2014_24__thousands_of_employees:
+        title: Total projected job growth 2014-24 (thousands of employees)
+        unit: thousands of employees
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

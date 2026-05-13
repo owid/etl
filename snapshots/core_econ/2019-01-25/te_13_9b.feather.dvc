@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: The World Bank (2018)
+    url: https://datacatalog.worldbank.org/dataset/world-development-indicators
+    published_by: The World Bank Development Indicators (2018)
+  name: TE-13.9b
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 1a8fee0d1eccda02ac51139697169142
+    size: 4674
+    path: te_13_9b.feather
