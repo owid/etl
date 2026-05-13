@@ -66,7 +66,9 @@ def run() -> None:
     }
 
     expenditure_cols = [col for col in expenditure_enrollment_mapping if col in tb_pivoted.columns]
-    enrollment_cols = [v for k, v in expenditure_enrollment_mapping.items() if k in tb_pivoted.columns and v in tb_pivoted.columns]
+    enrollment_cols = [
+        v for k, v in expenditure_enrollment_mapping.items() if k in tb_pivoted.columns and v in tb_pivoted.columns
+    ]
 
     if expenditure_cols and enrollment_cols:
         tb_pivoted["Enrolment in education, total across all levels (number)"] = tb_pivoted[enrollment_cols].sum(
@@ -87,7 +89,11 @@ def run() -> None:
         meta.title = column
         # Use WB long definition when available; derived columns won't have one
         if column in long_desc_lookup.index:
-            meta.description_from_producer = long_desc_lookup[column].iloc[0] if hasattr(long_desc_lookup[column], "iloc") else long_desc_lookup[column]
+            meta.description_from_producer = (
+                long_desc_lookup[column].iloc[0]
+                if hasattr(long_desc_lookup[column], "iloc")
+                else long_desc_lookup[column]
+            )
         decimals, unit, short_unit = _unit_info(column)
         update_metadata(meta, display_decimals=decimals, unit=unit, short_unit=short_unit)
 
