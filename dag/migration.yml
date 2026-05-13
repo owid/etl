@@ -5,14 +5,13 @@ steps:
       - snapshot://idmc/2024-08-02/internal_displacement.xlsx
       - data://garden/demography/2024-07-15/population
 
-  # UNHCR resettlement data
-
   # UNHCR refugee data
   data://grapher/un/2024-07-25/refugee_data:
     - data://garden/un/2024-07-25/refugee_data:
       - data://meadow/un/2024-07-25/refugee_data:
         - snapshot://un/2024-07-25/refugee_data.zip
       - data://garden/demography/2024-07-15/population
+      # UNHCR resettlement data
       - data://garden/un/2024-07-25/resettlement:
         - data://meadow/un/2024-07-25/resettlement:
           - snapshot://un/2024-07-25/resettlement.zip
@@ -63,26 +62,16 @@ steps:
   export://explorers/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
 
-
-  #
-  # UNICEF child migration data (up to 2024)
-  #
-
-
-    # IDMC Internal Displacement Data (2025 update)
-
-
-  # UNHCR refugee data (2025)
-
-
   #Refugee, Asylum and Migration Explorer (2026 Jan update):
   export://explorers/migration/2026-01-27/migration:
+    # UNICEF child migration data (up to 2024)
     - data://grapher/unicef/2026-01-07/child_migration:
       - data://garden/unicef/2026-01-07/child_migration:
         - data://meadow/unicef/2026-01-07/child_migration:
           - snapshot://unicef/2026-01-07/child_migration.csv
         - data://garden/demography/2024-07-15/population
         - data://garden/regions/2023-01-01/regions
+    # UNHCR refugee data (2025)
     - data://grapher/un/2025-07-03/refugee_data:
       - data://garden/un/2025-07-03/refugee_data:
         - data://meadow/un/2025-07-03/refugee_data:
@@ -92,6 +81,7 @@ steps:
       - data://garden/un/2025-03-12/migrant_stock
     - data://grapher/un/2024-07-12/un_wpp
     - data://grapher/worldbank_wdi/2025-09-08/wdi
+    # IDMC Internal Displacement Data (2025 update)
     - data://grapher/idmc/2026-01-19/internal_displacement:
       - data://garden/idmc/2026-01-19/internal_displacement:
         - data://meadow/idmc/2026-01-19/internal_displacement:

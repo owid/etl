@@ -3,11 +3,11 @@ steps:
   data://garden/geography/2025-06-26/wb_admin_boundaries:
     - data://meadow/geography/2025-06-26/wb_admin_boundaries:
       - snapshot://geography/2025-06-26/wb_admin_boundaries.zip
-  # Map (Natural Earth)
 
     # Latitude
   data://grapher/geography/2024-07-18/latitude:
     - data://garden/geography/2023-11-28/nat_earth_110:
+      # Map (Natural Earth)
       - data://meadow/geography/2023-11-28/nat_earth_110:
         - snapshot://geography/2023-11-28/nat_earth_110.zip
 

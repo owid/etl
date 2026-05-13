@@ -197,21 +197,18 @@ steps:
         - snapshot://technology/2024-05-13/computer_memory_storage.xlsx
       - data://garden/bls/2026-03-20/us_consumer_prices
 
-  # European Social Survey - Trust questions
-
   # Trust surveys
-
-  # Afrobarometer survey - Trust
-
-  # Latinobarómetro survey - Trust
   data://grapher/survey/2023-08-04/trust_surveys:
     - data://garden/survey/2023-08-04/trust_surveys:
+      # Latinobarómetro survey - Trust
       - data://garden/survey/2023-08-04/latinobarometro_trust:
         - data://meadow/survey/2023-08-04/latinobarometro_trust:
           - snapshot://survey/2023-08-04/latinobarometro_trust.csv
+      # Afrobarometer survey - Trust
       - data://garden/survey/2023-08-07/afrobarometer_trust:
         - data://meadow/survey/2023-08-07/afrobarometer_trust:
           - snapshot://survey/2023-08-07/afrobarometer_trust.csv
+      # European Social Survey - Trust questions
       - data://garden/ess/2023-08-02/ess_trust:
         - data://meadow/ess/2023-08-02/ess_trust:
           - snapshot://ess/2023-08-02/ess_trust.csv
@@ -239,8 +236,8 @@ steps:
     - data://garden/news/2024-05-23/gdelt_v2:
       - data://meadow/news/2024-05-23/gdelt_v2:
         - snapshot://news/2024-05-23/gdelt_v2.csv
-  # World Development Indicators - WDI
 
+  # World Development Indicators - WDI
   data://grapher/worldbank_wdi/2025-01-24/wdi:
     - data://garden/worldbank_wdi/2025-01-24/wdi:
       - snapshot://worldbank_wdi/2025-01-24/wdi.zip
@@ -277,16 +274,14 @@ steps:
   data://grapher/un/2025-03-25/igme:
     - data://garden/un/2025-03-25/igme
 
-  #  Gapminder  - Under five mortality v11
-
-  # Gapminder  - Under five mortality v7
-
     # Long-run child mortality, Gapminder + UN IGME - to update
   data://garden/un/2025-04-25/long_run_child_mortality:
     - data://garden/un/2025-03-25/igme
+    # Gapminder  - Under five mortality v7
     - data://garden/gapminder/2023-09-18/under_five_mortality:
       - data://meadow/gapminder/2023-09-18/under_five_mortality:
         - snapshot://gapminder/2023-09-18/under_five_mortality.xlsx
+    #  Gapminder  - Under five mortality v11
     - data://garden/gapminder/2023-09-21/under_five_mortality:
       - data://meadow/gapminder/2023-09-21/under_five_mortality:
         - snapshot://gapminder/2023-09-21/under_five_mortality.xlsx
@@ -355,7 +350,6 @@ steps:
       - data://meadow/happiness/2025-04-01/happiness_by_age:
         - snapshot://happiness/2025-04-01/happiness_by_age.csv
 
-  # United Nations members
   # United Nations members
   data://garden/un/2025-05-15/un_members:
     - data://garden/wb/2021-07-01/wb_income
@@ -426,8 +420,6 @@ steps:
       - data://meadow/ivs/2025-06-27/integrated_values_surveys:
         - snapshot://ivs/2025-06-27/integrated_values_surveys.csv
 
-  # CDC Wonder - Causes of Death
-
   #
   # Media deaths
   #
@@ -435,6 +427,7 @@ steps:
     - data://garden/media_cloud/2025-05-19/media_deaths:
       - data://meadow/media_cloud/2025-05-19/media_deaths:
         - snapshot://media_cloud/2025-05-19/media_deaths.csv
+      # CDC Wonder - Causes of Death
       - data://meadow/cdc/2025-05-19/external_causes:
         - snapshot://cdc/2025-05-19/external_causes.csv
       - data://meadow/cdc/2025-05-19/leading_causes:
@@ -454,13 +447,6 @@ steps:
         - snapshot://housing/2025-07-11/korevaar.xlsx
       - data://meadow/housing/2025-07-11/korevaar_quality:
         - snapshot://housing/2025-07-11/korevaar_quality.xlsx
-  #
-  # Gallup World Poll: Life in Five Years and Life Today
-  #
-
-  #
-  # Gallup World Poll: Life in Five Years and Life Today
-  #
   #
   # Gallup World Poll: Life in Five Years and Life Today
   #
@@ -510,14 +496,13 @@ steps:
 
   #
   # Trade Volume Index - WTO Trade Growth
-
-  #
-  # Trade Volume Index - "A tale of two globalizations: gains from trade and openness 1800–2010"
-  #
   data://grapher/trade/2025-09-22/wto_trade_growth:
     - data://garden/trade/2025-09-22/wto_trade_growth:
       - data://meadow/trade/2025-09-22/wto_trade_growth:
         - snapshot://trade/2025-09-22/wto_trade_growth.xlsx
+      #
+      # Trade Volume Index - "A tale of two globalizations: gains from trade and openness 1800–2010"
+      #
       - data://garden/trade/2025-09-22/historic_trade:
         - data://meadow/trade/2025-09-22/historic_trade:
           - snapshot://trade/2025-09-22/historic_trade.xlsx

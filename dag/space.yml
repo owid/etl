@@ -2,23 +2,11 @@ steps:
   #
   # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
   #
-  #
-  # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
-  #
-  #
-  # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
-  #
   data://grapher/space/2025-03-04/international_astronaut_database:
     - data://garden/space/2025-03-04/international_astronaut_database:
       - data://meadow/space/2025-03-04/international_astronaut_database:
         - snapshot://space/2025-03-04/international_astronaut_database.csv
       - data://garden/regions/2023-01-01/regions
-  #
-  # Center for Strategic and International Studies, Aerospace Security Project - Cost of space launches
-  #
-  #
-  # Center for Strategic and International Studies, Aerospace Security Project - Cost of space launches
-  #
   #
   # Center for Strategic and International Studies, Aerospace Security Project - Cost of space launches
   #
@@ -29,22 +17,10 @@ steps:
   #
   # Center for Strategic and International Studies, Aerospace Security Project - History of the NASA Budget
   #
-  #
-  # Center for Strategic and International Studies, Aerospace Security Project - History of the NASA Budget
-  #
-  #
-  # Center for Strategic and International Studies, Aerospace Security Project - History of the NASA Budget
-  #
   data://grapher/space/2025-03-04/nasa_budget:
     - data://garden/space/2025-03-04/nasa_budget:
       - data://meadow/space/2025-03-04/nasa_budget:
         - snapshot://space/2025-03-04/nasa_budget.csv
-  #
-  # Gravitational Wave Open Science Center - Gravitational wave events
-  #
-  #
-  # Gravitational Wave Open Science Center - Gravitational wave events
-  #
   #
   # Gravitational Wave Open Science Center - Gravitational wave events
   #
@@ -55,12 +31,6 @@ steps:
   #
   # NASA Center for Near-Earth Object Studies - Near-Earth Asteroids
   #
-  #
-  # NASA Center for Near-Earth Object Studies - Near-Earth Asteroids
-  #
-  #
-  # NASA Center for Near-Earth Object Studies - Near-Earth Asteroids
-  #
   data://grapher/space/2026-01-08/near_earth_asteroids:
     - data://garden/space/2026-01-08/near_earth_asteroids:
       - data://meadow/space/2026-01-08/near_earth_asteroids:
@@ -68,19 +38,10 @@ steps:
   #
   # NASA - Exoplanets
   #
-  #
-  # NASA - Exoplanets
-  #
-  #
-  # NASA - Exoplanets
-  #
   data://grapher/space/2026-01-08/exoplanets:
     - data://garden/space/2026-01-08/exoplanets:
       - data://meadow/space/2026-01-08/exoplanets:
         - snapshot://space/2026-01-08/exoplanets.csv
-  #
-  # United States Space Force - Number of objects in space
-  #
   #
   # United States Space Force - Number of objects in space
   #
@@ -97,12 +58,6 @@ steps:
   #
   data://grapher/space/2026-01-08/non_debris_objects_by_orbit:
     - data://garden/space/2026-01-08/objects_in_space
-  #
-  # UNOOSA - Online Index of Objects Launched into Outer Space
-  #
-  #
-  # UNOOSA - Online Index of Objects Launched into Outer Space
-  #
   #
   # UNOOSA - Online Index of Objects Launched into Outer Space
   #

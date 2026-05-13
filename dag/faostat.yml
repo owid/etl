@@ -3,12 +3,12 @@ steps:
   # Auxiliary FAOSTAT RL step with basic processing, used by the population dataset to generate population density.
   data://garden/faostat/2024-03-14/faostat_rl_auxiliary:
     - snapshot://faostat/2024-03-14/faostat_rl.zip
-  data://meadow/faostat/2025-03-17/faostat_fs:
-    - snapshot://faostat/2025-03-17/faostat_fs.zip
   ######################################################################################################################
   #
   # FAOSTAT meadow steps for version 2025-03-17
   #
+  data://meadow/faostat/2025-03-17/faostat_fs:
+    - snapshot://faostat/2025-03-17/faostat_fs.zip
   data://grapher/faostat/2025-03-17/faostat_fs:
     - data://garden/faostat/2025-03-17/faostat_fs:
       - data://garden/demography/2024-07-15/population
@@ -86,6 +86,9 @@ steps:
     - snapshot://faostat/2026-02-25/faostat_rp.zip
   data://meadow/faostat/2026-02-25/faostat_sdgb:
     - snapshot://faostat/2026-02-25/faostat_sdgb.zip
+  #
+  # FAOSTAT garden steps for version 2026-02-25
+  #
   data://garden/faostat/2026-02-25/faostat_fbsc:
     - data://meadow/faostat/2026-02-25/faostat_fbsh
     - data://garden/demography/2024-07-15/population
@@ -139,9 +142,6 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   #
-  # FAOSTAT garden steps for version 2026-02-25
-  #
-  #
   # FAOSTAT grapher steps for version 2026-02-25
   #
   data://grapher/faostat/2026-02-25/faostat_cisp:
@@ -174,16 +174,12 @@ steps:
       - data://garden/faostat/2026-02-25/faostat_metadata
       - data://garden/wb/2025-07-01/income_groups
       - data://meadow/faostat/2026-02-25/faostat_qv
-  #
-  # FAOSTAT grapher step for additional variables for version 2026-02-25
-  #
-  #
-  # FAOSTAT garden step for additional variables for version 2026-02-25
-  #
   export://multidim/faostat/latest/fertilizer_use:
     - data://grapher/faostat/2026-02-25/faostat_rfn:
       - data://garden/faostat/2026-02-25/faostat_rfn
+    # FAOSTAT grapher step for additional variables for version 2026-02-25
     - data://grapher/faostat/2026-02-25/additional_variables:
+      # FAOSTAT garden step for additional variables for version 2026-02-25
       - data://garden/faostat/2026-02-25/additional_variables:
         - data://garden/faostat/2026-02-25/faostat_rl
         - data://garden/faostat/2026-02-25/faostat_qi

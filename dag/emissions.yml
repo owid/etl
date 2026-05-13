@@ -27,20 +27,11 @@ steps:
   #
   # Emissions - CO2 dataset.
   #
-  #
-  # Emissions - CO2 dataset.
-  #
   # NOTE: The following step should be run after the github step, which is why the latter is added as a dependency.
   export://s3/co2_data/latest/owid_co2:
     - data://garden/emissions/2025-12-04/owid_co2
     - export://github/co2_data/latest/owid_co2:
       - data://garden/emissions/2025-12-04/owid_co2
-  #
-  # Hoesly et al. (2024): CEDS air pollutants
-  #
-  #
-  # Hoesly et al. (2024): CEDS air pollutants
-  #
   #
   # Hoesly et al. (2024): CEDS air pollutants
   #
@@ -62,15 +53,9 @@ steps:
   #
   # Emissions - Greenhouse gas emissions by custom sector.
   #
-  #
-  # Emissions - Greenhouse gas emissions by custom sector.
-  #
   data-private://grapher/emissions/2025-09-24/emissions_by_custom_sector:
     - data-private://garden/emissions/2025-09-24/emissions_by_custom_sector:
       - snapshot-private://wri/2025-09-24/emissions_by_detailed_sector.json
-  #
-  # GCP - Global Carbon Budget.
-  #
   #
   # GCP - Global Carbon Budget.
   #
@@ -93,24 +78,13 @@ steps:
   #
   # IPCC - Emission Factor Database.
   #
-  #
-  # IPCC - Emission Factor Database.
-  #
-  #
-  # IPCC - Electricity emission factors.
-  #
-  #
-  # IPCC - Emission Factor Database.
-  #
   data://grapher/emissions/2025-11-26/emission_factors:
     - data://garden/emissions/2025-11-26/emission_factors:
       - data://meadow/emissions/2025-11-26/emission_factors:
         - snapshot://emissions/2025-11-26/emission_factors.xlsx
+      # IPCC - Electricity emission factors.
       - data://meadow/emissions/2025-11-26/electricity_emission_factors:
         - snapshot://emissions/2025-11-26/technology_specific_cost_and_performance_parameters.pdf
-  #
-  # Jones et al. - National contributions to climate change.
-  #
   #
   # Jones et al. - National contributions to climate change.
   #
@@ -157,9 +131,6 @@ steps:
   #
   # Climate Watch - Greenhouse gas emissions by sector.
   #
-  #
-  # Climate Watch - Greenhouse gas emissions by sector.
-  #
   data://garden/climate_watch/2026-02-10/emissions_by_sector:
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
@@ -174,16 +145,10 @@ steps:
   #
   # Emissions - Greenhouse gas emissions by custom sector.
   #
-  #
-  # Emissions - Greenhouse gas emissions by custom sector.
-  #
   data://grapher/emissions/2026-02-11/emissions_by_custom_sector:
     - data://garden/emissions/2026-02-11/emissions_by_custom_sector:
       - data://garden/climate_watch/2026-02-10/emissions_by_sector
       - data://garden/ember/2026-04-24/yearly_electricity
-  #
-  # Emissions - Greenhouse gas emissions by custom sector (alternative version).
-  #
   #
   # Emissions - Greenhouse gas emissions by custom sector (alternative version).
   #
@@ -194,25 +159,13 @@ steps:
   #
   # RFF - World Carbon Pricing.
   #
-  #
-  # RFF - World Carbon Pricing.
-  #
-  # The IPCC codes lookup is loaded from a dedicated snapshot pinned to an old commit of the ECP
-  # repo, since the file was removed from upstream during the 2026 restructure.
-  #
-  # RFF - World Carbon Pricing.
-  #
   data://grapher/rff/2026-05-08/world_carbon_pricing:
     - data://garden/rff/2026-05-08/world_carbon_pricing:
+      # The IPCC codes lookup is loaded from a dedicated snapshot pinned to an old commit of the ECP
+      # repo, since the file was removed from upstream during the 2026 restructure.
       - data://meadow/rff/2026-05-08/world_carbon_pricing:
         - snapshot://rff/2026-05-08/world_carbon_pricing.zip
         - snapshot://rff/2026-05-08/ipcc_codes.csv
-  #
-  # RFF - Emissions-weighted Carbon Price.
-  #
-  #
-  # RFF - Emissions-weighted Carbon Price.
-  #
   #
   # RFF - Emissions-weighted Carbon Price.
   #

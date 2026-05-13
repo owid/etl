@@ -22,7 +22,7 @@ steps:
     - data://meadow/war/2023-01-10/sutton_1971:
       - snapshot://war/2023-01-09/sutton_1971.csv
 
-    # UCDP
+  # UCDP
   data://meadow/war/2025-06-13/ucdp:
     - snapshot://war/2025-06-13/ucdp_battle_related_conflict.zip
     - snapshot://war/2025-06-13/ucdp_non_state.zip
@@ -69,8 +69,6 @@ steps:
         - data://garden/war/2023-09-21/prio_v31
     - data://grapher/war/2025-06-13/ucdp
 
-  # Chupilkin and Koczan (Supplementary dataset to CoW)
-
   # COW - Wars
   data://grapher/war/2023-09-21/cow:
     - data://garden/war/2023-09-21/cow:
@@ -81,6 +79,7 @@ steps:
         - snapshot://war/2023-09-21/cow_intra_state.zip
         - snapshot://war/2023-09-21/cow_non_state.csv
       - data://garden/countries/2023-09-29/cow_ssm
+      # Chupilkin and Koczan (Supplementary dataset to CoW)
       - data://garden/war/2023-11-29/chupilkin_koczan:
         - data://meadow/war/2023-11-29/chupilkin_koczan:
           - snapshot://war/2023-11-29/chupilkin_koczan.dta
@@ -123,14 +122,13 @@ steps:
       - data://garden/countries/2023-09-29/cow_ssm
 
   # Bleek and Nuclear Threat Initiative - Nuclear Weapons Proliferation.
-
-  # Bleek - Spread of Nuclear Weapons.
-  # Nuclear Threat Initiative - Overview.
   data://grapher/war/2024-01-11/nuclear_weapons_proliferation:
     - data://garden/war/2024-01-11/nuclear_weapons_proliferation:
+      # Bleek - Spread of Nuclear Weapons.
       - data://garden/war/2024-01-11/spread_of_nuclear_weapons:
         - data://meadow/war/2024-01-11/spread_of_nuclear_weapons:
           - snapshot://war/2024-01-11/spread_of_nuclear_weapons.pdf
+      # Nuclear Threat Initiative - Overview.
       - data://garden/war/2024-01-11/nuclear_threat_initiative_overview:
         - data://meadow/war/2024-01-11/nuclear_threat_initiative_overview:
           - snapshot://war/2024-01-11/nuclear_threat_initiative_overview.csv

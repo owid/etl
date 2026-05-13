@@ -2,9 +2,6 @@ steps:
   #
   # EM-DAT Natural disasters.
   #
-  #
-  # EM-DAT Natural disasters.
-  #
   # The following dataset has a table for yearly data and another for decadal data.
   data://garden/emdat/2026-04-30/natural_disasters:
     - data://meadow/emdat/2026-04-30/natural_disasters:
@@ -53,12 +50,6 @@ steps:
     - data://grapher/emdat/2026-04-30/natural_disasters
   export://multidim/natural_disasters/latest/deaths:
     - data://grapher/emdat/2026-04-30/natural_disasters
-  #
-  # NOAA/NCEI Natural Hazards Data
-  #
-  #
-  # NOAA/NCEI Natural Hazards Data
-  #
   #
   # NOAA/NCEI Natural Hazards Data
   #

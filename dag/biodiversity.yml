@@ -44,12 +44,12 @@ steps:
     - data://garden/iucn/2026-01-05/threatened_and_evaluated_species:
       - data://meadow/iucn/2026-01-05/threatened_and_evaluated_species:
         - snapshot://iucn/2026-01-05/threatened_and_evaluated_species.csv
-  # IUCN Endemic vertebrate species
-  # Endemic fish species
   data://grapher/iucn/2026-01-05/endemic_vertebrates:
     - data://garden/iucn/2026-01-05/endemic_vertebrates:
+      # Endemic fish species
       - data://meadow/iucn/2026-01-05/endemic_fish:
         - snapshot://iucn/2026-01-05/endemic_fish.csv
+      # IUCN Endemic vertebrate species
       - data://meadow/iucn/2026-01-05/endemic_vertebrates:
         - snapshot://iucn/2026-01-05/endemic_vertebrates.csv
   # IUCN Endemic invertebrate species
@@ -65,12 +65,12 @@ steps:
       - data://meadow/iucn/2026-01-05/iucn_number_each_status:
         - snapshot://iucn/2026-01-05/iucn_number_each_status.csv
   #
-  # Fish stocks (RAM Legacy).
-  #
-  #
   # Fish stocks explorer.
   #
   export://explorers/biodiversity/latest/fish_stocks:
+    #
+    # Fish stocks (RAM Legacy).
+    #
     - data://grapher/biodiversity/2024-10-30/fish_stocks:
       - data://garden/biodiversity/2024-10-30/fish_stocks:
         - data://meadow/biodiversity/2024-10-30/fish_stocks:

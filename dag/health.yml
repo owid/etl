@@ -97,10 +97,9 @@ steps:
         - snapshot://unicef/2023-06-16/diarrhea.xlsx
 
   # Guinea worm - to archive
-
-  # Guinea worm - historical estimates
   data://grapher/who/2024-06-17/guinea_worm:
     - data://garden/who/2024-06-17/guinea_worm:
+      # Guinea worm - historical estimates
       - data://garden/who/2023-06-29/guinea_worm_certification:
         - data://meadow/who/2023-06-29/guinea_worm_certification:
           - snapshot://who/2023-06-29/guinea_worm.csv
@@ -194,14 +193,12 @@ steps:
       - data://garden/demography/2023-03-31/population
 
   # Combining polio datasets
-
-  # Polio historical data
-
-  # Polio AFP surveillance
   data://grapher/who/2024-04-08/polio:
     - data://garden/who/2024-04-08/polio:
+      # Polio AFP surveillance
       - data://meadow/who/2024-04-08/polio_afp:
         - snapshot://who/2024-04-08/polio_afp.csv
+      # Polio historical data
       - data://garden/who/2024-04-09/polio_historical:
         - data://meadow/who/2024-04-09/polio_historical:
           - snapshot://who/2024-04-09/polio_historical.xls
@@ -212,10 +209,9 @@ steps:
       - snapshot://health/2024-04-12/polio_status.csv
 
   # Polio free countries
-
-  # Polio certification status
   data://grapher/health/2024-04-12/polio_free_countries:
     - data://garden/health/2024-04-12/polio_free_countries:
+      # Polio certification status
       - data://meadow/health/2024-04-12/polio_status:
         - snapshot://health/2024-04-12/polio_status.csv
       - data://meadow/health/2024-04-12/polio_free_countries:
@@ -319,13 +315,13 @@ steps:
   data://grapher/who/2024-08-06/mortality_database_cancer_most_common:
     - data://garden/who/2024-08-06/mortality_database_cancer_most_common:
       - data://garden/who/2025-08-05/mortality_database_cancer
-  # Mpox - Global.health
-    # Mpox (Monkeypox) - WHO
+  # Mpox (Monkeypox) - WHO
   data://garden/who/latest/monkeypox:
     - data://meadow/who/latest/monkeypox:
       - snapshot://who/latest/monkeypox.csv
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
+    # Mpox - Global.health
     - data://garden/health/latest/global_health_mpox:
       - data://meadow/health/latest/global_health_mpox:
         - snapshot://health/latest/global_health_mpox.csv
@@ -461,12 +457,11 @@ steps:
     - data-private://meadow/antibiotics/2024-11-20/pathogen_bloodstream:
       - snapshot-private://antibiotics/2024-11-20/pathogen_bloodstream.csv
   # IHME Neonatal infections by syndrome and amr resistance
-
-  # IHME Neonatal infections by syndrome
   data-private://grapher/antibiotics/2024-12-02/microbe_amr:
     - data-private://garden/antibiotics/2024-12-02/microbe_amr:
       - data-private://meadow/antibiotics/2024-12-02/microbe_amr:
         - snapshot-private://antibiotics/2024-12-02/microbe_amr.csv
+      # IHME Neonatal infections by syndrome
       - data-private://meadow/antibiotics/2024-11-24/total_syndrome:
         - snapshot-private://antibiotics/2024-11-24/total_syndrome.csv
   # IHME Neonatal infections and amr resistance
@@ -487,22 +482,21 @@ steps:
       - data://meadow/antibiotics/2024-12-03/glass_enrolment:
         - snapshot://antibiotics/2024-12-03/glass_enrolment.xlsx
   # MICROBE - total deaths by pathogen and amr resistance
-  # MICROBE - total deaths by pathogen
   data-private://grapher/antibiotics/2024-12-04/microbe_total_pathogens_amr:
     - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens_amr:
       - data-private://meadow/antibiotics/2024-12-04/microbe_total_pathogens_amr:
         - snapshot-private://antibiotics/2024-12-04/microbe_total_pathogens_amr.csv
+      # MICROBE - total deaths by pathogen
       - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens:
         - data-private://meadow/antibiotics/2024-12-04/microbe_total_pathogens:
           - snapshot-private://antibiotics/2024-12-04/microbe_total_pathogens.csv
 
   # MICROBE - total deaths by syndrome and amr resistance
-
-    # MICROBE - total deaths by syndrome
   data-private://grapher/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr:
     - data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr:
       - data-private://meadow/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr:
         - snapshot-private://antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr.csv
+      # MICROBE - total deaths by syndrome
       - data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome:
         - data-private://meadow/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome:
           - snapshot-private://antibiotics/2024-12-05/microbe_total_deaths_by_syndrome.csv
@@ -575,16 +569,13 @@ steps:
         - snapshot://vcp/2025-06-04/vaccine_confidence.xlsx
 
   # Long-run measles data (auto-updated)
-
-  # CDC Measles Cases 1985-present - autoupdate
-
-  # Historical measles data (1919-1984)
-  #
   data://grapher/health/latest/measles_long_run:
     - data://garden/health/latest/measles_long_run:
+      # CDC Measles Cases 1985-present - autoupdate
       - data://garden/cdc/latest/measles_cases:
         - data://meadow/cdc/latest/measles_cases:
           - snapshot://cdc/latest/measles_cases.json
+      # Historical measles data (1919-1984)
       - data://garden/health/2025-02-19/measles_historical:
         - data://meadow/health/2025-02-19/measles_historical:
           - snapshot://health/2025-02-19/measles_historical.csv
@@ -599,17 +590,14 @@ steps:
         - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
 
   # Measles deaths long run
-
-  # Measles deaths historical - US Census Bureau
-
-  # Measles deaths historical - Public health reports
-  #
   data://grapher/health/2025-02-20/measles_deaths_long_run:
     - data://garden/health/2025-02-20/measles_deaths_long_run:
       - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
+      # Measles deaths historical - US Census Bureau
       - data://garden/health/2025-02-20/measles_deaths_census_bureau:
         - data://meadow/health/2025-02-20/measles_deaths_census_bureau:
           - snapshot://health/2025-02-20/measles_deaths_census_bureau.csv
+      # Measles deaths historical - Public health reports
       - data://garden/health/2025-02-20/measles_deaths_public_health_reports:
         - data://meadow/health/2025-02-20/measles_deaths_public_health_reports:
           - snapshot://health/2025-02-20/measles_deaths_public_health_reports.csv
@@ -618,19 +606,17 @@ steps:
   #
   # US - reported diphtheria cases - long-run
   #
-
-  #
-  # Historical diphtheria cases - US Census Bureau
-  #
-
-  #
-  # Diphtheria cases - US CDC
-  #
   data://grapher/health/2025-02-25/diphtheria_cases:
     - data://garden/health/2025-02-25/diphtheria_cases:
+      #
+      # Historical diphtheria cases - US Census Bureau
+      #
       - data://garden/us_census_bureau/2025-02-25/diphtheria_cases:
         - data://meadow/us_census_bureau/2025-02-25/diphtheria_cases:
           - snapshot://us_census_bureau/2025-02-25/diphtheria_cases.csv
+      #
+      # Diphtheria cases - US CDC
+      #
       - data://garden/cdc/2025-02-25/diphtheria_cases:
         - data://meadow/cdc/2025-02-25/diphtheria_cases:
           - snapshot://cdc/2025-02-24/diphtheria_cases.csv
@@ -681,19 +667,17 @@ steps:
   #
   # US diphtheria deaths - long run combined sources
   #
-
-    #
-  # US Census Bureau - Diphtheria deaths
-  #
-
-  #
-  # US Public Health Reports - Diphtheria deaths
-  #
   data://grapher/health/2025-03-04/diphtheria_deaths:
     - data://garden/health/2025-03-04/diphtheria_deaths:
+      #
+      # US Public Health Reports - Diphtheria deaths
+      #
       - data://garden/public_health_reports/2025-03-04/diphtheria_deaths:
         - data://meadow/public_health_reports/2025-03-04/diphtheria_deaths:
           - snapshot://public_health_reports/2025-02-26/diphtheria_deaths.csv
+      #
+      # US Census Bureau - Diphtheria deaths
+      #
       - data://garden/us_census_bureau/2025-03-04/diphtheria_deaths:
         - data://meadow/us_census_bureau/2025-03-04/diphtheria_deaths:
           - snapshot://us_census_bureau/2025-02-26/diphtheria_deaths.csv
@@ -728,12 +712,11 @@ steps:
   #
   # Pertussis deaths - combined
   #
-
-  #
-  # Pertussis deaths - US Census Bureau
-  #
   data://grapher/health/2025-03-06/pertussis_deaths:
     - data://garden/health/2025-03-06/pertussis_deaths:
+      #
+      # Pertussis deaths - US Census Bureau
+      #
       - data://garden/us_census_bureau/2025-03-06/pertussis_deaths:
         - data://meadow/us_census_bureau/2025-03-06/pertussis_deaths:
           - snapshot://us_census_bureau/2025-03-06/pertussis_deaths.csv
@@ -743,42 +726,38 @@ steps:
   #
   # Polio cases - combined
   #
-
-  #
-  # Polio cases - CDC
-  #
-
-  #
-  # Polio cases - US Census Bureau
-  #
-
-  #
-  # Polio cases - Public Health Reports
-  #
   data://grapher/health/2025-03-12/polio_cases:
     - data://garden/health/2025-03-12/polio_cases:
+      #
+      # Polio cases - CDC
+      #
       - data://meadow/cdc/2025-03-12/polio_cases:
         - snapshot://cdc/2025-03-12/polio_cases.csv
+      #
+      # Polio cases - US Census Bureau
+      #
       - data://meadow/us_census_bureau/2025-03-12/polio_cases:
         - snapshot://us_census_bureau/2025-03-12/polio_cases.csv
+      #
+      # Polio cases - Public Health Reports
+      #
       - data://meadow/public_health_reports/2025-03-12/polio_cases:
         - snapshot://public_health_reports/2025-03-12/polio_cases.csv
       - data://garden/demography/2024-07-15/population
 
   #
   # Polio deaths - combined
-
-  #
-  # Polio deaths - CDC
-  #
-
-  #
-  # Polio deaths - Public Health Reports
   #
   data://grapher/health/2025-03-14/polio_deaths:
     - data://garden/health/2025-03-14/polio_deaths:
+      #
+      # Polio deaths - CDC
+      #
       - data://meadow/cdc/2025-03-14/polio_deaths:
         - snapshot://cdc/2025-03-14/polio_deaths.csv
+      #
+      # Polio deaths - Public Health Reports
+      #
       - data://meadow/public_health_reports/2025-03-14/polio_deaths:
         - snapshot://public_health_reports/2025-03-14/polio_deaths.csv
       - data://garden/demography/2024-07-15/population
@@ -817,10 +796,9 @@ steps:
       - data://garden/who/latest/flunet
 
   # WHO Smoking data
-
-  # Global Health Observatory (GHO) from WHO
   data://grapher/who/2025-04-07/gho_smoking:
     - data://garden/who/2025-04-07/gho_smoking:
+      # Global Health Observatory (GHO) from WHO
       - data://garden/who/2024-01-03/gho:
         - data://meadow/who/2024-01-03/gho:
           - snapshot://who/2024-01-03/gho.zip
@@ -874,12 +852,11 @@ steps:
   data://grapher/health/2025-07-28/clinical_trials:
     - data://garden/health/2025-07-28/clinical_trials:
       - snapshot://health/2025-07-28/clinical_trials.csv
-    # Guinea worm cases
-
-  # Guinea worm certification
+  # Guinea worm cases
   data://grapher/who/2025-08-01/guinea_worm:
     - data://garden/who/2025-08-01/guinea_worm:
       - snapshot://fasttrack/latest/guinea_worm_cases.csv
+      # Guinea worm certification
       - data://garden/who/2025-08-01/guinea_worm_certification:
         - data://meadow/who/2025-08-01/guinea_worm_certification:
           - snapshot://who/2025-08-01/guinea_worm.csv
@@ -970,10 +947,9 @@ steps:
   data://grapher/un/2024-07-08/maternal_mortality:
     - data://garden/un/2024-07-08/maternal_mortality
 
-  # Gapminder Maternal Mortality (long run dataset)
-
   # Maternal Mortality long run data set (OWID OMM)
   data://garden/maternal_mortality/2024-07-08/maternal_mortality:
+    # Gapminder Maternal Mortality (long run dataset)
     - data://garden/gapminder/2024-07-08/maternal_mortality:
       - data://meadow/gapminder/2024-07-08/maternal_mortality:
         - snapshot://gapminder/2024-07-08/maternal_mortality.xlsx

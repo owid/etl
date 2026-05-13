@@ -6,10 +6,6 @@ steps:
         - snapshot://forests/2024-05-08/ifl.xlsx
       - data://garden/regions/2023-01-01/regions
 
-  #
-  # FAO Forest Resources Assessment (FRA) data
-  #
-
   # Forest Share combined sources
   data://grapher/forests/2025-05-09/forest_share:
     - data://garden/forests/2025-05-08/forest_share:
@@ -25,6 +21,9 @@ steps:
       - snapshot://papers/2025-05-23/he_2025.csv
       - snapshot://papers/2025-05-08/soo_bae_et_al_2012.csv
       - snapshot://usda_fs/2025-05-07/forest_share.csv
+      #
+      # FAO Forest Resources Assessment (FRA) data
+      #
       - data://garden/fao/2025-05-09/fra_forest_extent:
         - data://meadow/fao/2025-05-09/fra_forest_extent:
           - snapshot://fao/2025-05-09/fra_forest_extent.xlsx

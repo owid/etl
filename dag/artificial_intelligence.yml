@@ -144,23 +144,21 @@ steps:
         - snapshot://tsmc/2025-11-10/operating_data.xlsx
 
   # TSMC monthly revenue
-
-  # TWD/USD exchange rates from Central Bank of Taiwan
   data://grapher/tsmc/2025-11-10/monthly_revenue:
     - data://garden/tsmc/2025-11-10/monthly_revenue:
       - data://meadow/tsmc/2025-11-10/monthly_revenue:
         - snapshot://tsmc/2025-11-10/monthly_revenue.xlsx
+      # TWD/USD exchange rates from Central Bank of Taiwan
       - data://garden/cbc_taiwan/2025-12-22/twd_usd_exchange_rate:
         - data://meadow/cbc_taiwan/2025-12-22/twd_usd_exchange_rate:
           - snapshot://cbc_taiwan/2025-12-22/twd_usd_exchange_rate.csv
 
   # IFR robot density 2024 data
-
-  # IFR robot density data
   data://grapher/ifr/2026-04-10/robot_density:
     - data://garden/ifr/2026-04-10/robot_density:
       - data://meadow/ifr/2026-04-10/robot_density:
         - snapshot://ifr/2026-04-10/robot_density.csv
+      # IFR robot density data
       - data://garden/ifr/2026-01-14/robot_density:
         - data://meadow/ifr/2026-01-14/robot_density:
           - snapshot://ifr/2026-01-14/robot_density.xlsx
@@ -197,16 +195,14 @@ steps:
   ########################
   # AI Index Report 2026
   ############################
-
-  ########################
-  # AI Index report
-  ############################
-
-  # AI Index Report 2025 - AI adoption by organisations
   data://grapher/artificial_intelligence/2026-04-20/ai_index:
     - data://garden/artificial_intelligence/2026-04-20/ai_index_report:
       - data://meadow/artificial_intelligence/2026-04-20/ai_index_report:
         - snapshot://artificial_intelligence/2026-04-20/ai_index_report.zip
+      ########################
+      # AI Index report
+      ############################
+      # AI Index Report 2025 - AI adoption by organisations
       - data://garden/artificial_intelligence/2025-04-08/ai_adoption:
         - snapshot://artificial_intelligence/2025-04-08/ai_adoption.csv
         - snapshot://artificial_intelligence/2024-06-28/ai_adoption_2023.csv
