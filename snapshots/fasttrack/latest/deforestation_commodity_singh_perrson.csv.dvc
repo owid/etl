@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: Singh et al. (2026)
-    title: deforestation_commodity_singh_perrson
+    title: deforestation_by_commodity
     citation_full: |-
       Singh, C., Persson, U. M., Croft, S., Kastner, T., & West, C. D. (2026). Commodity-driven deforestation, associated carbon emissions and trade 2001-2023 (Version 2.1) [Dataset]. Zenodo. doi: 10.5281/zenodo.18953516
     url_main: https://www.nature.com/articles/s43016-026-01305-4
