@@ -472,6 +472,28 @@ COMBINED_CONFIGS = [
             mixed_label="Subnationally mixed",
         ),
     },
+    # ── Gender-affirming care: adults + minors combined (Bastian feedback) ──────────────
+    # 4 source columns (adults covered / restricted, minors covered / restricted) →
+    # one categorical indicator. Of 81 possible 4-tuple patterns, only 12 occur in the
+    # v2 data; we map the 5 most common ones and route everything else to the
+    # "Subnationally mixed or other" default.
+    {
+        "short_name": "gender_affirming_care",
+        "sources": [
+            ("gender_affirming_care_adults__covered", "ac"),
+            ("gender_affirming_care_adults__restricted", "ar"),
+            ("gender_affirming_care_minors__covered", "mc"),
+            ("gender_affirming_care_minors__restricted", "mr"),
+        ],
+        "category_map": {
+            "ac: 1 ar: 0 mc: 1 mr: 0": "Covered for adults and minors",
+            "ac: 1 ar: 0 mc: 0 mr: 0": "Covered for adults only",
+            "ac: 1 ar: 0 mc: 0 mr: 1": "Adults covered, minors restricted",
+            "ac: 0 ar: 1 mc: 0 mr: 1": "Restricted for both",
+            "ac: 0 ar: 0 mc: 0 mr: 0": "Neither covered nor restricted",
+        },
+        "default_category": "Subnationally mixed or other",
+    },
 ]
 
 
@@ -488,7 +510,10 @@ def _build_one_combined(wide, config):
     """Build one combined categorical indicator from its config.
 
     The bucket key is "<label1>: <b1> <label2>: <b2> ...", looked up in `category_map`.
-    Unmapped key combinations produce NaN in the output.
+    Unmapped key combinations get the optional `default_category` value (typically used
+    for "Subnationally mixed or other" buckets where enumerating every pattern is noisy);
+    if `default_category` is unset, unmapped keys are left as their raw bucket string,
+    which surfaces them as a sanity check rather than silently dropping.
     """
     parts = []
     for col, label in config["sources"]:
@@ -496,12 +521,16 @@ def _build_one_combined(wide, config):
     keys = parts[0]
     for part in parts[1:]:
         keys = keys + " " + part
-    result = map_series(
-        series=keys,
-        mapping=config["category_map"],
-        warn_on_missing_mappings=False,
-        warn_on_unused_mappings=False,
-    )
+    cat_map = config["category_map"]
+    if "default_category" in config:
+        result = keys.map(lambda k: cat_map.get(k, config["default_category"]))
+    else:
+        result = map_series(
+            series=keys,
+            mapping=cat_map,
+            warn_on_missing_mappings=False,
+            warn_on_unused_mappings=False,
+        )
     return result.copy_metadata(wide["country"])
 
 

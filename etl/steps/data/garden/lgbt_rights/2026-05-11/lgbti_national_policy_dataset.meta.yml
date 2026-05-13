@@ -713,6 +713,25 @@ tables:
           - Subnationally mixed
           - Not protected
 
+      # ── Gender-affirming care combined: adults + minors (Bastian feedback) ──────────
+      gender_affirming_care:
+        title: Gender-affirming care (adults and minors)
+        description_short: |-
+          Whether gender-affirming healthcare is publicly funded or legally restricted for adults and for minors. Several countries — Sweden (2022), Finland (2020), the United Kingdom (2024), Argentina (2025), Denmark (2023), New Zealand (2024), and Italy (2024) — have moved from covering minors to restricting care for them while maintaining coverage for adults.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Gender-affirming care
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Covered for adults and minors
+          - Covered for adults only
+          - Adults covered, minors restricted
+          - Restricted for both
+          - Subnationally mixed or other
+          - Neither covered nor restricted
+
   lgbti_national_policy_dataset_combined_regions:
     variables:
       # AGE OF CONSENT — number of countries
@@ -2292,5 +2311,104 @@ tables:
         short_unit: ""
         display:
           name: Not protected
+          numDecimalPlaces: 0
+
+
+      # ── Gender-affirming care regional aggregates ────────────────────────────────
+
+      gender_affirming_care_covered_for_adults_and_minors_count:
+        title: Number of countries — Covered for adults and minors (gender-affirming care)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Covered for adults and minors
+          numDecimalPlaces: 0
+
+      gender_affirming_care_covered_for_adults_and_minors_pop:
+        title: Population — Covered for adults and minors (gender-affirming care)
+        unit: people
+        short_unit: ""
+        display:
+          name: Covered for adults and minors
+          numDecimalPlaces: 0
+
+      gender_affirming_care_covered_for_adults_only_count:
+        title: Number of countries — Covered for adults only (gender-affirming care)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Covered for adults only
+          numDecimalPlaces: 0
+
+      gender_affirming_care_covered_for_adults_only_pop:
+        title: Population — Covered for adults only (gender-affirming care)
+        unit: people
+        short_unit: ""
+        display:
+          name: Covered for adults only
+          numDecimalPlaces: 0
+
+      gender_affirming_care_adults_covered__minors_restricted_count:
+        title: Number of countries — Adults covered, minors restricted (gender-affirming care)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Adults covered, minors restricted
+          numDecimalPlaces: 0
+
+      gender_affirming_care_adults_covered__minors_restricted_pop:
+        title: Population — Adults covered, minors restricted (gender-affirming care)
+        unit: people
+        short_unit: ""
+        display:
+          name: Adults covered, minors restricted
+          numDecimalPlaces: 0
+
+      gender_affirming_care_restricted_for_both_count:
+        title: Number of countries — Restricted for both (gender-affirming care)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Restricted for both
+          numDecimalPlaces: 0
+
+      gender_affirming_care_restricted_for_both_pop:
+        title: Population — Restricted for both (gender-affirming care)
+        unit: people
+        short_unit: ""
+        display:
+          name: Restricted for both
+          numDecimalPlaces: 0
+
+      gender_affirming_care_subnationally_mixed_or_other_count:
+        title: Number of countries — Subnationally mixed or other (gender-affirming care)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed or other
+          numDecimalPlaces: 0
+
+      gender_affirming_care_subnationally_mixed_or_other_pop:
+        title: Population — Subnationally mixed or other (gender-affirming care)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed or other
+          numDecimalPlaces: 0
+
+      gender_affirming_care_neither_covered_nor_restricted_count:
+        title: Number of countries — Neither covered nor restricted (gender-affirming care)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Neither covered nor restricted
+          numDecimalPlaces: 0
+
+      gender_affirming_care_neither_covered_nor_restricted_pop:
+        title: Population — Neither covered nor restricted (gender-affirming care)
+        unit: people
+        short_unit: ""
+        display:
+          name: Neither covered nor restricted
           numDecimalPlaces: 0
 
