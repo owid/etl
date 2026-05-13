@@ -67,6 +67,74 @@ MARRIAGE_MAP = {
     "equality: 0 ban: 1 civil_unions: 0.5": "Partially banned",
     "equality: 0 ban: 1 civil_unions: 0": "Banned",
 }
+LGB_MILITARY_MAP = {
+    "legal: 1 illegal: 0": "Allowed",
+    "legal: 0 illegal: 1": "Banned",
+    "legal: 0 illegal: 0": "No policy",
+}
+
+# Per-indicator config for combined-categorical indicators.
+# Each entry says which (law, status) proportion columns feed the bucket key,
+# which label each bucket gets via the bucket-key string, and the final category map.
+# `sources` is a list of (column_name, key_label) pairs; the bucket key is built by
+# joining "<label>: <bucket>" for each source with spaces.
+COMBINED_CONFIGS = [
+    {
+        "short_name": "age_of_consent",
+        "sources": [
+            ("age_of_consent__equal", "equal"),
+            ("age_of_consent__unequal", "unequal"),
+        ],
+        "category_map": AGE_OF_CONSENT_MAP,
+    },
+    {
+        "short_name": "marriage",
+        "sources": [
+            ("marriage_equality__legal", "equality"),
+            ("marriage_equality__illegal", "ban"),
+            ("civil_unions__legal", "civil_unions"),
+        ],
+        "category_map": MARRIAGE_MAP,
+    },
+    {
+        "short_name": "lgb_military_join",
+        "sources": [
+            ("lgb_military__legal", "legal"),
+            ("lgb_military__illegal", "illegal"),
+        ],
+        "category_map": LGB_MILITARY_MAP,
+    },
+]
+
+
+def _bucket(series):
+    """Bucket a continuous proportion (0..1) into '0', '0.5', '1' strings.
+
+    '1' = exactly 1, '0.5' = any 0 < x < 1 (subnational partial or transition year),
+    '0' = exactly 0.
+    """
+    return series.apply(lambda v: "1" if v == 1 else "0.5" if v > 0 else "0")
+
+
+def _build_one_combined(wide, config):
+    """Build one combined categorical indicator from its config.
+
+    The bucket key is "<label1>: <b1> <label2>: <b2> ...", looked up in `category_map`.
+    Unmapped key combinations produce NaN in the output.
+    """
+    parts = []
+    for col, label in config["sources"]:
+        parts.append(f"{label}: " + _bucket(wide[col]))
+    keys = parts[0]
+    for part in parts[1:]:
+        keys = keys + " " + part
+    result = map_series(
+        series=keys,
+        mapping=config["category_map"],
+        warn_on_missing_mappings=False,
+        warn_on_unused_mappings=False,
+    )
+    return result.copy_metadata(wide["country"])
 
 
 def run() -> None:
@@ -181,58 +249,22 @@ def _build_regional_aggregates(tb):
 
 
 def _build_combined_categorical_table(tb):
-    """Create three combined ordinal indicators: age_of_consent, marriage, lgb_military_join.
+    """Create combined ordinal indicators from the long-format (country, year, law, status) table.
 
-    It buckets each policy's Proportion into 0 / 0.5 / 1 (where 0.5 means "0 < x < 1"),
-    concatenated the bucket strings of the relevant policies, and mapped to a human-readable
-    category.
+    For each entry in COMBINED_CONFIGS, bucket the relevant `proportion` columns into
+    '0' / '0.5' / '1', concatenate bucket strings into a key, and map to a category label.
+    Unmapped key combinations produce NaN in the output column.
     """
     # Pivot the long table to wide so we can address each (law, status) column by name.
     wide = tb.pivot(index=["country", "year"], columns=["law", "status"], values="proportion")
     wide.columns = [f"{law}__{status}" for law, status in wide.columns]
     wide = wide.reset_index()
 
-    def bucket(series):
-        # 1 if exactly 1, "0.5" if 0 < x < 1 (any subnational partial), else "0".
-        return series.apply(lambda v: "1" if v == 1 else "0.5" if v > 0 else "0")
+    for config in COMBINED_CONFIGS:
+        wide[config["short_name"]] = _build_one_combined(wide, config)
 
-    # AGE OF CONSENT — built from equal_age and unequal_age proportions.
-    equal_b = bucket(wide["age_of_consent__equal"])
-    unequal_b = bucket(wide["age_of_consent__unequal"])
-    age_keys = "equal: " + equal_b + " unequal: " + unequal_b
-    wide["age_of_consent"] = map_series(
-        series=age_keys,
-        mapping=AGE_OF_CONSENT_MAP,
-        warn_on_missing_mappings=False,
-        warn_on_unused_mappings=False,
-    )
-    wide["age_of_consent"] = wide["age_of_consent"].copy_metadata(wide["country"])
-
-    # MARRIAGE — built from marriage_equality (Legal + Illegal) and civil_unions (Legal).
-    eq_b = bucket(wide["marriage_equality__legal"])
-    ban_b = bucket(wide["marriage_equality__illegal"])
-    cu_b = bucket(wide["civil_unions__legal"])
-    marriage_keys = "equality: " + eq_b + " ban: " + ban_b + " civil_unions: " + cu_b
-    wide["marriage"] = map_series(
-        series=marriage_keys,
-        mapping=MARRIAGE_MAP,
-        warn_on_missing_mappings=False,
-        warn_on_unused_mappings=False,
-    )
-    wide["marriage"] = wide["marriage"].copy_metadata(wide["country"])
-
-    # LGB MILITARY — three pure-binary categories: Allowed / Banned / No policy.
-    mil_legal = wide["lgb_military__legal"]
-    mil_ban = wide["lgb_military__illegal"]
-    wide["lgb_military_join"] = None
-    wide.loc[(mil_legal == 1) & (mil_ban == 0), "lgb_military_join"] = "Allowed"
-    wide.loc[(mil_legal == 0) & (mil_ban == 1), "lgb_military_join"] = "Banned"
-    wide.loc[(mil_legal == 0) & (mil_ban == 0), "lgb_military_join"] = "No policy"
-    wide["lgb_military_join"] = wide["lgb_military_join"].copy_metadata(wide["country"])
-
-    wide = wide[["country", "year", "age_of_consent", "marriage", "lgb_military_join"]]
-
-    return wide
+    output_cols = ["country", "year"] + [c["short_name"] for c in COMBINED_CONFIGS]
+    return wide[output_cols]
 
 
 def _build_combined_categorical_regional_aggregates(tb_combined):
@@ -249,7 +281,7 @@ def _build_combined_categorical_regional_aggregates(tb_combined):
     tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
 
     new_cols = []
-    for indicator in ("age_of_consent", "marriage", "lgb_military_join"):
+    for indicator in [c["short_name"] for c in COMBINED_CONFIGS]:
         for category in tb[indicator].dropna().unique():
             cat_snake = underscore(category)
             count_col = f"{indicator}_{cat_snake}_count"
