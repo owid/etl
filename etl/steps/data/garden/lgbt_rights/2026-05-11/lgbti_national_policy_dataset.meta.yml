@@ -270,7 +270,7 @@ tables:
   lgbti_national_policy_dataset_combined:
     variables:
       age_of_consent:
-        title: Age of consent (combined)
+        title: Age of consent
         description_short: |-
           Whether the minimum age of consent for same-sex sexual activity equals that for different-sex sexual activity.
         description_key:
@@ -291,7 +291,7 @@ tables:
           - Unequal
 
       marriage:
-        title: Marriage equality (combined)
+        title: Marriage equality
         description_short: |-
           Whether same-sex couples can legally marry, whether civil unions or registered partnerships are recognized instead, or whether same-sex marriage is banned.
         description_key:
@@ -314,7 +314,7 @@ tables:
           - Banned
 
       lgb_military_join:
-        title: LGB military (combined)
+        title: LGB military service
         description_short: |-
           Whether lesbian, gay, and bisexual people are allowed to serve in the military, banned from serving, or whether no policy exists.
         description_key:
