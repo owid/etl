@@ -38,7 +38,7 @@ definitions:
   derivation_gac: |-
     From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The most common patterns get a dedicated category (e.g. covered for both, adults covered with minors restricted); rarer combinations are grouped as "Varies by region or other".
   derivation_gmc: |-
-    From the original dataset, we combined the gender-marker-change proportion (legal direction) with the recorded legal-pathway requirement (Self-ID, Medical or psychological diagnosis, Surgery, Surgery plus sterilization) into a single categorical indicator that distinguishes both whether legal gender change is possible and what the procedure requires.
+    From the original dataset, we combined the gender-marker-change proportion (the legal direction) with the recorded legal-pathway requirement to produce a single categorical indicator. When legal change of the gender marker is fully in effect, we classify countries by their procedural requirement ("Self-declaration", "Medical or psychological diagnosis", "Surgery required", "Surgery and sterilization required", or "Legally possible, requirement unknown" when the requirement is not recorded). Otherwise the country is classified as "Varies by region" (legal change is only partially in effect across subnational jurisdictions) or "Not legally possible" (no legal procedure exists).
 
   # Per-law short description (used for description_short and as building block for title)
   law_short: |-
@@ -338,6 +338,9 @@ tables:
         title: Same-sex sexual acts
         description_short: |-
           Whether consensual same-sex sexual acts between adults are legal or criminalized under national law.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Legal_** (consensual same-sex sexual acts are legal under national law), **_Varies by region_** (laws differ between subnational jurisdictions, or the country is in a transition year between criminalization and decriminalization), **_No legal provisions_** (no national law specifically addresses consensual same-sex sexual acts) and **_Criminalized_** (consensual same-sex sexual acts are criminalized under national law).'
         unit: ""
         short_unit: ""
         display:
@@ -356,6 +359,9 @@ tables:
         title: Blood donations by men who have sex with men
         description_short: |-
           Whether men who have sex with men may donate blood without restriction. Any deferral or lifetime ban is coded as a restriction.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_No MSM restrictions_** (men who have sex with men may donate blood without specific restriction), **_Varies by region_** (rules differ between subnational jurisdictions or blood-service providers), **_No policy_** (no national rule on blood donation by men who have sex with men) and **_Deferral or ban_** (men who have sex with men face a deferral period or a lifetime ban on blood donation).'
         unit: ""
         short_unit: ""
         display:
@@ -374,6 +380,9 @@ tables:
         title: Transgender military service
         description_short: |-
           Whether transgender people may serve openly in the military.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Allowed_** (transgender people may serve openly in the military), **_Varies by region_** (rules differ between subnational jurisdictions, branches, or are in a transition period), **_No policy_** (no national policy allowing or banning transgender military service) and **_Banned_** (transgender people are banned from serving openly in the military).'
         unit: ""
         short_unit: ""
         display:
@@ -392,6 +401,9 @@ tables:
         title: Civil unions or registered partnerships
         description_short: |-
           Whether same-sex couples have access to a legally recognized partnership (civil union, domestic partnership, or registered partnership).
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Legally recognized_** (same-sex couples have access to a legally recognized partnership distinct from marriage), **_Varies by region_** (recognition differs between subnational jurisdictions) and **_Not recognized_** (no legal recognition of same-sex partnerships at the national level).'
         unit: ""
         short_unit: ""
         display:
@@ -409,6 +421,9 @@ tables:
         title: Joint adoption by same-sex couples
         description_short: |-
           Whether same-sex couples may jointly adopt children.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Permitted_** (same-sex couples may jointly adopt children under national law), **_Varies by region_** (rules differ between subnational jurisdictions) and **_Not permitted_** (national law does not permit joint adoption by same-sex couples).'
         unit: ""
         short_unit: ""
         display:
@@ -426,6 +441,9 @@ tables:
         title: Constitutional protections based on sexual orientation
         description_short: |-
           Whether sexual orientation is explicitly named in the constitution or established through binding constitutional court interpretation.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Constitutionally protected_** (sexual orientation is named in the constitution or established as a protected characteristic through binding constitutional court interpretation), **_Varies by region_** (constitutional protections differ between subnational jurisdictions) and **_Not protected_** (no national constitutional protection for sexual orientation).'
         unit: ""
         short_unit: ""
         display:
@@ -443,6 +461,9 @@ tables:
         title: Constitutional protections based on gender identity
         description_short: |-
           Whether gender identity is explicitly named in the constitution or established through binding constitutional court interpretation.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Constitutionally protected_** (gender identity is named in the constitution or established as a protected characteristic through binding constitutional court interpretation), **_Varies by region_** (constitutional protections differ between subnational jurisdictions) and **_Not protected_** (no national constitutional protection for gender identity).'
         unit: ""
         short_unit: ""
         display:
@@ -460,6 +481,9 @@ tables:
         title: Hate crime protections based on sexual orientation
         description_short: |-
           Whether sexual orientation is a protected characteristic in hate crime legislation with enhanced penalties.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Covered by hate crime laws_** (sexual orientation is a protected characteristic in national hate crime legislation that imposes enhanced penalties), **_Varies by region_** (coverage differs between subnational jurisdictions) and **_Not covered_** (sexual orientation is not covered by national hate crime legislation).'
         unit: ""
         short_unit: ""
         display:
@@ -477,6 +501,9 @@ tables:
         title: Hate crime protections based on gender identity
         description_short: |-
           Whether gender identity is a protected characteristic in hate crime legislation with enhanced penalties.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Covered by hate crime laws_** (gender identity is a protected characteristic in national hate crime legislation that imposes enhanced penalties), **_Varies by region_** (coverage differs between subnational jurisdictions) and **_Not covered_** (gender identity is not covered by national hate crime legislation).'
         unit: ""
         short_unit: ""
         display:
@@ -494,6 +521,9 @@ tables:
         title: Incitement to hatred protections
         description_short: |-
           Whether incitement to hatred based on sexual orientation or gender identity is prohibited.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Prohibited_** (incitement to hatred based on sexual orientation or gender identity is prohibited under national law), **_Varies by region_** (prohibitions differ between subnational jurisdictions) and **_Not prohibited_** (no national law prohibits incitement to hatred based on sexual orientation or gender identity).'
         unit: ""
         short_unit: ""
         display:
@@ -511,6 +541,9 @@ tables:
         title: Legal recognition of a third gender
         description_short: |-
           Whether a third gender marker or non-binary category is legally recognized on official identity documents.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Recognized_** (a third gender marker or non-binary category is legally recognized on official identity documents), **_Varies by region_** (recognition differs between subnational jurisdictions) and **_Not recognized_** (no legal recognition of a third gender marker or non-binary category).'
         unit: ""
         short_unit: ""
         display:
@@ -528,6 +561,9 @@ tables:
         title: Employment discrimination based on sexual orientation
         description_short: |-
           Whether national law prohibits employment discrimination based on sexual orientation.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Discrimination prohibited_** (national law prohibits employment discrimination based on sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions) and **_No protection_** (no national law prohibits employment discrimination based on sexual orientation).'
         unit: ""
         short_unit: ""
         display:
@@ -545,6 +581,9 @@ tables:
         title: Employment discrimination based on gender identity
         description_short: |-
           Whether national law prohibits employment discrimination based on gender identity.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Discrimination prohibited_** (national law prohibits employment discrimination based on gender identity), **_Varies by region_** (protections differ between subnational jurisdictions) and **_No protection_** (no national law prohibits employment discrimination based on gender identity).'
         unit: ""
         short_unit: ""
         display:
@@ -562,6 +601,9 @@ tables:
         title: Goods and services discrimination based on sexual orientation
         description_short: |-
           Whether national law prohibits discrimination in the provision of goods and services based on sexual orientation.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Discrimination prohibited_** (national law prohibits discrimination in the provision of goods and services based on sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions) and **_No protection_** (no national law prohibits goods and services discrimination based on sexual orientation).'
         unit: ""
         short_unit: ""
         display:
@@ -579,6 +621,9 @@ tables:
         title: Goods and services discrimination based on gender identity
         description_short: |-
           Whether national law prohibits discrimination in the provision of goods and services based on gender identity.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Discrimination prohibited_** (national law prohibits discrimination in the provision of goods and services based on gender identity), **_Varies by region_** (protections differ between subnational jurisdictions) and **_No protection_** (no national law prohibits goods and services discrimination based on gender identity).'
         unit: ""
         short_unit: ""
         display:
@@ -596,6 +641,9 @@ tables:
         title: Conversion therapy
         description_short: |-
           Whether conversion therapy is banned by law, executive order, or judicial ruling.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Banned_** (conversion therapy is banned by law, executive order, or judicial ruling), **_Varies by region_** (bans differ between subnational jurisdictions) and **_Not banned_** (no national ban on conversion therapy).'
         unit: ""
         short_unit: ""
         display:
@@ -613,6 +661,9 @@ tables:
         title: Non-consensual gender assignment surgeries on intersex minors
         description_short: |-
           Whether non-consensual gender assignment surgeries on intersex minors are banned.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Non-consensual surgeries banned_** (non-consensual gender assignment surgeries on intersex minors are banned under national law), **_Varies by region_** (bans differ between subnational jurisdictions) and **_Not banned_** (no national ban on non-consensual gender assignment surgeries on intersex minors).'
         unit: ""
         short_unit: ""
         display:
@@ -630,6 +681,9 @@ tables:
         title: Death penalty for same-sex acts
         description_short: |-
           Whether the death penalty is a codified or de facto punishment for same-sex sexual acts.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_No death penalty_** (the death penalty does not apply to same-sex sexual acts), **_Varies by region_** (application differs between subnational jurisdictions) and **_Death penalty applies_** (the death penalty is a codified or de facto punishment for same-sex sexual acts).'
         unit: ""
         short_unit: ""
         display:
@@ -647,6 +701,9 @@ tables:
         title: Anti-LGBTI "propaganda" or morality laws
         description_short: |-
           Whether national law restricts the public expression of LGBTI identities (so-called "gay propaganda" or morality provisions).
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_No restrictions_** (no national law restricts the public expression of LGBTI identities), **_Varies by region_** (restrictions differ between subnational jurisdictions) and **_Restrictions in effect_** (national law restricts the public expression of LGBTI identities (so-called "gay propaganda" or morality provisions)).'
         unit: ""
         short_unit: ""
         display:
@@ -664,6 +721,9 @@ tables:
         title: Restrictions on LGBTQ+ civil society
         description_short: |-
           Whether national law explicitly restricts the formation, registration, operation, or funding of LGBTQ+ civil society organizations.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_No restrictions_** (no national law restricts the formation, registration, operation, or funding of LGBTQ+ civil society organizations), **_Varies by region_** (restrictions differ between subnational jurisdictions) and **_Restrictions in effect_** (national law explicitly restricts the formation, registration, operation, or funding of LGBTQ+ civil society organizations).'
         unit: ""
         short_unit: ""
         display:
@@ -681,6 +741,9 @@ tables:
         title: Religious exemption laws
         description_short: |-
           Whether national law allows individuals, businesses, or organizations to refuse services to LGBTQ+ people on religious or conscientious grounds.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_No religious exemptions_** (no national law allows refusal of services to LGBTQ+ people on religious or conscientious grounds, beyond standard clergy exemptions), **_Varies by region_** (exemptions differ between subnational jurisdictions) and **_Religious exemptions in effect_** (national law allows individuals, businesses, or organizations to refuse services to LGBTQ+ people on religious or conscientious grounds).'
         unit: ""
         short_unit: ""
         display:
@@ -699,6 +762,9 @@ tables:
         title: Employment discrimination protections (sexual orientation and gender identity)
         description_short: |-
           Whether national law prohibits employment discrimination based on sexual orientation, gender identity, both, or neither.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Both protected_** (national law prohibits employment discrimination on both sexual orientation and gender identity), **_Sexual orientation only_** (national law prohibits employment discrimination on sexual orientation but not gender identity), **_Gender identity only_** (national law prohibits employment discrimination on gender identity but not sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions for either ground) and **_No protection_** (national law does not prohibit employment discrimination on either ground).'
         unit: ""
         short_unit: ""
         display:
@@ -718,6 +784,9 @@ tables:
         title: Goods and services discrimination protections (sexual orientation and gender identity)
         description_short: |-
           Whether national law prohibits discrimination in the provision of goods and services based on sexual orientation, gender identity, both, or neither.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Both protected_** (national law prohibits goods and services discrimination on both sexual orientation and gender identity), **_Sexual orientation only_** (national law prohibits goods and services discrimination on sexual orientation but not gender identity), **_Gender identity only_** (national law prohibits goods and services discrimination on gender identity but not sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions for either ground) and **_No protection_** (national law does not prohibit goods and services discrimination on either ground).'
         unit: ""
         short_unit: ""
         display:
@@ -737,6 +806,9 @@ tables:
         title: Hate crime protections (sexual orientation and gender identity)
         description_short: |-
           Whether national hate crime legislation covers sexual orientation, gender identity, both, or neither as a protected characteristic.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Both covered_** (national hate crime legislation covers both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is covered by national hate crime legislation), **_Gender identity only_** (only gender identity is covered by national hate crime legislation), **_Varies by region_** (coverage differs between subnational jurisdictions for either ground) and **_Not covered_** (national hate crime legislation does not cover either ground).'
         unit: ""
         short_unit: ""
         display:
@@ -756,6 +828,9 @@ tables:
         title: Constitutional protections (sexual orientation and gender identity)
         description_short: |-
           Whether the constitution explicitly or via binding court interpretation protects sexual orientation, gender identity, both, or neither.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Both protected_** (the constitution explicitly, or via binding court interpretation, protects both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is protected), **_Gender identity only_** (only gender identity is protected), **_Varies by region_** (protections differ between subnational jurisdictions for either ground) and **_Not protected_** (the constitution does not protect either ground).'
         unit: ""
         short_unit: ""
         display:
@@ -776,6 +851,9 @@ tables:
         title: Gender-affirming care (adults and minors)
         description_short: |-
           Whether gender-affirming healthcare is publicly funded or legally restricted for adults and for minors. Several countries — Sweden (2022), Finland (2020), the United Kingdom (2024), Argentina (2025), Denmark (2023), New Zealand (2024), and Italy (2024) — have moved from covering minors to restricting care for them while maintaining coverage for adults.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Covered for adults and minors_** (gender-affirming healthcare is publicly funded for both adults and minors), **_Covered for adults only_** (gender-affirming healthcare is publicly funded for adults but not for minors), **_Adults covered, minors restricted_** (gender-affirming healthcare is publicly funded for adults but explicitly restricted or banned for minors), **_Neither covered nor restricted_** (no national policy explicitly funds or restricts gender-affirming healthcare for either group), **_Varies by region or other_** (rules differ between subnational jurisdictions, or the pattern of coverage and restriction does not fit one of the dedicated categories) and **_Restricted for both_** (gender-affirming healthcare is explicitly restricted or banned for both adults and minors).'
         unit: ""
         short_unit: ""
         display:
@@ -797,6 +875,9 @@ tables:
         title: Legal change of gender marker
         description_short: |-
           Whether a legal process exists to change the gender marker on official identity documents, and what the process requires — self-declaration, medical or psychological diagnosis, surgery, or surgery plus sterilization.
+        description_key:
+          - '{definitions.description_key_dataset}'
+          - 'The indicator is coded as follows: **_Self-declaration_** (legal change of the gender marker is possible based on self-declaration), **_Medical or psychological diagnosis_** (legal change requires a medical or psychological diagnosis), **_Surgery required_** (legal change requires gender-affirming surgery), **_Surgery and sterilization required_** (legal change requires both gender-affirming surgery and sterilization), **_Legally possible, requirement unknown_** (legal change is in effect but the procedural requirement is not recorded in the source), **_Varies by region_** (rules differ between subnational jurisdictions, or legal change is only partially in effect) and **_Not legally possible_** (no legal procedure exists to change the gender marker on official identity documents).'
         unit: ""
         short_unit: ""
         display:
