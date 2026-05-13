@@ -237,4 +237,7 @@ steps:
     - snapshot://faostat/2026-05-07/faostat_tm.zip
   data://garden/faostat/2026-05-07/faostat_tm:
     - data://meadow/faostat/2026-05-07/faostat_tm
+  # Long-format slice of the trade matrix for the latest year with enough data coverage.
+  export://s3/faostat/latest/food_trade:
+    - data://garden/faostat/2026-05-07/faostat_tm
   ######################################################################################################################

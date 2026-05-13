@@ -253,9 +253,7 @@ def sanity_check_inputs(tb: Table) -> None:
     n_self_trade = _count_self_trade(tb)
     self_trade_share = n_self_trade / len(tb) if len(tb) > 0 else 0
     log.info("faostat_tm.self_trade_rows", count=n_self_trade, share=f"{self_trade_share:.2%}")
-    assert self_trade_share < 0.01, (
-        f"Self-trade rows are {self_trade_share:.2%} of the table."
-    )
+    assert self_trade_share < 0.01, f"Self-trade rows are {self_trade_share:.2%} of the table."
 
     # Year range is sensible.
     min_year, max_year = int(tb["year"].min()), int(tb["year"].max())
