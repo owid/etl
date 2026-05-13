@@ -843,7 +843,7 @@ tables:
       gender_affirming_care:
         title: Gender-affirming care (adults and minors)
         description_short: |-
-          Whether gender-affirming healthcare is publicly funded or legally restricted for adults and for minors. Several countries — Sweden (2022), Finland (2020), the United Kingdom (2024), Argentina (2025), Denmark (2023), New Zealand (2024), and Italy (2024) — have moved from covering minors to restricting care for them while maintaining coverage for adults.
+          Whether gender-affirming healthcare is publicly funded or legally restricted for adults and for minors.
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Covered for adults and minors_** (gender-affirming healthcare is publicly funded for both adults and minors), **_Covered for adults only_** (gender-affirming healthcare is publicly funded for adults but not for minors), **_Adults covered, minors restricted_** (gender-affirming healthcare is publicly funded for adults but explicitly restricted or banned for minors), **_Neither covered nor restricted_** (no national policy explicitly funds or restricts gender-affirming healthcare for either group), **_Varies by region or other_** (rules differ between subnational jurisdictions, or the pattern of coverage and restriction does not fit one of the dedicated categories) and **_Restricted for both_** (gender-affirming healthcare is explicitly restricted or banned for both adults and minors).'
