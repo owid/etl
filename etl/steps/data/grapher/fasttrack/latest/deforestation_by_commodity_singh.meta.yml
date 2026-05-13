@@ -1,0 +1,71 @@
+dataset:
+  title: Deforestation by commodity (Singh et al, 2026)
+  description: ''
+  licenses:
+    - {}
+tables:
+  deforestation_by_commodity_singh:
+    variables:
+      cattle:
+        title: Cattle (beef and leather)
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation driven by the conversion to pasture for cattle.
+      palm_oil:
+        title: Palm oil
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation driven by the conversion to land for the production of oil palm.
+      soy:
+        title: Soy
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation driven by the conversion to cropland for the production of soy.
+      forestry:
+        title: Oilseeds (excl. soy and palm)
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation driven by the conversion to managed forest for products such as paper, pulp and
+          wood.
+      cereals:
+        title: Forestry (paper and wood)
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation driven by the conversion to cropland for cereal production.
+      roots_and_tubers:
+        title: Cereals
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation driven by the conversion to cropland for the production of roots and tubers.
+      cocoa_and_coffee:
+        title: Roots and tubers
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation driven by the conversion to land for the production of coffee and cocoa.
+      other_crops:
+        title: Vegetables
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          Estimated deforestation driven by the conversion to land for the production of crops such as sugar, pulses, plant-based fibres, oilseeds (excluding palm and oil).
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year
