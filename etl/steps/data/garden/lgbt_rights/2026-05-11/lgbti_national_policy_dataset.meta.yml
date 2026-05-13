@@ -30,7 +30,7 @@ definitions:
   derivation_lgb_military_join: |-
     From the original dataset, we combined two indicators — LGB allowed in the military and LGB banned from the military — into a single categorical indicator (Allowed, No policy, Banned) based on the proportion scores of both directions.
   derivation_binary_two_direction: |-
-    From the original dataset, we combined the two opposing direction indicators (the progressive direction, e.g. legal, and the regressive direction, e.g. illegal) into a single categorical indicator. We bucketed each proportion into 0, partial (between 0 and 1), or 1, and then assigned a category from the bucket combination. Countries where either direction shows partial subnational implementation, or both directions are coded as 1 (typically a transition year), are classified as "Varies by region".
+    From the original dataset, we combined the two opposing direction indicators (the progressive direction, e.g. legal, and the regressive direction, e.g. illegal) into a single categorical indicator. We bucketed each proportion into 0, partial (between 0 and 1), or 1, and then assigned a category from the bucket combination. Countries where either direction shows partial subnational implementation are classified as "Varies by region".
   derivation_single_direction: |-
     From the original dataset's single-direction proportion (0 = no policy, 1 = fully implemented, intermediate values = partial subnational adoption), we coded countries into three categories: the substantive direction in effect, partial subnational implementation ("Varies by region"), or no policy in effect.
   derivation_so_gi_pair: |-
@@ -340,7 +340,7 @@ tables:
           Whether consensual same-sex sexual acts between adults are legal or criminalized under national law.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Legal_** (consensual same-sex sexual acts are legal under national law), **_Varies by region_** (laws differ between subnational jurisdictions, or the country is in a transition year between criminalization and decriminalization), **_No legal provisions_** (no national law specifically addresses consensual same-sex sexual acts) and **_Criminalized_** (consensual same-sex sexual acts are criminalized under national law).'
+          - 'The indicator is coded as follows: **_Legal_** (consensual same-sex sexual acts are legal under national law), **_Varies by region_** (laws differ between subnational jurisdictions), **_No legal provisions_** (no national law specifically addresses consensual same-sex sexual acts) and **_Criminalized_** (consensual same-sex sexual acts are criminalized under national law).'
         unit: ""
         short_unit: ""
         display:
@@ -382,7 +382,7 @@ tables:
           Whether transgender people may serve openly in the military.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Allowed_** (transgender people may serve openly in the military), **_Varies by region_** (rules differ between subnational jurisdictions, branches, or are in a transition period), **_No policy_** (no national policy allowing or banning transgender military service) and **_Banned_** (transgender people are banned from serving openly in the military).'
+          - 'The indicator is coded as follows: **_Allowed_** (transgender people may serve openly in the military), **_Varies by region_** (rules differ between subnational jurisdictions or branches of the armed forces), **_No policy_** (no national policy allowing or banning transgender military service) and **_Banned_** (transgender people are banned from serving openly in the military).'
         unit: ""
         short_unit: ""
         display:
