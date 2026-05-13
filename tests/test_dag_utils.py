@@ -5,8 +5,6 @@ import pytest
 
 from etl.dag_helpers import (
     _parse_dag_yaml,
-    build_consumer_graph,
-    compact_dag_file,
     flatten_dag_file,
     get_comments_above_step_in_dag,
     load_dag,
@@ -1036,64 +1034,6 @@ steps:
             assert f"\n  {step}:" in flat
         # Idempotent.
         assert flatten_dag_file(p) is False
-
-
-def _compact_roundtrip(content: str) -> tuple[str, dict]:
-    with tempfile.TemporaryDirectory() as d:
-        p = Path(d) / "dag.yml"
-        p.write_text(content)
-        consumers = build_consumer_graph(p)
-        before = load_dag(p)
-        compact_dag_file(p, consumers=consumers)
-        after = p.read_text()
-        # Idempotence: second run must not change the file.
-        compact_dag_file(p, consumers=consumers)
-        assert p.read_text() == after, "compact is not idempotent"
-        # Semantic preservation via flatten.
-        flatten_dag_file(p)
-        assert load_dag(p) == before
-        return after, before
-
-
-def test_compact_dag_file_folds_linear_chain():
-    flat = """\
-steps:
-  # UN WPP (2022)
-  data://meadow/un/2022-07-11/un_wpp:
-    - snapshot://un/2022-07-11/un_wpp.zip
-  data://garden/un/2022-07-11/un_wpp:
-    - data://meadow/un/2022-07-11/un_wpp
-  data://grapher/un/2022-07-11/un_wpp:
-    - data://garden/un/2022-07-11/un_wpp
-"""
-    compacted, _ = _compact_roundtrip(flat)
-    assert (
-        compacted
-        == """\
-steps:
-  # UN WPP (2022)
-  data://grapher/un/2022-07-11/un_wpp:
-    - data://garden/un/2022-07-11/un_wpp:
-      - data://meadow/un/2022-07-11/un_wpp:
-        - snapshot://un/2022-07-11/un_wpp.zip
-"""
-    )
-
-
-def test_compact_dag_file_keeps_shared_dep_flat():
-    flat = """\
-steps:
-  data://meadow/foo/a:
-    - snap_a
-  data://garden/foo/a:
-    - data://meadow/foo/a
-  data://garden/foo/b:
-    - data://meadow/foo/a
-"""
-    compacted, _ = _compact_roundtrip(flat)
-    # meadow is used by both gardens so it must stay at the top level.
-    assert "  data://meadow/foo/a:\n" in compacted
-    assert "    - data://meadow/foo/a" in compacted
 
 
 def test_write_to_dag_file_handles_nested_input():

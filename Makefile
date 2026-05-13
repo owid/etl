@@ -102,10 +102,6 @@ format-all:
 		(cd $$lib && make format); \
 	done
 
-format-dags: .venv
-	@echo '==> Compacting DAG files into nested syntax'
-	.venv/bin/etl dag compact
-
 watch: .venv
 	.venv/bin/watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
 
