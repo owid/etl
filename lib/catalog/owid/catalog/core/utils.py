@@ -77,9 +77,7 @@ def prune_dict(d: dict) -> dict:
             # dicts/lists to avoid serializing pointless placeholders. None is
             # semantically meaningful at a positional index (fallback marker).
             out[k] = [
-                prune_dict(x) if isinstance(x, dict) else x
-                for x in v
-                if not (isinstance(x, (dict, list)) and not x)
+                prune_dict(x) if isinstance(x, dict) else x for x in v if not (isinstance(x, (dict, list)) and not x)
             ]
         else:
             out[k] = v
