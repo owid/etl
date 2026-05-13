@@ -346,9 +346,9 @@ tables:
         type: ordinal
         sort:
           - Legal
-          - Criminalized
           - Varies by region
           - No legal provisions
+          - Criminalized
 
         processing_level: major
         description_processing: '{definitions.derivation_binary_two_direction}'
@@ -364,9 +364,9 @@ tables:
         type: ordinal
         sort:
           - No MSM restrictions
-          - Deferral or ban
           - Varies by region
           - No policy
+          - Deferral or ban
 
         processing_level: major
         description_processing: '{definitions.derivation_binary_two_direction}'
@@ -382,9 +382,9 @@ tables:
         type: ordinal
         sort:
           - Allowed
-          - Banned
           - Varies by region
           - No policy
+          - Banned
 
         processing_level: major
         description_processing: '{definitions.derivation_binary_two_direction}'
@@ -637,9 +637,9 @@ tables:
           numDecimalPlaces: 0
         type: ordinal
         sort:
-          - Death penalty applies
-          - Varies by region
           - No death penalty
+          - Varies by region
+          - Death penalty applies
 
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
@@ -654,9 +654,9 @@ tables:
           numDecimalPlaces: 0
         type: ordinal
         sort:
-          - Restrictions in effect
-          - Varies by region
           - No restrictions
+          - Varies by region
+          - Restrictions in effect
 
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
@@ -671,9 +671,9 @@ tables:
           numDecimalPlaces: 0
         type: ordinal
         sort:
-          - Restrictions in effect
-          - Varies by region
           - No restrictions
+          - Varies by region
+          - Restrictions in effect
 
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
@@ -688,9 +688,9 @@ tables:
           numDecimalPlaces: 0
         type: ordinal
         sort:
-          - Religious exemptions in effect
-          - Varies by region
           - No religious exemptions
+          - Varies by region
+          - Religious exemptions in effect
 
       # ── SO + GI pair combinations (Bastian feedback) ────────────────────────────────
         processing_level: major
@@ -786,9 +786,9 @@ tables:
           - Covered for adults and minors
           - Covered for adults only
           - Adults covered, minors restricted
-          - Restricted for both
-          - Varies by region or other
           - Neither covered nor restricted
+          - Varies by region or other
+          - Restricted for both
 
       # ── Gender marker change with legal-pathway requirements (Bastian feedback) ─────
         processing_level: major
