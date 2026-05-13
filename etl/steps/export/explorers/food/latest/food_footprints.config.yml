@@ -101,15 +101,32 @@ views:
       unit: per_kg
       by_stage: stages
     indicators:
+      # Colors match PROD chart 4986 (food-footprints explorer lifecycle-stage view).
       y:
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_land_use
+          display:
+            color: "#578145"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_farm
+          display:
+            color: "#bc8e5a"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_animal_feed
+          display:
+            color: "#f37104"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_processing
+          display:
+            color: "#004d84"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_transport
+          display:
+            color: "#c45267"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_retail
+          display:
+            color: "#f1dc19"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_packaging
+          display:
+            color: "#939597"
         - catalogPath: food_emissions_by_life_cycle_stage__poore_and_nemecek__2018#food_emissions_losses
+          display:
+            color: "#c4b4b6"
     # Multi-y view: the title/subtitle describe the combination (an 8-source stacked bar of
     # emissions across the supply chain), so they can't live on any single indicator's
     # grapher_config — kept inline here. `c.edit_views(... view_type=specific_food_product ...)`
