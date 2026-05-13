@@ -118,7 +118,9 @@ def combine_historical_expenditure(tb: Table, tb_expenditure: Table) -> Table:
     ]
     combined_df["combined_expenditure_share_gdp"].metadata.unit = "%"
     combined_df["combined_expenditure_share_gdp"].metadata.short_unit = "%"
-    combined_df["combined_expenditure_share_gdp"].metadata.title = "Government expenditure on education as a percentage of GDP (%)"
+    combined_df[
+        "combined_expenditure_share_gdp"
+    ].metadata.title = "Government expenditure on education as a percentage of GDP (%)"
 
     # Merge the combined expenditure data back into the original table
     tb = pr.merge(
