@@ -1,8 +1,13 @@
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from etl.dag_helpers import (
+    _parse_dag_yaml,
+    flatten_dag_file,
     get_comments_above_step_in_dag,
+    load_dag,
     load_single_dag_file,
     remove_steps_from_dag_file,
     write_to_dag_file,
@@ -918,24 +923,185 @@ steps:
     )
 
 
-def test_load_single_dag_file_returns_all_top_level_steps():
+# ---------------------------------------------------------------------------
+# Nested syntax / compact / flatten
+# ---------------------------------------------------------------------------
+
+
+def test_parse_dag_yaml_nested_syntax_equals_flat():
+    flat = {
+        "steps": {
+            "data://meadow/un/2022-07-11/un_wpp": ["snapshot://un/2022-07-11/un_wpp.zip"],
+            "data://garden/un/2022-07-11/un_wpp": ["data://meadow/un/2022-07-11/un_wpp"],
+            "data://grapher/un/2022-07-11/un_wpp": ["data://garden/un/2022-07-11/un_wpp"],
+        }
+    }
+    nested = {
+        "steps": {
+            "data://grapher/un/2022-07-11/un_wpp": [
+                {
+                    "data://garden/un/2022-07-11/un_wpp": [
+                        {"data://meadow/un/2022-07-11/un_wpp": ["snapshot://un/2022-07-11/un_wpp.zip"]}
+                    ]
+                }
+            ]
+        }
+    }
+    assert _parse_dag_yaml(flat) == _parse_dag_yaml(nested)
+
+
+def test_parse_dag_yaml_nested_shared_dep_stays_flat():
+    # A step that is consumed by two parents can only be declared once.
+    # Nest it under the first consumer and reference it as a plain string
+    # from the second — the flattened graph must still assign both
+    # consumers as its parents.
+    dag = {
+        "steps": {
+            "data://grapher/foo/a": [
+                {"data://garden/foo/a": ["data://meadow/foo/shared"]},
+            ],
+            "data://grapher/foo/b": ["data://garden/foo/a"],
+        }
+    }
+    result = _parse_dag_yaml(dag)
+    assert result["data://garden/foo/a"] == {"data://meadow/foo/shared"}
+    assert result["data://grapher/foo/a"] == {"data://garden/foo/a"}
+    assert result["data://grapher/foo/b"] == {"data://garden/foo/a"}
+
+
+def test_parse_dag_yaml_duplicate_nested_step_raises():
+    dag = {
+        "steps": {
+            "data://grapher/foo/a": [{"data://garden/foo/a": ["snap"]}],
+            "data://grapher/foo/b": [{"data://garden/foo/a": ["snap"]}],
+        }
+    }
+    with pytest.raises(ValueError, match="Duplicate step"):
+        _parse_dag_yaml(dag)
+
+
+def test_parse_dag_yaml_multi_key_nested_mapping_raises():
+    dag = {
+        "steps": {
+            "data://grapher/foo/a": [{"data://a": [], "data://b": []}],
+        }
+    }
+    with pytest.raises(ValueError, match="single-key mapping"):
+        _parse_dag_yaml(dag)
+
+
+def test_flatten_dag_file_flat_is_noop():
+    flat_content = """\
+steps:
+  data://meadow/a:
+    - snap_a
+  data://garden/a:
+    - data://meadow/a
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(flat_content)
+        assert flatten_dag_file(p) is False
+        assert p.read_text() == flat_content
+
+
+def test_flatten_dag_file_promotes_nested_entries_and_preserves_comments():
+    nested_content = """\
+steps:
+  # UN WPP (2022)
+  data://grapher/un/2022-07-11/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp:
+      - data://meadow/un/2022-07-11/un_wpp:
+        - snapshot://un/2022-07-11/un_wpp.zip
+
+  # Separate chain
+  data://grapher/foo/2024/a:
+    - snapshot://foo/2024/a.zip
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(nested_content)
+        assert flatten_dag_file(p) is True
+        flat = p.read_text()
+        assert "# UN WPP (2022)" in flat
+        assert "# Separate chain" in flat
+        # Every chain member is now declared at the top level.
+        for step in (
+            "data://meadow/un/2022-07-11/un_wpp",
+            "data://garden/un/2022-07-11/un_wpp",
+            "data://grapher/un/2022-07-11/un_wpp",
+        ):
+            assert f"\n  {step}:" in flat
+        # Idempotent.
+        assert flatten_dag_file(p) is False
+
+
+def test_write_to_dag_file_handles_nested_input():
+    # Writers operate on a flat file; if the target file has nested entries,
+    # they should be flattened first so that the line-based logic finds the
+    # step it is meant to update.
+    old_content = """\
+steps:
+  data://grapher/un/2022-07-11/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp:
+      - data://meadow/un/2022-07-11/un_wpp:
+        - snapshot://un/2022-07-11/un_wpp.zip
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        # Update the garden step to add a new dep — this must apply whether
+        # the file is stored flat or nested.
+        write_to_dag_file(
+            p,
+            dag_part={
+                "data://garden/un/2022-07-11/un_wpp": [
+                    "data://meadow/un/2022-07-11/un_wpp",
+                    "data://garden/regions/latest",
+                ]
+            },
+        )
+        after = p.read_text()
+        assert "    - data://garden/regions/latest" in after
+        # The update must not silently reintroduce the old single-dep form.
+        assert load_dag(p)["data://garden/un/2022-07-11/un_wpp"] == {
+            "data://meadow/un/2022-07-11/un_wpp",
+            "data://garden/regions/latest",
+        }
+
+
+def test_remove_steps_from_dag_file_handles_nested_input():
+    old_content = """\
+steps:
+  data://grapher/un/2022-07-11/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp:
+      - data://meadow/un/2022-07-11/un_wpp:
+        - snapshot://un/2022-07-11/un_wpp.zip
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        remove_steps_from_dag_file(p, ["data://meadow/un/2022-07-11/un_wpp"])
+        graph = load_dag(p)
+        assert "data://meadow/un/2022-07-11/un_wpp" not in graph
+
+
+def test_load_single_dag_file_returns_nested_steps_as_top_level_keys():
+    # ``load_single_dag_file`` is the entry point used by
+    # ``etl.version_tracker.load_steps_for_each_dag_file`` to attribute steps
+    # to a file; it must treat nested and flat declarations identically.
     content = """\
 steps:
-  data://meadow/un/2022-07-11/un_wpp:
-    - snapshot://un/2022-07-11/un_wpp.zip
-  data://garden/un/2022-07-11/un_wpp:
-    - data://meadow/un/2022-07-11/un_wpp
-
-include:
-  - path/to/another/dag.yml
+  data://grapher/un/2022-07-11/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp:
+      - data://meadow/un/2022-07-11/un_wpp:
+        - snapshot://un/2022-07-11/un_wpp.zip
 """
     with tempfile.TemporaryDirectory() as d:
         p = Path(d) / "dag.yml"
         p.write_text(content)
         graph = load_single_dag_file(p)
-    # Does not follow the ``include`` directive — only the local steps show up.
-    assert set(graph) == {
-        "data://meadow/un/2022-07-11/un_wpp",
-        "data://garden/un/2022-07-11/un_wpp",
-    }
-    assert graph["data://meadow/un/2022-07-11/un_wpp"] == {"snapshot://un/2022-07-11/un_wpp.zip"}
+        assert "data://grapher/un/2022-07-11/un_wpp" in graph
+        assert "data://garden/un/2022-07-11/un_wpp" in graph
+        assert "data://meadow/un/2022-07-11/un_wpp" in graph
+        assert graph["data://meadow/un/2022-07-11/un_wpp"] == {"snapshot://un/2022-07-11/un_wpp.zip"}
