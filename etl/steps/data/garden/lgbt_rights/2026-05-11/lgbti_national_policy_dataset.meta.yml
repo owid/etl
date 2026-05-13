@@ -333,7 +333,6 @@ tables:
           - No policy
           - Banned
 
-      # ── New combined-categorical indicators added in this PR ──────
       same_sex_acts:
         title: Same-sex sexual acts
         description_short: |-
@@ -352,9 +351,9 @@ tables:
           - Varies by region
           - No legal provisions
           - Criminalized
-
         processing_level: major
         description_processing: '{definitions.derivation_binary_two_direction}'
+
       blood_donations:
         title: Blood donations by men who have sex with men
         description_short: |-
@@ -372,9 +371,9 @@ tables:
           - No MSM restrictions
           - No policy
           - Deferral or ban
-
         processing_level: major
         description_processing: '{definitions.derivation_binary_two_direction}'
+
       transgender_military:
         title: Transgender military service
         description_short: |-
@@ -392,9 +391,9 @@ tables:
           - Allowed
           - No policy
           - Banned
-
         processing_level: major
         description_processing: '{definitions.derivation_binary_two_direction}'
+
       civil_unions:
         title: Civil unions or registered partnerships
         description_short: |-
@@ -412,9 +411,9 @@ tables:
           - Legally recognized
           - Varies by region
           - Not recognized
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       joint_adoption:
         title: Joint adoption by same-sex couples
         description_short: |-
@@ -432,9 +431,9 @@ tables:
           - Permitted
           - Varies by region
           - Not permitted
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       constitutional_protections_sexual_orientation:
         title: Constitutional protections based on sexual orientation
         description_short: |-
@@ -451,9 +450,9 @@ tables:
         sort:
           - Constitutionally protected
           - Not protected
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       constitutional_protections_gender_identity:
         title: Constitutional protections based on gender identity
         description_short: |-
@@ -470,9 +469,9 @@ tables:
         sort:
           - Constitutionally protected
           - Not protected
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       hate_crime_protections_sexual_orientation:
         title: Hate crime protections based on sexual orientation
         description_short: |-
@@ -490,9 +489,9 @@ tables:
           - Covered by hate crime laws
           - Varies by region
           - Not covered
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       hate_crime_protections_gender_identity:
         title: Hate crime protections based on gender identity
         description_short: |-
@@ -510,9 +509,9 @@ tables:
           - Covered by hate crime laws
           - Varies by region
           - Not covered
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       incitement_to_hatred:
         title: Incitement to hatred protections
         description_short: |-
@@ -530,9 +529,9 @@ tables:
           - Prohibited
           - Varies by region
           - Not prohibited
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       third_gender_recognition:
         title: Legal recognition of a third gender
         description_short: |-
@@ -550,9 +549,9 @@ tables:
           - Recognized
           - Varies by region
           - Not recognized
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       employment_discrimination_sexual_orientation:
         title: Employment discrimination based on sexual orientation
         description_short: |-
@@ -570,9 +569,9 @@ tables:
           - Discrimination prohibited
           - Varies by region
           - No protection
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       employment_discrimination_gender_identity:
         title: Employment discrimination based on gender identity
         description_short: |-
@@ -590,9 +589,9 @@ tables:
           - Discrimination prohibited
           - Varies by region
           - No protection
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       goods_services_discrimination_sexual_orientation:
         title: Goods and services discrimination based on sexual orientation
         description_short: |-
@@ -610,9 +609,9 @@ tables:
           - Discrimination prohibited
           - Varies by region
           - No protection
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       goods_services_discrimination_gender_identity:
         title: Goods and services discrimination based on gender identity
         description_short: |-
@@ -630,9 +629,9 @@ tables:
           - Discrimination prohibited
           - Varies by region
           - No protection
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       conversion_therapies:
         title: Conversion therapy
         description_short: |-
@@ -650,9 +649,9 @@ tables:
           - Banned
           - Varies by region
           - Not banned
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       gender_assignment_surgeries_on_children:
         title: Non-consensual gender assignment surgeries on intersex minors
         description_short: |-
@@ -670,9 +669,9 @@ tables:
           - Non-consensual surgeries banned
           - Varies by region
           - Not banned
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       death_penalty:
         title: Death penalty for same-sex acts
         description_short: |-
@@ -690,9 +689,9 @@ tables:
           - No death penalty
           - Varies by region
           - Death penalty applies
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       morality_propaganda:
         title: Anti-LGBTI "propaganda" or morality laws
         description_short: |-
@@ -710,9 +709,9 @@ tables:
           - No restrictions
           - Varies by region
           - Restrictions in effect
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       lgbtq_civil_society_restrictions:
         title: Restrictions on LGBTQ+ civil society
         description_short: |-
@@ -730,9 +729,9 @@ tables:
           - No restrictions
           - Varies by region
           - Restrictions in effect
-
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       religious_exemption_laws:
         title: Religious exemption laws
         description_short: |-
@@ -753,6 +752,7 @@ tables:
       # ── SO + GI pair combinations ────────────────────────────────
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
+
       employment_discrimination:
         title: Employment discrimination protections (sexual orientation and gender identity)
         description_short: |-
@@ -772,9 +772,9 @@ tables:
           - Gender identity only
           - Varies by region
           - No protection
-
         processing_level: major
         description_processing: '{definitions.derivation_so_gi_pair}'
+
       goods_services_discrimination:
         title: Goods and services discrimination protections (sexual orientation and gender identity)
         description_short: |-
@@ -794,9 +794,9 @@ tables:
           - Gender identity only
           - Varies by region
           - No protection
-
         processing_level: major
         description_processing: '{definitions.derivation_so_gi_pair}'
+
       hate_crime_protections:
         title: Hate crime protections (sexual orientation and gender identity)
         description_short: |-
@@ -815,9 +815,9 @@ tables:
           - Sexual orientation only
           - Varies by region
           - Not covered
-
         processing_level: major
         description_processing: '{definitions.derivation_so_gi_pair}'
+
       constitutional_protections:
         title: Constitutional protections (sexual orientation and gender identity)
         description_short: |-
@@ -839,6 +839,7 @@ tables:
       # ── Gender-affirming care combined: adults + minors ──────────
         processing_level: major
         description_processing: '{definitions.derivation_so_gi_pair}'
+
       gender_affirming_care:
         title: Gender-affirming care (adults and minors)
         description_short: |-
@@ -863,6 +864,7 @@ tables:
       # ── Gender marker change with legal-pathway requirements ─────
         processing_level: major
         description_processing: '{definitions.derivation_gac}'
+
       gender_marker_change:
         title: Legal change of gender marker
         description_short: |-
@@ -884,7 +886,6 @@ tables:
           - Legally possible, requirement unknown
           - Varies by region
           - Not legally possible
-
         processing_level: major
         description_processing: '{definitions.derivation_gmc}'
   lgbti_national_policy_dataset_combined_regions:
@@ -902,6 +903,7 @@ tables:
         display:
           name: Equal
           numDecimalPlaces: 0
+
       age_of_consent_partial_implementation_count:
         title: Number of countries where the age of consent law for same-sex partners is partially implemented
         description_short: |-
@@ -914,6 +916,7 @@ tables:
         display:
           name: Partial implementation
           numDecimalPlaces: 0
+
       age_of_consent_no_legal_provisions_count:
         title: Number of countries with no legal provisions on the age of consent for same-sex partners
         description_short: |-
@@ -926,6 +929,7 @@ tables:
         display:
           name: No legal provisions
           numDecimalPlaces: 0
+
       age_of_consent_unequal_count:
         title: Number of countries where the age of consent is higher for same-sex than different-sex partners
         description_short: |-
@@ -952,6 +956,7 @@ tables:
         display:
           name: Equal
           numDecimalPlaces: 0
+
       age_of_consent_partial_implementation_pop:
         title: Population in countries where the age of consent law for same-sex partners is partially implemented
         description_short: |-
@@ -964,6 +969,7 @@ tables:
         display:
           name: Partial implementation
           numDecimalPlaces: 0
+
       age_of_consent_no_legal_provisions_pop:
         title: Population in countries with no legal provisions on the age of consent for same-sex partners
         description_short: |-
@@ -976,6 +982,7 @@ tables:
         display:
           name: No legal provisions
           numDecimalPlaces: 0
+
       age_of_consent_unequal_pop:
         title: Population in countries where the age of consent is higher for same-sex than different-sex partners
         description_short: |-
@@ -1002,6 +1009,7 @@ tables:
         display:
           name: Legal
           numDecimalPlaces: 0
+
       marriage_partially_legal_count:
         title: Number of countries where same-sex marriage is partially legal
         description_short: |-
@@ -1014,6 +1022,7 @@ tables:
         display:
           name: Partially legal
           numDecimalPlaces: 0
+
       marriage_no_legal_provisions_count:
         title: Number of countries with no legal provisions on same-sex marriage or civil unions
         description_short: |-
@@ -1026,6 +1035,7 @@ tables:
         display:
           name: No legal provisions
           numDecimalPlaces: 0
+
       marriage_ban_and_marriage_both_partial_count:
         title: Number of countries where same-sex marriage and its ban are both partially implemented
         description_short: |-
@@ -1038,6 +1048,7 @@ tables:
         display:
           name: Ban and marriage both partial
           numDecimalPlaces: 0
+
       marriage_partially_banned_count:
         title: Number of countries where same-sex marriage is partially banned
         description_short: |-
@@ -1050,6 +1061,7 @@ tables:
         display:
           name: Partially banned
           numDecimalPlaces: 0
+
       marriage_banned_count:
         title: Number of countries where same-sex marriage is banned
         description_short: |-
@@ -1076,6 +1088,7 @@ tables:
         display:
           name: Legal
           numDecimalPlaces: 0
+
       marriage_partially_legal_pop:
         title: Population in countries where same-sex marriage is partially legal
         description_short: |-
@@ -1088,6 +1101,7 @@ tables:
         display:
           name: Partially legal
           numDecimalPlaces: 0
+
       marriage_no_legal_provisions_pop:
         title: Population in countries with no legal provisions on same-sex marriage or civil unions
         description_short: |-
@@ -1100,6 +1114,7 @@ tables:
         display:
           name: No legal provisions
           numDecimalPlaces: 0
+
       marriage_ban_and_marriage_both_partial_pop:
         title: Population in countries where same-sex marriage and its ban are both partially implemented
         description_short: |-
@@ -1112,6 +1127,7 @@ tables:
         display:
           name: Ban and marriage both partial
           numDecimalPlaces: 0
+
       marriage_partially_banned_pop:
         title: Population in countries where same-sex marriage is partially banned
         description_short: |-
@@ -1124,6 +1140,7 @@ tables:
         display:
           name: Partially banned
           numDecimalPlaces: 0
+
       marriage_banned_pop:
         title: Population in countries where same-sex marriage is banned
         description_short: |-
@@ -1150,6 +1167,7 @@ tables:
         display:
           name: Allowed
           numDecimalPlaces: 0
+
       lgb_military_join_no_policy_count:
         title: Number of countries with no policy on lesbian, gay, and bisexual people in the military
         description_short: |-
@@ -1162,6 +1180,7 @@ tables:
         display:
           name: No policy
           numDecimalPlaces: 0
+
       lgb_military_join_banned_count:
         title: Number of countries where lesbian, gay, and bisexual people are banned from the military
         description_short: |-
@@ -1188,6 +1207,7 @@ tables:
         display:
           name: Allowed
           numDecimalPlaces: 0
+
       lgb_military_join_no_policy_pop:
         title: Population in countries with no policy on lesbian, gay, and bisexual people in the military
         description_short: |-
@@ -1200,6 +1220,7 @@ tables:
         display:
           name: No policy
           numDecimalPlaces: 0
+
       lgb_military_join_banned_pop:
         title: Population in countries where lesbian, gay, and bisexual people are banned from the military
         description_short: |-
@@ -2556,9 +2577,7 @@ tables:
           name: Religious exemptions in effect
           numDecimalPlaces: 0
 
-
       # ── SO + GI pair regional aggregates ─────────────────────────────────────────
-
       employment_discrimination_both_protected_count:
         title: Number of countries — Both protected (employment discrimination)
         description_short: The number of countries classified as "Both protected" on the indicator on employment discrimination protections (sexual orientation and gender identity combined).
@@ -2933,9 +2952,7 @@ tables:
           name: Not protected
           numDecimalPlaces: 0
 
-
       # ── Gender-affirming care regional aggregates ────────────────────────────────
-
       gender_affirming_care_covered_for_adults_and_minors_count:
         title: Number of countries — Covered for adults and minors (gender-affirming care)
         description_short: The number of countries classified as "Covered for adults and minors" on the indicator on gender-affirming care for adults and minors.
@@ -3068,9 +3085,7 @@ tables:
           name: Neither covered nor restricted
           numDecimalPlaces: 0
 
-
       # ── Gender marker change regional aggregates ─────────────────────────────────
-
       gender_marker_change_legally_possible__requirement_unknown_count:
         title: Number of countries — Legally possible, requirement unknown (gender marker change)
         description_short: The number of countries classified as "Legally possible, requirement unknown" on the indicator on legal change of gender marker.
