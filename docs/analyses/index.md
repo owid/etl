@@ -44,10 +44,10 @@ This is just a sneak peek into some of our data work. But note that all our code
 
 !!! note ""
 
-    ## [Population projection tool: How will populations across the world change in the 21st century?](population_simulation/index.md)
+    ## [Population projection tool: How will populations across the world change in the 21st century?](population_tool/index.md)
     This document is a technical companion to the article ["Population tool: How will populations across the world change in the 21st century?"](https://ourworldindata.org/population-tool), explaining the cohort-component model used to project population totals and age structure based on fertility rates, life expectancy, and net migration.
 
-    [:material-book-open-variant: Methodology](population_simulation/index.md){ .md-button }
+    [:material-book-open-variant: Methodology](population_tool/index.md){ .md-button }
 
 !!! note ""
 
