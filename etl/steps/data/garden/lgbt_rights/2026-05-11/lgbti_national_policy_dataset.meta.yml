@@ -361,7 +361,7 @@ tables:
           Whether men who have sex with men may donate blood without restriction. Any deferral or lifetime ban is coded as a restriction.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_No MSM restrictions_** (men who have sex with men may donate blood without specific restriction), **_Varies by region_** (rules differ between subnational jurisdictions or blood-service providers), **_No policy_** (no national rule on blood donation by men who have sex with men) and **_Deferral or ban_** (men who have sex with men face a deferral period or a lifetime ban on blood donation).'
+          - 'The indicator is coded as follows: **_No MSM restrictions_** (men who have sex with men may donate blood without specific restriction), **_No policy_** (no national rule on blood donation by men who have sex with men) and **_Deferral or ban_** (men who have sex with men face a deferral period or a lifetime ban on blood donation).'
         unit: ""
         short_unit: ""
         display:
@@ -370,7 +370,6 @@ tables:
         type: ordinal
         sort:
           - No MSM restrictions
-          - Varies by region
           - No policy
           - Deferral or ban
 
@@ -382,7 +381,7 @@ tables:
           Whether transgender people may serve openly in the military.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Allowed_** (transgender people may serve openly in the military), **_Varies by region_** (rules differ between subnational jurisdictions or branches of the armed forces), **_No policy_** (no national policy allowing or banning transgender military service) and **_Banned_** (transgender people are banned from serving openly in the military).'
+          - 'The indicator is coded as follows: **_Allowed_** (transgender people may serve openly in the military), **_No policy_** (no national policy allowing or banning transgender military service) and **_Banned_** (transgender people are banned from serving openly in the military).'
         unit: ""
         short_unit: ""
         display:
@@ -391,7 +390,6 @@ tables:
         type: ordinal
         sort:
           - Allowed
-          - Varies by region
           - No policy
           - Banned
 
@@ -443,7 +441,7 @@ tables:
           Whether sexual orientation is explicitly named in the constitution or established through binding constitutional court interpretation.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Constitutionally protected_** (sexual orientation is named in the constitution or established as a protected characteristic through binding constitutional court interpretation), **_Varies by region_** (constitutional protections differ between subnational jurisdictions) and **_Not protected_** (no national constitutional protection for sexual orientation).'
+          - 'The indicator is coded as follows: **_Constitutionally protected_** (sexual orientation is named in the constitution or established as a protected characteristic through binding constitutional court interpretation) and **_Not protected_** (no national constitutional protection for sexual orientation).'
         unit: ""
         short_unit: ""
         display:
@@ -452,7 +450,6 @@ tables:
         type: ordinal
         sort:
           - Constitutionally protected
-          - Varies by region
           - Not protected
 
         processing_level: major
@@ -463,7 +460,7 @@ tables:
           Whether gender identity is explicitly named in the constitution or established through binding constitutional court interpretation.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Constitutionally protected_** (gender identity is named in the constitution or established as a protected characteristic through binding constitutional court interpretation), **_Varies by region_** (constitutional protections differ between subnational jurisdictions) and **_Not protected_** (no national constitutional protection for gender identity).'
+          - 'The indicator is coded as follows: **_Constitutionally protected_** (gender identity is named in the constitution or established as a protected characteristic through binding constitutional court interpretation) and **_Not protected_** (no national constitutional protection for gender identity).'
         unit: ""
         short_unit: ""
         display:
@@ -472,7 +469,6 @@ tables:
         type: ordinal
         sort:
           - Constitutionally protected
-          - Varies by region
           - Not protected
 
         processing_level: major
@@ -743,7 +739,7 @@ tables:
           Whether national law allows individuals, businesses, or organizations to refuse services to LGBTQ+ people on religious or conscientious grounds.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_No religious exemptions_** (no national law allows refusal of services to LGBTQ+ people on religious or conscientious grounds, beyond standard clergy exemptions), **_Varies by region_** (exemptions differ between subnational jurisdictions) and **_Religious exemptions in effect_** (national law allows individuals, businesses, or organizations to refuse services to LGBTQ+ people on religious or conscientious grounds).'
+          - 'The indicator is coded as follows: **_No religious exemptions_** (no national law allows refusal of services to LGBTQ+ people on religious or conscientious grounds, beyond standard clergy exemptions) and **_Religious exemptions in effect_** (national law allows individuals, businesses, or organizations to refuse services to LGBTQ+ people on religious or conscientious grounds).'
         unit: ""
         short_unit: ""
         display:
@@ -752,7 +748,6 @@ tables:
         type: ordinal
         sort:
           - No religious exemptions
-          - Varies by region
           - Religious exemptions in effect
 
       # ── SO + GI pair combinations ────────────────────────────────
@@ -808,7 +803,7 @@ tables:
           Whether national hate crime legislation covers sexual orientation, gender identity, both, or neither as a protected characteristic.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Both covered_** (national hate crime legislation covers both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is covered by national hate crime legislation), **_Gender identity only_** (only gender identity is covered by national hate crime legislation), **_Varies by region_** (coverage differs between subnational jurisdictions for either ground) and **_Not covered_** (national hate crime legislation does not cover either ground).'
+          - 'The indicator is coded as follows: **_Both covered_** (national hate crime legislation covers both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is covered by national hate crime legislation), **_Varies by region_** (coverage differs between subnational jurisdictions for either ground) and **_Not covered_** (national hate crime legislation does not cover either ground).'
         unit: ""
         short_unit: ""
         display:
@@ -818,7 +813,6 @@ tables:
         sort:
           - Both covered
           - Sexual orientation only
-          - Gender identity only
           - Varies by region
           - Not covered
 
@@ -830,7 +824,7 @@ tables:
           Whether the constitution explicitly or via binding court interpretation protects sexual orientation, gender identity, both, or neither.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Both protected_** (the constitution explicitly, or via binding court interpretation, protects both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is protected), **_Gender identity only_** (only gender identity is protected), **_Varies by region_** (protections differ between subnational jurisdictions for either ground) and **_Not protected_** (the constitution does not protect either ground).'
+          - 'The indicator is coded as follows: **_Both protected_** (the constitution explicitly, or via binding court interpretation, protects both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is protected) and **_Not protected_** (the constitution does not protect either ground).'
         unit: ""
         short_unit: ""
         display:
@@ -840,8 +834,6 @@ tables:
         sort:
           - Both protected
           - Sexual orientation only
-          - Gender identity only
-          - Varies by region
           - Not protected
 
       # ── Gender-affirming care combined: adults + minors ──────────
