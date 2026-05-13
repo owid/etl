@@ -1,0 +1,17 @@
+dataset:
+  title: TE-17.11
+tables:
+  te_17_11:
+    variables:
+      gdp_per_hour_relative_to_the_us__us_100:
+        title: GDP PER HOUR RELATIVE TO THE US (US=100)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

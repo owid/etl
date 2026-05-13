@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3200
-    date_accessed: 2023-08-10 09:02:12.573489
+    url: https://admin.owid.io/admin/datasets/3200
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3200_te_17_11
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8aa129a78d5aaf824aa432267bf65bdc
-  size: 1656
-  path: dataset_3200_te_17_11_config.json
+  - md5: 36a9fecec8cc53a2db1d8c099479df15
+    size: 1786
+    path: dataset_3200_te_17_11_config.json

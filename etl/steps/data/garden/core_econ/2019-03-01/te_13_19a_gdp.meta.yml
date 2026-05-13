@@ -1,0 +1,20 @@
+dataset:
+  title: TE-13.19a_GDP
+tables:
+  te_13_19a_gdp:
+    variables:
+      growth_rate_of_gdp__pct:
+        title: Growth rate of GDP (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,24 @@
+dataset:
+  title: TE-15.6
+tables:
+  te_15_6:
+    variables:
+      inflation__pct:
+        title: Inflation (%)
+        unit: ''
+        description: |-
+          Inflation data variable is CPIAUCSL (Consumer Price Index for All Urban Consumers: All Items). The data transformation is seasonally adjusted "percent change from year ago" calculated on average annual frequency.
+      unemployment_rate__pct:
+        title: Unemployment rate (%)
+        unit: ''
+        description: |-
+          Unemployment data variable is UNRATE (Civilian Unemployment Rate) with seasonally adjusted percent units and average annual frequency.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

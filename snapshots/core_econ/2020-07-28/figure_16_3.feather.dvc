@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: Allen
+    title: 'Technology and the great divergence: global economic development since 1820'
+    citation_full: 'Robert C. Allen. 2012. Technology and the great divergence: global economic development since 1820. Explorations in Economic History 49 (1) (January): pp. 1–16.'
+    url_main: https://www.sciencedirect.com/science/article/abs/pii/S0014498311000416
+    date_accessed: '2020-07-28'
+    date_published: '2012'
+  is_public: false
+outs:
+  - md5: 85de0b188a322fcb1162682263a67f6b
+    size: 6298
+    path: figure_16_3.feather

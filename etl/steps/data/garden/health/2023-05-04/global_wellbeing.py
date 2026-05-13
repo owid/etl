@@ -1,19 +1,12 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
-from owid.catalog import Dataset, Table
-from structlog import get_logger
+from owid.catalog import Table
 
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
-log = get_logger()
-
-# Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-# Expected questions in the dataset.
 QUESTIONS_EXPECTED = {
     "Count On to Help",
     "Enjoy the Work You Do Every Day",
@@ -32,72 +25,36 @@ QUESTIONS_EXPECTED = {
 }
 
 
-def run(dest_dir: str) -> None:
-    log.info("global_wellbeing.start")
+def run() -> None:
+    ds_meadow = paths.load_dataset("global_wellbeing")
+    tb = ds_meadow.read("global_wellbeing")
 
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("global_wellbeing")
+    # Fix a typo introduced upstream.
+    tb["dimension"] = tb["dimension"].str.replace("villAge", "village")
 
-    # Read table from meadow dataset.
-    tb_meadow = ds_meadow["global_wellbeing"]
+    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
+    tb["year"] = 2020
 
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow)
+    questions = set(tb["question"])
+    unknown = questions.difference(QUESTIONS_EXPECTED)
+    assert not unknown, f"Unknown questions! {unknown}"
 
-    # Reset index
-    df = df.reset_index()
+    # Pivot questions to columns.
+    tb_pivot = tb.pivot(index=["country", "year", "dimension", "answer"], columns="question", values="share")
 
-    # Fix typos
-    df.dimension = df.dimension.str.replace("villAge", "village")
+    # Split into Gallup indices (no "answer" dimension) and survey questions.
+    index_cols = [c for c in tb_pivot.columns if c.endswith("Index")]
 
-    #
-    # Process data.
-    #
-    log.info("global_wellbeing: harmonize_countries")
-    df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
+    tb_index = tb_pivot[index_cols].copy()
+    tb_index = tb_index.droplevel("answer").dropna(how="all")
+    tb_index = tb_index * 100
 
-    # Add year
-    df["year"] = 2020
+    tb_questions: Table = tb_pivot.drop(columns=index_cols).copy()
+    tb_questions = tb_questions * 100
 
-    # Sanity check on questions
-    log.info("global_wellbeing: check questions are as expected")
-    questions = set(df["question"])
-    assert not (questions_unknown := questions.difference(QUESTIONS_EXPECTED)), (
-        f"Unknown questions! {questions_unknown}"
-    )
+    # Preserve table-level short_name on both outputs.
+    tb_questions.metadata.short_name = paths.short_name
+    tb_index.metadata.short_name = f"{paths.short_name}_index"
 
-    # Pivot to have questions as columnns
-    log.info("global_wellbeing: harmonize_countries")
-    df = df.pivot(index=["country", "year", "dimension", "answer"], columns="question", values="share")
-
-    # Get table with the Gallup indices: suffering, struggling, thriving indices
-    # We define an additional table since these columns don't have the dimension "answer"
-    log.info("global_wellbeing: build df with gallup indices")
-    df_index = df.filter(regex=r".* Index")
-    df_index = df_index.droplevel(3).dropna(how="all")
-    df_index = 100 * df_index
-    # Get table with the survey questions
-    log.info("global_wellbeing: build df with survey questions")
-    df_questions = df[[col for col in df.columns if col not in df_index.columns]]
-    # Get percent from rates
-    df_questions = 100 * df_questions
-
-    # Create a new table with the processed data.
-    log.info("global_wellbeing: create tables")
-    tb_questions = Table(df_questions, short_name=paths.short_name)
-    tb_index = Table(df_index, short_name=f"{paths.short_name}_index")
-
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    log.info("global_wellbeing: create dictionary")
-    ds_garden = create_dataset(dest_dir, tables=[tb_questions, tb_index], default_metadata=ds_meadow.metadata)
-
-    # Save changes in the new garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb_questions, tb_index], default_metadata=ds_meadow.metadata)
     ds_garden.save()
-
-    log.info("global_wellbeing.end")

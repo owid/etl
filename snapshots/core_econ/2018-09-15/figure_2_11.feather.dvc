@@ -1,0 +1,16 @@
+meta:
+  is_public: false
+  origin:
+    producer: Allen
+    title: 'The British industrial revolution in global perspective, new approaches to economic and social history'
+    description: |-
+      Charts show 5-year centred moving averages. 1789 to 1801 are linearly interpolated as data was missing.
+
+      Data received directly from author via Kevin O'Rourke.
+    citation_full: "Allen, R. C. (2009). 'The British Industrial Revolution in Global Perspective, New Approaches to Economic and Social History'. Cambridge University Press."
+    date_accessed: '2018-09-15'
+    date_published: '2009'
+outs:
+  - md5: 0e708fa34c67d2ce1696460da5460dc9
+    size: 8498
+    path: figure_2_11.feather

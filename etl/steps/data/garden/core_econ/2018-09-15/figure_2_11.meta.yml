@@ -1,0 +1,19 @@
+dataset:
+  title: Figure 2.11
+tables:
+  figure_2_11:
+    variables:
+      wages_relative_to_the_cost_of_capital:
+        title: Wages relative to the cost of capital
+        unit: ''
+        description: |-
+          The cost of using capital goods is calculated from the prices of metal, wood, and brick, the cost of borrowing, and takes account of the rate at which the capital goods wear out, or depreciate.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

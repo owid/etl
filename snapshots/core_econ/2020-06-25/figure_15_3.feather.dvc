@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: Thomas and Dimsdale
+    title: Ryland Thomas and Nicholas Dimsdale
+    citation_full: 'Ryland Thomas and Nicholas Dimsdale. (2017).'
+    url_main: https://www.bankofengland.co.uk/statistics/research-datasets
+    date_accessed: '2020-06-25'
+    date_published: '2017'
+  is_public: false
+outs:
+  - md5: ef3d58ce9a81de1ebb78eda3faf03562
+    size: 5114
+    path: figure_15_3.feather

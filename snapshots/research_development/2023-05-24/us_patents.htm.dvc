@@ -1,20 +1,19 @@
 meta:
-  namespace: research_development
-  short_name: us_patents
-  name: U.S. patent activity since 1790 (USPTO, 2023)
-  version: '2023-05-24'
-  publication_year: 2020
-  source_name: United States Patent and Trademark Office (2020)
-  source_published_by: U.S. Patent and Trademark Office, U.S. Patent Activity Calendar Years 1790 to the Present
-  url: https://www.uspto.gov/web/offices/ac/ido/oeip/taf/reports.htm
-  source_data_url: https://www.uspto.gov/web/offices/ac/ido/oeip/taf/h_counts.htm
-  file_extension: htm
-  license_url: https://bulkdata.uspto.gov/
-  license_name: USPTO Terms and Conditions
-  date_accessed: 2023-05-24
+  origin:
+    producer: United States Patent and Trademark Office
+    title: U.S. patent activity calendar years 1790 to the present
+    description: |-
+      The U.S. Patent and Trademark Office (USPTO)'s Patent Technology Monitoring Team periodically issues general statistics and reports that profile patenting activity. The data imported by Our World in Data focuses on annual, U.S. patent application and grant activity from 1790 to the present. Annual activity is determined based on the calendar year.
+    citation_full: 'U.S. Patent and Trademark Office (2020). U.S. Patent Activity Calendar Years 1790 to the Present.'
+    attribution_short: USPTO
+    url_main: https://www.uspto.gov/web/offices/ac/ido/oeip/taf/reports.htm
+    url_download: https://www.uspto.gov/web/offices/ac/ido/oeip/taf/h_counts.htm
+    date_accessed: '2023-05-24'
+    date_published: '2020'
+    license:
+      name: USPTO Terms and Conditions
+      url: https://bulkdata.uspto.gov/
   is_public: true
-  description: The U.S. Patent and Trademark Office (USPTO)'s Patent Technology Monitoring Team periodically issues general statistics and reports that profile patenting activity. The data imported by Our World in Data focuses on annual, U.S. patent application and grant activity from 1790 to the present. Annual activity is determined based on the calendar year.
-wdir: ../../../data/snapshots/research_development/2023-05-24
 outs:
   - md5: f3c6d86e711ed577cbcb34ca83212eef
     size: 48933

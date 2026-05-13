@@ -1,0 +1,20 @@
+dataset:
+  title: OWID_21.3
+tables:
+  owid_21_3:
+    variables:
+      index_of_computations_per_second__manual__1:
+        title: Index of computations per second (manual = 1)
+        unit: ''
+      year_value:
+        title: Year
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
