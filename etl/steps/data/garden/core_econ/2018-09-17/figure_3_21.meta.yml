@@ -1,0 +1,25 @@
+dataset:
+  title: Figure 3.21
+tables:
+  figure_3_21:
+    variables:
+      lifetime_discretionary_hours:
+        title: Lifetime Discretionary Hours
+        unit: ''
+        description: Discretionary hours exclude hours used for sleep, meals and hygiene.
+      lifetime_leisure_hours:
+        title: Lifetime Leisure Hours
+        unit: ''
+      lifetime_work_hours:
+        title: Lifetime Work Hours
+        unit: ''
+        description: Work hours include paid work, travel to and from work, and household chores.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

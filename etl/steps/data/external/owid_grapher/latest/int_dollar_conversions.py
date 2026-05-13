@@ -192,7 +192,7 @@ def load_and_reconcile_ppp_data(ds_wdi: Dataset, ds_pip: Dataset) -> DataFrame:
 
 
 def load_cpi_data(ds_wdi: Dataset) -> DataFrame:
-    # Consumer price index (2010 = 100) — keep PPP_YEAR and the latest available year per country
+    # Consumer price index (2010 = 100) — keep PPP_YEAR and the latest available year.
     tb_cpi_all = (
         ds_wdi["wdi"]
         .query("year >= @PPP_YEAR and fp_cpi_totl.notna()")
@@ -202,10 +202,25 @@ def load_cpi_data(ds_wdi: Dataset) -> DataFrame:
 
     # Get data for the target year
     tb_cpi_base = tb_cpi_all.query("cpi_year == @PPP_YEAR").set_index("country")[["cpi_year", "cpi"]]
-    # Get data for the latest available year per country
+    # Get data for the latest available year per country.
     tb_cpi_latest = tb_cpi_all.loc[tb_cpi_all.groupby("country")["cpi_year"].idxmax()].set_index("country")[
         ["cpi_year", "cpi"]
     ]
+
+    cpi_latest_available_year = int(tb_cpi_latest["cpi_year"].max())
+    countries_with_outdated_cpi = tb_cpi_latest[tb_cpi_latest["cpi_year"] < cpi_latest_available_year]
+    countries_by_latest_cpi_year = {}
+    for cpi_year in sorted(countries_with_outdated_cpi["cpi_year"].unique()):
+        countries_by_latest_cpi_year[int(cpi_year)] = sorted(
+            countries_with_outdated_cpi.loc[countries_with_outdated_cpi["cpi_year"] == cpi_year].index
+        )
+    tb_cpi_latest = tb_cpi_latest[tb_cpi_latest["cpi_year"] == cpi_latest_available_year]
+    paths.log.info(
+        f"Dropped countries with outdated CPI data (CPI year < {cpi_latest_available_year}). Dropped {len(countries_with_outdated_cpi)} countries, {len(tb_cpi_latest)} remain.",
+        n_countries_dropped=len(countries_with_outdated_cpi),
+        latest_cpi_year=cpi_latest_available_year,
+        countries_dropped_by_latest_cpi_year=countries_by_latest_cpi_year,
+    )
 
     tb_wdi_cpi = tb_cpi_base.join(tb_cpi_latest, how="inner", lsuffix="_base", rsuffix="_latest")
 

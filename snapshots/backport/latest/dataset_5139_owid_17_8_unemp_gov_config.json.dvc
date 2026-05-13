@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5139
-    date_accessed: 2023-08-10 09:39:59.369540
+    url: https://admin.owid.io/admin/datasets/5139
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5139_owid_17_8_unemp_gov
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 96ae737775f6ee1895d0411c18c6629c
-  size: 4639
-  path: dataset_5139_owid_17_8_unemp_gov_config.json
+  - md5: 52993b3629bca0c5f407b95c0a17592b
+    size: 5141
+    path: dataset_5139_owid_17_8_unemp_gov_config.json

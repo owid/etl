@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Jaiteh et al. (2014)
+    url: http://www.epi.yale.edu
+    published_by: |-
+      Hsu, A., J. Emerson, M. Levy, A. de Sherbinin, L. Johnson, O. Malik, J. Schwartz, and M. Jaiteh. (2014). The 2014 Environmental Performance Index. New Haven, CT: Yale Center for Environmental Law and Policy
+  name: TE-20.25b_env
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 7a048d7caf86bb814dc711be636d1e3d
+    size: 6266
+    path: te_20_25b_env.feather

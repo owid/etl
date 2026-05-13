@@ -260,3 +260,5 @@ steps:
     - snapshot-private://fasttrack/latest/gov_torture_kill.csv
   data://grapher/fasttrack/latest/stunting_rate_schneider:
     - snapshot://fasttrack/latest/stunting_rate_schneider.csv
+  data://grapher/fasttrack/latest/deforestation_commodity_singh_perrson:
+    - snapshot://fasttrack/latest/deforestation_commodity_singh_perrson.csv

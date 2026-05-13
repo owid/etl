@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Friedman and Schwartz (1982)
+    url: https://www.nber.org/chapters/c11404.pdf
+    published_by: |-
+      Milton Friedman and Anna J. Schwartz, 1982. Monetary Trends in the United States and United Kingdom: Their Relation to Income, Prices, and Interest Rates (NBER book), 1867-1975, p. 98 - 137, University of Chicago Press
+  name: Figure_17.8_nominal_ir
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 0387a82eea017115e02af32eaa53fb42
+    size: 6082
+    path: figure_17_8_nominal_ir.feather

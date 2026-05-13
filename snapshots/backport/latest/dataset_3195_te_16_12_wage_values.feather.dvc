@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3195
-    date_accessed: 2023-08-10 07:48:28.060529
+    url: https://admin.owid.io/admin/datasets/3195
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: TE-16.12_Wage
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cbf35c231b2511756d77e5d5d500829b
-  size: 6850
-  path: dataset_3195_te_16_12_wage_values.feather
+  - md5: cdf02ddd4feb9ea1e58f3d395e3f08c8
+    size: 6890
+    path: dataset_3195_te_16_12_wage_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: GISTEMP (2018)
+    description: |-
+      Combined Land-Surface Air and Sea-Surface Water Temperature Anomalies (Land-Ocean Temperature Index, LOTI)
+
+      LOTI provides a more realistic representation of the global mean trends than Meteorological Station Data (dTs); it slightly underestimates warming or cooling trends, since the much larger heat capacity of water compared to air causes a slower and diminished reaction to changes; dTs on the other hand overestimates trends, since it disregards most of the dampening effects of the oceans that cover about two thirds of the Earth's surface.
+    url: https://data.giss.nasa.gov/gistemp/
+    published_by: |-
+      GISTEMP Team, 2018: GISS Surface Temperature Analysis (GISTEMP). NASA Goddard Institute for Space Studies. Dataset accessed 2018-11-25
+  name: TE-1.6b
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: d86919d55778f33a6c079c7806c0f193
+    size: 14794
+    path: te_1_6b.feather
