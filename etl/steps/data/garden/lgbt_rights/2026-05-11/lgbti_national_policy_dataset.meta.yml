@@ -644,6 +644,75 @@ tables:
           - Subnationally mixed
           - No religious exemptions
 
+      # ── SO + GI pair combinations (Bastian feedback) ────────────────────────────────
+      employment_discrimination:
+        title: Employment discrimination protections (combined SO + GI)
+        description_short: |-
+          Whether national law prohibits employment discrimination based on sexual orientation, gender identity, both, or neither.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Employment discrimination protections
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Both protected
+          - Sexual orientation only
+          - Gender identity only
+          - Subnationally mixed
+          - No protection
+
+      goods_services_discrimination:
+        title: Goods and services discrimination protections (combined SO + GI)
+        description_short: |-
+          Whether national law prohibits discrimination in the provision of goods and services based on sexual orientation, gender identity, both, or neither.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Goods and services discrimination protections
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Both protected
+          - Sexual orientation only
+          - Gender identity only
+          - Subnationally mixed
+          - No protection
+
+      hate_crime_protections:
+        title: Hate crime protections (combined SO + GI)
+        description_short: |-
+          Whether national hate crime legislation covers sexual orientation, gender identity, both, or neither as a protected characteristic.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Hate crime protections
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Both covered
+          - Sexual orientation only
+          - Gender identity only
+          - Subnationally mixed
+          - Not covered
+
+      constitutional_protections:
+        title: Constitutional protections (combined SO + GI)
+        description_short: |-
+          Whether the constitution explicitly or via binding court interpretation protects sexual orientation, gender identity, both, or neither.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Constitutional protections
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Both protected
+          - Sexual orientation only
+          - Gender identity only
+          - Subnationally mixed
+          - Not protected
+
   lgbti_national_policy_dataset_combined_regions:
     variables:
       # AGE OF CONSENT — number of countries
@@ -1948,5 +2017,280 @@ tables:
         short_unit: ""
         display:
           name: Religious exemptions in effect
+          numDecimalPlaces: 0
+
+
+      # ── SO + GI pair regional aggregates ─────────────────────────────────────────
+
+      employment_discrimination_both_protected_count:
+        title: Number of countries — Both protected (employment discrimination)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Both protected
+          numDecimalPlaces: 0
+
+      employment_discrimination_both_protected_pop:
+        title: Population — Both protected (employment discrimination)
+        unit: people
+        short_unit: ""
+        display:
+          name: Both protected
+          numDecimalPlaces: 0
+
+      employment_discrimination_sexual_orientation_only_count:
+        title: Number of countries — Sexual orientation only (employment discrimination)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Sexual orientation only
+          numDecimalPlaces: 0
+
+      employment_discrimination_sexual_orientation_only_pop:
+        title: Population — Sexual orientation only (employment discrimination)
+        unit: people
+        short_unit: ""
+        display:
+          name: Sexual orientation only
+          numDecimalPlaces: 0
+
+      employment_discrimination_gender_identity_only_count:
+        title: Number of countries — Gender identity only (employment discrimination)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Gender identity only
+          numDecimalPlaces: 0
+
+      employment_discrimination_gender_identity_only_pop:
+        title: Population — Gender identity only (employment discrimination)
+        unit: people
+        short_unit: ""
+        display:
+          name: Gender identity only
+          numDecimalPlaces: 0
+
+      employment_discrimination_no_protection_count:
+        title: Number of countries — No protection (employment discrimination)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      employment_discrimination_no_protection_pop:
+        title: Population — No protection (employment discrimination)
+        unit: people
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      employment_discrimination_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (employment discrimination)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      employment_discrimination_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (employment discrimination)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_both_protected_count:
+        title: Number of countries — Both protected (goods services discrimination)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Both protected
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_both_protected_pop:
+        title: Population — Both protected (goods services discrimination)
+        unit: people
+        short_unit: ""
+        display:
+          name: Both protected
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_sexual_orientation_only_count:
+        title: Number of countries — Sexual orientation only (goods services discrimination)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Sexual orientation only
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_sexual_orientation_only_pop:
+        title: Population — Sexual orientation only (goods services discrimination)
+        unit: people
+        short_unit: ""
+        display:
+          name: Sexual orientation only
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_gender_identity_only_count:
+        title: Number of countries — Gender identity only (goods services discrimination)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Gender identity only
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_gender_identity_only_pop:
+        title: Population — Gender identity only (goods services discrimination)
+        unit: people
+        short_unit: ""
+        display:
+          name: Gender identity only
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_no_protection_count:
+        title: Number of countries — No protection (goods services discrimination)
+        unit: countries
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_no_protection_pop:
+        title: Population — No protection (goods services discrimination)
+        unit: people
+        short_unit: ""
+        display:
+          name: No protection
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (goods services discrimination)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      goods_services_discrimination_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (goods services discrimination)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      hate_crime_protections_both_covered_count:
+        title: Number of countries — Both covered (hate crime protections)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Both covered
+          numDecimalPlaces: 0
+
+      hate_crime_protections_both_covered_pop:
+        title: Population — Both covered (hate crime protections)
+        unit: people
+        short_unit: ""
+        display:
+          name: Both covered
+          numDecimalPlaces: 0
+
+      hate_crime_protections_sexual_orientation_only_count:
+        title: Number of countries — Sexual orientation only (hate crime protections)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Sexual orientation only
+          numDecimalPlaces: 0
+
+      hate_crime_protections_sexual_orientation_only_pop:
+        title: Population — Sexual orientation only (hate crime protections)
+        unit: people
+        short_unit: ""
+        display:
+          name: Sexual orientation only
+          numDecimalPlaces: 0
+
+      hate_crime_protections_not_covered_count:
+        title: Number of countries — Not covered (hate crime protections)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not covered
+          numDecimalPlaces: 0
+
+      hate_crime_protections_not_covered_pop:
+        title: Population — Not covered (hate crime protections)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not covered
+          numDecimalPlaces: 0
+
+      hate_crime_protections_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (hate crime protections)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      hate_crime_protections_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (hate crime protections)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      constitutional_protections_both_protected_count:
+        title: Number of countries — Both protected (constitutional protections)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Both protected
+          numDecimalPlaces: 0
+
+      constitutional_protections_both_protected_pop:
+        title: Population — Both protected (constitutional protections)
+        unit: people
+        short_unit: ""
+        display:
+          name: Both protected
+          numDecimalPlaces: 0
+
+      constitutional_protections_sexual_orientation_only_count:
+        title: Number of countries — Sexual orientation only (constitutional protections)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Sexual orientation only
+          numDecimalPlaces: 0
+
+      constitutional_protections_sexual_orientation_only_pop:
+        title: Population — Sexual orientation only (constitutional protections)
+        unit: people
+        short_unit: ""
+        display:
+          name: Sexual orientation only
+          numDecimalPlaces: 0
+
+      constitutional_protections_not_protected_count:
+        title: Number of countries — Not protected (constitutional protections)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not protected
+          numDecimalPlaces: 0
+
+      constitutional_protections_not_protected_pop:
+        title: Population — Not protected (constitutional protections)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not protected
           numDecimalPlaces: 0
 

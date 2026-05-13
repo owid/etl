@@ -77,14 +77,19 @@ LGB_MILITARY_MAP = {
 def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixed_label):
     """Standard bucket map for a two-direction policy (progressive vs regressive).
 
-    The bucket key is "<prog_key>: <b1> <reg_key>: <b2>". The four resolved cases:
-      - Both 0      → neither_label  ("no policy in either direction")
-      - Progressive 1, regressive 0 → prog_label
-      - Progressive 0, regressive 1 → reg_label
-      - Anything else (subnational partial or transition year, both >0) → mixed_label
+    The bucket key is "<prog_key>: <b1> <reg_key>: <b2>". The five resolved cases:
+      - Both 0                       → neither_label  ("no policy in either direction")
+      - Progressive 1, regressive 0  → prog_label
+      - Progressive 0, regressive 1  → reg_label
+      - Any partial (subnational variation) or both = 1 → mixed_label
 
-    For transition years where both = 1, we default to prog_label; this is the
-    placeholder for the future end-of-year rule (see Bastian's note).
+    Note on `both = 1`: codebook §2.3 / §5.2.15 calls these "transition-year artefacts"
+    (a mid-year policy change recorded as both directions for the calendar year) and
+    recommends using the end-of-year status to disambiguate. In v2.0.x the producer
+    cleaned up almost all of these (we counted 1 stray row across the panel, in Brazil
+    GAC 2025), and the v2.0+ subnational coverage means most countries with both
+    directions populated are real subnational mixes. For both interpretations,
+    "Subnationally mixed" is a safer default than picking one direction arbitrarily.
     """
     m = {
         f"{prog_key}: 0 {reg_key}: 0": neither_label,
@@ -95,7 +100,7 @@ def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixe
         f"{prog_key}: 0.5 {reg_key}: 0.5": mixed_label,
         f"{prog_key}: 1 {reg_key}: 0.5": mixed_label,
         f"{prog_key}: 0.5 {reg_key}: 1": mixed_label,
-        f"{prog_key}: 1 {reg_key}: 1": prog_label,  # transition year — TODO: end-of-year rule
+        f"{prog_key}: 1 {reg_key}: 1": mixed_label,  # was prog_label — see docstring
     }
     return m
 
@@ -112,6 +117,33 @@ def _single_direction_map(*, key, yes_label, neither_label, mixed_label):
         f"{key}: 0": neither_label,
         f"{key}: 0.5": mixed_label,
         f"{key}: 1": yes_label,
+    }
+
+
+def _pair_map(*, key_a, key_b, both_label, a_only_label, b_only_label, neither_label, mixed_label):
+    """Map for combining two related single-direction protections into one indicator.
+
+    Used for SO + GI pairs (employment, hate crime, constitutional, goods/services
+    discrimination). Each input is a single-direction protection (the substantive
+    direction is fully in effect when its proportion = 1).
+
+    The bucket key is "<key_a>: <b_a> <key_b>: <b_b>". The five resolved cases:
+      - Both 1     → both_label  ("Both protected")
+      - a=1, b=0   → a_only_label  ("Sexual orientation only")
+      - a=0, b=1   → b_only_label  ("Gender identity only")
+      - Both 0     → neither_label
+      - Any partial → mixed_label
+    """
+    return {
+        f"{key_a}: 1 {key_b}: 1": both_label,
+        f"{key_a}: 1 {key_b}: 0": a_only_label,
+        f"{key_a}: 0 {key_b}: 1": b_only_label,
+        f"{key_a}: 0 {key_b}: 0": neither_label,
+        f"{key_a}: 0.5 {key_b}: 0": mixed_label,
+        f"{key_a}: 0 {key_b}: 0.5": mixed_label,
+        f"{key_a}: 0.5 {key_b}: 0.5": mixed_label,
+        f"{key_a}: 0.5 {key_b}: 1": mixed_label,
+        f"{key_a}: 1 {key_b}: 0.5": mixed_label,
     }
 
 
@@ -372,6 +404,71 @@ COMBINED_CONFIGS = [
             key="legal",
             yes_label="Religious exemptions in effect",
             neither_label="No religious exemptions",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    # ── SO + GI pair combinations (Bastian feedback) ────────────────────────────────────
+    {
+        "short_name": "employment_discrimination",
+        "sources": [
+            ("employment_discrimination_sexual_orientation__illegal", "so"),
+            ("employment_discrimination_gender_identity__illegal", "gi"),
+        ],
+        "category_map": _pair_map(
+            key_a="so",
+            key_b="gi",
+            both_label="Both protected",
+            a_only_label="Sexual orientation only",
+            b_only_label="Gender identity only",
+            neither_label="No protection",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "goods_services_discrimination",
+        "sources": [
+            ("goods_services_discrimination_sexual_orientation__illegal", "so"),
+            ("goods_services_discrimination_gender_identity__illegal", "gi"),
+        ],
+        "category_map": _pair_map(
+            key_a="so",
+            key_b="gi",
+            both_label="Both protected",
+            a_only_label="Sexual orientation only",
+            b_only_label="Gender identity only",
+            neither_label="No protection",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "hate_crime_protections",
+        "sources": [
+            ("hate_crime_protections_sexual_orientation__legal", "so"),
+            ("hate_crime_protections_gender_identity__legal", "gi"),
+        ],
+        "category_map": _pair_map(
+            key_a="so",
+            key_b="gi",
+            both_label="Both covered",
+            a_only_label="Sexual orientation only",
+            b_only_label="Gender identity only",
+            neither_label="Not covered",
+            mixed_label="Subnationally mixed",
+        ),
+    },
+    {
+        "short_name": "constitutional_protections",
+        "sources": [
+            ("constitutional_protections_sexual_orientation__legal", "so"),
+            ("constitutional_protections_gender_identity__legal", "gi"),
+        ],
+        "category_map": _pair_map(
+            key_a="so",
+            key_b="gi",
+            both_label="Both protected",
+            a_only_label="Sexual orientation only",
+            b_only_label="Gender identity only",
+            neither_label="Not protected",
             mixed_label="Subnationally mixed",
         ),
     },
