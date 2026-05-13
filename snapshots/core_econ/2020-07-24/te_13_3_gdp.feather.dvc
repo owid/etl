@@ -1,12 +1,12 @@
 meta:
-  source:
-    name: Maddison Project Database (2018)
-    url: |-
-      https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2018 and http://www.ggdc.net/maddison/oriindex.htm
-    published_by: |-
-      Maddison Project Database, version 2018. Bolt, Jutta, Robert Inklaar, Herman de Jong and Jan Luiten van Zanden (2018), “Rebasing ‘Maddison’: new income comparisons and the shape of long-run economic development”, Maddison Project Working paper 10
-  name: TE-13.3_GDP
-  description: core-econ.org
+  origin:
+    producer: Maddison Project Database
+    title: 'Maddison Project Database, version 2018'
+    citation_full: 'Maddison Project Database, version 2018. Bolt, Jutta, Robert Inklaar, Herman de Jong and Jan Luiten van Zanden (2018), "Rebasing ''Maddison'': new income comparisons and the shape of long-run economic development", Maddison Project Working paper 10.'
+    url_main: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2018
+    url_download: http://www.ggdc.net/maddison/oriindex.htm
+    date_accessed: '2020-07-24'
+    date_published: '2018'
   is_public: false
 outs:
   - md5: 0ce9b11d7861c8e1127ef6a9e19fcc5f

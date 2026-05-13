@@ -1,11 +1,11 @@
 meta:
-  source:
-    name: Fogel (2000)
-    published_by: |-
-      Fogel, Robert W. 2000. The Fourth Great Awakening and the Future of Egalitarianism. Chicago, IL and London: University Of Chicago Press.
-  name: Figure 3.21
-  description: core-econ.org
   is_public: false
+  origin:
+    producer: Fogel
+    title: The fourth great awakening and the future of egalitarianism
+    citation_full: 'Fogel, Robert W. (2000). The Fourth Great Awakening and the Future of Egalitarianism. Chicago, IL and London: University Of Chicago Press.'
+    date_accessed: '2018-09-17'
+    date_published: '2000'
 outs:
   - md5: 6a4d7eff291934b37d3cc746d328d71c
     size: 3962

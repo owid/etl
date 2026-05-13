@@ -107,9 +107,15 @@ For each vulnerable npm package:
 
 ## Step 5: Verify changes
 
-Run `make check` to ensure nothing is broken. This runs linting, formatting, and type checking.
+Run `make check-all` (lint + format + typecheck across the root and every `lib/`). The plain `make check` only covers the top-level codebase, so breaking changes from upgrades to packages used by `lib/` (e.g. gdown's `fuzzy=` removal in `lib/datautils/`) would slip through.
 
-If `make check` fails, fix the issues (commonly: removed imports that type checkers flag). Then re-run until it passes.
+If it fails, fix the issues (commonly: removed/renamed kwargs that type checkers flag) and re-run until it passes.
+
+## Step 5b: Bump lib/ package versions
+
+If you modified any `lib/{catalog,datautils,repack}/pyproject.toml`, also bump that file's `version = "x.y.z"` (patch bump). The `publish-owid-packages.yml` workflow republishes these packages to PyPI on master push and rejects the publish if the version already exists.
+
+After bumping, re-run `uv lock` (top-level and inside each modified `lib/<name>/`) so the lockfiles pick up the new version.
 
 ## Step 6: Create PR
 

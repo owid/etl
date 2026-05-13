@@ -9,8 +9,6 @@ NAMESPACE = "un"
 VERSION = "2022-07-11"
 FNAME = "un_wpp"
 TNAME = "un_wpp"
-SOURCE_NAME_DISPLAY = "UN, World Population Prospects (2022)"
-
 
 log = structlog.get_logger()
 
@@ -53,10 +51,8 @@ def _propagate_metadata(dataset: catalog.Dataset, table: catalog.Table) -> catal
     meta_map = {}
     for var_name, var_meta in meta["tables"][TNAME]["variables"].items():
         var_meta = catalog.VariableMeta(**var_meta)
+        var_meta.origins = table["value"].metadata.origins
         meta_map[var_name] = var_meta
-        var_meta.sources = dataset.metadata.sources
-        # Temporary
-        var_meta.sources[0].name = SOURCE_NAME_DISPLAY
 
     table["meta"] = table["variable"].astype(object).map(meta_map)
     return table

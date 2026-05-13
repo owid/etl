@@ -262,3 +262,5 @@ steps:
     - snapshot://fasttrack/latest/stunting_rate_schneider.csv
   data://grapher/fasttrack/latest/deforestation_commodity_singh_perrson:
     - snapshot://fasttrack/latest/deforestation_commodity_singh_perrson.csv
+  data://grapher/fasttrack/latest/deforestation_by_commodity_singh:
+    - snapshot://fasttrack/latest/deforestation_by_commodity_singh.csv
