@@ -20,6 +20,10 @@ definitions:
     name: "Full democracies"
     color: "#5e94c4"
 
+  common_views:
+    - config:
+        colorVariableId: regions#owid_region
+
 config:
   explorerTitle: "Democracy"
   explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
@@ -70,6 +74,8 @@ views:
     indicators:
       y:
         - catalogPath: eiu#regime_eiu
+    config:
+      colorVariableId: eiu#regime_eiu
   - dimensions:
       metric: democracy
       sub_metric: electoral_pluralism_index

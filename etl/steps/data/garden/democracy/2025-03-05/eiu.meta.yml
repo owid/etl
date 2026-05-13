@@ -21,17 +21,6 @@ definitions:
           - "#aad9e9"
           - "#73add2"
           - "#4575b4"
-        customNumericLabels:
-          - ""
-          - ""
-          - ""
-          - ""
-          - ""
-          - ""
-          - ""
-          - ""
-          - ""
-          - ""
         customNumericValues:
           - 0
           - 1
@@ -184,47 +173,40 @@ tables:
           - Flawed democracies have some weaknesses in democratic institutions and culture.
           - Hybrid regimes have serious weaknesses in democratic institutions and culture.
           - Authoritarian regimes have few democratic institutions and little democratic culture.
-
         presentation:
           grapher_config:
             title: Democracy
             subtitle: "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
             note: The Chart tab uses numeric values, ranging from 3 for full democracies to 0 for authoritarian regimes.
+            chartTypes:
+              - LineChart
             hasMapTab: true
             tab: map
             yAxis:
               max: 3
               min: 0
             selectedFacetStrategy: entity
+            colorScale: &color_regime
+              binningStrategy: manual
+              customNumericColors:
+                - "#f88a50"
+                - "#feeea5"
+                - "#c7e7f1"
+                - "#5e94c4"
+              customNumericLabels:
+                - Authoritarian regime
+                - Hybrid regime
+                - Flawed democracy
+                - Full democracy
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 2
+                - 3
+              customNumericColorsActive: true
             map:
-              colorScale:
-                baseColorScheme: PuBu
-                binningStrategy: manual
-                customNumericColors:
-                  - "#f88a50"
-                  - "#feeea5"
-                  - "#c7e7f1"
-                  - "#5e94c4"
-                customNumericLabels:
-                  - Authoritarian regime
-                  - Hybrid regime
-                  - Flawed democracy
-                  - Full democracy
-                  - ""
-                  - ""
-                  - ""
-                  - ""
-                  - ""
-                  - ""
-                customNumericValues:
-                  - 0
-                  - 0
-                  - 1
-                  - 2
-                  - 3
-                customCategoryLabels:
-                  No data: No data
-                customNumericColorsActive: true
+              colorScale: *color_regime
               tooltipUseCustomLabels: true
 
   num_countries:
