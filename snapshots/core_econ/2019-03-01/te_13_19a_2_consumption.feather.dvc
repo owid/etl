@@ -1,10 +1,12 @@
 meta:
-  source:
-    name: FRED (2016)
-    url: https://fred.stlouisfed.org/series/NAEXKP02USA657S
-    published_by: Federal Reserve Bank of St. Louis (2016) FRED.
-  name: TE-13.19a_2_consumption
-  description: core-econ.org
+  origin:
+    producer: Federal Reserve Bank of St. Louis
+    title: Federal Reserve Economic Data (FRED)
+    citation_full: Federal Reserve Bank of St. Louis (2016) FRED.
+    attribution_short: FRED
+    url_main: https://fred.stlouisfed.org/series/NAEXKP02USA657S
+    date_accessed: '2019-03-01'
+    date_published: '2016'
   is_public: false
 outs:
   - md5: 97b4f47d0925658f68dbe9e9ec926999

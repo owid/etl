@@ -1,11 +1,12 @@
 meta:
-  source:
-    name: LIS Database (2015)
-    url: https://www.lisdatacenter.org
-    published_by: Cross National Data Center. LIS Database (2015)
-  name: Figure 22.17_gini
-  description: core-econ.org
   is_public: false
+  origin:
+    producer: Cross National Data Center
+    title: LIS Database
+    citation_full: Cross National Data Center. LIS Database (2015). Cross National Data Center.
+    url_main: https://www.lisdatacenter.org
+    date_accessed: '2019-03-06'
+    date_published: '2015'
 outs:
   - md5: 43674cffdc56504ccd97e2c988712506
     size: 3338

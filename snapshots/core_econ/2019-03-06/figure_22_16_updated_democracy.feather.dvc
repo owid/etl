@@ -1,10 +1,10 @@
 meta:
-  source:
-    name: Inter-Parliamentary Union
-    url: http://archive.ipu.org/wmn-e/suffrage.htm
-    published_by: Inter-Parliamentary Union
-  name: Figure 22.16_updated_democracy
-  description: core-econ.org
+  origin:
+    producer: Inter-Parliamentary Union
+    title: Women's suffrage
+    citation_full: Inter-Parliamentary Union. Women's suffrage.
+    url_main: http://archive.ipu.org/wmn-e/suffrage.htm
+    date_accessed: '2019-03-06'
   is_public: false
 outs:
   - md5: de218f808fb6ccdd38738e2503276480

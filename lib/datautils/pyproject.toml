@@ -1,6 +1,6 @@
 [project]
 name = "owid-datautils"
-version = "0.6.2"
+version = "0.6.3"
 description = "Data utils library by the Data Team at Our World in Data"
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
@@ -18,7 +18,7 @@ dependencies = [
     "boto3>=1.38.23",
     "structlog>=21.5.0",
     "colorama>=0.4.4",
-    "gdown>=4.5.2",
+    "gdown>=5.2.2",
     "gsheets>=0.6.1",
     "pydrive2>=1.15.0",
     "pyarrow>=18.0.0",
@@ -37,7 +37,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pytest>=6.2.5",
+    "pytest>=9.0.3",
     "pytest-cov>=2.12.1",
     "Sphinx==4.5.0",
     "furo>=2022.4.7",
@@ -47,7 +47,7 @@ dev = [
     "ipdb>=0.13.9",
     "ipykernel>=6.13.0",
     "openpyxl>=3.0.10",
-    "lxml>=4.9.1",
+    "lxml>=6.1.0",
     "ty==0.0.26",
     "ruff==0.15.8"
 ]

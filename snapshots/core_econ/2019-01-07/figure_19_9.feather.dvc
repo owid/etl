@@ -1,12 +1,11 @@
 meta:
-  source:
-    name: The World Bank (2016)
-    url: |-
-      http://databank.worldbank.org/Data/Views/VariableSelection/SelectVariables.aspx?source=Education-Statistics:-Education-Attainment
-    published_by: |-
-      The World Bank. 2016. IIASA/VID Educational Attainment Model. Dataset produced by the International Institute for Applied Systems Analysis (IIASA) in Luxemburg, Austria and the Vienna Institute of Demography, Austrian Academy of Sciences. Educational Attainment Statistics.
-  name: Figure_19.9
-  description: core-econ.org
+  origin:
+    producer: World Bank
+    title: IIASA/VID educational attainment model
+    citation_full: 'The World Bank. 2016. IIASA/VID Educational Attainment Model. Dataset produced by the International Institute for Applied Systems Analysis (IIASA) in Luxemburg, Austria and the Vienna Institute of Demography, Austrian Academy of Sciences. Educational Attainment Statistics.'
+    url_main: http://databank.worldbank.org/Data/Views/VariableSelection/SelectVariables.aspx?source=Education-Statistics:-Education-Attainment
+    date_accessed: '2019-01-07'
+    date_published: '2016'
   is_public: false
 outs:
   - md5: 9d77d7ed477ab6428a6a3585f8909621
