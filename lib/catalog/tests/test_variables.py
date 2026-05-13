@@ -291,9 +291,7 @@ def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_
     assert tb1["j"].metadata.display == tb1["a"].metadata.display
 
 
-def test_create_new_variables_as_another_variable_to_the_power_of_another_variable(
-    table_1, origins, licenses
-) -> None:
+def test_create_new_variables_as_another_variable_to_the_power_of_another_variable(table_1, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["k"] = tb1["a"] ** tb1["b"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -425,9 +423,7 @@ def test_divide_variables_where_only_numerator_has_metadata(variable_1, variable
     assert variable.metadata.display == variable_1.metadata.display
 
 
-def test_divide_variables_where_only_denominator_has_metadata(
-    variable_1, variable_2, origins, licenses
-) -> None:
+def test_divide_variables_where_only_denominator_has_metadata(variable_1, variable_2, origins, licenses) -> None:
     variable_1 = variable_1.copy()
     variable_2 = variable_2.copy()
     # We remove metadata values from the numerator.
