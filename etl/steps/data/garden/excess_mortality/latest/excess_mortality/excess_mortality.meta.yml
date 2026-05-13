@@ -30,44 +30,7 @@ definitions:
           - 20
           - 50
           - 100
-  origins:
-    hmd: &origin_hmd
-      title: "Human Mortality Database"
-      producer: Human Mortality Database
-      date_published: "2025"
-      url_main: "https://www.mortality.org"
-      license:
-        name: Creative Commons BY 4.0
-        url: https://www.mortality.org/Data/UserAgreement
-      date_accessed: "2024-08-20"
-      citation_full: |-
-        HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). Available at www.mortality.org.
-    wmd: &origin_wmd
-      title: "World Mortality Database"
-      producer: World Mortality Database
-      date_published: "2024"
-      url_main: "https://github.com/akarlinsky/world_mortality"
-      license:
-        name: MIT License
-        url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
-      date_accessed: "2024-08-20"
-      citation_full: |-
-        Karlinsky & Kobak 2021, Tracking excess mortality across countries during the COVID-19 pandemic with the World Mortality Dataset, eLife https://doi.org/10.7554/eLife.69336
-    xm_kk: &origin_kk
-      title: "Excess mortality during the COVID-19 pandemic"
-      producer: Karlinsky & Kobak
-      date_published: "2024"
-      url_main: "https://github.com/dkobak/excess-mortality"
-      license:
-        name: GPL-3.0
-        url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
-      date_accessed: "2024-08-20"
-      citation_full: |-
-        Karlinsky & Kobak, 2021, Tracking excess mortality across countries during the COVID-19 pandemic with the World Mortality Dataset. eLife 10:e69336. https://elifesciences.org/articles/69336.
   common:
-    origins:
-      - *origin_hmd
-      - *origin_wmd
     description_key:
       - Excess deaths is estimated as _Excess deaths = Number of reported deaths - Number of expected deaths_. Excess mortality goes beyond confirmed COVID-19 fatalities by capturing all deaths above a projected baseline, including indirect deaths from pandemic-related disruptions.
       - All-cause mortality data is from the Human Mortality Database (HMD) Short-term Mortality Fluctuations project and the World Mortality Dataset (WMD). Both sources are updated weekly.
@@ -170,10 +133,6 @@ tables:
           includeInTable: true
           tolerance: 30
           numDecimalPlaces: 0
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
         presentation:
           grapher_config:
             title: "Excess mortality: Deaths from all causes compared to projection based on previous years"
@@ -190,10 +149,6 @@ tables:
           name: Ages 0–14
           includeInTable: true
           numDecimalPlaces: 0
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
       p_proj_15_64:
         title: p_proj_15_64
         # title: Excess mortality P-scores (projected baseline, 15–64)
@@ -204,10 +159,6 @@ tables:
           name: Ages 15–64
           includeInTable: true
           numDecimalPlaces: 0
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
       p_proj_65_74:
         title: p_proj_65_74
         # title: Excess mortality P-scores (projected baseline, 65–74)
@@ -218,10 +169,6 @@ tables:
           name: Ages 65–74
           includeInTable: true
           numDecimalPlaces: 0
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
       p_proj_75_84:
         title: p_proj_75_84
         # title: Excess mortality P-scores (projected baseline, 75–84)
@@ -232,10 +179,6 @@ tables:
           name: Ages 75–84
           includeInTable: true
           numDecimalPlaces: 0
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
       p_proj_85p:
         title: p_proj_85p
         # title: Excess mortality P-scores (projected baseline, 85+)
@@ -246,12 +189,6 @@ tables:
           name: Ages 85+
           includeInTable: true
           numDecimalPlaces: 0
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
-
-      # deaths_*_all_ages
       deaths_2010_all_ages:
         title: deaths_2010_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
@@ -382,10 +319,6 @@ tables:
         description_short: The number of excess deaths; calculated as reported deaths minus projected deaths.
         display:
           includeInTable: true
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
       excess_per_million_proj_all_ages:
         title: excess_per_million_proj_all_ages
         # title: Excess deaths per million people (projected, all ages)
@@ -393,10 +326,6 @@ tables:
         description_short: The number of excess deaths per million people in the population; calculated as reported deaths minus projected deaths.
         display:
           includeInTable: true
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
       average_deaths_2015_2019_all_ages:
         title: average_deaths_2015_2019_all_ages
         # title: Average number of deaths (2015–2019, all ages)
@@ -413,8 +342,6 @@ tables:
           name: Projected, 2020
           includeInTable: true
           numDecimalPlaces: 0
-        origins:
-          - *origin_kk
       cum_excess_proj_all_ages:
         title: cum_excess_proj_all_ages
         # title: Cumulative excess of deaths (projected, all ages)
@@ -424,10 +351,6 @@ tables:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years"
@@ -454,8 +377,6 @@ tables:
         description_short: The cumulative number of projected deaths; cumulated starting 1 January 2020
         display:
           includeInTable: true
-        origins:
-          - *origin_kk
       cum_p_proj_all_ages:
         title: cum_p_proj_all_ages
         # title: Cumulative p-score (projected, all ages)
@@ -467,10 +388,6 @@ tables:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative deaths from all causes compared to projection based on previous years"
@@ -486,10 +403,6 @@ tables:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years, per million people"
@@ -515,22 +428,12 @@ tables:
         description_short: The week or month number in the year.
         display:
           includeInTable: true
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
       time_unit:
         title: Time unit
         unit: ""
         description_short: Denotes whether the “time” column values are weekly or monthly.
         display:
           includeInTable: true
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
-
-      # Last 12 months
       cum_excess_proj_all_ages_last12m:
         title: cum_excess_proj_all_ages_last12m
         # title: Cumulative excess of deaths (projected, all ages)
@@ -540,10 +443,6 @@ tables:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years"
@@ -572,14 +471,6 @@ tables:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-        origins:
-          - *origin_hmd
-          - *origin_wmd
-          - *origin_kk
-        sources:
-          - name: Human Mortality Database
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years, per million people"

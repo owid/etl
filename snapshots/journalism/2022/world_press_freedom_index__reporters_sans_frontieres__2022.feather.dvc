@@ -1,16 +1,17 @@
 meta:
-  source:
-    name: Reporters sans Frontieres (2022)
+  origin:
+    producer: Reporters sans Frontieres
+    title: World Press Freedom Index
     description: |-
       This dataset provides information on press freedom, using data from the Reporters sans Frontieres' World Press Freedom Index.
 
+      We received the combined file for years 2014-2021 via email from the head of the World Press Freedom Index, Nalini Chella-Lepetit.
+
       You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/human_rights
-    url: https://rsf.org/en/index
-    date_accessed: 2022-03-21
-    published_by: Reporters sans Frontieres
-  name: World Press Freedom Index - Reporters sans Frontieres (2022)
-  description: |-
-    We received the combined file for years 2014-2021 via email from the head of the World Press Freedom Index, Nalini Chella-Lepetit.
+    citation_full: Reporters sans Frontieres (2022). World Press Freedom Index.
+    url_main: https://rsf.org/en/index
+    date_accessed: '2022-03-21'
+    date_published: '2022'
 outs:
   - md5: 1e611ca9921bea9177a2bdabba8ccffe
     size: 16834

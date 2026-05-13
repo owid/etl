@@ -1,14 +1,18 @@
 meta:
-  source:
-    name: Our World In Data based on GGDC-10 (2015)
-    description: |-
-      The only changes we applied to the GGDC 10-sector database were: (i) dropping observations for GDP shares in Peru 1950-1985 since these are reported as negative in the original; and (ii) dropping observations for GDP shares in the Netherlands 1949-1959, since these are comparable to the period after 1960, as suggested by a marked jump in levels in the original series.
-    url: http://www.rug.nl/ggdc/productivity/10-sector/
-    date_accessed: 2017-08-03
-    published_by: Our World In Data based on GGDC-10 (2015)
-  name: Share of industry in GDP at constant 2005 prices (GGDC) (split)
-  description: ''
   is_public: false
+  origin:
+    producer: Groningen Growth and Development Centre
+    title: GGDC 10-sector database
+    description: |-
+      The GGDC 10-sector database provides a long-run, internationally comparable dataset on sectoral productivity performance for 10 broad sectors of the economy, covering Asian, Latin American, and African countries as well as the US and Europe.
+    title_snapshot: GGDC 10-sector database - Share of industry in GDP at constant 2005 prices
+    description_snapshot: |-
+      The only changes we applied to the GGDC 10-sector database were: (i) dropping observations for GDP shares in Peru 1950–1985 since these are reported as negative in the original; and (ii) dropping observations for GDP shares in the Netherlands 1949–1959, since these are comparable to the period after 1960, as suggested by a marked jump in levels in the original series.
+    citation_full: Timmer, M. P., de Vries, G. J., and de Vries, K. (2015). Patterns of structural change in developing countries. In J. Weiss, & M. Tribe (Eds.), Routledge Handbook of Industry and Development (pp. 65–83). Routledge.
+    attribution_short: GGDC
+    url_main: http://www.rug.nl/ggdc/productivity/10-sector/
+    date_accessed: '2017-08-03'
+    date_published: '2015'
 outs:
   - md5: fe56480d0f33340a4683abf2e767da9f
     size: 12226

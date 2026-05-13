@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: HALF Index (Land Use) - Alexander et al. (2016)
+  origin:
+    producer: Alexander et al.
+    title: 'Human appropriation of land for food: the role of diet'
     description: |-
       This data is based on the published work of Alexander et al. (2016). Human appropriation of land for food: The role of diet. Full reference below.
 
@@ -15,10 +16,10 @@ meta:
       Alexander, P., Brown, C., Arneth, A., Finnigan, J., & Rounsevell, M. D. (2016). Human appropriation of land for food: the role of diet. Global Environmental Change, 41, 88-98. Available at: http://www.sciencedirect.com/science/article/pii/S0959378016302370
 
       WWF. 2016. Living Planet Report 2016. Risk and resilience in a new era. WWF International, Gland, Switzerland. Available at: http://awsassets.panda.org/downloads/lpr_living_planet_report_2016.pdf
-    date_accessed: 2026-03-05
-    published_by: HALF Index (Land Use) - Alexander et al. (2016)
-  name: HALF Index (Land Use) - Alexander et al. (2016)
-  description: ''
+    citation_full: 'Alexander, P., Brown, C., Arneth, A., Finnigan, J., and Rounsevell, M. D. (2016). Human appropriation of land for food: the role of diet. Global Environmental Change, 41, 88-98.'
+    url_main: http://www.sciencedirect.com/science/article/pii/S0959378016302370
+    date_accessed: '2016-01-01'
+    date_published: '2016'
 outs:
   - md5: cb9b7a453521d6100eaf6a8ef32579d1
     size: 7842

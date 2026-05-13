@@ -1,17 +1,14 @@
 meta:
-  namespace: fasttrack
-  short_name: ai_index
-  name: DRAFT AI Index
-  description: ''
-  source_name: Google Sheet
-  url: ''
-  file_extension: csv
-  date_accessed: 2023-01-03
-  source_data_url: gAAAAABjtCoJsvAcFP0HlzzttugJ22k9uQxG_zI1RI2xwVQh0c5vMHtMqsOGl4K6uOZ_QCCXpzMOVGqBB-LWO1MggkfHb5gNl-CGzfe_SEK9Vt_qcAoGmQR4CVPG-7UUwQh04c_OHt9dIXZAePjkhnh39sF89K-1ugUX39JcKEWfOpf1sCEeCeHylAna-OYnbri77pNLSjiQKM2wSHWRrPbDXXYJhZCPGoLqEmuQcaHTX8ydP5EE3ou6hugAN7a845ixWU_U9DqM
+  origin:
+    producer: AI Index
+    title: AI Index report
+    citation_full: 'AI Index (2022). AI Index report. Stanford University.'
+    url_main: https://aiindex.stanford.edu/
+    url_download: gAAAAABjtCoJsvAcFP0HlzzttugJ22k9uQxG_zI1RI2xwVQh0c5vMHtMqsOGl4K6uOZ_QCCXpzMOVGqBB-LWO1MggkfHb5gNl-CGzfe_SEK9Vt_qcAoGmQR4CVPG-7UUwQh04c_OHt9dIXZAePjkhnh39sF89K-1ugUX39JcKEWfOpf1sCEeCeHylAna-OYnbri77pNLSjiQKM2wSHWRrPbDXXYJhZCPGoLqEmuQcaHTX8ydP5EE3ou6hugAN7a845ixWU_U9DqM
+    date_accessed: '2023-01-03'
+    date_published: '2022-11-29'
   is_public: false
-  version: '2022-11-29'
-wdir: ../../../data/snapshots/fasttrack/2022-11-29
 outs:
-- md5: f9eec66a29f9c4d60a34d520e04acba0
-  size: 199651
-  path: ai_index.csv
+  - md5: f9eec66a29f9c4d60a34d520e04acba0
+    size: 199651
+    path: ai_index.csv

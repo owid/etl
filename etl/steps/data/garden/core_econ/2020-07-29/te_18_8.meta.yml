@@ -1,0 +1,19 @@
+dataset:
+  title: TE-18.8
+tables:
+  te_18_8:
+    variables:
+      average_absolute_current_account_balances__15_countries__as_a_pct_of_gdp:
+        title: Average absolute current account balances (15 countries, as a % of GDP)
+        unit: '%'
+        description: |-
+          The IMF data has been transformed to be comparable to the Obstfeld and Taylor data. First we take data from 15 countries on current account balances (as a % of GDP). Next, we take the absolute value of each country-year combination. Lastly, we average the absolute current account balances as a % of GDP of the 15 countries in the sample in 5 year blocks.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

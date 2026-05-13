@@ -602,7 +602,7 @@ def cleanup_ghost_sources(engine: Engine, dataset_id: int, dataset_upserted_sour
             DELETE FROM sources
             WHERE datasetId = :dataset_id
                 AND id NOT IN (
-                    select distinct sourceId from variables where datasetId = :dataset_id
+                    select distinct sourceId from variables where datasetId = :dataset_id AND sourceId IS NOT NULL
                 )
                 {where}
                 """

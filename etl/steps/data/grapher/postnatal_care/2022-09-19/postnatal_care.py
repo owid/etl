@@ -1,19 +1,15 @@
-from owid import catalog
+"""Load garden dataset and create grapher dataset."""
 
 from etl.helpers import PathFinder
 
-N = PathFinder(__file__)
+paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
-    dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
+def run() -> None:
+    # Load garden dataset and table.
+    ds_garden = paths.load_dataset("postnatal_care")
+    tb = ds_garden["postnatal_care"]
 
-    table = N.garden_dataset["postnatal_care"]
-    table = table.drop("index", axis=1)
-    # optionally set additional dimensions
-    # table = table.set_index(["sex", "income_group"], append=True)
-
-    # if your data is in long format, check gh.long_to_wide_tables
-    dataset.add(table)
-
-    dataset.save()
+    # Save grapher dataset.
+    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher.save()

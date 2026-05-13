@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5144
-    date_accessed: 2023-08-10 09:13:21.662316
+    url: https://admin.owid.io/admin/datasets/5144
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Figure_17.28_interest_rate
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c85fb48b8bd735e189912a5144c2247f
-  size: 7330
-  path: dataset_5144_figure_17_28_interest_rate_values.feather
+  - md5: 18a5194ca854c1ec3cca61466759c80d
+    size: 7362
+    path: dataset_5144_figure_17_28_interest_rate_values.feather

@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: US Bureau of Labor Statistics
+    title: US Bureau of Labor Statistics
+    citation_full: US Bureau of Labor Statistics (2020).
+    attribution_short: BLS
+    url_main: https://www.bls.gov/home.htm
+    date_accessed: '2020-08-03'
+    date_published: '2020'
+  is_public: false
+outs:
+  - md5: 0a08f66d1e38d7844d996b2ef6af7e15
+    size: 5018
+    path: figure_17_17_updated.feather

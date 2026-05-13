@@ -1,5 +1,3 @@
-dataset:
-  title: Threatened and evaluated species (IUCN Red List)
 tables:
   threatened_and_evaluated_species:
     variables:
@@ -9,8 +7,7 @@ tables:
         display:
           name: Number of described species
           numDecimalPlaces: 0
-        description: The total number of known/described species. This does not mean these species have been assessed for
-          their extinction risk level.
+        description_short: The total number of known/described species. This does not mean these species have been assessed for their extinction risk level.
       number_of_species_evaluated_for_the_iucn_red_list:
         title: Number of species evaluated for the IUCN Red List
         unit: species
@@ -22,17 +19,14 @@ tables:
         unit: species
         display:
           name: Number of species threatened with extinction
-        description: >-
-          The IUCN Red List has assessed only a small share of the total known species in the world. This means the number
-          of species threatened with extinction is likely to be a significant underestimate of the total number of species
-          at risk.
+        description_short: |-
+          The IUCN Red List has assessed only a small share of the total known species in the world. This means the number of species threatened with extinction is likely to be a significant underestimate of the total number of species at risk.
 
 
           This is particularly true for understudied groups such as insects, plants and fungi.
 
 
-          'Threatened' species are those that are categorized as 'Critically endangered', 'Endangered' or 'Vulnerable' on
-          the IUCN Red List.
+          'Threatened' species are those that are categorized as 'Critically endangered', 'Endangered' or 'Vulnerable' on the IUCN Red List.
       share_of_described_species_that_have_been_evaluated:
         title: Share of described species that have been evaluated
         unit: '%'
@@ -46,5 +40,4 @@ tables:
         short_unit: '%'
         display:
           name: Share of species threatened with extinction
-        description: The share of known species threatened with extinction is only available for a few taxonomic groups where
-          more than 80% of species have been assessed.
+        description_short: The share of known species threatened with extinction is only available for a few taxonomic groups where more than 80% of species have been assessed.

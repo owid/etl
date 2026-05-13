@@ -1,18 +1,17 @@
 meta:
-  source:
-    name: Plastic discarded, recycled, incinerated - Geyer et al. (2017)
+  origin:
+    producer: Geyer et al.
+    title: Production, use, and fate of all plastics ever made
     description: |-
-      Estimates of the proportion of plastic waste discarded, recycled and incinerated based on data in Geyer et al. (2017).
+      Estimates of the proportion of plastic waste discarded, recycled, and incinerated based on data in Geyer et al. (2017).
 
       Geyer et al. (2017) note an average linear rate of increase in recycling of 0.7% per year from 1990 onwards, and 0.7% per year for incineration from 1980 onwards.
 
-      Data for 1980-2015 is based on historical estimates. Data from 2016-2050 is based solely on extrapolation of consistent growth trends of 0.7% for recycling and incineration; it therefore represents business-as-usual growth but should not be interpreted as a direct projection.
-    url: http://advances.sciencemag.org/content/3/7/e1700782.full
-    date_accessed: 2026-03-05
-    published_by: |-
-      Geyer, R., Jambeck, J. R., & Law, K. L. (2017). Production, use, and fate of all plastics ever made. Science Advances, 3(7), e1700782.
-  name: Plastic discarded, recycled, incinerated - Geyer et al. (2017)
-  description: ''
+      Data for 1980–2015 is based on historical estimates. Data from 2016–2050 is based solely on extrapolation of consistent growth trends of 0.7% for recycling and incineration; it therefore represents business-as-usual growth but should not be interpreted as a direct projection.
+    citation_full: Geyer, R., Jambeck, J. R., and Law, K. L. (2017). Production, use, and fate of all plastics ever made. Science Advances, 3(7), e1700782.
+    url_main: http://advances.sciencemag.org/content/3/7/e1700782.full
+    date_accessed: '2018-08-01'
+    date_published: '2017'
 outs:
   - md5: e003e4fef6194f3921ae430107086010
     size: 5106

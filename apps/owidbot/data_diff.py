@@ -2,9 +2,12 @@ import os
 import re
 import subprocess
 
+import structlog
 from rich.ansi import AnsiDecoder
 
 from etl.paths import BASE_DIR
+
+log = structlog.get_logger()
 
 EXCLUDE_DATASETS = "excess_mortality|covid|fluid|flunet|country_profile|garden/ihme_gbd/2019/gbd_risk"
 
@@ -107,7 +110,9 @@ def call_etl_diff(include: str) -> list[str]:
         r"^.*You're on master branch, using local env instead of STAGING=master*", "", stdout, flags=re.MULTILINE
     )
 
+    if result.returncode != 0:
+        raise Exception(f"etl diff failed (exit {result.returncode}): {stderr}")
     if stderr:
-        raise Exception(f"Error: {stderr}")
+        log.warning("etl diff produced stderr output", stderr=stderr)
 
     return [str(line) for line in AnsiDecoder().decode(stdout)]

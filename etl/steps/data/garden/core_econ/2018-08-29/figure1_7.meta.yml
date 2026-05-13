@@ -1,0 +1,20 @@
+dataset:
+  title: FIgure1.7
+tables:
+  figure1_7:
+    variables:
+      fraction_of_articles:
+        title: Fraction of articles
+        unit: ''
+      percentage_of_articles:
+        title: Percentage of articles
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

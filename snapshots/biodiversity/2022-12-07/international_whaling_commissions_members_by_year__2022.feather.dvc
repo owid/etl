@@ -1,11 +1,12 @@
 meta:
-  source:
-    name: International Whaling Commission (IWC; 2022)
-    url: https://iwc.int/member-map
-    date_accessed: 2022-12-07
-    published_by: International Whaling Commission (IWC)
-  name: International Whaling Commissions Members by Year (2022)
-  description: ''
+  origin:
+    producer: International Whaling Commission
+    title: Member countries by year
+    citation_full: International Whaling Commission (2022). Member countries by year.
+    attribution_short: IWC
+    url_main: https://iwc.int/member-map
+    date_accessed: '2022-12-07'
+    date_published: '2022'
   is_public: false
 outs:
   - md5: 8c60116603562e90a43cac5a6a60a1d0

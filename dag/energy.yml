@@ -168,17 +168,41 @@ steps:
   data://grapher/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
   #
-  # EIA - Energy consumption.
+  # EIA - International Energy.
   #
-  data://meadow/eia/2025-07-08/energy_consumption:
-    - snapshot://eia/2025-07-08/international_energy_data.zip
+  data://meadow/eia/2026-05-05/international_energy:
+    - snapshot://eia/2026-05-05/international_energy.zip
   #
-  # EIA - Energy consumption.
+  # EIA - International Energy.
   #
-  data://garden/eia/2025-07-08/energy_consumption:
-    - data://meadow/eia/2025-07-08/energy_consumption
+  data://garden/eia/2026-05-05/international_energy:
+    - data://meadow/eia/2026-05-05/international_energy
+    - data://meadow/eia/2026-05-05/international_energy_archive
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
+  #
+  # EIA - International Energy archive (frozen 2022 export of indicators EIA no longer publishes).
+  #
+  data://meadow/eia/2026-05-05/international_energy_archive:
+    - snapshot://eia/2026-05-05/international_energy_archive.zip
+  #
+  # Energy - Fossil fuels.
+  #
+  data://garden/energy/2026-05-05/fossil_fuels:
+    - data://garden/eia/2026-05-05/international_energy
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Energy - Fossil fuels.
+  #
+  data://grapher/energy/2026-05-05/fossil_fuels:
+    - data://garden/energy/2026-05-05/fossil_fuels
+  #
+  # Energy - Fossil fuels explorer.
+  #
+  export://explorers/energy/latest/fossil_fuels:
+    - data://grapher/energy/2026-05-05/fossil_fuels
   #
   # Energy - Energy mix.
   #
@@ -227,16 +251,16 @@ steps:
   #
   # Energy - Primary energy consumption.
   #
-  data://garden/energy/2025-06-27/primary_energy_consumption:
+  data://garden/energy/2026-05-05/primary_energy_consumption:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/demography/2024-07-15/population
     - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/eia/2025-07-08/energy_consumption
+    - data://garden/eia/2026-05-05/international_energy
   #
   # Energy - Primary energy consumption.
   #
-  data://grapher/energy/2025-06-27/primary_energy_consumption:
-    - data://garden/energy/2025-06-27/primary_energy_consumption
+  data://grapher/energy/2026-05-05/primary_energy_consumption:
+    - data://garden/energy/2026-05-05/primary_energy_consumption
   #
   # IRENA - Renewable energy statistics.
   #
@@ -441,7 +465,7 @@ steps:
   #
   data://garden/energy_data/2026-04-24/owid_energy:
     - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/energy/2025-06-27/primary_energy_consumption
+    - data://garden/energy/2026-05-05/primary_energy_consumption
     - data://garden/energy/2025-06-27/fossil_fuel_production
     - data://garden/energy/2026-04-24/electricity_mix
     - data://garden/demography/2024-07-15/population

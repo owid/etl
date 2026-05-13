@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: Bureau of Labor Statistics
+    title: Bureau of Labor Statistics international labor comparisons
+    description: |-
+      Bureau of Labor Statistics data for Spanish real wages available only from 1979. Spanish real wage growth for 1970–1979 has therefore been estimated using Tables 16.25 and 16.5 from Barciela López, Carlos, Albert Carreras, and Xavier Tafunell. 2005. Estadísticas históricas de España: Siglos XIX-XX. Bilbao: Fundación BBVA.
+    citation_full: Bureau of Labor Statistics (2011).
+    url_main: http://www.bls.gov/fls/#gdp
+    date_accessed: '2018-11-17'
+    date_published: '2011'
+  is_public: false
+outs:
+  - md5: 3fa7910c938712ea69c287fddc6ce007
+    size: 4138
+    path: te_16_12.feather

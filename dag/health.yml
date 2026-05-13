@@ -1,4 +1,12 @@
 steps:
+  # Air Quality Life Index (AQLI)
+  data://meadow/aqli/2026-03-30/air_quality_life_index:
+    - snapshot://aqli/2026-03-30/air_quality_life_index.zip
+  data://garden/aqli/2026-03-30/air_quality_life_index:
+    - data://meadow/aqli/2026-03-30/air_quality_life_index
+  data://grapher/aqli/2026-03-30/air_quality_life_index:
+    - data://garden/aqli/2026-03-30/air_quality_life_index
+
   # Health
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
@@ -295,7 +303,7 @@ steps:
     - snapshot://health/2024-04-22/gpei_funding.xlsx
   data://garden/health/2024-04-22/gpei_funding:
     - data://meadow/health/2024-04-22/gpei_funding
-    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/worldbank_wdi/2026-02-27/wdi
   data://grapher/health/2024-04-22/gpei_funding:
     - data://garden/health/2024-04-22/gpei_funding
 
@@ -333,6 +341,14 @@ steps:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_cause_deaths
   data-private://grapher/ihme_gbd/2026-02-11/gbd_child_mortality_leading_causes:
     - data-private://garden/ihme_gbd/2026-02-11/gbd_child_mortality_leading_causes
+
+  # IHME Global Burden of Disease - Child mortality long run (frozen 2020-12-19 vintage, still used by the Global Health explorer)
+  data://meadow/ihme_gbd/2020-12-19/child_mortality:
+    - snapshot://ihme_gbd/2020-12-19/child_mortality.feather
+  data://garden/ihme_gbd/2020-12-19/child_mortality:
+    - data://meadow/ihme_gbd/2020-12-19/child_mortality
+  data://grapher/ihme_gbd/2020-12-19/child_mortality:
+    - data://garden/ihme_gbd/2020-12-19/child_mortality
 
   # GBD 2023 - GBD Health-adjusted Life Expectancy and Life Expectancy
   data-private://meadow/ihme_gbd/2026-02-07/gbd_life_expectancy:
@@ -1365,3 +1381,11 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_cancer:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_cancer
+
+    # PM2.5 air pollution - WashU
+  data://meadow/washu/2026-04-22/pm25_air_pollution:
+    - snapshot://washu/2026-04-22/pm25_air_pollution.csv
+  data://garden/washu/2026-04-22/pm25_air_pollution:
+    - data://meadow/washu/2026-04-22/pm25_air_pollution
+  data://grapher/washu/2026-04-22/pm25_air_pollution:
+    - data://garden/washu/2026-04-22/pm25_air_pollution

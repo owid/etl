@@ -1,7 +1,3 @@
-dataset:
-  title: Long run homicide rates (1250-2022; Eisner, WHO, UNODC)
-  sources:
-    - name: OWID based on Eisner (2014); United Nations Office of Drugs and Crime (2022); WHO Mortality Database (2024)
 tables:
   homicide_long_run_omm:
     variables:
@@ -17,13 +13,6 @@ tables:
           Historical estimates of homicide rates are derived from national vital statistics and judicial archives. The older data is often fragmented and subject to a number of biases including: geographic bias, incomplete records, changing age structure, wound treatment, and the lethality of weapons.
         short_unit: ""
         unit: "homicides per 100,000 people"
-        origins:
-          - title: Eisner (2014)
-            date_published: "2014"
-            producer: Eisner (2014)
-            citation_full: "Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press"
-            url_main: https://www.jstor.org/stable/10.1086/677662?read-now=1&seq=16#page_scan_tab_contents
-            date_accessed: "2024-01-03"
         display:
           numDecimalPlaces: 2
       death_rate_per_100_000_population_eisner_who:

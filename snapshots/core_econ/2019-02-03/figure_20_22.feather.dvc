@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: Pirón and Pasalodos
+    title: 'Nueva serie de extensión del hielo marino ártico en septiembre entre 1935 y 2014'
+    citation_full: 'Miguel Ángel Cea Pirón and Juan Antonio Cano Pasalodos (2016). ''Nueva serie de extensión del hielo marino ártico en septiembre entre 1935 y 2014''. Revista de Climatología, Vol. 16 (2016): pp. 1-19.'
+    url_main: http://www.climatol.eu/reclim/reclim16a.pdf
+    date_accessed: '2019-02-03'
+    date_published: '2016'
+  is_public: false
+outs:
+  - md5: 78b260f2a4972dd9cef1bf17c57a6330
+    size: 3706
+    path: figure_20_22.feather

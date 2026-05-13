@@ -1,61 +1,43 @@
 meta:
-  namespace: war
-  short_name: eckhardt_1991
-  name: Wars and War-Related Deaths, 1500-1990 - Eckhardt (1991)
-  source_name: Eckhardt (1991)
-  publication_year: 1991
-  publication_date: 1991-01-01
-  url: https://ruthsivard.com/wmse91.html
-  source_data_url: https://docs.google.com/spreadsheets/d/1vI5zTU5r7LNjG8AcH0ZIoCNEjMIo68Rn6pqwarVAQ-Q/edit?usp=sharing
-  file_extension: csv
-  license_url:
-  license_name: World Priorities
-  date_accessed: 2023-01-09
-  is_public: true
-  description: >-
-    What years and countries are covered? 1500 – 1990.
+  origin:
+    producer: Eckhardt
+    title: Wars and War-Related Deaths, 1500-1990
+    description: |-
+      This dataset provides information on military and civilian deaths from wars, drawn from the chapter by Eckhardt (1991).
 
+      What years and countries are covered? 1500 – 1990.
 
-    Which conflicts are covered? War, domestic or international, involving at least
-    one state.
+      Which conflicts are covered? War, domestic or international, involving at least one state.
 
-      - Threshold for a war: "War—any armed conflict involving one or more governments
-    and causing the death of 1,000 or more people per year"
-      (Eckhardt 1991: 25).
+      - Threshold for a war: "War—any armed conflict involving one or more governments and causing the death of 1,000 or more people per year" (Eckhardt 1991: 25).
 
-      - "Location refer to country which was principal battleground, except for two
-    World Wars for which location refers to participating country"
-      (Eckhardt 1991: 25).
+      - "Location refer to country which was principal battleground, except for two World Wars for which location refers to participating country" (Eckhardt 1991: 25).
 
-      - Also included: "Intervention—overt military action by foreign forces, at the
-    invitation of the government in power" (Eckhardt 1991: 25).
+      - Also included: "Intervention—overt military action by foreign forces, at the invitation of the government in power" (Eckhardt 1991: 25).
 
-      - Also included: "Invasion—armed attack by foreign country, including air attack
-    without land invasion" (Eckhardt 1991: 25).
+      - Also included: "Invasion—armed attack by foreign country, including air attack without land invasion" (Eckhardt 1991: 25).
 
-
-    Which deaths and casualties are covered? Deaths; total, military, or civilian;
-
+      Which deaths and casualties are covered? Deaths; total, military, or civilian.
 
       - "War-Related Deaths" (Eckhardt 1991: 22).
 
       - "Civilian [—] Military [—] Total" (Eckhardt 1991: 22).
 
-      - "Incomplete; breakdown of civilian and military deaths not available in all
-    cases" (Eckhardt 1991: 25).
+      - "Incomplete; breakdown of civilian and military deaths not available in all cases" (Eckhardt 1991: 25).
 
-      - "World War area-wide deaths are in addition to those which could be located
-    by country, and are shown under the country of origin"
-      (Eckhardt 1991: 25).
+      - "World War area-wide deaths are in addition to those which could be located by country, and are shown under the country of origin" (Eckhardt 1991: 25).
 
+      How did we construct it?
 
-    How did we construct it?
-
-      - We extracted conflicts as well as deaths and casualties from the list in this
-    book.
-      - There seems to be an affordable used edition available in the UK that we could
-    buy if we wanted more information; alternatively,
-      this book by Eckhardt may have more details in chapter 9.
+      - We extracted conflicts as well as deaths and casualties from the list in this book.
+      - There seems to be an affordable used edition available in the UK that we could buy if we wanted more information; alternatively, this book by Eckhardt may have more details in chapter 9.
+    citation_full: 'Eckhardt, W. (1991). Wars and War-Related Deaths, 1500-1990. In: Ruth Sivard, World Military and Social Expenditures. World Priorities.'
+    url_main: https://ruthsivard.com/wmse91.html
+    url_download: https://docs.google.com/spreadsheets/d/1vI5zTU5r7LNjG8AcH0ZIoCNEjMIo68Rn6pqwarVAQ-Q/edit?usp=sharing
+    date_accessed: '2023-01-09'
+    date_published: '1991-01-01'
+    license:
+      name: World Priorities
 wdir: ../../../data/snapshots/war/2023-01-09
 outs:
   - md5: 8714107efdc4a5d6a7bf1e7ac0531382

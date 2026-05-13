@@ -197,7 +197,9 @@ class Entity(Base):
     validated: Mapped[int] = mapped_column(TINYINT(1))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     code: Mapped[str | None] = mapped_column(VARCHAR(255))
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
 
     @classmethod
     def load_entity_mapping(cls, session: Session, entity_ids: list[int] | None = None) -> dict[int, str]:
@@ -246,7 +248,9 @@ class Namespace(Base):
     isArchived: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"), default=0)
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     description: Mapped[str | None] = mapped_column(VARCHAR(255), default=None)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
 
     def upsert(self, session: Session) -> "Namespace":
         cls = self.__class__
@@ -276,7 +280,9 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(255))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     specialType: Mapped[str | None] = mapped_column(VARCHAR(255))
     slug: Mapped[str | None] = mapped_column(VARCHAR(512))
 
@@ -327,7 +333,9 @@ class User(Base):
     fullName: Mapped[str] = mapped_column(VARCHAR(255))
     githubUsername: Mapped[str] = mapped_column(VARCHAR(255))
     lastLogin: Mapped[datetime | None] = mapped_column(DateTime)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     lastSeen: Mapped[datetime | None] = mapped_column(DateTime)
 
     @classmethod
@@ -355,7 +363,9 @@ class ChartRevisions(Base):
     chartId: Mapped[int | None] = mapped_column(Integer)
     userId: Mapped[int | None] = mapped_column(Integer)
     config: Mapped[dict | None] = mapped_column(JSON)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
 
     @classmethod
     def get_latest(cls, session: Session, chart_id: int, createdAt=None) -> "ChartRevisions":
@@ -392,7 +402,7 @@ class ChartConfig(Base):
         ),
     )
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, onupdate=func.current_timestamp())
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
 
     chartss: Mapped[list["Chart"]] = relationship("Chart", back_populates="chart_config")
     explorer_viewss: Mapped[list["ExplorerView"]] = relationship("ExplorerView", back_populates="chart_config")
@@ -430,7 +440,9 @@ class Chart(Base):
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
-    _updatedAt: Mapped[datetime] = mapped_column("updatedAt", DateTime, init=False)
+    _updatedAt: Mapped[datetime] = mapped_column(
+        "updatedAt", DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     publishedAt: Mapped[datetime | None] = mapped_column(DateTime)
     publishedByUserId: Mapped[int | None] = mapped_column(Integer)
 
@@ -699,7 +711,9 @@ class Dataset(Base):
     metadataEditedByUserId: Mapped[int] = mapped_column(Integer)
     dataEditedByUserId: Mapped[int] = mapped_column(Integer)
     nonRedistributable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     shortName: Mapped[str | None] = mapped_column(VARCHAR(255))
     version: Mapped[str | None] = mapped_column(VARCHAR(255))
     updatePeriodDays: Mapped[int | None] = mapped_column(Integer)
@@ -883,7 +897,9 @@ class Source(Base):
     description: Mapped[SourceDescription] = mapped_column(JSON)
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     name: Mapped[str | None] = mapped_column(VARCHAR(512), default=None)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     datasetId: Mapped[int | None] = mapped_column(Integer, default=None)
 
     @property
@@ -900,7 +916,10 @@ class Source(Base):
         return select(cls).where(*conds)
 
     def upsert(self, session: Session) -> "Source":
-        ds = session.scalars(self._upsert_select).one_or_none()
+        # NOTE: `sources` has no unique constraint, so legacy data may include duplicate rows
+        # matching this query. Pick the oldest (lowest id) and let the dupes remain — they're
+        # still referenced by other variables that point to them by id.
+        ds = session.scalars(self._upsert_select.order_by(self.__class__.id)).first()
 
         if not ds:
             ds = self
@@ -1005,7 +1024,9 @@ class PostsGdocs(Base):
         VARCHAR(255), Computed("(json_unquote(json_extract(`content`,_utf8mb4'$.type')))", persisted=False)
     )
     publishedAt: Mapped[datetime | None] = mapped_column(DateTime)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     revisionId: Mapped[str | None] = mapped_column(VARCHAR(255))
     manualBreadcrumbs: Mapped[dict | None] = mapped_column(JSON)
     markdown: Mapped[str | None] = mapped_column(LONGTEXT)
@@ -1199,7 +1220,9 @@ class Variable(Base):
     columnOrder: Mapped[int] = mapped_column(Integer, server_default=text("'0'"), default=0)
     schemaVersion: Mapped[int] = mapped_column(Integer, server_default=text("'1'"), default=1)
     name: Mapped[str | None] = mapped_column(VARCHAR(750), default=None)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     code: Mapped[str | None] = mapped_column(VARCHAR(255), default=None)
     sourceId: Mapped[int | None] = mapped_column(Integer, default=None)
     shortUnit: Mapped[str | None] = mapped_column(VARCHAR(255), default=None)
@@ -1405,7 +1428,7 @@ class Variable(Base):
         # Multiple path or id
         elif isinstance(id_or_path, list):
             # Filter the list to ensure only integers are passed
-            int_ids = [i for i in id_or_path if isinstance(i, (int, np.integer))]
+            int_ids = [i for i in id_or_path if isinstance(i, int | np.integer)]
             str_ids = [i for i in id_or_path if isinstance(i, str)]
             # Multiple IDs
             if len(int_ids) == len(id_or_path):
@@ -1604,7 +1627,9 @@ class ChartDimensions(Base):
     chartId: Mapped[int] = mapped_column(Integer)
     variableId: Mapped[int] = mapped_column(Integer)
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
 
     @classmethod
     def chart_ids_with_indicators(cls, session: Session, indicator_ids: list[int]) -> list[int]:
@@ -2050,8 +2075,8 @@ class Explorer(Base):
     lastEditedByUserId: Mapped[int | None] = mapped_column(Integer)
     lastEditedAt: Mapped[datetime | None] = mapped_column(DateTime)
     commitMessage: Mapped[str | None] = mapped_column(String(255, "utf8mb4_0900_as_cs"))
-    createdAt: Mapped[datetime | None] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
-    updatedAt: Mapped[datetime | None] = mapped_column(
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[datetime] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     )
     explorer_viewss: Mapped[list["ExplorerView"]] = relationship("ExplorerView", back_populates="explorer")
@@ -2157,8 +2182,8 @@ class NarrativeChart(Base):
     lastEditedByUserId: Mapped[int] = mapped_column(Integer, nullable=False)
     parentChartId: Mapped[int | None] = mapped_column(Integer)
     parentMultiDimXChartConfigId: Mapped[int | None] = mapped_column(Integer)
-    createdAt: Mapped[datetime | None] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
-    updatedAt: Mapped[datetime | None] = mapped_column(
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[datetime] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     )
 

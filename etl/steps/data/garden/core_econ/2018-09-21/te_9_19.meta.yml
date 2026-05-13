@@ -1,0 +1,21 @@
+dataset:
+  title: TE-9.19
+tables:
+  te_9_19:
+    variables:
+      adjusted_bargaining__or_union__coverage_rate:
+        title: Adjusted bargaining (or union) coverage rate
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Share of employees covered by collective bargaining agreements (%)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
