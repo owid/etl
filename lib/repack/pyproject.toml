@@ -1,6 +1,6 @@
 [project]
 name = "owid-repack"
-version = "0.1.7"
+version = "0.1.9"
 description = "Pack Pandas data frames into smaller, more memory-efficient data types."
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
@@ -16,7 +16,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pytest>=7.2.0",
+    "pytest>=9.0.3",
     "ty==0.0.26",
     "ruff==0.15.8",
     "ipdb>=0.13.13",

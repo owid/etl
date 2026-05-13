@@ -1,0 +1,11 @@
+meta:
+  is_public: false
+  origin:
+    producer: Our World in Data
+    title: TE-21.3 year data
+    citation_full: Our World in Data.
+    date_accessed: '2019-03-06'
+outs:
+  - md5: 0cde7fcfb72bda40c0243178ccbfe364
+    size: 1806
+    path: te_21_3_year.feather

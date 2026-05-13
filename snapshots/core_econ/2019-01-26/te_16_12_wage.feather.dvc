@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: OECD
+    title: OECD Statistics
+    citation_full: OECD (2019). OECD Statistics.
+    url_main: http://stats.oecd.org/
+    date_accessed: '2019-01-26'
+    date_published: '2019'
+  is_public: false
+outs:
+  - md5: 235f14cfa79519f78fe41440a9fe1106
+    size: 4138
+    path: te_16_12_wage.feather

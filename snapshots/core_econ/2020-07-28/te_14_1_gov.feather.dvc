@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: Wallis, Bureau of Economic Analysis, and Federal Reserve Bank of St Louis
+    title: American government finance in the long run
+    citation_full: 'Wallis, J. J. (2000). American government finance in the long run: 1790 to 1990. Journal of Economic Perspectives, 14(1), pp. 61–82; US Bureau of Economic Analysis (2020); Federal Reserve Bank of St Louis (FRED) (https://fred.stlouisfed.org/series/GNPA).'
+    url_main: https://www.jstor.org/stable/2647051?seq=1#page_scan_tab_contents
+    url_download: https://www.bea.gov/data/government/receipts-and-expenditures
+    date_accessed: '2020-07-28'
+    date_published: '2020'
+  is_public: false
+outs:
+  - md5: c1bb6c941801e1c8aee9339901bf0a3e
+    size: 6162
+    path: te_14_1_gov.feather

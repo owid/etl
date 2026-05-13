@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3256
-    date_accessed: 2023-08-10 09:20:34.618742
+    url: https://admin.owid.io/admin/datasets/3256
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Figure 22.17_gini
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cbc239800ac02f5f0c3987bb32ca99bd
-  size: 6906
-  path: dataset_3256_figure_22_17_gini_values.feather
+  - md5: 0765f533041128dac1732876492c8c69
+    size: 6946
+    path: dataset_3256_figure_22_17_gini_values.feather

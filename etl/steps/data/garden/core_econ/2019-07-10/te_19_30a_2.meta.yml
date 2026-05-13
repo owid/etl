@@ -1,0 +1,23 @@
+dataset:
+  title: TE-19.30a_2
+tables:
+  te_19_30a_2:
+    variables:
+      annual_average_gdp_per_capita_growth__1970_2016:
+        title: Annual average GDP per capita growth, 1970-2016
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      long_term_average_gini_of_disposable_income:
+        title: Long-term average gini of disposable income
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

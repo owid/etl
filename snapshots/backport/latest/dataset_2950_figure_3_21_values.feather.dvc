@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/2950
-    date_accessed: 2023-08-10 07:47:06.630838
+    url: https://admin.owid.io/admin/datasets/2950
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Figure 3.21
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c8f08b45e99b81273b1c467acb3f1867
-  size: 6298
-  path: dataset_2950_figure_3_21_values.feather
+  - md5: 70933fb399f4e3b021f911c363124369
+    size: 6338
+    path: dataset_2950_figure_3_21_values.feather
