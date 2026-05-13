@@ -9,7 +9,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-05-10T08:03:27.01869Z"
+exclude-newer = "2026-05-10T09:13:16.667053Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -5131,7 +5131,7 @@ dev = [
 
 [[package]]
 name = "owid-repack"
-version = "0.1.8"
+version = "0.1.9"
 source = { editable = "lib/repack" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
