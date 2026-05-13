@@ -7,6 +7,88 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Curated titles for indicators that have human-readable labels different from the raw UNESCO label.
+# Keys are the raw UNESCO indicator labels (as they appear as column names after the pivot).
+_TITLE_OVERRIDES = {
+    "All staff compensation as a percentage of total expenditure in primary public institutions (%)": "Share of total public education spending allocated to staff compensation in primary education",
+    "All staff compensation as a percentage of total expenditure in public institutions (%)": "Share of total public education spending allocated to staff compensation",
+    "Duration of compulsory education (years)": "Duration of compulsory education",
+    "Government expenditure on education, constant PPP$ (millions)": "Government spending on education",
+    "Government expenditure on education, PPP$ (millions)": "Government spending on education in purchasing power parity (PPP) dollars",
+    "Government expenditure on education per student, total across all levels (constant PPP$)": "Government spending on education per student across all levels",
+    "Government expenditure on lower secondary education, constant PPP$ (millions)": "Government spending on lower secondary education",
+    "Government expenditure on lower secondary education as a percentage of GDP (%)": "Government spending on lower secondary education as share of GDP",
+    "Government expenditure on pre-primary education, constant PPP$ (millions)": "Government spending on pre-primary education",
+    "Government expenditure on pre-primary education as a percentage of GDP (%)": "Government spending on pre-primary education as share of GDP",
+    "Government expenditure on primary education, constant PPP$ (millions)": "Government spending on primary education",
+    "Government expenditure on primary education as a percentage of GDP (%)": "Government spending on primary education as share of GDP",
+    "Government expenditure on secondary education as a percentage of GDP (%)": "Government spending on secondary education as share of GDP",
+    "Government expenditure on tertiary education, constant PPP$ (millions)": "Government spending on tertiary education",
+    "Government expenditure on tertiary education as a percentage of GDP (%)": "Government spending on tertiary education as share of GDP",
+    "Government expenditure on upper secondary education, constant PPP$ (millions)": "Government spending on upper secondary education",
+    "Government expenditure on upper secondary education as a percentage of GDP (%)": "Government spending on upper secondary education as share of GDP",
+    "Gross enrolment ratio, lower secondary, both sexes (%)": "Gross enrollment ratio in lower secondary education",
+    "Gross enrolment ratio, lower secondary, female (%)": "Gross enrollment ratio in lower secondary education among girls",
+    "Gross enrolment ratio, lower secondary, male (%)": "Gross enrollment ratio in lower secondary education among boys",
+    "Gross enrolment ratio, primary, both sexes (%)": "Gross enrollment ratio in primary education",
+    "Gross enrolment ratio, primary, female (%)": "Gross enrollment ratio in primary education among girls",
+    "Gross enrolment ratio, primary, male (%)": "Gross enrollment ratio in primary education among boys",
+    "Gross enrolment ratio, secondary, both sexes (%)": "Gross enrollment ratio in secondary education",
+    "Gross enrolment ratio, upper secondary, both sexes (%)": "Gross enrollment ratio in upper secondary education",
+    "Gross enrolment ratio, upper secondary, female (%)": "Gross enrollment ratio in upper secondary education among girls",
+    "Gross enrolment ratio, upper secondary, male (%)": "Gross enrollment ratio in upper secondary education among boys",
+    "Inbound mobility rate, both sexes (UIS estimate) (%)": "Share of students from abroad",
+    "Mean years of schooling (ISCED 1 or higher), population 25+ years, adjusted gender parity index (GPIA)": "Average years of schooling, adjusted gender parity index",
+    "Mean years of schooling (ISCED 1 or higher), population 25+ years, female": "Average years of schooling for women",
+    "Mean years of schooling (ISCED 1 or higher), population 25+ years, male": "Average years of schooling for men",
+    "Official entrance age to compulsory education (years)": "Official entrance age to compulsory education",
+    "Official entrance age to pre-primary education (years)": "Official entrance age to pre-primary education",
+    "Out-of-school adolescents of lower secondary school age, both sexes (number)": "Out-of-school children of lower secondary school age",
+    "Out-of-school adolescents of lower secondary school age, female (number)": "Out-of-school girls of lower secondary school age",
+    "Out-of-school adolescents of lower secondary school age, male (number)": "Out-of-school boys of lower secondary school age",
+    "Out-of-school children, one year before the official primary entry age, both sexes (number)": "Out-of-school children one year before official primary entry age",
+    "Out-of-school children, one year before the official primary entry age, female (number)": "Out-of-school girls one year before official primary entry age",
+    "Out-of-school children, one year before the official primary entry age, male (number)": "Out-of-school boys one year before official primary entry age",
+    "Out-of-school children of primary school age, both sexes (number)": "Out-of-school children of primary school age",
+    "Out-of-school children of primary school age, female (number)": "Out-of-school girls of primary school age",
+    "Out-of-school children of primary school age, male (number)": "Out-of-school boys of primary school age",
+    "Out-of-school youth of upper secondary school age, both sexes (number)": "Out-of-school children of upper secondary school age",
+    "Out-of-school youth of upper secondary school age, female (number)": "Out-of-school girls of upper secondary school age",
+    "Out-of-school youth of upper secondary school age, male (number)": "Out-of-school boys of upper secondary school age",
+    "Outbound mobility ratio, all regions, both sexes (UIS estimate) (%)": "Share of students studying abroad",
+    "Percentage of enrolment in pre-primary education in private institutions, both sexes (%)": "Percentage of enrollment in pre-primary education in private institutions",
+    "Percentage of enrolment in primary education in private institutions, both sexes (%)": "Percentage of enrollment in primary education in private institutions",
+    "Percentage of teachers in primary education who are female (%)": "Share of primary school teachers who are women",
+    "Percentage of teachers in secondary education who are female (%)": "Share of secondary school teachers who are women",
+    "Percentage of teachers in tertiary education who are female (%)": "Share of tertiary school teachers who are women",
+    "School life expectancy, pre-primary, both sexes (years)": "School life expectancy in pre-primary education",
+    "School life expectancy, pre-primary, female (years)": "School life expectancy in pre-primary education among girls",
+    "School life expectancy, pre-primary, male (years)": "School life expectancy in pre-primary education among boys",
+    "School life expectancy, primary, adjusted gender parity index (GPIA)": "School life expectancy in primary education, adjusted gender parity index",
+    "School life expectancy, primary, both sexes (years)": "School life expectancy in primary education",
+    "School life expectancy, primary, female (years)": "School life expectancy in primary education among girls",
+    "School life expectancy, primary, male (years)": "School life expectancy in primary education among boys",
+    "School life expectancy, secondary, both sexes (years)": "School life expectancy in secondary education",
+    "School life expectancy, secondary, female (years)": "School life expectancy in secondary education among girls",
+    "School life expectancy, secondary, male (years)": "School life expectancy in secondary education among boys",
+    "School life expectancy, tertiary, both sexes (years)": "School life expectancy in tertiary education",
+    "School life expectancy, tertiary, female (years)": "School life expectancy in tertiary education among girls",
+    "School life expectancy, tertiary, male (years)": "School life expectancy in tertiary education among boys",
+    "Theoretical duration of pre-primary education (years)": "Theoretical duration of pre-primary education",
+    "Total net attendance rate, primary, both sexes (%)": "Total net attendance rate in primary education",
+    "Total net enrolment rate, lower secondary, adjusted gender parity index (GPIA)": "Net enrollment rates in lower secondary education, adjusted gender parity index",
+    "Total net enrolment rate, lower secondary, both sexes (%)": "Net enrollment rate in lower secondary education",
+    "Total net enrolment rate, lower secondary, female (%)": "Net enrollment rate in lower secondary education among girls",
+    "Total net enrolment rate, lower secondary, male (%)": "Net enrollment rate in lower secondary education among boys",
+    "Total net enrolment rate, primary, adjusted gender parity index (GPIA)": "Net enrollment rates in primary education, adjusted gender parity index",
+    "Total net enrolment rate, primary, both sexes (%)": "Net enrollment rate in primary education",
+    "Total net enrolment rate, primary, female (%)": "Net enrollment rate in primary education among girls",
+    "Total net enrolment rate, primary, male (%)": "Net enrollment rate in primary education among boys",
+    "Total net enrolment rate, upper secondary, both sexes (%)": "Net enrollment rate in upper secondary education",
+    "Total net enrolment rate, upper secondary, female (%)": "Net enrollment rate in upper secondary education among girls",
+    "Total net enrolment rate, upper secondary, male (%)": "Net enrollment rate in upper secondary education among boys",
+}
+
 
 def run() -> None:
     #
@@ -86,7 +168,8 @@ def run() -> None:
     for column in tb_pivoted.columns:
         meta = tb_pivoted[column].metadata
         meta.display = {}
-        meta.title = column
+        # Apply curated title where available, otherwise use the raw indicator label
+        meta.title = _TITLE_OVERRIDES.get(column, column)
         # Use WB long definition when available; derived columns won't have one
         if column in long_desc_lookup.index:
             meta.description_from_producer = (
