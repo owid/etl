@@ -335,9 +335,7 @@ def _make_individual_df_with_share_answers(
     log.info(f"wgm_2018: building dataframe with share of answers for dimensions {dimensions}")
     columns_index_base = ["country", "year", "question", "answer"]
     columns_index = columns_index_base + dimensions
-    df_ = df.groupby(columns_index, observed=True).agg(
-        sum=(weight_column, "sum"), count=(weight_column, "count")
-    )
+    df_ = df.groupby(columns_index, observed=True).agg(sum=(weight_column, "sum"), count=(weight_column, "count"))
     df_ = df_.reset_index()
     # For each question, now obtain the percentage of each of its answers (weighted).
     columns_normalise = [col for col in columns_index if col not in ["answer"]]

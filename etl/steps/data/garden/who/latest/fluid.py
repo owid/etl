@@ -7,7 +7,7 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset
 from owid.catalog import processing as pr
 from structlog import get_logger
 
