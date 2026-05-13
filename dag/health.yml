@@ -218,7 +218,7 @@ steps:
         - snapshot://health/2024-04-12/polio_free_countries.csv
       - data://garden/regions/2023-01-01/regions
 
-    # Polio vaccine schedule - update
+  # Polio vaccine schedule - update
   data://grapher/who/2025-01-13/polio_vaccine_schedule:
     - data://garden/who/2025-01-13/polio_vaccine_schedule:
       - data://meadow/who/2025-01-13/polio_vaccine_schedule:
@@ -331,8 +331,6 @@ steps:
   export://github/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
 
-  # Eurostat cancer
-
   # Eurostat Cancer Screening
   data://grapher/health/2024-08-23/eurostat_cancer:
     - data://garden/health/2024-08-23/eurostat_cancer:
@@ -378,7 +376,7 @@ steps:
       - data://meadow/cancer/2024-09-13/diagnosis_routes_survival:
         - snapshot://cancer/2024-09-13/diagnosis_routes_survival.csv
 
-  #Antibiotics data
+  # Antibiotics data
   data://grapher/antibiotics/2024-10-09/gram:
     - data://garden/antibiotics/2024-10-09/gram:
       - data://meadow/antibiotics/2024-10-09/gram:
@@ -386,7 +384,7 @@ steps:
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
 
-  #Antibiotics data - by level
+  # Antibiotics data - by level
   data://grapher/antibiotics/2024-10-09/gram_level:
     - data://garden/antibiotics/2024-10-09/gram_level:
       - data://meadow/antibiotics/2024-10-09/gram_level:
@@ -394,7 +392,7 @@ steps:
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
 
-  #Antibiotics data - children
+  # Antibiotics data - children
   data://grapher/antibiotics/2024-10-09/gram_children:
     - data://garden/antibiotics/2024-10-09/gram_children:
       - data://meadow/antibiotics/2024-10-09/gram_children:
@@ -406,13 +404,13 @@ steps:
       - data://meadow/cancer/2024-10-13/gco_cancer_today_cervical:
         - snapshot://cancer/2024-10-13/gco_cancer_today_cervical.csv
 
-    # Antibiotic resistance data - WHO GLASS
+  # Antibiotic resistance data - WHO GLASS
   data://grapher/antibiotics/2024-10-18/who_glass_by_antibiotic:
     - data://garden/antibiotics/2024-10-18/who_glass_by_antibiotic:
       - data://meadow/antibiotics/2024-10-18/who_glass_by_antibiotic:
         - snapshot://antibiotics/2024-10-18/who_glass_by_antibiotic.zip
 
-    # ANIMUSE - antibiotic use in animals
+  # ANIMUSE - antibiotic use in animals
   data://grapher/antibiotics/2024-10-23/animuse_year:
     - data://garden/antibiotics/2024-10-23/animuse_year:
       - data://meadow/antibiotics/2024-10-23/animuse_year:
@@ -430,7 +428,7 @@ steps:
       - data://meadow/antibiotics/2024-10-25/esvac_sales_corrected:
         - snapshot://antibiotics/2024-10-25/esvac_sales_corrected.zip
 
-  #Antibiotics TRACSS data
+  # Antibiotics TRACSS data
   data://grapher/antibiotics/2024-10-23/tracss:
     - data://garden/antibiotics/2024-10-23/tracss:
       - data://meadow/antibiotics/2024-10-23/tracss:
@@ -511,6 +509,7 @@ steps:
 
   #
 
+  #
   # WHO vaccine stock out
   #
   data://grapher/who/2025-01-17/vaccine_stock_out:
@@ -640,6 +639,7 @@ steps:
         - snapshot://project_tycho/2025-02-27/diphtheria_cases_state_level.zip
       - data://garden/demography/2025-01-23/us_state_population
 
+  #
   # Pertussis cases - state level - Project Tycho
   #
   data://grapher/health/2025-02-27/pertussis_cases_state_level:
@@ -648,6 +648,7 @@ steps:
         - snapshot://project_tycho/2025-02-27/pertussis_cases_state_level.zip
       - data://garden/demography/2025-01-23/us_state_population
 
+  #
   # Typhoid fever cases - state level - Project Tycho
   #
   data://grapher/health/2025-02-27/typhoid_fever_cases_state_level:
@@ -656,7 +657,8 @@ steps:
         - snapshot://project_tycho/2025-02-27/typhoid_fever_cases_state_level.zip
       - data://garden/demography/2025-01-23/us_state_population
 
-    # Tetanus cases - state level - Project Tycho
+  #
+  # Tetanus cases - state level - Project Tycho
   #
   data://grapher/health/2025-02-27/tetanus_cases_state_level:
     - data://garden/health/2025-02-27/tetanus_cases_state_level:
@@ -701,6 +703,7 @@ steps:
         - data://meadow/who/2025-07-15/vaccination_introductions:
           - snapshot://who/2025-07-15/vaccination_introductions.xlsx
 
+  #
   # US Pertussis cases - CDC
   #
   data://grapher/cdc/2025-03-04/pertussis_cases:
@@ -780,6 +783,7 @@ steps:
         - snapshot://cdc/2025-03-17/mumps_deaths.csv
       - data://garden/demography/2024-07-15/population
 
+  #
   # Rubella cases - CDC
   #
   data://grapher/cdc/2025-03-19/rubella_cases:
@@ -832,8 +836,8 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2025-05-19/gho:
     - data://garden/who/2025-05-19/gho
-     #export://multidim/who/latest/share_overweight_adults:
-     #- data://grapher/who/2025-05-19/gho
+  #export://multidim/who/latest/share_overweight_adults:
+  #  - data://grapher/who/2025-05-19/gho
 
   # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
   data://grapher/health/2025-07-16/drug_approvals:
@@ -879,6 +883,7 @@ steps:
         - snapshot://who/2025-08-06/self_inflicted_injuries.csv
   #
   # WHO Mortality Database - Vaccine Preventable
+  #
   data://garden/who/2025-08-06/mortality_database_vaccine_preventable:
     - data://meadow/who/2025-08-06/mortality_database_vaccine_preventable:
       - snapshot://who/2025-08-06/mortality_database_vaccine_preventable.csv
@@ -912,7 +917,7 @@ steps:
       - data://meadow/neglected_tropical_diseases/2025-08-20/funding:
         - snapshot://neglected_tropical_diseases/2025-08-20/funding.xlsx
 
-    # GBD 2023 data for bespoke treemap project
+  # GBD 2023 data for bespoke treemap project
   data://garden/ihme_gbd/2025-10-13/gbd_treemap:
     - data://meadow/ihme_gbd/2025-10-13/gbd_treemap:
       - snapshot-private://ihme_gbd/2025-10-13/gbd_treemap.feather
@@ -1080,7 +1085,7 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/un/2024-07-12/un_wpp
 
-    # PM2.5 air pollution - WashU
+  # PM2.5 air pollution - WashU
   data://grapher/washu/2026-04-22/pm25_air_pollution:
     - data://garden/washu/2026-04-22/pm25_air_pollution:
       - data://meadow/washu/2026-04-22/pm25_air_pollution:

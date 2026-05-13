@@ -63,9 +63,6 @@ steps:
     - data://meadow/energy_institute/2025-06-27/statistical_review_of_world_energy:
       - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.csv
       - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.xlsx
-  #
-  # Energy Institute - Statistical Review of World Energy.
-  #
   data://grapher/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
   #
@@ -97,9 +94,6 @@ steps:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/demography/2024-07-15/population
     - data://garden/wb/2025-07-01/income_groups
-  #
-  # Energy - Energy mix.
-  #
   data://grapher/energy/2025-06-27/energy_mix:
     - data://garden/energy/2025-06-27/energy_mix
   #
@@ -120,9 +114,6 @@ steps:
       - data://garden/wb/2025-07-01/income_groups
       - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
-  #
-  # Energy - Fossil Fuel Production.
-  #
   data://grapher/energy/2025-06-27/fossil_fuel_production:
     - data://garden/energy/2025-06-27/fossil_fuel_production
   #
@@ -143,9 +134,6 @@ steps:
     - data://garden/demography/2024-07-15/population
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/eia/2026-05-05/international_energy
-  #
-  # Energy - Primary energy consumption.
-  #
   data://grapher/energy/2026-05-05/primary_energy_consumption:
     - data://garden/energy/2026-05-05/primary_energy_consumption
   #
@@ -156,14 +144,8 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
     - data://meadow/irena/2025-07-18/renewable_energy_statistics:
       - snapshot://irena/2025-07-18/renewable_energy_statistics.xlsx
-  #
-  # IRENA - Renewable energy statistics.
-  #
   data://grapher/irena/2025-07-18/renewable_capacity_by_technology:
     - data://garden/irena/2025-07-18/renewable_energy_statistics
-  #
-  # IRENA - Renewable energy statistics.
-  #
   data://grapher/irena/2025-07-18/renewable_capacity:
     - data://garden/irena/2025-07-18/renewable_energy_statistics
   #
@@ -178,9 +160,6 @@ steps:
     - data://meadow/irena/2024-11-15/renewable_power_generation_costs:
       - snapshot://irena/2024-11-15/renewable_power_generation_costs.xlsx
     - data://garden/economics/2025-08-29/owid_deflator
-  #
-  # IRENA - Renewable power generation costs.
-  #
   data://grapher/irena/2025-08-22/renewable_power_generation_costs:
     - data://garden/irena/2025-08-22/renewable_power_generation_costs
   #
@@ -244,9 +223,6 @@ steps:
   #
   export://github/energy_data/latest/owid_energy:
     - data://garden/energy_data/2026-04-24/owid_energy
-  #
-  # Energy - OWID Energy dataset.
-  #
   export://s3/energy_data/latest/owid_energy:
     - data://garden/energy_data/2026-04-24/owid_energy
   #
@@ -285,9 +261,6 @@ steps:
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/energy/2025-06-27/energy_mix
-  #
-  # Energy - Electricity mix (EI & Ember).
-  #
   data://grapher/energy/2026-04-24/electricity_mix:
     - data://garden/energy/2026-04-24/electricity_mix
   #

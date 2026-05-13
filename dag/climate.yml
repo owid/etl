@@ -27,7 +27,7 @@ steps:
       - data://meadow/climate/2026-01-16/total_precipitation:
         - snapshot://climate/2026-01-16/total_precipitation.zip
         - snapshot://countries/2023-12-27/world_bank.zip
-
+  #
   # Global Wildfire Information System - Weekly wildfires.
   #
   data://garden/climate/latest/weekly_wildfires:

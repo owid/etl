@@ -18,7 +18,7 @@ steps:
   ################################################################################################
   # AUSTRALIA
   ################################################################################################
-    # Gini coefficient for individual gross income, Hancock (1971)
+  # Gini coefficient for individual gross income, Hancock (1971)
   data://garden/chartbook/2024-08-01/hancock_1971_australia:
     - data://meadow/chartbook/2024-08-01/hancock_1971_australia:
       - snapshot://chartbook/2024-08-01/hancock_1971_australia.csv
@@ -108,7 +108,7 @@ steps:
     - data://meadow/chartbook/2024-08-14/atkinson_2008_canada:
       - snapshot://chartbook/2024-08-14/atkinson_2008_canada.xls
 
-   # Wealth share of the top 1% (Davies, Di Matteo, 2020)
+  # Wealth share of the top 1% (Davies, Di Matteo, 2020)
   data://garden/chartbook/2024-08-15/davies_di_matteo_2020_canada:
     - data://meadow/chartbook/2024-08-15/davies_di_matteo_2020_canada:
       - snapshot://chartbook/2024-08-15/davies_di_matteo_2020_canada.csv

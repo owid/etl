@@ -1,5 +1,5 @@
 steps:
-###########  UPDATED MONTHLY #############################################################################
+  ###########  UPDATED MONTHLY #############################################################################
   # FrontierMath Benchmark (EPOCH)
   data://grapher/artificial_intelligence/2026-01-30/frontiermath:
     - data://garden/artificial_intelligence/2026-01-30/frontiermath:
@@ -41,7 +41,7 @@ steps:
     - data://garden/artificial_intelligence/2025-03-12/epoch_aggregates_affiliation:
       - data://garden/artificial_intelligence/2025-03-12/epoch
 
- # EPOCH dataset on Compute Intensive AI
+  # EPOCH dataset on Compute Intensive AI
   data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive:
     - snapshot://artificial_intelligence/2025-03-12/epoch_compute_intensive.csv
   data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive:
@@ -58,7 +58,7 @@ steps:
     - data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive_domain:
       - data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive
 
- ############### OTHERS #####################################################################################
+  ############### OTHERS #####################################################################################
 
   # Large Language Models and Compute (EPOCH)
   data://grapher/artificial_intelligence/2024-02-15/epoch_llms:
@@ -199,9 +199,6 @@ steps:
     - data://garden/artificial_intelligence/2026-04-20/ai_index_report:
       - data://meadow/artificial_intelligence/2026-04-20/ai_index_report:
         - snapshot://artificial_intelligence/2026-04-20/ai_index_report.zip
-      ########################
-      # AI Index report
-      ############################
       # AI Index Report 2025 - AI adoption by organisations
       - data://garden/artificial_intelligence/2025-04-08/ai_adoption:
         - snapshot://artificial_intelligence/2025-04-08/ai_adoption.csv
@@ -213,7 +210,7 @@ steps:
       - data://meadow/artificial_intelligence/2025-11-07/energy_ai
       - data://garden/energy/2026-04-24/electricity_mix
 
-# IEA Energy and AI dataset
+  # IEA Energy and AI dataset
   data://grapher/artificial_intelligence/2026-04-27/energy_ai:
     - data://garden/artificial_intelligence/2026-04-27/energy_ai:
       - data://garden/regions/2023-01-01/regions

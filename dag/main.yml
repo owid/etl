@@ -23,7 +23,7 @@ steps:
     - data://meadow/gapminder/2023-03-31/population:
       - snapshot://gapminder/2023-03-31/population.xlsx
 
-      # Others
+  # Others
   data://garden/wb/2021-07-01/wb_income:
     - data://meadow/wb/2021-07-01/wb_income:
       - snapshot://wb/2021-07-01/wb_income.xlsx
@@ -35,8 +35,8 @@ steps:
       - data://garden/un/2024-07-12/un_wpp
 
   #
-  # UN
   # UN SDG - current
+  #
   data://meadow/un/2023-08-16/un_sdg:
     - snapshot://un/2023-08-16/un_sdg.feather
   data://grapher/un/2023-08-16/un_sdg:
@@ -274,7 +274,7 @@ steps:
   data://grapher/un/2025-03-25/igme:
     - data://garden/un/2025-03-25/igme
 
-    # Long-run child mortality, Gapminder + UN IGME - to update
+  # Long-run child mortality, Gapminder + UN IGME - to update
   data://garden/un/2025-04-25/long_run_child_mortality:
     - data://garden/un/2025-03-25/igme
     # Gapminder  - Under five mortality v7
@@ -332,7 +332,7 @@ steps:
     - data://garden/wpf/2025-01-17/famines_by_trigger:
       - data://garden/wpf/2025-01-17/famines
 
-    ### Global Flourishing Study wave 2
+  # Global Flourishing Study wave 2
   data://grapher/gfs/2026-04-08/gfs_wave_two:
     - data://garden/gfs/2026-04-08/gfs_wave_two:
       - data://meadow/gfs/2026-04-08/gfs_wave_two:
@@ -357,7 +357,6 @@ steps:
     - data://meadow/un/2025-05-15/un_members:
       - snapshot://un/2025-05-15/un_members.csv
     - data://garden/regions/2023-01-01/regions
-  # United Nations members
   data://grapher/un/2025-05-15/un_members:
     - data://garden/un/2025-05-15/un_members
 
@@ -391,7 +390,7 @@ steps:
         - snapshot://pew/2025-06-27/same_sex_marriage.csv
       - data://garden/regions/2023-01-01/regions
 
-      # Child Mortality Estimates - UN IGME - to archive
+  # Child Mortality Estimates - UN IGME - to archive
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme:
       - data://meadow/un/2024-09-11/igme:
@@ -439,6 +438,7 @@ steps:
       - snapshot://oecd/2025-07-03/affordable_housing_income.xlsx
       - snapshot://oecd/2025-07-03/affordable_housing.xlsx
 
+  #
   # Housing indicators from Korevaar et al.
   #
   data://grapher/housing/2025-07-11/korevaar:
@@ -496,6 +496,7 @@ steps:
 
   #
   # Trade Volume Index - WTO Trade Growth
+  #
   data://grapher/trade/2025-09-22/wto_trade_growth:
     - data://garden/trade/2025-09-22/wto_trade_growth:
       - data://meadow/trade/2025-09-22/wto_trade_growth:
@@ -508,7 +509,7 @@ steps:
           - snapshot://trade/2025-09-22/historic_trade.xlsx
   #
   # UN SDG (2024)
-
+  #
   data://grapher/un/2025-10-29/un_sdg:
     - data://garden/un/2025-10-29/un_sdg:
       - data://meadow/un/2025-10-29/un_sdg:
@@ -523,6 +524,7 @@ steps:
     - data://garden/ons/2025-11-26/crime_survey:
       - data://meadow/ons/2025-11-26/crime_survey:
         - snapshot://ons/2025-11-26/crime_survey.csv
+  #
   # FBI crime data - Summary Reporting System Estimates
   #
   data://grapher/fbi/2025-11-21/summary_reporting_system_estimates:
