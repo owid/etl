@@ -1,10 +1,11 @@
 meta:
-  source:
-    name: Reserve Bank of India
-    published_by: Reserve Bank of India - Database of Indian Economy
-  name: TESA_14.15
-  description: core-econ.org
   is_public: false
+  origin:
+    producer: Reserve Bank of India
+    title: Database of Indian Economy
+    citation_full: Reserve Bank of India - Database of Indian Economy.
+    date_accessed: '2020-07-08'
+    date_published: '2020'
 outs:
   - md5: 0ca171e9b0fc16e4bb4289b87d0099cd
     size: 3338
