@@ -1,6 +1,11 @@
+---
+status: new
+---
+
 # Population projection tool: How will populations across the world change in the 21st century?
 
-*Daniel Bachler, Sophia Mersmann, Hannah Ritchie (writing)*
+!!! info ""
+    :octicons-person-16: **[Daniel Bachler](https://ourworldindata.org/team/daniel-bachler), [Sophia Mersmann](https://ourworldindata.org/team/sophia-mersmann), [Hannah Ritchie](https://ourworldindata.org/team/hannah-ritchie)** • :octicons-calendar-16: May 13, 2026 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Population%20projection%20tool)
 
 Our team have built an interactive visualization tool that provides population projections until the end of the century, based on the user’s selection of three key demographic inputs: fertility rates, life expectancy, and net migration.
 
@@ -83,11 +88,11 @@ Instead, the model takes total net migration rates — which is number of people
 
 The **Western standard** is the classic distribution you’d get from labor-market migration in high-income countries. There is a peak of young adults (aged 20 to 35\) who have moved for study or work, with smaller numbers of children and older adults, which reflect family migration.
 
-![Western standard age profile][western-standard.png]
+![Western standard age profile](western-standard.png)
 
 The **Low Dependency** distribution has a much taller, narrower peak, with most migrants aged 20-30 who moved for work.
 
-![Low depdencendy age profile][low-dependency.png]
+![Low dependency age profile](low-dependency.png)
 
 For countries with good migration data, the model selects the distribution and sex pattern that best fits the observed population changes over the last 15 or so years. For countries with sparse data, it falls back to pooled defaults.
 
