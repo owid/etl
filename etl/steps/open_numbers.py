@@ -21,8 +21,7 @@ import frictionless
 import pandas as pd
 import structlog
 from frictionless.exception import FrictionlessException
-from owid.catalog import Dataset, Table, Variable, utils
-from owid.catalog.meta import Source
+from owid.catalog import Dataset, Origin, Table, Variable, utils
 from owid.repack import repack_series
 
 from etl.git_helpers import GithubRepo
@@ -48,7 +47,14 @@ def run(dest_dir: str) -> None:
     ds.metadata.namespace = "open_numbers"
     ds.metadata.short_name = short_name
     ds.metadata.title = package.title or None
-    ds.metadata.sources = [Source(url=repo.github_url, date_accessed=str(dt.date.today()))]
+    ds.metadata.origins = [
+        Origin(
+            producer="Open Numbers",
+            title=package.title or short_name,
+            url_main=repo.github_url,
+            date_accessed=str(dt.date.today()),
+        )
+    ]
 
     if package.description and package.title != package.description:
         ds.metadata.description = package.description
