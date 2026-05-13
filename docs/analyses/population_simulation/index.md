@@ -5,11 +5,11 @@ status: new
 # Population projection tool: How will populations across the world change in the 21st century?
 
 !!! info ""
-    :octicons-person-16: **[Daniel Bachler](https://ourworldindata.org/team/daniel-bachler), [Sophia Mersmann](https://ourworldindata.org/team/sophia-mersmann), [Hannah Ritchie](https://ourworldindata.org/team/hannah-ritchie)** • :octicons-calendar-16: May 13, 2026 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Population%20projection%20tool)
+    :octicons-person-16: **[Daniel Bachler](https://ourworldindata.org/team#daniel-bachler), [Sophia Mersmann](https://ourworldindata.org/team#sophia-mersmann), [Hannah Ritchie](https://ourworldindata.org/team/hannah-ritchie)** • :octicons-calendar-16: May 13, 2026 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Population%20projection%20tool)
 
 Our team have built an interactive visualization tool that provides population projections until the end of the century, based on the user’s selection of three key demographic inputs: fertility rates, life expectancy, and net migration.
 
-This tool is presented in our article Population tool: How will populations across the world change in the 21st century? We also provide a walkthrough of how to use this tool to answer a specific question: what would it take for South Korea to maintain its current population size throughout this century?
+This tool is presented in our article [Population tool: How will populations across the world change in the 21st century?](https://ourworldindata.org/population-tool) We also provide a walkthrough of how to use this tool to answer a specific question: what would it take for South Korea to [maintain its current population size](https://ourworldindata.org/south-koreas-population-is-set-to-shrink) throughout this century?
 
 This tool was designed to help people understand and explore how future populations could change based on different demographic assumptions. It is deliberately simple and less complex than expert demographic models. Nonetheless, we hope users find it helpful to understand how population projections respond to changes in key inputs. As we describe below, when given the UN's own demographic assumptions as inputs, our tool closely reproduces its projections.
 
