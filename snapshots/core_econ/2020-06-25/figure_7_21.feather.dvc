@@ -1,9 +1,10 @@
 meta:
-  source:
-    name: Matthew Shum (2004)
-    published_by: Matthew Shum (2004)
-  name: Figure_7.21
-  description: core-econ.org
+  origin:
+    producer: Shum
+    title: Matthew Shum
+    citation_full: 'Matthew Shum (2004).'
+    date_accessed: '2020-06-25'
+    date_published: '2004'
   is_public: false
 outs:
   - md5: a42dca49fe29872b74a488110d66ad5f
