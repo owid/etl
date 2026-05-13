@@ -544,8 +544,11 @@ def run() -> None:
     #
     # Process data.
     #
-    # Keep only the columns we publish (drop sources, supplementary metadata, ISO/COW codes).
-    tb = tb[["country", "year", "law", "status", "proportion"]].copy()
+    # Keep the columns we publish (drop sources, ISO/COW codes, most supplementary
+    # metadata) but retain `gender_change_requirement` — the GMC combined indicator
+    # uses it to refine "legal" countries into procedural categories (Self-ID,
+    # Medical/Psychological, Surgery required, Surgery and sterilization required).
+    tb = tb[["country", "year", "law", "status", "proportion", "gender_change_requirement"]].copy()
 
     # Harmonize country names
     tb = paths.regions.harmonize_names(tb=tb)
@@ -555,14 +558,16 @@ def run() -> None:
     mask = tb.set_index(["law", "status"]).index.isin(placeholders)
     tb = tb.loc[~mask].reset_index(drop=True)
 
-    # Country-level table.
-    tb_country = tb.copy()
+    # Country-level table — drop the requirement column here; it's only used to build the
+    # combined indicator and isn't published as a per-row long-table indicator.
+    tb_country = tb.drop(columns=["gender_change_requirement"]).copy()
 
     # Regional aggregates table (counts of countries + population by status per region).
     tb_regions = _build_regional_aggregates(tb_country)
 
     # Combined-categorical table reproducing v1's three ordinal indicators.
-    tb_combined = _build_combined_categorical_table(tb_country)
+    # Pass the full tb (with requirement) so the GMC combined indicator can use it.
+    tb_combined = _build_combined_categorical_table(tb)
 
     # Regional aggregates of the combined-categorical indicators (counts + population by category).
     tb_combined_regions = _build_combined_categorical_regional_aggregates(tb_combined)
@@ -651,17 +656,76 @@ def _build_combined_categorical_table(tb):
     For each entry in COMBINED_CONFIGS, bucket the relevant `proportion` columns into
     '0' / '0.5' / '1', concatenate bucket strings into a key, and map to a category label.
     Unmapped key combinations produce NaN in the output column.
+
+    Also extracts `gender_change_requirement` for `gender_marker_change/legal` rows so the
+    GMC combined indicator can refine "legal" countries by their legal pathway
+    (Self-ID, Medical/Psychological, Surgery required, Surgery and sterilization required).
     """
     # Pivot the long table to wide so we can address each (law, status) column by name.
     wide = tb.pivot(index=["country", "year"], columns=["law", "status"], values="proportion")
     wide.columns = [f"{law}__{status}" for law, status in wide.columns]
     wide = wide.reset_index()
 
+    # Extract the per-(country, year) GMC requirement and merge into wide as a side column.
+    gmc_req = tb[(tb["law"] == "gender_marker_change") & (tb["status"] == "legal")][
+        ["country", "year", "gender_change_requirement"]
+    ].rename(columns={"gender_change_requirement": "gender_marker_change_requirement"})
+    wide = wide.merge(gmc_req, on=["country", "year"], how="left")
+
+    # Build the GMC combined indicator (proportion + requirement) inline before the loop.
+    wide["gender_marker_change"] = _build_gmc_combined(wide)
+
     for config in COMBINED_CONFIGS:
         wide[config["short_name"]] = _build_one_combined(wide, config)
 
-    output_cols = ["country", "year"] + [c["short_name"] for c in COMBINED_CONFIGS]
+    output_cols = (
+        ["country", "year", "gender_marker_change"]
+        + [c["short_name"] for c in COMBINED_CONFIGS]
+    )
     return wide[output_cols]
+
+
+def _build_gmc_combined(wide):
+    """Build the gender_marker_change combined indicator with requirement refinement.
+
+    Source: `gender_marker_change__legal` (continuous proportion) +
+            `gender_marker_change_requirement` (string).
+
+    Categories:
+      - Not legally possible            : proportion = 0
+      - Subnationally mixed             : 0 < proportion < 1
+      - Self-declaration                : proportion = 1, requirement in {Self-ID, Self-Declaration}
+      - Medical/psychological diagnosis : proportion = 1, requirement = Medical/Psychological
+      - Surgery required                : proportion = 1, requirement = Surgery
+      - Surgery and sterilization       : proportion = 1, requirement = Surgery+Sterilization
+      - Legally possible, requirement unknown : proportion = 1, requirement is NaN
+    """
+    prop = wide["gender_marker_change__legal"]
+    req = wide["gender_marker_change_requirement"]
+
+    REQ_LABELS = {
+        "Self-ID": "Self-declaration",
+        "Self-Declaration": "Self-declaration",
+        "Medical/Psychological": "Medical or psychological diagnosis",
+        "Surgery": "Surgery required",
+        "Surgery+Sterilization": "Surgery and sterilization required",
+    }
+
+    def classify(p, r):
+        if p == 0:
+            return "Not legally possible"
+        if 0 < p < 1:
+            return "Subnationally mixed"
+        # p == 1: refine by requirement
+        if r in REQ_LABELS:
+            return REQ_LABELS[r]
+        return "Legally possible, requirement unknown"
+
+    out = [classify(p, r) for p, r in zip(prop, req)]
+    from owid.catalog import Variable
+    result = Variable(out, index=wide.index, name="gender_marker_change")
+    # Copy origins/metadata from the source proportion column so the indicator carries provenance.
+    return result.copy_metadata(wide["gender_marker_change__legal"])
 
 
 def _build_combined_categorical_regional_aggregates(tb_combined):
@@ -677,8 +741,12 @@ def _build_combined_categorical_regional_aggregates(tb_combined):
     tb = tb_combined.copy()
     tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
 
+    # All combined-categorical indicators: the config-driven ones + the GMC indicator
+    # that's built inline (via _build_gmc_combined) and isn't in COMBINED_CONFIGS.
+    indicator_cols = [c["short_name"] for c in COMBINED_CONFIGS] + ["gender_marker_change"]
+
     new_cols = []
-    for indicator in [c["short_name"] for c in COMBINED_CONFIGS]:
+    for indicator in indicator_cols:
         for category in tb[indicator].dropna().unique():
             cat_snake = underscore(category)
             count_col = f"{indicator}_{cat_snake}_count"

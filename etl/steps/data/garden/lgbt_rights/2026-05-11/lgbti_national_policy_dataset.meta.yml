@@ -732,6 +732,26 @@ tables:
           - Subnationally mixed or other
           - Neither covered nor restricted
 
+      # ── Gender marker change with legal-pathway requirements (Bastian feedback) ─────
+      gender_marker_change:
+        title: Legal change of gender marker
+        description_short: |-
+          Whether a legal process exists to change the gender marker on official identity documents, and what the process requires — self-declaration, medical or psychological diagnosis, surgery, or surgery plus sterilization.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Legal change of gender marker
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Self-declaration
+          - Medical or psychological diagnosis
+          - Surgery required
+          - Surgery and sterilization required
+          - Legally possible, requirement unknown
+          - Subnationally mixed
+          - Not legally possible
+
   lgbti_national_policy_dataset_combined_regions:
     variables:
       # AGE OF CONSENT — number of countries
@@ -2410,5 +2430,120 @@ tables:
         short_unit: ""
         display:
           name: Neither covered nor restricted
+          numDecimalPlaces: 0
+
+
+      # ── Gender marker change regional aggregates ─────────────────────────────────
+
+      gender_marker_change_legally_possible__requirement_unknown_count:
+        title: Number of countries — Legally possible, requirement unknown (gender marker change)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Legally possible, requirement unknown
+          numDecimalPlaces: 0
+
+      gender_marker_change_legally_possible__requirement_unknown_pop:
+        title: Population — Legally possible, requirement unknown (gender marker change)
+        unit: people
+        short_unit: ""
+        display:
+          name: Legally possible, requirement unknown
+          numDecimalPlaces: 0
+
+      gender_marker_change_medical_or_psychological_diagnosis_count:
+        title: Number of countries — Medical or psychological diagnosis (gender marker change)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Medical or psychological diagnosis
+          numDecimalPlaces: 0
+
+      gender_marker_change_medical_or_psychological_diagnosis_pop:
+        title: Population — Medical or psychological diagnosis (gender marker change)
+        unit: people
+        short_unit: ""
+        display:
+          name: Medical or psychological diagnosis
+          numDecimalPlaces: 0
+
+      gender_marker_change_not_legally_possible_count:
+        title: Number of countries — Not legally possible (gender marker change)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Not legally possible
+          numDecimalPlaces: 0
+
+      gender_marker_change_not_legally_possible_pop:
+        title: Population — Not legally possible (gender marker change)
+        unit: people
+        short_unit: ""
+        display:
+          name: Not legally possible
+          numDecimalPlaces: 0
+
+      gender_marker_change_self_declaration_count:
+        title: Number of countries — Self-declaration (gender marker change)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Self-declaration
+          numDecimalPlaces: 0
+
+      gender_marker_change_self_declaration_pop:
+        title: Population — Self-declaration (gender marker change)
+        unit: people
+        short_unit: ""
+        display:
+          name: Self-declaration
+          numDecimalPlaces: 0
+
+      gender_marker_change_subnationally_mixed_count:
+        title: Number of countries — Subnationally mixed (gender marker change)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      gender_marker_change_subnationally_mixed_pop:
+        title: Population — Subnationally mixed (gender marker change)
+        unit: people
+        short_unit: ""
+        display:
+          name: Subnationally mixed
+          numDecimalPlaces: 0
+
+      gender_marker_change_surgery_and_sterilization_required_count:
+        title: Number of countries — Surgery and sterilization required (gender marker change)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Surgery and sterilization required
+          numDecimalPlaces: 0
+
+      gender_marker_change_surgery_and_sterilization_required_pop:
+        title: Population — Surgery and sterilization required (gender marker change)
+        unit: people
+        short_unit: ""
+        display:
+          name: Surgery and sterilization required
+          numDecimalPlaces: 0
+
+      gender_marker_change_surgery_required_count:
+        title: Number of countries — Surgery required (gender marker change)
+        unit: countries
+        short_unit: ""
+        display:
+          name: Surgery required
+          numDecimalPlaces: 0
+
+      gender_marker_change_surgery_required_pop:
+        title: Population — Surgery required (gender marker change)
+        unit: people
+        short_unit: ""
+        display:
+          name: Surgery required
           numDecimalPlaces: 0
 
