@@ -254,6 +254,33 @@ age: |-
   ...<%- endif %>
 ```
 
+### Empty Jinja Output
+
+A Jinja template that renders to an empty string (e.g. `<% if cond %>val<% endif %>` when `cond` is false) keeps the field as `""`. This is intentional — it lets you force-empty fields like `subtitle` or `note`, which Grapher reads as "render no subtitle" instead of falling back to `description_short`:
+
+```yaml
+# variant == "estimates" → subtitle stays as "" → Grapher renders no subtitle
+grapher_config:
+  subtitle: "<% if variant != 'estimates' %>Future projections under the {{ variant }} scenario.<% endif %>"
+```
+
+If you don't want an empty result, add an `<% else %>` branch with the alternative content.
+
+### `as_value` for typed numeric fields
+
+A few Grapher schema fields are strict-typed (e.g. `yAxis.min`, `yAxis.max`, `comparisonLines[].yEquals`). Plain Jinja always returns a string, so `<% if cond %>90<% endif %>` would render to `"90"` and fail validation. Use the `as_value` filter to coerce to `int`/`float`:
+
+```yaml
+grapher_config:
+  yAxis:
+    min: "<% if age == '0' %><< 90 | as_value >><% endif %>"
+    max: "<% if age == '0' %><< 120 | as_value >><% endif %>"
+```
+
+When the conditional branch doesn't fire, the `as_value`-marked field is dropped (rather than left as `""`) so the schema doesn't see a string where it expected a number. This drop also propagates: if every numeric field in a list-of-dicts entry uses `as_value` and renders empty, the resulting empty `{}` is removed (avoids shipping `comparisonLines: [{}]`).
+
+The filter only makes sense on numeric fields — don't use it on strings.
+
 ### Checking Metadata
 
 The most straightforward way to check your metadata is in Admin, although that means waiting for your step to finish. There's a faster way to check your YAML file directly. Create a `playground.ipynb` notebook in the same folder as your YAML file and copy this to the first cell:

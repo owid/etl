@@ -46,7 +46,7 @@ steps:
     - data://garden/un/2025-05-07/undp_hdr
     - data://garden/wash/2025-12-08/household
     - data://garden/who/2024-07-30/ghe
-    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/worldbank_wdi/2026-02-27/wdi
 
   # Sequencing (variants)
   data-private://garden/covid/latest/sequence:
@@ -95,7 +95,7 @@ steps:
         - snapshot://covid/latest/yougov_finland.csv
         - snapshot://covid/latest/yougov_france.zip
         - snapshot://covid/latest/yougov_germany.zip
-        - snapshot://covid/latest/yougov_hong-kong.csv
+        - snapshot://covid/latest/yougov_hong_kong.csv
         - snapshot://covid/latest/yougov_india.csv
         - snapshot://covid/latest/yougov_indonesia.csv
         - snapshot://covid/latest/yougov_israel.zip
@@ -106,16 +106,16 @@ steps:
         - snapshot://covid/latest/yougov_netherlands.zip
         - snapshot://covid/latest/yougov_norway.zip
         - snapshot://covid/latest/yougov_philippines.csv
-        - snapshot://covid/latest/yougov_saudi-arabia.csv
+        - snapshot://covid/latest/yougov_saudi_arabia.csv
         - snapshot://covid/latest/yougov_singapore.zip
-        - snapshot://covid/latest/yougov_south-korea.csv
+        - snapshot://covid/latest/yougov_south_korea.csv
         - snapshot://covid/latest/yougov_spain.zip
         - snapshot://covid/latest/yougov_sweden.zip
         - snapshot://covid/latest/yougov_taiwan.csv
         - snapshot://covid/latest/yougov_thailand.csv
-        - snapshot://covid/latest/yougov_united-arab-emirates.csv
-        - snapshot://covid/latest/yougov_united-kingdom.zip
-        - snapshot://covid/latest/yougov_united-states.zip
+        - snapshot://covid/latest/yougov_united_arab_emirates.csv
+        - snapshot://covid/latest/yougov_united_kingdom.zip
+        - snapshot://covid/latest/yougov_united_states.zip
         - snapshot://covid/latest/yougov_vietnam.csv
         - snapshot://covid/latest/yougov_extra_mapping.csv
         - snapshot://covid/latest/yougov_composite.csv

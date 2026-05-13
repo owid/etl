@@ -122,11 +122,11 @@ definitions:
 
   description_key_welfare_type: |-
     <% if welfare_type == "before tax" %>
-    Income is _pre-tax_ — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.
+    Income is measured before taxes have been paid and most government benefits have been received. The exception is pensions and other social insurance, such as unemployment insurance. Contributions to social insurance are deducted, and the corresponding benefits are added back and counted as income.
     <%- elif welfare_type == "after tax" %>
-    Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received.
+    Income is measured after taxes have been paid and most government benefits have been received. Not just cash benefits like social assistance, but also public services like health and education, and collective spending, such as defense and infrastructure. This is a broader concept of income than used by most other sources.
     <%- elif welfare_type == "after tax disposable" %>
-    Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received, but does not include in-kind benefits and therefore does not add up to national income.
+    Income is measured after taxes have been paid and most government benefits have been received. It does not include public services like health and education, or collective spending such as defense and infrastructure, so it does not add up to national income.
     <%- elif welfare_type == "wealth" %>
     This measure is related to net national wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.
     <%- endif %>
@@ -136,25 +136,43 @@ definitions:
 
   description_key_methodology_1: |-
     <% if welfare_type != "wealth" %>
-    The data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.
+    The data comes from the World Inequality Database (WID), which combines household surveys, tax records, and national accounts to estimate how a country's total national income is distributed across the population. Because tax records have direct information on high earners, this approach captures more of the income received by those at the top of the distribution than surveys alone.
     <%- else %>
-    The data is constructed using the Mixed Income Capitalization-Survey (MICS) method, which combines capitalized income flows from tax data with survey-based estimates for assets that do not generate taxable income. This is done because wealth distributions are usually not directly available in administrative data, and because wealth surveys coverage is even more limited than for income.
+    The data comes from the World Inequality Database (WID), and it is constructed using the Mixed Income Capitalization-Survey (MICS) method, which combines capitalized income flows from tax data with survey-based estimates for assets that do not generate taxable income. This is done because wealth distributions are usually not directly available in administrative data, and because wealth surveys coverage is even more limited than for income.
     <%- endif %>
 
   description_key_methodology_2: |-
     <% if welfare_type != "wealth" %>
-    These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/countries-with-regional-income-imputations-on-wid-world-world-inequality-lab-technical-note-2021-15/).
+    For some countries and years, the underlying data sources (household surveys, tax records) are not available. In these cases, estimates are extrapolated from other years or modeled based on data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/).
     <%- else %>
-    Even with those considerations, the underlying data is not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/global-wealth-inequality-on-wid-world-estimates-and-imputations-wid-world-technical-note-2023-11/).
+    For some countries and years, the underlying data sources are not available. In these cases, estimates are extrapolated from other years or modeled based on data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/).
     <%- endif %>
 
   description_key_posttax: |-
     <% if welfare_type in ["after tax"] %>
-    In the case of national post-tax income, when the data sources are not available, distributions are constructed by using the more widely available pre-tax distributions, combined with tax revenue and government expenditure aggregates. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/).
+    Data on income after tax and benefits is less widely available than that before tax. Where it is missing, distributions are constructed from the more widely available pre-tax data, combined with data on tax revenue and government expenditure. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/).
     <%- endif %>
 
   description_key_relative_poverty: |-
     This is a measure of _relative_ poverty – it captures the share of people whose {definitions.concept_welfare_type} is low by the standards typical in their own country.
+
+  description_key_top_incomes: |-
+    Incomes are distributed very unequally, both between countries and within them. A large share of total income is concentrated among the very richest, making the top of the distribution important to understand. Read more in our topic page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_gini: |-
+    Incomes are distributed very unequally, both between countries and within them. The Gini coefficient is a common measure of inequality, which summarizes the distribution and expresses it in terms of a number from 0 to 1. Higher values indicate higher inequality. We explain how it works in our article [Measuring inequality: what is the Gini coefficient?](https://ourworldindata.org/what-is-the-gini-coefficient), and discuss income inequality more broadly on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_palma_ratio: |-
+    Incomes are distributed very unequally, both between countries and within them. The Palma ratio captures this by comparing the income share of the richest 10% to that of the poorest 40%. For example, a value of 2 means the richest 10% receive twice as much as the poorest 40%. We discuss income inequality more broadly on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_share: |-
+    This data shows the share of total income that goes to specific groups of the population. For example, if the richest decile receives 40% of total income, it means the richest 10% of people share 40% of all income between them.
+
+  description_key_avg: |-
+    This data shows the mean (average) income per person within specific groups of the population, ranked by income. For example, the poorest decile is the poorest 10% of people in a country.
+
+  description_key_thr: |-
+    This data shows the income threshold for a specific group of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.
 
   description_processing_general: |-
     We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively.
@@ -532,6 +550,7 @@ tables:
         short_unit: ""
         description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.description_short_welfare_type_inequality}
         description_key:
+          - "{definitions.description_key_gini}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -562,6 +581,7 @@ tables:
         short_unit: ""
         description_short: The Palma ratio is a measure of inequality that divides the share {definitions.verb_welfare_type} by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.description_short_welfare_type_inequality}
         description_key:
+          - "{definitions.description_key_palma_ratio}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -682,6 +702,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the poorest 50% of the population. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -713,6 +735,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the middle 40% of the population. The middle 40% is the share of the population whose {definitions.concept_welfare_type} lies between the poorest 50% and the richest 10%. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -728,6 +752,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the population between the 90th and 99th percentiles. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -743,6 +769,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -773,6 +801,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 1% of the population. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -803,6 +833,8 @@ tables:
         short_unit: "%"
         description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 0.1% of the population. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -942,6 +974,7 @@ tables:
           {macros}
           The mean {definitions.concept_welfare_type} {definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_avg}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
@@ -983,6 +1016,8 @@ tables:
           {macros}
           The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_top_incomes}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
           - "{definitions.description_key_methodology_2}"
@@ -1023,6 +1058,7 @@ tables:
           {macros}
           The level of {definitions.concept_welfare_type} {definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_welfare_type}
         description_key:
+          - "{definitions.description_key_thr}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"

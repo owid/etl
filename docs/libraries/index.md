@@ -7,7 +7,7 @@ hide:
 
 We have developed various python libraries that are used in our projects.
 
-## [`owid.catalog`](catalog.md)
+## [`owid.catalog`](catalog/intro.md)
 Data management with rich metadata support. Implements core data structures used in ETL.
 
 ## [`owid.repack`](repack.md)

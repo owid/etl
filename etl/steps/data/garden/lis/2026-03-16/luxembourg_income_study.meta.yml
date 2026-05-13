@@ -107,14 +107,14 @@ definitions:
 
   description_key_welfare_type: |-
     <% if welfare_type == "dhi" %>
-    Income is _post-tax_ — measured after taxes have been paid and most government benefits have been received.
+    Income is measured after taxes have been paid and most government benefits have been received.
     <%- elif welfare_type == "mi" %>
-    Income is _pre-tax_ — measured before taxes have been paid and most government benefits have been received.
+    Income is measured before taxes have been paid and most government benefits have been received.
     <%- endif %>
 
   description_key_equivalence_scale: |-
     <% if equivalence_scale == "square root" %>
-    Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
+    Income has been equivalized – adjusted to account for the household size and composition, to consider the fact that people in the same household can share costs like rent and heating. LIS uses the square root equivalence scale: household income is divided by the square root of the number of household members.
     <%- elif equivalence_scale == "per capita" %>
     Income is per capita, which means that each person (including children) is attributed an equal share of the total income received by all members of their household.
     <%- endif %>
@@ -125,6 +125,33 @@ definitions:
     <%- elif welfare_type == "mi" %>
     Inequality is measured here in terms of income before taxes and benefits.
     <%- endif %>
+
+  description_key_inequality: |-
+    Incomes are distributed very unequally, both between countries and within them. This data lets you compare how income is distributed across the population and how those levels have changed over time. We discuss this in more detail on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_lis: |-
+    The data comes from the Luxembourg Income Study (LIS), which takes the original microdata from national household surveys and harmonizes it — reconstructing incomes using a common set of definitions across countries. This makes the data more comparable across countries than other sources, but at the cost of covering fewer countries.
+
+  description_key_gini: |-
+    Incomes are distributed very unequally, both between countries and within them. The Gini coefficient is a common measure of inequality, which summarizes the distribution and expresses it in terms of a number from 0 to 1. Higher values indicate higher inequality. We explain how it works in our article [Measuring inequality: what is the Gini coefficient?](https://ourworldindata.org/what-is-the-gini-coefficient), and discuss income inequality more broadly on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_palma_ratio : |-
+    Incomes are distributed very unequally, both between countries and within them. The Palma ratio captures this by comparing the income share of the richest 10% to that of the poorest 40%. For example, a value of 2 means the richest 10% receive twice as much as the poorest 40%. We discuss income inequality more broadly on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_mean: |-
+    This data shows the mean (average) income per person. Because incomes are unevenly distributed, with a small number of people on very high incomes, the mean is typically higher than what most people have. To see the income of a typical person, you can look at the median income instead. We discuss how incomes are distributed in more detail on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_median: |-
+    This data shows the median income per person — the level below which half the population falls. Unlike the mean, the median is not pulled up by the incomes of the richest, so it better reflects what a typical person has. You can switch to mean income using the chart controls. We discuss how incomes are distributed in more detail on our page on [Economic Inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_avg: |-
+    This data shows the mean (average) income per person within decile groups — each representing a tenth of the population, ranked by income. For example, the poorest decile is the poorest 10% of people in a country.
+
+  description_key_thr: |-
+    This data shows the income threshold for a given decile — a tenth of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.
+
+  description_key_share: |-
+    This data shows the share of total income that goes to specific groups of the population. For example, if the poorest decile receives 3% of total income, it means the poorest 10% of people share just 3% of all income between them.
 
   numdecimalplaces_period: |-
     <% if period == "day" %>
@@ -788,6 +815,7 @@ tables:
           - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp_poverty}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Share below {definitions.poverty_line_a_day} ({definitions.welfare_type})
@@ -820,6 +848,7 @@ tables:
           - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp_poverty}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Number below {definitions.poverty_line_a_day} ({definitions.welfare_type})
@@ -854,6 +883,7 @@ tables:
           - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp_poverty}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Total shortfall - {definitions.poverty_line_a_day} ({definitions.welfare_type})
@@ -888,6 +918,7 @@ tables:
           - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp_poverty}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Average shortfall ($) - {definitions.poverty_line_a_day} ({definitions.welfare_type})
@@ -920,6 +951,7 @@ tables:
           - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp_poverty}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Average shortfall (%) - {definitions.poverty_line_a_day} ({definitions.welfare_type})
@@ -952,6 +984,7 @@ tables:
           - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp_poverty}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Poverty gap index - {definitions.poverty_line_a_day} ({definitions.welfare_type})
@@ -982,8 +1015,10 @@ tables:
         description_short: |-
           Average income {definitions.per_period} of the population.
         description_key:
+          - "{definitions.description_key_mean}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Mean income ({definitions.welfare_type})
@@ -1016,8 +1051,10 @@ tables:
         description_short: |-
           Value of income {definitions.per_period} below which 50% of the population live.
         description_key:
+          - "{definitions.description_key_median}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Median income ({definitions.welfare_type})
@@ -1051,10 +1088,13 @@ tables:
         short_unit: "$"
         description_short: |-
           {macros}
-          The mean income {definitions.per_period} within the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The mean income {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_avg}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: |-
@@ -1094,9 +1134,12 @@ tables:
         short_unit: "%"
         description_short: |-
           {macros}
-          The share of income received by the <<percentiles_avg_share(decile)>> (tenth of the population).
+          The share of income received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: |-
@@ -1134,8 +1177,11 @@ tables:
           {macros}
           The level of income {definitions.per_period} below which <<decile>>0% of the population falls.
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_thr}"
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: |-
@@ -1172,7 +1218,9 @@ tables:
         description_short: |-
           The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.description_short_welfare_type_inequality}
         description_key:
+          - "{definitions.description_key_gini}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Gini coefficient ({definitions.welfare_type})
@@ -1201,7 +1249,9 @@ tables:
         description_short: |-
           The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.description_short_welfare_type_inequality}
         description_key:
+          - "{definitions.description_key_palma_ratio}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Palma ratio ({definitions.welfare_type})
@@ -1232,6 +1282,7 @@ tables:
           The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median income is two times higher than that of someone just falling in the poorest tenth of the population.
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: P50/P10 ratio ({definitions.welfare_type})
@@ -1246,6 +1297,7 @@ tables:
           P90 and P10 are the levels of income below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: P90/P10 ratio ({definitions.welfare_type})
@@ -1260,6 +1312,7 @@ tables:
           The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income.
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: P90/P50 ratio ({definitions.welfare_type})
@@ -1303,6 +1356,7 @@ tables:
           The share of income received by the richest 10% of the population.
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Share (top 10%) ({definitions.welfare_type})
@@ -1332,6 +1386,7 @@ tables:
           The share of income received by the middle 40% of the population. The middle 40% is the share of the population whose income lies between the poorest 50% and the richest 10%.
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Share (middle 40%) ({definitions.welfare_type})
@@ -1346,6 +1401,7 @@ tables:
           The share of the population with income below 50% of the median. Relative poverty reflects the extent of inequality within the bottom of the distribution. {definitions.description_short_welfare_type_inequality}
         description_key:
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Share of population in relative poverty ({definitions.welfare_type})

@@ -1,4 +1,10 @@
 steps:
+  # Air Quality Life Index (AQLI)
+  data://grapher/aqli/2026-03-30/air_quality_life_index:
+    - data://garden/aqli/2026-03-30/air_quality_life_index:
+      - data://meadow/aqli/2026-03-30/air_quality_life_index:
+        - snapshot://aqli/2026-03-30/air_quality_life_index.zip
+
   # Health
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
@@ -227,7 +233,7 @@ steps:
     - data://garden/health/2024-04-22/gpei_funding:
       - data://meadow/health/2024-04-22/gpei_funding:
         - snapshot://health/2024-04-22/gpei_funding.xlsx
-      - data://garden/worldbank_wdi/2024-05-20/wdi
+      - data://garden/worldbank_wdi/2026-02-27/wdi
 
   # GBD 2023 - GBD Mental Health Burden
   data-private://grapher/ihme_gbd/2026-02-07/gbd_mental_health_burden_dalys:
@@ -242,7 +248,7 @@ steps:
       - data-private://meadow/ihme_gbd/2024-05-20/gbd_risk:
         - snapshot-private://ihme_gbd/2024-05-20/gbd_risk.feather
       - data://garden/regions/2023-01-01/regions
-      - data://garden/un/2022-07-11/un_wpp
+      - data://garden/un/2024-07-12/un_wpp
 
   # GBD 2023 - GBD Child Mortality
   data-private://grapher/ihme_gbd/2026-02-07/gbd_child_mortality:
@@ -256,6 +262,12 @@ steps:
   data-private://grapher/ihme_gbd/2026-02-11/gbd_child_mortality_leading_causes:
     - data-private://garden/ihme_gbd/2026-02-11/gbd_child_mortality_leading_causes:
       - data-private://garden/ihme_gbd/2026-02-07/gbd_cause_deaths
+
+  # IHME Global Burden of Disease - Child mortality long run (frozen 2020-12-19 vintage, still used by the Global Health explorer)
+  data://grapher/ihme_gbd/2020-12-19/child_mortality:
+    - data://garden/ihme_gbd/2020-12-19/child_mortality:
+      - data://meadow/ihme_gbd/2020-12-19/child_mortality:
+        - snapshot://ihme_gbd/2020-12-19/child_mortality.feather
 
   # GBD 2023 - GBD Health-adjusted Life Expectancy and Life Expectancy
   data-private://grapher/ihme_gbd/2026-02-07/gbd_healthy_life_expectancy:
@@ -298,7 +310,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/who/2024-07-30/ghe:
       - snapshot://who/2024-07-30/ghe.feather
-    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/un/2024-07-12/un_wpp
     - snapshot://who/2023-07-14/standard_age_distribution.csv
   data://grapher/who/2024-07-30/ghe:
     - data://garden/who/2024-07-30/ghe
@@ -1028,7 +1040,7 @@ steps:
         - snapshot://tuberculosis/2026-02-05/burden_disaggregated.csv
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2024-07-15/population
-      - data://garden/un/2022-07-11/un_wpp
+      - data://garden/un/2024-07-12/un_wpp
 
   # GBD 2023 - GBD Mental Health
   data-private://grapher/ihme_gbd/2026-02-07/gbd_mental_health:
@@ -1036,14 +1048,14 @@ steps:
       - data-private://meadow/ihme_gbd/2026-02-07/gbd_mental_health:
         - snapshot-private://ihme_gbd/2026-02-07/gbd_mental_health.feather
       - data://garden/regions/2023-01-01/regions
-      - data://garden/un/2022-07-11/un_wpp
+      - data://garden/un/2024-07-12/un_wpp
 
   # GBD 2023 - GBD Deaths
   data-private://garden/ihme_gbd/2026-02-07/gbd_cause_deaths:
     - data-private://meadow/ihme_gbd/2026-02-07/gbd_cause_deaths:
       - snapshot-private://ihme_gbd/2026-02-07/gbd_cause_deaths.feather
     - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/un/2024-07-12/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_cause_deaths:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_cause_deaths
 
@@ -1053,14 +1065,14 @@ steps:
       - data-private://meadow/ihme_gbd/2026-02-07/gbd_cause_dalys:
         - snapshot-private://ihme_gbd/2026-02-07/gbd_cause_dalys.feather
       - data://garden/regions/2023-01-01/regions
-      - data://garden/un/2022-07-11/un_wpp
+      - data://garden/un/2024-07-12/un_wpp
 
   # GBD 2023 - GBD Prevalence
   data-private://garden/ihme_gbd/2026-02-07/gbd_prevalence:
     - data-private://meadow/ihme_gbd/2026-02-07/gbd_prevalence:
       - snapshot-private://ihme_gbd/2026-02-07/gbd_prevalence.feather
     - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/un/2024-07-12/un_wpp
   data-private://grapher/ihme_gbd/2026-02-07/gbd_prevalence:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_prevalence
   data-private://grapher/ihme_gbd/2026-02-07/gbd_incidence:
@@ -1071,7 +1083,7 @@ steps:
     - data-private://meadow/ihme_gbd/2026-02-07/gbd_risk_deaths:
       - snapshot-private://ihme_gbd/2026-02-07/gbd_risk_deaths.feather
     - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/un/2024-07-12/un_wpp
   export://multidim/ihme_gbd/latest/air_pollution:
     - data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_deaths:
       - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_deaths
@@ -1082,7 +1094,7 @@ steps:
       - data-private://meadow/ihme_gbd/2026-02-07/gbd_risk_dalys:
         - snapshot-private://ihme_gbd/2026-02-07/gbd_risk_dalys.feather
       - data://garden/regions/2023-01-01/regions
-      - data://garden/un/2022-07-11/un_wpp
+      - data://garden/un/2024-07-12/un_wpp
 
   # GBD 2021 - GBD Risk Factors cancer specific
   data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_cancer:
@@ -1091,3 +1103,9 @@ steps:
         - snapshot-private://ihme_gbd/2026-02-07/gbd_risk_cancer.feather
       - data://garden/regions/2023-01-01/regions
       - data://garden/un/2024-07-12/un_wpp
+
+    # PM2.5 air pollution - WashU
+  data://grapher/washu/2026-04-22/pm25_air_pollution:
+    - data://garden/washu/2026-04-22/pm25_air_pollution:
+      - data://meadow/washu/2026-04-22/pm25_air_pollution:
+        - snapshot://washu/2026-04-22/pm25_air_pollution.csv

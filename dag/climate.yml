@@ -27,16 +27,7 @@ steps:
       - data://meadow/climate/2026-01-16/total_precipitation:
         - snapshot://climate/2026-01-16/total_precipitation.zip
         - snapshot://countries/2023-12-27/world_bank.zip
-  #
-  # Global Wildfire Information System - Monthly burned area.
-  #
-  data://grapher/climate/2024-02-19/yearly_burned_area:
-    - data://garden/climate/2024-02-19/monthly_burned_area:
-      - data://meadow/climate/2024-02-19/monthly_burned_area:
-        - snapshot://climate/2024-02-19/monthly_burned_area.zip
-      - data://garden/wb/2025-07-01/income_groups
-      - data://garden/regions/2023-01-01/regions
-  #
+
   # Global Wildfire Information System - Weekly wildfires.
   #
   data://garden/climate/latest/weekly_wildfires:
@@ -214,3 +205,12 @@ steps:
         - snapshot://climate/2026-01-14/ocean_heat_content_annual_world_700m.csv
         - snapshot://climate/2026-01-14/ocean_heat_content_monthly_world_700m.csv
     - data://garden/climate/2026-01-14/ghg_concentration
+  #
+  # Global Wildfire Information System - Yearly burned area by type.
+  #
+  data://grapher/climate/2026-04-20/yearly_burned_area:
+    - data://garden/climate/2026-04-20/yearly_burned_area:
+      - data://garden/wb/2025-07-01/income_groups
+      - data://meadow/climate/2026-04-20/yearly_burned_area:
+        - snapshot://climate/2026-04-20/yearly_burned_area.csv
+      - data://garden/regions/2023-01-01/regions

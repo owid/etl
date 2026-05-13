@@ -30,15 +30,6 @@ steps:
       - data://meadow/wb/2025-08-04/food_prices_for_nutrition:
         - snapshot://wb/2025-08-04/food_prices_for_nutrition.csv
   #
-  # Decoupling of agricultural production and land use
-  #
-  data://grapher/agriculture/2025-08-06/decoupling_food_production_and_land_use:
-    - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use:
-      - data://garden/faostat/2025-03-17/faostat_fbsc
-      - data://garden/faostat/2025-03-17/faostat_rl
-      - data://garden/regions/2023-01-01/regions
-      - data://garden/demography/2024-07-15/population
-  #
   # Lobell Lab: Crop productivity in southern Africa
   # NOTE: Not updateable.
   #
@@ -142,12 +133,39 @@ steps:
         - snapshot://usda_ers/2025-03-26/food_expenditure_in_us_archive.xlsx
       - data://meadow/usda_ers/2026-03-02/food_expenditure_in_us:
         - snapshot://usda_ers/2026-03-02/food_expenditure_in_us.xlsx
+  ######################################################################################################################
+  # TODO: The following steps are experiments; clean up once we make a decision on this. For more details:
+  # https://github.com/owid/owid-issues/issues/2057
+  #
+  # Decoupling of food supply and land use
+  #
+  #
+  # Decoupling of food supply and land use
+  #
+  data://grapher/agriculture/2026-02-20/decoupling_food_supply_and_land_use:
+    - data://garden/agriculture/2026-02-20/decoupling_food_supply_and_land_use:
+      - data://garden/faostat/2026-02-25/faostat_fbsc
+      - data://garden/faostat/2026-02-25/faostat_rl
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/demography/2024-07-15/population
+  #
+  # Decoupling of agricultural production and land use (with feed correction)
+  #
+  #
+  # Decoupling of agricultural production and land use (with feed correction)
+  #
+  data://grapher/agriculture/2026-02-25/decoupling_food_production_and_land_use:
+    - data://garden/agriculture/2026-02-25/decoupling_food_production_and_land_use:
+      - data://garden/faostat/2026-02-25/faostat_fbsc
+      - data://garden/faostat/2026-02-25/faostat_rl
+      - data://garden/regions/2023-01-01/regions
   #
   # USDA/FAS - Corn yields
   #
   #
   # USDA/FAS - Corn yields
   #
+  ######################################################################################################################
   #
   # USDA/FAS - Corn yields
   #

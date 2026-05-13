@@ -747,6 +747,20 @@ steps:
     - data://meadow/aviation/2025-04-01/air_traffic
   data://grapher/aviation/2025-04-01/air_traffic:
     - data://garden/aviation/2025-04-01/air_traffic
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2024-05-20/wdi:
+    - snapshot://worldbank_wdi/2024-05-20/wdi.zip
+
+  data://garden/worldbank_wdi/2024-05-20/wdi:
+    - data://garden/wb/2025-07-01/income_groups
+    - data://meadow/worldbank_wdi/2024-05-20/wdi
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://worldbank_wdi/2024-05-20/wdi.zip
+    - data://garden/demography/2024-07-15/population
+
+  data://grapher/worldbank_wdi/2024-05-20/wdi:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import uuid
 import warnings
 from collections import defaultdict
 from collections.abc import Generator, Iterable
@@ -422,9 +423,39 @@ class DataStep(Step):
             else:
                 raise e
 
+    def _clean_partial_output(self) -> None:
+        """Remove dest_dir if it exists without index.json.
+
+        A directory without index.json indicates a previous run was interrupted
+        mid-write (e.g. shutil.rmtree partially failed, or the process was killed
+        between mkdir and metadata.save). Reading it as a Dataset would crash, so
+        clean it up and let the step re-run from scratch.
+
+        Renames the dir aside before rmtree so the original path disappears
+        atomically — avoids leaving the path half-deleted if rmtree itself races
+        with another writer (which is what creates this state in the first place).
+        """
+        if not self._dest_dir.is_dir() or (self._dest_dir / "index.json").exists():
+            return
+
+        log.warning(
+            "step.cleanup_partial_output",
+            step=self.path,
+            path=str(self._dest_dir),
+        )
+        # Unique suffix per attempt so a leftover temp dir from an earlier
+        # partial cleanup never collides with the next attempt.
+        tmp = self._dest_dir.with_name(f".{self._dest_dir.name}.tmp.{uuid.uuid4().hex}")
+        self._dest_dir.rename(tmp)
+        shutil.rmtree(tmp, ignore_errors=True)
+
     def run(self) -> None:
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        # Self-heal partial output from a prior interrupted run before any read,
+        # otherwise _dataset_index_mtime below would crash on missing index.json.
+        self._clean_partial_output()
 
         if config.PREFER_DOWNLOAD:
             # if checksums match, download the dataset from the catalog
@@ -456,10 +487,7 @@ class DataStep(Step):
             else:
                 raise Exception(f"have no idea how to run step: {self.path}")
         except Exception:
-            # Clean up partial output so subsequent runs don't see an incomplete dataset
-            # (a directory without index.json would cause Dataset.__init__ to fail)
-            if self._dest_dir.is_dir() and not (self._dest_dir / "index.json").exists():
-                shutil.rmtree(self._dest_dir)
+            self._clean_partial_output()
             raise
 
         # was the index file modified? if not then `save` was not called

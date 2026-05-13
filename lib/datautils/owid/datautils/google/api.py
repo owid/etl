@@ -93,7 +93,7 @@ class GoogleApi:
             ValueError: If neither `url` nor `id` are provided.
         """
         if url:
-            gdown.download(url=url, output=output, fuzzy=True, quiet=quiet, **kwargs)
+            gdown.download(url=url, output=output, quiet=quiet, **kwargs)
         elif file_id:
             gdown.download(id=file_id, output=output, quiet=quiet, **kwargs)
         else:

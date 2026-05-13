@@ -46,7 +46,9 @@ Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run)
 ```
 
 **Important:**
-- **Avoid `--force`** — `etlr` has built-in change detection and only re-runs steps whose code or data changed. Use `--force` only when you need to re-run a step despite no code changes (e.g., after fixing external data). Never use `--force` alone — always pair with `--only`.
+- **Avoid `--force`** — `etlr` has built-in change detection and re-runs steps whose **code, dag entries, or data** changed. Editing a step's `.py`/`.yml` or its dag dependency line is enough to trigger a rebuild — don't add `--force`. Reserve `--force --only` for the narrow case where nothing in the repo changed but you still need to re-run (e.g., upstream data was patched out-of-band). Never use `--force` alone.
+- **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain.
+- **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code.
 - For `grapher://` steps, always add `--grapher` flag
 - Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset --private`
 
@@ -69,7 +71,7 @@ git push
 gh pr edit <number> --body "..."
 ```
 
-**Always post `@codex review` as a separate PR comment** (not in the PR description) to trigger a Codex review.
+**Post `@codex review` as a separate PR comment** (not in the PR description) when the PR is ready for a review pass. Do not repost it after every push/update unless the user asks or the changes are substantial enough to warrant a fresh review.
 
 ### Commit Message Emojis
 
@@ -90,8 +92,10 @@ Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 ### Preserving metadata/origins in steps
 
 - **No `np.where`** — strips origins. Use `tb["col"] = tb["b"]; tb.loc[mask, "col"] = tb.loc[mask, "a"]`
+- **No `pd.concat`** — strips origins. Use `pr.concat` (`from owid.catalog import processing as pr`)
 - **No `index.map()`** to pull columns from another table — loses origins. Use `tb.join(other[["col"]], how="left")`
 - **`snap.read_csv/json/excel/feather/...`** — prefer over manual file reading + `pd.DataFrame`
+- **Don't re-wrap `snap.read_csv()` output in `Table(...)`** — the Table constructor with a plain DataFrame argument drops column-level origins. Mutate the returned Table directly: `tb = snap.read_csv(); tb = tb.dropna(...)`
 - **`paths.regions.harmonize_names(tb, country_col=..., countries_file=...)`** — current harmonization API (replaces `geo.harmonize_countries`)
 - **`Table.format()`** needs both `country` and `year`. For year-less tables: `set_index("country")` + set `tb.metadata.short_name`
 - **`*.meta.yml`**: omit `dataset:` block — inherited from origin. Only define `tables:` → `variables:`

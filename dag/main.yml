@@ -31,7 +31,7 @@ steps:
   # Malnutrition
   data://grapher/malnutrition/2024-12-16/malnutrition:
     - data://garden/malnutrition/2024-12-16/malnutrition:
-      - data://garden/worldbank_wdi/2024-05-20/wdi
+      - data://garden/worldbank_wdi/2026-02-27/wdi
       - data://garden/un/2024-07-12/un_wpp
 
   #
@@ -48,7 +48,7 @@ steps:
   # Internet
   data://grapher/technology/2024-12-23/internet:
     - data://garden/technology/2024-12-23/internet:
-      - data://garden/worldbank_wdi/2024-05-20/wdi
+      - data://garden/worldbank_wdi/2026-02-27/wdi
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2025-07-01/income_groups
@@ -239,21 +239,6 @@ steps:
     - data://garden/news/2024-05-23/gdelt_v2:
       - data://meadow/news/2024-05-23/gdelt_v2:
         - snapshot://news/2024-05-23/gdelt_v2.csv
-
-  # World Development Indicators - WDI
-  # TO BE ARCHIVED
-
-  data://garden/worldbank_wdi/2024-05-20/wdi:
-    - snapshot://worldbank_wdi/2024-05-20/wdi.zip
-    - data://meadow/worldbank_wdi/2024-05-20/wdi:
-      - snapshot://worldbank_wdi/2024-05-20/wdi.zip
-    - data://garden/demography/2024-07-15/population
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
-
-  data://grapher/worldbank_wdi/2024-05-20/wdi:
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-
   # World Development Indicators - WDI
 
   data://grapher/worldbank_wdi/2025-01-24/wdi:
@@ -274,7 +259,7 @@ steps:
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_period.csv
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics.csv
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_nature.csv
-      - data://garden/worldbank_wdi/2024-05-20/wdi
+      - data://garden/worldbank_wdi/2026-02-27/wdi
 
   # Homicide - OMM
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
@@ -486,7 +471,7 @@ steps:
 
   # WHO Mort DB Homicides
   data://garden/homicide/2025-08-06/who_mort_db:
-    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/un/2024-07-12/un_wpp
     - data://meadow/homicide/2025-08-06/who_mort_db:
       - snapshot://homicide/2025-08-06/who_mort_db.csv
   data://grapher/homicide/2025-08-06/who_mort_db:
@@ -683,6 +668,13 @@ steps:
     - data://garden/aviation/2026-04-02/air_traffic:
       - data://meadow/aviation/2026-04-02/air_traffic:
         - snapshot://aviation/2026-04-02/air_traffic.csv
+
+  # Oil Spills
+
+  data://grapher/itopf/2026-05-06/oil_spills:
+    - data://garden/itopf/2026-05-06/oil_spills:
+      - data://meadow/itopf/2026-05-06/oil_spills:
+        - snapshot://itopf/2026-05-06/oil_spills.pdf
 
 include:
   - dag/open_numbers.yml

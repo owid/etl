@@ -58,10 +58,14 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/un/2024-07-12/un_wpp:
     - data://garden/un/2024-07-12/un_wpp
+  data://grapher/un/2024-07-12/un_wpp_full:
+    - data://garden/un/2024-07-12/un_wpp
   export://explorers/un/latest/un_wpp:
     - data://grapher/un/2024-07-12/un_wpp
-    - data://grapher/un/2024-07-12/un_wpp_full:
-      - data://garden/un/2024-07-12/un_wpp
+    - data://grapher/un/2024-07-12/un_wpp_full
+  export://multidim/un/latest/un_wpp:
+    - data://grapher/un/2024-07-12/un_wpp
+    - data://grapher/un/2024-07-12/un_wpp_full
 
   # UN WPP (2022)
   data://garden/un/2022-07-11/un_wpp:

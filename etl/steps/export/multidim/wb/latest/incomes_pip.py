@@ -25,6 +25,11 @@ PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences i
 POPULATION_PATH = "grapher/demography/2024-07-15/population/historical#population_historical"
 REGION_PATH = "grapher/regions/2023-01-01/regions/regions#owid_region"
 
+# Override of description_key_thr (line 245 of world_bank_pip.meta.yml) for the grouped thr+decile=all view.
+# OLD_DESCRIPTION_KEY_THR mirrors the garden text verbatim — the assertion below catches drift in the source.
+OLD_DESCRIPTION_KEY_THR = 'This data shows the income or consumption threshold for a given decile — a tenth of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
+NEW_DESCRIPTION_KEY_THR_ALL = 'This data shows the income or consumption threshold for each decile of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
+
 
 def run() -> None:
     #
@@ -233,6 +238,19 @@ def run() -> None:
             )
             view.config["matchingEntitiesOnly"] = True
 
+    # description_key_thr's "given decile" wording fits single-decile views; rewrite it for the grouped all-decile view while preserving the indicator's other bullets.
+    for view in c.views:
+        if view.matches(indicator="thr", decile="all") and view.indicators.y:
+            col_name = view.indicators.y[0].catalogPath.split("#")[-1]
+            source_description_key = list(tb[col_name].metadata.description_key) if col_name in tb.columns else []
+            assert OLD_DESCRIPTION_KEY_THR in source_description_key, (
+                f"OLD_DESCRIPTION_KEY_THR not found in {col_name}.description_key — garden text changed, update OLD_DESCRIPTION_KEY_THR/NEW_DESCRIPTION_KEY_THR_ALL."
+            )
+            view.metadata = view.metadata or {}
+            view.metadata["description_key"] = [
+                NEW_DESCRIPTION_KEY_THR_ALL if b == OLD_DESCRIPTION_KEY_THR else b for b in source_description_key
+            ]
+
     #
     # Save garden dataset.
     #
@@ -254,9 +272,9 @@ def _get_grouped_decile_subtitle(view):
     """Return subtitle for grouped decile views based on indicator type."""
     period = view.dimensions.get("period")
     subtitles = {
-        "thr": f"The level of after tax income or consumption per person per {period} below which 10%, 20%, 30%, etc. of the population falls. {PPP_ADJUSTMENT_SUBTITLE}",
-        "avg": f"The mean after tax income or consumption per person per {period} within each decile (tenth of the population). {PPP_ADJUSTMENT_SUBTITLE}",
-        "share": "The share of after tax income or consumption received by each decile (tenth of the population).",
+        "thr": f"The level of income or consumption per person per {period} below which 10%, 20%, 30%, etc. of the population falls. {PPP_ADJUSTMENT_SUBTITLE}",
+        "avg": f"The mean income or consumption per person per {period} within each decile (tenth of the population). {PPP_ADJUSTMENT_SUBTITLE}",
+        "share": "The share of income or consumption received by each decile (tenth of the population).",
     }
     return subtitles.get(view.dimensions.get("indicator"), "")
 
@@ -273,7 +291,7 @@ def _get_p10_p50_p90_subtitle(view):
     """Return subtitle for the P10/P50/P90 grouped threshold view."""
     period = view.dimensions.get("period")
     return (
-        f"The level of after tax income or consumption per person per {period} below which 10%, 50% and 90% of the population falls. "
+        f"The level of income or consumption per person per {period} below which 10%, 50% and 90% of the population falls. "
         f"{PPP_ADJUSTMENT_SUBTITLE}"
     )
 
@@ -306,5 +324,9 @@ def _get_display_name_from_metadata(ind, indicator_titles):
         start, end = text.find("("), text.find(")")
         if start != -1 and end != -1:
             extracted = text[start + 1 : end]
-            return extracted[0].upper() + extracted[1:] if extracted else extracted
+            name = extracted[0].upper() + extracted[1:] if extracted else extracted
+            # In thr views, annotate the 5th decile as the median.
+            if name and col_name.startswith("thr__") and _get_decile_number(ind) == 5:
+                name = f"{name} (median)"
+            return name
     return None

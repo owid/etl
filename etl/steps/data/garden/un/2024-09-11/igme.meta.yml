@@ -25,7 +25,7 @@ definitions:
       deaths per 100 children aged 5
       <% elif unit_of_measure == "Number of stillbirths" %>
       stillbirths
-      <% elif unit_of_measure == "Stillbirths per 100 total births" %>
+      <% elif unit_of_measure == "Stillbirths per 100 births" %>
       stillbirths per 100 total births
       <% elif unit_of_measure == "Number of deaths" %>
       deaths
@@ -149,8 +149,6 @@ tables:
         display:
           name: <<indicator>>
           numDecimalPlaces: <% if 'rate' in indicator %>2<% else %>0<%- endif -%>
-        sources:
-          - name: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2024)
         presentation:
           attribution: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2024)
           title_public: <<indicator>>

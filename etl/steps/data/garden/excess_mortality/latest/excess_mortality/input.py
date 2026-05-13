@@ -1,5 +1,5 @@
-import pandas as pd
-from owid.catalog import Dataset
+import owid.catalog.processing as pr
+from owid.catalog import Dataset, Table
 
 from etl.data_helpers.misc import check_known_columns, check_values_in_column
 
@@ -44,7 +44,7 @@ COLUMNS_IDX = [
 COLUMN_YEAR_RENAME = {col: col.replace("_", "") for col in COLUMNS_YEAR_EXPECTED}
 
 
-def build_df(ds_hmd: Dataset, ds_wmd: Dataset, ds_kobak: Dataset) -> pd.DataFrame:
+def build_df(ds_hmd: Dataset, ds_wmd: Dataset, ds_kobak: Dataset) -> Table:
     # Load estimates
     df_estimates = _build_estimates_df(ds_hmd, ds_wmd)
     # Load projections
@@ -58,39 +58,39 @@ def build_df(ds_hmd: Dataset, ds_wmd: Dataset, ds_kobak: Dataset) -> pd.DataFram
     return df
 
 
-def _build_estimates_df(ds_hmd: Dataset, ds_wmd: Dataset) -> pd.DataFrame:
+def _build_estimates_df(ds_hmd: Dataset, ds_wmd: Dataset) -> Table:
     """Some country data comes from HMD, other from WMD.
 
     We give priority to HMD data: If a country has data in both datasets, we keep the HMD data.
     """
     # Build dataframe
-    df_hmd = ds_hmd.read("hmd_stmf", reset_index=True)
-    df_hmd = df_hmd.rename(columns={"week": "time"}).assign(**{"time_unit": "weekly"})
-    df_wmd = ds_wmd.read("wmd", reset_index=True)
-    df_wmd = df_wmd[-df_wmd["entity"].isin(set(df_hmd["entity"]))]
-    df_estimates = pd.concat([df_hmd, df_wmd], ignore_index=True)
+    tb_hmd = ds_hmd.read("hmd_stmf", reset_index=True)
+    tb_hmd = tb_hmd.rename(columns={"week": "time"}).assign(**{"time_unit": "weekly"})
+    tb_wmd = ds_wmd.read("wmd", reset_index=True)
+    tb_wmd = tb_wmd[-tb_wmd["entity"].isin(set(tb_hmd["entity"]))]
+    df_estimates = pr.concat([tb_hmd, tb_wmd], ignore_index=True)
     # Run checks
     if (ds := df_estimates[COLUMNS_IDX].value_counts()).max() > 1:
         raise ValueError(f"Unexpected duplicates {ds[ds > 1]}")
-    return pd.DataFrame(df_estimates)
+    return df_estimates
 
 
-def _build_projections_df(ds_kobak: Dataset) -> pd.DataFrame:
+def _build_projections_df(ds_kobak: Dataset) -> Table:
     df_kobak = ds_kobak.read("xm_karlinsky_kobak", reset_index=True)
     df_kobak_age = ds_kobak.read("xm_karlinsky_kobak_by_age", reset_index=True)
-    df_proj = pd.concat([df_kobak, df_kobak_age], ignore_index=True)
+    df_proj = pr.concat([df_kobak, df_kobak_age], ignore_index=True)
     if (ds := df_proj[COLUMNS_IDX].value_counts()).max() > 1:
         raise ValueError(f"Unexpected duplicates {ds[ds > 1]}")
-    return pd.DataFrame(df_proj)
+    return df_proj
 
 
-def _merge_dfs(df_estimates: pd.DataFrame, df_proj: pd.DataFrame) -> pd.DataFrame:
+def _merge_dfs(df_estimates: Table, df_proj: Table) -> Table:
     # Merge estimates and projections
-    df = df_proj.merge(df_estimates, on=COLUMNS_IDX, how="outer")
+    df = pr.merge(df_proj, df_estimates, on=COLUMNS_IDX, how="outer")
     return df
 
 
-def _api_check(df: pd.DataFrame) -> None:
+def _api_check(df: Table) -> None:
     # Check columns are as expected
     check_known_columns(df, COLUMNS_EXPECTED)
     # Check values in `age`

@@ -57,7 +57,8 @@ Metadata-aware alternatives to pandas functions.
 ::: owid.catalog.core.processing
     options:
       heading_level: 3
-      filters: ["!^_"]
+      filters:
+        - "!^_"
       members_order: alphabetical
 
 Container for multiple tables with shared metadata.
@@ -65,7 +66,8 @@ Container for multiple tables with shared metadata.
 ::: owid.catalog.core.datasets
     options:
       heading_level: 3
-      filters: ["!^_"]
+      filters:
+        - "!^_"
       members_order: alphabetical
 
 
@@ -74,7 +76,8 @@ pandas DataFrame with column-level metadata.
 ::: owid.catalog.core.tables
     options:
       heading_level: 3
-      filters: ["!^_"]
+      filters:
+        - "!^_"
       members_order: alphabetical
 
 
@@ -83,25 +86,29 @@ pandas Series with metadata.
 ::: owid.catalog.core.indicators
     options:
       heading_level: 3
-      filters: ["!^_"]
+      filters:
+        - "!^_"
       members_order: alphabetical
 
 
 ::: owid.catalog.core.meta
     options:
       heading_level: 3
-      filters: ["!^_"]
+      filters:
+        - "!^_"
       members_order: alphabetical
 
 
 ::: owid.catalog.core.utils
     options:
       heading_level: 3
-      filters: ["!^_"]
+      filters:
+        - "!^_"
       members_order: alphabetical
 
 ::: owid.catalog.s3_utils
     options:
       heading_level: 3
-      filters: ["!^_"]
+      filters:
+        - "!^_"
       members_order: alphabetical

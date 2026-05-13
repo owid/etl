@@ -1,0 +1,22 @@
+dataset:
+  title: TE-5.16
+tables:
+  te_5_16:
+    variables:
+      disposable_gini:
+        title: Disposable Gini
+        unit: ''
+        description: Gini coefficients calculated on disposable income basis. (various years, 1992-2013)
+      market_gini:
+        title: Market Gini
+        unit: ''
+        description: Gini coefficients calculated on market income basis. (various years, 1992-2013)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

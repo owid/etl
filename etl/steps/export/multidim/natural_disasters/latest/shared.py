@@ -1,0 +1,325 @@
+"""Constants and helpers shared across the natural-disasters multidim exports.
+
+The three step files (`affected.py`, `deaths.py`, `economic_damages.py`) all
+share a common set of disaster-type definitions, colors, copy-paste subtitles,
+and a couple of helpers that traverse views to apply colors or assemble the
+mdim wide-form table. Keeping these in one place avoids three-way drift when
+adding or editing a disaster type.
+
+Per-export logic (indicator maps, titles, subtitles) stays in each step file
+because the wording and dimensionality genuinely differ.
+"""
+
+from collections.abc import Callable
+
+from owid.catalog import Table
+
+from etl.collection.model.view import Indicator
+
+########################################################################################################################
+# Last fully-reported year for which EM-DAT data is complete enough to display.
+# Used as the chart timeline's `maxTime` and the map's pinned `time`. The current
+# snapshot's most recent year is typically partial — showing it as "latest" on the
+# map or extending the bar chart to it would be misleading.
+#
+# When the next EM-DAT release brings a full extra year of data (e.g. all of
+# 2026 reported), bump this to that year.
+LAST_FULLY_REPORTED_YEAR = 2025
+########################################################################################################################
+
+# Disaster types to expose, in the order they appear in the dimension choices.
+DISASTER_TYPES = [
+    "drought",
+    "earthquake",
+    "volcanic_activity",
+    "flood",
+    "landslide",
+    "extreme_weather",
+    "wildfire",
+    "extreme_temperature",
+    # The following EM-DAT types are folded upstream at the garden step and so
+    # don't appear here:
+    #   - "fog": excluded entirely (only one event ever, the Great Smog of London
+    #            1952, and it's anthropogenic air pollution).
+    #   - "glacial_lake_outburst_flood": bucketed into "flood" (conventionally a
+    #            flood subtype).
+    #   - "dry_mass_movement" + "wet_mass_movement": bucketed into "landslide"
+    #            (the wet/dry split is a hydrological-trigger flag, not a hazard
+    #            distinction; "landslide" is the public-facing umbrella term).
+]
+
+# Same as DISASTER_TYPES; kept as a separate name to make group_views readable.
+INDIVIDUAL_DISASTER_TYPES = list(DISASTER_TYPES)
+
+# Disaster types stacked together for the "All disasters (excluding extreme temperatures)" view.
+DISASTER_TYPES_EXCLUDING_EXTREME_TEMPERATURE = [t for t in INDIVIDUAL_DISASTER_TYPES if t != "extreme_temperature"]
+
+# Aggregate type slugs whose views show a stacked breakdown plus a map tab pointing
+# at the matching precomputed total indicator.
+AGGREGATE_STACKED_TYPES = ("all_stacked", "all_disasters_excluding_extreme_temperature")
+
+# Map aggregate stacked type → underlying garden disaster_type slug, used to build
+# the catalog path of the precomputed total indicator shown on the map.
+AGGREGATE_TO_TOTAL_TYPE = {
+    "all_stacked": "all_disasters",
+    "all_disasters_excluding_extreme_temperature": "all_disasters_excluding_extreme_temperature",
+}
+
+# Subtitle clarification shown for individual disaster types whose scope is
+# non-obvious from the name alone. Types not listed here get no extra clarification.
+DISASTER_DESCRIPTIONS = {
+    "earthquake": "Earthquakes include the impacts of earthquake events, aftershocks, and tsunamis.",
+    "flood": (
+        "Floods include riverine, coastal, and flash floods, as well as glacial lake outburst floods "
+        "(when water held back by a glacier or moraine is suddenly released)."
+    ),
+    "landslide": (
+        "A landslide is a sudden movement of material down a slope. This includes wet mass movements "
+        "(such as mudflows triggered by heavy rain or melting snow) and dry mass movements (such as rockfalls)."
+    ),
+    "extreme_weather": (
+        "Storms include tornadoes, hailstorms, thunderstorms, sandstorms, blizzards, and extreme wind events."
+    ),
+}
+
+ALL_DISASTERS_SUBTITLE = (
+    "Disasters include events such as earthquakes, volcanoes, drought, wildfires, storms, and flooding."
+)
+
+ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE = (
+    "Disasters include events such as earthquakes, volcanoes, drought, wildfires, storms, and flooding."
+    "Extreme temperatures are not included here because their geographical and time coverage is poor, "
+    "making consistent comparisons difficult."
+)
+
+# Stable color per disaster type so the same disaster appears in the same colour
+# across views (single-series, stacked-by-type, and excluding-extreme-temperatures).
+# All values are picked from OWID's 24-color palette `OwidDistinctColors`
+# (owid-grapher: packages/@ourworldindata/grapher/src/color/CustomSchemes.ts).
+DISASTER_COLORS = {
+    "drought": "#bc8e5a",  # Camel
+    "earthquake": "#18470f",  # DarkOliveGreen
+    "volcanic_activity": "#a2559c",  # Mauve
+    "flood": "#286bbb",  # Blue
+    "landslide": "#3b8e1d",  # Lime
+    "extreme_weather": "#6d3e91",  # Purple
+    "wildfire": "#b13507",  # RustyOrange
+    "extreme_temperature": "#883039",  # Maroon
+    # "dry_mass_movement": ...
+    # "wet_mass_movement": ...
+    # "fog": ...
+    # "glacial_lake_outburst_flood": ...
+}
+
+# Human-readable phrase used in chart titles for each disaster-type choice.
+DISASTER_PHRASES = {
+    "all_disasters_excluding_extreme_temperature": "all natural disasters excluding extreme temperatures",
+    "all_stacked": "all natural disasters",
+    "drought": "droughts",
+    "earthquake": "earthquakes",
+    "volcanic_activity": "volcanoes",
+    "flood": "floods",
+    "landslide": "landslides",
+    "extreme_weather": "storms",
+    "wildfire": "wildfires",
+    "extreme_temperature": "extreme temperatures",
+    # Folded into other types upstream at the garden step (see DISASTER_TYPES).
+    # "dry_mass_movement": "dry mass movements",
+    # "wet_mass_movement": "wet mass movements",
+    # "fog": "fogs",
+    # "glacial_lake_outburst_flood": "glacial lake outburst floods",
+}
+
+# Question link rendered as "Related: <text>" at the bottom of every chart.
+# Points to the OWID page that explains EM-DAT's reporting coverage and
+# comparability limitations.
+RELATED_QUESTIONS = [
+    {
+        "text": "How complete is the data on natural disasters?",
+        "url": "https://ourworldindata.org/disaster-database-limitations",
+    }
+]
+
+COMMON_VIEW_CONFIG = {
+    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+    "chartTypes": ["StackedBar"],
+    "hasMapTab": True,
+    "tab": "chart",
+    "yAxis": {"min": 0},
+    "originUrl": "https://ourworldindata.org/natural-disasters",
+    # Default chart timeline starts at 2000, when reporting coverage becomes more complete.
+    # The slider lets users drag back further (with the footnote warning about coverage).
+    "minTime": 2000,
+    # Hard-stop on the timeline slider — users cannot navigate past this year. The
+    # current snapshot's most recent year is partial; allowing the slider to reach
+    # it would surface incomplete data. See LAST_FULLY_REPORTED_YEAR at the top.
+    "timelineMaxTime": LAST_FULLY_REPORTED_YEAR,
+    # Default endpoint of the displayed range. Same value so the chart opens on it.
+    "maxTime": LAST_FULLY_REPORTED_YEAR,
+    # Pin the map to a single year so it doesn't fall back to a "first year vs last year"
+    # comparison view when minTime/maxTime defines a range on the chart.
+    "map": {"time": LAST_FULLY_REPORTED_YEAR},
+    "relatedQuestions": RELATED_QUESTIONS,
+}
+
+STACKED_VIEW_CONFIG = {
+    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+    "chartTypes": ["StackedBar"],
+    # Map tab is enabled and shows the all-disasters total via map.columnSlug;
+    # see _add_total_indicator_for_map in each step file for how the total indicator is
+    # exposed to the map without being plotted on the stacked bar chart.
+    "hasMapTab": True,
+    "tab": "chart",
+    "yAxis": {"min": 0},
+    "originUrl": "https://ourworldindata.org/natural-disasters",
+    "minTime": 2000,
+    "timelineMaxTime": LAST_FULLY_REPORTED_YEAR,
+    "maxTime": LAST_FULLY_REPORTED_YEAR,
+    # Pin map to a single year so it doesn't fall back to a "first vs last year"
+    # comparison view when minTime/maxTime defines a range on the chart.
+    "map": {"time": LAST_FULLY_REPORTED_YEAR},
+    # Without this, a year drops out of the stack as soon as one disaster type has
+    # no reported data — even if other types had a non-zero value.
+    "missingDataStrategy": "show",
+    "relatedQuestions": RELATED_QUESTIONS,
+}
+
+# Footnote shown on every chart, flagging the limited reporting coverage in earlier decades.
+NOTE = (
+    "Based on recorded events; coverage is more limited before the year 2000. "
+    "Longer historical trends may partly reflect reporting improvements."
+)
+
+
+def disaster_type_from_path(catalog_path: str) -> str | None:
+    """Extract the disaster type slug from an indicator's catalog path. The column
+    name follows the pattern ``<prefix>_<type>_<garden_timespan>``."""
+    column = catalog_path.rsplit("#", 1)[-1]
+    padded = f"_{column}_"
+    # Sort longest first so e.g. ``extreme_temperature`` is matched before any
+    # shorter overlapping slug ever introduced.
+    for type_slug in sorted(DISASTER_COLORS, key=len, reverse=True):
+        if f"_{type_slug}_" in padded:
+            return type_slug
+    return None
+
+
+def prepare_table(
+    tb: Table,
+    garden_timespan: str,
+    mdim_timespan: str,
+    indicators: list[tuple[dict[str, str], str]],
+    extra_dimensions: list[tuple[str, str]] = (),
+) -> Table:
+    """Filter the wide grapher table to the columns we need and tag them with
+    dimension metadata so the multidim explorer can pick the right indicator.
+
+    Each entry in ``indicators`` is a ``(extra_dims, indicator_prefix)`` pair:
+    ``extra_dims`` is merged with the per-column ``{type, timespan}`` dimensions
+    (e.g. ``{"impact": "homeless", "metric": "per_capita"}``), and
+    ``indicator_prefix`` is the column-name prefix used to find the wide-form
+    column for each disaster type. The wide-form column name is built as
+    ``{prefix}_{type}_{garden_timespan}``.
+
+    ``extra_dimensions`` are ``(display_name, slug)`` entries appended to the
+    table-level dimensions list between ``Disaster type`` and ``Timespan`` —
+    e.g. ``[("Impact", "impact")]`` for the affected mdim. Pass an empty list
+    when the mdim has no dimensions beyond country/year/type/timespan/metric.
+    """
+    columns_to_keep = ["country", "year"]
+    for extra_dims, prefix in indicators:
+        for type_slug in DISASTER_TYPES:
+            col = f"{prefix}_{type_slug}_{garden_timespan}"
+            assert col in tb.columns, f"Column {col} not found in {tb.metadata.short_name}"
+            tb[col].metadata.original_short_name = "value"
+            tb[col].metadata.dimensions = {
+                "type": type_slug,
+                "timespan": mdim_timespan,
+                **extra_dims,
+            }
+            columns_to_keep.append(col)
+    tb = tb[columns_to_keep]
+    tb.metadata.dimensions = [
+        {"name": "country", "slug": "country"},
+        {"name": "year", "slug": "year"},
+        {"name": "Disaster type", "slug": "type"},
+        *[{"name": name, "slug": slug} for name, slug in extra_dimensions],
+        {"name": "Timespan", "slug": "timespan"},
+        {"name": "Metric", "slug": "metric"},
+    ]
+    return tb
+
+
+def add_total_indicator_for_map(
+    c,
+    indicator_prefix_for_view: Callable[[dict[str, str]], str],
+) -> None:
+    """Attach the all-disasters total indicator as a non-rendered "color" dimension
+    on each ``all_stacked`` view, and point ``map.columnSlug`` at it.
+
+    Why ``color``: Grapher requires ``map.columnSlug`` to reference a column that's
+    in the chart's ``dimensions`` array. For a ``StackedBar`` only ``y`` is a supported
+    rendering slot, so a dimension with ``property: color`` is silently filtered out
+    of plotting (validDimensions in GrapherState.tsx) but still satisfies the
+    columnSlug check (which uses the raw ``dimensions`` array). The data column
+    therefore loads, the bar chart still shows the type breakdown, and the map
+    renders the total. A future Grapher addition of a proper ``map`` dimension
+    property would make this trick unnecessary.
+
+    The catalog path is given in short form (``table#column``); the framework's
+    save-time ``expand_paths`` resolves it against the DAG dependencies, so the
+    dataset version is never hardcoded here.
+
+    ``indicator_prefix_for_view`` maps a view's dimension dict to the garden
+    indicator prefix for that combination of impact/metric — different per export
+    because each mdim's ``INDICATOR_BY_…`` dict has a different key shape.
+    """
+    for view in c.views:
+        type_slug = view.dimensions.get("type")
+        if type_slug not in AGGREGATE_STACKED_TYPES:
+            continue
+        garden_timespan = "yearly" if view.dimensions["timespan"] == "annual" else "decadal"
+        total_type = AGGREGATE_TO_TOTAL_TYPE[type_slug]
+        prefix = indicator_prefix_for_view(view.dimensions)
+        column = f"{prefix}_{total_type}_{garden_timespan}"
+        catalog_path = f"natural_disasters_{garden_timespan}#{column}"
+
+        view.indicators.color = Indicator(catalogPath=catalog_path)
+
+        view.config = view.config or {}
+        view.config["map"] = {**(view.config.get("map") or {}), "columnSlug": catalog_path}
+
+
+def apply_decadal_time_range(c, min_year: int = 1900) -> None:
+    """Show the full historical series by default for decadal views.
+
+    Annual views default to showing data from 2000 onwards; decadal data shows
+    the full timeline. ``min_year`` defaults to 1900 (the data start for
+    deaths/affected). For metrics that start later — e.g. economic damages as
+    a share of GDP, where pre-1960 GDP series aren't available — pass the
+    actual start year so the slider doesn't let users wander into a no-data zone.
+    """
+    for view in c.views:
+        if view.dimensions.get("timespan") != "decadal":
+            continue
+        view.config = view.config or {}
+        view.config["minTime"] = min_year
+        view.config["timelineMinTime"] = min_year
+
+
+def apply_disaster_colors(c) -> None:
+    """Set display.color on each y-indicator so the same disaster type renders in
+    the same colour across all views (single-series, stacked, etc.)."""
+    for view in c.views:
+        if view.indicators.y is None:
+            continue
+        for indicator in view.indicators.y:
+            disaster_type = disaster_type_from_path(indicator.catalogPath)
+            if disaster_type is None:
+                continue
+            color = DISASTER_COLORS.get(disaster_type)
+            if color is None:
+                continue
+            display = indicator.display or {}
+            display.setdefault("color", color)
+            indicator.display = display

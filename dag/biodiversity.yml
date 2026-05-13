@@ -64,3 +64,14 @@ steps:
     - data://garden/iucn/2026-01-05/iucn_number_each_status:
       - data://meadow/iucn/2026-01-05/iucn_number_each_status:
         - snapshot://iucn/2026-01-05/iucn_number_each_status.csv
+  #
+  # Fish stocks (RAM Legacy).
+  #
+  #
+  # Fish stocks explorer.
+  #
+  export://explorers/biodiversity/latest/fish_stocks:
+    - data://grapher/biodiversity/2024-10-30/fish_stocks:
+      - data://garden/biodiversity/2024-10-30/fish_stocks:
+        - data://meadow/biodiversity/2024-10-30/fish_stocks:
+          - snapshot://biodiversity/2024-10-30/fish_stocks.csv

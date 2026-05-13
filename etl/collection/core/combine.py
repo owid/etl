@@ -278,11 +278,24 @@ def combine_collections(
                 "Dimensions are not the same across collections. Please review that dimensions are listed in the same order, have the same slugs, names, description, etc."
             )
 
-    # Check for checkbox dimensions in the first collection
-    # TODO: Implement support for checkboxes when merging
+    # Checkbox dimensions are only safe to combine when all collections share the same
+    # definition (same slug/name/presentation AND same choice set). When they match, the
+    # merge is structurally identical to a 2-choice radio. The structural equality of
+    # everything except `choices` was already asserted above (see `dimensions_flatten`);
+    # we additionally require the choice slugs to match, since `_combine_dimensions`
+    # currently rebuilds the choice list by union and that would silently flip a checkbox
+    # into a 3+-choice widget if the sub-collections disagreed on the off/on slugs.
     for dim in collections[0].dimensions:
         if dim.ui_type == "checkbox" and is_explorer:
-            raise NotImplementedError("Checkbox dimensions are not supported yet for Explorers.")
+            ref_slugs = sorted(dim.choice_slugs)
+            for other in collections[1:]:
+                other_dim = next((d for d in other.dimensions if d.slug == dim.slug), None)
+                if other_dim is None or sorted(other_dim.choice_slugs) != ref_slugs:
+                    raise NotImplementedError(
+                        f"Checkbox dimension '{dim.slug}' has different choices across "
+                        "collections — merging is not supported. Ensure every sub-collection "
+                        "declares the same checkbox slug, choices, and `choice_slug_true`."
+                    )
 
     # Detect duplicate views + save dependencies
     seen_dims = set()
@@ -393,7 +406,12 @@ def combine_collections(
         [d.to_dict() for d in dimensions],
         cconfig.get("dimensions", []),
     )
-    cconfig["views"] = views
+    # Hand-listed YAML views (from the user's config) belong here — alongside the views
+    # accumulated from sub-collections. Sub-collection views are View instances; YAML views
+    # are dicts. `create_collection_from_config` (via Explorer.from_dict / Collection.from_dict)
+    # accepts both shapes.
+    yaml_views = cconfig.get("views") or []
+    cconfig["views"] = views + list(yaml_views)
 
     # Create the combined collection
     combined = create_collection_from_config(

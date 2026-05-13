@@ -40,12 +40,41 @@ etl pr "some title for the PR" --direct --base-branch "develop" --work-branch "t
 # Shorter
 etl pr "some title for the PR" --direct -b "develop" -w "this-temporary-branch"
 ```
+
+**Custom use case (4)**: Create the new branch in a sibling git worktree so you can keep editing your current branch in parallel.
+
+```shell
+etl pr "some title for the PR" --worktree
+# Shorter
+etl pr "some title for the PR" -t
+# With a custom path
+etl pr "some title for the PR" -t --worktree-path /tmp/etl-mybranch
+```
+
+The new working directory is printed at the end (default: `../etl-BRANCH`); `cd` into it to start working there.
+
+**Custom use case (5)**: Share the original repo's `data/` directory with the new worktree, so ETL steps don't have to recompute population, regions, etc.
+
+```shell
+etl pr "some title for the PR" -t --share-data
+```
+
+This makes the new worktree's `data/` a shortcut (symlink) to the original repo's `data/`, so both worktrees share the same ETL outputs and you don't have to recompute them. Note that data/ is a symlink to the original repo's data/, so:
+- If you run the same steps in both worktrees, they may overwrite each other's output.
+- DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. Instead, use `git worktree remove ../etl-[whatever-branch]` to remove a worktree.
+
+After the command finishes, `uv sync` has already run inside the worktree, so its `.venv/` is ready to use. With a `chpwd` hook in your `~/.zshrc` that sources `.venv/bin/activate` whenever present, `cd ../etl-BRANCH` is all that's needed — activation is automatic. Without the hook, also run `source .venv/bin/activate` after the cd. Skipping activation silently routes `etl`/`etlr` to the original repo's source code.
+
+See the docs (`Working on multiple branches in parallel`) for full details and tips.
 """
 
 import hashlib
 import os
 import re
+import shutil
+import subprocess
 import uuid
+from pathlib import Path
 from typing import cast
 
 import click
@@ -139,6 +168,25 @@ MODEL_DEFAULT = "gpt-5-mini"
     is_flag=True,
     help="We briefly use LLMs to simplify the title and use it in the branch name. Disable this by using -n flag.",
 )
+@click.option(
+    "--worktree",
+    "-t",
+    is_flag=True,
+    help="Create the new branch in a sibling git worktree (default: ../etl-BRANCH) instead of mutating the current working tree. Useful for working on multiple branches in parallel.",
+)
+@click.option(
+    "--worktree-path",
+    "worktree_path",
+    type=str,
+    default=None,
+    help="Override the worktree directory (only with --worktree). Defaults to ../etl-BRANCH.",
+)
+@click.option(
+    "--share-data",
+    "share_data",
+    is_flag=True,
+    help="Symlink the new worktree's data/ to the original repo's data/ (only with --worktree). Avoids recomputing upstream ETL steps. Don't run heavy ETL ops in both worktrees concurrently, and never `rm -rf data/` in the worktree.",
+)
 def cli(
     title: str,
     category: str | None,
@@ -148,6 +196,9 @@ def cli(
     direct: bool,
     private: bool,
     no_llm: bool,
+    worktree: bool,
+    worktree_path: str | None,
+    share_data: bool,
     # base_branch: Optional[str] = None,
 ) -> None:
     # Check that the user has set up a GitHub token.
@@ -155,6 +206,19 @@ def cli(
 
     # Validate title
     _validate_title(title)
+
+    # --worktree and --direct don't compose: --direct reuses the current branch in
+    # the current working tree, --worktree creates a new isolated working tree.
+    if worktree and direct:
+        raise click.ClickException(
+            "--worktree and --direct cannot be used together. "
+            "--direct reuses the current branch in the current working tree, "
+            "while --worktree creates a brand-new isolated working tree."
+        )
+    if worktree_path and not worktree:
+        raise click.ClickException("--worktree-path requires --worktree.")
+    if share_data and not worktree:
+        raise click.ClickException("--share-data requires --worktree.")
 
     # Get category
     category = ensure_category(category)
@@ -182,15 +246,34 @@ def cli(
     # Check branches main & work make sense!
     check_branches_valid(base_branch, work_branch, remote_branches)
 
+    resolved_worktree_path: Path | None = None
+
     # Auto PR mode: Create a new branch from the base branch.
     if not direct:
         if private:
             if not work_branch.endswith("-private"):
                 work_branch = f"{work_branch}-private"
-        branch_out(repo, base_branch, work_branch)
+        if worktree:
+            resolved_worktree_path = resolve_worktree_path(work_branch, worktree_path)
+            branch_out_worktree(repo, base_branch, work_branch, resolved_worktree_path)
+            if share_data:
+                symlink_data_dir(resolved_worktree_path)
+            # Subsequent git operations (commit, push) must run inside the worktree.
+            repo = Repo(resolved_worktree_path)
+        else:
+            branch_out(repo, base_branch, work_branch)
 
     # Create PR
     create_pr(repo, work_branch, base_branch, pr_title)
+
+    if resolved_worktree_path is not None:
+        venv_ok = install_worktree_venv(resolved_worktree_path)
+        print_worktree_hint(
+            resolved_worktree_path,
+            work_branch=work_branch,
+            shared_data=share_data,
+            venv_installed=venv_ok,
+        )
 
 
 def check_gh_token():
@@ -311,6 +394,116 @@ def branch_out(repo, base_branch, work_branch):
         repo.git.checkout("-b", work_branch)
     except GitCommandError as e:
         raise click.ClickException(f"Failed to create a new branch from '{base_branch}':\n{e}")
+
+
+def resolve_worktree_path(work_branch: str, override: str | None) -> Path:
+    """Resolve the absolute path where the new worktree should be created."""
+    if override:
+        return Path(override).expanduser().resolve()
+    return (BASE_DIR.parent / f"etl-{work_branch}").resolve()
+
+
+def branch_out_worktree(repo, base_branch: str, work_branch: str, worktree_path: Path) -> None:
+    """Create branch 'work_branch' from 'base_branch' inside a new git worktree at 'worktree_path'."""
+    if worktree_path.exists():
+        raise click.ClickException(
+            f"Worktree path '{worktree_path}' already exists. "
+            "Choose a different --worktree-path or remove the existing directory."
+        )
+    try:
+        log.info(f"Creating worktree at '{worktree_path}' with new branch '{work_branch}' from '{base_branch}'.")
+        repo.git.worktree("add", "-b", work_branch, str(worktree_path), base_branch)
+    except GitCommandError as e:
+        raise click.ClickException(f"Failed to create worktree at '{worktree_path}':\n{e}")
+
+    # Copy .env so the new worktree is immediately usable. .venv is intentionally not
+    # copied/symlinked — it's Python-version-specific and best recreated with `make check`.
+    src_env = BASE_DIR / ".env"
+    if src_env.exists():
+        shutil.copy2(src_env, worktree_path / ".env")
+        log.info(f"Copied .env to '{worktree_path / '.env'}'.")
+    else:
+        log.debug(f"No .env found at '{src_env}', skipping copy.")
+
+
+def symlink_data_dir(worktree_path: Path) -> None:
+    """Symlink the original repo's data dir into the worktree, so ETL steps reuse cached outputs."""
+    src = BASE_DIR / "data"
+    dst = worktree_path / "data"
+    if not src.exists():
+        log.warning(f"Cannot share data: '{src}' does not exist in the original repo.")
+        return
+    if dst.exists() or dst.is_symlink():
+        # `git worktree add` shouldn't have created a `data/` (it's gitignored), but be defensive.
+        log.warning(f"'{dst}' already exists, skipping data symlink.")
+        return
+    os.symlink(src, dst)
+    log.info(f"Symlinked '{dst}' -> '{src}'.")
+
+
+def install_worktree_venv(worktree_path: Path) -> bool:
+    """Run `uv sync` in the new worktree to set up its `.venv/`. Returns True on success.
+
+    This matches what the project's Makefile does for the `.venv` target — see
+    `default.mk` (`uv sync --all-extras --group dev`). Doing this automatically lets
+    the user just `cd` into the new worktree afterwards (with a chpwd hook the venv
+    activates automatically; without one, only `source .venv/bin/activate` is needed).
+    """
+    log.info(f"Installing dependencies in '{worktree_path}' (one-time, ~1 min)...")
+    try:
+        subprocess.run(
+            ["uv", "sync", "--all-extras", "--group", "dev"],
+            cwd=worktree_path,
+            check=True,
+        )
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError, KeyboardInterrupt) as e:
+        log.warning(
+            f"Could not set up the venv automatically ({e}). You'll need to run `make check` inside the worktree."
+        )
+        return False
+
+
+def print_worktree_hint(
+    worktree_path: Path,
+    work_branch: str,
+    shared_data: bool = False,
+    venv_installed: bool = False,
+) -> None:
+    """Tell the user how to land in the new worktree.
+
+    A child Python process can't change its parent shell's cwd, so we just print a
+    ready-to-paste cd line.
+    """
+    # Prefer a relative path from cwd if it's shorter than the absolute path
+    # (e.g. `../etl-foo` is friendlier than the full /Users/.../etl-foo).
+    rel_path = os.path.relpath(worktree_path)
+    display_path = rel_path if len(rel_path) < len(str(worktree_path)) else str(worktree_path)
+
+    print()
+    print(f"Worktree ready at: {worktree_path}")
+    print()
+    if venv_installed:
+        print("To start working there, just run:")
+        print(f"  cd {display_path}")
+        print()
+        print("If you have a chpwd hook in ~/.zshrc, the venv activates automatically.")
+        print("Otherwise also run: source .venv/bin/activate")
+    else:
+        print("Auto venv setup didn't complete. Inside the worktree, run:")
+        print(f"  cd {display_path}")
+        print("  make check")
+        print("  source .venv/bin/activate")
+    print()
+    print("When you're done with this worktree, clean up with:")
+    print(f"  git worktree remove {display_path}")
+    print(f"  git branch -D {work_branch}")
+    if shared_data:
+        print()
+        print("WARNING: data/ is a symlink to the original repo's data/, so:")
+        print("  - If you run the same steps in both worktrees, they may overwrite each other's output.")
+        print("  - DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. ")
+        print("    Instead, use `git worktree remove ../etl-[whatever-branch]` to remove a worktree.")
 
 
 def create_pr(repo, work_branch, base_branch, pr_title):

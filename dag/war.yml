@@ -50,6 +50,7 @@ steps:
         - data://garden/countries/2024-08-27/gleditsch
         - data://meadow/war/latest/ucdp_ced:
           - snapshot://war/latest/ucdp_ced_v25_01_25_12.csv
+          - snapshot://war/latest/ucdp_ced_v26_01_26_03.csv
 
   # PRIO v3.1
   data://garden/war/2023-09-21/prio_v31:
@@ -173,3 +174,7 @@ steps:
     - data://garden/war/2025-05-15/nuclear_weapons_inventories:
       - data://meadow/war/2025-05-15/nuclear_weapons_inventories:
         - snapshot://war/2025-05-15/nuclear_weapons_inventories.csv
+
+  # Countries in Conflict explorer.
+  export://explorers/war/latest/countries_in_conflict_data:
+    - data://grapher/war/2025-06-13/ucdp

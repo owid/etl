@@ -41,3 +41,62 @@ You can find an example [:fontawesome-brands-github: here](https://github.com/ow
     <img src="../../assets/pr-2.png" alt="Chart Upgrader" style="width:100%;">
     <figcaption>[GitHub action comment](https://github.com/owid/etl/pull/3563#issuecomment-2485414940), as of 19th November 2024</figcaption>
 </figure>
+
+## Working on multiple branches in parallel
+
+If you need several PRs in flight at once (e.g. several agent sessions, one per branch), `etl pr --worktree` creates the new branch in a separate **git worktree** so your current working tree is untouched:
+
+```bash
+etl pr "Update some dataset" data --worktree
+```
+
+The command creates the worktree at `../etl-<branch>` and runs `uv sync` inside it, so the worktree's `.venv/` is ready to use by the time the command finishes. To start working there:
+
+```bash
+cd ../etl-<branch>
+```
+
+Otherwise also run `source .venv/bin/activate`. Or, even better, set up auto-activation once (see below) — then `cd` alone is enough.
+
+When you're done with the worktree (typically after the PR is merged), clean up:
+
+```bash
+git worktree remove ../etl-<branch>
+git branch -D <branch>
+```
+
+### Optional: auto-activate the venv when you `cd`
+
+Add this snippet to your `~/.zshrc` so the right `.venv/` activates automatically every time you `cd` into a worktree (or any project folder with a `.venv/`):
+
+```zsh
+autoload -U add-zsh-hook
+load-py-venv() {
+    if [ -f .venv/bin/activate ]; then
+        source .venv/bin/activate
+    elif [ -f env/bin/activate ]; then
+        source env/bin/activate
+    elif [ -f venv/bin/activate ]; then
+        source venv/bin/activate
+    elif [ ! -z "$VIRTUAL_ENV" ] && [ -f poetry.toml -o -f requirements.txt ]; then
+        deactivate
+    fi
+}
+add-zsh-hook chpwd load-py-venv
+load-py-venv
+```
+
+After reloading your shell (`source ~/.zshrc` or open a new terminal), you can `cd` between worktrees and the matching venv will activate on its own.
+
+Tip: open each worktree in its own VS Code window (`File > New Window`). The Claude Code extension is scoped per workspace, so each window gets its own chat.
+
+### Sharing the data folder (optional)
+
+`--share-data` symlinks the new worktree's `data/` to the original's, so upstream ETL steps don't get recomputed:
+
+```bash
+etl pr "Update dataset" data --worktree --share-data
+```
+
+!!! warning
+    Never run `rm -rf data/` in a shared worktree — the trailing slash makes `rm` follow the symlink and wipe the **original** `data/`. Use `git worktree remove ../etl-<branch>` to clean up instead.

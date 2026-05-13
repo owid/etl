@@ -60,34 +60,6 @@ steps:
   export://multidim/emissions/latest/air_pollution:
     - data://grapher/emissions/2025-02-12/ceds_air_pollutants
   #
-  # RFF - Emissions-weighted Carbon Price.
-  #
-  #
-  # RFF - Emissions-weighted Carbon Price.
-  #
-  #
-  # RFF - Emissions-weighted Carbon Price.
-  #
-  data://grapher/rff/2025-06-02/emissions_weighted_carbon_price:
-    - data://garden/rff/2025-06-02/emissions_weighted_carbon_price:
-      - data://meadow/rff/2025-06-02/emissions_weighted_carbon_price:
-        - snapshot://rff/2025-06-02/emissions_weighted_carbon_price.zip
-  #
-  # RFF - World Carbon Pricing.
-  #
-  #
-  # RFF - World Carbon Pricing.
-  #
-  # The following step loads the EWC snapshot simply to get the IPCC codes.
-  #
-  # RFF - World Carbon Pricing.
-  #
-  data://grapher/rff/2025-06-02/world_carbon_pricing:
-    - data://garden/rff/2025-06-02/world_carbon_pricing:
-      - data://meadow/rff/2025-06-02/world_carbon_pricing:
-        - snapshot://rff/2025-06-02/world_carbon_pricing.zip
-        - snapshot://rff/2025-06-02/emissions_weighted_carbon_price.zip
-  #
   # Emissions - Greenhouse gas emissions by custom sector.
   #
   #
@@ -107,7 +79,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
     - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/energy/2025-06-27/primary_energy_consumption
+    - data://garden/energy/2026-05-05/primary_energy_consumption
     - data://meadow/gcp/2025-11-13/global_carbon_budget:
       - snapshot://gcp/2025-11-13/global_carbon_budget_fossil_co2_emissions.csv
       - snapshot://gcp/2025-11-13/global_carbon_budget_land_use_change_emissions.xlsx
@@ -161,7 +133,7 @@ steps:
   data://garden/emissions/2025-12-04/owid_co2:
     - data://garden/regions/2023-01-01/regions
     - data://garden/emissions/2025-12-04/national_contributions
-    - data://garden/energy/2025-06-27/primary_energy_consumption
+    - data://garden/energy/2026-05-05/primary_energy_consumption
     - data://garden/gcp/2025-11-13/global_carbon_budget
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population
@@ -208,7 +180,7 @@ steps:
   data://grapher/emissions/2026-02-11/emissions_by_custom_sector:
     - data://garden/emissions/2026-02-11/emissions_by_custom_sector:
       - data://garden/climate_watch/2026-02-10/emissions_by_sector
-      - data://garden/ember/2026-01-26/yearly_electricity
+      - data://garden/ember/2026-04-24/yearly_electricity
   #
   # Emissions - Greenhouse gas emissions by custom sector (alternative version).
   #
@@ -219,3 +191,32 @@ steps:
     - data://garden/emissions/2026-03-04/emissions_by_custom_sector:
       - data://garden/climate_watch/2026-02-10/emissions_by_sector
       - data://garden/un/2026-02-11/energy_statistics_database
+  #
+  # RFF - World Carbon Pricing.
+  #
+  #
+  # RFF - World Carbon Pricing.
+  #
+  # The IPCC codes lookup is loaded from a dedicated snapshot pinned to an old commit of the ECP
+  # repo, since the file was removed from upstream during the 2026 restructure.
+  #
+  # RFF - World Carbon Pricing.
+  #
+  data://grapher/rff/2026-05-08/world_carbon_pricing:
+    - data://garden/rff/2026-05-08/world_carbon_pricing:
+      - data://meadow/rff/2026-05-08/world_carbon_pricing:
+        - snapshot://rff/2026-05-08/world_carbon_pricing.zip
+        - snapshot://rff/2026-05-08/ipcc_codes.csv
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  data://grapher/rff/2026-05-08/emissions_weighted_carbon_price:
+    - data://garden/rff/2026-05-08/emissions_weighted_carbon_price:
+      - data://meadow/rff/2026-05-08/emissions_weighted_carbon_price:
+        - snapshot://rff/2026-05-08/emissions_weighted_carbon_price.zip
