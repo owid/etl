@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5101
-    date_accessed: 2023-08-10 08:29:37.546543
+    url: https://admin.owid.io/admin/datasets/5101
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5101_figure_17_1a
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 626dfcccc62544a40f112e823b87a3ad
-  size: 2589
-  path: dataset_5101_figure_17_1a_config.json
+  - md5: e3ff1a465d84ca83afe843eb0e094ebc
+    size: 2812
+    path: dataset_5101_figure_17_1a_config.json

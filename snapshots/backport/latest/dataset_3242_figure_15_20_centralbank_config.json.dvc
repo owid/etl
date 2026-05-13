@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3242
-    date_accessed: 2023-08-10 07:44:39.671799
+    url: https://admin.owid.io/admin/datasets/3242
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3242_figure_15_20_centralbank
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e43f0b63288a3c70dcb7c40bfd043da8
-  size: 1940
-  path: dataset_3242_figure_15_20_centralbank_config.json
+  - md5: 5daebc8f2e91b7158d2a8592d242c782
+    size: 2070
+    path: dataset_3242_figure_15_20_centralbank_config.json

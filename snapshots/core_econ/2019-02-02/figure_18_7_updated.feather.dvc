@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: World Bank
+    title: Data on trade and import barriers
+    citation_full: The World Bank. 2018. 'Data on Trade and Import Barriers.'
+    url_main: https://data.worldbank.org/indicator/TM.TAX.MRCH.SM.AR.ZS?locations=XM-XD-XO
+    date_accessed: '2019-02-02'
+    date_published: '2018'
+  is_public: false
+outs:
+  - md5: 4ce385c9164dcee8358bdc0c3ad72db8
+    size: 3906
+    path: figure_18_7_updated.feather

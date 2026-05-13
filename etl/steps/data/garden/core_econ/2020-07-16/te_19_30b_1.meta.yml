@@ -1,0 +1,20 @@
+dataset:
+  title: TE-19.30b_1
+tables:
+  te_19_30b_1:
+    variables:
+      annual_average_gdp_per_capita_growth__1980_2016:
+        title: Annual average GDP per capita growth, 1980-2016
+        unit: '%'
+      gini_of_disposable_income__mid_2000s:
+        title: Gini of disposable income, mid-2000s
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

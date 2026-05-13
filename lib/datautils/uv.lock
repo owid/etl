@@ -8,6 +8,10 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
+[options]
+exclude-newer = "2026-05-10T06:30:23.634374Z"
+exclude-newer-span = "P3D"
+
 [[package]]
 name = "alabaster"
 version = "0.7.16"

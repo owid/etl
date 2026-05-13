@@ -1,21 +1,14 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
-from owid.catalog import Dataset, Table, VariableMeta
-from structlog import get_logger
+from owid.catalog import Table
 
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
-log = get_logger()
-
-# Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-# Source provides the field `measure` which describes what the `variable` is measuring.
-# Based on its value, we define the value for the `unit` and, together with the `variable` name, we create the variable full name.
-# Note that the same `variable` value can have multiple `measures`.
+# Each `measure` value implies a unit and a human-readable title suffix.
+# Multiple `measures` per `variable` are possible — we generate one column per (variable, measure).
 MAPPING_MEASURE = {
     "% of total sales": {"unit": "%", "title": "Sales: % of total sales"},
     "% share of generics (value)": {"unit": "%", "title": "Market: % share of generics (value)"},
@@ -41,77 +34,44 @@ MAPPING_MEASURE = {
 }
 
 
-def run(dest_dir: str) -> None:
-    log.info("health_pharma_market: start")
+def run() -> None:
+    ds_meadow = paths.load_dataset("health_pharma_market")
+    tb = ds_meadow.read("health_pharma_market")
 
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("health_pharma_market")
+    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
 
-    # Read table from meadow dataset.
-    tb_meadow = ds_meadow["health_pharma_market"]
+    # Pivot so each (variable, measure) pair gets its own column. The resulting Table
+    # carries origins on the value-derived columns (pivot preserves column metadata).
+    tb = tb.pivot(index=["country", "year"], columns=["variable", "measure"], values="value")
 
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow)
+    tb = _apply_variable_metadata(tb)
+    tb = tb.reset_index()
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
 
-    #
-    # Process data.
-    #
-    # Harmonize country names
-    log.info("health_pharma_market: harmonize_countries")
-    df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
-
-    # Pivot (each variable has its own column)
-    # This is done so that we can customize the metadata for each variable.
-    log.info("health_pharma_market: pivot data")
-    df = df.pivot(index=["country", "year"], columns=["variable", "measure"], values="value")
-
-    # Create a new table with the processed data.
-    tb_garden = Table(df, short_name=paths.short_name)
-    # Add metadata to the variables in the table
-    log.info("health_pharma_market: add variable metadata")
-    tb_garden = add_variable_metadata(tb_garden)
-
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    log.info("health_pharma_market: create dataset")
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
     ds_garden.update_metadata(paths.metadata_path)
-    # Save changes in the new garden dataset.
     ds_garden.save()
-    log.info("health_pharma_market: end")
 
 
-def add_variable_metadata(tb: Table) -> Table:
-    """Add metadata to each variable (column) in the table.
-
-    Only metadata added is the strictly necessary:
-        - Title
-        - Unit
-
-    Both of these fields are created using MAPPING_MEASURE.
-
-    Expected format of `tb` is a table with two-level columns. Top level contains the variable name, lower level contains the measure.
-    """
-    # Build variable metadata
-    variable_metadata = []
+def _apply_variable_metadata(tb: Table) -> Table:
+    """Set title/unit per (variable, measure) column; preserve origins from pivot."""
+    new_names = {}
     for col in tb.columns:
-        # If necessary, add description to variable metadata
+        # `col` is a (variable, measure) tuple from the pivot.
+        variable, measure = col
+        new_name = f"{variable} ({MAPPING_MEASURE[measure]['title']})"
+        new_names[col] = new_name
 
-        # Bake variable metadata
-        variable_metadata.append(
-            VariableMeta(
-                title=f"{col[0]} ({MAPPING_MEASURE[col[1]]['title']})",
-                unit=MAPPING_MEASURE[col[1]]["unit"],
-            )
-        )
-    # Rename column names
-    tb.columns = [f"{col[0]} ({MAPPING_MEASURE[col[1]]['title']})" for col in tb.columns]
-    # Assign metadata to columns
-    for col, metadata in zip(tb.columns, variable_metadata):
-        tb[col].metadata = metadata
+    # Rename columns from MultiIndex tuples to flat strings.
+    tb.columns = [new_names[c] for c in tb.columns]
+
+    # Set title/unit on each renamed column without dropping its origins.
+    for col in tb.columns:
+        # The column's measure name lives in the title we just constructed.
+        # Recover (variable, measure) by reverse-lookup from new_names.
+        variable_measure = next(k for k, v in new_names.items() if v == col)
+        _, measure = variable_measure
+        tb[col].metadata.title = col
+        tb[col].metadata.unit = MAPPING_MEASURE[measure]["unit"]
+
     return tb
