@@ -8,6 +8,7 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -30,25 +31,22 @@ def run(dest_dir: str) -> None:
     ds_meadow: Dataset = paths.load_dependency("fluid")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow["fluid"]
-
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow)
+    tb = ds_meadow["fluid"].reset_index(drop=True)
 
     #
     # Process data.
     #
     log.info("fluid.harmonize_countries")
-    df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
     # Subset the data
-    df = subset_and_clean_data(df)
+    tb = subset_and_clean_data(tb)
 
     # Check for and remove duplicate rows (some countries have duplicate 'All' age group entries)
     # First verify duplicates are truly identical across all columns
-    dupes = df[df.duplicated(subset=["country", "date", "hemisphere"], keep=False)]
+    dupes = tb[tb.duplicated(subset=["country", "date", "hemisphere"], keep=False)]
     if len(dupes) > 0:
         log.warning(f"Found {len(dupes)} duplicate rows on [country, date, hemisphere], verifying they are identical")
         # Check that duplicates are truly identical (not just on key columns)
@@ -60,17 +58,16 @@ def run(dest_dir: str) -> None:
                         f"Duplicate rows for {country} on {date} have different values - investigate before dropping"
                     )
                 log.warning(f"Removing {len(group) - 1} duplicate row(s) for {country} on {date}")
-        df = df.drop_duplicates(subset=["country", "date", "hemisphere"], keep="first")
+        tb = tb.drop_duplicates(subset=["country", "date", "hemisphere"], keep="first")
 
-    df = rename_fluid(df)
+    tb = rename_fluid(tb)
     # Remove years with fewer than 10 datapoints
-    df = remove_sparse_years(df, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
+    tb = remove_sparse_years(tb, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
 
-    df = calculate_patient_rates(df)
+    tb = calculate_patient_rates(tb)
 
-    df = df.reset_index(drop=True)
-    # Create a new table with the processed data.
-    tb_garden = Table(df, short_name=paths.short_name)
+    tb_garden = tb.reset_index(drop=True)
+    tb_garden.metadata.short_name = paths.short_name
     #
     # Save outputs.
     #
@@ -89,7 +86,7 @@ def clean_sari_inpatient(df: pd.DataFrame) -> pd.DataFrame:
     """
     remove_inpatients = (df["sari_case"] > df["sari_inpatients"]).sum()
     log.info(f"Removing {remove_inpatients} rows where the number of inpatients is below the number of SARI cases...")
-    df["sari_inpatients"][(df["sari_case"] > df["sari_inpatients"])] = np.nan
+    df.loc[(df["sari_case"] > df["sari_inpatients"]), "sari_inpatients"] = np.nan
 
     return df
 
@@ -103,7 +100,8 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     * Drop rows where reported cases = 0
     """
     df = df[df["agegroup_code"] == "All"]
-    df["date"] = pd.to_datetime(df["iso_weekstartdate"], format="%Y-%m-%d", utc=True).dt.date.astype(str)
+    df["date"] = pr.to_datetime(df["iso_weekstartdate"], format="%Y-%m-%d", utc=True).dt.date.astype(str)
+    df["date"] = df["date"].copy_metadata(df["iso_weekstartdate"])
 
     df = df.drop(
         columns=[
@@ -256,7 +254,8 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
     For the current year then if all the values are 0 or NA then we remove all values for the year so far
     """
 
-    df["year"] = pd.to_datetime(df["date"]).dt.year
+    df["year"] = pr.to_datetime(df["date"]).dt.year
+    df["year"] = df["year"].copy_metadata(df["date"])
     constant_cols = [
         "country",
         "date",
@@ -267,11 +266,13 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
     current_year = datetime.today().year
     for col in cols:
         df_col = df.loc[:, ["country", "year", col]]
-        df_col[col] = pd.to_numeric(df_col[col])
+        df_col[col] = pr.to_numeric(df_col[col])
         df_col_bool = (
-            df_col.groupby(["country", "year"]).agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum())).reset_index()
+            df_col.groupby(["country", "year"], observed=True)
+            .agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum()))
+            .reset_index()
         )
-        df = pd.merge(df, df_col_bool, on=["country", "year"])
+        df = pr.merge(df, df_col_bool, on=["country", "year"])
 
         df_current = df[df["year"] == current_year]
         # Dropping rows if all the weeks data from this year are 0 or NA
@@ -287,8 +288,8 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
             col,
         ] = np.nan
 
-        df = pd.concat([df_current, df_hist])
-        df[col] = pd.to_numeric(df[col])
+        df = pr.concat([df_current, df_hist])
+        df[col] = pr.to_numeric(df[col])
         df = df.drop(columns=["weeks_gt_zero"])
 
     return df

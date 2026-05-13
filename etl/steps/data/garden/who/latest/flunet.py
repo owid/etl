@@ -5,7 +5,7 @@ Check out this issue with the refactoring plan on next update https://github.com
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import processing as pr
 from owid.catalog.core.datasets import NULLABLE_DTYPES
 from structlog import get_logger
 
@@ -32,33 +32,31 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("flunet")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow["flunet"]
+    tb = ds_meadow["flunet"].reset_index(drop=True)
 
     # Convert nullable types to float64, otherwise we risk pd.NA and np.nan being mixed up.
-    float64_cols = [col for col, dtype in tb_meadow.dtypes.items() if dtype in NULLABLE_DTYPES]
-    tb_meadow[float64_cols] = tb_meadow[float64_cols].astype(float)
-
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow)
+    float64_cols = [col for col, dtype in tb.dtypes.items() if dtype in NULLABLE_DTYPES]
+    tb[float64_cols] = tb[float64_cols].astype(float)
 
     #
     # Process data.
     #
     log.info("flunet.harmonize_countries")
-    df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
-    df = clean_and_format_data(df)
-    df = split_by_surveillance_type(df)
+    tb = clean_and_format_data(tb)
+    tb = split_by_surveillance_type(tb)
 
-    df = calculate_percent_positive(df, surveillance_cols=["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"])
-    df = create_united_kingdom_aggregate(df)
-    df = remove_sparse_years(df, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
-    df = df.reset_index(drop=True)
-    cols_check = df.columns.drop(["country", "hemisphere", "date", "year"])
-    df[cols_check] = df[cols_check].dropna(axis="rows", how="all")
-    tb_garden = Table(df, short_name=paths.short_name).reset_index(drop=True)
+    tb = calculate_percent_positive(tb, surveillance_cols=["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"])
+    tb = create_united_kingdom_aggregate(tb)
+    tb = remove_sparse_years(tb, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
+    tb = tb.reset_index(drop=True)
+    cols_check = tb.columns.drop(["country", "hemisphere", "date", "year"])
+    tb[cols_check] = tb[cols_check].dropna(axis="rows", how="all")
+    tb_garden = tb.reset_index(drop=True)
+    tb_garden.metadata.short_name = paths.short_name
     #
     # Save outputs.
     #
@@ -76,7 +74,9 @@ def remove_nan_dates(df: pd.DataFrame) -> pd.DataFrame:
     if ix.any():
         log.warning(f"Removing {ix.sum()} rows with invalid date format")
     df = df[~ix]
+    date_meta = df["date"].metadata
     df["date"] = df["date"].dt.date.astype(str)
+    df["date"].metadata = date_meta
     return df
 
 
@@ -160,7 +160,7 @@ def create_date_from_iso_week(date_iso: pd.Series) -> pd.Series:
     """
     Convert iso week to date format
     """
-    return pd.to_datetime(date_iso, format="%Y-%m-%d", utc=True, errors="coerce")
+    return pr.to_datetime(date_iso, format="%Y-%m-%d", utc=True, errors="coerce")
 
 
 def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -283,6 +283,6 @@ def create_united_kingdom_aggregate(df: pd.DataFrame) -> pd.DataFrame:
         df=uk_agg, surveillance_cols=["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"]
     )
 
-    df = pd.concat([df, uk_agg])
+    df = pr.concat([df, uk_agg])
 
     return df
