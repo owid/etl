@@ -6,13 +6,7 @@ tables:
       gdp_per_capita__1990_dollar:
         title: GDP per capita (1990 $)
         unit: $
-        description: 'Units of measurement: 1990 international dollars'
-        sources:
-          - name: The 2015 Total Economy Database
-            description: Missing observations for East Germany has been obtained by linear interpolation between 1950 and
-              1960.
-            url: https://www.conference-board.org/data/economydatabase/index.cfm?id=27762
-            published_by: 'The Conference Board: ‘The 2015 Total Economy Database’'
+        description_short: 'Units of measurement: 1990 international dollars'
     dimensions:
       - name: year
         slug: year

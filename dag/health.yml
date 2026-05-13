@@ -342,6 +342,14 @@ steps:
   data-private://grapher/ihme_gbd/2026-02-11/gbd_child_mortality_leading_causes:
     - data-private://garden/ihme_gbd/2026-02-11/gbd_child_mortality_leading_causes
 
+  # IHME Global Burden of Disease - Child mortality long run (frozen 2020-12-19 vintage, still used by the Global Health explorer)
+  data://meadow/ihme_gbd/2020-12-19/child_mortality:
+    - snapshot://ihme_gbd/2020-12-19/child_mortality.feather
+  data://garden/ihme_gbd/2020-12-19/child_mortality:
+    - data://meadow/ihme_gbd/2020-12-19/child_mortality
+  data://grapher/ihme_gbd/2020-12-19/child_mortality:
+    - data://garden/ihme_gbd/2020-12-19/child_mortality
+
   # GBD 2023 - GBD Health-adjusted Life Expectancy and Life Expectancy
   data-private://meadow/ihme_gbd/2026-02-07/gbd_life_expectancy:
     - snapshot-private://ihme_gbd/2026-02-07/gbd_life_expectancy.zip
