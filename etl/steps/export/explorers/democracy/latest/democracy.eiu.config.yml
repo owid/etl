@@ -7,6 +7,18 @@
 
 definitions:
   group_subtitle: &group_subtitle "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
+  display_aut: &display_aut
+    name: "Authoritarian regimes"
+    color: "#f88a50"
+  display_hyb: &display_hyb
+    name: "Hybrid regimes"
+    color: "#feeea5"
+  display_flw: &display_flw
+    name: "Flawed democracies"
+    color: "#c7e7f1"
+  display_dem: &display_dem
+    name: "Full democracies"
+    color: "#5e94c4"
 
 config:
   explorerTitle: "Democracy"
@@ -94,24 +106,17 @@ views:
     indicators:
       y:
         - catalogPath: eiu/num_countries#num_regime_eiu__category_authoritarian_regime
-          display:
-            name: "Authoritarian regimes"
-            color: "#f88a50"
+          display: *display_aut
         - catalogPath: eiu/num_countries#num_regime_eiu__category_hybrid_regime
-          display:
-            name: "Hybrid regimes"
-            color: "#feeea5"
+          display: *display_hyb
         - catalogPath: eiu/num_countries#num_regime_eiu__category_flawed_democracy
-          display:
-            name: "Flawed democracies"
-            color: "#c7e7f1"
+          display: *display_flw
         - catalogPath: eiu/num_countries#num_regime_eiu__category_full_democracy
-          display:
-            name: "Full democracies"
-            color: "#5e94c4"
+          display: *display_dem
     config:
       title: "Countries that are democracies and non-democracies"
       subtitle: *group_subtitle
+      type: "StackedArea StackedDiscreteBar"
       stackMode: "relative"
       yAxis:
         min: 0
@@ -126,23 +131,16 @@ views:
             name: "No regime data"
             color: "#555555"
         - catalogPath: eiu/num_people#pop_regime_eiu__category_authoritarian_regime
-          display:
-            name: "People living in authoritarian regimes"
-            color: "#f88a50"
+          display: *display_aut
         - catalogPath: eiu/num_people#pop_regime_eiu__category_hybrid_regime
-          display:
-            name: "People living in hybrid regimes"
-            color: "#feeea5"
+          display: *display_hyb
         - catalogPath: eiu/num_people#pop_regime_eiu__category_flawed_democracy
-          display:
-            name: "People living in flawed democracies"
-            color: "#c7e7f1"
+          display: *display_flw
         - catalogPath: eiu/num_people#pop_regime_eiu__category_full_democracy
-          display:
-            name: "People living in full democracies"
-            color: "#5e94c4"
+          display: *display_dem
     config:
       title: "People living in democracies and non-democracies"
       subtitle: *group_subtitle
+      type: "StackedArea StackedDiscreteBar"
       yAxis:
         facetDomain: "independent"
