@@ -200,7 +200,7 @@ tables:
     variables:
       n_countries_yes:
         title: |-
-          Number of countries with full implementation — {definitions.status_title}
+          {definitions.status_title} — Full implementation (number of countries)
         description_short: |-
           The number of countries in the region with full implementation (policy score equal to 1) of: {definitions.status_title}.
         description_key:
@@ -217,7 +217,7 @@ tables:
           tolerance: 0
       n_countries_no:
         title: |-
-          Number of countries without full implementation — {definitions.status_title}
+          {definitions.status_title} — No or partial implementation (number of countries)
         description_short: |-
           The number of countries in the region without full implementation (policy score below 1) of: {definitions.status_title}.
         description_key:
@@ -234,7 +234,7 @@ tables:
           tolerance: 0
       pop_yes:
         title: |-
-          Population in countries with full implementation — {definitions.status_title}
+          {definitions.status_title} — Full implementation (population)
         description_short: |-
           Total population of countries in the region with full implementation (policy score equal to 1) of: {definitions.status_title}.
         description_key:
@@ -251,7 +251,7 @@ tables:
           tolerance: 0
       pop_no:
         title: |-
-          Population in countries without full implementation — {definitions.status_title}
+          {definitions.status_title} — No or partial implementation (population)
         description_short: |-
           Total population of countries in the region without full implementation (policy score below 1) of: {definitions.status_title}.
         description_key:
