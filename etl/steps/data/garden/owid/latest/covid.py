@@ -13,6 +13,7 @@ MEGAFILE_URL = "https://raw.githubusercontent.com/owid/covid-19-data/master/publ
 
 def run(dest_dir: str) -> None:
     d = create_dataset(dest_dir)
+    origin = make_origin()
 
     df = pd.read_csv(MEGAFILE_URL)
 
@@ -25,7 +26,25 @@ def run(dest_dir: str) -> None:
 
     t = Table(df)
     t.metadata.short_name = "covid"
+    for col in t.columns:
+        t[col].metadata.origins = [origin]
     d.add(t)
+
+
+def make_origin() -> Origin:
+    return Origin(
+        producer="Multiple sources via Our World In Data",
+        title="COVID-19 dataset",
+        description="Our complete COVID-19 dataset maintained by Our World in Data. We will update it daily throughout the duration of the COVID-19 pandemic.",
+        attribution_short="OWID",
+        url_main="https://github.com/owid/covid-19-data/tree/master/public/data",
+        url_download=MEGAFILE_URL,
+        date_accessed=str(dt.date.today()),
+        license=License(
+            name="Other (Attribution)",
+            url="https://github.com/owid/covid-19-data/tree/master/public/data#license",
+        ),
+    )
 
 
 def create_dataset(dest_dir: str) -> Dataset:
@@ -33,21 +52,5 @@ def create_dataset(dest_dir: str) -> Dataset:
     d.metadata.version = "latest"
     d.metadata.short_name = "covid"
     d.metadata.namespace = "owid"
-    d.metadata.origins = [
-        Origin(
-            producer="Various sources",
-            title="COVID-19 dataset",
-            description="Our complete COVID-19 dataset maintained by Our World in Data. We will update it daily throughout the duration of the COVID-19 pandemic.",
-            attribution_short="OWID",
-            url_main="https://github.com/owid/covid-19-data/tree/master/public/data",
-            url_download=MEGAFILE_URL,
-            date_accessed=str(dt.date.today()),
-            date_published="latest",
-            license=License(
-                name="Other (Attribution)",
-                url="https://github.com/owid/covid-19-data/tree/master/public/data#license",
-            ),
-        )
-    ]
     d.save()
     return d

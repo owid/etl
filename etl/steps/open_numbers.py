@@ -47,25 +47,24 @@ def run(dest_dir: str) -> None:
     ds.metadata.namespace = "open_numbers"
     ds.metadata.short_name = short_name
     ds.metadata.title = package.title or None
-    ds.metadata.origins = [
-        Origin(
-            producer="Open Numbers",
-            title=package.title or short_name,
-            url_main=repo.github_url,
-            date_accessed=str(dt.date.today()),
-        )
-    ]
 
     if package.description and package.title != package.description:
         ds.metadata.description = package.description
     ds.save()
+
+    origin = Origin(
+        producer="Open Numbers",
+        title=package.title or short_name,
+        url_main=repo.github_url,
+        date_accessed=str(dt.date.today()),
+    )
 
     # name remapping
     resource_map = remap_names(package.resources)
 
     # copy tables one by one
     with ThreadPoolExecutor() as executor:
-        args = [(ds, repo, short_name, resources) for short_name, resources in resource_map.items()]
+        args = [(ds, repo, short_name, resources, origin) for short_name, resources in resource_map.items()]
         executor.map(lambda p: add_resource(*p), args)
 
 
@@ -74,6 +73,7 @@ def add_resource(
     repo: GithubRepo,
     short_name: str,
     resources: list[frictionless.Resource],
+    origin: Origin,
 ) -> None:
     print(f"- {short_name}")
     try:
@@ -92,6 +92,9 @@ def add_resource(
 
     # adapt the table name and its column names to our naming convention
     t = utils.underscore_table(t)
+
+    for col in t.columns:
+        t[col].metadata.origins = [origin]
 
     # we've already repacked the data
     ds.add(t, repack=False)
