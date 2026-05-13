@@ -1,26 +1,19 @@
 steps:
   # Transcriptions
   data://garden/war/2023-01-18/bouthoul_carrere_1978:
-    - data://meadow/war/2023-01-10/bouthoul_carrere_1978:
-      - snapshot://war/2023-01-09/bouthoul_carrere_1978.csv
+    - data://meadow/war/2023-01-10/bouthoul_carrere_1978
   data://garden/war/2023-01-18/clodfelter_2017:
-    - data://meadow/war/2023-01-10/clodfelter_2017:
-      - snapshot://war/2023-01-09/clodfelter_2017.csv
+    - data://meadow/war/2023-01-10/clodfelter_2017
   data://garden/war/2023-01-18/dunnigan_martel_1987:
-    - data://meadow/war/2023-01-10/dunnigan_martel_1987:
-      - snapshot://war/2023-01-09/dunnigan_martel_1987.csv
+    - data://meadow/war/2023-01-10/dunnigan_martel_1987
   data://garden/war/2023-01-18/eckhardt_1991:
-    - data://meadow/war/2023-01-10/eckhardt_1991:
-      - snapshot://war/2023-01-09/eckhardt_1991.csv
+    - data://meadow/war/2023-01-10/eckhardt_1991
   data://garden/war/2023-01-18/kaye_1985:
-    - data://meadow/war/2023-01-10/kaye_1985:
-      - snapshot://war/2023-01-09/kaye_1985.csv
+    - data://meadow/war/2023-01-10/kaye_1985
   data://garden/war/2023-01-18/sorokin_1937:
-    - data://meadow/war/2023-01-10/sorokin_1937:
-      - snapshot://war/2023-01-09/sorokin_1937.csv
+    - data://meadow/war/2023-01-10/sorokin_1937
   data://garden/war/2023-01-18/sutton_1971:
-    - data://meadow/war/2023-01-10/sutton_1971:
-      - snapshot://war/2023-01-09/sutton_1971.csv
+    - data://meadow/war/2023-01-10/sutton_1971
 
   # UCDP
   data://meadow/war/2025-06-13/ucdp:
@@ -41,107 +34,51 @@ steps:
   # UCDP (+preview)
   export://multidim/war/latest/ucdp:
     - data://grapher/war/2025-06-13/ucdp
-    - data://grapher/war/latest/ucdp_preview:
-      - data://garden/war/latest/ucdp_preview:
-        - data://meadow/war/2025-06-13/ucdp
-        - data://garden/war/2025-06-13/ucdp
-        - data://garden/geography/2025-06-26/geoboundaries_cgaz
-        - data://garden/demography/2024-07-15/population
-        - data://garden/countries/2024-08-27/gleditsch
-        - data://meadow/war/latest/ucdp_ced:
-          - snapshot://war/latest/ucdp_ced_v25_01_25_12.csv
-          - snapshot://war/latest/ucdp_ced_v26_01_26_03.csv
+    - data://grapher/war/latest/ucdp_preview
 
   # PRIO v3.1
   data://garden/war/2023-09-21/prio_v31:
-    - data://meadow/war/2023-09-21/prio_v31:
-      - snapshot://war/2023-09-21/prio_v31.xls
+    - data://meadow/war/2023-09-21/prio_v31
     - data://garden/countries/2024-08-27/gleditsch
   data://grapher/war/2023-09-21/prio_v31:
     - data://garden/war/2023-09-21/prio_v31
 
   # UCDP/PRIO
   export://multidim/war/latest/ucdp_prio:
-    - data://grapher/war/2025-06-16/ucdp_prio:
-      - data://garden/war/2025-06-16/ucdp_prio:
-        - data://garden/war/2025-06-13/ucdp
-        - data://garden/countries/2024-08-27/gleditsch
-        - data://garden/war/2023-09-21/prio_v31
+    - data://grapher/war/2025-06-16/ucdp_prio
     - data://grapher/war/2025-06-13/ucdp
 
   # COW - Wars
   data://grapher/war/2023-09-21/cow:
-    - data://garden/war/2023-09-21/cow:
-      - data://meadow/war/2023-09-21/cow:
-        - snapshot://war/2023-09-21/cow_extra_state.csv
-        - snapshot://war/2023-09-21/cow_inter_state.csv
-        - snapshot://war/2023-09-21/cow_inter_state_dyadic.zip
-        - snapshot://war/2023-09-21/cow_intra_state.zip
-        - snapshot://war/2023-09-21/cow_non_state.csv
-      - data://garden/countries/2023-09-29/cow_ssm
-      # Chupilkin and Koczan (Supplementary dataset to CoW)
-      - data://garden/war/2023-11-29/chupilkin_koczan:
-        - data://meadow/war/2023-11-29/chupilkin_koczan:
-          - snapshot://war/2023-11-29/chupilkin_koczan.dta
+    - data://garden/war/2023-09-21/cow
 
   # COW - MID
   data://grapher/war/2023-09-21/cow_mid:
-    - data://garden/war/2023-09-21/cow_mid:
-      - data://meadow/war/2023-09-21/cow_mid:
-        - snapshot://war/2023-09-21/cow_mid.zip
-      - data://garden/countries/2023-09-29/cow_ssm
+    - data://garden/war/2023-09-21/cow_mid
 
   # MIE
   data://grapher/war/2023-09-21/mie:
-    - data://garden/war/2023-09-21/mie:
-      - data://meadow/war/2023-09-21/mie:
-        - snapshot://war/2023-09-21/mie.zip
-      - data://garden/countries/2023-09-29/cow_ssm
+    - data://garden/war/2023-09-21/mie
 
   # Mars
   export://multidim/war/latest/mars:
-    - data://grapher/war/2023-09-21/mars:
-      - data://garden/war/2023-09-21/mars:
-        - data://meadow/war/2023-09-21/mars:
-          - snapshot://war/2023-09-21/war_mars.xls
-        - data://garden/countries/2023-09-25/isd
+    - data://grapher/war/2023-09-21/mars
 
   # Brecke
   data://grapher/war/2023-09-21/brecke:
-    - data://garden/war/2023-09-21/brecke:
-      - data://meadow/war/2023-09-21/brecke:
-        - snapshot://war/2023-09-21/war_brecke.xlsx
-      - data://garden/countries/2023-09-25/isd
-      - data://garden/demography/2023-03-31/population
+    - data://garden/war/2023-09-21/brecke
 
   # Peace data (Diehl)
   data://grapher/war/2025-04-18/peace_diehl:
-    - data://garden/war/2025-04-18/peace_diehl:
-      - data://meadow/war/2025-04-18/peace_diehl:
-        - snapshot://war/2025-04-18/peace_diehl.zip
-      - data://garden/countries/2023-09-29/cow_ssm
+    - data://garden/war/2025-04-18/peace_diehl
 
   # Bleek and Nuclear Threat Initiative - Nuclear Weapons Proliferation.
   data://grapher/war/2024-01-11/nuclear_weapons_proliferation:
-    - data://garden/war/2024-01-11/nuclear_weapons_proliferation:
-      # Bleek - Spread of Nuclear Weapons.
-      - data://garden/war/2024-01-11/spread_of_nuclear_weapons:
-        - data://meadow/war/2024-01-11/spread_of_nuclear_weapons:
-          - snapshot://war/2024-01-11/spread_of_nuclear_weapons.pdf
-      # Nuclear Threat Initiative - Overview.
-      - data://garden/war/2024-01-11/nuclear_threat_initiative_overview:
-        - data://meadow/war/2024-01-11/nuclear_threat_initiative_overview:
-          - snapshot://war/2024-01-11/nuclear_threat_initiative_overview.csv
-      - data://garden/regions/2023-01-01/regions
+    - data://garden/war/2024-01-11/nuclear_weapons_proliferation
 
   # UNODA - Treaties Database.
   data://garden/war/2025-05-15/nuclear_weapons_treaties:
-    - data://meadow/war/2025-05-15/nuclear_weapons_treaties:
-      - snapshot://war/2025-05-15/nuclear_weapons_treaties__comprehensive_test_ban.csv
-      - snapshot://war/2025-05-15/nuclear_weapons_treaties__prohibition.csv
-      - snapshot://war/2025-05-15/nuclear_weapons_treaties__partial_test_ban.csv
-      - snapshot://war/2025-05-15/nuclear_weapons_treaties__geneva_protocol.csv
-      - snapshot://war/2025-05-15/nuclear_weapons_treaties__non_proliferation.csv
+    - data://meadow/war/2025-05-15/nuclear_weapons_treaties
     - data://garden/un/2025-05-15/un_members
   data://grapher/war/2025-05-15/nuclear_weapons_treaties:
     - data://garden/war/2025-05-15/nuclear_weapons_treaties
@@ -150,29 +87,170 @@ steps:
 
   # The Strategic Nuclear Forces Dataset (Suh).
   data://grapher/war/2025-05-15/strategic_nuclear_forces:
-    - data://garden/war/2025-05-15/strategic_nuclear_forces:
-      - data://meadow/war/2025-05-15/strategic_nuclear_forces:
-        - snapshot://war/2025-05-15/strategic_nuclear_forces__monadic.xlsx
-        - snapshot://war/2025-05-15/strategic_nuclear_forces__dyadic.xlsx
+    - data://garden/war/2025-05-15/strategic_nuclear_forces
 
   # Federation of American Scientists - Status of World Nuclear Forces.
   data://grapher/war/2025-05-15/status_of_world_nuclear_forces:
-    - data://garden/war/2025-05-15/status_of_world_nuclear_forces:
-      - data://meadow/war/2025-05-15/status_of_world_nuclear_forces:
-        - snapshot://war/2025-05-15/status_of_world_nuclear_forces.csv
+    - data://garden/war/2025-05-15/status_of_world_nuclear_forces
 
   # Arms Control Association - Nuclear Weapons Tests.
   data://grapher/war/2025-05-15/nuclear_weapons_tests:
-    - data://garden/war/2025-05-15/nuclear_weapons_tests:
-      - data://meadow/war/2025-05-15/nuclear_weapons_tests:
-        - snapshot://war/2025-05-15/nuclear_weapons_tests.csv
+    - data://garden/war/2025-05-15/nuclear_weapons_tests
 
   # Federation of American Scientists - Estimated Global Nuclear Warhead Inventories.
   data://grapher/war/2025-05-15/nuclear_weapons_inventories:
-    - data://garden/war/2025-05-15/nuclear_weapons_inventories:
-      - data://meadow/war/2025-05-15/nuclear_weapons_inventories:
-        - snapshot://war/2025-05-15/nuclear_weapons_inventories.csv
+    - data://garden/war/2025-05-15/nuclear_weapons_inventories
 
   # Countries in Conflict explorer.
   export://explorers/war/latest/countries_in_conflict_data:
     - data://grapher/war/2025-06-13/ucdp
+
+  data://meadow/war/2023-01-10/bouthoul_carrere_1978:
+    - snapshot://war/2023-01-09/bouthoul_carrere_1978.csv
+  data://meadow/war/2023-01-10/clodfelter_2017:
+    - snapshot://war/2023-01-09/clodfelter_2017.csv
+  data://meadow/war/2023-01-10/dunnigan_martel_1987:
+    - snapshot://war/2023-01-09/dunnigan_martel_1987.csv
+  data://meadow/war/2023-01-10/eckhardt_1991:
+    - snapshot://war/2023-01-09/eckhardt_1991.csv
+  data://meadow/war/2023-01-10/kaye_1985:
+    - snapshot://war/2023-01-09/kaye_1985.csv
+  data://meadow/war/2023-01-10/sorokin_1937:
+    - snapshot://war/2023-01-09/sorokin_1937.csv
+  data://meadow/war/2023-01-10/sutton_1971:
+    - snapshot://war/2023-01-09/sutton_1971.csv
+  data://grapher/war/latest/ucdp_preview:
+    - data://garden/war/latest/ucdp_preview
+  data://garden/war/latest/ucdp_preview:
+    - data://meadow/war/2025-06-13/ucdp
+    - data://garden/war/2025-06-13/ucdp
+    - data://garden/geography/2025-06-26/geoboundaries_cgaz
+    - data://garden/demography/2024-07-15/population
+    - data://garden/countries/2024-08-27/gleditsch
+    - data://meadow/war/latest/ucdp_ced
+  data://meadow/war/latest/ucdp_ced:
+    - snapshot://war/latest/ucdp_ced_v25_01_25_12.csv
+    - snapshot://war/latest/ucdp_ced_v26_01_26_03.csv
+  data://meadow/war/2023-09-21/prio_v31:
+    - snapshot://war/2023-09-21/prio_v31.xls
+  data://grapher/war/2025-06-16/ucdp_prio:
+    - data://garden/war/2025-06-16/ucdp_prio
+  data://garden/war/2025-06-16/ucdp_prio:
+    - data://garden/war/2025-06-13/ucdp
+    - data://garden/countries/2024-08-27/gleditsch
+    - data://garden/war/2023-09-21/prio_v31
+  data://garden/war/2023-09-21/cow:
+    - data://meadow/war/2023-09-21/cow
+    - data://garden/countries/2023-09-29/cow_ssm
+    # Chupilkin and Koczan (Supplementary dataset to CoW)
+    - data://garden/war/2023-11-29/chupilkin_koczan
+  data://meadow/war/2023-09-21/cow:
+    - snapshot://war/2023-09-21/cow_extra_state.csv
+    - snapshot://war/2023-09-21/cow_inter_state.csv
+    - snapshot://war/2023-09-21/cow_inter_state_dyadic.zip
+    - snapshot://war/2023-09-21/cow_intra_state.zip
+    - snapshot://war/2023-09-21/cow_non_state.csv
+  data://garden/war/2023-11-29/chupilkin_koczan:
+    - data://meadow/war/2023-11-29/chupilkin_koczan
+  data://meadow/war/2023-11-29/chupilkin_koczan:
+    - snapshot://war/2023-11-29/chupilkin_koczan.dta
+  data://garden/war/2023-09-21/cow_mid:
+    - data://meadow/war/2023-09-21/cow_mid
+    - data://garden/countries/2023-09-29/cow_ssm
+  data://meadow/war/2023-09-21/cow_mid:
+    - snapshot://war/2023-09-21/cow_mid.zip
+  data://garden/war/2023-09-21/mie:
+    - data://meadow/war/2023-09-21/mie
+    - data://garden/countries/2023-09-29/cow_ssm
+  data://meadow/war/2023-09-21/mie:
+    - snapshot://war/2023-09-21/mie.zip
+  data://grapher/war/2023-09-21/mars:
+    - data://garden/war/2023-09-21/mars
+  data://garden/war/2023-09-21/mars:
+    - data://meadow/war/2023-09-21/mars
+    - data://garden/countries/2023-09-25/isd
+  data://meadow/war/2023-09-21/mars:
+    - snapshot://war/2023-09-21/war_mars.xls
+  data://garden/war/2023-09-21/brecke:
+    - data://meadow/war/2023-09-21/brecke
+    - data://garden/countries/2023-09-25/isd
+    - data://garden/demography/2023-03-31/population
+  data://meadow/war/2023-09-21/brecke:
+    - snapshot://war/2023-09-21/war_brecke.xlsx
+  data://garden/war/2025-04-18/peace_diehl:
+    - data://meadow/war/2025-04-18/peace_diehl
+    - data://garden/countries/2023-09-29/cow_ssm
+  data://meadow/war/2025-04-18/peace_diehl:
+    - snapshot://war/2025-04-18/peace_diehl.zip
+  data://garden/war/2024-01-11/nuclear_weapons_proliferation:
+    # Bleek - Spread of Nuclear Weapons.
+    - data://garden/war/2024-01-11/spread_of_nuclear_weapons
+    # Nuclear Threat Initiative - Overview.
+    - data://garden/war/2024-01-11/nuclear_threat_initiative_overview
+    - data://garden/regions/2023-01-01/regions
+  data://garden/war/2024-01-11/spread_of_nuclear_weapons:
+    - data://meadow/war/2024-01-11/spread_of_nuclear_weapons
+  data://meadow/war/2024-01-11/spread_of_nuclear_weapons:
+    - snapshot://war/2024-01-11/spread_of_nuclear_weapons.pdf
+  data://garden/war/2024-01-11/nuclear_threat_initiative_overview:
+    - data://meadow/war/2024-01-11/nuclear_threat_initiative_overview
+  data://meadow/war/2024-01-11/nuclear_threat_initiative_overview:
+    - snapshot://war/2024-01-11/nuclear_threat_initiative_overview.csv
+  data://meadow/war/2025-05-15/nuclear_weapons_treaties:
+    - snapshot://war/2025-05-15/nuclear_weapons_treaties__comprehensive_test_ban.csv
+    - snapshot://war/2025-05-15/nuclear_weapons_treaties__prohibition.csv
+    - snapshot://war/2025-05-15/nuclear_weapons_treaties__partial_test_ban.csv
+    - snapshot://war/2025-05-15/nuclear_weapons_treaties__geneva_protocol.csv
+    - snapshot://war/2025-05-15/nuclear_weapons_treaties__non_proliferation.csv
+  data://garden/war/2025-05-15/strategic_nuclear_forces:
+    - data://meadow/war/2025-05-15/strategic_nuclear_forces
+  data://meadow/war/2025-05-15/strategic_nuclear_forces:
+    - snapshot://war/2025-05-15/strategic_nuclear_forces__monadic.xlsx
+    - snapshot://war/2025-05-15/strategic_nuclear_forces__dyadic.xlsx
+  data://garden/war/2025-05-15/status_of_world_nuclear_forces:
+    - data://meadow/war/2025-05-15/status_of_world_nuclear_forces
+  data://meadow/war/2025-05-15/status_of_world_nuclear_forces:
+    - snapshot://war/2025-05-15/status_of_world_nuclear_forces.csv
+  data://garden/war/2025-05-15/nuclear_weapons_tests:
+    - data://meadow/war/2025-05-15/nuclear_weapons_tests
+  data://meadow/war/2025-05-15/nuclear_weapons_tests:
+    - snapshot://war/2025-05-15/nuclear_weapons_tests.csv
+  data://garden/war/2025-05-15/nuclear_weapons_inventories:
+    - data://meadow/war/2025-05-15/nuclear_weapons_inventories
+  data://meadow/war/2025-05-15/nuclear_weapons_inventories:
+    - snapshot://war/2025-05-15/nuclear_weapons_inventories.csv
+  data://meadow/war/2026-05-13/status_of_world_nuclear_forces:
+    - snapshot://war/2026-05-13/status_of_world_nuclear_forces.csv
+  data://meadow/war/2026-05-13/nuclear_weapons_treaties:
+    - snapshot://war/2026-05-13/nuclear_weapons_treaties__partial_test_ban.csv
+    - snapshot://war/2026-05-13/nuclear_weapons_treaties__geneva_protocol.csv
+    - snapshot://war/2026-05-13/nuclear_weapons_treaties__comprehensive_test_ban.csv
+    - snapshot://war/2026-05-13/nuclear_weapons_treaties__prohibition.csv
+    - snapshot://war/2026-05-13/nuclear_weapons_treaties__non_proliferation.csv
+  data://meadow/war/2026-05-13/nuclear_weapons_tests:
+    - snapshot://war/2026-05-13/nuclear_weapons_tests.csv
+  data://meadow/war/2026-05-13/nuclear_weapons_inventories:
+    - snapshot://war/2026-05-13/nuclear_weapons_inventories.csv
+  data://garden/war/2026-05-13/status_of_world_nuclear_forces:
+    - data://meadow/war/2026-05-13/status_of_world_nuclear_forces
+  # UNODA - Treaties Database.
+  data://garden/war/2026-05-13/nuclear_weapons_treaties:
+    - data://meadow/war/2026-05-13/nuclear_weapons_treaties
+    - data://garden/un/2025-05-15/un_members
+  data://garden/war/2026-05-13/nuclear_weapons_tests:
+    - data://meadow/war/2026-05-13/nuclear_weapons_tests
+  data://garden/war/2026-05-13/nuclear_weapons_inventories:
+    - data://meadow/war/2026-05-13/nuclear_weapons_inventories
+  # Federation of American Scientists - Status of World Nuclear Forces.
+  data://grapher/war/2026-05-13/status_of_world_nuclear_forces:
+    - data://garden/war/2026-05-13/status_of_world_nuclear_forces
+  data://grapher/war/2026-05-13/nuclear_weapons_treaties:
+    - data://garden/war/2026-05-13/nuclear_weapons_treaties
+  data://grapher/war/2026-05-13/nuclear_weapons_treaties_country_counts:
+    - data://garden/war/2026-05-13/nuclear_weapons_treaties
+  # Arms Control Association - Nuclear Weapons Tests.
+  data://grapher/war/2026-05-13/nuclear_weapons_tests:
+    - data://garden/war/2026-05-13/nuclear_weapons_tests
+  # Federation of American Scientists - Estimated Global Nuclear Warhead Inventories.
+  data://grapher/war/2026-05-13/nuclear_weapons_inventories:
+    - data://garden/war/2026-05-13/nuclear_weapons_inventories
