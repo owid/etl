@@ -1,0 +1,11 @@
+meta:
+  source:
+    name: Reserve Bank of India
+    published_by: Reserve Bank of India - Database of Indian Economy
+  name: TESA_14.15
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 0ca171e9b0fc16e4bb4289b87d0099cd
+    size: 3338
+    path: tesa_14_15.feather

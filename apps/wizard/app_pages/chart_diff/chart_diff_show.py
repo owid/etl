@@ -403,8 +403,10 @@ class ChartDiffShow:
                 source = filter_out_fields_in_metadata_for_checksum(source)
                 target = filter_out_fields_in_metadata_for_checksum(target)
 
-                # Get meta json diff
-                meta_diff = compare_dictionaries(source, target, fromfile="source", tofile="target")
+                # PROD is the base; STAGING is what the user is proposing to merge — pass
+                # `target` (prod) first so the diff reads as `production → staging` and
+                # the staging branch shows up as additions/modifications.
+                meta_diff = compare_dictionaries(target, source, fromfile="production", tofile="staging")
                 if meta_diff:
                     meta_diffs[indicator_id] = meta_diff
 

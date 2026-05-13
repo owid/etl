@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: Ryland Thomas and Nicholas Dimsdale. (2017)
+    url: https://www.bankofengland.co.uk/statistics/research-datasets
+    published_by: Ryland Thomas and Nicholas Dimsdale. (2017)
+  name: Figure_15.3
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: ef3d58ce9a81de1ebb78eda3faf03562
+    size: 5114
+    path: figure_15_3.feather

@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: WID (2020)
+    url: https://wid.world
+    published_by: |-
+      Facundo Alvaredo, Anthony B. Atkinson, Thomas Piketty, Emmanuel Saez, and Gabriel Zucman (2020) ‘The World Wealth and Income Database (WID)’.
+  name: Figure_19.3_updated
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: 3d53619c21f7c5a94b1c19309f7a7680
+    size: 7322
+    path: figure_19_3_updated.feather

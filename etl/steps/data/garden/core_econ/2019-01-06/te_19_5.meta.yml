@@ -1,0 +1,20 @@
+dataset:
+  title: TE-19.5
+tables:
+  te_19_5:
+    variables:
+      global_inequality__inequality_among_all_individuals_in_the_world:
+        title: 'Global inequality: inequality among all individuals in the world'
+        unit: ''
+      inequality_between_countries__hypothetical:
+        title: Inequality between countries (hypothetical)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

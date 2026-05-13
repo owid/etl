@@ -1,0 +1,17 @@
+dataset:
+  title: Figure_15.6_United_States_Decades
+tables:
+  figure_15_6_united_states_decades:
+    variables:
+      decade:
+        title: Decade
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

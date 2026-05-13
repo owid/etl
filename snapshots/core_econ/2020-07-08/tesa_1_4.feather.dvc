@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Roy, Tirthankar (2005); Lains et al. (2009); World Bank (2020)
+    description: |-
+      Data for India from 1875-1946 is from Roy, Tirthankar (2005). Data for France, Italy, UK, Nethderlands is from Lains et al. (2009) until 1960. From 1960 onwards, all data for all countries is from the World Bank.
+    url: https://datacatalog.worldbank.org/dataset/world-development-indicators
+    published_by: |-
+      Roy, Tirthankar. 2005. ‘Agricultural Labor and Economic Transition in Colonial India: Lessons from Wage Data’. Working Paper; World Bank (2020) ‘World Development Indicators’; Lains, Pedro and Vincente Pinella. 2009. ‘Agriculture and Economic Development in Europe Since 1870’. Routledge: Taylor and Francis India.
+  name: TESA_1.4
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: f3856c2763ecdc51912159d31d022fab
+    size: 5498
+    path: tesa_1_4.feather

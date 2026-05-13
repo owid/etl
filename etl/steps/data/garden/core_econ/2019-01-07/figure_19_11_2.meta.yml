@@ -1,0 +1,22 @@
+dataset:
+  title: Figure_19.11-2
+tables:
+  figure_19_11_2:
+    variables:
+      cross_sectional_inequality__gini_coefficient:
+        title: Cross-sectional inequality (Gini coefficient)
+        unit: ''
+        description: |-
+          Income inequality is measured by the Gini coefficient for earnings inequality (before taxes and government transfers). Gini coefficients are for various years between 2000 and 2004.
+      intergenerational_inequality__intergenerational_elasticity:
+        title: Intergenerational inequality (intergenerational elasticity)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

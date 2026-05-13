@@ -1,0 +1,21 @@
+dataset:
+  title: TE-13.3_unemployment
+tables:
+  te_13_3_unemployment:
+    variables:
+      gdp_growth__pct:
+        title: GDP Growth (%)
+        unit: ''
+      unemployment_rate__pct:
+        title: Unemployment rate (%)
+        unit: ''
+        description: Unemployment rate of the UK population aged 16 and over, seasonally adjusted.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

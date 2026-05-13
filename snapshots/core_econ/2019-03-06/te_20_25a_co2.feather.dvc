@@ -1,0 +1,12 @@
+meta:
+  source:
+    name: The World Bank (2018)
+    url: https://databank.worldbank.org/data/reports.aspx?source=2&series=EN.ATM.CO2E.PC#
+    published_by: The World Bank (2018). ‘World Development Indicators.’
+  name: TE-20.25a_CO2
+  description: core-econ.org
+  is_public: false
+outs:
+  - md5: d6dd33fa641e4376570323d82939108e
+    size: 6770
+    path: te_20_25a_co2.feather

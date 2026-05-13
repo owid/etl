@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5141
-    date_accessed: 2023-08-10 09:20:02.600590
+    url: https://admin.owid.io/admin/datasets/5141
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: TE-17.13_union
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6a1e8fbb4788f20126dc38ba5d4c72c1
-  size: 7786
-  path: dataset_5141_te_17_13_union_values.feather
+  - md5: a12aa5520590f3635f8b8f9f9ac66551
+    size: 7818
+    path: dataset_5141_te_17_13_union_values.feather
