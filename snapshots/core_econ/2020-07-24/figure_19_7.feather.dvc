@@ -1,11 +1,12 @@
 meta:
-  source:
-    name: US Bureau of Labor Statistics (2014 and 2015)
-    url: https://www.bls.gov/emp/; https://www.bls.gov/oes/
-    published_by: |-
-      US Bureau of Labor Statistics (2014) ‘Employment Projections’; US Bureau of Labor Statistics (2015) ‘Occupational Employment Statistics’.
-  name: Figure_19.7
-  description: core-econ.org
+  origin:
+    producer: US Bureau of Labor Statistics
+    title: Employment Projections and Occupational Employment Statistics
+    citation_full: 'US Bureau of Labor Statistics (2014) ''Employment Projections''; US Bureau of Labor Statistics (2015) ''Occupational Employment Statistics''.'
+    url_main: https://www.bls.gov/emp/
+    url_download: https://www.bls.gov/oes/
+    date_accessed: '2020-07-24'
+    date_published: '2015'
   is_public: false
 outs:
   - md5: 47b578b21e1fe3520138e163faba7ee6

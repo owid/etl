@@ -1,10 +1,11 @@
 meta:
-  source:
-    name: OECD(2019)
-    url: http://stats.oecd.org/
-    published_by: OECD (2019). OECD Statistics
-  name: TE-16.12_Wage
-  description: core-econ.org
+  origin:
+    producer: OECD
+    title: OECD Statistics
+    citation_full: OECD (2019). OECD Statistics.
+    url_main: http://stats.oecd.org/
+    date_accessed: '2019-01-26'
+    date_published: '2019'
   is_public: false
 outs:
   - md5: 235f14cfa79519f78fe41440a9fe1106

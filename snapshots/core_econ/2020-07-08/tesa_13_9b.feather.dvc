@@ -1,10 +1,11 @@
 meta:
-  source:
-    name: World Bank (2020)
-    published_by: World Bank National Accounts data
-  name: TESA_13.9b
-  description: core-econ.org
   is_public: false
+  origin:
+    producer: World Bank
+    title: World Bank National Accounts data
+    citation_full: World Bank National Accounts data.
+    date_accessed: '2020-07-08'
+    date_published: '2020'
 outs:
   - md5: 84960c42f75761b8cd12cad693c9effd
     size: 7546

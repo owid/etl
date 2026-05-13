@@ -1,10 +1,11 @@
 meta:
-  source:
-    name: The World Bank (2019)
-    url: https://databank.worldbank.org/data/reports.aspx?source=2&series=FP.CPI.TOTL.ZG
-    published_by: The World Bank (2019) World Development Indicators.
-  name: TE-13.21
-  description: core-econ.org
+  origin:
+    producer: World Bank
+    title: World Development Indicators
+    citation_full: The World Bank (2019) World Development Indicators.
+    url_main: https://databank.worldbank.org/data/reports.aspx?source=2&series=FP.CPI.TOTL.ZG
+    date_accessed: '2019-01-25'
+    date_published: '2019'
   is_public: false
 outs:
   - md5: 395f1d89a4d0c187778ace7f9d9f6359

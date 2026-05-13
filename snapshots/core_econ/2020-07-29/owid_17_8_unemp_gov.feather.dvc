@@ -1,10 +1,12 @@
 meta:
-  source:
-    name: FRED (2018)
-    url: https://fraser.stlouisfed.org/title/?id=237#!5809
-    published_by: Federal Reserve Bank of St Louis (FRED)
-  name: OWID_17.8_unemp_gov
-  description: core-econ.org
+  origin:
+    producer: Federal Reserve Bank of St Louis
+    title: FRED economic data
+    attribution_short: FRED
+    citation_full: Federal Reserve Bank of St Louis (FRED).
+    url_main: https://fraser.stlouisfed.org/title/?id=237#!5809
+    date_accessed: '2020-07-29'
+    date_published: '2018'
   is_public: false
 outs:
   - md5: 0387a82eea017115e02af32eaa53fb42

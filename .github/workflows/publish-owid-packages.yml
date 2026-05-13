@@ -15,82 +15,80 @@ on:
         required: true
         default: 'all'
 
+permissions:
+  contents: read
+
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      catalog: ${{ steps.filter.outputs.catalog }}
-      datautils: ${{ steps.filter.outputs.datautils }}
-      repack: ${{ steps.filter.outputs.repack }}
+      packages: ${{ steps.filter.outputs.packages }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
       with:
         fetch-depth: 2
 
     - name: Detect which packages changed
       id: filter
       run: |
+        catalog=false
+        datautils=false
+        repack=false
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
           PACKAGE="${{ github.event.inputs.package }}"
-          if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "catalog" ]; then
-            echo "catalog=true" >> $GITHUB_OUTPUT
-          fi
-          if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "datautils" ]; then
-            echo "datautils=true" >> $GITHUB_OUTPUT
-          fi
-          if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "repack" ]; then
-            echo "repack=true" >> $GITHUB_OUTPUT
-          fi
+          if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "catalog" ]; then catalog=true; fi
+          if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "datautils" ]; then datautils=true; fi
+          if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "repack" ]; then repack=true; fi
         else
-          git diff --name-only HEAD~1 HEAD | grep -q 'lib/catalog/pyproject.toml' && echo "catalog=true" >> $GITHUB_OUTPUT || echo "catalog=false" >> $GITHUB_OUTPUT
-          git diff --name-only HEAD~1 HEAD | grep -q 'lib/datautils/pyproject.toml' && echo "datautils=true" >> $GITHUB_OUTPUT || echo "datautils=false" >> $GITHUB_OUTPUT
-          git diff --name-only HEAD~1 HEAD | grep -q 'lib/repack/pyproject.toml' && echo "repack=true" >> $GITHUB_OUTPUT || echo "repack=false" >> $GITHUB_OUTPUT
+          CHANGED=$(git diff --name-only HEAD~1 HEAD)
+          if echo "$CHANGED" | grep -q 'lib/catalog/pyproject.toml'; then catalog=true; fi
+          if echo "$CHANGED" | grep -q 'lib/datautils/pyproject.toml'; then datautils=true; fi
+          if echo "$CHANGED" | grep -q 'lib/repack/pyproject.toml'; then repack=true; fi
         fi
+
+        items=()
+        if [ "$catalog" = "true" ]; then
+          items+=('{"package":"catalog","name":"owid-catalog","path":"lib/catalog"}')
+        fi
+        if [ "$datautils" = "true" ]; then
+          items+=('{"package":"datautils","name":"owid-datautils","path":"lib/datautils"}')
+        fi
+        if [ "$repack" = "true" ]; then
+          items+=('{"package":"repack","name":"owid-repack","path":"lib/repack"}')
+        fi
+
+        IFS=,
+        json="[${items[*]}]"
+        echo "Will publish: $json"
+        echo "packages=$json" >> $GITHUB_OUTPUT
 
   publish:
     needs: detect-changes
+    if: needs.detect-changes.outputs.packages != '[]'
     runs-on: ubuntu-latest
-    if: needs.detect-changes.outputs.catalog == 'true' || needs.detect-changes.outputs.datautils == 'true' || needs.detect-changes.outputs.repack == 'true'
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: read
 
     strategy:
+      fail-fast: false
       matrix:
-        include:
-          - package: catalog
-            name: owid-catalog
-            path: lib/catalog
-            should_run: ${{ needs.detect-changes.outputs.catalog }}
-          - package: datautils
-            name: owid-datautils
-            path: lib/datautils
-            should_run: ${{ needs.detect-changes.outputs.datautils }}
-          - package: repack
-            name: owid-repack
-            path: lib/repack
-            should_run: ${{ needs.detect-changes.outputs.repack }}
+        include: ${{ fromJSON(needs.detect-changes.outputs.packages) }}
 
     steps:
-    - name: Skip if not needed
-      if: matrix.should_run != 'true'
-      run: |
-        echo "Skipping ${{ matrix.name }} - no changes detected"
-        exit 0
-
     - name: Checkout code
-      if: matrix.should_run == 'true'
-      uses: actions/checkout@v2
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
       with:
         fetch-depth: 2
 
     - name: Check if version needs publishing
-      if: matrix.should_run == 'true'
       run: |
-        # Extract current version from pyproject.toml
         CURRENT_VERSION=$(grep '^version = ' ${{ matrix.path }}/pyproject.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
 
         echo "Current version in pyproject.toml: $CURRENT_VERSION"
 
-        # Check if this version already exists on PyPI
         PYPI_RESPONSE=$(curl -s "https://pypi.org/pypi/${{ matrix.name }}/${CURRENT_VERSION}/json" -w "%{http_code}" -o /tmp/pypi_response.json)
 
         if [ "$PYPI_RESPONSE" = "200" ]; then
@@ -102,22 +100,20 @@ jobs:
         echo "✅ Version $CURRENT_VERSION not found on PyPI, proceeding with publish"
 
     - name: Set up Python
-      if: matrix.should_run == 'true'
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
       with:
         python-version: '3.x'
 
-    - name: Install UV
-      if: matrix.should_run == 'true'
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+    - name: Set up uv
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
 
-    - name: Publish ${{ matrix.name }}
-      if: matrix.should_run == 'true'
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+    - name: Build ${{ matrix.name }}
       run: |
         cd ${{ matrix.path }}
         rm -rf dist
         uv build
-        uvx twine upload dist/*
+
+    - name: Publish ${{ matrix.name }} to PyPI
+      uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b  # v1.14.0
+      with:
+        packages-dir: ${{ matrix.path }}/dist
