@@ -22,7 +22,7 @@ def run() -> None:
     tb["number_of_warheads"] = tb["number_of_warheads"].str.replace(",", "").astype(float).fillna(0).astype("Int64")
 
     # Harmonize country names.
-    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb, countries_file=paths.country_mapping_path)
 
     # Improve table format.
     tb = tb.format(["country", "year"])

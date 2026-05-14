@@ -130,7 +130,7 @@ def run() -> None:
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise").astype(str)
 
     # Harmonize country names.
-    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb, countries_file=paths.country_mapping_path)
 
     # Run sanity checks.
     run_sanity_checks(tb)

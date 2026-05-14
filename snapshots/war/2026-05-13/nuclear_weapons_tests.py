@@ -69,7 +69,3 @@ def run(upload: bool) -> None:
 
     # Copy data to snapshots data folder, add file to DVC and upload to S3.
     snap.create_snapshot(data=df, upload=upload)
-
-
-if __name__ == "__main__":
-    run()

@@ -88,7 +88,7 @@ def run() -> None:
 
     # Harmonize country names.
     tb["country"] = tb["country"].str.replace("__", "_").str.replace("_", " ").str.title()
-    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb, countries_file=paths.country_mapping_path)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format(["country", "year"])

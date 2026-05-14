@@ -138,7 +138,3 @@ def run(upload: bool) -> None:
         snap.metadata.save()
         # Create snapshot.
         snap.create_snapshot(data=df, upload=upload)
-
-
-if __name__ == "__main__":
-    run()

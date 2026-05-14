@@ -41,7 +41,7 @@ def run() -> None:
     tb[cols] = tb[cols].fillna(0)
 
     # Harmonize country names.
-    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb, countries_file=paths.country_mapping_path)
 
     # Sanity check.
     error = "Column 'stockpile' should be the sum of deployed and reserve nuclear weapons."
