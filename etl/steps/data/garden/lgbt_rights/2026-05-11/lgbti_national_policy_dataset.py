@@ -741,9 +741,7 @@ def _build_combined_categorical_table(tb):
     wide["lgbt_military"] = _build_lgbt_military_combined(wide)
 
     output_cols = (
-        ["country", "year", "gender_marker_change"]
-        + [c["short_name"] for c in COMBINED_CONFIGS]
-        + ["lgbt_military"]
+        ["country", "year", "gender_marker_change"] + [c["short_name"] for c in COMBINED_CONFIGS] + ["lgbt_military"]
     )
     return wide[output_cols]
 
