@@ -170,6 +170,12 @@ COMBINED_CONFIGS = [
         ],
         "category_map": MARRIAGE_MAP,
     },
+    # NOTE: enforcement_refinement is set on the 4 combined indicators whose source
+    # (law, status) has any `Evidence_of_Enforcement == 0` rows in v2.0 — same_sex_acts,
+    # transgender_military, lgb_military_join, morality_propaganda. Every other policy
+    # has EoE uniformly 1 (codebook default). On each new data release, audit whether
+    # other indicators acquire EoE=0 cases; if so, add `enforcement_refinement` entries
+    # below and corresponding sort/description_key/region YAML entries.
     {
         "short_name": "lgb_military_join",
         "sources": [
@@ -177,6 +183,11 @@ COMBINED_CONFIGS = [
             ("lgb_military__illegal", "illegal"),
         ],
         "category_map": LGB_MILITARY_MAP,
+        "enforcement_refinement": {
+            "eoe_source": ("lgb_military", "illegal"),
+            "from_label": "Banned",
+            "to_label": "Banned but not enforced",
+        },
     },
     # ── Two-direction policies (both Legal and Illegal carry substantive data) ──────────
     {
@@ -193,6 +204,11 @@ COMBINED_CONFIGS = [
             neither_label="No legal provisions",
             mixed_label="Varies by region",
         ),
+        "enforcement_refinement": {
+            "eoe_source": ("same_sex_acts", "illegal"),
+            "from_label": "Criminalized",
+            "to_label": "Criminalized but not enforced",
+        },
     },
     {
         "short_name": "blood_donations",
@@ -223,6 +239,11 @@ COMBINED_CONFIGS = [
             neither_label="No policy",
             mixed_label="Varies by region",
         ),
+        "enforcement_refinement": {
+            "eoe_source": ("transgender_military", "illegal"),
+            "from_label": "Banned",
+            "to_label": "Banned but not enforced",
+        },
     },
     # ── Single-direction progressive policies (Legal carries the substantive data) ──────
     {
@@ -386,6 +407,11 @@ COMBINED_CONFIGS = [
             neither_label="No restrictions",
             mixed_label="Varies by region",
         ),
+        "enforcement_refinement": {
+            "eoe_source": ("morality_propaganda", "legal"),
+            "from_label": "Restrictions in effect",
+            "to_label": "Restrictions in effect but not enforced",
+        },
     },
     {
         "short_name": "lgbtq_civil_society_restrictions",
@@ -521,6 +547,11 @@ def _build_one_combined(wide, config):
     for "Varies by region or other" buckets where enumerating every pattern is noisy);
     if `default_category` is unset, unmapped keys are left as their raw bucket string,
     which surfaces them as a sanity check rather than silently dropping.
+
+    If `enforcement_refinement` is set, country-years whose bucketed label equals
+    `from_label` and whose `evidence_of_enforcement` for the configured (law, status)
+    is exactly 0 are reassigned to `to_label`. EoE NaN or 1 keeps `from_label`
+    (codebook default-1 rule).
     """
     parts = []
     for col, label in config["sources"]:
@@ -538,6 +569,15 @@ def _build_one_combined(wide, config):
             warn_on_missing_mappings=False,
             warn_on_unused_mappings=False,
         )
+    # Apply optional enforcement refinement: split `from_label` into `to_label` where
+    # EoE for the configured (law, status) source is 0. Strict equality so NaN keeps
+    # the unrefined label.
+    refinement = config.get("enforcement_refinement")
+    if refinement is not None:
+        law, status = refinement["eoe_source"]
+        eoe = wide[f"{law}__{status}__eoe"]
+        unenforced_mask = (result == refinement["from_label"]) & (eoe == 0)
+        result = result.where(~unenforced_mask, refinement["to_label"])
     return result.copy_metadata(wide["country"])
 
 
@@ -552,10 +592,13 @@ def run() -> None:
     # Process data.
     #
     # Keep the columns we publish (drop sources, ISO/COW codes, most supplementary
-    # metadata) but retain `gender_change_requirement` — the GMC combined indicator
-    # uses it to refine "legal" countries into procedural categories (Self-ID,
-    # Medical/Psychological, Surgery required, Surgery and sterilization required).
-    tb = tb[["country", "year", "law", "status", "proportion", "gender_change_requirement"]].copy()
+    # metadata) but retain `gender_change_requirement` (used by the GMC combined
+    # indicator to refine "legal" countries into procedural categories) and
+    # `evidence_of_enforcement` (used by 4 combined indicators to surface
+    # "X but not enforced" categories — see COMBINED_CONFIGS for the affected set).
+    tb = tb[
+        ["country", "year", "law", "status", "proportion", "gender_change_requirement", "evidence_of_enforcement"]
+    ].copy()
 
     # Harmonize country names
     tb = paths.regions.harmonize_names(tb=tb)
@@ -565,9 +608,10 @@ def run() -> None:
     mask = tb.set_index(["law", "status"]).index.isin(placeholders)
     tb = tb.loc[~mask].reset_index(drop=True)
 
-    # Country-level table — drop the requirement column here; it's only used to build the
-    # combined indicator and isn't published as a per-row long-table indicator.
-    tb_country = tb.drop(columns=["gender_change_requirement"]).copy()
+    # Country-level table — drop the requirement and enforcement columns here; they're
+    # only used to build combined indicators and aren't published as per-row long-table
+    # indicators.
+    tb_country = tb.drop(columns=["gender_change_requirement", "evidence_of_enforcement"]).copy()
 
     # Regional aggregates table (counts of countries + population by status per region).
     tb_regions = _build_regional_aggregates(tb_country)
@@ -672,6 +716,13 @@ def _build_combined_categorical_table(tb):
     wide = tb.pivot(index=["country", "year"], columns=["law", "status"], values="proportion")
     wide.columns = [f"{law}__{status}" for law, status in wide.columns]
     wide = wide.reset_index()
+
+    # Pivot `evidence_of_enforcement` on the same (law, status) axes and merge side
+    # columns into `wide` with naming `<law>__<status>__eoe`. Used by the
+    # enforcement_refinement field on COMBINED_CONFIGS entries.
+    eoe_wide = tb.pivot(index=["country", "year"], columns=["law", "status"], values="evidence_of_enforcement")
+    eoe_wide.columns = [f"{law}__{status}__eoe" for law, status in eoe_wide.columns]
+    wide = wide.merge(eoe_wide.reset_index(), on=["country", "year"], how="left")
 
     # Extract the per-(country, year) GMC requirement and merge into wide as a side column.
     gmc_req = tb[(tb["law"] == "gender_marker_change") & (tb["status"] == "legal")][
