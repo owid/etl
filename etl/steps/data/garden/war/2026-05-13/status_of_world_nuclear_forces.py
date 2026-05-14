@@ -43,11 +43,13 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb, countries_file=paths.country_mapping_path)
 
-    # Sanity check.
-    error = "Column 'stockpile' should be the sum of deployed and reserve nuclear weapons."
-    assert (
-        tb["stockpile"] == tb[["deployed_strategic", "deployed_nonstrategic", "reserve_nondeployed"]].sum(axis=1)
-    ).any(), error
+    # Sanity check: the per-category breakdown (deployed_strategic + deployed_nonstrategic + reserve_nondeployed)
+    # should never exceed the total stockpile. FAS treats `stockpile` as authoritative and sometimes publishes a
+    # partial breakdown (e.g. India 2026: stockpile 190 vs. 0+0+178 = 178), so we don't require strict equality —
+    # but the breakdown exceeding stockpile would be a parsing error.
+    breakdown_sum = tb[["deployed_strategic", "deployed_nonstrategic", "reserve_nondeployed"]].sum(axis=1)
+    error = "Per-category warhead breakdown exceeds the stockpile total for some country-year."
+    assert (breakdown_sum <= tb["stockpile"]).all(), error
 
     # Add column for retired nuclear weapons, which is the total inventory minus the stockpile.
     tb["retired"] = tb["inventory"] - tb["stockpile"]
