@@ -24,17 +24,16 @@ def run(dest_dir: str) -> None:
         zipfile.ZipFile(snap.path).extractall(temp_dir)
 
         code_path = Path(temp_dir) / "general_files" / "HYDE_country_codes.xlsx"
+        # country_codes is just an ISO-code → country-name reference table — keep it
+        # origin-less so the HYDE/PBL origin doesn't leak into every downstream chain
+        # that merges on country (e.g. demography/.../population).
         codes = pr.read_excel(
             code_path.as_posix(),
             sheet_name="country",
             usecols="A:B",
-            metadata=snap.to_table_metadata(),
-            origin=snap.metadata.origin,
         ).rename(columns={"ISO-CODE": "country_code", "Country": "country"})
 
-    country_meta = codes["country"].metadata
     codes["country"] = codes["country"].str.strip()
-    codes["country"].metadata = country_meta
     codes = codes.drop_duplicates(subset="country_code", keep="first")
     codes = codes.set_index("country_code")
     codes.metadata.short_name = "country_codes"
