@@ -106,14 +106,6 @@ definitions:
       - We calculate monthly variables from weekly variables - all weeks commencing in a particular month are aggregated to that month.
       - We remove all values for years with less than 10 data points.
       - We do not show data for the most recent 21 days. Data covering the most recent 21 days is often adjusted and updated in the weeks following its release.
-  sourceLink:
-    def_4019404533801586313: &def_4019404533801586313 https://frontdoor-l4uikgap6gz3m.azurefd.net/FLUMART/VIW_FNT?&$format=csv
-    def_1047553513020542972: &def_1047553513020542972 https://frontdoor-l4uikgap6gz3m.azurefd.net/FLUMART/VIW_FID?&$format=csv
-  dataPublishedBy:
-    def_7616543856230231790: &def_7616543856230231790 Global Influenza Surveillance and Response System, World Health Organization
-  sourceName:
-    def_9196648065525151193: &def_9196648065525151193 FluNet by the World Health Organization (2023)
-    def_2114940264292507114: &def_2114940264292507114 FluID by the World Health Organization (2023)
   common_views:
     - config:
         timelineMinTime: "-4043"
@@ -222,13 +214,10 @@ views:
           display:
             type: Percentage
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5;10;15;20;25;30;35;40;45;50
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly share of influenza tests that were positive
       subtitle: |-
@@ -247,13 +236,10 @@ views:
           display:
             type: Percentage
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5;10;15;20;25;30;35;40;45;50
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly share of influenza tests that were positive
       subtitle: |-
@@ -274,13 +260,10 @@ views:
           display:
             type: Percentage
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5;10;15;20;25;30;35;40;45;50
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly share of influenza tests that were positive, sentinel surveillance
       subtitle: |-
@@ -299,13 +282,10 @@ views:
           display:
             type: Percentage
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5;10;15;20;25;30;35;40;45;50
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly share of influenza tests that were positive, sentinel surveillance
       subtitle: |-
@@ -324,13 +304,10 @@ views:
           display:
             type: Percentage
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5;10;15;20;25;30;35;40;45;50
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly share of influenza tests that were positive, non-sentinel surveillance
       subtitle: |-
@@ -349,13 +326,10 @@ views:
           display:
             type: Percentage
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5;10;15;20;25;30;35;40;45;50
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly share of influenza tests that were positive, non-sentinel surveillance
       subtitle: |-
@@ -374,92 +348,65 @@ views:
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             color: "#8C2D04"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah1combined_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             color: "#CC4C02"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah3combined_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             color: "#EC7014"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah5combined_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             color: "#FE9929"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah7n9combined_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             color: "#FEC44F"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#a_no_subtypecombined_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             color: "#FEE391"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bviccombined_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             color: "#02818A"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#byamcombined_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             color: "#67A9CF"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bnotdeterminedcombined_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             color: "#BDC9E1"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza by strain
       subtitle: |-
@@ -478,84 +425,57 @@ views:
         - catalogPath: flu_monthly#ah1n12009combined_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             color: "#8C2D04"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah1combined_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             color: "#CC4C02"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah3combined_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             color: "#EC7014"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah5combined_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             color: "#FE9929"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah7n9combined_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             color: "#FEC44F"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#a_no_subtypecombined_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             color: "#FEE391"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bviccombined_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             color: "#02818A"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#byamcombined_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             color: "#67A9CF"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bnotdeterminedcombined_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             color: "#BDC9E1"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza by strain
       subtitle: |-
@@ -575,56 +495,38 @@ views:
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#8C2D04"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah3sentinel_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#EC7014"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#a_no_subtypesentinel_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#FEE391"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bvicsentinel_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#02818A"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#byamsentinel_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#67A9CF"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bnotdeterminedsentinel_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#BDC9E1"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza by strain, sentinel surveillance
       subtitle: |-
@@ -643,51 +545,33 @@ views:
         - catalogPath: flu_monthly#ah1n12009sentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#8C2D04"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah3sentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#EC7014"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#a_no_subtypesentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#FEE391"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bvicsentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#02818A"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#byamsentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#67A9CF"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bnotdeterminedsentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#BDC9E1"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza by strain, sentinel surveillance
       subtitle: |-
@@ -707,56 +591,38 @@ views:
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#8C2D04"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah3nonsentinel_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#EC7014"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#a_no_subtypenonsentinel_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#FEE391"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bvicnonsentinel_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#02818A"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#byamnonsentinel_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#67A9CF"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bnotdeterminednonsentinel_zfilled
           display:
             type: Integer
             tolerance: 0
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             color: "#BDC9E1"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza by strain, non-sentinel surveillance
       subtitle: |-
@@ -775,51 +641,33 @@ views:
         - catalogPath: flu_monthly#ah1n12009nonsentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#8C2D04"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah3nonsentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#EC7014"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#a_no_subtypenonsentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#FEE391"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bvicnonsentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#02818A"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#byamnonsentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#67A9CF"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bnotdeterminednonsentinel_zfilled
           display:
             type: Integer
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             color: "#BDC9E1"
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza by strain, non-sentinel surveillance
       subtitle: |-
@@ -839,35 +687,26 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500;1000;5000;10000
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#inf_allsentinel
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500;1000;5000
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#inf_allnonsentinel
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500;1000;5000
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza by surveillance type
       subtitle: |-
@@ -889,32 +728,23 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#inf_allsentinel
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#inf_allnonsentinel
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza by surveillance type
       subtitle: |-
@@ -936,13 +766,10 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500;1000;5000;10000
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza
       subtitle: |-
@@ -959,12 +786,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza
       subtitle: |-
@@ -981,13 +805,10 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500;1000;5000
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza, sentinel surveillance
       subtitle: |-
@@ -1005,12 +826,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of, sentinel surveillance
       subtitle: |-
@@ -1028,13 +846,10 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500;1000;5000
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza, non-sentinel surveillance
       subtitle: |-
@@ -1052,12 +867,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza, non-sentinel surveillance
       subtitle: |-
@@ -1075,32 +887,23 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_4446472389428730298
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#reported_ili_cases
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_4446472389428730298
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#reported_sari_cases
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_4446472389428730298
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly comparison of data on respiratory infections
       subtitle: |-
@@ -1122,32 +925,23 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_2511298276095561544
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#reported_ili_cases
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_2511298276095561544
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#reported_sari_cases
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_2511298276095561544
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly comparison of data on respiratory infections
       subtitle: |-
@@ -1169,12 +963,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_4446472389428730298
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly reported cases of influenza-like illnesses
       subtitle: |-
@@ -1191,12 +982,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_2511298276095561544
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly reported cases of influenza-like illnesses
       subtitle: |-
@@ -1213,12 +1001,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_4446472389428730298
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly reported cases of acute respiratory infections
       subtitle: |-
@@ -1235,12 +1020,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_2511298276095561544
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly reported cases of acute respiratory infections
       subtitle: |-
@@ -1257,12 +1039,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_4446472389428730298
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly reported cases of severe acute respiratory infections
       subtitle: |-
@@ -1279,12 +1058,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_2114940264292507114
             additionalInfo: *def_2511298276095561544
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_1047553513020542972
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly reported cases of severe acute respiratory infections
       subtitle: |-
@@ -1301,13 +1077,10 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500;1000
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A, sentinel surveillance
       subtitle: |-
@@ -1325,12 +1098,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A, sentinel surveillance
       subtitle: |-
@@ -1348,13 +1118,10 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500;1000
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A, non-sentinel surveillance
       subtitle: |-
@@ -1372,12 +1139,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A, non-sentinel surveillance
       subtitle: |-
@@ -1395,13 +1159,10 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500;1000;5000
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A
       subtitle: |-
@@ -1418,12 +1179,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A
       subtitle: |-
@@ -1440,12 +1198,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A H1N1 (2009), sentinel surveillance
       subtitle: |-
@@ -1464,12 +1219,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A H1N1 (2009), sentinel surveillance
       subtitle: |-
@@ -1488,12 +1240,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A H1N1 (2009), non-sentinel surveillance
       subtitle: |-
@@ -1512,12 +1261,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A H1N1 (2009), non-sentinel surveillance
       subtitle: |-
@@ -1536,12 +1282,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A H1N1 (2009)
       subtitle: |-
@@ -1558,12 +1301,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A H1N1 (2009)
       subtitle: |-
@@ -1580,12 +1320,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A H1
       subtitle: |-
@@ -1602,12 +1339,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A H1
       subtitle: |-
@@ -1624,12 +1358,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A H3, sentinel surveillance
       subtitle: |-
@@ -1647,12 +1378,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A H3, sentinel surveillance
       subtitle: |-
@@ -1670,12 +1398,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A H3, non-sentinel surveillance
       subtitle: |-
@@ -1693,12 +1418,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A H3, non-sentinel surveillance
       subtitle: |-
@@ -1716,12 +1438,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A H3
       subtitle: |-
@@ -1738,12 +1457,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A H3
       subtitle: |-
@@ -1760,12 +1476,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A H5
       subtitle: |-
@@ -1784,12 +1497,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A H7N9
       subtitle: |-
@@ -1806,12 +1516,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A (unknown subtype), sentinel surveillance
       subtitle: |-
@@ -1829,12 +1536,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A (unknown subtype), non-sentinel surveillance
       subtitle: |-
@@ -1852,12 +1556,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza A (unknown subtype)
       subtitle: |-
@@ -1874,13 +1575,10 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B, sentinel surveillance
       subtitle: |-
@@ -1898,13 +1596,10 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500;1000
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B, non-sentinel surveillance
       subtitle: |-
@@ -1922,13 +1617,10 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10;50;100;500;1000
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B
       subtitle: |-
@@ -1945,12 +1637,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B Victoria, sentinel surveillance
       subtitle: |-
@@ -1968,12 +1657,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B Victoria, non-sentinel surveillance
       subtitle: |-
@@ -1991,12 +1677,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B Victoria
       subtitle: |-
@@ -2013,12 +1696,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B Yamagata, sentinel surveillance
       subtitle: |-
@@ -2036,12 +1716,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B Yamagata, non-sentinel surveillance
       subtitle: |-
@@ -2059,12 +1736,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B Yamagata,
       subtitle: |-
@@ -2081,12 +1755,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B (unknown subtype), sentinel surveillance
       subtitle: |-
@@ -2104,12 +1775,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B (unknown subtype), non-sentinel surveillance
       subtitle: |-
@@ -2127,12 +1795,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Weekly confirmed cases of influenza B (unknown subtype)
       subtitle: |-
@@ -2149,13 +1814,10 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 1;2;5;10;
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A H5
       subtitle: |-
@@ -2174,12 +1836,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A H7N9
       subtitle: |-
@@ -2196,12 +1855,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A (unknown subtype), sentinel surveillance
       subtitle: |-
@@ -2219,12 +1875,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A (unknown subtype), non-sentinel surveillance
       subtitle: |-
@@ -2242,12 +1895,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza A (unknown subtype)
       subtitle: |-
@@ -2264,12 +1914,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B, sentinel surveillance
       subtitle: |-
@@ -2287,12 +1934,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B, non-sentinel surveillance
       subtitle: |-
@@ -2310,12 +1954,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B
       subtitle: |-
@@ -2332,12 +1973,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B Yamagata, sentinel surveillance
       subtitle: |-
@@ -2355,12 +1993,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B Yamagata, non-sentinel surveillance
       subtitle: |-
@@ -2378,12 +2013,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B Yamagata
       subtitle: |-
@@ -2400,12 +2032,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B Victoria, sentinel surveillance
       subtitle: |-
@@ -2423,12 +2052,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B Victoria, non-sentinel surveillance
       subtitle: |-
@@ -2446,12 +2072,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B Victoria
       subtitle: |-
@@ -2468,12 +2091,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B (unknown subtype), sentinel surveillance
       subtitle: |-
@@ -2491,12 +2111,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B (unknown subtype), non-sentinel surveillance
       subtitle: |-
@@ -2514,12 +2131,9 @@ views:
           display:
             type: Integer
             tolerance: 30
-            sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
             colorScaleScheme: YlOrRd
-            sourceLink: *def_4019404533801586313
-            dataPublishedBy: *def_7616543856230231790
     config:
       title: Monthly confirmed cases of influenza B (unknown subtype)
       subtitle: |-
