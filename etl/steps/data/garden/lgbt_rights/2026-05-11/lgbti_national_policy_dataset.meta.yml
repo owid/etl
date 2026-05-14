@@ -927,7 +927,7 @@ tables:
       lgbt_military_no_enforcement:
         title: LGBT military service (legal status only)
         description_short: |-
-          Whether lesbian, gay, bisexual, and transgender people are allowed to serve openly in the military, banned from serving, or whether no policy exists, with categories that name which group(s) are affected. Bans are not distinguished by whether they are enforced or not.
+          Whether lesbian, gay, bisexual, and transgender people are allowed to serve openly in the military, banned from serving, or whether no policy exists, with categories that name which group(s) are affected.
         description_key:
           - "{definitions.description_key_dataset}"
           - "This indicator combines `LGB military service` and `Transgender military service` into a single categorical, with one label per real combination that occurs in the data. **_Allowed for LGB and transgender_** (both can serve openly), **_Allowed for LGB only_** (LGB can serve openly, no national policy on transgender service), **_Allowed for transgender only_** (transgender can serve openly, no national policy on LGB service), **_Mixed (LGB allowed, transgender banned)_** (one group is allowed to serve while the other is banned), **_No policy_** (no national policy on either group), **_Banned for LGB only_** (LGB banned, no national policy on transgender service) and **_Banned for LGB and transgender_** (both banned)."
