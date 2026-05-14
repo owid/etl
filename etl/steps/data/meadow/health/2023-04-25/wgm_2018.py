@@ -3,7 +3,6 @@
 Formatting of the data file. We also map COUNTRY IDs to COUNTRY NAMES. This facilitates the country harmonization proces in Garden."""
 
 import pandas as pd
-from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -27,22 +26,21 @@ def run(dest_dir: str) -> None:
 
     # Load all data from snapshot.
     log.info("wgm_2018: load data")
-    dfs = pd.read_excel(snap.path, sheet_name=None)
-    # Load data
-    df = dfs["Full dataset"]
-    df = df.astype({column: str for column in df.columns if column not in ["wgt", "projwt"]})
+    tb = snap.read_excel(sheet_name="Full dataset")
+    tb = tb.astype({column: str for column in tb.columns if column not in ["wgt", "projwt"]})
     # Load metadata
-    df_metadata = dfs["Data dictionary"]
+    tb_meta = snap.read_excel(sheet_name="Data dictionary")
 
     #
     # Process data.
     #
     log.info("wgm_2018: create tables")
-    # Data table
-    df = add_country_column(df, df_metadata)
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-    # Metadata table
-    tb_meta = Table(df_metadata, short_name=f"{paths.short_name}_metadata", underscore=True)
+    # Data table — map COUNTRY IDs to COUNTRY NAMES using the metadata sheet
+    tb = add_country_column(tb, tb_meta)
+    tb = tb.underscore()
+    tb.metadata.short_name = paths.short_name
+    tb_meta = tb_meta.underscore()
+    tb_meta.metadata.short_name = f"{paths.short_name}_metadata"
     #
     # Save outputs.
     #
