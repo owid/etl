@@ -477,6 +477,13 @@ COMBINED_CONFIGS = [
     # one categorical indicator. Of 81 possible 4-tuple patterns, only 12 occur in the
     # v2 data; we map the 5 most common ones and route everything else to the
     # "Varies by region or other" default.
+    #
+    # NOTE: as of v2.0 the only country-year reaching the "or other" part of the
+    # default bucket is Brazil 2025 (a transition-year artefact with both covered=1
+    # and restricted=1 for adults). On each new data release, re-check whether more
+    # transition-year cases appear here and across the two-direction policies — if
+    # the count grows materially, revisit whether to surface them as their own
+    # category or apply the codebook's end-of-year recoding rule.
     {
         "short_name": "gender_affirming_care",
         "sources": [
