@@ -736,12 +736,17 @@ def _build_combined_categorical_table(tb):
     for config in COMBINED_CONFIGS:
         wide[config["short_name"]] = _build_one_combined(wide, config)
 
-    # Combined LGBT military service indicator — built AFTER the loop because it reads
+    # Combined LGBT military service indicators — built AFTER the loop because they read
     # the outputs of `lgb_military_join` and `transgender_military` (also categorical).
+    # Two variants: one preserves the enforcement refinement (8 categories), the other
+    # folds enforcement away (7 categories, legal-status only).
     wide["lgbt_military"] = _build_lgbt_military_combined(wide)
+    wide["lgbt_military_no_enforcement"] = _build_lgbt_military_no_enforcement_combined(wide)
 
     output_cols = (
-        ["country", "year", "gender_marker_change"] + [c["short_name"] for c in COMBINED_CONFIGS] + ["lgbt_military"]
+        ["country", "year", "gender_marker_change"]
+        + [c["short_name"] for c in COMBINED_CONFIGS]
+        + ["lgbt_military", "lgbt_military_no_enforcement"]
     )
     return wide[output_cols]
 
@@ -821,6 +826,38 @@ def _build_lgbt_military_combined(wide):
     return result.copy_metadata(wide["lgb_military__legal"])
 
 
+def _build_lgbt_military_no_enforcement_combined(wide):
+    """Combine `lgb_military_join` and `transgender_military` into a single LGBT military indicator,
+    collapsing the enforcement refinement back to legal-status only.
+
+    Same shape as `_build_lgbt_military_combined` but `"Banned but not enforced"` folds into
+    `"Banned"` on each side before mapping. Drops from 8 to 7 categories: removes the
+    `"Banned for LGB only, not enforced"` bucket and collapses the US-2025 case into
+    `"Mixed (LGB allowed, transgender banned)"`.
+    """
+    from owid.catalog import Variable
+
+    def _fold(label):
+        return "Banned" if label == "Banned but not enforced" else label
+
+    lgb = [_fold(x) for x in wide["lgb_military_join"]]
+    t = [_fold(x) for x in wide["transgender_military"]]
+
+    LABEL_MAP = {
+        ("Allowed", "Allowed"): "Allowed for LGB and transgender",
+        ("Allowed", "No policy"): "Allowed for LGB only",
+        ("No policy", "Allowed"): "Allowed for transgender only",
+        ("Allowed", "Banned"): "Mixed (LGB allowed, transgender banned)",
+        ("No policy", "No policy"): "No policy",
+        ("Banned", "No policy"): "Banned for LGB only",
+        ("Banned", "Banned"): "Banned for LGB and transgender",
+    }
+
+    out = [LABEL_MAP.get((a, b), f"Other ({a} / {b})") for a, b in zip(lgb, t)]
+    result = Variable(out, index=wide.index, name="lgbt_military_no_enforcement")
+    return result.copy_metadata(wide["lgb_military__legal"])
+
+
 def _build_combined_categorical_regional_aggregates(tb_combined):
     """Build regional aggregates for the three combined ordinal indicators.
 
@@ -836,7 +873,11 @@ def _build_combined_categorical_regional_aggregates(tb_combined):
 
     # All combined-categorical indicators: the config-driven ones + the GMC indicator
     # that's built inline (via _build_gmc_combined) and isn't in COMBINED_CONFIGS.
-    indicator_cols = [c["short_name"] for c in COMBINED_CONFIGS] + ["gender_marker_change", "lgbt_military"]
+    indicator_cols = [c["short_name"] for c in COMBINED_CONFIGS] + [
+        "gender_marker_change",
+        "lgbt_military",
+        "lgbt_military_no_enforcement",
+    ]
 
     new_cols = []
     for indicator in indicator_cols:

@@ -924,6 +924,31 @@ tables:
         processing_level: major
         description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. {definitions.derivation_enforcement_refinement}'
 
+      lgbt_military_no_enforcement:
+        title: LGBT military service (legal status only)
+        description_short: |-
+          Whether lesbian, gay, bisexual, and transgender people are allowed to serve openly in the military, banned from serving, or whether no policy exists, with categories that name which group(s) are affected. Bans are not distinguished by whether they are enforced or not.
+        description_key:
+          - "{definitions.description_key_dataset}"
+          - "This indicator combines `LGB military service` and `Transgender military service` into a single categorical, with one label per real combination that occurs in the data. **_Allowed for LGB and transgender_** (both can serve openly), **_Allowed for LGB only_** (LGB can serve openly, no national policy on transgender service), **_Allowed for transgender only_** (transgender can serve openly, no national policy on LGB service), **_Mixed (LGB allowed, transgender banned)_** (one group is allowed to serve while the other is banned), **_No policy_** (no national policy on either group), **_Banned for LGB only_** (LGB banned, no national policy on transgender service) and **_Banned for LGB and transgender_** (both banned)."
+          - "Enforcement is intentionally not surfaced in this version of the combined indicator — the enforcement story (`Banned but not enforced` rows on the underlying LGB and transgender indicators) is available on the standalone `LGB military service` and `Transgender military service` indicators, and on the parallel `LGBT military service` combined indicator that does carry the refinement."
+        unit: ""
+        short_unit: ""
+        display:
+          name: LGBT military service (legal status only)
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Allowed for LGB and transgender
+          - Allowed for LGB only
+          - Allowed for transgender only
+          - Mixed (LGB allowed, transgender banned)
+          - No policy
+          - Banned for LGB only
+          - Banned for LGB and transgender
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. The enforcement refinement carried by the standalone LGB and transgender indicators is collapsed here ("Banned but not enforced" folds into "Banned") so this combined view stays at the legal-status level.'
+
   lgbti_national_policy_dataset_combined_regions:
     variables:
       # AGE OF CONSENT — number of countries
@@ -3486,6 +3511,160 @@ tables:
         description_short: The total population of countries where both lesbian, gay, and bisexual people and transgender people are banned from serving openly in the military.
         processing_level: major
         description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator, with one label per real combination of LGB and transgender status. {definitions.derivation_enforcement_refinement} We then summed the populations of countries classified as "Banned for LGB and transgender" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Banned for LGB and transgender
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_allowed_for_lgb_and_transgender_count:
+        title: LGBT military service (legal status only) — Allowed for LGB and transgender (number of countries)
+        description_short: The number of countries where both lesbian, gay, and bisexual people and transgender people are allowed to serve openly in the military.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then counted the number of countries classified as "Allowed for LGB and transgender" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: Allowed for LGB and transgender
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_allowed_for_lgb_and_transgender_pop:
+        title: LGBT military service (legal status only) — Allowed for LGB and transgender (population)
+        description_short: The total population of countries where both lesbian, gay, and bisexual people and transgender people are allowed to serve openly in the military.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Allowed for LGB and transgender" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Allowed for LGB and transgender
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_allowed_for_lgb_only_count:
+        title: LGBT military service (legal status only) — Allowed for LGB only (number of countries)
+        description_short: The number of countries where lesbian, gay, and bisexual people are allowed to serve openly in the military; there is no national policy on transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then counted the number of countries classified as "Allowed for LGB only" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: Allowed for LGB only
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_allowed_for_lgb_only_pop:
+        title: LGBT military service (legal status only) — Allowed for LGB only (population)
+        description_short: The total population of countries where lesbian, gay, and bisexual people are allowed to serve openly in the military; there is no national policy on transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Allowed for LGB only" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Allowed for LGB only
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_allowed_for_transgender_only_count:
+        title: LGBT military service (legal status only) — Allowed for transgender only (number of countries)
+        description_short: The number of countries where transgender people are allowed to serve openly in the military; there is no national policy on LGB military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then counted the number of countries classified as "Allowed for transgender only" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: Allowed for transgender only
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_allowed_for_transgender_only_pop:
+        title: LGBT military service (legal status only) — Allowed for transgender only (population)
+        description_short: The total population of countries where transgender people are allowed to serve openly in the military; there is no national policy on LGB military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Allowed for transgender only" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Allowed for transgender only
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_mixed__lgb_allowed__transgender_banned_count:
+        title: LGBT military service (legal status only) — Mixed (LGB allowed, transgender banned) (number of countries)
+        description_short: The number of countries where lesbian, gay, and bisexual people can serve openly while transgender people are banned.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then counted the number of countries classified as "Mixed (LGB allowed, transgender banned)" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: Mixed (LGB allowed, transgender banned)
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_mixed__lgb_allowed__transgender_banned_pop:
+        title: LGBT military service (legal status only) — Mixed (LGB allowed, transgender banned) (population)
+        description_short: The total population of countries where lesbian, gay, and bisexual people can serve openly while transgender people are banned.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Mixed (LGB allowed, transgender banned)" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Mixed (LGB allowed, transgender banned)
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_no_policy_count:
+        title: LGBT military service (legal status only) — No policy (number of countries)
+        description_short: The number of countries where there is no national policy on either LGB or transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then counted the number of countries classified as "No policy" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: No policy
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_no_policy_pop:
+        title: LGBT military service (legal status only) — No policy (population)
+        description_short: The total population of countries where there is no national policy on either LGB or transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "No policy" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: No policy
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_banned_for_lgb_only_count:
+        title: LGBT military service (legal status only) — Banned for LGB only (number of countries)
+        description_short: The number of countries where lesbian, gay, and bisexual people are banned from serving openly; there is no national policy on transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then counted the number of countries classified as "Banned for LGB only" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: Banned for LGB only
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_banned_for_lgb_only_pop:
+        title: LGBT military service (legal status only) — Banned for LGB only (population)
+        description_short: The total population of countries where lesbian, gay, and bisexual people are banned from serving openly; there is no national policy on transgender military service.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Banned for LGB only" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Banned for LGB only
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_banned_for_lgb_and_transgender_count:
+        title: LGBT military service (legal status only) — Banned for LGB and transgender (number of countries)
+        description_short: The number of countries where both lesbian, gay, and bisexual people and transgender people are banned from serving openly in the military.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then counted the number of countries classified as "Banned for LGB and transgender" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: Banned for LGB and transgender
+          numDecimalPlaces: 0
+
+      lgbt_military_no_enforcement_banned_for_lgb_and_transgender_pop:
+        title: LGBT military service (legal status only) — Banned for LGB and transgender (population)
+        description_short: The total population of countries where both lesbian, gay, and bisexual people and transgender people are banned from serving openly in the military.
+        processing_level: major
+        description_processing: '{definitions.derivation_lgb_military_join} We then combined the resulting `LGB military service` categorical with the parallel `Transgender military service` categorical into a single LGBT-military indicator (legal status only — "Banned but not enforced" folds into "Banned"), with one label per real combination of LGB and transgender status. We then summed the populations of countries classified as "Banned for LGB and transgender" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
