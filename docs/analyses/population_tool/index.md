@@ -2,12 +2,12 @@
 status: new
 ---
 
-# Population projection tool: How will populations across the world change in the 21st century?
+# Population projection tool: how will populations across the world change in the 21st century?
 
 !!! info ""
     :octicons-person-16: **[Daniel Bachler](https://ourworldindata.org/team#daniel-bachler), [Sophia Mersmann](https://ourworldindata.org/team#sophia-mersmann), [Hannah Ritchie](https://ourworldindata.org/team/hannah-ritchie)** • :octicons-calendar-16: May 13, 2026 *(last edit)* • [**:octicons-mail-16: Feedback**](mailto:info@ourworldindata.org?subject=Feedback%20on%20technical%20publication%20-%20Population%20projection%20tool)
 
-Our team have built an interactive visualization tool that provides population projections until the end of the century, based on the user’s selection of three key demographic inputs: fertility rates, life expectancy, and net migration.
+Our team has built an interactive visualization tool that provides population projections until the end of the century, based on the user’s selection of three key demographic inputs: fertility rates, life expectancy, and net migration.
 
 This tool is presented in our article [Population tool: How will populations across the world change in the 21st century?](https://ourworldindata.org/population-tool) We also provide a walkthrough of how to use this tool to answer a specific question: what would it take for South Korea to [maintain its current population size](https://ourworldindata.org/south-koreas-population-is-set-to-shrink) throughout this century?
 
@@ -47,19 +47,19 @@ The biggest gaps were for very small territories and in countries whose populati
 
 The fact that our simplified model closely replicates the UN’s results in most countries is a strong validation of the approach.
 
-Note that here we are only testing how accurately the model can project future population totals based on assumed demographic inputs; we’re not testing the predictive accuracy (which hinges on how well you can forecast future changes in fertility rates, life expectancy and migration).
+Note that here we are only testing how accurately the model can project future population totals based on assumed demographic inputs; we’re not testing the predictive accuracy (which hinges on how well you can forecast future changes in fertility rates, life expectancy, and migration).
 
 ## How does it work?
 
 Our model applies the cohort-component method. This approach is also used by the UN in its forecasts, and is commonly used by expert demographers, researchers, and statistical offices.
 
-The approach follows groups of people — cohorts — over time, and applies the expected inputs for fertility, mortality and migration to each cohort.
+The approach follows groups of people — cohorts — over time, and applies the expected inputs for fertility, mortality, and migration to each cohort.
 
 Cohorts are broken down by age and sex. The projected change for the first year is then based on four changes.
 
 1\. **Deaths:** Some people die, and they are removed from the population total
 
-2\. **Ageing**: Everyone else advances by one year
+2\. **Aging**: Everyone else advances by one year
 
 3\. **Migration**: People arrive or leave the country, and are added or removed from the total
 
@@ -76,7 +76,7 @@ To translate the life expectancy input into these age-specific rates, it starts 
 
 This scaling results in proportionally larger reductions in mortality at younger and middle ages than at the oldest ages, reflecting how mortality improvements have historically been distributed. At very old ages (older than 85), the model applies a smooth mathematical closure to make sure that mortality rates remain plausible. But this rule is relaxed when the user puts very high life expectancies into the model (often leading to implausible realities).
 
-#### 2\. Ageing
+#### 2\. Aging
 
 This change is simple: if someone was 47 in the previous year, they become 48 in the next year’s model iteration.
 
@@ -90,13 +90,13 @@ The **Western standard** is the classic distribution you’d get from labor-mark
 
 ![Western standard age profile](western-standard.png)
 
-The **Low Dependency** distribution has a much taller, narrower peak, with most migrants aged 20-30 who moved for work.
+The **Low dependency** distribution has a much taller, narrower peak, with most migrants aged 20–30 who moved for work.
 
 ![Low dependency age profile](low-dependency.png)
 
 For countries with good migration data, the model selects the distribution and sex pattern that best fits the observed population changes over the last 15 or so years. For countries with sparse data, it falls back to pooled defaults.
 
-This choice of profile also varies depending on whether we’re talking about people leaving a country or entering. A country with positive net migration — with more people moving in — tends to have a younger migrant age profile. A country with negative net migration — with more people leaving — the age profile tends to be older. The model adjusts for this depending on the balance of people entering and leaving.
+This choice of profile also varies depending on whether we’re talking about people leaving a country or entering. A country with positive net migration — with more people moving in — tends to have a younger migrant age profile. A country with negative net migration — with more people leaving — tends to have an older migrant age profile. The model adjusts for this depending on the balance of people entering and leaving.
 
 #### 4\. Births
 
@@ -110,9 +110,9 @@ The natural [sex ratio at birth](https://ourworldindata.org/grapher/sex-ratio-at
 
 There are several limitations of the model, which means the output of any set of standard inputs may differ from projections from expert demographers. Here are some caveats to keep in mind when using and relying on its outputs.
 
-1. **It starts from historical estimates, which are also uncertain**. The model makes projections based on the UNWPP’s historical population estimates. For many countries, these counts are reliable, but for some without strong statistical capacity, figures for the total population, fertility rates, death rates, and migration are much more uncertain. Inevitably, if the starting point is inaccurate, future projections will be, too. In fact, these discrepancies may even compound over time. This is a challenge for all demographic models, not just ours.
+1. **It starts from historical estimates, which are also uncertain**. The model makes projections based on the UN’s historical population estimates. For many countries, these counts are reliable, but for some without strong statistical capacity, figures for the total population, fertility rates, death rates, and migration are much more uncertain. Inevitably, if the starting point is inaccurate, future projections will be, too. In fact, these discrepancies may even compound over time. This is a challenge for all demographic models, not just ours.
 
-2. **The model uses a linear extrapolation between 2023, 2030, 2050 and 2100**. The user can change values for the input variables at three points in time: 2030, 2050 and 2100\. The model then has to fill these inputs for the years between these points. It does this using a linear extrapolation. This is a simplifcation; in reality, many of these changes would follow non-linear paths, with steeper and shallower changes, and in some cases, temporary reversals.
+2. **The model uses a linear extrapolation between 2023, 2030, 2050, and 2100**. The user can change values for the input variables at three points in time: 2030, 2050, and 2100\. The model then has to fill these inputs for the years between these points. It does this using a linear extrapolation. This is a simplification; in reality, many of these changes would follow non-linear paths, with steeper and shallower changes, and in some cases, temporary reversals.
 
 3. **The age of birth and mortality patterns does not change over time**. If you change the fertility rate input, the model increases or reduces the age-specific rates proportionally. If, in 2023, it is mostly women in their late 20s having the most children, this will remain the case throughout the entire period. In other words, it does not account for the fact that the age pattern of births may change over time. This is also true for mortality: the distribution of who dies at what age is maintained.
 
@@ -121,5 +121,5 @@ Our model uses a small set of stylized age-sex schedules to distribute net migra
 
 5. **Population data is grouped into 5-year bands**. Both the inputs and outputs of this model have population grouped into 5-year age groups. This will miss some of the nuances and differences within each band, introducing some error.
 
-6. **Like many demographic models, there are is no feedback between demographic changes and societal response**. If there was a dramatic increase in fertility rates — and a subsequent rapid increase in population — a society would be impacted in a number of ways. For example, there may be housing shortages, or pressure on public services. Some people might be priced out of housing, and have fewer children in response.
-These types of feedbacks are not incorporated into the model. Depending on the user inputs, this can lead to some scenarios that are plausible mathemetically but implausible in reality.
+6. **Like many demographic models, there is no feedback between demographic changes and societal response**. If there was a dramatic increase in fertility rates — and a subsequent rapid increase in population — a society would be impacted in a number of ways. For example, there may be housing shortages, or pressure on public services. Some people might be priced out of housing, and have fewer children in response.
+These types of feedbacks are not incorporated into the model. Depending on the user inputs, this can lead to some scenarios that are plausible mathematically but implausible in reality.
