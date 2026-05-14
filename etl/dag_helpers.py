@@ -276,10 +276,22 @@ def write_to_dag_file(
             # Ensure all comments end in a line break, otherwise add it.
             comments[step] = comments[step] + "\n"
 
-    # The line-based logic below assumes every step is declared at the top level.
-    # If ``dag_file`` uses the compact nested syntax, flatten it first so that
-    # the update touches the right entries.
-    flatten_dag_file(dag_file)
+    dag_yml = _load_dag_yaml(str(dag_file))
+    existing_steps = _parse_dag_yaml(dag_yml)
+    top_level_steps = set((dag_yml.get("steps") or {}).keys())
+    nested_only_steps = set(existing_steps) - top_level_steps
+    nested_top_level_steps = {
+        step
+        for step, dependencies in (dag_yml.get("steps") or {}).items()
+        if _dependencies_contain_nested_step(dependencies)
+    }
+    steps_that_would_flatten = set(dag_part) & (nested_only_steps | nested_top_level_steps)
+    if steps_that_would_flatten:
+        steps = ", ".join(sorted(steps_that_would_flatten))
+        raise ValueError(
+            "Cannot update steps declared with nested DAG syntax without flattening the file. "
+            f"Affected steps: {steps}. Please flatten the file manually or use a nesting-aware writer."
+        )
 
     # Read the lines in the original dag file.
     with open(dag_file) as file:
@@ -379,6 +391,13 @@ def write_to_dag_file(
     # Write the updated content back to the dag file.
     with open(dag_file, "w") as file:
         file.writelines(updated_lines)
+
+
+def _dependencies_contain_nested_step(dependencies: Any) -> bool:
+    """Return true if a dependency list declares nested DAG steps."""
+    if not isinstance(dependencies, list):
+        return False
+    return any(isinstance(dependency, dict) for dependency in dependencies)
 
 
 def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:

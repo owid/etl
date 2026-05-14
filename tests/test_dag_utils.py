@@ -1036,10 +1036,50 @@ steps:
         assert flatten_dag_file(p) is False
 
 
-def test_write_to_dag_file_handles_nested_input():
-    # Writers operate on a flat file; if the target file has nested entries,
-    # they should be flattened first so that the line-based logic finds the
-    # step it is meant to update.
+def test_write_to_dag_file_nested_noop_preserves_structure_and_comments():
+    old_content = """\
+steps:
+  # UN WPP (2022)
+  data://grapher/un/2022-07-11/un_wpp:
+    # In-block comment.
+    - data://garden/un/2022-07-11/un_wpp:
+      - data://meadow/un/2022-07-11/un_wpp:
+        - snapshot://un/2022-07-11/un_wpp.zip
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        write_to_dag_file(p, dag_part={})
+        assert p.read_text() == old_content
+
+
+def test_write_to_dag_file_nested_input_appends_new_steps_flat_without_flattening_existing_steps():
+    old_content = """\
+steps:
+  data://grapher/un/2022-07-11/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp:
+      - data://meadow/un/2022-07-11/un_wpp:
+        - snapshot://un/2022-07-11/un_wpp.zip
+"""
+    expected_content = (
+        old_content
+        + """\
+  data://meadow/foo/2024/bar:
+    - snapshot://foo/2024/bar.csv
+"""
+    )
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        write_to_dag_file(
+            p,
+            dag_part={"data://meadow/foo/2024/bar": ["snapshot://foo/2024/bar.csv"]},
+        )
+        assert p.read_text() == expected_content
+        assert load_dag(p)["data://garden/un/2022-07-11/un_wpp"] == {"data://meadow/un/2022-07-11/un_wpp"}
+
+
+def test_write_to_dag_file_nested_input_refuses_to_update_nested_steps():
     old_content = """\
 steps:
   data://grapher/un/2022-07-11/un_wpp:
@@ -1050,24 +1090,17 @@ steps:
     with tempfile.TemporaryDirectory() as d:
         p = Path(d) / "dag.yml"
         p.write_text(old_content)
-        # Update the garden step to add a new dep — this must apply whether
-        # the file is stored flat or nested.
-        write_to_dag_file(
-            p,
-            dag_part={
-                "data://garden/un/2022-07-11/un_wpp": [
-                    "data://meadow/un/2022-07-11/un_wpp",
-                    "data://garden/regions/latest",
-                ]
-            },
-        )
-        after = p.read_text()
-        assert "    - data://garden/regions/latest" in after
-        # The update must not silently reintroduce the old single-dep form.
-        assert load_dag(p)["data://garden/un/2022-07-11/un_wpp"] == {
-            "data://meadow/un/2022-07-11/un_wpp",
-            "data://garden/regions/latest",
-        }
+        with pytest.raises(ValueError, match="nested DAG syntax"):
+            write_to_dag_file(
+                p,
+                dag_part={
+                    "data://garden/un/2022-07-11/un_wpp": [
+                        "data://meadow/un/2022-07-11/un_wpp",
+                        "data://garden/regions/latest",
+                    ]
+                },
+            )
+        assert p.read_text() == old_content
 
 
 def test_remove_steps_from_dag_file_handles_nested_input():
