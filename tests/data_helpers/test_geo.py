@@ -287,6 +287,7 @@ class TestHarmonizeCountries:
             excluded_countries_file="MOCK_EXCLUDED_COUNTRIES_FILE",
             warn_on_unused_countries=False,
             warn_on_missing_countries=False,
+            warn_on_unknown_excluded_countries=False,
         ).equals(df_out)
 
     def test_one_country_left_equal_one_harmonized_and_one_excluded(self):
@@ -298,6 +299,7 @@ class TestHarmonizeCountries:
             excluded_countries_file="MOCK_EXCLUDED_COUNTRIES_FILE",
             warn_on_unused_countries=False,
             warn_on_missing_countries=False,
+            warn_on_unknown_excluded_countries=False,
         ).equals(df_out)
 
     def test_warn_on_unknown_excluded_countries(self):
@@ -813,8 +815,8 @@ class MockRegionsDataset:
     def __getitem__(self, name: str) -> Table:
         mock_tb_regions = Table(
             {
-                "code": ["OWID_EUR", "BLR", "FRA", "ITA", "RUS", "ESP", "OWID_USS"],
-                "name": ["Europe", "Belarus", "France", "Italy", "Russia", "Spain", "USSR"],
+                "code": ["OWID_EUR", "BLR", "FRA", "ITA", "RUS", "ESP", "OWID_USS", "GUF"],
+                "name": ["Europe", "Belarus", "France", "Italy", "Russia", "Spain", "USSR", "French Guiana"],
                 "region_type": [
                     "continent",
                     "country",
@@ -823,11 +825,21 @@ class MockRegionsDataset:
                     "country",
                     "country",
                     "country",
+                    "country",
                 ],
-                "is_historical": [False, False, False, False, False, False, True],
-                "members": ['["BLR", "FRA", "ITA", "RUS", "ESP", "OWID_USS"]', "[]", "[]", "[]", "[]", "[]", "[]"],
-                "successors": ["[]", "[]", "[]", "[]", "[]", "[]", '["BLR", "RUS"]'],
-                "related": ["[]", '["GUF"]', "[]", "[]", "[]", "[]", "[]"],
+                "is_historical": [False, False, False, False, False, False, True, False],
+                "members": [
+                    '["BLR", "FRA", "ITA", "RUS", "ESP", "OWID_USS"]',
+                    "[]",
+                    "[]",
+                    "[]",
+                    "[]",
+                    "[]",
+                    "[]",
+                    "[]",
+                ],
+                "successors": ["[]", "[]", "[]", "[]", "[]", "[]", '["BLR", "RUS"]', "[]"],
+                "related": ["[]", '["GUF"]', "[]", "[]", "[]", "[]", "[]", "[]"],
             }
         ).set_index("code")
         return mock_tb_regions
