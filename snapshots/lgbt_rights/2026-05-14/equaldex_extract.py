@@ -82,9 +82,7 @@ VARIABLES_INDICES = ["name", "ei", "ei_legal", "ei_po"]
 def main(upload: bool) -> None:
     api_key = os.getenv("EQUALDEX_KEY")
     if not api_key:
-        raise click.ClickException(
-            "EQUALDEX_KEY not set. Add it to the repo .env (see this script's docstring)."
-        )
+        raise click.ClickException("EQUALDEX_KEY not set. Add it to the repo .env (see this script's docstring).")
 
     # Load the list of regions Equaldex publishes (curated alongside this script).
     with open(PARENT_DIR / "country_list.json") as f:
@@ -98,14 +96,10 @@ def main(upload: bool) -> None:
     Snapshot(f"lgbt_rights/{SNAPSHOT_VERSION}/equaldex.csv").create_snapshot(data=df_long, upload=upload)
     log.info("Uploaded snapshot: equaldex.csv")
 
-    Snapshot(f"lgbt_rights/{SNAPSHOT_VERSION}/equaldex_current.csv").create_snapshot(
-        data=df_current, upload=upload
-    )
+    Snapshot(f"lgbt_rights/{SNAPSHOT_VERSION}/equaldex_current.csv").create_snapshot(data=df_current, upload=upload)
     log.info("Uploaded snapshot: equaldex_current.csv")
 
-    Snapshot(f"lgbt_rights/{SNAPSHOT_VERSION}/equaldex_indices.csv").create_snapshot(
-        data=df_indices, upload=upload
-    )
+    Snapshot(f"lgbt_rights/{SNAPSHOT_VERSION}/equaldex_indices.csv").create_snapshot(data=df_indices, upload=upload)
     log.info("Uploaded snapshot: equaldex_indices.csv")
 
 
@@ -129,9 +123,7 @@ def fetch_region(region_id: str, api_key: str) -> dict:
     return _get_region(region_id, api_key)
 
 
-def extract_from_api(
-    country_list: list[str], api_key: str
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def extract_from_api(country_list: list[str], api_key: str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Hit the Equaldex API for every region in ``country_list`` and assemble three frames."""
     current_year = datetime.datetime.now().year
 
@@ -190,15 +182,11 @@ def extract_from_api(
             df_current = pd.concat([df_current, current_data], ignore_index=True)
 
     if countries_no_data:
-        log.info(
-            f"Data was not found for the following {len(countries_no_data)} countries: \n{countries_no_data}"
-        )
+        log.info(f"Data was not found for the following {len(countries_no_data)} countries: \n{countries_no_data}")
 
     cols_to_move = ["country", "issue"]
     df_current = df_current[cols_to_move + [c for c in df_current.columns if c not in cols_to_move]]
-    df_historical = df_historical[
-        cols_to_move + [c for c in df_historical.columns if c not in cols_to_move]
-    ]
+    df_historical = df_historical[cols_to_move + [c for c in df_historical.columns if c not in cols_to_move]]
 
     df_current["year_extraction"] = current_year
     df_indices["year"] = current_year
@@ -217,16 +205,13 @@ def create_long_dataset(df_current: pd.DataFrame, df_historical: pd.DataFrame) -
 
     # HISTORICAL DATA
     df_historical = df_historical[
-        ~df_historical["start_date_formatted"].isnull()
-        & ~df_historical["end_date_formatted"].isnull()
+        ~df_historical["start_date_formatted"].isnull() & ~df_historical["end_date_formatted"].isnull()
     ].reset_index(drop=True)
 
     df_historical["year_start"] = (
         df_historical["start_date_formatted"].str.extract(YEAR_REGEX, expand=False).astype(int)
     )
-    df_historical["year_end"] = (
-        df_historical["end_date_formatted"].str.extract(YEAR_REGEX, expand=False).astype(int)
-    )
+    df_historical["year_end"] = df_historical["end_date_formatted"].str.extract(YEAR_REGEX, expand=False).astype(int)
 
     df_historical_long = pd.DataFrame()
     for i in range(len(df_historical)):
@@ -251,13 +236,9 @@ def create_long_dataset(df_current: pd.DataFrame, df_historical: pd.DataFrame) -
     # CURRENT DATA
     df_current = df_current.copy()
     df_current.loc[df_current["start_date_formatted"].isnull(), "date_modified"] = True
-    df_current.loc[df_current["start_date_formatted"].isnull(), "start_date_formatted"] = (
-        f"Jan 1, {current_year}"
-    )
+    df_current.loc[df_current["start_date_formatted"].isnull(), "start_date_formatted"] = f"Jan 1, {current_year}"
 
-    df_current["year_start"] = (
-        df_current["start_date_formatted"].str.extract(YEAR_REGEX, expand=False).astype(int)
-    )
+    df_current["year_start"] = df_current["start_date_formatted"].str.extract(YEAR_REGEX, expand=False).astype(int)
 
     df_current_long = pd.DataFrame()
     for i in range(len(df_current)):
@@ -281,7 +262,5 @@ def create_long_dataset(df_current: pd.DataFrame, df_historical: pd.DataFrame) -
     df_long = df_long[df_long["year"] >= START_YEAR]
     df_long["date_modified"] = df_long["date_modified"].fillna(False)
     df_long = df_long.drop_duplicates(subset=["country", "year", "issue", "id"], keep="first")
-    df_long = df_long.sort_values(
-        by=["country", "year", "issue", "date_modified", "dataset"], ascending=True
-    )
+    df_long = df_long.sort_values(by=["country", "year", "issue", "date_modified", "dataset"], ascending=True)
     return df_long
