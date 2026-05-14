@@ -63,53 +63,53 @@ steps:
   #
   # NSIDC - Arctic sea ice extent.
   #
-  data://garden/climate/2026-01-14/sea_ice_index:
-    - data://meadow/climate/2026-01-14/sea_ice_index
+  data://garden/climate/2026-05-13/sea_ice_index:
+    - data://meadow/climate/2026-05-13/sea_ice_index
   #
   # NOAA Global Monitoring Laboratory - GHG concentration.
   #
-  data://garden/climate/2026-01-14/ghg_concentration:
-    - data://meadow/climate/2026-01-14/ghg_concentration
+  data://garden/climate/2026-05-13/ghg_concentration:
+    - data://meadow/climate/2026-05-13/ghg_concentration
   #
   # NSIDC - Monthly sea ice extent ("country" for decades and latest year, "year" for month number, one indicator per hemisphere).
   #
-  data://grapher/climate/2026-01-14/sea_ice_extent_by_decade:
-    - data://garden/climate/2026-01-14/sea_ice_index
+  data://grapher/climate/2026-05-13/sea_ice_extent_by_decade:
+    - data://garden/climate/2026-05-13/sea_ice_index
   #
   # NSIDC - Monthly sea ice anomalies ("country" for month names, "year" for years, one indicator per hemisphere).
   #
-  data://grapher/climate/2026-01-14/sea_ice_anomalies_by_month:
-    - data://garden/climate/2026-01-14/sea_ice_index
+  data://grapher/climate/2026-05-13/sea_ice_anomalies_by_month:
+    - data://garden/climate/2026-05-13/sea_ice_index
   #
   # NSIDC - Monthly sea ice extent ("country" for years, "year" for month number, one indicator per hemisphere).
   #
-  data://grapher/climate/2026-01-14/sea_ice_extent_by_year:
-    - data://garden/climate/2026-01-14/sea_ice_index
+  data://grapher/climate/2026-05-13/sea_ice_extent_by_year:
+    - data://garden/climate/2026-05-13/sea_ice_index
   #
   # Various sources - Climate change impacts.
   #
-  data://garden/climate/2026-01-14/climate_change_impacts:
+  data://garden/climate/2026-05-13/climate_change_impacts:
     # Various sources - Long-run greenhouse gas concentration.
-    - data://garden/climate/2026-01-14/long_run_ghg_concentration
+    - data://garden/climate/2026-05-13/long_run_ghg_concentration
     # NOAA National Centers for Environmental Information - Ocean Heat Content.
     - data://garden/epa/2024-04-17/ocean_heat_content
     # Rutgers University Global Snow Lab - Snow Cover Extent.
-    - data://garden/climate/2026-01-14/snow_cover_extent
+    - data://garden/climate/2026-05-13/snow_cover_extent
     # School of Ocean and Earth Science and Technology - Hawaii Ocean Time-series (HOT).
-    - data://garden/climate/2026-01-14/ocean_ph_levels
+    - data://garden/climate/2026-05-13/ocean_ph_levels
     # NOAA Climate.gov - Global sea level (possibly not updateable).
     - data://garden/climate/2024-01-28/global_sea_level
     # EPA - Climate change indicators (possibly not updateable).
     - data://garden/epa/2024-04-17/ice_sheet_mass_balance
     - data://garden/epa/2024-04-17/mass_balance_us_glaciers
     # Met Office Hadley Centre - Sea surface temperature.
-    - data://garden/climate/2026-01-14/sea_surface_temperature
-    - data://garden/climate/2026-01-14/sea_ice_index
+    - data://garden/climate/2026-05-13/sea_surface_temperature
+    - data://garden/climate/2026-05-13/sea_ice_index
     # Met Office Hadley Centre - Near surface temperature anomaly.
-    - data://garden/climate/2026-01-14/near_surface_temperature
+    - data://garden/climate/2026-05-13/near_surface_temperature
     # NOAA National Centers for Environmental Information - Ocean Heat Content.
-    - data://garden/climate/2026-01-14/ocean_heat_content
-    - data://garden/climate/2026-01-14/ghg_concentration
+    - data://garden/climate/2026-05-13/ocean_heat_content
+    - data://garden/climate/2026-05-13/ghg_concentration
   #
   # Global Wildfire Information System - Yearly burned area by type.
   #
@@ -132,10 +132,10 @@ steps:
     - data://garden/climate/latest/weekly_wildfires
   data://meadow/climate/2025-02-12/sst:
     - snapshot://climate/2025-04-07/sst.csv
-  data://grapher/climate/2026-01-14/climate_change_impacts_annual:
-    - data://garden/climate/2026-01-14/climate_change_impacts
-  data://grapher/climate/2026-01-14/climate_change_impacts_monthly:
-    - data://garden/climate/2026-01-14/climate_change_impacts
+  data://grapher/climate/2026-05-13/climate_change_impacts_annual:
+    - data://garden/climate/2026-05-13/climate_change_impacts
+  data://grapher/climate/2026-05-13/climate_change_impacts_monthly:
+    - data://garden/climate/2026-05-13/climate_change_impacts
   data://garden/climate/2026-03-02/nasa_ozone_hole:
     - data://meadow/climate/2026-03-02/nasa_ozone_hole
   data://meadow/climate/2026-03-02/nasa_ozone_hole:
@@ -143,14 +143,14 @@ steps:
     - snapshot://climate/2026-03-02/nasa_ozone_hole_p1.txt
   data://grapher/emissions/2022-08-30/ipcc_scenarios:
     - snapshot://emissions/2022-08-30/ipcc_scenarios.zip
-  data://meadow/climate/2026-01-14/sea_ice_index:
-    - snapshot://climate/2026-01-14/sea_ice_index.xlsx
-  data://meadow/climate/2026-01-14/ghg_concentration:
-    - snapshot://climate/2026-01-14/co2_concentration_monthly.csv
-    - snapshot://climate/2026-01-14/ch4_concentration_monthly.csv
-    - snapshot://climate/2026-01-14/n2o_concentration_monthly.csv
-  data://garden/climate/2026-01-14/long_run_ghg_concentration:
-    - data://garden/climate/2026-01-14/ghg_concentration
+  data://meadow/climate/2026-05-13/sea_ice_index:
+    - snapshot://climate/2026-05-13/sea_ice_index.xlsx
+  data://meadow/climate/2026-05-13/ghg_concentration:
+    - snapshot://climate/2026-05-13/co2_concentration_monthly.csv
+    - snapshot://climate/2026-05-13/ch4_concentration_monthly.csv
+    - snapshot://climate/2026-05-13/n2o_concentration_monthly.csv
+  data://garden/climate/2026-05-13/long_run_ghg_concentration:
+    - data://garden/climate/2026-05-13/ghg_concentration
     # EPA - Climate change indicators (possibly not updateable).
     - data://garden/epa/2024-04-17/ghg_concentration
   data://garden/epa/2024-04-17/ghg_concentration:
@@ -164,15 +164,15 @@ steps:
   data://meadow/epa/2024-04-17/ocean_heat_content:
     - snapshot://epa/2024-04-17/ocean_heat_content_annual_world_700m.csv
     - snapshot://epa/2024-04-17/ocean_heat_content_annual_world_2000m.csv
-  data://garden/climate/2026-01-14/snow_cover_extent:
-    - data://meadow/climate/2026-01-14/snow_cover_extent
-  data://meadow/climate/2026-01-14/snow_cover_extent:
-    - snapshot://climate/2026-01-14/snow_cover_extent_north_america.csv
-    - snapshot://climate/2026-01-14/snow_cover_extent_northern_hemisphere.csv
-  data://garden/climate/2026-01-14/ocean_ph_levels:
-    - data://meadow/climate/2026-01-14/hawaii_ocean_time_series
-  data://meadow/climate/2026-01-14/hawaii_ocean_time_series:
-    - snapshot://climate/2026-01-14/hawaii_ocean_time_series.csv
+  data://garden/climate/2026-05-13/snow_cover_extent:
+    - data://meadow/climate/2026-05-13/snow_cover_extent
+  data://meadow/climate/2026-05-13/snow_cover_extent:
+    - snapshot://climate/2026-05-13/snow_cover_extent_north_america.csv
+    - snapshot://climate/2026-05-13/snow_cover_extent_northern_hemisphere.csv
+  data://garden/climate/2026-05-13/ocean_ph_levels:
+    - data://meadow/climate/2026-05-13/hawaii_ocean_time_series
+  data://meadow/climate/2026-05-13/hawaii_ocean_time_series:
+    - snapshot://climate/2026-05-13/hawaii_ocean_time_series.csv
   data://garden/climate/2024-01-28/global_sea_level:
     - data://meadow/climate/2024-01-28/global_sea_level
   data://meadow/climate/2024-01-28/global_sea_level:
@@ -185,110 +185,28 @@ steps:
     - data://meadow/epa/2024-04-17/mass_balance_us_glaciers
   data://meadow/epa/2024-04-17/mass_balance_us_glaciers:
     - snapshot://epa/2024-04-17/mass_balance_us_glaciers.csv
-  data://garden/climate/2026-01-14/sea_surface_temperature:
-    - data://meadow/climate/2026-01-14/sea_surface_temperature
-  data://meadow/climate/2026-01-14/sea_surface_temperature:
-    - snapshot://climate/2026-01-14/sea_surface_temperature_southern_hemisphere.csv
-    - snapshot://climate/2026-01-14/sea_surface_temperature_northern_hemisphere.csv
-    - snapshot://climate/2026-01-14/sea_surface_temperature_world.csv
-  data://garden/climate/2026-01-14/near_surface_temperature:
-    - data://meadow/climate/2026-01-14/near_surface_temperature
-  data://meadow/climate/2026-01-14/near_surface_temperature:
-    - snapshot://climate/2026-01-14/near_surface_temperature_global.csv
-    - snapshot://climate/2026-01-14/near_surface_temperature_northern_hemisphere.csv
-    - snapshot://climate/2026-01-14/near_surface_temperature_southern_hemisphere.csv
-  data://garden/climate/2026-01-14/ocean_heat_content:
-    - data://meadow/climate/2026-01-14/ocean_heat_content
-  data://meadow/climate/2026-01-14/ocean_heat_content:
-    - snapshot://climate/2026-01-14/ocean_heat_content_monthly_world_2000m.csv
-    - snapshot://climate/2026-01-14/ocean_heat_content_annual_world_2000m.csv
-    - snapshot://climate/2026-01-14/ocean_heat_content_annual_world_700m.csv
-    - snapshot://climate/2026-01-14/ocean_heat_content_monthly_world_700m.csv
+  data://garden/climate/2026-05-13/sea_surface_temperature:
+    - data://meadow/climate/2026-05-13/sea_surface_temperature
+  data://meadow/climate/2026-05-13/sea_surface_temperature:
+    - snapshot://climate/2026-05-13/sea_surface_temperature_southern_hemisphere.csv
+    - snapshot://climate/2026-05-13/sea_surface_temperature_northern_hemisphere.csv
+    - snapshot://climate/2026-05-13/sea_surface_temperature_world.csv
+  data://garden/climate/2026-05-13/near_surface_temperature:
+    - data://meadow/climate/2026-05-13/near_surface_temperature
+  data://meadow/climate/2026-05-13/near_surface_temperature:
+    - snapshot://climate/2026-05-13/near_surface_temperature_global.csv
+    - snapshot://climate/2026-05-13/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://climate/2026-05-13/near_surface_temperature_southern_hemisphere.csv
+  data://garden/climate/2026-05-13/ocean_heat_content:
+    - data://meadow/climate/2026-05-13/ocean_heat_content
+  data://meadow/climate/2026-05-13/ocean_heat_content:
+    - snapshot://climate/2026-05-13/ocean_heat_content_monthly_world_2000m.csv
+    - snapshot://climate/2026-05-13/ocean_heat_content_annual_world_2000m.csv
+    - snapshot://climate/2026-05-13/ocean_heat_content_annual_world_700m.csv
+    - snapshot://climate/2026-05-13/ocean_heat_content_monthly_world_700m.csv
   data://garden/climate/2026-04-20/yearly_burned_area:
     - data://garden/wb/2025-07-01/income_groups
     - data://meadow/climate/2026-04-20/yearly_burned_area
     - data://garden/regions/2023-01-01/regions
   data://meadow/climate/2026-04-20/yearly_burned_area:
     - snapshot://climate/2026-04-20/yearly_burned_area.csv
-  #
-  # NSIDC - Arctic sea ice extent.
-  #
-  data://garden/climate/2026-05-13/sea_ice_index:
-    - data://meadow/climate/2026-05-13/sea_ice_index
-  #
-  # NOAA Global Monitoring Laboratory - GHG concentration.
-  #
-  data://garden/climate/2026-05-13/ghg_concentration:
-    - data://meadow/climate/2026-05-13/ghg_concentration
-  data://garden/climate/2026-05-13/long_run_ghg_concentration:
-    - data://garden/climate/2026-05-13/ghg_concentration
-    - data://garden/epa/2024-04-17/ghg_concentration
-  data://garden/climate/2026-05-13/snow_cover_extent:
-    - data://meadow/climate/2026-05-13/snow_cover_extent
-  data://garden/climate/2026-05-13/ocean_ph_levels:
-    - data://meadow/climate/2026-05-13/hawaii_ocean_time_series
-  data://garden/climate/2026-05-13/sea_surface_temperature:
-    - data://meadow/climate/2026-05-13/sea_surface_temperature
-  data://garden/climate/2026-05-13/near_surface_temperature:
-    - data://meadow/climate/2026-05-13/near_surface_temperature
-  data://garden/climate/2026-05-13/ocean_heat_content:
-    - data://meadow/climate/2026-05-13/ocean_heat_content
-  #
-  # NSIDC - Monthly sea ice extent ("country" for decades and latest year, "year" for month number, one indicator per hemisphere).
-  #
-  data://grapher/climate/2026-05-13/sea_ice_extent_by_decade:
-    - data://garden/climate/2026-05-13/sea_ice_index
-  #
-  # NSIDC - Monthly sea ice anomalies ("country" for month names, "year" for years, one indicator per hemisphere).
-  #
-  data://grapher/climate/2026-05-13/sea_ice_anomalies_by_month:
-    - data://garden/climate/2026-05-13/sea_ice_index
-  #
-  # NSIDC - Monthly sea ice extent ("country" for years, "year" for month number, one indicator per hemisphere).
-  #
-  data://grapher/climate/2026-05-13/sea_ice_extent_by_year:
-    - data://garden/climate/2026-05-13/sea_ice_index
-  #
-  # Various sources - Climate change impacts.
-  #
-  data://garden/climate/2026-05-13/climate_change_impacts:
-    - data://garden/climate/2026-05-13/sea_surface_temperature
-    - data://garden/climate/2026-05-13/near_surface_temperature
-    - data://garden/climate/2026-05-13/ocean_heat_content
-    - data://garden/climate/2026-05-13/snow_cover_extent
-    - data://garden/epa/2024-04-17/mass_balance_us_glaciers
-    - data://garden/climate/2026-05-13/ghg_concentration
-    - data://garden/climate/2024-01-28/global_sea_level
-    - data://garden/climate/2026-05-13/ocean_ph_levels
-    - data://garden/climate/2026-05-13/sea_ice_index
-    - data://garden/climate/2026-05-13/long_run_ghg_concentration
-    - data://garden/epa/2024-04-17/ice_sheet_mass_balance
-    - data://garden/epa/2024-04-17/ocean_heat_content
-  data://grapher/climate/2026-05-13/climate_change_impacts_annual:
-    - data://garden/climate/2026-05-13/climate_change_impacts
-  data://grapher/climate/2026-05-13/climate_change_impacts_monthly:
-    - data://garden/climate/2026-05-13/climate_change_impacts
-  data://meadow/climate/2026-05-13/ocean_heat_content:
-    - snapshot://climate/2026-05-13/ocean_heat_content_monthly_world_700m.csv
-    - snapshot://climate/2026-05-13/ocean_heat_content_annual_world_700m.csv
-    - snapshot://climate/2026-05-13/ocean_heat_content_monthly_world_2000m.csv
-    - snapshot://climate/2026-05-13/ocean_heat_content_annual_world_2000m.csv
-  data://meadow/climate/2026-05-13/sea_ice_index:
-    - snapshot://climate/2026-05-13/sea_ice_index.xlsx
-  data://meadow/climate/2026-05-13/hawaii_ocean_time_series:
-    - snapshot://climate/2026-05-13/hawaii_ocean_time_series.csv
-  data://meadow/climate/2026-05-13/ghg_concentration:
-    - snapshot://climate/2026-05-13/ch4_concentration_monthly.csv
-    - snapshot://climate/2026-05-13/co2_concentration_monthly.csv
-    - snapshot://climate/2026-05-13/n2o_concentration_monthly.csv
-  data://meadow/climate/2026-05-13/snow_cover_extent:
-    - snapshot://climate/2026-05-13/snow_cover_extent_northern_hemisphere.csv
-    - snapshot://climate/2026-05-13/snow_cover_extent_north_america.csv
-  data://meadow/climate/2026-05-13/sea_surface_temperature:
-    - snapshot://climate/2026-05-13/sea_surface_temperature_northern_hemisphere.csv
-    - snapshot://climate/2026-05-13/sea_surface_temperature_southern_hemisphere.csv
-    - snapshot://climate/2026-05-13/sea_surface_temperature_world.csv
-  data://meadow/climate/2026-05-13/near_surface_temperature:
-    - snapshot://climate/2026-05-13/near_surface_temperature_global.csv
-    - snapshot://climate/2026-05-13/near_surface_temperature_northern_hemisphere.csv
-    - snapshot://climate/2026-05-13/near_surface_temperature_southern_hemisphere.csv
