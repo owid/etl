@@ -117,7 +117,9 @@ def call_etl_diff(include: str) -> list[str]:
         r"^.*You're on master branch, using local env instead of STAGING=master*", "", stdout, flags=re.MULTILINE
     )
 
-    if result.returncode != 0:
+    if result.returncode == 1 and "Found differences" in stdout:
+        log.info("etl diff found differences", returncode=result.returncode)
+    elif result.returncode != 0:
         details = [f"etl diff failed (exit {result.returncode})", f"Command: {cmd_str}"]
         if stderr:
             details.append(f"stderr (tail):\n{_tail_output(stderr)}")
