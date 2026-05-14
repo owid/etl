@@ -902,80 +902,6 @@ class Source(Base):
     )
     datasetId: Mapped[int | None] = mapped_column(Integer, default=None)
 
-    @property
-    def _upsert_select(self) -> Select:
-        cls = self.__class__
-        # NOTE: we match on both name and additionalInfo (source's description) so that we can
-        # have sources with the same name, but different descriptions
-        conds = [
-            cls.name == self.name,
-            cls.datasetId == self.datasetId,
-            _json_is(cls.description, "additionalInfo", self.description.get("additionalInfo")),
-            _json_is(cls.description, "dataPublishedBy", self.description.get("dataPublishedBy")),
-        ]
-        return select(cls).where(*conds)
-
-    def upsert(self, session: Session) -> "Source":
-        # NOTE: `sources` has no unique constraint, so legacy data may include duplicate rows
-        # matching this query. Pick the oldest (lowest id) and let the dupes remain — they're
-        # still referenced by other variables that point to them by id.
-        ds = session.scalars(self._upsert_select.order_by(self.__class__.id)).first()
-
-        if not ds:
-            ds = self
-        else:
-            ds.updatedAt = datetime.now(timezone.utc)
-            ds.description = self.description
-
-        session.add(ds)
-        session.flush()  # Ensure the object is written to the database and its ID is generated
-        return ds
-
-    @classmethod
-    def load_source(cls, session: Session, source_id: int) -> "Source":
-        return session.scalars(select(cls).where(cls.id == source_id)).one()
-
-    @classmethod
-    def load_sources(
-        cls,
-        session: Session,
-        source_ids: list[int] = [],
-        dataset_id: int | None = None,
-        variable_ids: list[int] = [],
-    ) -> list["Source"]:
-        """Load sources for given dataset & variable ids & source ids."""
-        q = """
-        select distinct * from (
-            select * from sources where datasetId = %(datasetId)s
-            union
-            select * from sources where id in (
-                select sourceId from variables where id in %(variableIds)s
-            ) or id in %(sourceIds)s
-        ) t
-        order by t.id
-        """
-        sources = read_sql(
-            q,
-            session,
-            params={
-                "datasetId": dataset_id,
-                # NOTE: query doesn't work with empty list so we use a dummy value
-                "variableIds": variable_ids or [-1],
-                "sourceIds": source_ids or [-1],
-            },
-        )
-        sources.description = sources.description.map(json.loads)  # ty: ignore[unresolved-attribute]
-
-        # sources are rarely missing datasetId (that is most likely a bug)
-        if sources.datasetId.isnull().any():
-            log.warning(
-                "load_sources.sources_missing_datasetId",
-                source_ids=sources.id[sources.datasetId.isnull()].tolist(),
-            )
-            sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)  # ty: ignore[unresolved-attribute]
-
-        return [cls.from_dict(d) for d in sources.to_dict(orient="records")]  # ty: ignore
-
 
 class DimensionFilter(TypedDict):
     name: str
@@ -2270,14 +2196,6 @@ class NarrativeChart(Base):
 
         # Apply the remapping
         return _remap_variable_ids(copy.deepcopy(merged_config), remap_ids)
-
-
-def _json_is(json_field: Any, key: str, val: Any) -> Any:
-    """SQLAlchemy condition for checking if a JSON field has a key with a given value. Works for null."""
-    if val is None:
-        return text(f"JSON_VALUE({json_field.key}, '$.{key}') IS NULL")
-    else:
-        return json_field[key] == val
 
 
 def _remap_variable_ids(config: list | dict[str, Any] | Any, remap_ids: dict[int, int]) -> Any:
