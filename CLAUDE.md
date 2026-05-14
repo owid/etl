@@ -93,6 +93,10 @@ Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 
 - **No `np.where`** — strips origins. Use `tb["col"] = tb["b"]; tb.loc[mask, "col"] = tb.loc[mask, "a"]`
 - **No `pd.concat`** — strips origins. Use `pr.concat` (`from owid.catalog import processing as pr`)
+- **No `pd.to_numeric` / `pd.to_datetime`** — strip origins. Use `pr.to_numeric` / `pr.to_datetime` (same `from owid.catalog import processing as pr`).
+- **No `pd.DataFrame(tb)`** to "convert" a Table back to a plain DataFrame for downstream helpers — strips column origins. Tables are DataFrame subclasses; pass them through helpers directly and use `pr.*` for any combining ops.
+- **`.dt.*` and `.str.*` accessors return plain Series** — they drop the Variable's metadata on assignment. After `tb[col] = tb[col].str.strip()` (or `.dt.date.astype(str)`), restore with `tb[col] = tb[col].copy_metadata(tb[other_col])` or save `tb[col].metadata` before and reassign after.
+- **`pr.merge` / `pr.concat` require Tables on every side** — if you're merging in a synthetic axis (`pd.date_range`, etc.), wrap it as `Table(df.to_frame())` first, otherwise you get `AttributeError: 'DataFrame'/'Series' object has no attribute 'all_columns'`.
 - **No `index.map()`** to pull columns from another table — loses origins. Use `tb.join(other[["col"]], how="left")`
 - **`snap.read_csv/json/excel/feather/...`** — prefer over manual file reading + `pd.DataFrame`
 - **Don't re-wrap `snap.read_csv()` output in `Table(...)`** — the Table constructor with a plain DataFrame argument drops column-level origins. Mutate the returned Table directly: `tb = snap.read_csv(); tb = tb.dropna(...)`
