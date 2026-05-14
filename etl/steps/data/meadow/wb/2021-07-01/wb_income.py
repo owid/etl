@@ -16,13 +16,6 @@ def run(dest_dir: str) -> None:
     # Checks
     assert tb.Economy.value_counts().max() == 1
 
-    # Drop columns and set Index
-    tb.set_index(
-        ["Economy"],
-        inplace=True,
-        verify_integrity=True,
-    )
-
     tb = tb.rename(
         columns={
             "Other (EMU or HIPC)": "other_emu_or_hipc",
@@ -32,6 +25,8 @@ def run(dest_dir: str) -> None:
     tb.m.short_name = "wb_income_group"
 
     tb = tb.underscore()
+
+    tb = tb.set_index(["economy"], verify_integrity=True)
 
     ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
     ds.save()
