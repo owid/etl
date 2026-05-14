@@ -42,9 +42,9 @@ AGE_OF_CONSENT_MAP = {
     "equal: 1 unequal: 0": "Equal",
     "equal: 1 unequal: 0.5": "Equal",
     "equal: 1 unequal: 1": "Equal",  # transition-year edge case
-    "equal: 0.5 unequal: 0.5": "Partial implementation",
-    "equal: 0.5 unequal: 0": "Partial implementation",
-    "equal: 0 unequal: 0.5": "Partial implementation",
+    "equal: 0.5 unequal: 0.5": "Varies by region",
+    "equal: 0.5 unequal: 0": "Varies by region",
+    "equal: 0 unequal: 0.5": "Varies by region",
     "equal: 0 unequal: 0": "No legal provisions",
     "equal: 0 unequal: 1": "Unequal",
 }
@@ -52,19 +52,19 @@ MARRIAGE_MAP = {
     "equality: 1 ban: 0 civil_unions: 0": "Legal",
     "equality: 1 ban: 0 civil_unions: 1": "Legal",
     "equality: 1 ban: 0 civil_unions: 0.5": "Legal",
-    "equality: 0.5 ban: 0 civil_unions: 0.5": "Partially legal",
-    "equality: 0.5 ban: 0 civil_unions: 1": "Partially legal",  # Brazil 2011–2012
-    "equality: 0 ban: 0 civil_unions: 1": "Partially legal",
-    "equality: 0 ban: 0 civil_unions: 0.5": "Partially legal",
+    "equality: 0.5 ban: 0 civil_unions: 0.5": "Varies by region",
+    "equality: 0.5 ban: 0 civil_unions: 1": "Varies by region",  # Brazil 2011–2012
+    "equality: 0 ban: 0 civil_unions: 1": "Varies by region",
+    "equality: 0 ban: 0 civil_unions: 0.5": "Varies by region",
     "equality: 0 ban: 0 civil_unions: 0": "No legal provisions",
-    "equality: 0 ban: 0.5 civil_unions: 0.5": "Ban and marriage both partial",
-    "equality: 0.5 ban: 0.5 civil_unions: 0.5": "Ban and marriage both partial",
-    "equality: 0.5 ban: 0.5 civil_unions: 1": "Ban and marriage both partial",  # UK 2013–2018
-    "equality: 0.5 ban: 1 civil_unions: 0.5": "Partially banned",
-    "equality: 0.5 ban: 1 civil_unions: 1": "Partially banned",  # Canada 2003–2004
-    "equality: 0 ban: 0.5 civil_unions: 0": "Partially banned",
-    "equality: 0 ban: 1 civil_unions: 1": "Partially banned",
-    "equality: 0 ban: 1 civil_unions: 0.5": "Partially banned",
+    "equality: 0 ban: 0.5 civil_unions: 0.5": "Varies by region",
+    "equality: 0.5 ban: 0.5 civil_unions: 0.5": "Varies by region",
+    "equality: 0.5 ban: 0.5 civil_unions: 1": "Varies by region",  # UK 2013–2018
+    "equality: 0.5 ban: 1 civil_unions: 0.5": "Varies by region",
+    "equality: 0.5 ban: 1 civil_unions: 1": "Varies by region",  # Canada 2003–2004
+    "equality: 0 ban: 0.5 civil_unions: 0": "Varies by region",
+    "equality: 0 ban: 1 civil_unions: 1": "Varies by region",
+    "equality: 0 ban: 1 civil_unions: 0.5": "Varies by region",
     "equality: 0 ban: 1 civil_unions: 0": "Banned",
 }
 LGB_MILITARY_MAP = {
