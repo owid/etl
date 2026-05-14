@@ -931,7 +931,6 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "This indicator combines `LGB military service` and `Transgender military service` into a single categorical, with one label per real combination that occurs in the data. **_Allowed for LGB and transgender_** (both can serve openly), **_Allowed for LGB only_** (LGB can serve openly, no national policy on transgender service), **_Allowed for transgender only_** (transgender can serve openly, no national policy on LGB service), **_Mixed (LGB allowed, transgender banned)_** (one group is allowed to serve while the other is banned), **_No policy_** (no national policy on either group), **_Banned for LGB only_** (LGB banned, no national policy on transgender service) and **_Banned for LGB and transgender_** (both banned)."
-          - "Enforcement is intentionally not surfaced in this version of the combined indicator — the enforcement story (`Banned but not enforced` rows on the underlying LGB and transgender indicators) is available on the standalone `LGB military service` and `Transgender military service` indicators, and on the parallel `LGBT military service` combined indicator that does carry the refinement."
         unit: ""
         short_unit: ""
         display:
