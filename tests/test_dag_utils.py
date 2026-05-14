@@ -1147,12 +1147,15 @@ steps:
     - data://garden/existing/2024/bar:
       - data://meadow/existing/2024/bar
 """
-    expected_content = old_content + """\
+    expected_content = (
+        old_content
+        + """\
   data://grapher/foo/2025/bar:
     - data://garden/foo/2025/bar:
       - data://meadow/foo/2025/bar:
         - snapshot://foo/2025/bar.csv
 """
+    )
     with tempfile.TemporaryDirectory() as d:
         p = Path(d) / "dag.yml"
         p.write_text(old_content)
