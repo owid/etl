@@ -9,7 +9,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-05-11T09:29:47.988074Z"
+exclude-newer = "2026-05-11T11:23:38.741182Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -4674,7 +4674,7 @@ wheels = [
 
 [[package]]
 name = "owid-catalog"
-version = "1.1.1"
+version = "1.2.0"
 source = { editable = "lib/catalog" }
 dependencies = [
     { name = "brotli" },
