@@ -46,6 +46,7 @@ from owid.catalog import Dataset
 def run(dest_dir):
     ds = Dataset.create_empty(dest_dir)
     ds.metadata.short_name = "test"
+    ds.metadata.namespace = "test_ns"
     ds.save()
             """,
             file=ostream,
@@ -326,6 +327,7 @@ tables:
             # Create initial dataset
             ds = Dataset.create_empty(dataset_dir.as_posix())
             ds.metadata.short_name = "test_dataset"
+            ds.metadata.namespace = "test_ns"
 
             # Create a table with one indicator
             tb = Table(pd.DataFrame({"value": [1, 2, 3]}, index=pd.Index([2020, 2021, 2022], name="year")))

@@ -1,5 +1,6 @@
 import os
 import re
+import shlex
 import subprocess
 
 import structlog
@@ -73,6 +74,14 @@ def format_etl_diff(lines: list[str]) -> tuple[str, str]:
     return diff, result
 
 
+def _tail_output(output: str, max_lines: int = 80) -> str:
+    """Return the last non-empty lines from command output for error messages."""
+    lines = output.strip().splitlines()
+    if len(lines) > max_lines:
+        lines = [f"... ({len(lines) - max_lines} lines omitted)", *lines[-max_lines:]]
+    return "\n".join(lines)
+
+
 def call_etl_diff(include: str) -> list[str]:
     cmd = [
         "uv",
@@ -91,16 +100,14 @@ def call_etl_diff(include: str) -> list[str]:
         "3",
     ]
 
-    print(" ".join(cmd))
+    cmd_str = shlex.join(cmd)
+    print(cmd_str)
 
     env = os.environ.copy()
     env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
 
-    result = subprocess.Popen(cmd, cwd=BASE_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    result = subprocess.Popen(cmd, cwd=BASE_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, text=True)
     stdout, stderr = result.communicate()
-
-    stdout = stdout.decode()
-    stderr = stderr.decode()
 
     # Remove all warnings from stderr
     stderr = re.sub(r"^.*WARNING.*", "", stderr, flags=re.MULTILINE).strip()
@@ -110,8 +117,17 @@ def call_etl_diff(include: str) -> list[str]:
         r"^.*You're on master branch, using local env instead of STAGING=master*", "", stdout, flags=re.MULTILINE
     )
 
-    if result.returncode != 0:
-        raise Exception(f"etl diff failed (exit {result.returncode}): {stderr}")
+    if result.returncode == 1 and "Found differences" in stdout:
+        log.info("etl diff found differences", returncode=result.returncode)
+    elif result.returncode != 0:
+        details = [f"etl diff failed (exit {result.returncode})", f"Command: {cmd_str}"]
+        if stderr:
+            details.append(f"stderr (tail):\n{_tail_output(stderr)}")
+        if stdout:
+            details.append(f"stdout (tail):\n{_tail_output(stdout)}")
+        if not stdout and not stderr:
+            details.append("No stdout or stderr was captured.")
+        raise RuntimeError("\n\n".join(details))
     if stderr:
         log.warning("etl diff produced stderr output", stderr=stderr)
 
