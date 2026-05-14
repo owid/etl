@@ -231,14 +231,25 @@ def expand_time_column(
     if method == "full_range_entity":
 
         def _reindex_dates(group):
+            name = group.name
             complete_date_range = _get_complete_date_range(group[time_col])
             group = (
                 group.set_index(time_col).reindex(complete_date_range).reset_index().rename(columns={"index": time_col})
             )
-            group[dimension_col] = group[dimension_col].ffill().bfill()  # Fill NaNs in 'country'
+            # Fill the dimension column(s) with the group key (avoiding the previous ffill/bfill hack).
+            if SINGLE_DIMENSION:
+                group[dimension_col] = name
+            else:
+                for col, val in zip(dimension_col, name):
+                    group[col] = val
             return group
 
-        df = df.groupby(dimension_col).apply(_reindex_dates).reset_index(drop=True).set_index(index)  # ty: ignore
+        df = (  # ty: ignore[invalid-assignment]
+            df.groupby(dimension_col, group_keys=False)
+            .apply(_reindex_dates, include_groups=False)
+            .reset_index(drop=True)
+            .set_index(index)
+        )
         df = cast(TableOrDataFrame, df.reset_index())
     # Either full range or all observations.
     elif method in {"full_range", "observed"}:
