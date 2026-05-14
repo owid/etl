@@ -845,6 +845,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Covered for adults and minors_** (gender-affirming healthcare is publicly funded for both adults and minors), **_Covered for adults only_** (gender-affirming healthcare is publicly funded for adults but not for minors), **_Adults covered, minors restricted_** (gender-affirming healthcare is publicly funded for adults but explicitly restricted or banned for minors), **_Neither covered nor restricted_** (no national policy explicitly funds or restricts gender-affirming healthcare for either group), **_Varies by region or other_** (rules differ between subnational jurisdictions, or the pattern of coverage and restriction does not fit one of the dedicated categories) and **_Restricted for both_** (gender-affirming healthcare is explicitly restricted or banned for both adults and minors).'
+          - 'The **_Varies by region or other_** category captures two situations: (1) countries where rules differ between subnational jurisdictions, and (2) rare country-year patterns where coverage and restriction coexist in ways that don''t match the other categories — for example, when new restrictions are introduced for one group while existing coverage for that group remains formally in place.'
         unit: ""
         short_unit: ""
         display:
