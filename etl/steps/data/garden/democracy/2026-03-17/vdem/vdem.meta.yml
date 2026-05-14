@@ -1,5 +1,38 @@
 definitions:
   aux:
+    brackets_1: &brackets_1
+      - 0
+      - 0.1
+      - 0.2
+      - 0.3
+      - 0.4
+      - 0.5
+      - 0.6
+      - 0.7
+      - 0.8
+      - 0.9
+      - 1
+    gconfig_base: &gconfig_base
+      hasMapTab: true
+      tab: map
+      yAxis:
+        max: 1
+        min: 0
+      map:
+        colorScale:
+          binningStrategy: manual
+          customNumericValues: *brackets_1
+    gconfig_1: &gconfig_1
+      <<: *gconfig_base
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+    gconfig_2: &gconfig_2
+      <<: *gconfig_base
+      map:
+        colorScale:
+          baseColorScheme: GnBu
+
     description_processing_row: |-
       While RoW covers the years since 1900, we use V-Dem's historical data from 1789 to 1899 to expand the classification's coverage back in time.
 
@@ -128,16 +161,16 @@ tables:
                 baseColorScheme: BinaryMapPaletteA
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -154,9 +187,9 @@ tables:
         display:
           numDecimalPlaces: 2
 
-      ## 2.2.5 Share of population with suffrage
+          ## 2.2.5 Share of population with suffrage
           name: Elected Political Leaders Index
-          color: '#3c4e66'
+          color: "#3c4e66"
       suffr_vdem:
         title: "Share of population with suffrage"
         description_short: |-
@@ -189,23 +222,23 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericLabels:
-                  - ''
-                  - 
-                  - ''
-                  - ''
-                  - ''
-                  - ''
+                  - ""
+                  -
+                  - ""
+                  - ""
+                  - ""
+                  - ""
                 customNumericValues:
                   - 0
                   - 10
@@ -222,9 +255,9 @@ tables:
         display:
           numDecimalPlaces: 2
 
-      ## 3.1.3.3 Election turnout
-          unit: '%'
-          shortUnit: '%'
+          ## 3.1.3.3 Election turnout
+          unit: "%"
+          shortUnit: "%"
       turnout_vdem:
         title: "Voter turnout of registered voters"
         description_short: |-
@@ -310,7 +343,7 @@ tables:
         display:
           numDecimalPlaces: 2
 
-      ## 9.4.2 Government effectiveness
+          ## 9.4.2 Government effectiveness
           name: Direct Democracy Index
         presentation:
           grapher_config:
@@ -326,16 +359,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -387,19 +420,19 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericLabels:
-                  - ''
-                  - 
-                  - 
-                  - 
-                  - 
-                  - 
-                  - 
+                  - ""
+                  -
+                  -
+                  -
+                  -
+                  -
+                  -
                 customNumericValues:
                   - 0
                   - 18
@@ -408,11 +441,11 @@ tables:
                   - 90
                   - 176
                 customCategoryColors:
-                  No data: '#ffffff'
-                  no data: '#ffffff'
-                  closed autocracy: '#8d6e71'
-                  electoral autocracy: '#c6a1a5'
-                  not an electoral democracy: '#fdae61'
+                  No data: "#ffffff"
+                  no data: "#ffffff"
+                  closed autocracy: "#8d6e71"
+                  electoral autocracy: "#c6a1a5"
+                  not an electoral democracy: "#fdae61"
                 customCategoryLabels:
                   no data: No data
                   closed autocracy: Closed autocracy
@@ -455,18 +488,18 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericLabels:
-                  - ''
-                  - 
-                  - 
-                  - 
-                  - 
-                  - 
+                  - ""
+                  -
+                  -
+                  -
+                  -
+                  -
                 customNumericValues:
                   - 0
                   - 18
@@ -475,12 +508,12 @@ tables:
                   - 90
                   - 1
                 customCategoryColors:
-                  No data: '#ffffff'
-                  no data: '#ffffff'
-                  closed autocracy: '#8d6e71'
-                  electoral autocracy: '#c6a1a5'
-                  electoral democracy: '#f3d0d4'
-                  not a liberal democracy: '#fdae61'
+                  No data: "#ffffff"
+                  no data: "#ffffff"
+                  closed autocracy: "#8d6e71"
+                  electoral autocracy: "#c6a1a5"
+                  electoral democracy: "#f3d0d4"
+                  not a liberal democracy: "#fdae61"
                 customCategoryLabels:
                   no data: No data
                   closed autocracy: Closed autocracy
@@ -729,10 +762,10 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#ff0000'
-                  - '#ffc0c0'
-                  - '#80ff80'
-                  - '#008000'
+                  - "#ff0000"
+                  - "#ffc0c0"
+                  - "#80ff80"
+                  - "#008000"
                 customNumericLabels:
                   - Closed autocracy
                   - Electoral autocracy
@@ -778,26 +811,26 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#d7191c'
-                  - '#e74731'
-                  - '#f88e52'
-                  - 
-                  - '#f0cda5'
-                  - '#d0dcc1'
-                  - 
-                  - '#8dc1dc'
-                  - '#5496c5'
-                  - '#2c7bb6'
+                  - "#d7191c"
+                  - "#e74731"
+                  - "#f88e52"
+                  -
+                  - "#f0cda5"
+                  - "#d0dcc1"
+                  -
+                  - "#8dc1dc"
+                  - "#5496c5"
+                  - "#2c7bb6"
                 customNumericLabels:
                   - Closed autocracy
-                  - ''
-                  - '2'
+                  - ""
+                  - "2"
                   - Electoral autocracy
-                  - ''
-                  - '5'
+                  - ""
+                  - "5"
                   - Electoral democracy
-                  - ''
-                  - '8'
+                  - ""
+                  - "8"
                   - Liberal democracy
                 customNumericValues:
                   - 0
@@ -832,7 +865,7 @@ tables:
           title_public: "Political regime"
           title_variant: "reduced"
 
-      # 6.1 Party-System Democracy Index (D)
+          # 6.1 Party-System Democracy Index (D)
           grapher_config:
             title: Electoral democracy
             subtitle: Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections.
@@ -847,9 +880,9 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#8d6e71'
-                  - '#c6a1a5'
-                  - '#abd9e9'
+                  - "#8d6e71"
+                  - "#c6a1a5"
+                  - "#abd9e9"
                 customNumericLabels:
                   - Closed autocracy
                   - Electoral autocracy
@@ -1000,45 +1033,15 @@ tables:
           <<: *ppt_multi_w_regions
           title_public: Electoral democracy index
 
-      ## 2.1.2 Liberal democracy index
           grapher_config:
             title: Electoral Democracy Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed. The index ranges from 0 to 1 (most democratic).
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 1
-              min: 0
-            map:
-              colorScale:
-                baseColorScheme: YlGnBu
-                binningStrategy: manual
-                customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
-                customNumericValues:
-                  - 0
-                  - 0.1
-                  - 0.2
-                  - 0.3
-                  - 0.4
-                  - 0.5
-                  - 0.6
-                  - 0.7
-                  - 0.8
-                  - 0.9
-                  - 1
+            <<: *gconfig_1
         display:
           name: Electoral Democracy Index
-          color: '#3c4e66'
+          color: "#3c4e66"
+
+      ## 2.1.2 Liberal democracy index
       libdem_vdem:
         title: |-
           Liberal democracy index ({definitions.aux.estimate} estimate)
@@ -1060,16 +1063,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -1103,11 +1106,10 @@ tables:
 
           V-Dem indicator name: `v2x_libdem`
         unit: ""
-
-      # 2.1.3 Participatory democracy index
+        # 2.1.3 Participatory democracy index
         display:
           name: Liberal Democracy Index
-          color: '#3c4e66'
+          color: "#3c4e66"
       participdem_vdem:
         title: |-
           Extent of direct popular votes ({definitions.aux.estimate} estimate)
@@ -1130,16 +1132,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -1161,11 +1163,10 @@ tables:
 
           V-Dem indicator name: `v2x_partipdem`
         unit: ""
-
-      ## 2.1.4 Deliberative democracy index
+        ## 2.1.4 Deliberative democracy index
         display:
           name: Participatory Denocracy Index
-          color: '#3e4c66'
+          color: "#3e4c66"
       delibdem_vdem:
         title: |-
           Deliberative democracy index ({definitions.aux.estimate} estimate)
@@ -1187,16 +1188,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -1222,10 +1223,10 @@ tables:
         description_key:
           - *key_regions_agg
 
-      ## 2.1.5 Egalitarian democracy index
+        ## 2.1.5 Egalitarian democracy index
         display:
           name: Deliberative Democracy Index
-          color: '#3c4e66'
+          color: "#3c4e66"
       egaldem_vdem:
         title: |-
           Egalitarian democracy index ({definitions.aux.estimate} estimate)
@@ -1247,16 +1248,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -1282,10 +1283,10 @@ tables:
         description_key:
           - *key_regions_agg
 
-      ## 2.2.11 Legislative constraints on the executive index
+        ## 2.2.11 Legislative constraints on the executive index
         display:
           name: Egalitarian Democracy Index
-          color: '#3c4e66'
+          color: "#3c4e66"
       legis_constr_vdem:
         title: |-
           Legislative constraints on the executive index ({definitions.aux.estimate} estimate)
@@ -1307,16 +1308,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -1338,11 +1339,10 @@ tables:
 
           V-Dem indicator name: `v2xlg_legcon`
         unit: ""
-
-      ## 2.2.8 Liberal component index
+        ## 2.2.8 Liberal component index
         display:
           name: Legislative Checks on Government Index
-          color: '#3e4c66'
+          color: "#3e4c66"
       lib_vdem:
         title: |-
           Liberal component index ({definitions.aux.estimate} estimate)
@@ -1364,16 +1364,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -1395,11 +1395,10 @@ tables:
 
           V-Dem indicator name: `v2x_liberal`
         unit: ""
-
-      ## 2.2.15 Local government index
+        ## 2.2.15 Local government index
         display:
           name: Liberal Political Institutions Index
-          color: '#3c4e66'
+          color: "#3c4e66"
       locelect_vdem:
         title: |-
           Elected local governments ({definitions.aux.estimate} estimate)
@@ -1421,16 +1420,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -1452,11 +1451,10 @@ tables:
 
           V-Dem indicator name: `v2xel_locelec`
         unit: ""
-
-      ## 2.2.12 Participatory component index
+        ## 2.2.12 Participatory component index
         display:
           name: Strong Elected Local Governments Index
-          color: '#3c4e66'
+          color: "#3c4e66"
       particip_vdem:
         title: |-
           Participatory political institutions ({definitions.aux.estimate} estimate)
@@ -1478,16 +1476,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -1510,11 +1508,10 @@ tables:
 
           V-Dem indicator name: `v2x_partip`
         unit: ""
-
-      ## 2.2.16 Regional government index
+        ## 2.2.16 Regional government index
         display:
           name: Participatory Political Institutions Index
-          color: '#3c4e66'
+          color: "#3c4e66"
       regelect_vdem:
         title: "Elected regional governments ({definitions.aux.estimate} estimate)"
         description_short: |-
@@ -1536,16 +1533,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -1567,11 +1564,10 @@ tables:
 
           V-Dem indicator name: `v2xel_regelec`
         unit: ""
-
-      ## 2.2.21 Equal distribution of resources index
+        ## 2.2.21 Equal distribution of resources index
         display:
           name: Strong Elected Regional Governments Index
-          color: '#3c4e66'
+          color: "#3c4e66"
       equal_res_vdem:
         title: |-
           Equal resource distribution index ({definitions.aux.estimate} estimate)
@@ -1593,16 +1589,16 @@ tables:
                 baseColorScheme: PuBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.1
@@ -1627,10 +1623,10 @@ tables:
         description_key:
           - *key_regions_agg
 
-      ## 3.5.1.6 Legislature corrupt activities
+        ## 3.5.1.6 Legislature corrupt activities
         display:
           name: Equal Resource Distribution Index
-          color: '#3c4e66'
+          color: "#3c4e66"
       corr_leg_vdem:
         title: |-
           Legislative corruption score ({definitions.aux.estimate} estimate)
@@ -1700,14 +1696,14 @@ tables:
                 baseColorScheme: RdBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - 
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#172976'
+                  - "#9f0026"
+                  -
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - -3
@@ -1735,9 +1731,9 @@ tables:
         description_key:
           - *key_regions_agg
 
-      ## 3.6.0.1 Reasoned justification
+        ## 3.6.0.1 Reasoned justification
         display:
-          color: '#3c4e66'
+          color: "#3c4e66"
       justified_polch_vdem:
         title: |-
           Justified political positions ({definitions.aux.estimate} estimate)
@@ -1759,14 +1755,14 @@ tables:
                 baseColorScheme: RdBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - 
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#172976'
+                  - "#9f0026"
+                  -
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - -3
@@ -1793,9 +1789,9 @@ tables:
         description_key:
           - *key_regions_agg
 
-      ## 3.6.0.5 Engaged society
+        ## 3.6.0.5 Engaged society
         display:
-          color: '#3c4e66'
+          color: "#3c4e66"
       soccons_polch_vdem:
         title: "Engaged society ({definitions.aux.estimate} estimate)"
         description_short: |-
@@ -1816,14 +1812,14 @@ tables:
                 baseColorScheme: RdBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - 
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#172976'
+                  - "#9f0026"
+                  -
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - -3
@@ -1851,10 +1847,9 @@ tables:
 
           V-Dem indicator name: `v2dlengage`
         unit: ""
-
-      ## 3.7.0.6 Judicial corruption decision
+        ## 3.7.0.6 Judicial corruption decision
         display:
-          color: '#3c4e66'
+          color: "#3c4e66"
       corr_jud_vdem:
         title: |-
           Judicial corruption score ({definitions.aux.estimate} estimate)
@@ -2350,16 +2345,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -2385,11 +2380,11 @@ tables:
 
           V-Dem indicator name: `v2x_cspart`
         unit: ""
-
-      ## 3.6.0.3 Respect counterarguments
         display:
           name: Civil Society Participation Index
-          color: '#3c4e66'
+          color: "#3c4e66"
+
+      ## 3.6.0.3 Respect counterarguments
       counterarg_polch_vdem:
         title: |-
           Respect for counterarguments ({definitions.aux.estimate} estimate)
@@ -2411,14 +2406,14 @@ tables:
                 baseColorScheme: RdBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - 
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#172976'
+                  - "#9f0026"
+                  -
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - -3
@@ -2448,11 +2443,11 @@ tables:
         unit: ""
         description_key:
           - *key_regions_agg
-
-      # 2.2.17 Deliberative component index
         display:
           name: Respect for counterarguments
-          color: '#3c4e66'
+          color: "#3c4e66"
+
+      # 2.2.17 Deliberative component index
       delib_vdem:
         title: |-
           Deliberative political institutions index ({definitions.aux.estimate} estimate)
@@ -2474,16 +2469,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -2511,11 +2506,11 @@ tables:
         unit: ""
         description_key:
           - *key_regions_agg
-
-      ## 2.2.18 Egalitarian component index
         display:
           name: Deliberative Political Institutions Index
-          color: '#3c4e66'
+          color: "#3c4e66"
+
+      ## 2.2.18 Egalitarian component index
       egal_vdem:
         title: |-
           Egalitarian political institutions index ({definitions.aux.estimate} estimate)
@@ -2537,16 +2532,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -2570,11 +2565,11 @@ tables:
         unit: ""
         description_key:
           - *key_regions_agg
-
-      ## 2.2.6 Clean elections index
         display:
           name: Egaliatarian Political Institutions Index
-          color: '#3c4e66'
+          color: "#3c4e66"
+
+      ## 2.2.6 Clean elections index
       electfreefair_vdem:
         title: |-
           Clean elections index ({definitions.aux.estimate} estimate)
@@ -2586,38 +2581,7 @@ tables:
           grapher_config:
             title: Free and Fair Elections Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which election violence, government intimidation, fraud, large irregularities, and vote buying are absent. The index ranges from 0 to 1 (most free and fair).
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 1
-              min: 0
-            map:
-              colorScale:
-                baseColorScheme: YlGnBu
-                binningStrategy: manual
-                customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
-                customNumericValues:
-                  - 0
-                  - 0.099
-                  - 0.199
-                  - 0.299
-                  - 0.399
-                  - 0.499
-                  - 0.599
-                  - 0.699
-                  - 0.799
-                  - 0.899
-                  - 1
+            <<: *gconfig_1
         description_key:
           - This index, produced by Varieties of Democracy (V-Dem), is useful if you are exclusively interested in how free and fair elections are. For data that focuses on how democratic a country's political system is more broadly, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
           - It is based on assessments by V-Dem's country experts.
@@ -2637,11 +2601,11 @@ tables:
 
           V-Dem indicator name: `v2xel_frefair`
         unit: ""
-
-      ### 3.6.0.4 Range of consultation
         display:
           name: Free and Fair Elections Index
-          color: '#3c4e66'
+          color: "#3c4e66"
+
+      ### 3.6.0.4 Range of consultation
       elitecons_polch_vdem:
         title: "Elite consultation ({definitions.aux.estimate} estimate)"
         description_short: |-
@@ -2662,14 +2626,14 @@ tables:
                 baseColorScheme: RdBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - 
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#172976'
+                  - "#9f0026"
+                  -
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - -3
@@ -2697,10 +2661,9 @@ tables:
 
           V-Dem indicator name: `v2dlconslt`
         unit: ""
-
-      ## 2.2.20 Equal access index
+        ## 2.2.20 Equal access index
         display:
-          color: '#3c4e66'
+          color: "#3c4e66"
       equal_access_vdem:
         title: |-
           Equal access to power index ({definitions.aux.estimate} estimate)
@@ -2722,16 +2685,16 @@ tables:
                 baseColorScheme: GnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.1
@@ -2753,11 +2716,10 @@ tables:
 
           V-Dem indicator name: `v2xeg_eqaccess`
         unit: ""
-
-      ## 2.2.19 Equal protection index
+        ## 2.2.19 Equal protection index
         display:
           name: Equal Access to Power Index
-          color: '#3c4e66'
+          color: "#3c4e66"
       equal_rights_vdem:
         title: |-
           Equal rights protection index ({definitions.aux.estimate} estimate)
@@ -2779,16 +2741,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.1
@@ -2810,11 +2772,11 @@ tables:
 
           V-Dem indicator name: `v2xeg_eqprotec`
         unit: ""
-
-      ## 2.2.4 Freedom of association thick index
         display:
           name: Equal Rights Protection Index
-          color: '#3c4e66'
+          color: "#3c4e66"
+
+      ## 2.2.4 Freedom of association thick index
       freeassoc_vdem:
         title: "Freedom of association thick index ({definitions.aux.estimate} estimate)"
         description_short: |-
@@ -2825,38 +2787,7 @@ tables:
           grapher_config:
             title: Freedom of Association Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which parties and civil society organizations can form and operate freely. The index ranges from 0 to 1 (most free).
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 1
-              min: 0
-            map:
-              colorScale:
-                baseColorScheme: GnBu
-                binningStrategy: manual
-                customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
-                customNumericValues:
-                  - 0
-                  - 0.1
-                  - 0.2
-                  - 0.3
-                  - 0.4
-                  - 0.5
-                  - 0.6
-                  - 0.7
-                  - 0.8
-                  - 0.9
-                  - 1
+            <<: *gconfig_2
         description_from_producer: |-
           Question: To what extent are parties, including opposition parties, allowed to form and to participate in elections, and to what extent are civil society organizations able to form and to operate freely?
 
@@ -2864,11 +2795,11 @@ tables:
 
           V-Dem indicator name: `v2x_frassoc_thick`
         unit: ""
-
-      ## 2.2.3 Freedom of Expression and Alternative Sources of Information index
         display:
           name: Freedom of Association Index
-          color: '#3c4e66'
+          color: "#3c4e66"
+
+      ## 2.2.3 Freedom of Expression and Alternative Sources of Information index
       freeexpr_vdem:
         title: "Freedom of expression and alternative sources of information index ({definitions.aux.estimate} estimate)"
         description_short: |-
@@ -2889,16 +2820,16 @@ tables:
                 baseColorScheme: YlGn
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.1
@@ -2928,11 +2859,11 @@ tables:
 
           V-Dem indicator name: `v2x_freexp_altinf`
         unit: ""
-
-      ## 2.2.9 Equality before the law and individual liberty index
         display:
           name: Freedom of Expression index
-          color: '#3c4e66'
+          color: "#3c4e66"
+
+      ## 2.2.9 Equality before the law and individual liberty index
       indiv_libs_vdem:
         title: |-
           Equality before the law and individual liberty index ({definitions.aux.estimate} estimate)
@@ -2955,16 +2886,16 @@ tables:
                 baseColorScheme: Blues
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.1
@@ -3007,16 +2938,16 @@ tables:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
+                  - "#9f0026"
+                  - "#e31a1c"
+                  - "#fd8d3c"
+                  - "#fed976"
+                  - "#ffeda0"
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
                 customNumericValues:
                   - 0
                   - 0.099
@@ -3036,11 +2967,10 @@ tables:
 
           V-Dem indicator name: `v2x_jucon`
         unit: ""
-
-      # 5.15.1 Academic Freedom Index
+        # 5.15.1 Academic Freedom Index
         display:
           name: Judicial Checks on Government Index
-          color: '#3c4e66'
+          color: "#3c4e66"
       v2xca_academ:
         title: |-
           Academic freedom index ({definitions.aux.estimate} estimate)
@@ -3457,8 +3387,8 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#ef8a62'
-                  - '#2c7bb6'
+                  - "#ef8a62"
+                  - "#2c7bb6"
                 customNumericLabels:
                   - "No"
                   - "Yes"
@@ -3493,8 +3423,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      # [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.4 Access to justice for women
-          color: '#3c4e66'
+          # [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.4 Access to justice for women
+          color: "#3c4e66"
       accessjust_w_row:
         title: Access to justice for women ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3516,8 +3446,8 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#ef8a62'
-                  - '#2c7bb6'
+                  - "#ef8a62"
+                  - "#2c7bb6"
                 customNumericLabels:
                   - "No"
                   - "Yes"
@@ -3551,8 +3481,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.1.1 Electoral democracy index
-          color: '#3c4e66'
+          ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.1.1 Electoral democracy index
+          color: "#3c4e66"
       electdem_dich_row_owid:
         title: Electoral democracy ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3574,8 +3504,8 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#ef8a62'
-                  - '#2c7bb6'
+                  - "#ef8a62"
+                  - "#2c7bb6"
                 customNumericLabels:
                   - "No"
                   - "Yes"
@@ -3596,8 +3526,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.1.2.15 Election free and fair
-          color: '#3c4e66'
+          ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.1.2.15 Election free and fair
+          color: "#3c4e66"
       electfreefair_row:
         title: Free and fair elections ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3619,8 +3549,8 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#ef8a62'
-                  - '#2c7bb6'
+                  - "#ef8a62"
+                  - "#2c7bb6"
                 customNumericLabels:
                   - "No"
                   - "Yes"
@@ -3657,8 +3587,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      ## [CUSTOM] TODOO
-          color: '#3c4e66'
+          ## [CUSTOM] TODOO
+          color: "#3c4e66"
       electmulpar_hoe_row_owid:
         title: Multi-party elections for government's chief executive ({definitions.aux.estimate} estimate)
         description_short: |
@@ -3680,8 +3610,8 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#ef8a62'
-                  - '#2c7bb6'
+                  - "#ef8a62"
+                  - "#2c7bb6"
                 customNumericLabels:
                   - "No"
                   - "Yes"
@@ -3707,8 +3637,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      ## [CUSTOM, based on `v2elmulpar_osp`]
-          color: '#3c4e66'
+          ## [CUSTOM, based on `v2elmulpar_osp`]
+          color: "#3c4e66"
       electmulpar_leg_row:
         title: Multiparty elections for legislature ({definitions.aux.estimate} estimate)
         description_short: |-
@@ -3730,8 +3660,8 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#ef8a62'
-                  - '#2c7bb6'
+                  - "#ef8a62"
+                  - "#2c7bb6"
                 customNumericLabels:
                   - "No"
                   - "Yes"
@@ -3751,8 +3681,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      ## [RE-ESTIMATE] 3.1.2.5 Elections multiparty
-          color: '#3c4e66'
+          ## [RE-ESTIMATE] 3.1.2.5 Elections multiparty
+          color: "#3c4e66"
       electmulpar_row:
         title: Multiparty elections ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3774,8 +3704,8 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#ef8a62'
-                  - '#2c7bb6'
+                  - "#ef8a62"
+                  - "#2c7bb6"
                 customNumericLabels:
                   - "No"
                   - "Yes"
@@ -3806,8 +3736,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.2.8 Liberal component index
-          color: '#3c4e66'
+          ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.2.8 Liberal component index
+          color: "#3c4e66"
       lib_dich_row:
         title: Liberal political institutions ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3829,8 +3759,8 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#ef8a62'
-                  - '#2c7bb6'
+                  - "#ef8a62"
+                  - "#2c7bb6"
                 customNumericLabels:
                   - "No"
                   - "Yes"
@@ -3851,8 +3781,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.1 Transparent laws with predictable enforcement
-          color: '#3c4e66'
+          ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.1 Transparent laws with predictable enforcement
+          color: "#3c4e66"
       transplaws_row:
         title: Transparent laws with predictable enforcement ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
@@ -3874,8 +3804,8 @@ tables:
                 baseColorScheme: RdYlBu
                 binningStrategy: manual
                 customNumericColors:
-                  - '#ef8a62'
-                  - '#2c7bb6'
+                  - "#ef8a62"
+                  - "#2c7bb6"
                 customNumericLabels:
                   - "No"
                   - "Yes"
@@ -3908,10 +3838,10 @@ tables:
         display:
           numDecimalPlaces: 0
 
-  ##################################################################################################
-  ##################################################################################################
-  # TABLE: COUNT OF COUNTRIES IN X REGIME
-          color: '#3c4e66'
+          ##################################################################################################
+          ##################################################################################################
+          # TABLE: COUNT OF COUNTRIES IN X REGIME
+          color: "#3c4e66"
   vdem_num_countries:
     common:
       unit: "countries"
