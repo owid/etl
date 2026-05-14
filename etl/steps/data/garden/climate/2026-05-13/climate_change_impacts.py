@@ -9,7 +9,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def prepare_sea_ice_extent(tb_nsidc: Table) -> Table:
+def prepare_sea_ice_extent(tb_nsidc: Table) -> tuple[Table, Table]:
     tb_nsidc = tb_nsidc.copy()
     # Create a table with the minimum and maximum Arctic sea ice extent.
     # Assume minimum and maximum occur in September and February every year.
@@ -39,7 +39,7 @@ def prepare_sea_ice_extent(tb_nsidc: Table) -> Table:
 def prepare_ocean_heat_content(tb_ocean_heat_annual: Table, tb_ocean_heat_annual_epa: Table) -> Table:
     # Combine NOAA's annual data on ocean heat content (which is more up-to-date) with the analogous EPA's data based on
     # NOAA (which, for some reason, spans a longer time range for 2000m). Prioritize NOAA's data on common years.
-    tb_ocean_heat_annual = combine_two_overlapping_dataframes(
+    tb_ocean_heat_annual = combine_two_overlapping_dataframes(  # ty: ignore[invalid-assignment]
         tb_ocean_heat_annual.rename(
             columns={
                 "ocean_heat_content_700m": "ocean_heat_content_noaa_700m",

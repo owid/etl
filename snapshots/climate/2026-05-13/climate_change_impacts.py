@@ -208,7 +208,3 @@ def run(upload: bool) -> None:
     for file_name in tqdm(FILES):
         snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/{file_name}")
         snap.create_snapshot(upload=upload)
-
-
-if __name__ == "__main__":
-    run()

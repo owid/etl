@@ -70,7 +70,7 @@ def prepare_gas_data(tb: Table) -> Table:
     tb = tb.copy()
 
     # Extract gas name from table's short name.
-    gas = tb.metadata.short_name.split("_")[0]
+    gas = str(tb.metadata.short_name).split("_")[0]
 
     # Columns to select from the data, and how to rename them.
     columns = {
