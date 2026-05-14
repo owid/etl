@@ -1,5 +1,6 @@
 definitions:
   additionalInfo:
+    # TODO: shouldn't this rather go into origins?
     def_7743772186090429532: &def_7743772186090429532 |-
       **Dataset Description:**
       - FluNET is a human influenza surveillance dataset that aggregates data from (1) the Global Influenza Surveillance and Response System (GISRS), (2) other national influenza reference laboratories that collaborate with the GISRS, and (3) other influenza surveillance data uploaded from WHO regional databases.
