@@ -11,7 +11,7 @@ Our team has built an interactive visualization tool that provides population pr
 
 This tool is presented in our article [Population tool: How will populations across the world change in the 21st century?](https://ourworldindata.org/population-tool) We also provide a walkthrough of how to use this tool to answer a specific question: what would it take for South Korea to [maintain its current population size](https://ourworldindata.org/south-koreas-population-is-set-to-shrink) throughout this century?
 
-This tool was designed to help people understand and explore how future populations could change based on different demographic assumptions. It is deliberately simple and less complex than expert demographic models. Nonetheless, we hope users find it helpful to understand how population projections respond to changes in key inputs. As we describe below, when given the UN's own demographic assumptions as inputs, our tool closely reproduces its projections.
+This tool was designed to help people understand and explore how future populations could change based on different demographic assumptions. It is deliberately simple and less complex than expert demographic models. Nonetheless, we hope users find it helpful to understand how population projections respond to changes in key inputs. As we describe below, when given the UN’s own demographic assumptions as inputs, our tool closely reproduces its projections.
 
 Here, we want to provide a technical explainer of how this model works, its assumptions, and its limitations. This will be more in-depth than most users need, but it is here for those who want to understand the background.
 
@@ -39,7 +39,7 @@ The model then shows what would happen to the total population, and age structur
 
 ## How accurate is it?
 
-One way to assess the accuracy of our simplified model is to run it using the UN’s assumptions for fertility rates, life expectancy, and net migration, and compare its projections with those of the UN's more complex model. That’s what we did.
+One way to assess the accuracy of our simplified model is to run it using the UN’s assumptions for fertility rates, life expectancy, and net migration, and compare its projections with those of the UN’s more complex model. That’s what we did.
 
 When we compared populations in 2100 across 237 countries and territories, the mean difference between our model and the UN was 5.1%, and the median difference was 2.4%. Almost 80% of countries came within 5% of the UN projection, and 90% within 10%.
 
