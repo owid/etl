@@ -811,14 +811,14 @@ def _build_lgbt_military_combined(wide):
     t = wide["transgender_military"]
 
     LABEL_MAP = {
-        ("Allowed", "Allowed"): "Allowed for LGB and transgender",
+        ("Allowed", "Allowed"): "Open service permitted",
         ("Allowed", "No policy"): "Allowed for LGB only",
         ("No policy", "Allowed"): "Allowed for transgender only",
         ("Allowed", "Banned but not enforced"): "Mixed (LGB allowed, transgender banned but not enforced)",
         ("No policy", "No policy"): "No policy",
         ("Banned but not enforced", "No policy"): "Banned for LGB only, not enforced",
         ("Banned", "No policy"): "Banned for LGB only",
-        ("Banned", "Banned"): "Banned for LGB and transgender",
+        ("Banned", "Banned"): "Service banned",
     }
 
     out = [LABEL_MAP.get((a, b), f"Other ({a} / {b})") for a, b in zip(lgb, t)]
@@ -844,13 +844,13 @@ def _build_lgbt_military_no_enforcement_combined(wide):
     t = [_fold(x) for x in wide["transgender_military"]]
 
     LABEL_MAP = {
-        ("Allowed", "Allowed"): "Allowed for LGB and transgender",
+        ("Allowed", "Allowed"): "Open service permitted",
         ("Allowed", "No policy"): "Allowed for LGB only",
         ("No policy", "Allowed"): "Allowed for transgender only",
         ("Allowed", "Banned"): "Mixed (LGB allowed, transgender banned)",
         ("No policy", "No policy"): "No policy",
         ("Banned", "No policy"): "Banned for LGB only",
-        ("Banned", "Banned"): "Banned for LGB and transgender",
+        ("Banned", "Banned"): "Service banned",
     }
 
     out = [LABEL_MAP.get((a, b), f"Other ({a} / {b})") for a, b in zip(lgb, t)]
