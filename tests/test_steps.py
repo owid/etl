@@ -107,13 +107,9 @@ def temporary_step() -> Iterator[str]:
             shutil.rmtree(data_dir.as_posix())
 
         py_file = paths.STEP_DIR / "data" / f"{name}.py"
-        ipy_file = paths.STEP_DIR / "data" / f"{name}.ipynb"
 
         if py_file.exists():
             py_file.unlink()
-
-        if ipy_file.exists():
-            ipy_file.unlink()
 
 
 def test_dependency_ordering():
