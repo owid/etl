@@ -546,15 +546,14 @@ def enable_sentry_for_streamlit():
 def _get_staging_creation_time(session: Session):
     """Get staging server creation time.
 
-    Uses the earliest creation time among critical tables to ensure we capture
-    all changes made after the database was initially set up. Some tables may be
-    created/recreated later during the setup process, so we use the minimum.
+    Use the earliest creation time across all tables. Individual tables can be
+    rebuilt by migrations (for example ALTER TABLE), which updates their
+    information_schema create_time and makes a table allowlist too fragile.
     """
     query_ts = """
     SELECT MIN(create_time) as min_create_time
     FROM information_schema.tables
     WHERE table_schema = DATABASE()
-      AND table_name IN ('charts', 'variables', 'datasets', 'chart_dimensions')
     """
     df = read_sql(query_ts, session)
     assert len(df) == 1 and df["min_create_time"].notna().all(), (

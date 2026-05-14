@@ -1,10 +1,12 @@
 meta:
-  source:
-    name: OECD (2015)
-    url: https://stats.oecd.org
-    published_by: OECD (2015) OECD Statistics
-  name: Figure 15.20_Inflation
-  description: core-econ.org
+  origin:
+    producer: Organisation for Economic Co-operation and Development
+    title: OECD statistics
+    attribution_short: OECD
+    citation_full: OECD (2015). OECD Statistics.
+    url_main: https://stats.oecd.org
+    date_accessed: '2019-03-01'
+    date_published: '2015'
   is_public: false
 outs:
   - md5: 47308480044cf5e516982abe0675047f

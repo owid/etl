@@ -1,89 +1,48 @@
+"""Garden step for IHME GBD 2020-12-19 child mortality (frozen vintage)."""
+
 import json
-from typing import cast
 
-import pandas as pd
-from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore_table
-from structlog import get_logger
+from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
-from etl.paths import DATA_DIR
 
-log = get_logger()
-
-# naming conventions
-N = PathFinder(__file__)
+paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
-    log.info("child_mortality.start")
+def run() -> None:
+    ds_meadow = paths.load_dataset("child_mortality")
+    tb = ds_meadow["child_mortality"].reset_index()
 
-    # read dataset from meadow
-    ds_meadow = Dataset(DATA_DIR / "meadow/ihme_gbd/2020-12-19/child_mortality")
-    tb_meadow = ds_meadow["child_mortality"]
+    tb = exclude_countries(tb)
+    tb = paths.regions.harmonize_names(
+        tb,
+        country_col="country",
+        countries_file=paths.country_mapping_path,
+    )
 
-    df = pd.DataFrame(tb_meadow)
-    df = df.drop(columns="index")
-    log.info("child_mortality.exclude_countries")
-    df = exclude_countries(df)
+    # Keep only Both-sex rows. Rate metric is dropped — its definition is ambiguous in the raw export.
+    tb = tb[(tb["sex"] == "Both") & (tb["metric_name"] != "Rate")]
 
-    log.info("child_mortality.harmonize_countries")
-    df = harmonize_countries(df)
+    tb_p = tb.pivot(
+        index=["country", "year"],
+        columns=["measure_name", "age_group_name"],
+        values="value",
+    )
+    tb_p.columns = ["_".join(col).strip() for col in tb_p.columns.values]
+    tb_p = tb_p.reset_index()
 
-    # Selecting only Both sex values for now as need this data quite quickly - Also dropping Rate metrics as it is not clear what this means.
-    df = df[(df["sex"] == "Both") & (df["metric_name"] != "Rate")]
+    num_cols = [c for c in tb_p.columns if "Deaths" in c]
+    prob_cols = [c for c in tb_p.columns if "Probability of death" in c]
+    tb_p[num_cols] = tb_p[num_cols].round(0).astype(int)
+    tb_p[prob_cols] = (100 * tb_p[prob_cols]).round(2)
 
-    df_p = df.pivot(index=["country", "year"], columns=["measure_name", "age_group_name"], values="value")
+    tb_p = tb_p.format(["country", "year"], short_name="child_mortality")
 
-    df_p.columns = ["_".join(col).strip() for col in df_p.columns.values]
-    df_p = df_p.reset_index()
-
-    # Ensuring there is appropriate rounding for the different metrics
-    num_cols = [col for col in df_p.columns if "Deaths" in col]
-    prob_cols = [col for col in df_p.columns if "Probability of death" in col]
-    df_p[num_cols] = df_p[num_cols].round(0).astype(int)
-    df_p[prob_cols] = 100 * df_p[prob_cols]
-    df_p[prob_cols] = df_p[prob_cols].round(2)
-
-    ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
-
-    tb_garden = underscore_table(Table(df_p))
-    tb_garden.metadata = tb_meadow.metadata
-
-    ds_garden.metadata.update_from_yaml(N.metadata_path)
-    tb_garden.update_metadata_from_yaml(N.metadata_path, "child_mortality")
-
-    ds_garden.add(tb_garden)
+    ds_garden = paths.create_dataset(tables=[tb_p], default_metadata=ds_meadow.metadata)
     ds_garden.save()
 
-    log.info("child_mortality.end")
 
-
-def load_excluded_countries() -> list[str]:
-    with open(N.excluded_countries_path) as f:
-        data = json.load(f)
-        assert isinstance(data, list)
-    return data
-
-
-def exclude_countries(df: pd.DataFrame) -> pd.DataFrame:
-    excluded_countries = load_excluded_countries()
-    return cast(pd.DataFrame, df.loc[~df.country.isin(excluded_countries)])
-
-
-def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
-    unharmonized_countries = df["country"]
-    df = geo.harmonize_countries(df=df, countries_file=str(N.country_mapping_path))
-
-    missing_countries = set(unharmonized_countries[df.country.isnull()])
-    if any(missing_countries):
-        raise RuntimeError(
-            "The following raw country names have not been harmonized. "
-            f"Please: (a) edit {N.country_mapping_path} to include these country "
-            f"names; or (b) add them to {N.excluded_countries_path}."
-            f"Raw country names: {missing_countries}"
-        )
-
-    return df
+def exclude_countries(tb: Table) -> Table:
+    with open(paths.excluded_countries_path) as f:
+        excluded = json.load(f)
+    return tb.loc[~tb["country"].isin(excluded)]
