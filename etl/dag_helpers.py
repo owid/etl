@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from ruamel.yaml import YAML
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
 from structlog import get_logger
 
 from etl import paths
@@ -276,10 +278,21 @@ def write_to_dag_file(
             # Ensure all comments end in a line break, otherwise add it.
             comments[step] = comments[step] + "\n"
 
-    # The line-based logic below assumes every step is declared at the top level.
-    # If ``dag_file`` uses the compact nested syntax, flatten it first so that
-    # the update touches the right entries.
-    flatten_dag_file(dag_file)
+    dag_yml = _load_dag_yaml(str(dag_file))
+    existing_steps = _parse_dag_yaml(dag_yml)
+    top_level_steps = set((dag_yml.get("steps") or {}).keys())
+    nested_only_steps = set(existing_steps) - top_level_steps
+    nested_top_level_steps = {
+        step
+        for step, dependencies in (dag_yml.get("steps") or {}).items()
+        if _dependencies_contain_nested_step(dependencies)
+    }
+    steps_that_need_nested_writer = set(dag_part) & (nested_only_steps | nested_top_level_steps)
+    has_nested_steps = bool(nested_only_steps or nested_top_level_steps)
+    has_new_step = any(step not in existing_steps for step in dag_part)
+    if steps_that_need_nested_writer or (has_nested_steps and has_new_step):
+        _write_to_nested_dag_file(dag_file=dag_file, dag_part=dag_part, comments=comments)
+        return
 
     # Read the lines in the original dag file.
     with open(dag_file) as file:
@@ -379,6 +392,113 @@ def write_to_dag_file(
     # Write the updated content back to the dag file.
     with open(dag_file, "w") as file:
         file.writelines(updated_lines)
+
+
+def _dependencies_contain_nested_step(dependencies: Any) -> bool:
+    """Return true if a dependency list declares nested DAG steps."""
+    if not isinstance(dependencies, list):
+        return False
+    return any(isinstance(dependency, dict) for dependency in dependencies)
+
+
+def _write_to_nested_dag_file(dag_file: Path, dag_part: dict[str, Any], comments: dict[str, str]) -> None:
+    """Update a DAG file that already uses compact nested syntax.
+
+    The historical writer is line-based and can only update top-level step
+    declarations. For nested declarations, use ruamel's round-trip loader so
+    existing structure and comments are preserved while replacing dependency
+    lists structurally.
+    """
+    yaml_rt = YAML(typ="rt")
+    yaml_rt.preserve_quotes = True
+    yaml_rt.indent(mapping=2, sequence=2, offset=2)
+    yaml_rt.width = 4096
+    yaml_rt.emitter.MAX_SIMPLE_KEY_LENGTH = 4096
+
+    with open(dag_file) as istream:
+        doc = yaml_rt.load(istream)
+
+    steps = doc.setdefault("steps", CommentedMap())
+    original_steps = set(_parse_dag_yaml(doc))
+    declared_steps = set(original_steps)
+
+    for step, dependencies in dag_part.items():
+        node = _find_step_mapping(steps, step)
+        if node is None:
+            continue
+        mapping, key = node
+        mapping[key] = _build_dependency_sequence(dependencies, dag_part, declared_steps, {step})
+        declared_steps.update(_collect_declared_steps(mapping[key]))
+
+    dag_part_dependencies = {dependency for dependencies in dag_part.values() for dependency in dependencies}
+    new_roots = [step for step in dag_part if step not in original_steps and step not in dag_part_dependencies]
+    for step in new_roots:
+        steps[step] = _build_dependency_sequence(dag_part[step], dag_part, declared_steps, {step})
+        if comments.get(step):
+            steps.yaml_set_comment_before_after_key(step, before=_normalise_ruamel_comment(comments[step]), indent=2)
+        declared_steps.add(step)
+        declared_steps.update(_collect_declared_steps(steps[step]))
+
+    with open(dag_file, "w") as ostream:
+        yaml_rt.dump(doc, ostream)
+
+
+def _normalise_ruamel_comment(comment: str) -> str:
+    """Convert a literal YAML comment block to ruamel's comment text format."""
+    lines = []
+    for line in comment.rstrip("\n").split("\n"):
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            stripped = stripped[1:].lstrip()
+        lines.append(stripped)
+    return "\n".join(lines)
+
+
+def _find_step_mapping(node: Any, step: str) -> tuple[Any, str] | None:
+    """Find the mapping object and key where ``step`` is declared."""
+    if isinstance(node, dict):
+        if step in node:
+            return node, step
+        for value in node.values():
+            result = _find_step_mapping(value, step)
+            if result is not None:
+                return result
+    elif isinstance(node, list):
+        for item in node:
+            result = _find_step_mapping(item, step)
+            if result is not None:
+                return result
+    return None
+
+
+def _build_dependency_sequence(
+    dependencies: Any, dag_part: dict[str, Any], declared_steps: set[str], ancestors: set[str]
+) -> CommentedSeq:
+    sequence = CommentedSeq()
+    for dependency in dependencies or []:
+        if dependency in dag_part and dependency not in declared_steps and dependency not in ancestors:
+            nested = CommentedMap()
+            nested[dependency] = _build_dependency_sequence(
+                dag_part[dependency], dag_part, declared_steps, ancestors | {dependency}
+            )
+            sequence.append(nested)
+            declared_steps.add(dependency)
+            declared_steps.update(_collect_declared_steps(nested[dependency]))
+        else:
+            sequence.append(dependency)
+    return sequence
+
+
+def _collect_declared_steps(node: Any) -> set[str]:
+    declared_steps: set[str] = set()
+    if isinstance(node, dict):
+        for step, dependencies in node.items():
+            declared_steps.add(step)
+            declared_steps.update(_collect_declared_steps(dependencies))
+    elif isinstance(node, list):
+        for item in node:
+            declared_steps.update(_collect_declared_steps(item))
+    return declared_steps
 
 
 def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:

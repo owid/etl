@@ -500,12 +500,11 @@ class VersionTracker:
             log.error(f"Unknown channel {channel} for step {step}.")
 
         path_to_script_detected = None
-        # A step script can exist either as a .py file, as a .ipynb file, or a __init__.py file inside a folder.
+        # A step script can exist either as a .py file or a __init__.py file inside a folder.
         # In the case of snapshots, there may or may not be a .py file, but there definitely needs to be a dvc file.
         # In that case, the corresponding script is not trivial to find, but at least we can return the dvc file.
         for path_to_script_candidate in [
             path_to_script.with_suffix(".py"),  # ty: ignore
-            path_to_script.with_suffix(".ipynb"),  # ty: ignore
             path_to_script / "__init__.py",  # ty: ignore
             path_to_script.with_name(path_to_script.name + ".dvc"),  # ty: ignore
         ]:

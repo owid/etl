@@ -1,7 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset
+from owid.catalog import processing as pr
 from shared import MAPPING_COLUMN_NAMES, MAPPING_GENDER_VALUES, MAPPING_QUESTION_VALUES
 from structlog import get_logger
 
@@ -27,35 +28,31 @@ def run(dest_dir: str) -> None:
     ds_meadow: Dataset = paths.load_dependency("wgm_2018")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow["wgm_2018"]
-
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow)
+    tb = ds_meadow["wgm_2018"].reset_index(drop=True)
 
     #
     # Process data.
     #
     log.info("wgm_2018: process data")
     # Add age_group (based on age value)
-    df = add_age_group(df)
+    tb = add_age_group(tb)
     # Keep relevant columns, unpivot dataframe, harmonize country names.
-    df = clean_df(df)
+    tb = clean_df(tb)
     # Remove empty answers
-    df = df[df["answer"] != " "]
+    tb = tb[tb["answer"] != " "]
     # Merge "Don't Know" and "Refused" categories, as done in WGM 2020
-    df = merge_dk_and_refused_answers(df)
+    tb = merge_dk_and_refused_answers(tb)
     # Build dataframe with shares of answers to each questions.
-    df = make_df_with_share_answers(df)
+    tb = make_df_with_share_answers(tb)
     # Map IDs to labels (question, age and gender groups, answers)
-    df = map_ids_to_labels(df)
+    tb = map_ids_to_labels(tb)
     # Filter out questions with low participation
-    df = filter_rows_with_low_participation(df)
+    tb = filter_rows_with_low_participation(tb)
     # Create new categories: "Somewhat agree" and "Strongly agree" -> "Agree"
-    df = create_agree_and_disagree_categories(df)
+    tb = create_agree_and_disagree_categories(tb)
     # Format dataframe with appropriate columns, indexes
-    df = final_formatting(df)
-    # Create a new table based on the dataframe `df`
-    tb_garden = Table(df, short_name=paths.short_name, underscore=True)
+    tb_garden = final_formatting(tb)
+    tb_garden.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
@@ -168,7 +165,7 @@ def make_df_with_share_answers(df: pd.DataFrame) -> pd.DataFrame:
     df_incomes = _build_df_with_incomes(df)
     df_incomes = _make_df_with_share_answers(df_incomes, "weight_inter_country")
     # # Merge
-    df = pd.concat([df_countries, df_world, df_continents, df_incomes], ignore_index=True)
+    df = pr.concat([df_countries, df_world, df_continents, df_incomes], ignore_index=True)
     # df = df_countries
     # df = df.astype({"gender": "category", "age_group": "category"})
     return df
@@ -253,7 +250,7 @@ def create_agree_and_disagree_categories(df: pd.DataFrame) -> pd.DataFrame:
         }
         assert answers == answers_expected, f"Unknown or unexpected answers! {answers.difference(answers_expected)}"
         # Add to main dataframe
-        df = pd.concat([df, df_], ignore_index=True)
+        df = pr.concat([df, df_], ignore_index=True)
     return df
 
 
@@ -314,7 +311,7 @@ def _make_df_with_share_answers(df: pd.DataFrame, weight_column: str = "weight_i
     df_nb = _make_individual_df_with_share_answers(df, weight_column=weight_column)
     # Combine dataframes
     log.info("wgm_2018: combining dataframes into combined one")
-    df_combined = pd.concat([df_nb, df_gender, df_age, df_gender_age], ignore_index=True)
+    df_combined = pr.concat([df_nb, df_gender, df_age, df_gender_age], ignore_index=True)
     # Sanity check
     x = df_combined.groupby(["country", "year", "question", "gender", "age_group"], observed=True)[["share"]].sum()
     assert x[abs(x.share - 100) > 0.1].empty, (
@@ -336,11 +333,9 @@ def _make_individual_df_with_share_answers(
     """
 
     log.info(f"wgm_2018: building dataframe with share of answers for dimensions {dimensions}")
-    operations = ["sum", "count"]
     columns_index_base = ["country", "year", "question", "answer"]
     columns_index = columns_index_base + dimensions
-    df_ = df.groupby(columns_index, observed=True).agg({weight_column: operations})
-    df_.columns = operations
+    df_ = df.groupby(columns_index, observed=True).agg(sum=(weight_column, "sum"), count=(weight_column, "count"))
     df_ = df_.reset_index()
     # For each question, now obtain the percentage of each of its answers (weighted).
     columns_normalise = [col for col in columns_index if col not in ["answer"]]

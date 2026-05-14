@@ -1036,13 +1036,12 @@ steps:
         assert flatten_dag_file(p) is False
 
 
-def test_write_to_dag_file_handles_nested_input():
-    # Writers operate on a flat file; if the target file has nested entries,
-    # they should be flattened first so that the line-based logic finds the
-    # step it is meant to update.
+def test_write_to_dag_file_nested_noop_preserves_structure_and_comments():
     old_content = """\
 steps:
+  # UN WPP (2022)
   data://grapher/un/2022-07-11/un_wpp:
+    # In-block comment.
     - data://garden/un/2022-07-11/un_wpp:
       - data://meadow/un/2022-07-11/un_wpp:
         - snapshot://un/2022-07-11/un_wpp.zip
@@ -1050,8 +1049,49 @@ steps:
     with tempfile.TemporaryDirectory() as d:
         p = Path(d) / "dag.yml"
         p.write_text(old_content)
-        # Update the garden step to add a new dep — this must apply whether
-        # the file is stored flat or nested.
+        write_to_dag_file(p, dag_part={})
+        assert p.read_text() == old_content
+
+
+def test_write_to_dag_file_nested_input_appends_new_steps_flat_without_flattening_existing_steps():
+    old_content = """\
+steps:
+  data://grapher/un/2022-07-11/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp:
+      - data://meadow/un/2022-07-11/un_wpp:
+        - snapshot://un/2022-07-11/un_wpp.zip
+"""
+    expected_content = (
+        old_content
+        + """\
+  data://meadow/foo/2024/bar:
+    - snapshot://foo/2024/bar.csv
+"""
+    )
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        write_to_dag_file(
+            p,
+            dag_part={"data://meadow/foo/2024/bar": ["snapshot://foo/2024/bar.csv"]},
+        )
+        assert p.read_text() == expected_content
+        assert load_dag(p)["data://garden/un/2022-07-11/un_wpp"] == {"data://meadow/un/2022-07-11/un_wpp"}
+
+
+def test_write_to_dag_file_nested_input_updates_nested_steps_in_place():
+    old_content = """\
+steps:
+  # UN WPP (2022)
+  data://grapher/un/2022-07-11/un_wpp:
+    # In-block comment.
+    - data://garden/un/2022-07-11/un_wpp:
+      - data://meadow/un/2022-07-11/un_wpp:
+        - snapshot://un/2022-07-11/un_wpp.zip
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
         write_to_dag_file(
             p,
             dag_part={
@@ -1062,12 +1102,73 @@ steps:
             },
         )
         after = p.read_text()
-        assert "    - data://garden/regions/latest" in after
-        # The update must not silently reintroduce the old single-dep form.
+        assert "# UN WPP (2022)" in after
+        assert "# In-block comment." in after
+        assert "data://grapher/un/2022-07-11/un_wpp:\n    # In-block comment.\n    - data://garden" in after
+        assert "      - data://garden/regions/latest\n" in after
         assert load_dag(p)["data://garden/un/2022-07-11/un_wpp"] == {
             "data://meadow/un/2022-07-11/un_wpp",
             "data://garden/regions/latest",
         }
+
+
+def test_write_to_dag_file_nested_input_inserts_new_step_under_natural_parent():
+    old_content = """\
+steps:
+  data://grapher/foo/2024/bar:
+    - data://garden/foo/2024/bar:
+      - data://meadow/foo/2024/bar
+"""
+    expected_content = """\
+steps:
+  data://grapher/foo/2024/bar:
+    - data://garden/foo/2024/bar:
+      - data://meadow/foo/2024/bar:
+        - snapshot://foo/2024/bar.csv
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        write_to_dag_file(
+            p,
+            dag_part={
+                "data://garden/foo/2024/bar": ["data://meadow/foo/2024/bar"],
+                "data://meadow/foo/2024/bar": ["snapshot://foo/2024/bar.csv"],
+            },
+        )
+        assert p.read_text() == expected_content
+        assert load_dag(p)["data://meadow/foo/2024/bar"] == {"snapshot://foo/2024/bar.csv"}
+
+
+def test_write_to_dag_file_nested_input_adds_brand_new_chain_nested():
+    old_content = """\
+steps:
+  data://grapher/existing/2024/bar:
+    - data://garden/existing/2024/bar:
+      - data://meadow/existing/2024/bar
+"""
+    expected_content = (
+        old_content
+        + """\
+  data://grapher/foo/2025/bar:
+    - data://garden/foo/2025/bar:
+      - data://meadow/foo/2025/bar:
+        - snapshot://foo/2025/bar.csv
+"""
+    )
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        write_to_dag_file(
+            p,
+            dag_part={
+                "data://grapher/foo/2025/bar": ["data://garden/foo/2025/bar"],
+                "data://garden/foo/2025/bar": ["data://meadow/foo/2025/bar"],
+                "data://meadow/foo/2025/bar": ["snapshot://foo/2025/bar.csv"],
+            },
+        )
+        assert p.read_text() == expected_content
+        assert load_dag(p)["data://grapher/foo/2025/bar"] == {"data://garden/foo/2025/bar"}
 
 
 def test_remove_steps_from_dag_file_handles_nested_input():
