@@ -12,7 +12,6 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 import uuid
 import warnings
 from collections import defaultdict
@@ -28,7 +27,6 @@ from types import ModuleType
 from typing import Any, Protocol, cast
 from urllib.parse import urlparse
 
-import fasteners
 import pandas as pd
 import requests
 import structlog
@@ -52,8 +50,6 @@ from etl.snapshot import Snapshot
 log = structlog.get_logger()
 
 DAG = dict[str, set[str]]
-
-ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".ipynb_lock")
 
 # Dictionary to store metadata changes for each dataset if INSTANT flag is set
 INSTANT_METADATA_DIFF = {}
@@ -477,13 +473,6 @@ class DataStep(Step):
                     self._run_py_isolated()
                 else:
                     self._run_py()
-
-            # We lock this to prevent the following error
-            # ImportError: PyO3 modules may only be initialized once per interpreter process
-            elif sp.with_suffix(".ipynb").exists():
-                with ipynb_lock:
-                    self._run_notebook()
-
             else:
                 raise Exception(f"have no idea how to run step: {self.path}")
         except Exception:
@@ -558,8 +547,6 @@ class DataStep(Step):
             sp.with_suffix(".py").exists()
             # folder of scripts with __init__.py
             or (sp / "__init__.py").exists()
-            # jupyter notebook
-            or sp.with_suffix(".ipynb").exists()
         )
 
     def checksum_input(self) -> str:
@@ -783,33 +770,6 @@ class DataStep(Step):
             subprocess.check_call(args, env=env)
         except subprocess.CalledProcessError as e:
             sys.exit(e.returncode)
-
-    def _run_notebook(self) -> None:
-        "Run a parameterised Jupyter notebook."
-        # don't import it again if it's already imported to avoid
-        # ImportError: PyO3 modules may only be initialized once per interpreter process
-        if "papermill" not in sys.modules:
-            # smother deprecation warnings by papermill
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                import papermill as pm
-        else:
-            pm = sys.modules["papermill"]
-
-        notebook_path = self._search_path.with_suffix(".ipynb")
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            notebook_out = Path(tmp_dir) / "notebook.ipynb"
-            log_file = Path(tmp_dir) / "output.log"
-            with open(log_file.as_posix(), "w") as ostream:
-                pm.execute_notebook(
-                    notebook_path.as_posix(),
-                    notebook_out.as_posix(),
-                    parameters={"dest_dir": self._dest_dir.as_posix()},
-                    progress_bar=False,
-                    stdout_file=ostream,
-                    stderr_file=ostream,
-                    cwd=notebook_path.parent.as_posix(),
-                )
 
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
