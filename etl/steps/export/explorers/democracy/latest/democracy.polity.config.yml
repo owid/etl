@@ -8,6 +8,10 @@
 definitions:
   group_subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity)."
 
+  common_views:
+    - config:
+        colorVariableId: regions#owid_region
+
 config:
   explorerTitle: "Democracy"
   explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
@@ -68,12 +72,16 @@ views:
     indicators:
       y:
         - catalogPath: polity#exec_reccomp_polity
+    config:
+      colorVariableId: polity#exec_reccomp_polity
   - dimensions:
       metric: democracy
       sub_metric: openness_of_executive_recruitment_score
     indicators:
       y:
         - catalogPath: polity#exec_recopen_polity
+    config:
+      colorVariableId: polity#exec_recopen_polity
   - dimensions:
       metric: democracy
       sub_metric: constraints_on_the_executive_score
@@ -86,24 +94,33 @@ views:
     indicators:
       y:
         - catalogPath: polity#polpart_reg_polity
+    config:
+      colorVariableId: polity#polpart_reg_polity
   - dimensions:
       metric: democracy
       sub_metric: competitiveness_of_political_participation_score
     indicators:
       y:
         - catalogPath: polity#polpart_comp_polity
+    config:
+      colorVariableId: polity#polpart_comp_polity
   - dimensions:
       metric: democracy
       sub_metric: main_index_distribution
     indicators:
       y:
         - catalogPath: polity#democracy_recod_polity
+
+  # == Political regime ==
   - dimensions:
       metric: political_regime
       sub_metric: main_classification
     indicators:
       y:
         - catalogPath: polity#regime_polity
+    config:
+      type: "LineChart"
+      colorVariableId: polity#regime_polity
   - dimensions:
       metric: political_regime
       sub_metric: number_and_share_of_democracies
@@ -125,6 +142,7 @@ views:
       title: "Countries that are democracies and non-democracies"
       subtitle: "{definitions.group_subtitle}"
       stackMode: "relative"
+      type: "StackedArea StackedDiscreteBar"
       yAxis:
         min: 0
         facetDomain: "independent"
@@ -152,6 +170,7 @@ views:
     config:
       title: "People living in democracies and non-democracies"
       subtitle: "{definitions.group_subtitle}"
+      type: "StackedArea StackedDiscreteBar"
   - dimensions:
       metric: political_regime
       sub_metric: age_of_democracy
@@ -195,3 +214,4 @@ views:
       title: "Countries that are long-standing democracies"
       subtitle: "{definitions.group_subtitle} Democracies are political systems with broadly open, multi-party, and competitive elections for a chief executive who faces comprehensive institutional constraints, and political participation is broadly competitive."
       stackMode: "relative"
+      type: "StackedArea StackedDiscreteBar"
