@@ -50,7 +50,6 @@ CATEGORIES_RENAMING = {
     },
     "adoption": {
         "Legal": "Legal",
-        "Married couples only": "Married couples only",
         "Second parent adoption only": "Second parent adoption only",
         "Varies by Region": "Varies by region",
         "Single only": "Individual only",
@@ -80,7 +79,6 @@ CATEGORIES_RENAMING = {
         "No censorship": "No censorship",
         "Varies by Region": "Varies by region",
         "Ambiguous": "Ambiguous",
-        "Other punishment": "Other punishment",
         "Fine as punishment": "Fine as punishment",
         "State-enforced": "State-enforced",
         "Imprisonment as punishment": "Imprisonment as punishment",
@@ -173,6 +171,19 @@ def run() -> None:
     #
     # Process data.
 
+    # Harmonize country names + filter to sovereign countries (plus the Greenland exception)
+    # BEFORE the pivot+map. This way the CATEGORIES_RENAMING coverage warnings (in
+    # make_table_wide_and_map_categories) only fire for values that actually reach the
+    # published charts — values that live only on non-sovereign entities like Vatican
+    # City no longer surface in the source set, so the warning channel stays clean.
+    tb = paths.regions.harmonize_names(tb)
+    tb_current = paths.regions.harmonize_names(tb_current)
+    tb_indices = paths.regions.harmonize_names(tb_indices)
+
+    tb = select_only_sovereign_countries(tb, tb_sovereign_countries, keep_extra=["Greenland"])
+    tb_current = select_only_sovereign_countries(tb_current, tb_sovereign_countries, keep_extra=["Greenland"])
+    tb_indices = select_only_sovereign_countries(tb_indices, tb_sovereign_countries, keep_extra=["Greenland"])
+
     tb = make_table_wide_and_map_categories(tb, table_name="historical")
     tb_current = make_table_wide_and_map_categories(tb_current, table_name="current")
 
@@ -182,18 +193,13 @@ def run() -> None:
     # Merge table with indices
     tb = pr.merge(tb, tb_indices, on=["country", "year"], how="left")
 
-    tb = paths.regions.harmonize_names(tb)
-
-    # Snapshot Greenland's rows BEFORE the sovereign-country filter and the
-    # region aggregations. Greenland is treated as a Danish territory by the
-    # sovereignty source (Butcher and Griffiths 2020) and by OWID's regions
-    # dataset, but Equaldex publishes a Greenland-specific record we want on
-    # country-level charts. Re-appending it AFTER the aggregations means it
-    # shows on the map but doesn't contribute to Europe / World totals.
+    # Snapshot Greenland's wide rows before the regional aggregations. Greenland appears on
+    # country-level / map charts but is excluded from Europe / World totals (the sovereignty
+    # source treats it as Danish territory). The pre-pivot sovereign filter already kept
+    # Greenland in the wide table; here we just take it out for the aggregation pass and
+    # concat it back after.
     tb_greenland = tb[tb["country"] == "Greenland"].reset_index(drop=True)
-
-    # Select only sovereign countries (Greenland is intentionally dropped here).
-    tb = select_only_sovereign_countries(tb=tb, tb_sovereign_countries=tb_sovereign_countries)
+    tb = tb[tb["country"] != "Greenland"].reset_index(drop=True)
 
     # Add population-weighted aggregations for the columns in the list
     tb = add_population_weighted_aggregations(
@@ -209,10 +215,7 @@ def run() -> None:
         regions=REGIONS,
     )
 
-    # Re-append Greenland after the aggregations so it shows up on country-level
-    # charts (its row only carries the raw status columns; the per-status count /
-    # population columns are intentionally left NaN since those are region-level
-    # indicators).
+    # Re-append Greenland so it shows on country-level / map charts.
     tb = pr.concat([tb, tb_greenland], ignore_index=True)
 
     # Verify index and order them
@@ -459,28 +462,25 @@ def add_metadata_for_aggregated_columns(col: str, status: str, count_or_pop: str
     return meta  # ty: ignore
 
 
-def select_only_sovereign_countries(tb: Table, tb_sovereign_countries: Table) -> Table:
+def select_only_sovereign_countries(
+    tb: Table, tb_sovereign_countries: Table, keep_extra: list[str] | None = None
+) -> Table:
     """
-    Use the latest sovereign countries data to select only those countries in the table
+    Inner-join the table against the latest-year sovereign-countries list (Butcher and
+    Griffiths 2020). Rows for countries listed in `keep_extra` (e.g. Greenland) are kept
+    even though they're not in the sovereignty source — Equaldex tracks them separately
+    and we want them on country-level charts.
     """
-
-    # Format tb_sovereign_countries
-    # Rename regions to country
     tb_sovereign_countries = tb_sovereign_countries.rename({"statename": "country"})
     tb_sovereign_countries = tb_sovereign_countries[["country", "year"]]
-
-    # Filter data: max year
     tb_sovereign_countries = tb_sovereign_countries[
         (tb_sovereign_countries["year"] == tb_sovereign_countries["year"].max())
     ]
-
-    # Drop year column
     tb_sovereign_countries = tb_sovereign_countries.drop(columns=["year"])
 
-    # Merge the two tables. Non-sovereign entities (including Greenland) are dropped
-    # here intentionally; the caller in `run()` re-appends Greenland after the
-    # region aggregations so it appears on country-level charts without
-    # contaminating Europe / World totals.
-    tb = pr.merge(tb, tb_sovereign_countries, on=["country"], how="inner")
-
-    return tb
+    tb_sovereign = pr.merge(tb, tb_sovereign_countries, on=["country"], how="inner")
+    if keep_extra:
+        tb_extra = tb[tb["country"].isin(keep_extra)]
+        if len(tb_extra):
+            tb_sovereign = pr.concat([tb_sovereign, tb_extra], ignore_index=True)
+    return tb_sovereign
