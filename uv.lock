@@ -9,7 +9,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-05-12T07:12:33.033549Z"
+exclude-newer = "2026-05-12T09:53:42.511511Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -69,7 +69,7 @@ wheels = [
 
 [[package]]
 name = "anthropic"
-version = "0.102.0"
+version = "0.101.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -81,9 +81,9 @@ dependencies = [
     { name = "sniffio" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b9/47/cb2a71f70431fb09af4db83e3ea89eb2dd8e0e348d27af53ed32e6c599dd/anthropic-0.102.0.tar.gz", hash = "sha256:96f747cad11886c4ae12d4080131b94eebd68b202bd2190fe27959031bb1fa9c", size = 763697, upload-time = "2026-05-13T18:12:41.624Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b5/cb/9d0123243e749ac3a579972b2c398971bce1dc57bcc4efb08066df610360/anthropic-0.101.0.tar.gz", hash = "sha256:1116a6a87c55757e0fbe3e1ba40804fbd04de7963601a6dd6b539a889f18de3e", size = 758603, upload-time = "2026-05-11T15:46:33.944Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/87/75/0f6c603594876413bc858a00e7cc0d80a0cc14edf5c7b959a3ea6ec45e44/anthropic-0.102.0-py3-none-any.whl", hash = "sha256:ab96540bbd4b0f36564252d955a86f8abbe4f00944a24bc9931acc9b139bab6f", size = 763070, upload-time = "2026-05-13T18:12:43.474Z" },
+    { url = "https://files.pythonhosted.org/packages/f1/b2/74ff06762d005ecf1658929a292df0acb786d025f6a6c54fcb30e2dc7761/anthropic-0.101.0-py3-none-any.whl", hash = "sha256:cc3cc6576989471e2aa9132258034ad0ff0d8fe500b04ac499e4e46ed68c5ed0", size = 753594, upload-time = "2026-05-11T15:46:32.216Z" },
 ]
 
 [[package]]
@@ -4682,7 +4682,7 @@ wheels = [
 
 [[package]]
 name = "owid-catalog"
-version = "1.1.1"
+version = "1.2.0"
 source = { editable = "lib/catalog" }
 dependencies = [
     { name = "brotli" },

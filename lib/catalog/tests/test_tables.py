@@ -20,7 +20,6 @@ from owid.catalog.tables import (
     SCHEMA,
     Table,
     get_unique_licenses_from_tables,
-    get_unique_sources_from_tables,
     keep_metadata,
 )
 
@@ -411,7 +410,7 @@ def test_set_index_keeps_metadata_inplace() -> None:
     assert tb_new["b"].metadata.title == "B"
 
 
-def test_merge_without_any_on_arguments(table_1, table_2, sources, origins, licenses) -> None:
+def test_merge_without_any_on_arguments(table_1, table_2, origins, licenses) -> None:
     # If "on", "left_on" and "right_on" are not specified, the join is performed on common columns.
     # In this case, "country", "year", "a".
     tb = tables.merge(table_1, table_2)
@@ -431,7 +430,6 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, origins, lice
     # different in left and right tables).
     assert tb["a"].metadata.title is None
     assert tb["a"].metadata.description is None
-    assert tb["a"].metadata.sources == [sources[2], sources[1]]
     assert tb["a"].metadata.origins == [origins[2], origins[1]]
     assert tb["a"].metadata.licenses == [licenses[1], licenses[2]]
     # Since table_1["a"] has processing level "minor" and table_2["a"] has "major", the combination should be "major".
@@ -493,7 +491,7 @@ def test_merge_with_on_argument(table_1, table_2) -> None:
     assert tb.metadata.description is None
 
 
-def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, origins, licenses) -> None:
+def test_merge_with_left_on_and_right_on_argument(table_1, table_2, origins, licenses) -> None:
     # Join on columns "country" and "year" (in this case, the result should be identical to simply defining
     # on=["country", "year"]).
     tb = tables.merge(table_1, table_2, left_on=["country", "year"], right_on=["country", "year"])
@@ -576,7 +574,6 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, ori
     assert tb["a"].metadata.title is None
     assert tb["a"].metadata.description is None
     # Sources, origins and licenses should be the combination from the two tables.
-    assert tb["a"].metadata.sources == [sources[2], sources[1]]
     assert tb["a"].metadata.origins == [origins[2], origins[1]]
     assert tb["a"].metadata.licenses == [licenses[1], licenses[2]]
     # Column "b" appears only in table_1, so it should keep its original metadata.
@@ -634,7 +631,7 @@ def test_concat_categoricals(table_1, table_2, origins) -> None:
     assert tb.country.m.origins[0] == origins[1]
 
 
-def test_concat_with_axis_0(table_1, table_2, sources, origins, licenses) -> None:
+def test_concat_with_axis_0(table_1, table_2, origins, licenses) -> None:
     tb = tables.concat([table_1, table_2])
     # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
     # with table_2, the unique title should be preserved, and the only existing description should persist.
@@ -646,7 +643,6 @@ def test_concat_with_axis_0(table_1, table_2, sources, origins, licenses) -> Non
     # Column "a" appears in both tables, so the resulting "a" columns should combine sources and licenses.
     assert tb["a"].metadata.title is None
     assert tb["a"].metadata.description is None
-    assert tb["a"].metadata.sources == [sources[2], sources[1]]
     assert tb["a"].metadata.origins == [origins[2], origins[1]]
     assert tb["a"].metadata.licenses == [licenses[1], licenses[2]]
     # Column "b" appears only in table_1, so it should keep its original metadata.
@@ -685,7 +681,7 @@ def test_concat_with_axis_1(table_1, table_2) -> None:
     assert tb.metadata.description is None
 
 
-def test_melt(table_1, sources, origins, licenses) -> None:
+def test_melt(table_1, origins, licenses) -> None:
     # If nothing specified, all columns are melted.
     tb = tables.melt(table_1)
     # Check that the result is identical to using the table method.
@@ -695,7 +691,6 @@ def test_melt(table_1, sources, origins, licenses) -> None:
         assert tb[column].metadata.title is None
         assert tb[column].metadata.description is None
         # Sources and licenses should be the combination of sources and licenses of all columns in table_1.
-        assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
         # The combination should have the largest processing level of both variables combined.
@@ -716,7 +711,6 @@ def test_melt(table_1, sources, origins, licenses) -> None:
         assert tb[column].metadata.title is None
         assert tb[column].metadata.description is None
         # Sources and licenses should be the combination of sources and licenses of all columns in table_1.
-        assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
         # The combination should have the largest processing level of both variables combined.
@@ -738,7 +732,6 @@ def test_melt(table_1, sources, origins, licenses) -> None:
     assert tb["year"].metadata.description is None
     # The new "variable" and "value" columns should combine the sources and licenses of "a" and "b".
     for column in ["variable", "value"]:
-        assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
         # The combination should have the largest processing level of both variables combined.
@@ -761,7 +754,6 @@ def test_melt(table_1, sources, origins, licenses) -> None:
     assert tb["year"].metadata.description is None
     # The new "variable" and "value" columns should combine the sources and licenses of "a" and "b".
     for column in ["var", "val"]:
-        assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
         # The combination should have the largest processing level of both variables combined.
@@ -786,7 +778,6 @@ def test_melt(table_1, sources, origins, licenses) -> None:
     for column in ["variable", "value"]:
         assert tb[column].metadata.title == table_1["b"].metadata.title
         assert tb[column].metadata.description == table_1["b"].metadata.description
-        assert tb[column].metadata.sources == table_1["b"].metadata.sources
         assert tb[column].metadata.origins == table_1["b"].metadata.origins
         assert tb[column].metadata.licenses == table_1["b"].metadata.licenses
         assert tb[column].metadata.processing_level == table_1["b"].metadata.processing_level
@@ -796,9 +787,8 @@ def test_melt(table_1, sources, origins, licenses) -> None:
     assert tb.metadata == table_1.metadata
 
 
-def test_pivot(table_1, sources, origins) -> None:
+def test_pivot(table_1, origins) -> None:
     # To better test the expected behavior, I will add a source (and origin) to the "country" column.
-    table_1["country"].metadata.sources = [sources[4]]
     table_1["country"].metadata.origins = [origins[4]]
     tb = tables.pivot(table_1, columns="country")
     # Check that the result is identical to using the table method.
@@ -921,15 +911,6 @@ def test_pivot_dimensions():
     assert tb_p.g1_s2.m.dimensions == {"group": "g1", "subgroup": "s2"}
 
 
-def test_get_unique_sources_from_tables(table_1, sources):
-    unique_sources = get_unique_sources_from_tables([table_1, table_1])
-    assert unique_sources == [
-        sources[2],
-        sources[1],
-        sources[3],
-    ]
-
-
 def test_get_unique_license_from_tables(table_1, licenses):
     unique_licenses = get_unique_licenses_from_tables([table_1, table_1])
     assert unique_licenses == [
@@ -939,10 +920,9 @@ def test_get_unique_license_from_tables(table_1, licenses):
     ]
 
 
-def test_sum_columns(table_1, sources, origins, licenses):
+def test_sum_columns(table_1, origins, licenses):
     # Create a new column that is the element-wise sum of the other two existing columns.
     table_1["c"] = table_1[["a", "b"]].sum(axis=1)
-    assert table_1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert table_1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert table_1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     assert table_1["c"].metadata.title is None
@@ -954,7 +934,6 @@ def test_sum_columns(table_1, sources, origins, licenses):
     # Create a new variable (it cannot be added as a new column since it has different dimensions) that is the sum of
     # each of the other two existing columns.
     variable_c = table_1[["a", "b"]].sum(axis=0)
-    assert variable_c.metadata.sources == [sources[2], sources[1], sources[3]]
     assert variable_c.metadata.origins == [origins[2], origins[1], origins[3]]
     assert variable_c.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     assert variable_c.metadata.title is None
@@ -964,7 +943,7 @@ def test_sum_columns(table_1, sources, origins, licenses):
     assert variable_c.metadata.display == table_1["a"].metadata.display
 
 
-def test_operations_of_table_and_scalar(table_1, sources, origins, licenses):
+def test_operations_of_table_and_scalar(table_1, origins, licenses):
     table_1_original = table_1.copy()
     table_1[["a", "b"]] = table_1[["a", "b"]] + 1
     table_1[["a", "b"]] += 1
@@ -986,10 +965,9 @@ def test_operations_of_table_and_scalar(table_1, sources, origins, licenses):
     assert table_1["b"].metadata == table_1_original["b"].metadata
 
 
-def test_multiply_columns(table_1, sources, origins, licenses):
+def test_multiply_columns(table_1, origins, licenses):
     # Create a new column that is the element-wise product of the other two existing columns.
     table_1["c"] = table_1[["a", "b"]].prod(axis=1)
-    assert table_1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert table_1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert table_1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     assert table_1["c"].metadata.title is None
@@ -1001,7 +979,6 @@ def test_multiply_columns(table_1, sources, origins, licenses):
     # Create a new variable (it cannot be added as a new column since it has different dimensions) that is the product
     # of each of the other two existing columns.
     variable_c = table_1[["a", "b"]].prod(axis=0)
-    assert variable_c.metadata.sources == [sources[2], sources[1], sources[3]]
     assert variable_c.metadata.origins == [origins[2], origins[1], origins[3]]
     assert variable_c.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     assert variable_c.metadata.title is None

@@ -189,16 +189,9 @@ def is_dataset_already_up_to_date(
     """
     dataset_up_to_date = False
     for snapshot in existing_snapshots:
-        # NOTE: This is still necessary (in the current implementation) to be able to handle old snapshots.
-        assert snapshot.metadata.source or snapshot.metadata.origin
-        if snapshot.metadata.source:
-            snapshot_source_data_url = snapshot.metadata.source.source_data_url
-            snapshot_date_accessed = parser.parse(str(snapshot.metadata.source.date_accessed)).date()
-        elif snapshot.metadata.origin:
-            snapshot_source_data_url = snapshot.metadata.origin.url_download
-            snapshot_date_accessed = parser.parse(str(snapshot.metadata.origin.date_accessed)).date()
-        else:
-            raise ValueError(f"Snapshot {snapshot.metadata.short_name} does not have source or origin.")
+        assert snapshot.metadata.origin, f"Snapshot {snapshot.metadata.short_name} does not have an origin."
+        snapshot_source_data_url = snapshot.metadata.origin.url_download
+        snapshot_date_accessed = parser.parse(str(snapshot.metadata.origin.date_accessed)).date()
         if (snapshot_source_data_url == source_data_url) and (snapshot_date_accessed >= source_modification_date):
             dataset_up_to_date = True
 
