@@ -4,7 +4,6 @@ from typing import cast
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -38,34 +37,35 @@ def run(dest_dir: str) -> None:
     snap = cast(Snapshot, paths.load_dependency("unaids_deaths_averted_art.xlsx"))
 
     # Load data from snapshot.
-    df = pd.read_excel(snap.path, sheet_name="ResultGrid", header=1)
+    tb = snap.read_excel(sheet_name="ResultGrid", header=1)
 
     #
     # Process data.
     #
     log.info("unaids_deaths_averted_art: handle NaNs")
-    df = handle_nans(df)
+    tb = handle_nans(tb)
 
     # Rename columns
     log.info("unaids_deaths_averted_art: rename columns and keep relevant ones")
     # Rename columns & keep relevant columns
-    df = df.rename(columns=INDICATOR_MAPPING | INDEX_MAPPING)[COLUMNS]
+    tb = tb.rename(columns=INDICATOR_MAPPING | INDEX_MAPPING)[COLUMNS]
 
     # Format dataframe (wide to long format)
     log.info("unaids_deaths_averted_art: format table with indices and values (wide to long format)")
-    df = df.melt(id_vars=["country", "year"], var_name="subgroup_description", value_name="deaths_averted_art")
+    tb = tb.melt(id_vars=["country", "year"], var_name="subgroup_description", value_name="deaths_averted_art")
 
     # Replace dots
     log.info("unaids_deaths_averted_art: replace '...' with NaNs and assign float type")
-    df["deaths_averted_art"] = df["deaths_averted_art"].replace("...", np.nan).astype(float)
+    tb["deaths_averted_art"] = tb["deaths_averted_art"].replace("...", np.nan).astype(float)
 
     # Strip empty characters from country names
     log.info("unaids_deaths_averted_art: strip empty characters from country names")
-    df["country"] = df["country"].str.strip()
+    tb["country"] = tb["country"].str.strip()
 
     # Create a new table and ensure all columns are snake-case.
-    log.info("unaids_deaths_averted_art: create table")
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    log.info("unaids_deaths_averted_art: format table")
+    tb = tb.underscore()
+    tb.metadata.short_name = paths.short_name
     tb = tb.set_index(["country", "year", "subgroup_description"], verify_integrity=True)
 
     #

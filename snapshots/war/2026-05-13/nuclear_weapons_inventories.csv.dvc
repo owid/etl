@@ -1,0 +1,24 @@
+# The data needs to be manually downloaded from a Tableau dashboard:
+# 1. Open an incognito window (to avoid Tableau from changing the default language of the data columns).
+# 2. Go to: https://public.tableau.com/app/profile/kate.kohn/viz/EstimatedGlobalNuclearWarheadInventories1945-2021/Dashboard1
+# 3. Click on the "Download" button on the upper right corner of the dashboard.
+# 4. Select "Crosstab" on the small pop-up window ("Data" used to be available, but now it's not).
+# 5. Run this script using the --path-to-file argument followed by the path to the downloaded file.
+# 6. Change the field date_published in the .dvc metadata file, with the "Updated" date shown below the chart.
+meta:
+  origin:
+    producer: Federation of American Scientists
+    title: Estimated Global Nuclear Warhead Inventories
+    description: This dataset provides information on the number of stockpiled nuclear warheads by the nuclear powers.
+    citation_full: |-
+      Hans M. Kristensen, Matt Korda, Robert S. Norris, Eliana Johns, and Mackenzie Knight, Federation of American Scientists - Estimated Global Nuclear Warhead Inventories.
+    attribution_short: FAS
+    url_main: https://fas.org/initiative/status-world-nuclear-forces/
+    date_accessed: '2026-05-13'
+    date_published: '2026-03-30'
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 68b068d473c3d04238d4a12b145c1956
+    size: 7192
+    path: nuclear_weapons_inventories.csv
