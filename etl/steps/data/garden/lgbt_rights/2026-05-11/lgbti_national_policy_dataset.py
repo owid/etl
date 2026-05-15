@@ -534,9 +534,22 @@ def _bucket(series):
     """Bucket a continuous proportion (0..1) into '0', '0.5', '1' strings.
 
     '1' = exactly 1, '0.5' = any 0 < x < 1 (subnational partial or transition year),
-    '0' = exactly 0.
+    '0' = exactly 0. Missing proportions (NaN) propagate as NaN so downstream
+    combined-categorical lookups surface them as missing rather than silently
+    collapsing into "no policy".
     """
-    return series.apply(lambda v: "1" if v == 1 else "0.5" if v > 0 else "0")
+    import pandas as pd
+
+    def bucket(v):
+        if pd.isna(v):
+            return pd.NA
+        if v == 1:
+            return "1"
+        if v > 0:
+            return "0.5"
+        return "0"
+
+    return series.apply(bucket)
 
 
 def _build_one_combined(wide, config):
@@ -561,7 +574,9 @@ def _build_one_combined(wide, config):
         keys = keys + " " + part
     cat_map = config["category_map"]
     if "default_category" in config:
-        result = keys.map(lambda k: cat_map.get(k, config["default_category"]))
+        import pandas as pd
+
+        result = keys.map(lambda k: pd.NA if pd.isna(k) else cat_map.get(k, config["default_category"]))
     else:
         result = map_series(
             series=keys,
