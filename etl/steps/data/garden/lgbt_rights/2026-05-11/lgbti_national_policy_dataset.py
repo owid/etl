@@ -789,9 +789,9 @@ def _build_gmc_combined(wide):
     req = wide["gender_marker_change_requirement"]
 
     REQ_LABELS = {
-        "Self-ID": "Self-declaration",
-        "Self-Declaration": "Self-declaration",
-        "Medical/Psychological": "Medical or psychological diagnosis",
+        "Self-ID": "Self-declaration is enough",
+        "Self-Declaration": "Self-declaration is enough",
+        "Medical/Psychological": "Diagnosis required",
         "Surgery": "Surgery required",
         "Surgery+Sterilization": "Surgery and sterilization required",
     }

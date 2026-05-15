@@ -44,7 +44,7 @@ definitions:
   derivation_gac: |-
     From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The most common patterns get a dedicated category (e.g. covered for both, adults covered with minors restricted); rarer combinations are grouped as "Varies by region or other".
   derivation_gmc: |-
-    From the original dataset, we combined the gender-marker-change proportion (the legal direction) with the recorded legal-pathway requirement to produce a single categorical indicator. When legal change of the gender marker is fully in effect, we classify countries by their procedural requirement ("Self-declaration", "Medical or psychological diagnosis", "Surgery required", "Surgery and sterilization required", or "Legally possible, requirement unknown" when the requirement is not recorded). Otherwise the country is classified as "Varies by region" (legal change is only partially in effect across subnational jurisdictions) or "Not legally possible" (no legal procedure exists).
+    From the original dataset, we combined the gender-marker-change proportion (the legal direction) with the recorded legal-pathway requirement to produce a single categorical indicator. When legal change of the gender marker is fully in effect, we classify countries by their procedural requirement ("Self-declaration is enough", "Diagnosis required", "Surgery required", "Surgery and sterilization required", or "Legally possible, requirement unknown" when the requirement is not recorded). Otherwise the country is classified as "Varies by region" (legal change is only partially in effect across subnational jurisdictions) or "Not legally possible" (no legal procedure exists).
 
   # Per-law short description (used for description_short and as building block for title)
   law_short: |-
@@ -888,7 +888,7 @@ tables:
           Whether a legal process exists to change the gender marker on official identity documents, and what the process requires — self-declaration, medical or psychological diagnosis, surgery, or surgery plus sterilization.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Self-declaration_** (legal change of the gender marker is possible based on self-declaration), **_Medical or psychological diagnosis_** (legal change requires a medical or psychological diagnosis), **_Surgery required_** (legal change requires gender-affirming surgery), **_Surgery and sterilization required_** (legal change requires both gender-affirming surgery and sterilization), **_Legally possible, requirement unknown_** (legal change is in effect but the procedural requirement is not recorded in the source), **_Varies by region_** (rules differ between subnational jurisdictions, or legal change is only partially in effect) and **_Not legally possible_** (no legal procedure exists to change the gender marker on official identity documents).'
+          - 'The indicator is coded as follows: **_Self-declaration is enough_** (legal change of the gender marker is possible based on self-declaration), **_Diagnosis required_** (legal change requires a medical or psychological diagnosis), **_Surgery required_** (legal change requires gender-affirming surgery), **_Surgery and sterilization required_** (legal change requires both gender-affirming surgery and sterilization), **_Legally possible, requirement unknown_** (legal change is in effect but the procedural requirement is not recorded in the source), **_Varies by region_** (rules differ between subnational jurisdictions, or legal change is only partially in effect) and **_Not legally possible_** (no legal procedure exists to change the gender marker on official identity documents).'
         unit: ""
         short_unit: ""
         display:
@@ -896,8 +896,8 @@ tables:
           numDecimalPlaces: 0
         type: ordinal
         sort:
-          - Self-declaration
-          - Medical or psychological diagnosis
+          - Self-declaration is enough
+          - Diagnosis required
           - Surgery required
           - Surgery and sterilization required
           - Legally possible, requirement unknown
@@ -3242,26 +3242,26 @@ tables:
           name: Legally possible, requirement unknown
           numDecimalPlaces: 0
 
-      gender_marker_change_medical_or_psychological_diagnosis_count:
-        title: Legal change of gender marker — Medical or psychological diagnosis (number of countries)
-        description_short: The number of countries classified as "Medical or psychological diagnosis" on the indicator on legal change of gender marker.
+      gender_marker_change_diagnosis_required_count:
+        title: Legal change of gender marker — Diagnosis required (number of countries)
+        description_short: The number of countries classified as "Diagnosis required" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Medical or psychological diagnosis" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Diagnosis required" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Medical or psychological diagnosis
+          name: Diagnosis required
           numDecimalPlaces: 0
 
-      gender_marker_change_medical_or_psychological_diagnosis_pop:
-        title: Legal change of gender marker — Medical or psychological diagnosis (population)
-        description_short: The total population of countries classified as "Medical or psychological diagnosis" on the indicator on legal change of gender marker.
+      gender_marker_change_diagnosis_required_pop:
+        title: Legal change of gender marker — Diagnosis required (population)
+        description_short: The total population of countries classified as "Diagnosis required" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Medical or psychological diagnosis" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Diagnosis required" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Medical or psychological diagnosis
+          name: Diagnosis required
           numDecimalPlaces: 0
 
       gender_marker_change_not_legally_possible_count:
@@ -3286,26 +3286,26 @@ tables:
           name: Not legally possible
           numDecimalPlaces: 0
 
-      gender_marker_change_self_declaration_count:
-        title: Legal change of gender marker — Self-declaration (number of countries)
-        description_short: The number of countries classified as "Self-declaration" on the indicator on legal change of gender marker.
+      gender_marker_change_self_declaration_is_enough_count:
+        title: Legal change of gender marker — Self-declaration is enough (number of countries)
+        description_short: The number of countries classified as "Self-declaration is enough" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Self-declaration" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Self-declaration is enough" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Self-declaration
+          name: Self-declaration is enough
           numDecimalPlaces: 0
 
-      gender_marker_change_self_declaration_pop:
-        title: Legal change of gender marker — Self-declaration (population)
-        description_short: The total population of countries classified as "Self-declaration" on the indicator on legal change of gender marker.
+      gender_marker_change_self_declaration_is_enough_pop:
+        title: Legal change of gender marker — Self-declaration is enough (population)
+        description_short: The total population of countries classified as "Self-declaration is enough" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Self-declaration" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Self-declaration is enough" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Self-declaration
+          name: Self-declaration is enough
           numDecimalPlaces: 0
 
       gender_marker_change_varies_by_region_count:
