@@ -974,7 +974,6 @@ class GrapherStep(Step):
             engine,
             dataset,
             dataset.metadata.namespace,
-            dataset.metadata.sources,
         )
 
         # We sometimes get a warning, but it's unclear where it is coming from
@@ -1077,9 +1076,7 @@ class GrapherStep(Step):
             # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
             # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
             # needed for remapping. However, we can delete it on next ETL run
-            success = self._cleanup_ghost_resources(
-                engine, dataset_upsert_results, catalog_paths, list(dataset_upsert_results.source_ids.values())
-            )
+            success = self._cleanup_ghost_resources(engine, dataset_upsert_results, catalog_paths)
 
             # set checksum and updatedAt timestamps after all data got inserted
             if success:
@@ -1103,7 +1100,6 @@ class GrapherStep(Step):
         engine: Engine,
         dataset_upsert_results,
         catalog_paths: list[str],
-        dataset_upserted_source_ids: list[int],
     ) -> bool:
         """
         Cleanup all ghost variables that weren't upserted
@@ -1126,7 +1122,6 @@ class GrapherStep(Step):
             upserted_variable_ids,
         )
 
-        db.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, dataset_upserted_source_ids)
         # TODO: cleanup origins that are not used by any variable. We can do it in batch
         return success
 

@@ -12,6 +12,7 @@ from jsonschema.exceptions import ValidationError
 from yaml.loader import SafeLoader
 
 from etl.config import DEFAULT_GRAPHER_SCHEMA
+from etl.dag_helpers import get_active_snapshots, get_active_steps
 from etl.files import read_json_schema
 from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
 
@@ -133,10 +134,16 @@ def test_dataset_schemas():
 
     validator = Draft7Validator(DATASET_SCHEMA)
     validation_errors = []
+    active_steps = get_active_steps()
 
     # Walk over all files in STEPS_DATA_DIR with *.meta.yml extension
     for meta_file_path in Path(STEPS_DATA_DIR).glob("**/*.meta.yml"):
         if not _should_validate(meta_file_path, changed_files):
+            continue
+
+        # Skip files that are not part of the active DAG (archived steps)
+        rel = str(meta_file_path.relative_to(STEPS_DATA_DIR)).rsplit(".meta.yml", 1)[0]
+        if not any(s.startswith(rel) for s in active_steps):
             continue
 
         # extract version from path
@@ -206,9 +213,16 @@ def test_snapshot_schemas():
         return  # No .dvc files changed, skip entirely
 
     validator = Draft7Validator(SNAPSHOT_SCHEMA)
+    active_snapshots = get_active_snapshots()
 
     for meta_file_path in Path(SNAPSHOTS_DIR).glob("**/*.dvc"):
         if not _should_validate(meta_file_path, changed_files):
+            continue
+
+        # Skip files that are not part of the active DAG (archived snapshots)
+        rel = str(meta_file_path.relative_to(SNAPSHOTS_DIR))
+        rel_no_dvc = rel.rsplit(".dvc", 1)[0]
+        if rel_no_dvc not in active_snapshots:
             continue
 
         # extract version from etl/snapshots/namespace/version/snapshot_name.ext.dvc
