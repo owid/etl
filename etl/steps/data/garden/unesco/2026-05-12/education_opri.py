@@ -110,7 +110,7 @@ def run() -> None:
     country_mapping_path = paths.directory / "education.countries.json"
     excluded_countries_path = paths.directory / "education.excluded_countries.json"
     tb = paths.regions.harmonize_names(
-        tb, country_col="country", countries_file=country_mapping_path, excluded_countries_file=excluded_countries_path
+        tb, countries_file=country_mapping_path, excluded_countries_file=excluded_countries_path
     )
 
     # Drop columns that are not needed
