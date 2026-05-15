@@ -97,7 +97,6 @@ CATEGORIES_RENAMING = {
         "Illegal": "Illegal",
         "Illegal in some contexts": "Illegal in some contexts",
         "Varies by Region": "Varies by region",
-        "Ambiguous": "Ambiguous",
         "No protections": "No protections",
     },
     "employment_discrimination": {
@@ -143,7 +142,6 @@ CATEGORIES_RENAMING = {
         "Full ban": "Full ban",
         "Parental approval required": "Parental approval required",
         "Varies by Region": "Varies by region",
-        "Ambiguous": "Ambiguous",
         "Not banned": "Not banned",
     },
     "hate_crime_protections": {
@@ -175,8 +173,8 @@ def run() -> None:
     #
     # Process data.
 
-    tb = make_table_wide_and_map_categories(tb)
-    tb_current = make_table_wide_and_map_categories(tb_current)
+    tb = make_table_wide_and_map_categories(tb, table_name="historical")
+    tb_current = make_table_wide_and_map_categories(tb_current, table_name="current")
 
     # Merge both datasets and include the suffix _current to the columns of the current dataset
     tb = pr.merge(tb, tb_current, on=["country", "year"], how="outer", suffixes=("", "_current"))
@@ -230,9 +228,12 @@ def run() -> None:
     ds_garden.save()
 
 
-def make_table_wide_and_map_categories(tb: Table) -> Table:
+def make_table_wide_and_map_categories(tb: Table, table_name: str = "table") -> Table:
     """
     Make the reable wide by pivoting on the issue column and map the categories to clearer names, sorted by order of progressiveness.
+
+    `table_name` is just a label used in the category-coverage warnings ("historical" / "current") so the
+    log line tells the maintainer which of the two Equaldex tables flagged an unused / unmapped value.
     """
     # Make value_formatted a string
     tb["value_formatted"] = tb["value_formatted"].astype("string")
@@ -251,18 +252,33 @@ def make_table_wide_and_map_categories(tb: Table) -> Table:
     # Define issues
     issue_list = list(CATEGORIES_RENAMING.keys())
 
-    # Rename categories. `warn_on_unused_mappings=True` surfaces CATEGORIES_RENAMING entries
-    # that no row in the current data carries — catches stale phantom keys we should clean
-    # out. `warn_on_missing_mappings` stays False because map_series lumps NaN into "missing",
-    # which produces noise on every sparse issue (every country/year combination without a
-    # value).
+    # Rename categories. Before each map_series, compare the source values present in this
+    # table against the keys declared in CATEGORIES_RENAMING[issue], so the maintainer sees a
+    # log line naming both the table (historical / current) and the issue when there's drift:
+    #   - "unmapped" = source value not declared in the dict → silently NaN'd downstream
+    #     (safety-critical: a new producer-side category needs a mapping).
+    #   - "phantom"  = declared key with no row in the data → clutters the chart legend's
+    #     categorical sort order with empty buckets. A phantom on the "historical" table is a
+    #     real drop candidate; one that only shows on "current" is just not a current status.
     for issue in issue_list:
+        source_values = set(tb[issue].dropna().astype(str).unique())
+        declared = set(CATEGORIES_RENAMING[issue].keys())
+        unmapped = source_values - declared
+        phantom = declared - source_values
+        if unmapped:
+            paths.log.warning(
+                f"[{table_name}] CATEGORIES_RENAMING[{issue!r}]: source values not declared (will become NaN): {sorted(unmapped)}"
+            )
+        if phantom:
+            paths.log.warning(
+                f"[{table_name}] CATEGORIES_RENAMING[{issue!r}]: phantom keys not in data: {sorted(phantom)}"
+            )
         tb[issue] = map_series(
             series=tb[issue],
             mapping=CATEGORIES_RENAMING[issue],
             warn_on_missing_mappings=False,
-            warn_on_unused_mappings=True,
-            show_full_warning=True,
+            warn_on_unused_mappings=False,
+            show_full_warning=False,
         )
         tb[issue] = tb[issue].copy_metadata(tb["country"])
 
