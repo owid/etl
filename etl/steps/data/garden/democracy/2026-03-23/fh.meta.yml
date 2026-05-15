@@ -24,6 +24,11 @@ tables:
           - It distills a detailed checklist—10 political-rights and 15 civil-liberties questions—into one intuitive figure, making complex governance data easy to grasp.
           - The number is the gateway to Freedom House's headline categories Free, Partly Free, Not Free, so a small point swing can shift a country's global status.
           - "Scores are re-evaluated each year: analysts adjust points only when real-world events warrant, allowing the metric to flag both rapid crackdowns and gradual reforms."
+        presentation:
+          grapher_config:
+            title: Freedom Score
+            subtitle: |-
+              Data by [Freedom House](#dod:freedom-house). The score captures the extent of free and fair elections, political pluralism and participation, a functioning government, freedom of expression and association, the rule of law, and personal autonomy. Higher scores indicate more freedom.
 
       civlibs:
         title: Civil liberties rating
@@ -33,6 +38,43 @@ tables:
         description_key:
           - It is measured on a one-to-seven scale, with one representing the highest degree of Freedom and seven the lowest.
 
+        presentation:
+          grapher_config:
+            title: Civil Liberties Rating
+            subtitle: Data by [Freedom House](#dod:freedom-house). It captures the extent of freedom of expression and association, the rule of law, and personal autonomy. Lower ratings indicate more liberties.
+            chartTypes:
+              - LineChart
+              - SlopeChart
+              - DiscreteBar
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 7
+              min: 1
+            map:
+              colorScale:
+                baseColorScheme: Greens
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericLabels:
+                  - "1"
+                  - "2"
+                  - "3"
+                  - "4"
+                  - "5"
+                  - "6"
+                  - "7"
+                customNumericValues:
+                  - 1
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+        display:
+          numDecimalPlaces: 0
       polrights:
         title: Political rights rating
         unit: ""
@@ -41,12 +83,51 @@ tables:
         description_key:
           - It is measured on a one-to-seven scale, with one representing the highest degree of Freedom and seven the lowest.
 
+        presentation:
+          grapher_config:
+            title: Political Rights Rating
+            subtitle: Data by [Freedom House](#dod:freedom-house). It captures the extent of free and fair elections, political pluralism and participation, and a functioning government. Lower ratings indicate more rights.
+            chartTypes:
+              - LineChart
+              - SlopeChart
+              - DiscreteBar
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 7
+              min: 1
+            map:
+              colorScale:
+                baseColorScheme: Blues
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericColors:
+                  -
+                customNumericLabels:
+                  - "1"
+                  - "2"
+                  - "3"
+                  - "4"
+                  - "5"
+                  - "6"
+                  - "7"
+                customNumericValues:
+                  - 1
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+        display:
+          numDecimalPlaces: 0
+
       regime:
         title: Political regime
         unit: ""
         description_short: |-
           The variable identifies the political regime of a country. It distinguishes between free countries (score 2), partly free countries (score 1), and not free countries (score 0).
-
         description_key:
           - Free countries are understood as countries in which citizens have many political rights (free and fair elections, political pluralism and participation, functioning government) and civil liberties (freedoms of expression and association, rule of law, personal autonomy).
           - Partly free country are countries in which citizens have some political rights and civil liberties.
@@ -55,6 +136,39 @@ tables:
           score 0: Not free
           Score 1: Partly free
           Score 2: Free
+        presentation:
+          grapher_config:
+            title: Free country
+            subtitle: "[Data](#dod:regimes-fh) by [Freedom House](#dod:freedom-house). Free countries are those in which citizens have many political rights (free and fair elections, political pluralism and participation, functioning government) and civil liberties (freedoms of expression and association, rule of law, personal autonomy)."
+            chartTypes:
+              - LineChart
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 2
+              min: 0
+            selectedFacetStrategy: entity
+            colorScale: &color_regime
+              binningStrategy: manual
+              customNumericColors:
+                - "#a588c3"
+                - "#e8b864"
+                - "#58ac8c"
+              customNumericLabels:
+                - Not free
+                - Partly free
+                - Free
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 2
+              customNumericColorsActive: true
+            map:
+              colorScale: *color_regime
+              tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
 
       country_flag:
         title: Entity considered a country by Freedom House
@@ -68,18 +182,106 @@ tables:
         description_short: |-
           The variable identifies the extent to which the chief executive and legislature are chosen in free and fair elections under universal suffrage. Higher scores indicate a freer electoral process.
 
+        presentation:
+          grapher_config:
+            title: Democratic Electoral Institutions Score
+            subtitle: Data by [Freedom House](#dod:freedom-house). The score captures the extent to which the chief executive and legislature are chosen in free and fair elections under universal suffrage. It ranges from 0 to 12 (most democratic).
+            chartTypes:
+              - LineChart
+              - SlopeChart
+              - DiscreteBar
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 12
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: YlGn
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 3
+                  - 5
+                  - 7
+                  - 9
+                  - 11
+                  - 12
+        display:
+          numDecimalPlaces: 0
+
       polrights_score:
         title: Political rights score
         unit: ""
         description_short: |-
           Identifies the fine-grained extent of free and fair elections, political pluralism and participation, and a functioning government. Higher scores indicate more rights.
 
+        presentation:
+          grapher_config:
+            title: Political Rights Score
+            subtitle: Data by [Freedom House](#dod:freedom-house). The score captures the extent of free and fair elections, political pluralism and participation, and a functioning government. Higher scores indicate more rights.
+            chartTypes:
+              - LineChart
+              - SlopeChart
+              - DiscreteBar
+              - Marimekko
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 40
+              min: -3
+            map:
+              colorScale:
+                baseColorScheme: Blues
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 0
+                  - 5
+                  - 10
+                  - 15
+                  - 20
+                  - 25
+                  - 30
+                  - 35
+                  - 40
+        display:
+          numDecimalPlaces: 0
       civlibs_score:
         title: Civil liberties score
         unit: ""
         description_short: |-
           The variable identifies the fine-grained extent of freedom of expression and association, the rule of law, and personal autonomy. Higher scores indicate more liberties.
 
+        presentation:
+          grapher_config:
+            title: Civil Liberties Score
+            subtitle: Data by [Freedom House](#dod:freedom-house). The score captures the extent of freedom of expression and association, the rule of law, and personal autonomy. Higher scores indicate more liberties.
+            chartTypes:
+              - LineChart
+              - SlopeChart
+              - DiscreteBar
+              - Marimekko
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 60
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: Greens
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+        display:
+          numDecimalPlaces: 0
       electdem:
         title: Electoral democracy
         unit: ""
@@ -94,6 +296,35 @@ tables:
           * score NA: If `electprocess`, `polrights_score` and `civlibs_score` values are all missing.
           * score 0: Otherwise.
 
+        presentation:
+          grapher_config:
+            title: Democracy
+            subtitle: "[Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house). Democracies are political systems in which citizens have the right to choose the chief executive and legislature in broadly free and fair elections and have substantial other political rights and civil liberties."
+            chartTypes:
+              - LineChart
+            note: The Chart tab uses numeric values, with 1 for electoral democracies and 0 for non-democracies.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            selectedFacetStrategy: entity
+            colorScale: &color_electdem
+              binningStrategy: manual
+              customNumericColorsActive: true
+              customNumericColors:
+                - "#ef8a62"
+                - "#2c7bb6"
+              customNumericLabels:
+                - "No"
+                - "Yes"
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+            map:
+              colorScale: *color_electdem
+              tooltipUseCustomLabels: true
   fh_regions:
     variables:
       num_regime:
