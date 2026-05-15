@@ -267,7 +267,7 @@ tables:
           title_public: Elected officials index
           grapher_config:
             title: Elected Political Leaders Index
-            subtitle: "{definitions.grapher_configs.subtitle_vdem} . It measures the extent to which broad elections choose the chief executive and the legislature. The index ranges from 0 to 1 (chief executive and entire legislature elected)."
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. It measures the extent to which broad elections choose the chief executive and the legislature. The index ranges from 0 to 1 (chief executive and entire legislature elected)."
             <<: *gconfig_base
             chartTypes: *chart_types
             map:
