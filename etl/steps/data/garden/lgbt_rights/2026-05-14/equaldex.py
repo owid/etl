@@ -236,9 +236,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def make_table_wide_and_map_categories(
-    tb: Table, table_name: str = "table", check_phantoms: bool = True
-) -> Table:
+def make_table_wide_and_map_categories(tb: Table, table_name: str = "table", check_phantoms: bool = True) -> Table:
     """
     Make the reable wide by pivoting on the issue column and map the categories to clearer names, sorted by order of progressiveness.
 
