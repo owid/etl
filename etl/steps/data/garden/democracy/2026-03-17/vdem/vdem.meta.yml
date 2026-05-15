@@ -24,6 +24,11 @@ definitions:
       binningStrategy: manual
       customNumericValues: *brackets_1
 
+    chart_types: &chart_types
+      - LineChart
+      - SlopeChart
+      - DiscreteBar
+      - Marimekko
     # 0-1 (10 bins), YlGnBu
     gconfig_a1: &gconfig_a1
       <<: *gconfig_base
@@ -260,6 +265,7 @@ tables:
             title: Elected Political Leaders Index
             subtitle: Data by [V-Dem](#dod:v-dem). It measures the extent to which broad elections choose the chief executive and the legislature. The index ranges from 0 to 1 (chief executive and entire legislature elected).
             <<: *gconfig_base
+            chartTypes: *chart_types
             map:
               colorScale:
                 baseColorScheme: BinaryMapPaletteA
@@ -291,6 +297,7 @@ tables:
             hasMapTab: true
             tab: map
             selectedFacetStrategy: entity
+            chartTypes: *chart_types
             map:
               colorScale:
                 baseColorScheme: YlGnBu
@@ -397,12 +404,12 @@ tables:
         unit: ""
         display:
           numDecimalPlaces: 2
-
           name: Direct Democracy Index
         presentation:
           grapher_config:
             title: Direct Democracy Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens can easily vote on specific issues themselves in popular initiatives, referendums, and plebiscites. The index ranges from 0 to 1 (easiest).
+            chartTypes: *chart_types
             <<: *gconfig_a1
 
       ## 9.4.2 Government effectiveness
@@ -977,6 +984,7 @@ tables:
           grapher_config:
             title: Electoral Democracy Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed. The index ranges from 0 to 1 (most democratic).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         display:
           color: "#3c4e66"
@@ -993,6 +1001,7 @@ tables:
           grapher_config:
             title: Liberal Democracy Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, civil liberties, and executive constraints. The index ranges from 0 to 1 (most democratic).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_key:
           - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in big and small differences in democracy, want scores for almost all countries, and prefer a narrow understanding of democracy. For data that focuses on big differences in political systems or has a broad understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
@@ -1030,6 +1039,7 @@ tables:
           grapher_config:
             title: Participatory Democracy Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and citizens being able to engage in regional and local government, civil society organizations, and direct democracy. The index ranges from 0 to 1 (most democratic).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the ideal of participatory democracy achieved?
@@ -1053,6 +1063,7 @@ tables:
           grapher_config:
             title: Deliberative Democracy Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and citizens and leaders discussing different views and seeking the public good. The index ranges from 0 to 1 (most democratic).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the ideal of deliberative democracy achieved?
@@ -1080,6 +1091,7 @@ tables:
           <<: *ppt_multi_w_regions
           title_public: Egalitarian democracy index
           grapher_config:
+            chartTypes: *chart_types
             title: Egalitarian Democracy Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and the protection of rights, access to power, and distribution of resources being equal. The index ranges from 0 to 1 (most democratic).
             <<: *gconfig_a1
@@ -1111,6 +1123,7 @@ tables:
           grapher_config:
             title: Legislative Checks on Government Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the legislature and government agencies can question, investigate and oversee the executive. The index ranges from 0 to 1 (most constrained).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
@@ -1134,6 +1147,7 @@ tables:
           grapher_config:
             title: Liberal Political Institutions Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of individual and minority rights, equality before the law, and constraints on the executive by the legislature and courts. The index ranges from 0 to 1 (most liberal).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: &description_prod_lib_vdem |-
           Question: To what extent is the liberal principle of democracy achieved?
@@ -1160,6 +1174,7 @@ tables:
           grapher_config:
             title: Strong Elected Local Governments Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens elect local governments that are free from the influence of unelected local actors, except for courts. The index ranges from 0 to 1 (strongest).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
           Question: Are there elected local governments, and — if so — to what extent can they operate without interference from unelected bodies at the local level?
@@ -1186,6 +1201,7 @@ tables:
           grapher_config:
             title: Participatory Political Institutions Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy. The index ranges from 0 to 1 (most participatory).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the participatory principle achieved?
@@ -1212,6 +1228,7 @@ tables:
           grapher_config:
             title: Strong Elected Regional Governments Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens elect regional governments that are free from the influence of unelected regional actors, except for courts. The index ranges from 0 to 1 (strongest).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
           Question: Are there elected regional governments, and — if so — to what extent can they operate without interference from unelected bodies at the regional level?
@@ -1237,6 +1254,7 @@ tables:
           title_public: Equal resource distribution index
           grapher_config:
             <<: *gconfig_a3
+            chartTypes: *chart_types
             title: Equal Resource Distribution Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which all social groups benefit from public spending, and have equal access to education, healthcare, and the welfare state. The index ranges from 0 to 1 (most equal).
         description_from_producer: |-
@@ -1885,6 +1903,7 @@ tables:
           grapher_config:
             title: Civil Society Participation Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens are active in diverse organizations which choose and influence policy-makers. The index ranges from 0 to 1 (most active).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
           Question: Are major CSOs routinely consulted by policymakers; how large is the involvement of people in CSOs; are women prevented from participating; and is legislative candidate nomination within party organization highly decentralized or made through party primaries?
@@ -1949,6 +1968,7 @@ tables:
           grapher_config:
             title: Deliberative Political Institutions Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens and leaders discuss different views and seek the public good. The index ranges from 0 to 1 (most deliberative).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the deliberative principle of democracy achieved?
@@ -1978,6 +1998,7 @@ tables:
           title_public: Egalitarian political institutions index
           <<: *ppt_multi_w_regions
           grapher_config:
+            chartTypes: *chart_types
             title: Egalitarian Political Institutions Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the protection of rights, access to power, and distribution of resources are equal. The index ranges from 0 to 1 (most egalitarian).
             <<: *gconfig_a1
@@ -2007,6 +2028,7 @@ tables:
           grapher_config:
             title: Free and Fair Elections Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which election violence, government intimidation, fraud, large irregularities, and vote buying are absent. The index ranges from 0 to 1 (most free and fair).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_key:
           - This index, produced by Varieties of Democracy (V-Dem), is useful if you are exclusively interested in how free and fair elections are. For data that focuses on how democratic a country's political system is more broadly, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
@@ -2073,6 +2095,7 @@ tables:
           title_public: Equal access to power index
           grapher_config:
             <<: *gconfig_a2
+            chartTypes: *chart_types
             title: Equal Access to Power Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which all social groups can influence and participate in policy-making. The index ranges from 0 to 1 (most equal).
         description_from_producer: |-
@@ -2098,6 +2121,7 @@ tables:
           title_public: Equal rights protection index
           grapher_config:
             <<: *gconfig_a1
+            chartTypes: *chart_types
             title: Equal Rights Protection Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the state grants and protects rights and freedoms equally across all social groups. The index ranges from 0 to 1 (most equal).
         description_from_producer: |-
@@ -2123,6 +2147,7 @@ tables:
           grapher_config:
             title: Freedom of Association Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which parties and civil society organizations can form and operate freely. The index ranges from 0 to 1 (most free).
+            chartTypes: *chart_types
             <<: *gconfig_a2
         description_from_producer: |-
           Question: To what extent are parties, including opposition parties, allowed to form and to participate in elections, and to what extent are civil society organizations able to form and to operate freely?
@@ -2145,6 +2170,7 @@ tables:
           title_public: Freedom of expression index
           grapher_config:
             <<: *gconfig_a4
+            chartTypes: *chart_types
             title: Freedom of Expression Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of free speech and the freedom of the press. The index ranges from 0 to 1 (most free).
         description_key:
@@ -2178,6 +2204,7 @@ tables:
           title_public: Equality before the law and individual liberty index
           grapher_config:
             <<: *gconfig_a5
+            chartTypes: *chart_types
             title: Individual Liberties and Equality before the Law Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which laws are transparent and predictably enforced, public administration is impartial, and citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion. The index ranges from 0 to 1 (most liberties).
         description_from_producer: |-
@@ -2200,6 +2227,7 @@ tables:
           grapher_config:
             title: Judicial Checks on Government Index
             subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the executive respects the constitution and complies with the rulings of independent courts. The index ranges from 0 to 1 (most constrained).
+            chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent does the executive respect the constitution and comply with court rulings, and to what extent is the judiciary able to act in an independent fashion?

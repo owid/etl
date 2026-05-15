@@ -7,6 +7,14 @@
 
 definitions:
   subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed. The index ranges from 0 to 1 (most democratic)."
+  common_views:
+    - dimensions:
+        metric: varieties_of_democracy
+      # config:
+      #   type: "LineChart SlopeChart DiscreteBar"
+      #   hasMapTab: false
+    - config:
+        colorVariableId: regions#owid_region
 
 config:
   explorerTitle: "Democracy"
@@ -306,24 +314,30 @@ views:
         - catalogPath: vdem_multi_with_regions#electdem_vdem__estimate_best
           display:
             name: "Electoral democracy"
+            color: "#4C6A9C"
         - catalogPath: vdem_multi_with_regions#libdem_vdem__estimate_best
           display:
             name: "Liberal democracy"
+            color: "#B13507"
         - catalogPath: vdem_multi_with_regions#participdem_vdem__estimate_best
           display:
             name: "Participatory democracy"
+            color: "#996D39"
         - catalogPath: vdem_multi_with_regions#delibdem_vdem__estimate_best
           display:
             name: "Deliberative democracy"
+            color: "#2C8465"
         - catalogPath: vdem_multi_with_regions#egaldem_vdem__estimate_best
           display:
             name: "Egalitarian democracy"
+            color: "#6D3E91"
     config:
       title: "Varieties of democracy"
       subtitle: "The indices are by [V-Dem](#dod:v-dem), based on expert estimates, and range from 0 to 1 (most democratic)."
       selectedFacetStrategy: "entity"
       addCountryMode: "change-country"
-      minTime: 1900
       yAxis:
         max: 1
         min: 0
+      type: "LineChart SlopeChart DiscreteBar"
+      hasMapTab: false
