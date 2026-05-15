@@ -265,8 +265,8 @@ COMBINED_CONFIGS = [
         "sources": [("joint_adoption__legal", "legal")],
         "category_map": _single_direction_map(
             key="legal",
-            yes_label="Permitted",
-            neither_label="Not permitted",
+            yes_label="Allowed",
+            neither_label="Not allowed",
             mixed_label="Varies by region",
         ),
     },

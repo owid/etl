@@ -431,7 +431,7 @@ tables:
           Whether same-sex couples may jointly adopt children.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Permitted_** (same-sex couples may jointly adopt children under national law), **_Varies by region_** (rules differ between subnational jurisdictions) and **_Not permitted_** (national law does not permit joint adoption by same-sex couples).'
+          - 'The indicator is coded as follows: **_Allowed_** (same-sex couples may jointly adopt children under national law), **_Varies by region_** (rules differ between subnational jurisdictions) and **_Not allowed_** (national law does not permit joint adoption by same-sex couples).'
         unit: ""
         short_unit: ""
         display:
@@ -439,9 +439,9 @@ tables:
           numDecimalPlaces: 0
         type: ordinal
         sort:
-          - Permitted
+          - Allowed
           - Varies by region
-          - Not permitted
+          - Not allowed
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
 
@@ -1633,26 +1633,26 @@ tables:
           name: Legally recognized
           numDecimalPlaces: 0
 
-      joint_adoption_not_permitted_count:
-        title: Joint adoption by same-sex couples — Not permitted (number of countries)
-        description_short: The number of countries classified as "Not permitted" on the indicator on joint adoption by same-sex couples.
+      joint_adoption_not_allowed_count:
+        title: Joint adoption by same-sex couples — Not allowed (number of countries)
+        description_short: The number of countries classified as "Not allowed" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not permitted" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not allowed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Not permitted
+          name: Not allowed
           numDecimalPlaces: 0
 
-      joint_adoption_not_permitted_pop:
-        title: Joint adoption by same-sex couples — Not permitted (population)
-        description_short: The total population of countries classified as "Not permitted" on the indicator on joint adoption by same-sex couples.
+      joint_adoption_not_allowed_pop:
+        title: Joint adoption by same-sex couples — Not allowed (population)
+        description_short: The total population of countries classified as "Not allowed" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not permitted" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not allowed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Not permitted
+          name: Not allowed
           numDecimalPlaces: 0
 
       joint_adoption_varies_by_region_count:
@@ -1677,26 +1677,26 @@ tables:
           name: Varies by region
           numDecimalPlaces: 0
 
-      joint_adoption_permitted_count:
-        title: Joint adoption by same-sex couples — Permitted (number of countries)
-        description_short: The number of countries classified as "Permitted" on the indicator on joint adoption by same-sex couples.
+      joint_adoption_allowed_count:
+        title: Joint adoption by same-sex couples — Allowed (number of countries)
+        description_short: The number of countries classified as "Allowed" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Permitted" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Allowed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Permitted
+          name: Allowed
           numDecimalPlaces: 0
 
-      joint_adoption_permitted_pop:
-        title: Joint adoption by same-sex couples — Permitted (population)
-        description_short: The total population of countries classified as "Permitted" on the indicator on joint adoption by same-sex couples.
+      joint_adoption_allowed_pop:
+        title: Joint adoption by same-sex couples — Allowed (population)
+        description_short: The total population of countries classified as "Allowed" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Permitted" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Allowed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Permitted
+          name: Allowed
           numDecimalPlaces: 0
 
       constitutional_protections_sexual_orientation_not_protected_count:
