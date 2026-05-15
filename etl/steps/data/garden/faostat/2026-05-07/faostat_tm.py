@@ -90,11 +90,7 @@ def plot_reporting_coverage_by_year(tb: Table) -> None:
     and bucket the tuple accordingly. The plot is a quick way to see how much
     of the data is one-sided vs symmetric, and whether consistency is
     improving over time.
-
-    Restricted to the physical-quantity elements — value-side mismatches are
-    dominated by CIF/FOB pricing differences and are less interpretable.
-
-    Intended as a development aid; it is not called by `run()` by default."""
+    """
     import plotly.express as px
 
     # Build the two key sets. For the importer side, swap reporter ↔ partner
@@ -143,7 +139,7 @@ def plot_reporting_coverage_by_year(tb: Table) -> None:
         x="year",
         y="share",
         color="status",
-        title="FAOSTAT TM — reporting coverage by year (Export vs Import quantity, per (reporter, partner, item))",
+        title="Reporting coverage",
         labels={"year": "Year", "share": "Share of (reporter, partner, item) tuples"},
         category_orders={"status": ["matched", "exporter-only", "importer-only"]},
     )
@@ -151,9 +147,11 @@ def plot_reporting_coverage_by_year(tb: Table) -> None:
     fig.show()
 
 
-def plot_quantity_mismatch_by_reporter(tb: Table, year: int | None = None, top_n: int = 20) -> None:
-    """Stacked horizontal bar showing how matched bilateral flows distribute
-    across agreement bands, for the top-N reporting countries.
+def plot_quantity_mismatch_by_reporter(
+    tb: Table, year: int | None = None, top_n: int = 20, include_unmatched: bool = False
+) -> None:
+    """Stacked horizontal bar showing how bilateral flows distribute across
+    quantity-agreement bands, for the top-N reporting countries.
 
     For every matched (reporter, partner, item) flow we compute the
     intuitive quantity-agreement ratio
@@ -161,15 +159,22 @@ def plot_quantity_mismatch_by_reporter(tb: Table, year: int | None = None, top_n
     which is 1.0 when both sides report the same quantity, 0.5 when one
     side reports twice the other, 0.1 when one side reports ten times the
     other, etc. Flows are binned into bands (<25% / 25–50% / 50–75% /
-    75–90% / ≥90%) and we plot, per reporter, the share of their matched
-    flows in each band, sorted so the worst reporters (smallest share of
-    ≥90% agreement) sit at the top.
+    75–90% / ≥90%) and we plot, per reporter, the share of flows in each
+    band, sorted so the worst reporters (smallest share of ≥90% agreement)
+    sit at the top.
 
     Args:
         year: Year to analyze. Defaults to the latest year with row count
             ≥ 90% of the series maximum (skipping the partial tail year).
         top_n: Number of reporters to include, ranked by total number of
-            matched flows in `year`.
+            flows in `year`.
+        include_unmatched: If True, also count flows reported by only one
+            side (exporter-only or importer-only). Their `agreement` is
+            zero by definition (one of the two quantities is missing), so
+            they land in a dedicated "Unmatched" band drawn darkest red.
+            The chart then captures both coverage *and* quantity-agreement
+            problems in one view (otherwise `plot_reporting_coverage_by_year`
+            shows the coverage half separately). Default False.
 
     Intended as a development aid; not called by `run()` by default."""
     import numpy as np
@@ -180,7 +185,7 @@ def plot_quantity_mismatch_by_reporter(tb: Table, year: int | None = None, top_n
         rows_per_year = tb.groupby("year", observed=True).size()
         year = int(rows_per_year[rows_per_year >= 0.9 * rows_per_year.max()].index.max())
 
-    # Build the matched view for that year.
+    # Build per-direction tables for that year.
     qty = tb[(tb["year"] == year) & tb["element"].isin(["Export quantity", "Import quantity"])][
         ["reporter_country", "partner_country", "item_code", "element", "value"]
     ].copy()
@@ -194,33 +199,51 @@ def plot_quantity_mismatch_by_reporter(tb: Table, year: int | None = None, top_n
     imp = qty.loc[
         qty["element"] == "Import quantity",
         ["reporter_country", "partner_country", "item_code", "value"],
-    ].rename(
-        columns={
-            "reporter_country": "partner_country",
-            "partner_country": "reporter_country",
-            "value": "imp_qty",
-        }
-    )
-    matched = exp.merge(imp, on=["reporter_country", "partner_country", "item_code"], how="inner")
-    matched = matched[(matched["exp_qty"] > 0) & (matched["imp_qty"] > 0)].copy()
+    ].rename(columns={"reporter_country": "partner_country", "partner_country": "reporter_country", "value": "imp_qty"})
+
+    # Inner-merge gives matched flows only; outer-merge keeps exporter-only and
+    # importer-only too (an unmatched flow has one quantity NaN before fillna).
+    how = "outer" if include_unmatched else "inner"
+    merged = exp.merge(imp, on=["reporter_country", "partner_country", "item_code"], how=how)
+    merged["exp_qty"] = merged["exp_qty"].fillna(0)
+    merged["imp_qty"] = merged["imp_qty"].fillna(0)
+    if include_unmatched:
+        # Keep rows reported by at least one side. After fillna, a row with one
+        # zero side is exactly an "unmatched" flow.
+        merged = merged[(merged["exp_qty"] > 0) | (merged["imp_qty"] > 0)].copy()
+    else:
+        # Matched-only: both sides reported a positive quantity.
+        merged = merged[(merged["exp_qty"] > 0) & (merged["imp_qty"] > 0)].copy()
+
     # Compute the agreement ratio on plain numpy arrays to bypass the owid
     # Variable arithmetic (which combines indicator metadata and gets confused
     # by `np.maximum` / `np.minimum` on filtered Variables).
-    exp_arr = matched["exp_qty"].to_numpy()
-    imp_arr = matched["imp_qty"].to_numpy()
-    matched["agreement"] = np.minimum(exp_arr, imp_arr) / np.maximum(exp_arr, imp_arr)
+    exp_arr = merged["exp_qty"].to_numpy()
+    imp_arr = merged["imp_qty"].to_numpy()
+    max_arr = np.maximum(exp_arr, imp_arr)
+    # max_arr is > 0 for every surviving row, so the division is safe.
+    merged["agreement"] = np.minimum(exp_arr, imp_arr) / max_arr
 
-    # Bin agreement into intuitive bands (red = poor, green = near-perfect).
-    band_labels = ["<25%", "25–50%", "50–75%", "75–90%", "≥90%"]
-    matched["band"] = pd.cut(
-        matched["agreement"],
-        bins=[-0.001, 0.25, 0.50, 0.75, 0.90, 1.001],
-        labels=band_labels,
-    )
+    # Bin by agreement. Matched flows land in 5 bands; unmatched flows (only
+    # present when include_unmatched=True; both sides are positive in the
+    # matched-only branch) get tagged as "Unmatched" via a mask override.
+    matched_band_labels = ["<25%", "25–50%", "50–75%", "75–90%", "≥90%"]
+    matched_band_colors = ["#d73027", "#fc8d59", "#fee08b", "#91cf60", "#1a9850"]
+    band = pd.cut(merged["agreement"], bins=[-0.001, 0.25, 0.50, 0.75, 0.90, 1.001], labels=matched_band_labels)
+    if include_unmatched:
+        unmatched_mask = (merged["exp_qty"] == 0) | (merged["imp_qty"] == 0)
+        band = band.cat.add_categories("Unmatched")
+        band[unmatched_mask] = "Unmatched"
+        band_labels = ["Unmatched"] + matched_band_labels
+        band_colors = ["#67000d"] + matched_band_colors  # darker red for "Unmatched"
+    else:
+        band_labels = matched_band_labels
+        band_colors = matched_band_colors
+    merged["band"] = band
 
-    # Top-N reporters by total number of matched flows.
-    top = matched["reporter_country"].value_counts().head(top_n).index.tolist()
-    sub = matched[matched["reporter_country"].isin(top)]
+    # Top-N reporters by total number of flows in this view.
+    top = merged["reporter_country"].value_counts().head(top_n).index.tolist()
+    sub = merged[merged["reporter_country"].isin(top)]
 
     shares = sub.groupby(["reporter_country", "band"], observed=True).size().unstack(fill_value=0)
     shares = shares.div(shares.sum(axis=1), axis=0)[band_labels]
@@ -228,16 +251,22 @@ def plot_quantity_mismatch_by_reporter(tb: Table, year: int | None = None, top_n
     shares = shares.sort_values("≥90%", ascending=True)
 
     long = shares.reset_index().melt(id_vars="reporter_country", var_name="band", value_name="share")
+    title = (
+        "Quantity agreement (matched flows + unmatched as 0%)"
+        if include_unmatched
+        else "Quantity agreement among matched flows"
+    )
+    x_label = "Share of all flows" if include_unmatched else "Share of matched flows"
     fig = px.bar(
         long,
         x="share",
         y="reporter_country",
         color="band",
         orientation="h",
-        title=f"FAOSTAT TM — quantity agreement among matched flows, top-{top_n} reporters in {year}",
-        labels={"share": "Share of matched flows", "reporter_country": "Reporter"},
+        title=title,
+        labels={"share": x_label, "reporter_country": "Reporter"},
         category_orders={"band": band_labels, "reporter_country": shares.index.tolist()},
-        color_discrete_sequence=["#d73027", "#fc8d59", "#fee08b", "#91cf60", "#1a9850"],
+        color_discrete_sequence=band_colors,
     )
     fig.update_layout(barmode="stack", xaxis_tickformat=".0%")
     fig.show()

@@ -2,9 +2,7 @@
 #
 # Each entry is one option in the viz dropdown. Each entry references a single
 # FAO commodity item code — the same codebook used by both TM (trade) and QCL
-# (production), so the rollup is a direct integer-code filter against
-# `item_code` in the TM data, and the share-of-production denominator (when
-# wired) is a direct lookup in QCL.
+# (production).
 #
 # Each entry:
 #   display:    name shown in the dropdown
@@ -45,9 +43,9 @@ items:
 
   # ─────────────────────────────────────────────────────────────────────────
   # Pulses
-  - display: Beans (dry)
+  - display: Dry beans
     item_code: 176   # Beans, dry
-  - display: Peas (dry)
+  - display: Dry peas
     item_code: 187   # Peas, dry
 
   # ─────────────────────────────────────────────────────────────────────────
@@ -79,7 +77,7 @@ items:
     item_code: 261   # Olive oil
   - display: Soybean oil
     item_code: 237   # Soya bean oil
-  - display: Sunflower-seed oil
+  - display: Sunflower oil
     item_code: 268   # Sunflower-seed oil, crude
   - display: Coconut oil
     item_code: 252   # Coconut oil
@@ -106,20 +104,26 @@ items:
 
   # ─────────────────────────────────────────────────────────────────────────
   # Meat
-  - display: Beef (with bone, fresh)
+  # Each meat item's `item_code` is FAOSTAT's "primary product" trade code,
+  # which doubles as the production code in QCL. Trade-side, it captures only
+  # the fresh-with-bone cuts (not boneless / frozen / processed); production-
+  # side, it represents the country's total output of that meat. The share
+  # therefore reads as "fraction of total production exported as fresh bone-in
+  # cuts" — partial on the trade side but the denominator is right.
+  - display: Beef
     item_code: 867   # Meat of cattle with the bone, fresh or chilled
-  - display: Pork (with bone, fresh)
+  - display: Pork
     item_code: 1035  # Meat of pig with the bone, fresh or chilled
-  - display: Chicken meat (fresh)
+  - display: Chicken meat
     item_code: 1058  # Meat of chickens, fresh or chilled
-  - display: Sheep meat (fresh)
+  - display: Sheep meat
     item_code: 977   # Meat of sheep, fresh or chilled
-  - display: Goat meat (fresh)
+  - display: Goat meat
     item_code: 1017  # Meat of goat, fresh or chilled
 
   # ─────────────────────────────────────────────────────────────────────────
   # Eggs, honey, beverages
-  - display: Hen eggs (in shell)
+  - display: Hen eggs in shell
     item_code: 1062  # Hen eggs in shell, fresh
   - display: Honey
     item_code: 1182  # Natural honey
@@ -130,7 +134,7 @@ items:
 
   # ─────────────────────────────────────────────────────────────────────────
   # Stimulants
-  - display: Coffee (green)
+  - display: Green coffee
     item_code: 656   # Coffee, green
   - display: Cocoa beans
     item_code: 661   # Cocoa beans

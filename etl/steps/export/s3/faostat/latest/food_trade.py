@@ -83,4 +83,4 @@ def run() -> None:
             log.info("food_trade.dry_run_skip_upload", local=str(local_file), s3=s3_url, size_mb=size_mb)
         else:
             log.info("food_trade.uploading", s3=s3_url, size_mb=size_mb)
-            s3_utils.upload(s3_url, local_file, public=True, downloadable=False)
+            s3_utils.upload(s3_url, local_file, public=True, downloadable=True)
