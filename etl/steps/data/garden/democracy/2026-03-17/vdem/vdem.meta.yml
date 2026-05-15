@@ -19,10 +19,10 @@ definitions:
       yAxis:
         max: 1
         min: 0
-      map:
-        colorScale:
-          binningStrategy: manual
-          customNumericValues: *brackets_1
+
+    map_colorscale_1: &map_colorscale_1
+      binningStrategy: manual
+      customNumericValues: *brackets_1
 
     # 0-1 (10 bins), YlGnBu
     gconfig_a1: &gconfig_a1
@@ -30,24 +30,28 @@ definitions:
       map:
         colorScale:
           baseColorScheme: YlGnBu
+          <<: *map_colorscale_1
     # 0-1 (10 bins), GnBu
     gconfig_a2: &gconfig_a2
       <<: *gconfig_base
       map:
         colorScale:
           baseColorScheme: GnBu
+          <<: *map_colorscale_1
     # 0-1 (10 bins), PuBu
     gconfig_a3: &gconfig_a3
       <<: *gconfig_base
       map:
         colorScale:
           baseColorScheme: PuBu
+          <<: *map_colorscale_1
     # 0-1 (10 bins), YlGn
     gconfig_a4: &gconfig_a4
       <<: *gconfig_base
       map:
         colorScale:
           baseColorScheme: YlGn
+          <<: *map_colorscale_1
 
     # 0-1 (10 bins), Blues
     gconfig_a5: &gconfig_a5
@@ -55,6 +59,7 @@ definitions:
       map:
         colorScale:
           baseColorScheme: Blues
+          <<: *map_colorscale_1
 
     # 0-1 (binary), RdYlBu
     gconfig_b1: &gconfig_b1
@@ -258,6 +263,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: BinaryMapPaletteA
+                <<: *map_colorscale_1
             selectedFacetStrategy: entity
 
       ## 2.2.5 Share of population with suffrage
