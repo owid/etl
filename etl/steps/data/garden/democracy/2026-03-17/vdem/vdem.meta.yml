@@ -74,20 +74,21 @@ definitions:
     gconfig_b1: &gconfig_b1
       <<: *gconfig_base
       selectedFacetStrategy: entity
+      colorScale: &color_b1
+        binningStrategy: manual
+        customNumericColorsActive: true
+        customNumericColors:
+          - "#ef8a62"
+          - "#2c7bb6"
+        customNumericLabels:
+          - "No"
+          - "Yes"
+        customNumericValues:
+          - 0
+          - 0
+          - 1
       map:
-        colorScale:
-          binningStrategy: manual
-          customNumericColors:
-            - "#ef8a62"
-            - "#2c7bb6"
-          customNumericLabels:
-            - "No"
-            - "Yes"
-          customNumericValues:
-            - 0
-            - 0
-            - 1
-          customNumericColorsActive: true
+        colorScale: *color_b1
         tooltipUseCustomLabels: true
 
     # -4 to 4, RdBu
@@ -448,6 +449,7 @@ tables:
         presentation:
           grapher_config:
             <<: *gconfig_d1
+            chartTypes: []
             title: Age of electoral democracy
             subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections."
         display:
@@ -476,6 +478,7 @@ tables:
         presentation:
           grapher_config:
             <<: *gconfig_d1
+            chartTypes: []
             title: Age of liberal democracy
             subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. Liberal democracies are political systems that hold meaningful, free and fair, and multi-party elections, and their citizens have further individual rights, are equal before the law, and the legislative and the courts constrain the executive."
         display:
@@ -712,25 +715,22 @@ tables:
               max: 0
               min: 0
             selectedFacetStrategy: entity
+            colorScale: &colorscale_regime
+              baseColorScheme: RdYlBu
+              binningStrategy: manual
+              customNumericLabels:
+                - Closed autocracy
+                - Electoral autocracy
+                - Electoral democracy
+                - Liberal democracy
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 2
+                - 3
             map:
-              colorScale:
-                binningStrategy: manual
-                customNumericColors:
-                  - "#ff0000"
-                  - "#ffc0c0"
-                  - "#80ff80"
-                  - "#008000"
-                customNumericLabels:
-                  - Closed autocracy
-                  - Electoral autocracy
-                  - Electoral democracy
-                  - Liberal democracy
-                customNumericValues:
-                  - 0
-                  - 0
-                  - 1
-                  - 2
-                  - 3
+              colorScale: *colorscale_regime
               tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
@@ -761,47 +761,48 @@ tables:
               max: 9
               min: 0
             selectedFacetStrategy: entity
+            colorScale: &colorscale_regime_amb
+              baseColorScheme: RdYlBu
+              binningStrategy: manual
+              customNumericColors:
+                - "#d7191c"
+                - "#e74731"
+                - "#f88e52"
+                -
+                - "#f0cda5"
+                - "#d0dcc1"
+                -
+                - "#8dc1dc"
+                - "#5496c5"
+                - "#2c7bb6"
+              customNumericLabels:
+                - Closed autocracy
+                - ""
+                - "2"
+                - Electoral autocracy
+                - ""
+                - "5"
+                - Electoral democracy
+                - ""
+                - "8"
+                - Liberal democracy
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+                - 6
+                - 7
+                - 8
+                - 9
+              customCategoryLabels:
+                No data: No data
+              customNumericColorsActive: true
             map:
-              colorScale:
-                baseColorScheme: RdYlBu
-                binningStrategy: manual
-                customNumericColors:
-                  - "#d7191c"
-                  - "#e74731"
-                  - "#f88e52"
-                  -
-                  - "#f0cda5"
-                  - "#d0dcc1"
-                  -
-                  - "#8dc1dc"
-                  - "#5496c5"
-                  - "#2c7bb6"
-                customNumericLabels:
-                  - Closed autocracy
-                  - ""
-                  - "2"
-                  - Electoral autocracy
-                  - ""
-                  - "5"
-                  - Electoral democracy
-                  - ""
-                  - "8"
-                  - Liberal democracy
-                customNumericValues:
-                  - 0
-                  - 0
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  - 6
-                  - 7
-                  - 8
-                  - 9
-                customCategoryLabels:
-                  No data: No data
-                customNumericColorsActive: true
+              colorScale: *colorscale_regime_amb
               tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0
@@ -827,24 +828,26 @@ tables:
             hasMapTab: true
             tab: map
             selectedFacetStrategy: entity
+
+            colorScale: &colorscale_regime_redux
+              baseColorScheme: RdYlBu
+              binningStrategy: manual
+              customNumericColors:
+                - "#8d6e71"
+                - "#c6a1a5"
+                - "#abd9e9"
+              customNumericLabels:
+                - Closed autocracy
+                - Electoral autocracy
+                - Electoral democracy
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 3
+              customNumericColorsActive: true
             map:
-              colorScale:
-                baseColorScheme: RdYlBu
-                binningStrategy: manual
-                customNumericColors:
-                  - "#8d6e71"
-                  - "#c6a1a5"
-                  - "#abd9e9"
-                customNumericLabels:
-                  - Closed autocracy
-                  - Electoral autocracy
-                  - Electoral democracy
-                customNumericValues:
-                  - 0
-                  - 0
-                  - 1
-                  - 3
-                customNumericColorsActive: true
+              colorScale: *colorscale_regime_redux
               tooltipUseCustomLabels: true
         display:
           numDecimalPlaces: 0

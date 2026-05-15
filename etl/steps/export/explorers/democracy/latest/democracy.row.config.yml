@@ -6,6 +6,39 @@
 # for single-y views; multi-y views keep their combined chart config.
 
 definitions:
+  # Legend & colors
+  display_c_aut: &display_c_aut
+    name: "Closed autocracies"
+    color: "#D7191C"
+  display_p_c_aut: &display_p_c_aut
+    name: "Probably closed autocracies"
+    color: "#E74731"
+  display_p_e_aut_top: &display_p_e_aut_top
+    name: "Probably electoral autocracy"
+    color: "#F88E52"
+  display_e_aut: &display_e_aut
+    name: "Electoral autocracies"
+    color: "#FDAE61"
+  display_p_e_aut_bottom: &display_p_e_aut_bottom
+    name: "\xadProbably electoral autocracy"
+    color: "#F0CDA5"
+  display_p_e_dem_top: &display_p_e_dem_top
+    name: "Probably electoral democracy"
+    color: "#D0DCC1"
+  display_e_dem: &display_e_dem
+    name: "Electoral democracies"
+    color: "#ABD9E9"
+  display_p_e_dem_bottom: &display_p_e_dem_bottom
+    name: "\xadProbably electoral democracy"
+    color: "#8DC1DC"
+  display_p_l_dem: &display_p_l_dem
+    name: "Probably liberal democracy"
+    color: "#5496C5"
+  display_l_dem: &display_l_dem
+    name: "Liberal democracies"
+    color: "#2C7BB6"
+
+  # Subtitles
   group_subtitle_1: &group_subtitle_1 |-
     Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem).
   note: &note "The share of closed autocracies increases a lot in 1900 because V-Dem covers many more countries since then, often colonies."
@@ -70,33 +103,28 @@ dimensions:
         name: "Number and share of long-standing liberal democracies"
 
 views:
+  # == Political regime ==
   - dimensions:
       metric: political_regime
       sub_metric: main_classification
     indicators:
       y:
         - catalogPath: vdem_uni_without_regions#regime_row_owid
+    config:
+      colorVariableId: vdem_uni_without_regions#regime_row_owid
   - dimensions:
       metric: political_regime
       sub_metric: number_and_share_of_democracies
     indicators:
       y:
         - catalogPath: vdem_num_countries#num_countries_regime__category_closed_autocracy
-          display:
-            name: "Closed autocracies"
-            color: "#d7191c"
+          display: *display_c_aut
         - catalogPath: vdem_num_countries#num_countries_regime__category_electoral_autocracy
-          display:
-            name: "Electoral autocracies"
-            color: "#ec9d4f"
+          display: *display_e_aut
         - catalogPath: vdem_num_countries#num_countries_regime__category_electoral_democracy
-          display:
-            name: "Electoral democracies"
-            color: "#6da5b8"
+          display: *display_e_dem
         - catalogPath: vdem_num_countries#num_countries_regime__category_liberal_democracy
-          display:
-            name: "Liberal democracies"
-            color: "#2c7bb6"
+          display: *display_l_dem
     config:
       title: "Countries that are democracies and autocracies"
       subtitle: *group_subtitle_1
@@ -113,60 +141,67 @@ views:
             name: "No regime data"
             color: "#555555"
         - catalogPath: vdem_population#population_regime__category_closed_autocracy
-          display:
-            name: "People living in closed autocracies"
-            color: "#d7191c"
+          display: *display_c_aut
         - catalogPath: vdem_population#population_regime__category_electoral_autocracy
-          display:
-            name: "in electoral autocracies"
-            color: "#ec9d4f"
+          display: *display_e_aut
         - catalogPath: vdem_population#population_regime__category_electoral_democracy
-          display:
-            name: "in electoral democracies"
-            color: "#6da5b8"
+          display: *display_e_dem
         - catalogPath: vdem_population#population_regime__category_liberal_democracy
-          display:
-            name: "in liberal democracies"
-            color: "#2c7bb6"
+          display: *display_l_dem
     config:
       title: "People living in democracies and autocracies"
       subtitle: *group_subtitle_1
+      type: "StackedArea StackedDiscreteBar"
+
+  # == Electoral democracy ==
   - dimensions:
       metric: electoral_democracy
       sub_metric: main_classification
     indicators:
       y:
         - catalogPath: vdem_uni_without_regions#regime_redux_row_owid
+    config:
+      colorVariableId: vdem_uni_without_regions#regime_redux_row_owid
   - dimensions:
       metric: electoral_democracy
       sub_metric: multi_party_elections
     indicators:
       y:
         - catalogPath: vdem_multi_without_regions#electmulpar_row__estimate_best
+    config:
+      colorVariableId: vdem_multi_without_regions#electmulpar_row__estimate_best
   - dimensions:
       metric: electoral_democracy
       sub_metric: multi_party_elections_for_chief_executive
     indicators:
       y:
         - catalogPath: vdem_multi_without_regions#electmulpar_hoe_row_owid__estimate_best
+    config:
+      colorVariableId: vdem_multi_without_regions#electmulpar_hoe_row_owid__estimate_best
   - dimensions:
       metric: electoral_democracy
       sub_metric: multi_party_elections_for_legislature
     indicators:
       y:
         - catalogPath: vdem_multi_without_regions#electmulpar_leg_row__estimate_best
+    config:
+      colorVariableId: vdem_multi_without_regions#electmulpar_leg_row__estimate_best
   - dimensions:
       metric: electoral_democracy
       sub_metric: free_and_fair_elections
     indicators:
       y:
         - catalogPath: vdem_multi_without_regions#electfreefair_row__estimate_best
+    config:
+      colorVariableId: vdem_multi_without_regions#electfreefair_row__estimate_best
   - dimensions:
       metric: electoral_democracy
       sub_metric: democratic_electoral_institutions
     indicators:
       y:
         - catalogPath: vdem_multi_without_regions#electdem_dich_row_owid__estimate_best
+    config:
+      colorVariableId: vdem_multi_without_regions#electdem_dich_row_owid__estimate_best
   - dimensions:
       metric: electoral_democracy
       sub_metric: age_of_electoral_democracy
@@ -210,7 +245,10 @@ views:
       title: "Countries that are long-standing electoral democracies"
       subtitle: *group_subtitle_3
       note: *note
+      type: "StackedArea StackedDiscreteBar"
       stackMode: "relative"
+
+  # == Liberal democracy ==
   - dimensions:
       metric: liberal_democracy
       sub_metric: main_classification
@@ -218,61 +256,73 @@ views:
       y:
         - catalogPath: vdem_uni_without_regions#regime_row_owid
     config:
-      title: "Liberal democracy"
-      subtitle: *group_subtitle_2
-      map:
-        colorScale:
-          baseColorScheme: "RdYlBu"
-          binningStrategy: "manual"
-          customNumericColors:
-            - "#8d6e71"
-            - "#c6a1a5"
-            - "#f3d0d4"
-            -
-          customNumericLabels:
-            - "Closed autocracy"
-            - "Electoral autocracy"
-            - "Electoral democracy"
-            - "Liberal democracy"
-          customNumericValues:
-            - 0
-            - 0
-            - 1
-            - 2
-            - 3
-          customNumericColorsActive: true
-        columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_row_owid"
-        tooltipUseCustomLabels: true
+      colorVariableId: vdem_uni_without_regions#regime_row_owid
+      # title: "Liberal democracy"
+      # subtitle: *group_subtitle_2
+      # map:
+      #   colorScale:
+      #     baseColorScheme: "RdYlBu"
+      #     binningStrategy: "manual"
+      #     customNumericColors:
+      #       - "#8d6e71"
+      #       - "#c6a1a5"
+      #       - "#f3d0d4"
+      #       -
+      #     customNumericLabels:
+      #       - "Closed autocracy"
+      #       - "Electoral autocracy"
+      #       - "Electoral democracy"
+      #       - "Liberal democracy"
+      #     customNumericValues:
+      #       - 0
+      #       - 0
+      #       - 1
+      #       - 2
+      #       - 3
+      #     customNumericColorsActive: true
+      #   columnSlug: "grapher/democracy/2026-03-17/vdem/vdem_uni_without_regions#regime_row_owid"
+      #   tooltipUseCustomLabels: true
   - dimensions:
       metric: liberal_democracy
       sub_metric: transparent_laws
     indicators:
       y:
         - catalogPath: vdem_multi_without_regions#transplaws_row__estimate_best
+
+    config:
+      colorVariableId: vdem_multi_without_regions#transplaws_row__estimate_best
   - dimensions:
       metric: liberal_democracy
       sub_metric: access_to_justice_for_men
     indicators:
       y:
         - catalogPath: vdem_multi_without_regions#accessjust_m_row__estimate_best
+    config:
+      colorVariableId: vdem_multi_without_regions#accessjust_m_row__estimate_best
   - dimensions:
       metric: liberal_democracy
       sub_metric: access_to_justice_for_women
     indicators:
       y:
         - catalogPath: vdem_multi_without_regions#accessjust_w_row__estimate_best
+    config:
+      colorVariableId: vdem_multi_without_regions#accessjust_w_row__estimate_best
   - dimensions:
       metric: liberal_democracy
       sub_metric: liberal_political_institutions
     indicators:
       y:
         - catalogPath: vdem_multi_without_regions#lib_dich_row__estimate_best
+    config:
+      colorVariableId: vdem_multi_without_regions#lib_dich_row__estimate_best
   - dimensions:
       metric: liberal_democracy
       sub_metric: age_of_liberal_democracy
     indicators:
       y:
         - catalogPath: vdem_uni_without_regions#num_years_in_libdem_consecutive
+    config:
+      colorVariableId: vdem_uni_without_regions#num_years_in_libdem_consecutive
   - dimensions:
       metric: liberal_democracy
       sub_metric: number_and_share_of_long_standing_liberal_democracies
@@ -315,62 +365,47 @@ views:
       subtitle: *group_subtitle_2
       note: *note
       stackMode: "relative"
+      type: "StackedArea StackedDiscreteBar"
+
+  # == Political regime, including ambiguous categories ==
   - dimensions:
       metric: political_regime_including_ambiguous_categories
       sub_metric: main_classification
     indicators:
       y:
         - catalogPath: vdem_uni_without_regions#regime_amb_row_owid
+    config:
+      colorVariableId: vdem_uni_without_regions#regime_amb_row_owid
   - dimensions:
       metric: political_regime_including_ambiguous_categories
       sub_metric: number_and_share_of_democracies
     indicators:
       y:
         - catalogPath: vdem_num_countries#num_countries_regime_amb__category_closed_autocracy
-          display:
-            name: "Closed autocracies"
-            color: "#d7191c"
+          display: *display_c_aut
         - catalogPath: vdem_num_countries#num_countries_regime_amb__category_closed__maybe_electoral__autocracy
-          display:
-            name: "Probably closed autocracies"
-            color: "#e74731"
+          display: *display_p_c_aut
         - catalogPath: vdem_num_countries#num_countries_regime_amb__category_electoral__maybe_closed__autocracy
-          display:
-            name: "Probably electoral autocracy"
-            color: "#f88e52"
+          display: *display_p_e_aut_top
         - catalogPath: vdem_num_countries#num_countries_regime__category_electoral_autocracy
-          display:
-            name: "Electoral autocracies"
-            color: "#fdae61"
+          display: *display_e_aut
         - catalogPath: vdem_num_countries#num_countries_regime_amb__category_electoral_autocracy__maybe_electoral_democracy
-          display:
-            name: " Probably electoral autocracy"
-            color: "#f0cda5"
+          display: *display_p_e_aut_bottom
         - catalogPath: vdem_num_countries#num_countries_regime_amb__category_electoral_democracy__maybe_electoral_autocracy
-          display:
-            name: " Probably electoral democracy"
-            color: "#d0dcc1"
+          display: *display_p_e_dem_top
         - catalogPath: vdem_num_countries#num_countries_regime__category_electoral_democracy
-          display:
-            name: "Electoral democracies"
-            color: "#abd9e9"
+          display: *display_e_dem
         - catalogPath: vdem_num_countries#num_countries_regime_amb__category_electoral_democracy__maybe_liberal_democracy
-          display:
-            name: "Probably electoral democracy"
-            color: "#8dc1dc"
+          display: *display_p_e_dem_bottom
         - catalogPath: vdem_num_countries#num_countries_regime_amb__category_liberal_democracy__maybe_electoral_democracy
-          display:
-            name: "Probably liberal democracy"
-            color: "#5496c5"
+          display: *display_p_l_dem
         - catalogPath: vdem_num_countries#num_countries_regime_amb__category_liberal_democracy
-          display:
-            name: "Liberal democracies"
-            color: "#2c7bb6"
+          display: *display_l_dem
     config:
       title: "Countries that are democracies and autocracies"
       subtitle: *group_subtitle_1
       note: *note
-      type: "StackedDiscreteBar StackedArea"
+      type: "StackedArea StackedDiscreteBar"
       stackMode: "relative"
   - dimensions:
       metric: political_regime_including_ambiguous_categories
@@ -382,46 +417,26 @@ views:
             name: "No regime data"
             color: "#555555"
         - catalogPath: vdem_population#population_regime_amb__category_closed_autocracy
-          display:
-            name: "People living in closed autocracies"
-            color: "#d7191c"
+          display: *display_c_aut
         - catalogPath: vdem_population#population_regime_amb__category_closed__maybe_electoral__autocracy
-          display:
-            name: "in probably closed aut."
-            color: "#e74731"
+          display: *display_p_c_aut
         - catalogPath: vdem_population#population_regime_amb__category_electoral__maybe_closed__autocracy
-          display:
-            name: "in probably elect. aut."
-            color: "#f88e52"
+          display: *display_p_e_aut_top
         - catalogPath: vdem_population#population_regime_amb__category_electoral_autocracy
-          display:
-            name: "in electoral autocracies"
-            color: "#fdae61"
+          display: *display_e_aut
         - catalogPath: vdem_population#population_regime_amb__category_electoral_autocracy__maybe_electoral_democracy
-          display:
-            name: " in probably elect. aut."
-            color: "#f0cda5"
+          display: *display_p_e_aut_bottom
         - catalogPath: vdem_population#population_regime_amb__category_electoral_democracy__maybe_electoral_autocracy
-          display:
-            name: "in probably elect. dem."
-            color: "#d0dcc1"
+          display: *display_p_e_dem_top
         - catalogPath: vdem_population#population_regime_amb__category_electoral_democracy
-          display:
-            name: "in electoral democracies"
-            color: "#abd9e9"
+          display: *display_e_dem
         - catalogPath: vdem_population#population_regime_amb__category_electoral_democracy__maybe_liberal_democracy
-          display:
-            name: " in probably elect. dem."
-            color: "#8dc1dc"
+          display: *display_p_e_dem_bottom
         - catalogPath: vdem_population#population_regime_amb__category_liberal_democracy__maybe_electoral_democracy
-          display:
-            name: "in probably lib. dem."
-            color: "#5496c5"
+          display: *display_p_l_dem
         - catalogPath: vdem_population#population_regime_amb__category_liberal_democracy
-          display:
-            name: "in liberal democracies"
-            unit: "people"
-            color: "#2c7bb6"
+          display: *display_l_dem
     config:
       title: "People living in democracies and autocracies"
       subtitle: *group_subtitle_1
+      type: "StackedArea StackedDiscreteBar"
