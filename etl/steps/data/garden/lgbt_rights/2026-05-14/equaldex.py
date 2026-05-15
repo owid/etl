@@ -188,7 +188,15 @@ def run() -> None:
 
     tb = paths.regions.harmonize_names(tb)
 
-    # Select only sovereign countries
+    # Snapshot Greenland's rows BEFORE the sovereign-country filter and the
+    # region aggregations. Greenland is treated as a Danish territory by the
+    # sovereignty source (Butcher and Griffiths 2020) and by OWID's regions
+    # dataset, but Equaldex publishes a Greenland-specific record we want on
+    # country-level charts. Re-appending it AFTER the aggregations means it
+    # shows on the map but doesn't contribute to Europe / World totals.
+    tb_greenland = tb[tb["country"] == "Greenland"].reset_index(drop=True)
+
+    # Select only sovereign countries (Greenland is intentionally dropped here).
     tb = select_only_sovereign_countries(tb=tb, tb_sovereign_countries=tb_sovereign_countries)
 
     # Add population-weighted aggregations for the columns in the list
@@ -208,6 +216,12 @@ def run() -> None:
         ds_population=ds_population,
         regions=REGIONS,
     )
+
+    # Re-append Greenland after the aggregations so it shows up on country-level
+    # charts (its row only carries the raw status columns; the per-status count /
+    # population columns are intentionally left NaN since those are region-level
+    # indicators).
+    tb = pr.concat([tb, tb_greenland], ignore_index=True)
 
     # Verify index and order them
     tb = tb.format(["country", "year"])
@@ -459,13 +473,10 @@ def select_only_sovereign_countries(tb: Table, tb_sovereign_countries: Table) ->
     # Drop year column
     tb_sovereign_countries = tb_sovereign_countries.drop(columns=["year"])
 
-    # Merge the two tables
-    tb_with_sovereign = pr.merge(tb, tb_sovereign_countries, on=["country"], how="inner")
-
-    # NOTE: This is a fix to include Greenland data
-    # Add Greenland data back from tb
-    tb_greenland = tb[tb["country"] == "Greenland"].reset_index(drop=True)
-
-    tb = pr.concat([tb_with_sovereign, tb_greenland], ignore_index=True)
+    # Merge the two tables. Non-sovereign entities (including Greenland) are dropped
+    # here intentionally; the caller in `run()` re-appends Greenland after the
+    # region aggregations so it appears on country-level charts without
+    # contaminating Europe / World totals.
+    tb = pr.merge(tb, tb_sovereign_countries, on=["country"], how="inner")
 
     return tb
