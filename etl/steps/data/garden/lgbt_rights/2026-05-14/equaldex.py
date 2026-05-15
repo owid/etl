@@ -185,7 +185,12 @@ def run() -> None:
     tb_indices = select_only_sovereign_countries(tb_indices, tb_sovereign_countries, keep_extra=["Greenland"])
 
     tb = make_table_wide_and_map_categories(tb, table_name="historical")
-    tb_current = make_table_wide_and_map_categories(tb_current, table_name="current")
+    # Phantom warnings on the "current" snapshot are noisy by construction: any category
+    # that's a legitimate historical status but isn't anyone's most recent status surfaces
+    # as a phantom (e.g. `marriage['Varies by Region']`, `homosexuality['Male illegal,
+    # female uncertain']`). The unmapped check still fires here, which is the only
+    # actionable signal — a new source value not declared in the dict.
+    tb_current = make_table_wide_and_map_categories(tb_current, table_name="current", check_phantoms=False)
 
     # Merge both datasets and include the suffix _current to the columns of the current dataset
     tb = pr.merge(tb, tb_current, on=["country", "year"], how="outer", suffixes=("", "_current"))
@@ -231,12 +236,19 @@ def run() -> None:
     ds_garden.save()
 
 
-def make_table_wide_and_map_categories(tb: Table, table_name: str = "table") -> Table:
+def make_table_wide_and_map_categories(
+    tb: Table, table_name: str = "table", check_phantoms: bool = True
+) -> Table:
     """
     Make the reable wide by pivoting on the issue column and map the categories to clearer names, sorted by order of progressiveness.
 
     `table_name` is just a label used in the category-coverage warnings ("historical" / "current") so the
     log line tells the maintainer which of the two Equaldex tables flagged an unused / unmapped value.
+
+    `check_phantoms` controls whether to log warnings about CATEGORIES_RENAMING keys with no
+    row in the data. Default True for the historical table — phantoms there are real drop
+    candidates. The caller passes False for the "current" snapshot, where a phantom just
+    means "no country currently holds this status" (still a legitimate historical value).
     """
     # Make value_formatted a string
     tb["value_formatted"] = tb["value_formatted"].astype("string")
@@ -272,7 +284,7 @@ def make_table_wide_and_map_categories(tb: Table, table_name: str = "table") -> 
             paths.log.warning(
                 f"[{table_name}] CATEGORIES_RENAMING[{issue!r}]: source values not declared (will become NaN): {sorted(unmapped)}"
             )
-        if phantom:
+        if phantom and check_phantoms:
             paths.log.warning(
                 f"[{table_name}] CATEGORIES_RENAMING[{issue!r}]: phantom keys not in data: {sorted(phantom)}"
             )
