@@ -709,7 +709,7 @@ tables:
           Whether national law restricts the public expression of LGBTI identities (so-called "gay propaganda" or morality provisions).
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_No restrictions_** (no national law restricts the public expression of LGBTI identities), **_Varies by region_** (restrictions differ between subnational jurisdictions), **_Restrictions in effect but not enforced_** (national law restricts the public expression of LGBTI identities, but the dataset records the restrictions as not enforced) and **_Restrictions in effect_** (national law restricts the public expression of LGBTI identities, e.g. so-called "gay propaganda" or morality provisions).'
+          - 'The indicator is coded as follows: **_No restrictions_** (no national law restricts the public expression of LGBTI identities), **_Laws vary by region_** (restrictions differ between subnational jurisdictions), **_Restrictions exist but not enforced_** (national law restricts the public expression of LGBTI identities, but the dataset records the restrictions as not enforced) and **_Restrictions exist_** (national law restricts the public expression of LGBTI identities, e.g. so-called "gay propaganda" or morality provisions).'
           - "{definitions.derivation_enforcement_refinement}"
         unit: ""
         short_unit: ""
@@ -719,9 +719,9 @@ tables:
         type: ordinal
         sort:
           - No restrictions
-          - Varies by region
-          - Restrictions in effect but not enforced
-          - Restrictions in effect
+          - Laws vary by region
+          - Restrictions exist but not enforced
+          - Restrictions exist
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} {definitions.derivation_enforcement_refinement}'
 
@@ -2535,70 +2535,70 @@ tables:
           name: No restrictions
           numDecimalPlaces: 0
 
-      morality_propaganda_varies_by_region_count:
-        title: Anti-LGBTI "propaganda" or morality laws — Varies by region (number of countries)
-        description_short: The number of countries classified as "Varies by region" on the indicator on anti-LGBTI "propaganda" or morality laws.
+      morality_propaganda_laws_vary_by_region_count:
+        title: Anti-LGBTI "propaganda" or morality laws — Laws vary by region (number of countries)
+        description_short: The number of countries classified as "Laws vary by region" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Laws vary by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Varies by region
+          name: Laws vary by region
           numDecimalPlaces: 0
 
-      morality_propaganda_varies_by_region_pop:
-        title: Anti-LGBTI "propaganda" or morality laws — Varies by region (population)
-        description_short: The total population of countries classified as "Varies by region" on the indicator on anti-LGBTI "propaganda" or morality laws.
+      morality_propaganda_laws_vary_by_region_pop:
+        title: Anti-LGBTI "propaganda" or morality laws — Laws vary by region (population)
+        description_short: The total population of countries classified as "Laws vary by region" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Laws vary by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Varies by region
+          name: Laws vary by region
           numDecimalPlaces: 0
 
-      morality_propaganda_restrictions_in_effect_but_not_enforced_count:
-        title: Anti-LGBTI "propaganda" or morality laws — Restrictions in effect but not enforced (number of countries)
+      morality_propaganda_restrictions_exist_but_not_enforced_count:
+        title: Anti-LGBTI "propaganda" or morality laws — Restrictions exist but not enforced (number of countries)
         description_short: The number of countries where national law restricts the public expression of LGBTI identities but the restrictions are recorded as not enforced.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} {definitions.derivation_enforcement_refinement} We then counted the countries classified as "Restrictions in effect but not enforced" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} {definitions.derivation_enforcement_refinement} We then counted the countries classified as "Restrictions exist but not enforced" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Restrictions in effect but not enforced
+          name: Restrictions exist but not enforced
           numDecimalPlaces: 0
 
-      morality_propaganda_restrictions_in_effect_count:
-        title: Anti-LGBTI "propaganda" or morality laws — Restrictions in effect (number of countries)
-        description_short: The number of countries classified as "Restrictions in effect" on the indicator on anti-LGBTI "propaganda" or morality laws.
+      morality_propaganda_restrictions_exist_count:
+        title: Anti-LGBTI "propaganda" or morality laws — Restrictions exist (number of countries)
+        description_short: The number of countries classified as "Restrictions exist" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Restrictions in effect" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Restrictions exist" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Restrictions in effect
+          name: Restrictions exist
           numDecimalPlaces: 0
 
-      morality_propaganda_restrictions_in_effect_but_not_enforced_pop:
-        title: Anti-LGBTI "propaganda" or morality laws — Restrictions in effect but not enforced (population)
+      morality_propaganda_restrictions_exist_but_not_enforced_pop:
+        title: Anti-LGBTI "propaganda" or morality laws — Restrictions exist but not enforced (population)
         description_short: The total population of countries where national law restricts the public expression of LGBTI identities but the restrictions are recorded as not enforced.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} {definitions.derivation_enforcement_refinement} We then summed the populations of countries classified as "Restrictions in effect but not enforced" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} {definitions.derivation_enforcement_refinement} We then summed the populations of countries classified as "Restrictions exist but not enforced" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Restrictions in effect but not enforced
+          name: Restrictions exist but not enforced
           numDecimalPlaces: 0
 
-      morality_propaganda_restrictions_in_effect_pop:
-        title: Anti-LGBTI "propaganda" or morality laws — Restrictions in effect (population)
-        description_short: The total population of countries classified as "Restrictions in effect" on the indicator on anti-LGBTI "propaganda" or morality laws.
+      morality_propaganda_restrictions_exist_pop:
+        title: Anti-LGBTI "propaganda" or morality laws — Restrictions exist (population)
+        description_short: The total population of countries classified as "Restrictions exist" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Restrictions in effect" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Restrictions exist" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Restrictions in effect
+          name: Restrictions exist
           numDecimalPlaces: 0
 
       lgbtq_civil_society_restrictions_no_restrictions_count:

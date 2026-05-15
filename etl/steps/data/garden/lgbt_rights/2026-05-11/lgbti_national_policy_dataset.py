@@ -407,14 +407,14 @@ COMBINED_CONFIGS = [
         "sources": [("morality_propaganda__legal", "legal")],
         "category_map": _single_direction_map(
             key="legal",
-            yes_label="Restrictions in effect",
+            yes_label="Restrictions exist",
             neither_label="No restrictions",
-            mixed_label="Varies by region",
+            mixed_label="Laws vary by region",
         ),
         "enforcement_refinement": {
             "eoe_source": ("morality_propaganda", "legal"),
-            "from_label": "Restrictions in effect",
-            "to_label": "Restrictions in effect but not enforced",
+            "from_label": "Restrictions exist",
+            "to_label": "Restrictions exist but not enforced",
         },
     },
     {
