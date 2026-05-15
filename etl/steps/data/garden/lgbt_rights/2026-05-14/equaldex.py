@@ -1,10 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table, VariableMeta, VariablePresentationMeta
+from owid.catalog import Table, VariableMeta, VariablePresentationMeta
 from owid.datautils.dataframes import map_series
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -162,10 +161,9 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load meadow and regions and population datasets.
+    # Load meadow and sovereign-countries datasets. Regions and population are auto-resolved
+    # from the DAG by `paths.regions.*` and don't need explicit `load_dataset` calls.
     ds_meadow = paths.load_dataset("equaldex")
-    ds_regions = paths.load_dataset("regions")
-    ds_population = paths.load_dataset("population")
     ds_sovereign_countries = paths.load_dataset("isd")
 
     # Read tables from meadow dataset.
@@ -203,8 +201,6 @@ def run() -> None:
     tb = add_population_weighted_aggregations(
         tb=tb,
         columns=["ei", "ei_legal", "ei_po"],
-        ds_regions=ds_regions,
-        ds_population=ds_population,
         regions=REGIONS,
     )
 
@@ -212,8 +208,6 @@ def run() -> None:
     tb = add_country_counts_and_population_by_status(
         tb=tb,
         columns=list(CATEGORIES_RENAMING.keys()),
-        ds_regions=ds_regions,
-        ds_population=ds_population,
         regions=REGIONS,
     )
 
@@ -289,16 +283,14 @@ def make_table_wide_and_map_categories(tb: Table) -> Table:
     return tb
 
 
-def add_population_weighted_aggregations(
-    tb: Table, columns: list[str], ds_regions: Dataset, ds_population: Dataset, regions: list[str]
-) -> Table:
+def add_population_weighted_aggregations(tb: Table, columns: list[str], regions: list[str]) -> Table:
     """
     Add population-weighted aggregations for the columns in the list
     """
 
     tb = tb.copy()
 
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+    tb = paths.regions.add_population(tb, warn_on_missing_countries=False)
 
     columns_pop = []
     for col in columns:
@@ -310,9 +302,8 @@ def add_population_weighted_aggregations(
         "sum",
     )
 
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb=tb,
-        ds_regions=ds_regions,
         regions=regions,
         aggregations=aggregations,
         frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
@@ -328,18 +319,14 @@ def add_population_weighted_aggregations(
     return tb
 
 
-def add_country_counts_and_population_by_status(
-    tb: Table, columns: list[str], ds_regions: Dataset, ds_population: Dataset, regions: list[str]
-) -> Table:
+def add_country_counts_and_population_by_status(tb: Table, columns: list[str], regions: list[str]) -> Table:
     """
     Add country counts and population by status for the columns in the list
     """
 
     tb_regions = tb.copy()
 
-    tb_regions = geo.add_population_to_table(
-        tb=tb_regions, ds_population=ds_population, warn_on_missing_countries=False
-    )
+    tb_regions = paths.regions.add_population(tb_regions, warn_on_missing_countries=False)
 
     # Define empty dictionaries for each of the columns
     columns_count_dict = {columns[i]: [] for i in range(len(columns))}
@@ -375,9 +362,8 @@ def add_country_counts_and_population_by_status(
         "sum",
     )
 
-    tb_regions = geo.add_regions_to_table(
+    tb_regions = paths.regions.add_aggregates(
         tb=tb_regions,
-        ds_regions=ds_regions,
         regions=regions,
         aggregations=aggregations,
         frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
@@ -387,9 +373,7 @@ def add_country_counts_and_population_by_status(
     tb_regions = tb_regions.drop(columns=["population"])
 
     # Add population again
-    tb_regions = geo.add_population_to_table(
-        tb=tb_regions, ds_population=ds_population, warn_on_missing_countries=False
-    )
+    tb_regions = paths.regions.add_population(tb_regions, warn_on_missing_countries=False)
 
     # Calculate the missing population for each region
     for col in columns:
