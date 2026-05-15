@@ -52,9 +52,13 @@ MARRIAGE_MAP = {
     "equality: 1 ban: 0 civil_unions: 0": "Legal",
     "equality: 1 ban: 0 civil_unions: 1": "Legal",
     "equality: 1 ban: 0 civil_unions: 0.5": "Legal",
+    # Civil unions exist nationally, no marriage equality, no ban — distinct from
+    # both "Varies by region" (federal mismatches) and "No legal provisions"
+    # (no recognition at all). Captures countries like Cyprus, Czechia, Israel,
+    # Italy, Monaco, San Marino in 2025.
+    "equality: 0 ban: 0 civil_unions: 1": "Civil unions only",
     "equality: 0.5 ban: 0 civil_unions: 0.5": "Varies by region",
     "equality: 0.5 ban: 0 civil_unions: 1": "Varies by region",  # Brazil 2011–2012
-    "equality: 0 ban: 0 civil_unions: 1": "Varies by region",
     "equality: 0 ban: 0 civil_unions: 0.5": "Varies by region",
     "equality: 0 ban: 0 civil_unions: 0": "No legal provisions",
     "equality: 0 ban: 0.5 civil_unions: 0.5": "Varies by region",

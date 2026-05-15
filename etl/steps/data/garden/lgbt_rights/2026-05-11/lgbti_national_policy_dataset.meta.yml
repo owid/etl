@@ -26,7 +26,7 @@ definitions:
   derivation_age_of_consent: |-
     From the original dataset, we combined two indicators — age of consent equal and age of consent unequal — into a single categorical indicator (Equal, Varies by region, No legal provisions, Unequal) based on the proportion scores of both directions. Country-years where either direction shows partial subnational implementation are classified as "Varies by region".
   derivation_marriage: |-
-    From the original dataset, we combined three indicators — marriage equality (legal direction), marriage equality (illegal direction, i.e. constitutional or statutory bans), and civil unions — into a single categorical indicator (Legal, Varies by region, No legal provisions, Banned) based on the proportion scores of all three. Country-years where marriage equality, the ban, or civil unions are only partially in effect across subnational jurisdictions are classified as "Varies by region".
+    From the original dataset, we combined three indicators — marriage equality (legal direction), marriage equality (illegal direction, i.e. constitutional or statutory bans), and civil unions — into a single categorical indicator (Legal, Civil unions only, Varies by region, No legal provisions, Banned) based on the proportion scores of all three. Country-years where marriage equality, the ban, or civil unions are only partially in effect across subnational jurisdictions are classified as "Varies by region"; country-years where a national civil union or registered partnership is recognized but same-sex marriage is not are classified as "Civil unions only".
   derivation_lgb_military_join: |-
     From the original dataset, we combined two indicators — LGB allowed in the military and LGB banned from the military — into a single categorical indicator (Allowed, No policy, Banned) based on the proportion scores of both directions.
 
@@ -38,6 +38,9 @@ definitions:
     From the original dataset's single-direction proportion (0 = no policy, 1 = fully implemented, intermediate values = partial subnational adoption), we coded countries into three categories: the substantive direction in effect, partial subnational implementation ("Varies by region"), or no policy in effect.
   derivation_so_gi_pair: |-
     From the original dataset's two separate indicators — one for sexual orientation and one for gender identity — we combined them into a single categorical indicator with five categories: both protected, sexual orientation only, gender identity only, no protection, and "Varies by region" (any partial subnational coverage in either dimension).
+
+  description_key_so_gi_partial_note: |-
+    "Varies by region" also covers asymmetric cases where one dimension is fully unprotected and the other is partially protected across subnational jurisdictions — e.g. a federal country where some states have hate-crime protections for sexual orientation but none for gender identity.
   derivation_gac: |-
     From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The most common patterns get a dedicated category (e.g. covered for both, adults covered with minors restricted); rarer combinations are grouped as "Varies by region or other".
   derivation_gmc: |-
@@ -299,7 +302,7 @@ tables:
           Whether same-sex couples can legally marry, whether civil unions or registered partnerships are recognized instead, or whether same-sex marriage is banned.
         description_key:
           - "{definitions.description_key_dataset}"
-          - "The indicator is coded as follows: **_Legal_** (marriage equality is fully implemented under national law; civil unions may also exist), **_Varies by region_** (marriage equality, the marriage ban, or civil unions are only partially in effect across subnational jurisdictions), **_No legal provisions_** (no national law regulating same-sex marriage or civil unions) and **_Banned_** (marriage equality is banned and the ban is fully implemented, with no civil unions)."
+          - "The indicator is coded as follows: **_Legal_** (marriage equality is fully implemented under national law; civil unions may also exist), **_Civil unions only_** (a national civil union or registered partnership is recognized, but same-sex marriage is not), **_Varies by region_** (marriage equality, the marriage ban, or civil unions are only partially in effect across subnational jurisdictions), **_No legal provisions_** (no national law regulating same-sex marriage or civil unions) and **_Banned_** (marriage equality is banned and the ban is fully implemented, with no civil unions)."
         processing_level: major
         description_processing: "{definitions.derivation_marriage}"
         unit: ""
@@ -310,6 +313,7 @@ tables:
         type: ordinal
         sort:
           - Legal
+          - Civil unions only
           - Varies by region
           - No legal provisions
           - Banned
@@ -769,6 +773,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both protected_** (national law prohibits employment discrimination on both sexual orientation and gender identity), **_Sexual orientation only_** (national law prohibits employment discrimination on sexual orientation but not gender identity), **_Gender identity only_** (national law prohibits employment discrimination on gender identity but not sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions for either ground) and **_No protection_** (national law does not prohibit employment discrimination on either ground).'
+          - "{definitions.description_key_so_gi_partial_note}"
         unit: ""
         short_unit: ""
         display:
@@ -791,6 +796,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both protected_** (national law prohibits goods and services discrimination on both sexual orientation and gender identity), **_Sexual orientation only_** (national law prohibits goods and services discrimination on sexual orientation but not gender identity), **_Gender identity only_** (national law prohibits goods and services discrimination on gender identity but not sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions for either ground) and **_No protection_** (national law does not prohibit goods and services discrimination on either ground).'
+          - "{definitions.description_key_so_gi_partial_note}"
         unit: ""
         short_unit: ""
         display:
@@ -813,6 +819,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both covered_** (national hate crime legislation covers both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is covered by national hate crime legislation), **_Varies by region_** (coverage differs between subnational jurisdictions for either ground) and **_Not covered_** (national hate crime legislation does not cover either ground).'
+          - "{definitions.description_key_so_gi_partial_note}"
         unit: ""
         short_unit: ""
         display:
@@ -834,6 +841,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both protected_** (the constitution explicitly, or via binding court interpretation, protects both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is protected) and **_Not protected_** (the constitution does not protect either ground).'
+          - "{definitions.description_key_so_gi_partial_note}"
         unit: ""
         short_unit: ""
         display:
@@ -1070,6 +1078,19 @@ tables:
           name: Legal
           numDecimalPlaces: 0
 
+      marriage_civil_unions_only_count:
+        title: Marriage equality — Civil unions only (number of countries)
+        description_short: |-
+          The number of countries where a national civil union or registered partnership is recognized, but same-sex marriage is not.
+        processing_level: major
+        description_processing: |-
+          {definitions.derivation_marriage} We then counted the countries classified as "Civil unions only" within each region. {definitions.description_regions_processing}
+        unit: countries
+        short_unit: ""
+        display:
+          name: Civil unions only
+          numDecimalPlaces: 0
+
       marriage_varies_by_region_count:
         title: Marriage equality — Varies by region (number of countries)
         description_short: |-
@@ -1121,6 +1142,19 @@ tables:
         short_unit: ""
         display:
           name: Legal
+          numDecimalPlaces: 0
+
+      marriage_civil_unions_only_pop:
+        title: Marriage equality — Civil unions only (population)
+        description_short: |-
+          The total population of countries where a national civil union or registered partnership is recognized, but same-sex marriage is not.
+        processing_level: major
+        description_processing: |-
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "Civil unions only" within each region. {definitions.description_regions_processing}
+        unit: people
+        short_unit: ""
+        display:
+          name: Civil unions only
           numDecimalPlaces: 0
 
       marriage_varies_by_region_pop:
