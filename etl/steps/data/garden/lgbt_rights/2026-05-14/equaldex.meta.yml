@@ -3,6 +3,7 @@ definitions:
   common:
     display: &display_common
       tolerance: 0
+      numDecimalPlaces: 0
     processing_level: major
     description_processing: |-
       - We have extracted the data from the official [Equaldex JSON API](https://equaldex.stoplight.io/docs/equaldex/d033e28a5cf0c-equaldex-json-api).
@@ -14,6 +15,7 @@ definitions:
       topic_tags:
         - LGBT+ Rights
         - Human Rights
+      attribution_short: Equaldex
 
   description_from_producer_equality_index: |-
     Equaldex's Equality Index is a rating from 0 to 100 (with 100 being the most equal) to help visualize the legal rights and public attitudes towards LGBTQ+ (lesbian, gay, bisexual, transgender, queer, questioning, intersex...) people in each region. The Equality Index is an average of two indexes: the legal index and the public opinion Index.
@@ -310,7 +312,7 @@ tables:
         short_unit: ""
         description_short: Describes the ability for homosexuals to serve in the military and be open about their sexuality.
         description_key:
-          - "\"Don't Ask, Don't Tell\" refers to policies that prohibit military personnel from discriminating against or harassing closeted homosexuals (people who have not revealed their sexual orientation to the public), while barring openly homosexuals."
+          - "\"Don't ask, don't tell\" refers to policies that prohibit military personnel from discriminating against or harassing closeted homosexuals (people who have not revealed their sexual orientation to the public), while barring openly homosexuals."
         presentation:
           title_public: Lesbian, gay, bisexual, and transgender people serve openly in the military
         display:
@@ -376,7 +378,7 @@ tables:
         title: Intersex infant surgery (current)
         unit: ""
         short_unit: ""
-        description_short: Medical procedures on newborns or infants with physical sex characteristics that do differ from typical male or female bodies, usually without the informed consent of the child who is too young to participate in the decision-making process.
+        description_short: Medical procedures on newborns or infants with physical sex characteristics that differ from typical male or female bodies, usually without the informed consent of the child who is too young to participate in the decision-making process.
         presentation:
           title_public: Intersex infant surgery
         display:
