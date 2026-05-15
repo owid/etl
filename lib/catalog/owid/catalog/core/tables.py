@@ -31,7 +31,7 @@ from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # ty: ignore
 from pandas.core.series import Series
 
 from owid.catalog.core import indicators, utils, warnings
-from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, Source, TableMeta, VariableMeta
+from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, TableMeta, VariableMeta
 
 log = structlog.get_logger()
 
@@ -2783,16 +2783,6 @@ def copy_metadata(from_table: Table, to_table: Table, deep: bool = False) -> Tab
 
     tab._fields = new_fields
     return tab
-
-
-def get_unique_sources_from_tables(tables: Iterable[Table]) -> list[Source]:
-    # Make a list of all sources of all variables in all tables.
-    sources = []
-    for table in tables:
-        for column in list(table.all_columns):
-            # Get unique array of tuples of source fields (respecting the order).
-            sources += [source for source in table._fields[column].sources if source not in sources]
-    return sources
 
 
 def get_unique_licenses_from_tables(tables: Iterable[Table]) -> list[License]:

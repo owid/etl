@@ -10,17 +10,13 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset.
-    ds_garden = paths.load_dataset()
-
-    # Read table from garden dataset.
-    tb = ds_garden["{{cookiecutter.short_name}}"]
+    # Load garden dataset and read its main table.
+    ds_garden = paths.load_dataset("nuclear_weapons_tests")
+    tb = ds_garden.read("nuclear_weapons_tests", reset_index=False)
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
-
-    # Save changes in the new grapher dataset.
+    ds_grapher = paths.create_dataset(tables=[tb])
     ds_grapher.save()

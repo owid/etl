@@ -85,6 +85,14 @@ make watch
 
 ## Changelog
 
+### `v1.2.0`
+- **Remove legacy `Source` metadata (origins only)**
+  - Removed `Source` class from `owid.catalog.core.meta`
+  - Removed `sources` field from `VariableMeta` and `DatasetMeta` (use `origins` instead)
+  - Removed `if_source_exists` parameter from `Dataset.update_metadata` (use `if_origins_exist`)
+  - Removed `get_unique_sources_from_indicators` helper
+  - Removed `sources` aggregation from `combine_indicators_metadata`
+
 ### `v1.1.0`
 - **Remove processing log feature**
   - Removed `ProcessingLog` and `processing_log` module from `owid.catalog.core`

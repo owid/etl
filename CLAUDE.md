@@ -15,6 +15,32 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
 - **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
 
+## Team
+
+When generating user-facing prose (PR descriptions, Slack messages, PR comments, review responses, etc.):
+
+1. **Attribute the work** with a single italicized blockquote at the very top of the PR body, and as the opening line of any standalone Slack draft or long PR comment you generate:
+
+   ```
+   > _Written by Claude Code — @<handle> at the wheel._
+   ```
+
+   Use the handle of the human directing the work (usually the current git user; fall back to asking if ambiguous). Skip the disclosure on tiny mechanical comments (e.g. a one-line `@codex review` ping) — it's meant for substantive prose.
+
+2. **Use exact handles** from the table below when tagging colleagues. Don't guess — a wrong tag pings a real person. If a name isn't in this table, write the plain name (e.g. "Bastian") instead of `@`-tagging, and ask the user for the handle.
+
+   | Name | GitHub handle |
+   |---|---|
+   | Pablo A Rosado | `@pabloarosado` |
+   | Pablo Arriagada | `@paarriagadap` |
+   | Veronika Samborska | `@veronikasamborska1994` |
+   | Mojmir Vinkler | `@Marigold` |
+   | Lucas Rodés-Guirao | `@lucasrodes` |
+   | Tuna Acisu | `@antea04` |
+   | Fiona Spooner | `@spoonerf` |
+   | Edouard Mathieu | `@edomt` |
+
+   The disclosure rule does **not** apply to OWID-reader-facing artifacts (e.g. the `/latest` data-update post on ourworldindata.org) — those are authored by the named human, not by Claude.
 
 ## Pipeline Overview
 

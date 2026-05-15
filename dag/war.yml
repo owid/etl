@@ -135,18 +135,18 @@ steps:
       - data://garden/regions/2023-01-01/regions
 
   # UNODA - Treaties Database.
-  data://garden/war/2025-05-15/nuclear_weapons_treaties:
-    - data://meadow/war/2025-05-15/nuclear_weapons_treaties:
-      - snapshot://war/2025-05-15/nuclear_weapons_treaties__comprehensive_test_ban.csv
-      - snapshot://war/2025-05-15/nuclear_weapons_treaties__prohibition.csv
-      - snapshot://war/2025-05-15/nuclear_weapons_treaties__partial_test_ban.csv
-      - snapshot://war/2025-05-15/nuclear_weapons_treaties__geneva_protocol.csv
-      - snapshot://war/2025-05-15/nuclear_weapons_treaties__non_proliferation.csv
+  data://garden/war/2026-05-13/nuclear_weapons_treaties:
+    - data://meadow/war/2026-05-13/nuclear_weapons_treaties:
+      - snapshot://war/2026-05-13/nuclear_weapons_treaties__comprehensive_test_ban.csv
+      - snapshot://war/2026-05-13/nuclear_weapons_treaties__prohibition.csv
+      - snapshot://war/2026-05-13/nuclear_weapons_treaties__partial_test_ban.csv
+      - snapshot://war/2026-05-13/nuclear_weapons_treaties__geneva_protocol.csv
+      - snapshot://war/2026-05-13/nuclear_weapons_treaties__non_proliferation.csv
     - data://garden/un/2025-05-15/un_members
-  data://grapher/war/2025-05-15/nuclear_weapons_treaties:
-    - data://garden/war/2025-05-15/nuclear_weapons_treaties
-  data://grapher/war/2025-05-15/nuclear_weapons_treaties_country_counts:
-    - data://garden/war/2025-05-15/nuclear_weapons_treaties
+  data://grapher/war/2026-05-13/nuclear_weapons_treaties:
+    - data://garden/war/2026-05-13/nuclear_weapons_treaties
+  data://grapher/war/2026-05-13/nuclear_weapons_treaties_country_counts:
+    - data://garden/war/2026-05-13/nuclear_weapons_treaties
 
   # The Strategic Nuclear Forces Dataset (Suh).
   data://grapher/war/2025-05-15/strategic_nuclear_forces:
@@ -156,22 +156,22 @@ steps:
         - snapshot://war/2025-05-15/strategic_nuclear_forces__dyadic.xlsx
 
   # Federation of American Scientists - Status of World Nuclear Forces.
-  data://grapher/war/2025-05-15/status_of_world_nuclear_forces:
-    - data://garden/war/2025-05-15/status_of_world_nuclear_forces:
-      - data://meadow/war/2025-05-15/status_of_world_nuclear_forces:
-        - snapshot://war/2025-05-15/status_of_world_nuclear_forces.csv
+  data://grapher/war/2026-05-13/status_of_world_nuclear_forces:
+    - data://garden/war/2026-05-13/status_of_world_nuclear_forces:
+      - data://meadow/war/2026-05-13/status_of_world_nuclear_forces:
+        - snapshot://war/2026-05-13/status_of_world_nuclear_forces.csv
 
   # Arms Control Association - Nuclear Weapons Tests.
-  data://grapher/war/2025-05-15/nuclear_weapons_tests:
-    - data://garden/war/2025-05-15/nuclear_weapons_tests:
-      - data://meadow/war/2025-05-15/nuclear_weapons_tests:
-        - snapshot://war/2025-05-15/nuclear_weapons_tests.csv
+  data://grapher/war/2026-05-13/nuclear_weapons_tests:
+    - data://garden/war/2026-05-13/nuclear_weapons_tests:
+      - data://meadow/war/2026-05-13/nuclear_weapons_tests:
+        - snapshot://war/2026-05-13/nuclear_weapons_tests.csv
 
   # Federation of American Scientists - Estimated Global Nuclear Warhead Inventories.
-  data://grapher/war/2025-05-15/nuclear_weapons_inventories:
-    - data://garden/war/2025-05-15/nuclear_weapons_inventories:
-      - data://meadow/war/2025-05-15/nuclear_weapons_inventories:
-        - snapshot://war/2025-05-15/nuclear_weapons_inventories.csv
+  data://grapher/war/2026-05-13/nuclear_weapons_inventories:
+    - data://garden/war/2026-05-13/nuclear_weapons_inventories:
+      - data://meadow/war/2026-05-13/nuclear_weapons_inventories:
+        - snapshot://war/2026-05-13/nuclear_weapons_inventories.csv
 
   # Countries in Conflict explorer.
   export://explorers/war/latest/countries_in_conflict_data:
