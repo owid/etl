@@ -1,6 +1,10 @@
 definitions:
   # Define common grapher config patterns
-  aux:
+  grapher_configs:
+    subtitle_vdem: "Data by [V-Dem](#dod:v-dem)"
+    subtitle_luhrmann: "Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem)"
+    subtitle_luhrmann_2: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem)"
+
     brackets_1: &brackets_1
       - 0
       - 0.099
@@ -141,7 +145,7 @@ definitions:
             No data: true
           customNumericColorsActive: true
         tooltipUseCustomLabels: true
-
+  aux:
     description_processing_row: |-
       While RoW covers the years since 1900, we use V-Dem's historical data from 1789 to 1899 to expand the classification's coverage back in time.
 
@@ -263,7 +267,7 @@ tables:
           title_public: Elected officials index
           grapher_config:
             title: Elected Political Leaders Index
-            subtitle: Data by [V-Dem](#dod:v-dem). It measures the extent to which broad elections choose the chief executive and the legislature. The index ranges from 0 to 1 (chief executive and entire legislature elected).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem} . It measures the extent to which broad elections choose the chief executive and the legislature. The index ranges from 0 to 1 (chief executive and entire legislature elected)."
             <<: *gconfig_base
             chartTypes: *chart_types
             map:
@@ -408,7 +412,7 @@ tables:
         presentation:
           grapher_config:
             title: Direct Democracy Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens can easily vote on specific issues themselves in popular initiatives, referendums, and plebiscites. The index ranges from 0 to 1 (easiest).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens can easily vote on specific issues themselves in popular initiatives, referendums, and plebiscites. The index ranges from 0 to 1 (easiest)."
             chartTypes: *chart_types
             <<: *gconfig_a1
 
@@ -445,7 +449,7 @@ tables:
           grapher_config:
             <<: *gconfig_d1
             title: Age of electoral democracy
-            subtitle: Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections.
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections."
         display:
           numDecimalPlaces: 0
 
@@ -473,7 +477,7 @@ tables:
           grapher_config:
             <<: *gconfig_d1
             title: Age of liberal democracy
-            subtitle: Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Liberal democracies are political systems that hold meaningful, free and fair, and multi-party elections, and their citizens have further individual rights, are equal before the law, and the legislative and the courts constrain the executive.
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. Liberal democracies are political systems that hold meaningful, free and fair, and multi-party elections, and their citizens have further individual rights, are equal before the law, and the legislative and the courts constrain the executive."
         display:
           numDecimalPlaces: 0
 
@@ -701,7 +705,7 @@ tables:
         presentation:
           grapher_config:
             title: Democracy
-            subtitle: Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem).
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}."
             hasMapTab: true
             tab: map
             yAxis:
@@ -750,7 +754,7 @@ tables:
 
           grapher_config:
             title: Democracy
-            subtitle: Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). The intermediate categories indicate that the country may belong in the next-higher or next-lower group.
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. The intermediate categories indicate that the country may belong in the next-higher or next-lower group."
             hasMapTab: true
             tab: map
             yAxis:
@@ -819,7 +823,7 @@ tables:
 
           grapher_config:
             title: Electoral democracy
-            subtitle: Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem). Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections.
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections."
             hasMapTab: true
             tab: map
             selectedFacetStrategy: entity
@@ -983,7 +987,7 @@ tables:
           title_public: Electoral democracy index
           grapher_config:
             title: Electoral Democracy Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed. The index ranges from 0 to 1 (most democratic).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed. The index ranges from 0 to 1 (most democratic)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         display:
@@ -1000,7 +1004,7 @@ tables:
           title_public: Liberal democracy index
           grapher_config:
             title: Liberal Democracy Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, civil liberties, and executive constraints. The index ranges from 0 to 1 (most democratic).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, civil liberties, and executive constraints. The index ranges from 0 to 1 (most democratic)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_key:
@@ -1038,7 +1042,7 @@ tables:
           title_public: Participatory democracy index
           grapher_config:
             title: Participatory Democracy Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and citizens being able to engage in regional and local government, civil society organizations, and direct democracy. The index ranges from 0 to 1 (most democratic).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and citizens being able to engage in regional and local government, civil society organizations, and direct democracy. The index ranges from 0 to 1 (most democratic)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
@@ -1062,7 +1066,7 @@ tables:
           title_public: Deliberative democracy index
           grapher_config:
             title: Deliberative Democracy Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and citizens and leaders discussing different views and seeking the public good. The index ranges from 0 to 1 (most democratic).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and citizens and leaders discussing different views and seeking the public good. The index ranges from 0 to 1 (most democratic)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
@@ -1093,7 +1097,7 @@ tables:
           grapher_config:
             chartTypes: *chart_types
             title: Egalitarian Democracy Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and the protection of rights, access to power, and distribution of resources being equal. The index ranges from 0 to 1 (most democratic).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and the protection of rights, access to power, and distribution of resources being equal. The index ranges from 0 to 1 (most democratic)."
             <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the ideal of egalitarian democracy achieved?
@@ -1122,7 +1126,7 @@ tables:
           title_public: Legislative constraints on the executive index
           grapher_config:
             title: Legislative Checks on Government Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the legislature and government agencies can question, investigate and oversee the executive. The index ranges from 0 to 1 (most constrained).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which the legislature and government agencies can question, investigate and oversee the executive. The index ranges from 0 to 1 (most constrained)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
@@ -1146,7 +1150,7 @@ tables:
           title_public: Liberal component index
           grapher_config:
             title: Liberal Political Institutions Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of individual and minority rights, equality before the law, and constraints on the executive by the legislature and courts. The index ranges from 0 to 1 (most liberal).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of individual and minority rights, equality before the law, and constraints on the executive by the legislature and courts. The index ranges from 0 to 1 (most liberal)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: &description_prod_lib_vdem |-
@@ -1173,7 +1177,7 @@ tables:
           title_public: Elected local governments
           grapher_config:
             title: Strong Elected Local Governments Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens elect local governments that are free from the influence of unelected local actors, except for courts. The index ranges from 0 to 1 (strongest).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens elect local governments that are free from the influence of unelected local actors, except for courts. The index ranges from 0 to 1 (strongest)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
@@ -1200,7 +1204,7 @@ tables:
           title_public: Participatory political institutions
           grapher_config:
             title: Participatory Political Institutions Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy. The index ranges from 0 to 1 (most participatory).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy. The index ranges from 0 to 1 (most participatory)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
@@ -1227,7 +1231,7 @@ tables:
           title_public: Elected regional governments
           grapher_config:
             title: Strong Elected Regional Governments Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens elect regional governments that are free from the influence of unelected regional actors, except for courts. The index ranges from 0 to 1 (strongest).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens elect regional governments that are free from the influence of unelected regional actors, except for courts. The index ranges from 0 to 1 (strongest)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
@@ -1256,7 +1260,7 @@ tables:
             <<: *gconfig_a3
             chartTypes: *chart_types
             title: Equal Resource Distribution Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which all social groups benefit from public spending, and have equal access to education, healthcare, and the welfare state. The index ranges from 0 to 1 (most equal).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which all social groups benefit from public spending, and have equal access to education, healthcare, and the welfare state. The index ranges from 0 to 1 (most equal)."
         description_from_producer: |-
           Question: How equal is the distribution of resources?
 
@@ -1331,7 +1335,7 @@ tables:
           title_public: Common good justifications
           grapher_config:
             title: Common Good Justifications Score
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders justify their views with what is best for society overall. Higher scores mean more justification. A score of 0 is approximately the average across all countries and years.
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which political leaders justify their views with what is best for society overall. Higher scores mean more justification. A score of 0 is approximately the average across all countries and years."
             <<: *gconfig_c1
         description_from_producer: |-
           Question: Question: When important policy changes are being considered, to what extent do political elites justify their positions in terms of the common good?
@@ -1364,7 +1368,7 @@ tables:
           title_public: Justified political positions
           grapher_config:
             title: Justified Political Positions Score
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders give reasons for their views. Higher scores mean more justification. A score of 0 is approximately the average across all countries and years.
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which political leaders give reasons for their views. Higher scores mean more justification. A score of 0 is approximately the average across all countries and years."
             <<: *gconfig_c1
         description_from_producer: |-
           Question: When important policy changes are being considered, i.e. before a decision has been made, to what extent do political elites give public and reasoned justifications for their positions?
@@ -1395,7 +1399,7 @@ tables:
           title_public: Engaged society
           grapher_config:
             title: Engaged Society Score
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which many ordinary people discuss policies freely in private and public. Higher scores mean more engagement. A score of 0 is approximately the average across all countries and years.
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which many ordinary people discuss policies freely in private and public. Higher scores mean more engagement. A score of 0 is approximately the average across all countries and years."
             <<: *gconfig_c1
         description_from_producer: |-
           Question: When important policy changes are being considered, how wide and how independent are public deliberations?
@@ -1902,7 +1906,7 @@ tables:
           title_public: Civil society participation index
           grapher_config:
             title: Civil Society Participation Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens are active in diverse organizations which choose and influence policy-makers. The index ranges from 0 to 1 (most active).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens are active in diverse organizations which choose and influence policy-makers. The index ranges from 0 to 1 (most active)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
@@ -1932,7 +1936,7 @@ tables:
           title_public: Respect for counterarguments
           grapher_config:
             title: Respect for Counterarguments Score
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders acknowledge and respect different views and sometimes change their own. Higher scores mean more respect. A score of 0 is approximately the average across all countries and years.
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which political leaders acknowledge and respect different views and sometimes change their own. Higher scores mean more respect. A score of 0 is approximately the average across all countries and years."
             <<: *gconfig_c1
         description_from_producer: |-
           Question: When important policy changes are being considered, to what extent do political elites acknowledge and respect counterarguments?
@@ -1967,7 +1971,7 @@ tables:
           title_public: Deliberative political institutions index
           grapher_config:
             title: Deliberative Political Institutions Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which citizens and leaders discuss different views and seek the public good. The index ranges from 0 to 1 (most deliberative).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens and leaders discuss different views and seek the public good. The index ranges from 0 to 1 (most deliberative)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
@@ -2000,7 +2004,7 @@ tables:
           grapher_config:
             chartTypes: *chart_types
             title: Egalitarian Political Institutions Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the protection of rights, access to power, and distribution of resources are equal. The index ranges from 0 to 1 (most egalitarian).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which the protection of rights, access to power, and distribution of resources are equal. The index ranges from 0 to 1 (most egalitarian)."
             <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the egalitarian principle achieved?
@@ -2027,7 +2031,7 @@ tables:
           <<: *ppt_multi_w_regions
           grapher_config:
             title: Free and Fair Elections Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which election violence, government intimidation, fraud, large irregularities, and vote buying are absent. The index ranges from 0 to 1 (most free and fair).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which election violence, government intimidation, fraud, large irregularities, and vote buying are absent. The index ranges from 0 to 1 (most free and fair)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_key:
@@ -2062,7 +2066,7 @@ tables:
           title_public: Elite consultation
           grapher_config:
             title: Elite Consultations Score
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which leaders across the political spectrum, society, and business are consulted when deciding on policies. Higher scores mean more consultation. A score of 0 is approximately the average across all countries and years.
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which leaders across the political spectrum, society, and business are consulted when deciding on policies. Higher scores mean more consultation. A score of 0 is approximately the average across all countries and years."
             <<: *gconfig_c1
         description_from_producer: |-
           Question: When important policy changes are being considered, how wide is the range of consultation at elite levels?
@@ -2097,7 +2101,7 @@ tables:
             <<: *gconfig_a2
             chartTypes: *chart_types
             title: Equal Access to Power Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which all social groups can influence and participate in policy-making. The index ranges from 0 to 1 (most equal).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which all social groups can influence and participate in policy-making. The index ranges from 0 to 1 (most equal)."
         description_from_producer: |-
           Question: How equal is access to power?
 
@@ -2123,7 +2127,7 @@ tables:
             <<: *gconfig_a1
             chartTypes: *chart_types
             title: Equal Rights Protection Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the state grants and protects rights and freedoms equally across all social groups. The index ranges from 0 to 1 (most equal).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which the state grants and protects rights and freedoms equally across all social groups. The index ranges from 0 to 1 (most equal)."
         description_from_producer: |-
           Question: How equal is the protection of rights and freedoms across social groups by the state?
 
@@ -2146,7 +2150,7 @@ tables:
           title_public: Freedom of association thick index
           grapher_config:
             title: Freedom of Association Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which parties and civil society organizations can form and operate freely. The index ranges from 0 to 1 (most free).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which parties and civil society organizations can form and operate freely. The index ranges from 0 to 1 (most free)."
             chartTypes: *chart_types
             <<: *gconfig_a2
         description_from_producer: |-
@@ -2172,7 +2176,7 @@ tables:
             <<: *gconfig_a4
             chartTypes: *chart_types
             title: Freedom of Expression Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent of free speech and the freedom of the press. The index ranges from 0 to 1 (most free).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of free speech and the freedom of the press. The index ranges from 0 to 1 (most free)."
         description_key:
           - This index, produced by Varieties of Democracy (V-Dem), combines information on freedom of discussion, freedom of academic and cultural expression, media censorship, media self-censorship, media bias, harassment of journalists, and the existence of critical and different perspectives in print and broadcast media.
           - It is based on assessments by V-Dem's country experts.
@@ -2206,7 +2210,7 @@ tables:
             <<: *gconfig_a5
             chartTypes: *chart_types
             title: Individual Liberties and Equality before the Law Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which laws are transparent and predictably enforced, public administration is impartial, and citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion. The index ranges from 0 to 1 (most liberties).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which laws are transparent and predictably enforced, public administration is impartial, and citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion. The index ranges from 0 to 1 (most liberties)."
         description_from_producer: |-
           Question: To what extent are laws transparent and rigorously enforced and public administration impartial, and to what extent do citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion?
 
@@ -2226,7 +2230,7 @@ tables:
           title_public: Judicial constraints on the executive index
           grapher_config:
             title: Judicial Checks on Government Index
-            subtitle: Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which the executive respects the constitution and complies with the rulings of independent courts. The index ranges from 0 to 1 (most constrained).
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which the executive respects the constitution and complies with the rulings of independent courts. The index ranges from 0 to 1 (most constrained)."
             chartTypes: *chart_types
             <<: *gconfig_a1
         description_from_producer: |-
@@ -2645,7 +2649,7 @@ tables:
           title_public: "Access to justice for men"
           grapher_config:
             title: Access to justice for men
-            subtitle: Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether men can safely bring cases before courts, are able to seek redress if public authorities violate their rights, and trials are fair.
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether men can safely bring cases before courts, are able to seek redress if public authorities violate their rights, and trials are fair."
             <<: *gconfig_b1
         description_from_producer: |-
           Question: Do men enjoy secure and effective access to justice?
@@ -2682,7 +2686,7 @@ tables:
           title_public: "Access to justice for women"
           grapher_config:
             title: Access to justice for women
-            subtitle: Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether women can safely bring cases before courts, are able to seek redress if public authorities violate their rights, and trials are fair.
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether women can safely bring cases before courts, are able to seek redress if public authorities violate their rights, and trials are fair."
             <<: *gconfig_b1
         description_from_producer: |-
           Question: Do women enjoy equal, secure, and effective access to justice?
@@ -2718,7 +2722,7 @@ tables:
           <<: *ppt_multi_wo_regions
           grapher_config:
             title: Meaningful democratic electoral institutions
-            subtitle: Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether the country has meaningful democratic electoral institutions, meaning political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed.
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether the country has meaningful democratic electoral institutions, meaning political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed."
             <<: *gconfig_b1
         description_from_producer: *description_prod_electdem_vdem
         description_processing: |-
@@ -2741,7 +2745,7 @@ tables:
           <<: *ppt_multi_wo_regions
           grapher_config:
             title: Free and fair elections
-            subtitle: Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether election violence, government intimidation, fraud, large irregularities, and vote buying are broadly absent.
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether election violence, government intimidation, fraud, large irregularities, and vote buying are broadly absent."
             <<: *gconfig_b1
         description_key:
           - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
@@ -2780,7 +2784,7 @@ tables:
           title_public: Multi-party elections for government's chief executive
           grapher_config:
             title: Multi-party elections for government's chief executive
-            subtitle: Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem).
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}."
             <<: *gconfig_b1
         unit: ""
         description_processing: |-
@@ -2808,7 +2812,7 @@ tables:
           title_public: Multiparty elections for legislature
           grapher_config:
             title: Multi-party elections for legislature
-            subtitle: Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem).
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}."
             <<: *gconfig_b1
         description_processing: |-
           We use the value from `v2elmulpar_osp` whenever `v2eltype` is 0, 1, 4 or 5. Otherwise the value is missing.
@@ -2830,7 +2834,7 @@ tables:
           title_public: Multiparty elections
           grapher_config:
             title: Multi-party elections
-            subtitle: Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem).
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}."
             <<: *gconfig_b1
         description_from_producer: |-
           Question: Question: Was this national election multiparty?
@@ -2863,7 +2867,7 @@ tables:
           title_public: Liberal political institutions
           grapher_config:
             title: Liberal political institutions
-            subtitle: Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether the country has liberal political institutions, meaning citizens have individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether the country has liberal political institutions, meaning citizens have individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts."
             <<: *gconfig_b1
         description_from_producer: *description_prod_lib_vdem
         description_processing: |-
@@ -2886,7 +2890,7 @@ tables:
           title_public: Transparent laws with predictable enforcement
           grapher_config:
             title: Transparent laws
-            subtitle: Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem). Expert estimates of whether laws are transparent, coherent, and relatively stable, and their enforcement predictable.
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether laws are transparent, coherent, and relatively stable, and their enforcement predictable."
             <<: *gconfig_b1
         description_from_producer: |-
           Question: Are the laws of the land clear, well publicized, coherent (consistent with each other), relatively stable from year to year, and enforced in a predictable manner?
