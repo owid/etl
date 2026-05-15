@@ -1034,8 +1034,6 @@ tables:
 
           V-Dem indicator name: `v2x_partipdem`
         unit: ""
-        display:
-          color: "#3e4c66"
 
       ## 2.1.4 Deliberative democracy index
       delibdem_vdem:
@@ -1117,9 +1115,6 @@ tables:
 
           V-Dem indicator name: `v2xlg_legcon`
         unit: ""
-        display:
-          name: Legislative Checks on Government Index
-          color: "#3e4c66"
 
       ## 2.2.8 Liberal component index
       lib_vdem:
