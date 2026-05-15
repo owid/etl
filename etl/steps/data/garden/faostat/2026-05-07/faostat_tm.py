@@ -52,20 +52,29 @@ def _count_self_trade(tb: Table) -> int:
     return int((rep == par).sum())
 
 
-def plot_rows_per_year(tb: Table) -> None:
-    """Show a bar chart of the number of rows per year as a quick coverage
-    check (e.g. to spot the partial tail year, late-starting reporters, or
-    sudden gaps). Imported lazily so plotly only loads when this is called.
+def plot_coverage(tb: Table) -> None:
+    """Show two side-by-side bars per year: number of rows and number of
+    distinct reporting countries. Together they distinguish 'less data
+    actually reported' (both drop) from 'less trade activity' (rows drop
+    but reporter count stays roughly flat) — useful when picking the
+    latest well-covered year."""
+    import plotly.graph_objects as go
 
-    Intended as a development aid; it is not called by `run()` by default."""
-    import plotly.express as px
+    grouped = tb.groupby("year", observed=True)
+    rows = grouped.size().sort_index()
+    reporters = grouped["reporter_country"].nunique().sort_index()
+    years = rows.index.astype(int).tolist()
 
-    rows_per_year = tb.groupby("year", observed=True).size().sort_index()
-    fig = px.bar(
-        x=rows_per_year.index.astype(int),
-        y=rows_per_year.values,
-        labels={"x": "Year", "y": "Rows"},
-        title="FAOSTAT TM — number of rows per year",
+    fig = go.Figure()
+    fig.add_bar(x=years, y=rows.values, name="Rows", yaxis="y1", opacity=0.8)
+    fig.add_bar(x=years, y=reporters.values, name="Distinct reporters", yaxis="y2", opacity=0.8)
+    fig.update_layout(
+        title="Detailed trade matrix dataset - Coverage",
+        xaxis=dict(title="Year"),
+        yaxis=dict(title="Rows", side="left"),
+        yaxis2=dict(title="Distinct reporters", side="right", overlaying="y", showgrid=False),
+        barmode="group",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
     fig.show()
 
@@ -282,9 +291,9 @@ def run() -> None:
     # Sanity check inputs.
     sanity_check_inputs(tb=tb)
 
-    # Inspect the number of rows per year (useful to identify the latest well-covered year).
+    # Inspect rows + distinct reporters per year (useful to spot the partial tail year).
     # Uncomment for research.
-    # plot_rows_per_year(tb=tb)
+    # plot_coverage(tb=tb)
 
     # Inspect what fraction of bilateral flows are matched (both sides report) vs. one-sided (exporter-only / importer-only), by year.
     # Uncomment for research.

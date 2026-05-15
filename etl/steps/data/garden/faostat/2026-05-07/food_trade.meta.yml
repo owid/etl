@@ -1,0 +1,21 @@
+tables:
+  food_trade:
+    variables:
+      value:
+        title: Bilateral trade flow
+        unit: tonnes
+        short_unit: t
+        description_short: |-
+          Quantity of the item flowing from the exporter to the importer in the export year. When both sides report a value the importer's report is used; otherwise the exporter's. Self-trade rows (reporter == partner) are dropped.
+      exporter_production:
+        title: Exporter's production
+        unit: tonnes
+        short_unit: t
+        description_short: |-
+          Total production tonnes of the item in the exporter country, in the export year, from FAOSTAT QCL.
+      importer_supply:
+        title: Importer's apparent domestic supply
+        unit: tonnes
+        short_unit: t
+        description_short: |-
+          Apparent domestic supply of the item in the importer country, in the export year, computed as Production (from QCL) + total imports − total exports (from the trade matrix, summed over partners).
