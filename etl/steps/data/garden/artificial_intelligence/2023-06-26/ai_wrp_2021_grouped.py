@@ -2,7 +2,7 @@
 
 from typing import cast
 
-import pandas as pd
+import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
@@ -14,29 +14,28 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def melt_and_clean(df: pd.DataFrame, col_name: str, excluded_columns: list[str]) -> pd.DataFrame:
+def melt_and_clean(tb: Table, col_name: str, excluded_columns: list[str]) -> Table:
     """
-    Melt and clean dataframe based on column name.
+    Melt and clean table based on column name.
     """
-    melted_df = pd.melt(
-        df.reset_index(),
+    melted_tb = tb.reset_index().melt(
         id_vars=["year", "country"],
-        value_vars=[col for col in df.columns if col_name in col and col not in excluded_columns],
+        value_vars=[col for col in tb.columns if col_name in col and col not in excluded_columns],
     )
-    melted_df["group"] = (
-        melted_df["variable"].str.split("_" + col_name, expand=True)[0].str.replace("_", " ").str.title()
+    melted_tb["group"] = (
+        melted_tb["variable"].str.split("_" + col_name, expand=True)[0].str.replace("_", " ").str.title()
     )
-    melted_df.rename(columns={"value": f"{col_name}_value"}, inplace=True)
-    melted_df = melted_df[melted_df[f"{col_name}_value"].notnull()]
-    return melted_df[["year", f"{col_name}_value", "group"]]
+    melted_tb = melted_tb.rename(columns={"value": f"{col_name}_value"})
+    melted_tb = melted_tb[melted_tb[f"{col_name}_value"].notnull()]
+    return melted_tb[["year", f"{col_name}_value", "group"]]
 
 
 def run(dest_dir: str) -> None:
     log.info("ai_wrp_2021_grouped.start")
 
-    # Load meadow dataset.
+    # Load garden dataset.
     ds_garden = cast(Dataset, paths.load_dependency("ai_wrp_2021"))
-    df = pd.DataFrame(ds_garden["ai_wrp_2021"])
+    tb = ds_garden["ai_wrp_2021"]
 
     columns_to_melt = [
         "yes__would_feel_safe",
@@ -68,17 +67,14 @@ def run(dest_dir: str) -> None:
         "dont_have_an_opinion",
     ]
 
-    # Using a dictionary to store the melted dataframes.
-    melted_dfs = {}
+    # Melt each column.
+    melted_tbs = {column: melt_and_clean(tb, column, excluded_columns) for column in columns_to_melt}
 
-    for column in columns_to_melt:
-        melted_dfs[column] = melt_and_clean(df, column, excluded_columns)
+    merge_all = melted_tbs[columns_to_melt[0]]
 
-    merge_all = melted_dfs[columns_to_melt[0]]
-
-    # Merge all melted dataframes together.
+    # Merge all melted tables together.
     for column in columns_to_melt[1:]:
-        merge_all = pd.merge(merge_all, melted_dfs[column], on=["year", "group"], how="outer")
+        merge_all = pr.merge(merge_all, melted_tbs[column], on=["year", "group"], how="outer")
 
     # Derive additional columns (mainly to avoid grapher errors)
     merge_all["other_yes_no_value"] = merge_all["dk__cars_value"] + merge_all["refused__cars_value"]
@@ -111,17 +107,18 @@ def run(dest_dir: str) -> None:
         "Employed Part Time Want Full Time": "Employed Part-Time (Seeking Full-Time)",
     }
 
-    merge_all["group"].replace(group_replacements, inplace=True)
-    merge_all.set_index(["year", "group"], inplace=True)
+    merge_all["group"] = merge_all["group"].replace(group_replacements)
+    merge_all = merge_all.set_index(["year", "group"])
+    merge_all.metadata.short_name = paths.short_name
 
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
+    # Create a new garden dataset with the same metadata as the input dataset.
+    ds_garden_out = create_dataset(
         dest_dir,
-        tables=[Table(merge_all, short_name=paths.short_name, underscore=True)],
+        tables=[merge_all],
         default_metadata=ds_garden.metadata,
     )
 
     # Save changes in the new garden dataset.
-    ds_garden.save()
+    ds_garden_out.save()
 
     log.info("ai_wrp_2021_grouped.end")

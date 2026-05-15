@@ -1,0 +1,31 @@
+dataset:
+  title: Figure_15.3
+tables:
+  figure_15_3:
+    variables:
+      average_weekly_earnings:
+        title: Average weekly earnings
+        unit: £
+      inflation__pct:
+        title: Inflation (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      unemployment_rate__pct:
+        title: Unemployment rate (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: |-
+          ILO/LFS measure of unemployment rate recorded by the Bank of England starts in 1870. For the previous 10 years, administrative and claimant count basis unemployment rates are used.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

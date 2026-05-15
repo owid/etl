@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5110
-    date_accessed: 2023-08-10 08:04:14.516963
+    url: https://admin.owid.io/admin/datasets/5110
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5110_tesa_13_9b
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bd75833c3aceb3bb6fc800440110edeb
-  size: 3151
-  path: dataset_5110_tesa_13_9b_config.json
+  - md5: a5684b047326411b56b184c13ff0b46c
+    size: 3467
+    path: dataset_5110_tesa_13_9b_config.json

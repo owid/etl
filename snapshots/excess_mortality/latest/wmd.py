@@ -23,7 +23,8 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"excess_mortality/{SNAPSHOT_VERSION}/wmd.csv")
 
     # Add date_accessed
-    snap.metadata.source.date_accessed = date.today()  # ty: ignore
+    assert snap.metadata.origin
+    snap.metadata.origin.date_accessed = date.today().isoformat()
     snap.metadata.save()
 
     # Download data from source.

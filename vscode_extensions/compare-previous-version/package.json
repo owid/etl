@@ -2,7 +2,7 @@
   "name": "compare-previous-version",
   "displayName": "Compare Previous Version",
   "description": "Compare current file with its previous version by finding the highest date version that's lower than current",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "owid",
   "engines": {
     "vscode": "^1.93.0"

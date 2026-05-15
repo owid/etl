@@ -1,6 +1,5 @@
 meta:
   namespace: wvs
-  short_name: trust_wvs
   name: Trust questions in the World Values Survey Dataset (WVS, 2022)
   version: 2023-03-08
   publication_year: 2022

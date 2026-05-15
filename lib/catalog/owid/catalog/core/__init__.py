@@ -11,7 +11,6 @@ from owid.catalog.core.meta import (
     License,
     MetaBase,
     Origin,
-    Source,
     TableDimension,
     TableMeta,
     VariableMeta,
@@ -41,7 +40,6 @@ __all__ = [
     # meta
     "MetaBase",
     "License",
-    "Source",
     "Origin",
     "VariableMeta",
     "DatasetMeta",

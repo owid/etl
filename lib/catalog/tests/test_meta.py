@@ -53,17 +53,8 @@ def test_empty_dataset_metadata():
 
 
 def test_dataset_version():
-    s1 = meta.Source(name="s1", publication_date="2022-01-01")
-    s2 = meta.Source(name="s2", publication_date="2022-01-02")
-
     assert meta.DatasetMeta(version="1").version == "1"
-    assert meta.DatasetMeta(sources=[s1]).version == "2022-01-01"
-    assert meta.DatasetMeta(sources=[s1, s2]).version is None
-    assert meta.DatasetMeta(version="1", sources=[s1]).version == "1"
-
-
-def test_to_json():
-    meta.Source(name="s1", publication_date="2022-01-01").to_json()  # ty: ignore
+    assert meta.DatasetMeta().version is None
 
 
 def test_update_from_yaml(tmp_path):
@@ -71,24 +62,13 @@ def test_update_from_yaml(tmp_path):
     d.mkdir()
     metapath = d / "meta.yml"
 
-    s1 = meta.Source(name="s1")
-    s2 = meta.Source(name="s2")
-
-    # save dictionary to yaml using yaml library
     with open(metapath, "w") as f:
-        yaml.dump({"dataset": {"sources": [s2.to_dict()]}}, f)
+        yaml.dump({"dataset": {"title": "From YAML", "description": "yaml desc"}}, f)
 
-    d1 = meta.DatasetMeta(sources=[s1])
-    with pytest.raises(ValueError):
-        d1.update_from_yaml(metapath, if_source_exists="fail")
-
-    d1 = meta.DatasetMeta(sources=[s1])
-    d1.update_from_yaml(metapath, if_source_exists="replace")
-    assert len(d1.sources) == 1
-
-    d1 = meta.DatasetMeta(sources=[s1])
-    d1.update_from_yaml(metapath, if_source_exists="append")
-    assert len(d1.sources) == 2
+    d1 = meta.DatasetMeta(title="Original")
+    d1.update_from_yaml(metapath)
+    assert d1.title == "From YAML"
+    assert d1.description == "yaml desc"
 
 
 def test_load_license_from_dict():

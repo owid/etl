@@ -1,0 +1,19 @@
+dataset:
+  title: TE-20.1
+tables:
+  te_20_1:
+    variables:
+      world_bank_commodity_price_index__2010__100:
+        title: World Bank Commodity Price Index (2010 = 100)
+        unit: ''
+        description: |-
+          Commodity Price Index is combined from energy and non-energy price indices (2010=100, real 2010 US$) with weights 0.409 and 0.591, respectively. Weights are obtained from the IMF technical documentation.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

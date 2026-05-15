@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
 from owid.catalog import Dataset, Table
 from shared import make_tables, table_to_clean_df
 from structlog import get_logger
@@ -26,17 +25,16 @@ def run(dest_dir: str) -> None:
     ds_meadow: Dataset = paths.load_dependency(SHORT_NAME)
     # Read table from meadow dataset.
     tb_meadow = ds_meadow[SHORT_NAME]
-    # Create a dataframe with data from the table.
 
     #
     # Process data.
     #
     log.info(f"{SHORT_NAME}: processing dataframe")
-    df = clean_df(tb_meadow)
+    tb = clean_table(tb_meadow)
 
     # Create a new table with the processed data.
     log.info(f"{SHORT_NAME}: generating tables")
-    tables = make_tables(df, SHORT_NAME)
+    tables = make_tables(tb, SHORT_NAME)
 
     #
     # Save outputs.
@@ -51,7 +49,7 @@ def run(dest_dir: str) -> None:
     log.info(f"{SHORT_NAME}: end")
 
 
-def clean_df(tb: Table) -> pd.DataFrame:
+def clean_table(tb: Table) -> Table:
     # Standardize names of conflict participants
-    df = table_to_clean_df(tb)
-    return df
+    tb = table_to_clean_df(tb)
+    return tb

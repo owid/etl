@@ -8,6 +8,7 @@ meta:
       Disclaimer:
 
       The data should not be used in lieu of the full survey data, or in lieu of the poverty and inequality statistics that are estimated directly from the survey data. For these purposes, users should use the estimates available in the Poverty and Inequality Platform (PIP). The poverty and inequality statistics published in PIP are estimated directly from the survey data. For example, the binned database would result in a lower level of within-country inequality, since it does not account for the inequality within each bin.
+    attribution: Lakner et al. (2022) (updated using World Bank PIP in March 2026)
     citation_full: |-
       Mahler, Daniel Gerszon; Yonzan, Nishant; Lakner, Christoph (2022). The Impact of COVID-19 on Global Inequality and Poverty. Policy Research Working Papers; 10198. © World Bank, Washington, DC. https://openknowledge.worldbank.org/entities/publication/54fae299-8800-585f-9f18-a42514f8d83b updated with Poverty and Inequality Platform (March 2026).
     version_producer: Version 6

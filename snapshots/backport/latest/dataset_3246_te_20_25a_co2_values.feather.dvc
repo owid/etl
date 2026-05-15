@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3246
-    date_accessed: 2023-08-10 08:01:05.509218
+    url: https://admin.owid.io/admin/datasets/3246
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: TE-20.25a_CO2
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9769dc516f3a6f830e14159c21aefc98
-  size: 12386
-  path: dataset_3246_te_20_25a_co2_values.feather
+  - md5: 75bf25b7bd7fb58f713c72db3e66afe8
+    size: 12418
+    path: dataset_3246_te_20_25a_co2_values.feather

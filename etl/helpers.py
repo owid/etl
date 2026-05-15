@@ -22,7 +22,6 @@ from owid.catalog.core.tables import (
     combine_tables_title,
     combine_tables_update_period_days,
     get_unique_licenses_from_tables,
-    get_unique_sources_from_tables,
 )
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 
@@ -111,18 +110,12 @@ def create_dataset(
         # Note: If there are different titles or description, the result will be None.
         title = combine_tables_title(tables=tables)
         description = combine_tables_description(tables=tables)
-        # If not defined, gather origins and licenses from the metadata of the tables.
+        # Gather licenses from the metadata of the tables.
         licenses = get_unique_licenses_from_tables(tables=tables)
-        if any(["origins" in table[column].metadata.to_dict() for table in tables for column in table.columns]):
-            # If any of the variables contains "origins" this means that it is a recently created dataset.
-            update_period_days_combined = combine_tables_update_period_days(tables=tables)
-            default_metadata = DatasetMeta(
-                licenses=licenses, title=title, description=description, update_period_days=update_period_days_combined
-            )
-        else:
-            # None of the variables includes "origins", which means it is an old dataset, with "sources".
-            sources = get_unique_sources_from_tables(tables=tables)
-            default_metadata = DatasetMeta(licenses=licenses, sources=sources, title=title, description=description)
+        update_period_days_combined = combine_tables_update_period_days(tables=tables)
+        default_metadata = DatasetMeta(
+            licenses=licenses, title=title, description=description, update_period_days=update_period_days_combined
+        )
     elif isinstance(default_metadata, SnapshotMeta):
         # convert snapshot SnapshotMeta to DatasetMeta
         default_metadata = convert_snapshot_metadata(default_metadata)

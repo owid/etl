@@ -26,6 +26,12 @@ definitions:
     title: Regional groupings used in Report and Statistical Annex
     url_main: https://unstats.un.org/sdgs/indicators/regional-groups/
     date_accessed: *date_accessed
+  origins_iea_regions: &origins_iea_regions
+    producer: International Energy Agency
+    title: IEA world regions
+    url_main: https://www.iea.org/countries
+    date_accessed: *date_accessed
+    citation_full: International Energy Agency. IEA world regions. https://www.iea.org/countries
   origins_pew_regions: &origins_pew_regions
     producer: Pew Research Center
     title: Countries/areas by Pew region
@@ -292,6 +298,23 @@ tables:
                   "Western Pacific (WHO)": "Western Pacific"
                 customHiddenCategories:
                   "No data": true
+
+      # IEA
+      iea_region:
+        title: World regions according to IEA
+        description_short: |-
+          Regions as defined by the International Energy Agency.
+        type: ordinal
+        sort:
+          - Asia Pacific (IEA)
+          - Africa (IEA)
+          - Central and South America (IEA)
+          - Europe (IEA)
+          - Middle East (IEA)
+          - North America (IEA)
+          - Eurasia (IEA)
+        origins:
+          - *origins_iea_regions
 
       # Pew
       pew_region:

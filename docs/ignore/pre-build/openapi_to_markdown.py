@@ -67,11 +67,12 @@ def format_type(schema: dict[str, Any]) -> str:
 
     schema_type = schema.get("type", "any")
 
-    # Handle arrays
+    # Handle arrays. Wrapped in backticks so the bare `[...]` syntax doesn't
+    # collide with markdown reference-link parsing in strict checkers (e.g. zensical).
     if schema_type == "array":
         items = schema.get("items", {})
         item_type = format_type(items)
-        return f"array[{item_type}]"
+        return f"`array[{item_type}]`"
 
     # Handle enums
     if "enum" in schema:

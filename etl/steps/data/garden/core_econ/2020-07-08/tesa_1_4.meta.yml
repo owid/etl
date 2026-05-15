@@ -1,0 +1,20 @@
+dataset:
+  title: TESA_1.4
+tables:
+  tesa_1_4:
+    variables:
+      share_of_non_agricultural_labour_force__pct:
+        title: Share of non-agricultural labour force (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

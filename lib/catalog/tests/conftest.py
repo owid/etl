@@ -8,23 +8,11 @@ from owid.catalog.core.meta import (
     DatasetMeta,
     License,
     Origin,
-    Source,
     TableMeta,
     VariableMeta,
     VariablePresentationMeta,
 )
 from owid.catalog.core.tables import Table
-
-
-@pytest.fixture
-def sources():
-    sources = {
-        1: Source(name="Name of Source 1", description="Description of Source 1"),
-        2: Source(name="Name of Source 2", description="Description of Source 2"),
-        3: Source(name="Name of Source 3", description="Description of Source 3"),
-        4: Source(name="Name of Source 4", description="Description of Source 4"),
-    }
-    return sources
 
 
 @pytest.fixture
@@ -50,13 +38,12 @@ def licenses():
 
 
 @pytest.fixture
-def variable_1(sources, origins, licenses):
+def variable_1(origins, licenses):
     v1 = Indicator(pd.Series([1, 2, 3]), name="Indicator 1")
     v1.metadata.title = "Title of Indicator 1"
     v1.metadata.description = "Description of Indicator 1"
     v1.metadata.unit = "Unit of Indicator 1"
     v1.metadata.unit = "Short unit of Indicator 1"
-    v1.metadata.sources = [sources[2], sources[1]]
     v1.metadata.origins = [origins[2], origins[1]]
     v1.metadata.licenses = [licenses[1]]
     v1.metadata.processing_level = "minor"
@@ -66,13 +53,12 @@ def variable_1(sources, origins, licenses):
 
 
 @pytest.fixture
-def variable_2(sources, origins, licenses):
+def variable_2(origins, licenses):
     v2 = Indicator(pd.Series([4, 5, 6]), name="Indicator 2")
     v2.metadata.title = "Title of Indicator 2"
     v2.metadata.description = "Description of Variable 2"
     v2.metadata.unit = "Unit of Indicator 2"
     v2.metadata.unit = "Short unit of Indicator 2"
-    v2.metadata.sources = [sources[2], sources[3]]
     v2.metadata.origins = [origins[2], origins[3]]
     v2.metadata.licenses = [licenses[2], licenses[3]]
     v2.metadata.processing_level = "major"
@@ -90,13 +76,12 @@ def variable_3(origins):
 
 
 @pytest.fixture
-def table_1(sources, licenses, origins):
+def table_1(licenses, origins):
     tb1 = Table({"country": ["Spain", "Spain", "France"], "year": [2020, 2021, 2021], "a": [1, 2, 3], "b": [4, 5, 6]})
     tb1.metadata = TableMeta(
         title="Title of Table 1",
         description="Description of Table 1",
         dataset=DatasetMeta(
-            sources=[sources[1], sources[2], sources[3]],
             licenses=[licenses[1], licenses[2], licenses[3]],
         ),
     )
@@ -113,7 +98,6 @@ def table_1(sources, licenses, origins):
                     "Common key description point",
                 ],
                 description_from_producer="Common description from producer",
-                sources=[sources[2], sources[1]],
                 origins=[origins[2], origins[1]],
                 licenses=[licenses[1]],
                 processing_level="minor",
@@ -130,7 +114,6 @@ def table_1(sources, licenses, origins):
                     "Key description point 2 of Indicator 2",
                 ],
                 description_from_producer="Common description from producer",
-                sources=[sources[2], sources[3]],
                 origins=[origins[2], origins[3]],
                 licenses=[licenses[2], licenses[3]],
                 processing_level="major",
@@ -143,7 +126,7 @@ def table_1(sources, licenses, origins):
 
 
 @pytest.fixture
-def table_2(sources, licenses):
+def table_2(origins, licenses):
     tb2 = Table(
         {"country": ["Spain", "France", "France"], "year": [2020, 2021, 2022], "a": [10, 20, 30], "c": [40, 50, 60]}
     )
@@ -157,7 +140,7 @@ def table_2(sources, licenses):
             "a": VariableMeta(
                 title="Title of Table 2 Indicator a",
                 description="Description of Table 2 Indicator a",
-                sources=[sources[2]],
+                origins=[origins[2]],
                 licenses=[licenses[2]],
                 processing_level="major",
                 presentation=VariablePresentationMeta(title_public="Title of Indicator a"),
@@ -166,7 +149,7 @@ def table_2(sources, licenses):
             "c": VariableMeta(
                 title="Title of Table 2 Indicator c",
                 description="Description of Table 2 Indicator c",
-                sources=[sources[2], sources[4]],
+                origins=[origins[2], origins[4]],
                 licenses=[licenses[4], licenses[2]],
             ),
         },

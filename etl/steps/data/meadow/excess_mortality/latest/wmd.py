@@ -2,8 +2,7 @@
 
 In this step we perform sanity checks on the expected input fields and the values that they take."""
 
-import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset
 from structlog import get_logger
 
 from etl.data_helpers.misc import check_known_columns
@@ -38,13 +37,8 @@ def run(dest_dir: str) -> None:
     snap: Snapshot = paths.load_dependency("wmd.csv")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
-    check_known_columns(df, COLUMNS_EXPECTED)
-    #
-    # Process data.
-    #
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = snap.read_csv(underscore=True)
+    check_known_columns(tb, COLUMNS_EXPECTED)
     # Set index
     tb = tb.set_index(["iso3c", "year", "time"], verify_integrity=True)
 

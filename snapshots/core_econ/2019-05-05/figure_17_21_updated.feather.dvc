@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: US Federal Reserve and Bank of England
+    title: 'Financial Accounts of the United States, Historical'
+    description: Most recent UK data received directly from the Bank of England.
+    citation_full: "US Federal Reserve. 2016. 'Financial Accounts of the United States, Historical.' December 10; Bank of England. 2012. Financial Stability Report, Issue 31."
+    url_main: http://www.federalreserve.gov/releases/Z1/default.htm
+    url_download: https://www.bankofengland.co.uk/financial-stability-report/2012/june-2012
+    date_accessed: '2019-05-05'
+    date_published: '2016'
+  is_public: false
+outs:
+  - md5: 57c5c8b489102f155201fb3b858b83c7
+    size: 3834
+    path: figure_17_21_updated.feather

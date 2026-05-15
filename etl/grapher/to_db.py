@@ -14,14 +14,13 @@ import json
 import os
 import warnings
 from dataclasses import dataclass
-from threading import Lock
 from typing import Any, cast
 
 import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import Table, Variable, VariableMeta, utils
-from owid.catalog.core.meta import Source, update_variable_metadata
+from owid.catalog.core.meta import update_variable_metadata
 from owid.catalog.core.paths import CatalogPath
 from owid.catalog.core.utils import hash_any
 from sqlalchemy import select, text, update
@@ -40,33 +39,20 @@ from . import model as gm
 log = structlog.get_logger()
 
 
-source_table_lock = Lock()
-
-
 CURRENT_DIR = os.path.dirname(__file__)
 
 
 @dataclass
 class DatasetUpsertResult:
     dataset_id: int
-    source_ids: dict[int, int]
 
 
-def upsert_dataset(
-    engine: Engine, dataset: catalog.Dataset, namespace: str, sources: list[Source]
-) -> DatasetUpsertResult:
+def upsert_dataset(engine: Engine, dataset: catalog.Dataset, namespace: str) -> DatasetUpsertResult:
     assert dataset.metadata.short_name, "Dataset must have a short_name"
     assert dataset.metadata.version, "Dataset must have a version"
     assert dataset.metadata.title, "Dataset must have a title"
 
     utils.validate_underscore(dataset.metadata.short_name, "Dataset's short_name")
-
-    if len(sources) > 1:
-        raise NotImplementedError(
-            "only a single source is supported for grapher datasets, use"
-            " `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to"
-            " join multiple sources"
-        )
 
     short_name = dataset.metadata.short_name
 
@@ -109,57 +95,9 @@ def upsert_dataset(
             url=f"http://{engine.url.host}/admin/datasets/{ds.id}",
         )
 
-        source_ids: dict[int, int] = dict()
-        for source in sources:
-            assert source.name
-            source_ids[hash(source)] = _upsert_source_to_db(session, source, ds.id)
-
         session.commit()
 
-        return DatasetUpsertResult(ds.id, source_ids)
-
-
-def _upsert_source_to_db(session: Session, source: catalog.Source, dataset_id: int) -> int:
-    """Upsert source and return its id"""
-    # NOTE: we need the lock because upserts can happen in multiple threads and `sources` table
-    # has no unique constraint on `name`. It can be removed once we switch to variable views
-    # and stop using threads
-    with source_table_lock:
-        db_source = gm.Source.from_catalog_source(source, dataset_id).upsert(session)
-
-        # commit within the lock to make sure other threads get the latest sources
-        session.commit()
-
-        assert db_source.id
-        return db_source.id
-
-
-def _add_or_update_source(
-    session: Session, variable_meta: catalog.VariableMeta, column_name: str, dataset_upsert_result: DatasetUpsertResult
-) -> int | None:
-    if not variable_meta.sources:
-        assert variable_meta.origins, "Variable must have either sources or origins"
-        return None
-
-    # Every variable must have exactly one source
-    if len(variable_meta.sources) != 1:
-        raise NotImplementedError(
-            f"Variable `{column_name}` must have exactly one source, see function"
-            " `adapt_table_for_grapher` that can do that for you"
-        )
-
-    source = variable_meta.sources[0]
-
-    # Does it already exist in the database?
-    assert source.name
-    source_id = dataset_upsert_result.source_ids.get(hash(source))
-    if not source_id:
-        # Not exists, upsert it
-        # NOTE: this could be quite inefficient as we upsert source for every variable
-        #   luckily we are moving away from sources towards origins
-        source_id = _upsert_source_to_db(session, source, dataset_upsert_result.dataset_id)
-
-    return source_id
+        return DatasetUpsertResult(ds.id)
 
 
 def check_table(table: Table) -> None:
@@ -172,14 +110,8 @@ def check_table(table: Table) -> None:
         assert table[col].title, f"Column `{col}` must have a title in metadata"
 
         origins = table[col].m.origins
+        assert origins, f"Column `{col}` must have at least one origin"
         assert len(origins) == len(set(origins)), "origins must be unique"
-
-        if len(table[col].metadata.sources) > 1:
-            raise NotImplementedError(
-                "only a single source is supported for grapher datasets, use"
-                " `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to"
-                " join multiple sources"
-            )
 
     utils.validate_underscore(table.metadata.short_name, "Table's short_name")
     utils.validate_underscore(table.columns[0], "Variable's name")
@@ -336,7 +268,7 @@ def upsert_metadata(
 ) -> gm.Variable:
     timespan = _get_timespan(df, variable_meta)
 
-    source_id = _add_or_update_source(session, variable_meta, column_name, dataset_upsert_result)
+    assert variable_meta.origins, f"Variable `{column_name}` must have at least one origin"
 
     # pop grapher_config from variable metadata, later we send it to Admin API
     if variable_meta.presentation and variable_meta.presentation.grapher_config:
@@ -350,7 +282,7 @@ def upsert_metadata(
         short_name=column_name,
         timespan=timespan,
         dataset_id=dataset_upsert_result.dataset_id,
-        source_id=source_id,
+        source_id=None,
         catalog_path=catalog_path,
         dimensions=dimensions,
     ).upsert(session)
@@ -585,33 +517,6 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
     # always raise an error otherwise
     else:
         return True
-
-
-def cleanup_ghost_sources(engine: Engine, dataset_id: int, dataset_upserted_source_ids: list[int]) -> None:
-    """Remove all leftover sources that didn't get upserted into DB during grapher step.
-    This could happen when you rename or delete sources.
-    :param dataset_id: ID of the dataset
-    :param dataset_upserted_source_ids: upserted dataset sources, we combine them with variable sources
-    """
-    with engine.connect() as con:
-        where = " AND id NOT IN :dataset_source_ids" if dataset_upserted_source_ids else ""
-
-        result = con.execute(
-            text(
-                f"""
-            DELETE FROM sources
-            WHERE datasetId = :dataset_id
-                AND id NOT IN (
-                    select distinct sourceId from variables where datasetId = :dataset_id
-                )
-                {where}
-                """
-            ),
-            {"dataset_id": dataset_id, "dataset_source_ids": dataset_upserted_source_ids},
-        )
-        if result.rowcount > 0:
-            con.commit()
-            log.warning(f"Deleted {result.rowcount} ghost sources")
 
 
 def _get_timespan(table: pd.DataFrame, variable_meta: VariableMeta) -> str:

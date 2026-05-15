@@ -58,6 +58,7 @@ vscode_extensions/*/.vscode-test/
 vscode_extensions/*/out/
 
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
 CLAUDE.local.md
 
 workbench/

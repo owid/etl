@@ -9,7 +9,14 @@ from etl.helpers import PathFinder
 HISTORICAL_SCENARIO = "historical"
 TOTAL_ELEC_CONSUMPTION_METRIC = "Total electricity consumption (TWh)"
 SHARE_METRIC = "Total electricity consumption (share of total electricity demand)"
-
+IEA_REGION_NAMES = [
+    "Asia Pacific (IEA)",
+    "Africa (IEA)",
+    "Central and South America (IEA)",
+    "Europe (IEA)",
+    "Middle East (IEA)",
+    "North America (IEA)",
+]
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
@@ -169,23 +176,26 @@ def add_custom_regions(tb):
 
 
 def create_share_of_electricity_demand(tb, tb_electricity):
-    # Create a table of electricity demand (defined by Ember as electricity generation minus net imports) for selected countries.
-    tb_demand = (
-        tb_electricity[tb_electricity["country"].isin(["World", "United States", "China"])][
-            ["country", "year", "total_demand__twh"]
-        ]
-        .dropna()
-        .reset_index(drop=True)
-    )
 
-    # Create a temporary table for the demand of China and US.
+    # Use the regions dataset to aggregate Ember country-level demand into IEA regional totals.
+    # add_aggregates appends regional rows (summed from member countries) to the table.
+    tb_demand = paths.regions.add_aggregates(
+        tb=tb_electricity[["country", "year", "total_demand__twh"]].dropna().reset_index(drop=True),
+        regions=IEA_REGION_NAMES,
+        aggregations={"total_demand__twh": "sum"},
+        check_for_region_overlaps=False,
+    )
+    # Keep only IEA regions plus World, US, China (which already exist in Ember).
+    tb_demand = tb_demand[
+        tb_demand["country"].isin(IEA_REGION_NAMES + ["World", "United States", "China"])
+    ].reset_index(drop=True)
+
+    # Derive "World excl. United States and China" demand.
     tb_demand_us_china = (
         tb_demand[tb_demand["country"].isin(["United States", "China"])]
         .groupby(["year"], as_index=False)
         .agg({"total_demand__twh": "sum"})
     )
-
-    # Create a temporary table for the demand of all countries except China and US.
     tb_demand_rest = (
         tb_demand[tb_demand["country"] == "World"]
         .drop(columns=["country"])
@@ -195,15 +205,21 @@ def create_share_of_electricity_demand(tb, tb_electricity):
         tb_demand_rest["total_demand__twh_world"] - tb_demand_rest["total_demand__twh_us_china"]
     )
     tb_demand_rest["country"] = "World excl. United States and China"
-
-    # Combine the original demand table with the one that includes World excl. US and China.
     tb_demand = pr.concat([tb_demand, tb_demand_rest[["country", "year", "total_demand__twh"]]], ignore_index=True)
 
-    # Create a new table with the electricity consumption of China, US, World, and rest of the world, as a percentage of their total electricity demand.
+    # All countries/regions for which we compute the share.
+    share_countries = IEA_REGION_NAMES + [
+        "World",
+        "China",
+        "United States",
+        "World excl. United States and China",
+    ]
+
+    # Filter IEA data to historical electricity consumption for those countries/regions.
     tb_share = tb[
         (tb["metric"] == TOTAL_ELEC_CONSUMPTION_METRIC)
         & (tb["scenario"] == HISTORICAL_SCENARIO)
-        & (tb["country"].isin(["World", "China", "United States", "World excl. United States and China"]))
+        & (tb["country"].isin(share_countries))
     ].reset_index(drop=True)
     tb_share = tb_share.merge(tb_demand, on=["country", "year"], how="left")
     tb_share["value"] = 100 * tb_share["value"] / tb_share["total_demand__twh"]
