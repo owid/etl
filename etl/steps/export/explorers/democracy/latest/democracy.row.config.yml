@@ -4,7 +4,6 @@
 # `presentation.grapher_config` in the corresponding garden meta.yml — Grapher
 # inherits it at chart render time. Per-view `config:` here is intentionally empty
 # for single-y views; multi-y views keep their combined chart config.
-
 definitions:
   # Legend & colors
   display_c_aut: &display_c_aut
@@ -255,10 +254,12 @@ views:
     indicators:
       y:
         - catalogPath: vdem_uni_without_regions#regime_row_owid
+          display:
+            colorScaleNumericBins: 0.999,#8D6E71,Closed autocracy;1.999,#C6A1A5,Electoral autocracy;2.999,#F3D0D4,Electoral democracy;3.999,#2C7BB6,Liberal democracy
     config:
       colorVariableId: vdem_uni_without_regions#regime_row_owid
-      # title: "Liberal democracy"
-      # subtitle: *group_subtitle_2
+      title: "Liberal democracy"
+      subtitle: *group_subtitle_2
       # map:
       #   colorScale:
       #     baseColorScheme: "RdYlBu"
