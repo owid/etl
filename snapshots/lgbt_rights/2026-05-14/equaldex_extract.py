@@ -53,8 +53,11 @@ log = get_logger()
 PARENT_DIR = Path(__file__).parent.absolute()
 SNAPSHOT_VERSION = PARENT_DIR.name
 
-# Persistent cache so we don't re-hit the API on retries.
-memory = Memory(CACHE_DIR / "equaldex", verbose=0)
+# Per-version persistent cache so retries within a single extraction reuse fetched
+# regions, but a fresh extraction at a new SNAPSHOT_VERSION starts clean. Without the
+# version in the path, joblib.Memory would silently serve the previous year's API
+# payloads on the next refresh.
+memory = Memory(CACHE_DIR / "equaldex" / SNAPSHOT_VERSION, verbose=0)
 
 # API parameters.
 API_URL = "https://www.equaldex.com/api/region"
