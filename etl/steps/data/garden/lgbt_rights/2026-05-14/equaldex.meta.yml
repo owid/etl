@@ -12,8 +12,7 @@ definitions:
       - We combine the historical and current data extracted from the API to create a time series.
       - Whenever policy implementation dates for a status are not provided in the data, and this status is the only available for the country, we consider that this status has not changed during the entire period of the dataset.
       - We group some of the categories the source has defined for each issue, for further clarity in our visualizations.
-      - We present this data only for sovereign states, defined by [Butcher and Griffiths (2020)](https://ourworldindata.org/grapher/sovereign-state-butcher-griffiths). We use the definitions of the latest year available.
-      - We make one exception to the sovereignty filter for Greenland, which is treated as a Danish territory by the sovereignty source but which Equaldex tracks separately. Greenland appears as its own row so users can see it on country-level charts, but it does not contribute to any regional aggregate (Europe, World, etc.).
+      - We present this data only for sovereign states, defined by [Butcher and Griffiths (2020)](https://ourworldindata.org/grapher/sovereign-state-butcher-griffiths), using the definitions of the latest year available. Greenland is the one exception: we keep it as its own country row but exclude it from regional aggregates.
     presentation:
       topic_tags:
         - LGBT+ Rights
