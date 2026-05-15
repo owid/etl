@@ -421,7 +421,9 @@ tables:
         description_short: Rating from 0 to 100 (with 100 being the most equal) to help visualize the legal rights and public attitudes towards LGBT+ people in a given region.
         description_key:
           - "{definitions.description_key_dataset_intro}"
-          - "The index is the average of two other indices: the legal equality index (based on the current legal status of 15 policies) and the public opinion equality index (based on survey data)."
+          - "The index is the average of two other indices: the legal equality index (based on the current legal status of 16 policies) and the public opinion equality index (based on survey data)."
+          - "Public opinion data is not available in every region. When it isn't, the index reflects only the legal equality index for that region — not a blend of legal and attitudinal data — which is worth keeping in mind when comparing scores across regions."
+          - "The index is continuously being improved as more data is contributed and weights are tuned, so changes over time partly reflect data improvements rather than real-world shifts. Track region rankings cautiously across releases."
         description_from_producer: |-
           {definitions.description_from_producer_equality_index}
 
@@ -442,11 +444,12 @@ tables:
         description_short: The index captures to which extent lesbians, gay, bisexual, transgender and other people outside traditional sexuality and gender categories have the same rights as straight and cisgender people. It ranges from 0 to 100 (most equal).
         description_key:
           - "{definitions.description_key_dataset_intro}"
-          - "The index combines 15 individual policies: the legality of same-sex relationships, marriage, gender marker changes, censorship of LGBT+ issues, gender-affirming care, legal recognition of non-binary gender, LGBT+ discrimination, employment discrimination, housing discrimination, same-sex adoption, serving openly in the military, blood donations by men who have sex with men, conversion therapies, and equal age of consent between same-sex and different-sex partners."
-          - Each of these policies is weighted differently, with the most important policies receiving the highest weights. These weights are called _total possible scores_.
+          - "The index combines 16 individual policies: the legality of same-sex sexual activity, same-sex marriage, the right to change legal gender, censorship of LGBT+ issues, gender-affirming care, legal recognition of non-binary gender, hate-crime protections, LGBT+ discrimination, employment discrimination, housing discrimination, same-sex adoption, intersex infant surgery, serving openly in the military, blood donations by men who have sex with men, conversion therapy, and equal age of consent between same-sex and different-sex partners."
+          - "Each policy is weighted differently — these weights are called _total possible scores_. The most important policies are same-sex sexual activity (100 points) and same-sex marriage (60 points); the lowest-weighted are conversion therapy, blood donations by men who have sex with men, and age of consent (10 points each)."
           - Each policy status has a factor associated to it, ranging from 0 to 1. Higher scores indicate more equality.
           - The index is calculated by summing the product of total possible scores and the factor for each policy, divided by the sum of total possible scores.
-          - For more information about the methodology and the specific scores used, please refers to the [Equaldex Equality index methodology](https://www.equaldex.com/equality-index).
+          - "Policies whose status is unknown, not applicable, or hasn't been added to Equaldex yet are excluded from the ranking — they're not counted as zero. Where a law varies within a region (e.g. between states or provinces), the score is averaged across them."
+          - For more information about the methodology and the specific scores used, please refer to the [Equaldex Equality index methodology](https://www.equaldex.com/equality-index).
         description_from_producer: |-
           {definitions.description_from_producer_legal_index}
         presentation:
@@ -461,6 +464,12 @@ tables:
         unit: ""
         short_unit: ""
         description_short: The index captures the public attitudes towards LGBT+ people in a given region. It ranges from 0 to 100 (most equal).
+        description_key:
+          - "{definitions.description_key_dataset_intro}"
+          - "The index averages the results of surveys and polls from reputable organizations, generally taking the 'most equal' response value (for example, the share of respondents who support same-sex marriage)."
+          - "Surveys are weighted by recency: those from the current and previous year carry full weight, while older ones decay at roughly 75% per year (so a two-year-old survey is weighted at about 0.56, a three-year-old at about 0.42, and so on)."
+          - "Public opinion data isn't available in every region, and global surveys rarely include transgender-specific questions. More conservative regions are typically surveyed on a narrow set of topics, so comparisons across regions can hide differences in what was actually asked."
+          - "For more information about the methodology and the specific decay factors used, please refer to the [Equaldex Equality index methodology](https://www.equaldex.com/equality-index)."
         description_from_producer: |-
           {definitions.description_from_producer_public_opinion_index}
         presentation:
