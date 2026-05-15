@@ -386,7 +386,7 @@ COMBINED_CONFIGS = [
         "sources": [("gender_assignment_surgeries_on_children__illegal", "illegal")],
         "category_map": _single_direction_map(
             key="illegal",
-            yes_label="Non-consensual surgeries banned",
+            yes_label="Banned",
             neither_label="Not banned",
             mixed_label="Varies by region",
         ),

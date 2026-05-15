@@ -71,7 +71,7 @@ definitions:
     <% elif law == "gender_affirming_care_minors" %>
     Whether gender-affirming healthcare for minors under 18 is publicly funded, or explicitly restricted or banned by national law.
     <% elif law == "gender_assignment_surgeries_on_children" %>
-    Whether non-consensual gender assignment surgeries on intersex minors are banned.
+    Whether non-consensual gender assignment surgeries on intersex children are banned.
     <% elif law == "gender_marker_change" %>
     Whether a legal process exists to change the gender marker on official identity documents.
     <% elif law == "goods_services_discrimination_gender_identity" %>
@@ -137,9 +137,9 @@ definitions:
     <% elif law == "gender_affirming_care_minors" and status == "restricted" %>
     Gender-affirming healthcare for minors is restricted or banned
     <% elif law == "gender_assignment_surgeries_on_children" and status == "illegal" %>
-    Non-consensual gender assignment surgeries on intersex minors are banned
+    Non-consensual gender assignment surgeries on intersex children are banned
     <% elif law == "gender_assignment_surgeries_on_children" and status == "legal" %>
-    Non-consensual gender assignment surgeries on intersex minors are permitted
+    Non-consensual gender assignment surgeries on intersex children are permitted
     <% elif law == "gender_marker_change" and status == "legal" %>
     A legal process exists to change the gender marker on identity documents
     <% elif law == "goods_services_discrimination_gender_identity" and status == "illegal" %>
@@ -664,20 +664,20 @@ tables:
         description_processing: '{definitions.derivation_single_direction}'
 
       gender_assignment_surgeries_on_children:
-        title: Non-consensual gender assignment surgeries on intersex minors
+        title: Non-consensual gender assignment surgeries on intersex children
         description_short: |-
-          Whether non-consensual gender assignment surgeries on intersex minors are banned.
+          Whether non-consensual gender assignment surgeries on intersex children are banned.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Non-consensual surgeries banned_** (non-consensual gender assignment surgeries on intersex minors are banned under national law), **_Varies by region_** (bans differ between subnational jurisdictions) and **_Not banned_** (no national ban on non-consensual gender assignment surgeries on intersex minors).'
+          - 'The indicator is coded as follows: **_Banned_** (non-consensual gender assignment surgeries on intersex children are banned under national law), **_Varies by region_** (bans differ between subnational jurisdictions) and **_Not banned_** (no national ban on non-consensual gender assignment surgeries on intersex children).'
         unit: ""
         short_unit: ""
         display:
-          name: Non-consensual gender assignment surgeries on intersex minors
+          name: Non-consensual gender assignment surgeries on intersex children
           numDecimalPlaces: 0
         type: ordinal
         sort:
-          - Non-consensual surgeries banned
+          - Banned
           - Varies by region
           - Not banned
         processing_level: major
@@ -2382,8 +2382,8 @@ tables:
           numDecimalPlaces: 0
 
       gender_assignment_surgeries_on_children_not_banned_count:
-        title: Non-consensual gender assignment surgeries on intersex minors — Not banned (number of countries)
-        description_short: The number of countries classified as "Not banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        title: Non-consensual gender assignment surgeries on intersex children — Not banned (number of countries)
+        description_short: The number of countries classified as "Not banned" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not banned" within each region. {definitions.description_regions_processing}'
         unit: countries
@@ -2393,8 +2393,8 @@ tables:
           numDecimalPlaces: 0
 
       gender_assignment_surgeries_on_children_not_banned_pop:
-        title: Non-consensual gender assignment surgeries on intersex minors — Not banned (population)
-        description_short: The total population of countries classified as "Not banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        title: Non-consensual gender assignment surgeries on intersex children — Not banned (population)
+        description_short: The total population of countries classified as "Not banned" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not banned" within each region. {definitions.description_regions_processing}'
         unit: people
@@ -2404,8 +2404,8 @@ tables:
           numDecimalPlaces: 0
 
       gender_assignment_surgeries_on_children_varies_by_region_count:
-        title: Non-consensual gender assignment surgeries on intersex minors — Varies by region (number of countries)
-        description_short: The number of countries classified as "Varies by region" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        title: Non-consensual gender assignment surgeries on intersex children — Varies by region (number of countries)
+        description_short: The number of countries classified as "Varies by region" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
@@ -2415,8 +2415,8 @@ tables:
           numDecimalPlaces: 0
 
       gender_assignment_surgeries_on_children_varies_by_region_pop:
-        title: Non-consensual gender assignment surgeries on intersex minors — Varies by region (population)
-        description_short: The total population of countries classified as "Varies by region" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        title: Non-consensual gender assignment surgeries on intersex children — Varies by region (population)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
@@ -2425,26 +2425,26 @@ tables:
           name: Varies by region
           numDecimalPlaces: 0
 
-      gender_assignment_surgeries_on_children_non_consensual_surgeries_banned_count:
-        title: Non-consensual gender assignment surgeries on intersex minors — Non-consensual surgeries banned (number of countries)
-        description_short: The number of countries classified as "Non-consensual surgeries banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+      gender_assignment_surgeries_on_children_banned_count:
+        title: Non-consensual gender assignment surgeries on intersex children — Banned (number of countries)
+        description_short: The number of countries classified as "Banned" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Non-consensual surgeries banned" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Banned" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Non-consensual surgeries banned
+          name: Banned
           numDecimalPlaces: 0
 
-      gender_assignment_surgeries_on_children_non_consensual_surgeries_banned_pop:
-        title: Non-consensual gender assignment surgeries on intersex minors — Non-consensual surgeries banned (population)
-        description_short: The total population of countries classified as "Non-consensual surgeries banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+      gender_assignment_surgeries_on_children_banned_pop:
+        title: Non-consensual gender assignment surgeries on intersex children — Banned (population)
+        description_short: The total population of countries classified as "Banned" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Non-consensual surgeries banned" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Non-consensual surgeries banned
+          name: Banned
           numDecimalPlaces: 0
 
       death_penalty_no_death_penalty_count:
