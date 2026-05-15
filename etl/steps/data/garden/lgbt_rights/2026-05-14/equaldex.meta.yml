@@ -5,8 +5,6 @@ definitions:
       tolerance: 0
       numDecimalPlaces: 0
     processing_level: major
-    description_key:
-      - "{definitions.description_key_dataset_intro}"
     description_processing: |-
       - We have extracted the data from the official [Equaldex JSON API](https://equaldex.stoplight.io/docs/equaldex/d033e28a5cf0c-equaldex-json-api).
       - We combine the historical and current data extracted from the API to create a time series.
@@ -18,9 +16,6 @@ definitions:
         - LGBT+ Rights
         - Human Rights
       attribution_short: Equaldex
-
-  description_key_dataset_intro: |-
-    This data comes from [Equaldex](https://www.equaldex.com/), a crowdsourced global database of LGBT+ rights laws, covering nearly every country across 16 distinct legal issues — from the legality of same-sex sexual activity, marriage, and gender-affirming care to employment and housing discrimination and hate-crime protections — with history reaching back to the 1950s in many cases.
 
   description_from_producer_equality_index: |-
     Equaldex's Equality Index is a rating from 0 to 100 (with 100 being the most equal) to help visualize the legal rights and public attitudes towards LGBTQ+ (lesbian, gay, bisexual, transgender, queer, questioning, intersex...) people in each region. The Equality Index is an average of two indexes: the legal index and the public opinion Index.
@@ -304,7 +299,6 @@ tables:
         short_unit: ""
         description_short: Describes the ability for homosexuals to serve in the military and be open about their sexuality.
         description_key:
-          - "{definitions.description_key_dataset_intro}"
           - "\"Don't ask, don't tell\" refers to policies that prohibit military personnel from discriminating against or harassing closeted homosexuals (people who have not revealed their sexual orientation to the public), while barring openly homosexuals."
         presentation:
           title_public: Lesbian, gay, bisexual, and transgender people serve openly in the military
@@ -318,7 +312,6 @@ tables:
         short_unit: ""
         description_short: Describes the ability for homosexuals to serve in the military and be open about their sexuality.
         description_key:
-          - "{definitions.description_key_dataset_intro}"
           - "\"Don't ask, don't tell\" refers to policies that prohibit military personnel from discriminating against or harassing closeted homosexuals (people who have not revealed their sexual orientation to the public), while barring openly homosexuals."
         presentation:
           title_public: Lesbian, gay, bisexual, and transgender people serve openly in the military
@@ -420,7 +413,6 @@ tables:
         short_unit: ""
         description_short: Rating from 0 to 100 (with 100 being the most equal) to help visualize the legal rights and public attitudes towards LGBT+ people in a given region.
         description_key:
-          - "{definitions.description_key_dataset_intro}"
           - "The Equality Index is the average of the legal equality index (current legal status of 16 LGBT+ policies) and the public opinion equality index (survey-based attitudes toward LGBT+ people). For more information, visit the [Equaldex Equality Index methodology](https://www.equaldex.com/equality-index)."
         description_from_producer: |-
           {definitions.description_from_producer_equality_index}
@@ -441,7 +433,6 @@ tables:
         short_unit: ""
         description_short: The index captures to which extent lesbians, gay, bisexual, transgender and other people outside traditional sexuality and gender categories have the same rights as straight and cisgender people. It ranges from 0 to 100 (most equal).
         description_key:
-          - "{definitions.description_key_dataset_intro}"
           - "The legal equality index summarizes the current legal status of 16 LGBT+ policies — from the legality of same-sex sexual activity and marriage to hate-crime protections and the right to change legal gender — each weighted by how heavily it counts toward the overall ranking. For more information, visit the [Equaldex Equality Index methodology](https://www.equaldex.com/equality-index)."
         description_from_producer: |-
           {definitions.description_from_producer_legal_index}
@@ -458,7 +449,6 @@ tables:
         short_unit: ""
         description_short: The index captures the public attitudes towards LGBT+ people in a given region. It ranges from 0 to 100 (most equal).
         description_key:
-          - "{definitions.description_key_dataset_intro}"
           - "The public opinion equality index averages results from reputable surveys and polls on LGBT+ attitudes by region, weighted so that more recent surveys carry more influence. For more information, visit the [Equaldex Equality Index methodology](https://www.equaldex.com/equality-index)."
         description_from_producer: |-
           {definitions.description_from_producer_public_opinion_index}
