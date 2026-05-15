@@ -117,6 +117,7 @@ tables:
             title: Daily cost of a calorie sufficient diet
             subtitle: "{definitions.subtitle_calorie_sufficient_diet} {definitions.subtitle_inflation_clause}"
             note: *ppp_2021_note
+            chartTypes: ["DiscreteBar"]
             map:
               colorScale:
                 baseColorScheme: YlGnBu
@@ -137,6 +138,7 @@ tables:
           grapher_config:
             title: Cost of a calorie sufficient diet as a share of average food expenditure
             subtitle: "{definitions.subtitle_calorie_sufficient_diet}"
+            chartTypes: ["DiscreteBar"]
             map:
               colorScale:
                 baseColorScheme: BuPu
@@ -158,6 +160,7 @@ tables:
           grapher_config:
             title: Share of population that cannot afford a calorie sufficient diet
             subtitle: "{definitions.subtitle_calorie_sufficient_diet} {definitions.subtitle_unaffordable_clause}"
+            chartTypes: ["DiscreteBar"]
             map:
               colorScale:
                 baseColorScheme: YlOrRd
@@ -192,6 +195,7 @@ tables:
           grapher_config:
             title: Number of people who cannot afford a calorie sufficient diet
             subtitle: "{definitions.subtitle_calorie_sufficient_diet} {definitions.subtitle_unaffordable_clause}"
+            chartTypes: ["DiscreteBar"]
             map:
               colorScale:
                 baseColorScheme: YlOrRd
@@ -300,6 +304,7 @@ tables:
           - *description_healthy_diet
         display:
           numDecimalPlaces: 2
+
       affordability_of_a_healthy_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of a healthy diet: ratio of cost to food expenditures"
         unit: "%"
@@ -314,6 +319,7 @@ tables:
           grapher_config:
             title: Cost of a healthy diet as a share of average food spending
             subtitle: "{definitions.subtitle_healthy_diet}"
+            chartTypes: ["DiscreteBar"]
             map:
               colorScale:
                 baseColorScheme: BuPu
@@ -516,6 +522,7 @@ tables:
             title: Daily cost of a nutrient adequate diet
             subtitle: "{definitions.subtitle_nutrient_adequate_diet} {definitions.subtitle_inflation_clause}"
             note: *ppp_2021_note
+            chartTypes: ["DiscreteBar"]
             map:
               colorScale:
                 baseColorScheme: YlGnBu
@@ -536,6 +543,7 @@ tables:
           grapher_config:
             title: Cost of a nutrient adequate diet as a share of average food expenditure
             subtitle: "{definitions.subtitle_nutrient_adequate_diet}"
+            chartTypes: ["DiscreteBar"]
             map:
               colorScale:
                 baseColorScheme: BuPu
@@ -557,6 +565,7 @@ tables:
           grapher_config:
             title: Share of population that cannot afford a nutrient adequate diet
             subtitle: "{definitions.subtitle_nutrient_adequate_diet} {definitions.subtitle_unaffordable_clause}"
+            chartTypes: ["DiscreteBar"]
             map:
               colorScale:
                 baseColorScheme: YlOrRd
@@ -591,6 +600,7 @@ tables:
           grapher_config:
             title: Number of people who cannot afford a nutrient adequate diet
             subtitle: "{definitions.subtitle_nutrient_adequate_diet} {definitions.subtitle_unaffordable_clause}"
+            chartTypes: ["DiscreteBar"]
             map:
               colorScale:
                 baseColorScheme: YlOrRd
