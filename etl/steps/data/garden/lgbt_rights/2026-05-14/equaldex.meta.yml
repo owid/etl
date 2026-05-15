@@ -20,7 +20,7 @@ definitions:
       attribution_short: Equaldex
 
   description_key_dataset_intro: |-
-    [Equaldex](https://www.equaldex.com/) is a crowdsourced global database of LGBT+ rights laws, covering nearly every country across 16 distinct legal issues — from the legality of same-sex sexual activity, marriage, and gender-affirming care to employment and housing discrimination and hate-crime protections — with history reaching back to the 1950s in many cases.
+    This data comes from [Equaldex](https://www.equaldex.com/), a crowdsourced global database of LGBT+ rights laws, covering nearly every country across 16 distinct legal issues — from the legality of same-sex sexual activity, marriage, and gender-affirming care to employment and housing discrimination and hate-crime protections — with history reaching back to the 1950s in many cases.
 
   description_from_producer_equality_index: |-
     Equaldex's Equality Index is a rating from 0 to 100 (with 100 being the most equal) to help visualize the legal rights and public attitudes towards LGBTQ+ (lesbian, gay, bisexual, transgender, queer, questioning, intersex...) people in each region. The Equality Index is an average of two indexes: the legal index and the public opinion Index.
