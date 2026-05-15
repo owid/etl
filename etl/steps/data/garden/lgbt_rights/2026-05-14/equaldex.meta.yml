@@ -383,6 +383,28 @@ tables:
           name: Intersex infant surgery
           <<: *display_common
 
+      hate_crime_protections:
+        title: Hate crime protections (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people.
+        presentation:
+          title_public: Hate crime protections based on sexual orientation or gender identity
+        display:
+          name: Hate crime protections
+          <<: *display_common
+
+      hate_crime_protections_current:
+        title: Hate crime protections (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people.
+        presentation:
+          title_public: Hate crime protections based on sexual orientation or gender identity
+        display:
+          name: Hate crime protections
+          <<: *display_common
+
       ei:
         title: Equality index
         unit: ""

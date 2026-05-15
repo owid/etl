@@ -85,6 +85,7 @@ CATEGORIES_RENAMING = {
         "Fine as punishment": "Fine as punishment",
         "State-enforced": "State-enforced",
         "Imprisonment as punishment": "Imprisonment as punishment",
+        "Death penalty as punishment": "Death penalty as punishment",
     },
     "conversion_therapy": {
         "Banned": "Banned",
@@ -145,6 +146,14 @@ CATEGORIES_RENAMING = {
         "Varies by Region": "Varies by region",
         "Ambiguous": "Ambiguous",
         "Not banned": "Not banned",
+    },
+    "hate_crime_protections": {
+        "Sexual orientation and gender identity": "Sexual orientation and gender identity",
+        "Sexual orientation only": "Sexual orientation only",
+        "Protected in some contexts": "Protected in some contexts",
+        "Varies by Region": "Varies by region",
+        "Ambiguous": "Ambiguous",
+        "No protections": "No protections",
     },
 }
 
