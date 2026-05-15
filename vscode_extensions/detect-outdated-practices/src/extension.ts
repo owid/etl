@@ -40,6 +40,26 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         scope: 'etl/steps/data/**'
     },
     {
+        // Matches geo.add_population_to_table (deprecated per its own docstring).
+        // Common patterns:
+        // - geo.add_population_to_table(tb=tb, ds_population=...)
+        // - tb = geo.add_population_to_table(...)
+        pattern: /geo\.add_population_to_table\(/g,
+        message: '`geo.add_population_to_table` is outdated. Use `paths.regions.add_population(tb)` instead (auto-resolves the population dataset from the DAG; for per-capita indicators, prefer `paths.regions.add_per_capita(tb)`).',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches geo.add_regions_to_table (deprecated per its own docstring).
+        // Common patterns:
+        // - geo.add_regions_to_table(tb=tb, ds_regions=..., regions=[...], aggregations=...)
+        // - tb = geo.add_regions_to_table(...)
+        pattern: /geo\.add_regions_to_table\(/g,
+        message: '`geo.add_regions_to_table` is outdated. Use `paths.regions.add_aggregates(tb, ...)` instead (auto-resolves regions and income_groups from the DAG).',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
         // Matches paths.load_dependency
         // Common patterns:
         // - paths.load_dependency("dataset_name")

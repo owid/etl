@@ -2,7 +2,7 @@
   "name": "detect-outdated-practices",
   "displayName": "Detect Outdated Practices",
   "description": "Detects and highlights outdated code practices in Python files",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "owid",
   "repository": {
     "type": "git",
