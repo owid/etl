@@ -251,14 +251,18 @@ def make_table_wide_and_map_categories(tb: Table) -> Table:
     # Define issues
     issue_list = list(CATEGORIES_RENAMING.keys())
 
-    # Rename categories
+    # Rename categories. `warn_on_unused_mappings=True` surfaces CATEGORIES_RENAMING entries
+    # that no row in the current data carries — catches stale phantom keys we should clean
+    # out. `warn_on_missing_mappings` stays False because map_series lumps NaN into "missing",
+    # which produces noise on every sparse issue (every country/year combination without a
+    # value).
     for issue in issue_list:
         tb[issue] = map_series(
             series=tb[issue],
             mapping=CATEGORIES_RENAMING[issue],
             warn_on_missing_mappings=False,
-            warn_on_unused_mappings=False,
-            show_full_warning=False,
+            warn_on_unused_mappings=True,
+            show_full_warning=True,
         )
         tb[issue] = tb[issue].copy_metadata(tb["country"])
 
