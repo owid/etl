@@ -3,7 +3,7 @@
 Two upstream tables back the explorer:
 - Poore & Nemecek (2018) "environmental_impacts_of_food" (15 cols) — the **Commodity** half
   (5 impacts × 3 units: per_kg, per_100g_protein, per_1000kcal)
-- Clark et al. (2022) "environmental_impacts_of_food_clark_et_al_2022" (24 cols, 20 used)
+- Clark et al. (2022) "clark_et_al_2022" (24 cols, 20 used)
   — the **Specific food products** half (5 impacts × 4 units, including per_100g_fat;
   biodiversity columns ignored)
 
@@ -202,8 +202,8 @@ def run() -> None:
     tb_poore = ds_poore.read("environmental_impacts_of_food__poore__and__nemecek__2018", load_data=False)
     tag_dimensions(tb_poore, "commodity", POORE_IMPACT, POORE_UNIT)
 
-    ds_clark = paths.load_dataset("environmental_impacts_of_food_clark_et_al_2022")
-    tb_clark = ds_clark.read("environmental_impacts_of_food_clark_et_al_2022", load_data=False)
+    ds_clark = paths.load_dataset("clark_et_al_2022")
+    tb_clark = ds_clark.read("clark_et_al_2022", load_data=False)
     tag_dimensions(tb_clark, "specific_food_product", CLARK_IMPACT, CLARK_UNIT)
 
     # Per-table dimensions: each table only carries values for its own view_type and the

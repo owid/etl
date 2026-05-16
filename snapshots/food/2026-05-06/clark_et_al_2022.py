@@ -18,5 +18,5 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
-    snap = Snapshot(f"food/{SNAPSHOT_VERSION}/environmental_impacts_of_food_clark_et_al_2022.csv")
+    snap = Snapshot(f"food/{SNAPSHOT_VERSION}/clark_et_al_2022.csv")
     snap.create_snapshot(upload=upload)

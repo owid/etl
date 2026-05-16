@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Environmental impacts of food
+    title: Estimating the environmental impacts of 57,000 food products
     description: |-
       This dataset quantifies the environmental impacts of 57,000 food products across retailers in the UK. It expands on previous analyses which quantify the environmental impacts of individual commodities, to quantify the impacts of products with multiple ingredients.
 
@@ -20,7 +20,6 @@ meta:
     citation_full: |-
       Clark, M., Springmann, M., Rayner, M., Scarborough, P., Hill, J., Tilman, D., Macdiarmid, J. I., Fanzo, J., Bandy, L., & Harrington, R. A. (2022). Estimating the environmental impacts of 57,000 food products. Proceedings of the National Academy of Sciences, 119(33), e2120584119.
     attribution_short: Clark et al. (2022)
-
     # Files
     url_main: https://www.pnas.org/doi/full/10.1073/pnas.2120584119
     url_download: https://raw.githubusercontent.com/owid/owid-datasets/master/datasets/Environmental%20impacts%20of%20food%20%28Clark%20et%20al.%202022%29/Environmental%20impacts%20of%20food%20%28Clark%20et%20al.%202022%29.csv
@@ -33,4 +32,4 @@ meta:
 outs:
   - md5: 0e993eb1f17abeab12f9eb8e06cf3b35
     size: 96191
-    path: environmental_impacts_of_food_clark_et_al_2022.csv
+    path: clark_et_al_2022.csv

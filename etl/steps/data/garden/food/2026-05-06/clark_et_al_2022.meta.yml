@@ -1,15 +1,11 @@
 definitions:
   common:
-    description_key:
-      - This dataset quantifies the environmental impacts of 57,000 food products across retailers in the UK. It expands on previous analyses which quantify the environmental impacts of individual commodities, to quantify the impacts of products with multiple ingredients.
-      - To do this, it uses the environmental footprints of commodities from the largest meta-analysis to date (Poore and Nemecek, 2018) and ingredient lists for specific products to calculate the total footprint of each product. For example, calculating the impact of "Spaghetti Bolognese" would combine the impacts of the ingredients – pasta, minced beef, sauce, and any additional ingredients – in their weighted ratios.
-      - The raw, underlying dataset has footprint data for 57,000 products. Our World in Data has combined these products into higher-level categories. For example, "Steak pie" or "Pizza" or "Soy milk". To do this, we have calculated the average across the relevant products that fall into this category.
     presentation:
       topic_tags:
         - Environmental Impacts of Food Production
 
 tables:
-  environmental_impacts_of_food_clark_et_al_2022:
+  clark_et_al_2022:
     variables:
       ghg_kg:
         title: Greenhouse gas emissions per kilogram of food
