@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 from git.repo import Repo
-from owid.catalog import Dataset, DatasetMeta, Origin, Source, Table
+from owid.catalog import Dataset, DatasetMeta, Origin, Table
 from owid.datautils import io
 from rich.console import Console
 from sqlalchemy.orm import Session
@@ -37,7 +37,7 @@ class FasttrackImport:
     def __init__(
         self,
         dataset: Dataset,
-        origin: Origin | None,
+        origin: Origin,
         dataset_uri: str,
         is_gsheet: bool = False,
     ) -> None:
@@ -95,28 +95,10 @@ class FasttrackImport:
         # since sheets url is accessible with link, we have to encrypt it when storing in metadata
         dataset_uri = _encrypt(self.dataset_uri) if not self.meta.is_public else self.dataset_uri
 
-        if len(self.meta.sources) == 1:
-            dataset_source = self.meta.sources[0]
-            source = Source(
-                url=dataset_source.url,
-                name=dataset_source.name,
-                published_by=dataset_source.published_by,
-                source_data_url=dataset_uri,
-                date_accessed=str(dt.date.today()),
-                publication_year=dataset_source.publication_year
-                if not pd.isnull(dataset_source.publication_year)
-                else None,
-            )
-            origin = None
-            license = self.meta.licenses[0]
-        elif self.origin:
-            source = None
-            origin = self.origin
-            origin.date_accessed = str(dt.date.today())
-            origin.url_download = dataset_uri
-            license = self.meta.licenses[0] if self.meta.licenses else None
-        else:
-            raise ValueError("Dataset must have either one source or one origin")
+        origin = self.origin
+        origin.date_accessed = str(dt.date.today())
+        origin.url_download = dataset_uri
+        license = self.meta.licenses[0] if self.meta.licenses else None
 
         return SnapshotMeta(
             namespace=self.meta.namespace,  # ty: ignore
@@ -125,7 +107,6 @@ class FasttrackImport:
             version=str(self.meta.version),
             file_extension="csv",
             description=self.meta.description,  # ty: ignore
-            source=source,
             origin=origin,
             license=license,
             is_public=self.meta.is_public,

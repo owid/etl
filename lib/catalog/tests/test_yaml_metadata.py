@@ -1,5 +1,5 @@
 from owid.catalog.core import yaml_metadata as ym
-from owid.catalog.core.meta import Origin, Source
+from owid.catalog.core.meta import Origin
 from owid.catalog.core.tables import Table
 
 
@@ -29,11 +29,9 @@ tables:
 
 
 def test_update_metadata_from_yaml_common(tmp_path):
-    # delete sources and add origins for all variables
     yaml_text = """
 definitions:
   common:
-    sources: []
     origins:
       - producer: Origin1
         title: Title1
@@ -73,7 +71,6 @@ tables:
 
     t = Table({"a": [1, 2, 3], "b": [1, 2, 3]})
     t.a.metadata.description_short = "Will be overwritten"
-    t.a.metadata.sources = [Source()]
     t.b.metadata.origins = [Origin(producer="Producer", title="Title")]
 
     ym.update_metadata_from_yaml(t, path, "test")
