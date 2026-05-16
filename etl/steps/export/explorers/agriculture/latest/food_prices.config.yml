@@ -1,0 +1,61 @@
+config:
+  explorerTitle: Food Prices
+  explorerSubtitle: Explore the cost and affordability of diets across the world.
+  isPublished: true
+  selection:
+    - Nigeria
+    - Bangladesh
+    - India
+    - Ethiopia
+    - Mexico
+    - United States
+    - Brazil
+    - United Kingdom
+  subNavId: explorers
+  subNavCurrentId: food-prices
+
+dimensions:
+  - slug: diet
+    name: Diet
+    presentation:
+      type: radio
+    choices:
+      - slug: healthy
+        name: Healthy diet
+      - slug: nutrient_adequate
+        name: Nutrient adequate diet
+      - slug: calorie_sufficient
+        name: Calorie sufficient diet
+  - slug: type
+    name: Cost or Affordability
+    presentation:
+      type: radio
+    choices:
+      - slug: affordability
+        name: Affordability
+      - slug: cost
+        name: Cost
+  - slug: affordability_metric
+    name: Affordability metric
+    presentation:
+      type: radio
+    choices:
+      - slug: na
+        name: ""
+      - slug: share
+        name: Share that cannot afford
+      - slug: number
+        name: Number that cannot afford
+  - slug: cost_metric
+    name: Cost metric
+    presentation:
+      type: radio
+    choices:
+      - slug: na
+        name: ""
+      - slug: dollars_per_day
+        name: $ per day
+      - slug: share_food_expenditure
+        name: "% of average food expenditure"
+
+views: []

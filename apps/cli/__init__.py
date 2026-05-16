@@ -79,16 +79,6 @@ SUBGROUPS = {
             "housekeeper": "apps.housekeeper.cli.main",
         },
     },
-    "b": {
-        "entrypoint": "apps.cli.cli_back",
-        "name": "Backport",
-        "description": "Backport commands.",
-        "commands": {
-            "fasttrack": "apps.backport.fasttrack_backport.cli",
-            "migrate": "apps.backport.migrate.migrate.cli",
-            "run": "apps.backport.backport.backport_cli",
-        },
-    },
 }
 
 
@@ -101,18 +91,6 @@ SUBGROUPS = {
 )
 def cli_dev() -> None:
     """Run development tools."""
-    pass
-
-
-# Backport
-@click.group(
-    name="b",
-    context_settings=dict(show_default=True),
-    cls=LazyGroup,
-    lazy_subcommands=SUBGROUPS["b"]["commands"],
-)
-def cli_back() -> None:
-    """Run Backport tools."""
     pass
 
 

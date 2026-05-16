@@ -1,5 +1,11 @@
+definitions:
+  common:
+    presentation:
+      attribution: "Poore and Nemecek (2018)"
+
 dataset:
   title: Food emissions by life-cycle stage (Poore and Nemecek, 2018)
+
 tables:
   food_emissions_by_life_cycle_stage__poore_and_nemecek__2018:
     variables:
@@ -17,7 +23,7 @@ tables:
           name: Farm
       food_emissions_land_plus_farm:
         title: food_emissions_land_plus_farm
-        unit: ''
+        unit: ""
       food_emissions_land_use:
         title: food_emissions_land_use
         unit: kgCO₂eq per kg
@@ -50,7 +56,7 @@ tables:
           name: Retail
       food_emissions_supply_chain:
         title: food_emissions_supply_chain
-        unit: ''
+        unit: ""
       food_emissions_transport:
         title: food_emissions_transport
         unit: kgCO₂eq per kg

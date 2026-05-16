@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from owid.catalog import (
     DatasetMeta,
-    Source,
     Table,
     TableMeta,
     VariableMeta,
@@ -88,7 +87,7 @@ def test_long_to_wide_tables():
             "sex": ["male", "female", "male", "female"],
         }
     ).set_index(["year", "entity_id", "sex"])
-    table = Table(long, metadata=TableMeta(dataset=DatasetMeta(sources=[Source()])))
+    table = Table(long, metadata=TableMeta(dataset=DatasetMeta()))
     grapher_tables = list(gh.long_to_wide_tables(table))
 
     t = grapher_tables[0]
@@ -110,60 +109,6 @@ def test_contains_inf():
     assert not gh.contains_inf(pd.Series(["a", "b"]).astype("category"))
 
 
-def test_ensure_source_per_variable_multiple_sources():
-    table = Table(
-        pd.DataFrame(
-            {
-                "deaths": [0, 1],
-            }
-        )
-    )
-    table.metadata.dataset = DatasetMeta(
-        description="Dataset description", sources=[Source(name="s3", description="s3 description")]
-    )
-    table.metadata.description = "Table description"
-
-    # multiple sources
-    table.deaths.metadata.sources = [
-        Source(name="s1", description="s1 description"),
-        Source(name="s2", description="s2 description"),
-    ]
-    new_table = gh._ensure_source_per_variable(table)
-    assert len(new_table.deaths.metadata.sources) == 1
-    source = new_table.deaths.metadata.sources[0]
-    assert source.name == "s1; s2"
-    assert source.description == "s1 description\ns2 description"
-
-    # no sources
-    table.deaths.metadata.sources = []
-    new_table = gh._ensure_source_per_variable(table)
-    assert len(new_table.deaths.metadata.sources) == 1
-    source = new_table.deaths.metadata.sources[0]
-    assert source.name == "s3"
-    assert source.description == "Dataset description\ns3 description"
-
-    # sources have no description, but table has
-    table.deaths.metadata.sources = [Source(name="s1")]
-    new_table = gh._ensure_source_per_variable(table)
-    assert len(new_table.deaths.metadata.sources) == 1
-    source = new_table.deaths.metadata.sources[0]
-    assert source.name == "s1"
-    assert source.description == "Table description"
-
-
-def test_combine_metadata_sources():
-    sources = [
-        Source(name="s1", description="s1 description"),
-        Source(name="s2", description="s2 description"),
-    ]
-    source = gh.combine_metadata_sources(sources)
-    assert source.name == "s1; s2"
-    assert source.description == "s1 description\ns2 description"
-
-    # make sure we haven't modified original sources
-    assert sources[0].name == "s1"
-
-
 def _sample_table() -> Table:
     table = Table(
         pd.DataFrame(
@@ -175,9 +120,7 @@ def _sample_table() -> Table:
             }
         )
     )
-    table.metadata.dataset = DatasetMeta(
-        description="Dataset description", sources=[Source(name="s3", description="s3 description")]
-    )
+    table.metadata.dataset = DatasetMeta(description="Dataset description")
     table.metadata.description = "Table description"
     return table
 

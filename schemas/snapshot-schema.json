@@ -63,9 +63,6 @@
         "origin": {
           "$ref": "definitions.json#/origin"
         },
-        "source": {
-          "$ref": "definitions.json#/source"
-        },
         "license": {
           "$ref": "definitions.json#/license"
         }
