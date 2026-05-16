@@ -1,166 +1,166 @@
 steps:
-      #
-      # Food expenditure - USDA
-      # NOTE: On every update, the USDA adds a year and removes the oldest year.
-      # That's why we keep old snapshots to be able to collect as much data as possible.
-      #
-      data://grapher/usda_ers/2025-03-26/food_expenditure:
-            - data://garden/usda_ers/2025-03-26/food_expenditure:
-                    - data://meadow/usda_ers/2025-03-26/food_expenditure:
-                            - snapshot://usda_ers/2025-03-26/food_expenditure_since_2019.xlsx
-                            - snapshot://usda_ers/2024-03-26/food_expenditure_since_2018.xlsx
-                            - snapshot://usda_ers/2023-06-07/food_expenditure_since_2017.xlsx
-      #
-      # Food prices for nutrition - World Bank based on FAO.
-      #
-      data://grapher/wb/2025-08-04/food_prices_for_nutrition:
-            - data://garden/wb/2025-08-04/food_prices_for_nutrition:
-                    - data://meadow/wb/2025-08-04/food_prices_for_nutrition:
-                            - snapshot://wb/2025-08-04/food_prices_for_nutrition.csv
-      #
-      # Lobell Lab: Crop productivity in southern Africa
-      # NOTE: Not updateable.
-      #
-      data://grapher/agriculture/2025-10-15/crop_yields_in_southern_africa:
-            - data://garden/agriculture/2025-10-15/crop_yields_in_southern_africa:
-                    - data://meadow/agriculture/2025-10-15/crop_yields_in_southern_africa:
-                            - snapshot://agriculture/2025-10-15/crop_yields_in_southern_africa.zip
-      #
-      # Agriculture - Long-run daily calorie supply per person.
-      #
-      data://grapher/agriculture/2026-03-02/daily_calories_per_person:
-            - data://garden/agriculture/2026-03-02/daily_calories_per_person:
-                    # FAO (1949) - The State of Food and Agriculture 1949.
-                    # NOTE: Not updateable.
-                    - data://meadow/agriculture/2024-05-23/fao_1949:
-                            - snapshot://agriculture/2024-05-23/fao_1949.csv
-                    # FAO (2000) - The State of Food and Agriculture 2000.
-                    # NOTE: Not updateable.
-                    - data://meadow/agriculture/2024-05-23/fao_2000:
-                            - snapshot://agriculture/2024-05-23/fao_2000.csv
-                    # Grigg (1995) - Daily calories in Western Europe.
-                    # NOTE: Not updateable.
-                    - data://meadow/agriculture/2024-05-23/grigg_1995:
-                            - snapshot://agriculture/2024-05-23/grigg_1995.csv
-                    # Harris et al. (2015) - Daily calories in England and Wales, according to various studies.
-                    # NOTE: Not updateable.
-                    - data://meadow/agriculture/2024-05-23/harris_et_al_2015:
-                            - snapshot://agriculture/2024-05-23/harris_et_al_2015.csv
-                    # Fogel (2004) - Daily calories in France and Great Britain.
-                    # NOTE: Not updateable.
-                    - data://meadow/agriculture/2024-05-23/fogel_2004:
-                            - snapshot://agriculture/2024-05-23/fogel_2004.csv
-                    # Jonsson (1998) - Daily calories in Iceland.
-                    # NOTE: Not updateable.
-                    - data://meadow/agriculture/2024-05-23/jonsson_1998:
-                            - snapshot://agriculture/2024-05-23/jonsson_1998.csv
-                    # USDA/ERS (2015) - Food availability.
-                    # NOTE: Not updateable.
-                    - data://meadow/usda_ers/2025-03-26/food_availability:
-                            - snapshot://usda_ers/2025-03-26/food_availability.xls
-                    # Floud et al. (2011) - Daily calories in United States and Western Europe.
-                    # NOTE: Not updateable.
-                    - data://meadow/agriculture/2024-05-23/floud_et_al_2011:
-                            - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_europe.csv
-                            - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_us.csv
-                    - data://garden/faostat/2026-02-25/faostat_fbsc
-      #
-      # Long-term food and agriculture trends
-      #
-      data://grapher/agriculture/2026-03-02/long_term_food_and_agriculture_trends:
-            - data://garden/agriculture/2026-03-02/long_term_food_and_agriculture_trends:
-                    - data://garden/regions/2023-01-01/regions
-                    - data://garden/faostat/2026-02-25/faostat_fbsc
-                    - data://garden/faostat/2026-02-25/faostat_rl
-      #
-      # Food expenditure in US - USDA
-      #
-      data://grapher/usda_ers/2026-03-02/food_expenditure_in_us:
-            - data://garden/usda_ers/2026-03-02/food_expenditure_in_us:
-                    # Food expenditure in US archive (2018) - USDA
-                    # NOTE: Not updateable.
-                    - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive:
-                            - snapshot://usda_ers/2025-03-26/food_expenditure_in_us_archive.xlsx
-                    - data://meadow/usda_ers/2026-03-02/food_expenditure_in_us:
-                            - snapshot://usda_ers/2026-03-02/food_expenditure_in_us.xlsx
-      ######################################################################################################################
-      # TODO: The following steps are experiments; clean up once we make a decision on this. For more details:
-      # https://github.com/owid/owid-issues/issues/2057
-      #
-      # Decoupling of food supply and land use
-      #
-      data://grapher/agriculture/2026-02-20/decoupling_food_supply_and_land_use:
-            - data://garden/agriculture/2026-02-20/decoupling_food_supply_and_land_use:
-                    - data://garden/faostat/2026-02-25/faostat_fbsc
-                    - data://garden/faostat/2026-02-25/faostat_rl
-                    - data://garden/regions/2023-01-01/regions
-                    - data://garden/demography/2024-07-15/population
-      #
-      # Decoupling of agricultural production and land use (with feed correction)
-      #
-      data://grapher/agriculture/2026-02-25/decoupling_food_production_and_land_use:
-            - data://garden/agriculture/2026-02-25/decoupling_food_production_and_land_use:
-                    - data://garden/faostat/2026-02-25/faostat_fbsc
-                    - data://garden/faostat/2026-02-25/faostat_rl
-                    - data://garden/regions/2023-01-01/regions
-      ######################################################################################################################
-      #
-      # USDA/FAS - Corn yields
-      #
-      data://grapher/agriculture/2026-03-02/corn_yields:
-            - data://garden/agriculture/2026-03-02/corn_yields:
-                    - data://meadow/agriculture/2026-03-02/corn_yields:
-                            - snapshot://agriculture/2026-03-02/corn_yields.xls
-                    - data://garden/regions/2023-01-01/regions
-      #
-      # Long-term crop yields.
-      #
-      data://garden/agriculture/2026-03-02/long_term_crop_yields:
-            - data://garden/faostat/2026-02-25/faostat_qcl
-            # Long-term yields in the United Kingdom.
-            - data://garden/agriculture/2026-03-02/uk_long_term_yields:
-                    - data://garden/papers/2024-03-26/broadberry_et_al_2015
-                    - data://garden/faostat/2026-02-25/faostat_qcl
-                    - data://garden/papers/2024-03-26/brassley_2000
-            # Long-term corn yields in United States.
-            - data://garden/usda_nass/2026-03-02/us_corn_yields:
-                    - data://meadow/usda_nass/2026-03-02/us_corn_yields:
-                            - snapshot://usda_nass/2026-03-02/us_corn_yields.csv
-            # Long-term wheat yields in Europe.
-            - data://garden/agriculture/2026-03-02/long_term_wheat_yields:
-                    - data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984
-                    - data://garden/faostat/2026-02-25/faostat_qcl
-      data://grapher/agriculture/2026-03-02/long_term_crop_yields:
-            - data://garden/agriculture/2026-03-02/long_term_crop_yields
-      #
-      # Crop yields explorer (uses attainable yields).
-      #
-      export://explorers/agriculture/latest/crop_yields:
-            # Attainable yields.
-            - data://grapher/agriculture/2026-03-02/attainable_yields:
-                    - data://garden/agriculture/2026-03-02/attainable_yields:
-                            - data://garden/papers/2024-03-26/mueller_et_al_2012
-                            - data://garden/agriculture/2026-03-02/long_term_crop_yields
-      #
+        #
+        # Food expenditure - USDA
+        # NOTE: On every update, the USDA adds a year and removes the oldest year.
+        # That's why we keep old snapshots to be able to collect as much data as possible.
+        #
+        data://grapher/usda_ers/2025-03-26/food_expenditure:
+                - data://garden/usda_ers/2025-03-26/food_expenditure:
+                          - data://meadow/usda_ers/2025-03-26/food_expenditure:
+                                    - snapshot://usda_ers/2025-03-26/food_expenditure_since_2019.xlsx
+                                    - snapshot://usda_ers/2024-03-26/food_expenditure_since_2018.xlsx
+                                    - snapshot://usda_ers/2023-06-07/food_expenditure_since_2017.xlsx
+        #
+        # Food prices for nutrition - World Bank based on FAO.
+        #
+        data://grapher/wb/2025-08-04/food_prices_for_nutrition:
+                - data://garden/wb/2025-08-04/food_prices_for_nutrition:
+                          - data://meadow/wb/2025-08-04/food_prices_for_nutrition:
+                                    - snapshot://wb/2025-08-04/food_prices_for_nutrition.csv
+        #
+        # Lobell Lab: Crop productivity in southern Africa
+        # NOTE: Not updateable.
+        #
+        data://grapher/agriculture/2025-10-15/crop_yields_in_southern_africa:
+                - data://garden/agriculture/2025-10-15/crop_yields_in_southern_africa:
+                          - data://meadow/agriculture/2025-10-15/crop_yields_in_southern_africa:
+                                    - snapshot://agriculture/2025-10-15/crop_yields_in_southern_africa.zip
+        #
+        # Agriculture - Long-run daily calorie supply per person.
+        #
+        data://grapher/agriculture/2026-03-02/daily_calories_per_person:
+                - data://garden/agriculture/2026-03-02/daily_calories_per_person:
+                          # FAO (1949) - The State of Food and Agriculture 1949.
+                          # NOTE: Not updateable.
+                          - data://meadow/agriculture/2024-05-23/fao_1949:
+                                    - snapshot://agriculture/2024-05-23/fao_1949.csv
+                          # FAO (2000) - The State of Food and Agriculture 2000.
+                          # NOTE: Not updateable.
+                          - data://meadow/agriculture/2024-05-23/fao_2000:
+                                    - snapshot://agriculture/2024-05-23/fao_2000.csv
+                          # Grigg (1995) - Daily calories in Western Europe.
+                          # NOTE: Not updateable.
+                          - data://meadow/agriculture/2024-05-23/grigg_1995:
+                                    - snapshot://agriculture/2024-05-23/grigg_1995.csv
+                          # Harris et al. (2015) - Daily calories in England and Wales, according to various studies.
+                          # NOTE: Not updateable.
+                          - data://meadow/agriculture/2024-05-23/harris_et_al_2015:
+                                    - snapshot://agriculture/2024-05-23/harris_et_al_2015.csv
+                          # Fogel (2004) - Daily calories in France and Great Britain.
+                          # NOTE: Not updateable.
+                          - data://meadow/agriculture/2024-05-23/fogel_2004:
+                                    - snapshot://agriculture/2024-05-23/fogel_2004.csv
+                          # Jonsson (1998) - Daily calories in Iceland.
+                          # NOTE: Not updateable.
+                          - data://meadow/agriculture/2024-05-23/jonsson_1998:
+                                    - snapshot://agriculture/2024-05-23/jonsson_1998.csv
+                          # USDA/ERS (2015) - Food availability.
+                          # NOTE: Not updateable.
+                          - data://meadow/usda_ers/2025-03-26/food_availability:
+                                    - snapshot://usda_ers/2025-03-26/food_availability.xls
+                          # Floud et al. (2011) - Daily calories in United States and Western Europe.
+                          # NOTE: Not updateable.
+                          - data://meadow/agriculture/2024-05-23/floud_et_al_2011:
+                                    - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_europe.csv
+                                    - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_us.csv
+                          - data://garden/faostat/2026-02-25/faostat_fbsc
+        #
+        # Long-term food and agriculture trends
+        #
+        data://grapher/agriculture/2026-03-02/long_term_food_and_agriculture_trends:
+                - data://garden/agriculture/2026-03-02/long_term_food_and_agriculture_trends:
+                          - data://garden/regions/2023-01-01/regions
+                          - data://garden/faostat/2026-02-25/faostat_fbsc
+                          - data://garden/faostat/2026-02-25/faostat_rl
+        #
+        # Food expenditure in US - USDA
+        #
+        data://grapher/usda_ers/2026-03-02/food_expenditure_in_us:
+                - data://garden/usda_ers/2026-03-02/food_expenditure_in_us:
+                          # Food expenditure in US archive (2018) - USDA
+                          # NOTE: Not updateable.
+                          - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive:
+                                    - snapshot://usda_ers/2025-03-26/food_expenditure_in_us_archive.xlsx
+                          - data://meadow/usda_ers/2026-03-02/food_expenditure_in_us:
+                                    - snapshot://usda_ers/2026-03-02/food_expenditure_in_us.xlsx
+        ######################################################################################################################
+        # TODO: The following steps are experiments; clean up once we make a decision on this. For more details:
+        # https://github.com/owid/owid-issues/issues/2057
+        #
+        # Decoupling of food supply and land use
+        #
+        data://grapher/agriculture/2026-02-20/decoupling_food_supply_and_land_use:
+                - data://garden/agriculture/2026-02-20/decoupling_food_supply_and_land_use:
+                          - data://garden/faostat/2026-02-25/faostat_fbsc
+                          - data://garden/faostat/2026-02-25/faostat_rl
+                          - data://garden/regions/2023-01-01/regions
+                          - data://garden/demography/2024-07-15/population
+        #
+        # Decoupling of agricultural production and land use (with feed correction)
+        #
+        data://grapher/agriculture/2026-02-25/decoupling_food_production_and_land_use:
+                - data://garden/agriculture/2026-02-25/decoupling_food_production_and_land_use:
+                          - data://garden/faostat/2026-02-25/faostat_fbsc
+                          - data://garden/faostat/2026-02-25/faostat_rl
+                          - data://garden/regions/2023-01-01/regions
+        ######################################################################################################################
+        #
+        # USDA/FAS - Corn yields
+        #
+        data://grapher/agriculture/2026-03-02/corn_yields:
+                - data://garden/agriculture/2026-03-02/corn_yields:
+                          - data://meadow/agriculture/2026-03-02/corn_yields:
+                                    - snapshot://agriculture/2026-03-02/corn_yields.xls
+                          - data://garden/regions/2023-01-01/regions
+        #
+        # Long-term crop yields.
+        #
+        data://garden/agriculture/2026-03-02/long_term_crop_yields:
+                - data://garden/faostat/2026-02-25/faostat_qcl
+                # Long-term yields in the United Kingdom.
+                - data://garden/agriculture/2026-03-02/uk_long_term_yields:
+                          - data://garden/papers/2024-03-26/broadberry_et_al_2015
+                          - data://garden/faostat/2026-02-25/faostat_qcl
+                          - data://garden/papers/2024-03-26/brassley_2000
+                # Long-term corn yields in United States.
+                - data://garden/usda_nass/2026-03-02/us_corn_yields:
+                          - data://meadow/usda_nass/2026-03-02/us_corn_yields:
+                                    - snapshot://usda_nass/2026-03-02/us_corn_yields.csv
+                # Long-term wheat yields in Europe.
+                - data://garden/agriculture/2026-03-02/long_term_wheat_yields:
+                          - data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984
+                          - data://garden/faostat/2026-02-25/faostat_qcl
+        data://grapher/agriculture/2026-03-02/long_term_crop_yields:
+                - data://garden/agriculture/2026-03-02/long_term_crop_yields
+        #
+        # Crop yields explorer (uses attainable yields).
+        #
+        export://explorers/agriculture/latest/crop_yields:
+                # Attainable yields.
+                - data://grapher/agriculture/2026-03-02/attainable_yields:
+                          - data://garden/agriculture/2026-03-02/attainable_yields:
+                                    - data://garden/papers/2024-03-26/mueller_et_al_2012
+                                    - data://garden/agriculture/2026-03-02/long_term_crop_yields
+        #
+        # Fertilizers explorer.
+        #
+        export://explorers/agriculture/latest/fertilizers:
+                - data://grapher/faostat/2026-02-25/faostat_rfn
+                - data://grapher/faostat/2026-02-25/additional_variables
+                - data-private://grapher/agriculture/2014/excess_fertilizers__west_et_al__2014
+                - data-private://grapher/agriculture/2014-01-01/nitrogen_efficiency__lassaletta_et_al__2014
 
-      # Environmental impacts of food (Clark et al. 2022) — feeds the food-footprints explorer.
-      #
-      data://garden/food/2026-05-06/clark_et_al_2022:
-            - snapshot://food/2026-05-06/clark_et_al_2022.csv
-      data://grapher/food/2026-05-06/clark_et_al_2022:
-            - data://garden/food/2026-05-06/clark_et_al_2022
-      #
-      # Food footprints explorer (Environmental Impacts of Food).
-      #
-      export://explorers/food/latest/food_footprints:
-            - data://grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018
-            - data-private://grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018
-            - data://grapher/food/2026-05-06/clark_et_al_2022
+                # Environmental impacts of food (Clark et al. 2022) — feeds the food-footprints explorer.
 
-      # Fertilizers explorer.
-      #
-      export://explorers/agriculture/latest/fertilizers:
-            - data://grapher/faostat/2026-02-25/faostat_rfn
-            - data://grapher/faostat/2026-02-25/additional_variables
-            - data-private://grapher/agriculture/2014/excess_fertilizers__west_et_al__2014
-            - data-private://grapher/agriculture/2014-01-01/nitrogen_efficiency__lassaletta_et_al__2014
+        # Food footprints explorer (Clark et al. 2022) - Environmental impacts of food.
+        data://garden/food/2026-05-06/clark_et_al_2022:
+                - snapshot://food/2026-05-06/clark_et_al_2022.csv
+        data://grapher/food/2026-05-06/clark_et_al_2022:
+                - data://garden/food/2026-05-06/clark_et_al_2022
+        #
+        # Food footprints explorer (Environmental Impacts of Food).
+        #
+        export://explorers/food/latest/food_footprints:
+                - data://grapher/food/2019-10-08/environmental_impacts_of_food__poore__and__nemecek__2018
+                - data-private://grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018
+                - data://grapher/food/2026-05-06/clark_et_al_2022
