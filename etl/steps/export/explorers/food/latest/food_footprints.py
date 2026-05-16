@@ -293,11 +293,23 @@ def run() -> None:
     # Templated title / subtitle are only needed for the Clark `specific_food_product`
     # side. Commodity single-y views inherit from the Poore & Nemecek garden meta.yml;
     # the YAML-listed commodity stage view carries its own title/subtitle inline.
+    #
+    # `baseColorScheme: owid-distinct` is set on the Clark indicators (garden meta.yml)
+    # so single-y bars get a distinct color each. Clear it for the multi-y group views
+    # (`all_impacts` facet, `compare_units`) where the entity color logic doesn't apply.
     c.edit_views(
         [
             {
                 "dimensions": {"view_type": "specific_food_product"},
                 "config": {"title": _title, "subtitle": _subtitle},
+            },
+            {
+                "dimensions": {"view_type": "specific_food_product", "impact": "all_impacts"},
+                "config": {"baseColorScheme": None},
+            },
+            {
+                "dimensions": {"view_type": "specific_food_product", "unit": "compare_units"},
+                "config": {"baseColorScheme": None},
             },
         ]
     )

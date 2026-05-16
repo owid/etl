@@ -145,6 +145,7 @@ tables:
           grapher_config:
             title: "{definitions.title_carbon} per {definitions.noun_per_kg}"
             subtitle: "{definitions.subtitle_carbon} This means non-CO₂ gases are weighted by the amount of warming they cause over a 100-year timescale."
+            baseColorScheme: owid-distinct
 
       land_use_per_1000kcal__poore__and__nemecek__2018:
         title: Land use per 1000kcal (Poore & Nemecek, 2018)

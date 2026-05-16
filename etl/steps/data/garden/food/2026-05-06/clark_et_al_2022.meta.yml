@@ -3,10 +3,16 @@ definitions:
     presentation:
       topic_tags:
         - Environmental Impacts of Food Production
+      grapher_config:
+        # Per-bar colors on the explorer's single-y `specific_food_product` views.
+        # Explicitly cleared for `all_impacts` (facet) and `compare_units` group views
+        # in `etl/steps/export/explorers/food/latest/food_footprints.py`.
+        baseColorScheme: owid-distinct
 
 tables:
   clark_et_al_2022:
     variables:
+      # == Green gas emissions ==
       ghg_kg:
         title: Greenhouse gas emissions per kilogram of food
         unit: kilograms CO₂-equivalents per kilogram
@@ -40,6 +46,7 @@ tables:
           name: Emissions per 100 grams of fat
           numDecimalPlaces: 1
 
+      # == Land use ==
       land_use_kg:
         title: Land use per kilogram of food
         unit: square meters per kilogram
@@ -73,6 +80,7 @@ tables:
           name: Land use per 100 grams of fat
           numDecimalPlaces: 1
 
+      # == Water use ==
       water_kg:
         title: Freshwater withdrawals per kilogram of food
         unit: liters per kilogram
@@ -106,6 +114,7 @@ tables:
           name: Freshwater withdrawals per 100 grams of fat
           numDecimalPlaces: 0
 
+      # == Scarcity-weighted water use ==
       water_scarcity_kg:
         title: Scarcity-weighted water use per kilogram of food
         unit: liters per kilogram
@@ -139,6 +148,7 @@ tables:
           name: Scarcity-weighted water use per 100 grams of fat
           numDecimalPlaces: 0
 
+      # == Eutrophication ==
       eutrophication_kg:
         title: Eutrophication per kilogram of food
         unit: grams of phosphate equivalents per kilogram
@@ -172,6 +182,7 @@ tables:
           name: Eutrophication per 100 grams of fat
           numDecimalPlaces: 1
 
+      # == Biodiversity loss ==
       biodiversity_kg:
         title: Biodiversity loss per kilogram of food
         unit: species lost per kilogram
