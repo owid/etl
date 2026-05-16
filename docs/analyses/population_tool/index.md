@@ -9,7 +9,7 @@ status: new
 
 Our team has built an interactive visualization tool that provides population projections until the end of the century, based on the user’s selection of three key demographic inputs: fertility rates, life expectancy, and net migration.
 
-This tool is presented in our article [Population tool: How will populations across the world change in the 21st century?](https://ourworldindata.org/population-tool) We also provide a walkthrough of how to use this tool to answer a specific question: what would it take for South Korea to [maintain its current population size](https://ourworldindata.org/south-koreas-population-is-set-to-shrink) throughout this century?
+This tool is presented in our article [Population tool: How will populations across the world change in the 21st century?](https://ourworldindata.org/population-simulation-tool) We also provide a walkthrough of how to use this tool to answer a specific question: what would it take for South Korea to [maintain its current population size](https://ourworldindata.org/south-koreas-population-is-set-to-shrink-what-would-it-take-to-stop-the-decline) throughout this century?
 
 This tool was designed to help people understand and explore how future populations could change based on different demographic assumptions. It is deliberately simple and less complex than expert demographic models. Nonetheless, we hope users find it helpful to understand how population projections respond to changes in key inputs. As we describe below, when given the UN’s own demographic assumptions as inputs, our tool closely reproduces its projections.
 
