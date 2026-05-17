@@ -30,12 +30,12 @@ config:
   explorerTitle: Countries in Conflict
   explorerSubtitle: Explore conflict deaths and death rates across the world's countries.
   isPublished: true
+  originUrl: https://ourworldindata.org/war-and-peace
   selection:
     - Afghanistan
     - Ethiopia
     - Syria
     - Ukraine
-  subNavCurrentId: country-conflict
 
 dimensions:
   - slug: measure
@@ -109,7 +109,6 @@ views:
             name: Interstate
             <<: *deaths_color_scale
     config:
-
       title: Deaths in armed conflicts based on where they occurred
       subtitle: Included are deaths of combatants and civilians due to fighting in [interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), [extrasystemic](#dod:extrasystemic-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [one-sided violence](#dod:onesided-ucdp) that were ongoing that year.
 

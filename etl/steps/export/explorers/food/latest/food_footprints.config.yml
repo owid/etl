@@ -3,13 +3,10 @@ config:
   explorerSubtitle: Explore the land use, carbon, and water footprints of food products.
   isPublished: true
   hasMapTab: false
-  hideAlertBanner: true
   hideAnnotationFieldsInTitle: true
   entityType: food
-  thumbnail: https://assets.ourworldindata.org/uploads/2022/08/Env-Impacts-of-Food-Data-Explorer.png
   wpBlockId: "52428"
-  subNavId: explorers
-  subNavCurrentId: food-footprints
+  originUrl: https://ourworldindata.org/environmental-impacts-of-food
   selection:
     - Almonds
     - Bacon
