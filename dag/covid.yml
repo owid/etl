@@ -283,3 +283,8 @@ steps:
         - data://meadow/covid/latest/google_mobility:
           - snapshot://covid/latest/google_mobility.csv
     - data://grapher/regions/2023-01-01/regions
+    # Extras for covid.explorer multidim (covers the same indicators as the explorer)
+    - data-private://grapher/covid/latest/sequence
+    - data://grapher/covid/latest/oxcgrt_policy
+    - data://grapher/covid/latest/tracking_r
+    - data://grapher/covid/latest/combined

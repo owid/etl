@@ -593,6 +593,13 @@ class ChartDiffShow:
         if not self.diff.chart_id:
             return
 
+        # Respect the sidebar toggle. The list-side filter in app.py only runs when
+        # `show_all` is off; without this gate the block would still render here when
+        # the user toggles narrative-charts off but also has "Show all charts" enabled.
+        # Mirrors the same pattern in `_show_citations`.
+        if not st.session_state.get("show-narrative-charts", True):
+            return
+
         # Load narrative charts for this parent chart
         narrative_charts = gm.NarrativeChart.load_narrative_charts_by_parent_chart_ids(
             self.source_session, {self.diff.chart_id}

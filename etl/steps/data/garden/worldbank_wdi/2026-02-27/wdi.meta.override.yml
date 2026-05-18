@@ -719,7 +719,6 @@ tables:
               - url: >-
                   https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       sh_sta_stnt_me_zs:
         title: Share of children who are stunted (modeled estimates)
         unit: '% of children under 5'
@@ -808,7 +807,6 @@ tables:
               - url: >-
                   https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
       eg_cft_accs_zs:
         title: Access to clean fuels and technologies for cooking (% of population)
