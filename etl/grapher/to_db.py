@@ -319,13 +319,20 @@ def upsert_metadata(
 
 
 def calculate_checksum_metadata(variable_meta: VariableMeta, df: pd.DataFrame) -> str:
-    # entities and years are also part of the metadata checksum
+    # Hash the canonical (pruned) dict representation, not the dataclass itself.
+    # Dataclass-shape changes (a field renamed, added, or removed — even when the
+    # default is None / [] and the JSON output is unchanged) used to spuriously
+    # flip the checksum and lit up chart-diff as METADATA CHANGE with an empty
+    # UI diff. `to_dict()` goes through `@pruned_json`, which drops None/empty
+    # values the same way `_omit_nullable_values` does before upload to S3 — so
+    # the checksum now matches what the comparator actually sees.
+    # entities and years are also part of the metadata checksum.
     return str(
         hash_any(
             (
                 hash_any(sorted(df.entityId.unique())),
                 hash_any(sorted(df.year.unique())),
-                hash_any(variable_meta),
+                hash_any(variable_meta.to_dict()),
             )
         )
     )
