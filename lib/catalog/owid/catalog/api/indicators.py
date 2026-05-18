@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.tables import _keep_latest_versions, _load_table
-from owid.catalog.api.utils import HTTP_HEADERS
+from owid.catalog.api.utils import session
 from owid.catalog.core import CatalogPath
 from owid.catalog.core.tables import Table
 
@@ -331,9 +331,7 @@ class IndicatorsAPI:
             "limit": limit,
         }
 
-        resp = requests.get(
-            self.search_url, params=params, timeout=timeout or self._client.timeout, headers=HTTP_HEADERS
-        )
+        resp = session.get(self.search_url, params=params, timeout=timeout or self._client.timeout)
 
         # Handle HTTP errors with informative messages from response body
         if not resp.ok:

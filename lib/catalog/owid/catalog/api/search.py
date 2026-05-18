@@ -9,12 +9,11 @@ import warnings
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-import requests
 from pydantic import BaseModel, Field
 
 from owid.catalog.api.charts import ChartResult
 from owid.catalog.api.models import ResponseSet
-from owid.catalog.api.utils import HTTP_HEADERS
+from owid.catalog.api.utils import session
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -114,7 +113,7 @@ class SiteSearchAPI:
         if extra_params:
             params.update(extra_params)
 
-        resp = requests.get(self.base_url, params=params, timeout=timeout or self._client.timeout, headers=HTTP_HEADERS)
+        resp = session.get(self.base_url, params=params, timeout=timeout or self._client.timeout)
         resp.raise_for_status()
         return resp.json()
 

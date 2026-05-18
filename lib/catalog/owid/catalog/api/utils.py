@@ -13,6 +13,8 @@ from contextlib import contextmanager
 from importlib.metadata import PackageNotFoundError, version
 from typing import TYPE_CHECKING
 
+import requests
+
 if TYPE_CHECKING:
     from owid.catalog.core.datasets import FileFormat
 
@@ -38,12 +40,23 @@ except PackageNotFoundError:
 
 USER_AGENT = f"owid-catalog/{_LIB_VERSION} (python {platform.python_version()})"
 
-#: Pass as ``headers=`` to ``requests.get`` / ``requests.post`` calls.
-HTTP_HEADERS = {"User-Agent": USER_AGENT}
+
+def _make_session() -> requests.Session:
+    s = requests.Session()
+    s.headers["User-Agent"] = USER_AGENT
+    return s
+
+
+#: Module-level :class:`requests.Session` with the catalog UA pre-set as a
+#: default header. Use ``session.get`` / ``session.post`` in place of
+#: ``requests.get`` / ``requests.post`` so every call is tagged automatically
+#: and reuses pooled connections.
+session = _make_session()
 
 #: Pass as ``storage_options=`` to ``pd.read_csv``/``read_feather``/``read_parquet``
 #: when reading from an HTTP(S) URL. pandas forwards these as headers (see
-#: ``IOHandles`` / fsspec's HTTP backend).
+#: ``IOHandles`` / fsspec's HTTP backend). Used at the two HTTP-pandas-read
+#: sites since pandas does not accept a ``requests.Session``.
 STORAGE_OPTIONS = {"User-Agent": USER_AGENT}
 
 

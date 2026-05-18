@@ -27,13 +27,13 @@ from rapidfuzz import fuzz
 from owid.catalog import s3_utils
 from owid.catalog.api.utils import (
     DEFAULT_CATALOG_URL,
-    HTTP_HEADERS,
     INDEX_FORMATS,
     OWID_CATALOG_VERSION,
     PREFERRED_FORMAT,
     S3_OWID_URI,
     STORAGE_OPTIONS,
     SUPPORTED_FORMATS,
+    session,
 )
 from owid.catalog.core.datasets import CHANNEL, Dataset, FileFormat
 from owid.catalog.core.tables import Table
@@ -466,7 +466,7 @@ class ETLCatalog(CatalogMixin):
     @staticmethod
     def _read_metadata(uri: str, timeout: int = 30) -> dict[str, Any]:
         """Read the metadata JSON blob for this repo."""
-        resp = requests.get(uri, timeout=timeout, headers=HTTP_HEADERS)
+        resp = session.get(uri, timeout=timeout)
         resp.raise_for_status()
         return cast(dict[str, Any], resp.json())
 

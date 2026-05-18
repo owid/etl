@@ -16,14 +16,12 @@ from urllib.parse import urlparse
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-import requests
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 from rapidfuzz import fuzz
 
 from owid.catalog import s3_utils
 from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.utils import (
-    HTTP_HEADERS,
     OWID_CATALOG_VERSION,
     PREFERRED_FORMAT,
     S3_OWID_URI,
@@ -31,6 +29,7 @@ from owid.catalog.api.utils import (
     STORAGE_OPTIONS,
     SUPPORTED_FORMATS,
     _loading_data_from_api,
+    session,
 )
 from owid.catalog.core import CatalogPath
 from owid.catalog.core.paths import VALID_CHANNELS
@@ -88,7 +87,7 @@ def _read_catalog_index(uri: str, *, timeout: int = 30) -> pd.DataFrame:
     """
     # Read metadata to check version
     metadata_url = uri.rstrip("/") + "/catalog.meta.json"
-    resp = requests.get(metadata_url, timeout=timeout, headers=HTTP_HEADERS)
+    resp = session.get(metadata_url, timeout=timeout)
     resp.raise_for_status()
     metadata = resp.json()
 
