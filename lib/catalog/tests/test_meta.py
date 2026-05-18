@@ -71,6 +71,27 @@ def test_update_from_yaml(tmp_path):
     assert d1.description == "yaml desc"
 
 
+def test_owners_round_trip(tmp_path):
+    # Empty owners must not appear in to_dict (pruned).
+    assert "owners" not in meta.DatasetMeta().to_dict()
+
+    # Populated owners must round-trip through to_dict / from_dict and YAML.
+    owners = ["Mojmír Vinkler", "Pablo Rosado"]
+    d1 = meta.DatasetMeta(owners=owners)
+    assert d1.to_dict()["owners"] == owners
+    assert meta.DatasetMeta.from_dict(d1.to_dict()).owners == owners
+
+    metapath = tmp_path / "meta.yml"
+    with open(metapath, "w") as f:
+        yaml.dump({"dataset": {"owners": owners}}, f)
+
+    d2 = meta.DatasetMeta()
+    d2.update_from_yaml(metapath)
+    # update_from_yaml goes through dynamic_yaml, which returns a list-proxy;
+    # match by element rather than identity.
+    assert list(d2.owners) == owners
+
+
 def test_load_license_from_dict():
     d = {
         "url": "https://www.unicef.org/legal#terms-of-use",
