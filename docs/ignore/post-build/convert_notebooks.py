@@ -523,13 +523,27 @@ def wrap_in_full_zensical_template(
 
         template = re.sub(toc_pattern, replace_toc, template, flags=re.DOTALL)
 
-    # Fix relative paths for assets
+    # Fix relative paths for assets. Match both the bare form (`href="assets/…"`)
+    # and the explicitly-CWD-prefixed form (`href="./assets/…"`) that newer
+    # zensical versions emit — without this, the `./` prefix slips through
+    # untouched and resolves relative to the notebook's own subdirectory,
+    # 404'ing every asset on every notebook page (cell-toggles, the main
+    # bundle, CSS, …).
     if relative_root != "./":
-        template = template.replace('href="assets/', f'href="{relative_root}assets/')
-        template = template.replace('src="assets/', f'src="{relative_root}assets/')
-        template = template.replace('href="css/', f'href="{relative_root}css/')
-        template = template.replace('href="javascripts/', f'href="{relative_root}javascripts/')
-        template = template.replace('src="javascripts/', f'src="{relative_root}javascripts/')
+
+        def _retarget(attr: str, prefix: str) -> None:
+            nonlocal template
+            pattern = rf'{attr}="(?:\./)?({re.escape(prefix)}[^"]+)"'
+            template = re.sub(pattern, lambda m: f'{attr}="{relative_root}{m.group(1)}"', template)
+
+        for attr, prefix in [
+            ("href", "assets/"),
+            ("src", "assets/"),
+            ("href", "css/"),
+            ("href", "javascripts/"),
+            ("src", "javascripts/"),
+        ]:
+            _retarget(attr, prefix)
 
         # Fix __config base path for JavaScript bundle
         # Remove trailing slash from relative_root for JSON
