@@ -4,6 +4,7 @@ from typing import Any
 
 import httpx
 
+from etl.http import HEADERS
 from owid_mcp.config import HTTP_TIMEOUT, SEARCH_API_URL
 
 
@@ -19,7 +20,7 @@ async def semantic_search_indicators(query: str, limit: int = 10) -> list[dict[s
         List of indicator results with similarity scores
     """
     # Make HTTP request to the Search API
-    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT, headers=HEADERS) as client:
         response = await client.get(f"{SEARCH_API_URL}/indicators", params={"query": query, "limit": limit})
         response.raise_for_status()
         data = response.json()

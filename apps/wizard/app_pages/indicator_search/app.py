@@ -2,12 +2,12 @@ import re
 from dataclasses import dataclass
 
 import pandas as pd
-import requests
 import streamlit as st
 from structlog import get_logger
 
 from apps.wizard.utils.components import st_horizontal, st_multiselect_wider, st_title_with_expert, url_persist
 from etl.config import OWID_ENV, SEARCH_API_URL
+from etl.http import session as http_session
 
 # Initialize log.
 log = get_logger()
@@ -61,7 +61,7 @@ st.set_page_config(
 
 def search_indicators_api(query: str, limit: int = MAX_RESULTS) -> list[Indicator]:
     """Search indicators using the Search API."""
-    response = requests.get(
+    response = http_session.get(
         f"{SEARCH_API_URL}/indicators",
         params={"query": query, "limit": limit},
         timeout=30,

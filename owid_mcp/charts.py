@@ -10,6 +10,7 @@ from fastmcp.utilities.types import Image
 from mcp.types import ImageContent
 from pydantic import BaseModel
 
+from etl.http import HEADERS
 from owid_mcp.config import HTTP_TIMEOUT
 from owid_mcp.data_utils import make_algolia_request
 
@@ -76,7 +77,7 @@ async def _fetch_chart_data_impl(
     query_string = urllib.parse.urlencode(query_params)
     fetch_url = f"{csv_url}?{query_string}"
 
-    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT, headers=HEADERS) as client:
         resp = await client.get(fetch_url)
         resp.raise_for_status()
         csv_content = resp.text
@@ -172,7 +173,7 @@ async def fetch_chart_image(id: str, time: str | None = None, countries: str | N
     png_url = f"{png_url}?{query_string}"
 
     try:
-        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT, headers=HEADERS) as client:
             resp = await client.get(png_url)
             resp.raise_for_status()
             png_bytes = resp.content

@@ -12,6 +12,7 @@ from apps.wizard.app_pages.search_comparison.random_queries import get_benchmark
 from apps.wizard.utils.components import st_horizontal, st_title_with_expert, url_persist
 from etl.config import OWID_ENV  # noqa: F401 -- needed after TODO revert
 from etl.db import read_sql
+from etl.http import session as http_session
 
 
 # Search source types
@@ -131,7 +132,7 @@ def fetch_semantic_search(
             params["llmRerank"] = "true"
             if llm_model:
                 params["llmModel"] = llm_model
-        response = requests.get(
+        response = http_session.get(
             f"{api_base}/api/ai-search/charts",
             params=params,
             timeout=30,
@@ -146,7 +147,7 @@ def fetch_algolia_search(query: str, hits_per_page: int, api_base: str) -> tuple
     """Fetch results from Algolia keyword search API."""
     start = time.time()
     try:
-        response = requests.get(
+        response = http_session.get(
             f"{api_base}/api/search",
             params={"q": query, "hitsPerPage": hits_per_page},
             timeout=30,
@@ -161,7 +162,7 @@ def fetch_typesense_search(query: str, hits_per_page: int, api_base: str, alpha:
     """Fetch results from Typesense hybrid search API."""
     start = time.time()
     try:
-        response = requests.get(
+        response = http_session.get(
             f"{api_base}/api/search",
             params={"q": query, "hitsPerPage": hits_per_page, "alpha": alpha, "dedup": "api"},
             timeout=30,
@@ -183,7 +184,7 @@ def fetch_topics(query: str, api_base: str, limit: int = 3, source: str = "seman
     """
     start = time.time()
     try:
-        response = requests.get(
+        response = http_session.get(
             f"{api_base}/api/ai-search/topics",
             params={"q": query, "limit": limit, "source": source},
             timeout=30,
@@ -198,7 +199,7 @@ def fetch_keywords(query: str, api_base: str) -> tuple[dict, float]:
     """Fetch suggested keywords from AI search API."""
     start = time.time()
     try:
-        response = requests.get(
+        response = http_session.get(
             f"{api_base}/api/ai-search/keywords",
             params={"q": query},
             timeout=30,
@@ -223,7 +224,7 @@ def fetch_agent_search(
         params = {"q": query, "model": model, "search": search}
         if type_filter and type_filter != "all":
             params["type"] = type_filter
-        response = requests.get(
+        response = http_session.get(
             f"{api_base}/api/ai-search/agent",
             params=params,
             timeout=60,  # Agent may take longer

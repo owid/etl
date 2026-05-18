@@ -6,7 +6,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-import requests
 import streamlit as st
 from owid.catalog import fetch
 from owid.datautils.common import ExceptionFromDocstring
@@ -18,6 +17,7 @@ from etl.collection.explorer.legacy import ExplorerLegacy
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
 from etl.grapher.model import Entity, Explorer, Variable
+from etl.http import session as http_session
 
 # TODO:
 #  * Create another slider (from 0 to 10) for tolerance.
@@ -115,14 +115,14 @@ def load_variable_from_catalog_path(catalog_path: str):
 
 @st.cache_data
 def load_variable_metadata(variable: Variable) -> dict[str, Any]:
-    metadata = requests.get(variable.s3_metadata_path(typ="http")).json()
+    metadata = http_session.get(variable.s3_metadata_path(typ="http")).json()
 
     return metadata
 
 
 @st.cache_data
 def load_variable_data(variable: Variable) -> pd.DataFrame:
-    data = requests.get(variable.s3_data_path(typ="http")).json()
+    data = http_session.get(variable.s3_data_path(typ="http")).json()
     df = pd.DataFrame(data)
 
     return df
@@ -165,7 +165,7 @@ def load_explorer(explorer_path: Path) -> str:
 
 @st.cache_data
 def load_color_schemes() -> list[str]:
-    data = requests.get("https://files.ourworldindata.org/schemas/grapher-schema.004.json").json()
+    data = http_session.get("https://files.ourworldindata.org/schemas/grapher-schema.004.json").json()
     color_schemes = data["$defs"]["colorScale"]["properties"]["baseColorScheme"]["enum"]
 
     return color_schemes
