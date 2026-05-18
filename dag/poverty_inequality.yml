@@ -127,7 +127,7 @@ steps:
       - snapshot://wb/2026-03-25/thousand_bins_distribution.dta
   data://external/poverty_inequality/latest/thousand_bins_distribution:
     - data://garden/wb/2026-03-25/thousand_bins_distribution
-  export://s3/poverty_inequality/latest/income-distribution:
+  export://s3/poverty_inequality/latest/income_distribution:
     - data://garden/wb/2026-03-25/thousand_bins_distribution
 
   # Historical poverty estimates (combining thousand_bins with Maddison GDP growth)
