@@ -18,12 +18,12 @@ config:
   explorerTitle: Plastic Waste and Pollution
   explorerSubtitle: Explore global data on plastic waste generation, pollution, and trade.
   isPublished: true
+  originUrl: https://ourworldindata.org/plastic-pollution
   selection:
     - United States
     - China
     - India
   wpBlockId: 52472
-  thumbnail: https://assets.ourworldindata.org/uploads/2022/08/Plastic-Waste-Data-Explorer.png
 
 dimensions:
   - slug: metric

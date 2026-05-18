@@ -1,4 +1,3 @@
-import copy
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -257,11 +256,6 @@ def _underscore_column_and_dimensions(column: str, dim_dict: dict[str, Any], tri
 
 
 def _assert_long_table(table: catalog.Table) -> None:
-    # NOTE: I'm not sure if we need this validation, looks like we don't
-    # assert (
-    #     table.metadata.dataset and table.metadata.dataset.sources
-    # ), "Table must have a dataset with sources in its metadata"
-
     assert set(table.columns) == {
         "variable",
         "meta",
@@ -405,70 +399,6 @@ def country_to_entity_id(
     return cast(pd.Series, entity_id.astype(int))
 
 
-def _unique(x: list[Any]) -> list[Any]:
-    """Uniquify a list, preserving order."""
-    return list(dict.fromkeys(x))
-
-
-def combine_metadata_sources(sources: list[catalog.Source]) -> catalog.Source:
-    """Combine each of the attributes in the sources and assign them to the first source, since
-    that is the only source that grapher will read.
-
-    Parameters
-    ----------
-    sources : List[Source]
-        List of sources to combine.
-
-    Returns
-    -------
-    source : catalog.Source
-        Combined source.
-
-    """
-    assert len(sources) >= 1, "Dataset needs to have at least one source in metadata."
-
-    # Define the 'default_source', which will be the one where all sources' attributes are combined.
-    default_source = copy.deepcopy(sources[0])
-    # Attributes to combine from sources.
-    attributes = [
-        "name",
-        "description",
-        "url",
-        "source_data_url",
-        "owid_data_url",
-        "date_accessed",
-        "publication_date",
-        "publication_year",
-        "published_by",
-    ]
-    # Combine sources' attributes into the first source (which is the only one that grapher will interpret).
-    for attribute in attributes:
-        # Gather non-empty values from each source for current attribute.
-        values = _unique([getattr(source, attribute) for source in sources if getattr(source, attribute) is not None])
-        if attribute == "description":
-            # Descriptions are usually long, so it is better so put together descriptions from different sources in
-            # separate lines.
-            combined_value = "\n".join(values)
-        elif attribute in ["date_accessed", "publication_date", "publication_year"]:
-            # For dates simply take the one from the first source.
-            # TODO: Instead of picking the first source, choose the most recent date.
-            combined_value = values[0] if values else None
-        elif attribute in ["url", "source_data_url", "owid_data_url"]:
-            # Separate urls with " ; " (ensuring there is space between the urls and the semi-colons).
-            combined_value = " ; ".join(values)
-        else:
-            # For any other attribute, values from different sources can be in the same line, separated by ;.
-            combined_value = "; ".join(values)
-
-        # Instead of leaving an empty string, make any empty field None.
-        if combined_value == "":
-            combined_value = None  # ty: ignore
-
-        setattr(default_source, attribute, combined_value)
-
-    return default_source
-
-
 def _adapt_dataset_metadata_for_grapher(
     metadata: catalog.DatasetMeta,
 ) -> catalog.DatasetMeta:
@@ -486,22 +416,6 @@ def _adapt_dataset_metadata_for_grapher(
         Adapted dataset metadata, ready to be inserted into grapher.
 
     """
-    # Combine metadata sources into one.
-    if metadata.sources:
-        metadata.sources = [combine_metadata_sources(metadata.sources)]
-
-        # Add the dataset description as if it was a source's description.
-        if metadata.description is not None:
-            if metadata.sources[0].description:
-                # If descriptions are not subsets of each other (or equal), add them together
-                if (
-                    metadata.sources[0].description not in metadata.description
-                    and metadata.description not in metadata.sources[0].description
-                ):
-                    metadata.sources[0].description = metadata.description + "\n" + metadata.sources[0].description
-            else:
-                metadata.sources[0].description = metadata.description
-
     # Empty dataset description (otherwise it will appear in `Internal notes` in the admin UI).
     metadata.description = ""
 
@@ -557,58 +471,7 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
 
     table = table.set_index(["entityId", "entityCode", "entityName", "year"] + dim_names)
 
-    # Ensure the default source of each column includes the description of the table (since that is the description that
-    # will appear in grapher on the SOURCES tab).
-    table = _ensure_source_per_variable(table)
-
     return cast(catalog.Table, table)
-
-
-def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
-    assert table.metadata.dataset
-    dataset_meta = table.metadata.dataset
-    for column in table.columns:
-        variable_meta: catalog.VariableMeta = table[column].metadata
-
-        # If neither variable and dataset has no sources, we're using origins instead.
-        if len(variable_meta.sources) == 0 and len(dataset_meta.sources) == 0:
-            assert len(variable_meta.origins) > 0, f"Variable `{column}` has no sources or origins."
-            continue
-
-        if len(variable_meta.sources) == 0:
-            # Take the metadata sources from the dataset's metadata (after combining them into one).
-            assert len(dataset_meta.sources) > 0, (
-                f"If column `{column}` has no sources, dataset must have at least one."
-            )
-            source = combine_metadata_sources(dataset_meta.sources)
-
-            # Add the dataset description as if it was a source's description.
-            if dataset_meta.description is not None:
-                if source.description:
-                    source.description = dataset_meta.description + "\n" + source.description
-                else:
-                    source.description = dataset_meta.description
-        else:
-            sources: list[catalog.Source] = table[column].metadata.sources
-
-            if len(sources) > 1:
-                # Combine multiple sources into one.
-                # NOTE: dataset description is not included in the combined source
-                source = combine_metadata_sources(sources)
-            else:
-                source = sources[0]
-
-            if source.description is None:
-                # Use table description if sources don't have their own
-                if table.metadata.description:
-                    source.description = table.metadata.description
-                # Or dataset description if sources don't have their own
-                else:
-                    source.description = dataset_meta.description
-
-        table[column].metadata.sources = [source]
-
-    return table
 
 
 @dataclass
@@ -840,9 +703,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             catalog.utils.validate_underscore(col)
             assert tab[col].metadata.unit is not None, f"Column `{col}` must have a unit."
             assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
-            assert tab[col].m.origins or tab[col].m.sources or ds.metadata.sources, (
-                f"Column `{col}` must have either sources or origins"
-            )
+            assert tab[col].m.origins, f"Column `{col}` must have at least one origin"
 
             _validate_description_key(tab[col].m.description_key, col)
             _validate_ordinal_variables(tab, col)

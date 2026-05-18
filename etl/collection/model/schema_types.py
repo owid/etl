@@ -309,6 +309,14 @@ class _ViewConfigBase(TypedDict, total=False):
     yAxis: dict[str, Any]
     zoomToSelection: bool
 
+    # TODO: remove once we are done with explorers
+    # Legacy ID-shortcut fields for scatter/Marimekko color/x/size dimensions. The schema
+    # stores integers, but ETL `View.expand_paths` also accepts catalog-path strings
+    # (short or full) which `replace_catalog_paths_with_ids` resolves to ints at upload.
+    colorVariableId: int | str
+    xVariableId: int | str
+    sizeVariableId: int | str
+
 
 class ViewConfig(_ViewConfigBase, total=False):
     """View configuration options based on multidim schema."""
