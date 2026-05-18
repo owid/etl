@@ -9,8 +9,21 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Define regions to aggregate
-REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
+# Define regions to aggregate. The four income-group classifications are auto-resolved by
+# `paths.regions.add_aggregates(...)` against the `income_groups` dataset listed in the DAG.
+REGIONS = [
+    "Europe",
+    "Asia",
+    "North America",
+    "South America",
+    "Africa",
+    "Oceania",
+    "World",
+    "High-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "Low-income countries",
+]
 
 # Define fraction of allowed NaNs per year
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
