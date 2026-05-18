@@ -476,21 +476,21 @@ def select_only_sovereign_countries(
     tb: Table, tb_sovereign_countries: Table, keep_extra: list[str] | None = None
 ) -> Table:
     """
-    Inner-join the table against the latest-year sovereign-countries list (Butcher and
-    Griffiths 2020). Rows for countries listed in `keep_extra` (e.g. Greenland) are kept
-    even though they're not in the sovereignty source — Equaldex tracks them separately
-    and we want them on country-level charts.
+    Filter the table to countries present in the latest-year sovereign-countries list
+    (Butcher and Griffiths 2020). Rows for countries listed in `keep_extra` (e.g.
+    Greenland) are kept even though they're not in the sovereignty source — Equaldex
+    tracks them separately and we want them on country-level charts.
+
+    Implemented as an `isin` filter rather than a `pr.merge` so the sovereignty source
+    is used only for the country set, not for indicator-level origin attribution.
+    Without this, every variable in the output would inherit an ISD origin and the
+    Butcher-and-Griffiths citation would appear on every chart's source list.
     """
     tb_sovereign_countries = tb_sovereign_countries.rename({"statename": "country"})
-    tb_sovereign_countries = tb_sovereign_countries[["country", "year"]]
-    tb_sovereign_countries = tb_sovereign_countries[
-        (tb_sovereign_countries["year"] == tb_sovereign_countries["year"].max())
-    ]
-    tb_sovereign_countries = tb_sovereign_countries.drop(columns=["year"])
-
-    tb_sovereign = pr.merge(tb, tb_sovereign_countries, on=["country"], how="inner")
+    latest_year = tb_sovereign_countries["year"].max()
+    sovereign_countries = set(
+        tb_sovereign_countries[tb_sovereign_countries["year"] == latest_year]["country"].astype(str)
+    )
     if keep_extra:
-        tb_extra = tb[tb["country"].isin(keep_extra)]
-        if len(tb_extra):
-            tb_sovereign = pr.concat([tb_sovereign, tb_extra], ignore_index=True)
-    return tb_sovereign
+        sovereign_countries |= set(keep_extra)
+    return tb[tb["country"].astype(str).isin(sovereign_countries)].reset_index(drop=True)
