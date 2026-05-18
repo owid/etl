@@ -35,16 +35,13 @@ For ``httpx`` clients, pass :data:`HEADERS` as the ``headers=`` kwarg::
 from __future__ import annotations
 
 import platform
-from importlib.metadata import PackageNotFoundError, version
 
 import requests
 
-try:
-    _ETL_VERSION = version("etl")
-except PackageNotFoundError:
-    _ETL_VERSION = "unknown"
-
-USER_AGENT = f"owid-etl/{_ETL_VERSION} (python {platform.python_version()})"
+# The internal `etl` package version in pyproject.toml is a static placeholder
+# (never bumped), so attaching it here would be misleading. If per-deploy
+# attribution becomes useful, switch this to read a build/deploy env var.
+USER_AGENT = f"owid-etl (python {platform.python_version()})"
 
 #: Plain dict for ``requests.get(..., headers=HEADERS)`` and ``httpx`` clients.
 HEADERS = {"User-Agent": USER_AGENT}
