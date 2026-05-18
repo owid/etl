@@ -154,7 +154,7 @@ definitions:
     <%- endif %>
 
   description_key_relative_poverty: |-
-    This is a measure of _relative_ poverty – it captures the share of people whose {definitions.concept_welfare_type} is low by the standards typical in their own country.
+    This is a measure of _relative_ poverty — it captures the share of people whose {definitions.concept_welfare_type} is low by the standards typical in their own country.
 
   description_key_top_incomes: |-
     Incomes are distributed very unequally, both between countries and within them. A large share of total income is concentrated among the very richest, making the top of the distribution important to understand. Read more in our topic page on [economic inequality](https://ourworldindata.org/economic-inequality).
@@ -885,7 +885,7 @@ tables:
         presentation:
           grapher_config:
             title: "Relative poverty: Share of the population below <<poverty_line>> (<<welfare_type>>)"
-            subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at <<poverty_line>> {definitions.concept_welfare_type}. {definitions.subtitle_welfare_type}
+            subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes — in this case set at <<poverty_line>> {definitions.concept_welfare_type}. {definitions.subtitle_welfare_type}
             note: "{definitions.note_before_tax}"
             hasMapTab: true
             tab: map

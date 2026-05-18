@@ -89,7 +89,7 @@ definitions:
     <%- elif poverty_line == "30" %>
     A poverty line of {definitions.poverty_line_per_day} represents definitions of national poverty lines in high-income countries.
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
+    This is a measure of _relative_ poverty — it captures the share of people whose income is low by the standards typical in their own country.
     <%- endif %>
 
   description_key_extreme_poverty_additional: |-
@@ -114,7 +114,7 @@ definitions:
 
   description_key_equivalence_scale: |-
     <% if equivalence_scale == "square root" %>
-    Income has been equivalized – adjusted to account for household size and composition, since people in the same household can share costs like rent and heating. LIS does this using the square root equivalence scale: household income is divided by the square root of the number of household members.
+    Income has been equivalized — adjusted to account for household size and composition, since people in the same household can share costs like rent and heating. LIS does this using the square root equivalence scale: household income is divided by the square root of the number of household members.
     <%- elif equivalence_scale == "per capita" %>
     Income is per capita, which means that each person (including children) is attributed an equal share of the total income received by all members of their household.
     <%- endif %>
@@ -236,7 +236,7 @@ definitions:
     <%- elif poverty_line in poverty_line_umic %>
     The poverty line of {definitions.poverty_line_per_day} is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries. {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at <<poverty_line>> income. {definitions.subtitle_welfare_type}
+    Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes — in this case set at <<poverty_line>> income. {definitions.subtitle_welfare_type}
     <%- else %>
     {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
     <%- endif %>
