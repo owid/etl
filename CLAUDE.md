@@ -168,6 +168,18 @@ Built on **owid.catalog** library:
 - Multiple formats (feather, parquet, csv) with automatic schema validation
 
 
+### HTTP calls to OWID infra
+
+When internal code hits an OWID host (catalog, grapher, `files.ourworldindata.org`, `search.owid.io`, Datasette, admin API, etc.), use the shared session from `etl.http` instead of bare `requests` / `httpx` / `pd.read_*(url)`. It pre-sets a `User-Agent: owid-etl/...` header so our traffic is distinguishable in CDN logs.
+
+```python
+from etl.http import session as http_session  # for requests
+from etl.http import HEADERS                   # for httpx.AsyncClient(headers=HEADERS)
+from etl.http import STORAGE_OPTIONS           # for pd.read_csv(url, storage_options=STORAGE_OPTIONS)
+```
+
+Don't tag calls to third-party hosts (GitHub, Notion, Slack, source-data providers in `snapshots/`, etc.) — they should keep the default UA.
+
 ### YAML Editing (preserve comments)
 ```python
 from etl.files import ruamel_load, ruamel_dump
