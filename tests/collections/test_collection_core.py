@@ -9,7 +9,11 @@ from unittest.mock import patch
 
 import pytest
 
-from etl.collection.core.combine import combine_collections, combine_config_dimensions
+from etl.collection.core.combine import (
+    _update_choice_slugs_in_views,
+    combine_collections,
+    combine_config_dimensions,
+)
 from etl.collection.core.utils import create_collection_from_config
 
 
@@ -311,3 +315,47 @@ def test_combine_collections_rejects_differing_checkbox_dim():
                 config=config,
                 is_explorer=True,
             )
+
+
+# ---------------------------------------------------------------------------
+# _update_choice_slugs_in_views — defensive NaN handling
+# ---------------------------------------------------------------------------
+
+
+def test_update_choice_slugs_in_views_handles_nan_entries_from_unstack():
+    """Regression: ``_extract_choice_slug_changes`` builds its renames dict via
+    ``pd.DataFrame.unstack(...).to_dict()``, which leaves NaN placeholders for
+    ``(collection, dimension)`` pairs where another collection had conflicts but
+    this one didn't. ``_update_choice_slugs_in_views`` must drop those non-dict
+    entries before calling ``pd.DataFrame.replace`` — pandas rejects a nested
+    mapping unless every top-level value is also a mapping
+    (``TypeError: If a nested mapping is passed, all values of the top level
+    mapping must be mappings``).
+
+    Mirrors ``test_handles_nan_entries_from_unstack`` in ``test_core_create.py``,
+    which locks down the same NaN sanitization at the other consumer of
+    ``_extract_choice_slug_changes`` (``_remap_choice_renames``).
+    """
+    nan = float("nan")
+
+    # Two sub-collections, each with one view referencing its own view_type slug.
+    sub_a = _make_explorer_subcollection("a", "src_a")
+    sub_b = _make_explorer_subcollection("b", "src_b")
+    collection_by_id = {"0": sub_a, "1": sub_b}
+
+    # Shape produced by ``.unstack("collection_id").to_dict()`` when sub_a had a
+    # conflict on ``view_type`` and sub_b on an unrelated ``other`` dim; each
+    # collection sees a NaN for the other's conflicting dim.
+    slug_changes = {
+        "0": {"view_type": {"a": "a__0"}, "other": nan},
+        "1": {"view_type": nan, "other": {"x": "x__1"}},
+    }
+
+    # Should not raise.
+    result = _update_choice_slugs_in_views(slug_changes, collection_by_id)
+
+    # sub_a's view dimension got the rename applied.
+    assert result["0"].views[0].dimensions["view_type"] == "a__0"
+    # sub_b's view dimension was left untouched — its NaN entry was filtered out
+    # so ``view_type`` never reached ``.replace``.
+    assert result["1"].views[0].dimensions["view_type"] == "b"

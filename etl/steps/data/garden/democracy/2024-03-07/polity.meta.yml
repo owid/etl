@@ -1,5 +1,6 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  subtitle_main: Data by [Polity 5](#dod:polity)
   common:
     presentation:
       topic_tags:
@@ -41,6 +42,37 @@ tables:
           -88 Cases of “transition” are prorated across the span of the transition. For example, country X has a POLITY score of -7 in 1957, followed by three years of -88 and, finally, a score of +5 in 1961. The change (+12) would be prorated over the intervening three years at a rate of per year, so that the converted scores would be as follows: 1957 -7; 1958 -4; 1959 -1; 1960 +2; and 1961 +5.
 
           Note: Ongoing (-88) transitions in the most recent year (2018) are converted to “system missing” values. Transitions (-88) following a year of independence, interruption (-66), or interregnum (-77) are prorated from the value “0.”
+        presentation:
+          grapher_config:
+            title: Democracy Index
+            subtitle: |-
+              {definitions.subtitle_main}. Expert estimates of the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive. The index ranges from -10 to 10 (fully democratic).
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 10
+              min: -10
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: RdBu
+                binningStrategy: manual
+                customNumericValues:
+                  - -10
+                  - -9
+                  - -7
+                  - -5
+                  - -3
+                  - -1
+                  - 1
+                  - 3
+                  - 5
+                  - 7
+                  - 9
+                  - 10
+                customCategoryLabels:
+                  No data: No data
+              timeTolerance: 2
 
       exec_reccomp_polity:
         title: Competitiveness of executive recruitment
@@ -58,6 +90,44 @@ tables:
           (2) Dual/Transitional: Dual executives in which one is chosen by hereditary succession, the other by competitive election. Also used for transitional arrangements between selection (ascription and/or designation) and competitive election.
 
           (3) Chief executives are typically chosen in or through competitive elections matching two or more major parties or candidates. (Elections may be popular or by an elected assembly.)
+        presentation:
+          grapher_config:
+            title: Competitiveness of Executive Recruitment Score
+            subtitle: "{definitions.subtitle_main}."
+            note: The Chart tab uses numeric values, ranging from 4 for an elected executive to 0 if executive power is seized.
+            chartTypes: ["LineChart"]
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 3
+              min: 0
+            selectedFacetStrategy: entity
+            colorScale: &color_comp_exe
+              binningStrategy: manual
+              customNumericColors:
+                - "#b2182b"
+                - "#e74731"
+                - "#967282"
+                - "#5496c5"
+              customNumericLabels:
+                - Power seized
+                - Elite selection
+                - Dual or transitional
+                - Election
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 2
+                - 3
+              customCategoryLabels:
+                No data: No data
+              customNumericColorsActive: true
+            map:
+              colorScale: *color_comp_exe
+              timeTolerance: 2
+        display:
+          numDecimalPlaces: 0
 
       exec_recopen_polity:
         title: Openness of executive recruitment
@@ -81,6 +151,48 @@ tables:
           Some examples may clarify the coding scheme outlined above. The Soviet Union's (XRREG/XRCOMP/XROPEN) profile on these variables, since the accession of Khrushchev, is Designational/Selection/Open. Victorian Britain's profile was Regulated/Transitional/Dual Executive–Election, whereas contemporaryBritain, along with other modern democracies, is coded Regulated/Election/Open. The polities of leaders who seize power by force are coded Unregulated, but there is a recurring impulse among such leaders to regularize the process of succession, usually by relying on some form of selection. A less common variant, as in modern Iran and Nicaragua under the Somozas, is one in which a Caesaristic leader attempts to establish the principle of hereditary succession. Polity codes all such attempts at regularizing succession as Transitional (under Regulation, variable 3.1) until the first chief executive chosen under the new rules takes office.
 
           A translation of the conceptualizations of executive recruitment used in Polity IV and Polity5 into the component coding scheme outlined above is presented in Table 3.1 (see page 23 of codebook).
+        presentation:
+          grapher_config:
+            title: Openness of Executive Recruitment Score
+            subtitle: "{definitions.subtitle_main}."
+            chartTypes: ["LineChart"]
+            note: The Chart tab uses numeric values, ranging from 4 if recruitment is open to 0 if executive power is seized.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 4
+              min: 0
+            selectedFacetStrategy: entity
+            colorScale: &color_open
+              binningStrategy: manual
+              customNumericColors:
+                - "#b2182b"
+                - "#e74731"
+                - "#b66162"
+                - "#967282"
+                - "#0571b0"
+              customNumericLabels:
+                - Power seized
+                - Hereditary succession
+                - Dual, chief minister designated
+                - Dual, chief minister elected
+                - Open
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 2
+                - 3
+                - 4
+              customCategoryLabels:
+                No data: No data
+              customNumericColorsActive: true
+            map:
+              colorScale: *color_open
+              timeTolerance: 2
+              tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
 
       exec_constr_polity:
         title: Constraints on the executive
@@ -134,6 +246,47 @@ tables:
           i. A legislature, ruling party, or council of nobles initiates much or most important legislation.
           ii. The executive (president, premier, king, cabinet, council) is chosen by the accountability group and is dependent on its continued support to remain in office (as in most parliamentary systems).
           iii. In multi-party democracies, there is chronic "cabinet instability."
+        presentation:
+          grapher_config:
+            title: Constraints on the Executive Score
+            subtitle: "{definitions.subtitle_main}."
+            note: The Chart tab uses numeric values, ranging from 7 for an subordinated or on-par executive, to 1 if executive is unconstrained.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 7
+              min: 1
+            selectedFacetStrategy: entity
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericColors:
+                  - "#e74731"
+                  - "#b66162"
+                  - "#967282"
+                customNumericLabels:
+                  - Unconstrained
+                  - "2"
+                  - Slight to moderate
+                  - "4"
+                  - Substantial
+                  - "6"
+                  - Executive parity or subordination
+                customNumericValues:
+                  - 1
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+                customCategoryLabels:
+                  No data: No data
+              timeTolerance: 2
+        display:
+          numDecimalPlaces: 0
 
       polpart_reg_polity:
         title: Regulation of political participation
@@ -155,6 +308,47 @@ tables:
           (4) Restricted: Some organized political participation is permitted without intense factionalism but significant groups, issues, and/or types of conventional participation are regularly excluded from the political process.
 
           (5) Regulated: Relatively stable and enduring political groups regularly compete for political influence and positions with little use of coercion. No significant groups, issues, or types of conventional political action are regularly excluded from the political process.
+        presentation:
+          grapher_config:
+            title: Regulation of Political Participation Score
+            subtitle: "{definitions.subtitle_main}."
+            note: The Chart tab uses numeric values, ranging from 5 for unrestricted, stable political participation to 0 for highly unstable participation.
+            chartTypes: ["LineChart"]
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 5
+              min: 1
+            selectedFacetStrategy: entity
+            colorScale: &color_reg
+              baseColorScheme: RdBu
+              binningStrategy: manual
+              customNumericColors:
+                - "#b2182b"
+                - "#e74731"
+                - "#b66162"
+                - "#967282"
+              customNumericLabels:
+                - Highly unstable
+                - Multiple identities
+                - Sectarian
+                - Restricted
+                - Unrestricted and stable
+              customNumericValues:
+                - 0
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+              customCategoryLabels:
+                No data: No data
+              customNumericColorsActive: true
+            map:
+              colorScale: *color_reg
+              timeTolerance: 2
+        display:
+          numDecimalPlaces: 0
 
       polpart_comp_polity:
         title: Competitiveness of political participation
@@ -186,6 +380,50 @@ tables:
           (5) Competitive: There are relatively stable and enduring, secular political groups which regularly compete for political influence at the national level; ruling groups and coalitions regularly, voluntarily transfer central powerto competing groups. Competition among groups seldom involves coercion or disruption. Small parties or political groups may be restricted in the Competitive pattern.
 
           By combining scores on Regulation of Political Participation (variable 3.5) and the Competitiveness of Participation (variable 3.6), a relatively detailed picture of the extent of political competition and opposition emerges. A translation of the Polity IV conceptual categories of political competition into the component coding scheme described here is presented in Table 3.2 (in codebook).
+        presentation:
+          grapher_config:
+            title: Competitiveness of Political Participation Score
+            subtitle: "{definitions.subtitle_main}."
+            chartTypes: ["LineChart"]
+            note: The Chart tab uses numeric values, ranging from 5 for competitive political participation to 0 for highly unstable political participation.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 5
+              min: 0
+            selectedFacetStrategy: entity
+            colorScale: &color_comp_pol
+              baseColorScheme: RdBu
+              binningStrategy: manual
+              customNumericColors:
+                - "#67001f"
+                - "#b2182b"
+                - "#e74731"
+                - "#b66162"
+                - "#967282"
+              customNumericLabels:
+                - Unregulated
+                - Repressed
+                - Suppressed
+                - Factional
+                - Transitional
+                - Competitive
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+              customCategoryLabels:
+                No data: No data
+              customNumericColorsActive: true
+            map:
+              colorScale: *color_comp_pol
+              timeTolerance: 2
+        display:
+          numDecimalPlaces: 0
 
       regime_polity:
         title: Political regime
@@ -198,23 +436,110 @@ tables:
           - Anocracies have neither clearly democratic nor autocratic characteristics.
           - Autocracies have mostly autocratic/non-democratic characteristics.
           - "It uses the conventional coding rules (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) of coding Polity regimes given here: https://www.systemicpeace.org/polityproject.html"
+        presentation:
+          grapher_config:
+            title: Democracy
+            subtitle: "{definitions.subtitle_main}."
+            note: The Chart tab uses numeric values, ranging from 2 for democracies to 0 for autocracies.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 2
+              min: 0
+            selectedFacetStrategy: entity
+            colorScale: &color_regime
+              baseColorScheme: RdYlBu
+              binningStrategy: manual
+              customNumericColors:
+                - "#e74731"
+                - "#967282"
+                - "#5496c5"
+              customNumericLabels:
+                - Autocracy
+                - Anocracy
+                - Democracy
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 2
+              customCategoryLabels:
+                No data: No data
+              customNumericColorsActive: true
+            map:
+              colorScale: *color_regime
+              timeTolerance: 2
+              tooltipUseCustomLabels: true
+        display:
+          includeInTable: true
+          numDecimalPlaces: 0
+
       democracy_recod_polity:
         title: Democracy (recoded 0-20)
         unit: ""
         description_short: |-
           It combines information on the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive. It ranges from 0 to 20 (fully democratic).
-        description_processing: It matches the variable `polity2` in Polity 5 (2021), with the values rescaled to range from 0 to 20 instead of -10 to 10.
-
-          Values for continents have been obtained by averaging the values of the countries in the continent.
+        description_processing: "It matches the variable `polity2` in Polity 5 (2021), with the values rescaled to range from 0 to 20 instead of -10 to 10.\nValues for continents have been obtained by averaging the values of the countries in the continent."
+        presentation:
+          grapher_config:
+            title: Distribution of Democracy Index
+            subtitle: Data by [Polity 5](#dod:polity). Expert estimates of the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive. The index here ranges from 0 to 20 (fully democratic).
+            chartTypes:
+              - Marimekko
+            yAxis:
+              max: 20
+              min: 0
+            stackMode: relative
+            minTime: 1800
+            maxTime: 2018
+        display:
+          includeInTable: true
 
       age_dem_polity:
         title: Democracy age
-        unit: ""
+        unit: "years"
+        short_unit: "years"
         description_short: |-
           Number of consecutive years in a democracy.
         description_key:
           - *other_sources
           - "The identification of democracies is based on the conventional classification of the Polity data (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) given here: https://www.systemicpeace.org/polityproject.html"
+        presentation:
+          grapher_config:
+            title: Age of democracy
+            subtitle: "[Data](#dod:regimes-polity) by [Polity 5](#dod:polity). Democracies are political systems with broadly open, multi-party, and competitive elections for a chief executive who faces comprehensive institutional constraints, and political participation is broadly competitive."
+            chartTypes: []
+            hasMapTab: true
+            tab: map
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericColors:
+                  - "#edf8b1"
+                  - "#c7e9b4"
+                  - "#41b6c4"
+                  - "#225ea8"
+                  - "#172976"
+                customCategoryColors:
+                  anocracy: "#c6a1a5"
+                  autocracy: "#8d6e71"
+                customNumericValues:
+                  - 0
+                  - 18
+                  - 30
+                  - 60
+                  - 90
+                  - 120
+                customCategoryLabels:
+                  anocracy: Anocracy
+                  autocracy: Autocracy
+                customHiddenCategories:
+                  No data: true
+                customNumericColorsActive: true
+              timeTolerance: 2
+              tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
 
       experience_dem_polity:
         title: Experience with democracy
