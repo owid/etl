@@ -129,6 +129,7 @@ Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 - **`paths.regions.harmonize_names(tb, country_col=..., countries_file=...)`** — current harmonization API (replaces `geo.harmonize_countries`)
 - **`Table.format()`** needs both `country` and `year`. For year-less tables: `set_index("country")` + set `tb.metadata.short_name`
 - **`*.meta.yml`**: omit `dataset:` block — inherited from origin. Only define `tables:` → `variables:`
+- **`grapher_config`: omit `$schema:`** — pinning a specific schema version ages badly. The default in `etl/config.py:DEFAULT_GRAPHER_SCHEMA` is applied automatically by `_validate_grapher_config`.
 
 ### Performance
 
@@ -190,6 +191,8 @@ Automatically connects to `staging-site-{branch}` based on current git branch.
 from etl.config import OWID_ENV
 df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
 ```
+
+**Prefer Python when the SQL contains `%` (LIKE patterns, JSON_EXTRACT paths) or single-quoted strings — `make query` re-interprets those via shell + make and breaks unpredictably.** Use `params={...}` for `%`/quoted values to dodge pymysql's own `%`-format-string parsing.
 
 ## Additional Tools
 

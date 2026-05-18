@@ -1,4 +1,151 @@
 definitions:
+  # Define common grapher config patterns
+  grapher_configs:
+    subtitle_vdem: "Data by [V-Dem](#dod:v-dem)"
+    subtitle_luhrmann: "Data by Lührmann et al. (2018) and [V-Dem](#dod:v-dem)"
+    subtitle_luhrmann_2: "Classification by [Lührmann et al. (2018)](#dod:regimes-of-the-world) based on expert estimates by [V-Dem](#dod:v-dem)"
+
+    brackets_1: &brackets_1
+      - 0
+      - 0.099
+      - 0.199
+      - 0.299
+      - 0.399
+      - 0.499
+      - 0.599
+      - 0.699
+      - 0.799
+      - 0.899
+      - 1
+    gconfig_base: &gconfig_base
+      hasMapTab: true
+      tab: map
+      yAxis:
+        max: 1
+        min: 0
+
+    map_colorscale_1: &map_colorscale_1
+      binningStrategy: manual
+      customNumericValues: *brackets_1
+
+    chart_types: &chart_types
+      - LineChart
+      - SlopeChart
+      - DiscreteBar
+      - Marimekko
+    # 0-1 (10 bins), YlGnBu
+    gconfig_a1: &gconfig_a1
+      <<: *gconfig_base
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          <<: *map_colorscale_1
+    # 0-1 (10 bins), GnBu
+    gconfig_a2: &gconfig_a2
+      <<: *gconfig_base
+      map:
+        colorScale:
+          baseColorScheme: GnBu
+          <<: *map_colorscale_1
+    # 0-1 (10 bins), PuBu
+    gconfig_a3: &gconfig_a3
+      <<: *gconfig_base
+      map:
+        colorScale:
+          baseColorScheme: PuBu
+          <<: *map_colorscale_1
+    # 0-1 (10 bins), YlGn
+    gconfig_a4: &gconfig_a4
+      <<: *gconfig_base
+      map:
+        colorScale:
+          baseColorScheme: YlGn
+          <<: *map_colorscale_1
+
+    # 0-1 (10 bins), Blues
+    gconfig_a5: &gconfig_a5
+      <<: *gconfig_base
+      map:
+        colorScale:
+          baseColorScheme: Blues
+          <<: *map_colorscale_1
+
+    # 0-1 (binary), RdYlBu
+    gconfig_b1: &gconfig_b1
+      <<: *gconfig_base
+      selectedFacetStrategy: entity
+      colorScale: &color_b1
+        binningStrategy: manual
+        customNumericColorsActive: true
+        customNumericColors:
+          - "#ef8a62"
+          - "#2c7bb6"
+        customNumericLabels:
+          - "No"
+          - "Yes"
+        customNumericValues:
+          - 0
+          - 0
+          - 1
+      map:
+        colorScale: *color_b1
+        tooltipUseCustomLabels: true
+
+    # -4 to 4, RdBu
+    gconfig_c1: &gconfig_c1
+      hasMapTab: true
+      tab: map
+      yAxis:
+        max: 4
+        min: -4
+      map:
+        colorScale:
+          baseColorScheme: RdBu
+          binningStrategy: manual
+          customNumericValues:
+            - 0
+            - -3
+            - -2
+            - -1
+            - 0
+            - 1
+            - 2
+            - 3
+            - 2
+
+    # Number of years in ...
+    gconfig_d1: &gconfig_d1
+      hasMapTab: true
+      tab: map
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericColors:
+            - "#edf8b1"
+            - "#c7e9b4"
+            - "#41b6c4"
+            - "#225ea8"
+            - "#172976"
+          customNumericValues:
+            - 0
+            - 18
+            - 30
+            - 60
+            - 90
+            - 1
+          customCategoryColors:
+            closed autocracy: "#8d6e71"
+            electoral autocracy: "#c6a1a5"
+            electoral democracy: "#f3d0d4"
+          customCategoryLabels:
+            closed autocracy: Closed autocracy
+            electoral autocracy: Electoral autocracy
+            electoral democracy: Electoral democracy
+          customHiddenCategories:
+            No data: true
+          customNumericColorsActive: true
+        tooltipUseCustomLabels: true
   aux:
     description_processing_row: |-
       While RoW covers the years since 1900, we use V-Dem's historical data from 1789 to 1899 to expand the classification's coverage back in time.
@@ -111,12 +258,24 @@ tables:
           Clarification: This index attempts to measure (a) whether the chief executive is elected, either directly elected through popular elections or indirectly through a popularly elected legislature that then appoints the chief executive; and (b) whether the legislature, in presidential systems with a directly elected president that is also chief executive, is directly or indirectly elected. Note that a popular election is minimally defined and also includes sham elections with limited suffrage and no competition. Similarly, "appointment" by legislature only implies selection and/or approval, not the power to dismiss. This index is useful primarily for aggregating higher-order indices and should not necessarily be interpreted as an important element of democracy in its own right.
 
           V-Dem indicator name: `v2x_elecoff`
-        presentation:
-          <<: *ppt_uni_w_regions
-          title_public: Elected officials index
         unit: ""
         display:
           numDecimalPlaces: 2
+          name: Elected Political Leaders Index
+          color: "#3c4e66"
+        presentation:
+          <<: *ppt_uni_w_regions
+          title_public: Elected officials index
+          grapher_config:
+            title: Elected Political Leaders Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. It measures the extent to which broad elections choose the chief executive and the legislature. The index ranges from 0 to 1 (chief executive and entire legislature elected)."
+            <<: *gconfig_base
+            chartTypes: *chart_types
+            map:
+              colorScale:
+                baseColorScheme: BinaryMapPaletteA
+                <<: *map_colorscale_1
+            selectedFacetStrategy: entity
 
       ## 2.2.5 Share of population with suffrage
       suffr_vdem:
@@ -137,7 +296,31 @@ tables:
         presentation:
           <<: *ppt_uni_w_regions
           title_public: Share of population with suffrage
+          grapher_config:
+            title: Share of adult citizens who have the right to vote
+            subtitle: Share of adult citizens who have the legal right to vote in national elections.
+            hasMapTab: true
+            tab: map
+            selectedFacetStrategy: entity
+            chartTypes: *chart_types
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
         unit: "%"
+        short_unit: "%"
         display:
           numDecimalPlaces: 2
 
@@ -226,6 +409,13 @@ tables:
         unit: ""
         display:
           numDecimalPlaces: 2
+          name: Direct Democracy Index
+        presentation:
+          grapher_config:
+            title: Direct Democracy Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens can easily vote on specific issues themselves in popular initiatives, referendums, and plebiscites. The index ranges from 0 to 1 (easiest)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
 
       ## 9.4.2 Government effectiveness
       goveffective_vdem_wbgi:
@@ -255,6 +445,15 @@ tables:
         description_short: Number of consecutive years in electoral democracy.
         description_key: *description_key_num_electdem
         unit: years
+        short_unit: years
+        presentation:
+          grapher_config:
+            <<: *gconfig_d1
+            chartTypes: []
+            title: Age of electoral democracy
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections."
+        display:
+          numDecimalPlaces: 0
 
       num_years_in_electdem_consecutive_cat: # electdem_age_group_row_owid
         title: Electoral democracy age group
@@ -275,6 +474,15 @@ tables:
         description_short: Number of consecutive years in electoral democracy.
         description_key: *description_key_num_libdem
         unit: years
+        short_unit: years
+        presentation:
+          grapher_config:
+            <<: *gconfig_d1
+            chartTypes: []
+            title: Age of liberal democracy
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. Liberal democracies are political systems that hold meaningful, free and fair, and multi-party elections, and their citizens have further individual rights, are equal before the law, and the legislative and the courts constrain the executive."
+        display:
+          numDecimalPlaces: 0
 
       num_years_in_libdem_consecutive_cat: # libdem_age_group_row_owid
         title: Liberal democracy age group
@@ -497,6 +705,36 @@ tables:
           - In _electoral democracies_, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
           - In _liberal demoracies_, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
 
+        presentation:
+          grapher_config:
+            title: Democracy
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}."
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 0
+              min: 0
+            selectedFacetStrategy: entity
+            colorScale: &colorscale_regime
+              baseColorScheme: RdYlBu
+              binningStrategy: manual
+              customNumericLabels:
+                - Closed autocracy
+                - Electoral autocracy
+                - Electoral democracy
+                - Liberal democracy
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 2
+                - 3
+            map:
+              colorScale: *colorscale_regime
+              tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
+
       regime_amb_row_owid:
         title: Political regime (inc. ambiguous categories)
         unit: ""
@@ -514,6 +752,61 @@ tables:
           title_public: "Political regime"
           title_variant: "inc. ambiguous categories"
 
+          grapher_config:
+            title: Democracy
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. The intermediate categories indicate that the country may belong in the next-higher or next-lower group."
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 9
+              min: 0
+            selectedFacetStrategy: entity
+            colorScale: &colorscale_regime_amb
+              baseColorScheme: RdYlBu
+              binningStrategy: manual
+              customNumericColors:
+                - "#d7191c"
+                - "#e74731"
+                - "#f88e52"
+                -
+                - "#f0cda5"
+                - "#d0dcc1"
+                -
+                - "#8dc1dc"
+                - "#5496c5"
+                - "#2c7bb6"
+              customNumericLabels:
+                - Closed autocracy
+                - ""
+                - "2"
+                - Electoral autocracy
+                - ""
+                - "5"
+                - Electoral democracy
+                - ""
+                - "8"
+                - Liberal democracy
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+                - 6
+                - 7
+                - 8
+                - 9
+              customCategoryLabels:
+                No data: No data
+              customNumericColorsActive: true
+            map:
+              colorScale: *colorscale_regime_amb
+              tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
+
       regime_redux_row_owid:
         title: Political regime (reduced)
         description_short: |-
@@ -528,6 +821,36 @@ tables:
         presentation:
           title_public: "Political regime"
           title_variant: "reduced"
+
+          grapher_config:
+            title: Electoral democracy
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann_2}. Electoral democracies are political systems that hold meaningful, free and fair, and multi-party elections."
+            hasMapTab: true
+            tab: map
+            selectedFacetStrategy: entity
+
+            colorScale: &colorscale_regime_redux
+              baseColorScheme: RdYlBu
+              binningStrategy: manual
+              customNumericColors:
+                - "#8d6e71"
+                - "#c6a1a5"
+                - "#abd9e9"
+              customNumericLabels:
+                - Closed autocracy
+                - Electoral autocracy
+                - Electoral democracy
+              customNumericValues:
+                - 0
+                - 0
+                - 1
+                - 3
+              customNumericColorsActive: true
+            map:
+              colorScale: *colorscale_regime_redux
+              tooltipUseCustomLabels: true
+        display:
+          numDecimalPlaces: 0
 
       # 6.1 Party-System Democracy Index (D)
       v2xpas_democracy:
@@ -665,6 +988,13 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Electoral democracy index
+          grapher_config:
+            title: Electoral Democracy Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed. The index ranges from 0 to 1 (most democratic)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
+        display:
+          color: "#3c4e66"
 
       ## 2.1.2 Liberal democracy index
       libdem_vdem:
@@ -675,6 +1005,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Liberal democracy index
+          grapher_config:
+            title: Liberal Democracy Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, civil liberties, and executive constraints. The index ranges from 0 to 1 (most democratic)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_key:
           - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in big and small differences in democracy, want scores for almost all countries, and prefer a narrow understanding of democracy. For data that focuses on big differences in political systems or has a broad understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
           - It takes a narrow view of democracy by focusing on electoral (free and fair elections) and liberal political institutions (civil rights and protection from the state).
@@ -696,6 +1031,8 @@ tables:
 
           V-Dem indicator name: `v2x_libdem`
         unit: ""
+        display:
+          color: "#3c4e66"
 
       # 2.1.3 Participatory democracy index
       participdem_vdem:
@@ -706,6 +1043,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Participatory democracy index
+          grapher_config:
+            title: Participatory Democracy Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and citizens being able to engage in regional and local government, civil society organizations, and direct democracy. The index ranges from 0 to 1 (most democratic)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the ideal of participatory democracy achieved?
 
@@ -725,6 +1067,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Deliberative democracy index
+          grapher_config:
+            title: Deliberative Democracy Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and citizens and leaders discussing different views and seeking the public good. The index ranges from 0 to 1 (most democratic)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the ideal of deliberative democracy achieved?
 
@@ -738,6 +1085,9 @@ tables:
         description_key:
           - *key_regions_agg
 
+        display:
+          color: "#3c4e66"
+
       ## 2.1.5 Egalitarian democracy index
       egaldem_vdem:
         title: |-
@@ -747,6 +1097,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Egalitarian democracy index
+          grapher_config:
+            chartTypes: *chart_types
+            title: Egalitarian Democracy Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of voting rights, the freedom and fairness of elections, freedoms of association and expression, and the protection of rights, access to power, and distribution of resources being equal. The index ranges from 0 to 1 (most democratic)."
+            <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the ideal of egalitarian democracy achieved?
 
@@ -760,6 +1115,9 @@ tables:
         description_key:
           - *key_regions_agg
 
+        display:
+          color: "#3c4e66"
+
       ## 2.2.11 Legislative constraints on the executive index
       legis_constr_vdem:
         title: |-
@@ -769,6 +1127,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Legislative constraints on the executive index
+          grapher_config:
+            title: Legislative Checks on Government Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which the legislature and government agencies can question, investigate and oversee the executive. The index ranges from 0 to 1 (most constrained)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
 
@@ -788,6 +1151,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Liberal component index
+          grapher_config:
+            title: Liberal Political Institutions Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of individual and minority rights, equality before the law, and constraints on the executive by the legislature and courts. The index ranges from 0 to 1 (most liberal)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_from_producer: &description_prod_lib_vdem |-
           Question: To what extent is the liberal principle of democracy achieved?
 
@@ -797,6 +1165,9 @@ tables:
 
           V-Dem indicator name: `v2x_liberal`
         unit: ""
+        display:
+          name: Liberal Political Institutions Index
+          color: "#3c4e66"
 
       ## 2.2.15 Local government index
       locelect_vdem:
@@ -807,6 +1178,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Elected local governments
+          grapher_config:
+            title: Strong Elected Local Governments Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens elect local governments that are free from the influence of unelected local actors, except for courts. The index ranges from 0 to 1 (strongest)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_from_producer: |-
           Question: Are there elected local governments, and — if so — to what extent can they operate without interference from unelected bodies at the local level?
 
@@ -816,6 +1192,9 @@ tables:
 
           V-Dem indicator name: `v2xel_locelec`
         unit: ""
+        display:
+          name: Strong Elected Local Governments Index
+          color: "#3c4e66"
 
       ## 2.2.12 Participatory component index
       particip_vdem:
@@ -826,6 +1205,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Participatory political institutions
+          grapher_config:
+            title: Participatory Political Institutions Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy. The index ranges from 0 to 1 (most participatory)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the participatory principle achieved?
 
@@ -836,6 +1220,9 @@ tables:
 
           V-Dem indicator name: `v2x_partip`
         unit: ""
+        display:
+          name: Participatory Political Institutions Index
+          color: "#3c4e66"
 
       ## 2.2.16 Regional government index
       regelect_vdem:
@@ -845,6 +1232,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Elected regional governments
+          grapher_config:
+            title: Strong Elected Regional Governments Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens elect regional governments that are free from the influence of unelected regional actors, except for courts. The index ranges from 0 to 1 (strongest)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_from_producer: |-
           Question: Are there elected regional governments, and — if so — to what extent can they operate without interference from unelected bodies at the regional level?
 
@@ -854,6 +1246,9 @@ tables:
 
           V-Dem indicator name: `v2xel_regelec`
         unit: ""
+        display:
+          name: Strong Elected Regional Governments Index
+          color: "#3c4e66"
 
       ## 2.2.21 Equal distribution of resources index
       equal_res_vdem:
@@ -864,6 +1259,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Equal resource distribution index
+          grapher_config:
+            <<: *gconfig_a3
+            chartTypes: *chart_types
+            title: Equal Resource Distribution Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which all social groups benefit from public spending, and have equal access to education, healthcare, and the welfare state. The index ranges from 0 to 1 (most equal)."
         description_from_producer: |-
           Question: How equal is the distribution of resources?
 
@@ -875,6 +1275,9 @@ tables:
         unit: ""
         description_key:
           - *key_regions_agg
+
+        display:
+          color: "#3c4e66"
 
       ## 3.5.1.6 Legislature corrupt activities
       corr_leg_vdem:
@@ -933,6 +1336,10 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Common good justifications
+          grapher_config:
+            title: Common Good Justifications Score
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which political leaders justify their views with what is best for society overall. Higher scores mean more justification. A score of 0 is approximately the average across all countries and years."
+            <<: *gconfig_c1
         description_from_producer: |-
           Question: Question: When important policy changes are being considered, to what extent do political elites justify their positions in terms of the common good?
 
@@ -950,6 +1357,9 @@ tables:
         description_key:
           - *key_regions_agg
 
+        display:
+          color: "#3c4e66"
+
       ## 3.6.0.1 Reasoned justification
       justified_polch_vdem:
         title: |-
@@ -959,6 +1369,10 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Justified political positions
+          grapher_config:
+            title: Justified Political Positions Score
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which political leaders give reasons for their views. Higher scores mean more justification. A score of 0 is approximately the average across all countries and years."
+            <<: *gconfig_c1
         description_from_producer: |-
           Question: When important policy changes are being considered, i.e. before a decision has been made, to what extent do political elites give public and reasoned justifications for their positions?
 
@@ -975,6 +1389,9 @@ tables:
         description_key:
           - *key_regions_agg
 
+        display:
+          color: "#3c4e66"
+
       ## 3.6.0.5 Engaged society
       soccons_polch_vdem:
         title: "Engaged society ({definitions.aux.estimate} estimate)"
@@ -983,6 +1400,10 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Engaged society
+          grapher_config:
+            title: Engaged Society Score
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which many ordinary people discuss policies freely in private and public. Higher scores mean more engagement. A score of 0 is approximately the average across all countries and years."
+            <<: *gconfig_c1
         description_from_producer: |-
           Question: When important policy changes are being considered, how wide and how independent are public deliberations?
 
@@ -1000,6 +1421,8 @@ tables:
 
           V-Dem indicator name: `v2dlengage`
         unit: ""
+        display:
+          color: "#3c4e66"
 
       ## 3.7.0.6 Judicial corruption decision
       corr_jud_vdem:
@@ -1484,6 +1907,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Civil society participation index
+          grapher_config:
+            title: Civil Society Participation Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens are active in diverse organizations which choose and influence policy-makers. The index ranges from 0 to 1 (most active)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_from_producer: |-
           Question: Are major CSOs routinely consulted by policymakers; how large is the involvement of people in CSOs; are women prevented from participating; and is legislative candidate nomination within party organization highly decentralized or made through party primaries?
 
@@ -1497,6 +1925,8 @@ tables:
 
           V-Dem indicator name: `v2x_cspart`
         unit: ""
+        display:
+          color: "#3c4e66"
 
       ## 3.6.0.3 Respect counterarguments
       counterarg_polch_vdem:
@@ -1507,6 +1937,10 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Respect for counterarguments
+          grapher_config:
+            title: Respect for Counterarguments Score
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which political leaders acknowledge and respect different views and sometimes change their own. Higher scores mean more respect. A score of 0 is approximately the average across all countries and years."
+            <<: *gconfig_c1
         description_from_producer: |-
           Question: When important policy changes are being considered, to what extent do political elites acknowledge and respect counterarguments?
 
@@ -1526,6 +1960,8 @@ tables:
         unit: ""
         description_key:
           - *key_regions_agg
+        display:
+          color: "#3c4e66"
 
       # 2.2.17 Deliberative component index
       delib_vdem:
@@ -1536,6 +1972,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Deliberative political institutions index
+          grapher_config:
+            title: Deliberative Political Institutions Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which citizens and leaders discuss different views and seek the public good. The index ranges from 0 to 1 (most deliberative)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the deliberative principle of democracy achieved?
 
@@ -1551,6 +1992,8 @@ tables:
         unit: ""
         description_key:
           - *key_regions_agg
+        display:
+          color: "#3c4e66"
 
       ## 2.2.18 Egalitarian component index
       egal_vdem:
@@ -1561,6 +2004,11 @@ tables:
         presentation:
           title_public: Egalitarian political institutions index
           <<: *ppt_multi_w_regions
+          grapher_config:
+            chartTypes: *chart_types
+            title: Egalitarian Political Institutions Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which the protection of rights, access to power, and distribution of resources are equal. The index ranges from 0 to 1 (most egalitarian)."
+            <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent is the egalitarian principle achieved?
 
@@ -1572,6 +2020,8 @@ tables:
         unit: ""
         description_key:
           - *key_regions_agg
+        display:
+          color: "#3c4e66"
 
       ## 2.2.6 Clean elections index
       electfreefair_vdem:
@@ -1582,6 +2032,11 @@ tables:
         presentation:
           title_public: Free and fair elections index
           <<: *ppt_multi_w_regions
+          grapher_config:
+            title: Free and Fair Elections Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which election violence, government intimidation, fraud, large irregularities, and vote buying are absent. The index ranges from 0 to 1 (most free and fair)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_key:
           - This index, produced by Varieties of Democracy (V-Dem), is useful if you are exclusively interested in how free and fair elections are. For data that focuses on how democratic a country's political system is more broadly, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
           - It is based on assessments by V-Dem's country experts.
@@ -1601,6 +2056,8 @@ tables:
 
           V-Dem indicator name: `v2xel_frefair`
         unit: ""
+        display:
+          color: "#3c4e66"
 
       ### 3.6.0.4 Range of consultation
       elitecons_polch_vdem:
@@ -1610,6 +2067,10 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Elite consultation
+          grapher_config:
+            title: Elite Consultations Score
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which leaders across the political spectrum, society, and business are consulted when deciding on policies. Higher scores mean more consultation. A score of 0 is approximately the average across all countries and years."
+            <<: *gconfig_c1
         description_from_producer: |-
           Question: When important policy changes are being considered, how wide is the range of consultation at elite levels?
 
@@ -1627,6 +2088,8 @@ tables:
 
           V-Dem indicator name: `v2dlconslt`
         unit: ""
+        display:
+          color: "#3c4e66"
 
       ## 2.2.20 Equal access index
       equal_access_vdem:
@@ -1637,6 +2100,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Equal access to power index
+          grapher_config:
+            <<: *gconfig_a2
+            chartTypes: *chart_types
+            title: Equal Access to Power Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which all social groups can influence and participate in policy-making. The index ranges from 0 to 1 (most equal)."
         description_from_producer: |-
           Question: How equal is access to power?
 
@@ -1646,6 +2114,8 @@ tables:
 
           V-Dem indicator name: `v2xeg_eqaccess`
         unit: ""
+        display:
+          color: "#3c4e66"
 
       ## 2.2.19 Equal protection index
       equal_rights_vdem:
@@ -1656,6 +2126,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Equal rights protection index
+          grapher_config:
+            <<: *gconfig_a1
+            chartTypes: *chart_types
+            title: Equal Rights Protection Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which the state grants and protects rights and freedoms equally across all social groups. The index ranges from 0 to 1 (most equal)."
         description_from_producer: |-
           Question: How equal is the protection of rights and freedoms across social groups by the state?
 
@@ -1665,6 +2140,8 @@ tables:
 
           V-Dem indicator name: `v2xeg_eqprotec`
         unit: ""
+        display:
+          color: "#3c4e66"
 
       ## 2.2.4 Freedom of association thick index
       freeassoc_vdem:
@@ -1674,6 +2151,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Freedom of association thick index
+          grapher_config:
+            title: Freedom of Association Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which parties and civil society organizations can form and operate freely. The index ranges from 0 to 1 (most free)."
+            chartTypes: *chart_types
+            <<: *gconfig_a2
         description_from_producer: |-
           Question: To what extent are parties, including opposition parties, allowed to form and to participate in elections, and to what extent are civil society organizations able to form and to operate freely?
 
@@ -1681,6 +2163,9 @@ tables:
 
           V-Dem indicator name: `v2x_frassoc_thick`
         unit: ""
+        display:
+          name: Freedom of Association Index
+          color: "#3c4e66"
 
       ## 2.2.3 Freedom of Expression and Alternative Sources of Information index
       freeexpr_vdem:
@@ -1690,6 +2175,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Freedom of expression index
+          grapher_config:
+            <<: *gconfig_a4
+            chartTypes: *chart_types
+            title: Freedom of Expression Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent of free speech and the freedom of the press. The index ranges from 0 to 1 (most free)."
         description_key:
           - This index, produced by Varieties of Democracy (V-Dem), combines information on freedom of discussion, freedom of academic and cultural expression, media censorship, media self-censorship, media bias, harassment of journalists, and the existence of critical and different perspectives in print and broadcast media.
           - It is based on assessments by V-Dem's country experts.
@@ -1707,6 +2197,8 @@ tables:
 
           V-Dem indicator name: `v2x_freexp_altinf`
         unit: ""
+        display:
+          color: "#3c4e66"
 
       ## 2.2.9 Equality before the law and individual liberty index
       indiv_libs_vdem:
@@ -1717,6 +2209,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Equality before the law and individual liberty index
+          grapher_config:
+            <<: *gconfig_a5
+            chartTypes: *chart_types
+            title: Individual Liberties and Equality before the Law Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which laws are transparent and predictably enforced, public administration is impartial, and citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion. The index ranges from 0 to 1 (most liberties)."
         description_from_producer: |-
           Question: To what extent are laws transparent and rigorously enforced and public administration impartial, and to what extent do citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion?
 
@@ -1734,6 +2231,11 @@ tables:
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Judicial constraints on the executive index
+          grapher_config:
+            title: Judicial Checks on Government Index
+            subtitle: "{definitions.grapher_configs.subtitle_vdem}. Expert estimates of the extent to which the executive respects the constitution and complies with the rulings of independent courts. The index ranges from 0 to 1 (most constrained)."
+            chartTypes: *chart_types
+            <<: *gconfig_a1
         description_from_producer: |-
           Question: To what extent does the executive respect the constitution and comply with court rulings, and to what extent is the judiciary able to act in an independent fashion?
 
@@ -1741,6 +2243,9 @@ tables:
 
           V-Dem indicator name: `v2x_jucon`
         unit: ""
+        display:
+          name: Judicial Checks on Government Index
+          color: "#3c4e66"
 
       # 5.15.1 Academic Freedom Index
       v2xca_academ:
@@ -2145,6 +2650,10 @@ tables:
         presentation:
           <<: *ppt_multi_wo_regions
           title_public: "Access to justice for men"
+          grapher_config:
+            title: Access to justice for men
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether men can safely bring cases before courts, are able to seek redress if public authorities violate their rights, and trials are fair."
+            <<: *gconfig_b1
         description_from_producer: |-
           Question: Do men enjoy secure and effective access to justice?
 
@@ -2168,6 +2677,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
+          color: "#3c4e66"
+
       # [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.4 Access to justice for women
       accessjust_w_row:
         title: Access to justice for women ({definitions.aux.estimate} estimate) (re-estimate)
@@ -2176,6 +2687,10 @@ tables:
         presentation:
           <<: *ppt_multi_wo_regions
           title_public: "Access to justice for women"
+          grapher_config:
+            title: Access to justice for women
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether women can safely bring cases before courts, are able to seek redress if public authorities violate their rights, and trials are fair."
+            <<: *gconfig_b1
         description_from_producer: |-
           Question: Do women enjoy equal, secure, and effective access to justice?
 
@@ -2198,6 +2713,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
+          color: "#3c4e66"
+
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.1.1 Electoral democracy index
       electdem_dich_row_owid:
         title: Electoral democracy ({definitions.aux.estimate} estimate) (re-estimate)
@@ -2206,6 +2723,10 @@ tables:
         presentation:
           title_public: Electoral democracy
           <<: *ppt_multi_wo_regions
+          grapher_config:
+            title: Meaningful democratic electoral institutions
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether the country has meaningful democratic electoral institutions, meaning political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed."
+            <<: *gconfig_b1
         description_from_producer: *description_prod_electdem_vdem
         description_processing: |-
           We employ Lührmann et al.'s criteria and use a threshold of 0.5 to classify the original indicator (`v2x_polyarchy_osp*`) into two categories: 0 ("No") and 1 ("Yes").
@@ -2215,6 +2736,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
+          color: "#3c4e66"
+
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.1.2.15 Election free and fair
       electfreefair_row:
         title: Free and fair elections ({definitions.aux.estimate} estimate) (re-estimate)
@@ -2223,6 +2746,10 @@ tables:
         presentation:
           title_public: Free and fair elections
           <<: *ppt_multi_wo_regions
+          grapher_config:
+            title: Free and fair elections
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether election violence, government intimidation, fraud, large irregularities, and vote buying are broadly absent."
+            <<: *gconfig_b1
         description_key:
           - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
           - Based on indicators such as EMB autonomy/capacity, voter registry quality, and fairness of election procedures.
@@ -2248,14 +2775,20 @@ tables:
         display:
           numDecimalPlaces: 0
 
+          color: "#3c4e66"
+
       ## [CUSTOM] TODOO
       electmulpar_hoe_row_owid:
         title: Multi-party elections for government's chief executive ({definitions.aux.estimate} estimate)
-        description_short: |-
+        description_short: |
 
         presentation:
           <<: *ppt_multi_wo_regions
           title_public: Multi-party elections for government's chief executive
+          grapher_config:
+            title: Multi-party elections for government's chief executive
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}."
+            <<: *gconfig_b1
         unit: ""
         description_processing: |-
           While RoW covers the years since 1900, we use V-Dem's historical data from 1789 to 1899 to expand the classification's coverage back in time.
@@ -2270,6 +2803,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
+          color: "#3c4e66"
+
       ## [CUSTOM, based on `v2elmulpar_osp`]
       electmulpar_leg_row:
         title: Multiparty elections for legislature ({definitions.aux.estimate} estimate)
@@ -2278,6 +2813,10 @@ tables:
         presentation:
           <<: *ppt_multi_wo_regions
           title_public: Multiparty elections for legislature
+          grapher_config:
+            title: Multi-party elections for legislature
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}."
+            <<: *gconfig_b1
         description_processing: |-
           We use the value from `v2elmulpar_osp` whenever `v2eltype` is 0, 1, 4 or 5. Otherwise the value is missing.
 
@@ -2285,6 +2824,8 @@ tables:
         unit: ""
         display:
           numDecimalPlaces: 0
+
+          color: "#3c4e66"
 
       ## [RE-ESTIMATE] 3.1.2.5 Elections multiparty
       electmulpar_row:
@@ -2294,6 +2835,10 @@ tables:
         presentation:
           <<: *ppt_multi_wo_regions
           title_public: Multiparty elections
+          grapher_config:
+            title: Multi-party elections
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}."
+            <<: *gconfig_b1
         description_from_producer: |-
           Question: Question: Was this national election multiparty?
 
@@ -2313,6 +2858,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
+          color: "#3c4e66"
+
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.2.8 Liberal component index
       lib_dich_row:
         title: Liberal political institutions ({definitions.aux.estimate} estimate) (re-estimate)
@@ -2321,6 +2868,10 @@ tables:
         presentation:
           <<: *ppt_multi_wo_regions
           title_public: Liberal political institutions
+          grapher_config:
+            title: Liberal political institutions
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether the country has liberal political institutions, meaning citizens have individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts."
+            <<: *gconfig_b1
         description_from_producer: *description_prod_lib_vdem
         description_processing: |-
           We employ Lührmann et al.'s criteria and use a threshold of 0.8 to classify the original indicator (`v2x_liberal*`) into two categories: 0 ("No") and 1 ("Yes").
@@ -2330,6 +2881,8 @@ tables:
         display:
           numDecimalPlaces: 0
 
+          color: "#3c4e66"
+
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.1 Transparent laws with predictable enforcement
       transplaws_row:
         title: Transparent laws with predictable enforcement ({definitions.aux.estimate} estimate) (re-estimate)
@@ -2338,6 +2891,10 @@ tables:
         presentation:
           <<: *ppt_multi_wo_regions
           title_public: Transparent laws with predictable enforcement
+          grapher_config:
+            title: Transparent laws
+            subtitle: "{definitions.grapher_configs.subtitle_luhrmann}. Expert estimates of whether laws are transparent, coherent, and relatively stable, and their enforcement predictable."
+            <<: *gconfig_b1
         description_from_producer: |-
           Question: Are the laws of the land clear, well publicized, coherent (consistent with each other), relatively stable from year to year, and enforced in a predictable manner?
 
@@ -2358,6 +2915,8 @@ tables:
         unit: ""
         display:
           numDecimalPlaces: 0
+
+          color: "#3c4e66"
 
   ##################################################################################################
   ##################################################################################################

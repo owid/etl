@@ -19,13 +19,11 @@ definitions:
 
 dataset:
   update_period_days: 365
-  sources: []
 
 tables:
   wdi:
     variables:
       it_net_user_zs:
-        sources: []
         origins:
           - *wdi_origin
         title: Individuals using the Internet (% of population)
@@ -136,7 +134,6 @@ tables:
               - Latin America and Caribbean (WB)
               - World
       sh_sta_stnt_zs:
-        sources: []
         origins:
           - *wdi_origin
         title: Share of children who are stunted
@@ -226,9 +223,7 @@ tables:
               - url: >-
                   https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       ny_gdp_pcap_pp_kd:
-        sources: []
         origins:
           - *wdi_origin
         title: GDP per capita, PPP (constant 2017 international $)
@@ -293,9 +288,7 @@ tables:
               - China
               - India
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       ny_gdp_mktp_pp_kd:
-        sources: []
         origins:
           - *wdi_origin
         title: GDP, PPP (constant 2017 international $)
@@ -359,10 +352,7 @@ tables:
               - Russia
               - France
               - Mexico
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
-
       eg_cft_accs_zs:
-        sources: []
         origins:
           - *wdi_origin
         title: Access to clean fuels and technologies for cooking (% of population)
@@ -385,7 +375,6 @@ tables:
             - Energy
         processing_level: minor
       eg_elc_accs_zs:
-        sources: []
         origins:
           - *wdi_origin
         title: Access to electricity (% of population)
@@ -407,7 +396,6 @@ tables:
             - Energy
         processing_level: minor
       sn_itk_defc_zs:
-        sources: []
         origins:
           - *wdi_origin
         title: Prevalence of undernourishment (% of population)

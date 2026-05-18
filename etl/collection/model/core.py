@@ -1055,31 +1055,42 @@ def replace_catalog_paths_with_ids(config):
 
     Currently, affected fields are:
 
-    - views[].config.sortColumnSlug
+    - views[].config.sortColumnSlug   (string slug)
+    - views[].config.map.columnSlug   (string slug)
+    - views[].config.colorVariableId  (integer variableId)
+    - views[].config.xVariableId      (integer variableId)
+    - views[].config.sizeVariableId   (integer variableId)
+
+    Slug fields stay strings; the *VariableId fields are coerced to int so the
+    Grapher admin API doesn't reject them. ``map_indicator_path_to_id`` accepts
+    either a pure-digit value (passes through) or a catalog path — short
+    (``table#col``) or full (``grapher/ns/version/table/file#col``) — and
+    resolves the latter via a DB lookup.
 
     These fields above are treated like fields in `dimensions`, and also accessed from:
     - `expand_catalog_paths`: To expand the indicator URI to be in its complete form.
     - `validate_multidim_config`: To validate that the indicators exist in the database.
 
     TODO: There might be other fields which might make references to indicators:
-        - config.map.columnSlug
         - config.focusedSeriesNames
     """
+    VAR_ID_FIELDS = ("colorVariableId", "xVariableId", "sizeVariableId")
+
     if "views" in config:
         views = config["views"]
         for view in views:
-            if "config" in view:
-                # Update sortColumnSlug
-                if "sortColumnSlug" in view["config"]:
-                    # Check if catalogPath
-                    # Map to variable ID
-                    view["config"]["sortColumnSlug"] = str(map_indicator_path_to_id(view["config"]["sortColumnSlug"]))
-                # Update map.columnSlug
-                if "map" in view["config"]:
-                    if "columnSlug" in view["config"]["map"]:
-                        view["config"]["map"]["columnSlug"] = str(
-                            map_indicator_path_to_id(view["config"]["map"]["columnSlug"])
-                        )
+            if "config" not in view:
+                continue
+            vcfg = view["config"]
+            # Slug fields — keep as string
+            if "sortColumnSlug" in vcfg:
+                vcfg["sortColumnSlug"] = str(map_indicator_path_to_id(vcfg["sortColumnSlug"]))
+            if "map" in vcfg and "columnSlug" in vcfg["map"]:
+                vcfg["map"]["columnSlug"] = str(map_indicator_path_to_id(vcfg["map"]["columnSlug"]))
+            # VariableId fields — coerce to int
+            for fname in VAR_ID_FIELDS:
+                if fname in vcfg:
+                    vcfg[fname] = int(map_indicator_path_to_id(vcfg[fname]))
 
     return config
 
