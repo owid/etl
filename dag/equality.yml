@@ -12,18 +12,16 @@ steps:
     - data://garden/lgbt_rights/2026-05-11/lgbti_national_policy_dataset
 
   # Equaldex dataset
-  data://meadow/lgbt_rights/2026-05-14/equaldex:
-    - snapshot://lgbt_rights/2026-05-14/equaldex_indices.csv
-    - snapshot://lgbt_rights/2026-05-14/equaldex.csv
-    - snapshot://lgbt_rights/2026-05-14/equaldex_current.csv
-  data://garden/lgbt_rights/2026-05-14/equaldex:
-    - data://meadow/lgbt_rights/2026-05-14/equaldex
-    - data://garden/demography/2024-07-15/population
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
-    - data://garden/countries/2023-09-25/isd
   data://grapher/lgbt_rights/2026-05-14/equaldex:
-    - data://garden/lgbt_rights/2026-05-14/equaldex
+    - data://garden/lgbt_rights/2026-05-14/equaldex:
+      - data://meadow/lgbt_rights/2026-05-14/equaldex:
+        - snapshot://lgbt_rights/2026-05-14/equaldex.csv
+        - snapshot://lgbt_rights/2026-05-14/equaldex_indices.csv
+        - snapshot://lgbt_rights/2026-05-14/equaldex_current.csv
+      - data://garden/demography/2024-07-15/population
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/countries/2023-09-25/isd
 
   # Homosexuality criminalization data from Mignot (2025)
   data://grapher/lgbt_rights/2025-07-09/criminalization_mignot:
