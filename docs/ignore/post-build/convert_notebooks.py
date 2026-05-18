@@ -552,8 +552,14 @@ def wrap_in_full_zensical_template(
         # Remove trailing slash from relative_root for JSON
         base_path = relative_root.rstrip("/")
         template = template.replace('"base":"."', f'"base":"{base_path}"')
-        # Also fix search worker path in config
-        template = template.replace('"search":"assets/javascripts/', f'"search":"{relative_root}assets/javascripts/')
+        # Also fix search worker path in the __config JSON. Newer zensical
+        # emits `"search":"./assets/javascripts/..."` (with a leading `./`),
+        # so accept both forms.
+        template = re.sub(
+            r'"search":"(?:\./)?(assets/javascripts/[^"]+)"',
+            lambda m: f'"search":"{relative_root}{m.group(1)}"',
+            template,
+        )
 
     # Fix navigation links to be absolute from root
     # Convert relative navigation links like href="guides/" to href="../../guides/"
