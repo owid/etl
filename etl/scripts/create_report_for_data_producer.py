@@ -5,7 +5,6 @@ from datetime import datetime
 
 import click
 import pandas as pd
-import requests
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
@@ -22,6 +21,7 @@ from etl.config import (
 from etl.data_helpers.misc import humanize_number
 from etl.db import get_engine
 from etl.google import GoogleDoc, GoogleDrive, GoogleSheet
+from etl.http import session as http_session
 from etl.notion import get_data_producer_contacts, get_impact_highlights
 
 # Initialize logger.
@@ -43,7 +43,7 @@ PERIODS = {
 
 
 def get_chart_title_from_url(chart_url: str) -> str:
-    response = requests.get(f"{chart_url}.metadata.json")
+    response = http_session.get(f"{chart_url}.metadata.json")
     title = response.json()["chart"]["title"]
     return title
 

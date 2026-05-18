@@ -6,10 +6,10 @@ from typing import Literal
 from urllib import parse
 
 import pandas as pd
-import requests
 from dateutil.parser import parse as date_parse
 
 from etl.db import get_connection
+from etl.http import session as http_session
 
 
 def get_thumbnail_url(grapher_url: str) -> str:
@@ -25,7 +25,7 @@ def get_thumbnail_url(grapher_url: str) -> str:
 
 def get_grapher_thumbnail(grapher_url: str) -> str:
     url = get_thumbnail_url(grapher_url)
-    data = requests.get(url).content
+    data = http_session.get(url).content
     return f"data:image/png;base64,{base64.b64encode(data).decode('utf8')}"
 
 
@@ -129,8 +129,8 @@ def _convert_years_to_dates(metadata, years):
 
 
 def _fetch_dimension(id: int) -> dict:
-    data = requests.get(f"https://api.ourworldindata.org/v1/indicators/{id}.data.json").json()
-    metadata = requests.get(f"https://api.ourworldindata.org/v1/indicators/{id}.metadata.json").json()
+    data = http_session.get(f"https://api.ourworldindata.org/v1/indicators/{id}.data.json").json()
+    metadata = http_session.get(f"https://api.ourworldindata.org/v1/indicators/{id}.metadata.json").json()
     return {"data": data, "metadata": metadata}
 
 

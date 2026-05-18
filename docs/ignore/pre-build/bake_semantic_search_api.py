@@ -14,7 +14,7 @@ Output: docs/api/semantic-search-api.md
 from pathlib import Path
 from typing import Any
 
-import requests
+from etl.http import session as http_session
 
 from .openapi_to_markdown import generate_markdown  # ty: ignore
 
@@ -28,7 +28,7 @@ def load_openapi_spec_from_url(url: str = "https://search.owid.io/openapi.json")
     Returns:
         Parsed OpenAPI specification
     """
-    response = requests.get(url, timeout=30)
+    response = http_session.get(url, timeout=30)
     response.raise_for_status()
     return response.json()
 
