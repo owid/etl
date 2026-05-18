@@ -30,6 +30,7 @@ from owid.repack import repack_frame
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # ty: ignore
 from pandas.core.series import Series
 
+from owid.catalog.api.utils import session, storage_options_for_http
 from owid.catalog.core import indicators, utils, warnings
 from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, TableMeta, VariableMeta
 
@@ -818,8 +819,6 @@ class Table(pd.DataFrame):
 
     @staticmethod
     def _read_metadata(data_path: str) -> dict[str, Any]:
-        from owid.catalog.api.utils import session
-
         metadata_path = splitext(data_path)[0] + ".meta.json"
 
         if metadata_path.startswith("http"):
@@ -2437,8 +2436,6 @@ def read_csv(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
-    from owid.catalog.api.utils import storage_options_for_http
-
     if so := storage_options_for_http(filepath_or_buffer):
         kwargs.setdefault("storage_options", so)
     table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
@@ -2467,8 +2464,6 @@ def read_feather(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
-    from owid.catalog.api.utils import storage_options_for_http
-
     if so := storage_options_for_http(filepath):
         kwargs.setdefault("storage_options", so)
     table = Table(pd.read_feather(filepath, *args, **kwargs), underscore=underscore)
@@ -2536,8 +2531,6 @@ def read_json(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
-    from owid.catalog.api.utils import storage_options_for_http
-
     if so := storage_options_for_http(path_or_buf):
         kwargs.setdefault("storage_options", so)
     table = Table(pd.read_json(path_or_buf=path_or_buf, *args, **kwargs), underscore=underscore)
@@ -2659,8 +2652,6 @@ def read_parquet(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
-    from owid.catalog.api.utils import storage_options_for_http
-
     if so := storage_options_for_http(filepath_or_buffer):
         kwargs.setdefault("storage_options", so)
     table = Table(pd.read_parquet(path=filepath_or_buffer, *args, **kwargs), underscore=underscore)
