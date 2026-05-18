@@ -46,6 +46,20 @@ HTTP_HEADERS = {"User-Agent": USER_AGENT}
 #: ``IOHandles`` / fsspec's HTTP backend).
 STORAGE_OPTIONS = {"User-Agent": USER_AGENT}
 
+
+def storage_options_for_http(path: object) -> dict[str, str]:
+    """Return :data:`STORAGE_OPTIONS` if ``path`` is an HTTP(S) URL string, else ``{}``.
+
+    Use to safely inject the catalog UA into ``pd.read_*`` calls that may
+    receive either a local path/buffer or a remote URL — pandas raises
+    ``ValueError`` if ``storage_options`` is passed alongside a non-fsspec
+    local path.
+    """
+    if isinstance(path, str) and (path.startswith("http://") or path.startswith("https://")):
+        return STORAGE_OPTIONS
+    return {}
+
+
 # =============================================================================
 # Default API URLs
 # =============================================================================

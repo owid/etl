@@ -2439,6 +2439,10 @@ def read_csv(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
+    from owid.catalog.api.utils import storage_options_for_http
+
+    if so := storage_options_for_http(filepath_or_buffer):
+        kwargs.setdefault("storage_options", so)
     table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
@@ -2465,6 +2469,10 @@ def read_feather(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
+    from owid.catalog.api.utils import storage_options_for_http
+
+    if so := storage_options_for_http(filepath):
+        kwargs.setdefault("storage_options", so)
     table = Table(pd.read_feather(filepath, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
@@ -2530,6 +2538,10 @@ def read_json(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
+    from owid.catalog.api.utils import storage_options_for_http
+
+    if so := storage_options_for_http(path_or_buf):
+        kwargs.setdefault("storage_options", so)
     table = Table(pd.read_json(path_or_buf=path_or_buf, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
@@ -2649,6 +2661,10 @@ def read_parquet(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
+    from owid.catalog.api.utils import storage_options_for_http
+
+    if so := storage_options_for_http(filepath_or_buffer):
+        kwargs.setdefault("storage_options", so)
     table = Table(pd.read_parquet(path=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
