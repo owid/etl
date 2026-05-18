@@ -9,7 +9,6 @@ definitions:
       attribution_short: World Bank
       grapher_config:
         originUrl: https://ourworldindata.org/poverty
-        $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
     processing_level: major
 
 
@@ -404,8 +403,6 @@ tables:
               - Nigeria
               - Bangladesh
             originUrl: https://ourworldindata.org/poverty
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
-
       gini:
         presentation:
           title_public: Gini Coefficient

@@ -86,4 +86,3 @@ tables:
               - Russia
               - Indonesia
               - Nigeria
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json

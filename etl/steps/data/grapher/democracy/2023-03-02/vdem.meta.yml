@@ -331,7 +331,6 @@ tables:
               - Botswana
               - China
             note: The Chart tab uses numeric values, ranging from 0 for closed autocracies to 3 for liberal democracies.
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
       # wom_emp_vdem_owid:
       #   title: Women's political empowerment index
       #   description_short: Captures the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics. It ranges from 0 to 1 (most empowered).

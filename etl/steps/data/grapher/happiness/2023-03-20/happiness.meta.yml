@@ -146,4 +146,3 @@ tables:
               - Bhutan
               - Australia
               - Germany
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json

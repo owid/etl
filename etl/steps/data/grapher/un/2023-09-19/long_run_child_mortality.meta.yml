@@ -67,4 +67,3 @@ tables:
               - France
               - Brazil
               - India
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json

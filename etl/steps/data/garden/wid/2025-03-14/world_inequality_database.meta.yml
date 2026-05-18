@@ -7,7 +7,6 @@ definitions:
         - Economic Inequality
       grapher_config:
         originUrl: https://ourworldindata.org/economic-inequality
-        $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
     processing_level: major
 
 

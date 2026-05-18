@@ -85,8 +85,6 @@ tables:
             - Western offshoots (AHDI)
             - Western Europe (AHDI)
             - Eastern Europe (AHDI)
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
-
           topic_tags:
             - Human Development Index (HDI)
             - Life Expectancy
@@ -142,8 +140,6 @@ tables:
               - China
               - Brazil
               - Nigeria
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
-
       life_expectancy:
         title: Life expectancy
         unit: "years"

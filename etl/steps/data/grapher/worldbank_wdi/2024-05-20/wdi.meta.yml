@@ -223,7 +223,6 @@ tables:
               - url: >-
                   https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
       sh_sta_stnt_me_zs:
         origins:
           - *wdi_origin
@@ -314,7 +313,6 @@ tables:
               - url: >-
                   https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
       ny_gdp_pcap_pp_kd:
         origins:
           - *wdi_origin
@@ -380,7 +378,6 @@ tables:
               - China
               - India
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
       ny_gdp_mktp_pp_kd:
         origins:
           - *wdi_origin
@@ -445,8 +442,6 @@ tables:
               - Russia
               - France
               - Mexico
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
-
       eg_cft_accs_zs:
         origins:
           - *wdi_origin
