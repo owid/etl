@@ -523,12 +523,15 @@ def wrap_in_full_zensical_template(
 
         template = re.sub(toc_pattern, replace_toc, template, flags=re.DOTALL)
 
-    # Fix relative paths for assets. Match both the bare form (`href="assets/…"`)
-    # and the explicitly-CWD-prefixed form (`href="./assets/…"`) that newer
-    # zensical versions emit — without this, the `./` prefix slips through
-    # untouched and resolves relative to the notebook's own subdirectory,
-    # 404'ing every asset on every notebook page (cell-toggles, the main
-    # bundle, CSS, …).
+    # Fix relative paths for assets. Match both the bare form (`src="javascripts/…"`)
+    # and the CWD-prefixed form (`src="./javascripts/…"`) that newer zensical
+    # versions emit for the locally-hosted JS. Without the `./`-aware match,
+    # the prefix passes through untouched and resolves relative to the
+    # notebook's own subdirectory, 404-ing the main Material bundle and the
+    # extra_javascript files (cell-toggles, csv-table, katex, notebook-copy,
+    # tablesort) on every notebook page at depth ≥ 1. CSS hrefs are written by
+    # zensical with the depth-correct prefix already, so they are unaffected,
+    # but we cover them here too for completeness.
     if relative_root != "./":
 
         def _retarget(attr: str, prefix: str) -> None:
