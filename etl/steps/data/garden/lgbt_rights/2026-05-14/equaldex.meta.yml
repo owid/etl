@@ -54,7 +54,7 @@ tables:
         title: Homosexual activity (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
+        description_short: Legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
         presentation:
           title_public: Legal status of same-sex sexual acts
         display:
@@ -65,7 +65,7 @@ tables:
         title: Homosexual activity (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
+        description_short: Legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
         presentation:
           title_public: Legal status of same-sex sexual acts
         display:
@@ -76,7 +76,7 @@ tables:
         title: Right to change legal gender (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
+        description_short: Legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
         presentation:
           title_public: Gender marker change
         display:
@@ -87,7 +87,7 @@ tables:
         title: Right to change legal gender (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
+        description_short: Legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
         presentation:
           title_public: Gender marker change
         display:
@@ -98,7 +98,7 @@ tables:
         title: Same-sex marriage (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
+        description_short: Legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
         presentation:
           title_public: Marriage for same-sex partners
         display:
@@ -110,7 +110,7 @@ tables:
         title: Same-sex marriage (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
+        description_short: Legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
         presentation:
           title_public: Marriage for same-sex partners
         display:
@@ -121,7 +121,7 @@ tables:
         title: Same-sex adoption (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
+        description_short: Legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
         presentation:
           title_public: Joint adoptions by same-sex partners
         display:
@@ -132,7 +132,7 @@ tables:
         title: Same-sex adoption (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
+        description_short: Legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
         presentation:
           title_public: Joint adoptions by same-sex partners
         display:
@@ -143,7 +143,7 @@ tables:
         title: Equal age of consent (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the difference between legal age of consent for homosexual sex and heterosexual sex.
+        description_short: Difference between legal age of consent for homosexual sex and heterosexual sex.
         presentation:
           title_public: Age of consent for same-sex and different-sex partners
         display:
@@ -154,7 +154,7 @@ tables:
         title: Equal age of consent (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the difference between legal age of consent for homosexual sex and heterosexual sex.
+        description_short: Difference between legal age of consent for homosexual sex and heterosexual sex.
         presentation:
           title_public: Age of consent for same-sex and different-sex partners
         display:
@@ -165,7 +165,7 @@ tables:
         title: Blood donations by MSMs (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
+        description_short: Ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
         presentation:
           title_public: Blood donations by men who have sex with men
         display:
@@ -176,7 +176,7 @@ tables:
         title: Blood donations by MSMs (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
+        description_short: Ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
         presentation:
           title_public: Blood donations by men who have sex with men
         display:
@@ -187,7 +187,7 @@ tables:
         title: Censorship of LGBT+ issues (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes censorship or prohibition of discussing, promoting, or teaching LGBT+ topics in media, schools, and in the general public.
+        description_short: Censorship or prohibition of discussing, promoting, or teaching LGBT+ topics in media, schools, and in the general public.
         presentation:
           title_public: Censorship of LGBT+ issues
         display:
@@ -198,7 +198,7 @@ tables:
         title: Censorship of LGBT+ issues (current)
         unit: ""
         short_unit: ""
-        description_short: Describes censorship or prohibition of discussing, promoting, or teaching LGBT+ topics in media, schools, and in the general public.
+        description_short: Censorship or prohibition of discussing, promoting, or teaching LGBT+ topics in media, schools, and in the general public.
         presentation:
           title_public: Censorship of LGBT+ issues
         display:
@@ -209,7 +209,7 @@ tables:
         title: Conversion therapy (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the legal status of conducting sexual orientation changing therapy.
+        description_short: Legal status of conducting sexual orientation changing therapy.
         presentation:
           title_public: Conversion therapies
         display:
@@ -220,7 +220,7 @@ tables:
         title: Conversion therapy (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the legal status of conducting sexual orientation changing therapy.
+        description_short: Legal status of conducting sexual orientation changing therapy.
         presentation:
           title_public: Conversion therapies
         display:
@@ -231,7 +231,7 @@ tables:
         title: LGBT+ discrimination (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity.
+        description_short: Prohibition of discrimination based on sexual orientation and/or gender identity.
         presentation:
           title_public: Discrimination based on sexual orientation or gender identity
         display:
@@ -242,7 +242,7 @@ tables:
         title: LGBT+ discrimination (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity.
+        description_short: Prohibition of discrimination based on sexual orientation and/or gender identity.
         presentation:
           title_public: Discrimination based on sexual orientation or gender identity
         display:
@@ -253,7 +253,7 @@ tables:
         title: LGBT+ employment discrimination (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
+        description_short: Prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
         presentation:
           title_public: Employment discrimination based on sexual orientation or gender identity prohibited
         display:
@@ -264,7 +264,7 @@ tables:
         title: LGBT+ employment discrimination (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
+        description_short: Prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
         presentation:
           title_public: Employment discrimination based on sexual orientation or gender identity prohibited
         display:
@@ -275,7 +275,7 @@ tables:
         title: LGBT+ housing discrimination (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
+        description_short: Prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
         presentation:
           title_public: Housing discrimination based on sexual orientation or gender identity prohibited
         display:
@@ -286,7 +286,7 @@ tables:
         title: LGBT+ housing discrimination (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
+        description_short: Prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
         presentation:
           title_public: Housing discrimination based on sexual orientation or gender identity prohibited
         display:
@@ -297,7 +297,7 @@ tables:
         title: Serving openly in the military (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the ability for homosexuals to serve in the military and be open about their sexuality.
+        description_short: Ability for homosexuals to serve in the military and be open about their sexuality.
         description_key:
           - "\"Don't ask, don't tell\" refers to policies that prohibit military personnel from discriminating against or harassing closeted homosexuals (people who have not revealed their sexual orientation to the public), while barring openly homosexuals."
         presentation:
@@ -310,7 +310,7 @@ tables:
         title: Serving openly in the military (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the ability for homosexuals to serve in the military and be open about their sexuality.
+        description_short: Ability for homosexuals to serve in the military and be open about their sexuality.
         description_key:
           - "\"Don't ask, don't tell\" refers to policies that prohibit military personnel from discriminating against or harassing closeted homosexuals (people who have not revealed their sexual orientation to the public), while barring openly homosexuals."
         presentation:
@@ -323,7 +323,7 @@ tables:
         title: Legal recognition of non-binary gender (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the legal recognition of non-binary, genderqueer, or third gender identities.
+        description_short: Legal recognition of non-binary, genderqueer, or third gender identities.
         presentation:
           title_public: Third gender legally recognized
         display:
@@ -334,7 +334,7 @@ tables:
         title: Legal recognition of non-binary gender (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the legal recognition of non-binary, genderqueer, or third gender identities.
+        description_short: Legal recognition of non-binary, genderqueer, or third gender identities.
         presentation:
           title_public: Third gender legally recognized
         display:
@@ -389,7 +389,7 @@ tables:
         title: Hate crime protections (historical)
         unit: ""
         short_unit: ""
-        description_short: Describes the legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people.
+        description_short: Legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people.
         presentation:
           title_public: Hate crime protections based on sexual orientation or gender identity
         display:
@@ -400,7 +400,7 @@ tables:
         title: Hate crime protections (current)
         unit: ""
         short_unit: ""
-        description_short: Describes the legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people.
+        description_short: Legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people.
         presentation:
           title_public: Hate crime protections based on sexual orientation or gender identity
         display:
