@@ -42,7 +42,6 @@ tables:
                 colorScale:
                     baseColorScheme: GnBu
                     binningStrategy: manual
-                    binningStrategyBinCount: 9
                     customNumericValues:
                         - 0
                         - 1000
@@ -52,7 +51,6 @@ tables:
                         - 20000
                         - 50000
                         - 100000
-                variableId: 417485
             selectedEntityNames:
                 - World
                 - South and South-East Asia (MPD)
@@ -63,4 +61,4 @@ tables:
                 - Latin America (MPD)
                 - Middle East (MPD)
                 - East Asia (MPD)
-            $schema: 'https://files.ourworldindata.org/schemas/grapher-schema.003.json'
+            $schema: 'https://files.ourworldindata.org/schemas/grapher-schema.010.json'

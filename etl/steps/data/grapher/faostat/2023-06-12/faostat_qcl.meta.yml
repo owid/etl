@@ -1,6 +1,5 @@
 definitions:
   common:
-    sources: []
     origins:
       - producer: Food and Agriculture Organization of the United Nations
         title: 'Production: Crops and livestock products'
@@ -27,7 +26,6 @@ definitions:
 
 dataset:
   update_period_days: 365
-  sources: []
 
 tables:
   faostat_qcl_flat:
@@ -75,4 +73,4 @@ tables:
               - Northern America
               - Europe
               - South America
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json

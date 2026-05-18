@@ -69,4 +69,4 @@ tables:
               - Niger
               - Chad
             note: To allow comparisons between countries and over time this metric is [age-standardized](#dod:age_standardized).
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json

@@ -90,10 +90,10 @@ tables:
               timeTolerance: 1
               colorScale:
                 baseColorScheme: BuGn
-                binningStrategy: equalInterval
+                binningStrategy: equalSizeBins-normal
                 legendDescription: ""
             selectedEntityNames:
               - World
             selectedEntityColors:
               World: "#adadad"
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json

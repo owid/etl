@@ -1,9 +1,7 @@
 dataset:
   update_period_days: 365
-  sources: []
 definitions:
   common:
-    sources: []
     origins:
       - producer: World Happiness Report
         title: World Happiness Report (2023)
@@ -148,4 +146,4 @@ tables:
               - Bhutan
               - Australia
               - Germany
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json

@@ -254,7 +254,7 @@ tables:
               - United States
               - France
               - United Kingdom
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
       tax_ex_sc:
         title: Taxes excluding social contributions (as a share of GDP)
         description_from_producer: |-

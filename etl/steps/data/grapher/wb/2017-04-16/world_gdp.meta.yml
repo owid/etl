@@ -8,7 +8,6 @@ definitions:
 
 dataset:
   update_period_days: 0
-  sources: []
   title: World GDP (World Bank & Maddison, 2017)
 
 tables:

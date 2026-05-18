@@ -7,7 +7,6 @@ definitions:
         - Life Expectancy
         - Global Education
         - Economic Growth
-    sources: []
     origins:
       - producer: UNDP, Human Development Report (2021-22)
         title: Human Development Report - UNDP (2021-22)
@@ -38,7 +37,6 @@ definitions:
           url: https://hdr.undp.org/copyright-and-terms-use
 dataset:
   update_period_days: 365
-  sources: []
 tables:
   undp_hdr:
     variables:
@@ -103,4 +101,4 @@ tables:
               - Democratic Republic of Congo
               - Niger
               - Chile
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json

@@ -3,10 +3,8 @@
 
 dataset:
   update_period_days: 365
-  sources: []
 definitions:
   common:
-    sources: []
     origins:
       - producer: V-Dem
         version_producer: "v13"
@@ -122,7 +120,7 @@ tables:
       #         - url: https://ourworldindata.org/grapher/electoral-democracy-index#faqs
       #           text: FAQs on this data
       #       selectedFacetStrategy: entity
-      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
 
       # civ_libs_vdem_owid:
       #   title: civ_libs_vdem_owid
@@ -185,7 +183,7 @@ tables:
       #         - Botswana
       #         - China
       #         - World
-      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
       regime_row_owid:
         title: Political regime
         display:
@@ -333,7 +331,7 @@ tables:
               - Botswana
               - China
             note: The Chart tab uses numeric values, ranging from 0 for closed autocracies to 3 for liberal democracies.
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
       # wom_emp_vdem_owid:
       #   title: Women's political empowerment index
       #   description_short: Captures the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics. It ranges from 0 to 1 (most empowered).
@@ -419,7 +417,7 @@ tables:
       #         - Australia
       #         - Botswana
       #         - China
-      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
       # terr_contr_vdem_owid:
       #   title: Percentage of territory effectively controlled by government
       #   unit: "%"
@@ -503,4 +501,4 @@ tables:
       #         - Botswana
       #         - China
       #       note: Values are missing if the country is not independent.
-      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json

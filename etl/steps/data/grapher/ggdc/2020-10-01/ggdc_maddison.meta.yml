@@ -65,5 +65,5 @@ tables:
               - East Asia (MPD)
               - Western offshoots (MPD)
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices.
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.010.json
             hideRelativeToggle: false
