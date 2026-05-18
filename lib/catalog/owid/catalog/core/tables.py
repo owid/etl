@@ -820,10 +820,12 @@ class Table(pd.DataFrame):
     def _read_metadata(data_path: str) -> dict[str, Any]:
         import requests
 
+        from owid.catalog.api.utils import HTTP_HEADERS
+
         metadata_path = splitext(data_path)[0] + ".meta.json"
 
         if metadata_path.startswith("http"):
-            return cast(dict[str, Any], requests.get(metadata_path).json())
+            return cast(dict[str, Any], requests.get(metadata_path, headers=HTTP_HEADERS).json())
 
         with open(metadata_path) as istream:
             return cast(dict[str, Any], json.load(istream))

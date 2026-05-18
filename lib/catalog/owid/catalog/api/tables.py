@@ -23,10 +23,12 @@ from rapidfuzz import fuzz
 from owid.catalog import s3_utils
 from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.utils import (
+    HTTP_HEADERS,
     OWID_CATALOG_VERSION,
     PREFERRED_FORMAT,
     S3_OWID_URI,
     S3_OWID_URI_PRIVATE,
+    STORAGE_OPTIONS,
     SUPPORTED_FORMATS,
     _loading_data_from_api,
 )
@@ -86,7 +88,7 @@ def _read_catalog_index(uri: str, *, timeout: int = 30) -> pd.DataFrame:
     """
     # Read metadata to check version
     metadata_url = uri.rstrip("/") + "/catalog.meta.json"
-    resp = requests.get(metadata_url, timeout=timeout)
+    resp = requests.get(metadata_url, timeout=timeout, headers=HTTP_HEADERS)
     resp.raise_for_status()
     metadata = resp.json()
 
@@ -102,7 +104,7 @@ def _read_catalog_index(uri: str, *, timeout: int = 30) -> pd.DataFrame:
     for channel in VALID_CHANNELS:
         index_url = f"{uri.rstrip('/')}/catalog-{channel}.{PREFERRED_FORMAT}"
         try:
-            df = cast(pd.DataFrame, pd.read_feather(index_url))
+            df = cast(pd.DataFrame, pd.read_feather(index_url, storage_options=STORAGE_OPTIONS))
             frames.append(df)
         except Exception:
             # Channel might not exist, skip it

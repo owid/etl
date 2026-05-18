@@ -5,10 +5,12 @@
 #
 from __future__ import annotations
 
+import platform
 import sys
 import threading
 import time
 from contextlib import contextmanager
+from importlib.metadata import PackageNotFoundError, version
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -21,6 +23,28 @@ S3_OWID_URI_PRIVATE = "s3://owid-catalog-private"
 PREFERRED_FORMAT: FileFormat = "feather"
 SUPPORTED_FORMATS: list[FileFormat] = ["feather", "parquet", "csv"]
 INDEX_FORMATS: list[FileFormat] = ["feather"]
+
+# =============================================================================
+# User-Agent for outbound HTTP requests
+# =============================================================================
+# Tagging traffic with a recognizable User-Agent lets us distinguish library
+# usage from generic ``python-requests``/``pandas`` clients in CDN/access logs,
+# and lets us track which library version is in the wild.
+
+try:
+    _LIB_VERSION = version("owid-catalog")
+except PackageNotFoundError:
+    _LIB_VERSION = "unknown"
+
+USER_AGENT = f"owid-catalog/{_LIB_VERSION} (python {platform.python_version()})"
+
+#: Pass as ``headers=`` to ``requests.get`` / ``requests.post`` calls.
+HTTP_HEADERS = {"User-Agent": USER_AGENT}
+
+#: Pass as ``storage_options=`` to ``pd.read_csv``/``read_feather``/``read_parquet``
+#: when reading from an HTTP(S) URL. pandas forwards these as headers (see
+#: ``IOHandles`` / fsspec's HTTP backend).
+STORAGE_OPTIONS = {"User-Agent": USER_AGENT}
 
 # =============================================================================
 # Default API URLs

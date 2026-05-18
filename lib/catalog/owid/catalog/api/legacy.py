@@ -27,10 +27,12 @@ from rapidfuzz import fuzz
 from owid.catalog import s3_utils
 from owid.catalog.api.utils import (
     DEFAULT_CATALOG_URL,
+    HTTP_HEADERS,
     INDEX_FORMATS,
     OWID_CATALOG_VERSION,
     PREFERRED_FORMAT,
     S3_OWID_URI,
+    STORAGE_OPTIONS,
     SUPPORTED_FORMATS,
 )
 from owid.catalog.core.datasets import CHANNEL, Dataset, FileFormat
@@ -119,14 +121,17 @@ def read_frame(uri: str | Path) -> pd.DataFrame:
         uri = str(uri)
 
     is_remote = uri.startswith("http://") or uri.startswith("https://")
+    # Only HTTP(S) URLs forward storage_options as headers — passing them to a
+    # local-path read would be ignored at best and confusing at worst.
+    read_kwargs: dict[str, Any] = {"storage_options": STORAGE_OPTIONS} if is_remote else {}
 
     def _read() -> pd.DataFrame:
         if uri.endswith(".feather"):
-            return cast(pd.DataFrame, pd.read_feather(uri))
+            return cast(pd.DataFrame, pd.read_feather(uri, **read_kwargs))
         elif uri.endswith(".parquet"):
-            return cast(pd.DataFrame, pd.read_parquet(uri))
+            return cast(pd.DataFrame, pd.read_parquet(uri, **read_kwargs))
         elif uri.endswith(".csv"):
-            return pd.read_csv(uri)
+            return pd.read_csv(uri, **read_kwargs)
         raise ValueError(f"could not detect format of uri: {uri}")
 
     if is_remote:
@@ -461,7 +466,7 @@ class ETLCatalog(CatalogMixin):
     @staticmethod
     def _read_metadata(uri: str, timeout: int = 30) -> dict[str, Any]:
         """Read the metadata JSON blob for this repo."""
-        resp = requests.get(uri, timeout=timeout)
+        resp = requests.get(uri, timeout=timeout, headers=HTTP_HEADERS)
         resp.raise_for_status()
         return cast(dict[str, Any], resp.json())
 

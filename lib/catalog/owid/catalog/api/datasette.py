@@ -11,6 +11,8 @@ import pandas as pd
 import requests
 from pydantic import BaseModel, ConfigDict, Field
 
+from owid.catalog.api.utils import HTTP_HEADERS
+
 DATASETTE_BASE_URL = "https://datasette-public.owid.io/owid.json"
 DEFAULT_TIMEOUT = 10
 
@@ -121,6 +123,7 @@ class DatasetteAPI:
                 self.base_url,
                 params={"sql": paginated_sql, "_shape": "array"},
                 timeout=request_timeout,
+                headers=HTTP_HEADERS,
             )
             resp.raise_for_status()
             rows = resp.json()
@@ -254,6 +257,7 @@ def _fetch_table_metadata(
         table_url,
         params={"_size": 0},  # No rows, just metadata
         timeout=timeout,
+        headers=HTTP_HEADERS,
     )
     resp.raise_for_status()
     return resp.json()
