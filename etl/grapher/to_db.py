@@ -326,6 +326,13 @@ def calculate_checksum_metadata(variable_meta: VariableMeta, df: pd.DataFrame) -
     # UI diff. `to_dict()` goes through `@pruned_json`, which drops None/empty
     # values the same way `_omit_nullable_values` does before upload to S3 — so
     # the checksum now matches what the comparator actually sees.
+    #
+    # Performance: `to_dict()` (via DataClassJsonMixin) is ~130µs/call on a
+    # realistic VariableMeta — ~3× slower than hashing the raw dataclass. Per
+    # upsert this is drowned out by the S3+MySQL roundtrips (100s of ms each).
+    # If this ever shows up in a profile, replace with a custom field walker
+    # that prunes inline, same trick `dataclass_from_dict` uses in core/utils.py.
+    #
     # entities and years are also part of the metadata checksum.
     return str(
         hash_any(
