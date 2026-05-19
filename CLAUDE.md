@@ -129,6 +129,7 @@ Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 - **`paths.regions.harmonize_names(tb, country_col=..., countries_file=...)`** — current harmonization API (replaces `geo.harmonize_countries`)
 - **`Table.format()`** needs both `country` and `year`. For year-less tables: `set_index("country")` + set `tb.metadata.short_name`
 - **`*.meta.yml`**: omit `dataset:` block — inherited from origin. Only define `tables:` → `variables:`
+- **`grapher_config`: omit `$schema:`** — pinning a specific schema version ages badly. The default in `etl/config.py:DEFAULT_GRAPHER_SCHEMA` is applied automatically by `_validate_grapher_config`.
 
 ### Performance
 
@@ -168,6 +169,18 @@ Built on **owid.catalog** library:
 - Multiple formats (feather, parquet, csv) with automatic schema validation
 
 
+### HTTP calls to OWID infra
+
+When internal code hits an OWID host (catalog, grapher, `files.ourworldindata.org`, `search.owid.io`, Datasette, admin API, etc.), use the shared session from `etl.http` instead of bare `requests` / `httpx` / `pd.read_*(url)`. It pre-sets a `User-Agent: owid-etl/...` header so our traffic is distinguishable in CDN logs.
+
+```python
+from etl.http import session as http_session  # for requests
+from etl.http import HEADERS                   # for httpx.AsyncClient(headers=HEADERS)
+from etl.http import STORAGE_OPTIONS           # for pd.read_csv(url, storage_options=STORAGE_OPTIONS)
+```
+
+Don't tag calls to third-party hosts (GitHub, Notion, Slack, source-data providers in `snapshots/`, etc.) — they should keep the default UA.
+
 ### YAML Editing (preserve comments)
 ```python
 from etl.files import ruamel_load, ruamel_dump
@@ -190,6 +203,8 @@ Automatically connects to `staging-site-{branch}` based on current git branch.
 from etl.config import OWID_ENV
 df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
 ```
+
+**Prefer Python when the SQL contains `%` (LIKE patterns, JSON_EXTRACT paths) or single-quoted strings — `make query` re-interprets those via shell + make and breaks unpredictably.** Use `params={...}` for `%`/quoted values to dodge pymysql's own `%`-format-string parsing.
 
 ## Additional Tools
 

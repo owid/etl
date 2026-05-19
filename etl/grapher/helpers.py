@@ -741,9 +741,16 @@ def _validate_grapher_config(tab: Table, col: str) -> None:
         # schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version", "title")]
         schema["required"] = []
 
-        from jsonschema import validate
+        from jsonschema import ValidationError, validate
 
-        validate(grapher_config, schema)
+        # Re-raise as ValueError because jsonschema.exceptions.ValidationError is not
+        # reliably picklable across multiprocessing workers (re-imported class identity
+        # mismatches break ForkingPickler), which crashes parallel `etl run` past
+        # --continue-on-failure.
+        try:
+            validate(grapher_config, schema)
+        except ValidationError as e:
+            raise ValueError(f"Invalid grapher_config for column `{col}`: {e}") from None
 
 
 def _validate_description_key(description_key: list[str], col: str) -> None:

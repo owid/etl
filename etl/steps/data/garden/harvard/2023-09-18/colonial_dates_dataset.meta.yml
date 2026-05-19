@@ -120,8 +120,6 @@ tables:
                 customCategoryLabels:
                   z. Multiple colonizers: Multiple colonizers
                   United Kingdom: United Kingdom
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
-
       total_colonies:
         title: Number of colonies
         unit: "countries"
