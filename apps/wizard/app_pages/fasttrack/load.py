@@ -251,6 +251,9 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
     # drop empty rows
     data_df = data_df.dropna(how="all")
 
+    # drop fully empty columns (e.g. pandas-named `Unnamed: N` from a stray trailing comma)
+    data_df = data_df.dropna(axis=1, how="all")
+
     # lowercase columns names
     for col in data_df.columns:
         if col.lower() in ("entity", "year", "country"):
