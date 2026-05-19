@@ -389,7 +389,7 @@ tables:
         title: Hate crime protections (historical)
         unit: ""
         short_unit: ""
-        description_short: Legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people. "Protected in some contexts" means the protection extends only to violent crimes (such as assault) but not to lesser offenses (such as harassment).
+        description_short: Legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people. "Protected in some contexts" means the protection extends only to violent crimes (such as assault), or also to lesser offenses (such as harassment).
         presentation:
           title_public: Hate crime protections based on sexual orientation or gender identity
         display:
@@ -400,7 +400,7 @@ tables:
         title: Hate crime protections (current)
         unit: ""
         short_unit: ""
-        description_short: Legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people. "Protected in some contexts" means the protection extends only to violent crimes (such as assault) but not to lesser offenses (such as harassment).
+        description_short: Legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people. "Protected in some contexts" means the protection extends only to violent crimes (such as assault), or also to lesser offenses (such as harassment).
         presentation:
           title_public: Hate crime protections based on sexual orientation or gender identity
         display:
