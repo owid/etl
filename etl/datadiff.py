@@ -876,8 +876,10 @@ def _local_catalog_datasets(
 def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
     uri = f"{DEFAULT_CATALOG_URL}{path}/index.json"
     js = http_session.get(uri).json()
-    # drop origins for backward compatibility
+    # Drop deprecated provenance fields for backward compatibility with remote catalog entries
+    # that were built before the Source -> Origin migration was fully rolled out.
     js.pop("origins", None)
+    js.pop("sources", None)
     ds_meta = DatasetMeta(**js)
     # TODO: channel should be in DatasetMeta by default
     ds_meta.channel = path.split("/")[0]  # ty: ignore
