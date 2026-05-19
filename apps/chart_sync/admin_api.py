@@ -8,6 +8,8 @@ from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import HTTPError
 
 from etl.config import ADMIN_API_KEY, DEFAULT_GRAPHER_SCHEMA, GRAPHER_USER_ID, OWIDEnv
+from etl.http import USER_AGENT
+from etl.http import session as http_session
 
 log = structlog.get_logger()
 
@@ -48,7 +50,7 @@ class AdminAPI:
         return js
 
     def get_chart_config(self, chart_id: int) -> dict:
-        resp = requests.get(
+        resp = http_session.get(
             f"{self.owid_env.admin_api}/charts/{chart_id}.config.json",
             headers=self._headers(),
         )
@@ -56,7 +58,7 @@ class AdminAPI:
         return js
 
     def get_chart_references(self, chart_id: int) -> dict:
-        resp = requests.get(
+        resp = http_session.get(
             f"{self.owid_env.admin_api}/charts/{chart_id}.references.json",
             headers=self._headers(),
         )
@@ -75,7 +77,7 @@ class AdminAPI:
             inheritance_param = "enable" if is_inheritance_enabled else "disable"
             params["inheritance"] = inheritance_param
 
-        resp = requests.post(
+        resp = http_session.post(
             self.owid_env.admin_api + "/charts",
             headers=self._headers(user_id),
             json=config,
@@ -98,7 +100,7 @@ class AdminAPI:
             inheritance_param = "enable" if is_inheritance_enabled else "disable"
             params["inheritance"] = inheritance_param
 
-        resp = requests.put(
+        resp = http_session.put(
             f"{self.owid_env.admin_api}/charts/{chart_id}",
             headers=self._headers(user_id),
             json=config,
@@ -110,7 +112,7 @@ class AdminAPI:
         return js
 
     def set_tags(self, chart_id: int, tags: list[dict[str, Any]], user_id: int | None = None) -> dict:
-        resp = requests.post(
+        resp = http_session.post(
             f"{self.owid_env.admin_api}/charts/{chart_id}/setTags",
             headers=self._headers(user_id),
             json={"tags": tags},
@@ -136,7 +138,7 @@ class AdminAPI:
         return js
 
     def delete_grapher_config(self, variable_id: int) -> dict:
-        resp = requests.delete(
+        resp = http_session.delete(
             self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
             headers=self._headers(),
         )
@@ -179,7 +181,7 @@ class AdminAPI:
             "name": name,
             "content": content,
         }
-        resp = requests.post(
+        resp = http_session.post(
             f"{self.owid_env.admin_api}/dods",
             headers=self._headers(user_id),
             json=data,
@@ -194,7 +196,7 @@ class AdminAPI:
         data = {
             "content": content,
         }
-        resp = requests.patch(
+        resp = http_session.patch(
             f"{self.owid_env.admin_api}/dods/{dod_id}",
             headers=self._headers(user_id),
             json=data,
@@ -207,7 +209,7 @@ class AdminAPI:
 
     def get_narrative_chart(self, narrative_chart_id: int) -> dict:
         """Get a narrative chart by ID."""
-        resp = requests.get(
+        resp = http_session.get(
             f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}.config.json",
             headers=self._headers(),
             timeout=1,
@@ -226,7 +228,7 @@ class AdminAPI:
         Returns:
             Response dict from the API
         """
-        resp = requests.put(
+        resp = http_session.put(
             f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}",
             headers=self._headers(user_id),
             json={"config": config},
@@ -247,7 +249,7 @@ class AdminAPI:
         Returns:
             Response dict from the API
         """
-        resp = requests.post(
+        resp = http_session.post(
             f"{self.owid_env.admin_api}/datasets/{dataset_id}/setArchived",
             headers=self._headers(user_id),
             json={"isArchived": is_archived},
@@ -260,6 +262,7 @@ class AdminAPI:
 
 def requests_with_retry() -> requests.Session:
     s = requests.Session()
+    s.headers["User-Agent"] = USER_AGENT
     retries = Retry(total=5, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
     s.mount("http://", HTTPAdapter(max_retries=retries))
     s.mount("https://", HTTPAdapter(max_retries=retries))
