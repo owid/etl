@@ -860,7 +860,7 @@ tables:
       gender_affirming_care:
         title: Gender-affirming care (adults and minors)
         description_short: |-
-          Whether gender-affirming care is publicly funded or legally restricted for adults and for minors. Gender-affirming care refers to interventions that help transgender and non-binary people align their bodies with their gender identity — such as hormone replacement therapy or surgery for adults, and puberty blockers, cross-sex hormones, or surgery for minors.
+          Interventions that help transgender and non-binary people align their bodies with their gender identity — such as hormone replacement therapy or surgery for adults, and puberty blockers, cross-sex hormones, or surgery for minors.
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Covered for adults and minors_** (gender-affirming healthcare is publicly funded for both adults and minors), **_Covered for adults only_** (gender-affirming healthcare is publicly funded for adults but not for minors), **_Adults covered, minors restricted_** (gender-affirming healthcare is publicly funded for adults but explicitly restricted or banned for minors), **_Neither covered nor restricted_** (no national policy explicitly funds or restricts gender-affirming healthcare for either group), **_Varies by region or other_** (rules differ between subnational jurisdictions, or both coverage and restriction are recorded in the same year because of a mid-year policy change) and **_Restricted for both_** (gender-affirming healthcare is explicitly restricted or banned for both adults and minors).'
