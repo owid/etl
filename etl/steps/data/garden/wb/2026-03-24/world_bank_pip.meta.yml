@@ -198,7 +198,7 @@ definitions:
     Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). These are not perfectly comparable — consumption tends to be more evenly distributed than income. For most countries, we have only one option available. But when there is a mix of consumption and income data points, we process the data to keep one observation per country and year.
 
   description_key_welfare_type_spells: |-
-    The data comes from the World Bank's Poverty and Inequality Platform (PIP), which draws on national household surveys. Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). These are not perfectly comparable — consumption tends to be more evenly distributed than income. This chart shows the data with income and consumption measures separately.
+    The data comes from the World Bank's Poverty and Inequality Platform (PIP), which draws on national household surveys. Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). These are not perfectly comparable — consumption tends to be more evenly distributed than income. Comparability can also break _within_ either measure when survey methods or measurement change over time. This chart shows each comparable series separately.
 
   description_key_welfare_type: |-
     <% if welfare_type is defined and survey_comparability is defined and survey_comparability == "No spells" %>
