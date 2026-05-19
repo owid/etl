@@ -411,13 +411,13 @@ definitions:
     {macros}
     <% if survey_comparability == "No spells" %>
     <% if decile == "5" %>
-    Threshold <<welfare_type>> {definitions.per_period} marking the <<percentiles_thr(decile) | lower>> (median)
+    Median <<welfare_type>> {definitions.per_period}
     <%- else %>
     Threshold <<welfare_type>> {definitions.per_period} marking the <<percentiles_thr(decile) | lower>>
     <%- endif %>
     <%- else %>
     <% if decile == "5" %>
-    Threshold income or consumption {definitions.per_period} marking the <<percentiles_thr(decile) | lower>> (median)
+    Median income or consumption {definitions.per_period}
     <%- else %>
     Threshold income or consumption {definitions.per_period} marking the <<percentiles_thr(decile) | lower>>
     <%- endif %>

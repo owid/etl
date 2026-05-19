@@ -222,7 +222,7 @@ definitions:
   threshold_title: |-
     {macros}
     <% if decile == 5 %>
-    Threshold income {definitions.per_period} marking the <<percentiles_thr(decile) | lower>> (median) ({definitions.welfare_type})
+    Median income {definitions.per_period} ({definitions.welfare_type})
     <%- else %>
     Threshold income {definitions.per_period} marking the <<percentiles_thr(decile) | lower>> ({definitions.welfare_type})
     <%- endif %>
