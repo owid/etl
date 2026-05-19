@@ -219,9 +219,7 @@ def build_food_trade_table(tb_tm: Table, tb_qcl: Table) -> Table:
     # use that side's number.
     merged["value"] = merged["value_importer"].fillna(merged["value_exporter"])
     both = merged["value_exporter"].notna() & merged["value_importer"].notna()
-    merged.loc[both, "value"] = (
-        merged.loc[both, "value_exporter"] * merged.loc[both, "value_importer"]
-    ) ** 0.5
+    merged.loc[both, "value"] = (merged.loc[both, "value_exporter"] * merged.loc[both, "value_importer"]) ** 0.5
     merged = merged.dropna(subset=["value"])
     merged = merged[merged["value"] > 0]
 
