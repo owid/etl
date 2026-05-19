@@ -22,10 +22,14 @@ The display items shown in the dropdown are curated in
 integer-code filter against `item_code`.
 
 For each (exporter, importer, item) the trade matrix typically has two
-reports — one from each side — that can disagree. We pick the
-**importer-reported** quantity by default (FAO convention; import figures
-are more thoroughly tracked at customs) and fall back to the exporter-
-reported one when the importer didn't report.
+reports — one from each side — that can disagree. When both sides report,
+we take the **geometric mean** of the two quantities (√(exp × imp));
+this treats over- and under-reporting symmetrically in log space, which
+is the natural choice for heavy-tailed trade flows. When only one side
+reports, we use that side's number. The notebook at
+docs/analyses/food_trade/food_trade.ipynb justifies this choice and
+contrasts it with the academic alternative (CEPII-BACI reliability
+weights, Gaulier & Zignago 2010).
 
 Items in TM that aren't covered by `food_trade.items.yaml` are dropped;
 items in `food_trade.items.yaml` that aren't in the TM snapshot raise a
@@ -209,8 +213,15 @@ def build_food_trade_table(tb_tm: Table, tb_qcl: Table) -> Table:
     ].rename(columns={"reporter_country": "importer", "partner_country": "exporter", "value": "value_importer"})
 
     merged = exp_side.merge(imp_side, on=["exporter", "importer", "item"], how="outer")
-    # Prefer the importer-reported number; fall back to exporter-reported.
+    # When both sides report, take the geometric mean of the two quantities (this
+    # treats over- and under-reporting symmetrically in log space, which is the
+    # natural choice for heavy-tailed trade flows). When only one side reports,
+    # use that side's number.
     merged["value"] = merged["value_importer"].fillna(merged["value_exporter"])
+    both = merged["value_exporter"].notna() & merged["value_importer"].notna()
+    merged.loc[both, "value"] = (
+        merged.loc[both, "value_exporter"] * merged.loc[both, "value_importer"]
+    ) ** 0.5
     merged = merged.dropna(subset=["value"])
     merged = merged[merged["value"] > 0]
 
