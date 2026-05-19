@@ -90,11 +90,12 @@ def load_data_from_csv(uploaded_file):
         st.write("Parsing data...")
         data = parse_data_from_csv(csv_df)
 
-        # Obtain dataset and other objects
+        # Obtain dataset and other objects. Use the parsed data's columns (which exclude
+        # fully-empty trailing columns) so metadata stays aligned with the data.
         st.write("Parsing metadata...")
         dataset_meta, variables_meta_dict, origin = parse_metadata_from_csv(
             uploaded_file.name,
-            csv_df.columns,
+            data.columns,
         )
     except ValidationError as e:
         st.exception(e)
