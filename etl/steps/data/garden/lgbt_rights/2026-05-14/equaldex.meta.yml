@@ -55,8 +55,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
-        presentation:
-          title_public: Legal status of same-sex sexual acts
         display:
           name: Homosexual activity
           <<: *display_common
@@ -66,8 +64,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
-        presentation:
-          title_public: Legal status of same-sex sexual acts
         display:
           name: Homosexual activity
           <<: *display_common
@@ -77,8 +73,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
-        presentation:
-          title_public: Gender marker change
         display:
           name: Right to change legal gender
           <<: *display_common
@@ -88,8 +82,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
-        presentation:
-          title_public: Gender marker change
         display:
           name: Right to change legal gender
           <<: *display_common
@@ -99,8 +91,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
-        presentation:
-          title_public: Marriage for same-sex partners
         display:
           name: Same-sex marriage
           <<: *display_common
@@ -111,8 +101,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
-        presentation:
-          title_public: Marriage for same-sex partners
         display:
           name: Same-sex marriage
           <<: *display_common
@@ -122,8 +110,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
-        presentation:
-          title_public: Joint adoptions by same-sex partners
         display:
           name: Same-sex adoption
           <<: *display_common
@@ -133,8 +119,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
-        presentation:
-          title_public: Joint adoptions by same-sex partners
         display:
           name: Same-sex adoption
           <<: *display_common
@@ -144,8 +128,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Difference between legal age of consent for homosexual sex and heterosexual sex.
-        presentation:
-          title_public: Age of consent for same-sex and different-sex partners
         display:
           name: Equal age of consent
           <<: *display_common
@@ -155,8 +137,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Difference between legal age of consent for homosexual sex and heterosexual sex.
-        presentation:
-          title_public: Age of consent for same-sex and different-sex partners
         display:
           name: Equal age of consent
           <<: *display_common
@@ -166,8 +146,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
-        presentation:
-          title_public: Blood donations by men who have sex with men
         display:
           name: Blood donations by MSMs
           <<: *display_common
@@ -177,8 +155,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
-        presentation:
-          title_public: Blood donations by men who have sex with men
         display:
           name: Blood donations by MSMs
           <<: *display_common
@@ -188,8 +164,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Censorship or prohibition of discussing, promoting, or teaching LGBT+ topics in media, schools, and in the general public.
-        presentation:
-          title_public: Censorship of LGBT+ issues
         display:
           name: Censorship of LGBT+ issues
           <<: *display_common
@@ -199,8 +173,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Censorship or prohibition of discussing, promoting, or teaching LGBT+ topics in media, schools, and in the general public.
-        presentation:
-          title_public: Censorship of LGBT+ issues
         display:
           name: Censorship of LGBT+ issues
           <<: *display_common
@@ -210,8 +182,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legal status of conducting sexual orientation changing therapy.
-        presentation:
-          title_public: Conversion therapies
         display:
           name: Conversion therapy
           <<: *display_common
@@ -221,8 +191,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legal status of conducting sexual orientation changing therapy.
-        presentation:
-          title_public: Conversion therapies
         display:
           name: Conversion therapy
           <<: *display_common
@@ -232,8 +200,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Prohibition of discrimination based on sexual orientation and/or gender identity.
-        presentation:
-          title_public: Discrimination based on sexual orientation or gender identity
         display:
           name: LGBT+ discrimination
           <<: *display_common
@@ -243,8 +209,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Prohibition of discrimination based on sexual orientation and/or gender identity.
-        presentation:
-          title_public: Discrimination based on sexual orientation or gender identity
         display:
           name: LGBT+ discrimination
           <<: *display_common
@@ -254,8 +218,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
-        presentation:
-          title_public: Employment discrimination based on sexual orientation or gender identity prohibited
         display:
           name: LGBT+ employment discrimination
           <<: *display_common
@@ -265,8 +227,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
-        presentation:
-          title_public: Employment discrimination based on sexual orientation or gender identity prohibited
         display:
           name: LGBT+ employment discrimination
           <<: *display_common
@@ -276,8 +236,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
-        presentation:
-          title_public: Housing discrimination based on sexual orientation or gender identity prohibited
         display:
           name: LGBT+ housing discrimination
           <<: *display_common
@@ -287,8 +245,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
-        presentation:
-          title_public: Housing discrimination based on sexual orientation or gender identity prohibited
         display:
           name: LGBT+ housing discrimination
           <<: *display_common
@@ -300,8 +256,6 @@ tables:
         description_short: Ability for homosexuals to serve in the military and be open about their sexuality.
         description_key:
           - "\"Don't ask, don't tell\" refers to policies that prohibit military personnel from discriminating against or harassing closeted homosexuals (people who have not revealed their sexual orientation to the public), while barring openly homosexuals."
-        presentation:
-          title_public: Lesbian, gay, bisexual, and transgender people serve openly in the military
         display:
           name: Serving openly in the military
           <<: *display_common
@@ -313,8 +267,6 @@ tables:
         description_short: Ability for homosexuals to serve in the military and be open about their sexuality.
         description_key:
           - "\"Don't ask, don't tell\" refers to policies that prohibit military personnel from discriminating against or harassing closeted homosexuals (people who have not revealed their sexual orientation to the public), while barring openly homosexuals."
-        presentation:
-          title_public: Lesbian, gay, bisexual, and transgender people serve openly in the military
         display:
           name: Serving openly in the military
           <<: *display_common
@@ -324,8 +276,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legal recognition of non-binary, genderqueer, or third gender identities.
-        presentation:
-          title_public: Third gender legally recognized
         display:
           name: Legal recognition of non-binary gender
           <<: *display_common
@@ -335,8 +285,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legal recognition of non-binary, genderqueer, or third gender identities.
-        presentation:
-          title_public: Third gender legally recognized
         display:
           name: Legal recognition of non-binary gender
           <<: *display_common
@@ -346,8 +294,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Interventions to help transgender and non-binary people align their bodies with their gender identity. This can include hormone replacement therapy, surgeries, or psychological support.
-        presentation:
-          title_public: Gender-affirming care
         display:
           name: Gender-affirming care
           <<: *display_common
@@ -357,8 +303,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Interventions to help transgender and non-binary people align their bodies with their gender identity. This can include hormone replacement therapy, surgeries, or psychological support.
-        presentation:
-          title_public: Gender-affirming care
         display:
           name: Gender-affirming care
           <<: *display_common
@@ -368,8 +312,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Medical procedures on newborns or infants with physical sex characteristics that differ from typical male or female bodies, usually without the informed consent of the child who is too young to participate in the decision-making process.
-        presentation:
-          title_public: Intersex infant surgery
         display:
           name: Intersex infant surgery
           <<: *display_common
@@ -379,8 +321,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Medical procedures on newborns or infants with physical sex characteristics that differ from typical male or female bodies, usually without the informed consent of the child who is too young to participate in the decision-making process.
-        presentation:
-          title_public: Intersex infant surgery
         display:
           name: Intersex infant surgery
           <<: *display_common
@@ -390,8 +330,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people. "Protected in some contexts" means the protection extends only to violent crimes (such as assault), or also to lesser offenses (such as harassment).
-        presentation:
-          title_public: Hate crime protections based on sexual orientation or gender identity
         display:
           name: Hate crime protections
           <<: *display_common
@@ -401,8 +339,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Legal status of hate crime protections based on sexual orientation and/or gender identity, including laws that increase penalties for crimes motivated by bias against LGBT+ people. "Protected in some contexts" means the protection extends only to violent crimes (such as assault), or also to lesser offenses (such as harassment).
-        presentation:
-          title_public: Hate crime protections based on sexual orientation or gender identity
         display:
           name: Hate crime protections
           <<: *display_common
@@ -420,8 +356,6 @@ tables:
           {definitions.description_from_producer_legal_index}
 
           {definitions.description_from_producer_public_opinion_index}
-        presentation:
-          title_public: Equality index
         display:
           name: Equality index
           numDecimalPlaces: 0
@@ -436,8 +370,6 @@ tables:
           - "The legal equality index summarizes the current legal status of 16 LGBT+ policies — from the legality of same-sex sexual activity and marriage to hate-crime protections and the right to change legal gender — each weighted by how heavily it counts toward the overall ranking. For more information, visit the [Equaldex Equality Index methodology](https://www.equaldex.com/equality-index)."
         description_from_producer: |-
           {definitions.description_from_producer_legal_index}
-        presentation:
-          title_public: Legal equality index
         display:
           name: Legal equality index
           numDecimalPlaces: 0
@@ -452,8 +384,6 @@ tables:
           - "The public opinion equality index averages results from reputable surveys and polls on LGBT+ attitudes by region, weighted so that more recent surveys carry more influence. For more information, visit the [Equaldex Equality Index methodology](https://www.equaldex.com/equality-index)."
         description_from_producer: |-
           {definitions.description_from_producer_public_opinion_index}
-        presentation:
-          title_public: Public opinion equality index
         display:
           name: Public opinion equality index
           numDecimalPlaces: 0
