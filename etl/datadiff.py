@@ -10,7 +10,6 @@ from typing import Any, cast
 
 import numpy as np
 import pandas as pd
-import requests
 import rich
 import rich_click as click
 import structlog
@@ -25,6 +24,7 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 from etl.dag_helpers import load_dag
 from etl.files import yaml_dump
 from etl.git_helpers import get_changed_files
+from etl.http import session as http_session
 from etl.io import get_all_changed_catalog_paths
 from etl.tempcompare import series_equals
 
@@ -875,7 +875,7 @@ def _local_catalog_datasets(
 
 def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
     uri = f"{DEFAULT_CATALOG_URL}{path}/index.json"
-    js = requests.get(uri).json()
+    js = http_session.get(uri).json()
     # drop origins for backward compatibility
     js.pop("origins", None)
     ds_meta = DatasetMeta(**js)

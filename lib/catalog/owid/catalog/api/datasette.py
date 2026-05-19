@@ -8,8 +8,9 @@ from __future__ import annotations
 from typing import Any, Literal
 
 import pandas as pd
-import requests
 from pydantic import BaseModel, ConfigDict, Field
+
+from owid.catalog.api.utils import session
 
 DATASETTE_BASE_URL = "https://datasette-public.owid.io/owid.json"
 DEFAULT_TIMEOUT = 10
@@ -117,7 +118,7 @@ class DatasetteAPI:
             else:
                 paginated_sql = f"{sql_stripped} LIMIT {PAGE_SIZE} OFFSET {offset}"
 
-            resp = requests.get(
+            resp = session.get(
                 self.base_url,
                 params={"sql": paginated_sql, "_shape": "array"},
                 timeout=request_timeout,
@@ -250,7 +251,7 @@ def _fetch_table_metadata(
     # Build table endpoint URL from base URL
     # e.g., https://datasette-public.owid.io/owid.json -> https://datasette-public.owid.io/owid/{table}.json
     table_url = base_url.replace(".json", f"/{table_name}.json")
-    resp = requests.get(
+    resp = session.get(
         table_url,
         params={"_size": 0},  # No rows, just metadata
         timeout=timeout,

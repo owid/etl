@@ -1,9 +1,7 @@
 dataset:
   update_period_days: 365
-  sources: []
 definitions:
   common:
-    sources: []
     origins:
       - producer: World Inequality Database (WID.world)
         title: World Inequality Database
@@ -74,4 +72,3 @@ tables:
               - South Africa
               - China
               - France
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
