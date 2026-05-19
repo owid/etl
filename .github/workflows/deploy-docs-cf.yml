@@ -1,0 +1,72 @@
+name: Deploy docs to Cloudflare Pages
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-docs-cf-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  deployments: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Override site_url for the Cloudflare build
+        run: |
+          sed -i 's|^site_url = .*|site_url = "https://docs-cf.owid.io/projects/etl/"|' zensical.toml
+
+      - name: Build docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: make docs.build
+
+      - name: Stage build under /projects/etl/
+        run: |
+          mkdir -p staging/projects/etl
+          cp -a site/. staging/projects/etl/
+
+      - name: Deploy to Cloudflare Pages
+        id: cf
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy staging
+            --project-name=owid-etl-docs
+            --branch=${{ github.head_ref || github.ref_name }}
+
+      - name: Post preview URL on PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: docs-cf-preview
+          message: |
+            📚 **Docs preview (Cloudflare Pages)**
+
+            - Branch URL: ${{ steps.cf.outputs.deployment-url }}
+            - ETL docs entry point: ${{ steps.cf.outputs.deployment-url }}/projects/etl/
+
+            _Updated from commit ${{ github.event.pull_request.head.sha }}_
