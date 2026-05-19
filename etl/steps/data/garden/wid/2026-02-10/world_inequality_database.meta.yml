@@ -197,7 +197,7 @@ definitions:
   title_threshold: |-
     {macros}
     <% if quantile == "p50p60" %>
-    "Median {definitions.concept_welfare_type} {definitions.per_period}{definitions.concept_welfare_type_for_title}"
+    Median {definitions.concept_welfare_type} {definitions.per_period}{definitions.concept_welfare_type_for_title}
     <%- else %>
     Threshold {definitions.concept_welfare_type} {definitions.per_period} marking the <<quantiles_thr(quantile) | lower>>{definitions.concept_welfare_type_for_title}
     <%- endif %>
