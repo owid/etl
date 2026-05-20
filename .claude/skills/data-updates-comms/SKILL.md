@@ -95,21 +95,16 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
    - Map the count to a qualifier: 1–9 = "handful", 10–49 = "moderate", 50–199 = "large", 200+ = "massive".
    - **Only count published charts.** Drafts are excluded by design — the Slack audience cares about user-facing impact.
 
-4. **Seed the editorial fields with context.**
-   For each of "why it matters", "caveats", "anything interesting", do not write prose — write a short prompt block followed by extracted snippets. Example:
-   ```markdown
-   **What does this dataset help our users understand about the world?**
-   _Rewrite in your own voice. Snippets to draw from:_
-   - From `meta.origin.description` (BTI snapshot): "BTI puts development and transformation policies to the test… in-depth assessments of 137 countries…"
-   - Garden dataset description: "…"
-   - Top indicator `description_short`: "…"
-   ```
+4. **Seed the editorial fields with snippet bullets.**
+   For each of "why it matters", "caveats", "anything interesting": don't write prose, write 2–6 substantive bullets above an empty `text` fenced block. Bullets are clean reader-facing prose — **no `Snapshot description:` / `Garden description:` prefixes** in the output. Use those as internal source pointers only.
 
 5. **Pick chart views.**
    - Reuse `charts.selected_views` from `update-context.yml` if present.
-   - Otherwise query published charts on staging (same SQL as step 3 but selecting `c.id, cc.slug, cc.full->>'$.title', cc.full->>'$.type', cc.full->>'$.hasMapTab'`).
+   - Otherwise query published charts on staging (same SQL as step 3 but selecting `c.id, cc.slug, cc.full->>'$.title', cc.full->>'$.type', cc.full->>'$.hasMapTab', c.publishedAt, c.createdAt`).
    - Rank by: `hasMapTab=true` > `type=StackedArea` global views > standalone-headline titles. Skip population-weighted variants and country-specific views.
-   - Output 1–3 with slug + rationale.
+   - Output 1–3 as **`[<chart title>](<admin URL>)` — <rationale>**. Hyperlink the title to an admin URL so Charlie (or whoever runs the form) can open the chart directly:
+     - If the chart already exists in production (i.e. it was published *before* the current PR branch was cut — easiest signal: `c.publishedAt` is older than the branch's first commit), link to production: `https://admin.owid.io/admin/charts/<id>`.
+     - If the chart is **new in this PR** (created/first-published on this branch), link to staging: `http://staging-site-<branch>/admin/charts/<id>`. Don't link new charts to production — the page 404s until the branch merges.
    - Prefer the most-viewed / most-linked charts (e.g. the `analytics_pageviews` table on staging or the equivalent admin endpoint)
 
 6. **Build the search URL.**
@@ -122,163 +117,111 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
 8. **Write the draft.**
    - Output path: `ai/data-update-comms.md` by default, or `workbench/<short_name>/slack-announcement.md` when invoked from `update-dataset` step 9.
-   - Use the canonical format in the Output format section below.
-   - Mark each field with one of: `[filled]`, `[prompt — user rewrites]`, `[verify]`, `[missing]`.
+   - Use the canonical format in the Output format section below — no example lines, no `[filled]` / `[prompt]` tags, no inline instructions. If a field can't be filled mechanically, write `[missing — <what's needed>]` inside the fenced block and stop.
 
 9. **Show the user the file path** and stop. Do **not** post to Slack — that's a human action. The user copy-pastes from the Markdown file into the Slack form.
 
 ## Output format
 
-**The output file must follow the Slack form's wording verbatim.** Use the exact prompt strings and example strings shown in `slack-form-verbatim.md`. The user copy-pastes from this file directly into the Slack form, so each Slack field gets its own `## <verbatim prompt>` heading, the Slack-provided example sits unchanged underneath as a quoted line ("E.g.: …"), and our drafted answer goes below in a fenced ```text block``` (so the user can copy the answer cleanly without dragging the prompt or example with it).
+**The output file must use the Slack form's prompt wording verbatim as section headings.** The user copy-pastes the answer text into the matching Slack fields, so each prompt is its own `## <verbatim heading>`.
 
-The verbatim Slack prompts and examples (do **not** rephrase, abbreviate, or change punctuation):
+**Keep the file lean.** No "E.g.:" example lines, no `[filled]` / `[prompt — user rewrites]` tags, no inline framing instructions, no `_Snippets to draw from:_` / `_Candidate caveats:_` / `_Context from this PR:_` label preambles, no ```text``` code fences around the answers. The skill keeps the framing reminders for itself (see "Editorial framing" below); the file is just headings → answer prose (for mechanical fields) or snippet bullets (for editorial fields).
 
-| # | Prompt heading (verbatim) | Example line (verbatim, kept as-is) |
-|---|---|---|
-| 1 | `What dataset(s) did you update?` | `E.g.: UN World Population Prospects.` |
-| 2 | `When was this data released? When is the next scheduled release / our plan for next update?` | `E.g.: released: Jul 2024; next: Jul 2027, and we'll update that month.` |
-| 3 | `Who is the data source(s)? Is there anything our users should know about them?` | `E.g.: Maintained by researchers at the University of California and the Max Planck Institute for Demographic Research.` |
-| 4 | `What's the coverage of the data in terms of years and countries/regions?` | `E.g.: Covers the years 1991–2024, global total only.` |
-| 5 | `How many charts did this update affect?` | `Was this a small update affecting a handful of charts, or a massive one affecting tens or even hundreds?` |
-| 6 | `What does this dataset help our users understand about the world, and why is it important they know that?` | `In other words: Why do we have this data on OWID at all? What is unique about this dataset compared to similar ones?` |
-| 7 | `Any important caveats or pitfalls in interpretation that users should know about this data? (optional)` | `E.g.: note that saying "Country X is more productive than Country Y" is often taken as "people in Country X work harder".` |
-| 8 | `Anything interesting to note about this update, including what you had to do? Anything else you'd like to add? (optional)` | `E.g.: you worked with the data provider to improve the data somehow.` |
-| 9 | `Add 1–3 chart views we might use in the public announcement` | `Pick chart views that represent the whole dataset, rather than, e.g., something very specific about a single country.` |
-| 10 | `Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)` | `E.g.: https://ourworldindata.org/search?datasetProducts=World%20Development%20Indicators.` |
+The verbatim Slack prompt headings (do **not** rephrase, abbreviate, or change punctuation):
+
+| # | Prompt heading (verbatim) |
+|---|---|
+| 1 | `What dataset(s) did you update?` |
+| 2 | `When was this data released? When is the next scheduled release / our plan for next update?` |
+| 3 | `Who is the data source(s)? Is there anything our users should know about them?` |
+| 4 | `What's the coverage of the data in terms of years and countries/regions?` |
+| 5 | `How many charts did this update affect?` |
+| 6 | `What does this dataset help our users understand about the world, and why is it important they know that?` |
+| 7 | `Any important caveats or pitfalls in interpretation that users should know about this data? (optional)` |
+| 8 | `Anything interesting to note about this update, including what you had to do? Anything else you'd like to add? (optional)` |
+| 9 | `Add 1–3 chart views we might use in the public announcement` |
+| 10 | `Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)` |
 
 The table above is the single source of truth — if the Slack form's wording changes, update it here and nowhere else.
 
-The exact draft file structure:
+### Editorial framing (internal — do **not** copy into the output file)
 
-````markdown
+Before drafting fields #6, #7, #8, remember they go to Charlie, who turns them into public-facing posts — not into an internal team log. Snippets should sound like what you'd tell a curious friend, not a colleague: reader-centric, with a concrete number where possible, and what's interesting about the source. The agent uses this framing to *select* and *phrase* the snippets; the framing itself is never written into the output.
+
+### Snippet selection per editorial field
+
+- **Why does this matter (#6)** — pull 3–5 short bullets that, taken together, answer "why do we have this data on OWID at all?". Draw from `meta.origin.description`, garden dataset description, and top indicator `description_short`; rephrase into clean prose. Do **not** prefix each bullet with its source label (e.g. don't write `Snapshot description: "…"`); just write the substantive content.
+- **Caveats (#7)** — pull 2–4 bullets surfacing real interpretation pitfalls. Draw from indicator `description_key` bullets, sanity-check workarounds, and methodology notes. Skip if there are no load-bearing caveats.
+- **Interesting (#8)** — pull 3–6 bullets describing concrete findings or noteworthy events captured in this update (new policies, reversals, changed countries). Draw from `editorial_context.interesting_update_snippets` in `update-context.yml`, commit messages, and resolved workarounds. Phrase them as reader-facing facts, not engineering notes.
+
+### Exact draft file structure
+
+```markdown
 # Data update comms draft — <dataset name>
 
 Source: `<ns>/<new_version>/<short_name>` · Branch: `<branch>` · Generated: <iso datetime>
-
-> Each section below mirrors the #data-updates-comms Slack form verbatim. Copy the answer block (inside ```text``` fences) into the matching field in the Slack form. `[filled]` answers are mechanical and safe to use as-is. `[prompt — user rewrites]` answers are seeded with snippets — rewrite them in your own voice.
->
-> **Before you write the editorial fields (#6, #7, #8):** these go to Charlie, who turns them into public-facing posts on social media and in newsletters — not into an internal team log. Don't write what you'd say to your colleagues ("I updated all the WDI charts"). Write what you'd say to a friend who asks what you did this week ("I updated hundreds of our charts to the latest release of the World Bank's largest dataset, called the World Development Indicators…"). Try to take a reader-centric view: what work was done, what it changes/enables, what's interesting about the source, what it helps people understand about the world, why anyone should care it's been updated.
 
 ---
 
 ## What dataset(s) did you update?
 
-> E.g.: UN World Population Prospects.
-
-[filled]
-```text
 <Dataset title — Producer>
-```
 
 ## When was this data released? When is the next scheduled release / our plan for next update?
 
-> E.g.: released: Jul 2024; next: Jul 2027, and we'll update that month.
-
-[filled] / [verify]
-```text
-Released: <date_published>. Next: <best-effort guess>.
-```
+Released: <date_published>. Next: <best-effort or "unknown — …">.
 
 ## Who is the data source(s)? Is there anything our users should know about them?
 
-> E.g.: Maintained by researchers at the University of California and the Max Planck Institute for Demographic Research.
-
-[filled]
-```text
 <producer>. <citation_full or attribution_short, trimmed>.
-```
 
 ## What's the coverage of the data in terms of years and countries/regions?
 
-> E.g.: Covers the years 1991–2024, global total only.
-
-[filled]
-```text
 Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if applicable>. <Sparse-recent-year flag if applicable.>
-```
 
 ## How many charts did this update affect?
 
-> Was this a small update affecting a handful of charts, or a massive one affecting tens or even hundreds?
-
-[filled]
-```text
 <N> published charts (<size qualifier>).
-```
 
 ## What does this dataset help our users understand about the world, and why is it important they know that?
 
-> In other words: Why do we have this data on OWID at all? What is unique about this dataset compared to similar ones?
-
-[prompt — user rewrites]
-
-_This is the most important field. Write it as you'd describe the dataset to a curious friend, not to a colleague. What question does this data help answer? What's unique about this source vs. alternatives? Why should someone outside OWID care?_
-
-_Snippets to draw from:_
-- snapshot description: "…"
-- garden description: "…"
-- top indicator description_short: "…"
-
-```text
-<your draft answer here>
-```
+- <substantive snippet>
+- <substantive snippet>
+- <substantive snippet>
 
 ## Any important caveats or pitfalls in interpretation that users should know about this data? (optional)
 
-> E.g.: note that saying "Country X is more productive than Country Y" is often taken as "people in Country X work harder".
-
-[prompt — user rewrites]
-
-_Candidate caveats from indicator `description_key` bullets, sanity-check workarounds, and methodology notes:_
-- "…"
-- "…"
-
-```text
-<your draft answer here, or leave empty if no caveats>
-```
+- <caveat snippet>
+- <caveat snippet>
 
 ## Anything interesting to note about this update, including what you had to do? Anything else you'd like to add? (optional)
 
-> E.g.: you worked with the data provider to improve the data somehow.
-
-[prompt — user rewrites]
-
-_Frame this from the reader's perspective, not the engineer's. "We flagged three issues to the source" is too technical and internal. "We spotted several issues with the data on vaccination in Sub-Saharan Africa and emailed the WHO team, who has now corrected them" is much more helpful for Charlie. Skip routine engineering work; lead with anything a non-OWID reader would find genuinely interesting._
-
-_Context from this PR:_
-- <commit subject lines unique to this PR>
-- <resolved sanity_checks workarounds, if any>
-- <snapshot row delta vs old version, if available>
-
-```text
-<your draft answer here, or leave empty if nothing notable>
-```
+- <interesting snippet>
+- <interesting snippet>
 
 ## Add 1–3 chart views we might use in the public announcement
 
-> Pick chart views that represent the whole dataset, rather than, e.g., something very specific about a single country.
-
-[filled]
-
-1. **<title>** — `<slug>` — <rationale>
-2. **<title>** — `<slug>` — <rationale>
+1. **[<title>](<admin URL — production for existing charts, staging for new ones>)** — <one-line rationale>
+2. **[<title>](<admin URL — production for existing charts, staging for new ones>)** — <one-line rationale>
 
 ## Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)
 
-> E.g.: https://ourworldindata.org/search?datasetProducts=World%20Development%20Indicators.
+https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
 
-[filled]
-```text
-https://ourworldindata.org/search?datasetProducts=<urlencoded producer or dataset title>
+---
+
+## Pending mechanical follow-ups
+
+- <only if any — e.g. "next release date is best-effort", "verify producer's release cadence", source-of-truth caveats>
 ```
-````
 
-**Strict rules for the verbatim text:**
+**Strict rules:**
 - Do not paraphrase the prompt headings — they must match the Slack form character-for-character.
-- Keep the example line as a `> E.g.: …` blockquote directly under each heading. Do not delete it (the user reads it for tone calibration), do not paste it into our answer.
-- Each answer that is meant to be copy-pasted goes in a ```text``` fenced block. Editorial prompts may have unfenced snippet bullets above the fenced block, but the actual draft answer always sits inside fences.
+- No code fences around answers — they sit as plain prose under each heading.
+- Editorial fields (#6, #7, #8) carry snippet bullets only; the user writes their own answer when filling the Slack form.
+- Snippet bullets must be substantive prose, not labelled quotes. Drop source prefixes like "Snapshot description:" — the user shouldn't see them.
 - Optional sections (#7, #8, #10) keep their `(optional)` suffix.
-- Notes about scope corrections, source-of-truth caveats (e.g. "queried live DB instead of staging"), or branch-version mismatches go **below the form** under a `## Pending mechanical follow-ups` section — never inside the verbatim Slack fields.
+- Notes about scope corrections, source-of-truth caveats, or branch-version mismatches go **below the form** under a `## Pending mechanical follow-ups` section — never inside the verbatim Slack fields.
 
 ## Critical rules
 
