@@ -8,7 +8,7 @@ definitions:
     description_processing: |-
       - We have extracted the data from the official [Equaldex JSON API](https://equaldex.stoplight.io/docs/equaldex/d033e28a5cf0c-equaldex-json-api).
       - We combine the historical and current data extracted from the API to create a time series.
-      - Whenever policy implementation dates for a status are not provided in the data, and this status is the only available for the country, we consider that this status has not changed during the entire period of the dataset.
+      - If Equaldex doesn't record when a status began, we only include it for the most recent year — we don't extend it backward.
       - We group some of the categories the source has defined for each issue, for further clarity in our visualizations.
       - We present this data only for sovereign states, defined by [Butcher and Griffiths (2020)](https://ourworldindata.org/grapher/sovereign-state-butcher-griffiths), using the definitions of the latest year available. Greenland is the one exception: we keep it as its own country row but exclude it from regional aggregates.
     presentation:
