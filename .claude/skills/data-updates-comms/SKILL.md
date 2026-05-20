@@ -100,9 +100,11 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
 5. **Pick chart views.**
    - Reuse `charts.selected_views` from `update-context.yml` if present.
-   - Otherwise query published charts on staging (same SQL as step 3 but selecting `c.id, cc.slug, cc.full->>'$.title', cc.full->>'$.type', cc.full->>'$.hasMapTab'`).
+   - Otherwise query published charts on staging (same SQL as step 3 but selecting `c.id, cc.slug, cc.full->>'$.title', cc.full->>'$.type', cc.full->>'$.hasMapTab', c.publishedAt, c.createdAt`).
    - Rank by: `hasMapTab=true` > `type=StackedArea` global views > standalone-headline titles. Skip population-weighted variants and country-specific views.
-   - Output 1–3 with slug + rationale.
+   - Output 1–3 as **`[<chart title>](<admin URL>)` — <rationale>**. Hyperlink the title to an admin URL so Charlie (or whoever runs the form) can open the chart directly:
+     - If the chart already exists in production (i.e. it was published *before* the current PR branch was cut — easiest signal: `c.publishedAt` is older than the branch's first commit), link to production: `https://admin.owid.io/admin/charts/<id>`.
+     - If the chart is **new in this PR** (created/first-published on this branch), link to staging: `http://staging-site-<branch>/admin/charts/<id>`. Don't link new charts to production — the page 404s until the branch merges.
    - Prefer the most-viewed / most-linked charts (e.g. the `analytics_pageviews` table on staging or the equivalent admin endpoint)
 
 6. **Build the search URL.**
@@ -199,8 +201,8 @@ Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if a
 
 ## Add 1–3 chart views we might use in the public announcement
 
-1. **<title>** — `<slug>` — <one-line rationale>
-2. **<title>** — `<slug>` — <one-line rationale>
+1. **[<title>](<admin URL — production for existing charts, staging for new ones>)** — <one-line rationale>
+2. **[<title>](<admin URL — production for existing charts, staging for new ones>)** — <one-line rationale>
 
 ## Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)
 
