@@ -10,10 +10,6 @@
 #               Stable across FAOSTAT releases. The trailing `#` comment is
 #               the current TM item name for human readability only.
 #
-# We intentionally stick to raw commodities (no flours, oils, beer, etc.) and
-# avoid group totals — these don't have direct QCL Production data, so they
-# can't carry a share-of-production line without further machinery.
-
 items:
   # ─────────────────────────────────────────────────────────────────────────
   # Cereals
