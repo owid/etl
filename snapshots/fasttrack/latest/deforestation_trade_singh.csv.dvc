@@ -7,11 +7,11 @@ meta:
     url_main: https://doi.org/10.5281/zenodo.18953516
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRNWOtTUwN8MVHGwve-ixvSZMe_ktXF-fNfrKBKUuMUVYk27LabSe8EGBpIWYeZKWMMqP1W_Mopcsnv/pub?output=csv
-    date_accessed: '2026-05-19'
+    date_accessed: '2026-05-20'
   name: Deforestation embedded in trade (Singh et al, 2026)
   description: ''
   license: {}
 outs:
-  - md5: 5685e8d4ece14dbceff585999e5921b1
-    size: 252250
+  - md5: 87a431200c6cd1758a4421db2583e1e9
+    size: 269037
     path: deforestation_trade_singh.csv
