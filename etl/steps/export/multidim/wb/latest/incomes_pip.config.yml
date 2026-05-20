@@ -29,19 +29,22 @@ dimensions:
     choices:
       - slug: mean
         name: Mean income or consumption
-        # description:
+        description: The average income or consumption across the whole population
       - slug: median
         name: Median income or consumption
-        # description:
-      - slug: avg
-        name: Mean income or consumption, by decile
-        # description:
+        description: The level of income or consumption which 50% of the population falls below, and 50% fall above
       - slug: thr
-        name: Income threshold for each decile
-        description: The income or consumption level below which 10%, 20%, 30%, etc. of the population falls
+        name: Threshold income or consumption
+        description: The level of income or consumption below which 10%, 20%, 30%, etc. of the population falls
+        group: By decile
+      - slug: avg
+        name: "Mean income or consumption "
+        description: The average level of income or consumption of each decile (tenth) of the population
+        group: By decile
       - slug: share
-        name: Income share of each decile
-        description: The share of income or consumption received by each income group
+        name: Share of income or consumption
+        description: The share of income or consumption received by each decile (tenth) of the population
+        group: By decile
 
   - name: Group
     slug: decile

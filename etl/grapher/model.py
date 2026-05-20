@@ -28,7 +28,6 @@ from typing import Any, Literal, Optional, Union, get_args, overload
 import humps
 import numpy as np
 import pandas as pd
-import requests
 import structlog
 from deprecated import deprecated
 from owid import catalog
@@ -79,6 +78,7 @@ from typing_extensions import Self, TypedDict
 
 from etl import config, paths
 from etl.db import read_sql
+from etl.http import session as http_session
 
 log = structlog.get_logger()
 
@@ -1493,7 +1493,7 @@ class Variable(Base):
 
         If session is given, entity codes are replaced with entity names.
         """
-        data = requests.get(self.s3_data_path(typ="http")).json()
+        data = http_session.get(self.s3_data_path(typ="http")).json()
         df = pd.DataFrame(data)
 
         if session is not None:
@@ -1502,7 +1502,7 @@ class Variable(Base):
         return df
 
     def get_metadata(self) -> dict[str, Any]:
-        metadata = requests.get(self.s3_metadata_path(typ="http")).json()
+        metadata = http_session.get(self.s3_metadata_path(typ="http")).json()
 
         return metadata
 

@@ -217,7 +217,17 @@ def _validate_data(df: pd.DataFrame, variables_meta_dict: dict[str, VariableMeta
 
     # missing columns in metadata
     for col in set(df.columns) - set(variables_meta_dict.keys()):
-        errors.append(ValidationError(f"Variable {col} is not defined in metadata"))
+        if col.startswith("unnamed_"):
+            errors.append(
+                ValidationError(
+                    f"Variable `{col}` is not defined in metadata. This usually means your Google Sheet has an "
+                    "extra empty column with values somewhere (or a trailing comma in the header). Delete any "
+                    "empty columns past your last named column in the `data` tab, then wait ~5 minutes for the "
+                    "published CSV to refresh before re-running."
+                )
+            )
+        else:
+            errors.append(ValidationError(f"Variable {col} is not defined in metadata"))
 
     # extra columns in metadata
     for col in set(variables_meta_dict.keys()) - set(df.columns):

@@ -90,11 +90,12 @@ def load_data_from_csv(uploaded_file):
         st.write("Parsing data...")
         data = parse_data_from_csv(csv_df)
 
-        # Obtain dataset and other objects
+        # Obtain dataset and other objects. Use the parsed data's columns (which exclude
+        # fully-empty trailing columns) so metadata stays aligned with the data.
         st.write("Parsing metadata...")
         dataset_meta, variables_meta_dict, origin = parse_metadata_from_csv(
             uploaded_file.name,
-            csv_df.columns,
+            data.columns,
         )
     except ValidationError as e:
         st.exception(e)
@@ -250,6 +251,9 @@ def import_google_sheets(url: str) -> dict[str, Any]:
 def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
     # drop empty rows
     data_df = data_df.dropna(how="all")
+
+    # drop fully empty columns (e.g. pandas-named `Unnamed: N` from a stray trailing comma)
+    data_df = data_df.dropna(axis=1, how="all")
 
     # lowercase columns names
     for col in data_df.columns:
