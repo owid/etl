@@ -12,6 +12,6 @@ meta:
   description: ''
   license: {}
 outs:
-  - md5: 87a431200c6cd1758a4421db2583e1e9
-    size: 269037
+  - md5: c9e93f59c628db43eb787618b0c0fd70
+    size: 238735
     path: deforestation_trade_singh.csv
