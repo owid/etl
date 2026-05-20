@@ -130,6 +130,12 @@ steps:
     - data://meadow/ggdc/2024-01-19/maddison_federico_paper:
         - snapshot://ggdc/2024-01-19/maddison_federico_paper.xlsx
 
+  # Federico–Tena World Population Historical Database — V2 (1991 borders, 2026 update).
+  # Published Dataverse release that supersedes the 2024-01-19 working-paper Excel.
+  data://garden/ggdc/2026-05-20/federico_tena_population:
+    - data://meadow/ggdc/2026-05-20/federico_tena_population:
+        - snapshot://ggdc/2026-05-20/federico_tena_population.tab
+
   #
   # Population of the Republic of Ireland territory between 1841 and 2006 (Central Statistics Office of Ireland)
   #

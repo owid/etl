@@ -1,0 +1,31 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+
+dataset:
+  update_period_days: 365
+
+tables:
+  federico_tena_population:
+    variables:
+      population:
+        title: Population
+        unit: people
+        short_unit: ""
+        description_short: |-
+          Estimated population, harmonized to 1991 political borders, as compiled by Federico and Tena-Junguito from first-hand sources and country-specific literature.
+        display:
+          numDecimalPlaces: 0
+      continent:
+        title: Continent (source label)
+        unit: ""
+        description_short: |-
+          Continent label as recorded in the Federico–Tena source spreadsheet.
+      historical_name:
+        title: Historical name (source label)
+        unit: ""
+        description_short: |-
+          Historical or alternative polity name as recorded in the Federico–Tena source spreadsheet, where different from the 1991-borders country name.
