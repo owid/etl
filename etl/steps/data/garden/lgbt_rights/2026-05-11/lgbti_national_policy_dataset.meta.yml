@@ -26,7 +26,7 @@ definitions:
   derivation_age_of_consent: |-
     From the original dataset, we combined two indicators — age of consent equal and age of consent unequal — into a single categorical indicator (Equal, Varies by region, No legal provisions, Unequal) based on the proportion scores of both directions. Country-years where either direction shows partial subnational implementation are classified as "Varies by region".
   derivation_marriage: |-
-    From the original dataset, we combined three indicators — marriage equality (legal direction), marriage equality (illegal direction, i.e. constitutional or statutory bans), and civil unions — into a single categorical indicator (Legal, Varies by region, No legal provisions, Banned) based on the proportion scores of all three. Country-years where marriage equality, the ban, or civil unions are only partially in effect across subnational jurisdictions are classified as "Varies by region".
+    From the original dataset, we combined three indicators — marriage equality (legal direction), marriage equality (illegal direction, i.e. constitutional or statutory bans), and civil unions — into a single categorical indicator (Legal, Civil unions only, Varies by region, No legal provisions, Banned) based on the proportion scores of all three. Country-years where marriage equality, the ban, or civil unions are only partially in effect across subnational jurisdictions are classified as "Varies by region"; country-years where a national civil union or registered partnership is recognized but same-sex marriage is not are classified as "Civil unions only".
   derivation_lgb_military_join: |-
     From the original dataset, we combined two indicators — LGB allowed in the military and LGB banned from the military — into a single categorical indicator (Allowed, No policy, Banned) based on the proportion scores of both directions.
 
@@ -38,10 +38,13 @@ definitions:
     From the original dataset's single-direction proportion (0 = no policy, 1 = fully implemented, intermediate values = partial subnational adoption), we coded countries into three categories: the substantive direction in effect, partial subnational implementation ("Varies by region"), or no policy in effect.
   derivation_so_gi_pair: |-
     From the original dataset's two separate indicators — one for sexual orientation and one for gender identity — we combined them into a single categorical indicator with five categories: both protected, sexual orientation only, gender identity only, no protection, and "Varies by region" (any partial subnational coverage in either dimension).
+
+  description_key_so_gi_partial_note: |-
+    "Varies by region" also covers asymmetric cases where one dimension is fully unprotected and the other is partially protected across subnational jurisdictions — e.g. a federal country where some states have hate-crime protections for sexual orientation but none for gender identity.
   derivation_gac: |-
     From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The most common patterns get a dedicated category (e.g. covered for both, adults covered with minors restricted); rarer combinations are grouped as "Varies by region or other".
   derivation_gmc: |-
-    From the original dataset, we combined the gender-marker-change proportion (the legal direction) with the recorded legal-pathway requirement to produce a single categorical indicator. When legal change of the gender marker is fully in effect, we classify countries by their procedural requirement ("Self-declaration", "Medical or psychological diagnosis", "Surgery required", "Surgery and sterilization required", or "Legally possible, requirement unknown" when the requirement is not recorded). Otherwise the country is classified as "Varies by region" (legal change is only partially in effect across subnational jurisdictions) or "Not legally possible" (no legal procedure exists).
+    From the original dataset, we combined the gender-marker-change proportion (the legal direction) with the recorded legal-pathway requirement to produce a single categorical indicator. When legal change of the gender marker is fully in effect, we classify countries by their procedural requirement ("Self-declaration is enough", "Diagnosis required", "Surgery required", "Surgery and sterilization required", or "Legally possible, requirement unknown" when the requirement is not recorded). Otherwise the country is classified as "Varies by region" (legal change is only partially in effect across subnational jurisdictions) or "Not legally possible" (no legal procedure exists).
 
   # Per-law short description (used for description_short and as building block for title)
   law_short: |-
@@ -68,7 +71,7 @@ definitions:
     <% elif law == "gender_affirming_care_minors" %>
     Whether gender-affirming healthcare for minors under 18 is publicly funded, or explicitly restricted or banned by national law.
     <% elif law == "gender_assignment_surgeries_on_children" %>
-    Whether non-consensual gender assignment surgeries on intersex minors are banned.
+    Whether non-consensual gender assignment surgeries on intersex children are banned.
     <% elif law == "gender_marker_change" %>
     Whether a legal process exists to change the gender marker on official identity documents.
     <% elif law == "goods_services_discrimination_gender_identity" %>
@@ -134,9 +137,9 @@ definitions:
     <% elif law == "gender_affirming_care_minors" and status == "restricted" %>
     Gender-affirming healthcare for minors is restricted or banned
     <% elif law == "gender_assignment_surgeries_on_children" and status == "illegal" %>
-    Non-consensual gender assignment surgeries on intersex minors are banned
+    Non-consensual gender assignment surgeries on intersex children are banned
     <% elif law == "gender_assignment_surgeries_on_children" and status == "legal" %>
-    Non-consensual gender assignment surgeries on intersex minors are permitted
+    Non-consensual gender assignment surgeries on intersex children are permitted
     <% elif law == "gender_marker_change" and status == "legal" %>
     A legal process exists to change the gender marker on identity documents
     <% elif law == "goods_services_discrimination_gender_identity" and status == "illegal" %>
@@ -299,7 +302,7 @@ tables:
           Whether same-sex couples can legally marry, whether civil unions or registered partnerships are recognized instead, or whether same-sex marriage is banned.
         description_key:
           - "{definitions.description_key_dataset}"
-          - "The indicator is coded as follows: **_Legal_** (marriage equality is fully implemented under national law; civil unions may also exist), **_Varies by region_** (marriage equality, the marriage ban, or civil unions are only partially in effect across subnational jurisdictions), **_No legal provisions_** (no national law regulating same-sex marriage or civil unions) and **_Banned_** (marriage equality is banned and the ban is fully implemented, with no civil unions)."
+          - "The indicator is coded as follows: **_Legal_** (marriage equality is fully implemented under national law; civil unions may also exist), **_Civil unions only_** (a national civil union or registered partnership is recognized, but same-sex marriage is not), **_Varies by region_** (marriage equality, the marriage ban, or civil unions are only partially in effect across subnational jurisdictions), **_No legal provisions_** (no national law regulating same-sex marriage or civil unions) and **_Banned_** (marriage equality is banned and the ban is fully implemented, with no civil unions)."
         processing_level: major
         description_processing: "{definitions.derivation_marriage}"
         unit: ""
@@ -310,6 +313,7 @@ tables:
         type: ordinal
         sort:
           - Legal
+          - Civil unions only
           - Varies by region
           - No legal provisions
           - Banned
@@ -427,7 +431,7 @@ tables:
           Whether same-sex couples may jointly adopt children.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Permitted_** (same-sex couples may jointly adopt children under national law), **_Varies by region_** (rules differ between subnational jurisdictions) and **_Not permitted_** (national law does not permit joint adoption by same-sex couples).'
+          - 'The indicator is coded as follows: **_Allowed_** (same-sex couples may jointly adopt children under national law), **_Varies by region_** (rules differ between subnational jurisdictions) and **_Not allowed_** (national law does not permit joint adoption by same-sex couples).'
         unit: ""
         short_unit: ""
         display:
@@ -435,9 +439,9 @@ tables:
           numDecimalPlaces: 0
         type: ordinal
         sort:
-          - Permitted
+          - Allowed
           - Varies by region
-          - Not permitted
+          - Not allowed
         processing_level: major
         description_processing: '{definitions.derivation_single_direction}'
 
@@ -660,20 +664,20 @@ tables:
         description_processing: '{definitions.derivation_single_direction}'
 
       gender_assignment_surgeries_on_children:
-        title: Non-consensual gender assignment surgeries on intersex minors
+        title: Non-consensual gender assignment surgeries on intersex children
         description_short: |-
-          Whether non-consensual gender assignment surgeries on intersex minors are banned.
+          Whether non-consensual gender assignment surgeries on intersex children are banned.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Non-consensual surgeries banned_** (non-consensual gender assignment surgeries on intersex minors are banned under national law), **_Varies by region_** (bans differ between subnational jurisdictions) and **_Not banned_** (no national ban on non-consensual gender assignment surgeries on intersex minors).'
+          - 'The indicator is coded as follows: **_Banned_** (non-consensual gender assignment surgeries on intersex children are banned under national law), **_Varies by region_** (bans differ between subnational jurisdictions) and **_Not banned_** (no national ban on non-consensual gender assignment surgeries on intersex children).'
         unit: ""
         short_unit: ""
         display:
-          name: Non-consensual gender assignment surgeries on intersex minors
+          name: Non-consensual gender assignment surgeries on intersex children
           numDecimalPlaces: 0
         type: ordinal
         sort:
-          - Non-consensual surgeries banned
+          - Banned
           - Varies by region
           - Not banned
         processing_level: major
@@ -705,7 +709,7 @@ tables:
           Whether national law restricts the public expression of LGBTI identities (so-called "gay propaganda" or morality provisions).
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_No restrictions_** (no national law restricts the public expression of LGBTI identities), **_Varies by region_** (restrictions differ between subnational jurisdictions), **_Restrictions in effect but not enforced_** (national law restricts the public expression of LGBTI identities, but the dataset records the restrictions as not enforced) and **_Restrictions in effect_** (national law restricts the public expression of LGBTI identities, e.g. so-called "gay propaganda" or morality provisions).'
+          - 'The indicator is coded as follows: **_No restrictions_** (no national law restricts the public expression of LGBTI identities), **_Laws vary by region_** (restrictions differ between subnational jurisdictions), **_Restrictions exist but not enforced_** (national law restricts the public expression of LGBTI identities, but the dataset records the restrictions as not enforced) and **_Restrictions exist_** (national law restricts the public expression of LGBTI identities, e.g. so-called "gay propaganda" or morality provisions).'
           - "{definitions.derivation_enforcement_refinement}"
         unit: ""
         short_unit: ""
@@ -715,9 +719,9 @@ tables:
         type: ordinal
         sort:
           - No restrictions
-          - Varies by region
-          - Restrictions in effect but not enforced
-          - Restrictions in effect
+          - Laws vary by region
+          - Restrictions exist but not enforced
+          - Restrictions exist
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} {definitions.derivation_enforcement_refinement}'
 
@@ -769,6 +773,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both protected_** (national law prohibits employment discrimination on both sexual orientation and gender identity), **_Sexual orientation only_** (national law prohibits employment discrimination on sexual orientation but not gender identity), **_Gender identity only_** (national law prohibits employment discrimination on gender identity but not sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions for either ground) and **_No protection_** (national law does not prohibit employment discrimination on either ground).'
+          - "{definitions.description_key_so_gi_partial_note}"
         unit: ""
         short_unit: ""
         display:
@@ -791,6 +796,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both protected_** (national law prohibits goods and services discrimination on both sexual orientation and gender identity), **_Sexual orientation only_** (national law prohibits goods and services discrimination on sexual orientation but not gender identity), **_Gender identity only_** (national law prohibits goods and services discrimination on gender identity but not sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions for either ground) and **_No protection_** (national law does not prohibit goods and services discrimination on either ground).'
+          - "{definitions.description_key_so_gi_partial_note}"
         unit: ""
         short_unit: ""
         display:
@@ -813,6 +819,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both covered_** (national hate crime legislation covers both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is covered by national hate crime legislation), **_Varies by region_** (coverage differs between subnational jurisdictions for either ground) and **_Not covered_** (national hate crime legislation does not cover either ground).'
+          - "{definitions.description_key_so_gi_partial_note}"
         unit: ""
         short_unit: ""
         display:
@@ -834,6 +841,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both protected_** (the constitution explicitly, or via binding court interpretation, protects both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is protected) and **_Not protected_** (the constitution does not protect either ground).'
+          - "{definitions.description_key_so_gi_partial_note}"
         unit: ""
         short_unit: ""
         display:
@@ -852,7 +860,7 @@ tables:
       gender_affirming_care:
         title: Gender-affirming care (adults and minors)
         description_short: |-
-          Whether gender-affirming care is publicly funded or legally restricted for adults and for minors. Gender-affirming care refers to interventions that help transgender and non-binary people align their bodies with their gender identity — such as hormone replacement therapy or surgery for adults, and puberty blockers, cross-sex hormones, or surgery for minors.
+          Interventions that help transgender and non-binary people align their bodies with their gender identity — such as hormone replacement therapy or surgery for adults, and puberty blockers, cross-sex hormones, or surgery for minors.
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Covered for adults and minors_** (gender-affirming healthcare is publicly funded for both adults and minors), **_Covered for adults only_** (gender-affirming healthcare is publicly funded for adults but not for minors), **_Adults covered, minors restricted_** (gender-affirming healthcare is publicly funded for adults but explicitly restricted or banned for minors), **_Neither covered nor restricted_** (no national policy explicitly funds or restricts gender-affirming healthcare for either group), **_Varies by region or other_** (rules differ between subnational jurisdictions, or both coverage and restriction are recorded in the same year because of a mid-year policy change) and **_Restricted for both_** (gender-affirming healthcare is explicitly restricted or banned for both adults and minors).'
@@ -880,7 +888,7 @@ tables:
           Whether a legal process exists to change the gender marker on official identity documents, and what the process requires — self-declaration, medical or psychological diagnosis, surgery, or surgery plus sterilization.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Self-declaration_** (legal change of the gender marker is possible based on self-declaration), **_Medical or psychological diagnosis_** (legal change requires a medical or psychological diagnosis), **_Surgery required_** (legal change requires gender-affirming surgery), **_Surgery and sterilization required_** (legal change requires both gender-affirming surgery and sterilization), **_Legally possible, requirement unknown_** (legal change is in effect but the procedural requirement is not recorded in the source), **_Varies by region_** (rules differ between subnational jurisdictions, or legal change is only partially in effect) and **_Not legally possible_** (no legal procedure exists to change the gender marker on official identity documents).'
+          - 'The indicator is coded as follows: **_Self-declaration is enough_** (legal change of the gender marker is possible based on self-declaration), **_Diagnosis required_** (legal change requires a medical or psychological diagnosis), **_Surgery required_** (legal change requires gender-affirming surgery), **_Surgery and sterilization required_** (legal change requires both gender-affirming surgery and sterilization), **_Legally possible, requirement unknown_** (legal change is in effect but the procedural requirement is not recorded in the source), **_Varies by region_** (rules differ between subnational jurisdictions, or legal change is only partially in effect) and **_Not legally possible_** (no legal procedure exists to change the gender marker on official identity documents).'
         unit: ""
         short_unit: ""
         display:
@@ -888,8 +896,8 @@ tables:
           numDecimalPlaces: 0
         type: ordinal
         sort:
-          - Self-declaration
-          - Medical or psychological diagnosis
+          - Self-declaration is enough
+          - Diagnosis required
           - Surgery required
           - Surgery and sterilization required
           - Legally possible, requirement unknown
@@ -1070,6 +1078,19 @@ tables:
           name: Legal
           numDecimalPlaces: 0
 
+      marriage_civil_unions_only_count:
+        title: Marriage equality — Civil unions only (number of countries)
+        description_short: |-
+          The number of countries where a national civil union or registered partnership is recognized, but same-sex marriage is not.
+        processing_level: major
+        description_processing: |-
+          {definitions.derivation_marriage} We then counted the countries classified as "Civil unions only" within each region. {definitions.description_regions_processing}
+        unit: countries
+        short_unit: ""
+        display:
+          name: Civil unions only
+          numDecimalPlaces: 0
+
       marriage_varies_by_region_count:
         title: Marriage equality — Varies by region (number of countries)
         description_short: |-
@@ -1121,6 +1142,19 @@ tables:
         short_unit: ""
         display:
           name: Legal
+          numDecimalPlaces: 0
+
+      marriage_civil_unions_only_pop:
+        title: Marriage equality — Civil unions only (population)
+        description_short: |-
+          The total population of countries where a national civil union or registered partnership is recognized, but same-sex marriage is not.
+        processing_level: major
+        description_processing: |-
+          {definitions.derivation_marriage} We then summed the populations of countries classified as "Civil unions only" within each region. {definitions.description_regions_processing}
+        unit: people
+        short_unit: ""
+        display:
+          name: Civil unions only
           numDecimalPlaces: 0
 
       marriage_varies_by_region_pop:
@@ -1599,26 +1633,26 @@ tables:
           name: Legally recognized
           numDecimalPlaces: 0
 
-      joint_adoption_not_permitted_count:
-        title: Joint adoption by same-sex couples — Not permitted (number of countries)
-        description_short: The number of countries classified as "Not permitted" on the indicator on joint adoption by same-sex couples.
+      joint_adoption_not_allowed_count:
+        title: Joint adoption by same-sex couples — Not allowed (number of countries)
+        description_short: The number of countries classified as "Not allowed" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not permitted" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not allowed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Not permitted
+          name: Not allowed
           numDecimalPlaces: 0
 
-      joint_adoption_not_permitted_pop:
-        title: Joint adoption by same-sex couples — Not permitted (population)
-        description_short: The total population of countries classified as "Not permitted" on the indicator on joint adoption by same-sex couples.
+      joint_adoption_not_allowed_pop:
+        title: Joint adoption by same-sex couples — Not allowed (population)
+        description_short: The total population of countries classified as "Not allowed" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not permitted" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not allowed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Not permitted
+          name: Not allowed
           numDecimalPlaces: 0
 
       joint_adoption_varies_by_region_count:
@@ -1643,26 +1677,26 @@ tables:
           name: Varies by region
           numDecimalPlaces: 0
 
-      joint_adoption_permitted_count:
-        title: Joint adoption by same-sex couples — Permitted (number of countries)
-        description_short: The number of countries classified as "Permitted" on the indicator on joint adoption by same-sex couples.
+      joint_adoption_allowed_count:
+        title: Joint adoption by same-sex couples — Allowed (number of countries)
+        description_short: The number of countries classified as "Allowed" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Permitted" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Allowed" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Permitted
+          name: Allowed
           numDecimalPlaces: 0
 
-      joint_adoption_permitted_pop:
-        title: Joint adoption by same-sex couples — Permitted (population)
-        description_short: The total population of countries classified as "Permitted" on the indicator on joint adoption by same-sex couples.
+      joint_adoption_allowed_pop:
+        title: Joint adoption by same-sex couples — Allowed (population)
+        description_short: The total population of countries classified as "Allowed" on the indicator on joint adoption by same-sex couples.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Permitted" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Allowed" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Permitted
+          name: Allowed
           numDecimalPlaces: 0
 
       constitutional_protections_sexual_orientation_not_protected_count:
@@ -2348,8 +2382,8 @@ tables:
           numDecimalPlaces: 0
 
       gender_assignment_surgeries_on_children_not_banned_count:
-        title: Non-consensual gender assignment surgeries on intersex minors — Not banned (number of countries)
-        description_short: The number of countries classified as "Not banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        title: Non-consensual gender assignment surgeries on intersex children — Not banned (number of countries)
+        description_short: The number of countries classified as "Not banned" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Not banned" within each region. {definitions.description_regions_processing}'
         unit: countries
@@ -2359,8 +2393,8 @@ tables:
           numDecimalPlaces: 0
 
       gender_assignment_surgeries_on_children_not_banned_pop:
-        title: Non-consensual gender assignment surgeries on intersex minors — Not banned (population)
-        description_short: The total population of countries classified as "Not banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        title: Non-consensual gender assignment surgeries on intersex children — Not banned (population)
+        description_short: The total population of countries classified as "Not banned" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Not banned" within each region. {definitions.description_regions_processing}'
         unit: people
@@ -2370,8 +2404,8 @@ tables:
           numDecimalPlaces: 0
 
       gender_assignment_surgeries_on_children_varies_by_region_count:
-        title: Non-consensual gender assignment surgeries on intersex minors — Varies by region (number of countries)
-        description_short: The number of countries classified as "Varies by region" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        title: Non-consensual gender assignment surgeries on intersex children — Varies by region (number of countries)
+        description_short: The number of countries classified as "Varies by region" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: countries
@@ -2381,8 +2415,8 @@ tables:
           numDecimalPlaces: 0
 
       gender_assignment_surgeries_on_children_varies_by_region_pop:
-        title: Non-consensual gender assignment surgeries on intersex minors — Varies by region (population)
-        description_short: The total population of countries classified as "Varies by region" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+        title: Non-consensual gender assignment surgeries on intersex children — Varies by region (population)
+        description_short: The total population of countries classified as "Varies by region" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
         description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
         unit: people
@@ -2391,26 +2425,26 @@ tables:
           name: Varies by region
           numDecimalPlaces: 0
 
-      gender_assignment_surgeries_on_children_non_consensual_surgeries_banned_count:
-        title: Non-consensual gender assignment surgeries on intersex minors — Non-consensual surgeries banned (number of countries)
-        description_short: The number of countries classified as "Non-consensual surgeries banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+      gender_assignment_surgeries_on_children_banned_count:
+        title: Non-consensual gender assignment surgeries on intersex children — Banned (number of countries)
+        description_short: The number of countries classified as "Banned" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Non-consensual surgeries banned" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Banned" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Non-consensual surgeries banned
+          name: Banned
           numDecimalPlaces: 0
 
-      gender_assignment_surgeries_on_children_non_consensual_surgeries_banned_pop:
-        title: Non-consensual gender assignment surgeries on intersex minors — Non-consensual surgeries banned (population)
-        description_short: The total population of countries classified as "Non-consensual surgeries banned" on the indicator on non-consensual gender assignment surgeries on intersex minors.
+      gender_assignment_surgeries_on_children_banned_pop:
+        title: Non-consensual gender assignment surgeries on intersex children — Banned (population)
+        description_short: The total population of countries classified as "Banned" on the indicator on non-consensual gender assignment surgeries on intersex children.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Non-consensual surgeries banned" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Banned" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Non-consensual surgeries banned
+          name: Banned
           numDecimalPlaces: 0
 
       death_penalty_no_death_penalty_count:
@@ -2501,70 +2535,70 @@ tables:
           name: No restrictions
           numDecimalPlaces: 0
 
-      morality_propaganda_varies_by_region_count:
-        title: Anti-LGBTI "propaganda" or morality laws — Varies by region (number of countries)
-        description_short: The number of countries classified as "Varies by region" on the indicator on anti-LGBTI "propaganda" or morality laws.
+      morality_propaganda_laws_vary_by_region_count:
+        title: Anti-LGBTI "propaganda" or morality laws — Laws vary by region (number of countries)
+        description_short: The number of countries classified as "Laws vary by region" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Laws vary by region" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Varies by region
+          name: Laws vary by region
           numDecimalPlaces: 0
 
-      morality_propaganda_varies_by_region_pop:
-        title: Anti-LGBTI "propaganda" or morality laws — Varies by region (population)
-        description_short: The total population of countries classified as "Varies by region" on the indicator on anti-LGBTI "propaganda" or morality laws.
+      morality_propaganda_laws_vary_by_region_pop:
+        title: Anti-LGBTI "propaganda" or morality laws — Laws vary by region (population)
+        description_short: The total population of countries classified as "Laws vary by region" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Varies by region" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Laws vary by region" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Varies by region
+          name: Laws vary by region
           numDecimalPlaces: 0
 
-      morality_propaganda_restrictions_in_effect_but_not_enforced_count:
-        title: Anti-LGBTI "propaganda" or morality laws — Restrictions in effect but not enforced (number of countries)
+      morality_propaganda_restrictions_exist_but_not_enforced_count:
+        title: Anti-LGBTI "propaganda" or morality laws — Restrictions exist but not enforced (number of countries)
         description_short: The number of countries where national law restricts the public expression of LGBTI identities but the restrictions are recorded as not enforced.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} {definitions.derivation_enforcement_refinement} We then counted the countries classified as "Restrictions in effect but not enforced" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} {definitions.derivation_enforcement_refinement} We then counted the countries classified as "Restrictions exist but not enforced" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Restrictions in effect but not enforced
+          name: Restrictions exist but not enforced
           numDecimalPlaces: 0
 
-      morality_propaganda_restrictions_in_effect_count:
-        title: Anti-LGBTI "propaganda" or morality laws — Restrictions in effect (number of countries)
-        description_short: The number of countries classified as "Restrictions in effect" on the indicator on anti-LGBTI "propaganda" or morality laws.
+      morality_propaganda_restrictions_exist_count:
+        title: Anti-LGBTI "propaganda" or morality laws — Restrictions exist (number of countries)
+        description_short: The number of countries classified as "Restrictions exist" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Restrictions in effect" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then counted the countries classified as "Restrictions exist" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Restrictions in effect
+          name: Restrictions exist
           numDecimalPlaces: 0
 
-      morality_propaganda_restrictions_in_effect_but_not_enforced_pop:
-        title: Anti-LGBTI "propaganda" or morality laws — Restrictions in effect but not enforced (population)
+      morality_propaganda_restrictions_exist_but_not_enforced_pop:
+        title: Anti-LGBTI "propaganda" or morality laws — Restrictions exist but not enforced (population)
         description_short: The total population of countries where national law restricts the public expression of LGBTI identities but the restrictions are recorded as not enforced.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} {definitions.derivation_enforcement_refinement} We then summed the populations of countries classified as "Restrictions in effect but not enforced" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} {definitions.derivation_enforcement_refinement} We then summed the populations of countries classified as "Restrictions exist but not enforced" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Restrictions in effect but not enforced
+          name: Restrictions exist but not enforced
           numDecimalPlaces: 0
 
-      morality_propaganda_restrictions_in_effect_pop:
-        title: Anti-LGBTI "propaganda" or morality laws — Restrictions in effect (population)
-        description_short: The total population of countries classified as "Restrictions in effect" on the indicator on anti-LGBTI "propaganda" or morality laws.
+      morality_propaganda_restrictions_exist_pop:
+        title: Anti-LGBTI "propaganda" or morality laws — Restrictions exist (population)
+        description_short: The total population of countries classified as "Restrictions exist" on the indicator on anti-LGBTI "propaganda" or morality laws.
         processing_level: major
-        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Restrictions in effect" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_single_direction} We then summed the populations of countries classified as "Restrictions exist" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Restrictions in effect
+          name: Restrictions exist
           numDecimalPlaces: 0
 
       lgbtq_civil_society_restrictions_no_restrictions_count:
@@ -3208,26 +3242,26 @@ tables:
           name: Legally possible, requirement unknown
           numDecimalPlaces: 0
 
-      gender_marker_change_medical_or_psychological_diagnosis_count:
-        title: Legal change of gender marker — Medical or psychological diagnosis (number of countries)
-        description_short: The number of countries classified as "Medical or psychological diagnosis" on the indicator on legal change of gender marker.
+      gender_marker_change_diagnosis_required_count:
+        title: Legal change of gender marker — Diagnosis required (number of countries)
+        description_short: The number of countries classified as "Diagnosis required" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Medical or psychological diagnosis" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Diagnosis required" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Medical or psychological diagnosis
+          name: Diagnosis required
           numDecimalPlaces: 0
 
-      gender_marker_change_medical_or_psychological_diagnosis_pop:
-        title: Legal change of gender marker — Medical or psychological diagnosis (population)
-        description_short: The total population of countries classified as "Medical or psychological diagnosis" on the indicator on legal change of gender marker.
+      gender_marker_change_diagnosis_required_pop:
+        title: Legal change of gender marker — Diagnosis required (population)
+        description_short: The total population of countries classified as "Diagnosis required" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Medical or psychological diagnosis" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Diagnosis required" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Medical or psychological diagnosis
+          name: Diagnosis required
           numDecimalPlaces: 0
 
       gender_marker_change_not_legally_possible_count:
@@ -3252,26 +3286,26 @@ tables:
           name: Not legally possible
           numDecimalPlaces: 0
 
-      gender_marker_change_self_declaration_count:
-        title: Legal change of gender marker — Self-declaration (number of countries)
-        description_short: The number of countries classified as "Self-declaration" on the indicator on legal change of gender marker.
+      gender_marker_change_self_declaration_is_enough_count:
+        title: Legal change of gender marker — Self-declaration is enough (number of countries)
+        description_short: The number of countries classified as "Self-declaration is enough" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Self-declaration" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Self-declaration is enough" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Self-declaration
+          name: Self-declaration is enough
           numDecimalPlaces: 0
 
-      gender_marker_change_self_declaration_pop:
-        title: Legal change of gender marker — Self-declaration (population)
-        description_short: The total population of countries classified as "Self-declaration" on the indicator on legal change of gender marker.
+      gender_marker_change_self_declaration_is_enough_pop:
+        title: Legal change of gender marker — Self-declaration is enough (population)
+        description_short: The total population of countries classified as "Self-declaration is enough" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Self-declaration" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Self-declaration is enough" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Self-declaration
+          name: Self-declaration is enough
           numDecimalPlaces: 0
 
       gender_marker_change_varies_by_region_count:

@@ -1,15 +1,13 @@
 steps:
 
   # LGBTI National Policy Dataset (Velasco, 2026)
-  data://meadow/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
-    - snapshot://lgbt_rights/2026-05-11/lgbti_national_policy_dataset.csv
-  data://garden/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
-    - data://meadow/lgbt_rights/2026-05-11/lgbti_national_policy_dataset
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2025-07-01/income_groups
   data://grapher/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
-    - data://garden/lgbt_rights/2026-05-11/lgbti_national_policy_dataset
+    - data://garden/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
+      - data://meadow/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
+        - snapshot://lgbt_rights/2026-05-11/lgbti_national_policy_dataset.csv
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/demography/2024-07-15/population
+      - data://garden/wb/2025-07-01/income_groups
 
   # Equaldex dataset
   data://grapher/lgbt_rights/2026-05-14/equaldex:

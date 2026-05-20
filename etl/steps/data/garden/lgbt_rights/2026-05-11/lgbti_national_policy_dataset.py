@@ -52,9 +52,13 @@ MARRIAGE_MAP = {
     "equality: 1 ban: 0 civil_unions: 0": "Legal",
     "equality: 1 ban: 0 civil_unions: 1": "Legal",
     "equality: 1 ban: 0 civil_unions: 0.5": "Legal",
+    # Civil unions exist nationally, no marriage equality, no ban — distinct from
+    # both "Varies by region" (federal mismatches) and "No legal provisions"
+    # (no recognition at all). Captures countries like Cyprus, Czechia, Israel,
+    # Italy, Monaco, San Marino in 2025.
+    "equality: 0 ban: 0 civil_unions: 1": "Civil unions only",
     "equality: 0.5 ban: 0 civil_unions: 0.5": "Varies by region",
     "equality: 0.5 ban: 0 civil_unions: 1": "Varies by region",  # Brazil 2011–2012
-    "equality: 0 ban: 0 civil_unions: 1": "Varies by region",
     "equality: 0 ban: 0 civil_unions: 0.5": "Varies by region",
     "equality: 0 ban: 0 civil_unions: 0": "No legal provisions",
     "equality: 0 ban: 0.5 civil_unions: 0.5": "Varies by region",
@@ -261,8 +265,8 @@ COMBINED_CONFIGS = [
         "sources": [("joint_adoption__legal", "legal")],
         "category_map": _single_direction_map(
             key="legal",
-            yes_label="Permitted",
-            neither_label="Not permitted",
+            yes_label="Allowed",
+            neither_label="Not allowed",
             mixed_label="Varies by region",
         ),
     },
@@ -382,7 +386,7 @@ COMBINED_CONFIGS = [
         "sources": [("gender_assignment_surgeries_on_children__illegal", "illegal")],
         "category_map": _single_direction_map(
             key="illegal",
-            yes_label="Non-consensual surgeries banned",
+            yes_label="Banned",
             neither_label="Not banned",
             mixed_label="Varies by region",
         ),
@@ -403,14 +407,14 @@ COMBINED_CONFIGS = [
         "sources": [("morality_propaganda__legal", "legal")],
         "category_map": _single_direction_map(
             key="legal",
-            yes_label="Restrictions in effect",
+            yes_label="Restrictions exist",
             neither_label="No restrictions",
-            mixed_label="Varies by region",
+            mixed_label="Laws vary by region",
         ),
         "enforcement_refinement": {
             "eoe_source": ("morality_propaganda", "legal"),
-            "from_label": "Restrictions in effect",
-            "to_label": "Restrictions in effect but not enforced",
+            "from_label": "Restrictions exist",
+            "to_label": "Restrictions exist but not enforced",
         },
     },
     {
@@ -534,9 +538,22 @@ def _bucket(series):
     """Bucket a continuous proportion (0..1) into '0', '0.5', '1' strings.
 
     '1' = exactly 1, '0.5' = any 0 < x < 1 (subnational partial or transition year),
-    '0' = exactly 0.
+    '0' = exactly 0. Missing proportions (NaN) propagate as NaN so downstream
+    combined-categorical lookups surface them as missing rather than silently
+    collapsing into "no policy".
     """
-    return series.apply(lambda v: "1" if v == 1 else "0.5" if v > 0 else "0")
+    import pandas as pd
+
+    def bucket(v):
+        if pd.isna(v):
+            return pd.NA
+        if v == 1:
+            return "1"
+        if v > 0:
+            return "0.5"
+        return "0"
+
+    return series.apply(bucket)
 
 
 def _build_one_combined(wide, config):
@@ -561,7 +578,9 @@ def _build_one_combined(wide, config):
         keys = keys + " " + part
     cat_map = config["category_map"]
     if "default_category" in config:
-        result = keys.map(lambda k: cat_map.get(k, config["default_category"]))
+        import pandas as pd
+
+        result = keys.map(lambda k: pd.NA if pd.isna(k) else cat_map.get(k, config["default_category"]))
     else:
         result = map_series(
             series=keys,
@@ -770,9 +789,9 @@ def _build_gmc_combined(wide):
     req = wide["gender_marker_change_requirement"]
 
     REQ_LABELS = {
-        "Self-ID": "Self-declaration",
-        "Self-Declaration": "Self-declaration",
-        "Medical/Psychological": "Medical or psychological diagnosis",
+        "Self-ID": "Self-declaration is enough",
+        "Self-Declaration": "Self-declaration is enough",
+        "Medical/Psychological": "Diagnosis required",
         "Surgery": "Surgery required",
         "Surgery+Sterilization": "Surgery and sterilization required",
     }
