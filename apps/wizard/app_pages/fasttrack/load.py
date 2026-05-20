@@ -273,7 +273,27 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
     if data_df.year.dtype not in INT_TYPES and not _is_valid_date(data_df.year):
         raise ValidationError("Column 'year' should be integer or date")
 
+    _validate_unique_keys(data_df)
+
     return data_df.set_index(["country", "year"])
+
+
+def _validate_unique_keys(data_df: pd.DataFrame) -> None:
+    key_columns = ["country", "year"] + [col for col in data_df.columns if col.startswith("dim_")]
+    duplicated_keys = data_df.loc[data_df.duplicated(subset=key_columns, keep=False), key_columns]
+
+    if duplicated_keys.empty:
+        return
+
+    sample = duplicated_keys.drop_duplicates().head(20)
+    sample_text = sample.to_string(index=False)
+    extra = (
+        "" if len(duplicated_keys) <= 20 else f"\n\nShowing the first 20 duplicated rows out of {len(duplicated_keys)}."
+    )
+    raise ValidationError(
+        "Duplicate keys found in the incoming data. Each row must have a unique "
+        f"combination of {', '.join(key_columns)}.\n\n{sample_text}{extra}"
+    )
 
 
 def _is_valid_date(series: pd.Series) -> bool:
