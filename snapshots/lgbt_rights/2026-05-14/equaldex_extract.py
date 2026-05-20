@@ -29,7 +29,6 @@ minutes. Per-country responses are cached on disk via ``joblib.Memory`` so
 re-runs after a transient failure skip already-fetched regions.
 """
 
-import datetime
 import json
 import os
 from pathlib import Path
@@ -52,6 +51,10 @@ log = get_logger()
 # Resolve namespace/version from the script location.
 PARENT_DIR = Path(__file__).parent.absolute()
 SNAPSHOT_VERSION = PARENT_DIR.name
+# Year stamped on every row of the extracted output. Derived from SNAPSHOT_VERSION
+# (not `datetime.now().year`) so rerunning a fixed snapshot path produces the same
+# data across calendar years — important for reproducibility and downstream diffs.
+SNAPSHOT_YEAR = int(SNAPSHOT_VERSION.split("-")[0])
 
 # Per-version persistent cache so retries within a single extraction reuse fetched
 # regions, but a fresh extraction at a new SNAPSHOT_VERSION starts clean. Without the
@@ -128,7 +131,7 @@ def fetch_region(region_id: str, api_key: str) -> dict:
 
 def extract_from_api(country_list: list[str], api_key: str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Hit the Equaldex API for every region in ``country_list`` and assemble three frames."""
-    current_year = datetime.datetime.now().year
+    current_year = SNAPSHOT_YEAR
 
     df_current = pd.DataFrame()
     df_historical = pd.DataFrame()
@@ -204,7 +207,7 @@ def create_long_dataset(df_current: pd.DataFrame, df_historical: pd.DataFrame) -
     and clips to ``START_YEAR`` onward. Mirrors the v1 layout exactly so the
     meadow/garden steps don't need to change.
     """
-    current_year = datetime.datetime.now().year
+    current_year = SNAPSHOT_YEAR
 
     # HISTORICAL DATA
     df_historical = df_historical[
