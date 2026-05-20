@@ -13,7 +13,7 @@ Generate a draft for the #data-updates-comms Slack form. The skill inspects the 
 
 OWID's #data-updates-comms channel is **not** an internal "FYI I did X" log. It gives information to Charlie (OWID's Communications & Outreach Manager), who turns this input into public-facing posts on social media (Instagram, LinkedIn, X) and in newsletters.
 
-So the form's editorial fields are written for Charlie *and indirectly for the general public* — not for the data team. A big mistake is writing them in an internal/engineer voice.
+So the form's editorial fields are written for Charlie _and indirectly for the general public_ — not for the data team. A big mistake is writing them in an internal/engineer voice.
 
 **The reframing that matters most:**
 
@@ -41,19 +41,19 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
 ## What's mechanical vs. editorial
 
-| Slack field | Source | Skill output |
-|---|---|---|
-| Dataset name | `meta.origin.title` + `meta.origin.producer` from snapshot DVC | filled |
-| Release date | `meta.origin.date_published` | filled |
-| Next release | producer's page (web fetch of `url_main`) — best effort | candidate + `[verify]` tag |
-| Data source | `meta.origin.producer`, `attribution_short`, `citation_full` | filled |
-| Coverage (years + countries) | garden table: `year.min()..year.max()`, distinct `country` count, presence of regions | filled |
-| Charts affected | staging MySQL query on `chart_dimensions` joined to `variables.catalogPath` (filter `publishedAt IS NOT NULL`) | filled, with size qualifier (handful/moderate/large/massive) |
-| Why this matters | seeded from `meta.origin.description` + dataset `description` + top indicator `description_short` | **prompt** with extracted snippets — user rewrites |
-| Caveats | seeded from indicator `description_key` bullets, sanity-check workarounds (`notes_to_check.md` from update-dataset workbench), `meta.origin.description` paragraphs that mention "limitations" / "caution" | **prompt** with extracted snippets — user rewrites |
-| Anything interesting | seeded from PR commit messages, `notes_to_check.md` resolutions, snapshot diff summary if available in `workbench/<short_name>/` | **prompt** — user rewrites |
-| Chart views (1–3) | `update-context.yml` candidates OR query staging directly using the criteria below | filled with rationale, user confirms |
-| Search URL | `https://ourworldindata.org/search?datasetProducts=<urlquote(producer)>` | filled |
+| Slack field                  | Source                                                                                                                                                                                                     | Skill output                                                 |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Dataset name                 | `meta.origin.title` + `meta.origin.producer` from snapshot DVC                                                                                                                                             | filled                                                       |
+| Release date                 | `meta.origin.date_published`                                                                                                                                                                               | filled                                                       |
+| Next release                 | producer's page (web fetch of `url_main`) — best effort                                                                                                                                                    | candidate + `[verify]` tag                                   |
+| Data source                  | `meta.origin.producer`, `attribution_short`, `citation_full`                                                                                                                                               | filled                                                       |
+| Coverage (years + countries) | garden table: `year.min()..year.max()`, distinct `country` count, presence of regions                                                                                                                      | filled                                                       |
+| Charts affected              | staging MySQL query on `chart_dimensions` joined to `variables.catalogPath` (filter `publishedAt IS NOT NULL`)                                                                                             | filled, with size qualifier (handful/moderate/large/massive) |
+| Why this matters             | seeded from `meta.origin.description` + dataset `description` + top indicator `description_short`                                                                                                          | **prompt** with extracted snippets — user rewrites           |
+| Caveats                      | seeded from indicator `description_key` bullets, sanity-check workarounds (`notes_to_check.md` from update-dataset workbench), `meta.origin.description` paragraphs that mention "limitations" / "caution" | **prompt** with extracted snippets — user rewrites           |
+| Anything interesting         | seeded from PR commit messages, `notes_to_check.md` resolutions, snapshot diff summary if available in `workbench/<short_name>/`                                                                           | **prompt** — user rewrites                                   |
+| Chart views (1–3)            | `update-context.yml` candidates OR query staging directly using the criteria below                                                                                                                         | filled with rationale, user confirms                         |
+| Search URL                   | `https://ourworldindata.org/search?datasetProducts=<urlquote(producer)>`                                                                                                                                   | filled                                                       |
 
 **The editorial fields are deliberately not auto-prosed.** Slack posts in the editorial voice ("Why we have this dataset on OWID") read flat when LLM-written; the value is in the human framing. The skill's job is to surface the relevant snippets so the user doesn't have to grep for them.
 
@@ -83,6 +83,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
    - Year/country coverage: report the range, the distinct-country count, and whether OWID-defined regions are included. Flag if the most recent year has notably fewer countries than the overall median (sparse-recent caveat).
 
 3. **Query staging for affected published charts.**
+
    ```bash
    make query SQL="
      SELECT COUNT(DISTINCT c.id) FROM charts c
@@ -92,6 +93,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
      WHERE v.catalogPath LIKE '%<ns>/<ver>/<sn>%'
        AND c.publishedAt IS NOT NULL"
    ```
+
    - Map the count to a qualifier: 1–9 = "handful", 10–49 = "moderate", 50–199 = "large", 200+ = "massive".
    - **Only count published charts.** Drafts are excluded by design — the Slack audience cares about user-facing impact.
 
@@ -103,7 +105,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
    - Otherwise query published charts on staging (same SQL as step 3 but selecting `c.id, cc.slug, cc.full->>'$.title', cc.full->>'$.type', cc.full->>'$.hasMapTab', c.publishedAt, c.createdAt`).
    - Rank by: `hasMapTab=true` > `type=StackedArea` global views > standalone-headline titles. Skip population-weighted variants and country-specific views.
    - Output 1–3 as **`[<chart title>](<admin URL>)` — <rationale>**. Hyperlink the title to an admin URL so Charlie (or whoever runs the form) can open the chart directly:
-     - If the chart already exists in production (i.e. it was published *before* the current PR branch was cut — easiest signal: `c.publishedAt` is older than the branch's first commit), link to production: `https://admin.owid.io/admin/charts/<id>`.
+     - If the chart already exists in production (i.e. it was published _before_ the current PR branch was cut — easiest signal: `c.publishedAt` is older than the branch's first commit), link to production: `https://admin.owid.io/admin/charts/<id>`.
      - If the chart is **new in this PR** (created/first-published on this branch), link to staging: `http://staging-site-<branch>/admin/charts/<id>`. Don't link new charts to production — the page 404s until the branch merges.
    - Prefer the most-viewed / most-linked charts (e.g. the `analytics_pageviews` table on staging or the equivalent admin endpoint)
 
@@ -125,28 +127,28 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
 **The output file must use the Slack form's prompt wording verbatim as section headings.** The user copy-pastes the answer text into the matching Slack fields, so each prompt is its own `## <verbatim heading>`.
 
-**Keep the file lean.** No "E.g.:" example lines, no `[filled]` / `[prompt — user rewrites]` tags, no inline framing instructions, no `_Snippets to draw from:_` / `_Candidate caveats:_` / `_Context from this PR:_` label preambles, no ```text``` code fences around the answers. The skill keeps the framing reminders for itself (see "Editorial framing" below); the file is just headings → answer prose (for mechanical fields) or snippet bullets (for editorial fields).
+**Keep the file lean.** No "E.g.:" example lines, no `[filled]` / `[prompt — user rewrites]` tags, no inline framing instructions, no `_Snippets to draw from:_` / `_Candidate caveats:_` / `_Context from this PR:_` label preambles, no `text` code fences around the answers. The skill keeps the framing reminders for itself (see "Editorial framing" below); the file is just headings → answer prose (for mechanical fields) or snippet bullets (for editorial fields).
 
 The verbatim Slack prompt headings (do **not** rephrase, abbreviate, or change punctuation):
 
-| # | Prompt heading (verbatim) |
-|---|---|
-| 1 | `What dataset(s) did you update?` |
-| 2 | `When was this data released? When is the next scheduled release / our plan for next update?` |
-| 3 | `Who is the data source(s)? Is there anything our users should know about them?` |
-| 4 | `What's the coverage of the data in terms of years and countries/regions?` |
-| 5 | `How many charts did this update affect?` |
-| 6 | `What does this dataset help our users understand about the world, and why is it important they know that?` |
-| 7 | `Any important caveats or pitfalls in interpretation that users should know about this data? (optional)` |
-| 8 | `Anything interesting to note about this update, including what you had to do? Anything else you'd like to add? (optional)` |
-| 9 | `Add 1–3 chart views we might use in the public announcement` |
-| 10 | `Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)` |
+| #   | Prompt heading (verbatim)                                                                                                            |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | `What dataset(s) did you update?`                                                                                                    |
+| 2   | `When was this data released? When is the next scheduled release / our plan for next update?`                                        |
+| 3   | `Who is the data source(s)? Is there anything our users should know about them?`                                                     |
+| 4   | `What's the coverage of the data in terms of years and countries/regions?`                                                           |
+| 5   | `How many charts did this update affect?`                                                                                            |
+| 6   | `What does this dataset help our users understand about the world, and why is it important they know that?`                          |
+| 7   | `Any important caveats or pitfalls in interpretation that users should know about this data? (optional)`                             |
+| 8   | `Anything interesting to note about this update, including what you had to do? Anything else you'd like to add? (optional)`          |
+| 9   | `Add 1–3 chart views we might use in the public announcement`                                                                        |
+| 10  | `Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)` |
 
 The table above is the single source of truth — if the Slack form's wording changes, update it here and nowhere else.
 
 ### Editorial framing (internal — do **not** copy into the output file)
 
-Before drafting fields #6, #7, #8, remember they go to Charlie, who turns them into public-facing posts — not into an internal team log. Snippets should sound like what you'd tell a curious friend, not a colleague: reader-centric, with a concrete number where possible, and what's interesting about the source. The agent uses this framing to *select* and *phrase* the snippets; the framing itself is never written into the output.
+Before drafting fields #6, #7, #8, remember they go to Charlie, who turns them into public-facing posts — not into an internal team log. Snippets should sound like what you'd tell a curious friend, not a colleague: reader-centric, with a concrete number where possible, and what's interesting about the source. The agent uses this framing to _select_ and _phrase_ the snippets; the framing itself is never written into the output.
 
 ### Snippet selection per editorial field
 
@@ -201,8 +203,10 @@ Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if a
 
 ## Add 1–3 chart views we might use in the public announcement
 
-1. **[<title>](<admin URL — production for existing charts, staging for new ones>)** — <one-line rationale>
-2. **[<title>](<admin URL — production for existing charts, staging for new ones>)** — <one-line rationale>
+> Pick chart views that represent the whole dataset, rather than, e.g., something very specific about a single country.
+
+1. **<title>** — `<slug>` — <rationale>
+2. **<title>** — `<slug>` — <rationale>
 
 ## Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)
 
@@ -216,6 +220,7 @@ https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
 ```
 
 **Strict rules:**
+
 - Do not paraphrase the prompt headings — they must match the Slack form character-for-character.
 - No code fences around answers — they sit as plain prose under each heading.
 - Editorial fields (#6, #7, #8) carry snippet bullets only; the user writes their own answer when filling the Slack form.

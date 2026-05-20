@@ -382,15 +382,23 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    ```
    This controls the auto-update cadence. Even when the rest of the `dataset:` block is empty, **never strip `update_period_days`** — leave the block in place with just that field.
 
-   **Link verification.** Run a HEAD request on every URL in the new `.dvc` and `.meta.yml` files (all channels — meadow `.meta.yml` files matter when they exist). Anything non-2xx is a hard blocker:
+   **Link verification.** Run a HEAD request on every URL in the new `.dvc` and `.meta.yml` files (all channels — meadow `.meta.yml` files matter when they exist). Anything non-2xx is a *signal*, not a guaranteed break — always double-check before acting:
    ```bash
-   for url in $(rg -No "https?://[^\"' ]+" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/ \
+   for url in $(rg --no-filename -No "https?://[^\"' ]+" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/ \
        | sed -E 's/[).,;:>]+$//' \
        | sort -u); do
-       printf "%s  %s\n" "$(curl -sI -o /dev/null -w '%{http_code}' --max-time 10 "$url")" "$url"
+       printf "%s  %s\n" "$(curl -sI -L -o /dev/null -w '%{http_code}' --max-time 15 -A 'Mozilla/5.0' "$url")" "$url"
    done
    ```
-   The `sed` strips trailing markdown/punctuation chars (`)`, `.`, `,`, `;`, `:`, `>`) so URLs inside `[text](url)` aren't reported as broken because of a stray closing paren. Fix any non-2xx hit on `url_main`, `url_download`, `license.url`, or URLs referenced from `description` / `description_key` before continuing.
+   The `--no-filename` flag prevents `rg` from prepending `path:` to each match (otherwise the for-loop tries to curl `path:url` and every check returns 000). `-A 'Mozilla/5.0'` sometimes coaxes a real response out of Cloudflare-fronted hosts, but it doesn't always work — see the next note.
+
+   **`curl` non-2xx ≠ broken.** Cloudflare-fronted sites (notably `ourworldindata.org`) can return **404** to curl on URLs that work fine in a browser, depending on edge-node routing, IP geolocation, and cached state. Before treating a 4xx as a real failure:
+
+   1. **Re-check with `WebFetch`** (the built-in tool). It uses a different code path and a `Mozilla/5.0` UA that Cloudflare usually accepts. A `200` with a coherent page body is authoritative — trust it over curl.
+   2. **If `WebFetch` also fails**, sanity-check the Wayback Machine: `https://web.archive.org/web/<year>/<url>`. A recent successful snapshot means the URL is reachable on the public internet and your local route is the problem.
+   3. **Only act on a true failure** — both `WebFetch` *and* Wayback unable to reach the URL — and even then **flag and ask the user before silently rewriting an external link in metadata**. Replacing a working link with a "safer" alternative because of a curl false-positive is worse than leaving the original. Apply the same restraint here as the global "Checkpoints — when to pause" section.
+
+   Fix any genuinely-non-2xx hit on `url_main`, `url_download`, `license.url`, or URLs referenced from `description` / `description_key` before continuing. The `sed` strips trailing markdown/punctuation chars (`)`, `.`, `,`, `;`, `:`, `>`) so URLs inside `[text](url)` aren't reported as broken because of a stray closing paren.
 
    **Verification.** After editing, re-run the affected step (with `--grapher` if grapher) so the catalog reflects the changes. Then confirm `presentation.attribution_short` actually landed:
    ```python

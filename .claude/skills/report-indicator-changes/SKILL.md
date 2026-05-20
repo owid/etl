@@ -27,7 +27,16 @@ This skill drafts the kind of message you send to a topic owner when a dataset u
 3. **Reviewer handle** — Slack handle for a Slack post, or GitHub username for a PR comment. Check `workbench/<dataset>/` for prior drafts to confirm.
 4. **What's changed since the last round** — concise list of indicator-level changes since the previous message: new indicators built, categories renamed or collapsed, alternative versions added, decisions taken. Tip: `git log --oneline <since>` plus the latest commit messages.
 5. **One or two open design questions** — choices the reviewer needs to weigh in on (label wording, schema A vs B, include or skip a category, etc.). If there's nothing actionable for them, the message isn't ready.
-6. **Chart Diff URL** — the wizard chart-diff for this branch: `http://staging-site-<branch>/etl/wizard/chart-diff?show-narrative-charts=False&chart-diff-sort-by-results=relevance&show-article-citations=False`.
+6. **Chart Diff URL** — the wizard chart-diff for this branch, pre-filtered to the view the reviewer needs:
+
+   ```
+   http://staging-site-<branch>/etl/wizard/chart-diff?show_reviewed=&show-narrative-charts=False&show-article-citations=False
+   ```
+
+   The three query params are:
+   - `show_reviewed=` (empty value) — keeps already-reviewed charts visible. Without it, the page hides them by default, which can make the diff list look empty after the reviewer's first pass and surprise them.
+   - `show-narrative-charts=False` — hides charts that are parents of narrative charts. They show in their own grouped section by default; for a topic-owner pass we usually want the flat list.
+   - `show-article-citations=False` — hides the article-citation list under each chart. Useful in the dense first pass; switch back on when the reviewer wants to weigh chart-impact.
 
 ## Output structure
 
@@ -93,6 +102,10 @@ Single closing paragraph. Asks the reviewer to look at the [`Chart Diff`](http:/
 - Acknowledge corrections explicitly when the reviewer flags something we missed: "Good catch — I had forgotten X. Done now." Keeps trust through iteration.
 - Multi-option comparisons go in markdown tables, not bullet lists — the reviewer needs to weigh trade-offs at a glance.
 - When in doubt about whether to make a code change, propose it in the message and ask before doing it. Don't surprise the reviewer with changes they didn't ask for.
+- **Don't use "chart" as a verb.** "We haven't built a chart for it yet" reads natural; "we haven't charted it yet" doesn't.
+- **Avoid "mock up"** when offering to build a quick exploratory chart for the reviewer. "Happy to build one" lands the offer without the throwaway tone.
+- **Don't pin the dataset name to a version date.** "X 2026-05-14 update" reads stiff. Prefer "X update" or "latest X update" — the date sits in the PR / commit log where it belongs.
+- **Don't reference the PR number in the body** of a message that's being posted as a PR comment. The PR is implicit context; calling it out again ("on PR #6123") makes the prose read like an internal status report rather than a conversational ping.
 
 ## What NOT to put in the message
 
