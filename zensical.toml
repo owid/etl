@@ -126,6 +126,7 @@ nav = [
         { "Our COVID work" = "api/covid.md" },
         { "Land use for biofuels vs. solar" = "analyses/biofuels_land_use/index.md" },
         { "Tracking historical progress against slavery and forced labor: a long-run data view" = "analyses/slavery_historical_data/index.md" },
+        { "Population projection tool" = "analyses/population_tool/index.md" },
     ] },
 ]
 
@@ -202,7 +203,7 @@ link = "https://linkedin.com/company/ourworldindata"
 variant = "modern"             # Use "classic" for Material for MkDocs appearance
 language = "en"
 custom_dir = "docs/overrides/"
-logo = "assets/site-logo.svg"
+logo = "assets/owid-logo.svg"
 favicon = "assets/favicon.png"
 
 features = [

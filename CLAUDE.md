@@ -15,6 +15,32 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
 - **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
 
+## Team
+
+When generating user-facing prose (PR descriptions, Slack messages, PR comments, review responses, etc.):
+
+1. **Attribute the work** with a single italicized blockquote at the very top of the PR body, and as the opening line of any standalone Slack draft or long PR comment you generate:
+
+   ```
+   > _Written by Claude Code — @<handle> at the wheel._
+   ```
+
+   Use the handle of the human directing the work (usually the current git user; fall back to asking if ambiguous). Skip the disclosure on tiny mechanical comments (e.g. a one-line `@codex review` ping) — it's meant for substantive prose.
+
+2. **Use exact handles** from the table below when tagging colleagues. Don't guess — a wrong tag pings a real person. If a name isn't in this table, write the plain name (e.g. "Bastian") instead of `@`-tagging, and ask the user for the handle.
+
+   | Name | GitHub handle |
+   |---|---|
+   | Pablo A Rosado | `@pabloarosado` |
+   | Pablo Arriagada | `@paarriagadap` |
+   | Veronika Samborska | `@veronikasamborska1994` |
+   | Mojmir Vinkler | `@Marigold` |
+   | Lucas Rodés-Guirao | `@lucasrodes` |
+   | Tuna Acisu | `@antea04` |
+   | Fiona Spooner | `@spoonerf` |
+   | Edouard Mathieu | `@edomt` |
+
+   The disclosure rule does **not** apply to OWID-reader-facing artifacts (e.g. the `/latest` data-update post on ourworldindata.org) — those are authored by the named human, not by Claude.
 
 ## Pipeline Overview
 
@@ -103,6 +129,7 @@ Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 - **`paths.regions.harmonize_names(tb, country_col=..., countries_file=...)`** — current harmonization API (replaces `geo.harmonize_countries`)
 - **`Table.format()`** needs both `country` and `year`. For year-less tables: `set_index("country")` + set `tb.metadata.short_name`
 - **`*.meta.yml`**: omit `dataset:` block — inherited from origin. Only define `tables:` → `variables:`
+- **`grapher_config`: omit `$schema:`** — pinning a specific schema version ages badly. The default in `etl/config.py:DEFAULT_GRAPHER_SCHEMA` is applied automatically by `_validate_grapher_config`.
 
 ### Performance
 
@@ -142,6 +169,18 @@ Built on **owid.catalog** library:
 - Multiple formats (feather, parquet, csv) with automatic schema validation
 
 
+### HTTP calls to OWID infra
+
+When internal code hits an OWID host (catalog, grapher, `files.ourworldindata.org`, `search.owid.io`, Datasette, admin API, etc.), use the shared session from `etl.http` instead of bare `requests` / `httpx` / `pd.read_*(url)`. It pre-sets a `User-Agent: owid-etl/...` header so our traffic is distinguishable in CDN logs.
+
+```python
+from etl.http import session as http_session  # for requests
+from etl.http import HEADERS                   # for httpx.AsyncClient(headers=HEADERS)
+from etl.http import STORAGE_OPTIONS           # for pd.read_csv(url, storage_options=STORAGE_OPTIONS)
+```
+
+Don't tag calls to third-party hosts (GitHub, Notion, Slack, source-data providers in `snapshots/`, etc.) — they should keep the default UA.
+
 ### YAML Editing (preserve comments)
 ```python
 from etl.files import ruamel_load, ruamel_dump
@@ -164,6 +203,8 @@ Automatically connects to `staging-site-{branch}` based on current git branch.
 from etl.config import OWID_ENV
 df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
 ```
+
+**Prefer Python when the SQL contains `%` (LIKE patterns, JSON_EXTRACT paths) or single-quoted strings — `make query` re-interprets those via shell + make and breaks unpredictably.** Use `params={...}` for `%`/quoted values to dodge pymysql's own `%`-format-string parsing.
 
 ## Additional Tools
 

@@ -1,0 +1,299 @@
+# Mini-explorer for lexical_index indicators (used by democracy.py with combine_collections).
+# Carries only the views whose `dataset` dimension maps to this upstream source.
+# FAUST (title, subtitle, note, map config, etc.) lives in the indicator's
+# `presentation.grapher_config` in the corresponding garden meta.yml — Grapher
+# inherits it at chart render time. Per-view `config:` here is intentionally empty
+# for single-y views; multi-y views keep their combined chart config.
+
+definitions:
+  group_subtitle_base: Data by the [Lexical Index of Electoral Democracy](#dod:regimes-lexical-index).
+  display_ne_aut: &display_ne_aut
+    name: "Non-electoral autocracies"
+    color: "#d7191c"
+  display_1p_aut: &display_1p_aut
+    name: "One-party autocracies"
+    color: "#e74731"
+  display_m_aut_wo_exe: &display_m_aut_wo_exe
+    name: "Multi-party autocracies without elected executive"
+    color: "#f88e52"
+  display_m_aut: &display_m_aut
+    name: "Multi-party autocracies"
+    color: "#fee090"
+  display_exc_dem: &display_exc_dem
+    name: "Exclusive democracies"
+    color: "#e0f3f8"
+  display_m_dem: &display_m_dem
+    name: "Male democracies"
+    color: "#8dc1dc"
+  display_elect_dem: &display_elect_dem
+    name: "Electoral democracies"
+    color: "#5496c5"
+  display_f_dem: &display_f_dem
+    name: "Full democracies"
+    color: "#2c7bb6"
+
+  display_1930: &display_1930
+    name: "aged 19-30"
+    color: "#c7e9b4"
+  display_3160: &display_3160
+    name: "aged 31-60"
+    color: "#41b6c4"
+  display_6190: &display_6190
+    name: "aged 61-90"
+    color: "#225ea8"
+
+config:
+  explorerTitle: "Democracy"
+  explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
+  isPublished: true
+
+dimensions:
+  - slug: metric
+    name: "Metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: political_regime
+        name: "\xad\xadPolitical regime"
+      - slug: electoral_democracy
+        name: "\xad\xadElectoral democracy"
+      - slug: full_democracy
+        name: "Full democracy"
+  - slug: sub_metric
+    name: "Sub-metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: main_classification
+        name: "Main classification"
+      - slug: number_and_share_of_democracies
+        name: "Number and share of democracies"
+      - slug: people_living_in_democracies
+        name: "People living in democracies"
+      - slug: elections_for_legislature
+        name: "Elections for legislature"
+      - slug: elections_for_chief_executive
+        name: "Elections for chief executive"
+      - slug: political_opposition
+        name: "Political opposition"
+      - slug: competitive_elections
+        name: "Competitive elections"
+      - slug: universal_right_to_vote_for_men
+        name: "Universal right to vote for men"
+      - slug: universal_right_to_vote_for_women
+        name: "Universal right to vote for women"
+      - slug: age_of_electoral_democracy
+        name: "\xadAge of electoral democracy"
+      - slug: number_and_share_of_long_standing_electoral_democracies
+        name: "\xadNumber and share of long-standing electoral democracies"
+      - slug: political_liberties
+        name: "Political liberties"
+      - slug: age_of_full_democracy
+        name: "Age of full democracy"
+      - slug: number_and_share_of_long_standing_full_democracies
+        name: "Number and share of long-standing full democracies"
+
+views:
+  - dimensions:
+      metric: political_regime
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: lexical_index#regime_lied
+    config:
+      colorVariableId: lexical_index#regime_lied
+  - dimensions:
+      metric: political_regime
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: region_aggregates#num_regime_lied__category_non_electoral_autocracy
+          display: *display_ne_aut
+        - catalogPath: region_aggregates#num_regime_lied__category_one_party_autocracy
+          display: *display_1p_aut
+        - catalogPath: region_aggregates#num_regime_lied__category_multi_party_autocracy_without_elected_executive
+          display: *display_m_aut_wo_exe
+        - catalogPath: region_aggregates#num_regime_lied__category_multi_party_autocracy
+          display: *display_m_aut
+        - catalogPath: region_aggregates#num_regime_lied__category_exclusive_democracy
+          display: *display_exc_dem
+        - catalogPath: region_aggregates#num_regime_lied__category_male_democracy
+          display: *display_m_dem
+        - catalogPath: region_aggregates#num_regime_lied__category_electoral_democracy
+          display: *display_elect_dem
+        - catalogPath: region_aggregates#num_regime_lied__category_polyarchy
+          display: *display_f_dem
+    config:
+      title: "Countries that are democracies and autocracies"
+      subtitle: "{definitions.group_subtitle_base}"
+      type: "StackedArea StackedDiscreteBar"
+      stackMode: "relative"
+  - dimensions:
+      metric: political_regime
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: region_aggregates#pop_democracy_lied__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: region_aggregates#pop_regime_lied__category_non_electoral_autocracy
+          display: *display_ne_aut
+        - catalogPath: region_aggregates#pop_regime_lied__category_one_party_autocracy
+          display: *display_1p_aut
+        - catalogPath: region_aggregates#pop_regime_lied__category_multi_party_autocracy_without_elected_executive
+          display: *display_m_aut_wo_exe
+        - catalogPath: region_aggregates#pop_regime_lied__category_multi_party_autocracy
+          display: *display_m_aut
+        - catalogPath: region_aggregates#pop_regime_lied__category_exclusive_democracy
+          display: *display_exc_dem
+        - catalogPath: region_aggregates#pop_regime_lied__category_male_democracy
+          display: *display_m_dem
+        - catalogPath: region_aggregates#pop_regime_lied__category_electoral_democracy
+          display: *display_elect_dem
+        - catalogPath: region_aggregates#pop_regime_lied__category_polyarchy
+          display: *display_f_dem
+    config:
+      title: "People living in democracies and autocracies"
+      subtitle: "{definitions.group_subtitle_base}"
+      type: "StackedArea StackedDiscreteBar"
+
+  # === Electoral democracy views ===
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: lexical_index#democracy_lied
+    config:
+      colorVariableId: lexical_index#democracy_lied
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: elections_for_legislature
+    indicators:
+      y:
+        - catalogPath: lexical_index#legelec_lied
+    config:
+      colorVariableId: lexical_index#legelec_lied
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: elections_for_chief_executive
+    indicators:
+      y:
+        - catalogPath: lexical_index#exelec_lied
+    config:
+      colorVariableId: lexical_index#exelec_lied
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: political_opposition
+    indicators:
+      y:
+        - catalogPath: lexical_index#opposition_lied
+    config:
+      colorVariableId: lexical_index#opposition_lied
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: competitive_elections
+    indicators:
+      y:
+        - catalogPath: lexical_index#competition_lied
+    config:
+      colorVariableId: lexical_index#competition_lied
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: universal_right_to_vote_for_men
+    indicators:
+      y:
+        - catalogPath: lexical_index#male_suffrage_lied
+    config:
+      colorVariableId: lexical_index#male_suffrage_lied
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: universal_right_to_vote_for_women
+    indicators:
+      y:
+        - catalogPath: lexical_index#female_suffrage_lied
+    config:
+      colorVariableId: lexical_index#female_suffrage_lied
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: age_of_electoral_democracy
+    indicators:
+      y:
+        - catalogPath: lexical_index#age_electdem_lied
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: number_and_share_of_long_standing_electoral_democracies
+    indicators:
+      y:
+        - catalogPath: region_aggregates#num_democracy_lied__category_autocracy
+          display:
+            name: "Not electoral democracies"
+            color: "#97758e"
+        - catalogPath: region_aggregates#num_group_age_electdem_lied__category_1_18_years
+          display:
+            name: "Electoral democracies aged 1-18"
+            color: "#edf8b1"
+        - catalogPath: region_aggregates#num_group_age_electdem_lied__category_19_30_years
+          display: *display_1930
+        - catalogPath: region_aggregates#num_group_age_electdem_lied__category_31_60_years
+          display: *display_3160
+        - catalogPath: region_aggregates#num_group_age_electdem_lied__category_61_90_years
+          display: *display_6190
+        - catalogPath: region_aggregates#num_group_age_electdem_lied__category_91plus_years
+          display:
+            name: "aged 91 +"
+            color: "#172976"
+    config:
+      title: "Countries that are long-standing electoral democracies"
+      subtitle: "{definitions.group_subtitle_base} Electoral democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections."
+      stackMode: "relative"
+      type: "StackedArea StackedDiscreteBar"
+
+  # === Full democracy views ===
+  - dimensions:
+      metric: full_democracy
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: lexical_index#is_full_democracy
+    config:
+      colorVariableId: lexical_index#is_full_democracy
+  - dimensions:
+      metric: full_democracy
+      sub_metric: political_liberties
+    indicators:
+      y:
+        - catalogPath: lexical_index#poliberties_lied
+    config:
+      colorVariableId: lexical_index#poliberties_lied
+  - dimensions:
+      metric: full_democracy
+      sub_metric: age_of_full_democracy
+    indicators:
+      y:
+        - catalogPath: lexical_index#age_polyarchy_lied
+  - dimensions:
+      metric: full_democracy
+      sub_metric: number_and_share_of_long_standing_full_democracies
+    indicators:
+      y:
+        - catalogPath: region_aggregates#num_is_full_democracy__category_no
+          display:
+            name: "Not full democracies"
+            color: "#97758e"
+        - catalogPath: region_aggregates#num_group_age_polyarchy_lied__category_1_18_years
+          display:
+            name: "Full democracies aged 1-18"
+            color: "#edf8b1"
+        - catalogPath: region_aggregates#num_group_age_polyarchy_lied__category_19_30_years
+          display: *display_1930
+        - catalogPath: region_aggregates#num_group_age_polyarchy_lied__category_31_60_years
+          display: *display_3160
+        - catalogPath: region_aggregates#num_group_age_polyarchy_lied__category_61_90_years
+          display: *display_6190
+    config:
+      title: "Countries that are long-standing full democracies"
+      subtitle: "{definitions.group_subtitle_base} Full democracies are political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association."
+      stackMode: "relative"
+      type: "StackedArea StackedDiscreteBar"

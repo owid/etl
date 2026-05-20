@@ -173,30 +173,13 @@ tables:
             producer: "Common producer for this data product"
             citation_full: *common_citation_full
 
-      # Indicator that has multiple origins and sources.
+      # Indicator that has multiple origins.
       multiple_origins_and_sources:
-        title: "Multiple origins and sources"
+        title: "Multiple origins"
         unit: ""
         origins:
           - *origin_typical
           - *origin_with_all_normal_fields
-        sources:
-          - name: "Source number one"
-            description: Description of source one. This could be a long text that describes the source. This could be a long text that describes the source. This could be a long text that describes the source.
-            published_by: Citation of the first source. This could be a long text that contains the full citation of the source. This could be a long text that contains the full citation of the source. This could be a long text that contains the full citation of the source.
-            url: https://url-for-source-one.com/
-            source_data_url: https://url-to-download-data-from-source-one.com/
-            date_accessed: "2023-01-01"
-            publication_date: "2000-01-01"
-            publication_year: 2000
-          - name: "Source number two"
-            description: Description of source two. This could be a long text that describes the source. This could be a long text that describes the source. This could be a long text that describes the source.
-            published_by: Citation of the second source. This could be a long text that contains the full citation of the source. This could be a long text that contains the full citation of the source. This could be a long text that contains the full citation of the source.
-            url: https://url-for-source-two.com/
-            source_data_url: https://url-to-download-data-from-source-two.com/
-            date_accessed: "2023-01-01"
-            publication_date: "2000-01-01"
-            publication_year: 2000
 
       # Horrible indicator with all possible metadata, and all fields unreasonably long.
       all_possible_long_metadata:

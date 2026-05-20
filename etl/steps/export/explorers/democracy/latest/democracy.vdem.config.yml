@@ -1,0 +1,343 @@
+# Mini-explorer for vdem indicators (used by democracy.py with combine_collections).
+# Carries only the views whose `dataset` dimension maps to this upstream source.
+# FAUST (title, subtitle, note, map config, etc.) lives in the indicator's
+# `presentation.grapher_config` in the corresponding garden meta.yml — Grapher
+# inherits it at chart render time. Per-view `config:` here is intentionally empty
+# for single-y views; multi-y views keep their combined chart config.
+
+definitions:
+  subtitle: "Data by [V-Dem](#dod:v-dem). Expert estimates of the extent to which political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed. The index ranges from 0 to 1 (most democratic)."
+  common_views:
+    - dimensions:
+        metric: varieties_of_democracy
+      # config:
+      #   type: "LineChart SlopeChart DiscreteBar"
+      #   hasMapTab: false
+    - config:
+        colorVariableId: regions#owid_region
+
+config:
+  explorerTitle: "Democracy"
+  explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
+  isPublished: true
+
+dimensions:
+  - slug: metric
+    name: "Metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: electoral_democracy
+        name: "Electoral democracy"
+      - slug: liberal_democracy
+        name: "Liberal democracy"
+      - slug: participatory_democracy
+        name: "Participatory democracy"
+      - slug: deliberative_democracy
+        name: "Deliberative democracy"
+      - slug: egalitarian_democracy
+        name: "Egalitarian democracy"
+      - slug: varieties_of_democracy
+        name: "Varieties of democracy"
+  - slug: sub_metric
+    name: "Sub-metric"
+    presentation:
+      type: dropdown
+    choices:
+      # electoral democracy
+      - slug: main_index
+        name: "Main index"
+      - slug: elected_political_leaders_index
+        name: "Elected political leaders index"
+      - slug: share_of_adult_citizens_who_have_the_right_to_vote
+        name: "Share of adult citizens who have the right to vote"
+      - slug: free_and_fair_elections_index
+        name: "Free and fair elections index"
+      - slug: freedom_of_association_index
+        name: "Freedom of association index"
+      - slug: freedom_of_expression_index
+        name: "Freedom of expression index"
+
+      # liberal democracy
+      - slug: electoral_democracy_index
+        name: "Electoral democracy index"
+      - slug: liberal_political_institutions_index
+        name: "Liberal political institutions index"
+      - slug: individual_liberties_and_equality_before_the_law_index
+        name: "Individual liberties and equality before the law index"
+      - slug: judicial_constraints_on_the_executive_index
+        name: "Judicial constraints on the executive index"
+      - slug: legislative_constraints_on_the_executive_index
+        name: "Legislative constraints on the executive index"
+
+      # participatory democracy
+      - slug: participatory_political_institutions_index
+        name: "Participatory political institutions index"
+      - slug: strong_elected_regional_governments_index
+        name: "Strong elected regional governments index"
+      - slug: strong_elected_local_governments_index
+        name: "Strong elected local governments index"
+      - slug: civil_society_participation_index
+        name: "Civil society participation index"
+      - slug: direct_popular_voting_index
+        name: "Direct popular voting index"
+      # deliberative democracy
+      - slug: deliberative_political_institutions_index
+        name: "Deliberative political institutions index"
+      - slug: justified_political_positions_score
+        name: "Justified political positions score"
+      - slug: common_good_justifications_score
+        name: "Common good justifications score"
+      - slug: respect_for_counterarguments_score
+        name: "Respect for counterarguments score"
+      - slug: elite_consultations_score
+        name: "Elite consultations score"
+      - slug: engaged_society_score
+        name: "Engaged society score"
+      # egalitarian democracy
+      - slug: egalitarian_political_institutions_index
+        name: "Egalitarian political institutions index"
+      - slug: equal_rights_protection_index
+        name: "Equal rights protection index"
+      - slug: equal_access_to_power_index
+        name: "Equal access to power index"
+      - slug: equal_resource_distribution_index
+        name: "Equal resource distribution index"
+      # varieties of democracy
+      - slug: main_indices
+        name: "Main indices"
+
+views:
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#electdem_vdem__estimate_best
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: elected_political_leaders_index
+    indicators:
+      y:
+        - catalogPath: vdem_uni_with_regions#electoff_vdem
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: share_of_adult_citizens_who_have_the_right_to_vote
+    indicators:
+      y:
+        - catalogPath: vdem_uni_with_regions#suffr_vdem
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: free_and_fair_elections_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#electfreefair_vdem__estimate_best
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: freedom_of_association_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#freeassoc_vdem__estimate_best
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: freedom_of_expression_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#freeexpr_vdem__estimate_best
+  - dimensions:
+      metric: liberal_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#libdem_vdem__estimate_best
+  - dimensions:
+      metric: liberal_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#electdem_vdem__estimate_best
+  - dimensions:
+      metric: liberal_democracy
+      sub_metric: liberal_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#lib_vdem__estimate_best
+  - dimensions:
+      metric: liberal_democracy
+      sub_metric: individual_liberties_and_equality_before_the_law_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#indiv_libs_vdem__estimate_best
+  - dimensions:
+      metric: liberal_democracy
+      sub_metric: judicial_constraints_on_the_executive_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#judicial_constr_vdem__estimate_best
+  - dimensions:
+      metric: liberal_democracy
+      sub_metric: legislative_constraints_on_the_executive_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#legis_constr_vdem__estimate_best
+  - dimensions:
+      metric: participatory_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#participdem_vdem__estimate_best
+  - dimensions:
+      metric: participatory_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#electdem_vdem__estimate_best
+  - dimensions:
+      metric: participatory_democracy
+      sub_metric: participatory_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#particip_vdem__estimate_best
+  - dimensions:
+      metric: participatory_democracy
+      sub_metric: strong_elected_regional_governments_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#regelect_vdem__estimate_best
+  - dimensions:
+      metric: participatory_democracy
+      sub_metric: strong_elected_local_governments_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#locelect_vdem__estimate_best
+  - dimensions:
+      metric: participatory_democracy
+      sub_metric: civil_society_participation_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#civsoc_particip_vdem__estimate_best
+  - dimensions:
+      metric: participatory_democracy
+      sub_metric: direct_popular_voting_index
+    indicators:
+      y:
+        - catalogPath: vdem_uni_without_regions#dirpop_vote_vdem
+  - dimensions:
+      metric: deliberative_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#delibdem_vdem__estimate_best
+  - dimensions:
+      metric: deliberative_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#electdem_vdem__estimate_best
+  - dimensions:
+      metric: deliberative_democracy
+      sub_metric: deliberative_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#delib_vdem__estimate_best
+  - dimensions:
+      metric: deliberative_democracy
+      sub_metric: justified_political_positions_score
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#justified_polch_vdem__estimate_best
+  - dimensions:
+      metric: deliberative_democracy
+      sub_metric: common_good_justifications_score
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#justcomgd_polch_vdem__estimate_best
+  - dimensions:
+      metric: deliberative_democracy
+      sub_metric: respect_for_counterarguments_score
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#counterarg_polch_vdem__estimate_best
+  - dimensions:
+      metric: deliberative_democracy
+      sub_metric: elite_consultations_score
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#elitecons_polch_vdem__estimate_best
+  - dimensions:
+      metric: deliberative_democracy
+      sub_metric: engaged_society_score
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#soccons_polch_vdem__estimate_best
+  - dimensions:
+      metric: egalitarian_democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#egaldem_vdem__estimate_best
+  - dimensions:
+      metric: egalitarian_democracy
+      sub_metric: electoral_democracy_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#electdem_vdem__estimate_best
+  - dimensions:
+      metric: egalitarian_democracy
+      sub_metric: egalitarian_political_institutions_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#egal_vdem__estimate_best
+  - dimensions:
+      metric: egalitarian_democracy
+      sub_metric: equal_rights_protection_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#equal_rights_vdem__estimate_best
+  - dimensions:
+      metric: egalitarian_democracy
+      sub_metric: equal_access_to_power_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#equal_access_vdem__estimate_best
+  - dimensions:
+      metric: egalitarian_democracy
+      sub_metric: equal_resource_distribution_index
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#equal_res_vdem__estimate_best
+  - dimensions:
+      metric: varieties_of_democracy
+      sub_metric: main_indices
+    indicators:
+      y:
+        - catalogPath: vdem_multi_with_regions#electdem_vdem__estimate_best
+          display:
+            name: "Electoral democracy"
+            color: "#4C6A9C"
+        - catalogPath: vdem_multi_with_regions#libdem_vdem__estimate_best
+          display:
+            name: "Liberal democracy"
+            color: "#B13507"
+        - catalogPath: vdem_multi_with_regions#participdem_vdem__estimate_best
+          display:
+            name: "Participatory democracy"
+            color: "#996D39"
+        - catalogPath: vdem_multi_with_regions#delibdem_vdem__estimate_best
+          display:
+            name: "Deliberative democracy"
+            color: "#2C8465"
+        - catalogPath: vdem_multi_with_regions#egaldem_vdem__estimate_best
+          display:
+            name: "Egalitarian democracy"
+            color: "#6D3E91"
+    config:
+      title: "Varieties of democracy"
+      subtitle: "The indices are by [V-Dem](#dod:v-dem), based on expert estimates, and range from 0 to 1 (most democratic)."
+      selectedFacetStrategy: "entity"
+      addCountryMode: "change-country"
+      yAxis:
+        max: 1
+        min: 0
+      type: "LineChart SlopeChart DiscreteBar"
+      hasMapTab: false

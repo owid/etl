@@ -10,7 +10,6 @@ from typing import Any, cast
 
 import numpy as np
 import pandas as pd
-import requests
 import rich
 import rich_click as click
 import structlog
@@ -25,6 +24,7 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 from etl.dag_helpers import load_dag
 from etl.files import yaml_dump
 from etl.git_helpers import get_changed_files
+from etl.http import session as http_session
 from etl.io import get_all_changed_catalog_paths
 from etl.tempcompare import series_equals
 
@@ -301,6 +301,45 @@ class RemoteDataset:
         return tb
 
 
+def _data_files_match(ds_local: Dataset, ds_remote: "RemoteDataset") -> bool:
+    """Return True if every local table's feather file is byte-identical to its remote counterpart.
+
+    Compares the local MD5 to the remote object's S3/R2 ETag (which is the file's MD5 for
+    OWID's non-multipart uploads). Used to skip data diffs when ``source_checksum`` cascades
+    from an upstream metadata-only change but the actual feather bytes are unchanged.
+    """
+    from owid.catalog.core.datasets import checksum_file
+
+    if set(ds_local.table_names) != set(ds_remote.table_names):
+        return False
+
+    local_md5: dict[str, str] = {}
+    for t in ds_local.table_names:
+        path = Path(ds_local.path) / f"{t}.feather"
+        if not path.exists():
+            return False
+        local_md5[t] = checksum_file(path.as_posix()).hexdigest()
+
+    base = (
+        f"{DEFAULT_CATALOG_URL}{ds_remote.metadata.channel}/{ds_remote.metadata.namespace}/"
+        f"{ds_remote.metadata.version}/{ds_remote.metadata.short_name}"
+    )
+
+    def _remote_md5(table_name: str) -> str | None:
+        try:
+            r = http_session.head(f"{base}/{table_name}.feather", timeout=10)
+        except Exception:
+            return None
+        if r.status_code != 200:
+            return None
+        return r.headers.get("ETag", "").strip('"').lower() or None
+
+    with ThreadPoolExecutor(max_workers=min(8, max(1, len(local_md5)))) as executor:
+        remote_md5 = dict(zip(local_md5.keys(), executor.map(_remote_md5, local_md5.keys())))
+
+    return all(local_md5[t] == remote_md5.get(t) for t in local_md5)
+
+
 @click.command(name="diff", help=__doc__)
 @click.argument(
     "path-a",
@@ -453,6 +492,7 @@ def cli(
     any_error = False
 
     matched_datasets = []
+    skipped_identical_data = 0
     for path in sorted(set(path_to_ds_a.keys()) | set(path_to_ds_b.keys())):
         ds_a = _match_dataset(path_to_ds_a, path)
         ds_b = _match_dataset(path_to_ds_b, path)
@@ -462,7 +502,20 @@ def cli(
             # to improve performance. Source checksum should be enough
             continue
 
+        # Fast-path: source_checksum differs (typical when an upstream metadata change cascades)
+        # but the feather files are byte-identical. Compare local MD5 to remote S3/R2 ETag and
+        # skip the full data download/diff when they match.
+        if ds_a and ds_b:
+            local_ds = ds_b if isinstance(ds_a, RemoteDataset) else ds_a
+            remote_ds = ds_a if isinstance(ds_a, RemoteDataset) else (ds_b if isinstance(ds_b, RemoteDataset) else None)
+            if remote_ds is not None and isinstance(local_ds, Dataset) and _data_files_match(local_ds, remote_ds):
+                skipped_identical_data += 1
+                continue
+
         matched_datasets.append((ds_a, ds_b))
+
+    if skipped_identical_data:
+        log.info("Skipped datasets with identical data (source_checksum cascade)", count=skipped_identical_data)
 
     if workers > 1:
         futures = []
@@ -875,9 +928,11 @@ def _local_catalog_datasets(
 
 def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
     uri = f"{DEFAULT_CATALOG_URL}{path}/index.json"
-    js = requests.get(uri).json()
-    # drop origins for backward compatibility
+    js = http_session.get(uri).json()
+    # Drop deprecated provenance fields for backward compatibility with remote catalog entries
+    # that were built before the Source -> Origin migration was fully rolled out.
     js.pop("origins", None)
+    js.pop("sources", None)
     ds_meta = DatasetMeta(**js)
     # TODO: channel should be in DatasetMeta by default
     ds_meta.channel = path.split("/")[0]  # ty: ignore

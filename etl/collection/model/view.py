@@ -292,6 +292,16 @@ class View(MDIMBase):
                     indicator = Indicator(self.config["map"]["columnSlug"]).expand_path(tables_by_name)
                     self.config["map"]["columnSlug"] = indicator.catalogPath
 
+            # *VariableId fields: accept either an int/digit-string (passes through unchanged
+            # and resolves at upload time) or a catalog path — short or full — which we expand
+            # here against the step's dependency tables. Integer-shaped values can't be
+            # constructed as `Indicator`s (path validator would reject them), so we skip them.
+            for fname in ("colorVariableId", "xVariableId", "sizeVariableId"):
+                value = self.config.get(fname)
+                if isinstance(value, str) and not value.isdigit():
+                    indicator = Indicator(value).expand_path(tables_by_name)
+                    self.config[fname] = indicator.catalogPath
+
         return self
 
     def combine_with_common(self, common_views: list[CommonView], common_has_priority: bool = False):

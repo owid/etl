@@ -1,9 +1,7 @@
 dataset:
   update_period_days: 365
-  sources: []
 definitions:
   common:
-    sources: []
     origins:
       - producer: Ariel Karlinksy
         title: International Completeness of Death Registration 2015-2019
@@ -88,4 +86,3 @@ tables:
               - Russia
               - Indonesia
               - Nigeria
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
