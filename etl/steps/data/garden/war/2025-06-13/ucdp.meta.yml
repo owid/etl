@@ -42,23 +42,25 @@ definitions:
 
       <%- endif -%>
     # Conflict-type label used in titles/subtitles (e.g. "armed conflicts", "one-sided violence").
+    # Outer trim markers intentionally non-stripping (<% ... %>) so surrounding spaces in the
+    # interpolating template (e.g. title: "Deaths {prep} {label} based...") are preserved.
     conflict_label: |-
-      <%- if conflict_type == "all" -%>armed conflicts
+      <% if conflict_type == "all" -%>armed conflicts
       <%- elif conflict_type == "one-sided violence" -%>one-sided violence
       <%- else -%><< conflict_type >> conflicts
-      <%- endif -%>
+      <%- endif %>
     # Slug for the matching DoD ("details on demand") definition link.
     conflict_dod_slug: |-
-      <%- if conflict_type == "all" -%>armed-conflict-ucdp
+      <% if conflict_type == "all" -%>armed-conflict-ucdp
       <%- elif conflict_type == "one-sided violence" -%>onesided-ucdp
       <%- elif conflict_type == "non-state conflict" -%>nonstate-ucdp
       <%- else -%><< conflict_type >>-ucdp
-      <%- endif -%>
+      <%- endif %>
     # Preposition: "from" for one-sided violence, "in" for everything else.
     conflict_prep: |-
-      <%- if conflict_type == "one-sided violence" -%>from
+      <% if conflict_type == "one-sided violence" -%>from
       <%- else -%>in
-      <%- endif -%>
+      <%- endif %>
     location_conflicts_method: |-
       UCDP provides geographical coordinates of each conflict event. We have mapped these coordinates to countries by means of the geoBoundaries dataset.
 
