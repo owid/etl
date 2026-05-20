@@ -160,8 +160,10 @@ definitions:
       - "{definitions.all.conflict_type}"
 
   number_ongoing_conflicts:
+    # Outer trim markers intentionally non-stripping (<% ... %>) so a leading space
+    # in the interpolating template (e.g. "...over time. {description_short}") is preserved.
     description_short: |-
-      <%- if conflict_type == "all" -%>
+      <% if conflict_type == "all" -%>
       Included are armed conflicts that were ongoing a year.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
@@ -182,7 +184,7 @@ definitions:
       <%- else -%>
       Included are << conflict_type >> conflicts that were ongoing a year.
 
-      <%- endif -%>
+      <%- endif %>
     description_key: &description_key_ongoing
       - "{definitions.all.conflict_type}"
       # - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
