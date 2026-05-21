@@ -71,6 +71,9 @@ steps:
     - snapshot://faostat/2026-02-25/faostat_qcl.zip
   data://meadow/faostat/2026-02-25/faostat_qi:
     - snapshot://faostat/2026-02-25/faostat_qi.zip
+  data://meadow/faostat/2026-02-25/faostat_scl:
+    # NOTE: For convenience, we included the snapshot of SCL later, on 2026-05-21 (the latest update from FAOSTAT SCL was on 2025-11-01).
+    - snapshot://faostat/2026-02-25/faostat_scl.zip
   ##################################################################################################################
   # NOTE: The latest version of QV is missing post-2017 data for all EU-27 countries.
   # For now, import the data for those missing country-years from the previous version:
@@ -138,6 +141,12 @@ steps:
   data://garden/faostat/2026-02-25/faostat_sdgb:
     - data://meadow/faostat/2026-02-25/faostat_sdgb
     - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://garden/faostat/2026-02-25/faostat_scl:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/faostat/2026-02-25/faostat_scl
     - data://garden/faostat/2026-02-25/faostat_metadata
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions

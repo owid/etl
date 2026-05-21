@@ -277,7 +277,7 @@ class FAOAdditionalMetadata:
             snap.create_snapshot(filename=f.name, upload=True)
 
 
-def main(read_only: bool = False, include_all_datasets: bool = False) -> None:
+def run(read_only: bool = False, include_all_datasets: bool = False) -> None:
     # Load list of existing snapshots related to current NAMESPACE.
     existing_snapshots = [
         snapshot for snapshot in list(snapshot_catalog(match=NAMESPACE)) if "backport/" not in snapshot.uri
@@ -342,4 +342,4 @@ if __name__ == "__main__":
         help="If given, create snapshots for all datasets, even if the source data was not updated.",
     )
     args = argument_parser.parse_args()
-    main(read_only=args.read_only, include_all_datasets=args.include_all_datasets)
+    run(read_only=args.read_only, include_all_datasets=args.include_all_datasets)

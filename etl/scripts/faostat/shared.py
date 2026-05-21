@@ -99,7 +99,7 @@ INCLUDED_DATASETS_CODES = [
     # Credit to Agriculture.
     # "ic",
     # Food Balances: Supply Utilization Accounts.
-    # "scl",
+    "scl",
 ]
 # URL for dataset codes in FAOSTAT catalog.
 # This is the URL used to get the remote location of the actual data files to be downloaded, and the date of their
