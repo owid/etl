@@ -7,6 +7,10 @@ Snapshots will be stored as:
 * .zip files, for data of each of the individual domains (e.g. faostat_qcl.zip).
 * .json files, for metadata (faostat_metadata.json).
 
+Note: fetching the additional metadata (faostat_metadata.json) now requires a FAOSTAT API token.
+Register for a (free) account on the FAOSTAT developer portal to obtain one, then add it to your
+local `.env` as `FAOSTAT_API_TOKEN=...`. The data zip downloads still work without a token.
+
 Usage:
 * To show available options:
 ```
@@ -30,11 +34,13 @@ uv run python -m create_new_snapshots -a
 import argparse
 import datetime as dt
 import json
+import os
 import tempfile
 from typing import Any, cast
 
 import requests
 from dateutil import parser
+from dotenv import load_dotenv
 
 from etl.scripts.faostat.shared import (
     API_BASE_URL,
@@ -237,17 +243,26 @@ class FAOAdditionalMetadata:
 
     @staticmethod
     def _fetch_additional_metadata_and_save(output_filename: str) -> None:
+        load_dotenv()
+        token = os.environ.get("FAOSTAT_API_TOKEN")
+        if not token:
+            raise RuntimeError(
+                "FAOSTAT_API_TOKEN is not set. Register on the FAOSTAT developer portal "
+                "for a free API token and add it to your local .env as FAOSTAT_API_TOKEN=..."
+            )
+        headers = {"Authorization": f"Bearer {token}"}
+
         faostat_metadata = {}
         # Fetch additional metadata for each domain and category using API.
         for domain in INCLUDED_DATASETS_CODES:
             log.info(f"Fetching additional metadata for domain {domain}.")
             domain_meta = {}
             # Get list of categories (e.g. "items", "element", etc.) for this dataset.
-            response = requests.get(f"{API_BASE_URL}/{domain}")
+            response = requests.get(f"{API_BASE_URL}/{domain}", headers=headers)
             assert response.ok, f"Failed to fetch API data for dataset {domain}."
             categories = [field["code"] for field in json.loads(response.content)["data"]]
             for category in categories:
-                resp = requests.get(f"{API_BASE_URL}/{domain}/{category}")
+                resp = requests.get(f"{API_BASE_URL}/{domain}/{category}", headers=headers)
                 if resp.ok:
                     domain_meta[category] = resp.json()
 

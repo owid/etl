@@ -13,6 +13,6 @@ definitions:
 # However, it is preferable to change unit and short_unit in the custom_elements_and_units.csv.
 # After any modifications to the `custom_*.csv` files, remember to run the `faostat_metadata` garden step again.
 tables:
-  faostat_rl_flat:
+  faostat_scl_flat:
     variables:
       {}

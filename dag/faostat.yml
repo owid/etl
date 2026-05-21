@@ -114,6 +114,7 @@ steps:
     - data://meadow/faostat/2026-02-25/faostat_qcl
     - data://meadow/faostat/2026-02-25/faostat_fbs
     - data://meadow/faostat/2026-02-25/faostat_qv
+    - data://meadow/faostat/2026-02-25/faostat_scl
   data://garden/faostat/2026-02-25/faostat_qcl:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2026-02-25/faostat_qcl
