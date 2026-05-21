@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from etl.tempcompare import df_equals, series_equals
+from etl.tempcompare import HighLevelDiff, df_equals, series_equals
 
 
 def test_df_equals():
@@ -66,6 +66,30 @@ def test_df_equals_exceptions():
     df2 = pd.DataFrame({"col1": [1, 2, 3]}, index=[4, 5, 6])
     with pytest.raises(AssertionError):
         df_equals(df1, df2)
+
+
+def test_high_level_diff_with_duplicate_index_values_does_not_crash():
+    df1 = pd.DataFrame({"col1": [1, 2]}, index=pd.Index([1, 1], name="year"))
+    df2 = pd.DataFrame({"col1": [1]}, index=pd.Index([1], name="year"))
+
+    diff = HighLevelDiff(df1, df2)
+
+    assert not diff.are_structurally_equal
+    assert list(diff.duplicate_index_values_in_df1) == [1]
+    assert diff.value_differences is None
+
+
+def test_high_level_diff_compares_unique_shared_rows_when_other_rows_have_duplicate_index_values():
+    df1 = pd.DataFrame({"col1": [1, 2, 3]}, index=pd.Index([1, 2, 2], name="year"))
+    df2 = pd.DataFrame({"col1": [1, 20, 4]}, index=pd.Index([1, 2, 3], name="year"))
+
+    diff = HighLevelDiff(df1, df2)
+
+    assert not diff.are_structurally_equal
+    assert diff.value_differences is None
+    assert list(diff.duplicate_index_values_in_df1) == [2]
+    assert list(diff.index_values_missing_in_df2) == []
+    assert list(diff.index_values_missing_in_df1) == [3]
 
 
 def test_series_equals_nans():
