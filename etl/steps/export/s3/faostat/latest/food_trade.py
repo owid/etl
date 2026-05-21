@@ -2,101 +2,116 @@
 
 Loads the `food_trade` garden table and writes two kinds of files:
 
-  * one metadata JSON at `food-trade.metadata.json` listing the year, source
-    and the entity/product id-to-name mappings used in the per-country files;
-  * one per-country JSON at `food-trade.{entity_id}.json` carrying that
-    country's `exports`, `imports`, `production` and `supply` arrays.
+  * one metadata JSON at `food-trade.metadata.json` listing the year, source,
+    the entity/product id-to-name mappings, and a `productsByEntity` map
+    that tells the viz which (entity, product) combinations have any data;
+  * one per-product JSON at `food-trade.<product_id>.json` carrying that
+    product's `flows` (every (exporter, importer, value) triple in the data
+    for that item), plus `production` and `supply` per entity.
 
-The split lets the viz lazy-load only the country the user has selected,
-rather than the full dataset upfront. The layout mirrors the causes-of-death
-JSON used by other OWID custom visualisations (see
-`etl/steps/export/s3/ihme_gbd/latest/gbd_treemap_json.py`).
+The product-keyed split naturally powers "Global trade of item X" views in
+the viz: pick a product, fetch one JSON, render. The metadata's
+`productsByEntity` map lets the viz pre-compute "what can this country be
+the exporter / importer of?" without loading every product file.
 
 Output URLs:
     https://owid-public.owid.io/data/food-trade/food-trade.metadata.json
-    https://owid-public.owid.io/data/food-trade/food-trade.<entity_id>.json
+    https://owid-public.owid.io/data/food-trade/food-trade.<product_id>.json
 
-Schema of each file is documented inline below.
+Layout mirrors the causes-of-death JSON pattern
+(`etl/steps/export/s3/ihme_gbd/latest/gbd_treemap_json.py`).
 """
 
 import json
 from pathlib import Path
 
 import pandas as pd
+import yaml
 from owid.catalog import s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.config import DRY_RUN
 from etl.helpers import PathFinder
-from etl.paths import EXPORT_DIR
+from etl.paths import EXPORT_DIR, STEPS_GARDEN_DIR
 
 log = get_logger()
 paths = PathFinder(__file__)
 
-# Public S3 bucket and prefix. Matches the directory layout used by other
-# OWID custom-viz JSON exports (causes-of-death, migration-stock-flows).
+# Public S3 bucket and prefix.
 S3_BUCKET_NAME = "owid-public"
 S3_DATA_DIR = Path("data/food-trade")
 FILE_SLUG = "food-trade"
 
-# Hard-coded to match the YEAR constant in the garden step. If/when the
-# garden step bumps its YEAR, bump this too (and re-run).
+# Hard-coded to match the YEAR constant in the garden step. Bump both together.
 YEAR = 2023
 SOURCE = "FAO, Detailed Trade Matrix (2026)"
 LICENSE = "CC BY-NC-SA 3.0 IGO"
 
+# Source of the (item name -> FAO item code) mapping. Same yaml the garden
+# step uses, so the product ids in this export are the canonical FAOSTAT codes
+# (e.g. 15 = Wheat, 56 = Maize (corn), 236 = Soya beans). Stable across
+# FAOSTAT releases and shared with QCL and TM.
+ITEMS_YAML_PATH = STEPS_GARDEN_DIR / "faostat/2026-05-07/food_trade.items.yaml"
 
-def _build_entity_data(df: pd.DataFrame, country: str, entity_to_id: dict, product_to_id: dict) -> dict:
-    """Build the per-country JSON.
+
+def _build_product_data(df: pd.DataFrame, product: str, entity_to_id: dict) -> dict:
+    """Build the per-product JSON.
 
     Schema:
         {
-          "exports":    {"partners": [<id>], "products": [<id>], "values": [<float>]},
-          "imports":    {"partners": [<id>], "products": [<id>], "values": [<float>]},
-          "production": {"products": [<id>], "values": [<float>]},
-          "supply":     {"products": [<id>], "values": [<float>]}
+          "flows":      {"exporters": [<entity_id>],
+                         "importers": [<entity_id>],
+                         "values":    [<tonnes>]},
+          "production": {"entities":  [<entity_id>], "values": [<tonnes>]},
+          "supply":     {"entities":  [<entity_id>], "values": [<tonnes>]}
         }
 
-    `exports.partners[i]` is the *importer* entity-id for the i-th outbound
-    flow; `imports.partners[i]` is the *exporter* entity-id for the i-th
-    inbound flow.
-
-    `production` and `supply` list only products where QCL Production /
-    apparent-supply has a value — NaN entries are omitted so the consumer
-    never has to handle JSON `null`.
+    `production` / `supply` list only the entities that have a value for
+    this product — NaN entries are dropped so the consumer never has to
+    handle JSON `null`.
     """
-    exports = df[df["exporter"] == country]
-    imports = df[df["importer"] == country]
+    rows = df[df["item"] == product]
 
     out: dict = {
-        "exports": {
-            "partners": [entity_to_id[p] for p in exports["importer"]],
-            "products": [product_to_id[p] for p in exports["item"]],
-            "values": exports["value"].astype(float).round(3).tolist(),
-        },
-        "imports": {
-            "partners": [entity_to_id[p] for p in imports["exporter"]],
-            "products": [product_to_id[p] for p in imports["item"]],
-            "values": imports["value"].astype(float).round(3).tolist(),
-        },
+        "flows": {
+            "exporters": [entity_to_id[e] for e in rows["exporter"]],
+            "importers": [entity_to_id[e] for e in rows["importer"]],
+            "values": rows["value"].astype(float).round(3).tolist(),
+        }
     }
 
-    # Production: per-item value for this country as an exporter. Repeats across
-    # all rows with the same (exporter, item); dedupe and drop NaN.
-    prod = exports[["item", "exporter_production"]].dropna().drop_duplicates("item").sort_values("item")
+    # Production: per-exporter for this product. Dedupe by exporter (same
+    # value repeats across all rows that share the exporter), drop NaN.
+    prod = rows[["exporter", "exporter_production"]].dropna().drop_duplicates("exporter").sort_values("exporter")
     out["production"] = {
-        "products": [product_to_id[p] for p in prod["item"]],
+        "entities": [entity_to_id[e] for e in prod["exporter"]],
         "values": prod["exporter_production"].astype(float).round(3).tolist(),
     }
 
-    # Supply: per-item value for this country as an importer.
-    sup = imports[["item", "importer_supply"]].dropna().drop_duplicates("item").sort_values("item")
+    # Supply: per-importer for this product. Dedupe by importer, drop NaN.
+    sup = rows[["importer", "importer_supply"]].dropna().drop_duplicates("importer").sort_values("importer")
     out["supply"] = {
-        "products": [product_to_id[p] for p in sup["item"]],
+        "entities": [entity_to_id[e] for e in sup["importer"]],
         "values": sup["importer_supply"].astype(float).round(3).tolist(),
     }
 
+    return out
+
+
+def _build_products_by_entity(df: pd.DataFrame, entity_to_id: dict, product_to_id: dict) -> dict:
+    """Build {entity_id_str: [sorted product_ids]} listing every product the
+    entity trades, whether as exporter or importer.
+
+    Keys are stringified ints because JSON object keys must be strings.
+    """
+    out = {}
+    exp = df.groupby("exporter", observed=True)["item"].apply(lambda s: set(s))
+    imp = df.groupby("importer", observed=True)["item"].apply(lambda s: set(s))
+    all_entities = set(exp.index) | set(imp.index)
+    for ent in all_entities:
+        items = exp.get(ent, set()) | imp.get(ent, set())
+        out[str(entity_to_id[ent])] = sorted(product_to_id[i] for i in items)
     return out
 
 
@@ -127,13 +142,23 @@ def run() -> None:
         df[col] = df[col].astype(str)
 
     #
-    # Build id mappings. Entities sorted alphabetically by name; same for
-    # products. 1-based ids match the causes-of-death / migration convention.
+    # Build id mappings.
+    # - Entities: no canonical external id (FAO uses country names), so we
+    #   assign 1-based alphabetical ids — matches causes-of-death / migration.
+    # - Products: use the canonical FAO item codes from the yaml. These are
+    #   stable across FAOSTAT releases and shared with QCL and TM, so the
+    #   per-product URLs `food-trade.<item_code>.json` are externally
+    #   recognisable.
     #
     countries = sorted(set(df["exporter"]) | set(df["importer"]))
-    products = sorted(df["item"].unique())
     entity_to_id = {name: i + 1 for i, name in enumerate(countries)}
-    product_to_id = {name: i + 1 for i, name in enumerate(products)}
+
+    with open(ITEMS_YAML_PATH) as f:
+        items_config = yaml.safe_load(f)
+    product_to_id = {entry["display"]: int(entry["item_code"]) for entry in items_config["items"]}
+    products = sorted(df["item"].unique())
+    missing = set(products) - set(product_to_id)
+    assert not missing, f"items in the data are not in items.yaml: {sorted(missing)}"
 
     #
     # Write metadata.
@@ -146,14 +171,15 @@ def run() -> None:
             "entities": [{"id": entity_to_id[c], "name": c} for c in countries],
             "products": [{"id": product_to_id[p], "name": p} for p in products],
         },
+        "productsByEntity": _build_products_by_entity(df, entity_to_id, product_to_id),
     }
     log.info("food_trade.write_metadata", n_entities=len(countries), n_products=len(products))
     _save_and_upload(metadata, f"{FILE_SLUG}.metadata.json")
 
     #
-    # Write one file per country.
+    # Write one file per product.
     #
-    log.info("food_trade.write_per_country", n_files=len(countries))
-    for country in tqdm(countries, desc="food_trade per-country JSON"):
-        data = _build_entity_data(df, country, entity_to_id, product_to_id)
-        _save_and_upload(data, f"{FILE_SLUG}.{entity_to_id[country]}.json")
+    log.info("food_trade.write_per_product", n_files=len(products))
+    for product in tqdm(products, desc="food_trade per-product JSON"):
+        data = _build_product_data(df, product, entity_to_id)
+        _save_and_upload(data, f"{FILE_SLUG}.{product_to_id[product]}.json")
