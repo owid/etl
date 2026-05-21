@@ -9,12 +9,17 @@ matrix (`faostat_tm`), with two context columns from SCL Production:
   value    (float, tonnes)     — bilateral A→B trade flow in tonnes
   exporter_production (float)  — exporter's SCL Production tonnes of that item
                                  (NaN if SCL has no Production row for it)
-  importer_supply (float)      — importer's apparent domestic supply tonnes,
-                                 computed as
-                                     Production + Total imports − Total exports
-                                 using the importer's own TM reports. NaN
-                                 when SCL has no Production figure for the
-                                 (importer, item) pair.
+  importer_supply (float)      — importer's domestic supply in tonnes,
+                                 computed from SCL via the FAOSTAT Food
+                                 Balance Sheet identity:
+                                     Production + Imports − Exports + Stock Variation
+                                 All four components come from SCL. Stock
+                                 Variation uses FAO's sign convention
+                                 (positive when stocks are drawn down, i.e.
+                                 added to supply). NaN when SCL has no row
+                                 for the (importer, item) pair at all, or
+                                 when the FBS identity returns a negative
+                                 (a data-inconsistency signal).
 
 The display items shown in the dropdown are curated in
 `food_trade.items.yaml`. Each entry names a single FAO commodity item code
@@ -122,27 +127,58 @@ def _assert_year_is_latest_well_covered(tb: Table, year: int) -> None:
     )
 
 
-def _scl_production_by_country_and_code(tb_scl: Table, year: int) -> pd.DataFrame:
-    """Return SCL Production tonnes for `year`, keyed on (country, item_code).
+def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> pd.DataFrame:
+    """Return SCL-derived Production and Domestic Supply for `year`, keyed on (country, item_code).
 
-    SCL uses the same FAO commodity item codebook as TM (codes 1-1296), so the
-    join with TM is a direct integer-code lookup. We keep rows with
-    `element == "Production"` and `unit_short_name == "t"`; non-tonne rows
-    (e.g. per-capita supply elements) are filtered out.
+    Domestic Supply follows the FAOSTAT Food Balance Sheet identity:
 
-    Country names come from SCL (OWID-harmonized by the broader FAOSTAT
-    pipeline) and match our TM `reporter_country` names (also OWID-harmonized,
-    via `faostat_tm.countries.json`)."""
-    prod = tb_scl[
-        (tb_scl["element"] == "Production") & (tb_scl["year"] == year) & (tb_scl["unit_short_name"] == "t")
+        Domestic Supply = Production + Imports − Exports + Stock Variation
+
+    All four components come from SCL (in tonnes). Stock Variation uses
+    FAO's sign convention: positive when stocks are drawn down (added to
+    supply), negative when stocks are accumulated.
+
+    Missing components are treated as 0 (a country that didn't report a
+    flow or didn't change stocks for an item simply had none). A
+    (country, item) pair absent from SCL entirely is absent from the
+    output, and will produce NaN in the downstream merge.
+
+    SCL uses the same FAO commodity item codebook as TM (codes 1-1296), so
+    the join with TM is a direct integer-code lookup."""
+    elements = ["Production", "Import quantity", "Export quantity", "Stock Variation"]
+    sub = tb_scl[
+        (tb_scl["year"] == year) & (tb_scl["unit_short_name"] == "t") & tb_scl["element"].isin(elements)
     ].copy()
     # SCL stores `item_code` as a categorical of zero-padded strings ("00000015");
     # convert via str to int so it joins cleanly with TM's integer item codes.
-    prod["item_code"] = prod["item_code"].astype(str).astype(int)
-    prod["country"] = prod["country"].astype(str)
-    out = pd.DataFrame(prod[["country", "item_code", "value"]]).rename(columns={"value": "production"})
-    # If SCL has multiple rows per (country, item_code), sum them deterministically.
-    return out.groupby(["country", "item_code"], as_index=False, observed=True)[["production"]].sum()
+    sub["item_code"] = sub["item_code"].astype(str).astype(int)
+    sub["country"] = sub["country"].astype(str)
+    sub["element"] = sub["element"].astype(str)
+
+    wide = pd.DataFrame(
+        sub.groupby(["country", "item_code", "element"], observed=True)["value"]
+        .sum()
+        .unstack("element")
+        .reset_index()
+    )
+    # Ensure all four element columns exist even if SCL didn't have any rows for one.
+    for elem in elements:
+        if elem not in wide.columns:
+            wide[elem] = pd.NA
+
+    wide["supply"] = (
+        wide["Production"].fillna(0)
+        + wide["Import quantity"].fillna(0)
+        - wide["Export quantity"].fillna(0)
+        + wide["Stock Variation"].fillna(0)
+    )
+    # Negative supply is not physically meaningful — it signals that FBS components
+    # don't reconcile for that (country, item) (re-exports not fully captured by
+    # Stock Variation, timing mismatches, primary-equivalent aggregation, etc.).
+    # NaN it out rather than clipping to 0, so the downstream "imports as a share
+    # of supply" ratio is undefined for these pairs instead of misleadingly zero.
+    wide.loc[wide["supply"] < 0, "supply"] = pd.NA
+    return wide[["country", "item_code", "Production", "supply"]].rename(columns={"Production": "production"})
 
 
 def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
@@ -167,40 +203,28 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     qty = qty[qty["item_code"].isin(code_to_display)].copy()
     qty["item"] = qty["item_code"].map(code_to_display)
 
-    # 2) SCL Production by (country, item), restricted to curated codes.
-    scl_prod = _scl_production_by_country_and_code(tb_scl, YEAR)
-    scl_prod = scl_prod[scl_prod["item_code"].isin(code_to_display)].copy()
-    scl_prod["item"] = scl_prod["item_code"].map(code_to_display)
-    production = scl_prod[["country", "item", "production"]]
+    # 2) SCL-derived Production and Domestic Supply by (country, item), restricted to
+    #    curated codes. Supply follows the FAOSTAT FBS identity
+    #        Production + Imports − Exports + Stock Variation
+    #    with every component sourced from SCL (see `_scl_supply_by_country_and_code`).
+    scl_ctx = _scl_supply_by_country_and_code(tb_scl, YEAR)
+    scl_ctx = scl_ctx[scl_ctx["item_code"].isin(code_to_display)].copy()
+    scl_ctx["item"] = scl_ctx["item_code"].map(code_to_display)
 
-    # 3) Per-(country, item) total Import / Export quantity from each country's
-    #    own TM reports — used as the trade-flow components of apparent supply.
-    totals = pd.DataFrame(
-        qty.groupby(["reporter_country", "item", "element"], observed=True)["value"]
-        .sum()
-        .unstack("element", fill_value=0.0)
-        .reset_index()
-    ).rename(
-        columns={
-            "reporter_country": "country",
-            "Import quantity": "country_imports",
-            "Export quantity": "country_exports",
-        }
+    # Exporter context column: only emit `exporter_production` for countries with
+    # an SCL Production figure (we don't want to imply "0 production" for absent rows).
+    exporter_production = (
+        scl_ctx[["country", "item", "production"]]
+        .dropna(subset=["production"])
+        .rename(columns={"country": "exporter", "production": "exporter_production"})
     )
-    for col in ("country_imports", "country_exports"):
-        if col not in totals.columns:
-            totals[col] = 0.0
 
-    # Apparent domestic supply = Production + Imports − Exports. Production is
-    # required (a missing SCL row leaves `importer_supply` NaN); missing import
-    # / export flows are treated as zero (a country that didn't report a flow
-    # for an item simply didn't trade it).
-    supply = totals.merge(production, on=["country", "item"], how="left")
-    supply["importer_supply"] = (
-        supply["production"] + supply["country_imports"].fillna(0) - supply["country_exports"].fillna(0)
+    # Importer context column: use the FBS-identity supply for every (country, item)
+    # row SCL knows about. Pairs entirely absent from SCL will fall out as NaN in
+    # the downstream merge.
+    supply = scl_ctx[["country", "item", "supply"]].rename(
+        columns={"country": "importer", "supply": "importer_supply"}
     )
-    supply = supply.rename(columns={"country": "importer"})[["importer", "item", "importer_supply"]]
-    exporter_production = production.rename(columns={"country": "exporter", "production": "exporter_production"})
 
     # 4) Join the directional reports into one row per (exporter, importer, item).
     exp_side = qty.loc[

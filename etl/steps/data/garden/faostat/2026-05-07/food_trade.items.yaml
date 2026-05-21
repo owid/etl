@@ -1,12 +1,12 @@
 # Curated items for the food-trade Sankey viz.
 #
 # Each entry is one option in the viz dropdown. Each entry references a single
-# FAO commodity item code — the same codebook used by both TM (trade) and QCL
+# FAO commodity item code — the same codebook used by both TM (trade) and SCL
 # (production).
 #
 # Each entry:
 #   display:    name shown in the dropdown
-#   item_code:  FAO commodity item code (TM/QCL codebook, 1-1296 range).
+#   item_code:  FAO commodity item code (TM/SCL codebook, 1-1296 range).
 #               Stable across FAOSTAT releases. The trailing `#` comment is
 #               the current TM item name for human readability only.
 #
@@ -65,8 +65,7 @@ items:
     item_code: 256   # Palm kernels
 
   # ─────────────────────────────────────────────────────────────────────────
-  # Vegetable oils (kept for trade-only; QCL Production for these is via
-  # primary equivalent, will need separate handling when share line is wired)
+  # Vegetable oils
   - display: Palm oil
     item_code: 257   # Palm oil
   - display: Olive oil
@@ -101,7 +100,7 @@ items:
   # ─────────────────────────────────────────────────────────────────────────
   # Meat
   # Each meat item's `item_code` is FAOSTAT's "primary product" trade code,
-  # which doubles as the production code in QCL. Trade-side, it captures only
+  # which doubles as the production code in SCL. Trade-side, it captures only
   # the fresh-with-bone cuts (not boneless / frozen / processed); production-
   # side, it represents the country's total output of that meat. The share
   # therefore reads as "fraction of total production exported as fresh bone-in

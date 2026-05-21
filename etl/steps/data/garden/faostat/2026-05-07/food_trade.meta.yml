@@ -12,10 +12,12 @@ tables:
         unit: tonnes
         short_unit: t
         description_short: |-
-          Total production tonnes of the item in the exporter country, in the export year, from FAOSTAT QCL.
+          Total production tonnes of the item in the exporter country, in the export year.
       importer_supply:
-        title: Importer's apparent domestic supply
+        title: Importer's domestic supply
         unit: tonnes
         short_unit: t
         description_short: |-
-          Apparent domestic supply of the item in the importer country, in the export year, computed as Production (from QCL) + total imports − total exports (from the trade matrix, summed over partners).
+          Domestic supply of the item in the importer country.
+        description_processing: |-
+          Domestic supply is calculated as Production + Imports - Exports + Stock Variation. Negative results were removed.
