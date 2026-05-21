@@ -6,7 +6,9 @@ tables:
         unit: tonnes
         short_unit: t
         description_short: |-
-          Quantity of the item flowing from the exporter to the importer in the export year. When both sides report a value the importer's report is used; otherwise the exporter's. Self-trade rows (reporter == partner) are dropped.
+          Quantity of the item flowing from the exporter to the importer in the export year.
+        description_processing: |-
+          When both the exporter and the importer report a value, the two are reconciled by taking the geometric mean √(exporter × importer). When only one side reports, that side's number is used. Self-trade rows (reporter == partner) are dropped.
       exporter_production:
         title: Exporter's production
         unit: tonnes
@@ -20,4 +22,4 @@ tables:
         description_short: |-
           Domestic supply of the item in the importer country.
         description_processing: |-
-          Domestic supply is calculated as Production + Imports - Exports + Stock Variation. Negative results were removed.
+          Domestic supply is calculated using the FAOSTAT Food Balance Sheet identity: Production + Imports − Exports − Stock Variation, all sourced from FAOSTAT's Supply Utilization Accounts (SCL). Stock Variation in SCL is defined as Closing − Opening stocks (positive when stocks accumulated), so it is subtracted from supply. Negative results — which signal that FBS components don't reconcile — were removed.

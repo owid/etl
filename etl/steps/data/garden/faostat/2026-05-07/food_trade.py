@@ -12,14 +12,17 @@ matrix (`faostat_tm`), with two context columns from SCL Production:
   importer_supply (float)      — importer's domestic supply in tonnes,
                                  computed from SCL via the FAOSTAT Food
                                  Balance Sheet identity:
-                                     Production + Imports − Exports + Stock Variation
+                                     Production + Imports − Exports − Stock Variation
                                  All four components come from SCL. Stock
-                                 Variation uses FAO's sign convention
-                                 (positive when stocks are drawn down, i.e.
-                                 added to supply). NaN when SCL has no row
-                                 for the (importer, item) pair at all, or
-                                 when the FBS identity returns a negative
-                                 (a data-inconsistency signal).
+                                 Variation in SCL is `Closing − Opening`
+                                 (positive when stocks accumulated during
+                                 the year, negative when drawn down) — so
+                                 it is *subtracted* from the supply, as
+                                 accumulated stocks don't reach domestic
+                                 use. NaN when SCL has no row for the
+                                 (importer, item) pair at all, or when the
+                                 FBS identity returns a negative (a
+                                 data-inconsistency signal).
 
 The display items shown in the dropdown are curated in
 `food_trade.items.yaml`. Each entry names a single FAO commodity item code
@@ -132,11 +135,14 @@ def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> pd.DataFrame:
 
     Domestic Supply follows the FAOSTAT Food Balance Sheet identity:
 
-        Domestic Supply = Production + Imports − Exports + Stock Variation
+        Domestic Supply = Production + Imports − Exports − Stock Variation
 
-    All four components come from SCL (in tonnes). Stock Variation uses
-    FAO's sign convention: positive when stocks are drawn down (added to
-    supply), negative when stocks are accumulated.
+    All four components come from SCL (in tonnes). Stock Variation in
+    FAOSTAT SCL is defined as `Closing − Opening` (positive when stocks
+    accumulate during the year, negative when stocks are drawn down) —
+    verified empirically against the `Opening stocks` element. It is
+    therefore *subtracted* from the supply identity: accumulated stocks
+    don't reach domestic use, while drawn-down stocks do.
 
     Missing components are treated as 0 (a country that didn't report a
     flow or didn't change stocks for an item simply had none). A
@@ -167,7 +173,7 @@ def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> pd.DataFrame:
         wide["Production"].fillna(0)
         + wide["Import quantity"].fillna(0)
         - wide["Export quantity"].fillna(0)
-        + wide["Stock Variation"].fillna(0)
+        - wide["Stock Variation"].fillna(0)
     )
     # Negative supply is not physically meaningful — it signals that FBS components
     # don't reconcile for that (country, item) (re-exports not fully captured by
@@ -245,8 +251,12 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     out = out.merge(supply, on=["importer", "item"], how="left")
     out = out.sort_values(["exporter", "importer", "item"]).reset_index(drop=True)
 
-    # Wrap as an owid Table and set the natural key as index.
+    # Wrap as an owid Table and propagate origins to the numeric columns
+    # (pandas merges and arithmetic above strip Variable metadata).
     tb_out = Table(out, short_name=paths.short_name, underscore=False)
+    tb_out["value"] = tb_out["value"].copy_metadata(tb_tm["value"])
+    tb_out["exporter_production"] = tb_out["exporter_production"].copy_metadata(tb_scl["value"])
+    tb_out["importer_supply"] = tb_out["importer_supply"].copy_metadata(tb_scl["value"])
     tb_out = tb_out.format(keys=["exporter", "importer", "item"], short_name=paths.short_name)
     return tb_out
 
