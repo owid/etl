@@ -1,24 +1,24 @@
 """Garden step for the FAOSTAT food-trade Sankey viz.
 
 Builds the slim, viz-ready slice of bilateral trade flows from the trade
-matrix (`faostat_tm`), with two context columns from QCL Production:
+matrix (`faostat_tm`), with two context columns from SCL Production:
 
   exporter (str)               — exporting country (OWID-harmonized)
   importer (str)               — importing country (OWID-harmonized)
   item     (str)               — viz-display item (see food_trade.items.yaml)
   value    (float, tonnes)     — bilateral A→B trade flow in tonnes
-  exporter_production (float)  — exporter's QCL Production tonnes of that item
-                                 (NaN if QCL has no Production row for it)
+  exporter_production (float)  — exporter's SCL Production tonnes of that item
+                                 (NaN if SCL has no Production row for it)
   importer_supply (float)      — importer's apparent domestic supply tonnes,
                                  computed as
                                      Production + Total imports − Total exports
                                  using the importer's own TM reports. NaN
-                                 when QCL has no Production figure for the
+                                 when SCL has no Production figure for the
                                  (importer, item) pair.
 
 The display items shown in the dropdown are curated in
 `food_trade.items.yaml`. Each entry names a single FAO commodity item code
-(the same codebook used by both TM and QCL), so the rollup is a direct
+(the same codebook used by both TM and SCL), so the rollup is a direct
 integer-code filter against `item_code`.
 
 For each (exporter, importer, item) the trade matrix typically has two
@@ -122,32 +122,30 @@ def _assert_year_is_latest_well_covered(tb: Table, year: int) -> None:
     )
 
 
-def _qcl_production_by_country_and_code(tb_qcl: Table, year: int) -> pd.DataFrame:
-    """Return QCL Production tonnes for `year`, keyed on (country, item_code).
+def _scl_production_by_country_and_code(tb_scl: Table, year: int) -> pd.DataFrame:
+    """Return SCL Production tonnes for `year`, keyed on (country, item_code).
 
-    QCL uses the same FAO commodity item codebook as TM (codes 1-1296), so the
+    SCL uses the same FAO commodity item codebook as TM (codes 1-1296), so the
     join with TM is a direct integer-code lookup. We keep rows with
-    `element == "Production"` and `unit_short_name == "t"`; the few non-tonne
-    rows (live animals reported as `"head"`) are filtered out because the YAML
-    deliberately surfaces only crops.
+    `element == "Production"` and `unit_short_name == "t"`; non-tonne rows
+    (e.g. per-capita supply elements) are filtered out.
 
-    Country names come from QCL (OWID-harmonized by the broader FAOSTAT
-    pipeline). They match our TM `reporter_country` names (also OWID-harmonized,
-    via `faostat_tm.countries.json`): 209 of 221 TM countries also appear in
-    QCL; the 12 unmapped ones are tiny territories with no agricultural output."""
-    prod = tb_qcl[
-        (tb_qcl["element"] == "Production") & (tb_qcl["year"] == year) & (tb_qcl["unit_short_name"] == "t")
+    Country names come from SCL (OWID-harmonized by the broader FAOSTAT
+    pipeline) and match our TM `reporter_country` names (also OWID-harmonized,
+    via `faostat_tm.countries.json`)."""
+    prod = tb_scl[
+        (tb_scl["element"] == "Production") & (tb_scl["year"] == year) & (tb_scl["unit_short_name"] == "t")
     ].copy()
-    # QCL stores `item_code` as a zero-padded string ("00000015"); cast to int.
-    prod["item_code"] = prod["item_code"].astype(int)
+    # SCL stores `item_code` as a categorical of zero-padded strings ("00000015");
+    # convert via str to int so it joins cleanly with TM's integer item codes.
+    prod["item_code"] = prod["item_code"].astype(str).astype(int)
     prod["country"] = prod["country"].astype(str)
     out = pd.DataFrame(prod[["country", "item_code", "value"]]).rename(columns={"value": "production"})
-    # If QCL has multiple rows per (country, item_code) — e.g. mainland +
-    # aggregate ambiguity — sum them deterministically.
+    # If SCL has multiple rows per (country, item_code), sum them deterministically.
     return out.groupby(["country", "item_code"], as_index=False, observed=True)[["production"]].sum()
 
 
-def build_food_trade_table(tb_tm: Table, tb_qcl: Table) -> Table:
+def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     """Reshape the trade matrix into the viz-ready slice with Production and
     apparent domestic supply context."""
     _assert_year_is_latest_well_covered(tb_tm, YEAR)
@@ -169,14 +167,14 @@ def build_food_trade_table(tb_tm: Table, tb_qcl: Table) -> Table:
     qty = qty[qty["item_code"].isin(code_to_display)].copy()
     qty["item"] = qty["item_code"].map(code_to_display)
 
-    # 2) QCL Production by (country, item), restricted to curated codes.
-    qcl_prod = _qcl_production_by_country_and_code(tb_qcl, YEAR)
-    qcl_prod = qcl_prod[qcl_prod["item_code"].isin(code_to_display)].copy()
-    qcl_prod["item"] = qcl_prod["item_code"].map(code_to_display)
-    production = qcl_prod[["country", "item", "production"]]
+    # 2) SCL Production by (country, item), restricted to curated codes.
+    scl_prod = _scl_production_by_country_and_code(tb_scl, YEAR)
+    scl_prod = scl_prod[scl_prod["item_code"].isin(code_to_display)].copy()
+    scl_prod["item"] = scl_prod["item_code"].map(code_to_display)
+    production = scl_prod[["country", "item", "production"]]
 
     # 3) Per-(country, item) total Import / Export quantity from each country's
-    #    own reports — used as the trade-flow components of apparent supply.
+    #    own TM reports — used as the trade-flow components of apparent supply.
     totals = pd.DataFrame(
         qty.groupby(["reporter_country", "item", "element"], observed=True)["value"]
         .sum()
@@ -194,7 +192,7 @@ def build_food_trade_table(tb_tm: Table, tb_qcl: Table) -> Table:
             totals[col] = 0.0
 
     # Apparent domestic supply = Production + Imports − Exports. Production is
-    # required (a missing QCL row leaves `importer_supply` NaN); missing import
+    # required (a missing SCL row leaves `importer_supply` NaN); missing import
     # / export flows are treated as zero (a country that didn't report a flow
     # for an item simply didn't trade it).
     supply = totals.merge(production, on=["country", "item"], how="left")
@@ -240,13 +238,13 @@ def run() -> None:
     #
     ds_tm = paths.load_dataset("faostat_tm")
     tb_tm = ds_tm.read("faostat_tm", safe_types=False)
-    ds_qcl = paths.load_dataset("faostat_qcl")
-    tb_qcl = ds_qcl.read("faostat_qcl", safe_types=False)
+    ds_scl = paths.load_dataset("faostat_scl")
+    tb_scl = ds_scl.read("faostat_scl", safe_types=False)
 
     #
     # Process data.
     #
-    tb = build_food_trade_table(tb_tm, tb_qcl)
+    tb = build_food_trade_table(tb_tm, tb_scl)
 
     #
     # Save outputs.

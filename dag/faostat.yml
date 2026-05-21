@@ -219,11 +219,11 @@ steps:
   data://garden/faostat/2026-05-07/faostat_tm:
     - data://meadow/faostat/2026-05-07/faostat_tm
   # Viz-ready slice of the trade matrix for the latest year, with Production and
-  # apparent-supply context joined from QCL. All the build logic lives in this
+  # apparent-supply context joined from SCL. All the build logic lives in this
   # garden step; the dropdown definition lives next to it in food_trade.items.yaml.
   data://garden/faostat/2026-05-07/food_trade:
     - data://garden/faostat/2026-05-07/faostat_tm
-    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/faostat/2026-02-25/faostat_scl
   # Thin S3 export step: load the garden table, rename to the viz-facing CamelCase
   # schema, write CSV, upload to s3://owid-public/food-trade/trade.csv.
   export://s3/faostat/latest/food_trade:
