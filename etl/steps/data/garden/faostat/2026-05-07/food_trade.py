@@ -156,10 +156,7 @@ def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> pd.DataFrame:
     sub["element"] = sub["element"].astype(str)
 
     wide = pd.DataFrame(
-        sub.groupby(["country", "item_code", "element"], observed=True)["value"]
-        .sum()
-        .unstack("element")
-        .reset_index()
+        sub.groupby(["country", "item_code", "element"], observed=True)["value"].sum().unstack("element").reset_index()
     )
     # Ensure all four element columns exist even if SCL didn't have any rows for one.
     for elem in elements:
@@ -222,9 +219,7 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     # Importer context column: use the FBS-identity supply for every (country, item)
     # row SCL knows about. Pairs entirely absent from SCL will fall out as NaN in
     # the downstream merge.
-    supply = scl_ctx[["country", "item", "supply"]].rename(
-        columns={"country": "importer", "supply": "importer_supply"}
-    )
+    supply = scl_ctx[["country", "item", "supply"]].rename(columns={"country": "importer", "supply": "importer_supply"})
 
     # 4) Join the directional reports into one row per (exporter, importer, item).
     exp_side = qty.loc[
