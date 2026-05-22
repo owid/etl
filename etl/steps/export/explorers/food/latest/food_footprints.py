@@ -171,7 +171,7 @@ def _subtitle(view) -> str | None:
         return None
     noun = UNIT_NOUN[unit]
     if impact == "land_use":
-        return f"Land use is measured in meters squared (m²) of land used for 1 year, per {noun}."
+        return f"Land use is measured in meters squared (m²) for 1 year, per {noun}."
     if impact == "water":
         return f"Freshwater withdrawals are measured in liters per {noun}."
     if impact == "water_scarcity":
