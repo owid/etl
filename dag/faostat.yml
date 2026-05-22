@@ -177,10 +177,10 @@ steps:
   export://multidim/faostat/latest/fertilizer_use:
     - data://grapher/faostat/2026-02-25/faostat_rfn:
       - data://garden/faostat/2026-02-25/faostat_rfn
-    # FAOSTAT grapher step for additional variables for version 2026-02-25
-    - data://grapher/faostat/2026-02-25/additional_variables:
-      # FAOSTAT garden step for additional variables for version 2026-02-25
-      - data://garden/faostat/2026-02-25/additional_variables:
+    # FAOSTAT grapher step for additional variables for version 2026-05-22
+    - data://grapher/faostat/2026-05-22/additional_variables:
+      # FAOSTAT garden step for additional variables for version 2026-05-22
+      - data://garden/faostat/2026-05-22/additional_variables:
         - data://garden/faostat/2026-02-25/faostat_rl
         - data://garden/faostat/2026-02-25/faostat_qi
         - data://garden/faostat/2026-02-25/faostat_qcl
