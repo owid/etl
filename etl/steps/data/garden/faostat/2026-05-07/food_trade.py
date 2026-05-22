@@ -30,14 +30,12 @@ The display items shown in the dropdown are curated in
 integer-code filter against `item_code`.
 
 For each (exporter, importer, item) the trade matrix typically has two
-reports — one from each side — that can disagree. When both sides report,
-we take the **geometric mean** of the two quantities (√(exp × imp));
-this treats over- and under-reporting symmetrically in log space, which
-is the natural choice for heavy-tailed trade flows. When only one side
-reports, we use that side's number. The notebook at
-docs/analyses/food_trade/food_trade.ipynb justifies this choice and
-contrasts it with the academic alternative (CEPII-BACI reliability
-weights, Gaulier & Zignago 2010).
+reports — one from each side — that can disagree. We default to the
+importer-reported value; FAOSTAT itself notes that "imports are
+typically documented more thoroughly and verified more rigorously than
+exports" (FAO 2025, Food Balance Sheets and Supply Utilization Accounts
+Resource Handbook, §6.1, citing UNSD 2013). When only one side reports,
+we use that side's number.
 
 Items in TM that aren't covered by `food_trade.items.yaml` are dropped;
 items in `food_trade.items.yaml` that aren't in the TM snapshot raise a
@@ -236,13 +234,9 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     ].rename(columns={"reporter_country": "importer", "partner_country": "exporter", "value": "value_importer"})
 
     merged = exp_side.merge(imp_side, on=["exporter", "importer", "item"], how="outer")
-    # When both sides report, take the geometric mean of the two quantities (this
-    # treats over- and under-reporting symmetrically in log space, which is the
-    # natural choice for heavy-tailed trade flows). When only one side reports,
-    # use that side's number.
+    # Default to the importer-reported value; fall back to the exporter-reported value
+    # only when the importer doesn't report. See docstring for the rationale.
     merged["value"] = merged["value_importer"].fillna(merged["value_exporter"])
-    both = merged["value_exporter"].notna() & merged["value_importer"].notna()
-    merged.loc[both, "value"] = (merged.loc[both, "value_exporter"] * merged.loc[both, "value_importer"]) ** 0.5
     merged = merged.dropna(subset=["value"])
     merged = merged[merged["value"] > 0]
 
