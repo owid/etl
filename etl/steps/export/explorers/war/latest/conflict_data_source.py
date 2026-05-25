@@ -757,20 +757,6 @@ def build_source_explorer(spec: SourceSpec, yaml_config: dict[str, Any]):
 # Per-source specs
 # ===========================================================================
 
-# Standard ct_map shared by sources that use UCDP-style conflict_type slugs
-# (UCDP, UCDP+PRIO; PRIO uses a subset).
-UCDP_STYLE_CT_MAP = {
-    "all": "all_armed_conflicts",
-    "state-based": "all_state_based_conflicts",
-    "interstate": "interstate_conflicts",
-    "intrastate": "intrastate_conflicts",
-    "intrastate (internationalized)": "_intrastate_int",
-    "intrastate (non-internationalized)": "_intrastate_non_int",
-    "extrasystemic": "extrastate_conflicts",
-    "non-state conflict": "non_state_conflicts",
-    "one-sided violence": "one_sided_violence",
-}
-
 # ---- UCDP -----------------------------------------------------------------
 
 UCDP_SPEC = SourceSpec(
@@ -788,7 +774,19 @@ UCDP_SPEC = SourceSpec(
         "conflict_locations",
         "conflict_participants",
     },
-    ct_map=UCDP_STYLE_CT_MAP,
+    # Standard ct_map shared by sources that use UCDP-style conflict_type slugs
+    # (UCDP, UCDP+PRIO; PRIO uses a subset).
+    ct_map={
+        "all": "all_armed_conflicts",
+        "state-based": "all_state_based_conflicts",
+        "interstate": "interstate_conflicts",
+        "intrastate": "intrastate_conflicts",
+        "intrastate (internationalized)": "_intrastate_int",
+        "intrastate (non-internationalized)": "_intrastate_non_int",
+        "extrasystemic": "extrastate_conflicts",
+        "non-state conflict": "non_state_conflicts",
+        "one-sided violence": "one_sided_violence",
+    },
     deaths_sub_measure="country_and_region_data",
     by_sub_type_labels={
         "all_armed_conflicts": [
@@ -934,23 +932,6 @@ MARS_SPEC = SourceSpec(
 
 # ---- COW (Correlates of War – Wars) ---------------------------------------
 
-# COW uses "wars" instead of "conflicts" in user-facing text. Per-CT overrides
-# replace the global names.
-COW_CT_NAME = {
-    "all_armed_conflicts": "wars",
-    "all_state_based_conflicts": "state-based wars",
-    "interstate_conflicts": "interstate wars",
-    "intrastate_conflicts": "intrastate wars",
-    "extrastate_conflicts": "extrastate wars",
-    "non_state_conflicts": "non-state wars",
-}
-COW_CT_SHORT = {
-    "interstate_conflicts": "Interstate wars",
-    "intrastate_conflicts": "Intrastate wars",
-    "extrastate_conflicts": "Extrastate wars",
-    "non_state_conflicts": "Non-state wars",
-}
-
 COW_SPEC = SourceSpec(
     slug="cow",
     name="Correlates of War – Wars",
@@ -993,8 +974,22 @@ COW_SPEC = SourceSpec(
         "all_armed_conflicts": {"conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate"},
         "intrastate_conflicts": {"number_of_conflicts", "conflict_rate"},
     },
-    ct_name_override=COW_CT_NAME,
-    ct_short_override=COW_CT_SHORT,
+    # COW uses "wars" instead of "conflicts" in user-facing text. Per-CT overrides
+    # replace the global names.
+    ct_name_override={
+        "all_armed_conflicts": "wars",
+        "all_state_based_conflicts": "state-based wars",
+        "interstate_conflicts": "interstate wars",
+        "intrastate_conflicts": "intrastate wars",
+        "extrastate_conflicts": "extrastate wars",
+        "non_state_conflicts": "non-state wars",
+    },
+    ct_short_override={
+        "interstate_conflicts": "Interstate wars",
+        "intrastate_conflicts": "Intrastate wars",
+        "extrastate_conflicts": "Extrastate wars",
+        "non_state_conflicts": "Non-state wars",
+    },
     dod={
         "all_armed_conflicts": "[wars](#dod:war-cow)",
         "all_state_based_conflicts": "[state-based wars](#dod:state-based-war-cow)",
@@ -1074,7 +1069,13 @@ PRIO_SPEC = SourceSpec(
 # ===========================================================================
 
 # Sources built programmatically. The rest still load from the YAML.
-PROGRAMMATIC_SPECS: list[SourceSpec] = [UCDP_SPEC, UCDP_PRIO_SPEC, MARS_SPEC, COW_SPEC, PRIO_SPEC]
+PROGRAMMATIC_SPECS: list[SourceSpec] = [
+    UCDP_SPEC,
+    UCDP_PRIO_SPEC,
+    MARS_SPEC,
+    COW_SPEC,
+    PRIO_SPEC,
+]
 
 
 def run() -> None:
