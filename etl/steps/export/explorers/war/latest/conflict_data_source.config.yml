@@ -92,7 +92,7 @@ dimensions:
       - slug: only_wars
         name: "Only wars"
   - slug: sub_measure
-    name: "Sub-measure2"
+    name: "Sub-measure"
     presentation:
       type: dropdown
     choices:
