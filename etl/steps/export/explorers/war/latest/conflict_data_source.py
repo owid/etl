@@ -95,6 +95,16 @@ class SourceSpec:
     # uses just "regional_data".
     deaths_sub_measure: str = "regional_data"
 
+    # Per-CT name overrides (used in titles + display labels). Falls back to the
+    # global CT_NAME / CT_SHORT if not set. Sources like COW that say "interstate
+    # wars" instead of "interstate conflicts" populate these.
+    ct_name_override: dict[str, str] = field(default_factory=dict)
+    ct_short_override: dict[str, str] = field(default_factory=dict)
+
+    # Per-(measure, conflict_type) title overrides — last resort for cases where
+    # the templated title doesn't fit. Falls back to template if not set.
+    title_overrides: dict[tuple[str, str], str] = field(default_factory=dict)
+
     # FAUST parameters
     deaths_noun: str = "Deaths"  # PRIO: "Battle deaths"
     dod: dict[str, str] = field(default_factory=dict)  # CT slug → DoD link
@@ -438,6 +448,16 @@ def _refresh_dim_choices(c, dim_slug: str, order: list[str]) -> None:
 # ===========================================================================
 
 
+def _ct_name(spec: SourceSpec, ctype: str) -> str:
+    return spec.ct_name_override.get(ctype) or CT_NAME[ctype]
+
+
+def _ct_short(spec: SourceSpec, ctype: str) -> str | None:
+    if ctype in spec.ct_short_override:
+        return spec.ct_short_override[ctype]
+    return CT_SHORT.get(ctype)
+
+
 def _set_view_config(view, spec: SourceSpec) -> None:
     d = view.dimensions
     measure = d["measure"]
@@ -455,13 +475,18 @@ def _set_view_config(view, spec: SourceSpec) -> None:
     elif measure == "conflict_locations":
         _locations_text(cfg, spec, ctype, sub_measure)
 
+    # Apply per-source title overrides as a last step.
+    override = spec.title_overrides.get((measure, ctype))
+    if override:
+        cfg["title"] = override
+
     view.config = cfg
 
 
 def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str, cst: str) -> None:
     per_capita = measure == "death_rate"
     noun = "Death rate" if per_capita else spec.deaths_noun
-    name = CT_NAME[ctype]
+    name = _ct_name(spec, ctype)
     if cst == "by_sub_type":
         cfg["title"] = f"{noun} in {name} based on where they occurred"
         cfg["subtitle"] = (
@@ -505,7 +530,7 @@ def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str
 def _count_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str, cst: str, sub_measure: str) -> None:
     rate = measure == "conflict_rate"
     is_new = sub_measure == "only_new_conflicts"
-    name = CT_NAME[ctype]
+    name = _ct_name(spec, ctype)
     new_prefix = "new " if is_new else ""
     lead = "Rate of" if rate else "Number of"
     verb = "started that year" if is_new else "were ongoing that year"
@@ -541,7 +566,7 @@ def _count_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str,
 
 
 def _participants_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_measure: str) -> None:
-    name = CT_NAME[ctype]
+    name = _ct_name(spec, ctype)
     country_level = sub_measure == "country_level_data"
     cfg["title"] = f"States involved in {name}" if country_level else f"Number of states involved in {name}"
     if ctype == "all_state_based_conflicts":
@@ -560,7 +585,7 @@ def _participants_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_me
 
 
 def _locations_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_measure: str) -> None:
-    name = CT_NAME[ctype]
+    name = _ct_name(spec, ctype)
     country_level = sub_measure == "country_level_data"
     cfg["title"] = (
         f"Countries where {name} took place" if country_level else f"Number of countries where {name} took place"
@@ -583,6 +608,14 @@ def _set_view_displays(view, spec: SourceSpec) -> None:
         per_capita = measure == "death_rate"
         if cst == "by_sub_type":
             return
+        # Distinguish a CI stack (has _low_/_high_ variants) from a single-indicator
+        # view (e.g. COW deaths). Single views get a CT label, not "Best estimate".
+        has_ci_variants = any(("_low_" in i.catalogPath or "_high_" in i.catalogPath) for i in ys)
+        if not has_ci_variants:
+            short = _ct_short(spec, ctype)
+            if len(ys) == 1 and short:
+                ys[0].display = {"name": short}
+            return
         with_cs = (ctype, cst) in spec.deaths_map_with_cs
         for ind in ys:
             if "_low_" in ind.catalogPath:
@@ -598,8 +631,9 @@ def _set_view_displays(view, spec: SourceSpec) -> None:
     elif measure in ("number_of_conflicts", "conflict_rate"):
         if cst == "by_sub_type":
             return
-        if len(ys) == 1 and ctype in CT_SHORT:
-            ys[0].display = {"name": CT_SHORT[ctype]}
+        short = _ct_short(spec, ctype)
+        if len(ys) == 1 and short:
+            ys[0].display = {"name": short}
     elif measure in ("conflict_locations", "conflict_participants"):
         country_level = d["sub_measure"] == "country_level_data"
         for ind in ys:
@@ -898,28 +932,151 @@ MARS_SPEC = SourceSpec(
 )
 
 
+# ---- COW (Correlates of War – Wars) ---------------------------------------
+
+# COW uses "wars" instead of "conflicts" in user-facing text. Per-CT overrides
+# replace the global names.
+COW_CT_NAME = {
+    "all_armed_conflicts": "wars",
+    "all_state_based_conflicts": "state-based wars",
+    "interstate_conflicts": "interstate wars",
+    "intrastate_conflicts": "intrastate wars",
+    "extrastate_conflicts": "extrastate wars",
+    "non_state_conflicts": "non-state wars",
+}
+COW_CT_SHORT = {
+    "interstate_conflicts": "Interstate wars",
+    "intrastate_conflicts": "Intrastate wars",
+    "extrastate_conflicts": "Extrastate wars",
+    "non_state_conflicts": "Non-state wars",
+}
+
+COW_SPEC = SourceSpec(
+    slug="cow",
+    name="Correlates of War – Wars",
+    dataset_path="cow",
+    main_table="cow",
+    country_table="cow_country",
+    locations_table="cow_locations",
+    measures={
+        "conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate",
+        "conflict_locations", "conflict_participants",
+    },
+    # COW uses hyphenated forms (inter-state, intra-state, extra-state, non-state).
+    ct_map={
+        "all": "all_armed_conflicts",
+        "state-based": "all_state_based_conflicts",
+        "inter-state": "interstate_conflicts",
+        "intra-state": "intrastate_conflicts",
+        "intra-state (internationalized)": "_intrastate_int",
+        "intra-state (non-internationalized)": "_intrastate_non_int",
+        "extra-state": "extrastate_conflicts",
+        "non-state": "non_state_conflicts",
+    },
+    by_sub_type_labels={
+        "all_armed_conflicts": [
+            ("non_state_conflicts", "Non-state wars"),
+            ("intrastate_conflicts", "Intrastate wars"),
+            ("extrastate_conflicts", "Extrastate wars"),
+            ("interstate_conflicts", "Interstate wars"),
+        ],
+        "intrastate_conflicts": [
+            ("_intrastate_non_int", "Non-internationalized intrastate"),
+            ("_intrastate_int", "Internationalized intrastate"),
+        ],
+    },
+    by_sub_type_measures={
+        "all_armed_conflicts": {"conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate"},
+        "intrastate_conflicts": {"number_of_conflicts", "conflict_rate"},
+    },
+    ct_name_override=COW_CT_NAME,
+    ct_short_override=COW_CT_SHORT,
+    dod={
+        "all_armed_conflicts": "[wars](#dod:war-cow)",
+        "all_state_based_conflicts": "[state-based wars](#dod:state-based-war-cow)",
+        "interstate_conflicts": "[interstate wars](#dod:interstate-war-cow)",
+        "intrastate_conflicts": "[intrastate wars](#dod:intrastate-war-cow)",
+        "extrastate_conflicts": "[extrastate wars](#dod:extrastate-war-cow)",
+        "non_state_conflicts": "[non-state wars](#dod:non-state-war-cow)",
+    },
+    dod_by_sub_type={
+        "all_armed_conflicts": "[interstate](#dod:interstate-war-cow), [intrastate](#dod:intrastate-war-cow), [extrastate](#dod:extrastate-war-cow), and [non-state](#dod:non-state-war-cow) wars",
+        "intrastate_conflicts": "[non-internationalized and internationalized intrastate wars](#dod:intrastate-war-cow)",
+    },
+)
+
+
+# ---- PRIO (Peace Research Institute Oslo) ---------------------------------
+
+PRIO_SPEC = SourceSpec(
+    slug="prio",
+    name="Peace Research Institute Oslo",
+    dataset_path="prio_v31",
+    main_table="prio_v31",
+    country_table="prio_v31_country",
+    # No locations table.
+    measures={
+        "conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate",
+        "conflict_participants",
+    },
+    # PRIO's "all" represents state-based conflicts (no all_armed_conflicts).
+    # The country table uses "state-based" instead of "all" — both map to the same slug.
+    ct_map={
+        "all": "all_state_based_conflicts",
+        "state-based": "all_state_based_conflicts",
+        "interstate": "interstate_conflicts",
+        "intrastate": "intrastate_conflicts",
+        "intrastate (internationalized)": "_intrastate_int",
+        "intrastate (non-internationalized)": "_intrastate_non_int",
+        "extrasystemic": "extrastate_conflicts",
+    },
+    # PRIO uses battle-deaths columns: `number_deaths_ongoing_conflicts_battle*`.
+    deaths_family="number_deaths_ongoing_conflicts_battle",
+    deaths_noun="Deaths",  # legacy title still says "Deaths in ..." (not "Battle deaths")
+    by_sub_type_labels={
+        "all_state_based_conflicts": [
+            ("_intrastate_int", "Internationalized intrastate"),
+            ("_intrastate_non_int", "Non-internationalized intrastate"),
+            ("extrastate_conflicts", "Extrasystemic"),
+            ("interstate_conflicts", "Interstate"),
+        ],
+        "intrastate_conflicts": [
+            ("_intrastate_non_int", "Non-internationalized intrastate"),
+            ("_intrastate_int", "Internationalized intrastate"),
+        ],
+    },
+    by_sub_type_measures={
+        "all_state_based_conflicts": {"conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate"},
+        "intrastate_conflicts": {"number_of_conflicts", "conflict_rate"},
+    },
+    dod={
+        "all_state_based_conflicts": "[state-based conflicts](#dod:state-based-conflict-prio)",
+        "interstate_conflicts": "[interstate conflicts](#dod:interstate-prio)",
+        "intrastate_conflicts": "[intrastate conflicts](#dod:intrastate-prio)",
+        "extrastate_conflicts": "[extrasystemic conflicts](#dod:extrasystemic-prio)",
+    },
+    dod_by_sub_type={
+        "all_state_based_conflicts": "[interstate](#dod:interstate-prio), [intrastate](#dod:intrastate-prio), and [extrasystemic](#dod:extrasystemic-prio) conflicts",
+        "intrastate_conflicts": "[non-internationalized and internationalized intrastate conflicts](#dod:intrastate-prio)",
+    },
+)
+
+
 # ===========================================================================
 # Entry point
 # ===========================================================================
 
 # Sources built programmatically. The rest still load from the YAML.
-PROGRAMMATIC_SPECS: list[SourceSpec] = [UCDP_SPEC, UCDP_PRIO_SPEC, MARS_SPEC]
-PROGRAMMATIC_SLUGS: set[str] = {s.slug for s in PROGRAMMATIC_SPECS}
+PROGRAMMATIC_SPECS: list[SourceSpec] = [UCDP_SPEC, UCDP_PRIO_SPEC, MARS_SPEC, COW_SPEC, PRIO_SPEC]
 
 
 def run() -> None:
     yaml_config = paths.load_collection_config()
 
-    # Build one sub-explorer for the YAML-driven sources (those not yet
-    # migrated to a SourceSpec). It carries data_source as a normal dim with
-    # only the slug subset it has views for.
-    yaml_config_filtered = deepcopy(yaml_config)
-    yaml_config_filtered["views"] = [
-        v for v in yaml_config_filtered.get("views", []) if v["dimensions"]["data_source"] not in PROGRAMMATIC_SLUGS
-    ]
-    yaml_explorer = paths.create_collection(config=yaml_config_filtered, explorer=True)
+    # The YAML carries views only for sources we haven't migrated yet (MIE +
+    # COW-MID). It still defines all five dims and the explorer-level config.
+    yaml_explorer = paths.create_collection(config=yaml_config, explorer=True)
 
-    # Build one sub-explorer per programmatic source and attach its data_source dim.
     programmatic_subs = []
     for spec in PROGRAMMATIC_SPECS:
         sub = build_source_explorer(spec, yaml_config)
