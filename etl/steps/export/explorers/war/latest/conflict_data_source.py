@@ -476,11 +476,7 @@ def _refresh_dim_choices(c, dim_slug: str, order: list[str]) -> None:
     by_slug = {ch.slug: ch for ch in dim.choices}
     used = {v.dimensions.get(dim_slug) for v in c.views}
     used.discard(None)
-    new_choices = [
-        by_slug.get(slug) or DimensionChoice(slug=slug, name=slug)
-        for slug in order
-        if slug in used
-    ]
+    new_choices = [by_slug.get(slug) or DimensionChoice(slug=slug, name=slug) for slug in order if slug in used]
     # Append any used-but-unlisted slugs at the end (defensive — shouldn't happen).
     for slug in sorted(used - set(order)):
         new_choices.append(by_slug.get(slug) or DimensionChoice(slug=slug, name=slug))
@@ -573,10 +569,7 @@ def _deaths_subtitle(dod_link: str, per_capita: bool) -> str:
             "Deaths of combatants and civilians due to fighting, per 100,000 people. "
             f"Included are {dod_link} that were ongoing that year."
         )
-    return (
-        "Included are deaths of combatants and civilians due to fighting in "
-        f"{dod_link} that were ongoing that year."
-    )
+    return f"Included are deaths of combatants and civilians due to fighting in {dod_link} that were ongoing that year."
 
 
 def _count_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str, cst: str, sub_measure: str) -> None:
@@ -1023,15 +1016,20 @@ COW_SPEC = SourceSpec(
         "non-state": "non_state_conflicts",
     },
     by_sub_type_labels={
+        # COW's all_armed by_sub_type expands intrastate into the two
+        # internationalized variants. Stacking order matches PROD: internationalized
+        # intrastate first (bottom of the stack), then non-internationalized,
+        # non-state, extrastate, interstate (top).
         "all_armed_conflicts": [
+            ("_intrastate_int", "Internationalized intrastate"),
+            ("_intrastate_non_int", "Non-internationalized intrastate"),
             ("non_state_conflicts", "Non-state wars"),
-            ("intrastate_conflicts", "Intrastate wars"),
             ("extrastate_conflicts", "Extrastate wars"),
             ("interstate_conflicts", "Interstate wars"),
         ],
         "intrastate_conflicts": [
-            ("_intrastate_non_int", "Non-internationalized intrastate"),
             ("_intrastate_int", "Internationalized intrastate"),
+            ("_intrastate_non_int", "Non-internationalized intrastate"),
         ],
     },
     by_sub_type_measures={
