@@ -1,8 +1,12 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import VariableMeta
+import owid.catalog.processing as pr
+from owid.catalog import Table, VariableMeta
 
 from etl.helpers import PathFinder
+
+# World source variants as they appear after country harmonization
+_WORLD_VARIANTS = ["World (UIS)", "World (SDG)", "World (WB)", "World (UNICEF)", "World (MDG)"]
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -90,6 +94,150 @@ _TITLE_OVERRIDES = {
 }
 
 
+def _world_values_agree(series) -> bool:
+    """Return True if all non-null values in a group agree within 1% relative tolerance."""
+    vals = series.dropna()
+    if len(vals) <= 1:
+        return True
+    mean = vals.mean()
+    if mean == 0:
+        return (vals.max() - vals.min()) == 0
+    return (vals.max() - vals.min()) / abs(mean) <= 0.01
+
+
+def consolidate_world_entries(tb: Table) -> Table:
+    """Replace multiple World source variants with a single 'World' row per year+indicator.
+
+    Consolidates when all non-null values within a (year, indicator_id) group agree within
+    1% relative tolerance. Groups with genuinely different values are left unchanged.
+    The first non-null row (or first row if all null) is kept as the 'World' entry.
+    """
+    world_mask = tb["country"].isin(_WORLD_VARIANTS)
+    if not world_mask.any():
+        return tb
+
+    tb_world = tb[world_mask]
+    tb_other = tb[~world_mask]
+
+    # Identify (year, indicator_id) groups where all sources report the same value
+    can_consolidate = set(
+        tb_world.groupby(["year", "indicator_id"])["value"].apply(_world_values_agree).loc[lambda s: s].index.tolist()
+    )
+
+    # Tag rows belonging to consolidatable groups
+    consolidate_keys = {f"{y}___{i}" for y, i in can_consolidate}
+    tb_world = tb_world.copy()
+    tb_world["_consolidate"] = [
+        f"{y}___{i}" in consolidate_keys for y, i in zip(tb_world["year"].values, tb_world["indicator_id"].values)
+    ]
+
+    tb_to_consolidate = tb_world[tb_world["_consolidate"]].drop(columns=["_consolidate"]).copy()
+    tb_keep_as_is = tb_world[~tb_world["_consolidate"]].drop(columns=["_consolidate"])
+
+    if not tb_to_consolidate.empty:
+        # Keep one row per group, preferring non-null values
+        tb_to_consolidate = tb_to_consolidate.sort_values("value", na_position="last")
+        tb_to_consolidate = tb_to_consolidate.drop_duplicates(subset=["year", "indicator_id"], keep="first")
+        if hasattr(tb_to_consolidate["country"].dtype, "categories"):
+            tb_to_consolidate["country"] = tb_to_consolidate["country"].astype(str)
+        tb_to_consolidate["country"] = "World"
+
+    parts = [p for p in [tb_other, tb_keep_as_is, tb_to_consolidate] if not p.empty]
+    return pr.concat(parts) if len(parts) > 1 else parts[0]
+
+
+def _drop_if_abnormal(tb, country, year, col, threshold, reason):
+    """Null out a single cell if it exists, exceeds `threshold`, and log the removal.
+
+    If the value is present but NOT above the threshold the data may have been fixed
+    upstream; a warning is logged so the filter can be reviewed.
+    """
+    if col not in tb.columns:
+        return
+    mask = (tb["country"] == country) & (tb["year"] == year)
+    val = tb.loc[mask, col]
+    if val.empty or val.isna().all():
+        return
+    numeric_val = float(val.iloc[0])
+    if numeric_val > threshold:
+        tb.loc[mask, col] = None
+        paths.log.info(
+            "outlier_removed",
+            country=country,
+            year=year,
+            indicator=col,
+            value=round(numeric_val, 4),
+            reason=reason,
+        )
+    else:
+        paths.log.warning(
+            "outlier_check_skipped",
+            country=country,
+            year=year,
+            indicator=col,
+            value=round(numeric_val, 4),
+            note="Value is no longer above threshold — upstream data may have changed. Review this filter.",
+        )
+
+
+def drop_outliers(tb):
+    """Remove known impossible values from the pivoted OPRI table and log each removal.
+
+    Each entry is checked against a plausibility threshold before removal so that if
+    the source data is corrected the filter raises a warning instead of silently no-oping.
+    """
+    # Sierra Leone 2023: multiple education-level GDP columns report >100 % of GDP (impossible).
+    sl_cols = [
+        "Government expenditure on primary education as a percentage of GDP (%)",
+        "Government expenditure on lower secondary education as a percentage of GDP (%)",
+        "Government expenditure on upper secondary education as a percentage of GDP (%)",
+        "Government expenditure on tertiary education as a percentage of GDP (%)",
+        "Government expenditure on secondary education as a percentage of GDP (%)",
+        "Government expenditure on post-secondary non-tertiary education as a percentage of GDP (%)",
+    ]
+    for col in sl_cols:
+        _drop_if_abnormal(
+            tb,
+            "Sierra Leone",
+            2023,
+            col,
+            threshold=10,
+            reason="value exceeds 10 % of GDP — physically impossible for a single education level",
+        )
+
+    # Chad 2024: primary education spending reported as ~177 % of GDP.
+    _drop_if_abnormal(
+        tb,
+        "Chad",
+        2024,
+        "Government expenditure on primary education as a percentage of GDP (%)",
+        threshold=10,
+        reason="value of ~177 % of GDP is physically impossible",
+    )
+
+    # Oman 2017 / 2019 / 2021: alternating-year spikes (12–165 % GDP) across all
+    # level-specific columns while adjacent even years are normal (~0–2 % GDP).
+    oman_cols = [
+        "Government expenditure on pre-primary education as a percentage of GDP (%)",
+        "Government expenditure on primary education as a percentage of GDP (%)",
+        "Government expenditure on lower secondary education as a percentage of GDP (%)",
+        "Government expenditure on secondary education as a percentage of GDP (%)",
+        "Government expenditure on upper secondary education as a percentage of GDP (%)",
+    ]
+    for year in [2017, 2019, 2021]:
+        for col in oman_cols:
+            _drop_if_abnormal(
+                tb,
+                "Oman",
+                year,
+                col,
+                threshold=10,
+                reason=f"alternating-year spike pattern ({year}): value far exceeds normal range of ~0–2 % GDP",
+            )
+
+    return tb
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -110,9 +258,9 @@ def run() -> None:
     country_mapping_path = paths.directory / "education.countries.json"
     excluded_countries_path = paths.directory / "education.excluded_countries.json"
     tb = paths.regions.harmonize_names(
-        tb, countries_file=country_mapping_path, excluded_countries_file=excluded_countries_path
+        tb, country_col="country", countries_file=country_mapping_path, excluded_countries_file=excluded_countries_path
     )
-
+    tb = consolidate_world_entries(tb)
     # Drop columns that are not needed
     tb = tb.drop(columns=["indicator_id", "magnitude", "qualifier"])
 
@@ -182,16 +330,7 @@ def run() -> None:
 
     tb_pivoted = tb_pivoted.reset_index()
 
-    # Remove 2023 data point for Sierra Leone for specific government expenditure indicators (outlier data)
-    outlier_indicators = [
-        "Government expenditure on primary education as a percentage of GDP (%)",
-        "Government expenditure on lower secondary education as a percentage of GDP (%)",
-        "Government expenditure on upper secondary education as a percentage of GDP (%)",
-        "Government expenditure on tertiary education as a percentage of GDP (%)",
-    ]
-    columns = tb_pivoted.columns.intersection(outlier_indicators)
-    mask = (tb_pivoted["country"] == "Sierra Leone") & (tb_pivoted["year"] == 2023)
-    tb_pivoted.loc[mask, columns] = None
+    tb_pivoted = drop_outliers(tb_pivoted)
 
     tb_pivoted = tb_pivoted.format(["country", "year"])
 

@@ -5,6 +5,10 @@ from owid.catalog import Table, VariableMeta
 
 from etl.helpers import PathFinder
 
+# World source variants in priority order (UIS is most authoritative for UNESCO data)
+_WORLD_VARIANTS = ["World (UIS)", "World (SDG)", "World (WB)", "World (UNICEF)", "World (MDG)"]
+_WORLD_PRIORITY = {w: i for i, w in enumerate(_WORLD_VARIANTS)}
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
@@ -148,6 +152,58 @@ _SHORT_NAME_RENAMES = {
 }
 
 
+def _world_values_agree(series) -> bool:
+    """Return True if all non-null values in a group agree within 1% relative tolerance."""
+    vals = series.dropna()
+    if len(vals) <= 1:
+        return True
+    mean = vals.mean()
+    if mean == 0:
+        return (vals.max() - vals.min()) == 0
+    return (vals.max() - vals.min()) / abs(mean) <= 0.01
+
+
+def consolidate_world_entries(tb: Table) -> Table:
+    """Replace multiple World source variants with a single 'World' row per year+indicator.
+
+    Consolidates when all non-null values within a (year, indicator_id) group agree within
+    1% relative tolerance. Groups with genuinely different values are left unchanged.
+    The first non-null row (or first row if all null) is kept as the 'World' entry.
+    """
+    world_mask = tb["country"].isin(_WORLD_VARIANTS)
+    if not world_mask.any():
+        return tb
+
+    tb_world = tb[world_mask]
+    tb_other = tb[~world_mask]
+
+    # Identify (year, indicator_id) groups where all sources report the same value
+    can_consolidate = set(
+        tb_world.groupby(["year", "indicator_id"])["value"].apply(_world_values_agree).loc[lambda s: s].index.tolist()
+    )
+
+    # Tag rows belonging to consolidatable groups
+    consolidate_keys = {f"{y}___{i}" for y, i in can_consolidate}
+    tb_world = tb_world.copy()
+    tb_world["_consolidate"] = [
+        f"{y}___{i}" in consolidate_keys for y, i in zip(tb_world["year"].values, tb_world["indicator_id"].values)
+    ]
+
+    tb_to_consolidate = tb_world[tb_world["_consolidate"]].drop(columns=["_consolidate"]).copy()
+    tb_keep_as_is = tb_world[~tb_world["_consolidate"]].drop(columns=["_consolidate"])
+
+    if not tb_to_consolidate.empty:
+        # Keep one row per group, preferring non-null values
+        tb_to_consolidate = tb_to_consolidate.sort_values("value", na_position="last")
+        tb_to_consolidate = tb_to_consolidate.drop_duplicates(subset=["year", "indicator_id"], keep="first")
+        if hasattr(tb_to_consolidate["country"].dtype, "categories"):
+            tb_to_consolidate["country"] = tb_to_consolidate["country"].astype(str)
+        tb_to_consolidate["country"] = "World"
+
+    parts = [p for p in [tb_other, tb_keep_as_is, tb_to_consolidate] if not p.empty]
+    return pr.concat(parts) if len(parts) > 1 else parts[0]
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -174,6 +230,7 @@ def run() -> None:
     tb = paths.regions.harmonize_names(
         tb, country_col="country", countries_file=country_mapping_path, excluded_countries_file=excluded_countries_path
     )
+    tb = consolidate_world_entries(tb)
     # Drop columns that are not needed
     tb = tb.drop(columns=["magnitude", "qualifier"])
 
