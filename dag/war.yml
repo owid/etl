@@ -177,9 +177,8 @@ steps:
   export://explorers/war/latest/countries_in_conflict_data:
     - data://grapher/war/2025-06-13/ucdp
 
-  # Conflict Data Source explorer — combines one mini-explorer per data source via
-  # `combine_collections(collection_dimension_slug="data_source")`. A sibling
-  # explorer (`conflict-data`) will reuse the same sub-configs in a follow-up PR.
+  # Conflict Data Source explorer — single config covering all seven data sources
+  # via a leading `data_source` dropdown.
   export://explorers/war/latest/conflict_data_source:
     - data://grapher/war/2023-09-21/cow
     - data://grapher/war/2023-09-21/cow_mid
