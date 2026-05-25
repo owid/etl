@@ -58,6 +58,9 @@ definitions:
 dataset:
   title: "Global AIDS Update"
 
+  owners:
+    - Fiona Spooner
+    - Lucas Rodés-Guirao
 tables:
   epi:
     common:

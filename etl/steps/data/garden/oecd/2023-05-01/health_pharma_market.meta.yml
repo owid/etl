@@ -1,4 +1,6 @@
-
+dataset:
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   health_pharma_market:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Agricultural policy support - (Agrimonitor, 2017)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   agricultural_policy_support__agrimonitor__2017:
     variables:

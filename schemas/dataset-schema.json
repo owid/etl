@@ -416,7 +416,7 @@
         "owners": {
           "type": "array",
           "title": "Dataset owners",
-          "description": "OWID team members who maintain this dataset. The first entry is the accountable owner / point of contact for issues with the data page. Former employees who contributed substantially can remain in the list; reorder so a current employee is first.",
+          "description": "Contributors who built or maintain this dataset. The first entry is the accountable owner / point of contact for issues with the data page. Former employees who originally created the data can remain in the list (matches the article-author convention); reorder so a current employee is first.",
           "guidelines": [
             "First entry is the accountable owner and will be surfaced as the contact person.",
             "Use the canonical display name (with diacritics) — entries are validated against the enum below."
@@ -432,7 +432,34 @@
               "Lucas Rodés-Guirao",
               "Tuna Acisu",
               "Fiona Spooner",
-              "Edouard Mathieu"
+              "Edouard Mathieu",
+              "Hannah Ritchie",
+              "Max Roser",
+              "Joe Hasell",
+              "Esteban Ortiz-Ospina",
+              "Diana Beltekian",
+              "Sandra Tzvetkova",
+              "Saloni Dattani",
+              "Sophie Ochmann",
+              "Charlie Giattino",
+              "Cameron Appel",
+              "Bastian Herre",
+              "Bobbie Macdonald",
+              "Ruby Mittal",
+              "Daniel Gavrilov",
+              "Aibek Aldabergenov",
+              "Gyorgy Attila Ruzicska",
+              "Marco Molteni",
+              "Jaiden Mispy",
+              "Bernadeta",
+              "Shahid Ahmad",
+              "Breck Yunits",
+              "Choo Yan Min",
+              "Mallika Snyder",
+              "Marcel Gerber",
+              "Bertha Rohenkohl",
+              "Daniel Bachler",
+              "Lars Yencken"
             ]
           }
         }

@@ -1,5 +1,7 @@
 dataset:
   title: Swedish Historical National Accounts - Schön and Krantz (2007, 2012, 2015)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015:
     variables:

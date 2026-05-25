@@ -17,6 +17,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   energy_ai:
     variables:
@@ -61,7 +63,7 @@ tables:
           - *base_case
         display:
           numDecimalPlaces: 1
-          isProjection: True
+          isProjection: true
 
       total_electricity_consumption__twh__base:
         title: Projected total electricity consumption by data centers
@@ -73,5 +75,5 @@ tables:
           - *base_case
         display:
           numDecimalPlaces: 0
-          isProjection: True
+          isProjection: true
 

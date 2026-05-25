@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Lucas Rodés-Guirao  # fasttrack
 tables:
   draft_joe_gini_diff_1993_2018:
     variables:

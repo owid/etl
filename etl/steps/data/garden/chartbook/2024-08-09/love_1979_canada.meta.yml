@@ -12,6 +12,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   love_1979_canada:
     variables:

@@ -11,6 +11,8 @@ definitions:
 dataset:
   update_period_days: 364
 
+  owners:
+    - Veronika Samborska
 tables:
   edstats:
     variables:
@@ -31,11 +33,11 @@ tables:
         unit: score
         description_short: Average learning outcomes correspond to [harmonized](#dod:harmonized-scores) test scores across standardized, psychometrically-robust international and regional student achievement tests.
         description_from_producer: |-
-           Harmonized test scores from major international student achievement testing programs. They are measured in TIMSS-equivalent units, where 300 is minimal attainment and 625 is advanced attainment.
+          Harmonized test scores from major international student achievement testing programs. They are measured in TIMSS-equivalent units, where 300 is minimal attainment and 625 is advanced attainment.
 
-           World Bank variable id: HD.HCI.HLO
+          World Bank variable id: HD.HCI.HLO
 
-           Original source: Patrinos and Angrist (2018). http://documents.worldbank.org/curated/en/390321538076747773/Global-Dataset-on-Education-Quality-A-Review-and-Update-2000-2017
+          Original source: Patrinos and Angrist (2018). http://documents.worldbank.org/curated/en/390321538076747773/Global-Dataset-on-Education-Quality-A-Review-and-Update-2000-2017
         display:
           numDecimalPlaces: 0
 
@@ -71,11 +73,11 @@ tables:
         unit: score
         description_short: Average numeracy proficiency of adults aged 16-65.
         description_from_producer: |-
-            Numeracy is defined as the ability to access, use, interpret and communicate mathematical information and ideas in order to engage in and manage the mathematical demands of a range of situations in adult life. To this end, numeracy involves managing a situation or solving a problem in a real context, by responding to mathematical content/information/ideas represented in multiple ways. The target population for the survey was the non-institutionalized population, aged 16-65 years, residing in the country at the time of data collection, irrespective of nationality, citizenship or language status. For more information, consult the OECD PIAAC website: http://www.oecd.org/site/piaac/.
+          Numeracy is defined as the ability to access, use, interpret and communicate mathematical information and ideas in order to engage in and manage the mathematical demands of a range of situations in adult life. To this end, numeracy involves managing a situation or solving a problem in a real context, by responding to mathematical content/information/ideas represented in multiple ways. The target population for the survey was the non-institutionalized population, aged 16-65 years, residing in the country at the time of data collection, irrespective of nationality, citizenship or language status. For more information, consult the OECD PIAAC website: http://www.oecd.org/site/piaac/.
 
-            World Bank variable id: LO.PIAAC.NUM
+          World Bank variable id: LO.PIAAC.NUM
 
-            Original source: OECD Programme for the International Assessment of Adult Competencies (PIAAC)
+          Original source: OECD Programme for the International Assessment of Adult Competencies (PIAAC)
         display:
           numDecimalPlaces: 0
 
@@ -182,11 +184,11 @@ tables:
         short_unit: "%"
         description_short: Number of children of any age group who are enrolled in [pre-primary](#dod:pre-primary-education) education expressed as a percentage of the total population of the official pre-primary school age.
         description_from_producer: |-
-         Total enrollment in pre-primary education, regardless of age, expressed as a percentage of the total population of official pre-primary education age. GER can exceed 100% due to the inclusion of over-aged and under-aged students because of early or late school entrance and grade repetition.
+          Total enrollment in pre-primary education, regardless of age, expressed as a percentage of the total population of official pre-primary education age. GER can exceed 100% due to the inclusion of over-aged and under-aged students because of early or late school entrance and grade repetition.
 
-         World Bank variable id: SE.PRE.ENRR
+          World Bank variable id: SE.PRE.ENRR
 
-         Original source: UNESCO Institute for Statistics
+          Original source: UNESCO Institute for Statistics
         display:
           numDecimalPlaces: 1
 
@@ -206,7 +208,7 @@ tables:
 
 
       trained_teachers_in_secondary_education__pct_of_total_teachers:
-        title:  Share of teachers in secondary education who are trained
+        title: Share of teachers in secondary education who are trained
         unit: "%"
         short_unit: "%"
         description_short: Share of [secondary](#dod:secondary-education) school teachers who have completed either the training required before starting their teaching career (pre-service) or the ongoing professional development after becoming teachers (in-service) in their specific country.
@@ -318,11 +320,11 @@ tables:
         unit: score
         description_short: The quality of schooling is assessed using the [harmonized learning scores](#dod:harmonized-scores), adjusted relative to the country with the highest performance, in this instance, Singapore.
         description_from_producer: |-
-           Harmonized test scores from major international student achievement testing programs. They are measured in TIMSS-equivalent units, where 300 is minimal attainment and 625 is advanced attainment. Most recent estimates are used.  Year of most recent estimate shown in data notes. \n\nTest scores from the following testing programs are included:\n• TIMSS/PIRLS:  Refers to average of test scores from TIMSS (Trends in International Maths and Science Study) and PIRLS (Progress in International Reading Literacy Study), both carried out by the International Association for the Evaluation of Educational Achievement. Data from each PIRLS round is moved to the year of the nearest TIMSS round and averaged with the TIMSS data.     \n• PISA:  Refers to test scores from Programme for International Student Assessment\n• PISA+TIMSS/PIRLS:  Refers to the average of these programs for countries and years where both are available\n• SACMEQ:  Refers to test scores from Southern and Eastern Africa Consortium for Monitoring Educational Quality \n• PASEC: Refers to test scores from Program of Analysis of Education Systems\n• LLECE:  Refers to test scores from Latin American Laboratory for Assessment of the Quality of Education\n• PILNA: Refers to test scores from Pacific Islands Literacy and Numeracy Assessment\n• EGRA:  Refers to test scores from nationally-representative Early Grade Reading Assessments  \n• EGRANR:  Refers to test scores from non-nationally-representative Early Grade Reading Assessments\
+          Harmonized test scores from major international student achievement testing programs. They are measured in TIMSS-equivalent units, where 300 is minimal attainment and 625 is advanced attainment. Most recent estimates are used.  Year of most recent estimate shown in data notes. \n\nTest scores from the following testing programs are included:\n• TIMSS/PIRLS:  Refers to average of test scores from TIMSS (Trends in International Maths and Science Study) and PIRLS (Progress in International Reading Literacy Study), both carried out by the International Association for the Evaluation of Educational Achievement. Data from each PIRLS round is moved to the year of the nearest TIMSS round and averaged with the TIMSS data.     \n• PISA:  Refers to test scores from Programme for International Student Assessment\n• PISA+TIMSS/PIRLS:  Refers to the average of these programs for countries and years where both are available\n• SACMEQ:  Refers to test scores from Southern and Eastern Africa Consortium for Monitoring Educational Quality \n• PASEC: Refers to test scores from Program of Analysis of Education Systems\n• LLECE:  Refers to test scores from Latin American Laboratory for Assessment of the Quality of Education\n• PILNA: Refers to test scores from Pacific Islands Literacy and Numeracy Assessment\n• EGRA:  Refers to test scores from nationally-representative Early Grade Reading Assessments  \n• EGRANR:  Refers to test scores from non-nationally-representative Early Grade Reading Assessments\
 
-           World Bank variable id: HD.HCI.HLO
+          World Bank variable id: HD.HCI.HLO
 
-           Original source: Patrinos and Angrist (2018). http://documents.worldbank.org/curated/en/390321538076747773/Global-Dataset-on-Education-Quality-A-Review-and-Update-2000-2017
+          Original source: Patrinos and Angrist (2018). http://documents.worldbank.org/curated/en/390321538076747773/Global-Dataset-on-Education-Quality-A-Review-and-Update-2000-2017
         description_processing: |-
           Harmonized test scores are normalized to the country with the highest performance, in this case, Singapore. The normalization process involves dividing the country's score by the highest score.
 

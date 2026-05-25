@@ -9,6 +9,8 @@ dataset:
   title: Global Tuberculosis Report - Burden Estimates
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+  owners:
+    - Fiona Spooner
 tables:
   burden_estimates:
     variables:

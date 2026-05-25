@@ -3,6 +3,9 @@ dataset:
   description: |
     Additional variables created using data from different FAOSTAT datasets.
 
+  owners:
+    - Hannah Ritchie
+    - Pablo Rosado
 definitions:
   common:
     processing_level: major

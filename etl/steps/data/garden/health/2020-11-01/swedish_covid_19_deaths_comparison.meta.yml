@@ -1,5 +1,7 @@
 dataset:
   title: Swedish COVID-19 deaths comparison
+  owners:
+    - Edouard Mathieu  # backport
 tables:
   swedish_covid_19_deaths_comparison:
     variables:

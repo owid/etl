@@ -1,5 +1,7 @@
 dataset:
   title: Streptococcus-caused deaths in children under-5, Wahl (2018)
+  owners:
+    - Bernadeta  # backport
 tables:
   streptococcus_caused_deaths_in_children_under_5__wahl__2018:
     variables:

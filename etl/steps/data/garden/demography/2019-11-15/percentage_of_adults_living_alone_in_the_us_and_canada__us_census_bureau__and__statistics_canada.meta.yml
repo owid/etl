@@ -1,5 +1,7 @@
 dataset:
   title: Percentage of adults living alone in the US and Canada- US Census Bureau & Statistics Canada
+  owners:
+    - Diana Beltekian  # backport
 tables:
   percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada:
     variables:

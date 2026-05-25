@@ -29,6 +29,9 @@ dataset:
   title: Human Development Report
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
+    - Lucas Rodés-Guirao
 tables:
   undp_hdr:
     common:
@@ -58,7 +61,7 @@ tables:
         unit: ""
         description_short: |-
           The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. Inequality is measured here in terms of the number of years adults older than 25 participated in formal education.
-        description_key: &description_key_ineq
+        description_key:
           - Measures how unevenly educational attainment is distributed within a country. It is the [Atkinson inequality measure](#dod:atkinson) (ε = 1) applied to years-of-schooling data.
           - This version of the Atkinson index uses an inequality aversion parameter ε equal to 1. The parameter defines how sensitive the index is to changes in the lower end of the distribution. In this form, the inequality measure is A = 1 - g/μ, where g is the geometric mean and μ is the arithmetic mean of the distribution.
           - Data are originally sourced from harmonised datasets, including CEDLAS and World Bank (2024), Eurostat's European Union Statistics on Income and Living Conditions (2024), ICF Macro Demographic and Health Surveys (various years), LIS (2024), United Nations Children's Fund Multiple Indicator Cluster Surveys (various years) and UNESCO Institute for Statistics (2024)

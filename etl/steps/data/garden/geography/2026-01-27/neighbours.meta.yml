@@ -17,6 +17,8 @@ dataset:
 
     Border detection uses geoBoundaries CGAZ administrative boundaries at the ADM0 (sovereign state) level. Island nations and countries without land borders have a border score of 0 for all other countries but still have valid distance-based scores.
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   neighbours:
     variables:

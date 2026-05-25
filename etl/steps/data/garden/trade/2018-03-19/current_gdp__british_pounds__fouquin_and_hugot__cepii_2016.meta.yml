@@ -1,5 +1,7 @@
 dataset:
   title: Current GDP (British pounds) - Fouquin and Hugot (CEPII 2016)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   current_gdp__british_pounds__fouquin_and_hugot__cepii_2016:
     variables:

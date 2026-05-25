@@ -1,10 +1,11 @@
 dataset:
   title: |-
     Biological and chemical weapons proliferation – OWID based on Arms Control Association (2022), Nuclear Threat Initiative (2022), Center for Nonproliferation Studies (2008) and the UN (2022)
+  owners:
+    - Bastian Herre  # backport
 tables:
-  ? |-
-    biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022
-  : variables:
+  "biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022":
+    variables:
       bioweapons_convention:
         title: bioweapons_convention
         unit: ''
@@ -120,8 +121,7 @@ tables:
       num_bioweapons_curr_neither:
         title: num_bioweapons_curr_neither
         unit: ''
-        description: The variable identifies the number of countries that currently neither pursue nor possess biological
-          weapons.
+        description: The variable identifies the number of countries that currently neither pursue nor possess biological weapons.
       num_bioweapons_hist_alleposs:
         title: num_bioweapons_hist_alleposs
         unit: ''

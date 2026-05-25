@@ -21,6 +21,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Tuna Acisu
 tables:
   road_accidents:
     variables:

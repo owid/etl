@@ -12,6 +12,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   soepmonitor_1984_2013_germany:
     variables:

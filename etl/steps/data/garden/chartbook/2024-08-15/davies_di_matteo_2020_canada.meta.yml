@@ -19,6 +19,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   davies_di_matteo_2020_canada:
     variables:

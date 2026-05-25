@@ -1,5 +1,7 @@
 dataset:
   title: Health Expenditure US 1929-2013 Public - US Census and WDI (2013)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   health_expenditure_us_1929_2013_public__us_census_and_wdi__2013:
     variables:

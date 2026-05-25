@@ -16,6 +16,8 @@ dataset:
   update_period_days: 365
   title: Long-run reported polio deaths in the United States
 
+  owners:
+    - Fiona Spooner
 tables:
   polio_deaths:
     variables:

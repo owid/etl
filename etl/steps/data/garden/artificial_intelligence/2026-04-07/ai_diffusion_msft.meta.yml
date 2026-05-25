@@ -8,6 +8,8 @@ definitions:
 dataset:
   update_period_days: 183
 
+  owners:
+    - Veronika Samborska
 tables:
   ai_diffusion_msft:
     variables:

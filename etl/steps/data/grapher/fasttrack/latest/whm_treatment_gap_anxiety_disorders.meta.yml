@@ -5,6 +5,8 @@ dataset:
   licenses:
     - name: Made freely available by authors
       url: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6008788/
+  owners:
+    - Saloni Dattani  # fasttrack
 tables:
   whm_treatment_gap_anxiety_disorders:
     variables:
@@ -18,14 +20,12 @@ tables:
         title: Any treatment
         unit: '%'
         short_unit: '%'
-        description: Share who met the criteria for having an anxiety disorder in the past 12 months and received any treatment
-          for it.
+        description: Share who met the criteria for having an anxiety disorder in the past 12 months and received any treatment for it.
       any_treatment__conditional:
         title: Any treatment, conditional
         unit: '%'
         short_unit: '%'
-        description: Share who received any treatment, among those who met the criteria for an anxiety disorder in the past
-          12 months.
+        description: Share who received any treatment, among those who met the criteria for an anxiety disorder in the past 12 months.
       possibly_adequate_treatment:
         title: Potentially adequate treatment
         unit: '%'
@@ -60,5 +60,4 @@ tables:
         title: Untreated, conditional
         unit: '%'
         short_unit: '%'
-        description: Share who did not receive any treatment, among those who met the criteria for an anxiety disorder in
-          the past 12 months.
+        description: Share who did not receive any treatment, among those who met the criteria for an anxiety disorder in the past 12 months.

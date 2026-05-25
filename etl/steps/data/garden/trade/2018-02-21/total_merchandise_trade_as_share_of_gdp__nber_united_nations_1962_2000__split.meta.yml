@@ -1,5 +1,7 @@
 dataset:
   title: Total merchandise trade as share of GDP (NBER-United Nations 1962-2000) (split)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split:
     variables:

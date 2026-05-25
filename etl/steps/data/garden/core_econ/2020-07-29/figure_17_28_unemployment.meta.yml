@@ -1,5 +1,7 @@
 dataset:
   title: Figure_17.28_unemployment
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   figure_17_28_unemployment:
     variables:

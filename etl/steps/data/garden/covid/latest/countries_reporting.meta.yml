@@ -19,6 +19,8 @@ dataset:
   update_period_days: 0
   title: COVID-19, Countries reporting data
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   country_flags:
     variables:
