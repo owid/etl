@@ -706,25 +706,19 @@ def generate_vegetable_oil_yields(tb_qcl: Table, tb_fbsc: Table) -> Table:
     UNIT_FOR_AREA = "hectares"
     # Item code for "Vegetable Oils" (required to get the global production of vegetable oils on a given year).
     ITEM_CODE_FOR_VEGETABLE_OILS_TOTAL = "00002914"
-    # FBSC item codes for each crop's seed/fruit, used to compute the share of seed supply coming from imports.
-    # The chart's ratio (area / oil production) only makes sense when the local oil was crushed from locally
-    # grown seeds. For countries that import seeds and crush them locally, oil "production" is inflated relative
-    # to local crop area and the ratio collapses towards zero. We mask such rows below.
-    # Palm has no comparable traded-seed item in FBSC (palm fruit deteriorates within hours of harvest, so palm
-    # oil is essentially always made from locally grown fruit) — palm rows are left unmasked.
-    SEED_ITEM_CODE_FBSC = {
-        "sesame": "00002561",  # Sesame seed
-        "groundnut": "00002552",  # Groundnuts
-        "soybean": "00002555",  # Soybeans
+    # FBSC primary-equivalent items used to compute each crop's seed imports/production share.
+    ITEM_CODE_FOR_SEEDS = {
+        "palm": "00002562",  # Palm kernels (FBSC composition: Oil palm fruit + Palm kernels)
         "sunflower": "00002557",  # Sunflower seed
         "rapeseed": "00002558",  # Rape and Mustardseed
-        "cottonseed": "00002559",  # Cottonseed
-        "coconut": "00002560",  # Coconuts
+        "soybean": "00002555",  # Soybeans
         "olive": "00002563",  # Olives
+        "coconut": "00002560",  # Coconuts
+        "groundnut": "00002552",  # Groundnuts
+        "cottonseed": "00002559",  # Cottonseed
+        "sesame": "00002561",  # Sesame seed
     }
-    # Maximum allowed share of seed supply coming from imports for a country's per-crop ratio to be kept.
-    # Above this threshold, the oil production figure is dominated by crushed imports and the area/production
-    # ratio no longer reflects local agronomy. 0.20 (20%) is a defensible "predominantly local" cutoff.
+    # Mask per-crop ratios when imports exceed this share of local seed production.
     MAX_SEED_IMPORT_SHARE = 0.20
     # Item codes in faostat_qcl for the area of the crops (we don't need the production of the crops).
     ITEM_CODE_FOR_EACH_CROP_AREA = {
@@ -870,14 +864,12 @@ def generate_vegetable_oil_yields(tb_qcl: Table, tb_fbsc: Table) -> Table:
     # Replace infinite values (obtained when dividing by a null area) by nans.
     combined = combined.replace(np.inf, np.nan)
 
-    # Mask per-crop ratios for rows where the country crushes more imported seed than it grows.
-    # FBSC "Imports" at the World level sums all country-level imports (a gross trade flow), not a net inflow,
-    # so the filter would mask World by mistake — we skip it for World, where the metric is meaningful by
-    # construction (all crushed oil came from seed grown somewhere on Earth that year).
+    # Mask per-crop ratios for net seed-importer countries. World is exempt because FBSC's "Imports" at
+    # World level sums all country-level imports (gross trade flow, not a net inflow).
     combined = _mask_oil_yields_for_net_seed_importers(
         combined=combined,
         tb_fbsc=tb_fbsc,
-        seed_item_codes=SEED_ITEM_CODE_FBSC,
+        seed_item_codes=ITEM_CODE_FOR_SEEDS,
         production_element_code=ELEMENT_CODE_FOR_PRODUCTION_FBSC,
         imports_element_code=ELEMENT_CODE_FOR_IMPORTS_FBSC,
         max_import_share=MAX_SEED_IMPORT_SHARE,
@@ -897,9 +889,7 @@ def _mask_oil_yields_for_net_seed_importers(
     imports_element_code: str,
     max_import_share: float,
 ) -> Table:
-    """Set per-crop oil-yield ratios to NaN for (country, year) rows where imports of the seed exceed
-    `max_import_share` of local seed production. World is preserved unconditionally (see caller note)."""
-    # Build a long table of country/year/seed -> imports, production, share.
+    """Mask per-crop oil-yield ratios where seed imports exceed `max_import_share` of seed production. World is exempt."""
     seed_trade = tb_fbsc[
         tb_fbsc["item_code"].isin(seed_item_codes.values())
         & tb_fbsc["element_code"].isin([production_element_code, imports_element_code])
@@ -918,13 +908,12 @@ def _mask_oil_yields_for_net_seed_importers(
         errors="raise",
     )
     seed_trade["seed_imports"] = seed_trade["seed_imports"].fillna(0)
-    # Where seed production is zero or missing but imports exist, treat the row as over the threshold.
     seed_trade["import_share"] = seed_trade["seed_imports"] / seed_trade["seed_production"].replace(0, np.nan)
+    # If production is zero/missing but imports are positive, treat as over the threshold.
     seed_trade.loc[
         seed_trade["seed_production"].isin([0, np.nan]) & (seed_trade["seed_imports"] > 0), "import_share"
     ] = np.inf
 
-    # Pivot to one column per crop with the import share.
     item_code_to_crop = {code: crop for crop, code in seed_item_codes.items()}
     seed_trade["crop"] = seed_trade["item_code"].map(item_code_to_crop)
     share = seed_trade.pivot(
@@ -939,10 +928,8 @@ def _mask_oil_yields_for_net_seed_importers(
         errors="raise",
     )
 
-    # Bring the import-share columns alongside the combined table.
     combined = combined.merge(share, on=["country", "year"], how="left")
 
-    # Apply the mask per crop. World is always exempt (see caller).
     is_world = combined["country"] == "World"
     for crop in seed_item_codes:
         share_col = f"{crop}_import_share"
@@ -954,7 +941,6 @@ def _mask_oil_yields_for_net_seed_importers(
             if col in combined.columns:
                 combined.loc[over_threshold, col] = np.nan
 
-    # Drop the helper import-share columns before returning.
     combined = combined.drop(columns=[c for c in combined.columns if c.endswith("_import_share")], errors="ignore")
 
     return combined
