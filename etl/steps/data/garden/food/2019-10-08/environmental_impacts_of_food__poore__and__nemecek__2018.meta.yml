@@ -159,7 +159,7 @@ tables:
         presentation:
           grapher_config:
             title: "{definitions.title_land_use} of foods per {definitions.noun_per_1000kcal}"
-            subtitle: "Land use is measured in meters squared (m²) for 1 year to produce {definitions.noun_per_1000kcal_long_2}."
+            subtitle: "Land use is measured in meters squared (m²) for one year to produce {definitions.noun_per_1000kcal_long_2}."
             note: "The median year of the studies involved in this research was 2010."
 
       land_use_per_100g_protein__poore__and__nemecek__2018:
@@ -174,7 +174,7 @@ tables:
         presentation:
           grapher_config:
             title: "{definitions.title_land_use} per {definitions.noun_per_100g_protein}"
-            subtitle: "Land use is measured in meters squared (m²) for 1 year to produce {definitions.noun_per_100g_protein} across various food products."
+            subtitle: "Land use is measured in meters squared (m²) for one year to produce {definitions.noun_per_100g_protein} across various food products."
 
       land_use_per_kilogram__poore__and__nemecek__2018:
         title: Land use per kilogram (Poore & Nemecek, 2018)
@@ -188,7 +188,7 @@ tables:
         presentation:
           grapher_config:
             title: "{definitions.title_land_use} per {definitions.noun_per_kg}"
-            subtitle: "Land use is measured in meters squared (m²) for 1 year to produce one kilogram of a given food product."
+            subtitle: "Land use is measured in meters squared (m²) for one year to produce one kilogram of a given food product."
 
       scarcity_weighted_water_use_per_1000kcal__poore__and__nemecek__2018:
         title: Scarcity-weighted water use per 1000kcal (Poore & Nemecek, 2018)
