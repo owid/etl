@@ -634,6 +634,21 @@ steps:
   data://grapher/faostat/2025-03-17/additional_variables:
     - data://garden/faostat/2025-03-17/additional_variables
   #
+  # FAOSTAT garden step for additional variables for version 2026-02-25
+  #
+  data://garden/faostat/2026-02-25/additional_variables:
+    - data://garden/faostat/2026-02-25/faostat_rl
+    - data://garden/faostat/2026-02-25/faostat_qi
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/faostat/2026-02-25/faostat_sdgb
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+    - data://garden/faostat/2026-02-25/faostat_rfn
+  #
+  # FAOSTAT grapher step for additional variables for version 2026-02-25
+  #
+  data://grapher/faostat/2026-02-25/additional_variables:
+    - data://garden/faostat/2026-02-25/additional_variables
+  #
   # FAOSTAT garden steps for version 2025-03-17
   #
   data://garden/faostat/2025-03-17/faostat_cisp:
