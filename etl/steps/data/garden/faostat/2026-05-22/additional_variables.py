@@ -708,17 +708,17 @@ def generate_vegetable_oil_yields(tb_qcl: Table, tb_fbsc: Table) -> Table:
     ITEM_CODE_FOR_VEGETABLE_OILS_TOTAL = "00002914"
     # FBSC primary-equivalent items used to compute each crop's seed imports/production share.
     ITEM_CODE_FOR_SEEDS = {
-        "palm": "00002562",  # Palm kernels (FBSC composition: Oil palm fruit + Palm kernels)
-        "sunflower": "00002557",  # Sunflower seed
-        "rapeseed": "00002558",  # Rape and Mustardseed
-        "soybean": "00002555",  # Soybeans
-        "olive": "00002563",  # Olives
-        "coconut": "00002560",  # Coconuts
-        "groundnut": "00002552",  # Groundnuts
-        "cottonseed": "00002559",  # Cottonseed
-        "sesame": "00002561",  # Sesame seed
+        "palm": "00002562",
+        "sunflower": "00002557",
+        "rapeseed": "00002558",
+        "soybean": "00002555",
+        "olive": "00002563",
+        "coconut": "00002560",
+        "groundnut": "00002552",
+        "cottonseed": "00002559",
+        "sesame": "00002561",
     }
-    # Mask per-crop ratios when imports exceed this share of local seed production.
+    # Remove per-crop ratios when imports exceed this share of local seed production.
     MAX_SEED_IMPORT_SHARE = 0.20
     # Item codes in faostat_qcl for the area of the crops (we don't need the production of the crops).
     ITEM_CODE_FOR_EACH_CROP_AREA = {
@@ -864,8 +864,8 @@ def generate_vegetable_oil_yields(tb_qcl: Table, tb_fbsc: Table) -> Table:
     # Replace infinite values (obtained when dividing by a null area) by nans.
     combined = combined.replace(np.inf, np.nan)
 
-    # Mask per-crop ratios for net seed-importer countries. World is exempt because FBSC's "Imports" at
-    # World level sums all country-level imports (gross trade flow, not a net inflow).
+    # Remove per-crop ratios for net seed-importer countries.
+    # World is exempt because FBSC's "Imports" at World level sums all country-level imports.
     combined = _mask_oil_yields_for_net_seed_importers(
         combined=combined,
         tb_fbsc=tb_fbsc,
