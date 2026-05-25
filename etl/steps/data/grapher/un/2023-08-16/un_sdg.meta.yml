@@ -75,7 +75,6 @@ tables:
               - Oceania (UN)
               - Europe and Northern America (UN)
               - Eastern and South-Eastern Asia (UN)
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
   _6_1_1__sh_h2o_safe__all_areas:
     variables:
       _6_1_1__sh_h2o_safe__all_areas:
@@ -134,4 +133,3 @@ tables:
               - Oceania (UN)
               - Europe and Northern America (UN)
               - Eastern and South-Eastern Asia (UN)
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

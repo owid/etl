@@ -1,0 +1,152 @@
+# Mini-explorer for eiu indicators (used by democracy.py with combine_collections).
+# Carries only the views whose `dataset` dimension maps to this upstream source.
+# FAUST (title, subtitle, note, map config, etc.) lives in the indicator's
+# `presentation.grapher_config` in the corresponding garden meta.yml — Grapher
+# inherits it at chart render time. Per-view `config:` here is intentionally empty
+# for single-y views; multi-y views keep their combined chart config.
+
+definitions:
+  group_subtitle: &group_subtitle "[Data](#dod:regimes-economist) by the [Economist Intelligence Unit](#dod:economist-intelligence-unit)."
+  display_aut: &display_aut
+    name: "Authoritarian regimes"
+    color: "#f88a50"
+  display_hyb: &display_hyb
+    name: "Hybrid regimes"
+    color: "#feeea5"
+  display_flw: &display_flw
+    name: "Flawed democracies"
+    color: "#c7e7f1"
+  display_dem: &display_dem
+    name: "Full democracies"
+    color: "#5e94c4"
+
+  common_views:
+    - config:
+        colorVariableId: regions#owid_region
+
+config:
+  explorerTitle: "Democracy"
+  explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
+  isPublished: true
+
+dimensions:
+  - slug: metric
+    name: "Metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: democracy
+        name: "\xad\xad\xad\xadDemocracy"
+  - slug: sub_metric
+    name: "Sub-metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: main_index
+        name: "Main index"
+      - slug: political_regime
+        name: "Political regime"
+      - slug: electoral_pluralism_index
+        name: "Electoral pluralism index"
+      - slug: functioning_government_index
+        name: "Functioning government index"
+      - slug: political_participation_index
+        name: "\xadPolitical participation index"
+      - slug: democratic_culture_index
+        name: "Democratic culture index"
+      - slug: civil_liberties_index
+        name: "\xadCivil liberties index"
+      - slug: number_and_share_of_democracies
+        name: "\xad\xad\xadNumber and share of democracies"
+      - slug: people_living_in_democracies
+        name: "\xad\xad\xadPeople living in democracies"
+
+views:
+  - dimensions:
+      metric: democracy
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: eiu#democracy_eiu
+  - dimensions:
+      metric: democracy
+      sub_metric: political_regime
+    indicators:
+      y:
+        - catalogPath: eiu#regime_eiu
+    config:
+      colorVariableId: eiu#regime_eiu
+  - dimensions:
+      metric: democracy
+      sub_metric: electoral_pluralism_index
+    indicators:
+      y:
+        - catalogPath: eiu#elect_freefair_eiu
+  - dimensions:
+      metric: democracy
+      sub_metric: functioning_government_index
+    indicators:
+      y:
+        - catalogPath: eiu#funct_gov_eiu
+  - dimensions:
+      metric: democracy
+      sub_metric: political_participation_index
+    indicators:
+      y:
+        - catalogPath: eiu#pol_part_eiu
+  - dimensions:
+      metric: democracy
+      sub_metric: democratic_culture_index
+    indicators:
+      y:
+        - catalogPath: eiu#dem_culture_eiu
+  - dimensions:
+      metric: democracy
+      sub_metric: civil_liberties_index
+    indicators:
+      y:
+        - catalogPath: eiu#civlib_eiu
+  - dimensions:
+      metric: democracy
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: eiu/num_countries#num_regime_eiu__category_authoritarian_regime
+          display: *display_aut
+        - catalogPath: eiu/num_countries#num_regime_eiu__category_hybrid_regime
+          display: *display_hyb
+        - catalogPath: eiu/num_countries#num_regime_eiu__category_flawed_democracy
+          display: *display_flw
+        - catalogPath: eiu/num_countries#num_regime_eiu__category_full_democracy
+          display: *display_dem
+    config:
+      title: "Countries that are democracies and non-democracies"
+      subtitle: *group_subtitle
+      type: "StackedArea StackedDiscreteBar"
+      stackMode: "relative"
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      metric: democracy
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: eiu/num_people#pop_regime_eiu__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: eiu/num_people#pop_regime_eiu__category_authoritarian_regime
+          display: *display_aut
+        - catalogPath: eiu/num_people#pop_regime_eiu__category_hybrid_regime
+          display: *display_hyb
+        - catalogPath: eiu/num_people#pop_regime_eiu__category_flawed_democracy
+          display: *display_flw
+        - catalogPath: eiu/num_people#pop_regime_eiu__category_full_democracy
+          display: *display_dem
+    config:
+      title: "People living in democracies and non-democracies"
+      subtitle: *group_subtitle
+      type: "StackedArea StackedDiscreteBar"
+      yAxis:
+        facetDomain: "independent"

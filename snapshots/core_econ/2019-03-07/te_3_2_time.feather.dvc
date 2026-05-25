@@ -1,10 +1,11 @@
 meta:
-  source:
-    name: OECD
-    url: https://stats.oecd.org/Index.aspx?DataSetCode=ANHRS
-    published_by: OECD. Average annual hours actually worked per worker. Accessed July 2022.
-  name: TE-3.2_time
-  description: core-econ.org
+  origin:
+    producer: OECD
+    title: Average annual hours actually worked per worker
+    citation_full: OECD. Average annual hours actually worked per worker.
+    url_main: https://stats.oecd.org/Index.aspx?DataSetCode=ANHRS
+    date_accessed: '2022-07-01'
+    date_published: '2022'
   is_public: false
 outs:
   - md5: cc228b90a180c61cb7f7d1bb3b0d470d

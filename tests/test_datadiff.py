@@ -2,6 +2,7 @@ import os
 from unittest.mock import patch
 
 import pandas as pd
+import pytest
 from owid.catalog import Dataset, DatasetMeta, Table
 
 from etl.datadiff import DatasetDiff
@@ -22,6 +23,7 @@ def _create_datasets(tmp_path):
     return ds_a, ds_b
 
 
+@pytest.mark.filterwarnings("ignore:Table `tab` does not have a primary_key")
 @patch.dict(os.environ, {"OWID_STRICT": ""})
 def test_DatasetDiff_summary(tmp_path):
     ds_a, ds_b = _create_datasets(tmp_path)
@@ -47,6 +49,7 @@ def test_DatasetDiff_summary(tmp_path):
     ]
 
 
+@pytest.mark.filterwarnings("ignore:Table `tab` does not have a primary_key")
 @patch.dict(os.environ, {"OWID_STRICT": ""})
 def test_new_data(tmp_path):
     ds_a, ds_b = _create_datasets(tmp_path)

@@ -489,6 +489,13 @@ def _combine_dimensions(
 def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapping[str, Collection | Explorer]:
     """Access each explorer, and update choice slugs in views"""
     for collection_id, change in choice_slug_changes.items():
+        # `change` is the column from `_extract_choice_slug_changes`'s unstacked frame —
+        # dimensions with no conflicts in this collection come through as NaN. Drop them;
+        # pandas.DataFrame.replace rejects a nested mapping if any top-level value isn't a dict.
+        change = {k: v for k, v in change.items() if isinstance(v, dict) and v}
+        if not change:
+            continue
+
         # Get collection
         collection = collection_by_id[collection_id]
 

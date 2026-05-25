@@ -35,6 +35,7 @@ help:
 	@echo '  make install-hooks	Activate pre-commit hook (auto-runs with make .venv)'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
+	@echo '  make check-all 	Format, lint, and typecheck (including for modules in lib/)'
 	@echo '  make vsce-exclude-archived  Exclude archived steps from VSCode user settings'
 	@echo '  make vsce-sync 	Sync VS Code extensions (install missing, upgrade outdated)'
 # 	@echo '  make vsce-compile EXT=name [BUMP=patch|minor|major] [INSTALL=1]  Compile and package VS Code extension'
@@ -83,6 +84,14 @@ test-all:
 	@for lib in $(LIBS); do \
 		echo "================ $$lib ================="; \
 		(cd $$lib && make test); \
+	done
+
+check-all:
+	@echo '================ etl ================='
+	@make check
+	@for lib in $(LIBS); do \
+		echo "================ $$lib ================="; \
+		(cd $$lib && make check); \
 	done
 
 format-all:

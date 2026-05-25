@@ -1,12 +1,12 @@
 meta:
-  source:
-    name: Nemet (2006); Nagy et al. (2013)
-    url: |-
-      https://www.sciencedirect.com/science/article/pii/S0301421505001795; https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0052669
-    published_by: |-
-      Gregory F. Nemet (2006). ‘Beyond the Learning Curve: Factors Influencing Cost Reductions in Photovoltaics’. Energy Policy 34 (17): pp. 3218–32; Béla, J. Nagy, Doyne Farmer, Quan M. Bui, and Jessika E. Trancik (2013). ‘Statistical Basis for Predicting Technological Progress’. PLoS ONE 8 (2). Public Library of Science (PLoS).
-  name: TE-20.19a
-  description: core-econ.org
+  origin:
+    producer: Nemet and Nagy et al.
+    title: 'Beyond the learning curve: factors influencing cost reductions in photovoltaics'
+    citation_full: |-
+      Gregory F. Nemet (2006). 'Beyond the Learning Curve: Factors Influencing Cost Reductions in Photovoltaics'. Energy Policy 34 (17): pp. 3218-32; Béla, J. Nagy, Doyne Farmer, Quan M. Bui, and Jessika E. Trancik (2013). 'Statistical Basis for Predicting Technological Progress'. PLoS ONE 8 (2). Public Library of Science (PLoS).
+    url_main: https://www.sciencedirect.com/science/article/pii/S0301421505001795
+    date_accessed: '2019-02-03'
+    date_published: '2013'
   is_public: false
 outs:
   - md5: f8ba88a7eecaab3f357f12479d8ce4fc

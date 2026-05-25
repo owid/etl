@@ -229,6 +229,7 @@
     - "Zaire/ Congo , Dem. Rep."
     - "Congo, Democratic Republic"
     - "Congo (Kinshasa)"
+    - "Democratic Congo"
 - code: "DNK"
   name: "Denmark"
   related:
@@ -485,6 +486,8 @@
   name: "Mayotte"
 - code: "MEX"
   name: "Mexico"
+  aliases:
+    - "México"
 - code: "FSM"
   name: "Micronesia (country)"
   aliases:

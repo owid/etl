@@ -2,10 +2,10 @@ config:
   explorerTitle: Fish Stocks
   explorerSubtitle: Explore available data on the world's fish stocks.
   isPublished: true
-  hideAlertBanner: true
   hasMapTab: false
   hideAnnotationFieldsInTitle: true
   entityType: fish stock
+  originUrl: https://ourworldindata.org/
   selection:
     - Albacore tuna North Pacific Ocean
     - Albacore tuna South Atlantic

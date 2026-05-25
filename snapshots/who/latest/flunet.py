@@ -1,5 +1,6 @@
-"""Script to create a snapshot of dataset 'FluNet, World Health Organization (2023)'."""
+"""Script to create a snapshot of dataset 'FluNet, World Health Organization'."""
 
+from datetime import date
 from pathlib import Path
 
 import click
@@ -21,6 +22,11 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"who/{SNAPSHOT_VERSION}/flunet.csv")
+
+    # Bump date_accessed to today since this is a `latest/` snapshot that re-pulls fresh data.
+    assert snap.metadata.origin
+    snap.metadata.origin.date_accessed = date.today().isoformat()
+    snap.metadata.save()
 
     # Download data from source.
     snap.download_from_source()

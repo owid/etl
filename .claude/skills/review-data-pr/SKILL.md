@@ -38,6 +38,21 @@ From the changed files, identify:
 - New step files: `etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/<short_name>.{py,meta.yml}`
 - Old version (from `dag/archive/*.yml` or by grepping for the same `<short_name>`)
 
+### 3b. Update shape — version bump vs restructure
+
+Before running the pipeline, classify the PR. If any of the following are true, you're reviewing a **restructure**, not a version bump, and several downstream checks apply differently:
+
+- The `short_name` changed (old version uses one name, new version uses another).
+- The schema changed (wide ↔ long, different file format with a different column set, new dimensions).
+- The set of policies/indicators changed substantially (splits, dropped composites, newly added areas).
+- Score semantics changed (e.g. binary → continuous 0–1, units/scale changed).
+
+When it's a restructure:
+
+- **Don't expect the auto-Indicator-Upgrader to have remapped charts.** When short_names differ entirely, the upgrader has nothing to match on. Look for a hand-curated v1 title → v2 title mapping table in the PR description (or a follow-up PR thread). 🟡 if charts on the old chain are still published but no mapping plan exists.
+- **Don't expect a `.py` step copy from the old version.** Step files should be authored from scratch, not produced by `etl update` rename. If the new step files look mechanically renamed (same logic, just version-bumped strings), flag 🟡 — the author may have skipped restructure-specific decisions.
+- **Slack + `/latest` drafts can legitimately be empty** in the first PR of a multi-PR restructure (chart remap pending). 🟢 if PR body explicitly defers them.
+
 ### 4. Run the full pipeline end-to-end
 
 ```bash
@@ -107,6 +122,14 @@ make query SQL="SELECT shortName, attributionShort FROM variables WHERE catalogP
 ```
 Any `NULL` row is a 🔴.
 
+**Additional reviewer-side metadata checks:**
+
+- **`processing_level: major` must come with `description_processing`.** Grep the new garden meta.yml for `processing_level: major`. Each occurrence (whether on `definitions.common` or per-indicator) requires a `description_processing` field on that same scope. 🟡 mismatch.
+- **Per-indicator `description_processing` should describe the indicator's own derivation, not just point at a shared generic note.** When every aggregate indicator's `description_processing` is the exact same string (e.g. all four region indicators just reference `{definitions.description_regions_processing}` with no per-indicator detail), 🟡 flag — author should compose per-indicator sentences.
+- **Long-format-with-dimensions Jinja coverage.** When variables are keyed by a long-column name (e.g. `proportion`) with `<% if <dim> == "X" %>...<% endif %>` blocks for `title`, `description_short`, `display.name`, verify every active `(dim1, dim2)` cell renders a non-empty value. Easiest check: read every column from the grapher dataset and assert `metadata.title` is non-empty.
+- **`paths.regions.add_population(tb)` / `paths.regions.add_aggregates(tb, regions=[...])` auto-resolve their DAG dependencies.** If the garden step loads `population` (or `income_groups`) via `paths.load_dataset(...)` but never passes the dataset to anything, that's dead code — 🟡. The DAG dependency still needs to be declared either way.
+- **WB income groups in regional aggregates.** When the dataset is suitable for cross-country aggregation, check that the four WB income groups (`High-income countries`, `Upper-middle-income countries`, `Lower-middle-income countries`, `Low-income countries`) are in the `REGIONS` list, the `income_groups` DAG dep is declared, and `description_regions_processing` references the [income groups article](https://ourworldindata.org/world-bank-income-groups-explained). 🟢 informational if absent — not all datasets need this, but it's worth surfacing.
+
 ### 10. Metadata quality skills
 
 Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` against the new garden + grapher `.meta.yml` files. See `/update-dataset` § 6b for the full procedure (typos / spacing / style + a manual clarity checklist for general-audience readability — apply that checklist here too). Report findings as 🟡 (or 🔴 if a violation breaks rendering or makes the text outright misleading).
@@ -149,6 +172,8 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 | Codex threads resolved (§10) | `gh api graphql -f query='{ repository(owner:"owid", name:"etl") { pullRequest(number:<num>) { reviewThreads(first:20) { nodes { isResolved } } } } }'` — all `isResolved: true` |
 
 **Out of scope for review:** Slack announcement and Anomalist + Chart Diff hand-off are author-side concerns, not reviewer checks.
+
+**Producer-docs vs. data consistency.** If the PR description notes a discrepancy between the producer's documentation (codebook, methodology page, README, release notes — whatever is available) and the actual file shipped, that's a 🟢 informational item — the author has surfaced it for producer follow-up. **Don't ask them to "fix" the data to match the docs**; the PR should preserve what the source shipped and flag the discrepancy.
 
 ### 14. Final report
 

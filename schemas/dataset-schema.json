@@ -412,13 +412,6 @@
           "items": {
             "$ref": "definitions.json#/license"
           }
-        },
-        "sources": {
-          "type": "array",
-          "description": "(DEPRECATED, no longer in use). List of all sources of the indicators in this dataset.",
-          "items": {
-            "$ref": "definitions.json#/source"
-          }
         }
       }
     },
@@ -810,13 +803,6 @@
                     ]
                   ],
                   "category": "metadata"
-                },
-                "sources": {
-                  "type": "array",
-                  "description": "List of all sources of the indicator. Automatically filled. NOTE: This is no longer in use, you should use origins.",
-                  "items": {
-                    "$ref": "definitions.json#/source"
-                  }
                 },
                 "origins": {
                   "type": "array",

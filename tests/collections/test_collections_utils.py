@@ -129,7 +129,8 @@ def test_group_views_legacy():
         {"dimensions": {"country": "a"}, "indicators": {"y": "ind2"}},
         {"dimensions": {"country": "b"}, "indicators": {"y": "ind3"}},
     ]
-    grouped = group_views_legacy(views, by=["country"])
+    with pytest.warns(DeprecationWarning, match="group_views_legacy"):
+        grouped = group_views_legacy(views, by=["country"])
     assert grouped == [
         {
             "dimensions": {"country": "a"},
@@ -142,7 +143,7 @@ def test_group_views_legacy():
     ]
 
     err_view = {"dimensions": {"country": "c"}, "indicators": {"y": ["a", "b"]}}
-    with pytest.raises(NotImplementedError):
+    with pytest.warns(DeprecationWarning, match="group_views_legacy"), pytest.raises(NotImplementedError):
         group_views_legacy([err_view], by=["country"])
 
 

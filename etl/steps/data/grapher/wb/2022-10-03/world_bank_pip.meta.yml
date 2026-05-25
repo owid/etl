@@ -1,10 +1,8 @@
 dataset:
   update_period_days: 365
-  sources: []
 
 definitions:
   common:
-    sources: []
     origins:
       - producer: World Bank Poverty and Inequality Platform
         title: World Bank Poverty and Inequality Platform
@@ -25,8 +23,6 @@ definitions:
       attribution_short: World Bank
       grapher_config:
         originUrl: https://ourworldindata.org/poverty
-        $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
-
   income_consumption_pc: Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children).
   non_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
   processing_notes: |-

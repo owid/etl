@@ -20,8 +20,8 @@ In this document, we detail the methodology we used to do this analysis and high
 The first step was to compile data on what Americans die from.
 
 -   We used death data from the CDC Wonder database: “[:octicons-link-external-16:  Underlying cause of death](https://wonder.cdc.gov/deaths-by-underlying-cause.html)”.
--   In this database, every death in the U.S. is assigned one main cause, classified in the [:octicons-link-external-16:  International Classification of Diseases](https://www.who.int/standards/classifications/classification-of-diseases) (ICD). Each cause of death has a unique “ICD-10” code.
--   We used the “15 leading causes of death”, given by the CDC. Of those, we selected the twelve most common causes and additionally included the categories "drug overdoses" and "homicides", as these are commonly covered in the media.
+-   In this database, every death in the US is assigned one main cause, classified in the [:octicons-link-external-16:  International Classification of Diseases](https://www.who.int/standards/classifications/classification-of-diseases) (ICD). Each cause of death has a unique “ICD-10” code.
+-   We used the “15 leading causes of death”, given by the CDC. Of those, we selected the twelve most common causes and additionally included the categories “drug overdoses” and “homicides”, as these are commonly covered in the media.
 -   The specific CDC category, ICD-10 code, and name we use in the article are shown in the table below.
 
 | **Cause of death (CDC category)**                                      | **ICD-10 codes**           | **Category name in the article**   |
@@ -43,7 +43,7 @@ The first step was to compile data on what Americans die from.
 
 -   Since terrorism is often covered in the media, we also included this category in the analysis. The CDC does not have data specifically on terrorism deaths, so we used the [:octicons-link-external-16:  Global Terrorism Index](https://www.visionofhumanity.org/maps/global-terrorism-index/#/) (US Terrorism deaths for 2023).
 -   We used 2023 data, as this is the latest year for which complete data from the CDC was available.
--   During the COVID-19 pandemic, especially 2020-2022, COVID-19 was a major cause of death in the United States. In 2023, it still ranks under the 10 most common causes, but there are fewer deaths attributed to the disease than in 2020-2022.
+-   During the COVID-19 pandemic, especially 2020–2022, COVID-19 was a major cause of death in the United States. In 2023, it still ranks under the ten most common causes, but there are fewer deaths attributed to the disease than in 2020–2022.
 
 ### Media coverage from Media Cloud
 
