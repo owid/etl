@@ -959,8 +959,12 @@ COW_SPEC = SourceSpec(
     country_table="cow_country",
     locations_table="cow_locations",
     measures={
-        "conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate",
-        "conflict_locations", "conflict_participants",
+        "conflict_deaths",
+        "death_rate",
+        "number_of_conflicts",
+        "conflict_rate",
+        "conflict_locations",
+        "conflict_participants",
     },
     # COW uses hyphenated forms (inter-state, intra-state, extra-state, non-state).
     ct_map={
@@ -1016,7 +1020,10 @@ PRIO_SPEC = SourceSpec(
     country_table="prio_v31_country",
     # No locations table.
     measures={
-        "conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate",
+        "conflict_deaths",
+        "death_rate",
+        "number_of_conflicts",
+        "conflict_rate",
         "conflict_participants",
     },
     # PRIO's "all" represents state-based conflicts (no all_armed_conflicts).
