@@ -13,8 +13,6 @@ config:
   isPublished: true
   selection:
     - World
-  subNavId: explorers
-  subNavCurrentId: conflict-data-source
   entityType: region
   hideAnnotationFieldsInTitle: true
   yAxisMin: 0

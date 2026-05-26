@@ -179,7 +179,7 @@ HIGH_DISPLAY = {"name": "High estimate", "color": "#C3AEA6"}
 
 # Map colorScaleNumericBins for deaths / rate / boolean (locations/participants).
 DEATHS_MAP_BINS = "0.99, #E8F4EA, 0;10;100;1000;10000;100000"
-RATE_MAP_BINS = "0.1; 0.3; 1; 3; 10; 30; 100"
+RATE_MAP_BINS = "0.1;0.3;1;3;10;30;100"
 BOOL_MAP_BINS = "0,#92C5DE,No;1,#F4A582,Yes"
 
 # Shared view-config blocks.
@@ -1079,7 +1079,11 @@ def _participants_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_me
     # One-sided violence: "engaging in" / "primary perpetrators of at least one
     # instance of".
     if ctype == CT.ONE_SIDED:
-        cfg["title"] = "States engaging in one-sided violence" if country_level else "Number of states engaging in one-sided violence"
+        cfg["title"] = (
+            "States engaging in one-sided violence"
+            if country_level
+            else "Number of states engaging in one-sided violence"
+        )
         cfg["subtitle"] = (
             f"Included are states that were [primary perpetrators]({spec.dod_primary_participant}) "
             f"of at least one instance of {spec.dod[ctype]} that year."
@@ -1115,7 +1119,7 @@ def _participants_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_me
 
 
 def _singularize_dod(link: str) -> str:
-    """"[interstate wars](url)" → "[interstate war](url)"."""
+    """ "[interstate wars](url)" → "[interstate war](url)"."""
     return link.replace("conflicts](", "conflict](").replace("wars](", "war](")
 
 
