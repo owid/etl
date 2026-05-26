@@ -355,14 +355,33 @@ class Collection(MDIMBase):
         return dix
 
     def get_dimension(self, slug: str) -> Dimension:
-        """Get dimension object with slug `slug`"""
+        """Return the `Dimension` object whose slug matches `slug`.
+
+        Use this when you need the full dim (choices + presentation + metadata).
+        Raises ``ValueError`` if no dim with that slug exists.
+
+        Example:
+
+            >>> dim = c.get_dimension("sex")
+            >>> dim.choice_slugs
+            ['female', 'male']
+        """
         for dim in self.dimensions:
             if dim.slug == slug:
                 return dim
         raise ValueError(f"Dimension {slug} not found in dimensions!")
 
     def get_choice_names(self, dimension_slug: str) -> dict[str, str]:
-        """Get all choice names in a given dimension."""
+        """Return a `{choice_slug: choice_name}` map for one dimension.
+
+        Convenience for looking up the human-readable choice names declared on
+        the dim. Raises ``ValueError`` if `dimension_slug` is unknown.
+
+        Example:
+
+            >>> c.get_choice_names("sex")
+            {'female': 'Female', 'male': 'Male'}
+        """
         dimension = self.get_dimension(dimension_slug)
         choice_names = {}
         for choice in dimension.choices:
@@ -566,15 +585,44 @@ class Collection(MDIMBase):
             dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences.get(dim.slug, set())]
 
     @property
-    def dimension_slugs(self):
+    def dimension_slugs(self) -> list[str]:
+        """Return the dim slugs in declared order.
+
+        Example:
+
+            >>> c.dimension_slugs
+            ['sex', 'age', 'cause']
+        """
         return [dim.slug for dim in self.dimensions]
 
     @property
     def dimension_choices(self) -> dict[str, list[str]]:
-        """Get all dimension choices in the collection."""
+        """Return choice slugs **declared** on each dim, regardless of view use.
+
+        Reflects what's configured in the dim's ``.choices`` list (e.g. from
+        the YAML). Compare with :meth:`dimension_choices_in_use` for the
+        runtime "actually referenced by a view" subset.
+
+        Example:
+
+            >>> c.dimension_choices
+            {'sex': ['female', 'male'], 'age': ['0-4', '5-9', '10-14']}
+        """
         return {dim.slug: [choice.slug for choice in dim.choices] for dim in self.dimensions}
 
     def dimension_choices_in_use(self) -> dict[str, set[str]]:
+        """Return choice slugs **actually used** by at least one view, per dim.
+
+        Walks every view's ``view.dimensions`` and aggregates the values into
+        a set per dim. Useful for "is X still referenced anywhere?" checks
+        after grouping / dropping views. Compare with :attr:`dimension_choices`
+        for the declared (possibly-unused) set.
+
+        Example:
+
+            >>> c.dimension_choices_in_use()
+            {'sex': {'female', 'male'}, 'age': {'0-4', '5-9'}}
+        """
         from collections import defaultdict
 
         # Get all dimension choices in use
