@@ -15,7 +15,7 @@ items:
   # Cereals
   - display: Wheat
     item_code: 15    # Wheat
-  - display: Maize (corn)
+  - display: Maize
     item_code: 56    # Maize (corn)
   - display: Rice
     item_code: 27    # Rice
