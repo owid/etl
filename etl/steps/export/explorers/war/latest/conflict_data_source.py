@@ -91,11 +91,11 @@ CT_SHORT = {
 }
 
 # "Parent" conflict types: their single-indicator (or CI-stacked) view uses
-# `conflict_sub_type=all_sub_types` rather than `na`.
+# `conflict_sub_type=all_sub_types` rather than `na`. For deaths/counts/rate
+# the parents are the aggregates plus intrastate (which has the
+# internationalized sub-types). For locations/participants only intrastate is
+# treated as a parent — see `_conflict_sub_type`.
 PARENT_CTS = {"all_armed_conflicts", "all_state_based_conflicts", "intrastate_conflicts"}
-# Legacy quirk: interstate's counts/rate view also uses `all_sub_types`
-# even though interstate is otherwise treated as atomic.
-INTERSTATE_USES_ALL_SUB_TYPES_FOR_COUNTS = {"interstate_conflicts"}
 
 # Helper conflict_type slugs used during the build to keep the two intrastate
 # sub-types separable (so by_sub_type stacks can pick them up as children).
@@ -212,13 +212,9 @@ def _conflict_sub_type(measure: str, ctype: str) -> str:
         return "only_internationalized_conflicts"
     if ctype == "_intrastate_non_int":
         return "only_non_internationalized_conflicts"
-    if measure in ("conflict_deaths", "death_rate"):
+    if measure in ("conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate"):
         return "all_sub_types" if ctype in PARENT_CTS else "na"
-    if measure in ("number_of_conflicts", "conflict_rate"):
-        if ctype in PARENT_CTS or ctype in INTERSTATE_USES_ALL_SUB_TYPES_FOR_COUNTS:
-            return "all_sub_types"
-        return "na"
-    # locations / participants: only intrastate uses "all_sub_types".
+    # locations / participants: only intrastate behaves as a parent.
     return "all_sub_types" if ctype == "intrastate_conflicts" else "na"
 
 

@@ -398,7 +398,7 @@ views:
       tab: "map"
       selectedFacetStrategy: "entity"
 
-  # == COW ==
+  # == COW-MID ==
   - dimensions:
       data_source: cow_mid
       conflict_type: "interstate_conflicts"
@@ -681,5 +681,3 @@ views:
       hasMapTab: true
       tab: "map"
       selectedFacetStrategy: "entity"
-
-  # == PRIO ==
