@@ -93,6 +93,22 @@ class M:
     PARTICIPANTS = "conflict_participants"
 
 
+class CST:
+    """Conflict sub-type slugs — single source of truth for the explorer's
+    `conflict_sub_type` dim choices. `NA` is the "not applicable" value used
+    for views without a meaningful sub-type split; `BY_SUB_TYPE` tags the
+    stacked-across-children views; the `ONLY_*` values flag intrastate
+    variants (and `ONLY_WARS` for the COW-MID interstate cut).
+    """
+
+    NA = "na"
+    BY_SUB_TYPE = "by_sub_type"
+    ALL_SUB_TYPES = "all_sub_types"
+    ONLY_NON_INTERNATIONALIZED = "only_non_internationalized_conflicts"
+    ONLY_INTERNATIONALIZED = "only_internationalized_conflicts"
+    ONLY_WARS = "only_wars"
+
+
 # === Definition-on-Demand anchors (one source of truth per data source) =====
 # Each `#dod:...` URL is typed once here and referenced symbolically below so a
 # typo becomes `AttributeError` at import. The spec's `dod` / `dod_by_sub_type`
@@ -194,11 +210,11 @@ PARENT_CTS = {CT.ALL_ARMED, CT.ALL_STATE_BASED, CT.INTRASTATE}
 # They get remapped to `intrastate_conflicts` + a matching `conflict_sub_type`
 # in `build_source_explorer`.
 INTRASTATE_VARIANT_REMAP = {
-    CT._INTRA_INT: (CT.INTRASTATE, "only_internationalized_conflicts"),
-    CT._INTRA_NON_INT: (CT.INTRASTATE, "only_non_internationalized_conflicts"),
+    CT._INTRA_INT: CT.INTRASTATE,
+    CT._INTRA_NON_INT: CT.INTRASTATE,
 }
 
-# Canonical dimension orderings used by `_refresh_dim_choices` after the build.
+# Canonical dimension orderings applied via `Collection.sort_choices` after the build.
 CONFLICT_TYPE_ORDER = [
     CT.ALL_ARMED,
     CT.ALL_STATE_BASED,
@@ -209,11 +225,11 @@ CONFLICT_TYPE_ORDER = [
     CT.ONE_SIDED,
 ]
 CONFLICT_SUB_TYPE_ORDER = [
-    "na",
-    "by_sub_type",
-    "all_sub_types",
-    "only_non_internationalized_conflicts",
-    "only_internationalized_conflicts",
+    CST.NA,
+    CST.BY_SUB_TYPE,
+    CST.ALL_SUB_TYPES,
+    CST.ONLY_NON_INTERNATIONALIZED,
+    CST.ONLY_INTERNATIONALIZED,
 ]
 
 
@@ -303,13 +319,13 @@ class SourceSpec:
 def _conflict_sub_type(measure: str, ctype: str) -> str:
     """Return the `conflict_sub_type` value for a non-stacked / non-CI view."""
     if ctype == CT._INTRA_INT:
-        return "only_internationalized_conflicts"
+        return CST.ONLY_INTERNATIONALIZED
     if ctype == CT._INTRA_NON_INT:
-        return "only_non_internationalized_conflicts"
+        return CST.ONLY_NON_INTERNATIONALIZED
     if measure in (M.DEATHS, M.DEATH_RATE, M.N_CONFLICTS, M.CONFLICT_RATE):
-        return "all_sub_types" if ctype in PARENT_CTS else "na"
+        return CST.ALL_SUB_TYPES if ctype in PARENT_CTS else CST.NA
     # locations / participants: only intrastate behaves as a parent.
-    return "all_sub_types" if ctype == CT.INTRASTATE else "na"
+    return CST.ALL_SUB_TYPES if ctype == CT.INTRASTATE else CST.NA
 
 
 def _parse_main_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str, Any] | None:
@@ -404,10 +420,16 @@ def _dim_dict(measure: str, ctype: str, sub_measure: str, estimate: str) -> dict
 
 
 def _maybe_dim_dict(spec: SourceSpec, measure: str, ctype: str, sub_measure: str) -> dict[str, str] | None:
-    """Same as `_dim_dict` for non-CI measures, gated on the spec carrying this measure."""
+    """Same as `_dim_dict` for non-CI measures, gated on the spec carrying this measure.
+
+    Non-CI columns carry `_estimate="best"` — semantically the single available
+    value IS the best estimate, and using the same value as the CI columns'
+    center lets `group_views` collapse all `_estimate` choices uniformly (and
+    `drop_dimensions_if_single_choice` then auto-drops the now-trivial dim).
+    """
     if measure not in spec.measures:
         return None
-    return _dim_dict(measure, ctype, sub_measure, "_na")
+    return _dim_dict(measure, ctype, sub_measure, "best")
 
 
 def _adjust_table(tb: Table, spec: SourceSpec, parse: Callable) -> Table:
@@ -488,7 +510,7 @@ def _build_by_sub_type_views(c, spec: SourceSpec) -> None:
                         dimensions={
                             "measure": measure,
                             "conflict_type": parent,
-                            "conflict_sub_type": "by_sub_type",
+                            "conflict_sub_type": CST.BY_SUB_TYPE,
                             "sub_measure": sub_measure,
                         },
                         indicators=ViewIndicators(y=stacked),
@@ -553,26 +575,6 @@ def _pick_best_or_low(inds: list[Indicator]) -> Indicator | None:
 # ===========================================================================
 
 
-def _drop_dim(c, dim_slug: str) -> None:
-    """Remove a dimension from the collection and from every view's dimensions dict."""
-    c.dimensions = [d for d in c.dimensions if d.slug != dim_slug]
-    for v in c.views:
-        v.dimensions.pop(dim_slug, None)
-
-
-def _refresh_dim_choices(c, dim_slug: str, order: list[str]) -> None:
-    """Re-list a dim's choices in `order`, dropping unused slugs."""
-    dim = next(d for d in c.dimensions if d.slug == dim_slug)
-    by_slug = {ch.slug: ch for ch in dim.choices}
-    used = {v.dimensions.get(dim_slug) for v in c.views}
-    used.discard(None)
-    new_choices = [by_slug.get(slug) or DimensionChoice(slug=slug, name=slug) for slug in order if slug in used]
-    # Append any used-but-unlisted slugs at the end (defensive — shouldn't happen).
-    for slug in sorted(used - set(order)):
-        new_choices.append(by_slug.get(slug) or DimensionChoice(slug=slug, name=slug))
-    dim.choices = new_choices
-
-
 # ===========================================================================
 # FAUST templates (titles, subtitles, notes, displays)
 # ===========================================================================
@@ -623,14 +625,14 @@ def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str
     noun = "Death rate" if per_capita else spec.deaths_noun
     name = _ct_name(spec, ctype)
 
-    if cst == "by_sub_type":
+    if cst == CST.BY_SUB_TYPE:
         cfg["title"] = f"{noun} in {name} based on where they occurred"
         cfg["subtitle"] = _deaths_subtitle(spec.dod_by_sub_type.get(ctype, spec.dod[ctype]), per_capita)
         cfg.update(STACKED_CONFIG)
         return
 
-    if cst in ("only_non_internationalized_conflicts", "only_internationalized_conflicts"):
-        word = "non-internationalized" if cst.startswith("only_non") else "internationalized"
+    if cst in (CST.ONLY_NON_INTERNATIONALIZED, CST.ONLY_INTERNATIONALIZED):
+        word = "non-internationalized" if cst == CST.ONLY_NON_INTERNATIONALIZED else "internationalized"
         intrastate_anchor = _dod_url(spec.dod[CT.INTRASTATE])
         cfg["title"] = f"{noun} in {word} intrastate conflicts"
         cfg["subtitle"] = _deaths_subtitle(
@@ -670,7 +672,7 @@ def _count_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str,
     lead = "Rate of" if rate else "Number of"
     verb = "started that year" if is_new else "were ongoing that year"
 
-    if cst == "by_sub_type":
+    if cst == CST.BY_SUB_TYPE:
         cfg["title"] = f"{lead} {new_prefix}{name}"
         cfg["subtitle"] = _count_subtitle(spec.dod_by_sub_type.get(ctype, spec.dod[ctype]), rate, verb)
         cfg["note"] = (
@@ -761,7 +763,7 @@ def _set_view_displays(view, spec: SourceSpec) -> None:
     ys = view.indicators.y
 
     # by_sub_type stacks: labels are set by `_build_by_sub_type_views`.
-    if cst == "by_sub_type":
+    if cst == CST.BY_SUB_TYPE:
         return
 
     if measure in (M.DEATHS, M.DEATH_RATE):
@@ -821,8 +823,13 @@ def _set_locations_or_participants_displays(ys: list[Indicator], measure: str, s
 # ===========================================================================
 
 
-def build_source_explorer(spec: SourceSpec, yaml_config: dict[str, Any]):
+def build_source_explorer(spec: SourceSpec, sub_config: dict[str, Any]):
     """Build one sub-explorer for `spec` and return it.
+
+    `sub_config` is the shared per-spec create_collection input — the YAML's
+    dim definitions (minus `data_source`) plus the explorer's `definitions`
+    block. It's identical across sources, so `run()` computes it once and
+    passes it in.
 
     The returned explorer does not carry the `data_source` dim; that's added
     by `_attach_data_source_dim` (or by `combine_collections` in the future,
@@ -838,15 +845,6 @@ def build_source_explorer(spec: SourceSpec, yaml_config: dict[str, Any]):
     if spec.locations_table:
         indicator_names.append([M.LOCATIONS])
 
-    # Reuse the YAML's dim definitions (minus data_source) so this sub-explorer
-    # shares the same dim metadata as the YAML-driven one — required by
-    # `combine_collections`'s structural-equality check.
-    sub_config = {
-        "config": {},
-        "definitions": yaml_config.get("definitions", {}),
-        "dimensions": [d for d in yaml_config["dimensions"] if d["slug"] != "data_source"],
-        "views": [],
-    }
     c = paths.create_collection(
         config=sub_config,
         tb=tables,
@@ -857,16 +855,20 @@ def build_source_explorer(spec: SourceSpec, yaml_config: dict[str, Any]):
         explorer=True,
     )
 
-    # 1) CI collapse: merge (best, low, high) → "_ci". Some sources (e.g. MARS)
-    #    don't carry every CI variant — intersect against what's actually there.
-    estimate_in_use = c.dimension_choices_in_use().get("_estimate", set())
-    print(spec.name, len(estimate_in_use), estimate_in_use)
-    ci_choices = [v for v in ("best", "low", "high") if v in estimate_in_use]
-    if len(ci_choices) >= 2:
-        c.group_views(
-            groups=[{"dimension": "_estimate", "choices": ci_choices, "choice_new_slug": "_ci", "replace": True}]
-        )
-    _drop_dim(c, "_estimate")
+    # 1) CI collapse: merge all `_estimate` values into a single "_ci" stack.
+    #    Non-CI columns carry `_estimate="best"` too, so a single group_views
+    #    call handles every source — deaths views become 3-indicator CI
+    #    stacks, non-CI views become 1-indicator (degenerate) "stacks". Every
+    #    view ends up at `_estimate="_ci"`, so `drop_dimensions_if_single_choice`
+    #    (default True) auto-drops the now-trivial dim.
+    #    NOTE: we pass the explicit list of existing choices rather than
+    #    omitting `choices` because group_views adds "_ci" to the dim *before*
+    #    its replace-pass runs, and an omitted `choices` would then include
+    #    "_ci" itself — wiping the new views we just created.
+    estimate_in_use = list(c.dimension_choices_in_use().get("_estimate", set()))
+    c.group_views(
+        groups=[{"dimension": "_estimate", "choices": estimate_in_use, "choice_new_slug": "_ci", "replace": True}]
+    )
 
     # 2) Build by_sub_type stacks (manual — see comment on `_build_by_sub_type_views`).
     _build_by_sub_type_views(c, spec)
@@ -882,18 +884,26 @@ def build_source_explorer(spec: SourceSpec, yaml_config: dict[str, Any]):
     if helpers_in_use and non_deaths_measures:
         c.drop_views([{"conflict_type": helpers_in_use, "measure": non_deaths_measures}])
 
-    # 4) Rename the remaining helper conflict_type slugs (deaths only_*_internationalized
-    #    views) to use `intrastate_conflicts`. `conflict_sub_type` and `sub_measure`
-    #    were already set correctly in `_parse_main_col`.
-    for view in c.views:
-        ct = view.dimensions.get("conflict_type")
-        if ct in INTRASTATE_VARIANT_REMAP:
-            new_ct, _ = INTRASTATE_VARIANT_REMAP[ct]
-            view.dimensions["conflict_type"] = new_ct
+    # 4) Consolidate the remaining helper conflict_type slugs (deaths
+    #    only_*_internationalized views) into `intrastate_conflicts`. The
+    #    helper-bearing views differ from canonical intrastate views by
+    #    `conflict_sub_type`, so no coordinate collision occurs.
+    #    `dedup_slug="inherit"` keeps the canonical `intrastate_conflicts`
+    #    choice config that's already on the dim.
+    declared_cts = set(c.get_dimension("conflict_type").choice_slugs)
+    for old_ct, new_ct in INTRASTATE_VARIANT_REMAP.items():
+        if old_ct in declared_cts:
+            c.rename_choice_slug("conflict_type", old_ct, new_ct, dedup_slug="inherit")
 
-    # 5) Canonical dim choice ordering.
-    _refresh_dim_choices(c, "conflict_type", CONFLICT_TYPE_ORDER)
-    _refresh_dim_choices(c, "conflict_sub_type", CONFLICT_SUB_TYPE_ORDER)
+    # 5) Drop any dim choices no longer referenced by a view, then enforce
+    #    canonical ordering on the conflict_type / conflict_sub_type dims.
+    c.prune_dimension_choices(["conflict_type", "conflict_sub_type"])
+    c.sort_choices(
+        {
+            "conflict_type": CONFLICT_TYPE_ORDER,
+            "conflict_sub_type": CONFLICT_SUB_TYPE_ORDER,
+        }
+    )
 
     # 6) Fill in titles / subtitles / notes / displays.
     for view in c.views:
@@ -989,18 +999,18 @@ UCDP_SPEC = SourceSpec(
         CT.INTRASTATE: f"[non-internationalized and internationalized intrastate conflicts]({DOD_UCDP.INTRASTATE})",
     },
     deaths_map_views={
-        (CT.ALL_ARMED, "all_sub_types"),
-        (CT.ALL_STATE_BASED, "all_sub_types"),
-        (CT.INTERSTATE, "na"),
-        (CT.INTRASTATE, "all_sub_types"),
-        (CT.NON_STATE, "na"),
-        (CT.ONE_SIDED, "na"),
+        (CT.ALL_ARMED, CST.ALL_SUB_TYPES),
+        (CT.ALL_STATE_BASED, CST.ALL_SUB_TYPES),
+        (CT.INTERSTATE, CST.NA),
+        (CT.INTRASTATE, CST.ALL_SUB_TYPES),
+        (CT.NON_STATE, CST.NA),
+        (CT.ONE_SIDED, CST.NA),
     },
     deaths_map_with_cs={
-        (CT.INTERSTATE, "na"),
-        (CT.INTRASTATE, "all_sub_types"),
-        (CT.NON_STATE, "na"),
-        (CT.ONE_SIDED, "na"),
+        (CT.INTERSTATE, CST.NA),
+        (CT.INTRASTATE, CST.ALL_SUB_TYPES),
+        (CT.NON_STATE, CST.NA),
+        (CT.ONE_SIDED, CST.NA),
     },
 )
 
@@ -1252,19 +1262,20 @@ PROGRAMMATIC_SPECS: list[SourceSpec] = [UCDP_SPEC, UCDP_PRIO_SPEC, MARS_SPEC, CO
 
 
 def _validate_constants_match_yaml(config: dict[str, Any]) -> None:
-    """Assert that the `CT` and `M` classes are in sync with the YAML's dim choices.
+    """Assert that the `CT`, `M`, and `CST` classes are in sync with the YAML's dim choices.
 
     Catches drift between this module's slug constants and the YAML's
-    `conflict_type` / `measure` dimensions — e.g., adding a new measure to
-    `M` but forgetting to declare it in the YAML's dropdown (or vice versa)
-    would otherwise surface as a silent missing-view or KeyError at save.
+    `conflict_type` / `measure` / `conflict_sub_type` dimensions — e.g.,
+    adding a new measure to `M` but forgetting to declare it in the YAML's
+    dropdown (or vice versa) would otherwise surface as a silent
+    missing-view or KeyError at save.
 
     Helper attrs on `CT` (those starting with `_`, like `CT._INTRA_INT`) are
     transient build-time slugs and are intentionally excluded — they never
     appear in the YAML's dim choices.
     """
     dims_by_slug = {d["slug"]: d for d in config.get("dimensions", [])}
-    for cls, dim_slug in [(CT, "conflict_type"), (M, "measure")]:
+    for cls, dim_slug in [(CT, "conflict_type"), (M, "measure"), (CST, "conflict_sub_type")]:
         if dim_slug not in dims_by_slug:
             raise ValueError(f"YAML config is missing the `{dim_slug}` dimension.")
         py_slugs = {v for k, v in vars(cls).items() if isinstance(v, str) and not k.startswith("_")}
@@ -1288,7 +1299,17 @@ def run() -> None:
     # It still defines all five dims and the explorer-level config.
     yaml_explorer = paths.create_collection(config=yaml_config, explorer=True)
 
-    programmatic_subs = [build_source_explorer(spec, yaml_config) for spec in PROGRAMMATIC_SPECS]
+    # Per-source sub_config shared by all programmatic specs: same dim
+    # definitions as the YAML (minus `data_source`, which combine_collections
+    # re-introduces), same `definitions` block, no views.
+    sub_config = {
+        "config": {},
+        "definitions": yaml_config.get("definitions", {}),
+        "dimensions": [d for d in yaml_config["dimensions"] if d["slug"] != "data_source"],
+        "views": [],
+    }
+
+    programmatic_subs = [build_source_explorer(spec, sub_config) for spec in PROGRAMMATIC_SPECS]
     for spec, sub in zip(PROGRAMMATIC_SPECS, programmatic_subs):
         _attach_data_source_dim(sub, spec, yaml_explorer)
 
