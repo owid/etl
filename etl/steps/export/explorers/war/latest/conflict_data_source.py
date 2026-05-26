@@ -1498,7 +1498,14 @@ UCDP_SPEC = SourceSpec(
         (CT.NON_STATE, CST.NA),
         (CT.ONE_SIDED, CST.NA),
     },
+    # Aggregate (ALL_ARMED / ALL_STATE_BASED) views match the OrRd+bins config
+    # the per-CT views already use — matches UCDP 2025-06-13's PROD grapher
+    # chart config for these indicators. Our garden dataset is at 2023-09-21
+    # (no `map.colorScale` on the indicators), so we inject the bins via the
+    # explorer-display path.
     deaths_map_with_cs={
+        (CT.ALL_ARMED, CST.ALL_SUB_TYPES),
+        (CT.ALL_STATE_BASED, CST.ALL_SUB_TYPES),
         (CT.INTERSTATE, CST.NA),
         (CT.INTRASTATE, CST.ALL_SUB_TYPES),
         (CT.NON_STATE, CST.NA),
@@ -1843,7 +1850,11 @@ def run() -> None:
 
     # The YAML carries dim definitions + explorer-level config only — every
     # source is built programmatically now.
-    yaml_explorer = paths.create_collection(config=yaml_config, explorer=True)
+    yaml_explorer = paths.create_collection(
+        config=yaml_config,
+        explorer=True,
+        short_name="conflict-data-source",
+    )
 
     # Per-source sub_config shared by all programmatic specs: same dim
     # definitions as the YAML (minus `data_source`, which combine_collections

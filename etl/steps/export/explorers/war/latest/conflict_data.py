@@ -26,14 +26,15 @@ paths = PathFinder(__file__)
 def run() -> None:
     # Load upstream explorer
     cs = paths.load_collectionset("conflict_data_source", channel="explorers")
-    c_old = cast(Explorer, cs.read("conflict_data_source"))
+    c_old = cast(Explorer, cs.read("conflict-data-source"))
 
     # Create new explorer
     config = paths.load_collection_config()
-    c = paths.create_collection(config, explorer=True)
-
-    # Re-target the loaded explorer to this step.
-    c.catalog_path = f"{paths.namespace}/{paths.version}/{paths.short_name}#{paths.short_name}"
+    c = paths.create_collection(
+        config,
+        short_name="conflict-data",
+        explorer=True,
+    )
 
     # Swap explorer-level config (title, subtitle, subNavCurrentId differ).
     c.views = c_old.views
