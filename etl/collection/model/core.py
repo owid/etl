@@ -798,8 +798,14 @@ class Collection(MDIMBase):
             # Get dimension slug
             assert "dimension" in group, "Dimension must be provided!"
             dimension = group["dimension"]
-            # Get choice slugs
-            choices = _ensure_choices(group, dimension)
+            # Resolve the list of original choices to group. We snapshot this
+            # *before* adding `choice_new_slug` to the dim below, because the
+            # `replace`-pass at the end needs the pre-mutation list. Otherwise,
+            # when callers omit `choices` (which is documented to mean "group
+            # every choice on the dim"), `_ensure_choices` would later return
+            # the dim's choices *including* the just-added new slug, and the
+            # replace pass would delete the very views it just created.
+            choices = list(_ensure_choices(group, dimension))
 
             # Get new choice slug
             assert "choice_new_slug" in group, "Dimension must be provided!"
@@ -831,6 +837,10 @@ class Collection(MDIMBase):
                     "views": new_views_,
                     "dimension": dimension,
                     "choice_new": choice_new_slug,
+                    # Capture the resolved choices and replace flag here so the
+                    # post-grouping `replace`-pass uses the pre-mutation values.
+                    "choices": choices,
+                    "replace": group.get("replace", False),
                 }
             )
 
@@ -866,11 +876,12 @@ class Collection(MDIMBase):
         # Extend views
         self.views.extend(new_views_list)
 
-        # Remove original choices if asked to
-        for group in groups:
-            if group.get("replace", False):
-                dimension = group["dimension"]
-                choices = _ensure_choices(group, dimension)
+        # Remove original choices if asked to. Use the choices snapshotted in
+        # the loop above — see the long comment on `choices = …` for why.
+        for new_views in new_views_all:
+            if new_views["replace"]:
+                dimension = new_views["dimension"]
+                choices = new_views["choices"]
                 # Remove views with old choices
                 self.views = [view for view in self.views if view.dimensions[dimension] not in choices]
                 # Remove unused choices (only for the dimension being replaced, not all dimensions)
