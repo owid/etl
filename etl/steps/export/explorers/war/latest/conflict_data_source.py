@@ -20,28 +20,26 @@ from its grapher table(s) via the same `build_source_explorer` pipeline:
      the spec.
 
 The seven sub-explorers are merged by `combine_collections` under a leading
-`data_source` dropdown. The YAML carries the dim definitions and the
-explorer-level config plus the views for any source that hasn't been migrated
-yet.
+`data_source` dropdown (introduced by `force_collection_dimension=True`).
+The YAML carries only dim definitions + explorer-level config — every source
+is built programmatically.
 
-Sources currently programmatic: ucdp, ucdp_prio, mars, cow, prio.
-Still loaded from YAML: mie, cow_mid.
-
-When MIE and COW-MID are migrated, `_attach_data_source_dim` becomes obsolete:
-`combine_collections` can introduce the `data_source` dim via
-`force_collection_dimension=True` + `collection_dimension_slug="data_source"`,
-and the YAML can shrink to dim definitions + explorer-level config only.
+UCDP-style sources (ucdp, ucdp_prio, mars, cow, prio) use the existing CT
+pipeline. MIC-style sources (mie, cow_mid) use `style="mic"`: their columns
+carry a `hostility_level` / `hostility` dim that maps to helper
+`conflict_sub_type` slugs (stacked into `by_sub_type` by
+`_build_mic_post_process`); COW-MID's deaths view is an 8-indicator
+fatality-bucket stack assembled via the universal `_estimate` CI-collapse
+step.
 """
 
 from collections.abc import Callable
-from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal
 
 from owid.catalog.tables import Table
 
 from etl.collection.core.combine import combine_collections
-from etl.collection.model.dimension import Dimension, DimensionChoice
 from etl.collection.model.view import Indicator, View, ViewIndicators
 from etl.helpers import PathFinder
 
@@ -107,6 +105,13 @@ class CST:
     ONLY_NON_INTERNATIONALIZED = "only_non_internationalized_conflicts"
     ONLY_INTERNATIONALIZED = "only_internationalized_conflicts"
     ONLY_WARS = "only_wars"
+    # Build-time helpers (MIE / COW-MID hostility levels). Stacked into
+    # BY_SUB_TYPE by `_build_mic_post_process`, with `_HOSTLEV_WAR` renamed to
+    # `ONLY_WARS` and the rest dropped. Never appear in the saved explorer.
+    _HOSTLEV_THREAT = "_hostlev_threat"
+    _HOSTLEV_DISPLAY = "_hostlev_display"
+    _HOSTLEV_USE = "_hostlev_use"
+    _HOSTLEV_WAR = "_hostlev_war"
 
 
 # === Definition-on-Demand anchors (one source of truth per data source) =====
@@ -147,6 +152,21 @@ class DOD_MARS:
     CONVENTIONAL_WARS = "#dod:conventional-war-mars"
 
 
+class DOD_MIE:
+    """MIE DoD anchor URLs (Militarized Interstate Events)."""
+
+    FORCE = "#dod:force-mic"
+    WAR = "#dod:interstate-war-mic"
+
+
+class DOD_COW_MID:
+    """COW-MID DoD anchor URLs (Militarized Interstate Disputes — uses COW
+    war anchors but the same MIC-style ``force`` anchor schema)."""
+
+    FORCE = "#dod:force-cow"
+    WAR = "#dod:interstate-war-cow"
+
+
 # Used in every conflict_participants subtitle (override per-source if needed).
 DOD_PRIMARY_PARTICIPANT = "#dod:primary-participant-ucdp"
 
@@ -169,6 +189,40 @@ STACKED_CONFIG = {
     "selectedFacetStrategy": "entity",
 }
 MAP_CONFIG = {"hasMapTab": True, "tab": "map", "selectedFacetStrategy": "entity"}
+
+# === MIC (MIE / COW-MID) constants ==========================================
+
+# Map source-table `hostility_level` / `hostility` dim values → helper
+# conflict_sub_type slug + stack display label. Stack order (bottom→top)
+# follows insertion order: threat / display / use / war.
+HOSTLEV_RAW_TO_HELPER: dict[str, tuple[str, str]] = {
+    "Threat to use force": (CST._HOSTLEV_THREAT, "Threats of force"),
+    "Display of force": (CST._HOSTLEV_DISPLAY, "Displays of force"),
+    "Use of force": (CST._HOSTLEV_USE, "Uses of force"),
+    "War": (CST._HOSTLEV_WAR, "Wars"),
+}
+HOSTLEV_LABEL: dict[str, str] = {helper: label for helper, label in HOSTLEV_RAW_TO_HELPER.values()}
+
+# COW-MID fatality buckets used in the by-bucket deaths stack. Each tuple
+# carries (raw `fatality` dim value, helper `_estimate` slug, display label).
+# Helper estimates are grouped into the `_ci` collapse alongside best/low/high,
+# then the dim is auto-dropped by `drop_dimensions_if_single_choice`.
+FATALITY_BUCKETS: list[tuple[str, str, str]] = [
+    ("Unknown", "_fat_unknown", "No deaths data"),
+    ("No deaths", "_fat_no_deaths", "No deaths"),
+    ("1-25 deaths", "_fat_1_25", "1-25 deaths"),
+    ("26-100 deaths", "_fat_26_100", "26-100 deaths"),
+    ("101-250 deaths", "_fat_101_250", "101-250 deaths"),
+    ("251-500 deaths", "_fat_251_500", "251-500 deaths"),
+    ("501-999 deaths", "_fat_501_999", "501-999 deaths"),
+    ("> 999 deaths", "_fat_gt_999", "1000 deaths or more"),
+]
+FATALITY_RAW_TO_HELPER: dict[str, str] = {raw: helper for raw, helper, _ in FATALITY_BUCKETS}
+FATALITY_HELPER_TO_LABEL: dict[str, str] = {helper: label for _, helper, label in FATALITY_BUCKETS}
+
+# MIE deaths CI displays (low/high range plot — non-standard colors).
+MIE_LOW_DISPLAY = {"name": "Low estimate", "color": "#00295B"}
+MIE_HIGH_DISPLAY = {"name": "High estimate", "color": "#B13507"}
 
 # Human-readable conflict_type names + short labels used in templates. Specs
 # can override individual entries via `ct_name` / `ct_short` on the spec.
@@ -221,6 +275,7 @@ CONFLICT_SUB_TYPE_ORDER = [
     CST.ALL_SUB_TYPES,
     CST.ONLY_NON_INTERNATIONALIZED,
     CST.ONLY_INTERNATIONALIZED,
+    CST.ONLY_WARS,
 ]
 
 
@@ -302,6 +357,23 @@ class SourceSpec:
     deaths_map_views: set[tuple[str, str]] = field(default_factory=set)
     deaths_map_with_cs: set[tuple[str, str]] = field(default_factory=set)
 
+    # ------------------------------------------------------------------------
+    # MIC family (MIE / COW-MID) — interstate-only sources whose `conflict_sub_type`
+    # carries a hostility-level split instead of an intrastate split. Defaults
+    # apply to UCDP-style sources; MIC specs set `style="mic"` and the MIC
+    # builder branch is taken.
+    # ------------------------------------------------------------------------
+    style: Literal["ucdp", "mic"] = "ucdp"
+    # Deaths kind for MIC sources: "low_high" (MIE — 2-indicator range plot)
+    # or "fatality_stack" (COW-MID — 8-indicator stacked bar). Ignored for
+    # UCDP-style sources, which always use the CI (best/low/high) shape.
+    mic_deaths_kind: Literal["low_high", "fatality_stack"] | None = None
+    # DoD anchor URLs for the MIC subtitles ("force was threatened, displayed,
+    # used" / "interstate wars"). The templates wrap each URL with the right
+    # link text per usage site.
+    mic_dod_force_url: str = ""
+    mic_dod_war_url: str = ""
+
     def __post_init__(self) -> None:
         # Overlay the spec's partial CT name dicts onto the module defaults so
         # callers can just read `spec.ct_name[ct]` without falling back.
@@ -326,8 +398,9 @@ def _conflict_sub_type(measure: str, ctype: str) -> str:
     return CST.ALL_SUB_TYPES if ctype == CT.INTRASTATE else CST.NA
 
 
-def _parse_main_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str, Any] | None:
+def _parse_main_col(spec: SourceSpec, short: str, dims_raw: dict[str, Any]) -> dict[str, Any] | None:
     """Map a `main_table` column to explorer dim values; return None to drop."""
+    ct_raw = dims_raw.get("conflict_type")
     ctype = spec.ct_map.get(ct_raw)
     if ctype is None:
         return None
@@ -376,8 +449,9 @@ def _parse_main_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str, Any]
     return None  # any other column family (civilians/combatants/unknown, etc.)
 
 
-def _parse_country_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str, Any] | None:
+def _parse_country_col(spec: SourceSpec, short: str, dims_raw: dict[str, Any]) -> dict[str, Any] | None:
     """Map a `country_table` column (conflict_participants) to explorer dims."""
+    ct_raw = dims_raw.get("conflict_type")
     ctype = spec.ct_map.get(ct_raw)
     if ctype is None or ctype == CT.NON_STATE:
         return None  # non-state has no "primary state participant" semantics
@@ -391,8 +465,9 @@ def _parse_country_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str, A
     return None
 
 
-def _parse_locations_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str, Any] | None:
+def _parse_locations_col(spec: SourceSpec, short: str, dims_raw: dict[str, Any]) -> dict[str, Any] | None:
     """Map a `locations_table` column (conflict_locations) to explorer dims."""
+    ct_raw = dims_raw.get("conflict_type")
     ctype = spec.ct_map.get(ct_raw)
     if ctype is None:
         return None
@@ -404,6 +479,117 @@ def _parse_locations_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str,
     if short == "is_location_of_conflict":
         return _maybe_dim_dict(spec, M.LOCATIONS, ctype, "country_level_data")
     return None
+
+
+def _parse_mic_main_col(spec: SourceSpec, short: str, dims_raw: dict[str, Any]) -> dict[str, Any] | None:
+    """Map a MIE / COW-MID main_table column to explorer dims.
+
+    Columns carry source-specific helper dims (`hostility_level` for MIE,
+    `hostility` + `fatality` for COW-MID). Output dims align with the rest
+    of the explorer: hostility levels become helper `conflict_sub_type` slugs
+    that get stacked into `by_sub_type` by `_build_mic_post_process`; fatality
+    buckets become helper `_estimate` slugs that get folded into the deaths
+    stack by the universal CI-collapse step.
+    """
+    hostility_raw = dims_raw.get("hostility_level") or dims_raw.get("hostility")
+    fatality_raw = dims_raw.get("fatality")
+
+    # COW-MID fatality-bucket deaths columns: only the plain ongoing-counts
+    # × hostility=all family contributes (per_country / per_country_pair
+    # variants exist in the source but aren't surfaced).
+    if fatality_raw is not None and fatality_raw != "all":
+        if short != spec.ongoing_conflicts_family or hostility_raw != "all":
+            return None
+        if M.DEATHS not in spec.measures:
+            return None
+        helper = FATALITY_RAW_TO_HELPER.get(fatality_raw)
+        if helper is None:
+            return None
+        return {
+            "measure": M.DEATHS,
+            "conflict_type": CT.INTERSTATE,
+            "conflict_sub_type": CST.NA,
+            "sub_measure": spec.deaths_sub_measure,
+            "_estimate": helper,
+        }
+
+    # MIE deaths CI columns (low/high, with optional _per_capita for death_rate).
+    deaths_variants = {
+        f"{spec.deaths_family}_low": (M.DEATHS, "low"),
+        f"{spec.deaths_family}_high": (M.DEATHS, "high"),
+        f"{spec.deaths_family}_low_per_capita": (M.DEATH_RATE, "low"),
+        f"{spec.deaths_family}_high_per_capita": (M.DEATH_RATE, "high"),
+    }
+    if short in deaths_variants:
+        if hostility_raw != "all":
+            return None
+        measure, estimate = deaths_variants[short]
+        if measure not in spec.measures:
+            return None
+        return {
+            "measure": measure,
+            "conflict_type": CT.INTERSTATE,
+            "conflict_sub_type": CST.NA,
+            "sub_measure": spec.deaths_sub_measure,
+            "_estimate": estimate,
+        }
+
+    # Count / rate columns — hostility=all → all_sub_types, otherwise a helper
+    # _hostlev_<level> slug that gets stacked into `by_sub_type` later.
+    if hostility_raw is None:
+        return None
+    if hostility_raw == "all":
+        sub_type = CST.ALL_SUB_TYPES
+    else:
+        helper_label = HOSTLEV_RAW_TO_HELPER.get(hostility_raw)
+        if helper_label is None:
+            return None
+        sub_type = helper_label[0]
+
+    for is_ongoing, family in (
+        (True, spec.ongoing_conflicts_family),
+        (False, spec.new_conflicts_family),
+    ):
+        sub_measure = "all_ongoing_conflicts" if is_ongoing else "only_new_conflicts"
+        if short == family:
+            return _mic_count_dim_dict(spec, M.N_CONFLICTS, sub_type, sub_measure)
+        if short == f"{family}_per_country_pair":
+            return _mic_count_dim_dict(spec, M.CONFLICT_RATE, sub_type, sub_measure)
+        # _per_country variants exist in the source but aren't surfaced.
+    return None
+
+
+def _parse_mic_country_col(spec: SourceSpec, short: str, dims_raw: dict[str, Any]) -> dict[str, Any] | None:
+    """Map a MIE / COW-MID country_table column (conflict_participants) to explorer dims.
+
+    Only the aggregate `hostlev=all` columns are surfaced; the per-hostility
+    variants exist in the source but the legacy explorer doesn't surface them.
+    """
+    hostlev_raw = dims_raw.get("hostlev")
+    if hostlev_raw != "all":
+        return None
+    if M.PARTICIPANTS not in spec.measures:
+        return None
+    if short == "number_participants":
+        return _mic_count_dim_dict(spec, M.PARTICIPANTS, CST.NA, "regional_data")
+    if short == "participated_in_conflict":
+        return _mic_count_dim_dict(spec, M.PARTICIPANTS, CST.NA, "country_level_data")
+    return None
+
+
+def _mic_count_dim_dict(
+    spec: SourceSpec, measure: str, sub_type: str, sub_measure: str
+) -> dict[str, str] | None:
+    """Dim assignment for a non-CI MIC view (count / rate / participants)."""
+    if measure not in spec.measures:
+        return None
+    return {
+        "measure": measure,
+        "conflict_type": CT.INTERSTATE,
+        "conflict_sub_type": sub_type,
+        "sub_measure": sub_measure,
+        "_estimate": "best",
+    }
 
 
 def _dim_dict(measure: str, ctype: str, sub_measure: str, estimate: str) -> dict[str, str]:
@@ -437,11 +623,11 @@ def _adjust_table(tb: Table, spec: SourceSpec, parse: Callable) -> Table:
         if col in ("year", "country"):
             continue
         meta = tb[col].metadata
-        ct_raw = (meta.dimensions or {}).get("conflict_type")
-        if not ct_raw or not meta.original_short_name:
+        dims_raw = dict(meta.dimensions or {})
+        if not meta.original_short_name:
             drops.append(col)
             continue
-        dims = parse(spec, meta.original_short_name, ct_raw)
+        dims = parse(spec, meta.original_short_name, dims_raw)
         if dims is None:
             drops.append(col)
             continue
@@ -452,7 +638,7 @@ def _adjust_table(tb: Table, spec: SourceSpec, parse: Callable) -> Table:
     # Make sure the table-level dim list mentions the helper dims we added.
     if isinstance(tb.metadata.dimensions, list):
         existing = {d.get("slug") for d in tb.metadata.dimensions}
-        for slug in ("conflict_sub_type", "sub_measure", "_estimate"):
+        for slug in ("conflict_type", "conflict_sub_type", "sub_measure", "_estimate"):
             if slug not in existing:
                 tb.metadata.dimensions.append({"name": slug, "slug": slug})
     return tb
@@ -461,10 +647,18 @@ def _adjust_table(tb: Table, spec: SourceSpec, parse: Callable) -> Table:
 def _load_and_adjust(spec: SourceSpec) -> list[Table]:
     """Load every table the spec references and apply `_adjust_table` to each."""
     ds = paths.load_dataset(spec.dataset_path)
-    tables: list[Table] = [_adjust_table(ds.read(spec.main_table, load_data=False), spec, _parse_main_col)]
+    if spec.style == "mic":
+        main_parser: Callable = _parse_mic_main_col
+        country_parser: Callable = _parse_mic_country_col
+    else:
+        main_parser = _parse_main_col
+        country_parser = _parse_country_col
+    tables: list[Table] = [_adjust_table(ds.read(spec.main_table, load_data=False), spec, main_parser)]
     if spec.country_table:
-        tables.append(_adjust_table(ds.read(spec.country_table, load_data=False), spec, _parse_country_col))
+        tables.append(_adjust_table(ds.read(spec.country_table, load_data=False), spec, country_parser))
     if spec.locations_table:
+        # MIC sources don't surface conflict_locations.
+        assert spec.style != "mic", "MIC sources don't support a locations_table"
         tables.append(_adjust_table(ds.read(spec.locations_table, load_data=False), spec, _parse_locations_col))
     return tables
 
@@ -568,6 +762,72 @@ def _pick_best_or_low(inds: list[Indicator]) -> Indicator | None:
     return next((i for i in inds if "_low_" in i.catalogPath), None)
 
 
+# ---------------------------------------------------------------------------
+# MIC (MIE / COW-MID) post-process — hostility-level stacking.
+# ---------------------------------------------------------------------------
+
+
+def _drop_dim(c, dim_slug: str) -> None:
+    """Remove a dimension and its references from every view. No-op if absent."""
+    dim = next((d for d in c.dimensions if d.slug == dim_slug), None)
+    if dim is None:
+        return
+    c.dimensions.remove(dim)
+    for view in c.views:
+        view.dimensions.pop(dim_slug, None)
+
+
+def _build_mic_post_process(c, spec: SourceSpec) -> None:
+    """Collapse the 4 hostility-level helper conflict_sub_type slugs into
+    `by_sub_type` (stacked) and `only_wars` (war-only).
+
+    Each (measure, sub_measure) combo carries 5 views after CI collapse:
+    `all_sub_types` (aggregate) + 4 helper `_hostlev_*` views. We stack the
+    helpers into a single `by_sub_type` view, then rename `_hostlev_war` to
+    `only_wars` to surface that one as a standalone view; the other three
+    helpers are dropped.
+    """
+    # 1. Stack the 4 hostility-level helper slugs into `by_sub_type`. Use
+    #    replace=False so the helper-bearing views survive — we still need
+    #    `_hostlev_war` for the rename, and we explicitly drop the others below.
+    #    `drop_dimensions_if_single_choice=False` keeps `conflict_type` (which
+    #    has a single choice for MIC sources) so the dim survives for the
+    #    combined-explorer merge.
+    c.group_views(
+        groups=[
+            {
+                "dimension": "conflict_sub_type",
+                "choices": [
+                    CST._HOSTLEV_THREAT,
+                    CST._HOSTLEV_DISPLAY,
+                    CST._HOSTLEV_USE,
+                    CST._HOSTLEV_WAR,
+                ],
+                "choice_new_slug": CST.BY_SUB_TYPE,
+                "replace": False,
+            }
+        ],
+        drop_dimensions_if_single_choice=False,
+    )
+    # 2. Surface the war helper as the canonical `only_wars` view.
+    c.rename_choice_slug(
+        "conflict_sub_type", CST._HOSTLEV_WAR, CST.ONLY_WARS, dedup_slug="inherit"
+    )
+    # 3. Drop the remaining helper hostility-level views — only the
+    #    by_sub_type stack and only_wars survive.
+    c.drop_views(
+        [
+            {
+                "conflict_sub_type": [
+                    CST._HOSTLEV_THREAT,
+                    CST._HOSTLEV_DISPLAY,
+                    CST._HOSTLEV_USE,
+                ]
+            }
+        ]
+    )
+
+
 # ===========================================================================
 # Collection-level helpers
 # ===========================================================================
@@ -598,14 +858,17 @@ def _set_view_config(view, spec: SourceSpec) -> None:
     sub_measure = d["sub_measure"]
     cfg = view.config or {}
 
-    if measure in (M.DEATHS, M.DEATH_RATE):
-        _deaths_text(cfg, spec, measure, ctype, cst)
-    elif measure in (M.N_CONFLICTS, M.CONFLICT_RATE):
-        _count_text(cfg, spec, measure, ctype, cst, sub_measure)
-    elif measure == M.PARTICIPANTS:
-        _participants_text(cfg, spec, ctype, sub_measure)
-    elif measure == M.LOCATIONS:
-        _locations_text(cfg, spec, ctype, sub_measure)
+    if spec.style == "mic":
+        _set_view_config_mic(cfg, spec, measure, cst, sub_measure)
+    else:
+        if measure in (M.DEATHS, M.DEATH_RATE):
+            _deaths_text(cfg, spec, measure, ctype, cst)
+        elif measure in (M.N_CONFLICTS, M.CONFLICT_RATE):
+            _count_text(cfg, spec, measure, ctype, cst, sub_measure)
+        elif measure == M.PARTICIPANTS:
+            _participants_text(cfg, spec, ctype, sub_measure)
+        elif measure == M.LOCATIONS:
+            _locations_text(cfg, spec, ctype, sub_measure)
 
     view.config = cfg
 
@@ -742,15 +1005,149 @@ def _locations_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_measu
         cfg.update(MAP_CONFIG)
 
 
+# ---------------------------------------------------------------------------
+# FAUST for MIC sources (MIE / COW-MID).
+# ---------------------------------------------------------------------------
+
+
+def _set_view_config_mic(
+    cfg: dict[str, Any], spec: SourceSpec, measure: str, cst: str, sub_measure: str
+) -> None:
+    """Dispatch MIC view-config helpers by measure."""
+    if measure in (M.DEATHS, M.DEATH_RATE):
+        _mic_deaths_text(cfg, spec, measure)
+    elif measure in (M.N_CONFLICTS, M.CONFLICT_RATE):
+        _mic_count_text(cfg, spec, measure, cst, sub_measure)
+    elif measure == M.PARTICIPANTS:
+        _mic_participants_text(cfg, spec, sub_measure)
+
+
+def _mic_deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str) -> None:
+    per_capita = measure == M.DEATH_RATE
+    if per_capita:
+        cfg["title"] = "Death rate in interstate conflicts"
+        cfg["subtitle"] = "Deaths of combatants due to fighting between states that year, per 100,000 people."
+    else:
+        cfg["title"] = "Deaths in interstate conflicts"
+        cfg["subtitle"] = "Included are deaths of combatants due to fighting between states that year."
+    if spec.mic_deaths_kind == "fatality_stack":
+        cfg.update(STACKED_CONFIG)
+    else:
+        # MIE low/high range plot.
+        cfg["yScaleToggle"] = True
+        cfg["selectedFacetStrategy"] = "entity"
+
+
+def _mic_count_text(
+    cfg: dict[str, Any], spec: SourceSpec, measure: str, cst: str, sub_measure: str
+) -> None:
+    rate = measure == M.CONFLICT_RATE
+    is_new = sub_measure == "only_new_conflicts"
+    noun = "wars" if cst == CST.ONLY_WARS else "conflicts"
+    prefix = "new " if is_new else ""
+    lead = "Rate of" if rate else "Number of"
+    cfg["title"] = f"{lead} {prefix}interstate {noun}"
+    cfg["subtitle"] = _mic_count_subtitle(spec, cst, rate=rate, is_new=is_new)
+    cfg["note"] = _mic_count_note(cst, is_new=is_new, rate=rate)
+    if not cfg["note"]:
+        cfg.pop("note", None)
+    if cst == CST.BY_SUB_TYPE:
+        cfg.update(STACKED_CONFIG)
+
+
+def _mic_count_subtitle(spec: SourceSpec, cst: str, *, rate: bool, is_new: bool) -> str:
+    """Build a MIC subtitle from the spec's force / war DoD URLs."""
+    war_verb = "started that year" if is_new else "were ongoing that year"
+    if cst == CST.ONLY_WARS:
+        body = f"Included are [interstate wars]({spec.mic_dod_war_url}) that {war_verb}."
+        if rate:
+            return (
+                "The number of wars divided by the number of all state-pairs. "
+                f"This accounts for the changing number of states over time. {body}"
+            )
+        return body
+    # all_sub_types / by_sub_type — same wording.
+    suffix = "that year for the first time" if is_new else "that year"
+    body = (
+        f"Included are conflicts between states where force was "
+        f"[threatened, displayed, used]({spec.mic_dod_force_url}), or escalated to a "
+        f"[war]({spec.mic_dod_war_url}) {suffix}."
+    )
+    if rate:
+        return (
+            "The number of conflicts divided by the number of all state-pairs. "
+            f"This accounts for the changing number of states over time. {body}"
+        )
+    return body
+
+
+def _mic_count_note(cst: str, *, is_new: bool, rate: bool) -> str:
+    """Build the MIC count-view note (matches the legacy YAML wording)."""
+    if cst == CST.ONLY_WARS:
+        if is_new or rate:
+            return ""
+        return (
+            "Some wars affect several regions. The sum across all regions can therefore "
+            "be higher than the global number."
+        )
+    if cst == CST.ALL_SUB_TYPES:
+        if is_new:
+            return ""
+        if rate:
+            return ""
+        return (
+            "The number of states has increased a lot over time. Some conflicts affect "
+            "several regions. The sum across all regions can therefore be higher than the "
+            "global number."
+        )
+    # by_sub_type
+    if is_new:
+        return (
+            "Some conflicts affect several regions, and do not necessarily start at the same time "
+            "across them. The sum across all regions can therefore be higher than the global number."
+        )
+    if rate:
+        return (
+            "Some conflicts affect several regions. The sum across all regions can therefore "
+            "be higher than the global number."
+        )
+    return (
+        "The number of states has increased a lot over time. Some conflicts affect "
+        "several regions. The sum across all regions can therefore be higher than the "
+        "global number."
+    )
+
+
+def _mic_participants_text(cfg: dict[str, Any], spec: SourceSpec, sub_measure: str) -> None:
+    country_level = sub_measure == "country_level_data"
+    cfg["title"] = (
+        "States involved in interstate conflicts"
+        if country_level
+        else "Number of states involved in interstate conflicts"
+    )
+    cfg["subtitle"] = (
+        "Included are states that participated in at least one conflict with another state "
+        f"where force was [threatened, displayed, or used]({spec.mic_dod_force_url}) that year."
+    )
+    if country_level:
+        cfg["note"] = "Some states are not shown in the map because they do not exist anymore."
+        cfg.update(MAP_CONFIG)
+
+
 def _set_view_displays(view, spec: SourceSpec) -> None:
     """Fill in per-indicator display (name / color / colorScale) blocks per view."""
     d = view.dimensions
     measure = d["measure"]
     ctype = d["conflict_type"]
     cst = d["conflict_sub_type"]
+    sub_measure = d["sub_measure"]
     if view.indicators is None or view.indicators.y is None:
         return
     ys = view.indicators.y
+
+    if spec.style == "mic":
+        _set_view_displays_mic(ys, spec, measure, cst, sub_measure)
+        return
 
     # by_sub_type stacks: labels are set by `_build_by_sub_type_views`.
     if cst == CST.BY_SUB_TYPE:
@@ -762,6 +1159,104 @@ def _set_view_displays(view, spec: SourceSpec) -> None:
         _set_count_display(ys, spec, ctype)
     elif measure in (M.LOCATIONS, M.PARTICIPANTS):
         _set_locations_or_participants_displays(ys, measure, sub_measure=d["sub_measure"])
+
+
+# ---------------------------------------------------------------------------
+# MIC display helpers.
+# ---------------------------------------------------------------------------
+
+# Identify a hostility level from an indicator's catalogPath suffix.
+# MIE columns carry `__hostility_level_<level>`; COW-MID columns carry
+# `__hostility_<level>` (no "_level"). Both share the same set of labels.
+_HOSTLEV_PATH_LABEL: list[tuple[str, str]] = [
+    ("hostility_level_threat_to_use_force", "Threats of force"),
+    ("hostility_level_display_of_force", "Displays of force"),
+    ("hostility_level_use_of_force", "Uses of force"),
+    ("hostility_level_war", "Wars"),
+    ("hostility_threat_to_use_force", "Threats of force"),
+    ("hostility_display_of_force", "Displays of force"),
+    ("hostility_use_of_force", "Uses of force"),
+    ("hostility_war", "Wars"),
+]
+# Identify a fatality bucket from an indicator's catalogPath. COW-MID's
+# fatality column slug suffixes match these substrings exactly.
+_FATALITY_PATH_LABEL: list[tuple[str, str]] = [
+    ("fatality_unknown__", "No deaths data"),
+    ("fatality_no_deaths__", "No deaths"),
+    ("fatality_1_25_deaths__", "1-25 deaths"),
+    ("fatality_26_100_deaths__", "26-100 deaths"),
+    ("fatality_101_250_deaths__", "101-250 deaths"),
+    ("fatality_251_500_deaths__", "251-500 deaths"),
+    ("fatality_501_999_deaths__", "501-999 deaths"),
+    ("fatality__gt__999_deaths__", "1000 deaths or more"),
+]
+
+
+def _set_view_displays_mic(
+    ys: list[Indicator],
+    spec: SourceSpec,
+    measure: str,
+    cst: str,
+    sub_measure: str,
+) -> None:
+    """Dispatch MIC display helpers."""
+    if measure == M.DEATHS:
+        if spec.mic_deaths_kind == "fatality_stack":
+            _sort_and_label_by_path(ys, _FATALITY_PATH_LABEL)
+        else:  # low_high
+            _set_mie_low_high(ys, per_capita=False)
+    elif measure == M.DEATH_RATE:
+        _set_mie_low_high(ys, per_capita=True)
+    elif measure in (M.N_CONFLICTS, M.CONFLICT_RATE):
+        if cst == CST.BY_SUB_TYPE:
+            _sort_and_label_by_path(ys, _HOSTLEV_PATH_LABEL)
+        elif cst == CST.ONLY_WARS:
+            if ys:
+                ys[0].display = {"name": "Wars"}
+    elif measure == M.PARTICIPANTS and sub_measure == "country_level_data":
+        for ind in ys:
+            ind.display = {"colorScaleNumericBins": BOOL_MAP_BINS}
+
+
+def _set_mie_low_high(ys: list[Indicator], per_capita: bool) -> None:
+    """Apply MIE low/high colors (non-standard). The 2 indicators are stacked
+    in the order the CI-collapse step gave us; we sort high above low so the
+    deaths range plot reads top-down."""
+    def kind(path: str) -> str:
+        # MIE deaths column suffix: `_high__` / `_low__` (with `_per_capita`
+        # inserted before `__hostility_level_all` for rates).
+        if "_high__" in path or "_high_per_capita__" in path:
+            return "high"
+        if "_low__" in path or "_low_per_capita__" in path:
+            return "low"
+        return "other"
+
+    ys.sort(key=lambda ind: 0 if kind(ind.catalogPath) == "high" else 1)
+    for ind in ys:
+        k = kind(ind.catalogPath)
+        if k == "high":
+            ind.display = dict(MIE_HIGH_DISPLAY)
+        elif k == "low":
+            ind.display = dict(MIE_LOW_DISPLAY)
+
+
+def _sort_and_label_by_path(
+    ys: list[Indicator], path_label_order: list[tuple[str, str]]
+) -> None:
+    """Sort `ys` by the position of the first matching catalogPath substring
+    in `path_label_order`, then apply the corresponding display name."""
+    def rank(path: str) -> int:
+        for i, (needle, _) in enumerate(path_label_order):
+            if needle in path:
+                return i
+        return len(path_label_order)
+
+    ys.sort(key=lambda ind: rank(ind.catalogPath))
+    for ind in ys:
+        for needle, label in path_label_order:
+            if needle in ind.catalogPath:
+                ind.display = {"name": label}
+                break
 
 
 def _set_deaths_displays(ys: list[Indicator], spec: SourceSpec, measure: str, ctype: str, cst: str) -> None:
@@ -847,43 +1342,48 @@ def build_source_explorer(spec: SourceSpec, sub_config: dict[str, Any]):
 
     # 1) CI collapse: merge all `_estimate` values into a single "_ci" stack.
     #    Non-CI columns carry `_estimate="best"` too, so a single group_views
-    #    call handles every source — deaths views become 3-indicator CI
-    #    stacks, non-CI views become 1-indicator (degenerate) "stacks". Every
-    #    view ends up at `_estimate="_ci"`, so `drop_dimensions_if_single_choice`
-    #    (default True) auto-drops the now-trivial dim.
+    #    call handles every source — deaths views become CI / range / fatality
+    #    stacks, non-CI views become 1-indicator (degenerate) "stacks".
     #    NOTE: we pass the explicit list of existing choices rather than
     #    omitting `choices` because group_views adds "_ci" to the dim *before*
     #    its replace-pass runs, and an omitted `choices` would then include
     #    "_ci" itself — wiping the new views we just created.
+    #    We pass `drop_dimensions_if_single_choice=False` and drop `_estimate`
+    #    explicitly below so we keep `conflict_type` for MIC sources (where it
+    #    has a single choice but still needs to surface in the combined
+    #    explorer for `combine_collections` to merge cleanly).
     estimate_in_use = list(c.dimension_choices_in_use().get("_estimate", set()))
     c.group_views(
-        groups=[{"dimension": "_estimate", "choices": estimate_in_use, "choice_new_slug": "_ci", "replace": True}]
+        groups=[{"dimension": "_estimate", "choices": estimate_in_use, "choice_new_slug": "_ci", "replace": True}],
+        drop_dimensions_if_single_choice=False,
     )
+    _drop_dim(c, "_estimate")
 
-    # 2) Build by_sub_type stacks (manual — see comment on `_build_by_sub_type_views`).
-    _build_by_sub_type_views(c, spec)
+    # 2-4) Style-specific stacking and helper-slug cleanup.
+    if spec.style == "mic":
+        # MIC sources stack hostility-level helper slugs on `conflict_sub_type`
+        # into a single `by_sub_type` view, then surface `_hostlev_war` as
+        # `only_wars` and drop the rest.
+        _build_mic_post_process(c, spec)
+    else:
+        # UCDP-style: manually build by_sub_type stacks across conflict_type
+        # children, drop helper intrastate views for non-deaths measures, and
+        # consolidate the remaining helper conflict_type slugs into
+        # `intrastate_conflicts`.
+        _build_by_sub_type_views(c, spec)
 
-    # 3) Drop the helper intrastate-variant views for non-deaths measures.
-    #    They only exist as children of the by_sub_type stacks above; the
-    #    legacy explorer doesn't surface them standalone.
-    ct_in_use = c.dimension_choices_in_use().get("conflict_type", set())
-    helpers_in_use = [s for s in INTRASTATE_VARIANT_REMAP if s in ct_in_use]
-    non_deaths_measures = [
-        m for m in (M.N_CONFLICTS, M.CONFLICT_RATE, M.LOCATIONS, M.PARTICIPANTS) if m in spec.measures
-    ]
-    if helpers_in_use and non_deaths_measures:
-        c.drop_views([{"conflict_type": helpers_in_use, "measure": non_deaths_measures}])
+        ct_in_use = c.dimension_choices_in_use().get("conflict_type", set())
+        helpers_in_use = [s for s in INTRASTATE_VARIANT_REMAP if s in ct_in_use]
+        non_deaths_measures = [
+            m for m in (M.N_CONFLICTS, M.CONFLICT_RATE, M.LOCATIONS, M.PARTICIPANTS) if m in spec.measures
+        ]
+        if helpers_in_use and non_deaths_measures:
+            c.drop_views([{"conflict_type": helpers_in_use, "measure": non_deaths_measures}])
 
-    # 4) Consolidate the remaining helper conflict_type slugs (deaths
-    #    only_*_internationalized views) into `intrastate_conflicts`. The
-    #    helper-bearing views differ from canonical intrastate views by
-    #    `conflict_sub_type`, so no coordinate collision occurs.
-    #    `dedup_slug="inherit"` keeps the canonical `intrastate_conflicts`
-    #    choice config that's already on the dim.
-    declared_cts = set(c.get_dimension("conflict_type").choice_slugs)
-    for old_ct, new_ct in INTRASTATE_VARIANT_REMAP.items():
-        if old_ct in declared_cts:
-            c.rename_choice_slug("conflict_type", old_ct, new_ct, dedup_slug="inherit")
+        declared_cts = set(c.get_dimension("conflict_type").choice_slugs)
+        for old_ct, new_ct in INTRASTATE_VARIANT_REMAP.items():
+            if old_ct in declared_cts:
+                c.rename_choice_slug("conflict_type", old_ct, new_ct, dedup_slug="inherit")
 
     # 5) Drop any dim choices no longer referenced by a view, then enforce
     #    canonical ordering on the conflict_type / conflict_sub_type dims.
@@ -1236,14 +1736,71 @@ PRIO_SPEC = SourceSpec(
 )
 
 
+# ---- MIE -----------------------------------------------------------------
+# Interstate-only. Hostility-level split on `conflict_sub_type` instead of
+# the intrastate split UCDP-family sources use. Deaths is a 2-indicator
+# low/high range plot (no center estimate).
+
+MIE_SPEC = SourceSpec(
+    slug="mie",
+    name="Militarized Interstate Events",
+    dataset_path="mie",
+    main_table="mie",
+    country_table="mie_country",
+    measures={
+        M.DEATHS,
+        M.DEATH_RATE,
+        M.N_CONFLICTS,
+        M.CONFLICT_RATE,
+        M.PARTICIPANTS,
+    },
+    style="mic",
+    mic_deaths_kind="low_high",
+    mic_dod_force_url=DOD_MIE.FORCE,
+    mic_dod_war_url=DOD_MIE.WAR,
+)
+
+
+# ---- COW-MID -------------------------------------------------------------
+# Interstate-only. Same hostility-level split as MIE, but uses "disputes"
+# instead of "conflicts" in the source columns. Deaths is an 8-indicator
+# stacked-bar by fatality bucket (no CI; no death_rate).
+
+COW_MID_SPEC = SourceSpec(
+    slug="cow_mid",
+    name="Correlates of War — Militarized Interstate Disputes",
+    dataset_path="cow_mid",
+    main_table="cow_mid",
+    country_table="cow_mid_country",
+    measures={
+        M.DEATHS,
+        M.N_CONFLICTS,
+        M.CONFLICT_RATE,
+        M.PARTICIPANTS,
+    },
+    # COW-MID uses "disputes" rather than "conflicts" in column families.
+    ongoing_conflicts_family="number_ongoing_disputes",
+    new_conflicts_family="number_new_disputes",
+    style="mic",
+    mic_deaths_kind="fatality_stack",
+    mic_dod_force_url=DOD_COW_MID.FORCE,
+    mic_dod_war_url=DOD_COW_MID.WAR,
+)
+
+
 # ===========================================================================
 # Entry point
 # ===========================================================================
 
-# Sources built programmatically. The rest still load from the YAML.
-# TODO: add MIE + COW-MID once they're migrated; the YAML's `views:` section
-# can then be removed entirely.
-PROGRAMMATIC_SPECS: list[SourceSpec] = [UCDP_SPEC, UCDP_PRIO_SPEC, MARS_SPEC, COW_SPEC, PRIO_SPEC]
+PROGRAMMATIC_SPECS: list[SourceSpec] = [
+    UCDP_SPEC,
+    UCDP_PRIO_SPEC,
+    MARS_SPEC,
+    MIE_SPEC,
+    COW_SPEC,
+    COW_MID_SPEC,
+    PRIO_SPEC,
+]
 
 
 def _validate_constants_match_yaml(config: dict[str, Any]) -> None:
@@ -1280,13 +1837,13 @@ def run() -> None:
     yaml_config = paths.load_collection_config()
     _validate_constants_match_yaml(yaml_config)
 
-    # The YAML carries views only for sources not yet migrated (MIE + COW-MID).
-    # It still defines all five dims and the explorer-level config.
+    # The YAML carries dim definitions + explorer-level config only — every
+    # source is built programmatically now.
     yaml_explorer = paths.create_collection(config=yaml_config, explorer=True)
 
     # Per-source sub_config shared by all programmatic specs: same dim
     # definitions as the YAML (minus `data_source`, which combine_collections
-    # re-introduces), same `definitions` block, no views.
+    # re-introduces below), same `definitions` block, no views.
     sub_config = {
         "config": {},
         "definitions": yaml_config.get("definitions", {}),
@@ -1295,32 +1852,14 @@ def run() -> None:
     }
 
     programmatic_subs = [build_source_explorer(spec, sub_config) for spec in PROGRAMMATIC_SPECS]
-    for spec, sub in zip(PROGRAMMATIC_SPECS, programmatic_subs):
-        _attach_data_source_dim(sub, spec, yaml_explorer)
 
     final = combine_collections(
-        collections=[*programmatic_subs, yaml_explorer],
+        collections=programmatic_subs,
         catalog_path=yaml_explorer.catalog_path,
         config={"config": yaml_config.get("config", {})},
+        force_collection_dimension=True,
+        collection_dimension_slug="data_source",
+        collection_dimension_name="Data source",
+        collection_choices_names=[spec.name for spec in PROGRAMMATIC_SPECS],
     )
     final.save(tolerate_extra_indicators=True)
-
-
-def _attach_data_source_dim(sub_explorer, spec: SourceSpec, yaml_explorer) -> None:
-    """Insert a `data_source` dim matching the YAML's definition and tag views.
-
-    Transitional shim: when every source is programmatic this can be deleted
-    and `combine_collections` will introduce the dim itself via
-    `force_collection_dimension=True` + `collection_dimension_slug="data_source"`.
-    """
-    ds_yaml = next(d for d in yaml_explorer.dimensions if d.slug == "data_source")
-    ds_dim = Dimension(
-        slug=ds_yaml.slug,
-        name=ds_yaml.name,
-        description=ds_yaml.description,
-        presentation=deepcopy(ds_yaml.presentation),
-        choices=[DimensionChoice(slug=spec.slug, name=spec.name)],
-    )
-    sub_explorer.dimensions = [ds_dim, *sub_explorer.dimensions]
-    for view in sub_explorer.views:
-        view.dimensions = {"data_source": spec.slug, **view.dimensions}
