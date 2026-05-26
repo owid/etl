@@ -135,7 +135,7 @@ class DOD_COW:
     INTERSTATE = "#dod:interstate-war-cow"
     INTRASTATE = "#dod:intrastate-war-cow"
     EXTRASTATE = "#dod:extrastate-war-cow"
-    NON_STATE = "#dod:non-state-war-cow"
+    NON_STATE = "#dod:nonstate-war-cow"
 
 
 class DOD_MARS:
@@ -145,15 +145,6 @@ class DOD_MARS:
     CIVIL_WAR = "#dod:civil-war-mars"
     NON_CIVIL_WAR = "#dod:non-civil-war-mars"
     CONVENTIONAL_WARS = "#dod:conventional-war-mars"
-
-
-class DOD_PRIO:
-    """PRIO DoD anchor URLs."""
-
-    STATE_BASED = "#dod:state-based-conflict-prio"
-    INTERSTATE = "#dod:interstate-prio"
-    INTRASTATE = "#dod:intrastate-prio"
-    EXTRASYSTEMIC = "#dod:extrasystemic-prio"
 
 
 # Used in every conflict_participants subtitle (override per-source if needed).
@@ -1171,7 +1162,7 @@ COW_SPEC = SourceSpec(
     },
     dod={
         CT.ALL_ARMED: f"[wars]({DOD_COW.WAR})",
-        CT.ALL_STATE_BASED: f"[state-based wars]({DOD_COW.STATE_BASED})",
+        CT.ALL_STATE_BASED: f"[interstate]({DOD_COW.INTERSTATE}) and [intrastate]({DOD_COW.INTRASTATE}) wars",
         CT.INTERSTATE: f"[interstate wars]({DOD_COW.INTERSTATE})",
         CT.INTRASTATE: f"[intrastate wars]({DOD_COW.INTRASTATE})",
         CT.EXTRASTATE: f"[extrastate wars]({DOD_COW.EXTRASTATE})",
@@ -1234,18 +1225,13 @@ PRIO_SPEC = SourceSpec(
         CT.INTRASTATE: {M.N_CONFLICTS, M.CONFLICT_RATE},
     },
     dod={
-        CT.ALL_STATE_BASED: f"[state-based conflicts]({DOD_PRIO.STATE_BASED})",
-        CT.INTERSTATE: f"[interstate conflicts]({DOD_PRIO.INTERSTATE})",
-        CT.INTRASTATE: f"[intrastate conflicts]({DOD_PRIO.INTRASTATE})",
-        CT.EXTRASTATE: f"[extrasystemic conflicts]({DOD_PRIO.EXTRASYSTEMIC})",
+        CT.ALL_STATE_BASED: f"[interstate]({DOD_UCDP.INTERSTATE}), [intrastate]({DOD_UCDP.INTRASTATE}) and [extrasystemic]({DOD_UCDP.EXTRASYSTEMIC}) conflicts",
+        CT.INTERSTATE: f"[interstate conflicts]({DOD_UCDP.INTERSTATE})",
+        CT.INTRASTATE: f"[intrastate conflicts]({DOD_UCDP.INTRASTATE})",
+        CT.EXTRASTATE: f"[extrasystemic conflicts]({DOD_UCDP.EXTRASYSTEMIC})",
     },
     dod_by_sub_type={
-        CT.ALL_STATE_BASED: (
-            f"[interstate]({DOD_PRIO.INTERSTATE}), "
-            f"[intrastate]({DOD_PRIO.INTRASTATE}), and "
-            f"[extrasystemic]({DOD_PRIO.EXTRASYSTEMIC}) conflicts"
-        ),
-        CT.INTRASTATE: f"[non-internationalized and internationalized intrastate conflicts]({DOD_PRIO.INTRASTATE})",
+        CT.INTRASTATE: f"[non-internationalized and internationalized intrastate conflicts]({DOD_UCDP.INTRASTATE})",
     },
 )
 
