@@ -8,7 +8,7 @@ from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import fastjsonschema
 import pandas as pd
@@ -583,6 +583,117 @@ class Collection(MDIMBase):
             if dimension_slugs is not None and dim.slug not in dimension_slugs:
                 continue
             dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences.get(dim.slug, set())]
+
+    def rename_choice_slug(
+        self,
+        dimension_slug: str,
+        old_slug: str,
+        new_slug: str,
+        dedup_slug: Literal["inherit", "overwrite"] | None = None,
+    ) -> None:
+        """Rename a choice slug across views AND the dim's ``choices`` list.
+
+        Use this when a build-time helper slug (e.g. ``_intra_int``) needs to be
+        rewritten to its canonical form before save, or when consolidating
+        multiple slugs into one (provided other dim coords keep the affected
+        views distinct).
+
+        **Hard rule (always enforced)**
+            After the rename, no two views may share the same set of dim
+            coordinates. Duplicate coordinates are a data-integrity violation
+            and cannot be bypassed via ``dedup_slug``.
+
+        **Soft rule (opt-in via ``dedup_slug``)**
+            If ``new_slug`` is already declared on the dim — either in use by
+            views or just sitting in ``dim.choices`` — the call fails by
+            default. Set ``dedup_slug`` to opt in and pick whose choice config
+            survives:
+
+            - ``"inherit"``: keep the existing ``new_slug`` DimensionChoice
+              (its name/description/group). Drop the old-slug entry.
+            - ``"overwrite"``: relabel the existing ``new_slug``
+              DimensionChoice with the config of ``old_slug``. Drop the
+              old-slug entry.
+
+        Args:
+            dimension_slug: The dim whose choice should be renamed. Must exist.
+            old_slug: The current slug. Must be declared on the dim. If no view
+                references it, the call still updates the dim entry (no-op on
+                views).
+            new_slug: The replacement slug.
+            dedup_slug: ``None`` (default — fail if ``new_slug`` is already
+                declared), ``"inherit"``, or ``"overwrite"``. See "Soft rule"
+                above.
+
+        Example:
+            >>> # Consolidate a helper slug into the canonical one
+            >>> c.rename_choice_slug(
+            ...     "conflict_type", "_intra_int", "intrastate_conflicts",
+            ...     dedup_slug="inherit",
+            ... )
+        """
+        dim = self.get_dimension(dimension_slug)
+
+        declared = {ch.slug: ch for ch in dim.choices}
+        if old_slug not in declared:
+            raise ValueError(
+                f"Cannot rename '{old_slug}' on dimension '{dimension_slug}': "
+                f"old slug is not declared on the dim. "
+                f"Declared choices: {sorted(declared)}"
+            )
+
+        if old_slug == new_slug:
+            return
+
+        # Hard rule: simulate the rename and reject any duplicate view
+        # coordinates. Runs first, before any state mutation.
+        seen: dict[tuple, dict[str, str]] = {}
+        for view in self.views:
+            coords = dict(view.dimensions)
+            if coords.get(dimension_slug) == old_slug:
+                coords[dimension_slug] = new_slug
+            key = tuple(sorted(coords.items()))
+            if key in seen:
+                raise ValueError(
+                    f"Cannot rename '{old_slug}' → '{new_slug}' on dimension "
+                    f"'{dimension_slug}': the result would contain duplicate "
+                    f"views with dim coordinates {coords}."
+                )
+            seen[key] = coords
+
+        # Soft rule: `new_slug` already declared on dim (in use or not) →
+        # require explicit `dedup_slug`.
+        if new_slug in declared:
+            if dedup_slug is None:
+                raise ValueError(
+                    f"Cannot rename '{old_slug}' → '{new_slug}' on dimension "
+                    f"'{dimension_slug}': the new slug is already declared on "
+                    f"the dim. Pass `dedup_slug='inherit'` to keep the "
+                    f"existing '{new_slug}' config, or "
+                    f"`dedup_slug='overwrite'` to replace it with the config "
+                    f"of '{old_slug}'."
+                )
+            if dedup_slug not in ("inherit", "overwrite"):
+                raise ValueError(f"`dedup_slug` must be 'inherit' or 'overwrite' (got {dedup_slug!r}).")
+            if dedup_slug == "overwrite":
+                # Copy old's metadata onto the existing new-slug choice,
+                # preserving the new entry's position in dim.choices.
+                old_choice = declared[old_slug]
+                new_choice = declared[new_slug]
+                new_choice.name = old_choice.name
+                new_choice.description = old_choice.description
+                new_choice.group = old_choice.group
+            # Both modes: drop the old-slug entry; the new-slug entry stays.
+            dim.choices = [ch for ch in dim.choices if ch.slug != old_slug]
+        else:
+            # Simple rename: mutate the old choice's slug in place so its
+            # position and metadata carry forward.
+            declared[old_slug].slug = new_slug
+
+        # Rewrite views referencing the old slug.
+        for view in self.views:
+            if view.dimensions.get(dimension_slug) == old_slug:
+                view.dimensions[dimension_slug] = new_slug
 
     @property
     def dimension_slugs(self) -> list[str]:
