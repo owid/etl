@@ -220,9 +220,11 @@ FATALITY_BUCKETS: list[tuple[str, str, str]] = [
 FATALITY_RAW_TO_HELPER: dict[str, str] = {raw: helper for raw, helper, _ in FATALITY_BUCKETS}
 FATALITY_HELPER_TO_LABEL: dict[str, str] = {helper: label for _, helper, label in FATALITY_BUCKETS}
 
-# MIE deaths CI displays (low/high range plot — non-standard colors).
-MIE_LOW_DISPLAY = {"name": "Low estimate", "color": "#00295B"}
-MIE_HIGH_DISPLAY = {"name": "High estimate", "color": "#B13507"}
+# Low/high range-plot displays (used by MARS and MIE — sources whose deaths
+# view carries only low+high, no center). Distinct from `LOW_DISPLAY` /
+# `HIGH_DISPLAY` (grey) which fade out around a colored center estimate.
+RANGE_LOW_DISPLAY = {"name": "Low estimate", "color": "#00295B"}
+RANGE_HIGH_DISPLAY = {"name": "High estimate", "color": "#B13507"}
 
 # Human-readable conflict_type names + short labels used in templates. Specs
 # can override individual entries via `ct_name` / `ct_short` on the spec.
@@ -340,6 +342,9 @@ class SourceSpec:
     # Noun used in deaths titles. PRIO/UCDP say "Deaths"; "Battle deaths" would
     # surface here for any source that adopts the legacy PRIO wording later.
     deaths_noun: str = "Deaths"
+    # Whose deaths the source counts. UCDP / UCDP+PRIO / PRIO count combatants
+    # *and* civilians; MARS and COW count only combatants.
+    deaths_subjects: str = "combatants and civilians"
     # CT slug → DoD-link markdown (e.g. "[interstate conflicts](#dod:interstate-ucdp)").
     dod: dict[str, str] = field(default_factory=dict)
     # CT slug (parent) → combined DoD link used in by_sub_type subtitles.
@@ -577,9 +582,7 @@ def _parse_mic_country_col(spec: SourceSpec, short: str, dims_raw: dict[str, Any
     return None
 
 
-def _mic_count_dim_dict(
-    spec: SourceSpec, measure: str, sub_type: str, sub_measure: str
-) -> dict[str, str] | None:
+def _mic_count_dim_dict(spec: SourceSpec, measure: str, sub_type: str, sub_measure: str) -> dict[str, str] | None:
     """Dim assignment for a non-CI MIC view (count / rate / participants)."""
     if measure not in spec.measures:
         return None
@@ -810,9 +813,7 @@ def _build_mic_post_process(c, spec: SourceSpec) -> None:
         drop_dimensions_if_single_choice=False,
     )
     # 2. Surface the war helper as the canonical `only_wars` view.
-    c.rename_choice_slug(
-        "conflict_sub_type", CST._HOSTLEV_WAR, CST.ONLY_WARS, dedup_slug="inherit"
-    )
+    c.rename_choice_slug("conflict_sub_type", CST._HOSTLEV_WAR, CST.ONLY_WARS, dedup_slug="inherit")
     # 3. Drop the remaining helper hostility-level views — only the
     #    by_sub_type stack and only_wars survive.
     c.drop_views(
@@ -880,7 +881,7 @@ def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str
 
     if cst == CST.BY_SUB_TYPE:
         cfg["title"] = f"{noun} in {name} based on where they occurred"
-        cfg["subtitle"] = _deaths_subtitle(spec.dod_by_sub_type.get(ctype, spec.dod[ctype]), per_capita)
+        cfg["subtitle"] = _deaths_subtitle(spec, spec.dod_by_sub_type.get(ctype, spec.dod[ctype]), per_capita)
         cfg.update(STACKED_CONFIG)
         return
 
@@ -889,6 +890,7 @@ def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str
         intrastate_anchor = _dod_url(spec.dod[CT.INTRASTATE])
         cfg["title"] = f"{noun} in {word} intrastate conflicts"
         cfg["subtitle"] = _deaths_subtitle(
+            spec,
             f"[{word} intrastate conflicts]({intrastate_anchor})",
             per_capita,
         )
@@ -899,7 +901,7 @@ def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str
     # na / all_sub_types — single-indicator or CI-stacked deaths view.
     has_map = (ctype, cst) in spec.deaths_map_views
     cfg["title"] = f"{noun} in {name} based on where they occurred" if has_map else f"{noun} in {name}"
-    cfg["subtitle"] = _deaths_subtitle(spec.dod[ctype], per_capita)
+    cfg["subtitle"] = _deaths_subtitle(spec, spec.dod[ctype], per_capita)
     cfg["note"] = f"'Best' estimates as identified by {spec.ci_estimate_source}."
     if has_map:
         cfg.update(MAP_CONFIG)
@@ -907,14 +909,15 @@ def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str
         cfg["selectedFacetStrategy"] = "entity"
 
 
-def _deaths_subtitle(dod_link: str, per_capita: bool) -> str:
+def _deaths_subtitle(spec: SourceSpec, dod_link: str, per_capita: bool) -> str:
     """Build the deaths/death-rate subtitle from a DoD-link fragment."""
+    subjects = spec.deaths_subjects
     if per_capita:
         return (
-            "Deaths of combatants and civilians due to fighting, per 100,000 people. "
+            f"Deaths of {subjects} due to fighting, per 100,000 people. "
             f"Included are {dod_link} that were ongoing that year."
         )
-    return f"Included are deaths of combatants and civilians due to fighting in {dod_link} that were ongoing that year."
+    return f"Included are deaths of {subjects} due to fighting in {dod_link} that were ongoing that year."
 
 
 def _count_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str, cst: str, sub_measure: str) -> None:
@@ -1010,9 +1013,7 @@ def _locations_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_measu
 # ---------------------------------------------------------------------------
 
 
-def _set_view_config_mic(
-    cfg: dict[str, Any], spec: SourceSpec, measure: str, cst: str, sub_measure: str
-) -> None:
+def _set_view_config_mic(cfg: dict[str, Any], spec: SourceSpec, measure: str, cst: str, sub_measure: str) -> None:
     """Dispatch MIC view-config helpers by measure."""
     if measure in (M.DEATHS, M.DEATH_RATE):
         _mic_deaths_text(cfg, spec, measure)
@@ -1038,9 +1039,7 @@ def _mic_deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str) -> Non
         cfg["selectedFacetStrategy"] = "entity"
 
 
-def _mic_count_text(
-    cfg: dict[str, Any], spec: SourceSpec, measure: str, cst: str, sub_measure: str
-) -> None:
+def _mic_count_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, cst: str, sub_measure: str) -> None:
     rate = measure == M.CONFLICT_RATE
     is_new = sub_measure == "only_new_conflicts"
     noun = "wars" if cst == CST.ONLY_WARS else "conflicts"
@@ -1222,6 +1221,7 @@ def _set_mie_low_high(ys: list[Indicator], per_capita: bool) -> None:
     """Apply MIE low/high colors (non-standard). The 2 indicators are stacked
     in the order the CI-collapse step gave us; we sort high above low so the
     deaths range plot reads top-down."""
+
     def kind(path: str) -> str:
         # MIE deaths column suffix: `_high__` / `_low__` (with `_per_capita`
         # inserted before `__hostility_level_all` for rates).
@@ -1235,16 +1235,15 @@ def _set_mie_low_high(ys: list[Indicator], per_capita: bool) -> None:
     for ind in ys:
         k = kind(ind.catalogPath)
         if k == "high":
-            ind.display = dict(MIE_HIGH_DISPLAY)
+            ind.display = dict(RANGE_HIGH_DISPLAY)
         elif k == "low":
-            ind.display = dict(MIE_LOW_DISPLAY)
+            ind.display = dict(RANGE_LOW_DISPLAY)
 
 
-def _sort_and_label_by_path(
-    ys: list[Indicator], path_label_order: list[tuple[str, str]]
-) -> None:
+def _sort_and_label_by_path(ys: list[Indicator], path_label_order: list[tuple[str, str]]) -> None:
     """Sort `ys` by the position of the first matching catalogPath substring
     in `path_label_order`, then apply the corresponding display name."""
+
     def rank(path: str) -> int:
         for i, (needle, _) in enumerate(path_label_order):
             if needle in path:
@@ -1262,8 +1261,10 @@ def _sort_and_label_by_path(
 def _set_deaths_displays(ys: list[Indicator], spec: SourceSpec, measure: str, ctype: str, cst: str) -> None:
     """Set displays on a deaths / death_rate view.
 
-    CI-stacked views (has _low_/_high_ variants) → best/low/high labels.
-    Single-indicator views (e.g. COW) → CT short label, no "Best estimate" tag.
+    Three shapes:
+        - CI with center (UCDP-style: best / low / high) → red center + grey CI.
+        - Range only (MARS-style: low / high, no center) → red high + blue low.
+        - Single indicator (COW) → CT short label, no "Best estimate" tag.
     """
     has_ci_variants = any("_low_" in i.catalogPath or "_high_" in i.catalogPath for i in ys)
     if not has_ci_variants:
@@ -1274,11 +1275,12 @@ def _set_deaths_displays(ys: list[Indicator], spec: SourceSpec, measure: str, ct
 
     per_capita = measure == M.DEATH_RATE
     with_cs = (ctype, cst) in spec.deaths_map_with_cs
+    has_center = any("_low_" not in i.catalogPath and "_high_" not in i.catalogPath for i in ys)
     for ind in ys:
         if "_low_" in ind.catalogPath:
-            ind.display = dict(LOW_DISPLAY)
+            ind.display = dict(LOW_DISPLAY if has_center else RANGE_LOW_DISPLAY)
         elif "_high_" in ind.catalogPath:
-            ind.display = dict(HIGH_DISPLAY)
+            ind.display = dict(HIGH_DISPLAY if has_center else RANGE_HIGH_DISPLAY)
         else:
             disp = dict(BEST_DISPLAY)
             if with_cs:
@@ -1564,6 +1566,7 @@ MARS_SPEC = SourceSpec(
     dataset_path="mars",
     main_table="mars",
     country_table="mars_country",
+    deaths_subjects="combatants",
     measures={
         M.DEATHS,
         M.DEATH_RATE,
@@ -1607,6 +1610,7 @@ COW_SPEC = SourceSpec(
     main_table="cow",
     country_table="cow_country",
     locations_table="cow_locations",
+    deaths_subjects="combatants",
     measures={
         M.DEATHS,
         M.DEATH_RATE,
