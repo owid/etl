@@ -1,25 +1,14 @@
-definitions:
-  common_views:
-    - config:
-        yAxisMin: 0
-        hideAnnotationFieldsInTitle: true
-        type: LineChart DiscreteBar
-        entityType: country
-        relatedQuestionText: How do different approaches measure armed conflicts and their deaths?
-        relatedQuestionUrl: https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths
 config:
   explorerTitle: Conflict
   explorerSubtitle: Explore the world's conflicts through their deaths, number, and locations.
   isPublished: true
   selection:
     - World
-  subNavId: explorers
-  subNavCurrentId: conflict
   entityType: region
   hideAnnotationFieldsInTitle: true
   yAxisMin: 0
   tab: map
-  hasMapTab: true
+
 dimensions:
   - slug: conflict_type
     name: "Conflict type"

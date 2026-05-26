@@ -927,6 +927,15 @@ def _set_view_config(view, spec: SourceSpec) -> None:
         elif measure == M.LOCATIONS:
             _locations_text(cfg, spec, ctype, sub_measure)
 
+    # Pin the map column to the best estimate on CI-stacked deaths / death_rate
+    # maps. Without this, grapher picks the mapped column from the (unstable)
+    # indicator order and may land on the low/high estimate — which also drops
+    # the colorScale, since only the best indicator carries it.
+    if cfg.get("hasMapTab") and measure in (M.DEATHS, M.DEATH_RATE) and view.indicators and view.indicators.y:
+        best = _pick_best_or_low(view.indicators.y)
+        if best is not None:
+            cfg.setdefault("map", {})["columnSlug"] = best.catalogPath
+
     view.config = cfg
 
 
@@ -1513,6 +1522,10 @@ def build_source_explorer(spec: SourceSpec, sub_config: dict[str, Any]):
     #    has a single choice but still needs to surface in the combined
     #    explorer for `combine_collections` to merge cleanly).
     estimate_in_use = list(c.dimension_choices_in_use().get("_estimate", set()))
+    if "best" in estimate_in_use:
+        estimate_in_use = ["best"] + [
+            e for e in estimate_in_use if e != "best"
+        ]  # "best" is the default, not a real choice
     c.group_views(
         groups=[{"dimension": "_estimate", "choices": estimate_in_use, "choice_new_slug": "_ci", "replace": True}],
         drop_dimensions_if_single_choice=False,
